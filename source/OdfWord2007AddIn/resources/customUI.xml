@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui"> 
+   <ribbon> 
+      <fileMenu>
+		<menu id="OdfMenu" getLabel="GetLabel" insertAfterMso="FileSaveAsMenu" itemSize="large" getImage="GetImage">
+			<button id="OdfImport" imageMso="Open" getLabel="GetLabel" onAction="ImportODF" getDescription="GetDescription"/>
+			<button id="OdfExport" imageMso="Save" getLabel="GetLabel" onAction="ExportODF" getDescription="GetDescription" enabled="false"/>
+		</menu>
+      </fileMenu> 
+   </ribbon> 
+</customUI>

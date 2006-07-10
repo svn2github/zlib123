@@ -1,0 +1,142 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>CleverAge.OdfConverter.OdfConverterTest</RootNamespace>
+    <AssemblyName>OdfConverterTest</AssemblyName>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{289C4B72-B929-4E3D-808F-F622E275AC70}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <Optimize>False</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>Full</DebugType>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <Optimize>True</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <DebugSymbols>False</DebugSymbols>
+    <DebugType>None</DebugType>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="OoxValidator.cs" />
+    <EmbeddedResource Include="resources\ooxschemas\opc-contenttypes.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\opc-coreproperties.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\opc-relationships.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dc.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dcmitype.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dcterms.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-audiovideo.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-basestylesheet.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-basetypes.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-chart.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-chartDrawing.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-compat.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramcolortransform.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramdatamodel.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramdefinition.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramelementpropertyset.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramlayoutvariables.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramstyledefinition.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramtypes.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-docproperties.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-graphicalobject.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-graphicalobjectanimation.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-graphicalobjectformat.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-gvml.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-lockedcanvas.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-picture.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dcamera.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dlight.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dscene.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dsceneplane.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dstyles.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapeeffects.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapegeometry.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapelineproperties.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapemisc.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapeproperties.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapestyle.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-spreadsheetdrawing.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-styledefaults.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-stylesheet.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-table.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-tablestyle.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-text.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-textbullet.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-textchar.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-textpara.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-textrun.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-wordprocessingdrawing.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-animationinfo.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-base.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-comments.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-ole.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-presentation.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-presentationproperties.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-ptags.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-slide.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-slidesyncinfo.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\pml-viewproperties.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-activex.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-customxmlprops.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiescustom.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiesextended.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiesvectortypes.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-math.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-relationships.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-schemalibrary.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-autofilter.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-basictypes.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-calcchain.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-comments.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-extconns.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-metadata.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-pivot.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-pivotshared.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-qsi.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-sheet.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-shrrev.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-shrusr.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-singlecells.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-sst.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-styles.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-supbook.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-table.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-voldeps.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-workbook.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-xmlmaps.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\vml-officedrawing.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\vml-wordprocessingdrawing.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\vml.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\wml.xsd" />
+    <Compile Include="OdfConverterTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="README.TXT">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
+      <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
+      <Name>OdfZipUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OdfConverterLib\OdfConverterLib.csproj">
+      <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
+      <Name>OdfConverterLib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="resources\tests\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
+</Project>

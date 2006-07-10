@@ -1,0 +1,12 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartWorkingDirectory>D:\apps\Microsoft Visual Studio 8\Common7\IDE\</StartWorkingDirectory>
+    <StartProgram>D:\apps\Microsoft Visual Studio 8\Common7\IDE\devenv.exe</StartProgram>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <StartWorkingDirectory>D:\apps\Microsoft Visual Studio 8\Common7\IDE\</StartWorkingDirectory>
+    <StartProgram>D:\apps\Microsoft Visual Studio 8\Common7\IDE\devenv.exe</StartProgram>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+</Project>
