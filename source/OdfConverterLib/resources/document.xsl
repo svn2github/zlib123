@@ -427,7 +427,7 @@
 	</xsl:template>
 	
 
-	<!-- Extra spaces management from J. David Heisenberg -->
+	<!-- Extra spaces management from J. David Eisenberg -->
 	<xsl:variable name="spaces" xml:space="preserve">                                       </xsl:variable>
 	
 	<xsl:template name="extra-spaces">
