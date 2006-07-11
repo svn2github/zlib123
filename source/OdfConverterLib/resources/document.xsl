@@ -426,6 +426,10 @@
 		<w:r><w:br/><w:t/></w:r>
 	</xsl:template>
 	
+	<xsl:template match="text:line-break" mode="text">
+		<w:br/>
+	</xsl:template>
+
 
 	<!-- Extra spaces management from J. David Eisenberg -->
 	<xsl:variable name="spaces" xml:space="preserve">                                       </xsl:variable>
