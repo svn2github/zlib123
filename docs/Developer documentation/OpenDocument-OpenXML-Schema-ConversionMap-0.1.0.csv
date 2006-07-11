@@ -377,7 +377,9 @@ Common Content;;;;;;;
 Styles;;;;;;;
 ;Style Element;;;;;;
 ;;Style Mappings;;;;;
-;Default Styles;;;;;;
+;Default Styles;;;0.2;Complete;"office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties is translated to w:docDefaults/w:rPrDefault.
+office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties translated to w:docDefaults/w:pPrDefault.
+";
 ;Page Layout;;;;;;
 ;;Header and Footer Styles;;;;;
 ;Master Pages;;;;;;
@@ -524,8 +526,8 @@ If fo:font-size is expressed in percentage of a parent font-size, we climb up th
 ;;Font Style;;;;;
 ;;Font Relief;;;;;
 ;;Text Shadow;;;;;
-;;Underlining Type;;;;;
-;;Underlining Style;;0.1;Partial;"style:style/@style:text-underline-style used in w:styles/w:style/w:rPr/w:u/@w:val
+;;Underlining Type;;0.2;Completed;ODF 'double' value only makes sense for OOX 'double' and 'wavyDouble'. ;The translation might be lossy, because underline feature is richer in ODF than in OOX
+;;Underlining Style;;0.2;Completed;"style:style/@style:text-underline-style used in w:styles/w:style/w:rPr/w:u/@w:val
 solid -> single
 dotted -> dotted
 dash -> dash
@@ -533,8 +535,8 @@ long-dash -> dashLong
 dot-dash -> dotDash
 dot-dot-dash -> dotDotDash
 wave -> wave
-otherwise 'single' is used.";
-;;Underling Width;;;;;
+otherwise 'single' is used.";The translation might be lossy, because underline feature is richer in ODF than in OOX
+;;Underling Width;;0.2;Completed;ODF 'thick' or 'bold' values produce OOX *Heavy* underline style when it exists.  ;The translation might be lossy, because underline feature is richer in ODF than in OOX
 ;;Underline Color;;0.1;Completed;"style:style/@style:text-underline-color converted to w:styles/w:style/w:rPr/w:u/@w:color
 'font-color' is converted to 'auto'
 otherwise RGB values are parsed. ";
@@ -582,10 +584,10 @@ style:tab-stop/@style:type converted to w:tab/@w:val. When @style:type is not pr
 ;;Maximum Hyphens;;;;;
 ;;Drop Caps;;;;;
 ;;Register True;;;;;
-;;Left and Right Margins;;0.1;Completed;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
-respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).";
+;;Left and Right Margins;;0.1;Completed;The translation might be lossy, because underline feature is richer in ODF than in OOX;
 ;;Text Indent;;0.1;Completed;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
-respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).";
+respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).
+";
 ;;Automatic Text Indent;;;;;
 ;;Top and Bottom Margins;;0.1;Completed;"style:paragraph-properties/@fo:margin-top converted to w:styles/w:style/w:pPr/w:spacing/@w:before
 style:paragraph-properties/@fo:margin-right converted to w:styles/w:style/w:pPr/w:spacing/@w:after";
