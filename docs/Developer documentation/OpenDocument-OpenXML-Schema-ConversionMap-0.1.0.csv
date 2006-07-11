@@ -86,7 +86,7 @@ Paragraph Elements Content;;;;;;;
 ;;White-space Characters;;0.1;Completed;"Extra space characters text:c elements are injected into w:t elements by looking at the 
 text:p or text:span following siblings
 Tab character text:tab is translated to a run including a tabulation <w:r><w:tab/></w:r>
-Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";
+Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r> in paragraph mode or to <w:br/> in text mode";
 ;;Soft Hyphens, Hyphens, and Non-breaking Blanks;;;;;
 ;;Attributed Text;;;;;
 ;;Hyperlinks;;0.1;Completed;text:a is converted to w:hyperlink where attribute r:id is the result of the generate-id() function;
