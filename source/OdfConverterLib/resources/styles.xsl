@@ -338,19 +338,61 @@
 				</w:color>
 			</xsl:if>
 			
-			<xsl:if test="@style:text-underline-style and (@style:text-underline-style != 'none')">
+			<xsl:if test="@style:text-underline-style != 'none' ">
 				<w:u>
-					<!-- TODO : handle  @style:text-underline-width modifier -->
 					<xsl:attribute name="w:val">
 						<xsl:choose>
-							<xsl:when test="@style:text-underline-style = 'solid'">single</xsl:when>
-							<xsl:when test="@style:text-underline-style = 'dotted'">dotted</xsl:when>
-							<xsl:when test="@style:text-underline-style = 'dash' ">dash</xsl:when>
-							<xsl:when test="@style:text-underline-style = 'long-dash'">dashLong</xsl:when>
-							<xsl:when test="@style:text-underline-style = 'dot-dash' ">dotDash</xsl:when>
-							<xsl:when test="@style:text-underline-style = 'dot-dot-dash' ">dotDotDash</xsl:when>
-							<xsl:when test="@style:text-underline-style = 'wave' ">wave</xsl:when>
-							<xsl:otherwise>single</xsl:otherwise> <!-- TODO : implement all the different underline-styles -->
+							<xsl:when test="@style:text-underline-style = 'dotted'">
+								<xsl:choose>
+									<xsl:when test="@style:text-underline-width = 'thick' ">dottedHeavy</xsl:when>
+									<xsl:when test="@style:text-underline-width = 'bold' ">dottedHeavy</xsl:when>
+									<xsl:otherwise>dotted</xsl:otherwise>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:when test="@style:text-underline-style = 'dash' ">
+								<xsl:choose>
+									<xsl:when test="@style:text-underline-width = 'thick' ">dashedHeavy</xsl:when>
+									<xsl:when test="@style:text-underline-width = 'bold' ">dashedHeavy</xsl:when>
+									<xsl:otherwise>dash</xsl:otherwise>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:when test="@style:text-underline-style = 'long-dash'">
+								<xsl:choose>
+									<xsl:when test="@style:text-underline-width = 'thick' ">dashLongHeavy</xsl:when>
+									<xsl:when test="@style:text-underline-width = 'bold' ">dashLongHeavy</xsl:when>
+									<xsl:otherwise>dashLong</xsl:otherwise>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:when test="@style:text-underline-style = 'dot-dash' ">
+								<xsl:choose>
+									<xsl:when test="@style:text-underline-width = 'thick' ">dashDotHeavy</xsl:when>
+									<xsl:when test="@style:text-underline-width = 'bold' ">dashDotHeavy</xsl:when>
+									<xsl:otherwise>dotDash</xsl:otherwise>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:when test="@style:text-underline-style = 'dot-dot-dash' ">
+								<xsl:choose>
+									<xsl:when test="@style:text-underline-width = 'thick' ">dashDotDotHeavy</xsl:when>
+									<xsl:when test="@style:text-underline-width = 'bold' ">dashDotDotHeavy</xsl:when>
+									<xsl:otherwise>dotDotDash</xsl:otherwise>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:when test="@style:text-underline-style = 'wave' ">
+								<xsl:choose>
+									<xsl:when test="@style:text-underline-type = 'double' ">wavyDouble</xsl:when>
+									<xsl:when test="@style:text-underline-width = 'thick' ">wavyHeavy</xsl:when>
+									<xsl:when test="@style:text-underline-width = 'bold' ">wavyHeavy</xsl:when>
+									<xsl:otherwise>wave</xsl:otherwise>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:choose>
+									<xsl:when test="@style:text-underline-type = 'double' ">double</xsl:when>
+									<xsl:when test="@style:text-underline-width = 'thick' ">thick</xsl:when>
+									<xsl:when test="@style:text-underline-width = 'bold' ">thick</xsl:when>
+									<xsl:otherwise>single</xsl:otherwise>
+								</xsl:choose>
+							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute>
 					<xsl:if test="@style:text-underline-color">
