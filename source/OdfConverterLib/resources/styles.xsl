@@ -40,15 +40,22 @@
 	
 	<xsl:template name="styles">
 		<w:styles>
+			<w:docDefaults>
+				<!-- Default text properties -->
+				<xsl:variable name="paragraphDefaultStyle" select="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']"/>
+				<w:rPrDefault>
+					<xsl:apply-templates select="$paragraphDefaultStyle/style:text-properties" mode="styles"/>
+				</w:rPrDefault>
+				<!-- Default paragraph properties -->
+				<w:pPrDefault>
+					<xsl:apply-templates select="$paragraphDefaultStyle/style:paragraph-properties" mode="styles"/>
+				</w:pPrDefault>	
+			</w:docDefaults>
 			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles" mode="styles"/>
 			<xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles" mode="styles"/>
 		</w:styles>
 	</xsl:template>
 	
-	
-	<xsl:template match="style:default-style" mode="styles">
-		<!-- TODO: deal with default styles -->
-	</xsl:template>
 	
 	
 	<xsl:template match="style:style" mode="styles">
@@ -112,8 +119,10 @@
 		</w:style>
 	</xsl:template>
 	
+	<xsl:template match="style:default-style" mode="styles">
+	</xsl:template>
 	
-	<xsl:template match="style:paragraph-properties[parent::style:style]" mode="styles">
+	<xsl:template match="style:paragraph-properties[parent::style:style  or parent::style:default-style]" mode="styles">
 		<w:pPr>
 			<!-- background color -->
 			<xsl:if test="@fo:background-color and (@fo:background-color != 'transparent')">
@@ -249,7 +258,7 @@
 		</w:pPr>
 	</xsl:template>
 	
-	<xsl:template match="style:text-properties[parent::style:style]" mode="styles">
+	<xsl:template match="style:text-properties[parent::style:style  or parent::style:default-style]" mode="styles">
 		<w:rPr>
 		
 			<xsl:if test="@fo:font-size">
