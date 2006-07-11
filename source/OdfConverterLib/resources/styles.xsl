@@ -437,7 +437,7 @@
 	<xsl:template name="computeSize">
 		<xsl:param name="node"/>
 		<xsl:if test="contains($node/@fo:font-size, 'pt')">
-			<xsl:value-of select="number(substring-before($node/@fo:font-size, 'pt')) * 2"/>
+			<xsl:value-of select="round(number(substring-before($node/@fo:font-size, 'pt')) * 2)"/>
 		</xsl:if>
 		<xsl:if test="contains($node/@fo:font-size, '%')">
 			<xsl:variable name="parentStyleName" select="$node/../@style:parent-style-name"/>
