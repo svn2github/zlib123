@@ -376,7 +376,7 @@ Common Content;;;;;;;
 ;;Declaring DDE Connections for Tables;;;;;
 Styles;;;;;;;
 ;Style Element;;;;;;
-;;Style Mappings;;;;;
+;;Style Mappings;;0.2;Complete;;
 ;Default Styles;;;0.2;Complete;"office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties is translated to w:docDefaults/w:rPrDefault.
 office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties translated to w:docDefaults/w:pPrDefault.
 ";

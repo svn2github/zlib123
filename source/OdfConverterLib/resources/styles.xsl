@@ -59,8 +59,8 @@
 	
 	
 	<xsl:template match="style:style" mode="styles">
-		<w:style  w:styleId="{@style:name}" >
-			
+		<w:style  w:styleId="{@style:name}" w:customStyle="1">
+		
 			<xsl:choose>
 				<xsl:when test="@style:family = 'text' ">
 					<xsl:attribute name="w:type">character</xsl:attribute>
@@ -101,9 +101,16 @@
 			</xsl:choose>
 			
 			<!-- Nested elements-->
+
 			<xsl:if test="@style:display-name">
 				<w:name w:val="{@style:display-name}"/>
 			</xsl:if>
+			
+			<xsl:if test="@style:name">
+				<w:name w:val="{@style:name}"/>
+			</xsl:if>
+			
+			<w:qFormat/>
 			
 			<xsl:if test="@style:parent-style-name">
 				<w:basedOn w:val="{@style:parent-style-name}" />
@@ -113,7 +120,7 @@
 			</xsl:if>
 			<xsl:if test="name(parent::*) = 'office:automatic-styles'">
 				<!--w:semiHidden/-->
-				<w:hidden/>
+				<!--w:hidden/-->
 			</xsl:if>
 			<xsl:apply-templates mode="styles"/>
 		</w:style>
