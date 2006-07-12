@@ -100,17 +100,28 @@
 				</xsl:otherwise>
 			</xsl:choose>
 			
+			<xsl:choose>
+				<xsl:when test="@style:name">
+					<w:name w:val="{@style:name}"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:if test="@style:display-name">
+						<w:name w:val="{@style:display-name}"/>
+					</xsl:if>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 			<!-- Nested elements-->
 
-			<xsl:if test="@style:display-name">
+			<!--xsl:if test="@style:display-name">
 				<w:name w:val="{@style:display-name}"/>
 			</xsl:if>
 			
 			<xsl:if test="@style:name">
 				<w:name w:val="{@style:name}"/>
-			</xsl:if>
+			</xsl:if-->
 			
-			<w:qFormat/>
+			
 			
 			<xsl:if test="@style:parent-style-name">
 				<w:basedOn w:val="{@style:parent-style-name}" />
@@ -118,6 +129,7 @@
 			<xsl:if test="@style:next-style-name">
 				<w:next w:val="{@style:next-style-name}" />
 			</xsl:if>
+			<w:qFormat/>
 			<xsl:if test="name(parent::*) = 'office:automatic-styles'">
 				<!--w:semiHidden/-->
 				<!--w:hidden/-->
