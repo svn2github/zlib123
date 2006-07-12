@@ -323,7 +323,14 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</w:tcBorders>
-				
+
+				<xsl:choose>
+					<xsl:when test="$cellProp[@fo:background-color]">
+						<xsl:variable name="fill" select="$cellProp/@fo:background-color"/>
+						<w:shd w:val="clear" w:color="auto" w:fill="{substring-after($fill, '#')}" />
+					</xsl:when>
+				</xsl:choose>
+
 				<w:tcMar>
 					<xsl:choose>
 						<xsl:when test="$cellProp[@fo:padding and @fo:padding != 'none']">
