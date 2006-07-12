@@ -450,7 +450,8 @@
 			<xsl:variable name="parentStyleName" select="$node/../@style:parent-style-name"/>
 			<xsl:variable name="value">
 				<xsl:call-template name="computeSize">
-					<xsl:with-param name="node" select="$node/../../style:style[@style:name = $parentStyleName]/style:properties[last()]"/>
+					<!-- should we look for @style:name in styles.xml, otherwise in content.xml ? -->
+					<xsl:with-param name="node" select="/office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:text-properties"/>
 				</xsl:call-template>
 			</xsl:variable>
 			<xsl:choose>
