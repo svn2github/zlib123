@@ -312,6 +312,9 @@
 					<xsl:when test="@fo:font-style = 'none'">
 						<w:i w:val="off"/>
 					</xsl:when>
+					<xsl:otherwise>
+						<w:i w:val="off"/>
+					</xsl:otherwise>
 					<!-- It could be also oblique in fo DTD, but it is not possible to set it via Ooo interface -->
 				</xsl:choose>
 			</xsl:if>
