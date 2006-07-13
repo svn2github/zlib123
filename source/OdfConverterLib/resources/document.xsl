@@ -249,6 +249,9 @@
 	<xsl:template match="table:table-row|table:table-header-row">
 		<w:tr>
 			<w:trPr>
+				<xsl:if test="name(parent::*) = 'table:table-header-rows'">
+					<w:tblHeader/>
+				</xsl:if>
 				<!-- row styles -->
 			</w:trPr>
 			<xsl:apply-templates select="table:table-cell"/>
