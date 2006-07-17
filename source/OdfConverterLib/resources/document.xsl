@@ -282,7 +282,7 @@
 							<!-- fo:border = "0.002cm solid #000000" -->
 							<xsl:variable name="border-color" select="substring-after($border, '#')"/>
 							<xsl:variable name="border-size">
-								<xsl:call-template name="twips-measure">
+								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length" select="substring-before($border,' ')"/>
 								</xsl:call-template>
 							</xsl:variable>
@@ -296,7 +296,7 @@
 								<xsl:variable name="border" select="$cellProp/@fo:border-top"/>
 								<w:top w:val="single" w:color="{substring-after($border, '#')}">
 									<xsl:attribute name="w:sz">
-										<xsl:call-template name="twips-measure">
+										<xsl:call-template name="eightspoint-measure">
 											<xsl:with-param name="length" select="substring-before($border, ' ')"/>
 										</xsl:call-template>
 									</xsl:attribute>
@@ -306,7 +306,7 @@
 								<xsl:variable name="border" select="$cellProp/@fo:border-left"/>
 								<w:left w:val="single" w:color="{substring-after($border, '#')}">
 									<xsl:attribute name="w:sz">
-										<xsl:call-template name="twips-measure">
+										<xsl:call-template name="eightspoint-measure">
 											<xsl:with-param name="length" select="substring-before($border, ' ')"/>
 										</xsl:call-template>
 									</xsl:attribute>
@@ -316,7 +316,7 @@
 								<xsl:variable name="border" select="$cellProp/@fo:border-bottom"/>
 								<w:bottom w:val="single" w:color="{substring-after($border, '#')}">
 									<xsl:attribute name="w:sz">
-										<xsl:call-template name="twips-measure">
+										<xsl:call-template name="eightspoint-measure">
 											<xsl:with-param name="length" select="substring-before($border, ' ')"/>
 										</xsl:call-template>
 									</xsl:attribute>
@@ -326,7 +326,7 @@
 								<xsl:variable name="border" select="$cellProp/@fo:border-right"/>
 								<w:right w:val="single" w:color="{substring-after($border, '#')}">
 									<xsl:attribute name="w:sz">
-										<xsl:call-template name="twips-measure">
+										<xsl:call-template name="eightspoint-measure">
 											<xsl:with-param name="length" select="substring-before($border, ' ')"/>
 										</xsl:call-template>
 									</xsl:attribute>
