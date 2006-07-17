@@ -95,6 +95,15 @@
 				<w:p>
 					<w:pPr>
 						<w:pStyle w:val="{@text:style-name}"/>
+						<xsl:variable name="style" select="@text:style-name"/>
+						<xsl:for-each select="/office:document-content/office:automatic-styles/style:style">
+							<xsl:if test="@style:name = $style">
+								<xsl:if test="style:paragraph-properties/@fo:line-height ">
+									<xsl:variable name="space" select="round(number(substring-before(style:paragraph-properties/@fo:line-height, '%')) * 24 div 10)"/>
+									<w:spacing w:line="{$space}" w:lineRule="auto"/>
+								</xsl:if>
+							</xsl:if>
+						</xsl:for-each>
 					</w:pPr>
 					<xsl:apply-templates mode="paragraph"/>
 				</w:p>		
@@ -417,6 +426,22 @@
 		<w:r>
 			<w:rPr>
 				<w:rStyle w:val="{@text:style-name}"/>
+				<xsl:variable name="style" select="@text:style-name"/>
+				<xsl:for-each select="/office:document-content/office:automatic-styles/style:style">
+					<xsl:if test="@style:name = $style">
+						<xsl:if test="style:text-properties/@style:text-position">
+							<xsl:variable name="pos" select="substring-before(style:text-properties/@style:text-position, ' ')"/>
+							<xsl:choose>
+								<xsl:when test="$pos = 'sub'">
+									<w:vertAlign w:val="subscript"/>
+								</xsl:when>
+								<xsl:when test="$pos = 'super'">
+									<w:vertAlign w:val="superscript"/>
+								</xsl:when>
+							</xsl:choose>
+						</xsl:if>
+					</xsl:if>
+				</xsl:for-each>
 			</w:rPr>
 			<xsl:apply-templates mode="text"/>
 		</w:r>
