@@ -341,12 +341,65 @@
 					</xsl:when>
 				</xsl:choose>
 			</xsl:if>
+			<xsl:if test="@fo:font-variant">
+				<xsl:choose>
+					<xsl:when test="@fo:font-variant = 'small-caps'">
+						<w:smallCaps w:val="on" />
+					</xsl:when>
+					<xsl:when test="@fo:font-weight = 'normal'">
+						<w:smallCaps w:val="off" />
+					</xsl:when>
+				</xsl:choose>
+			</xsl:if>
+			<xsl:if test="@fo:text-transform">
+				<xsl:choose>
+					<xsl:when test="@fo:text-transform = 'uppercase'">
+						<w:caps w:val="on" />
+					</xsl:when>
+					<xsl:when test="@fo:text-transform = 'none'">
+						<w:caps w:val="off" />
+					</xsl:when>
+					<!-- It could be also lowercase or capitalize in fo DTD, but it is not possible to set it via word 2007 interface -->
+				</xsl:choose>
+			</xsl:if>
 			<xsl:if test="@fo:color">
 				<w:color>
 					<xsl:attribute name="w:val"><xsl:value-of select="substring(@fo:color, 2, string-length(@fo:color) -1)"/></xsl:attribute>
 				</w:color>
 			</xsl:if>
-			
+			<xsl:if test="@style:text-outline">
+				<xsl:choose>
+					<xsl:when test="@style:text-outline = 'true'">
+						<w:outline w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@style:text-outline = 'false'">
+						<w:outline w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:if>
+			<xsl:if test="@style:text-line-through-style != 'none'">
+				<xsl:choose>
+					<xsl:when test="@style:text-line-through-type = 'double'">
+						<w:dstrike w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@style:text-line-through-type = 'none'">
+						<w:strike w:val="off"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:strike w:val="on"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:if>
+			<xsl:if test="@style:text-position">
+				<xsl:choose>
+					<xsl:when test="substring(@style:text-position, 1, 3) = 'sub'">
+						<w:vertAlign w:val="subscript"/>
+					</xsl:when>
+					<xsl:when test="substring(@style:text-position, 1, 5) = 'super'">
+						 <w:vertAlign w:val="superscript"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:if>
 			<xsl:if test="@style:text-underline-style != 'none' ">
 				<w:u>
 					<xsl:attribute name="w:val">
