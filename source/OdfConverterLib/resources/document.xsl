@@ -49,7 +49,62 @@
 			<xsl:apply-templates select="document('content.xml')/office:document-content"/>
 		</w:document>
 	</xsl:template>
-
+	
+	<xsl:template name="subtable">
+		<xsl:param name="node"/>
+		<xsl:for-each select="$node/table:table-cell">
+			<xsl:call-template name="table-cell"/>
+		</xsl:for-each>
+	</xsl:template>
+	
+	<xsl:template name="merged-rows">
+		<xsl:param name="i" select="0"/>
+		<xsl:param name="iterator"/>
+		<xsl:variable name="test">
+			<xsl:if test="$i > 0">
+				<xsl:text>true</xsl:text>
+			</xsl:if>
+		</xsl:variable>
+		<xsl:if test="$test='true'">
+			<w:tr>
+				<xsl:for-each select="table:table-cell">
+					<xsl:choose>
+						<xsl:when test="table:table[@table:is-sub-table='true']">
+							<!-- table to process -->
+							<xsl:call-template name="subtable">
+								<xsl:with-param name="node" select="table:table/child::table:table-row[$iterator]"></xsl:with-param>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:when test="@table:number-columns-spanned">
+							<xsl:choose>
+								<xsl:when test="$iterator = 1">
+									<xsl:call-template name="table-cell">
+										<xsl:with-param name="grid" select="round(number(@table:number-columns-spanned))"/>
+										<xsl:with-param name="merge" select="1"/>									
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:call-template name="table-cell">
+										<xsl:with-param name="grid" select="round(number(@table:number-columns-spanned))"/>
+										<xsl:with-param name="merge" select="2"/>									
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+							
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:apply-templates select="."/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
+			</w:tr>
+			<xsl:call-template name="merged-rows">
+				<xsl:with-param name="i" select="$i  -1"/>
+				<xsl:with-param name="iterator" select="$iterator +1"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
+	
 	<!--xsl:template match="text()" mode="document">
 	</xsl:template-->
 	
@@ -256,25 +311,49 @@
 	</xsl:template>
 	
 	<xsl:template match="table:table-row|table:table-header-row">
-		<w:tr>
-			<w:trPr>
-				<xsl:if test="name(parent::*) = 'table:table-header-rows'">
-					<w:tblHeader/>
-				</xsl:if>
-				<!-- row styles -->
-			</w:trPr>
-			<xsl:apply-templates select="table:table-cell"/>
-		</w:tr>
+		<xsl:choose>
+			<xsl:when test="table:table-cell/table:table/@table:is-sub-table='true'">
+				<!-- merged cells -->
+				<xsl:variable name="total_rows" select="count(table:table-cell/table:table[@table:is-sub-table='true']/table:table-row)"/>
+				<xsl:variable name="subtables" select="count(table:table-cell/table:table[@table:is-sub-table='true'])"/>
+				<xsl:call-template name="merged-rows">
+					<xsl:with-param name="i" select="$total_rows div $subtables"/>
+					<xsl:with-param name="iterator" select="1"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<w:tr>
+					<w:trPr>
+						<xsl:if test="name(parent::*) = 'table:table-header-rows'">
+							<w:tblHeader/>
+						</xsl:if>
+						<!-- row styles -->
+					</w:trPr>
+					<xsl:apply-templates select="table:table-cell"/>
+				</w:tr>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template match="table:table-cell">
+	<xsl:template match="table:table-cell" name="table-cell">
+		<xsl:param name="grid" select="0"/>
+		<xsl:param name="merge" select="0"/>	
 		<w:tc>
 			<w:tcPr>
 				<!-- point on the cell style properties --> 
 				<xsl:variable name="cellProp" select="key('style', @table:style-name)/style:table-cell-properties"/>
 	
 				<!-- @TODO : width of the cell -->
-				
+				<xsl:choose>
+					<xsl:when test="$merge = 1">
+						<w:gridSpan w:val="{$grid}"/>
+						<w:vmerge w:val="restart"/>
+					</xsl:when>
+					<xsl:when test="$merge = 2">
+						<w:gridSpan w:val="{$grid}"/>
+						<w:vmerge/>
+					</xsl:when>
+				</xsl:choose>
 				<w:tcBorders>
 					<xsl:choose>
 						<xsl:when test="$cellProp[@fo:border and @fo:border!='none']">
