@@ -37,6 +37,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
     using System.Runtime.InteropServices;
     using MSword = Microsoft.Office.Interop.Word;
     using CleverAge.OdfConverter.OdfConverterLib;
+    using CleverAge.OdfConverter.OdfWordAddinLib;
 
 	#region Read me for Add-in installation and setup information.
 	// When run, the Add-in wizard prepared the registry for the Add-in.
@@ -52,7 +53,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 	///   The object for implementing an Add-in.
 	/// </summary>
 	/// <seealso class='IDTExtensibility2' />
-	[GuidAttribute("61835F6F-37E4-423E-9674-B5D070BDA12F"), ProgId("ODFWord2007Addin.Connect")]
+	[GuidAttribute("61835F6F-37E4-423E-9674-B5D070BDA12F"), ProgId("OdfWord2007Addin.Connect")]
     public class Connect : Object, Extensibility.IDTExtensibility2, IRibbonExtensibility
 	{
 		/// <summary>
@@ -80,7 +81,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 		public void OnConnection(object application, Extensibility.ext_ConnectMode connectMode, object addInInst, ref System.Array custom)
         {
             this.applicationObject = (MSword.Application)application;
-            this.labelsResourceManager = new System.Resources.ResourceManager("CleverAge.ODFConverter.ODFWord2007Addin.resources.Labels", GetType().Assembly);
+            this.labelsResourceManager = OdfWordAddinLib.GetResourceManager();
 		}
 
 		/// <summary>
@@ -138,7 +139,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 
 		string IRibbonExtensibility.GetCustomUI(string RibbonID)
 		{
-            using (System.IO.TextReader tr = new System.IO.StreamReader(GetEmbeddedResource("customUI.xml"))) {
+            using (System.IO.TextReader tr = new System.IO.StreamReader(GetCustomUI())) {
                 return tr.ReadToEnd();
             }
 		}
@@ -171,7 +172,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 {
                     applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
                     // create a temporary file
-                    fileName = this.GetTempFileName(odfFile);
+                    fileName = OdfWordAddinLib.GetTempFileName(odfFile);
 
                     // call the converter
                     using (form = new ConverterForm(odfFile, (string)fileName)) {
@@ -192,9 +193,6 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                             // and activate it
                             doc.Activate();
                         } else {
-                            /* This throws an Exception... (file used by another process)
-                             * TODO: find a way to remove tmp file when aborted
-                            */
                             if (File.Exists((string)fileName)) {
                                 File.Delete((string)fileName);
                             }
@@ -231,15 +229,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 
 		public stdole.IPictureDisp GetImage(IRibbonControl control)
 		{
-            using (System.IO.Stream stream = GetEmbeddedResource(control.Id + ".png")) {
-                if (stream == null) {
-                    System.Windows.Forms.MessageBox.Show("Error: stream null");
-                    return null;
-                } else {
-                    System.Drawing.Bitmap image = new System.Drawing.Bitmap(stream);
-                    return ConvertImage.Convert(image);
-                }
-            }
+            return OdfWordAddinLib.GetLogo();
 		}
 
 		public string getLabel(IRibbonControl control)
@@ -252,74 +242,18 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
             return labelsResourceManager.GetString(control.Id + "Description");
 		}
 
-		private System.IO.Stream GetEmbeddedResource(string resourceName)
-		{
-			Assembly asm = Assembly.GetExecutingAssembly();
-			foreach (string name in asm.GetManifestResourceNames())
-			{
-				if (name.EndsWith(resourceName))
-				{
-					return asm.GetManifestResourceStream(name);
-				}
-			}
-			return null;
-		}
-
-        /// <summary>
-        /// Build a temporary file.
-        /// </summary>
-        /// <param name="input">The orginal odf file name</param>
-        /// <returns>A temporary file name pointing to the user's \Temp folder</returns>
-        private string GetTempFileName(string input)
+        private Stream GetCustomUI()
         {
-            // Get the \Temp path
-            string tempPath = Path.GetTempPath().ToString();
-
-            // Build the output file name
-            string root = null;
-
-            int lastSlash = input.LastIndexOf('\\');
-            if (lastSlash > 0)
+            Assembly asm = Assembly.GetExecutingAssembly();
+            foreach (string name in asm.GetManifestResourceNames())
             {
-                root = input.Substring(lastSlash + 1);
+                if (name.EndsWith("customUI.xml"))
+                {
+                    return asm.GetManifestResourceStream(name);
+                }
             }
-            else
-            {
-                root = input;
-            }
-            
-            int index = root.LastIndexOf('.');
-            if (index > 0)
-            {
-                root = root.Substring(0, index);
-            }
-
-            string output = tempPath + root + "_tmp.docx";
-            int i = 1;
-
-            while (File.Exists(output) || Directory.Exists(output))
-            {
-                output = tempPath + root + "_tmp" + i + ".docx";
-                i++;
-            }
-            return output;
+            return null;
         }
-		
-
-		sealed public class ConvertImage : System.Windows.Forms.AxHost
-		{
-			private ConvertImage()
-				: base(null)
-			{
-			}
-			public static stdole.IPictureDisp Convert
-				(System.Drawing.Image image)
-			{
-				return (stdole.IPictureDisp)System.
-					Windows.Forms.AxHost
-					.GetIPictureDispFromPicture(image);
-			}
-		}
 
 		private MSword.Application applicationObject;
 		private System.Resources.ResourceManager labelsResourceManager;

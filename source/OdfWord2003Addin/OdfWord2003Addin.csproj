@@ -4,11 +4,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CBCC62ED-16A9-4FB0-9B68-EF715763E5D0}</ProjectGuid>
+    <ProjectGuid>{C14FEC7D-2E44-4B69-A3EE-BF2011671401}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <StartupObject>
+    </StartupObject>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>OdfWord2007Addin</AssemblyName>
-    <RootNamespace>CleverAge.OdfConverter.OdfWord2007Addin</RootNamespace>
+    <AssemblyName>OdfWord2003Addin</AssemblyName>
+    <RootNamespace>OdfWord2003Addin</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,7 +35,6 @@
   <ItemGroup>
     <Reference Include="Extensibility, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.Office.Interop.Word, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
-    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System">
       <HintPath>System.dll</HintPath>
       <Name>System</Name>
@@ -42,7 +43,6 @@
       <HintPath>System.Data.dll</HintPath>
       <Name>System.Data</Name>
     </Reference>
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML">
       <HintPath>System.XML.dll</HintPath>
@@ -54,20 +54,18 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Connect.cs">
+      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
       <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
       <VersionMajor>2</VersionMajor>
-      <VersionMinor>4</VersionMinor>
+      <VersionMinor>3</VersionMinor>
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="README.rtf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfConverterLib\OdfConverterLib.csproj">
@@ -79,12 +77,15 @@
       <Name>OdfWordAddinLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\customUI.xml" />
-  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
 </Project>
