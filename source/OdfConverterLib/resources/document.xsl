@@ -363,6 +363,11 @@
 						<w:gridSpan w:val="{$grid}"/>
 						<w:vmerge/>
 					</xsl:when>
+					<xsl:otherwise>
+						<xsl:if test="@table:number-columns-spanned">
+							<w:gridSpan w:val="{@table:number-columns-spanned}"/>
+						</xsl:if>
+					</xsl:otherwise>
 				</xsl:choose>
 				<w:tcBorders>
 					<xsl:choose>
