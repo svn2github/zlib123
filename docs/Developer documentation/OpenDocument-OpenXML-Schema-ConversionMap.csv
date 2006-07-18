@@ -494,18 +494,18 @@ Formatting Properties;;;;;;;
 ;;Shadow;;0.2-M1;;;
 ;;Dynamic Spacing;;0.2-M1;;;
 ;Text Formatting Properties;;;0.2-M1;;;
-;;Font Variant;;0.2-M1;;;
-;;Text Transformations;;0.2-M1;;;
+;;Font Variant;;0.2-M1;Completed;style:text-properties/@fo:font-variant convert to w:styles/w:style/w:rPr/w:smallCaps;
+;;Text Transformations;;0.2-M1;Completed;style:text-properties/@fo:text-transform convert to w:styles/w:style/w:rPr/w:caps;
 ;;Color;;0.1;Completed;style:text-properties/@fo:color used in w:styles/w:style/w:rPr/w:color/@w:val;
 ;;Window Font Color;;0.2-M1;;;
-;;Text Outline;;0.2-M1;;;
-;;Line Through Type;;0.2-M1;;;
-;;Line Through Style;;0.2-M1;;;
-;;Line Through Width;;0.2-M1;;;
-;;Line Through Color;;0.2-M1;;;
-;;Line Through Text;;0.2-M1;;;
-;;Line Through Text Style;;0.2-M1;;;
-;;Text Position;;0.2-M1;;;
+;;Text Outline;;0.2-M1;Completed;style:text-properties/@style:text-outline convert to w:styles/w:style/w:rPr/w:outline;
+;;Line Through Type;;0.2-M1;Completed;style:text-properties/@style:text-line-through-type='double' convert to w:styles/w:style/w:rPr/w:dstrike;
+;;Line Through Style;;0.2-M1;Completed;style:text-properties/@style:text-line-through-style convert to w:styles/w:style/w:rPr/w:strike;All style are convert to a line, because line through feature is richer in ODF than in OOX. If line through type exist, the convertion isn't made.
+;;Line Through Width;;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Line Through Color;;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Line Through Text;;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Line Through Text Style;;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Text Position;;0.2-M1;Completed;style:text-properties/@style:text-position convert to w:styles/w:style/w:rPr/w:vertAlign;
 ;;Font Name;;0.1;Completed;"style:text-properties/@style:font-name copied to 
 /w:styles/w:style/w:rPr/w:rFonts/@w:ascii and @w:hAnsi attributes";
 ;;Font Family;;0.1;Partial;"style:style/@style:font-family converted to w:styles/w:style/@w:type
