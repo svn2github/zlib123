@@ -32,22 +32,7 @@
 				xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"  
 				exclude-result-prefixes="style">
 
-	<!--
-	function    : num-format
-	param       : format (string)
-	description : convert the ODF numFormat to OOX numFormat
-	-->
-	<xsl:template name="num-format">
-		<xsl:param name="format"/>
-		<xsl:choose>
-			<xsl:when test="$format='1'">decimal</xsl:when>
-			<xsl:when test="$format='i'">lowerRoman</xsl:when>
-			<xsl:when test="$format='I'">upperRoman</xsl:when>
-			<xsl:when test="$format='a'">lowerLetter</xsl:when>
-			<xsl:when test="$format='A'">upperLetter</xsl:when>
-			<xsl:otherwise>decimal</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
+
 	
 	<!--
 		U n i t s
