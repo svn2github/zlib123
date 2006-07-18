@@ -34,6 +34,8 @@
 		xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"  
 		exclude-result-prefixes="office text style">
 	
+	<xsl:output method="xml" encoding="UTF-8"/>
+	
 	<xsl:key name="list-style" match="text:list-style" use="@style:name"/>
 	
 	<xsl:template name="numbering">
@@ -41,7 +43,7 @@
 			<xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style" mode="numbering"/>
 			<xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style" mode="num"/>
 		</w:numbering>
-	</xsl:template>
+	</xsl:template> 
 	
 	<xsl:template match="text:list-style" mode="numbering">
 		<w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list-style)+1}">
@@ -59,7 +61,19 @@
 		<xsl:if test="number(@text:level) &lt; 10">
 			<w:lvl w:ilvl="{number(@text:level) - 1}">
 			    	<w:numFmt w:val="bullet"/>
-			    	<w:lvlText w:val="•"/>
+			    	<w:lvlText w:val="{@text:bullet-char}">
+			    		<!--
+			    		<xsl:attribute name="w:val">
+			    			<xsl:choose>
+			    				<xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
+			    				<xsl:when test="@text:bullet-char = '' "></xsl:when>
+			    				<xsl:when test="@text:bullet-char = '➢' ">➢</xsl:when>
+			    				<xsl:when test="@text:bullet-char = '✔' ">✔</xsl:when>
+			    				<xsl:otherwise>•</xsl:otherwise>
+			    			</xsl:choose>
+			    		</xsl:attribute>
+			    			-->
+			    	</w:lvlText>
 				<w:lvlJc w:val="left"/>
 				<w:pPr>
 					<w:ind>
@@ -97,11 +111,33 @@
 				<w:numFmt>
 					<xsl:attribute name="w:val">
 						<xsl:call-template name="num-format">
-							<xsl:with-param name="format"><xsl:value-of select="@style:num-format"/></xsl:with-param>
+							<xsl:with-param name="format">
+								<xsl:value-of select="@style:num-format"/>
+							</xsl:with-param>
 						</xsl:call-template>
 					</xsl:attribute>
 				</w:numFmt>
-				<w:lvlText w:val="{concat(@style:num-prefix, concat('%', @text:level), @style:num-suffix)}"/>
+				<w:lvlText>	
+					<xsl:attribute name="w:val">
+						<xsl:choose>
+							<xsl:when test="@style:num-format = '' "></xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="@style:num-prefix"/>
+								<xsl:choose>
+									<xsl:when test="@text:display-levels">
+										<xsl:call-template name="display-levels">
+											<xsl:with-param name="dlvl" select="@text:display-levels"/>
+											<xsl:with-param name="lvl" select="@text:level"/>
+											<xsl:with-param name="listStyleName" select="ancestor::text:list-style/@style:name"/>
+										</xsl:call-template>
+									</xsl:when>
+									<xsl:otherwise>%<xsl:value-of select="@text:level"/></xsl:otherwise>
+								</xsl:choose>
+								<xsl:value-of select="@style:num-suffix"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</w:lvlText>
 				<w:lvlJc w:val="left"/>
 				<w:pPr>
 					<w:ind>
@@ -124,5 +160,44 @@
 			</w:lvl>
 		</xsl:if>
 	</xsl:template>
+	
+	
+	<!--
+		function    : num-format
+		param       : format (string)
+		description : convert the ODF numFormat to OOX numFormat
+	-->
+	<xsl:template name="num-format">
+		<xsl:param name="format"/>
+		<xsl:choose>
+			<xsl:when test="$format='1'">decimal</xsl:when>
+			<xsl:when test="$format='i'">lowerRoman</xsl:when>
+			<xsl:when test="$format='I'">upperRoman</xsl:when>
+			<xsl:when test="$format='a'">lowerLetter</xsl:when>
+			<xsl:when test="$format='A'">upperLetter</xsl:when>
+			<xsl:otherwise>decimal</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	
+	<!-- Generate the format string for multiple levels -->
+	<xsl:template name="display-levels">
+		<xsl:param name="dlvl"/>
+		<xsl:param name="lvl"/>
+		<xsl:param name="listStyleName"/>
+		<xsl:if test="$dlvl &gt; 0">
+			<xsl:call-template name="display-levels">
+				<xsl:with-param name="dlvl" select="$dlvl - 1"/>
+				<xsl:with-param name="lvl" select="$lvl - 1"/>
+				<xsl:with-param name="listStyleName" select="$listStyleName"/>
+			</xsl:call-template>
+			<!-- levels with no formatting are not displayed -->
+			<xsl:variable name="levelStyle" select="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $lvl]"/>
+			<xsl:if test="$levelStyle/@style:num-format and $levelStyle/@style:num-format != '' ">
+				<xsl:if test="$dlvl &gt; 1">.</xsl:if>%<xsl:value-of select="$lvl"/>
+			</xsl:if>
+		</xsl:if>
+	</xsl:template>
+	
 
 </xsl:stylesheet>
