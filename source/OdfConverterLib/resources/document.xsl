@@ -50,61 +50,6 @@
 		</w:document>
 	</xsl:template>
 	
-	<xsl:template name="subtable">
-		<xsl:param name="node"/>
-		<xsl:for-each select="$node/table:table-cell">
-			<xsl:call-template name="table-cell"/>
-		</xsl:for-each>
-	</xsl:template>
-	
-	<xsl:template name="merged-rows">
-		<xsl:param name="i" select="0"/>
-		<xsl:param name="iterator"/>
-		<xsl:variable name="test">
-			<xsl:if test="$i > 0">
-				<xsl:text>true</xsl:text>
-			</xsl:if>
-		</xsl:variable>
-		<xsl:if test="$test='true'">
-			<w:tr>
-				<xsl:for-each select="table:table-cell">
-					<xsl:choose>
-						<xsl:when test="table:table[@table:is-sub-table='true']">
-							<!-- table to process -->
-							<xsl:call-template name="subtable">
-								<xsl:with-param name="node" select="table:table/child::table:table-row[$iterator]"></xsl:with-param>
-							</xsl:call-template>
-						</xsl:when>
-						<xsl:when test="@table:number-columns-spanned">
-							<xsl:choose>
-								<xsl:when test="$iterator = 1">
-									<xsl:call-template name="table-cell">
-										<xsl:with-param name="grid" select="round(number(@table:number-columns-spanned))"/>
-										<xsl:with-param name="merge" select="1"/>									
-									</xsl:call-template>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:call-template name="table-cell">
-										<xsl:with-param name="grid" select="round(number(@table:number-columns-spanned))"/>
-										<xsl:with-param name="merge" select="2"/>									
-									</xsl:call-template>
-								</xsl:otherwise>
-							</xsl:choose>
-							
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:apply-templates select="."/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:for-each>
-			</w:tr>
-			<xsl:call-template name="merged-rows">
-				<xsl:with-param name="i" select="$i  -1"/>
-				<xsl:with-param name="iterator" select="$iterator +1"/>
-			</xsl:call-template>
-		</xsl:if>
-	</xsl:template>
-	
 	<!--xsl:template match="text()" mode="document">
 	</xsl:template-->
 	
@@ -267,6 +212,71 @@
 	</xsl:template>
 
 	<!-- tables -->
+	
+	<xsl:template name="subtable">
+		<xsl:param name="node"/>
+		<xsl:for-each select="$node/table:table-cell">
+			<xsl:call-template name="table-cell"/>
+		</xsl:for-each>
+	</xsl:template>
+	
+	<xsl:template name="merged-rows">
+		<xsl:param name="i" select="0"/>
+		<xsl:param name="iterator"/>
+		<xsl:variable name="test">
+			<xsl:if test="$i > 0">
+				<xsl:text>true</xsl:text>
+			</xsl:if>
+		</xsl:variable>
+		<xsl:if test="$test='true'">
+			<w:tr>
+				<xsl:for-each select="table:table-cell">
+					<xsl:choose>
+						<xsl:when test="table:table[@table:is-sub-table='true']">
+							<!-- table to process -->
+							<xsl:call-template name="subtable">
+								<xsl:with-param name="node" select="table:table/child::table:table-row[$iterator]"></xsl:with-param>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:when test="@table:number-columns-spanned">
+							<xsl:choose>
+								<xsl:when test="$iterator = 1">
+									<xsl:call-template name="table-cell">
+										<xsl:with-param name="grid" select="round(number(@table:number-columns-spanned))"/>
+										<xsl:with-param name="merge" select="1"/>									
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:call-template name="table-cell">
+										<xsl:with-param name="grid" select="round(number(@table:number-columns-spanned))"/>
+										<xsl:with-param name="merge" select="2"/>									
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:choose>
+								<xsl:when test="$iterator = 1">
+									<xsl:call-template name="table-cell">
+										<xsl:with-param name="merge" select="1"/>									
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:call-template name="table-cell">
+										<xsl:with-param name="merge" select="2"/>									
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
+			</w:tr>
+			<xsl:call-template name="merged-rows">
+				<xsl:with-param name="i" select="$i  -1"/>
+				<xsl:with-param name="iterator" select="$iterator +1"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
 	
 	<xsl:template match="table:table">
 		<w:tbl>
