@@ -254,6 +254,10 @@
 				</w:jc>
 			</xsl:if>
 			
+			<xsl:if test="@fo:break-before='page'">
+				<w:pageBreakBefore/>
+			</xsl:if>
+
 			<!--
 			<xsl:if test="@fo:break-before='page'">
 				<w:pageBreakBefore val="on"/>
