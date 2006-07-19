@@ -289,7 +289,9 @@
 						</xsl:call-template>
 					</xsl:attribute>
 				</w:tblW>
-				
+				<xsl:if test="key('style', @table:style-name)/style:table-properties/@table:align">
+					<w:jc w:val="{key('style', @table:style-name)/style:table-properties/@table:align}"/>
+				</xsl:if>
 				</w:tblPr>
 			<w:tblGrid>
 				<xsl:apply-templates select="table:table-column"/>
