@@ -418,19 +418,23 @@ One special case : 'StarSymbol' value is converted to 'Symbol'";
 ;;Notes Configuration Element;1;0.2-Final;;;refers to footnote styles!
 ;;Bibliography Configuration;3;0.2-Final;;;
 ;List Style;;;;;;
-;;Common List-Level Style Attributes;1;0.2-M1;;;
-;;Number Level Style;1;0.2-M1;Completed;"text:list-level-style-number is converted to w:lvl 
-and w:lvl/@w:ilvi is based on text:list-level-style-number/@text:level.
-If text:list-level-style-number/@text:start-value exists, it is converted to w:lvl/w:start/@w:val
-Otherwise, it is set to value 1.
-Attributes @style:num-prefix and @style:num-suffix along with @text:level are used to build w:lvl/w:lvlText/@w:val
-Style property style:list-level-properties/@text:space-before defines w:lvl/w:pPr/w:ind/@w:left and style:list-level-properties/@text:min-label-width defines w:lvl/w:pPr/w:ind/@w:hanging. For both properties, conversion to twip (twentieth of a point) is required.
-@style:num-format is converted to w:lvl/w:numFmt/@w:val
-";
+;;Common List-Level Style Attributes;1;0.2-M1;Complete;"text:level translated to <w:lvl w:ilvl=""{number(@text:level) - 1}"">";
+;;Number Level Style;1;0.2-M1;Partial;"text:display-number is involved in the generation of w:lvlText/@w:val format string. When display-number is encountered, ""display-levels"" template is recursively called until text:display-number has been reached.
+style:num-format is translated to w:numFmt/@w:val as  :
+1 -> decimal
+i -> lowerRoman
+I -> upperRoman
+a -> lowerLetter
+A -> upperLetter
+otherwise decimal.
+style:num-format may also be empty. In this case, it is translated to lvlText/@w:val = '' if  no text:display-number has been specified. Otherwise, numbering is skipped when ""display-levels"" is called on an empty num-format.
+text:start-value is converted to w:start/@w:val";TODO : text:style-name
 ;;Bullet Level Style;1;0.2-M1;Partial;"w:lvl/w:numFmt/@w:val set to 'bullet'
-w:lvl/w:lvlText/@w:val set to ""•""
+w:lvl/w:lvlText/@w:val set to @text:bullet-char
 w:lvl/w:lvlJc/@w:val set to ""left""
-Same indentation properties as for text:list-level-style-number";
+Same indentation properties as for text:list-level-style-number";"TODO : some bullet characters are not correctly converted 
+style:num-format-prefix, style:num-format-suffix
+bullet-relative-size"
 ;;Image Level Style;3;0.2-Final;;;
 ;;List Level Style Example;;;;;
 ;Outline Style;;1;;;;
