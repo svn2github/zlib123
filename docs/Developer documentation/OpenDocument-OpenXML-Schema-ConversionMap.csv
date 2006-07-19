@@ -593,14 +593,14 @@ respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:s
 ;;Top and Bottom Margins;;0.1;Completed;"style:paragraph-properties/@fo:margin-top converted to w:styles/w:style/w:pPr/w:spacing/@w:before
 style:paragraph-properties/@fo:margin-right converted to w:styles/w:style/w:pPr/w:spacing/@w:after";
 ;;Margins;;0.2-M1;;;
-;;Break Before and Break After;;0.2-M1;;;
+;;Break Before and Break After;;0.2-M1;Partial;style:paragraph-properties/@fo:break-before='page' converted to w:styles/w:style/w:pPr/w:pageBreakBefore;
 ;;Paragraph Background Color;;0.1;Partial;"style:paragraph-properties/@fo:background-color translated to w:styles/w:style/w:pPr/w:shd/@w:fill
 Attribute @w:val is set to 'solid'";
 ;;Paragraph Background Image;;0.2-M1;;;
 ;;Border;;0.2-M1;;;
 ;;Border Line Width;;0.2-M1;;;
 ;;Padding;;0.2-M1;;;
-;;Shadow;;0.2-M1;;;
+;;Shadow;;0.2-M1;;Seems to not exist in OOX;
 ;;Keep with Next;;0.2-M1;;;
 ;;Line Numbering;;0.2-M1;;;
 ;;Line Number Start Value;;0.2-M1;;;
