@@ -307,13 +307,13 @@
 			</xsl:if>
 			
 			<!-- TODO determine all the different font styles-->
-			<xsl:if test="@fo:font-style">
+			<xsl:if test="@fo:font-style or @style:font-style-asian or @style:font-style-complex">
 				<xsl:choose>
-					<xsl:when test="@fo:font-style = 'italic'">
+					<xsl:when test="fo:font-style = 'italic' or @style:font-style-asian = 'italic' or @style:font-style-complex = 'italic'">
 						<w:i w:val="on"/>						
 					</xsl:when>
-					<xsl:when test="@fo:font-style = 'none'">
-						<w:i w:val="off"/>
+					<xsl:when test="fo:font-style = 'oblique' or @style:font-style-asian = 'oblique' or @style:font-style-complex = 'oblique'">
+						<w:i w:val="on"/>						
 					</xsl:when>
 					<xsl:otherwise>
 						<w:i w:val="off"/>
@@ -321,27 +321,23 @@
 					<!-- It could be also oblique in fo DTD, but it is not possible to set it via Ooo interface -->
 				</xsl:choose>
 			</xsl:if>
-			<xsl:if test="@fo:font-style-complex">
+			<xsl:if test="@fo:font-weight or @fo:font-weight-asian">
 				<xsl:choose>
-					<xsl:when test="@fo:font-style-complex = 'italic'">
-						<w:i-cs/>						
-					</xsl:when>
-				</xsl:choose>
-			</xsl:if>
-			<xsl:if test="@fo:font-weight">
-				<xsl:choose>
-					<xsl:when test="@fo:font-weight = 'bold'">
+					<xsl:when test="@fo:font-weight = 'bold' or @fo:font-weight-asian = 'bold'">
 						<w:b w:val="on"/>						
 					</xsl:when>
-					<xsl:when test="@fo:font-weight = 'normal'">
+					<xsl:when test="@fo:font-weight = 'normal' or @fo:font-weight-asian = 'normal'">
 						<w:b w:val="off"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:if>
 			<xsl:if test="@fo:font-weight-complex">
 				<xsl:choose>
-					<xsl:when test="@fo:font-weight-complex = 'bold'">
-						<w:b-cs/>
+					<xsl:when test="@style:font-weight-complex = 'bold'">
+						<w:b-cs w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@style:font-weight-complex = 'normal'">
+						<w:b-cs w:val="off"/>
 					</xsl:when>
 				</xsl:choose>
 			</xsl:if>
@@ -404,6 +400,52 @@
 					</xsl:when>
 				</xsl:choose>
 			</xsl:if>
+			<xsl:if test="@fo:letter-spacing">
+				<w:spacing>
+					<xsl:attribute name="w:val">
+						<xsl:call-template name="twips-measure">
+							<xsl:with-param name="length" select="@fo:letter-spacing"/>
+						</xsl:call-template>
+					</xsl:attribute>
+				</w:spacing>
+			</xsl:if>
+			<xsl:if test="(@fo:language and @fo:country) or (@style:language-asian and @style:country-asian) or (@style:language-complex and @style:country-complex)">
+				<w:lang>
+					<xsl:if test="(@fo:language and @fo:country)">
+						<xsl:attribute name="w:val"><xsl:value-of select="@fo:language"/>-<xsl:value-of select="@fo:country"/></xsl:attribute>
+					</xsl:if>
+					<xsl:if test="(@style:language-asian and @style:country-asian)">
+						<xsl:attribute name="w:eastAsia"><xsl:value-of select="@style:language-asian"/>-<xsl:value-of select="@style:country-asian"/></xsl:attribute>
+					</xsl:if>
+					<xsl:if test="(@style:language-complex and @style:country-complex)">
+						<xsl:attribute name="w:bidi"><xsl:value-of select="@style:language-complex"/>-<xsl:value-of select="@style:country-complex"/></xsl:attribute>
+					</xsl:if>
+				</w:lang>
+			</xsl:if>
+			<xsl:if test="(@style:font-relief)">
+				<xsl:choose>
+					<xsl:when test="@style:font-relief = 'embossed'">
+						<w:emboss w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@style:font-relief = 'engraved'">
+						<w:imprint w:val="on"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:emboss w:val="off"/>
+						<w:imprint w:val="off"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:if>
+			<xsl:if test="(@fo:text-shadow)">
+				<xsl:choose>
+					<xsl:when test="@fo:text-shadow = 'none'">
+						<w:shadow w:val="off"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:shadow w:val="on"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:if>
 			<xsl:if test="@style:text-underline-style != 'none' ">
 				<w:u>
 					<xsl:attribute name="w:val">
@@ -456,6 +498,7 @@
 									<xsl:when test="@style:text-underline-type = 'double' ">double</xsl:when>
 									<xsl:when test="@style:text-underline-width = 'thick' ">thick</xsl:when>
 									<xsl:when test="@style:text-underline-width = 'bold' ">thick</xsl:when>
+									<xsl:when test="@style:text-underline-mode = 'skip-white-space' ">words</xsl:when>
 									<xsl:otherwise>single</xsl:otherwise>
 								</xsl:choose>
 							</xsl:otherwise>
@@ -472,6 +515,9 @@
 						</xsl:attribute>
 					</xsl:if>
 				</w:u>
+			</xsl:if>
+			<xsl:if test="@style:letter-kerning = 'true'">
+				<w:kern w:val="16" />
 			</xsl:if>
 		</w:rPr>		
 	</xsl:template>
