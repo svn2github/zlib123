@@ -525,12 +525,13 @@ style:style[@fo:font-style-complex='italic'] converted to w:styles/w:style/w:rPr
 If fo:font-size is expressed in percentage of a parent font-size, we climb up the style ancestors until we find an absolute size (expressed in points). If none was found, the size of the default style (office:styles/style:default-style)  in the same family is used. ";
 ;;Relative Font Size;1;0.2-M1;;;
 ;;Script Type;2;0.2-M1;Partial;w:pPr/w:spacing based on style:paragraph-properties/@fo:line-height;
-;;Letter Spacing;2;0.2-M1;;;
-;;Language;0;0.2-M1;;;
-;;Country;2;0.2-M1;;;
-;;Font Style;0;0.2-M1;;;
-;;Font Relief;2;0.2-M1;;;
-;;Text Shadow;2;0.2-M1;;;
+;;Letter Spacing;2;0.2-M1;Completed;style:text-properties/@fo:letter-spacing convert to w:styles/w:style/w:rPr/w:spacing;
+;;Language;0;0.2-M1;Completed;style:text-properties/@fo:language convert to w:styles/w:style/w:rPr/w:lang concatenated with country;
+;;Country;2;0.2-M1;Completed;style:text-properties/@fo:country convert to w:styles/w:style/w:rPr/w:lang concatenated with language;
+;;Font Style;0;0.2-M1;Completed;style:text-properties/@fo:letter-spacing convert to w:styles/w:style/w:rPr/w:spacing;
+;;Font Relief;2;0.2-M1;Completed;"style:text-properties/@style:font-relief='embossed' convert to w:styles/w:style/w:rPr/w:emboss
+style:text-properties/@style:font-relief='engraved' convert to w:styles/w:style/w:rPr/w:imprint";
+;;Text Shadow;2;0.2-M1;Completed;style:text-properties/@fo:text-shadow convert to w:styles/w:style/w:rPr/w:shadow concatenated with language;
 ;;Underlining Type;1;0.2-M1;Completed;ODF 'double' value only makes sense for OOX 'double' and 'wavyDouble'. ;The translation might be lossy, because underline feature is richer in ODF than in OOX
 ;;Underlining Style;0;0.2-M1;Completed;"style:style/@style:text-underline-style used in w:styles/w:style/w:rPr/w:u/@w:val
 solid -> single
@@ -545,12 +546,12 @@ otherwise 'single' is used.";The translation might be lossy, because underline f
 ;;Underline Color;1;0.2-M1;Completed;"style:style/@style:text-underline-color converted to w:styles/w:style/w:rPr/w:u/@w:color
 'font-color' is converted to 'auto'
 otherwise RGB values are parsed. ";
-;;Font Weight;0;0.2-M1;Partial;"style:text-properties/@fo:font-weight translated to w:styles/w:style/w:rPr/w:b
+;;Font Weight;0;0.2-M1;Completed;"style:text-properties/@fo:font-weight or style:text-properties/@fo:font-weight-asian translated to w:styles/w:style/w:rPr/w:b
 style:text-properties/@fo:font-complex-weight translated to w:styles/w:style/w:rPr/w:b-cs";
-;;Text Underline Word Mode;2;0.2-M1;;;
-;;Text Line Through Word Mode;2;0.2-M1;;;
-;;Letter Kerning;2;0.2-M1;;;
-;;Text Blinking;3;0.2-M1;;;
+;;Text Underline Word Mode;2;0.2-M1;Completed;ODF 'skip-white-space' value produce OOX *Words* underline style when it exists.  ;The translation might be lossy, because underline feature is richer in ODF than in OOX
+;;Text Line Through Word Mode;2;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Letter Kerning;2;0.2-M1;Completed;style:text-properties/@style:letter-kerning convert to w:styles/w:style/w:rPr/w:kern;
+;;Text Blinking;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
 ;;Text Background Color;1;0.2-M1;;;
 ;;Text Combine;?;0.2-M1;;;what does it mean? drop caps?
 ;;Text Combine Start and End Characters;?;0.2-M1;;;
