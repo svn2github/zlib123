@@ -634,7 +634,7 @@ Attribute @w:val is set to 'solid'";
 ;Table Formatting Properties;;1;;;;to be analysed in more detail (some elements might not be required, e.g. Page Number element)
 ;;Table Width;1;0.1;Completed;"The table style name table:table/@table:style-name is set to w:tbl/w:tblPr/w:tblStyle/@w:val.
 style:table-properties/@style:width for this table style name is converted to w:tbl/w:tblPr/w:tblW/@w:w";
-;;Table Alignment;1;0.2-M1;;;
+;;Table Alignment;1;0.2-M1;Completed;w:jc based on style:table-properties/@table:align;
 ;;Table Left and Right Margin;1;0.2-M1;;;
 ;;Table Top and Bottom Margin;1;0.2-M1;;;
 ;;Table Margins;1;0.2-M1;;;
@@ -658,7 +658,7 @@ style:table-properties/@style:width for this table style name is converted to w:
 ;;Break Before and Break After;1;0.2-Final;;;
 ;;Keep Together;1;0.2-Final;;;
 ;Table Cell Formatting Properties;;1;;;;
-;;Vertical Alignment;1;0.2-Final;;;
+;;Vertical Alignment;1;0.2-Final;Completed; w:vAlign based on style:table-cell-properties@style:vertical-align;
 ;;Text Align Source;1;0.2-Final;;;
 ;;Direction;1;0.2-Final;;;
 ;;Vertical Glyph Orientation;1;0.2-Final;;;
