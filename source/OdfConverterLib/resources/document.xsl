@@ -289,9 +289,7 @@
 						</xsl:call-template>
 					</xsl:attribute>
 				</w:tblW>
-				<xsl:if test="key('style', @table:style-name)/style:table-properties/@table:align">
-					<w:jc w:val="{key('style', @table:style-name)/style:table-properties/@table:align}"/>
-				</xsl:if>
+				
 				</w:tblPr>
 			<w:tblGrid>
 				<xsl:apply-templates select="table:table-column"/>
@@ -487,7 +485,14 @@
 				</w:tcMar>
 				
 				<xsl:if test="$cellProp[@style:vertical-align and @style:vertical-align!='']">
-					<w:vAlign w:val="{$cellProp/@style:vertical-align}"/>
+					<xsl:choose>
+						<xsl:when test="$cellProp/@style:vertical-align = 'middle'">
+							<w:vAlign w:val="center"/> 
+						</xsl:when>
+						<xsl:otherwise>
+							<w:vAlign w:val="{$cellProp/@style:vertical-align}"/>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:if>	
 			</w:tcPr>
 			<xsl:apply-templates/>
