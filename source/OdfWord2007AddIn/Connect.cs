@@ -145,7 +145,8 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 		}
 
         public void ImportODF(IRibbonControl control)
-		{
+        {
+
             FileDialog fd = applicationObject.get_FileDialog(MsoFileDialogType.msoFileDialogFilePicker);
             // allow multiple file opening
 			fd.AllowMultiSelect = true;
@@ -205,14 +206,15 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 }
                 catch (Exception e)
                 {
-                    if (File.Exists((string)fileName)) {
-                        File.Delete((string)fileName);
-                    }
 #if DEBUG
                     System.Windows.Forms.MessageBox.Show(e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
 #else
                     System.Windows.Forms.MessageBox.Show(labelsResourceManager.GetString("OdfUnexpectedError"));
 #endif
+                    if (File.Exists((string)fileName))
+                    {
+                        File.Delete((string)fileName);
+                    }
                 }
                 finally
                 {
@@ -234,7 +236,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 
 		public string getLabel(IRibbonControl control)
 		{
-			return labelsResourceManager.GetString(control.Id + "Label");
+            return labelsResourceManager.GetString(control.Id + "Label");
 		}
 
 		public string getDescription(IRibbonControl control)

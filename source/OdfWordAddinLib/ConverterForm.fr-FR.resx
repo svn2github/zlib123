@@ -117,34 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OdfImportLabel" xml:space="preserve">
-    <value>Open ODF...</value>
+  <data name="$this.Text" xml:space="preserve">
+    <value>Ouvrir un fichier ODF...</value>
   </data>
-  <data name="OdfImportDescription" xml:space="preserve">
-    <value>Open an Open Document Format (ODF) file.</value>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>ConverterForm</value>
   </data>
-  <data name="OdfExportLabel" xml:space="preserve">
-    <value>Save as ODF...</value>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="OdfExportDescription" xml:space="preserve">
-    <value>Save a copy of the document with Open Document Format (ODF).</value>
+  <data name="&gt;&gt;cancelButton.Name" xml:space="preserve">
+    <value>cancelButton</value>
   </data>
-  <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+  <data name="&gt;&gt;cancelButton.Parent" xml:space="preserve">
+    <value>$this</value>
   </data>
-  <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>An unexpected error occured. Please feel free to fill a bug report on the project web site (http://odf-converter.sourceforge.net) with your file attached.</value>
+  <data name="&gt;&gt;cancelButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="NotAnOdfDocumentError" xml:space="preserve">
-    <value>is not an ODF document.</value>
+  <data name="&gt;&gt;cancelButton.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
-  <data name="AllFileType" xml:space="preserve">
-    <value>All Files</value>
+  <data name="&gt;&gt;progressBar1.Name" xml:space="preserve">
+    <value>progressBar1</value>
   </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument Text files</value>
+  <data name="&gt;&gt;progressBar1.Parent" xml:space="preserve">
+    <value>$this</value>
   </data>
-  <data name="NotImplemented" xml:space="preserve">
-    <value>Sorry, this feature is not yet implemented</value>
+  <data name="&gt;&gt;progressBar1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ProgressBar, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;progressBar1.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="cancelButton.Text" xml:space="preserve">
+    <value>Annuler</value>
   </data>
 </root>

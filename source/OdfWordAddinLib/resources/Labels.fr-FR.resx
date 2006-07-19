@@ -118,33 +118,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="OdfImportLabel" xml:space="preserve">
-    <value>Open ODF...</value>
+    <value>Ouvrir un fichier ODF...</value>
   </data>
   <data name="OdfImportDescription" xml:space="preserve">
-    <value>Open an Open Document Format (ODF) file.</value>
+    <value>Ouvrir un fichier au format OpenDocument (ODF).</value>
   </data>
   <data name="OdfExportLabel" xml:space="preserve">
-    <value>Save as ODF...</value>
+    <value>Enregistrer au format ODF...</value>
   </data>
   <data name="OdfExportDescription" xml:space="preserve">
-    <value>Save a copy of the document with Open Document Format (ODF).</value>
+    <value>Enregistrer une copie du document dans le format OpenDocument (ODF).</value>
   </data>
   <data name="OdfMenuLabel" xml:space="preserve">
     <value>ODF...</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>An unexpected error occured. Please feel free to fill a bug report on the project web site (http://odf-converter.sourceforge.net) with your file attached.</value>
+    <value>Une erreur inattendue s'est produite. Vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur.</value>
   </data>
   <data name="NotAnOdfDocumentError" xml:space="preserve">
-    <value>is not an ODF document.</value>
+    <value>n'est pas un document ODF.</value>
   </data>
   <data name="AllFileType" xml:space="preserve">
-    <value>All Files</value>
+    <value>Tous les fichiers</value>
   </data>
   <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument Text files</value>
+    <value>Fichiers textes OpenDocument</value>
   </data>
   <data name="NotImplemented" xml:space="preserve">
-    <value>Sorry, this feature is not yet implemented</value>
+    <value>Désolé, cette fonctionnalité n'est pas implémentée.</value>
   </data>
 </root>
