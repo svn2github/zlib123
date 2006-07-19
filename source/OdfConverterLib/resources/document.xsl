@@ -483,12 +483,12 @@
 					</xsl:choose>
 				</w:tcMar>
 				
-				<xsl:if test="$cellProp[@fo:vertical-align and @fo:vertical-align!='']">
-					<w:vAlign w:val="{$cellProp/@fo:vertical-align}"/>
+				<xsl:if test="$cellProp[@style:vertical-align and @style:vertical-align!='']">
+					<w:vAlign w:val="{$cellProp/@style:vertical-align}"/>
 				</xsl:if>	
 			</w:tcPr>
 			<xsl:apply-templates/>
-			<w:p/> <!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
+			 <!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
 		</w:tc>
 	</xsl:template>
 	
