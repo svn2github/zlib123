@@ -173,7 +173,7 @@
 			</xsl:if>
 			<xsl:if test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
 				<w:pBdr>
-					<xsl:if test="@fo:border-top">
+					<xsl:if test="@fo:border-top and (@fo:border-top != 'none')">
 						<w:top>
 							<xsl:attribute name="w:val">single</xsl:attribute>
 							<xsl:attribute name="w:sz">
@@ -184,7 +184,7 @@
 							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-top, string-length(@fo:border-top) -5, 6)"/></xsl:attribute>
 						</w:top>
 					</xsl:if>
-					<xsl:if test="@fo:border-left">
+					<xsl:if test="@fo:border-left and (@fo:border-left != 'none')">
 						<w:left>
 							<xsl:attribute name="w:val">single</xsl:attribute>
 							<xsl:attribute name="w:sz">
@@ -195,7 +195,7 @@
 							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-left, string-length(@fo:border-left) -5, 6)"/></xsl:attribute>
 						</w:left>
 					</xsl:if>
-					<xsl:if test="@fo:border-bottom">
+					<xsl:if test="@fo:border-bottom and (@fo:border-bottom != 'none')">
 						<w:bottom>
 							<xsl:attribute name="w:val">single</xsl:attribute>
 							<xsl:attribute name="w:sz">
@@ -206,7 +206,7 @@
 							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-bottom, string-length(@fo:border-bottom) -5, 6)"/></xsl:attribute>
 						</w:bottom>
 					</xsl:if>
-					<xsl:if test="@fo:border-right">
+					<xsl:if test="@fo:border-right and (@fo:border-right != 'none')">
 						<w:right>
 							<xsl:attribute name="w:val">single</xsl:attribute>
 							<xsl:attribute name="w:sz">
