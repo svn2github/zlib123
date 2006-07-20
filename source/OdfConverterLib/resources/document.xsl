@@ -363,7 +363,7 @@
 			<w:tcPr>
 				<!-- point on the cell style properties --> 
 				<xsl:variable name="cellProp" select="key('style', @table:style-name)/style:table-cell-properties"/>
-	
+				
 				<!-- @TODO : width of the cell -->
 				<xsl:choose>
 					<xsl:when test="$merge = 1">
@@ -440,7 +440,6 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</w:tcBorders>
-
 				<xsl:choose>
 					<xsl:when test="$cellProp[@fo:background-color]">
 						<xsl:variable name="fill" select="$cellProp/@fo:background-color"/>
@@ -504,6 +503,16 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:if>	
+				<xsl:if test="$cellProp/@style:writing-mode">
+					<xsl:choose>
+						<xsl:when test="$cellProp[@style:writing-mode = 'tb-rl']">
+							<w:textDirection w:val="tbRl"/>
+						</xsl:when>
+						<xsl:when test="$cellProp[@style:writing-mode = 'lr-tb']">
+							<w:textDirection w:val="lrTb"/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:if>
 			</w:tcPr>
 			<xsl:apply-templates/>
 			 <!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
