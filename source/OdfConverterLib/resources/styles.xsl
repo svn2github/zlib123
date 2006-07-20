@@ -173,42 +173,50 @@
 			</xsl:if>
 			<xsl:if test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
 				<w:pBdr>
-					<w:top>
-						<xsl:attribute name="w:val">single</xsl:attribute>
-						<xsl:attribute name="w:sz">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="substring-before(@fo:border-top,  ' ')"/>	
-							</xsl:call-template>
-						</xsl:attribute>
-						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-top, string-length(@fo:border-top) -5, 6)"/></xsl:attribute>
-					</w:top>
-					<w:left>
-						<xsl:attribute name="w:val">single</xsl:attribute>
-						<xsl:attribute name="w:sz">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="substring-before(@fo:border-left,  ' ')"/>	
-							</xsl:call-template>
-						</xsl:attribute>
-						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-left, string-length(@fo:border-left) -5, 6)"/></xsl:attribute>
-					</w:left>
-					<w:bottom>
-						<xsl:attribute name="w:val">single</xsl:attribute>
-						<xsl:attribute name="w:sz">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="substring-before(@fo:border-bottom,  ' ')"/>	
-							</xsl:call-template>
-						</xsl:attribute>
-						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-bottom, string-length(@fo:border-bottom) -5, 6)"/></xsl:attribute>
-					</w:bottom>
-					<w:right>
-						<xsl:attribute name="w:val">single</xsl:attribute>
-						<xsl:attribute name="w:sz">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="substring-before(@fo:border-right,  ' ')"/>	
-							</xsl:call-template>
-						</xsl:attribute>
-						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-right, string-length(@fo:border-right) -5, 6)"/></xsl:attribute>
-					</w:right>
+					<xsl:if test="@fo:border-top">
+						<w:top>
+							<xsl:attribute name="w:val">single</xsl:attribute>
+							<xsl:attribute name="w:sz">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="substring-before(@fo:border-top,  ' ')"/>	
+								</xsl:call-template>
+							</xsl:attribute>
+							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-top, string-length(@fo:border-top) -5, 6)"/></xsl:attribute>
+						</w:top>
+					</xsl:if>
+					<xsl:if test="@fo:border-left">
+						<w:left>
+							<xsl:attribute name="w:val">single</xsl:attribute>
+							<xsl:attribute name="w:sz">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="substring-before(@fo:border-left,  ' ')"/>	
+								</xsl:call-template>
+							</xsl:attribute>
+							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-left, string-length(@fo:border-left) -5, 6)"/></xsl:attribute>
+						</w:left>
+					</xsl:if>
+					<xsl:if test="@fo:border-bottom">
+						<w:bottom>
+							<xsl:attribute name="w:val">single</xsl:attribute>
+							<xsl:attribute name="w:sz">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="substring-before(@fo:border-bottom,  ' ')"/>	
+								</xsl:call-template>
+							</xsl:attribute>
+							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-bottom, string-length(@fo:border-bottom) -5, 6)"/></xsl:attribute>
+						</w:bottom>
+					</xsl:if>
+					<xsl:if test="@fo:border-right">
+						<w:right>
+							<xsl:attribute name="w:val">single</xsl:attribute>
+							<xsl:attribute name="w:sz">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="substring-before(@fo:border-right,  ' ')"/>	
+								</xsl:call-template>
+							</xsl:attribute>
+							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-right, string-length(@fo:border-right) -5, 6)"/></xsl:attribute>
+						</w:right>
+					</xsl:if>
 				</w:pBdr>
 			</xsl:if>
 			
