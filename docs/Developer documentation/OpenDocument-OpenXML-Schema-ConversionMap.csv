@@ -603,10 +603,11 @@ style:paragraph-properties/@fo:margin-right converted to w:styles/w:style/w:pPr/
 ;;Paragraph Background Color;1;0.1;Partial;"style:paragraph-properties/@fo:background-color translated to w:styles/w:style/w:pPr/w:shd/@w:fill
 Attribute @w:val is set to 'solid'";
 ;;Paragraph Background Image;3;0.2-M1;;;not available in Word?
-;;Border;1;0.2-M1;;;
+;;Border;1;0.2-M1;Partial;"style:paragraph-properties/@fo:border translated to w:styles/w:style/w:pPr/w:pBdr/@w:color and @w:sz
+Attribute @w:val is set to 'single'";
 ;;Border Line Width;2;0.2-M1;;;
 ;;Padding;2;0.2-M1;;;
-;;Shadow;3;0.2-M1;;;Seems to not exist in OOX
+;;Shadow;3;0.2-M1;;;not available in Word?
 ;;Keep with Next;1;0.2-M1;;;
 ;;Line Numbering;2;0.2-M1;;;cannot be mapped one-to-ont (Word automatically inserts page breaks
 ;;Line Number Start Value;2;0.2-M1;;;
