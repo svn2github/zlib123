@@ -290,7 +290,15 @@
 					</xsl:attribute>
 				</w:tblW>
 				<xsl:if test="key('style', @table:style-name)/style:table-properties/@table:align">
-					<w:jc w:val="{key('style', @table:style-name)/style:table-properties/@table:align}"/>
+					<xsl:choose>
+						<xsl:when test="key('style', @table:style-name)/style:table-properties/@table:align = 'margins'">
+							<w:jc w:val="left"/>
+							<!--User agents that do not support the "margins" value, may treat this value as "left".-->
+						</xsl:when>
+						<xsl:otherwise>
+							<w:jc w:val="{key('style', @table:style-name)/style:table-properties/@table:align}"/>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:if>
 				</w:tblPr>
 			<w:tblGrid>
