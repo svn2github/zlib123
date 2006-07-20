@@ -130,15 +130,97 @@
 	
 	<xsl:template match="style:paragraph-properties[parent::style:style  or parent::style:default-style]" mode="styles">
 		<w:pPr>
+			<!-- border color  -->
+			<xsl:if test="@fo:border">
+				<w:pBdr>
+					<w:top>
+						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:attribute name="w:sz">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
+					</w:top>
+					<w:left>
+						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:attribute name="w:sz">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
+					</w:left>
+					<w:bottom>
+						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:attribute name="w:sz">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
+					</w:bottom>
+					<w:right>
+						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:attribute name="w:sz">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
+					</w:right>
+				</w:pBdr>
+			</xsl:if>
+			<xsl:if test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
+				<w:pBdr>
+					<w:top>
+						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:attribute name="w:sz">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="substring-before(@fo:border-top,  ' ')"/>	
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-top, string-length(@fo:border-top) -5, 6)"/></xsl:attribute>
+					</w:top>
+					<w:left>
+						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:attribute name="w:sz">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="substring-before(@fo:border-left,  ' ')"/>	
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-left, string-length(@fo:border-left) -5, 6)"/></xsl:attribute>
+					</w:left>
+					<w:bottom>
+						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:attribute name="w:sz">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="substring-before(@fo:border-bottom,  ' ')"/>	
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-bottom, string-length(@fo:border-bottom) -5, 6)"/></xsl:attribute>
+					</w:bottom>
+					<w:right>
+						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:attribute name="w:sz">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="substring-before(@fo:border-right,  ' ')"/>	
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-right, string-length(@fo:border-right) -5, 6)"/></xsl:attribute>
+					</w:right>
+				</w:pBdr>
+			</xsl:if>
+			
 			<!-- background color -->
 			<xsl:if test="@fo:background-color and (@fo:background-color != 'transparent')">
 				<w:shd>
-					<!--xsl:attribute name="w:val">solid</xsl:attribute-->
 					<xsl:attribute name="w:val">clear</xsl:attribute>
 					<xsl:attribute name="w:color">auto</xsl:attribute>
 					<xsl:attribute name="w:fill"><xsl:value-of select="substring(@fo:background-color, 2, string-length(@fo:background-color) -1)"/></xsl:attribute>
 				</w:shd>
 			</xsl:if>
+			
 			<!-- tabs -->
 			<xsl:if test="style:tab-stops/style:tab-stop">
 				<w:tabs>
@@ -230,7 +312,6 @@
 					</xsl:if>
 				</w:ind>
 			</xsl:if>
-			
 			
 			<!-- TODO this should be modified when we will manage bidi properties -->
 			<xsl:if test="@fo:text-align">
