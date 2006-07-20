@@ -36,7 +36,8 @@
 	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 	xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
 	exclude-result-prefixes="office style fo text draw number">
-		
+
+	<xsl:variable name="asianLayoutId">1</xsl:variable>
 	
 	<xsl:template name="styles">
 		<w:styles>
@@ -610,7 +611,75 @@
 			<xsl:if test="@style:letter-kerning = 'true'">
 				<w:kern w:val="16" />
 			</xsl:if>
-		</w:rPr>		
+			<xsl:if test="@fo:background-color">
+				<w:shd w:val="clear" w:color="auto">
+					<xsl:attribute name="w:fill">
+						<xsl:choose>
+							<xsl:when test="@fo:background-color = 'transparent'">auto</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="substring(@fo:background-color, 2, string-length(@fo:background-color)-1)"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</w:shd>
+			</xsl:if>
+			<xsl:if test="@style:text-combine">
+				<xsl:choose>
+					<xsl:when test="@style:text-combine = 'lines'">
+						<w:eastAsianLayout>
+							<xsl:attribute name="w:id"><xsl:value-of select="$asianLayoutId"/></xsl:attribute>
+							<xsl:variable name="asianLayoutId" select="$asianLayoutId+1"/>
+							<xsl:attribute name="w:combine">lines</xsl:attribute>
+							<xsl:choose>
+								<xsl:when test="@style:text-combine-start-char = '&lt;' and @style:text-combine-end-char = '&gt;'">
+									<xsl:attribute name="w:combineBrackets">angle</xsl:attribute>
+								</xsl:when>
+								<xsl:when test="@style:text-combine-start-char = '{' and @style:text-combine-end-char = '}'">
+									<xsl:attribute name="w:combineBrackets">curly</xsl:attribute>
+								</xsl:when>
+								<xsl:when test="@style:text-combine-start-char = '(' and @style:text-combine-end-char = ')'">
+									<xsl:attribute name="w:combineBrackets">round</xsl:attribute>
+								</xsl:when>
+								<xsl:when test="@style:text-combine-start-char = '[' and @style:text-combine-end-char = ']'">
+									<xsl:attribute name="w:combineBrackets">square</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise><xsl:attribute name="w:combineBrackets">none</xsl:attribute></xsl:otherwise>
+							</xsl:choose>
+						</w:eastAsianLayout>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:if>
+			<xsl:if test="@style:text-emphasize">
+				<w:em>
+					<xsl:attribute name="w:val">
+						<xsl:choose>
+							<xsl:when test="@style:text-emphasize = 'accent above'">comma</xsl:when>
+							<xsl:when test="@style:text-emphasize = 'dot above'">dot</xsl:when>
+							<xsl:when test="@style:text-emphasize = 'circle above'">circle</xsl:when>
+							<xsl:when test="@style:text-emphasize = 'dot below'">underDot</xsl:when>
+							<xsl:otherwise>none</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</w:em>
+			</xsl:if>
+			<xsl:if test="@style:text-scale">
+				<w:w>
+					<xsl:attribute name="w:val">
+						<xsl:value-of select="substring(@style:text-scale, 1, string-length(@style:text-scale)-1)"/>
+					</xsl:attribute>
+				</w:w>
+			</xsl:if>
+			<xsl:if test="@text:display">
+				<xsl:choose>
+					<xsl:when test="@text:display = 'true'">
+						<w:vanish w:val="on"/>
+					</xsl:when>
+					<xsl:when test="@text:display = 'none'">
+						<w:vanish w:val="off"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:if>
+		</w:rPr>
 	</xsl:template>
 	
 	<xsl:template match="style:graphic-properties[parent::style:style]" mode="styles">
