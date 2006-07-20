@@ -82,6 +82,11 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
         {
             this.applicationObject = (MSword.Application)application;
             this.labelsResourceManager = OdfWordAddinLib.GetResourceManager();
+
+            if (connectMode != Extensibility.ext_ConnectMode.ext_cm_Startup)
+            {
+                OnStartupComplete(ref custom);
+            }
         }
 
         /// <summary>
@@ -97,6 +102,10 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
         /// <seealso class='IDTExtensibility2' />
         public void OnDisconnection(Extensibility.ext_DisconnectMode disconnectMode, ref System.Array custom)
         {
+            if (disconnectMode != Extensibility.ext_DisconnectMode.ext_dm_HostShutdown)
+            {
+                OnBeginShutdown(ref custom);
+            }
             this.applicationObject = null;
             this.labelsResourceManager = null;
         }
@@ -178,6 +187,13 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
         /// <seealso class='IDTExtensibility2' />
         public void OnBeginShutdown(ref System.Array custom)
         {
+            // remove menu items (use FindControl instead of referenced object
+            // in order to actually remove the items - this is a workaround)
+            CommandBarButton button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, labelsResourceManager.GetString("OdfImportLabel"), Type.Missing);
+            button.Delete(Type.Missing);
+            button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, labelsResourceManager.GetString("OdfExportLabel"), Type.Missing);
+            button.Delete(Type.Missing);
+            applicationObject.NormalTemplate.Save();
         }
 
         private void importButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
