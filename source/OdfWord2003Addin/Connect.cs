@@ -164,7 +164,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
             catch (Exception)
             {
                 // otherwise, create a new one
-                exportButton = (CommandBarButton)commandBar.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 3, true);
+                exportButton = (CommandBarButton)commandBar.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 4, true);
             }
             // set item's label
             exportButton.Caption = labelsResourceManager.GetString("OdfExportLabel");
