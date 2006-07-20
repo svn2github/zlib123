@@ -552,17 +552,17 @@ style:text-properties/@fo:font-complex-weight translated to w:styles/w:style/w:r
 ;;Text Line Through Word Mode;2;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
 ;;Letter Kerning;2;0.2-M1;Completed;style:text-properties/@style:letter-kerning convert to w:styles/w:style/w:rPr/w:kern;
 ;;Text Blinking;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
-;;Text Background Color;1;0.2-M1;;;
-;;Text Combine;?;0.2-M1;;;what does it mean? drop caps?
-;;Text Combine Start and End Characters;?;0.2-M1;;;
-;;Text Emphasis;;0.2-M1;;;for Asian languages
-;;Text Scale;3;0.2-M1;;;
-;;Text Rotation Angle;3;0.2-M1;;;might not directly exist in Word! Simulated via text boxes?
-;;Text Rotation Scale;3;0.2-M1;;;
-;;Hyphenation;3;0.2-M1;;;
-;;Hyphenation Remain Char Count;3;0.2-M1;;;
-;;Hyphenation Push Char Count;3;0.2-M1;;;
-;;Hidden or Conditional Text;0;0.2-M1;;;Conditional hidden text in Word?
+;;Text Background Color;1;0.2-M1;Completed;style:text-properties/@fo:background-color convert to w:styles/w:style/w:rPr/w:shd;
+;;Text Combine;?;0.2-M1;Completed;style:text-properties/@style:text-combine convert to w:styles/w:style/w:rPr/w:eastAsianLayout;Is for Asian languages, it's to combine characters so that they are displayed within two lines 
+;;Text Combine Start and End Characters;?;0.2-M1;Completed;style:text-properties/@style:text-combine-start-char and  style:text-properties/@style:text-combine-end-char convert to w:styles/w:style/w:rPr/w:eastAsianLayout/@w:combineBrackets;The translation might be lossy, because underline feature is richer in ODF than in OOX
+;;Text Emphasis;;0.2-M1;Completed;style:text-properties/@style:text-emphasize convert to w:styles/w:style/w:rPr/w:em;The translation might be lossy, because underline feature is richer in ODF than in OOX
+;;Text Scale;3;0.2-M1;Completed;style:text-properties/@style:text-scale convert to w:styles/w:style/w:rPr/w:w;
+;;Text Rotation Angle;3;0.2-M1;Partial;;might not directly exist in Word! Simulated via text boxes?
+;;Text Rotation Scale;3;0.2-M1;Partial;;might not directly exist in Word! Simulated via text boxes?
+;;Hyphenation;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Hyphenation Remain Char Count;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Hyphenation Push Char Count;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Hidden or Conditional Text;0;0.2-M1;Partial;style:text-properties/@text:display convert to w:styles/w:style/w:rPr/w:vanish;There are a bug beetwen open office and ODF, conditional text don't existe in OOX
 ;Paragraph Formatting Properties;;;0.2-M1;;;
 ;;Fixed Line Height;1;0.2-M1;;"styles:paragraph-properties/@fo:line-height translated to w:styles/w:style/w:pPr/w:spacing
 @w:lineRule set to 'auto' if @w:line is expressed in percentage, otherwise, it is set to 'exact'. Attribute @w:line is the twip (twentieth of a point) measure of line-height";mapping to Word has to be defined
