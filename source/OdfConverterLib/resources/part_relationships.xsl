@@ -56,7 +56,9 @@
 		  <Relationship Id="rId4" 
 			    Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" 
 		        Target="settings.xml"/>
-		
+		  <Relationship Id="rId5"
+				Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes"
+				Target="footnotes.xml"/>
 			
 			<!-- images 
 				TODO : manage ole-objects 
