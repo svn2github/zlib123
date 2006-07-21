@@ -502,7 +502,7 @@ Formatting Properties;;;;;;;
 ;;Font Variant;1;0.2-M1;Completed;style:text-properties/@fo:font-variant convert to w:styles/w:style/w:rPr/w:smallCaps;
 ;;Text Transformations;1;0.2-M1;Completed;style:text-properties/@fo:text-transform convert to w:styles/w:style/w:rPr/w:caps;
 ;;Color;1;0.1;Completed;style:text-properties/@fo:color used in w:styles/w:style/w:rPr/w:color/@w:val;
-;;Window Font Color;1;0.2-M1;;;
+;;Window Font Color;1;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
 ;;Text Outline;2;0.2-M1;Completed;style:text-properties/@style:text-outline convert to w:styles/w:style/w:rPr/w:outline;
 ;;Line Through Type;3;0.2-M1;Completed;style:text-properties/@style:text-line-through-type='double' convert to w:styles/w:style/w:rPr/w:dstrike;
 ;;Line Through Style;3;0.2-M1;Completed;style:text-properties/@style:text-line-through-style convert to w:styles/w:style/w:rPr/w:strike;All style are convert to a line, because line through feature is richer in ODF than in OOX. If line through type exist, the convertion isn't made.
@@ -516,14 +516,14 @@ Formatting Properties;;;;;;;
 ;;Font Family;0;0.1;Partial;"style:style/@style:font-family converted to w:styles/w:style/@w:type
 'text' family matches 'character' type.
 'graphic', 'section' and 'paragraph' families match 'paragraph' type. ";
-;;Font Family Generic;0;0.2-M1;;;
+;;Font Family Generic;0;0.2-M1;Completed;style:font-face/@style:font-family-generic convert to w:fonts/w:font/w:family;
 ;;Font style;0;0.1;Completed;"style:style[@fo:font-style='italic'] converted to w:styles/w:style/w:rPr/w:i
 style:style[@fo:font-style-complex='italic'] converted to w:styles/w:style/w:rPr/w:i-cs";
-;;Font Pitch;0;0.2-M1;;;
-;;Font Character Set;1?;0.2-M1;;;
+;;Font Pitch;0;0.2-M1;Completed;style:font-face/@style:font-pitch convert to w:fonts/w:font/w:pitch;
+;;Font Character Set;1?;0.2-M1;Completed;style:font-face/@style:font-charset convert to w:fonts/w:font/w:charset;
 ;;Font Size;0;0.1;Completed;"style:text-properties/@fo:font-size converted to w:styles/w:style/w:rPr/@w:sz
 If fo:font-size is expressed in percentage of a parent font-size, we climb up the style ancestors until we find an absolute size (expressed in points). If none was found, the size of the default style (office:styles/style:default-style)  in the same family is used. ";
-;;Relative Font Size;1;0.2-M1;;;
+;;Relative Font Size;1;0.2-M1;Partial;;not available in Open Office?
 ;;Script Type;2;0.2-M1;Partial;w:pPr/w:spacing based on style:paragraph-properties/@fo:line-height;
 ;;Letter Spacing;2;0.2-M1;Completed;style:text-properties/@fo:letter-spacing convert to w:styles/w:style/w:rPr/w:spacing;
 ;;Language;0;0.2-M1;Completed;style:text-properties/@fo:language convert to w:styles/w:style/w:rPr/w:lang concatenated with country;
