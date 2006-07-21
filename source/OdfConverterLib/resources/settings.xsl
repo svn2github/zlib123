@@ -34,10 +34,7 @@
                 <w:view w:val="print"/>
     	        
             	<!-- Footnotes document wide properties -->
-                <w:footnotePr>
-                    <w:footnote w:id="0"/>
-                    <w:footnote w:id="1"/>
-                </w:footnotePr>
+               <xsl:call-template name="footnotes-configuration"/>
             </w:settings>
     </xsl:template>
    

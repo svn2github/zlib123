@@ -29,7 +29,9 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-    exclude-result-prefixes="text">
+    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    exclude-result-prefixes="text style office">
     
         <xsl:key name="footnotes" match="text:note" use="''"/>
         
@@ -50,7 +52,7 @@
                         </w:footnote>
                         <w:footnote w:type="continuationSeparator" w:id="1">
                                 <w:p>
-                                        <!-- TODO :  extract properties from document('styles.xml')/office:automatic-styles/style:page-layout/style:footnote-sep -->
+                                        <!-- TODO :  extract properties from document('styles.xml')/office:automatic-styles/style:page-layout/ -->
                                         <w:pPr>
                                                 <w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
                                         </w:pPr>
@@ -84,6 +86,46 @@
                         </xsl:for-each>
                         
                 </w:footnotes>
+        </xsl:template>
+        
+        <!-- footnotes configuration -->
+        <xsl:template name="footnotes-configuration">
+                <xsl:variable name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
+                <w:footnotePr>
+                       
+                        <w:pos>
+                                <xsl:attribute name="w:val">
+                                        <xsl:choose>
+                                                <xsl:when test="$config/@text:footnotes-position = 'text' ">beneathText</xsl:when>
+                                                <xsl:otherwise>pageBottom</xsl:otherwise>
+                                        </xsl:choose>
+                                </xsl:attribute>
+                        </w:pos>
+                        
+                        <w:numFmt>
+                                <xsl:attribute name="w:val">
+                                        <xsl:call-template name="num-format">
+                                                <xsl:with-param name="format" select="$config/@style:num-format"/>
+                                        </xsl:call-template>
+                                </xsl:attribute>
+                        </w:numFmt>
+                        
+                        <w:numStart w:val="{$config/@text:start-value}"/>
+                        
+                        <w:numRestart>
+                                <xsl:attribute name="w:val">
+                                        <xsl:choose>
+                                                <xsl:when test="$config/@text:start-numbering-at = 'page' ">eachPage</xsl:when>
+                                                <xsl:when test="$config/@text:start-numbering-at = 'chapter' ">eachSect</xsl:when>
+                                                <xsl:otherwise>continuous</xsl:otherwise>
+                                        </xsl:choose>                    
+                                </xsl:attribute>
+                        </w:numRestart> 
+                           
+                        <w:footnote w:id="0"/>
+                        <w:footnote w:id="1"/>
+                     
+                </w:footnotePr>
         </xsl:template>
  
 </xsl:stylesheet>
