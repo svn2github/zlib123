@@ -13,7 +13,7 @@ To test the add-in, you will need the following:
 * Word 2007 beta 2 (http://www.microsoft.com/office/preview/beta/download/en/default.mspx)
 * .NET framework 2.0 (http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&displaylang=en)
 
-Warning: if you install Word 2007 before the .NET Framework, you will need to update your Word installation after installing the  .NET Framework, by running the following these steps below.
+Warning: if you install Word 2007 before the .NET Framework, you will need to update your Word installation after installing the  .NET Framework, by running the following steps:
 * Open "Add or remove Programs" from the Control Panel
 * Find the Word 2007 entry and choose "Modify"
 * Within the installation process, choose "Add or remove features" then add ".NET Programmability Support" in the "Microsoft Office Word" section. 
