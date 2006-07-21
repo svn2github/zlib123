@@ -595,7 +595,7 @@ respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:s
 ;;Text Indent;0;0.1;Completed;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
 respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).
 ";
-;;Automatic Text Indent;1;0.2-M1;;;not available in Word?
+;;Automatic Text Indent;1;0.2-M1;Partial;style:paragraph-properties/@style:auto-text-indent converted to w:styles/w:style/w:pPr/w:ind/w:firstLine;not available in Word, then use a trick to indent the first line egal paragraph font-size
 ;;Top and Bottom Margins;0;0.1;Completed;"style:paragraph-properties/@fo:margin-top converted to w:styles/w:style/w:pPr/w:spacing/@w:before
 style:paragraph-properties/@fo:margin-right converted to w:styles/w:style/w:pPr/w:spacing/@w:after";
 ;;Margins;0;0.2-M1;;;
@@ -606,7 +606,7 @@ Attribute @w:val is set to 'solid'";
 ;;Border;1;0.2-M1;Partial;"style:paragraph-properties/@fo:border translated to w:styles/w:style/w:pPr/w:pBdr/@w:color and @w:sz
 Attribute @w:val is set to 'single'";
 ;;Border Line Width;2;0.2-M1;;;
-;;Padding;2;0.2-M1;;;
+;;Padding;2;0.2-M1;Partial;style:paragraph-properties/@fo:padding translated to w:styles/w:style/w:pPr/w:pBdr/@w:space;
 ;;Shadow;3;0.2-M1;;;not available in Word?
 ;;Keep with Next;1;0.2-M1;;;
 ;;Line Numbering;2;0.2-M1;;;cannot be mapped one-to-ont (Word automatically inserts page breaks
