@@ -44,6 +44,7 @@
 	<!-- Make sure we manage all cases -->	
 	<xsl:template match="style:font-face" mode="fonts">
 		<w:font>
+			<!-- Make sur the 'x-symbol' charset is always '02' and the asian and complex charset are not control -->
 			<xsl:choose>
 				<xsl:when test="@svg:font-family = 'StarSymbol'">
 					<xsl:attribute name="w:name">Symbol</xsl:attribute>
@@ -53,14 +54,17 @@
 					<xsl:attribute name="w:name"><xsl:value-of select="@svg:font-family"/></xsl:attribute>
 				</xsl:otherwise>
 			</xsl:choose>
+			<xsl:choose>
+				<xsl:when test="@style:font-charset = 'x-symbol'">
+					<w:charset w:val="02"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<w:charset w:val="00"/>
+				</xsl:otherwise>
+			</xsl:choose>
 			<xsl:if test="@style:font-family-generic">
 				<w:family w:val="{@style:font-family-generic}"/>
 			</xsl:if>
-			<!--
-			<xsl:if test="@style:font-charset">
-				<w:charset w:val="{@style:font-charset}"/>
-			</xsl:if>
-			-->
 			<xsl:if test="@style:font-pitch">
 				<w:pitch w:val="{@style:font-pitch}"/>
 			</xsl:if>
