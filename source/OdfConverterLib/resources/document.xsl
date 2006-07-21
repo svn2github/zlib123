@@ -560,6 +560,42 @@
 	<xsl:template match="text:line-break" mode="text">
 		<w:br/>
 	</xsl:template>
+	
+		<!-- footnotes -->
+	<xsl:template match="text:note" mode="paragraph">
+		<w:r>
+			<w:rPr>
+				<w:rStyle w:val="{concat(@text:note-class, 'Reference')}"/>
+			</w:rPr>
+			<xsl:apply-templates select="." mode="text"/>
+		</w:r>
+	</xsl:template>
+	
+	<xsl:template match="text:note" mode="text">
+		<w:footnoteReference>
+			<xsl:attribute name="w:id">
+				<xsl:call-template name="footnoteId">
+					<xsl:with-param name="node" select="."/>
+				</xsl:call-template>
+			</xsl:attribute>
+		</w:footnoteReference>
+	</xsl:template>
+	
+	<!-- 
+	       Generate a decimal identifier based on the position of the current 
+	       footenote among all the indexed footnotes.
+	-->
+	<xsl:template name="footnoteId">
+		<xsl:param name="node"/>
+		<xsl:variable name="positionInGroup">
+			<xsl:for-each select="key('footnotes', '')">
+				<xsl:if test="generate-id($node) = generate-id(.)">
+					<xsl:value-of select="position() + 1"/>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:value-of select="$positionInGroup"/>
+	</xsl:template>
 
 
 	<!-- Extra spaces management, courtesy of J. David Eisenberg -->
