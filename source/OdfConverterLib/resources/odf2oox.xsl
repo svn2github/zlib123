@@ -34,6 +34,7 @@
   <xsl:import href="docprops.xsl"/>
   <xsl:import href="document.xsl"/>
   <xsl:import href="numbering.xsl"/>
+  <xsl:import href="footnotes.xsl"/>
   <xsl:import href="fonts.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="pictures.xsl"/>	
@@ -86,6 +87,11 @@
       <!-- numbering (lists) -->
       <zip:entry zip:target="word/numbering.xml">
         <xsl:call-template name="numbering"/>
+      </zip:entry>
+    	
+      <!-- numbering (lists) -->
+      <zip:entry zip:target="word/footnotes.xml">
+        <xsl:call-template name="footnotes"/>
       </zip:entry>
     	
       <!-- styles -->
