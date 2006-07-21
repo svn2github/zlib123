@@ -66,6 +66,7 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
             resources.ApplyResources(this.progressBar1, "progressBar1");
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.UseWaitCursor = true;
+            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
             // 
             // cancelButton
             // 
@@ -82,9 +83,11 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
             this.ControlBox = false;
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.progressBar1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ConverterForm";
+            this.ShowInTaskbar = false;
             this.UseWaitCursor = true;
             this.Activated += new System.EventHandler(this.ConverterForm_Activated);
             this.Load += new System.EventHandler(this.ConverterForm_Load);

@@ -37,6 +37,8 @@ using System.Windows.Forms;
 using System.IO;
 using System.Threading;
 using CleverAge.OdfConverter.OdfConverterLib;
+using System.Resources;
+using System.Collections;
 
 namespace CleverAge.OdfConverter.OdfWordAddinLib
 {
@@ -47,17 +49,21 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
 
         private string inputFile;
         private string outputFile;
+        private ResourceManager manager;
         private bool computeSize;
         private int size;
         private Exception exception;
         private bool cancel;
         private bool converting;
-        public ConverterForm(string inputFile, string outputFile)
+        private ArrayList lostElements;
+
+        public ConverterForm(string inputFile, string outputFile, ResourceManager manager)
         {
             InitializeComponent();
             this.inputFile = inputFile;
             this.outputFile = outputFile;
-           // DoConvert();
+            this.manager = manager;
+            lostElements = new ArrayList();
         }
 
         public class CancelledException : Exception
@@ -77,11 +83,29 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                 return cancel;
             }
         }
+
+        public bool HasLostElements
+        {
+            get
+            {
+                return lostElements.Count > 0;
+            }
+        }
+
+        public ArrayList LostElements
+        {
+            get
+            {
+                return lostElements;
+            }
+        }
+
         private void DoConvert()
         {
             try {
                 Converter converter = new Converter();
-                converter.AddMessageListener(new Converter.MessageListener(MessageInterceptor));
+                converter.AddProgressMessageListener(new Converter.MessageListener(ProgressMessageInterceptor));
+                converter.AddFeedbackMessageListener(new Converter.MessageListener(FeedbackMessageInterceptor));
                 this.computeSize = true;
                 converter.OdfToOoxComputeSize(this.inputFile);
                 this.progressBar1.Maximum = this.size;
@@ -93,7 +117,7 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
             }
         }
 
-        private void MessageInterceptor(object sender, EventArgs e)
+        private void ProgressMessageInterceptor(object sender, EventArgs e)
         {
             if (this.computeSize)
             {
@@ -107,6 +131,15 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
             if (cancel) {
                 // As we need to leave converter.OdfToOox, throw an exception
                 throw new CancelledException();
+            }
+        }
+
+        private void FeedbackMessageInterceptor(object sender, EventArgs e)
+        {
+            string message = ((OdfEventArgs)e).Message;
+            if (!lostElements.Contains(message))
+            {
+                lostElements.Add(message);
             }
         }
 
@@ -136,7 +169,7 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
 
         private void ConverterForm_Load(object sender, EventArgs e) {
             FileInfo file = new FileInfo(inputFile);
-            this.Text = "Converting " + file.Name + "...";
+            this.Text = manager.GetString("ConversionFormTitle").Replace("%1",  file.Name);
         }
 
         private void ConverterForm_Activated(object sender, EventArgs e) {
@@ -146,6 +179,11 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                 DoConvert();
                 converting = false;
             }
+        }
+
+        private void progressBar1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -52,12 +52,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		}
 
         public delegate void MessageListener(object sender, EventArgs e);
-        
-        private event MessageListener messageIntercepted;
 
-        public void AddMessageListener(MessageListener listener)
+        private event MessageListener progressMessageIntercepted;
+        private event MessageListener feedbackMessageIntercepted;
+
+        public void AddProgressMessageListener(MessageListener listener)
         {
-            messageIntercepted += listener;
+            progressMessageIntercepted += listener;
+        }
+
+        public void AddFeedbackMessageListener(MessageListener listener)
+        {
+            feedbackMessageIntercepted += listener;
         }
 		
 		public void OdfToOox(string inputFile, string outputFile)
@@ -140,9 +146,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void MessageCallBack(object sender, XsltMessageEncounteredEventArgs e)
         {
-            if (messageIntercepted != null)
+            if (e.Message.StartsWith("progress:"))
             {
-                messageIntercepted(this, null);
+                if (progressMessageIntercepted != null)
+                {
+                    progressMessageIntercepted(this, null);
+                }
+            }
+            else if (e.Message.StartsWith("feedback:"))
+            {
+                if (feedbackMessageIntercepted != null)
+                {
+                    feedbackMessageIntercepted(this, new OdfEventArgs(e.Message.Substring("feedback:".Length)));
+                }
             }
         }
         

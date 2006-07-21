@@ -35,6 +35,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
     using System.Xml;
     using Extensibility;
     using System.Runtime.InteropServices;
+    using System.Collections;
     using MSword = Microsoft.Office.Interop.Word;
     using CleverAge.OdfConverter.OdfConverterLib;
     using CleverAge.OdfConverter.OdfWordAddinLib;
@@ -176,7 +177,8 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                     fileName = OdfWordAddinLib.GetTempFileName(odfFile);
 
                     // call the converter
-                    using (form = new ConverterForm(odfFile, (string)fileName)) {
+                    using (form = new ConverterForm(odfFile, (string)fileName, labelsResourceManager))
+                    {
                         System.Windows.Forms.DialogResult dr = form.ShowDialog();
 
                         if (form.Exception != null) {
@@ -191,6 +193,12 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                             object missing = Type.Missing;
                             Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
 
+                            if (form.HasLostElements)
+                            {
+                                ArrayList elements = form.LostElements;
+                                InfoBox infoBox = new InfoBox(elements, labelsResourceManager);
+                                infoBox.ShowDialog();
+                            }
                             // and activate it
                             doc.Activate();
                         } else {

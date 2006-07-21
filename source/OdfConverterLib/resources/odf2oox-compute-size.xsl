@@ -31,7 +31,7 @@
     <xsl:apply-templates select="document('content.xml')//text:p"/>
   </xsl:template>
   <xsl:template match="text:p">
-    <xsl:message terminate="no">text:p</xsl:message>
+    <xsl:message terminate="no">progress:text:p</xsl:message>
     <xsl:apply-templates/>
   </xsl:template>
 </xsl:stylesheet>

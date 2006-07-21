@@ -147,4 +147,7 @@
   <data name="NotImplemented" xml:space="preserve">
     <value>Désolé, cette fonctionnalité n'est pas implémentée.</value>
   </data>
+  <data name="ConversionFormTitle" xml:space="preserve">
+    <value>Conversion de %1...</value>
+  </data>
 </root>
