@@ -57,6 +57,7 @@
     <EmbeddedResource Include="resources\contentTypes.xsl" />
     <EmbeddedResource Include="resources\package_relationships.xsl" />
     <Compile Include="NotAnOdfDocumentException.cs" />
+    <EmbeddedResource Include="resources\footnotes.xsl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
