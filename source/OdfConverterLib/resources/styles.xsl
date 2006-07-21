@@ -131,43 +131,103 @@
 	
 	<xsl:template match="style:paragraph-properties[parent::style:style  or parent::style:default-style]" mode="styles">
 		<w:pPr>
-			<!-- border color  -->
+			<xsl:if test="@fo:break-before='page'">
+				<w:pageBreakBefore/>
+			</xsl:if>
+			
+			<!-- border color + padding  -->
 			<xsl:if test="@fo:border">
 				<w:pBdr>
 					<w:top>
 						<xsl:attribute name="w:val">single</xsl:attribute>
 						<xsl:attribute name="w:sz">
-							<xsl:call-template name="twips-measure">
+							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
 							</xsl:call-template>
 						</xsl:attribute>
+						<xsl:if test="@fo:padding">
+							<xsl:attribute name="w:space">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length" select="@fo:padding"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:if>
+						<xsl:if test="@fo:padding-top">
+							<xsl:attribute name="w:space">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length" select="@fo:padding-top"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:if>
 						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
 					</w:top>
 					<w:left>
 						<xsl:attribute name="w:val">single</xsl:attribute>
 						<xsl:attribute name="w:sz">
-							<xsl:call-template name="twips-measure">
+							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
 							</xsl:call-template>
 						</xsl:attribute>
+						<xsl:if test="@fo:padding">
+							<xsl:attribute name="w:space">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length" select="@fo:padding"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:if>
+						<xsl:if test="@fo:padding-left">
+							<xsl:attribute name="w:space">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length" select="@fo:padding-left"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:if>
 						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
 					</w:left>
 					<w:bottom>
 						<xsl:attribute name="w:val">single</xsl:attribute>
 						<xsl:attribute name="w:sz">
-							<xsl:call-template name="twips-measure">
+							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
 							</xsl:call-template>
 						</xsl:attribute>
+						<xsl:if test="@fo:padding">
+							<xsl:attribute name="w:space">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length" select="@fo:padding"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:if>
+						<xsl:if test="@fo:padding-bottom">
+							<xsl:attribute name="w:space">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length" select="@fo:padding-bottom"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:if>
 						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
 					</w:bottom>
 					<w:right>
 						<xsl:attribute name="w:val">single</xsl:attribute>
 						<xsl:attribute name="w:sz">
-							<xsl:call-template name="twips-measure">
+							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
 							</xsl:call-template>
 						</xsl:attribute>
+						<xsl:if test="@fo:padding">
+							<xsl:attribute name="w:space">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length" select="@fo:padding"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:if>
+						<xsl:if test="@fo:padding-right">
+							<xsl:attribute name="w:space">
+								<xsl:call-template name="point-measure">
+									<xsl:with-param name="length" select="@fo:padding-right"/>
+								</xsl:call-template>
+							</xsl:attribute>
+						</xsl:if>
 						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
 					</w:right>
 				</w:pBdr>
@@ -178,10 +238,17 @@
 						<w:top>
 							<xsl:attribute name="w:val">single</xsl:attribute>
 							<xsl:attribute name="w:sz">
-								<xsl:call-template name="twips-measure">
+								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length" select="substring-before(@fo:border-top,  ' ')"/>	
 								</xsl:call-template>
 							</xsl:attribute>
+							<xsl:if test="@fo:padding-top">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="point-measure">
+										<xsl:with-param name="length" select="@fo:padding-top"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-top, string-length(@fo:border-top) -5, 6)"/></xsl:attribute>
 						</w:top>
 					</xsl:if>
@@ -189,10 +256,17 @@
 						<w:left>
 							<xsl:attribute name="w:val">single</xsl:attribute>
 							<xsl:attribute name="w:sz">
-								<xsl:call-template name="twips-measure">
+								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length" select="substring-before(@fo:border-left,  ' ')"/>	
 								</xsl:call-template>
 							</xsl:attribute>
+							<xsl:if test="@fo:padding-left">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="point-measure">
+										<xsl:with-param name="length" select="@fo:padding-left"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-left, string-length(@fo:border-left) -5, 6)"/></xsl:attribute>
 						</w:left>
 					</xsl:if>
@@ -200,10 +274,17 @@
 						<w:bottom>
 							<xsl:attribute name="w:val">single</xsl:attribute>
 							<xsl:attribute name="w:sz">
-								<xsl:call-template name="twips-measure">
+								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length" select="substring-before(@fo:border-bottom,  ' ')"/>	
 								</xsl:call-template>
 							</xsl:attribute>
+							<xsl:if test="@fo:padding-bottom">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="point-measure">
+										<xsl:with-param name="length" select="@fo:padding-bottom"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-bottom, string-length(@fo:border-bottom) -5, 6)"/></xsl:attribute>
 						</w:bottom>
 					</xsl:if>
@@ -211,10 +292,17 @@
 						<w:right>
 							<xsl:attribute name="w:val">single</xsl:attribute>
 							<xsl:attribute name="w:sz">
-								<xsl:call-template name="twips-measure">
+								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length" select="substring-before(@fo:border-right,  ' ')"/>	
 								</xsl:call-template>
 							</xsl:attribute>
+							<xsl:if test="@fo:padding-right">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="point-measure">
+										<xsl:with-param name="length" select="@fo:padding-right"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border-right, string-length(@fo:border-right) -5, 6)"/></xsl:attribute>
 						</w:right>
 					</xsl:if>
@@ -345,16 +433,6 @@
 	
 				</w:jc>
 			</xsl:if>
-			
-			<xsl:if test="@fo:break-before='page'">
-				<w:pageBreakBefore/>
-			</xsl:if>
-
-			<!--
-			<xsl:if test="@fo:break-before='page'">
-				<w:pageBreakBefore val="on"/>
-			</xsl:if>
-			-->
 				
 		<!-- TODO Manage Bidi but it is not prioritary-->
 		</w:pPr>
