@@ -706,6 +706,25 @@
 		</w:pPr>
 	</xsl:template>
 	
+	
+	<!-- footnote reference and text styles -->
+	<xsl:template match="text:notes-configuration[@text:note-class='footnote']" mode="styles">
+		<w:style w:styleId="{concat(@text:note-class, 'Reference')}" w:type="character">
+			<w:name w:val="footnote reference"/>
+			<w:basedOn w:val="{@text:citation-body-style-name}"/>
+			<w:semiHidden/>
+			<w:unhideWhenUsed/>
+		</w:style>
+		<w:style w:styleId="{concat(@text:note-class, 'Text')}" w:type="paragraph">
+			<w:name w:val="footnote text"/>
+			<w:basedOn w:val="{@text:citation-style-name}"/>
+			<!--w:link w:val="FootnoteTextChar"/-->
+			<w:semiHidden/>
+			<w:unhideWhenUsed/>
+		</w:style>
+	</xsl:template>
+	
+	
 	<xsl:template name="computeSize">
 		<xsl:param name="node"/>
 		<xsl:if test="contains($node/@fo:font-size, 'pt')">
