@@ -32,6 +32,12 @@
     <xsl:template name="settings">
             <w:settings>
                 <w:view w:val="print"/>
+    	        
+            	<!-- Footnotes document wide properties -->
+                <w:footnotePr>
+                    <w:footnote w:id="0"/>
+                    <w:footnote w:id="1"/>
+                </w:footnotePr>
             </w:settings>
     </xsl:template>
    
