@@ -400,10 +400,18 @@
 							</xsl:call-template>
 						</xsl:attribute>
 					</xsl:if>
-					<xsl:if test="@fo:text-indent">
+					<xsl:if test="@fo:text-indent and (@style:auto-text-indent!='true')">
 						<xsl:attribute name="w:firstLine">
 							<xsl:call-template name="twips-measure">
 								<xsl:with-param name="length" select="@fo:text-indent"/>
+							</xsl:call-template>
+						</xsl:attribute>
+					</xsl:if>
+					<!-- Trick to replace automatic indent for OOX -->
+					<xsl:if test="@style:auto-text-indent='true'">
+						<xsl:attribute name="w:firstLine">
+							<xsl:call-template name="twips-measure">
+							<xsl:with-param name="length" select="parent::style:style/style:text-properties/@fo:font-size"/>
 							</xsl:call-template>
 						</xsl:attribute>
 					</xsl:if>
