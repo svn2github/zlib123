@@ -26,7 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace CleverAge.OdfConverter.OdfWord2007Addin
+namespace CleverAge.OdfConverter.OdfWord2003Addin
 {
     using System;
     using System.Reflection;
