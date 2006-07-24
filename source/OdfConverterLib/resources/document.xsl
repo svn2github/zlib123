@@ -91,8 +91,8 @@
 
 	<xsl:template match="text:p">
 		<xsl:param name="level" select="0"/>
-    <xsl:message terminate="no">progress:text:p</xsl:message>
-    <xsl:message terminate="no">feedback:paragraph</xsl:message>
+		<xsl:message terminate="no">progress:text:p</xsl:message>
+		<xsl:message terminate="no">feedback:paragraph</xsl:message>
 		<xsl:choose>
 			<xsl:when test="$level = 0">
 				<w:p>
@@ -173,9 +173,9 @@
 
 	<xsl:template match="text:list">
 		<xsl:param name="level" select="-1"/>
-    <xsl:message terminate="no">feedback:list</xsl:message>
-    <xsl:apply-templates select="text:list-item">
-      <xsl:with-param name="level" select="$level+1"/>
+		<xsl:message terminate="no">feedback:list</xsl:message>
+		<xsl:apply-templates select="text:list-item">
+			<xsl:with-param name="level" select="$level+1"/>
 		</xsl:apply-templates>
 	</xsl:template>
 
@@ -371,11 +371,13 @@
 
 	<xsl:template name="cellWidth">
 		<xsl:param name="col"/>
-		
-		<xsl:variable name="colStyle" select="//table:table-column[position() = $col]/@table:style-name"/>
+
+		<xsl:variable name="table" select="ancestor::table:table[1]" />
+		<xsl:variable name="colStyle"
+			select="$table/table:table-column[position() = $col]/@table:style-name"/>
 		<xsl:variable name="width"
 			select="//office:automatic-styles/style:style[@style:name=$colStyle]/style:table-column-properties/@style:column-width"/>
-		
+
 		<w:tcW w:type="{$type}">
 			<xsl:attribute name="w:w">
 				<xsl:call-template name="twips-measure">
@@ -384,13 +386,13 @@
 			</xsl:attribute>
 		</w:tcW>
 	</xsl:template>
-	
+
 	<xsl:template name="loopCell">
-		<xsl:param name="cellPosition" />
-		<xsl:param name="colNum" />
-		<xsl:param name="iterator" />
-		<xsl:param name="repeat" />
-		
+		<xsl:param name="cellPosition"/>
+		<xsl:param name="colNum"/>
+		<xsl:param name="iterator"/>
+		<xsl:param name="repeat"/>
+
 		<xsl:choose>
 			<xsl:when test="$iterator = $cellPosition">
 				<xsl:call-template name="cellWidth">
@@ -400,7 +402,7 @@
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:variable name="column" select="//table:table-column[position() = $colNum]" />
+				<xsl:variable name="column" select="//table:table-column[position() = $colNum]"/>
 				<xsl:variable name="repeatVal">
 					<xsl:choose>
 						<xsl:when test="$repeat &gt; 0">
@@ -410,7 +412,7 @@
 							<xsl:value-of select="$column/@table:number-columns-repeated"/>
 						</xsl:otherwise>
 					</xsl:choose>
-				</xsl:variable> 
+				</xsl:variable>
 				<xsl:choose>
 					<xsl:when test="$repeatVal and $repeatVal &gt; 1">
 						<xsl:call-template name="loopCell">
@@ -446,7 +448,7 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
+
 	<xsl:template match="table:table-cell" name="table-cell">
 		<xsl:param name="grid" select="0"/>
 		<xsl:param name="merge" select="0"/>
@@ -459,11 +461,11 @@
 				<!-- width of the cell -  @TODO handle problem of merged columns or rows-->
 				<xsl:call-template name="loopCell">
 					<xsl:with-param name="iterator">1</xsl:with-param>
-					<xsl:with-param name="cellPosition" select="position()" />
+					<xsl:with-param name="cellPosition" select="position()"/>
 					<xsl:with-param name="colNum">1</xsl:with-param>
 					<xsl:with-param name="repeat">-1</xsl:with-param>
 				</xsl:call-template>
-				
+
 				<xsl:choose>
 					<xsl:when test="$merge = 1">
 						<w:gridSpan w:val="{$grid}"/>
@@ -688,8 +690,8 @@
 	<xsl:template match="text:line-break" mode="text">
 		<w:br/>
 	</xsl:template>
-	
-		<!-- footnotes -->
+
+	<!-- footnotes -->
 	<xsl:template match="text:note" mode="paragraph">
 		<w:r>
 			<w:rPr>
@@ -698,7 +700,7 @@
 			<xsl:apply-templates select="." mode="text"/>
 		</w:r>
 	</xsl:template>
-	
+
 	<xsl:template match="text:note" mode="text">
 		<w:footnoteReference>
 			<xsl:attribute name="w:id">
@@ -708,7 +710,7 @@
 			</xsl:attribute>
 		</w:footnoteReference>
 	</xsl:template>
-	
+
 	<!-- 
 	       Generate a decimal identifier based on the position of the current 
 	       footenote among all the indexed footnotes.
