@@ -151,7 +151,7 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
             importButton.Caption = labelsResourceManager.GetString("OdfImportLabel");
             importButton.Tag = labelsResourceManager.GetString("OdfImportLabel");
             // set action
-            importButton.OnAction = "!<OpenOfficePlugin.Connect>";
+            importButton.OnAction = "!<OdfWord2003Addin.Connect>";
             importButton.Visible = true;
             importButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.importButton_Click);
 
@@ -170,7 +170,7 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
             exportButton.Caption = labelsResourceManager.GetString("OdfExportLabel");
             exportButton.Tag = labelsResourceManager.GetString("OdfExportLabel");
             // set action
-            exportButton.OnAction = "!<OpenOfficePlugin.Connect>";
+            exportButton.OnAction = "!<OdfWord2003Addin.Connect>";
             exportButton.Visible = true;
             exportButton.Enabled = false;
             exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
