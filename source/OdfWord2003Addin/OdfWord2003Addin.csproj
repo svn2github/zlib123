@@ -10,7 +10,7 @@
     </StartupObject>
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>OdfWord2003Addin</AssemblyName>
-    <RootNamespace>OdfWord2003Addin</RootNamespace>
+    <RootNamespace>CleverAge.OdfConverter.OdfWord2003Addin</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
