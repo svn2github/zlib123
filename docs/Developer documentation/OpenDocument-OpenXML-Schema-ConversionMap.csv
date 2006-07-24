@@ -650,7 +650,7 @@ style:table-properties/@style:width for this table style name is converted to w:
 ;;Writing Mode;1;0.2-M1;;;
 ;;Display;1;0.2-M1;;;
 ;Column Formatting Properties;;1;;;;
-;;Column Width;1;0.2-Final;;;
+;;Column Width;1;0.2-Final;Partial;w:tc/w:tcPr/w:tcW based on style:table-column-properties/@style:column-width;TODO: handle problem of merged columns or rows
 ;;Optimal Table Column Width;1;0.2-Final;;;
 ;;Break Before and Break After;1;0.2-Final;;;
 ;Table Row Formatting Properties;;1;;;;
