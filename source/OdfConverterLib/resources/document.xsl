@@ -361,16 +361,43 @@
 						<xsl:if test="name(parent::*) = 'table:table-header-rows'">
 							<w:tblHeader/>
 						</xsl:if>
-						<xsl:if test="parent::*[@table:style-name]">
+						<xsl:if test="@table:style-name">
 							<xsl:variable name="rowStyle" select="@table:style-name" />
-							<xsl:variable name="widthRow"
-								select="key('style', $rowStyle)/style:table-row-properties/@style:min-row-height"/>
+							<xsl:variable name="widthType"
+								select="key('style', $rowStyle)/style:table-row-properties"/>
+							
+							<xsl:variable name="widthRow">
+								<xsl:choose>
+									<xsl:when test="$widthType[@style:row-height]">
+										<xsl:value-of select="$widthType/@style:row-height"/>
+									</xsl:when>
+									<xsl:when test="$widthType[@style:min-row-height]">
+										<xsl:value-of select="$widthType/@style:min-row-height"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="0"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
 							
 							<w:trHeight>
 								<xsl:attribute name="w:val">
 									<xsl:call-template name="twips-measure">
 										<xsl:with-param name="length" select="$widthRow"/>
 									</xsl:call-template>
+								</xsl:attribute>
+								<xsl:attribute name="w:hRule">
+									<xsl:choose>
+										<xsl:when test="$widthType[@style:row-height]">
+											<xsl:value-of select="'exact'"/>
+										</xsl:when>
+										<xsl:when test="$widthType[@style:min-row-height]">
+											<xsl:value-of select="'atLeast'"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="'auto'"/>
+										</xsl:otherwise>
+									</xsl:choose>
 								</xsl:attribute>
 							</w:trHeight> 
 						</xsl:if>
