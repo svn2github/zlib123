@@ -361,6 +361,19 @@
 						<xsl:if test="name(parent::*) = 'table:table-header-rows'">
 							<w:tblHeader/>
 						</xsl:if>
+						<xsl:if test="parent::*[@table:style-name]">
+							<xsl:variable name="rowStyle" select="@table:style-name" />
+							<xsl:variable name="widthRow"
+								select="key('style', $rowStyle)/style:table-row-properties/@style:min-row-height"/>
+							
+							<w:trHeight>
+								<xsl:attribute name="w:val">
+									<xsl:call-template name="twips-measure">
+										<xsl:with-param name="length" select="$widthRow"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</w:trHeight> 
+						</xsl:if>
 						<!-- row styles -->
 					</w:trPr>
 					<xsl:apply-templates select="table:table-cell"/>
@@ -376,7 +389,7 @@
 		<xsl:variable name="colStyle"
 			select="$table/table:table-column[position() = $col]/@table:style-name"/>
 		<xsl:variable name="width"
-			select="//office:automatic-styles/style:style[@style:name=$colStyle]/style:table-column-properties/@style:column-width"/>
+			select="key('style', $colStyle)/style:table-column-properties/@style:column-width"/>
 
 		<w:tcW w:type="{$type}">
 			<xsl:attribute name="w:w">
