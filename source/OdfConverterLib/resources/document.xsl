@@ -402,7 +402,8 @@
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:variable name="column" select="//table:table-column[position() = $colNum]"/>
+				<xsl:variable name="table" select="ancestor::table:table[1]" />
+				<xsl:variable name="column" select="$table/table:table-column[position() = $colNum]"/>
 				<xsl:variable name="repeatVal">
 					<xsl:choose>
 						<xsl:when test="$repeat &gt; 0">
