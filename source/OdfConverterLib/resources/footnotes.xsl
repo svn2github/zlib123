@@ -33,7 +33,8 @@
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     exclude-result-prefixes="text style office">
     
-        <xsl:key name="footnotes" match="text:note" use="''"/>
+        <!-- Group footnotes under the same key -->
+        <xsl:key name="footnotes" match="text:note[@text:note-class='footnote']" use="''"/>
         
         <xsl:template name="footnotes">
                 <w:footnotes>
@@ -110,7 +111,9 @@
                                 </xsl:attribute>
                         </w:numFmt>
                         
-                        <w:numStart w:val="{$config/@text:start-value}"/>
+                        <xsl:if test="$config/@text:start-value">
+                                <w:numStart w:val="{$config/@text:start-value}"/>
+                        </xsl:if>
                         
                         <w:numRestart>
                                 <xsl:attribute name="w:val">
