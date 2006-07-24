@@ -654,7 +654,7 @@ style:table-properties/@style:width for this table style name is converted to w:
 ;;Optimal Table Column Width;1;0.2-Final;;;
 ;;Break Before and Break After;1;0.2-Final;;;
 ;Table Row Formatting Properties;;1;;;;
-;;Row Height;1;0.2-Final;;;
+;;Row Height;1;0.2-Final;Partial;w:tr/w:trPr/w:trHeight based on style:table-row-properties/@style:min-row-height;TODO: handle problem of merged rows
 ;;Optimal Table Row Height;1;0.2-Final;;;
 ;;Row Background;1;0.2-Final;;;
 ;;Break Before and Break After;1;0.2-Final;;;
