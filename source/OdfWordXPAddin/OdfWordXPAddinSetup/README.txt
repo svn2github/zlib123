@@ -1,41 +1,35 @@
-ODF Add-in for Word 2003
+ODF Add-in for Word XP
 ================================
 
-Thank you for downloading ODF Add-in for Word 2003.
-The purpose of the software is to enable users to open ODF Specification based documents in Word 2003 and demonstrate the interoperability between OpenXML & ODF specifications. 
+Thank you for downloading ODF Add-in for Word XP.
+The purpose of the software is to enable users to open ODF Specification based documents in Word XP and demonstrate the interoperability between OpenXML & ODF specifications. 
 This add-in is under development (see the roadmap at http://sourceforge.net/projects/odf-converter for more details about planned releases).
-We will provide stable nightly builds. You can install and test them at your own risk!
+
 
 Software Requirements
 --------------------------------
 To test the add-in, you will need the following:
 
 * Microsoft .NET framework 2.0 (http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&displaylang=en)
-* Microsoft Word 2003 with Compatibility Pack (http://www.microsoft.com/office/preview/beta/converter.mspx)
+* Microsoft Word XP with Compatibility Pack for Office 2007 (http://www.microsoft.com/office/preview/beta/converter.mspx)
+Note that the Compatibility Pack for Office 2007 requires the Service Pack 3 for Office XP to be installed.
 
-
-Warning: if you install Word 2003 before the .NET Framework, you will need to update your Word installation after installing the  .NET Framework, by running the following these steps below.
-* Open "Add or remove Programs" from the Control Panel
-* Find the Word 2003 entry and choose "Modify"
-* Within the installation process, choose "Add or remove features" then add ".NET Programmability Support" in the "Microsoft Office Word" section. 
 
 Download and install the add-in
 -------------------------------
 Visit the Download Page and download the latest binary distribution of the add-in.  
-Double click the the MSI file to install the add-in for Word 2003.
-
+Double click the the MSI file to install the add-in for Word XP.
 
 
 Test the add-in 
 -------------------------------
-If installation is successful, you should see two new entries related to ODF (Open and Save) in the "File" menu in Word 2003. It allows you to either import an ODF text file or export your current working document as an ODF text file (note that during development process, those functionalities might be temporary unavailable).
+If installation is successful, you should see two new entries related to ODF (Open and Save) in the "File" menu in Word XP. It allows you to either import an ODF text file or export your current working document as an ODF text file (note that during development process, those functionalities might be temporary unavailable).
 
 Important note: The ODF file opened by the add-in is converted into Office OpenXML (Office 2007 new file format) and imported into Word as a read-only file. If you want to save it as ODF, you have to use the "Export as ODF" button and provide a new file name (that can be the same as the current file name).
 
+
 Troubleshooting Guide:
 -------------------------------
-If you don't see the ODF entry, it could be due to missing features in Word (see the Software Requirements listed above). After completing the ODF Add-in installation,  you need to activate the Add-in by doing the following actions:
-
-[to be completed]
+If an error occures when you try to open an ODF file, it might be that the Service Pack 3 for Office XP or the Compatibility Pack for Word 2007 is not installed (see Software Requirements).
 
 
