@@ -227,7 +227,7 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                     fileName = OdfWordAddinLib.GetTempFileName(odfFile);
 
                     // call the converter
-                    using (form = new ConverterForm(odfFile, (string)fileName))
+                    using (form = new ConverterForm(odfFile, (string)fileName, labelsResourceManager))
                     {
                         System.Windows.Forms.DialogResult dr = form.ShowDialog();
 
