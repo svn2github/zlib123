@@ -578,7 +578,8 @@ justify -> both
 otherwise start";
 ;;Text Align of Last Line;;0.2-M1;;;not available in Word?
 ;;Justify Single Word;;0.2-M1;;;not available in Word?
-;;Keep Together;1;0.2-M1;;;
+;;Keep Together;1;0.2-M1;Completed;"style:paragraph-properties/@fo:keep-together='always' converted to w:styles/w:style/w:pPr/w:keepLines
+style:paragraph-properties/@fo:keep-with-next='always' converted to w:styles/w:style/w:pPr/w:keepNext";
 ;;Widows;1;0.2-M1;;;
 ;;Orphans;1;0.2-M1;;;
 ;;Tab Stops;0;0.2-M1;Partial;"style:paragraph-properties/style:tab-stops converted to w:styles/w:style/w:pPr/w:tabs
@@ -588,8 +589,8 @@ style:tab-stop/@style:type converted to w:tab/@w:val. When @style:type is not pr
 ;;Tab Stop Distance;0;0.2-M1;;;
 ;;Hyphenation Keep;;0.2-M1;;;
 ;;Maximum Hyphens;;0.2-M1;;;
-;;Drop Caps;2;0.2-M1;;;
-;;Register True;3;0.2-M1;;;
+;;Drop Caps;2;0.2-M1;;;mapping to Word has to be defined
+;;Register True;3;0.2-M1;;;mapping to Word has to be defined
 ;;Left and Right Margins;0;0.1;Completed;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
 respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).";
 ;;Text Indent;0;0.1;Completed;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
@@ -609,7 +610,7 @@ Attribute @w:val is set to 'single'";
 ;;Padding;2;0.2-M1;Partial;style:paragraph-properties/@fo:padding translated to w:styles/w:style/w:pPr/w:pBdr/@w:space;
 ;;Shadow;3;0.2-M1;;;not available in Word?
 ;;Keep with Next;1;0.2-M1;;;
-;;Line Numbering;2;0.2-M1;;;cannot be mapped one-to-ont (Word automatically inserts page breaks
+;;Line Numbering;2;0.2-M1;;;cannot be mapped one-to-ont (Word automatically inserts page breaks)
 ;;Line Number Start Value;2;0.2-M1;;;
 ;;Text Autospace;;0.2-M1;;;
 ;;Punctuation Wrap;;0.2-M1;;;
