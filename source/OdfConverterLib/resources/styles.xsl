@@ -156,7 +156,7 @@
 			
 			<xsl:if test="@fo:widows or @fo:orphans">
 				<w:widowControl>
-					
+					<xsl:attribute name="w:val">off</xsl:attribute>
 				</w:widowControl>
 			</xsl:if>
 			
