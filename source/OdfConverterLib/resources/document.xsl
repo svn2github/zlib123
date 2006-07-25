@@ -34,6 +34,7 @@
 	xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
 	xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
 	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 	exclude-result-prefixes="office text table fo style">
 
 	<xsl:strip-space elements="*"/>
@@ -101,8 +102,15 @@
 						<xsl:when test="parent::text:note-body">
 							<xsl:variable name="note" select="ancestor::text:note"/>
 							<w:pPr>
-								<w:pStyle w:val="{@text:style-name}"/>
-								<!--w:pStyle w:val="{concat($note/@text:note-class, 'Text')}"/-->
+								<xsl:choose>
+									<xsl:when test="count(draw:frame) = 1 and count(child::text()) = 0">
+										<w:pStyle w:val="{draw:frame/@draw:style-name}"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<w:pStyle w:val="{@text:style-name}"/>
+										<!--w:pStyle w:val="{concat($note/@text:note-class, 'Text')}"/-->
+									</xsl:otherwise>
+								</xsl:choose>
 							</w:pPr>
 							<xsl:if test="position() = 1">
 								<!-- Include the mark to the first paragraph -->
