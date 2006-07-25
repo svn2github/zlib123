@@ -96,10 +96,41 @@
 		<xsl:choose>
 			<xsl:when test="$level = 0">
 				<w:p>
-					<w:pPr>
-						<w:pStyle w:val="{@text:style-name}"/>
-					</w:pPr>
-					<xsl:apply-templates mode="paragraph"/>
+					<xsl:choose>
+						<!-- we are in a footnote or endnote -->
+						<xsl:when test="parent::text:note-body">
+							<xsl:variable name="note" select="ancestor::text:note"/>
+							<w:pPr>
+								<w:pStyle w:val="concat($note/@text:note-class, 'Text')"/>
+							</w:pPr>
+							<xsl:if test="position() = 1">
+								<!-- Include the mark to the first paragraph -->
+								<w:r>
+									<w:rPr>
+										<w:rStyle w:val="{concat($note/@text:note-class, 'Reference')}"/>
+									</w:rPr>
+									<xsl:choose>
+										<xsl:when test="$note/text:note-citation/@text:label">
+											<w:t>
+												<xsl:value-of select="$note/text:note-citation"/>
+											</w:t>
+										</xsl:when>
+										<xsl:otherwise>
+											<w:footnoteRef/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</w:r>
+							</xsl:if>
+							<xsl:apply-templates mode="paragraph"/>
+						</xsl:when>
+						<!-- main scenario -->
+						<xsl:otherwise>
+							<w:pPr>
+								<w:pStyle w:val="{@text:style-name}"/>
+							</w:pPr>
+							<xsl:apply-templates mode="paragraph"/>
+						</xsl:otherwise>
+					</xsl:choose>
 				</w:p>
 			</xsl:when>
 			<xsl:otherwise>
@@ -750,6 +781,9 @@
 				</xsl:call-template>
 			</xsl:attribute>
 		</w:footnoteReference>
+		<xsl:if test="text:note-citation/@text:label">
+			<w:t><xsl:value-of select="text:note-citation"/></w:t>
+		</xsl:if>
 	</xsl:template>
 
 	<!-- 

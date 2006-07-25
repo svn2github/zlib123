@@ -70,18 +70,11 @@
                                 <!-- iterating over the footnotes -->
                                     <xsl:for-each select="key('footnotes', '')">
                                             <w:footnote w:type="normal" w:id="{position() + 1}">
-                                                    <w:p>
-                                                            <w:pPr>
-                                                                    <w:pStyle w:val="{concat(@text:note-class, 'Text')}"/>
-                                                            </w:pPr>
-                                                            <w:r>
-                                                                    <w:rPr>
-                                                                            <w:rStyle w:val="{concat(@text:note-class, 'Reference')}"/>
-                                                                    </w:rPr>
-                                                                    <w:footnoteRef/>
-                                                             </w:r>
-                                                         <xsl:apply-templates select="text:note-body" mode="paragraph"/>   
-                                                    </w:p>
+                                                    <!-- This a custom mark, don't increment the counter -->
+                                                    <xsl:if test="text:note-citation/@text:label">
+                                                            <xsl:attribute name="w:suppressRef">1</xsl:attribute>
+                                                    </xsl:if>
+                                                    <xsl:apply-templates select="text:note-body"/>   
                                             </w:footnote>
                                     </xsl:for-each>
                         </xsl:for-each>
