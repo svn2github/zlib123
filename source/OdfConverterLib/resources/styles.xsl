@@ -156,8 +156,27 @@
 			
 			<xsl:if test="@fo:widows or @fo:orphans">
 				<w:widowControl>
-					<xsl:attribute name="w:val">on</xsl:attribute>
+					
 				</w:widowControl>
+			</xsl:if>
+			
+			<xsl:if test="@style:vertical-align">
+				<w:textAlignment>
+					<xsl:choose>
+						<xsl:when test="@style:vertical-align='bottom'">
+							<xsl:attribute name="w:val">bottom</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="@style:vertical-align='top'">
+							<xsl:attribute name="w:val">top</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="@style:vertical-align='middle'">
+							<xsl:attribute name="w:val">center</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:attribute name="w:val">auto</xsl:attribute>
+						</xsl:otherwise>
+					</xsl:choose>
+				</w:textAlignment>
 			</xsl:if>
 
 			<!-- border color + padding  -->
