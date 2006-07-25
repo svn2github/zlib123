@@ -101,7 +101,8 @@
 						<xsl:when test="parent::text:note-body">
 							<xsl:variable name="note" select="ancestor::text:note"/>
 							<w:pPr>
-								<w:pStyle w:val="concat($note/@text:note-class, 'Text')"/>
+								<w:pStyle w:val="{@text:style-name}"/>
+								<!--w:pStyle w:val="{concat($note/@text:note-class, 'Text')}"/-->
 							</w:pPr>
 							<xsl:if test="position() = 1">
 								<!-- Include the mark to the first paragraph -->
