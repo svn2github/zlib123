@@ -153,6 +153,12 @@
 			<xsl:if test="@fo:keep-with-next='always'">
 				<w:keepNext/>
 			</xsl:if>
+			
+			<xsl:if test="@fo:widows or @fo:orphans">
+				<w:widowControl>
+					<xsl:attribute name="w:val">on</xsl:attribute>
+				</w:widowControl>
+			</xsl:if>
 
 			<!-- border color + padding  -->
 			<xsl:if test="@fo:border">
