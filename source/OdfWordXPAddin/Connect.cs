@@ -262,15 +262,15 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                 }
                 catch (Exception e)
                 {
-                    if (File.Exists((string)fileName))
-                    {
-                        File.Delete((string)fileName);
-                    }
 #if DEBUG
                     System.Windows.Forms.MessageBox.Show(e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
 #else
                     System.Windows.Forms.MessageBox.Show(labelsResourceManager.GetString("OdfUnexpectedError"));
 #endif
+                    if (File.Exists((string)fileName))
+                    {
+                        File.Delete((string)fileName);
+                    }
                 }
                 finally
                 {
