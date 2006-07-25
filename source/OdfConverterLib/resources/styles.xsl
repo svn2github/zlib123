@@ -178,6 +178,19 @@
 					</xsl:choose>
 				</w:textAlignment>
 			</xsl:if>
+			
+			<xsl:if test="@style:text-autospace">
+				<w:autoSpaceDN>
+					<xsl:choose>
+						<xsl:when test="@style:text-autospace='none'">
+							<xsl:attribute name="w:val">off</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="@style:text-autospace='ideograph-alpha'">
+							<xsl:attribute name="w:val">on</xsl:attribute>
+						</xsl:when>
+					</xsl:choose>
+				</w:autoSpaceDN>
+			</xsl:if>
 
 			<!-- border color + padding  -->
 			<xsl:if test="@fo:border">
