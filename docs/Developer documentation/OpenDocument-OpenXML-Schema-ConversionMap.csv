@@ -415,7 +415,25 @@ One special case : 'StarSymbol' value is converted to 'Symbol'";
 ;;Ruby Style;3;0.2-Final;;;
 ;Enhanced Text Styles;;;;;;
 ;;Line Numbering Configuration;3;0.2-Final;;;
-;;Notes Configuration Element;1;0.2-Final;;;refers to footnote styles!
+;;Notes Configuration Element;1;0.2-Final;Partial;"text:notes-configuration/@text:note-class attribute discriminates between footnotes and endnotes. This is required in OOX. 
+Footnotes :
+text:notes-configuration gives birth to two OOX styles named : 
+concat(@text:note-class, 'Reference') and concat(@text:note-class, 'Text')
+Both are defined w:semiHidden and w:unhideWhenUsed. 
+The first one is based on @text:citation-body-style-name and the other on @text:citation-style-name.
+The main use of text:notes-configuration is its translation to w:footnotePr (footnote properties) when @text:note-class is 'footnote' or w:endnotePr for 'endnote'.
+Let's assume we are configuring footnotes.
+- @text:start-value is translated to w:footnotePr/w:numStart/@w:val
+- @style:num-format translates to w:footnotePr/w:numFmt using num-format template (already used for lists)
+- @text:start-numbering-at translates to w:footnotePr/w:numRestart with the following mapping :
+   - 'page' - > 'eachPage'
+  - 'chapter' -> 'eachSect'
+  - otherwise value is set to 'continuous'
+- @text:footnotes-position is converted to w:footnotePr/w:pos/@w:val with the following mapping : 
+  - 'text' -> 'beneathText'
+  - otherwise 'pageBottom' value is set.";"TODO : endnotes
+TODO : concerning footntes : handle master page, default note paragraph style, Footnote Continuation.
+footnotes positions 'section' and 'document' don't seem to have counterpart in OOX."
 ;;Bibliography Configuration;3;0.2-Final;;;
 ;List Style;;;;;;
 ;;Common List-Level Style Attributes;1;0.2-M1;Complete;"text:level translated to <w:lvl w:ilvl=""{number(@text:level) - 1}"">";
