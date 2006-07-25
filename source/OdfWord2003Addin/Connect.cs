@@ -35,6 +35,7 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
     using System.Xml;
     using Extensibility;
     using System.Runtime.InteropServices;
+    using System.Collections;
     using MSword = Microsoft.Office.Interop.Word;
     using CleverAge.OdfConverter.OdfConverterLib;
     using CleverAge.OdfConverter.OdfWordAddinLib;
@@ -53,7 +54,7 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
     ///   The object for implementing an Add-in.
     /// </summary>
     /// <seealso class='IDTExtensibility2' />
-    [GuidAttribute("CA43CC65-0A7F-4CA0-97A8-3BA6BFA7AAFB"), ProgId("OdfWord2003Addin.Connect")]
+    [GuidAttribute("0A2B8EBA-9B2D-43D7-B82C-CC2D85936BE4"), ProgId("OdfWord2003Addin.Connect")]
     public class Connect : Object, Extensibility.IDTExtensibility2
     {
         /// <summary>
@@ -245,6 +246,12 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                             object missing = Type.Missing;
                             Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
 
+                            if (form.HasLostElements)
+                            {
+                                ArrayList elements = form.LostElements;
+                                InfoBox infoBox = new InfoBox(elements, labelsResourceManager);
+                                infoBox.ShowDialog();
+                            }
                             // and activate it
                             doc.Activate();
                         }
@@ -263,15 +270,15 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                 }
                 catch (Exception e)
                 {
-                    if (File.Exists((string)fileName))
-                    {
-                        File.Delete((string)fileName);
-                    }
 #if DEBUG
                     System.Windows.Forms.MessageBox.Show(e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
 #else
                     System.Windows.Forms.MessageBox.Show(labelsResourceManager.GetString("OdfUnexpectedError"));
 #endif
+                    if (File.Exists((string)fileName))
+                    {
+                        File.Delete((string)fileName);
+                    }
                 }
                 finally
                 {
