@@ -135,6 +135,25 @@
 				<w:pageBreakBefore/>
 			</xsl:if>
 			
+			<!--xsl:if test="@style:line-spacing">
+				<w:spacing>
+					<xsl:attribute name="w:line">
+						<xsl:call-template name="twips-measure">
+							<xsl:with-param name="length" select="@style:line-spacing"/>
+						</xsl:call-template>
+					</xsl:attribute>
+					<xsl:attribute name="w:lineRule">auto</xsl:attribute>
+				</w:spacing>
+			</xsl:if-->
+			
+			<xsl:if test="@fo:keep-together='always'">
+				<w:keepLines/>
+			</xsl:if>
+			
+			<xsl:if test="@fo:keep-with-next='always'">
+				<w:keepNext/>
+			</xsl:if>
+
 			<!-- border color + padding  -->
 			<xsl:if test="@fo:border">
 				<w:pBdr>
