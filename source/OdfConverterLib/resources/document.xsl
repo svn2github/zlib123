@@ -774,7 +774,7 @@
 		</w:r>
 	</xsl:template>
 
-	<xsl:template match="text:note" mode="text">
+	<xsl:template match="text:note[@text:note-class='footnote']" mode="text">
 		<w:footnoteReference>
 			<xsl:attribute name="w:id">
 				<xsl:call-template name="footnoteId">
