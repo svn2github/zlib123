@@ -598,8 +598,8 @@ otherwise start";
 ;;Justify Single Word;;0.2-M1;;;not available in Word?
 ;;Keep Together;1;0.2-M1;Completed;"style:paragraph-properties/@fo:keep-together='always' converted to w:styles/w:style/w:pPr/w:keepLines
 style:paragraph-properties/@fo:keep-with-next='always' converted to w:styles/w:style/w:pPr/w:keepNext";
-;;Widows;1;0.2-M1;;;
-;;Orphans;1;0.2-M1;;;
+;;Widows;1;0.2-M1;Partial;style:paragraph-properties/@fo:widows  converted to w:styles/w:style/w:pPr/w:widowControl;Widows & Orphan are same in Word
+;;Orphans;1;0.2-M1;Partial;style:paragraph-properties/@fo:orphans converted to w:styles/w:style/w:pPr/w:widowControl;Widows & Orphan are same in Word
 ;;Tab Stops;0;0.2-M1;Partial;"style:paragraph-properties/style:tab-stops converted to w:styles/w:style/w:pPr/w:tabs
 style:paragraph-properties/style:tab-stops/style:tab-stop converted to w:styles/w:style/w:pPr/w:tabs/w:tab
 style:tab-stop/@fo:position converted to w:tab/@w:pos
