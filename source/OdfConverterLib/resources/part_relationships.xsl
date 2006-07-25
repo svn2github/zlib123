@@ -88,11 +88,18 @@
 			<!-- hyperlinks relationships 
 				TODO : really needs a clean way to find the text:a back! 
 			-->
-			<xsl:for-each select="document('content.xml')//text:a">
+			<xsl:for-each select="document('content.xml')/office:document-content/office:body//text:a">
 				<Relationship Id='{generate-id()}' 					
 				              Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-					            Target="{@xlink:href}"
-					            TargetMode="External" />
+					  TargetMode="External">
+					<xsl:attribute name="Target">
+						<!-- having Target empty makes Word Beta 2007 crash -->
+						<xsl:choose>
+							<xsl:when test="string-length(@xlink:href) &gt; 0"><xsl:value-of select="@xlink:href"/></xsl:when>
+							<xsl:otherwise>/</xsl:otherwise>
+						</xsl:choose>	
+					</xsl:attribute>
+				</Relationship>
 			</xsl:for-each>
 	  
 		</Relationships>
