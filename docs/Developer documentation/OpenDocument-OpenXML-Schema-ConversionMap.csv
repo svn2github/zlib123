@@ -94,7 +94,13 @@ Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";
 ;;Bookmarks;2;;;;
 ;;References;2;;;;
 ;Notes;;;0.2-M1;;;
-;;Note Element;0;;;;seems to be a general concept also including footnotes and endnotes
+;;Note Element;0;;Partial;"text:note element is converted to a run with a style named after the @text:footnote-class.
+When @text:note-class is 'footnote', a w:footnoteReference's child is created. Its @w:id to the reference is given by the position of the footnote in the 'footnotes' index (which groups all the document(s footnotes). This id must start at 2, because values 0 and 1 are reserved for 'separator' and 'continuation-separator' special footnotes.
+If text:note-citation/@text:label exists, we consider it to be a custom mark. Thus, a w:t is created into the run. containing text:note-citataion value.
+The rest of the note information are scattered into different OOX parts.  Mainly, footnotes and endnotes file parts. The footnotes part is defined by the Relationship Id=""rId5""
+    Type=""http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes""
+    Target=""footnotes.xml""
+Each footnote content is stored under w:footnote element. The 'separator' and 'continuation-separator' footnotes are defined first with w:id 0 and 1. Then the index of footnotes is iterated over. @w:id is given by the position of the footnote in the index +1,  @w:suppressRef is set '1' if text:note-citation/@text:label exists (custom mark). The management of the note body is delegated to the template matching text:p, more precisely when parent::text:note-body is true.  Special care must be taken if the note consists of more than one paragraph. Because the first paragraph (position() must include the note-citation with the appropriate style.  ";TODO : endnotes
 ;Ruby;;;0.2-Final;;;
 ;Text Annotation;;;0.2-Final;;;
 ;Index Marks;;3;0.2-Final;;;
