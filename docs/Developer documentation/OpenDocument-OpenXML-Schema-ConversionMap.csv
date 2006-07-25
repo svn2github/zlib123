@@ -639,7 +639,7 @@ Attribute @w:val is set to 'single'";
 ;;Text Autospace;;0.2-M1;;;
 ;;Punctuation Wrap;;0.2-M1;;;
 ;;Line Break;;0.2-M1;;;
-;;Vertical Alignment;2;0.2-M1;;;
+;;Vertical Alignment;2;0.2-M1;Completed;style:paragraph-properties/@style:vertical-align to w:styles/w:style/w:pPr/w:textAlignment/@w:val;
 ;;Writing Mode;;0.2-M1;;;
 ;;Automatic Writing Mode;;0.2-M1;;;
 ;;Snap To Layout;;0.2-M1;;;
