@@ -636,7 +636,7 @@ Attribute @w:val is set to 'single'";
 ;;Keep with Next;1;0.2-M1;;;
 ;;Line Numbering;2;0.2-M1;;;cannot be mapped one-to-ont (Word automatically inserts page breaks)
 ;;Line Number Start Value;2;0.2-M1;;;
-;;Text Autospace;;0.2-M1;;;
+;;Text Autospace;;0.2-M1;Partial;style:paragraph-properties/@style:text-autospace to w:styles/w:style/w:pPr/w:autoSpaceDN/@w:val;In word there are autoSpaceDN and autoSpaceDE
 ;;Punctuation Wrap;;0.2-M1;;;
 ;;Line Break;;0.2-M1;;;
 ;;Vertical Alignment;2;0.2-M1;Completed;style:paragraph-properties/@style:vertical-align to w:styles/w:style/w:pPr/w:textAlignment/@w:val;
