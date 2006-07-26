@@ -135,17 +135,6 @@
 				<w:pageBreakBefore/>
 			</xsl:if>
 			
-			<!--xsl:if test="@style:line-spacing">
-				<w:spacing>
-					<xsl:attribute name="w:line">
-						<xsl:call-template name="twips-measure">
-							<xsl:with-param name="length" select="@style:line-spacing"/>
-						</xsl:call-template>
-					</xsl:attribute>
-					<xsl:attribute name="w:lineRule">auto</xsl:attribute>
-				</w:spacing>
-			</xsl:if-->
-			
 			<xsl:if test="@fo:keep-together='always'">
 				<w:keepLines/>
 			</xsl:if>
@@ -396,7 +385,8 @@
 				</xsl:for-each>
 				</w:tabs>
 			</xsl:if>
-			<xsl:if test="@style:line-height-at-least or fo:line-height or @fo:margin-bottom or @fo:margin-top">
+			
+			<xsl:if test="@style:line-height-at-least or fo:line-height or @fo:margin-bottom or @fo:margin-top or @style:line-spacing">
 				<w:spacing>
 					<xsl:if test="@style:line-height-at-least">
 						<xsl:attribute name="w:lineRule">atLeast</xsl:attribute>
@@ -405,6 +395,14 @@
 								<xsl:with-param name="length" select="@style:line-height-at-least"/>
 							</xsl:call-template>
 						</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="@style:line-spacing">
+						<xsl:attribute name="w:line">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="@style:line-spacing"/>
+							</xsl:call-template>
+						</xsl:attribute>
+						<xsl:attribute name="w:lineRule">auto</xsl:attribute>
 					</xsl:if>
 					<xsl:if test="contains(@fo:line-height, '%')">
 						<xsl:attribute name="w:lineRule">auto</xsl:attribute>
