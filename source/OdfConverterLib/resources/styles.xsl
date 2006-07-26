@@ -131,8 +131,6 @@
 	
 	<xsl:template match="style:paragraph-properties[parent::style:style  or parent::style:default-style]" mode="styles">
 		<w:pPr>
-			
-			
 			<xsl:if test="@fo:keep-with-next='always'">
 				<w:keepNext/>
 			</xsl:if>
@@ -499,7 +497,6 @@
 					</xsl:choose>
 				</w:textAlignment>
 			</xsl:if>
-		<!-- TODO Manage Bidi but it is not prioritary-->
 		</w:pPr>
 	</xsl:template>
 	
