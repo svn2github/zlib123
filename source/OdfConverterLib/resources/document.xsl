@@ -35,15 +35,17 @@
 	xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
 	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
 	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-	exclude-result-prefixes="office text table fo style">
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	exclude-result-prefixes="office text table fo style draw xlink">
 
 	<xsl:strip-space elements="*"/>
 	<xsl:preserve-space elements="text:p"/>
 	<xsl:preserve-space elements="text:span"/>
 
-	<xsl:key name="style"
-		match="office:automatic-styles/style:style|office:automatic-styles/style:style"
-		use="@style:name"/>
+	<xsl:key name="style" match="office:automatic-styles/style:style|office:automatic-styles/style:style" use="@style:name"/>
+	<xsl:key name="hyperlinks" match="text:a" use="''"/>
+	<xsl:key name="images" match="draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]" use="''"/>
+	
 
 	<xsl:variable name="type">dxa</xsl:variable>
 

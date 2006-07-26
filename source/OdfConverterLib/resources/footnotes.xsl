@@ -27,24 +27,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
-    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-    exclude-result-prefixes="text style office">
-    
+        xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+        xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+        xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+        xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+        xmlns:zip="urn:cleverage:xmlns:zip"
+        exclude-result-prefixes="text style office xlink draw zip">
+
         <!-- Group footnotes under the same key -->
         <xsl:key name="footnotes" match="text:note[@text:note-class='footnote']" use="''"/>
-        
+
         <xsl:template name="footnotes">
                 <w:footnotes>
-                        
+
                         <!-- special footnotes -->
                         <w:footnote w:type="separator" w:id="0">
                                 <w:p>
                                         <!-- TODO :  extract properties from document('styles.xml')/office:automatic-styles/style:page-layout/style:footnote-sep -->
                                         <w:pPr>
-                                                <w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
+                                                <w:spacing w:after="0" w:line="240"
+                                                  w:lineRule="auto"/>
                                         </w:pPr>
                                         <w:r>
                                                 <w:separator/>
@@ -55,78 +59,138 @@
                                 <w:p>
                                         <!-- TODO :  extract properties from document('styles.xml')/office:automatic-styles/style:page-layout/ -->
                                         <w:pPr>
-                                                <w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
+                                                <w:spacing w:after="0" w:line="240"
+                                                  w:lineRule="auto"/>
                                         </w:pPr>
-                                        <w:r>        
+                                        <w:r>
                                                 <w:continuationSeparator/>
                                         </w:r>
                                 </w:p>
                         </w:footnote>
-                        
+
                         <!-- normal footnotes -->
-                        
+
                         <!-- absurd hack for changing the context -->
                         <xsl:for-each select="document('content.xml')">
                                 <!-- iterating over the footnotes -->
-                                    <xsl:for-each select="key('footnotes', '')">
-                                            <w:footnote w:type="normal" w:id="{position() + 1}">
-                                                    <!-- This a custom mark, don't increment the counter -->
-                                                    <xsl:if test="text:note-citation/@text:label">
-                                                            <xsl:attribute name="w:suppressRef">1</xsl:attribute>
-                                                    </xsl:if>
-                                                    <xsl:apply-templates select="text:note-body"/>   
-                                            </w:footnote>
-                                    </xsl:for-each>
+                                <xsl:for-each select="key('footnotes', '')">
+                                        <w:footnote w:type="normal" w:id="{position() + 1}">
+                                                <!-- This a custom mark, don't increment the counter -->
+                                                <xsl:if test="text:note-citation/@text:label">
+                                                  <xsl:attribute name="w:suppressRef"
+                                                  >1</xsl:attribute>
+                                                </xsl:if>
+                                                <xsl:apply-templates select="text:note-body"/>
+                                        </w:footnote>
+                                </xsl:for-each>
                         </xsl:for-each>
-                        
+
                 </w:footnotes>
         </xsl:template>
-        
+
         <!-- footnotes configuration -->
         <xsl:template name="footnotes-configuration">
-                <xsl:variable name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
+                <xsl:variable name="config"
+                        select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
                 <w:footnotePr>
-                       
+
                         <w:pos>
                                 <xsl:attribute name="w:val">
                                         <xsl:choose>
-                                                <xsl:when test="$config/@text:footnotes-position = 'text' ">beneathText</xsl:when>
+                                                <xsl:when
+                                                  test="$config/@text:footnotes-position = 'text' "
+                                                  >beneathText</xsl:when>
                                                 <xsl:otherwise>pageBottom</xsl:otherwise>
                                         </xsl:choose>
                                 </xsl:attribute>
                         </w:pos>
-                        
+
                         <w:numFmt>
                                 <xsl:attribute name="w:val">
                                         <xsl:call-template name="num-format">
-                                                <xsl:with-param name="format" select="$config/@style:num-format"/>
+                                                <xsl:with-param name="format"
+                                                  select="$config/@style:num-format"/>
                                         </xsl:call-template>
                                 </xsl:attribute>
                         </w:numFmt>
-                        
+
                         <xsl:if test="$config/@text:start-value">
                                 <w:numStart w:val="{$config/@text:start-value}"/>
                         </xsl:if>
-                        
+
                         <w:numRestart>
                                 <xsl:attribute name="w:val">
                                         <xsl:choose>
-                                                <xsl:when test="$config/@text:start-numbering-at = 'page' ">eachPage</xsl:when>
-                                                <xsl:when test="$config/@text:start-numbering-at = 'chapter' ">eachSect</xsl:when>
+                                                <xsl:when
+                                                  test="$config/@text:start-numbering-at = 'page' "
+                                                  >eachPage</xsl:when>
+                                                <xsl:when
+                                                  test="$config/@text:start-numbering-at = 'chapter' "
+                                                  >eachSect</xsl:when>
                                                 <xsl:otherwise>continuous</xsl:otherwise>
-                                        </xsl:choose>                    
+                                        </xsl:choose>
                                 </xsl:attribute>
-                        </w:numRestart> 
-                           
+                        </w:numRestart>
+
                         <w:footnote w:id="0"/>
                         <w:footnote w:id="1"/>
-                     
+
                 </w:footnotePr>
         </xsl:template>
- 
+
+        <xsl:template name="footnotes-relationships">
+                <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                        <!-- hyperlinks relationships. 
+                                        Do not pick up hyperlinks other than those coming from footnotes.  -->
+                        <xsl:for-each select="document('content.xml')">
+                                <xsl:for-each
+                                        select="key('hyperlinks', '')[ancestor::text:note/@text:note-class = 'footnote' ]">
+                                        <Relationship Id="{generate-id()}"
+                                                Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+                                                TargetMode="External">
+                                                <xsl:attribute name="Target">
+                                                  <!-- having Target empty makes Word Beta 2007 crash -->
+                                                  <xsl:choose>
+                                                          <xsl:when test="string-length(@xlink:href) &gt; 0">
+                                                                  <xsl:value-of select="@xlink:href"/>
+                                                          </xsl:when>
+                                                          <xsl:otherwise>/</xsl:otherwise>
+                                                  </xsl:choose>
+                                                </xsl:attribute>
+                                        </Relationship>
+                                </xsl:for-each>
+                        </xsl:for-each>
+
+                        <xsl:for-each select="document('content.xml')">
+                                <xsl:for-each
+                                        select="key('images', '')[ancestor::text:note/@text:note-class = 'footnote' ]">
+                                        <xsl:choose>
+                                                <!-- Internal image -->
+                                                <xsl:when
+                                                  test="starts-with(draw:image/@xlink:href, 'Pictures/')">
+                                                  <!-- copy this image to the oox package -->
+                                                  <zip:copy
+                                                  zip:source="{draw:image/@xlink:href}"
+                                                  zip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
+                                                  <Relationship Id="{generate-id(draw:image)}"
+                                                  Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                                                  Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"
+                                                  />
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                  <!-- External image -->
+                                                  <!-- TOTO support for external images
+                                                                        <Relationship Id='{generate-id(draw:image)}' 					
+                                                                        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                                                                        Target="{draw:image/@xlink:href}"
+                                                                        TargetMode="External"/>
+                                                                -->
+                                                </xsl:otherwise>
+                                        </xsl:choose>
+                                </xsl:for-each>
+                        </xsl:for-each>
+
+                </Relationships>
+        </xsl:template>
+
 </xsl:stylesheet>
-
-  
-
-
-

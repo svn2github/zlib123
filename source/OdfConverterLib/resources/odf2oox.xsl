@@ -89,9 +89,14 @@
         <xsl:call-template name="numbering"/>
       </zip:entry>
     	
-      <!-- numbering (lists) -->
+      <!-- footnotes -->
       <zip:entry zip:target="word/footnotes.xml">
         <xsl:call-template name="footnotes"/>
+      </zip:entry>
+   
+      <!-- footnotes part relationships -->
+      <zip:entry zip:target="word/_rels/footnotes.xml.rels">
+        <xsl:call-template name="footnotes-relationships"/>
       </zip:entry>
     	
       <!-- styles -->
