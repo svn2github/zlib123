@@ -1,426 +1,426 @@
-ODF Experience / Scenario;Feature;Sub Feature;Priority ;Delivery Milestone ;Completion Status;Technical description;Remarks/Questions;;;
-Document Structure;;;;;;;;;;
-;Document Roots;;;;;;;;;
-;;Document Root Element Content Models;;;;;;;;
-;;Document Root Attributes;;;;;;;;
-;Document Metadata;;;;;;;;;
-;;Pre-Defined vs. Custom Metadata;;;;;;;;
-;;Sample Metadata;;;;;;;;
-;Body Element and Document Types;;;;;;;;;
-;;Text Documents;;;;;;;;
-;;Drawing Documents;;;;;;;;
-;;Presentation Documents;;;;;;;;
-;;Spreadsheet Documents;;;;;;;;
-;;Chart Documents;;;;;;;;
-;;Image Documents;;;;;;;;
-;Application Settings;;;;;;;;;
-;;Sequence of Settings;;;;;;;;
-;;Base Settings;;;;;;;;
-;;Index Access of Sequences;;;;;;;;
-;;Map Entry;;;;;;;;
-;;Name Access of Sequences;;;;;;;;
-;;Cursor Position Setting;;;;;;;;
-;Scripts;;;;;;;;;
-;;Script;;;;;;;;
-;Font Face Declarations;;;;;;;;;
-;Styles;;;;;;;;;
-;;Location of Styles;;;;;;;;
-;Page Styles and Layout;;;;;;;;;
-Meta Data Elements;;;;;;;;;;
-;Pre-Defined Metadata Elements;;;;;;;;;
-;;Generator;;0.1;Completed;"Not exported (""ODF Converter"" put in Properties/Application)";;;;
-;;Title;;0.1;Completed;dc:title in both;;;;
-;;Description;;0.1;Completed;dc:description in both;;;;
-;;Subject;;0.1;Completed;dc:subject in both;;;;
-;;Keywords;;0.1;Completed;Merged all meta:keyword elemnts into a single space separated list within cp:keywords;;;;
-;;Initial Creator;;0.1;Completed;meta:initial-creator converted to dc:creator;;;;
-;;Creator;;0.1;Completed;dc:creator converted to cp:lastModifiedBy;;;;
-;;Printed By;;;;;;;;
-;;Creation Date and Time;;0.1;Completed;meta:creation-date converted to dcterms:created;;;;
-;;Modification Date and Time;;0.1;Completed;dc:date converted to dcterms:modified (only if exists);;;;
-;;Print Date and Time;;;;;;;;
-;;Document Template;3;;;;would it be possible to store here information for roundtrip conversion?;;;
-;;Automatic Reload;;;;;;;;
-;;Hyperlink Behavior;;;;;;;;
-;;Language;;;;;;;;
-;;Editing Cycles;;0.1;Completed;meta:editing-cycles converted to cp:revision;;;;
-;;Editing Duration;;;;;;;;
+ODF Experience / Scenario;Feature;Sub Feature;Priority ;Delivery Milestone ;Completion Status;Technical description;Remarks/Questions
+Document Structure;;;;;;;
+;Document Roots;;;;;;
+;;Document Root Element Content Models;;;;;
+;;Document Root Attributes;;;;;
+;Document Metadata;;;;;;
+;;Pre-Defined vs. Custom Metadata;;;;;
+;;Sample Metadata;;;;;
+;Body Element and Document Types;;;;;;
+;;Text Documents;;;;;
+;;Drawing Documents;;;;;
+;;Presentation Documents;;;;;
+;;Spreadsheet Documents;;;;;
+;;Chart Documents;;;;;
+;;Image Documents;;;;;
+;Application Settings;;;;;;
+;;Sequence of Settings;;;;;
+;;Base Settings;;;;;
+;;Index Access of Sequences;;;;;
+;;Map Entry;;;;;
+;;Name Access of Sequences;;;;;
+;;Cursor Position Setting;;;;;
+;Scripts;;;;;;
+;;Script;;;;;
+;Font Face Declarations;;;;;;
+;Styles;;;;;;
+;;Location of Styles;;;;;
+;Page Styles and Layout;;;;;;
+Meta Data Elements;;;;;;;
+;Pre-Defined Metadata Elements;;;;;;
+;;Generator;;0.1;Completed;"Not exported (""ODF Converter"" put in Properties/Application)";
+;;Title;;0.1;Completed;dc:title in both;
+;;Description;;0.1;Completed;dc:description in both;
+;;Subject;;0.1;Completed;dc:subject in both;
+;;Keywords;;0.1;Completed;Merged all meta:keyword elemnts into a single space separated list within cp:keywords;
+;;Initial Creator;;0.1;Completed;meta:initial-creator converted to dc:creator;
+;;Creator;;0.1;Completed;dc:creator converted to cp:lastModifiedBy;
+;;Printed By;;;;;
+;;Creation Date and Time;;0.1;Completed;meta:creation-date converted to dcterms:created;
+;;Modification Date and Time;;0.1;Completed;dc:date converted to dcterms:modified (only if exists);
+;;Print Date and Time;;;;;
+;;Document Template;3;;;;would it be possible to store here information for roundtrip conversion?
+;;Automatic Reload;;;;;
+;;Hyperlink Behavior;;;;;
+;;Language;;;;;
+;;Editing Cycles;;0.1;Completed;meta:editing-cycles converted to cp:revision;
+;;Editing Duration;;;;;
 ;;Document Statistics;;0.1;Partial;"meta:document-statistic/@meta:page-count converted to Pages
 meta:document-statistic/@meta:word-count converted to Words
 meta:document-statistic/@meta:paragraph-count converted to Paragraphs
-meta:document-statistic/@meta:character-count converted to CharactersWithSpaces";Bug #49 reports wrong word count;;;
-;User-defined Metadata;;;0.1;Partial;Each @meta:name is converted to a property with type corresponding to String (using {D5CDD505-2E9C-101B-9397-08002B2CF9AE} as fmtid);Other formats should be treated as well;;;
-;Custom Metadata;;;;;;;;;
-Text Content;;;;;;;;;;
-;Headings, Paragraphs and Basic Text Structure;;;;;;;;;
+meta:document-statistic/@meta:character-count converted to CharactersWithSpaces";Bug #49 reports wrong word count
+;User-defined Metadata;;;0.1;Partial;Each @meta:name is converted to a property with type corresponding to String (using {D5CDD505-2E9C-101B-9397-08002B2CF9AE} as fmtid);Other formats should be treated as well
+;Custom Metadata;;;;;;
+Text Content;;;;;;;
+;Headings, Paragraphs and Basic Text Structure;;;;;;
 ;;Headings;0;0.2-M1;Partial;"text:h is converted to a w:document/w:body/w:p paragraph.
-text:h/@text:outline-level is translated to w:p/w:pPr/w:outLineLvi";;;;
-;;Paragraphs;0;0.1;Completed;text:p is converted to w:document/w:body/w:p;;;;
-;;Common Paragraph Elements Attributes;0;0.2-Final;;text:p/@text:style-name converted to w:styles/w:style;TODO : class-names, cond-style-name;;;
-;Page Sequences;;;;;;;;;
-;;Page;;0.2-Final;;;TODO : investigate;;;
-;Lists;;;;;;;;;
-;;List Block;;0.2-M1;Partial;text:list/@text:style-name translated to w:p/w:pPr/w:pStyle/@w:val;TODO : @continue-numbering;;;
+text:h/@text:outline-level is translated to w:p/w:pPr/w:outLineLvi";
+;;Paragraphs;0;0.1;Completed;text:p is converted to w:document/w:body/w:p;
+;;Common Paragraph Elements Attributes;0;0.2-Final;;text:p/@text:style-name converted to w:styles/w:style;TODO : class-names, cond-style-name
+;Page Sequences;;;;;;
+;;Page;;0.2-Final;;;TODO : investigate
+;Lists;;;;;;
+;;List Block;;0.2-M1;Partial;text:list/@text:style-name translated to w:p/w:pPr/w:pStyle/@w:val;TODO : @continue-numbering
 ;;List Item;0;0.2-M1;Partial;"text:list-item is translated to a paragraph with w:pPr/w:numPr descendant set a follow : 
 w:ilvi child is the item level starting at 0.
 w:numId identifier is based on the relative position of this element's style.   
-";TODO: check this formatted-number, @start-value;;;
-;;List Header;;0.2-M1;;;what is the equivalent feature in Word? Also no idea how to create such a List Header in OO.;;;
-;;Numbered Paragraphs;0;0.2-Final ?;;;TODO : investigate;;;
-;Text Sections;;;0.2-Final;;;TODO : investigate;;;
-;;Section Attributes;2;;;;seems to be related to Word sections, but not one-to-one;;;
-;;Section Source;;;;;;;;
-;;DDE Source;;;;;;;;
-;Page-bound graphical content;;;;;;;;;
-;Change Tracking;;;;;;;;;
-;;Tracked Changes;2;;;;;;;
-;;Changed Regions;2;;;;;;;
-;;Insertion;2;;;;;;;
-;;Deletion;2;;;;;;;
-;;Format Change;2;;;;;;;
-;;Change Info;2;;;;;;;
-;;Change Marks;2;;;;;;;
-;Text Declarations;;;?;;;;;;
-Paragraph Elements Content;;;;;;;;;;
-;Basic Text Content;;;;;;;;;
+";TODO: check this formatted-number, @start-value
+;;List Header;;0.2-M1;;;what is the equivalent feature in Word? Also no idea how to create such a List Header in OO.
+;;Numbered Paragraphs;0;0.2-Final ?;;;TODO : investigate
+;Text Sections;;;0.2-Final;;;TODO : investigate
+;;Section Attributes;2;;;;seems to be related to Word sections, but not one-to-one
+;;Section Source;;;;;
+;;DDE Source;;;;;
+;Page-bound graphical content;;;;;;
+;Change Tracking;;;;;;
+;;Tracked Changes;2;;;;
+;;Changed Regions;2;;;;
+;;Insertion;2;;;;
+;;Deletion;2;;;;
+;;Format Change;2;;;;
+;;Change Info;2;;;;
+;;Change Marks;2;;;;
+;Text Declarations;;;?;;;
+Paragraph Elements Content;;;;;;;
+;Basic Text Content;;;;;;
 ;;White-space Characters;0;0.1;Completed;"Extra space characters text:c elements are injected into w:t elements by looking at the 
 text:p or text:span following siblings
 Tab character text:tab is translated to a run including a tabulation <w:r><w:tab/></w:r>
-Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";;;;
-;;Soft Hyphens, Hyphens, and Non-breaking Blanks;0;0.1;Completed? ;;TODO : check this is really completed;;;
-;;Attributed Text;0;0.2-Final;Partial;text:span @style-name treated;TODO : class-names;;;
-;;Hyperlinks;0;0.2-M1;Partial;text:a is converted to w:hyperlink where attribute r:id is the result of the generate-id() function;TODO : name: link-location, target-frames, text-styles;;;
-;Bookmarks and References;;;0.2-M1;;;TODO : investigate;;;
-;;Bookmarks;2;;;;;;;
-;;References;2;;;;;;;
-;Notes;;;0.2-M1;;;;;;
+Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";
+;;Soft Hyphens, Hyphens, and Non-breaking Blanks;0;0.1;Completed? ;;TODO : check this is really completed
+;;Attributed Text;0;0.2-Final;Partial;text:span @style-name treated;TODO : class-names
+;;Hyperlinks;0;0.2-M1;Partial;text:a is converted to w:hyperlink where attribute r:id is the result of the generate-id() function;TODO : name: link-location, target-frames, text-styles
+;Bookmarks and References;;;0.2-M1;;;TODO : investigate
+;;Bookmarks;2;;;;
+;;References;2;;;;
+;Notes;;;0.2-M1;;;
 ;;Note Element;0;;Partial;"text:note element is converted to a run with a style named after the @text:footnote-class.
 When @text:note-class is 'footnote', a w:footnoteReference's child is created. Its @w:id to the reference is given by the position of the footnote in the 'footnotes' index (which groups all the document(s footnotes). This id must start at 2, because values 0 and 1 are reserved for 'separator' and 'continuation-separator' special footnotes.
 If text:note-citation/@text:label exists, we consider it to be a custom mark. Thus, a w:t is created into the run. containing text:note-citataion value.
 The rest of the note information are scattered into different OOX parts.  Mainly, footnotes and endnotes file parts. The footnotes part is defined by the Relationship Id=""rId5""
     Type=""http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes""
     Target=""footnotes.xml""
-Each footnote content is stored under w:footnote element. The 'separator' and 'continuation-separator' footnotes are defined first with w:id 0 and 1. Then the index of footnotes is iterated over. @w:id is given by the position of the footnote in the index +1,  @w:suppressRef is set '1' if text:note-citation/@text:label exists (custom mark). The management of the note body is delegated to the template matching text:p, more precisely when parent::text:note-body is true.  Special care must be taken if the note consists of more than one paragraph. Because the first paragraph (position() must include the note-citation with the appropriate style.  ";TODO : endnotes;;;
-;Ruby;;;0.2-Final;;;;;;
-;Text Annotation;;;0.2-Final;;;;;;
-;Index Marks;;3;0.2-Final;;;;;;
-;Change Tracking and Change Marks;;2;0.2-Final;;;;;;
-;Inline graphics and text-boxes;;1;;;;;;;
-Text Fields;;;;;;;in a first step, fixed text fields could be converted as text (does not work for dynamic fields such as page numbers!);;;
-;Common Characteristics of Field Elements;;;;;;;;;
-;Document Fields;;1;;;;;;;
-;;Date Fields;1;;;;;;;
-;;Time Fields;1;;;;;;;
-;;Page Number Fields;1;0.2-M1;;;;;;
-;;Page Continuation Text;2;;;;"tricky feature, it allows to insert a field with ""current page number"" plus or minus 1";;;
-;;Sender Fields;3;;;;could be converted as text (instead of a field);;;
-;;Author Fields;1;;;;;;;
-;;Chapter Fields;2;;;;"Note: the ""Chapter"" style can be redefined!";;;
-;;File Name Fields;1;;;;;;;
-;;Document Template Name Fields;2;;;;;;;
-;;Sheet Name Fields;;;;;seems to be for spreadsheets;;;
+Each footnote content is stored under w:footnote element. The 'separator' and 'continuation-separator' footnotes are defined first with w:id 0 and 1. Then the index of footnotes is iterated over. @w:id is given by the position of the footnote in the index +1,  @w:suppressRef is set '1' if text:note-citation/@text:label exists (custom mark). The management of the note body is delegated to the template matching text:p, more precisely when parent::text:note-body is true.  Special care must be taken if the note consists of more than one paragraph. Because the first paragraph (position() must include the note-citation with the appropriate style.  ";TODO : endnotes
+;Ruby;;;0.2-Final;;;
+;Text Annotation;;;0.2-Final;;;
+;Index Marks;;3;0.2-Final;;;
+;Change Tracking and Change Marks;;2;0.2-Final;;;
+;Inline graphics and text-boxes;;1;;;;
+Text Fields;;;;;;;in a first step, fixed text fields could be converted as text (does not work for dynamic fields such as page numbers!)
+;Common Characteristics of Field Elements;;;;;;
+;Document Fields;;1;;;;
+;;Date Fields;1;;;;
+;;Time Fields;1;;;;
+;;Page Number Fields;1;0.2-M1;Completed;text:page-number is conv to a w:fldSimple;
+;;Page Continuation Text;2;;;;"tricky feature, it allows to insert a field with ""current page number"" plus or minus 1"
+;;Sender Fields;3;;;;could be converted as text (instead of a field)
+;;Author Fields;1;;;;
+;;Chapter Fields;2;;;;"Note: the ""Chapter"" style can be redefined!"
+;;File Name Fields;1;;;;
+;;Document Template Name Fields;2;;;;
+;;Sheet Name Fields;;;;;seems to be for spreadsheets
 ;Variable Fields;;3;;;;"retaining variables might be useful for roundtrip conversions
-TODO: investigate";;;
-;;Declaring Simple Variables;;0.2-Final;;;;;;
-;;Setting Simple Variables;;0.2-Final;;;;;;
-;;Displaying Simple Variables;;0.2-Final;;;;;;
-;;Simple Variable Input Fields;;0.2-Final;;;;;;
-;;Declaring User Variables;;0.2-Final;;;;;;
-;;Displaying User Variables;;0.2-Final;;;;;;
-;;User Variable Input Fields;;0.2-Final;;;;;;
-;;Declaring Sequence Variables;;0.2-Final;;;;;;
-;;Using Sequence Fields;;0.2-Final;;;;;;
-;;Expression Fields;;0.2-Final;;;;;;
-;;Text Input Fields;;0.2-Final;;;;;;
-;Metadata Fields;;2;;;;some properties might not exist in Word, e.g. Initial Creator. These fields should be converted as text;;;
-;;Initial Creator;2;0.2-Final;;;;;;
-;;Document Creation Date;2;0.2-Final;;;;;;
-;;Document Creation Time;2;0.2-Final;;;;;;
-;;Document Description;2;0.2-Final;;;;;;
-;;User-Defined Document Information;2;0.2-Final;;;;;;
-;;Print Time;2;0.2-Final;;;;;;
-;;Print Date;2;0.2-Final;;;;;;
-;;Printed By;2;0.2-Final;;;;;;
-;;Document Title;2;0.2-Final;;;;;;
-;;Document Subject;2;0.2-Final;;;;;;
-;;Document Keywords;2;0.2-Final;;;;;;
-;;Document Revision Number;2;0.2-Final;;;;;;
-;;Document Edit Duration;2;0.2-Final;;;;;;
-;;Document Modification Time;2;0.2-Final;;;;;;
-;;Document Modification Date;2;0.2-Final;;;;;;
-;;Document Modified By;2;0.2-Final;;;;;;
-;;Document Statistics Fields;2;0.2-Final;;;;;;
-;Database Fields;;;;;;;;;
-;;Database Field Data Source;;0.2-Final;;;;;;
-;;Displaying Database Content;;0.2-Final;;;;;;
-;;Selecting the Next Database Row;;0.2-Final;;;;;;
-;;Selecting a Row Number;;0.2-Final;;;;;;
-;;Displaying the Row Number;;0.2-Final;;;;;;
-;;Display Current Database and Table;;0.2-Final;;;;;;
-;More Fields;;2;;;;converted as text in a first step?;;;
-;;Page Variable Fields;;;;;;;;
-;;Placeholders;;;;;;;;
-;;Conditional Text Fields;;;;;;;;
-;;Hidden Text Field;;;;;;;;
-;;Reference Fields;;;;;;;;
-;;Script Fields;;;;;;;;
-;;Macro Fields;;;;;;;;
-;;Hidden Paragraph Fields;;;;;;;;
-;;DDE Connection Fields;;;;;;;;
-;;Measure Fields;;;;;;;;
-;;Table Formula Field;;;;;;;;
-;Common Field Attributes;;;;;TODO : see which one might be useful;;;;
-;;Variable Value Types and Values;;;;;;;;
-;;Fixed;;;;;;;;
-;;Variable Name;;;;;;;;
-;;Description;;;;;;;;
-;;Display;;;;;;;;
-;;Formula;;;;;;;;
-;;Formatting Style;;;;;;;;
-;;Number Formatting Style;;;;;;;;
-Text Indices;;;;;;;;;;
-;Index Marks;;01-févr;;;;converting indexes as text could be a first solution;;;
-;;Table of Content Index Marks;1;0.2-M1;;;;;;
-;;User-Defined Index Marks;2;0.2-M1;;;;;;
-;;Alphabetical Index Mark;2;0.2-M1;;;;;;
-;;Bibliography Index Mark;2;0.2-M1;;;;;;
-;Index Structure;;2;;;;;;;
-;;Index Source;2;0.2-M1;;;;;;
-;;Index Body Section;2;0.2-M1;;;;;;
-;;Index Title Section;2;0.2-M1;;;;;;
-;Table Of Content;;1;;;;;;;
-;;Table of Content Source;1;0.2-M1;;;;;;
-;;Table of Content Entry Template;1;0.2-M1;;;;;;
-;Index of Illustrations;;2;;;;;;;
-;;Index of Illustration Source;2;0.2-M1;;;;;;
-;;Illustration Index Entry Template;2;0.2-M1;;;;;;
-;Index of Tables;;1;;;;;;;
-;;Table Index Source;1;0.2-M1;;;;;;
-;;Table Index Entry Template;1;0.2-M1;;;;;;
-;Index of Objects;;2;;;;;;;
-;;Object Index Source;2;0.2-Final;;;;;;
-;;Object Index Entry Template;2;0.2-Final;;;;;;
-;User-Defined Index;;2;;;;;;;
-;;User-Defined Index Source;2;0.2-Final;;;;;;
-;;User-Defined Index Entry Template;2;0.2-Final;;;;;;
-;Alphabetical Index;;2;;;;;;;
-;;Alphabetical Index Source;2;0.2-Final;;;;;;
-;;Auto Mark File;2;0.2-Final;;;;;;
-;;Alphabetical Index Entry Template;2;0.2-Final;;;;;;
-;Bibliography;;2;;;;;;;
-;;Bibliography Index Source;2;0.2-Final;;;;;;
-;;Bibliography Entry Template;2;0.2-Final;;;;;;
-;index source styles;;2;;;;;;;
-;;Index source style;2;0.2-Final;;;;;;
-;Index title template;;1;0.2-Final;;;;;;
-;Index Template Entries;;1;;;;;;;
-;;Chapter Information;1;0.2-Final;;;;;;
-;;Entry Text;1;0.2-Final;;;;;;
-;;Page Number;1;0.2-Final;;;;;;
-;;Fixed String;1;0.2-Final;;;;;;
-;;Bibliography Information;1;0.2-Final;;;;;;
-;;Tab Stop;1;0.2-Final;;;;;;
-;;Hyperlink Start and End;1;0.2-Final;;;;;;
-;;Example of an Index Entry Configuration;1;0.2-Final;;;;;;
-Tables;;;;;;;;;;
-;Basic Table Model;;0;;;;;;;
-;;Table Element;0;0.2-M1;Partial;table:table is converted to w:tbl.;TODO protect, print, print ranges;;;
-;;Table Row;0;0.2-M1;Partial;table:table-row is converted to w:tr/w:trPr element;;;;
+TODO: investigate"
+;;Declaring Simple Variables;;0.2-Final;;;
+;;Setting Simple Variables;;0.2-Final;;;
+;;Displaying Simple Variables;;0.2-Final;;;
+;;Simple Variable Input Fields;;0.2-Final;;;
+;;Declaring User Variables;;0.2-Final;;;
+;;Displaying User Variables;;0.2-Final;;;
+;;User Variable Input Fields;;0.2-Final;;;
+;;Declaring Sequence Variables;;0.2-Final;;;
+;;Using Sequence Fields;;0.2-Final;;;
+;;Expression Fields;;0.2-Final;;;
+;;Text Input Fields;;0.2-Final;;;
+;Metadata Fields;;2;;;;some properties might not exist in Word, e.g. Initial Creator. These fields should be converted as text
+;;Initial Creator;2;0.2-Final;;;
+;;Document Creation Date;2;0.2-Final;;;
+;;Document Creation Time;2;0.2-Final;;;
+;;Document Description;2;0.2-Final;;;
+;;User-Defined Document Information;2;0.2-Final;;;
+;;Print Time;2;0.2-Final;;;
+;;Print Date;2;0.2-Final;;;
+;;Printed By;2;0.2-Final;;;
+;;Document Title;2;0.2-Final;;;
+;;Document Subject;2;0.2-Final;;;
+;;Document Keywords;2;0.2-Final;;;
+;;Document Revision Number;2;0.2-Final;;;
+;;Document Edit Duration;2;0.2-Final;;;
+;;Document Modification Time;2;0.2-Final;;;
+;;Document Modification Date;2;0.2-Final;;;
+;;Document Modified By;2;0.2-Final;;;
+;;Document Statistics Fields;2;0.2-Final;;;
+;Database Fields;;;;;;
+;;Database Field Data Source;;0.2-Final;;;
+;;Displaying Database Content;;0.2-Final;;;
+;;Selecting the Next Database Row;;0.2-Final;;;
+;;Selecting a Row Number;;0.2-Final;;;
+;;Displaying the Row Number;;0.2-Final;;;
+;;Display Current Database and Table;;0.2-Final;;;
+;More Fields;;2;;;;converted as text in a first step?
+;;Page Variable Fields;;;;;
+;;Placeholders;;;;;
+;;Conditional Text Fields;;;;;
+;;Hidden Text Field;;;;;
+;;Reference Fields;;;;;
+;;Script Fields;;;;;
+;;Macro Fields;;;;;
+;;Hidden Paragraph Fields;;;;;
+;;DDE Connection Fields;;;;;
+;;Measure Fields;;;;;
+;;Table Formula Field;;;;;
+;Common Field Attributes;;;;;TODO : see which one might be useful;
+;;Variable Value Types and Values;;;;;
+;;Fixed;;;;;
+;;Variable Name;;;;;
+;;Description;;;;;
+;;Display;;;;;
+;;Formula;;;;;
+;;Formatting Style;;;;;
+;;Number Formatting Style;;;;;
+Text Indices;;;;;;;
+;Index Marks;;01-févr;;;;converting indexes as text could be a first solution
+;;Table of Content Index Marks;1;0.2-M1;;;
+;;User-Defined Index Marks;2;0.2-M1;;;
+;;Alphabetical Index Mark;2;0.2-M1;;;
+;;Bibliography Index Mark;2;0.2-M1;;;
+;Index Structure;;2;;;;
+;;Index Source;2;0.2-M1;;;
+;;Index Body Section;2;0.2-M1;;;
+;;Index Title Section;2;0.2-M1;;;
+;Table Of Content;;1;;;;
+;;Table of Content Source;1;0.2-M1;;;
+;;Table of Content Entry Template;1;0.2-M1;;;
+;Index of Illustrations;;2;;;;
+;;Index of Illustration Source;2;0.2-M1;;;
+;;Illustration Index Entry Template;2;0.2-M1;;;
+;Index of Tables;;1;;;;
+;;Table Index Source;1;0.2-M1;;;
+;;Table Index Entry Template;1;0.2-M1;;;
+;Index of Objects;;2;;;;
+;;Object Index Source;2;0.2-Final;;;
+;;Object Index Entry Template;2;0.2-Final;;;
+;User-Defined Index;;2;;;;
+;;User-Defined Index Source;2;0.2-Final;;;
+;;User-Defined Index Entry Template;2;0.2-Final;;;
+;Alphabetical Index;;2;;;;
+;;Alphabetical Index Source;2;0.2-Final;;;
+;;Auto Mark File;2;0.2-Final;;;
+;;Alphabetical Index Entry Template;2;0.2-Final;;;
+;Bibliography;;2;;;;
+;;Bibliography Index Source;2;0.2-Final;;;
+;;Bibliography Entry Template;2;0.2-Final;;;
+;index source styles;;2;;;;
+;;Index source style;2;0.2-Final;;;
+;Index title template;;1;0.2-Final;;;
+;Index Template Entries;;1;;;;
+;;Chapter Information;1;0.2-Final;;;
+;;Entry Text;1;0.2-Final;;;
+;;Page Number;1;0.2-Final;;;
+;;Fixed String;1;0.2-Final;;;
+;;Bibliography Information;1;0.2-Final;;;
+;;Tab Stop;1;0.2-Final;;;
+;;Hyperlink Start and End;1;0.2-Final;;;
+;;Example of an Index Entry Configuration;1;0.2-Final;;;
+Tables;;;;;;;
+;Basic Table Model;;0;;;;
+;;Table Element;0;0.2-M1;Partial;table:table is converted to w:tbl.;TODO protect, print, print ranges
+;;Table Row;0;0.2-M1;Partial;table:table-row is converted to w:tr/w:trPr element;
 ;;Table Cell;0;0.2-M1;Partial;"table:table-cell is converted to w:tc
-";;;;
-;Advanced Table Model;;1;;;;;;;
+";
+;Advanced Table Model;;1;;;;
 ;;Column Description;1;0.2-M1;Partial;"table:table-column converted to w:gridCol
-w:gridCol/@w:w is based on style:table-column-properties/@style:column-width for this column style name";;;;
-;;Header Columns;1;0.2-M1;;;;;;
-;;Column Groups;1;0.2-M1;;;;;;
-;;Header Rows;1;0.2-M1;Partial;/table/table:table-header-rows/table:table-row gets w:tblHeader tag in properties section;;;;
-;;Row Groups;1;0.2-M1;;;;;;
-;;Subtables;1;0.2-M1;;;;;;
-Graphic Content;;;;;;;;;;
-;Drawing Shapes;;2;;;;;;;
-;;Rectangle;2;0.2-Final;;;;;;
-;;Line;2;0.2-Final;;;;;;
-;;Polyline;2;0.2-Final;;;;;;
-;;Polygon;2;0.2-Final;;;;;;
-;;Regular Polygon;2;0.2-Final;;;;;;
-;;Path;2;0.2-Final;;;;;;
-;;Circle;2;0.2-Final;;;;;;
-;;Ellipse;2;0.2-Final;;;;;;
-;;Connector;2;0.2-Final;;;;;;
-;;Caption;2;0.2-Final;;;;;;
-;;Measure;;;;;;;;
-;;Control;;;;;;;;
-;;Page Thumbnail;;;;;;;;
-;;Grouping;;;;;;;;
-;;Common Drawing Shape Attributes;;;;;;;;
-;;Common Shape Attributes for Text and Spreadsheet Documents;;;;;;;;
-;;Common Drawing Shape Content;;;;;;;;
-;;Common Shape Attribute Groups;;;;;;;;
-;;Glue Points;;;;;;;;
-;;Event Listeners;;;;;;;;
-;Frames;;1;;;;;;;
-;;Text Box;1;0.2-M1;;;;;;
+w:gridCol/@w:w is based on style:table-column-properties/@style:column-width for this column style name";
+;;Header Columns;1;0.2-M1;;;
+;;Column Groups;1;0.2-M1;;;
+;;Header Rows;1;0.2-M1;Partial;/table/table:table-header-rows/table:table-row gets w:tblHeader tag in properties section;
+;;Row Groups;1;0.2-M1;;;
+;;Subtables;1;0.2-M1;;;
+Graphic Content;;;;;;;
+;Drawing Shapes;;2;;;;
+;;Rectangle;2;0.2-Final;;;
+;;Line;2;0.2-Final;;;
+;;Polyline;2;0.2-Final;;;
+;;Polygon;2;0.2-Final;;;
+;;Regular Polygon;2;0.2-Final;;;
+;;Path;2;0.2-Final;;;
+;;Circle;2;0.2-Final;;;
+;;Ellipse;2;0.2-Final;;;
+;;Connector;2;0.2-Final;;;
+;;Caption;2;0.2-Final;;;
+;;Measure;;;;;
+;;Control;;;;;
+;;Page Thumbnail;;;;;
+;;Grouping;;;;;
+;;Common Drawing Shape Attributes;;;;;
+;;Common Shape Attributes for Text and Spreadsheet Documents;;;;;
+;;Common Drawing Shape Content;;;;;
+;;Common Shape Attribute Groups;;;;;
+;;Glue Points;;;;;
+;;Event Listeners;;;;;
+;Frames;;1;;;;
+;;Text Box;1;0.2-M1;;;
 ;;Image;1;0.2-M1;Partial;"Internal images only, ie [starts-with(draw:frame/draw:image/@xlink:href, 'Pictures/')]. Converted to w:drawing/wp:inline.
-wp:extend attibutes @cx and @cx respectively use draw:frame/@svg:width and draw:frame/@svg:height and fail-safe with draw:text-box/@fo:min-width and draw:text-box/@fo:min-height";TODO : image positioning;;;
-;;Objects;;;;;;;;
-;;Applet;;;;;;;;
-;;Plugins;;;;;;;;
-;;Parameters;;;;;;;;
-;;Floating Frame;;;;;;;;
-;;Contour;;;;;;;;
-;;Alternative Text;;0.2-Final;;;;;;
-;;Hyperlinks;;0.2-Final;;;these are frames behaving like hyperlinks;;;
-;;Client Side Image Maps;;;;;;;;
-;3D Shapes;;;;;;;;;
-;;Scene;;;;;;;;
-;;Light;;;;;;;;
-;;Cube;;;;;;;;
-;;Sphere;;;;;;;;
-;;Extrude;;;;;;;;
-;;Rotate;;;;;;;;
-;Custom Shape;;;;;;;;;
-;;Enhanced Geometry;;;;;;;;
-;;Enhanced Geometry - Extrusion Attributes;;;;;;;;
-;;Enhanced Geometry - Path Attributes;;;;;;;;
-;;Enhanced Geometry - Text Path Attributes;;;;;;;;
-;;Enhanced Geometry â€“ Equation;;;;;;;;
-;;Enhanced Geometry - Handle Attributes;;;;;;;;
-Form Content;;;;;;;;;;
-;Form;;;;;;;;;
-;;Action;;;;;;;;
-;;Target Frame;;;;;;;;
-;;Method;;;;;;;;
-;;Encoding Type;;;;;;;;
-;;Allow Deletes;;;;;;;;
-;;Allow Inserts;;;;;;;;
-;;Allow Updates;;;;;;;;
-;;Apply Filter;;;;;;;;
-;;Command Type;;;;;;;;
-;;Command;;;;;;;;
-;;Data Source;;;;;;;;
-;;Master Fields;;;;;;;;
-;;Detail Fields;;;;;;;;
-;;Escape Processing;;;;;;;;
-;;Filter;;;;;;;;
-;;Ignore Result;;;;;;;;
-;;Navigation Mode;;;;;;;;
-;;Order;;;;;;;;
-;;Tabbing Cycle;;;;;;;;
-;;Connection Resource;;;;;;;;
-;XForms Model;;;;;;;;;
-;;XForms Model;;;;;;;;
-;Controls;;;;;;;;;
-;;Text;;;;;;;;
-;;Text Area;;;;;;;;
-;;Password;;;;;;;;
-;;File;;;;;;;;
-;;Formatted Text;;;;;;;;
-;;Number;;;;;;;;
-;;Date And Time;;;;;;;;
-;;Fixed Text;;;;;;;;
-;;Combo Box;;;;;;;;
-;;List Box;;;;;;;;
-;;Button;;;;;;;;
-;;Image;;;;;;;;
-;;Check Box;;;;;;;;
-;;Radio Button;;;;;;;;
-;;Frame;;;;;;;;
-;;Image Frame;;;;;;;;
-;;Hidden;;;;;;;;
-;;Grid;;;;;;;;
-;;Value Range;;;;;;;;
-;;Generic Control;;;;;;;;
-;Common Form and Control Attributes;;;;;;;;;
-;;Name;;;;;;;;
-;;Control Implementation;;;;;;;;
-;;Bind to XForms;;;;;;;;
-;Common Control Attributes;;;;;;;;;
-;;Button Type;;;;;;;;
-;;Control ID;;;;;;;;
-;;Current Selected;;;;;;;;
-;;Value and Current Value;;;;;;;;
-;;Disabled;;;;;;;;
-;;Dropdown;;;;;;;;
-;;For;;;;;;;;
-;;Image Data;;;;;;;;
-;;Label;;;;;;;;
-;;Maximum Length;;;;;;;;
-;;Printable;;;;;;;;
-;;Read only;;;;;;;;
-;;Selected;;;;;;;;
-;;Size;;;;;;;;
-;;Tab Index;;;;;;;;
-;;Tab Stop;;;;;;;;
-;;Target Frame;;;;;;;;
-;;Target Location;;;;;;;;
-;;Title;;;;;;;;
-;;Visual Effect;;;;;;;;
-;;Relative Image Position;;;;;;;;
-;;Database Binding Attributes;;;;;;;;
-;Events;;;;;;;;;
-;;Events with an Equivalent HTML Event Type;;;;;;;;
-;;Event Types;;;;;;;;
-;Properties;;;;;;;;;
-;;Property Set;;;;;;;;
-;;Property;;;;;;;;
-;;List Property;;;;;;;;
-Common Content;;;;;;;;;;
-;Annotation;;3;;;;;;;
-;;Creator;3;;;;;;;
-;;Creation Date and Time;3;;;;;;;
-;;Creation Date and Time String;3;;;;;;;
-;Number Format;;;;;;;;;
-;;Prefix and Suffix;;;;;;;;
-;;Format Specification;;;;;;;;
-;;Letter Synchronization in Number Formats;;;;;;;;
-;Change Tracking Metadata;;;;;;;;;
-;Event Listener Tables;;;;;;;;;
-;;Event Listener;;;;;;;;
-;Mathematical Content;;;;;;;;;
-;DDE Connections;;;;;;;;;
-;;Container for DDE Connection Declarations;;;;;;;;
-;;Declaring DDE Connections for Text Fields;;;;;;;;
-;;Declaring DDE Connections for Tables;;;;;;;;
-Styles;;;;;;;;;;
-;Style Element;;1;;;;;;;
-;;Style Mappings;1;;;;what does it mean?;;;
+wp:extend attibutes @cx and @cx respectively use draw:frame/@svg:width and draw:frame/@svg:height and fail-safe with draw:text-box/@fo:min-width and draw:text-box/@fo:min-height";TODO : image positioning
+;;Objects;;;;;
+;;Applet;;;;;
+;;Plugins;;;;;
+;;Parameters;;;;;
+;;Floating Frame;;;;;
+;;Contour;;;;;
+;;Alternative Text;;0.2-Final;;;
+;;Hyperlinks;;0.2-Final;;;these are frames behaving like hyperlinks
+;;Client Side Image Maps;;;;;
+;3D Shapes;;;;;;
+;;Scene;;;;;
+;;Light;;;;;
+;;Cube;;;;;
+;;Sphere;;;;;
+;;Extrude;;;;;
+;;Rotate;;;;;
+;Custom Shape;;;;;;
+;;Enhanced Geometry;;;;;
+;;Enhanced Geometry - Extrusion Attributes;;;;;
+;;Enhanced Geometry - Path Attributes;;;;;
+;;Enhanced Geometry - Text Path Attributes;;;;;
+;;Enhanced Geometry â€“ Equation;;;;;
+;;Enhanced Geometry - Handle Attributes;;;;;
+Form Content;;;;;;;
+;Form;;;;;;
+;;Action;;;;;
+;;Target Frame;;;;;
+;;Method;;;;;
+;;Encoding Type;;;;;
+;;Allow Deletes;;;;;
+;;Allow Inserts;;;;;
+;;Allow Updates;;;;;
+;;Apply Filter;;;;;
+;;Command Type;;;;;
+;;Command;;;;;
+;;Data Source;;;;;
+;;Master Fields;;;;;
+;;Detail Fields;;;;;
+;;Escape Processing;;;;;
+;;Filter;;;;;
+;;Ignore Result;;;;;
+;;Navigation Mode;;;;;
+;;Order;;;;;
+;;Tabbing Cycle;;;;;
+;;Connection Resource;;;;;
+;XForms Model;;;;;;
+;;XForms Model;;;;;
+;Controls;;;;;;
+;;Text;;;;;
+;;Text Area;;;;;
+;;Password;;;;;
+;;File;;;;;
+;;Formatted Text;;;;;
+;;Number;;;;;
+;;Date And Time;;;;;
+;;Fixed Text;;;;;
+;;Combo Box;;;;;
+;;List Box;;;;;
+;;Button;;;;;
+;;Image;;;;;
+;;Check Box;;;;;
+;;Radio Button;;;;;
+;;Frame;;;;;
+;;Image Frame;;;;;
+;;Hidden;;;;;
+;;Grid;;;;;
+;;Value Range;;;;;
+;;Generic Control;;;;;
+;Common Form and Control Attributes;;;;;;
+;;Name;;;;;
+;;Control Implementation;;;;;
+;;Bind to XForms;;;;;
+;Common Control Attributes;;;;;;
+;;Button Type;;;;;
+;;Control ID;;;;;
+;;Current Selected;;;;;
+;;Value and Current Value;;;;;
+;;Disabled;;;;;
+;;Dropdown;;;;;
+;;For;;;;;
+;;Image Data;;;;;
+;;Label;;;;;
+;;Maximum Length;;;;;
+;;Printable;;;;;
+;;Read only;;;;;
+;;Selected;;;;;
+;;Size;;;;;
+;;Tab Index;;;;;
+;;Tab Stop;;;;;
+;;Target Frame;;;;;
+;;Target Location;;;;;
+;;Title;;;;;
+;;Visual Effect;;;;;
+;;Relative Image Position;;;;;
+;;Database Binding Attributes;;;;;
+;Events;;;;;;
+;;Events with an Equivalent HTML Event Type;;;;;
+;;Event Types;;;;;
+;Properties;;;;;;
+;;Property Set;;;;;
+;;Property;;;;;
+;;List Property;;;;;
+Common Content;;;;;;;
+;Annotation;;3;;;;
+;;Creator;3;;;;
+;;Creation Date and Time;3;;;;
+;;Creation Date and Time String;3;;;;
+;Number Format;;;;;;
+;;Prefix and Suffix;;;;;
+;;Format Specification;;;;;
+;;Letter Synchronization in Number Formats;;;;;
+;Change Tracking Metadata;;;;;;
+;Event Listener Tables;;;;;;
+;;Event Listener;;;;;
+;Mathematical Content;;;;;;
+;DDE Connections;;;;;;
+;;Container for DDE Connection Declarations;;;;;
+;;Declaring DDE Connections for Text Fields;;;;;
+;;Declaring DDE Connections for Tables;;;;;
+Styles;;;;;;;
+;Style Element;;1;;;;
+;;Style Mappings;1;;;;what does it mean?
 ;Default Styles;;1;0.2-M1;Completed;"office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties is translated to w:docDefaults/w:rPrDefault.
 office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties translated to w:docDefaults/w:pPrDefault.
-";;;;
-;Page Layout;;1;0.2-Final;;;a page style concept does not exist in Word (roundtrip won't work);;;
-;;Header and Footer Styles;1;0.2-Final;;;;;;
-;Master Pages;;1;0.2-Final;;;;;;
-;;Headers and Footers;1;0.2-Final;;;header and footer belong to the page style!;;;
-;;Presentation Notes;1;0.2-Final;;;;;;
-;Table Templates;;2;0.2-Final;;;;;;
-;;Row and Column Styles;2;0.2-Final;;;;;;
-;Font Face Declaration;;0;;;;;;;
+";
+;Page Layout;;1;0.2-Final;;;a page style concept does not exist in Word (roundtrip won't work)
+;;Header and Footer Styles;1;0.2-Final;;;
+;Master Pages;;1;0.2-Final;;;
+;;Headers and Footers;1;0.2-Final;;;header and footer belong to the page style!
+;;Presentation Notes;1;0.2-Final;;;
+;Table Templates;;2;0.2-Final;;;
+;;Row and Column Styles;2;0.2-Final;;;
+;Font Face Declaration;;0;;;;
 ;;CSS2/SVG Font Descriptors;;0.2-M1;Partial;"style:font-face/@svg:font-family is converted to w:fonts/w:font/@w:name
-One special case : 'StarSymbol' value is converted to 'Symbol'";;;;
-;;Name;;0.2-M1;;;;;;
-;;Adornments;;0.2-M1;;;;;;
-;;Font Family Generic;;0.1;Completed;style:font-face/@svg:font-family-generic is converted to w:fonts/w:font/w:family;;;;
-;;Font Pitch;;0.1;Completed;style:font-face/@style:font-picth is converted to w:fonts/w:font/w:pitch;;;;
-;;Font Character Set;;0.2-M1;;;;;;
-;Data Styles;;;;;;;;;
-;;Number Style;;;;;;;;
-;;Currency Style;;;;;;;;
-;;Percentage Style;;;;;;;;
-;;Date Style;;;;;;;;
-;;Time Style;;;;;;;;
-;;Boolean Style;;;;;;;;
-;;Text Style;;;;;;;;
-;;Common Data Style Elements;;;;;;;;
-;;Common Data Style Attributes;;;;;;;;
-;;Transliteration;;;;;;;;
-;;Common Data Style Child Element Attributes;;;;;;;;
-;Text Styles;;1;;;;;;;
-;;Text Styles;1;0.2-Final;;;;;;
-;;Paragraph Styles;1;0.2-Final;;;;;;
-;;Section Styles;1;0.2-Final;;;;;;
-;;Ruby Style;3;0.2-Final;;;;;;
-;Enhanced Text Styles;;;;;;;;;
-;;Line Numbering Configuration;3;0.2-Final;;;;;;
+One special case : 'StarSymbol' value is converted to 'Symbol'";
+;;Name;;0.2-M1;;;
+;;Adornments;;0.2-M1;;;
+;;Font Family Generic;;0.1;Completed;style:font-face/@svg:font-family-generic is converted to w:fonts/w:font/w:family;
+;;Font Pitch;;0.1;Completed;style:font-face/@style:font-picth is converted to w:fonts/w:font/w:pitch;
+;;Font Character Set;;0.2-M1;;;
+;Data Styles;;;;;;
+;;Number Style;;;;;
+;;Currency Style;;;;;
+;;Percentage Style;;;;;
+;;Date Style;;;;;
+;;Time Style;;;;;
+;;Boolean Style;;;;;
+;;Text Style;;;;;
+;;Common Data Style Elements;;;;;
+;;Common Data Style Attributes;;;;;
+;;Transliteration;;;;;
+;;Common Data Style Child Element Attributes;;;;;
+;Text Styles;;1;;;;
+;;Text Styles;1;0.2-Final;;;
+;;Paragraph Styles;1;0.2-Final;;;
+;;Section Styles;1;0.2-Final;;;
+;;Ruby Style;3;0.2-Final;;;
+;Enhanced Text Styles;;;;;;
+;;Line Numbering Configuration;3;0.2-Final;;;
 ;;Notes Configuration Element;1;0.2-Final;Partial;"text:notes-configuration/@text:note-class attribute discriminates between footnotes and endnotes. This is required in OOX. 
 Footnotes :
 text:notes-configuration gives birth to two OOX styles named : 
@@ -439,10 +439,10 @@ Let's assume we are configuring footnotes.
   - 'text' -> 'beneathText'
   - otherwise 'pageBottom' value is set.";"TODO : endnotes
 TODO : concerning footntes : handle master page, default note paragraph style, Footnote Continuation.
-footnotes positions 'section' and 'document' don't seem to have counterpart in OOX.";;;
-;;Bibliography Configuration;3;0.2-Final;;;;;;
-;List Style;;;;;;;;;
-;;Common List-Level Style Attributes;1;0.2-M1;Complete;"text:level translated to <w:lvl w:ilvl=""{number(@text:level) - 1}"">";;;;
+footnotes positions 'section' and 'document' don't seem to have counterpart in OOX."
+;;Bibliography Configuration;3;0.2-Final;;;
+;List Style;;;;;;
+;;Common List-Level Style Attributes;1;0.2-M1;Complete;"text:level translated to <w:lvl w:ilvl=""{number(@text:level) - 1}"">";
 ;;Number Level Style;1;0.2-M1;Partial;"text:display-number is involved in the generation of w:lvlText/@w:val format string. When display-number is encountered, ""display-levels"" template is recursively called until text:display-number has been reached.
 style:num-format is translated to w:numFmt/@w:val as  :
 1 -> decimal
@@ -452,111 +452,111 @@ a -> lowerLetter
 A -> upperLetter
 otherwise decimal.
 style:num-format may also be empty. In this case, it is translated to lvlText/@w:val = '' if  no text:display-number has been specified. Otherwise, numbering is skipped when ""display-levels"" is called on an empty num-format.
-text:start-value is converted to w:start/@w:val";TODO : text:style-name;;;
+text:start-value is converted to w:start/@w:val";TODO : text:style-name
 ;;Bullet Level Style;1;0.2-M1;Partial;"w:lvl/w:numFmt/@w:val set to 'bullet'
 w:lvl/w:lvlText/@w:val set to @text:bullet-char
 w:lvl/w:lvlJc/@w:val set to ""left""
 Same indentation properties as for text:list-level-style-number";"TODO : some bullet characters are not correctly converted 
 style:num-format-prefix, style:num-format-suffix
-bullet-relative-size";;;
-;;Image Level Style;3;0.2-Final;;;;;;
-;;List Level Style Example;;;;;;;;
-;Outline Style;;1;;;;;;;
-;;Outline Level Style;1;0.2-Final;Completed;w:ilvi child is the item level starting at 0.;;;;
-;Table Styles;;2;0.2-Final;;;;;;
-;;Table Styles;2;0.2-M1;;;;;;
-;;Table Column Styles;2;0.2-Final;;;;;;
-;;Table Row Styles;2;0.2-Final;;;;;;
-;;Table Cell Styles;2;0.2-Final;Partial;See Table Formatting Properties;TODO cell width;;;
-;Graphic Styles;;;;;;;;;
-;;Graphic and Presentation Styles;;;;;;;;
-;;Drawing Page Style;;;;;;;;
-;Enhanced Graphic Style Elements;;;;;;;;;
-;;Gradient;;;;;;;;
-;;SVG Gradients;;;;;;;;
-;;Hatch;;;;;;;;
-;;Fill Image;;;;;;;;
-;;Opacity Gradient;;;;;;;;
-;;Marker;;;;;;;;
-;;StrCompletede Dash;;;;;;;;
-Formatting Properties;;;;;;;;;;
-;Simple and Complex Formatting Properties;;;;;;;;;
-;;Simple Formatting Properties;;;;;;;;
-;;Complex Formatting Properties;1;;;;seems to be important, see example in ODF documentation on page 541;;;
-;;Processing Rules for Formatting Properties;;;;;;;;
-;Page Layout Formatting Properties;;1;0.2-Final;;;;;;
-;;Page Size;1;0.2-Final;;;;;;
-;;Page Number Format;1;0.2-Final;;;;;;
-;;Paper Tray;2;0.2-Final;;;;;;
-;;Print Orientation;0;0.2-Final;;;;;;
-;;Margins;0;0.2-Final;;;;;;
-;;Border;2;0.2-Final;;;;;;
-;;Border Line Width;2;0.2-Final;;;;;;
-;;Padding;1;0.2-Final;;;;;;
-;;Shadow;2;0.2-Final;;;;;;
-;;Background;2;0.2-Final;;;;;;
-;;Columns;0;0.2-Final;;;;;;
-;;Register-truth;3;0.2-Final;;;;;;
-;;Print;;0.2-Final;;;refers to spreadsheets, some of the remaining also;;;
-;;Print Page Order;;0.2-Final;;;;;;
-;;First Page Number;;0.2-Final;;;;;;
-;;Scale;;0.2-Final;;;;;;
-;;Table Centering;;0.2-Final;;;;;;
-;;Maximum Footnote Height;2;0.2-Final;;;;;;
-;;Writing Mode;;0.2-Final;;;;;;
-;;Footnote Separator;2;0.2-Final;;;;;;
-;;Layout Grid;;0.2-Final;;;refers to Asian layout grids;;;
-;;Layout Grid Base Height;;0.2-Final;;;;;;
-;;Layout Grid Ruby Height;;0.2-Final;;;;;;
-;;Layout Grid Lines;;0.2-Final;;;;;;
-;;Layout Grid Color;;0.2-Final;;;;;;
-;;Layout Grid Ruby Below;;0.2-Final;;;;;;
-;;Layout Grid Print;;0.2-Final;;;;;;
-;;Layout Grid Display;;0.2-Final;;;;;;
-;Header Footer Formatting Properties;;0;0.2-M1;;;;;;
-;;Fixed and Minimum heights;0;0.2-M1;;;;;;
-;;Margins;0;0.2-M1;;;;;;
-;;Border;2;0.2-M1;;;;;;
-;;Border Line Width;2;0.2-M1;;;;;;
-;;Padding;1;0.2-M1;;;;;;
-;;Background;2;0.2-M1;;;;;;
-;;Shadow;3;0.2-M1;;;;;;
-;;Dynamic Spacing;3;0.2-M1;;;;;;
-;Text Formatting Properties;;0;0.2-M1;;;;;;
-;;Font Variant;1;0.2-M1;Completed;style:text-properties/@fo:font-variant convert to w:styles/w:style/w:rPr/w:smallCaps;;;;
-;;Text Transformations;1;0.2-M1;Completed;style:text-properties/@fo:text-transform convert to w:styles/w:style/w:rPr/w:caps;;;;
-;;Color;1;0.1;Completed;style:text-properties/@fo:color used in w:styles/w:style/w:rPr/w:color/@w:val;;;;
-;;Window Font Color;1;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Text Outline;2;0.2-M1;Completed;style:text-properties/@style:text-outline convert to w:styles/w:style/w:rPr/w:outline;;;;
-;;Line Through Type;3;0.2-M1;Completed;style:text-properties/@style:text-line-through-type='double' convert to w:styles/w:style/w:rPr/w:dstrike;;;;
-;;Line Through Style;3;0.2-M1;Completed;style:text-properties/@style:text-line-through-style convert to w:styles/w:style/w:rPr/w:strike;All style are convert to a line, because line through feature is richer in ODF than in OOX. If line through type exist, the convertion isn't made.;;;
-;;Line Through Width;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Line Through Color;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Line Through Text;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Line Through Text Style;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Text Position;1;0.2-M1;Completed;style:text-properties/@style:text-position convert to w:styles/w:style/w:rPr/w:vertAlign;;;;
+bullet-relative-size"
+;;Image Level Style;3;0.2-Final;;;
+;;List Level Style Example;;;;;
+;Outline Style;;1;;;;
+;;Outline Level Style;1;0.2-Final;Completed;w:ilvi child is the item level starting at 0.;
+;Table Styles;;2;0.2-Final;;;
+;;Table Styles;2;0.2-M1;;;
+;;Table Column Styles;2;0.2-Final;;;
+;;Table Row Styles;2;0.2-Final;;;
+;;Table Cell Styles;2;0.2-Final;Partial;See Table Formatting Properties;TODO cell width
+;Graphic Styles;;;;;;
+;;Graphic and Presentation Styles;;;;;
+;;Drawing Page Style;;;;;
+;Enhanced Graphic Style Elements;;;;;;
+;;Gradient;;;;;
+;;SVG Gradients;;;;;
+;;Hatch;;;;;
+;;Fill Image;;;;;
+;;Opacity Gradient;;;;;
+;;Marker;;;;;
+;;StrCompletede Dash;;;;;
+Formatting Properties;;;;;;;
+;Simple and Complex Formatting Properties;;;;;;
+;;Simple Formatting Properties;;;;;
+;;Complex Formatting Properties;1;;;;seems to be important, see example in ODF documentation on page 541
+;;Processing Rules for Formatting Properties;;;;;
+;Page Layout Formatting Properties;;1;0.2-Final;;;
+;;Page Size;1;0.2-Final;;;
+;;Page Number Format;1;0.2-Final;;;
+;;Paper Tray;2;0.2-Final;;;
+;;Print Orientation;0;0.2-Final;;;
+;;Margins;0;0.2-Final;;;
+;;Border;2;0.2-Final;;;
+;;Border Line Width;2;0.2-Final;;;
+;;Padding;1;0.2-Final;;;
+;;Shadow;2;0.2-Final;;;
+;;Background;2;0.2-Final;;;
+;;Columns;0;0.2-Final;;;
+;;Register-truth;3;0.2-Final;;;
+;;Print;;0.2-Final;;;refers to spreadsheets, some of the remaining also
+;;Print Page Order;;0.2-Final;;;
+;;First Page Number;;0.2-Final;;;
+;;Scale;;0.2-Final;;;
+;;Table Centering;;0.2-Final;;;
+;;Maximum Footnote Height;2;0.2-Final;;;
+;;Writing Mode;;0.2-Final;;;
+;;Footnote Separator;2;0.2-Final;;;
+;;Layout Grid;;0.2-Final;;;refers to Asian layout grids
+;;Layout Grid Base Height;;0.2-Final;;;
+;;Layout Grid Ruby Height;;0.2-Final;;;
+;;Layout Grid Lines;;0.2-Final;;;
+;;Layout Grid Color;;0.2-Final;;;
+;;Layout Grid Ruby Below;;0.2-Final;;;
+;;Layout Grid Print;;0.2-Final;;;
+;;Layout Grid Display;;0.2-Final;;;
+;Header Footer Formatting Properties;;0;0.2-M1;;;
+;;Fixed and Minimum heights;0;0.2-M1;;;
+;;Margins;0;0.2-M1;;;
+;;Border;2;0.2-M1;;;
+;;Border Line Width;2;0.2-M1;;;
+;;Padding;1;0.2-M1;;;
+;;Background;2;0.2-M1;;;
+;;Shadow;3;0.2-M1;;;
+;;Dynamic Spacing;3;0.2-M1;;;
+;Text Formatting Properties;;0;0.2-M1;;;
+;;Font Variant;1;0.2-M1;Completed;style:text-properties/@fo:font-variant convert to w:styles/w:style/w:rPr/w:smallCaps;
+;;Text Transformations;1;0.2-M1;Completed;style:text-properties/@fo:text-transform convert to w:styles/w:style/w:rPr/w:caps;
+;;Color;1;0.1;Completed;style:text-properties/@fo:color used in w:styles/w:style/w:rPr/w:color/@w:val;
+;;Window Font Color;1;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Text Outline;2;0.2-M1;Completed;style:text-properties/@style:text-outline convert to w:styles/w:style/w:rPr/w:outline;
+;;Line Through Type;3;0.2-M1;Completed;style:text-properties/@style:text-line-through-type='double' convert to w:styles/w:style/w:rPr/w:dstrike;
+;;Line Through Style;3;0.2-M1;Completed;style:text-properties/@style:text-line-through-style convert to w:styles/w:style/w:rPr/w:strike;All style are convert to a line, because line through feature is richer in ODF than in OOX. If line through type exist, the convertion isn't made.
+;;Line Through Width;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Line Through Color;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Line Through Text;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Line Through Text Style;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Text Position;1;0.2-M1;Completed;style:text-properties/@style:text-position convert to w:styles/w:style/w:rPr/w:vertAlign;
 ;;Font Name;1;0.1;Completed;"style:text-properties/@style:font-name copied to 
-/w:styles/w:style/w:rPr/w:rFonts/@w:ascii and @w:hAnsi attributes";;;;
+/w:styles/w:style/w:rPr/w:rFonts/@w:ascii and @w:hAnsi attributes";
 ;;Font Family;0;0.1;Partial;"style:style/@style:font-family converted to w:styles/w:style/@w:type
 'text' family matches 'character' type.
-'graphic', 'section' and 'paragraph' families match 'paragraph' type. ";;;;
-;;Font Family Generic;0;0.2-M1;Completed;style:font-face/@style:font-family-generic convert to w:fonts/w:font/w:family;;;;
+'graphic', 'section' and 'paragraph' families match 'paragraph' type. ";
+;;Font Family Generic;0;0.2-M1;Completed;style:font-face/@style:font-family-generic convert to w:fonts/w:font/w:family;
 ;;Font style;0;0.1;Completed;"style:style[@fo:font-style='italic'] converted to w:styles/w:style/w:rPr/w:i
-style:style[@fo:font-style-complex='italic'] converted to w:styles/w:style/w:rPr/w:i-cs";;;;
-;;Font Pitch;0;0.2-M1;Completed;style:font-face/@style:font-pitch convert to w:fonts/w:font/w:pitch;;;;
-;;Font Character Set;1?;0.2-M1;Completed;style:font-face/@style:font-charset convert to w:fonts/w:font/w:charset;;;;
+style:style[@fo:font-style-complex='italic'] converted to w:styles/w:style/w:rPr/w:i-cs";
+;;Font Pitch;0;0.2-M1;Completed;style:font-face/@style:font-pitch convert to w:fonts/w:font/w:pitch;
+;;Font Character Set;1?;0.2-M1;Completed;style:font-face/@style:font-charset convert to w:fonts/w:font/w:charset;
 ;;Font Size;0;0.1;Completed;"style:text-properties/@fo:font-size converted to w:styles/w:style/w:rPr/@w:sz
-If fo:font-size is expressed in percentage of a parent font-size, we climb up the style ancestors until we find an absolute size (expressed in points). If none was found, the size of the default style (office:styles/style:default-style)  in the same family is used. ";;;;
-;;Relative Font Size;1;0.2-M1;Partial;;not available in Open Office?;;;
-;;Script Type;2;0.2-M1;Partial;w:pPr/w:spacing based on style:paragraph-properties/@fo:line-height;;;;
-;;Letter Spacing;2;0.2-M1;Completed;style:text-properties/@fo:letter-spacing convert to w:styles/w:style/w:rPr/w:spacing;;;;
-;;Language;0;0.2-M1;Completed;style:text-properties/@fo:language convert to w:styles/w:style/w:rPr/w:lang concatenated with country;;;;
-;;Country;2;0.2-M1;Completed;style:text-properties/@fo:country convert to w:styles/w:style/w:rPr/w:lang concatenated with language;;;;
-;;Font Style;0;0.2-M1;Completed;style:text-properties/@fo:letter-spacing convert to w:styles/w:style/w:rPr/w:spacing;;;;
+If fo:font-size is expressed in percentage of a parent font-size, we climb up the style ancestors until we find an absolute size (expressed in points). If none was found, the size of the default style (office:styles/style:default-style)  in the same family is used. ";
+;;Relative Font Size;1;0.2-M1;Partial;;not available in Open Office?
+;;Script Type;2;0.2-M1;Partial;w:pPr/w:spacing based on style:paragraph-properties/@fo:line-height;
+;;Letter Spacing;2;0.2-M1;Completed;style:text-properties/@fo:letter-spacing convert to w:styles/w:style/w:rPr/w:spacing;
+;;Language;0;0.2-M1;Completed;style:text-properties/@fo:language convert to w:styles/w:style/w:rPr/w:lang concatenated with country;
+;;Country;2;0.2-M1;Completed;style:text-properties/@fo:country convert to w:styles/w:style/w:rPr/w:lang concatenated with language;
+;;Font Style;0;0.2-M1;Completed;style:text-properties/@fo:letter-spacing convert to w:styles/w:style/w:rPr/w:spacing;
 ;;Font Relief;2;0.2-M1;Completed;"style:text-properties/@style:font-relief='embossed' convert to w:styles/w:style/w:rPr/w:emboss
-style:text-properties/@style:font-relief='engraved' convert to w:styles/w:style/w:rPr/w:imprint";;;;
-;;Text Shadow;2;0.2-M1;Completed;style:text-properties/@fo:text-shadow convert to w:styles/w:style/w:rPr/w:shadow concatenated with language;;;;
-;;Underlining Type;1;0.2-M1;Completed;ODF 'double' value only makes sense for OOX 'double' and 'wavyDouble'. ;The translation might be lossy, because underline feature is richer in ODF than in OOX;;;
+style:text-properties/@style:font-relief='engraved' convert to w:styles/w:style/w:rPr/w:imprint";
+;;Text Shadow;2;0.2-M1;Completed;style:text-properties/@fo:text-shadow convert to w:styles/w:style/w:rPr/w:shadow concatenated with language;
+;;Underlining Type;1;0.2-M1;Completed;ODF 'double' value only makes sense for OOX 'double' and 'wavyDouble'. ;The translation might be lossy, because underline feature is richer in ODF than in OOX
 ;;Underlining Style;0;0.2-M1;Completed;"style:style/@style:text-underline-style used in w:styles/w:style/w:rPr/w:u/@w:val
 solid -> single
 dotted -> dotted
@@ -565,300 +565,300 @@ long-dash -> dashLong
 dot-dash -> dotDash
 dot-dot-dash -> dotDotDash
 wave -> wave
-otherwise 'single' is used.";The translation might be lossy, because underline feature is richer in ODF than in OOX;;;
-;;Underling Width;2;0.2-M1;Completed;ODF 'thick' or 'bold' values produce OOX *Heavy* underline style when it exists.  ;The translation might be lossy, because underline feature is richer in ODF than in OOX;;;
+otherwise 'single' is used.";The translation might be lossy, because underline feature is richer in ODF than in OOX
+;;Underling Width;2;0.2-M1;Completed;ODF 'thick' or 'bold' values produce OOX *Heavy* underline style when it exists.  ;The translation might be lossy, because underline feature is richer in ODF than in OOX
 ;;Underline Color;1;0.2-M1;Completed;"style:style/@style:text-underline-color converted to w:styles/w:style/w:rPr/w:u/@w:color
 'font-color' is converted to 'auto'
-otherwise RGB values are parsed. ";;;;
+otherwise RGB values are parsed. ";
 ;;Font Weight;0;0.2-M1;Completed;"style:text-properties/@fo:font-weight or style:text-properties/@fo:font-weight-asian translated to w:styles/w:style/w:rPr/w:b
-style:text-properties/@fo:font-complex-weight translated to w:styles/w:style/w:rPr/w:b-cs";;;;
-;;Text Underline Word Mode;2;0.2-M1;Completed;ODF 'skip-white-space' value produce OOX *Words* underline style when it exists.  ;The translation might be lossy, because underline feature is richer in ODF than in OOX;;;
-;;Text Line Through Word Mode;2;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Letter Kerning;2;0.2-M1;Completed;style:text-properties/@style:letter-kerning convert to w:styles/w:style/w:rPr/w:kern;;;;
-;;Text Blinking;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Text Background Color;1;0.2-M1;Completed;style:text-properties/@fo:background-color convert to w:styles/w:style/w:rPr/w:shd;;;;
-;;Text Combine;?;0.2-M1;Completed;style:text-properties/@style:text-combine convert to w:styles/w:style/w:rPr/w:eastAsianLayout;Is for Asian languages, it's to combine characters so that they are displayed within two lines ;;;
-;;Text Combine Start and End Characters;?;0.2-M1;Completed;style:text-properties/@style:text-combine-start-char and  style:text-properties/@style:text-combine-end-char convert to w:styles/w:style/w:rPr/w:eastAsianLayout/@w:combineBrackets;The translation might be lossy, because underline feature is richer in ODF than in OOX;;;
-;;Text Emphasis;;0.2-M1;Completed;style:text-properties/@style:text-emphasize convert to w:styles/w:style/w:rPr/w:em;The translation might be lossy, because underline feature is richer in ODF than in OOX;;;
-;;Text Scale;3;0.2-M1;Completed;style:text-properties/@style:text-scale convert to w:styles/w:style/w:rPr/w:w;;;;
-;;Text Rotation Angle;3;0.2-M1;Partial;;might not directly exist in Word! Simulated via text boxes?;;;
-;;Text Rotation Scale;3;0.2-M1;Partial;;might not directly exist in Word! Simulated via text boxes?;;;
-;;Hyphenation;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Hyphenation Remain Char Count;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Hyphenation Push Char Count;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX;;;
-;;Hidden or Conditional Text;0;0.2-M1;Partial;style:text-properties/@text:display convert to w:styles/w:style/w:rPr/w:vanish;There are a bug beetwen open office and ODF, conditional text don't existe in OOX;;;
-;Paragraph Formatting Properties;;;0.2-M1;;;;;;
+style:text-properties/@fo:font-complex-weight translated to w:styles/w:style/w:rPr/w:b-cs";
+;;Text Underline Word Mode;2;0.2-M1;Completed;ODF 'skip-white-space' value produce OOX *Words* underline style when it exists.  ;The translation might be lossy, because underline feature is richer in ODF than in OOX
+;;Text Line Through Word Mode;2;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Letter Kerning;2;0.2-M1;Completed;style:text-properties/@style:letter-kerning convert to w:styles/w:style/w:rPr/w:kern;
+;;Text Blinking;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Text Background Color;1;0.2-M1;Completed;style:text-properties/@fo:background-color convert to w:styles/w:style/w:rPr/w:shd;
+;;Text Combine;?;0.2-M1;Completed;style:text-properties/@style:text-combine convert to w:styles/w:style/w:rPr/w:eastAsianLayout;Is for Asian languages, it's to combine characters so that they are displayed within two lines 
+;;Text Combine Start and End Characters;?;0.2-M1;Completed;style:text-properties/@style:text-combine-start-char and  style:text-properties/@style:text-combine-end-char convert to w:styles/w:style/w:rPr/w:eastAsianLayout/@w:combineBrackets;The translation might be lossy, because underline feature is richer in ODF than in OOX
+;;Text Emphasis;;0.2-M1;Completed;style:text-properties/@style:text-emphasize convert to w:styles/w:style/w:rPr/w:em;The translation might be lossy, because underline feature is richer in ODF than in OOX
+;;Text Scale;3;0.2-M1;Completed;style:text-properties/@style:text-scale convert to w:styles/w:style/w:rPr/w:w;
+;;Text Rotation Angle;3;0.2-M1;Partial;;might not directly exist in Word! Simulated via text boxes?
+;;Text Rotation Scale;3;0.2-M1;Partial;;might not directly exist in Word! Simulated via text boxes?
+;;Hyphenation;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Hyphenation Remain Char Count;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Hyphenation Push Char Count;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
+;;Hidden or Conditional Text;0;0.2-M1;Partial;style:text-properties/@text:display convert to w:styles/w:style/w:rPr/w:vanish;There are a bug beetwen open office and ODF, conditional text don't existe in OOX
+;Paragraph Formatting Properties;;;0.2-M1;;;
 ;;Fixed Line Height;1;0.2-M1;;"styles:paragraph-properties/@fo:line-height translated to w:styles/w:style/w:pPr/w:spacing
-@w:lineRule set to 'auto' if @w:line is expressed in percentage, otherwise, it is set to 'exact'. Attribute @w:line is the twip (twentieth of a point) measure of line-height";mapping to Word has to be defined;;;
+@w:lineRule set to 'auto' if @w:line is expressed in percentage, otherwise, it is set to 'exact'. Attribute @w:line is the twip (twentieth of a point) measure of line-height";mapping to Word has to be defined
 ;;Minimum Line Height;1;0.2-M1;Partial;"styles:paragraph-properties/@style:line-height-at-least translated to w:styles/w:style/w:pPr/w:spacing
-@w:lineRule set to 'atLeast' and @w:line is the twip measure of line-height ";;;;
-;;Line Distance;1;0.2-M1;;;;;;
-;;Font-Independent Line Spacing;1;0.2-M1;;;;;;
+@w:lineRule set to 'atLeast' and @w:line is the twip measure of line-height ";
+;;Line Distance;1;0.2-M1;;;
+;;Font-Independent Line Spacing;1;0.2-M1;;;
 ;;Text Align;0;0.2-M1;Partial;"style:paragraph-properties/@fo:text-align converted to w:styles/w:style/w:pPr/w:jc.Translated values are :
 center -> center
 start -> left
 end -> right
 justify -> both
-otherwise start";;;;
-;;Text Align of Last Line;;0.2-M1;;;not available in Word?;;;
-;;Justify Single Word;;0.2-M1;;;not available in Word?;;;
+otherwise start";
+;;Text Align of Last Line;;0.2-M1;;;not available in Word?
+;;Justify Single Word;;0.2-M1;;;not available in Word?
 ;;Keep Together;1;0.2-M1;Completed;"style:paragraph-properties/@fo:keep-together='always' converted to w:styles/w:style/w:pPr/w:keepLines
-style:paragraph-properties/@fo:keep-with-next='always' converted to w:styles/w:style/w:pPr/w:keepNext";;;;
-;;Widows;1;0.2-M1;Partial;style:paragraph-properties/@fo:widows  converted to w:styles/w:style/w:pPr/w:widowControl;Widows & Orphan are same in Word;;;
-;;Orphans;1;0.2-M1;Partial;style:paragraph-properties/@fo:orphans converted to w:styles/w:style/w:pPr/w:widowControl;Widows & Orphan are same in Word;;;
+style:paragraph-properties/@fo:keep-with-next='always' converted to w:styles/w:style/w:pPr/w:keepNext";
+;;Widows;1;0.2-M1;Partial;style:paragraph-properties/@fo:widows  converted to w:styles/w:style/w:pPr/w:widowControl;Widows & Orphan are same in Word
+;;Orphans;1;0.2-M1;Partial;style:paragraph-properties/@fo:orphans converted to w:styles/w:style/w:pPr/w:widowControl;Widows & Orphan are same in Word
 ;;Tab Stops;0;0.2-M1;Partial;"style:paragraph-properties/style:tab-stops converted to w:styles/w:style/w:pPr/w:tabs
 style:paragraph-properties/style:tab-stops/style:tab-stop converted to w:styles/w:style/w:pPr/w:tabs/w:tab
 style:tab-stop/@fo:position converted to w:tab/@w:pos
-style:tab-stop/@style:type converted to w:tab/@w:val. When @style:type is not present, @w:val is set to 'clear' ";;;;
-;;Tab Stop Distance;0;0.2-M1;;;;;;
-;;Hyphenation Keep;;0.2-M1;;;;;;
-;;Maximum Hyphens;;0.2-M1;;;;;;
-;;Drop Caps;2;0.2-M1;;;mapping to Word has to be defined;;;
-;;Register True;3;0.2-M1;;;mapping to Word has to be defined;;;
+style:tab-stop/@style:type converted to w:tab/@w:val. When @style:type is not present, @w:val is set to 'clear' ";
+;;Tab Stop Distance;0;0.2-M1;;;
+;;Hyphenation Keep;;0.2-M1;;;
+;;Maximum Hyphens;;0.2-M1;;;
+;;Drop Caps;2;0.2-M1;;;mapping to Word has to be defined
+;;Register True;3;0.2-M1;;;mapping to Word has to be defined
 ;;Left and Right Margins;0;0.1;Completed;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
-respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).";;;;
+respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).";
 ;;Text Indent;0;0.1;Completed;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
 respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).
-";;;;
-;;Automatic Text Indent;1;0.2-M1;Partial;style:paragraph-properties/@style:auto-text-indent converted to w:styles/w:style/w:pPr/w:ind/w:firstLine;not available in Word, then use a trick to indent the first line egal paragraph font-size;;;
+";
+;;Automatic Text Indent;1;0.2-M1;Partial;style:paragraph-properties/@style:auto-text-indent converted to w:styles/w:style/w:pPr/w:ind/w:firstLine;not available in Word, then use a trick to indent the first line egal paragraph font-size
 ;;Top and Bottom Margins;0;0.1;Completed;"style:paragraph-properties/@fo:margin-top converted to w:styles/w:style/w:pPr/w:spacing/@w:before
-style:paragraph-properties/@fo:margin-right converted to w:styles/w:style/w:pPr/w:spacing/@w:after";;;;
-;;Margins;0;0.2-M1;;;;;;
-;;Break Before and Break After;0;0.2-M1;Partial;style:paragraph-properties/@fo:break-before='page' converted to w:styles/w:style/w:pPr/w:pageBreakBefore;;;;
+style:paragraph-properties/@fo:margin-right converted to w:styles/w:style/w:pPr/w:spacing/@w:after";
+;;Margins;0;0.2-M1;;;
+;;Break Before and Break After;0;0.2-M1;Partial;style:paragraph-properties/@fo:break-before='page' converted to w:styles/w:style/w:pPr/w:pageBreakBefore;
 ;;Paragraph Background Color;1;0.1;Partial;"style:paragraph-properties/@fo:background-color translated to w:styles/w:style/w:pPr/w:shd/@w:fill
-Attribute @w:val is set to 'solid'";;;;
-;;Paragraph Background Image;3;0.2-M1;;;not available in Word?;;;
+Attribute @w:val is set to 'solid'";
+;;Paragraph Background Image;3;0.2-M1;;;not available in Word?
 ;;Border;1;0.2-M1;Partial;"style:paragraph-properties/@fo:border translated to w:styles/w:style/w:pPr/w:pBdr/@w:color and @w:sz
-Attribute @w:val is set to 'single'";;;;
-;;Border Line Width;2;0.2-M1;;;;;;
-;;Padding;2;0.2-M1;Partial;style:paragraph-properties/@fo:padding translated to w:styles/w:style/w:pPr/w:pBdr/@w:space;;;;
-;;Shadow;3;0.2-M1;;;not available in Word?;;;
-;;Keep with Next;1;0.2-M1;;;;;;
-;;Line Numbering;2;0.2-M1;;;cannot be mapped one-to-ont (Word automatically inserts page breaks);;;
-;;Line Number Start Value;2;0.2-M1;;;;;;
-;;Text Autospace;;0.2-M1;Partial;style:paragraph-properties/@style:text-autospace to w:styles/w:style/w:pPr/w:autoSpaceDN/@w:val;In word there are autoSpaceDN and autoSpaceDE;;;
-;;Punctuation Wrap;;0.2-M1;;;;;;
-;;Line Break;;0.2-M1;;;;;;
-;;Vertical Alignment;2;0.2-M1;Completed;style:paragraph-properties/@style:vertical-align to w:styles/w:style/w:pPr/w:textAlignment/@w:val;;;;
-;;Writing Mode;;0.2-M1;;;;;;
-;;Automatic Writing Mode;;0.2-M1;;;;;;
-;;Snap To Layout;;0.2-M1;;;;;;
-;;Page Number;;0.2-M1;;;no idea?;;;
-;;Background Transparency;;0.2-M1;;;;;;
-;Ruby Text Formatting Properties;;;;;;;;;
-;;Ruby Position;;;;;;;;
-;;Ruby Alignment;;;;;;;;
-;Section Formatting Properties;;;;;;;;;
-;;Section Background;2;0.2-Final;;;;;;
-;;Margins;0;0.2-Final;;;;;;
-;;Columns;0;0.2-Final;;;;;;
-;;Column Specification;1;;;;;;;
-;;Column Separator;2;;;;;;;
-;;Protect;2;;;;;;;
-;;Don&#39;3;;;;;;;
-;;Writing Mode;;;;;;;;
-;;Notes Configuration;;;;;not available in Word?;;;
-;Table Formatting Properties;;1;;;;to be analysed in more detail (some elements might not be required, e.g. Page Number element);;;
+Attribute @w:val is set to 'single'";
+;;Border Line Width;2;0.2-M1;;;
+;;Padding;2;0.2-M1;Partial;style:paragraph-properties/@fo:padding translated to w:styles/w:style/w:pPr/w:pBdr/@w:space;
+;;Shadow;3;0.2-M1;;;not available in Word?
+;;Keep with Next;1;0.2-M1;;;
+;;Line Numbering;2;0.2-M1;;;cannot be mapped one-to-ont (Word automatically inserts page breaks)
+;;Line Number Start Value;2;0.2-M1;;;
+;;Text Autospace;;0.2-M1;Partial;style:paragraph-properties/@style:text-autospace to w:styles/w:style/w:pPr/w:autoSpaceDN/@w:val;In word there are autoSpaceDN and autoSpaceDE
+;;Punctuation Wrap;;0.2-M1;;;
+;;Line Break;;0.2-M1;;;
+;;Vertical Alignment;2;0.2-M1;Completed;style:paragraph-properties/@style:vertical-align to w:styles/w:style/w:pPr/w:textAlignment/@w:val;
+;;Writing Mode;;0.2-M1;;;
+;;Automatic Writing Mode;;0.2-M1;;;
+;;Snap To Layout;;0.2-M1;;;
+;;Page Number;;0.2-M1;;;no idea?
+;;Background Transparency;;0.2-M1;;;
+;Ruby Text Formatting Properties;;;;;;
+;;Ruby Position;;;;;
+;;Ruby Alignment;;;;;
+;Section Formatting Properties;;;;;;
+;;Section Background;2;0.2-Final;;;
+;;Margins;0;0.2-Final;;;
+;;Columns;0;0.2-Final;;;
+;;Column Specification;1;;;;
+;;Column Separator;2;;;;
+;;Protect;2;;;;
+;;Don&#39;3;;;;
+;;Writing Mode;;;;;
+;;Notes Configuration;;;;;not available in Word?
+;Table Formatting Properties;;1;;;;to be analysed in more detail (some elements might not be required, e.g. Page Number element)
 ;;Table Width;1;0.1;Completed;"The table style name table:table/@table:style-name is set to w:tbl/w:tblPr/w:tblStyle/@w:val.
-style:table-properties/@style:width for this table style name is converted to w:tbl/w:tblPr/w:tblW/@w:w";;;;
-;;Table Alignment;1;0.2-M1;Completed;w:jc based on style:table-properties/@table:align;;;;
-;;Table Left and Right Margin;1;0.2-M1;;;it seems that it's not available in Word;;;
-;;Table Top and Bottom Margin;1;0.2-M1;;;you cannot add spacing before or after table in Word as you can in OO;;;
-;;Table Margins;1;0.2-M1;;;it seems that it's not available in Word;;;
-;;Page Number;;0.2-M1;;;;;;
-;;Break Before and Break After;1;0.2-M1;;;these properties can be applied to paragraph but not to table in Word;;;
-;;Table Background and Background Image;1;0.2-M1;Partial;;there is no such feature like background image for table in Word;;;
-;;Table Shadow;1;0.2-M1;;;it cannot be mapped one to one;;;
-;;Keep with Next;1;0.2-M1;;;these properties can be applied to paragraph but not to table in Word;;;
-;;May Break Between Rows;1;0.2-M1;;;;;;
-;;Border Model Property;1;0.2-M1;;;in Word there is only one model so this cannot be transformed;;;
-;;Writing Mode;1;0.2-M1;;;;;;
-;;Display;1;0.2-M1;;;;;;
-;Column Formatting Properties;;1;;;;;;;
-;;Column Width;1;0.2-Final;Partial;w:tc/w:tcPr/w:tcW based on style:table-column-properties/@style:column-width;TODO: handle problem of merged columns or rows;;;
-;;Optimal Table Column Width;1;0.2-Final;;;;;;
-;;Break Before and Break After;1;0.2-Final;;;;;;
-;Table Row Formatting Properties;;1;;;;;;;
-;;Row Height;1;0.2-Final;Partial;w:tr/w:trPr/w:trHeight based on style:table-row-properties/@style:min-row-height | @style:row-height;TODO: handle problem of merged rows;;;
-;;Optimal Table Row Height;1;0.2-Final;;;;;;
-;;Row Background;1;0.2-Final;Completed;;;;;
-;;Break Before and Break After;1;0.2-Final;;;;;;
-;;Keep Together;1;0.2-Final;;;;;;
-;Table Cell Formatting Properties;;1;;;;;;;
-;;Vertical Alignment;1;0.2-Final;Completed; w:vAlign based on style:table-cell-properties@style:vertical-align;;;;
-;;Text Align Source;1;0.2-Final;;;;;;
-;;Direction;1;0.2-Final;;;;;;
-;;Vertical Glyph Orientation;1;0.2-Final;;;;;;
-;;Cell Shadow;1;0.2-Final;;;it cannot be mapped one to one;;;
-;;Cell Background;1;0.2-Final;Partial;w:tc/w:tcPr/w:shd is based on @fo:background-color;;;;
+style:table-properties/@style:width for this table style name is converted to w:tbl/w:tblPr/w:tblW/@w:w";
+;;Table Alignment;1;0.2-M1;Completed;w:jc based on style:table-properties/@table:align;
+;;Table Left and Right Margin;1;0.2-M1;;;it seems that it's not available in Word
+;;Table Top and Bottom Margin;1;0.2-M1;;;you cannot add spacing before or after table in Word as you can in OO
+;;Table Margins;1;0.2-M1;;;it seems that it's not available in Word
+;;Page Number;;0.2-M1;;;
+;;Break Before and Break After;1;0.2-M1;;;these properties can be applied to paragraph but not to table in Word
+;;Table Background and Background Image;1;0.2-M1;Partial;;there is no such feature like background image for table in Word
+;;Table Shadow;1;0.2-M1;;;it cannot be mapped one to one
+;;Keep with Next;1;0.2-M1;;;these properties can be applied to paragraph but not to table in Word
+;;May Break Between Rows;1;0.2-M1;;;
+;;Border Model Property;1;0.2-M1;;;in Word there is only one model so this cannot be transformed
+;;Writing Mode;1;0.2-M1;;;
+;;Display;1;0.2-M1;;;
+;Column Formatting Properties;;1;;;;
+;;Column Width;1;0.2-Final;Partial;w:tc/w:tcPr/w:tcW based on style:table-column-properties/@style:column-width;TODO: handle problem of merged columns or rows
+;;Optimal Table Column Width;1;0.2-Final;;;
+;;Break Before and Break After;1;0.2-Final;;;
+;Table Row Formatting Properties;;1;;;;
+;;Row Height;1;0.2-Final;Partial;w:tr/w:trPr/w:trHeight based on style:table-row-properties/@style:min-row-height | @style:row-height;TODO: handle problem of merged rows
+;;Optimal Table Row Height;1;0.2-Final;;;
+;;Row Background;1;0.2-Final;Completed;;
+;;Break Before and Break After;1;0.2-Final;;;
+;;Keep Together;1;0.2-Final;;;
+;Table Cell Formatting Properties;;1;;;;
+;;Vertical Alignment;1;0.2-Final;Completed; w:vAlign based on style:table-cell-properties@style:vertical-align;
+;;Text Align Source;1;0.2-Final;;;
+;;Direction;1;0.2-Final;;;
+;;Vertical Glyph Orientation;1;0.2-Final;;;
+;;Cell Shadow;1;0.2-Final;;;it cannot be mapped one to one
+;;Cell Background;1;0.2-Final;Partial;w:tc/w:tcPr/w:shd is based on @fo:background-color;
 ;;Cell Border;1;0.2-Final;Partial;"table:table-cell is converted to w:tc
 Based on style:table-cell-properties of the table style name the following properties have been converted :
 w:tc/w:tcBorders children w:top, w:bottom, w:left, w:right have their attributes @w:val set to 'single'
 @w:color set to substring-after(style:table-cell-properties/@fo:border, '#') and  
-@w:sz set to substring-before(style:table-cell-properties/@fo:border, ' ')";;;;
-;;Diagonal Lines;1;0.2-Final;;;;;;
-;;Border Line Width;1;0.2-Final;Partial;;;;;
+@w:sz set to substring-before(style:table-cell-properties/@fo:border, ' ')";
+;;Diagonal Lines;1;0.2-Final;;;
+;;Border Line Width;1;0.2-Final;Partial;;
 ;;Padding;1;0.2-Final;Partial;"w:tc/w:tcMar/w:top is based on @fo:padding or @fo:padding-top (whether defined or not) attribute found in style:table-cell-properties. 
 w:tc/w:tcMar/w:top/@w:type is set to 'dxa'
-The same applies to the elements w:bottom, w:right and w:left";;;;
-;;Wrap Option;1;0.2-Final;;;;;;
-;;Rotation Angle;1;0.2-Final;;;;;;
-;;Rotation Align;1;0.2-Final;;;;;;
-;;Cell Protect;1;0.2-Final;;;"The property ""cell protect"" (which is available in open office) in word is not handled in the same way. The only method to protect cells from editing is to add to a cell content control (""plain text"") which can be locked from editing.";;;
-;;Print Content;1;0.2-Final;;;;;;
-;;Decimal places;1;0.2-Final;;;;;;
-;;Repeat Content;1;0.2-Final;;;;;;
-;;Shrink To Fit;1;0.2-Final;;;;;;
+The same applies to the elements w:bottom, w:right and w:left";
+;;Wrap Option;1;0.2-Final;;;
+;;Rotation Angle;1;0.2-Final;;;
+;;Rotation Align;1;0.2-Final;;;
+;;Cell Protect;1;0.2-Final;;;"The property ""cell protect"" (which is available in open office) in word is not handled in the same way. The only method to protect cells from editing is to add to a cell content control (""plain text"") which can be locked from editing."
+;;Print Content;1;0.2-Final;;;
+;;Decimal places;1;0.2-Final;;;
+;;Repeat Content;1;0.2-Final;;;
+;;Shrink To Fit;1;0.2-Final;;;
 ;List-Level Style Properties;;0;0.2-Final;Partial;"text:space-before + text:min-label-width used for w:ind/@w:left
 text:min-label-width used in w:ind/@w:hanging
-@fo:text-align translated to w:lvlJc/@w:val";TODO : indentation from outside!;;;
-;Stroke Properties;;2;;;;how should drawing objects be processed? Converted as a picture?;;;
-;;Stroke Style;;;;;;;;
-;;Dash;;;;;;;;
-;;Multiple Dashes;;;;;;;;
-;;Width;;;;;;;;
-;;Color;;;;;;;;
-;;Start Marker;;;;;;;;
-;;End Marker;;;;;;;;
-;;Start Marker Width;;;;;;;;
-;;End Marker Width;;;;;;;;
-;;Start Marker Center;;;;;;;;
-;;End Marker Center;;;;;;;;
-;;Opacity;;;;;;;;
-;;Line Join;;;;;;;;
-;Fill Properties;;;;;;;;;
-;;Fill Style;;;;;;;;
-;;Color;;;;;;;;
-;;Secondary Fill Color;;;;;;;;
-;;Gradient;;;;;;;;
-;;Gradient Step Count;;;;;;;;
-;;Hatch;;;;;;;;
-;;Solid Hatch;;;;;;;;
-;;Fill Image;;;;;;;;
-;;Fill Image Rendering Style;;;;;;;;
-;;Fill Image Size;;;;;;;;
-;;Fill Image Tile Reference Point;;;;;;;;
-;;Fill Image Tile Translation;;;;;;;;
-;;None and Linear Opacity;;;;;;;;
-;;Gradient Opacity;;;;;;;;
-;;Fill Rule;;;;;;;;
-;;Symbol color;;;;;;;;
-;Text Animation Properties;;;;;;;;;
-;;Animation;;;;;;;;
-;;Animation Direction;;;;;;;;
-;;Animation Start Inside;;;;;;;;
-;;Animation Stop Inside;;;;;;;;
-;;Animation Repeat;;;;;;;;
-;;Animation Delay;;;;;;;;
-;;Animation Steps;;;;;;;;
-;Text and Text Alignment Properties;;2;;;;refers to text in drawing objects, to be analysed in more detail, especially how drawing objects are handled;;;
-;;Auto Grow Width and Height;2;0.2-M1;;;;;;
-;;Fit To Size;2;0.2-M1;;;;;;
-;;Fit To Contour;2;0.2-M1;;;;;;
-;;Text Area Vertical Align;2;0.2-M1;;;;;;
-;;Text Area Horizontal Align;2;0.2-M1;;;;;;
-;;Word Wrap;2;0.2-M1;;;;;;
-;;List Styles;2;0.2-M1;;;;;;
-;Color Properties;;;;;;might be not required at all;;;
-;;Color Mode;;0.2-Final;;;;;;
-;;Color Inversion;;0.2-Final;;;;;;
-;;Adjust Luminance;;0.2-Final;;;;;;
-;;Adjust Contrast;;0.2-Final;;;;;;
-;;Adjust Gamma;;0.2-Final;;;;;;
-;;Adjust Red;;0.2-Final;;;;;;
-;;Adjust Green;;0.2-Final;;;;;;
-;;Adjust Blue;;0.2-Final;;;;;;
-;;Adjust Opacity;;0.2-Final;;;;;;
-;Shadow Properties;;;;;;;;;
-;;Shadow;;0.2-Final;;;;;;
-;;Offset;;0.2-Final;;;;;;
-;;Color;;0.2-Final;;;;;;
-;;Opacity;;0.2-Final;;;;;;
-;Connector Properties;;;;;;;;;
-;;Start Line Spacing;;;;;;;;
-;;End Line Spacing;;;;;;;;
-;Measure Properties;;;;;;;;;
-;;Line Distance;;;;;;;;
-;;Guide Overhang;;;;;;;;
-;;Guide Distance;;;;;;;;
-;;Start Guide;;;;;;;;
-;;End Guide;;;;;;;;
-;;Placing;;;;;;;;
-;;Parallel;;;;;;;;
-;;Text Alignment;;;;;;;;
-;;Unit;;;;;;;;
-;;Show Unit;;;;;;;;
-;;Decimal Places;;;;;;;;
-;Caption Properties;;;;;;;;;
-;;Type;;0.2-Final;;;;;;
-;;Angle Type;;0.2-Final;;;;;;
-;;Angle;;0.2-Final;;;;;;
-;;Gap;;0.2-Final;;;;;;
-;;Escape Direction;;0.2-Final;;;;;;
-;;Escape;;0.2-Final;;;;;;
-;;Line Length;;0.2-Final;;;;;;
-;;Fit Line Length;;0.2-Final;;;;;;
-;3D Geometry Properties;;;;;;;;;
-;;Horizontal Segments;;;;;;;;
-;;Vertical Segments;;;;;;;;
-;;Edge Rounding;;;;;;;;
-;;Edge Rounding Mode;;;;;;;;
-;;Back Scale;;;;;;;;
-;;Depth;;;;;;;;
-;;Backface Culling;;;;;;;;
-;;End Angle;;;;;;;;
-;;Close Front;;;;;;;;
-;;Close Back;;;;;;;;
-;3D Lighting Properties;;;;;;;;;
-;;Mode;;;;;;;;
-;;Normals Kind;;;;;;;;
-;;Normals Direction;;;;;;;;
-;3D Texture Properties;;;;;;;;;
-;;Generation Mode;;;;;;;;
-;;Kind;;;;;;;;
-;;Filter;;;;;;;;
-;;Mode;;;;;;;;
-;3D Material Properties;;;;;;;;;
-;;Colors;;;;;;;;
-;;Shininess;;;;;;;;
-;3D Shadow Properties;;;;;;;;;
-;;Shadow;;;;;;;;
-;Frame Formatting Properties;;;;;;;;;
-;;Frame Widths;;;;;;;;
-;;Frame Heights;;;;;;;;
-;;Maximum Width and Height;;;;;;;;
-;;Left and Right Margins;;;;;;;;
-;;Top and Bottom Margins;;;;;;;;
-;;Margins;;;;;;;;
-;;Print Content;;;;;;;;
-;;Protect;;;;;;;;
-;;Horizontal Position;;;;;;;;
-;;Horizontal Relation;;;;;;;;
-;;Vertical Position;;;;;;;;
-;;Vertical Relation;;;;;;;;
-;;Frame Anchor;;;;;;;;
-;;Border;;;;;;;;
-;;Border Line Width;;;;;;;;
-;;Padding;;;;;;;;
-;;Shadow;;;;;;;;
-;;Background;;;;;;;;
-;;Columns;;;;;;;;
-;;Editable;;;;;;;;
-;;Wrapping;;;;;;;;
-;;Dynamic Wrap Threshold;;;;;;;;
-;;Paragraph-only Wrapping;;;;;;;;
-;;Contour Wrapping;;;;;;;;
-;;Contour Wrapping Mode;;;;;;;;
-;;Run Through;;;;;;;;
-;;Flow with Text;;;;;;;;
-;;Overflow behavior;;;;;;;;
-;;Mirroring;;;;;;;;
-;;Clipping;;;;;;;;
-;;Wrap Influence on Position;;;;;;;;
-;Floating Frame Formatting Properties;;;;;;;;;
-;;Display Scrollbar;;;;;;;;
-;;Display Border;;;;;;;;
-;;Margins;;;;;;;;
-;;Object Formatting Properties;;;;;;;;
-;;Visible Area;;;;;;;;
-;;Draw Aspect;;;;;;;;
+@fo:text-align translated to w:lvlJc/@w:val";TODO : indentation from outside!
+;Stroke Properties;;2;;;;how should drawing objects be processed? Converted as a picture?
+;;Stroke Style;;;;;
+;;Dash;;;;;
+;;Multiple Dashes;;;;;
+;;Width;;;;;
+;;Color;;;;;
+;;Start Marker;;;;;
+;;End Marker;;;;;
+;;Start Marker Width;;;;;
+;;End Marker Width;;;;;
+;;Start Marker Center;;;;;
+;;End Marker Center;;;;;
+;;Opacity;;;;;
+;;Line Join;;;;;
+;Fill Properties;;;;;;
+;;Fill Style;;;;;
+;;Color;;;;;
+;;Secondary Fill Color;;;;;
+;;Gradient;;;;;
+;;Gradient Step Count;;;;;
+;;Hatch;;;;;
+;;Solid Hatch;;;;;
+;;Fill Image;;;;;
+;;Fill Image Rendering Style;;;;;
+;;Fill Image Size;;;;;
+;;Fill Image Tile Reference Point;;;;;
+;;Fill Image Tile Translation;;;;;
+;;None and Linear Opacity;;;;;
+;;Gradient Opacity;;;;;
+;;Fill Rule;;;;;
+;;Symbol color;;;;;
+;Text Animation Properties;;;;;;
+;;Animation;;;;;
+;;Animation Direction;;;;;
+;;Animation Start Inside;;;;;
+;;Animation Stop Inside;;;;;
+;;Animation Repeat;;;;;
+;;Animation Delay;;;;;
+;;Animation Steps;;;;;
+;Text and Text Alignment Properties;;2;;;;refers to text in drawing objects, to be analysed in more detail, especially how drawing objects are handled
+;;Auto Grow Width and Height;2;0.2-M1;;;
+;;Fit To Size;2;0.2-M1;;;
+;;Fit To Contour;2;0.2-M1;;;
+;;Text Area Vertical Align;2;0.2-M1;;;
+;;Text Area Horizontal Align;2;0.2-M1;;;
+;;Word Wrap;2;0.2-M1;;;
+;;List Styles;2;0.2-M1;;;
+;Color Properties;;;;;;might be not required at all
+;;Color Mode;;0.2-Final;;;
+;;Color Inversion;;0.2-Final;;;
+;;Adjust Luminance;;0.2-Final;;;
+;;Adjust Contrast;;0.2-Final;;;
+;;Adjust Gamma;;0.2-Final;;;
+;;Adjust Red;;0.2-Final;;;
+;;Adjust Green;;0.2-Final;;;
+;;Adjust Blue;;0.2-Final;;;
+;;Adjust Opacity;;0.2-Final;;;
+;Shadow Properties;;;;;;
+;;Shadow;;0.2-Final;;;
+;;Offset;;0.2-Final;;;
+;;Color;;0.2-Final;;;
+;;Opacity;;0.2-Final;;;
+;Connector Properties;;;;;;
+;;Start Line Spacing;;;;;
+;;End Line Spacing;;;;;
+;Measure Properties;;;;;;
+;;Line Distance;;;;;
+;;Guide Overhang;;;;;
+;;Guide Distance;;;;;
+;;Start Guide;;;;;
+;;End Guide;;;;;
+;;Placing;;;;;
+;;Parallel;;;;;
+;;Text Alignment;;;;;
+;;Unit;;;;;
+;;Show Unit;;;;;
+;;Decimal Places;;;;;
+;Caption Properties;;;;;;
+;;Type;;0.2-Final;;;
+;;Angle Type;;0.2-Final;;;
+;;Angle;;0.2-Final;;;
+;;Gap;;0.2-Final;;;
+;;Escape Direction;;0.2-Final;;;
+;;Escape;;0.2-Final;;;
+;;Line Length;;0.2-Final;;;
+;;Fit Line Length;;0.2-Final;;;
+;3D Geometry Properties;;;;;;
+;;Horizontal Segments;;;;;
+;;Vertical Segments;;;;;
+;;Edge Rounding;;;;;
+;;Edge Rounding Mode;;;;;
+;;Back Scale;;;;;
+;;Depth;;;;;
+;;Backface Culling;;;;;
+;;End Angle;;;;;
+;;Close Front;;;;;
+;;Close Back;;;;;
+;3D Lighting Properties;;;;;;
+;;Mode;;;;;
+;;Normals Kind;;;;;
+;;Normals Direction;;;;;
+;3D Texture Properties;;;;;;
+;;Generation Mode;;;;;
+;;Kind;;;;;
+;;Filter;;;;;
+;;Mode;;;;;
+;3D Material Properties;;;;;;
+;;Colors;;;;;
+;;Shininess;;;;;
+;3D Shadow Properties;;;;;;
+;;Shadow;;;;;
+;Frame Formatting Properties;;;;;;
+;;Frame Widths;;;;;
+;;Frame Heights;;;;;
+;;Maximum Width and Height;;;;;
+;;Left and Right Margins;;;;;
+;;Top and Bottom Margins;;;;;
+;;Margins;;;;;
+;;Print Content;;;;;
+;;Protect;;;;;
+;;Horizontal Position;;;;;
+;;Horizontal Relation;;;;;
+;;Vertical Position;;;;;
+;;Vertical Relation;;;;;
+;;Frame Anchor;;;;;
+;;Border;;;;;
+;;Border Line Width;;;;;
+;;Padding;;;;;
+;;Shadow;;;;;
+;;Background;;;;;
+;;Columns;;;;;
+;;Editable;;;;;
+;;Wrapping;;;;;
+;;Dynamic Wrap Threshold;;;;;
+;;Paragraph-only Wrapping;;;;;
+;;Contour Wrapping;;;;;
+;;Contour Wrapping Mode;;;;;
+;;Run Through;;;;;
+;;Flow with Text;;;;;
+;;Overflow behavior;;;;;
+;;Mirroring;;;;;
+;;Clipping;;;;;
+;;Wrap Influence on Position;;;;;
+;Floating Frame Formatting Properties;;;;;;
+;;Display Scrollbar;;;;;
+;;Display Border;;;;;
+;;Margins;;;;;
+;;Object Formatting Properties;;;;;
+;;Visible Area;;;;;
+;;Draw Aspect;;;;;

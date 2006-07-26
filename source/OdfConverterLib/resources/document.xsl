@@ -746,7 +746,11 @@
 			<xsl:apply-templates mode="text"/>
 		</w:r>
 	</xsl:template>
-
+	
+	<xsl:template match="text:span[child::*]" mode="paragraph">
+		<xsl:apply-templates mode="paragraph"/>
+	</xsl:template>
+	
 	<xsl:template match="text:tab-stop" mode="paragraph">
 		<w:r>
 			<w:tab/>
@@ -811,7 +815,17 @@
 		</xsl:variable>
 		<xsl:value-of select="$positionInGroup"/>
 	</xsl:template>
-
+	
+	<xsl:template match="text:page-number" mode="paragraph">
+		<w:fldSimple w:instr=" PAGE   \* MERGEFORMAT ">
+			<w:r>
+				<w:rPr>
+					<w:rStyle w:val="{../@text:style-name}"/>
+				</w:rPr>
+				<xsl:apply-templates mode="text"/>
+			</w:r>
+		</w:fldSimple>
+	</xsl:template>
 
 	<!-- Extra spaces management, courtesy of J. David Eisenberg -->
 	<xsl:variable name="spaces" xml:space="preserve">                                       </xsl:variable>
