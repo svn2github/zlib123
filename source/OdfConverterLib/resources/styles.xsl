@@ -131,16 +131,18 @@
 	
 	<xsl:template match="style:paragraph-properties[parent::style:style  or parent::style:default-style]" mode="styles">
 		<w:pPr>
-			<xsl:if test="@fo:break-before='page'">
-				<w:pageBreakBefore/>
+			
+			
+			<xsl:if test="@fo:keep-with-next='always'">
+				<w:keepNext/>
 			</xsl:if>
 			
 			<xsl:if test="@fo:keep-together='always'">
 				<w:keepLines/>
 			</xsl:if>
 			
-			<xsl:if test="@fo:keep-with-next='always'">
-				<w:keepNext/>
+			<xsl:if test="@fo:break-before='page'">
+				<w:pageBreakBefore/>
 			</xsl:if>
 			
 			<xsl:if test="@fo:widows or @fo:orphans">
@@ -149,38 +151,6 @@
 				</w:widowControl>
 			</xsl:if>
 			
-			<xsl:if test="@style:vertical-align">
-				<w:textAlignment>
-					<xsl:choose>
-						<xsl:when test="@style:vertical-align='bottom'">
-							<xsl:attribute name="w:val">bottom</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="@style:vertical-align='top'">
-							<xsl:attribute name="w:val">top</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="@style:vertical-align='middle'">
-							<xsl:attribute name="w:val">center</xsl:attribute>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:attribute name="w:val">auto</xsl:attribute>
-						</xsl:otherwise>
-					</xsl:choose>
-				</w:textAlignment>
-			</xsl:if>
-			
-			<xsl:if test="@style:text-autospace">
-				<w:autoSpaceDN>
-					<xsl:choose>
-						<xsl:when test="@style:text-autospace='none'">
-							<xsl:attribute name="w:val">off</xsl:attribute>
-						</xsl:when>
-						<xsl:when test="@style:text-autospace='ideograph-alpha'">
-							<xsl:attribute name="w:val">on</xsl:attribute>
-						</xsl:when>
-					</xsl:choose>
-				</w:autoSpaceDN>
-			</xsl:if>
-
 			<!-- border color + padding  -->
 			<xsl:if test="@fo:border">
 				<w:pBdr>
@@ -367,23 +337,36 @@
 			<!-- tabs -->
 			<xsl:if test="style:tab-stops/style:tab-stop">
 				<w:tabs>
-				<xsl:for-each select="style:tab-stops/style:tab-stop">
-					<w:tab>
-						<xsl:attribute name="w:pos">
-							<xsl:call-template name="twips-measure">
-						 		<xsl:with-param name="length" select="@style:position"/>
-							</xsl:call-template>
-						</xsl:attribute>					
-						<xsl:if test="@style:type">
-							<xsl:attribute name="w:val"><xsl:value-of select="@style:type"/></xsl:attribute>
-						</xsl:if>
-						<!-- Default value -->
-						<xsl:if test="not(@style:type)">
-							<xsl:attribute name="w:val">clear</xsl:attribute>
-						</xsl:if>
-					</w:tab>
-				</xsl:for-each>
+					<xsl:for-each select="style:tab-stops/style:tab-stop">
+						<w:tab>
+							<xsl:attribute name="w:pos">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="@style:position"/>
+								</xsl:call-template>
+							</xsl:attribute>					
+							<xsl:if test="@style:type">
+								<xsl:attribute name="w:val"><xsl:value-of select="@style:type"/></xsl:attribute>
+							</xsl:if>
+							<!-- Default value -->
+							<xsl:if test="not(@style:type)">
+								<xsl:attribute name="w:val">clear</xsl:attribute>
+							</xsl:if>
+						</w:tab>
+					</xsl:for-each>
 				</w:tabs>
+			</xsl:if>
+			
+			<xsl:if test="@style:text-autospace">
+				<w:autoSpaceDN>
+					<xsl:choose>
+						<xsl:when test="@style:text-autospace='none'">
+							<xsl:attribute name="w:val">off</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="@style:text-autospace='ideograph-alpha'">
+							<xsl:attribute name="w:val">on</xsl:attribute>
+						</xsl:when>
+					</xsl:choose>
+				</w:autoSpaceDN>
 			</xsl:if>
 			
 			<xsl:if test="@style:line-height-at-least or fo:line-height or @fo:margin-bottom or @fo:margin-top or @style:line-spacing">
@@ -432,6 +415,7 @@
 					</xsl:if>
 				</w:spacing>
 			</xsl:if>
+			
 			<xsl:if test="@fo:margin-left or @fo:margin-right or @fo:text-indent or @text:space-before">
 				<w:ind>
 					<xsl:if test="@fo:margin-left">
@@ -466,7 +450,7 @@
 					<xsl:if test="@style:auto-text-indent='true'">
 						<xsl:attribute name="w:firstLine">
 							<xsl:call-template name="twips-measure">
-							<xsl:with-param name="length" select="parent::style:style/style:text-properties/@fo:font-size"/>
+								<xsl:with-param name="length" select="parent::style:style/style:text-properties/@fo:font-size"/>
 							</xsl:call-template>
 						</xsl:attribute>
 					</xsl:if>
@@ -493,10 +477,28 @@
 							<xsl:attribute name="w:val">start</xsl:attribute>
 						</xsl:otherwise>
 					</xsl:choose>
-	
+					
 				</w:jc>
 			</xsl:if>
-				
+			
+			<xsl:if test="@style:vertical-align">
+				<w:textAlignment>
+					<xsl:choose>
+						<xsl:when test="@style:vertical-align='bottom'">
+							<xsl:attribute name="w:val">bottom</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="@style:vertical-align='top'">
+							<xsl:attribute name="w:val">top</xsl:attribute>
+						</xsl:when>
+						<xsl:when test="@style:vertical-align='middle'">
+							<xsl:attribute name="w:val">center</xsl:attribute>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:attribute name="w:val">auto</xsl:attribute>
+						</xsl:otherwise>
+					</xsl:choose>
+				</w:textAlignment>
+			</xsl:if>
 		<!-- TODO Manage Bidi but it is not prioritary-->
 		</w:pPr>
 	</xsl:template>
