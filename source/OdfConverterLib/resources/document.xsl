@@ -634,7 +634,6 @@
 				</w:tcBorders>
 				<xsl:choose>
 					<xsl:when test="$cellProp/@fo:background-color and $cellProp/@fo:background-color != 'transparent' ">
-						<!--xsl:variable name="fill" select="$cellProp/@fo:background-color"/-->
 						<w:shd w:val="clear" w:color="auto" w:fill="{substring($cellProp/@fo:background-color, 2, string-length($cellProp/@fo:background-color) -1)}"/>
 					</xsl:when>
 				</xsl:choose>
@@ -688,17 +687,6 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</w:tcMar>
-
-				<xsl:if test="$cellProp[@style:vertical-align and @style:vertical-align!='']">
-					<xsl:choose>
-						<xsl:when test="$cellProp/@style:vertical-align = 'middle'">
-							<w:vAlign w:val="center"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<w:vAlign w:val="{$cellProp/@style:vertical-align}"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:if>
 				<xsl:if test="$cellProp/@style:writing-mode">
 					<xsl:choose>
 						<xsl:when test="$cellProp[@style:writing-mode = 'tb-rl']">
@@ -709,6 +697,17 @@
 						</xsl:when>
 					</xsl:choose>
 				</xsl:if>
+				<xsl:if test="$cellProp[@style:vertical-align and @style:vertical-align!='']">
+					<xsl:choose>
+						<xsl:when test="$cellProp/@style:vertical-align = 'middle'">
+							<w:vAlign w:val="center"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<w:vAlign w:val="{$cellProp/@style:vertical-align}"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:if>
+			
 			</w:tcPr>
 			<xsl:apply-templates/>
 			<!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
