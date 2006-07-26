@@ -633,9 +633,9 @@
 					</xsl:choose>
 				</w:tcBorders>
 				<xsl:choose>
-					<xsl:when test="$cellProp[@fo:background-color]">
-						<xsl:variable name="fill" select="$cellProp/@fo:background-color"/>
-						<w:shd w:val="clear" w:color="auto" w:fill="{substring-after($fill, '#')}"/>
+					<xsl:when test="$cellProp/@fo:background-color and $cellProp/@fo:background-color != 'transparent' ">
+						<!--xsl:variable name="fill" select="$cellProp/@fo:background-color"/-->
+						<w:shd w:val="clear" w:color="auto" w:fill="{substring($cellProp/@fo:background-color, 2, string-length($cellProp/@fo:background-color) -1)}"/>
 					</xsl:when>
 				</xsl:choose>
 
