@@ -704,7 +704,7 @@ The same applies to the elements w:bottom, w:right and w:left";
 ;;Wrap Option;1;0.2-Final;;;
 ;;Rotation Angle;1;0.2-Final;;;
 ;;Rotation Align;1;0.2-Final;;;
-;;Cell Protect;1;0.2-Final;;;
+;;Cell Protect;1;0.2-Final;;;"The property ""cell protect"" (which is available in open office) in word is not handled in the same way. The only method to protect cells from editing is to add to a cell content control (""plain text"") which can be locked from editing."
 ;;Print Content;1;0.2-Final;;;
 ;;Decimal places;1;0.2-Final;;;
 ;;Repeat Content;1;0.2-Final;;;
