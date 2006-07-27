@@ -56,7 +56,21 @@
           <Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/>
           <Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
           <Override PartName="/word/footnotes.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>
-       
+
+          <xsl:variable name="masterPage"
+            select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"
+            xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+            xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"/>
+
+          <xsl:for-each select="$masterPage">
+            <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml">
+              <xsl:attribute name="PartName">/word/header<xsl:value-of select="position()"/>.xml</xsl:attribute>
+          	</Override>
+            <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml">
+              <xsl:attribute name="PartName">/word/footer<xsl:value-of select="position()"/>.xml</xsl:attribute>
+          	</Override>
+          </xsl:for-each>
+          
         </Types>
       </xsl:template>
   

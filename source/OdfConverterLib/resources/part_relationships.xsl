@@ -32,8 +32,9 @@
     xmlns:zip="urn:cleverage:xmlns:zip"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-	xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
-  
+	xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0">
+    
 	<xsl:template name="part_relationships">
 
 		<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
@@ -59,7 +60,19 @@
 		  <Relationship Id="rId5"
 				Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes"
 				Target="footnotes.xml"/>
-			
+			<!-- Relationship for header and footer -->
+			<xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page">
+				<Relationship>
+					<xsl:attribute name="Id">hfId<xsl:value-of select="(position() * 2) - 1"/></xsl:attribute>
+					<xsl:attribute name="Type">http://schemas.openxmlformats.org/officeDocument/2006/relationships/header</xsl:attribute>
+					<xsl:attribute name="Target">header<xsl:value-of select="position()"/>.xml</xsl:attribute>
+				</Relationship>
+				<Relationship>
+					<xsl:attribute name="Id">hfId<xsl:value-of select="position() * 2"/></xsl:attribute>
+					<xsl:attribute name="Type">http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer</xsl:attribute>
+					<xsl:attribute name="Target">footer<xsl:value-of select="position()"/>.xml</xsl:attribute>
+				</Relationship>
+			</xsl:for-each>
 			<!-- images 
 				TODO : manage ole-objects 
 			-->

@@ -32,9 +32,13 @@
     <xsl:template name="settings">
             <w:settings>
                 <w:view w:val="print"/>
+
+            	<!-- Header and Footer even and odd propertie -->
+            	<xsl:call-template name="EvenAndOddConfiguration"/>
     	        
             	<!-- Footnotes document wide properties -->
                <xsl:call-template name="footnotes-configuration"/>
+    	
             </w:settings>
     </xsl:template>
    

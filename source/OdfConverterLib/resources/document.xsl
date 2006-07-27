@@ -61,6 +61,7 @@
 	<xsl:template match="office:body">
 		<w:body>
 			<xsl:apply-templates/>
+			<xsl:call-template name="headerFooter"/>
 		</w:body>
 	</xsl:template>
 

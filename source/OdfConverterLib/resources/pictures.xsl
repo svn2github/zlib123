@@ -34,6 +34,7 @@
     xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
     xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
     xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
     exclude-result-prefixes="xlink draw svg fo">
@@ -45,13 +46,33 @@
     <xsl:template name="GetPosition">
         <xsl:param name="node"/>
         <xsl:variable name="positionInGroup">
-            <xsl:for-each select="key('images', 'const')">
-                <xsl:if test="generate-id($node) = generate-id(.)">
-                    <xsl:value-of select="position()"/>
-                </xsl:if>
-            </xsl:for-each>
+            <xsl:for-each select="document('content.xml')">
+                <xsl:for-each select="key('images', 'const')">
+                    <xsl:if test="generate-id($node) = generate-id(.)">
+                        <xsl:value-of select="position()"/>
+                    </xsl:if>
+                </xsl:for-each>
+    		</xsl:for-each>
         </xsl:variable>
-        <xsl:value-of select="$positionInGroup"/>
+    	<xsl:choose>
+    		<xsl:when test="string-length($positionInGroup)>0">
+                <xsl:value-of select="$positionInGroup"/>
+    		</xsl:when>
+    	    <xsl:otherwise>
+    			<xsl:variable name="countContentImages">
+    	    		<xsl:for-each select="document('content.xml')">
+    					<xsl:value-of select="count(key('images', 'const'))"/>
+    				</xsl:for-each>
+    	    	</xsl:variable>
+    	    	<xsl:for-each select="document('styles.xml')">
+	                <xsl:for-each select="key('images', 'const')">
+	                    <xsl:if test="generate-id($node) = generate-id(.)">
+	                        <xsl:value-of select="$countContentImages+position()"/>
+	                    </xsl:if>
+	                </xsl:for-each>
+	    		</xsl:for-each>
+    		</xsl:otherwise>
+    	</xsl:choose>
     </xsl:template>
 
     <!-- TODO: manage ole-objects -->
