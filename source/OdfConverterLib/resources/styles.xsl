@@ -54,6 +54,7 @@
 			</w:docDefaults>
 			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles" mode="styles"/>
 			<xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles" mode="styles"/>
+			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:automatic-styles" mode="styles"/>
 		</w:styles>
 	</xsl:template>
 	
@@ -121,7 +122,15 @@
 			
 			<w:qFormat/>
 			
+			<xsl:if test="@style:master-page-name and not(style:paragraph-properties) and not(style:paragraph-properties = '')">
+				<w:pPr>
+					<w:pageBreakBefore/>
+				</w:pPr>
+			</xsl:if>
+
 			<xsl:apply-templates mode="styles"/>
+
+
 		
 		</w:style>
 	</xsl:template>
@@ -140,6 +149,9 @@
 			</xsl:if>
 			
 			<xsl:if test="@fo:break-before='page'">
+				<w:pageBreakBefore/>
+			</xsl:if>
+			<xsl:if test="parent::node()/@style:master-page-name and not(parent::node()/@style:master-page-name = '')">
 				<w:pageBreakBefore/>
 			</xsl:if>
 			
@@ -557,8 +569,7 @@
 	</xsl:template>
 	
 	<xsl:template match="style:text-properties[parent::style:style  or parent::style:default-style]" mode="styles">
-		<w:rPr>
-		
+		<w:rPr>		
 			<xsl:if test="@style:font-name">
 				<w:rFonts>
 					<xsl:if test="@style:font-name">
@@ -869,8 +880,7 @@
 				<xsl:choose>
 					<xsl:when test="@style:text-combine = 'lines'">
 						<w:eastAsianLayout>
-							<xsl:attribute name="w:id"><xsl:value-of select="$asianLayoutId"/></xsl:attribute>
-							<xsl:variable name="asianLayoutId" select="$asianLayoutId+1"/>
+							<xsl:attribute name="w:id"><xsl:number count="style:style"/></xsl:attribute>
 							<xsl:attribute name="w:combine">lines</xsl:attribute>
 							<xsl:choose>
 								<xsl:when test="@style:text-combine-start-char = '&lt;' and @style:text-combine-end-char = '&gt;'">
