@@ -624,12 +624,12 @@ respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:s
 ;;Top and Bottom Margins;0;0.1;Completed;"style:paragraph-properties/@fo:margin-top converted to w:styles/w:style/w:pPr/w:spacing/@w:before
 style:paragraph-properties/@fo:margin-right converted to w:styles/w:style/w:pPr/w:spacing/@w:after";
 ;;Margins;0;0.2-M1;;;
-;;Break Before and Break After;0;0.2-M1;Partial;style:paragraph-properties/@fo:break-before='page' converted to w:styles/w:style/w:pPr/w:pageBreakBefore;
+;;Break Before and Break After;0;0.2-M1;Partial;style:paragraph-properties/@fo:break-before='page' converted to w:styles/w:style/w:pPr/w:pageBreakBefore;Break before doesn't exist in Word
 ;;Paragraph Background Color;1;0.1;Partial;"style:paragraph-properties/@fo:background-color translated to w:styles/w:style/w:pPr/w:shd/@w:fill
 Attribute @w:val is set to 'solid'";
 ;;Paragraph Background Image;3;0.2-M1;;;not available in Word?
 ;;Border;1;0.2-M1;Partial;"style:paragraph-properties/@fo:border translated to w:styles/w:style/w:pPr/w:pBdr/@w:color and @w:sz
-Attribute @w:val is set to 'single'";
+Attribute @w:val is set to 'single' or 'double' only";
 ;;Border Line Width;2;0.2-M1;;;
 ;;Padding;2;0.2-M1;Partial;style:paragraph-properties/@fo:padding translated to w:styles/w:style/w:pPr/w:pBdr/@w:space;
 ;;Shadow;3;0.2-M1;;;not available in Word?
