@@ -373,7 +373,8 @@ Styles;;;;;;;
 ;;Style Mappings;1;;;;what does it mean?
 ;Default Styles;;1;0.2-M1;Completed;###############################################################################################################################################################################################################################################################;
 ;Page Layout;;1;0.2-Final;;;a page style concept does not exist in Word (roundtrip won't work)
-;;Header and Footer Styles;1;0.2-Final;;;
+;;Header and Footer Styles;1;0.2-Final;Partial;;"There are  a different first page in OOX only if the style ""first page"" is used in ODF.
+If there are many odd and even page, only one is kept and odd and even pages may be inverted."
 ;Master Pages;;1;0.2-Final;;;
 ;;Headers and Footers;1;0.2-Final;;;header and footer belong to the page style!
 ;;Presentation Notes;1;0.2-Final;;;
