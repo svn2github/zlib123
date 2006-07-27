@@ -142,6 +142,10 @@
 							<xsl:apply-templates mode="paragraph"/>
 						</xsl:otherwise>
 					</xsl:choose>
+					<!-- selfstanding image before paragraph-->
+					<xsl:if test="name(preceding-sibling::*[1]) = 'draw:frame'">
+						<xsl:apply-templates select="preceding-sibling::*[1]" mode="paragraph"/>
+					</xsl:if>
 				</w:p>
 			</xsl:when>
 			<xsl:otherwise>
