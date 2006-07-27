@@ -548,7 +548,8 @@ style:text-properties/@fo:font-complex-weight translated to w:styles/w:style/w:r
 ;;Hyphenation Push Char Count;3;0.2-M1;Completed;;The translation is lost, because line through feature is richer in ODF than in OOX
 ;;Hidden or Conditional Text;0;0.2-M1;Partial;style:text-properties/@text:display convert to w:styles/w:style/w:rPr/w:vanish;There are a bug beetwen open office and ODF, conditional text don't existe in OOX
 ;Paragraph Formatting Properties;;;0.2-M1;;;
-;;Fixed Line Height;1;0.2-M1;;###############################################################################################################################################################################################################################################################;mapping to Word has to be defined
+;;Fixed Line Height;1;0.2-M1;Partial;"styles:paragraph-properties/@fo:line-height translated to w:styles/w:style/w:pPr/w:spacing
+@w:lineRule set to 'auto' if @w:line is expressed in percentage, otherwise, it is set to 'exact'. Attribute @w:line is the twip (twentieth of a point) measure of line-height";mapping to Word has to be defined
 ;;Minimum Line Height;1;0.2-M1;Partial;"styles:paragraph-properties/@style:line-height-at-least translated to w:styles/w:style/w:pPr/w:spacing
 @w:lineRule set to 'atLeast' and @w:line is the twip measure of line-height ";
 ;;Line Distance;1;0.2-M1;;;
@@ -559,18 +560,21 @@ start -> left
 end -> right
 justify -> both
 otherwise start";
-;;Text Align of Last Line;;0.2-M1;;;not available in Word?
-;;Justify Single Word;;0.2-M1;;;not available in Word?
+;;Text Align of Last Line;;0.2-M1;Partial;;not available in Word?
+;;Justify Single Word;;0.2-M1;Partial;;not available in Word?
 ;;Keep Together;1;0.2-M1;Completed;"style:paragraph-properties/@fo:keep-together='always' converted to w:styles/w:style/w:pPr/w:keepLines
 style:paragraph-properties/@fo:keep-with-next='always' converted to w:styles/w:style/w:pPr/w:keepNext";
 ;;Widows;1;0.2-M1;Partial;style:paragraph-properties/@fo:widows  converted to w:styles/w:style/w:pPr/w:widowControl;Widows & Orphan are same in Word
 ;;Orphans;1;0.2-M1;Partial;style:paragraph-properties/@fo:orphans converted to w:styles/w:style/w:pPr/w:widowControl;Widows & Orphan are same in Word
-;;Tab Stops;0;0.2-M1;Partial;###############################################################################################################################################################################################################################################################;
+;;Tab Stops;0;0.2-M1;Partial;"style:paragraph-properties/style:tab-stops converted to w:styles/w:style/w:pPr/w:tabs
+style:paragraph-properties/style:tab-stops/style:tab-stop converted to w:styles/w:style/w:pPr/w:tabs/w:tab
+style:tab-stop/@fo:position converted to w:tab/@w:pos
+style:tab-stop/@style:type converted to w:tab/@w:val. When @style:type is not present, @w:val is set to 'clear' ";
 ;;Tab Stop Distance;0;0.2-M1;;;
-;;Hyphenation Keep;;0.2-M1;;;
-;;Maximum Hyphens;;0.2-M1;;;
-;;Drop Caps;2;0.2-M1;;;mapping to Word has to be defined
-;;Register True;3;0.2-M1;;;mapping to Word has to be defined
+;;Hyphenation Keep;;0.2-M1;Partial;;not available in Word?
+;;Maximum Hyphens;;0.2-M1;Partial;;not available in Word?
+;;Drop Caps;2;0.2-M1;Partial;;For Word in Text Formatting Properties
+;;Register True;3;0.2-M1;Partial;;mapping to Word has to be defined
 ;;Left and Right Margins;0;0.1;Completed;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
 respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).";
 ;;Text Indent;0;0.1;Completed;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
@@ -579,28 +583,28 @@ respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:s
 ;;Automatic Text Indent;1;0.2-M1;Partial;style:paragraph-properties/@style:auto-text-indent converted to w:styles/w:style/w:pPr/w:ind/w:firstLine;not available in Word, then use a trick to indent the first line egal paragraph font-size
 ;;Top and Bottom Margins;0;0.1;Completed;"style:paragraph-properties/@fo:margin-top converted to w:styles/w:style/w:pPr/w:spacing/@w:before
 style:paragraph-properties/@fo:margin-right converted to w:styles/w:style/w:pPr/w:spacing/@w:after";
-;;Margins;0;0.2-M1;;;
+;;Margins;0;0.2-M1;Completed;style:paragraph-properties/@fo:margin-top and margin-bottom translated to w:styles/w:style/w:pPr/w:spacing/@fo:margin-top and margin-bottom;
 ;;Break Before and Break After;0;0.2-M1;Partial;style:paragraph-properties/@fo:break-before='page' converted to w:styles/w:style/w:pPr/w:pageBreakBefore;Break before doesn't exist in Word
 ;;Paragraph Background Color;1;0.1;Partial;"style:paragraph-properties/@fo:background-color translated to w:styles/w:style/w:pPr/w:shd/@w:fill
 Attribute @w:val is set to 'solid'";
-;;Paragraph Background Image;3;0.2-M1;;;not available in Word?
+;;Paragraph Background Image;3;0.2-M1;Partial;;not available in Word?
 ;;Border;1;0.2-M1;Partial;"style:paragraph-properties/@fo:border translated to w:styles/w:style/w:pPr/w:pBdr/@w:color and @w:sz
 Attribute @w:val is set to 'single' or 'double' only";
-;;Border Line Width;2;0.2-M1;;;
+;;Border Line Width;2;0.2-M1;Partial;;not available in Word?
 ;;Padding;2;0.2-M1;Partial;style:paragraph-properties/@fo:padding translated to w:styles/w:style/w:pPr/w:pBdr/@w:space;
-;;Shadow;3;0.2-M1;;;not available in Word?
+;;Shadow;3;0.2-M1;Partial;;not available in Word?
 ;;Keep with Next;1;0.2-M1;;;
-;;Line Numbering;2;0.2-M1;;;cannot be mapped one-to-ont (Word automatically inserts page breaks)
+;;Line Numbering;2;0.2-M1;Partial;;cannot be mapped one-to-ont (Word automatically inserts page breaks)
 ;;Line Number Start Value;2;0.2-M1;;;
 ;;Text Autospace;;0.2-M1;Partial;style:paragraph-properties/@style:text-autospace to w:styles/w:style/w:pPr/w:autoSpaceDN/@w:val;In word there are autoSpaceDN and autoSpaceDE
 ;;Punctuation Wrap;;0.2-M1;;;
 ;;Line Break;;0.2-M1;;;
 ;;Vertical Alignment;2;0.2-M1;Completed;style:paragraph-properties/@style:vertical-align to w:styles/w:style/w:pPr/w:textAlignment/@w:val;
-;;Writing Mode;;0.2-M1;;;
-;;Automatic Writing Mode;;0.2-M1;;;
+;;Writing Mode;;0.2-M1;Partial;;not available in Word?
+;;Automatic Writing Mode;;0.2-M1;Partial;;not available in Word?
 ;;Snap To Layout;;0.2-M1;;;
 ;;Page Number;;0.2-M1;;;no idea?
-;;Background Transparency;;0.2-M1;;;
+;;Background Transparency;;0.2-M1;Partial;;not available in Word?
 ;Ruby Text Formatting Properties;;;;;;
 ;;Ruby Position;;;;;
 ;;Ruby Alignment;;;;;
