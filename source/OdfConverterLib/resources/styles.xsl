@@ -153,7 +153,14 @@
 			<xsl:if test="@fo:border">
 				<w:pBdr>
 					<w:top>
-						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:choose>
+							<xsl:when test="contains(@fo:border, 'double')">
+								<xsl:attribute name="w:val">double</xsl:attribute>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:attribute name="w:val">single</xsl:attribute>
+							</xsl:otherwise>
+						</xsl:choose>
 						<xsl:attribute name="w:sz">
 							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
@@ -176,7 +183,14 @@
 						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
 					</w:top>
 					<w:left>
-						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:choose>
+							<xsl:when test="contains(@fo:border, 'double')">
+								<xsl:attribute name="w:val">double</xsl:attribute>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:attribute name="w:val">single</xsl:attribute>
+							</xsl:otherwise>
+						</xsl:choose>
 						<xsl:attribute name="w:sz">
 							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
@@ -199,7 +213,14 @@
 						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
 					</w:left>
 					<w:bottom>
-						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:choose>
+							<xsl:when test="contains(@fo:border, 'double')">
+								<xsl:attribute name="w:val">double</xsl:attribute>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:attribute name="w:val">single</xsl:attribute>
+							</xsl:otherwise>
+						</xsl:choose>
 						<xsl:attribute name="w:sz">
 							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
@@ -222,7 +243,14 @@
 						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
 					</w:bottom>
 					<w:right>
-						<xsl:attribute name="w:val">single</xsl:attribute>
+						<xsl:choose>
+							<xsl:when test="contains(@fo:border, 'double')">
+								<xsl:attribute name="w:val">double</xsl:attribute>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:attribute name="w:val">single</xsl:attribute>
+							</xsl:otherwise>
+						</xsl:choose>
 						<xsl:attribute name="w:sz">
 							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>	
@@ -250,7 +278,14 @@
 				<w:pBdr>
 					<xsl:if test="@fo:border-top and (@fo:border-top != 'none')">
 						<w:top>
-							<xsl:attribute name="w:val">single</xsl:attribute>
+							<xsl:choose>
+								<xsl:when test="contains(@fo:border-top, 'double')">
+									<xsl:attribute name="w:val">double</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="w:val">single</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
 							<xsl:attribute name="w:sz">
 								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length" select="substring-before(@fo:border-top,  ' ')"/>	
@@ -268,7 +303,14 @@
 					</xsl:if>
 					<xsl:if test="@fo:border-left and (@fo:border-left != 'none')">
 						<w:left>
-							<xsl:attribute name="w:val">single</xsl:attribute>
+							<xsl:choose>
+								<xsl:when test="contains(@fo:border-left, 'double')">
+									<xsl:attribute name="w:val">double</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="w:val">single</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
 							<xsl:attribute name="w:sz">
 								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length" select="substring-before(@fo:border-left,  ' ')"/>	
@@ -286,7 +328,14 @@
 					</xsl:if>
 					<xsl:if test="@fo:border-bottom and (@fo:border-bottom != 'none')">
 						<w:bottom>
-							<xsl:attribute name="w:val">single</xsl:attribute>
+							<xsl:choose>
+								<xsl:when test="contains(@fo:border-bottom, 'double')">
+									<xsl:attribute name="w:val">double</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="w:val">single</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
 							<xsl:attribute name="w:sz">
 								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length" select="substring-before(@fo:border-bottom,  ' ')"/>	
@@ -304,7 +353,14 @@
 					</xsl:if>
 					<xsl:if test="@fo:border-right and (@fo:border-right != 'none')">
 						<w:right>
-							<xsl:attribute name="w:val">single</xsl:attribute>
+							<xsl:choose>
+								<xsl:when test="contains(@fo:border-right, 'double')">
+									<xsl:attribute name="w:val">double</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="w:val">single</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
 							<xsl:attribute name="w:sz">
 								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length" select="substring-before(@fo:border-right,  ' ')"/>	
