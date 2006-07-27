@@ -45,7 +45,10 @@ Meta Data Elements;;;;;;;
 ;;Language;;;;;
 ;;Editing Cycles;;0.1;Completed;meta:editing-cycles converted to cp:revision;
 ;;Editing Duration;;;;;
-;;Document Statistics;;0.1;Partial;###############################################################################################################################################################################################################################################################;Bug #49 reports wrong word count
+;;Document Statistics;;0.1;Partial;"meta:document-statistic/@meta:page-count converted to Pages
+meta:document-statistic/@meta:word-count converted to Words
+meta:document-statistic/@meta:paragraph-count converted to Paragraphs
+meta:document-statistic/@meta:character-count converted to CharactersWithSpaces";Bug #49 reports wrong word count
 ;User-defined Metadata;;;0.1;Partial;Each @meta:name is converted to a property with type corresponding to String (using {D5CDD505-2E9C-101B-9397-08002B2CF9AE} as fmtid);Other formats should be treated as well
 ;Custom Metadata;;;;;;
 Text Content;;;;;;;
@@ -80,7 +83,10 @@ w:numId identifier is based on the relative position of this element's style.
 ;Text Declarations;;;?;;;
 Paragraph Elements Content;;;;;;;
 ;Basic Text Content;;;;;;
-;;White-space Characters;0;0.1;Completed;###############################################################################################################################################################################################################################################################;
+;;White-space Characters;0;0.1;Completed;"Extra space characters text:c elements are injected into w:t elements by looking at the 
+text:p or text:span following siblings
+Tab character text:tab is translated to a run including a tabulation <w:r><w:tab/></w:r>
+Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";
 ;;Soft Hyphens, Hyphens, and Non-breaking Blanks;0;0.1;Completed? ;;TODO : check this is really completed
 ;;Attributed Text;0;0.2-Final;Partial;text:span @style-name treated;TODO : class-names
 ;;Hyperlinks;0;0.2-M1;Partial;text:a is converted to w:hyperlink where attribute r:id is the result of the generate-id() function;TODO : name: link-location, target-frames, text-styles
@@ -88,7 +94,10 @@ Paragraph Elements Content;;;;;;;
 ;;Bookmarks;2;;;;
 ;;References;2;;;;
 ;Notes;;;0.2-M1;;;
-;;Note Element;0;;Partial;###############################################################################################################################################################################################################################################################;TODO : endnotes
+;;Note Element;0;;Partial;"Extra space characters text:c elements are injected into w:t elements by looking at the 
+text:p or text:span following siblings
+Tab character text:tab is translated to a run including a tabulation <w:r><w:tab/></w:r>
+Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";TODO : endnotes
 ;Ruby;;;0.2-Final;;;
 ;Text Annotation;;;0.2-Final;;;
 ;Index Marks;;3;0.2-Final;;;
@@ -248,7 +257,8 @@ Graphic Content;;;;;;;
 ;;Event Listeners;;;;;
 ;Frames;;1;;;;
 ;;Text Box;1;0.2-M1;;;
-;;Image;1;0.2-M1;Partial;###############################################################################################################################################################################################################################################################;
+;;Image;1;0.2-M1;Partial;"Internal images only, ie [starts-with(draw:frame/draw:image/@xlink:href, 'Pictures/')]. Converted to w:drawing/wp:inline.
+wp:extend attibutes @cx and @cx respectively use draw:frame/@svg:width and draw:frame/@svg:height and fail-safe with draw:text-box/@fo:min-width and draw:text-box/@fo:min-height";
 ;;Objects;;;;;
 ;;Applet;;;;;
 ;;Plugins;;;;;
@@ -371,7 +381,9 @@ Common Content;;;;;;;
 Styles;;;;;;;
 ;Style Element;;1;;;;
 ;;Style Mappings;1;;;;what does it mean?
-;Default Styles;;1;0.2-M1;Completed;###############################################################################################################################################################################################################################################################;
+;Default Styles;;1;0.2-M1;Completed;"office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties is translated to w:docDefaults/w:rPrDefault.
+office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties translated to w:docDefaults/w:pPrDefault.
+";
 ;Page Layout;;1;0.2-Final;;;a page style concept does not exist in Word (roundtrip won't work)
 ;;Header and Footer Styles;1;0.2-Final;Partial;"For each office:document-styles/office:master-styles/style:master-page are created a file headerX.xml, footerX.xml, _rels/headerX.xml.rels, _rels/footerX.xml.rels.
 The content of headerX.xml and footerX.xml are generated like document.xml and _rels/headerX.xml.rels, _rels/footerX.xml.rels contains relations for images and hyperlinks.
@@ -411,13 +423,38 @@ One special case : 'StarSymbol' value is converted to 'Symbol'";
 ;;Ruby Style;3;0.2-Final;;;
 ;Enhanced Text Styles;;;;;;
 ;;Line Numbering Configuration;3;0.2-Final;;;
-;;Notes Configuration Element;1;0.2-Final;Partial;###############################################################################################################################################################################################################################################################;"TODO : endnotes
+;;Notes Configuration Element;1;0.2-Final;Partial;"text:notes-configuration/@text:note-class attribute discriminates between footnotes and endnotes. This is required in OOX. 
+Footnotes :
+text:notes-configuration gives birth to two OOX styles named : 
+concat(@text:note-class, 'Reference') and concat(@text:note-class, 'Text')
+Both are defined w:semiHidden and w:unhideWhenUsed. 
+The first one is based on @text:citation-body-style-name and the other on @text:citation-style-name.
+The main use of text:notes-configuration is its translation to w:footnotePr (footnote properties) when @text:note-class is 'footnote' or w:endnotePr for 'endnote'.
+Let's assume we are configuring footnotes.
+- @text:start-value is translated to w:footnotePr/w:numStart/@w:val
+- @style:num-format translates to w:footnotePr/w:numFmt using num-format template (already used for lists)
+- @text:start-numbering-at translates to w:footnotePr/w:numRestart with the following mapping :
+   - 'page' - > 'eachPage'
+  - 'chapter' -> 'eachSect'
+  - otherwise value is set to 'continuous'
+- @text:footnotes-position is converted to w:footnotePr/w:pos/@w:val with the following mapping : 
+  - 'text' -> 'beneathText'
+  - otherwise 'pageBottom' value is set.";"TODO : endnotes
 TODO : concerning footntes : handle master page, default note paragraph style, Footnote Continuation.
 footnotes positions 'section' and 'document' don't seem to have counterpart in OOX."
 ;;Bibliography Configuration;3;0.2-Final;;;
 ;List Style;;;;;;
 ;;Common List-Level Style Attributes;1;0.2-M1;Complete;"text:level translated to <w:lvl w:ilvl=""{number(@text:level) - 1}"">";
-;;Number Level Style;1;0.2-M1;Partial;###############################################################################################################################################################################################################################################################;TODO : text:style-name
+;;Number Level Style;1;0.2-M1;Partial;"text:display-number is involved in the generation of w:lvlText/@w:val format string. When display-number is encountered, ""display-levels"" template is recursively called until text:display-number has been reached.
+style:num-format is translated to w:numFmt/@w:val as  :
+1 -> decimal
+i -> lowerRoman
+I -> upperRoman
+a -> lowerLetter
+A -> upperLetter
+otherwise decimal.
+style:num-format may also be empty. In this case, it is translated to lvlText/@w:val = '' if  no text:display-number has been specified. Otherwise, numbering is skipped when ""display-levels"" is called on an empty num-format.
+text:start-value is converted to w:start/@w:val";TODO : text:style-name
 ;;Bullet Level Style;1;0.2-M1;Partial;"w:lvl/w:numFmt/@w:val set to 'bullet'
 w:lvl/w:lvlText/@w:val set to @text:bullet-char
 w:lvl/w:lvlJc/@w:val set to ""left""
@@ -510,7 +547,8 @@ Formatting Properties;;;;;;;
 style:style[@fo:font-style-complex='italic'] converted to w:styles/w:style/w:rPr/w:i-cs";
 ;;Font Pitch;0;0.2-M1;Completed;style:font-face/@style:font-pitch convert to w:fonts/w:font/w:pitch;
 ;;Font Character Set;1?;0.2-M1;Completed;style:font-face/@style:font-charset convert to w:fonts/w:font/w:charset;
-;;Font Size;0;0.1;Completed;###############################################################################################################################################################################################################################################################;
+;;Font Size;0;0.1;Completed;"style:text-properties/@fo:font-size converted to w:styles/w:style/w:rPr/@w:sz
+If fo:font-size is expressed in percentage of a parent font-size, we climb up the style ancestors until we find an absolute size (expressed in points). If none was found, the size of the default style (office:styles/style:default-style)  in the same family is used. ";
 ;;Relative Font Size;1;0.2-M1;Partial;;not available in Open Office?
 ;;Script Type;2;0.2-M1;Partial;w:pPr/w:spacing based on style:paragraph-properties/@fo:line-height;
 ;;Letter Spacing;2;0.2-M1;Completed;style:text-properties/@fo:letter-spacing convert to w:styles/w:style/w:rPr/w:spacing;
@@ -655,7 +693,11 @@ style:table-properties/@style:width for this table style name is converted to w:
 ;;Vertical Glyph Orientation;1;0.2-Final;;;
 ;;Cell Shadow;1;0.2-Final;;;it cannot be mapped one to one
 ;;Cell Background;1;0.2-Final;Partial;w:tc/w:tcPr/w:shd is based on @fo:background-color;
-;;Cell Border;1;0.2-Final;Partial;###############################################################################################################################################################################################################################################################;
+;;Cell Border;1;0.2-Final;Partial;"table:table-cell is converted to w:tc
+Based on style:table-cell-properties of the table style name the following properties have been converted :
+w:tc/w:tcBorders children w:top, w:bottom, w:left, w:right have their attributes @w:val set to 'single'
+@w:color set to substring-after(style:table-cell-properties/@fo:border, '#') and  
+@w:sz set to substring-before(style:table-cell-properties/@fo:border, ' ')";
 ;;Diagonal Lines;1;0.2-Final;;;
 ;;Border Line Width;1;0.2-Final;Partial;;
 ;;Padding;1;0.2-Final;Partial;"w:tc/w:tcMar/w:top is based on @fo:padding or @fo:padding-top (whether defined or not) attribute found in style:table-cell-properties. 
