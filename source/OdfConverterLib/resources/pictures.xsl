@@ -223,6 +223,9 @@
                                                         <xsl:with-param name="length" select="$style/@fo:margin-bottom"/>
                                                     </xsl:call-template>
                                                 </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:value-of select="0"/>
+                                                </xsl:otherwise>
                                             </xsl:choose>
                                          </xsl:attribute>
                                          <xsl:attribute name="distT">
@@ -239,6 +242,9 @@
                                             </xsl:attribute>
                                     </wp:wrapTopAndBottom>
                                 </xsl:when>
+                                <xsl:otherwise>
+                                    <wp:wrapNone/>
+                                </xsl:otherwise>
                             </xsl:choose>
                             <wp:docPr name="{@draw:name}" id="{$intId}"/>
                             <wp:cNvGraphicFramePr>
