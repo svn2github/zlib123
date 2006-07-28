@@ -340,6 +340,7 @@
 		<w:tbl>
 			<w:tblPr>
 				<w:tblStyle w:val="{@table:style-name}"/>
+				<xsl:variable name="tableProp" select="key('style', @table:style-name)/style:table-properties" />
 				<w:tblW w:type="{$type}">
 					<xsl:attribute name="w:w">
 						<xsl:call-template name="twips-measure">
@@ -363,6 +364,16 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:if>
+			
+			<!--table background-->
+			<xsl:if test="$tableProp/@fo:background-color">
+			<xsl:choose>
+				<xsl:when test="$tableProp/@fo:background-color != 'transparent' ">
+					<w:shd w:val="clear" w:color="auto" w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"/>
+				</xsl:when>
+			</xsl:choose>
+			</xsl:if>
+				
 			</w:tblPr>
 			<w:tblGrid>
 				<xsl:apply-templates select="table:table-column"/>
@@ -554,6 +565,11 @@
 				<!-- point on the cell style properties -->
 				<xsl:variable name="cellProp"
 					select="key('style', @table:style-name)/style:table-cell-properties"/>
+				<xsl:variable name="tableStyle" select="substring-before(@table:style-name, '.')"/>
+				<xsl:variable name="rowStyle" select="../@table:style-name"/>
+				<xsl:variable name="tableProp"
+					select="key('style', $tableStyle)/style:table-properties"/>
+				<xsl:variable name="rowProp" select="key('style', $rowStyle)/style:table-row-properties" />
 
 				<!-- width of the cell -  @TODO handle problem of merged columns or rows-->
 				<xsl:call-template name="loopCell">
@@ -646,10 +662,23 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</w:tcBorders>
+				
+				<!--cell background color-->
 				<xsl:choose>
 					<xsl:when test="$cellProp/@fo:background-color and $cellProp/@fo:background-color != 'transparent' ">
 						<w:shd w:val="clear" w:color="auto" w:fill="{substring($cellProp/@fo:background-color, 2, string-length($cellProp/@fo:background-color) -1)}"/>
 					</xsl:when>
+					
+					<xsl:otherwise>
+						<xsl:choose>
+							<xsl:when test="$rowProp/@fo:background-color and $rowProp/@fo:background-color != 'transparent' ">
+								<w:shd w:val="clear" w:color="auto" w:fill="{substring($rowProp/@fo:background-color, 2, string-length($rowProp/@fo:background-color) -1)}"/>
+							</xsl:when>
+							<xsl:when test="not($rowProp/@fo:background-color) and $tableProp/@fo:background-color != 'transparent'  and $tableProp/@fo:background-color">
+								<w:shd w:val="clear" w:color="auto" w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"/>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:otherwise>
 				</xsl:choose>
 
 				<w:tcMar>
