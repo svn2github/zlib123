@@ -692,7 +692,7 @@ style:table-properties/@style:width for this table style name is converted to w:
 ;;Direction;1;0.2-Final;;;
 ;;Vertical Glyph Orientation;1;0.2-Final;;;
 ;;Cell Shadow;1;0.2-Final;;;it cannot be mapped one to one
-;;Cell Background;1;0.2-Final;Partial;w:tc/w:tcPr/w:shd is based on @fo:background-color;
+;;Cell Background;1;0.2-Final;Completed;w:tc/w:tcPr/w:shd is based on @fo:background-color;
 ;;Cell Border;1;0.2-Final;Partial;"table:table-cell is converted to w:tc
 Based on style:table-cell-properties of the table style name the following properties have been converted :
 w:tc/w:tcBorders children w:top, w:bottom, w:left, w:right have their attributes @w:val set to 'single'
