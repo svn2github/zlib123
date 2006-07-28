@@ -6,8 +6,6 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EADC5454-8DF0-4B0F-B20F-5C36136C054C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <StartupObject>
-    </StartupObject>
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>OdfWordXPAddin</AssemblyName>
     <RootNamespace>CleverAge.OdfConverter.OdfWordXPAddin</RootNamespace>
@@ -78,15 +76,9 @@
       <Name>OdfWordAddinLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
 </Project>
