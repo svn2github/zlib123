@@ -435,7 +435,7 @@
 				</w:autoSpaceDN>
 			</xsl:if>
 			
-			<xsl:if test="@style:line-height-at-least or fo:line-height or @fo:margin-bottom or @fo:margin-top or @style:line-spacing">
+			<xsl:if test="@style:line-height-at-least or @fo:line-height or @fo:margin-bottom or @fo:margin-top or @style:line-spacing">
 				<w:spacing>
 					<xsl:if test="@style:line-height-at-least">
 						<xsl:attribute name="w:lineRule">atLeast</xsl:attribute>
