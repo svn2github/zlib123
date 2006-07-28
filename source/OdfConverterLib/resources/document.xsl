@@ -128,7 +128,16 @@
 											</w:t>
 										</xsl:when>
 										<xsl:otherwise>
-											<w:footnoteRef/>
+											<xsl:choose>
+												<xsl:when test="$note/@text:note-class = 'footnote'">
+													<w:footnoteRef/>
+												</xsl:when>
+												<xsl:when test="$note/@text:note-class = 'endnote' ">
+													<w:endnoteRef/>
+												</xsl:when>
+											</xsl:choose>
+											
+											
 										</xsl:otherwise>
 									</xsl:choose>
 								</w:r>
