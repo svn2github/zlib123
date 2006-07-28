@@ -6,8 +6,6 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{82DF891A-E0DE-42CB-9941-AF0DFBCDCCDF}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <StartupObject>
-    </StartupObject>
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>OdfWord2003Addin</AssemblyName>
     <RootNamespace>CleverAge.OdfConverter.OdfWord2003Addin</RootNamespace>
@@ -81,8 +79,6 @@
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\OdfConverterLib\OdfConverterLib.csproj">
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
@@ -92,15 +88,9 @@
       <Name>OdfWordAddinLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
 </Project>

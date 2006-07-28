@@ -61,6 +61,7 @@
     <Compile Include="NotAnOdfDocumentException.cs" />
     <EmbeddedResource Include="resources\footnotes.xsl" />
     <EmbeddedResource Include="resources\header-footer.xsl" />
+    <EmbeddedResource Include="resources\endnotes.xsl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
