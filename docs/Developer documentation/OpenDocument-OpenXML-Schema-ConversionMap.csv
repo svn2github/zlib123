@@ -611,7 +611,8 @@ style:paragraph-properties/@fo:keep-with-next='always' converted to w:styles/w:s
 ;;Tab Stops;0;0.2-M1;Partial;"style:paragraph-properties/style:tab-stops converted to w:styles/w:style/w:pPr/w:tabs
 style:paragraph-properties/style:tab-stops/style:tab-stop converted to w:styles/w:style/w:pPr/w:tabs/w:tab
 style:tab-stop/@fo:position converted to w:tab/@w:pos
-style:tab-stop/@style:type converted to w:tab/@w:val. When @style:type is not present, @w:val is set to 'clear' ";
+style:tab-stop/@style:type converted to w:tab/@w:val. When @style:type is not present, @w:val is set to 'clear' style:tab-stop/@style:leader-style and style:tab-stop/style:leader-text converted to w:tab/@w:leader";"
+Format .odt has more options for @style:leader-style for example: dot-dash, dot-dot-dash, long-dash or wave - so they can not be converted to .docx"
 ;;Tab Stop Distance;0;0.2-M1;;;
 ;;Hyphenation Keep;;0.2-M1;;;not available in Word?
 ;;Maximum Hyphens;;0.2-M1;;;not available in Word?
