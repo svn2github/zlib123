@@ -41,6 +41,7 @@
   <xsl:import href="header-footer.xsl"/>
   <xsl:import href="fonts.xsl"/>
   <xsl:import href="styles.xsl"/>
+  <xsl:import href="dataStyles.xsl"/>
   <xsl:import href="pictures.xsl"/>	
   <xsl:import href="settings.xsl"/>
   <xsl:import href="part_relationships.xsl"/>
