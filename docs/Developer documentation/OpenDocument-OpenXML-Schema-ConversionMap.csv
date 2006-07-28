@@ -688,7 +688,7 @@ style:table-properties/@style:width for this table style name is converted to w:
 ;;Optimal Table Row Height;1;0.2-Final;;;
 ;;Row Background;1;0.2-Final;Completed;;
 ;;Break Before and Break After;1;0.2-Final;;;
-;;Keep Together;1;0.2-Final;;;
+;;Keep Together;1;0.2-Final;Completed;when @style:keep-together is false it is transfomed to w:cantSplit;
 ;Table Cell Formatting Properties;;1;;;;
 ;;Vertical Alignment;1;0.2-Final;Completed; w:vAlign based on style:table-cell-properties@style:vertical-align;
 ;;Text Align Source;1;0.2-Final;;;

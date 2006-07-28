@@ -469,6 +469,11 @@
 							</w:trHeight> 
 						</xsl:if>
 						<!-- row styles -->
+						
+						<!--keep together-->
+						<xsl:if test="key('style', @table:style-name)/style:table-row-properties/@style:keep-together = 'false'">
+							<w:cantSplit/>
+						</xsl:if>
 					</w:trPr>
 					<xsl:apply-templates select="table:table-cell"/>
 				</w:tr>
