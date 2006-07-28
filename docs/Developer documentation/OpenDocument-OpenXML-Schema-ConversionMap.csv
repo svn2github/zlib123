@@ -106,8 +106,10 @@ Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";
 Text Fields;;;;;;;in a first step, fixed text fields could be converted as text (does not work for dynamic fields such as page numbers!)
 ;Common Characteristics of Field Elements;;;;;;
 ;Document Fields;;1;;;;
-;;Date Fields;1;;;;
-;;Time Fields;1;;;;
+;;Date Fields;1;;Completed;"text:date convert to w:fldSimple/@w:instr=""TIME \@ &quot;$dataStyle&quot;""";"The translation might be lossy, because data fields feature is richer in ODF than in OOX
+Properties lost : Era, Week Of Year, Quarter."
+;;Time Fields;1;;Completed;"text:time convert to w:fldSimple/@w:instr=""TIME \@ &quot;$dataStyle&quot;""";"The translation might be lossy, because time fields feature is richer in ODF than in OOX
+Property lost : Time Value Truncation"
 ;;Page Number Fields;1;0.2-M1;Completed;text:page-number is conv to a w:fldSimple;
 ;;Page Continuation Text;2;;;;"tricky feature, it allows to insert a field with ""current page number"" plus or minus 1"
 ;;Sender Fields;3;;;;could be converted as text (instead of a field)
