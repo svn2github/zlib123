@@ -49,6 +49,7 @@
 		</w:fldSimple>
 	</xsl:template>
 
+	<!-- Date Fields -->
 	<xsl:template match="text:date" mode="paragraph">
 		<xsl:choose>
 			<xsl:when test="@text:fixed='true'">
@@ -59,29 +60,6 @@
 					<xsl:variable name="curStyle" select="@style:data-style-name"/>
 					<xsl:variable name="dataStyle">
 						<xsl:apply-templates select="/*/office:automatic-styles/number:date-style[@style:name=$curStyle]" mode="dataStyle"/>
-					</xsl:variable>
-					<xsl:attribute name="w:instr"><xsl:value-of select="concat('TIME \@ &quot;',$dataStyle,'&quot;')"/></xsl:attribute>
-					<w:r>
-	                    <w:rPr>
-	                        <w:noProof/>
-	                    </w:rPr>
-	                    <w:t><xsl:value-of select="text()"/></w:t>
-	                </w:r>
-				</w:fldSimple>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-
-	<xsl:template match="text:time" mode="paragraph">
-		<xsl:choose>
-			<xsl:when test="@text:fixed='true'">
-				<w:r><w:t><xsl:value-of select="text()"/></w:t></w:r>
-			</xsl:when>
-			<xsl:otherwise>
-				<w:fldSimple>
-					<xsl:variable name="curStyle" select="@style:data-style-name"/>
-					<xsl:variable name="dataStyle">
-						<xsl:apply-templates select="/*/office:automatic-styles/number:time-style[@style:name=$curStyle]" mode="dataStyle"/>
 					</xsl:variable>
 					<xsl:attribute name="w:instr"><xsl:value-of select="concat('TIME \@ &quot;',$dataStyle,'&quot;')"/></xsl:attribute>
 					<w:r>
@@ -126,6 +104,30 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<!-- Time Fields -->
+	<xsl:template match="text:time" mode="paragraph">
+		<xsl:choose>
+			<xsl:when test="@text:fixed='true'">
+				<w:r><w:t><xsl:value-of select="text()"/></w:t></w:r>
+			</xsl:when>
+			<xsl:otherwise>
+				<w:fldSimple>
+					<xsl:variable name="curStyle" select="@style:data-style-name"/>
+					<xsl:variable name="dataStyle">
+						<xsl:apply-templates select="/*/office:automatic-styles/number:time-style[@style:name=$curStyle]" mode="dataStyle"/>
+					</xsl:variable>
+					<xsl:attribute name="w:instr"><xsl:value-of select="concat('TIME \@ &quot;',$dataStyle,'&quot;')"/></xsl:attribute>
+					<w:r>
+	                    <w:rPr>
+	                        <w:noProof/>
+	                    </w:rPr>
+	                    <w:t><xsl:value-of select="text()"/></w:t>
+	                </w:r>
+				</w:fldSimple>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
 	<xsl:template match="number:hours" mode="dataStyle">
 		<xsl:choose>
 			<xsl:when test="parent::node()/number:am-pm">
@@ -158,5 +160,27 @@
 	</xsl:template>
 
 	<xsl:template match="number:am-pm" mode="dataStyle">am/pm</xsl:template>
+
+	<!-- Author Fields -->
+	<!-- TODO : comment csv file -->
+	<xsl:template match="text:author-name[not(@text:fixed='true')]" mode="paragraph">
+		<w:fldSimple w:instr=" USERNAME \* MERGEFORMAT ">
+			<xsl:apply-templates mode="paragraph"/>
+		</w:fldSimple>
+	</xsl:template>
+
+	<!-- User Fields -->
+	<!-- TODO : comment csv file -->
+	<xsl:template match="text:author-initials[not(@text:fixed='true')]" mode="paragraph">
+		<w:fldSimple w:instr=" USERINITIALS \* Upper  \* MERGEFORMAT ">
+			<xsl:apply-templates mode="paragraph"/>
+		</w:fldSimple>
+	</xsl:template>
+
+	<xsl:template match="text:initial-creator[not(@text:fixed='true')]" mode="paragraph">
+		<w:fldSimple w:instr=" AUTHOR ">
+			<xsl:apply-templates mode="paragraph"/>
+		</w:fldSimple>
+	</xsl:template>
 </xsl:stylesheet>
 
