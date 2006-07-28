@@ -97,7 +97,7 @@ Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";
 ;;Note Element;0;;Partial;"Extra space characters text:c elements are injected into w:t elements by looking at the 
 text:p or text:span following siblings
 Tab character text:tab is translated to a run including a tabulation <w:r><w:tab/></w:r>
-Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";TODO : endnotes
+Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";
 ;Ruby;;;0.2-Final;;;
 ;Text Annotation;;;0.2-Final;;;
 ;Index Marks;;3;0.2-Final;;;
@@ -439,7 +439,7 @@ Let's assume we are configuring footnotes.
   - otherwise value is set to 'continuous'
 - @text:footnotes-position is converted to w:footnotePr/w:pos/@w:val with the following mapping : 
   - 'text' -> 'beneathText'
-  - otherwise 'pageBottom' value is set.";"TODO : endnotes
+  - otherwise 'pageBottom' value is set.                                                          ";"
 TODO : concerning footntes : handle master page, default note paragraph style, Footnote Continuation.
 footnotes positions 'section' and 'document' don't seem to have counterpart in OOX."
 ;;Bibliography Configuration;3;0.2-Final;;;

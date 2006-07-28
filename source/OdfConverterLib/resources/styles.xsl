@@ -930,16 +930,16 @@
 	</xsl:template>
 	
 	
-	<!-- footnote reference and text styles -->
-	<xsl:template match="text:notes-configuration[@text:note-class='footnote']" mode="styles">
+	<!-- footnote and endnote reference and text styles -->
+	<xsl:template match="text:notes-configuration[@text:note-class='footnote'] | text:notes-configuration[@text:note-class='endnote']" mode="styles">
 		<w:style w:styleId="{concat(@text:note-class, 'Reference')}" w:type="character">
-			<w:name w:val="footnote reference"/>
+			<w:name w:val="note reference"/>
 			<w:basedOn w:val="{@text:citation-body-style-name}"/>
 			<w:semiHidden/>
 			<w:unhideWhenUsed/>
 		</w:style>
 		<w:style w:styleId="{concat(@text:note-class, 'Text')}" w:type="paragraph">
-			<w:name w:val="footnote text"/>
+			<w:name w:val="note text"/>
 			<w:basedOn w:val="{@text:citation-style-name}"/>
 			<!--w:link w:val="FootnoteTextChar"/-->
 			<w:semiHidden/>

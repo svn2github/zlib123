@@ -38,7 +38,10 @@
     	        
             	<!-- Footnotes document wide properties -->
                <xsl:call-template name="footnotes-configuration"/>
-    	
+             
+             <!-- Endnotes document wide properties -->
+             <xsl:call-template name="endnotes-configuration"/>
+             
             </w:settings>
     </xsl:template>
    

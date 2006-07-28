@@ -59,7 +59,10 @@
 		        Target="settings.xml"/>
 		  <Relationship Id="rId5"
 				Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes"
-				Target="footnotes.xml"/>
+		  	Target="footnotes.xml"/>
+		<Relationship Id="rId6"
+				Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes"
+				Target="endnotes.xml"/>
 			<!-- Relationship for header and footer -->
 			<xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page">
 				<Relationship>

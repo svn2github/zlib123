@@ -37,6 +37,7 @@
   <xsl:import href="document.xsl"/>
   <xsl:import href="numbering.xsl"/>
   <xsl:import href="footnotes.xsl"/>
+  <xsl:import href="endnotes.xsl"/>
   <xsl:import href="header-footer.xsl"/>
   <xsl:import href="fonts.xsl"/>
   <xsl:import href="styles.xsl"/>
@@ -138,6 +139,11 @@
       	</zip:entry>
       </xsl:for-each>
 
+      <!-- endnotes -->
+      <zip:entry zip:target="word/endnotes.xml">
+        <xsl:call-template name="endnotes"/>
+      </zip:entry>
+      
       <!-- styles -->
       <zip:entry zip:target="word/styles.xml">
     	<xsl:call-template name="styles"/>

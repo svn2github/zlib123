@@ -782,7 +782,7 @@
 		<w:br/>
 	</xsl:template>
 
-	<!-- footnotes -->
+	<!-- footnotes and endnotes -->
 	<xsl:template match="text:note" mode="paragraph">
 		<w:r>
 			<w:rPr>
@@ -795,8 +795,9 @@
 	<xsl:template match="text:note[@text:note-class='footnote']" mode="text">
 		<w:footnoteReference>
 			<xsl:attribute name="w:id">
-				<xsl:call-template name="footnoteId">
+				<xsl:call-template name="noteId">
 					<xsl:with-param name="node" select="."/>
+					<xsl:with-param name="nodetype" select="@text:note-class"/>
 				</xsl:call-template>
 			</xsl:attribute>
 		</w:footnoteReference>
@@ -804,15 +805,30 @@
 			<w:t><xsl:value-of select="text:note-citation"/></w:t>
 		</xsl:if>
 	</xsl:template>
+	
+	<xsl:template match="text:note[@text:note-class='endnote']" mode="text">
+		<w:endnoteReference>
+			<xsl:attribute name="w:id">
+				<xsl:call-template name="noteId">
+					<xsl:with-param name="node" select="."/>
+					<xsl:with-param name="nodetype" select="@text:note-class"/>
+				</xsl:call-template>
+			</xsl:attribute>
+		</w:endnoteReference>
+		<xsl:if test="text:note-citation/@text:label">
+			<w:t><xsl:value-of select="text:note-citation"/></w:t>
+		</xsl:if>
+	</xsl:template>
 
 	<!-- 
-	       Generate a decimal identifier based on the position of the current 
-	       footenote among all the indexed footnotes.
+		Generate a decimal identifier based on the position of the current 
+		footenote/endnote among all the indexed footnotes/endnotes.
 	-->
-	<xsl:template name="footnoteId">
+	<xsl:template name="noteId">
 		<xsl:param name="node"/>
+		<xsl:param name="nodetype"/>
 		<xsl:variable name="positionInGroup">
-			<xsl:for-each select="key('footnotes', '')">
+			<xsl:for-each select="key(concat($nodetype,'s'), '')">
 				<xsl:if test="generate-id($node) = generate-id(.)">
 					<xsl:value-of select="position() + 1"/>
 				</xsl:if>
