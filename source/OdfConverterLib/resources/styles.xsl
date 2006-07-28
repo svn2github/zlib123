@@ -162,7 +162,7 @@
 			</xsl:if>
 			
 			<!-- border color + padding  -->
-			<xsl:if test="@fo:border">
+			<xsl:if test="@fo:border and @fo:border != 'none' ">
 				<w:pBdr>
 					<w:top>
 						<xsl:choose>
@@ -192,7 +192,14 @@
 								</xsl:call-template>
 							</xsl:attribute>
 						</xsl:if>
-						<xsl:attribute name="w:color"><xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/></xsl:attribute>
+						
+						<xsl:variable name="color" select="substring(@fo:border, string-length(@fo:border) -5, 6)"/>
+						<xsl:if test="$color != 'none' ">
+							<xsl:attribute name="w:color">
+								<xsl:value-of select="$color"/>
+							</xsl:attribute>
+						</xsl:if>
+						
 					</w:top>
 					<w:left>
 						<xsl:choose>
