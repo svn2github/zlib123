@@ -30,6 +30,6 @@ Important note: The ODF file opened by the add-in is converted into Office OpenX
 
 Troubleshooting Guide:
 -------------------------------
-If an error occures when you try to open an ODF file, it might be that the Service Pack 3 for Office XP or the Compatibility Pack for Word 2007 is not installed (see Software Requirements).
+If an error occurs when you try to open an ODF file, it might be that the Service Pack 3 for Office XP or the Compatibility Pack for Word 2007 is not installed (see Software Requirements).
 
 
