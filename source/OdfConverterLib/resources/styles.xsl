@@ -37,7 +37,7 @@
 	exclude-result-prefixes="office style fo text draw number">
 
 	<xsl:variable name="asianLayoutId">1</xsl:variable>
-
+	
 	<xsl:template name="styles">
 		<w:styles>
 			<w:docDefaults>
@@ -68,7 +68,7 @@
 
 
 	<xsl:template match="style:style" mode="styles">
-		<w:style w:styleId="{@style:name}" w:customStyle="1">
+		<w:style w:styleId="{@style:name}" >
 
 			<xsl:choose>
 				<xsl:when test="@style:family = 'text' ">
@@ -111,18 +111,26 @@
 
 			<!-- Nested elements-->
 
-			<xsl:if test="@style:display-name">
-				<w:name w:val="{@style:display-name}"/>
-			</xsl:if>
-
+			<xsl:choose>
+				<xsl:when test="@style:display-name">
+					<w:name w:val="{@style:display-name}"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:if test="@style:name">
+						<w:name w:val="{@style:name}"/>
+					</xsl:if>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+			
 			<xsl:if test="@style:parent-style-name">
 				<w:basedOn w:val="{@style:parent-style-name}"/>
 			</xsl:if>
 			<xsl:if test="@style:next-style-name">
 				<w:next w:val="{@style:next-style-name}"/>
 			</xsl:if>
-
-			<xsl:if test="name(parent::*) = 'office:automatic-styles'">
+			
+			<xsl:if test=" name(parent::*) = 'office:automatic-styles' ">
 				<!-- Automatic-styles are not displayed -->
 				<w:hidden/>
 			</xsl:if>
