@@ -127,6 +127,60 @@
         </w:endnotePr>
     </xsl:template>
     
-    <!--TODO endnotes relationships-->
+    
+    <xsl:template name="endnotes-relationships">
+        <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+            <!-- hyperlinks relationships. 
+                Do not pick up hyperlinks other than those coming from footnotes.  -->
+            <xsl:for-each select="document('content.xml')">
+                <xsl:for-each
+                    select="key('hyperlinks', '')[ancestor::text:note/@text:note-class = 'endnote' ]">
+                    <Relationship Id="{generate-id()}"
+                        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+                        TargetMode="External">
+                        <xsl:attribute name="Target">
+                            <!-- having Target empty makes Word Beta 2007 crash -->
+                            <xsl:choose>
+                                <xsl:when test="string-length(@xlink:href) &gt; 0">
+                                    <xsl:value-of select="@xlink:href"/>
+                                </xsl:when>
+                                <xsl:otherwise>/</xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:attribute>
+                    </Relationship>
+                </xsl:for-each>
+            </xsl:for-each>
+            
+            <xsl:for-each select="document('content.xml')">
+                <xsl:for-each
+                    select="key('images', '')[ancestor::text:note/@text:note-class = 'endnote' ]">
+                    <xsl:choose>
+                        <!-- Internal image -->
+                        <xsl:when
+                            test="starts-with(draw:image/@xlink:href, 'Pictures/')">
+                            <!-- copy this image to the oox package -->
+                            <zip:copy
+                                zip:source="{draw:image/@xlink:href}"
+                                zip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
+                            <Relationship Id="{generate-id(draw:image)}"
+                                Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                                Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"
+                            />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <!-- External image -->
+                            <!-- TOTO support for external images
+                                <Relationship Id='{generate-id(draw:image)}' 					
+                                Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+                                Target="{draw:image/@xlink:href}"
+                                TargetMode="External"/>
+                            -->
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:for-each>
+            </xsl:for-each>
+            
+        </Relationships>
+    </xsl:template>
     
 </xsl:stylesheet>

@@ -103,7 +103,18 @@
       <zip:entry zip:target="word/_rels/footnotes.xml.rels">
         <xsl:call-template name="footnotes-relationships"/>
       </zip:entry>
+      
+      <!-- endnotes -->
+      <zip:entry zip:target="word/endnotes.xml">
+        <xsl:call-template name="endnotes"/>
+      </zip:entry>
+      
+      <!-- endnotes part relationships -->
+      <zip:entry zip:target="word/_rels/endnotes.xml.rels">
+        <xsl:call-template name="endnotes-relationships"/>
+      </zip:entry>
 
+      <!-- headers and footers -->
       <xsl:variable name="masterPage"
         select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"
         xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -140,11 +151,7 @@
       	</zip:entry>
       </xsl:for-each>
 
-      <!-- endnotes -->
-      <zip:entry zip:target="word/endnotes.xml">
-        <xsl:call-template name="endnotes"/>
-      </zip:entry>
-      
+ 
       <!-- styles -->
       <zip:entry zip:target="word/styles.xml">
     	<xsl:call-template name="styles"/>
