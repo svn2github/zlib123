@@ -222,7 +222,7 @@ Text Indices;;;;;;;
 ;;Hyperlink Start and End;1;0.2-Final;;;
 ;;Example of an Index Entry Configuration;1;0.2-Final;;;
 Tables;;;;;;;
-;Basic Table Model;;0;;;;
+;Basic Table Model;;0;;;;because of limitation in .docx, we convert only 63 columns @TODO a proper error message indicating the column limitation of tables in Word 
 ;;Table Element;0;0.2-M1;Partial;table:table is converted to w:tbl.;TODO protect, print, print ranges
 ;;Table Row;0;0.2-M1;Partial;table:table-row is converted to w:tr/w:trPr element;
 ;;Table Cell;0;0.2-M1;Partial;"table:table-cell is converted to w:tc
