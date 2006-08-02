@@ -42,10 +42,13 @@
 	<xsl:preserve-space elements="text:p"/>
 	<xsl:preserve-space elements="text:span"/>
 
-	<xsl:key name="style" match="office:automatic-styles/style:style|office:automatic-styles/style:style" use="@style:name"/>
+	<xsl:key name="style"
+		match="office:automatic-styles/style:style|office:automatic-styles/style:style"
+		use="@style:name"/>
 	<xsl:key name="hyperlinks" match="text:a" use="''"/>
-	<xsl:key name="images" match="draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]" use="''"/>
-	
+	<xsl:key name="images" match="draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]"
+		use="''"/>
+
 
 	<xsl:variable name="type">dxa</xsl:variable>
 
@@ -106,7 +109,8 @@
 							<xsl:variable name="note" select="ancestor::text:note"/>
 							<w:pPr>
 								<xsl:choose>
-									<xsl:when test="count(draw:frame) = 1 and count(child::text()) = 0">
+									<xsl:when
+										test="count(draw:frame) = 1 and count(child::text()) = 0">
 										<w:pStyle w:val="{draw:frame/@draw:style-name}"/>
 									</xsl:when>
 									<xsl:otherwise>
@@ -119,7 +123,8 @@
 								<!-- Include the mark to the first paragraph -->
 								<w:r>
 									<w:rPr>
-										<w:rStyle w:val="{concat($note/@text:note-class, 'Reference')}"/>
+										<w:rStyle
+											w:val="{concat($note/@text:note-class, 'Reference')}"/>
 									</w:rPr>
 									<xsl:choose>
 										<xsl:when test="$note/text:note-citation/@text:label">
@@ -130,14 +135,14 @@
 										<xsl:otherwise>
 											<xsl:choose>
 												<xsl:when test="$note/@text:note-class = 'footnote'">
-													<w:footnoteRef/>
+												<w:footnoteRef/>
 												</xsl:when>
 												<xsl:when test="$note/@text:note-class = 'endnote' ">
-													<w:endnoteRef/>
+												<w:endnoteRef/>
 												</xsl:when>
 											</xsl:choose>
-											
-											
+
+
 										</xsl:otherwise>
 									</xsl:choose>
 								</w:r>
@@ -340,7 +345,8 @@
 		<w:tbl>
 			<w:tblPr>
 				<w:tblStyle w:val="{@table:style-name}"/>
-				<xsl:variable name="tableProp" select="key('style', @table:style-name)/style:table-properties" />
+				<xsl:variable name="tableProp"
+					select="key('style', @table:style-name)/style:table-properties"/>
 				<w:tblW w:type="{$type}">
 					<xsl:attribute name="w:w">
 						<xsl:call-template name="twips-measure">
@@ -364,19 +370,21 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:if>
-			
-			<!--table background-->
-			<xsl:if test="$tableProp/@fo:background-color">
-			<xsl:choose>
-				<xsl:when test="$tableProp/@fo:background-color != 'transparent' ">
-					<w:shd w:val="clear" w:color="auto" w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"/>
-				</xsl:when>
-			</xsl:choose>
-			</xsl:if>
-				
+
+				<!--table background-->
+				<xsl:if test="$tableProp/@fo:background-color">
+					<xsl:choose>
+						<xsl:when test="$tableProp/@fo:background-color != 'transparent' ">
+							<w:shd w:val="clear" w:color="auto"
+								w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"
+							/>
+						</xsl:when>
+					</xsl:choose>
+				</xsl:if>
+
 			</w:tblPr>
 			<w:tblGrid>
-				<xsl:apply-templates select="table:table-column"/>
+				<xsl:apply-templates select="table:table-column"/> 
 			</w:tblGrid>
 			<xsl:apply-templates
 				select="table:table-rows|table:table-header-rows|table:table-row|table:table-header-row"
@@ -384,23 +392,57 @@
 		</w:tbl>
 	</xsl:template>
 
+	<!-- this fragment count table:table-column so the max number of cols was 63 -->
+	<xsl:template name="colCount">
+		<xsl:param name="nodeList"/>
+		<xsl:choose>
+			<xsl:when test="$nodeList">
+				<xsl:variable name="recursive_result">
+					<xsl:call-template name="colCount">
+						<xsl:with-param name="productList"
+							select="$nodeList[position() > 1]"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="$nodeList[1]/@table:number-columns-repeated ">
+						<xsl:value-of
+							select="number($nodeList[1]/@table:number-columns-repeated) + $recursive_result"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="1 + $recursive_result"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="0"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 	<xsl:template match="table:table-column">
 		<xsl:param name="repeat" select="1"/>
-		<!-- relative width not supported yet -->
-		<w:gridCol>
-			<xsl:attribute name="w:w">
-				<xsl:call-template name="twips-measure">
-					<xsl:with-param name="length"
-						select="key('style', @table:style-name)/style:table-column-properties/@style:column-width"
-					/>
-				</xsl:call-template>
-			</xsl:attribute>
-		</w:gridCol>
-		<xsl:if test="@table:number-columns-repeated ">
-			<xsl:if test="@table:number-columns-repeated &gt; $repeat">
-				<xsl:apply-templates select=".">
-					<xsl:with-param name="repeat" select="$repeat + 1"/>
-				</xsl:apply-templates>
+		
+		<xsl:variable name="columnNumber">
+			<xsl:call-template name="colCount">
+				<xsl:with-param name="nodeList" select="preceding-sibling::table:table-column" />
+			</xsl:call-template>
+		</xsl:variable>
+		
+		<xsl:if test="$columnNumber &lt; 63">
+			<!-- relative width not supported yet -->
+			<w:gridCol>
+				<xsl:attribute name="w:w">
+					<xsl:call-template name="twips-measure">
+						<xsl:with-param name="length"
+							select="key('style', @table:style-name)/style:table-column-properties/@style:column-width"
+						/>
+					</xsl:call-template>
+				</xsl:attribute>
+			</w:gridCol>
+			<xsl:if test="@table:number-columns-repeated ">
+				<xsl:if test="@table:number-columns-repeated &gt; $repeat">
+					<xsl:apply-templates select=".">
+						<xsl:with-param name="repeat" select="$repeat + 1"/>
+					</xsl:apply-templates>
+				</xsl:if>
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
@@ -429,10 +471,10 @@
 							<w:tblHeader/>
 						</xsl:if>
 						<xsl:if test="@table:style-name">
-							<xsl:variable name="rowStyle" select="@table:style-name" />
+							<xsl:variable name="rowStyle" select="@table:style-name"/>
 							<xsl:variable name="widthType"
 								select="key('style', $rowStyle)/style:table-row-properties"/>
-							
+
 							<xsl:variable name="widthRow">
 								<xsl:choose>
 									<xsl:when test="$widthType[@style:row-height]">
@@ -446,7 +488,7 @@
 									</xsl:otherwise>
 								</xsl:choose>
 							</xsl:variable>
-							
+
 							<w:trHeight>
 								<xsl:attribute name="w:val">
 									<xsl:call-template name="twips-measure">
@@ -466,16 +508,19 @@
 										</xsl:otherwise>
 									</xsl:choose>
 								</xsl:attribute>
-							</w:trHeight> 
+							</w:trHeight>
 						</xsl:if>
 						<!-- row styles -->
-						
+
 						<!--keep together-->
-						<xsl:if test="key('style', @table:style-name)/style:table-row-properties/@style:keep-together = 'false'">
+						<xsl:if
+							test="key('style', @table:style-name)/style:table-row-properties/@style:keep-together = 'false'">
 							<w:cantSplit/>
 						</xsl:if>
 					</w:trPr>
-					<xsl:apply-templates select="table:table-cell"/>
+					<xsl:apply-templates select="table:table-cell[position() &lt; 64]">
+						<xsl:with-param name="colsNumber" select="count(table:table-cell)"/>
+					</xsl:apply-templates>
 				</w:tr>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -484,7 +529,7 @@
 	<xsl:template name="cellWidth">
 		<xsl:param name="col"/>
 
-		<xsl:variable name="table" select="ancestor::table:table[1]" />
+		<xsl:variable name="table" select="ancestor::table:table[1]"/>
 		<xsl:variable name="colStyle"
 			select="$table/table:table-column[position() = $col]/@table:style-name"/>
 		<xsl:variable name="width"
@@ -514,7 +559,7 @@
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:variable name="table" select="ancestor::table:table[1]" />
+				<xsl:variable name="table" select="ancestor::table:table[1]"/>
 				<xsl:variable name="column" select="$table/table:table-column[position() = $colNum]"/>
 				<xsl:variable name="repeatVal">
 					<xsl:choose>
@@ -563,6 +608,7 @@
 	</xsl:template>
 
 	<xsl:template match="table:table-cell" name="table-cell">
+		<xsl:param name="colsNumber"/>
 		<xsl:param name="grid" select="0"/>
 		<xsl:param name="merge" select="0"/>
 		<w:tc>
@@ -574,7 +620,8 @@
 				<xsl:variable name="rowStyle" select="../@table:style-name"/>
 				<xsl:variable name="tableProp"
 					select="key('style', $tableStyle)/style:table-properties"/>
-				<xsl:variable name="rowProp" select="key('style', $rowStyle)/style:table-row-properties" />
+				<xsl:variable name="rowProp"
+					select="key('style', $rowStyle)/style:table-row-properties"/>
 
 				<!-- width of the cell -  @TODO handle problem of merged columns or rows-->
 				<xsl:call-template name="loopCell">
@@ -601,7 +648,7 @@
 				</xsl:choose>
 				<w:tcBorders>
 					<xsl:choose>
-						<xsl:when test="$cellProp[@fo:border and @fo:border!='none']">
+						<xsl:when test="$cellProp[@fo:border and @fo:border!='none' ]">
 							<xsl:variable name="border" select="$cellProp/@fo:border"/>
 							<!-- fo:border = "0.002cm solid #000000" -->
 							<xsl:variable name="border-color" select="substring-after($border, '#')"/>
@@ -617,6 +664,7 @@
 							<w:right w:val="single" w:color="{$border-color}" w:sz="{$border-size}"
 							/>
 						</xsl:when>
+
 						<xsl:otherwise>
 							<xsl:if test="$cellProp[@fo:border-top and @fo:border-top != 'none']">
 								<xsl:variable name="border" select="$cellProp/@fo:border-top"/>
@@ -653,8 +701,19 @@
 								</w:bottom>
 							</xsl:if>
 							<xsl:if
-								test="$cellProp[@fo:border-right and @fo:border-right != 'none']">
-								<xsl:variable name="border" select="$cellProp/@fo:border-right"/>
+								test="$cellProp[(@fo:border-right and @fo:border-right != 'none')] or (position() &lt; $colsNumber and position() = 63)">
+								<xsl:variable name="border">
+									<xsl:choose>
+										<xsl:when
+											test="position() &lt; $colsNumber and position() = 63">
+											<xsl:value-of select="$cellProp/@fo:border-left"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="$cellProp/@fo:border-right"/>
+										</xsl:otherwise>
+									</xsl:choose>
+
+								</xsl:variable>
 								<w:right w:val="single" w:color="{substring-after($border, '#')}">
 									<xsl:attribute name="w:sz">
 										<xsl:call-template name="eightspoint-measure">
@@ -667,20 +726,29 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</w:tcBorders>
-				
+
 				<!--cell background color-->
 				<xsl:choose>
-					<xsl:when test="$cellProp/@fo:background-color and $cellProp/@fo:background-color != 'transparent' ">
-						<w:shd w:val="clear" w:color="auto" w:fill="{substring($cellProp/@fo:background-color, 2, string-length($cellProp/@fo:background-color) -1)}"/>
+					<xsl:when
+						test="$cellProp/@fo:background-color and $cellProp/@fo:background-color != 'transparent' ">
+						<w:shd w:val="clear" w:color="auto"
+							w:fill="{substring($cellProp/@fo:background-color, 2, string-length($cellProp/@fo:background-color) -1)}"
+						/>
 					</xsl:when>
-					
+
 					<xsl:otherwise>
 						<xsl:choose>
-							<xsl:when test="$rowProp/@fo:background-color and $rowProp/@fo:background-color != 'transparent' ">
-								<w:shd w:val="clear" w:color="auto" w:fill="{substring($rowProp/@fo:background-color, 2, string-length($rowProp/@fo:background-color) -1)}"/>
+							<xsl:when
+								test="$rowProp/@fo:background-color and $rowProp/@fo:background-color != 'transparent' ">
+								<w:shd w:val="clear" w:color="auto"
+									w:fill="{substring($rowProp/@fo:background-color, 2, string-length($rowProp/@fo:background-color) -1)}"
+								/>
 							</xsl:when>
-							<xsl:when test="not($rowProp/@fo:background-color) and $tableProp/@fo:background-color != 'transparent'  and $tableProp/@fo:background-color">
-								<w:shd w:val="clear" w:color="auto" w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"/>
+							<xsl:when
+								test="not($rowProp/@fo:background-color) and $tableProp/@fo:background-color != 'transparent'  and $tableProp/@fo:background-color">
+								<w:shd w:val="clear" w:color="auto"
+									w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"
+								/>
 							</xsl:when>
 						</xsl:choose>
 					</xsl:otherwise>
@@ -755,7 +823,7 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:if>
-			
+
 			</w:tcPr>
 			<xsl:apply-templates/>
 			<!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
@@ -794,11 +862,11 @@
 			<xsl:apply-templates mode="text"/>
 		</w:r>
 	</xsl:template>
-	
+
 	<xsl:template match="text:span[child::*]" mode="paragraph">
 		<xsl:apply-templates mode="paragraph"/>
 	</xsl:template>
-	
+
 	<xsl:template match="text:tab-stop" mode="paragraph">
 		<w:r>
 			<w:tab/>
@@ -845,10 +913,12 @@
 			</xsl:attribute>
 		</w:footnoteReference>
 		<xsl:if test="text:note-citation/@text:label">
-			<w:t><xsl:value-of select="text:note-citation"/></w:t>
+			<w:t>
+				<xsl:value-of select="text:note-citation"/>
+			</w:t>
 		</xsl:if>
 	</xsl:template>
-	
+
 	<xsl:template match="text:note[@text:note-class='endnote']" mode="text">
 		<w:endnoteReference>
 			<xsl:attribute name="w:id">
@@ -859,7 +929,9 @@
 			</xsl:attribute>
 		</w:endnoteReference>
 		<xsl:if test="text:note-citation/@text:label">
-			<w:t><xsl:value-of select="text:note-citation"/></w:t>
+			<w:t>
+				<xsl:value-of select="text:note-citation"/>
+			</w:t>
 		</xsl:if>
 	</xsl:template>
 
@@ -879,7 +951,7 @@
 		</xsl:variable>
 		<xsl:value-of select="$positionInGroup"/>
 	</xsl:template>
-	
+
 	<xsl:template match="text:page-number" mode="paragraph">
 		<w:fldSimple w:instr=" PAGE   \* MERGEFORMAT ">
 			<w:r>
