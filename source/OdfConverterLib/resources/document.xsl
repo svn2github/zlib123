@@ -90,7 +90,17 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</w:pPr>
+			<xsl:variable name="id">
+				<xsl:number/>
+			</xsl:variable>
+
+			<xsl:if test="substring-before(@text:style-name,'_')='Heading'">
+				<w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id)}"/>
+			</xsl:if>
 			<xsl:apply-templates mode="paragraph"/>
+			<xsl:if test="substring-before(@text:style-name,'_')='Heading'">
+				<w:bookmarkEnd w:id="{$id}"/>
+			</xsl:if>
 		</w:p>
 	</xsl:template>
 
@@ -149,6 +159,44 @@
 							</xsl:if>
 							<xsl:apply-templates mode="paragraph"/>
 						</xsl:when>
+						<!-- we are in table of contents -->
+						<xsl:when test="parent::text:index-body">
+							<w:pPr>
+								<w:pStyle w:val="{@text:style-name}"/>
+							</w:pPr>
+							<xsl:variable name="num">
+								<xsl:number/>
+							</xsl:variable>
+							<xsl:if test="$num=1">
+								<w:r>
+									<w:fldChar w:fldCharType="begin"/>
+								</w:r>
+								<w:r>
+									<w:instrText xml:space="preserve"> TOC \o "1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
+								</w:r>
+								<w:r>
+									<w:fldChar w:fldCharType="separate"/>
+								</w:r>
+							</xsl:if>
+							<xsl:choose>
+								<xsl:when test="text:a">
+									<w:hyperlink w:history="1">
+										<xsl:attribute name="w:anchor">
+											<xsl:value-of select="concat('_Toc',$num)"/>
+										</xsl:attribute>
+										<xsl:call-template name="tableContent">
+											<xsl:with-param name="num" select="$num"/>
+											<xsl:with-param name="test">1</xsl:with-param>
+										</xsl:call-template>
+									</w:hyperlink>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:call-template name="tableContent">
+										<xsl:with-param name="num" select="$num"/>
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
 						<!-- main scenario -->
 						<xsl:otherwise>
 							<w:pPr>
@@ -198,9 +246,23 @@
 	</xsl:template-->
 
 	<xsl:template match="text:a" mode="paragraph">
-		<w:hyperlink r:id="{generate-id()}">
-			<xsl:apply-templates mode="paragraph"/>
-		</w:hyperlink>
+		<xsl:choose>
+			<xsl:when test="ancestor::text:index-body">
+				<xsl:variable name="num" select="count(parent::*/preceding-sibling::*)"> </xsl:variable>
+				<w:hyperlink w:history="1">
+					<xsl:attribute name="w:anchor">
+						<xsl:value-of select="concat('_Toc',$num)"/>
+					</xsl:attribute>
+					<xsl:apply-templates mode="paragraph"/>
+				</w:hyperlink>
+			</xsl:when>
+			<xsl:otherwise>
+				<w:hyperlink r:id="{generate-id()}">
+					<xsl:apply-templates mode="paragraph"/>
+				</w:hyperlink>
+			</xsl:otherwise>
+		</xsl:choose>
+
 	</xsl:template>
 
 	<!-- TODO : find the best way to avoid code duplication -->
@@ -269,6 +331,83 @@
 				</xsl:apply-templates>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+
+	<!-- table of contents -->
+
+	<xsl:template name="tableContent">
+		<xsl:param name="num"/>
+		<xsl:param name="test" select="0"/>
+		<w:r>
+			<xsl:choose>
+				<xsl:when test="$test=1">
+					<xsl:apply-templates select="text:a/child::text()[1]" mode="text"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<w:t>
+						<xsl:for-each select="child::text()[position() &lt; last()]">
+							<xsl:value-of select="."/>
+						</xsl:for-each>
+					</w:t>
+					<!--<xsl:apply-templates select="child::text()[1]" mode="text"/>-->
+				</xsl:otherwise>
+			</xsl:choose>
+		</w:r>
+		<xsl:apply-templates select="text:tab" mode="paragraph"/>
+		<w:r>
+			<w:rPr/>
+			<w:fldChar w:fldCharType="begin">
+				<w:fldData xml:space="preserve">CNDJ6nn5us4RjIIAqgBLqQsCAAAACAAAAA4AAABfAFQAbwBjADEANAAxADgAMwA5ADIANwA2AAAA</w:fldData>
+			</w:fldChar>
+		</w:r>
+		<w:r>
+			<w:rPr/>
+			<w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $num, ' \h')"/></w:instrText>
+		</w:r>
+		<w:r>
+			<w:rPr/>
+			<w:fldChar w:fldCharType="separate"/>
+		</w:r>
+		<w:r>
+			<xsl:apply-templates select="child::text()[last()]" mode="text"/>
+		</w:r>
+		<w:r>
+			<w:rPr/>
+			<w:fldChar w:fldCharType="end"/>
+		</w:r>
+	</xsl:template>
+
+	<xsl:template match="text:table-of-content">
+		<w:sdt>
+			<w:sdtPr>
+				<w:docPartObj>
+					<w:docPartType>
+						<xsl:attribute name="w:val">
+							<xsl:value-of select="'Table of Contents'"/>
+						</xsl:attribute>
+					</w:docPartType>
+				</w:docPartObj>
+			</w:sdtPr>
+			<w:sdtContent>
+
+				<xsl:if test="text:index-body/text:index-title/text:p">
+					<xsl:apply-templates select="text:index-body/text:index-title/text:p"/>
+				</xsl:if>
+
+				<xsl:for-each select="text:index-body/child::text:p">
+					<xsl:variable name="num">
+						<xsl:number/>
+					</xsl:variable>
+					<xsl:apply-templates select="."/>
+				</xsl:for-each>
+				<w:p>
+					<w:r>
+						<w:rPr/>
+						<w:fldChar w:fldCharType="end"/>
+					</w:r>
+				</w:p>
+			</w:sdtContent>
+		</w:sdt>
 	</xsl:template>
 
 	<!-- tables -->
