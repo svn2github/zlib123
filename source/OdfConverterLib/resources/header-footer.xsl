@@ -168,7 +168,7 @@
 		<xsl:param name="node"/>
 		<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 			<!-- hyperlinks relationships. -->
-			<xsl:for-each select="$node/descendant::draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]">
+			<xsl:for-each select="key('hyperlinks', '')[not(ancestor::text:note)]">
 				<Relationship Id="{generate-id()}"
 						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
 						TargetMode="External">
