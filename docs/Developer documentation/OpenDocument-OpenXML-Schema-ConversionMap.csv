@@ -187,7 +187,7 @@ Text Indices;;;;;;;
 ;;Index Source;2;0.2-M1;;;
 ;;Index Body Section;2;0.2-M1;;;
 ;;Index Title Section;2;0.2-M1;;;
-;Table Of Content;;1;;;;
+;Table Of Content;;1;;Partial;text:table-of-content converted to structured document tags w:sdt/w:stdPr/w:docPartObj/w:docPartType - decide that the type of structure is table of content  and w:std/w:sdtContent which is content container;TODO: check styles for table of content
 ;;Table of Content Source;1;0.2-M1;;;
 ;;Table of Content Entry Template;1;0.2-M1;;;
 ;Index of Illustrations;;2;;;;
