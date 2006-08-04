@@ -964,8 +964,13 @@
 				</xsl:if>
 
 			</w:tcPr>
-			<xsl:apply-templates/>
-			<!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
+			<xsl:choose>
+				<xsl:when test="not(child::table:table)">
+					<xsl:apply-templates/>
+					<!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
+				</xsl:when>
+				<xsl:otherwise><w:p/></xsl:otherwise>
+			</xsl:choose>
 		</w:tc>
 	</xsl:template>
 
