@@ -184,7 +184,13 @@
 				</Relationship>
 			</xsl:for-each>
 
-			<xsl:for-each select="$node/descendant::draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]">
+			<xsl:for-each select="$node/descendant::draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]">	
+				<xsl:variable name="supported">
+					<xsl:call-template name="image-support">
+						<xsl:with-param name="name" select="./draw:image/@xlink:href"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:if test="$supported = 'true' ">
 				<xsl:choose>
 					<!-- Internal image -->
 					<xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
@@ -206,6 +212,7 @@
 					                -->
 					</xsl:otherwise>
 				</xsl:choose>
+				</xsl:if>
 			</xsl:for-each>
 		
 		</Relationships>

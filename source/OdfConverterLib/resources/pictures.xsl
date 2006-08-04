@@ -41,6 +41,22 @@
 
 
     <xsl:key name="images" match="draw:frame" use="'const'"/>
+    
+    
+    <xsl:template name="image-support">
+        <xsl:param name="name"/>
+        <xsl:variable name="support">
+            <xsl:choose>
+                <xsl:when test="contains($name, '.svm')">
+                    <xsl:message terminate="no">feedback:SVM image</xsl:message>
+                    false
+                </xsl:when>
+                <xsl:otherwise>true</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:value-of select="$support"/>
+    </xsl:template>
+    
 
     <!-- Get the position of an element in the draw:frame group -->
     <xsl:template name="GetPosition">
@@ -77,6 +93,15 @@
 
     <!-- TODO: manage ole-objects -->
     <xsl:template match="draw:frame[not(./draw:object-ole) and starts-with(./draw:image/@xlink:href, 'Pictures/')]" mode="paragraph">
+        
+     <xsl:variable name="supported">
+         <xsl:call-template name="image-support">
+             <xsl:with-param name="name" select="./draw:image/@xlink:href"/>
+         </xsl:call-template>
+     </xsl:variable>
+        
+        <xsl:if test="$supported = 'true'">
+        
         <xsl:variable name="intId">
             <xsl:call-template name="GetPosition">
                 <xsl:with-param name="node" select="."/>
@@ -353,6 +378,8 @@
                     </w:r>
             </xsl:otherwise>
         </xsl:choose>
+            
+        </xsl:if>
         
     </xsl:template>
 

@@ -81,14 +81,22 @@
 			-->
 			<xsl:for-each select="document('content.xml')">
 				<xsl:for-each select="key('images', '')[not(ancestor::text:note)]">	
+					<xsl:variable name="supported">
+						<xsl:call-template name="image-support">
+							<xsl:with-param name="name" select="draw:image/@xlink:href"/>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:if test="$supported = 'true' ">
 					<xsl:choose>
 						<!-- Internal image -->
 						<xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
+							
 							<!-- copy this image to the oox package -->
 							<zip:copy zip:source="{draw:image/@xlink:href}" zip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
 							<Relationship Id='{generate-id(draw:image)}' 					
 								Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
 								Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>	
+							
 						</xsl:when>
 						<xsl:otherwise> 
 							<!-- External image -->
@@ -100,6 +108,7 @@
 							-->
 						</xsl:otherwise>
 					</xsl:choose>
+					</xsl:if>
 				</xsl:for-each>
 			</xsl:for-each>
 			<!-- hyperlinks relationships. 

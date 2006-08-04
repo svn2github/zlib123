@@ -154,6 +154,13 @@
             <xsl:for-each select="document('content.xml')">
                 <xsl:for-each
                     select="key('images', '')[ancestor::text:note/@text:note-class = 'endnote' ]">
+                    select="key('images', '')[ancestor::text:note/@text:note-class = 'footnote' ]">
+                    <xsl:variable name="supported">
+                        <xsl:call-template name="image-support">
+                            <xsl:with-param name="name" select="draw:image/@xlink:href"/>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:if test="$supported = 'true' ">
                     <xsl:choose>
                         <!-- Internal image -->
                         <xsl:when
@@ -177,6 +184,7 @@
                             -->
                         </xsl:otherwise>
                     </xsl:choose>
+                    </xsl:if>
                 </xsl:for-each>
             </xsl:for-each>
             
