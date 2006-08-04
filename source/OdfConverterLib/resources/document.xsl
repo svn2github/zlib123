@@ -28,6 +28,8 @@
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+	xmlns:v="urn:schemas-microsoft-com:vml"
+	xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
 	xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 	xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
 	xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -298,6 +300,64 @@
 			<xsl:apply-templates mode="hyperlink"/>
 		</w:t>
 	</xsl:template>
+	
+	<!-- @TODO  positioning text-boxes -->
+	<xsl:template match="draw:frame" mode="paragraph">
+		<xsl:for-each select="descendant::draw:text-box">
+			<w:r>
+				<w:rPr>
+					<w:rStyle w:val="{@text:style-name}"/>
+				</w:rPr>
+				<w:pict>
+					<v:shapetype/>
+					<v:shape type="#_x0000_t202">
+						<xsl:variable name="frameW">
+							<xsl:call-template name="point-measure">
+								<xsl:with-param name="length" select="parent::draw:frame/@svg:width"
+								/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:variable name="frameH">
+							<xsl:call-template name="point-measure">
+								<xsl:with-param name="length" select="@fo:min-height"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:variable name="marginL">
+							<xsl:call-template name="point-measure">
+								<xsl:with-param name="length" select="parent::draw:frame/@svg:x"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:variable name="marginT">
+							<xsl:call-template name="point-measure">
+								<xsl:with-param name="length" select="parent::draw:frame/@svg:y"/>
+							</xsl:call-template>
+						</xsl:variable>
+						<xsl:variable name="zIndex">
+							<xsl:value-of select="parent::draw:frame/@draw:z-index"/>
+						</xsl:variable>
+						<xsl:attribute name="style">
+							<xsl:value-of select="'position:absolute;'"/>
+							<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
+							<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
+							<xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
+							<xsl:value-of select="concat('margin-left:',$marginL,'pt;')"/>
+							<xsl:value-of select="concat('margin-top:',$marginT,'pt;')"/>
+						</xsl:attribute>
+						<v:textbox>
+							<w:txbxContent>
+								<w:p>
+									<w:r>
+										<xsl:apply-templates select="descendant::text()[last()]"
+											mode="text"/>
+									</w:r>
+								</w:p>
+							</w:txbxContent>
+						</v:textbox>
+					</v:shape>
+				</w:pict>
+			</w:r>
+		</xsl:for-each>
+	</xsl:template>
 
 	<!-- lists -->
 
@@ -530,7 +590,7 @@
 
 			</w:tblPr>
 			<w:tblGrid>
-				<xsl:apply-templates select="table:table-column"/> 
+				<xsl:apply-templates select="table:table-column"/>
 			</w:tblGrid>
 			<xsl:apply-templates
 				select="table:table-rows|table:table-header-rows|table:table-row|table:table-header-row"
@@ -545,33 +605,35 @@
 			<xsl:when test="$nodeList">
 				<xsl:variable name="recursive_result">
 					<xsl:call-template name="colCount">
-						<xsl:with-param name="productList"
-							select="$nodeList[position() > 1]"/>
+						<xsl:with-param name="productList" select="$nodeList[position() > 1]"/>
 					</xsl:call-template>
 				</xsl:variable>
 				<xsl:choose>
 					<xsl:when test="$nodeList[1]/@table:number-columns-repeated ">
 						<xsl:value-of
-							select="number($nodeList[1]/@table:number-columns-repeated) + $recursive_result"/>
+							select="number($nodeList[1]/@table:number-columns-repeated) + $recursive_result"
+						/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of select="1 + $recursive_result"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
-			<xsl:otherwise><xsl:value-of select="0"/></xsl:otherwise>
+			<xsl:otherwise>
+				<xsl:value-of select="0"/>
+			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
+
 	<xsl:template match="table:table-column">
 		<xsl:param name="repeat" select="1"/>
-		
+
 		<xsl:variable name="columnNumber">
 			<xsl:call-template name="colCount">
-				<xsl:with-param name="nodeList" select="preceding-sibling::table:table-column" />
+				<xsl:with-param name="nodeList" select="preceding-sibling::table:table-column"/>
 			</xsl:call-template>
 		</xsl:variable>
-		
+
 		<xsl:if test="$columnNumber &lt; 63">
 			<!-- relative width not supported yet -->
 			<w:gridCol>
@@ -976,7 +1038,9 @@
 					<xsl:apply-templates/>
 					<!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
 				</xsl:when>
-				<xsl:otherwise><w:p/></xsl:otherwise>
+				<xsl:otherwise>
+					<w:p/>
+				</xsl:otherwise>
 			</xsl:choose>
 		</w:tc>
 	</xsl:template>
