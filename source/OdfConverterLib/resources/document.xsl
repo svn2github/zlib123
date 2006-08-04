@@ -118,7 +118,6 @@
 	<xsl:template match="text:p">
 		<xsl:param name="level" select="0"/>
 		<xsl:message terminate="no">progress:text:p</xsl:message>
-		<xsl:message terminate="no">feedback:paragraph</xsl:message>
 		<xsl:choose>
 			<xsl:when test="$level = 0">
 				<w:p>
@@ -363,7 +362,6 @@
 
 	<xsl:template match="text:list">
 		<xsl:param name="level" select="-1"/>
-		<xsl:message terminate="no">feedback:list</xsl:message>
 		<xsl:apply-templates select="text:list-item">
 			<xsl:with-param name="level" select="$level+1"/>
 		</xsl:apply-templates>
