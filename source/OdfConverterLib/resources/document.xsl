@@ -83,6 +83,13 @@
 						<w:outlineLvl w:val="0"/>
 					</xsl:when>
 					<xsl:when test="@text:outline-level &lt;= 9">
+						<xsl:if
+							test="document('styles.xml')//office:document-styles/office:styles/text:outline-style">
+							<w:numPr>
+								<w:ilvl w:val="{@text:outline-level - 1}"/>
+								<w:numId w:val="1"/>
+							</w:numPr>
+						</xsl:if>
 						<w:outlineLvl w:val="{@text:outline-level}"/>
 					</xsl:when>
 					<xsl:otherwise>
@@ -220,7 +227,7 @@
 							<w:ilvl w:val="{$level}"/>
 							<xsl:variable name="id" select="ancestor::text:list/@text:style-name"/>
 							<w:numId
-								w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+1}"
+								w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+2}"
 							/>
 						</w:numPr>
 					</w:pPr>
@@ -313,7 +320,7 @@
 							<w:ilvl w:val="{$level}"/>
 							<xsl:variable name="id" select="ancestor::text:list/@text:style-name"/>
 							<w:numId
-								w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+1}"
+								w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+2}"
 							/>
 						</w:numPr>
 					</w:pPr>
