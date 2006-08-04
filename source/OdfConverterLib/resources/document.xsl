@@ -86,7 +86,7 @@
 					</xsl:when>
 					<xsl:when test="@text:outline-level &lt;= 9">
 						<xsl:if
-							test="document('styles.xml')//office:document-styles/office:styles/text:outline-style">
+							test="document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
 							<w:numPr>
 								<w:ilvl w:val="{@text:outline-level - 1}"/>
 								<w:numId w:val="1"/>
@@ -624,8 +624,7 @@
 				<xsl:choose>
 					<xsl:when test="$nodeList[1]/@table:number-columns-repeated ">
 						<xsl:value-of
-							select="number($nodeList[1]/@table:number-columns-repeated) + $recursive_result"
-						/>
+							select="number($nodeList[1]/@table:number-columns-repeated) + $recursive_result"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of select="1 + $recursive_result"/>
