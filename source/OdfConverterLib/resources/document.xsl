@@ -118,6 +118,7 @@
 	<xsl:template match="text:p">
 		<xsl:param name="level" select="0"/>
 		<xsl:message terminate="no">progress:text:p</xsl:message>
+		
 		<xsl:choose>
 			<xsl:when test="$level = 0">
 				<w:p>
@@ -137,33 +138,12 @@
 									</xsl:otherwise>
 								</xsl:choose>
 							</w:pPr>
-							<xsl:if test="position() = 1">
+							
+							<xsl:if test="position() = 1 and parent::text:note-body">
+								
 								<!-- Include the mark to the first paragraph -->
-								<w:r>
-									<w:rPr>
-										<w:rStyle
-											w:val="{concat($note/@text:note-class, 'Reference')}"/>
-									</w:rPr>
-									<xsl:choose>
-										<xsl:when test="$note/text:note-citation/@text:label">
-											<w:t>
-												<xsl:value-of select="$note/text:note-citation"/>
-											</w:t>
-										</xsl:when>
-										<xsl:otherwise>
-											<xsl:choose>
-												<xsl:when test="$note/@text:note-class = 'footnote'">
-												<w:footnoteRef/>
-												</xsl:when>
-												<xsl:when test="$note/@text:note-class = 'endnote' ">
-												<w:endnoteRef/>
-												</xsl:when>
-											</xsl:choose>
-
-
-										</xsl:otherwise>
-									</xsl:choose>
-								</w:r>
+								<xsl:apply-templates select="../../text:note-citation"  />
+								
 							</xsl:if>
 							<xsl:apply-templates mode="paragraph"/>
 						</xsl:when>
@@ -238,6 +218,34 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<xsl:template match="text:note-citation">
+		<w:r>
+			<w:rPr>
+				<w:rStyle
+					w:val="{concat(../@text:note-class, 'Reference')}"/>
+			</w:rPr>
+			<xsl:choose>
+				<xsl:when test="../text:note-citation/@text:label">
+					<w:t>
+						<xsl:value-of select="../text:note-citation"/>
+					</w:t>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:choose>
+						<xsl:when test="../@text:note-class = 'footnote'">
+							<w:footnoteRef/>
+						</xsl:when>
+						<xsl:when test="../@text:note-class = 'endnote' ">
+							<w:endnoteRef/>
+						</xsl:when>
+					</xsl:choose>
+					
+					
+				</xsl:otherwise>
+			</xsl:choose>
+		</w:r>    
+	</xsl:template>
+	
 	<!-- links -->
 
 	<!--xsl:template match="text:a" mode="paragraph">
@@ -374,14 +382,21 @@
 				<w:p>
 					<w:pPr>
 						<w:pStyle w:val="{*[1][self::text:p]/@text:style-name}"/>
-						<w:numPr>
-							<w:ilvl w:val="{$level}"/>
-							<xsl:variable name="id" select="ancestor::text:list/@text:style-name"/>
-							<w:numId
-								w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+2}"
-							/>
-						</w:numPr>
+							<w:numPr>
+								<w:ilvl w:val="{$level}"/>
+								<xsl:variable name="id" select="ancestor::text:list/@text:style-name"/>
+								<w:numId
+									w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+2}"
+								/>
+							</w:numPr>
+						
 					</w:pPr>
+					
+					<!--footnote or endnote - Include the mark to the first paragraph only when first child of text:note-body is not paragraph -->
+					<xsl:if test="ancestor::text:note and not(ancestor::text:note-body/child::*[position()=1]/text:p) and position() = 1">
+						<xsl:apply-templates select="ancestor::text:note/text:note-citation"  />
+					</xsl:if>
+					
 					<!-- first paragraph -->
 					<xsl:apply-templates select="*[1][self::text:p]" mode="paragraph"/>
 				</w:p>
@@ -1049,6 +1064,7 @@
 		<w:r>
 			<xsl:apply-templates select="." mode="text"/>
 		</w:r>
+		
 	</xsl:template>
 
 
@@ -1064,6 +1080,7 @@
 				</xsl:call-template>
 			</xsl:if>
 		</w:t>
+		
 	</xsl:template>
 
 
@@ -1075,7 +1092,7 @@
 			<xsl:apply-templates mode="text"/>
 		</w:r>
 	</xsl:template>
-
+	
 	<xsl:template match="text:span[child::*]" mode="paragraph">
 		<xsl:apply-templates mode="paragraph"/>
 	</xsl:template>
@@ -1165,7 +1182,7 @@
 		<xsl:value-of select="$positionInGroup"/>
 	</xsl:template>
 
-	<xsl:template match="text:page-number" mode="paragraph">
+	<!--<xsl:template match="text:page-number" mode="paragraph">
 		<w:fldSimple w:instr=" PAGE   \* MERGEFORMAT ">
 			<w:r>
 				<w:rPr>
@@ -1174,7 +1191,7 @@
 				<xsl:apply-templates mode="text"/>
 			</w:r>
 		</w:fldSimple>
-	</xsl:template>
+	</xsl:template>-->
 
 	<!-- Extra spaces management, courtesy of J. David Eisenberg -->
 	<xsl:variable name="spaces" xml:space="preserve">                                       </xsl:variable>
