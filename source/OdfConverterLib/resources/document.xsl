@@ -118,7 +118,7 @@
 	<xsl:template match="text:p">
 		<xsl:param name="level" select="0"/>
 		<xsl:message terminate="no">progress:text:p</xsl:message>
-		
+
 		<xsl:choose>
 			<xsl:when test="$level = 0">
 				<w:p>
@@ -138,12 +138,12 @@
 									</xsl:otherwise>
 								</xsl:choose>
 							</w:pPr>
-							
+
 							<xsl:if test="position() = 1 and parent::text:note-body">
-								
+
 								<!-- Include the mark to the first paragraph -->
-								<xsl:apply-templates select="../../text:note-citation"  />
-								
+								<xsl:apply-templates select="../../text:note-citation"/>
+
 							</xsl:if>
 							<xsl:apply-templates mode="paragraph"/>
 						</xsl:when>
@@ -221,8 +221,7 @@
 	<xsl:template match="text:note-citation">
 		<w:r>
 			<w:rPr>
-				<w:rStyle
-					w:val="{concat(../@text:note-class, 'Reference')}"/>
+				<w:rStyle w:val="{concat(../@text:note-class, 'Reference')}"/>
 			</w:rPr>
 			<xsl:choose>
 				<xsl:when test="../text:note-citation/@text:label">
@@ -239,16 +238,16 @@
 							<w:endnoteRef/>
 						</xsl:when>
 					</xsl:choose>
-					
-					
+
+
 				</xsl:otherwise>
 			</xsl:choose>
-			
+
 			<!-- extra space between footnote/endnote mark and text-->
 			<w:t xml:space="preserve"> </w:t>
-		</w:r>    
+		</w:r>
 	</xsl:template>
-	
+
 	<!-- links -->
 
 	<!--xsl:template match="text:a" mode="paragraph">
@@ -310,7 +309,7 @@
 			<xsl:apply-templates mode="hyperlink"/>
 		</w:t>
 	</xsl:template>
-	
+
 	<!-- @TODO  positioning text-boxes -->
 	<xsl:template match="draw:frame" mode="paragraph">
 		<xsl:for-each select="descendant::draw:text-box">
@@ -385,21 +384,22 @@
 				<w:p>
 					<w:pPr>
 						<w:pStyle w:val="{*[1][self::text:p]/@text:style-name}"/>
-							<w:numPr>
-								<w:ilvl w:val="{$level}"/>
-								<xsl:variable name="id" select="ancestor::text:list/@text:style-name"/>
-								<w:numId
-									w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+2}"
-								/>
-							</w:numPr>
-						
+						<w:numPr>
+							<w:ilvl w:val="{$level}"/>
+							<xsl:variable name="id" select="ancestor::text:list/@text:style-name"/>
+							<w:numId
+								w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+2}"
+							/>
+						</w:numPr>
+
 					</w:pPr>
-					
+
 					<!--footnote or endnote - Include the mark to the first paragraph only when first child of text:note-body is not paragraph -->
-					<xsl:if test="ancestor::text:note and not(ancestor::text:note-body/child::*[position()=1]/text:p) and position() = 1">
-						<xsl:apply-templates select="ancestor::text:note/text:note-citation"  />
+					<xsl:if
+						test="ancestor::text:note and not(ancestor::text:note-body/child::*[position()=1]/text:p) and position() = 1">
+						<xsl:apply-templates select="ancestor::text:note/text:note-citation"/>
 					</xsl:if>
-					
+
 					<!-- first paragraph -->
 					<xsl:apply-templates select="*[1][self::text:p]" mode="paragraph"/>
 				</w:p>
@@ -627,7 +627,8 @@
 				<xsl:choose>
 					<xsl:when test="$nodeList[1]/@table:number-columns-repeated ">
 						<xsl:value-of
-							select="number($nodeList[1]/@table:number-columns-repeated) + $recursive_result"/>
+							select="number($nodeList[1]/@table:number-columns-repeated) + $recursive_result"
+						/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of select="1 + $recursive_result"/>
@@ -741,7 +742,7 @@
 							<w:cantSplit/>
 						</xsl:if>
 					</w:trPr>
-					<xsl:apply-templates select="table:table-cell[position() &lt; 64]">
+					<xsl:apply-templates select="table:table-cell[position() &lt; 64]|table:covered-table-cell">
 						<xsl:with-param name="colsNumber" select="count(table:table-cell)"/>
 					</xsl:apply-templates>
 				</w:tr>
@@ -749,20 +750,63 @@
 		</xsl:choose>
 	</xsl:template>
 
+	
+	
+	<!-- this fragment sum up width of a column in case of merged columns -->
+	<xsl:template name="cellWidthCount">
+		<xsl:param name="cellSpanned" />
+		<xsl:param name="col" />
+		<xsl:variable name="table" select="ancestor::table:table[1]"/>
+		<xsl:choose>
+			<xsl:when test="$cellSpanned &gt; 1">
+				<xsl:variable name="recursive_result">
+					<xsl:call-template name="cellWidthCount">
+						<xsl:with-param name="cellSpanned" select="$cellSpanned -1"/>
+						<xsl:with-param name="col" select="$col+1" />
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:variable name="colStyle"
+					select="$table/table:table-column[position() = $col]/@table:style-name"/>
+				<xsl:variable name="width">
+					<xsl:call-template name="twips-measure">
+						<xsl:with-param name="length" select="key('style', $colStyle)/style:table-column-properties/@style:column-width"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="$width + $recursive_result"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="colStyle"
+					select="$table/table:table-column[position() = $col]/@table:style-name"/>
+				<xsl:call-template name="twips-measure">
+					<xsl:with-param name="length" select="key('style', $colStyle)/style:table-column-properties/@style:column-width"/>
+				</xsl:call-template>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 	<xsl:template name="cellWidth">
 		<xsl:param name="col"/>
-
-		<xsl:variable name="table" select="ancestor::table:table[1]"/>
-		<xsl:variable name="colStyle"
-			select="$table/table:table-column[position() = $col]/@table:style-name"/>
-		<xsl:variable name="width"
-			select="key('style', $colStyle)/style:table-column-properties/@style:column-width"/>
-
+		<xsl:variable name="cellSpanned"> 
+			<xsl:choose>
+				<xsl:when test="@table:number-columns-spanned">
+					<xsl:value-of select="@table:number-columns-spanned"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="1"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:variable name="width">
+			<xsl:call-template name="cellWidthCount">
+				<xsl:with-param name="cellSpanned"  select="$cellSpanned"/>
+				<xsl:with-param name="col" select="$col" />
+			</xsl:call-template>
+		</xsl:variable>
+		
 		<w:tcW w:type="{$type}">
 			<xsl:attribute name="w:w">
-				<xsl:call-template name="twips-measure">
-					<xsl:with-param name="length" select="$width"/>
-				</xsl:call-template>
+				<xsl:value-of select="$width" />
 			</xsl:attribute>
 		</w:tcW>
 	</xsl:template>
@@ -1066,7 +1110,7 @@
 		<w:r>
 			<xsl:apply-templates select="." mode="text"/>
 		</w:r>
-		
+
 	</xsl:template>
 
 	<xsl:template name="text" match="text()" mode="text">
@@ -1081,7 +1125,7 @@
 				</xsl:call-template>
 			</xsl:if>
 		</w:t>
-		
+
 	</xsl:template>
 
 
@@ -1093,7 +1137,7 @@
 			<xsl:apply-templates mode="text"/>
 		</w:r>
 	</xsl:template>
-	
+
 	<xsl:template match="text:span[child::*]" mode="paragraph">
 		<xsl:apply-templates mode="paragraph"/>
 	</xsl:template>
