@@ -1274,5 +1274,17 @@
 
 	<!-- ignored -->
 	<xsl:template match="text()"/>
+	
+	<!-- odt section -->
+	<xsl:template match="text:section">
+		<xsl:choose>
+			<xsl:when test="@text:display='none'">
+				
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 
 </xsl:stylesheet>
