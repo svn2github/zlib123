@@ -37,7 +37,7 @@
 	exclude-result-prefixes="office style fo text draw number">
 
 	<xsl:variable name="asianLayoutId">1</xsl:variable>
-	
+
 	<xsl:template name="styles">
 		<w:styles>
 			<w:docDefaults>
@@ -68,7 +68,7 @@
 
 
 	<xsl:template match="style:style" mode="styles">
-		<w:style w:styleId="{@style:name}" >
+		<w:style w:styleId="{@style:name}">
 
 			<xsl:choose>
 				<xsl:when test="@style:family = 'text' ">
@@ -121,15 +121,15 @@
 					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
-			
-			
+
+
 			<xsl:if test="@style:parent-style-name">
 				<w:basedOn w:val="{@style:parent-style-name}"/>
 			</xsl:if>
 			<xsl:if test="@style:next-style-name">
 				<w:next w:val="{@style:next-style-name}"/>
 			</xsl:if>
-			
+
 			<xsl:if test=" name(parent::*) = 'office:automatic-styles' ">
 				<!-- Automatic-styles are not displayed -->
 				<w:hidden/>
@@ -482,7 +482,7 @@
 							<!-- Default value -->
 							<xsl:if test="not(@style:type)">
 								<xsl:attribute name="w:val">clear</xsl:attribute>
-							</xsl:if>					
+							</xsl:if>
 							<xsl:attribute name="w:leader">
 								<xsl:choose>
 									<xsl:when test="@style:leader-text">
@@ -500,7 +500,7 @@
 												<xsl:value-of select="'none'"/>
 											</xsl:otherwise>
 										</xsl:choose>
-		
+
 									</xsl:when>
 									<xsl:when test="@style:leader-style and not(@style:leader-text)">
 										<xsl:choose>
@@ -746,11 +746,11 @@
 			<xsl:if test="@fo:font-style or @style:font-style-asian or @style:font-style-complex">
 				<xsl:choose>
 					<xsl:when
-						test="fo:font-style = 'italic' or @style:font-style-asian = 'italic' or @style:font-style-complex = 'italic'">
+						test="@fo:font-style = 'italic' or @style:font-style-asian = 'italic' or @style:font-style-complex = 'italic'">
 						<w:i w:val="on"/>
 					</xsl:when>
 					<xsl:when
-						test="fo:font-style = 'oblique' or @style:font-style-asian = 'oblique' or @style:font-style-complex = 'oblique'">
+						test="@fo:font-style = 'oblique' or @style:font-style-asian = 'oblique' or @style:font-style-complex = 'oblique'">
 						<w:i w:val="on"/>
 					</xsl:when>
 					<xsl:otherwise>
