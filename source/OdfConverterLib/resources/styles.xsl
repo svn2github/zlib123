@@ -867,9 +867,12 @@
 			<xsl:if test="@style:text-scale">
 				<w:w>
 					<xsl:attribute name="w:val">
-						<xsl:value-of
-							select="substring(@style:text-scale, 1, string-length(@style:text-scale)-1)"
-						/>
+						<xsl:variable name="scale" select="substring(@style:text-scale, 1, string-length(@style:text-scale)-1)"/>
+						<xsl:choose>
+							<xsl:when test="number($scale) &lt; 600"><xsl:value-of select="$scale"/></xsl:when>
+							<xsl:otherwise><xsl:message terminate="no">feedback: Text scale can't exceed 600%</xsl:message>
+								600</xsl:otherwise>
+						</xsl:choose>
 					</xsl:attribute>
 				</w:w>
 			</xsl:if>
