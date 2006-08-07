@@ -243,6 +243,9 @@
 					
 				</xsl:otherwise>
 			</xsl:choose>
+			
+			<!-- extra space between footnote/endnote mark and text-->
+			<w:t xml:space="preserve"> </w:t>
 		</w:r>    
 	</xsl:template>
 	
@@ -1066,8 +1069,7 @@
 		
 	</xsl:template>
 
-
-	<xsl:template match="text()" mode="text">
+	<xsl:template name="text" match="text()" mode="text">
 		<w:t>
 			<xsl:attribute name="xml:space">preserve</xsl:attribute>
 			<xsl:value-of select="."/>
