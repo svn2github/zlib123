@@ -188,7 +188,20 @@
 						<!-- main scenario -->
 						<xsl:otherwise>
 							<w:pPr>
-								<w:pStyle w:val="{@text:style-name}"/>
+								<xsl:choose>
+									<!-- this is not an automatic-style -->
+									<xsl:when test="not(key('style', @text:style-name))">
+										<w:pStyle w:val="{@text:style-name}"/>
+									</xsl:when>
+									<!-- this is an automatic-style : translate it to direct formatting -->
+									<xsl:otherwise>
+										<xsl:apply-templates select="key('style', @text:style-name)/style:paragraph-properties" mode="styles"/>
+										<w:rPr>
+											<xsl:apply-templates select="key('style', @text:style-name)/style:text-properties" mode="styles"/>
+										</w:rPr>
+									</xsl:otherwise>
+								</xsl:choose>
+								
 							</w:pPr>
 							<xsl:apply-templates mode="paragraph"/>
 						</xsl:otherwise>
@@ -1064,9 +1077,13 @@
 
 	<xsl:template match="text()" mode="paragraph">
 		<w:r>
+			<xsl:if test="key('style', parent::text:p/@text:style-name)">
+				<w:rPr>
+					<xsl:apply-templates select="key('style', parent::text:p/@text:style-name)/style:text-properties" mode="styles"/>
+				</w:rPr>
+			</xsl:if>
 			<xsl:apply-templates select="." mode="text"/>
 		</w:r>
-		
 	</xsl:template>
 
 	<xsl:template name="text" match="text()" mode="text">
@@ -1088,15 +1105,26 @@
 	<xsl:template match="text:span" mode="paragraph">
 		<w:r>
 			<w:rPr>
-				<w:rStyle w:val="{@text:style-name}"/>
+				<xsl:choose>
+					<xsl:when test="key('style', @text:style-name)">
+						<!-- inherit properties of the parent -->
+						<xsl:apply-templates select="key('style', parent::text:p/@text:style-name)/style:text-properties" mode="styles"/>
+						<!-- override them with span properties -->
+						<xsl:apply-templates select="key('style', @text:style-name)/style:text-properties" mode="styles"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:rStyle w:val="{@text:style-name}"/>
+					</xsl:otherwise>		
+				</xsl:choose>
 			</w:rPr>
 			<xsl:apply-templates mode="text"/>
 		</w:r>
 	</xsl:template>
 	
-	<xsl:template match="text:span[child::*]" mode="paragraph">
+	<!-- This conflicts with basic text:span template !
+		xsl:template match="text:span[child::*]" mode="paragraph">
 		<xsl:apply-templates mode="paragraph"/>
-	</xsl:template>
+	</xsl:template-->
 
 	<xsl:template match="text:tab-stop" mode="paragraph">
 		<w:r>
