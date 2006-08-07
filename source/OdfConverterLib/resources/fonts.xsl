@@ -62,9 +62,18 @@
 					<w:charset w:val="00"/>
 				</xsl:otherwise>
 			</xsl:choose>
-			<xsl:if test="@style:font-family-generic">
-				<w:family w:val="{@style:font-family-generic}"/>
-			</xsl:if>
+			<xsl:choose>
+				
+				<!-- open xml don't know the attribute filed system : replace with auto -->
+				<xsl:when test="@style:font-family-generic='system'">
+					<w:family w:val="auto"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:if test="@style:font-family-generic">
+						<w:family w:val="{@style:font-family-generic}"/>
+					</xsl:if>	
+				</xsl:otherwise>	
+			</xsl:choose>
 			<xsl:if test="@style:font-pitch">
 				<w:pitch w:val="{@style:font-pitch}"/>
 			</xsl:if>
