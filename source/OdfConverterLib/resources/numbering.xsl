@@ -269,9 +269,20 @@
 						<w:lvlText>
 
 							<xsl:attribute name="w:val">
-								<xsl:call-template name="text-format">
-									<xsl:with-param name="level" select="@text:level"/>
-								</xsl:call-template>
+								<xsl:choose>
+									<xsl:when test="@style:num-format='1'">
+										<xsl:call-template name="text-format">
+											<xsl:with-param name="level" select="@text:level"/>
+										</xsl:call-template>
+									</xsl:when>
+									<xsl:when test="@style:num-format='a'">
+										<xsl:value-of select="concat('%',string(@text:level),'/')"/>
+									</xsl:when>
+									<xsl:when test="@style:num-format='A'">
+										<xsl:value-of select="concat('%',string(@text:level),'/')"/>
+									</xsl:when>
+									<xsl:otherwise></xsl:otherwise>
+								</xsl:choose>
 							</xsl:attribute>
 						</w:lvlText>
 						<w:lvlJc w:val="left"/>
