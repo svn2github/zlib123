@@ -178,18 +178,25 @@
 						</w:tabs>
 						</xsl:if -->
 					<w:ind>
-						<xsl:if test="style:list-level-properties/@text:space-before">
-							<xsl:attribute name="w:left">
-								<!-- Margin to the text  distance -->
-								<xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
-							</xsl:attribute>
-						</xsl:if>
 						<xsl:if test="style:list-level-properties/@text:min-label-width">
-							<!--Text to numbering distance to be retrieved -->
-							<xsl:attribute name="w:hanging">
+							<xsl:attribute name="w:left">
 								<xsl:value-of select="$minLabelWidthTwip"/>
 							</xsl:attribute>
 						</xsl:if>
+						
+						<xsl:choose>
+							<xsl:when test="style:list-level-properties/@text:space-before">
+								<xsl:attribute name="w:hanging">
+									<xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip "/>
+								</xsl:attribute>	
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:attribute name="w:hanging">
+									<xsl:value-of select="$minLabelWidthTwip"/>
+								</xsl:attribute>
+							</xsl:otherwise>
+						</xsl:choose>
+						
 					</w:ind>
 				</w:pPr>
 			</w:lvl>
