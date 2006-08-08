@@ -190,11 +190,18 @@
 							<w:pPr>
 								<w:pStyle w:val="{@text:style-name}"/>
 							</w:pPr>
-							<xsl:apply-templates mode="paragraph"/>
+							<xsl:choose>
+								<xsl:when test="child::draw:frame and not(parent::draw:text-box)">
+									<xsl:apply-templates select="draw:frame"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:apply-templates mode="paragraph"/>
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:otherwise>
 					</xsl:choose>
 					<!-- selfstanding image before paragraph-->
-					<xsl:if test="name(preceding-sibling::*[1]) = 'draw:frame'">
+					<xsl:if test="name(preceding-sibling::*[1]) = 'draw:frame' and preceding-sibling::*[1]/draw:image">
 						<xsl:apply-templates select="preceding-sibling::*[1]" mode="paragraph"/>
 					</xsl:if>
 				</w:p>
@@ -209,7 +216,8 @@
 							<w:numId>
 								<xsl:attribute name="w:val">
 									<xsl:call-template name="numberingId">
-										<xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
+										<xsl:with-param name="styleName"
+											select="ancestor::text:list/@text:style-name"/>
 									</xsl:call-template>
 								</xsl:attribute>
 							</w:numId>
@@ -313,62 +321,84 @@
 		</w:t>
 	</xsl:template>
 
-	<!-- @TODO  positioning text-boxes -->
-	<xsl:template match="draw:frame" mode="paragraph">
-		<xsl:for-each select="descendant::draw:text-box">
-			<w:r>
-				<w:rPr>
-					<w:rStyle w:val="{@text:style-name}"/>
-				</w:rPr>
-				<w:pict>
-					<v:shapetype/>
-					<v:shape type="#_x0000_t202">
-						<xsl:variable name="frameW">
-							<xsl:call-template name="point-measure">
-								<xsl:with-param name="length" select="parent::draw:frame/@svg:width"
-								/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:variable name="frameH">
-							<xsl:call-template name="point-measure">
-								<xsl:with-param name="length" select="@fo:min-height"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:variable name="marginL">
-							<xsl:call-template name="point-measure">
-								<xsl:with-param name="length" select="parent::draw:frame/@svg:x"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:variable name="marginT">
-							<xsl:call-template name="point-measure">
-								<xsl:with-param name="length" select="parent::draw:frame/@svg:y"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:variable name="zIndex">
-							<xsl:value-of select="parent::draw:frame/@draw:z-index"/>
-						</xsl:variable>
-						<xsl:attribute name="style">
-							<xsl:value-of select="'position:absolute;'"/>
-							<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
-							<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
-							<xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
-							<xsl:value-of select="concat('margin-left:',$marginL,'pt;')"/>
-							<xsl:value-of select="concat('margin-top:',$marginT,'pt;')"/>
+	<xsl:template match="draw:text-box">
+		<w:r>
+			<w:rPr>
+				<w:rStyle w:val="{parent::draw:frame/@draw:style-name}"/>
+			</w:rPr>
+			<w:pict>
+				<v:shapetype/>
+				<v:shape type="#_x0000_t202">
+					<xsl:variable name="frameW">
+						<xsl:call-template name="point-measure">
+							<xsl:with-param name="length"
+								select="parent::draw:frame/@svg:width|parent::draw:frame/@fo:min-width"
+							/>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:variable name="frameH">
+						<xsl:call-template name="point-measure">
+							<xsl:with-param name="length" select="@fo:min-height"/>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:variable name="marginL">
+						<xsl:call-template name="point-measure">
+							<xsl:with-param name="length" select="parent::draw:frame/@svg:x"/>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:variable name="marginT">
+						<xsl:call-template name="point-measure">
+							<xsl:with-param name="length" select="parent::draw:frame/@svg:y"/>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:variable name="zIndex">
+						<xsl:value-of select="parent::draw:frame/@draw:z-index"/>
+					</xsl:variable>
+					<xsl:attribute name="style">
+						<xsl:value-of select="'position:absolute;'"/>
+						<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
+						<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
+						<xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
+						<xsl:value-of select="concat('margin-left:',$marginL,'pt;')"/>
+						<xsl:value-of select="concat('margin-top:',$marginT,'pt;')"/>
+					</xsl:attribute>
+					<xsl:if
+						test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:background-color">
+						<xsl:attribute name="fillcolor">
+							<xsl:value-of
+								select="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:background-color"
+							/>
 						</xsl:attribute>
-						<v:textbox>
-							<w:txbxContent>
-								<w:p>
-									<w:r>
-										<xsl:apply-templates select="descendant::text()[last()]"
-											mode="text"/>
-									</w:r>
-								</w:p>
-							</w:txbxContent>
-						</v:textbox>
-					</v:shape>
-				</w:pict>
-			</w:r>
-		</xsl:for-each>
+					</xsl:if>
+					<v:textbox>
+						<w:txbxContent>
+							<xsl:for-each select="child::node()">
+								<xsl:apply-templates select="."/>
+							</xsl:for-each>
+						</w:txbxContent>
+					</v:textbox>
+				</v:shape>
+			</w:pict>
+		</w:r>
+	</xsl:template>
+	
+	
+	<!-- @TODO  positioning text-boxes -->
+	<xsl:template match="draw:frame">
+		<xsl:choose>
+			<xsl:when test="not(parent::text:p)">
+				<w:p>
+					<xsl:for-each select="descendant::draw:text-box">
+						<xsl:apply-templates select="."/>
+					</xsl:for-each>
+				</w:p>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:for-each select="descendant::draw:text-box">
+					<xsl:apply-templates select="."/>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<!-- lists -->
@@ -392,7 +422,8 @@
 							<w:numId>
 								<xsl:attribute name="w:val">
 									<xsl:call-template name="numberingId">
-										<xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
+										<xsl:with-param name="styleName"
+											select="ancestor::text:list/@text:style-name"/>
 									</xsl:call-template>
 								</xsl:attribute>
 							</w:numId>
@@ -748,7 +779,8 @@
 							<w:cantSplit/>
 						</xsl:if>
 					</w:trPr>
-					<xsl:apply-templates select="table:table-cell[position() &lt; 64]|table:covered-table-cell">
+					<xsl:apply-templates
+						select="table:table-cell[position() &lt; 64]|table:covered-table-cell">
 						<xsl:with-param name="colsNumber" select="count(table:table-cell)"/>
 					</xsl:apply-templates>
 				</w:tr>
@@ -756,26 +788,28 @@
 		</xsl:choose>
 	</xsl:template>
 
-	
-	
+
+
 	<!-- this fragment sum up width of a column in case of merged columns -->
 	<xsl:template name="cellWidthCount">
-		<xsl:param name="cellSpanned" />
-		<xsl:param name="col" />
+		<xsl:param name="cellSpanned"/>
+		<xsl:param name="col"/>
 		<xsl:variable name="table" select="ancestor::table:table[1]"/>
 		<xsl:choose>
 			<xsl:when test="$cellSpanned &gt; 1">
 				<xsl:variable name="recursive_result">
 					<xsl:call-template name="cellWidthCount">
 						<xsl:with-param name="cellSpanned" select="$cellSpanned -1"/>
-						<xsl:with-param name="col" select="$col+1" />
+						<xsl:with-param name="col" select="$col+1"/>
 					</xsl:call-template>
 				</xsl:variable>
 				<xsl:variable name="colStyle"
 					select="$table/table:table-column[position() = $col]/@table:style-name"/>
 				<xsl:variable name="width">
 					<xsl:call-template name="twips-measure">
-						<xsl:with-param name="length" select="key('style', $colStyle)/style:table-column-properties/@style:column-width"/>
+						<xsl:with-param name="length"
+							select="key('style', $colStyle)/style:table-column-properties/@style:column-width"
+						/>
 					</xsl:call-template>
 				</xsl:variable>
 				<xsl:value-of select="$width + $recursive_result"/>
@@ -784,15 +818,17 @@
 				<xsl:variable name="colStyle"
 					select="$table/table:table-column[position() = $col]/@table:style-name"/>
 				<xsl:call-template name="twips-measure">
-					<xsl:with-param name="length" select="key('style', $colStyle)/style:table-column-properties/@style:column-width"/>
+					<xsl:with-param name="length"
+						select="key('style', $colStyle)/style:table-column-properties/@style:column-width"
+					/>
 				</xsl:call-template>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
+
 	<xsl:template name="cellWidth">
 		<xsl:param name="col"/>
-		<xsl:variable name="cellSpanned"> 
+		<xsl:variable name="cellSpanned">
 			<xsl:choose>
 				<xsl:when test="@table:number-columns-spanned">
 					<xsl:value-of select="@table:number-columns-spanned"/>
@@ -802,17 +838,17 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		
+
 		<xsl:variable name="width">
 			<xsl:call-template name="cellWidthCount">
-				<xsl:with-param name="cellSpanned"  select="$cellSpanned"/>
-				<xsl:with-param name="col" select="$col" />
+				<xsl:with-param name="cellSpanned" select="$cellSpanned"/>
+				<xsl:with-param name="col" select="$col"/>
 			</xsl:call-template>
 		</xsl:variable>
-		
+
 		<w:tcW w:type="{$type}">
 			<xsl:attribute name="w:w">
-				<xsl:value-of select="$width" />
+				<xsl:value-of select="$width"/>
 			</xsl:attribute>
 		</w:tcW>
 	</xsl:template>
@@ -1280,13 +1316,11 @@
 
 	<!-- ignored -->
 	<xsl:template match="text()"/>
-	
+
 	<!-- odt section -->
 	<xsl:template match="text:section">
 		<xsl:choose>
-			<xsl:when test="@text:display='none'">
-				
-			</xsl:when>
+			<xsl:when test="@text:display='none'"> </xsl:when>
 			<xsl:otherwise>
 				<xsl:apply-templates/>
 			</xsl:otherwise>
