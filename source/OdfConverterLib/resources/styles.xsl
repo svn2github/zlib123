@@ -470,9 +470,17 @@
 					<xsl:for-each select="style:tab-stops/style:tab-stop">
 						<w:tab>
 							<xsl:attribute name="w:pos">
-								<xsl:call-template name="twips-measure">
-									<xsl:with-param name="length" select="@style:position"/>
-								</xsl:call-template>
+								<xsl:variable name="position">
+									<xsl:call-template name="twips-measure">
+										<xsl:with-param name="length" select="ancestor::style:paragraph-properties/@fo:margin-left"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<xsl:variable name="position2">
+									<xsl:call-template name="twips-measure">
+										<xsl:with-param name="length" select="@style:position"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<xsl:value-of select="$position+$position2"/>
 							</xsl:attribute>
 							<xsl:if test="@style:type">
 								<xsl:attribute name="w:val">
@@ -481,7 +489,7 @@
 							</xsl:if>
 							<!-- Default value -->
 							<xsl:if test="not(@style:type)">
-								<xsl:attribute name="w:val">clear</xsl:attribute>
+								<xsl:attribute name="w:val">left</xsl:attribute>
 							</xsl:if>
 							<xsl:attribute name="w:leader">
 								<xsl:choose>
