@@ -26,57 +26,83 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0"
-		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-		xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-                	xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-		xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-		xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"  
-		xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-		exclude-result-prefixes="office text style fo">
-	
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+	xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+	xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+	xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+	exclude-result-prefixes="office text style fo">
+
 	<xsl:output method="xml" encoding="UTF-8"/>
-	
+
 	<xsl:key name="list-style" match="text:list-style" use="@style:name"/>
 	<xsl:key name="list-content" match="text:list" use="@text:style-name"/>
-	
+
+	<xsl:variable name="automaticListStylesCount"
+		select="count(/office:document-content/office:automatic-styles/text:list-style)"/>
+
+
 	<xsl:template name="numbering">
 		<w:numbering>
-			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:outline-style" mode="numbering"/>
-			<xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style" mode="numbering"/>
-			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:outline-style" mode="num"/>
-			<xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style" mode="num"/>
+			<xsl:apply-templates
+				select="document('styles.xml')/office:document-styles/office:styles/text:outline-style"
+				mode="numbering"/>
+			<xsl:apply-templates
+				select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style"
+				mode="numbering"/>
+			<xsl:apply-templates
+				select="document('styles.xml')/office:document-styles/office:styles/text:list-style"
+				mode="numbering">
+				<xsl:with-param name="offset" select="$automaticListStylesCount"/>
+			</xsl:apply-templates>
+
+			<xsl:apply-templates
+				select="document('styles.xml')/office:document-styles/office:styles/text:outline-style"
+				mode="num"/>
+			<xsl:apply-templates
+				select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style"
+				mode="num"/>
+			<xsl:apply-templates
+				select="document('styles.xml')/office:document-styles/office:styles/text:list-style"
+				mode="num">
+				<xsl:with-param name="offset" select="$automaticListStylesCount"/>
+			</xsl:apply-templates>
 		</w:numbering>
-	</xsl:template> 
-	
+	</xsl:template>
+
 	<xsl:template match="text:list-style" mode="numbering">
-		<w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list-style)+2}">
-			<xsl:apply-templates select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image" mode="numbering"/>
+		<xsl:param name="offset" select="0"/>
+		<w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list-style)+2+$offset}">
+			<xsl:apply-templates
+				select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+				mode="numbering"/>
 		</w:abstractNum>
 	</xsl:template>
 
 	<xsl:template match="text:list-style" mode="num">
-		<w:num w:numId="{count(preceding-sibling::text:list-style)+2}">
-			<w:abstractNumId w:val="{count(preceding-sibling::text:list-style)+2}"/>
+		<xsl:param name="offset" select="0"/>
+		<w:num w:numId="{count(preceding-sibling::text:list-style)+2+$offset}">
+			<w:abstractNumId w:val="{count(preceding-sibling::text:list-style)+2+$offset}"/>
 		</w:num>
 	</xsl:template>
-	
+
 	<xsl:template match="text:list-level-style-bullet|text:list-level-style-number" mode="numbering">
 		<xsl:if test="number(@text:level) &lt; 10">
 			<w:lvl w:ilvl="{number(@text:level) - 1}">
 				<xsl:if test="name() = 'text:list-level-style-bullet' ">
-			    		<w:numFmt w:val="bullet"/>
-			    		<w:lvlText w:val="{@text:bullet-char}">
-			    		<xsl:attribute name="w:val">
-			    			<xsl:choose>
-			    				<xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
-			    				<xsl:when test="@text:bullet-char = '' "></xsl:when>
-			    				<xsl:when test="@text:bullet-char = '➢' ">➢</xsl:when>
-			    				<xsl:when test="@text:bullet-char = '✔' ">✔</xsl:when>
-			    				<xsl:otherwise>•</xsl:otherwise>
-			    			</xsl:choose>
-			    		</xsl:attribute>
-			    		</w:lvlText>
+					<w:numFmt w:val="bullet"/>
+					<w:lvlText w:val="{@text:bullet-char}">
+						<xsl:attribute name="w:val">
+							<xsl:choose>
+								<xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
+								<xsl:when test="@text:bullet-char = '' "></xsl:when>
+								<xsl:when test="@text:bullet-char = '➢' ">➢</xsl:when>
+								<xsl:when test="@text:bullet-char = '✔' ">✔</xsl:when>
+								<xsl:otherwise>•</xsl:otherwise>
+							</xsl:choose>
+						</xsl:attribute>
+					</w:lvlText>
 				</xsl:if>
 				<xsl:if test="name() = 'text:list-level-style-number' ">
 					<xsl:choose>
@@ -99,21 +125,24 @@
 					<!-- xsl:if test="ancestor::text:list-style/@text:consecutive-numbering = 'true' ">
 						<w:lvlRestart w:val="1"/>
 						</xsl:if -->
-					<w:lvlText>	
+					<w:lvlText>
 						<xsl:attribute name="w:val">
 							<xsl:choose>
-								<xsl:when test="@style:num-format = '' "></xsl:when>
+								<xsl:when test="@style:num-format = '' "/>
 								<xsl:otherwise>
 									<xsl:value-of select="@style:num-prefix"/>
 									<xsl:choose>
 										<xsl:when test="@text:display-levels">
 											<xsl:call-template name="display-levels">
-												<xsl:with-param name="dlvl" select="@text:display-levels"/>
+												<xsl:with-param name="dlvl"
+												select="@text:display-levels"/>
 												<xsl:with-param name="lvl" select="@text:level"/>
-												<xsl:with-param name="listStyleName" select="ancestor::text:list-style/@style:name"/>
+												<xsl:with-param name="listStyleName"
+												select="ancestor::text:list-style/@style:name"/>
 											</xsl:call-template>
 										</xsl:when>
-										<xsl:otherwise>%<xsl:value-of select="@text:level"/></xsl:otherwise>
+										<xsl:otherwise>%<xsl:value-of select="@text:level"
+										/></xsl:otherwise>
 									</xsl:choose>
 									<xsl:value-of select="@style:num-suffix"/>
 								</xsl:otherwise>
@@ -121,23 +150,26 @@
 						</xsl:attribute>
 					</w:lvlText>
 				</xsl:if>
-					
+
 				<w:lvlJc>
 					<xsl:attribute name="w:val">
 						<xsl:call-template name="text-align">
-							<xsl:with-param name="align" select="style:list-level-properties/@fo:text-align"/>
+							<xsl:with-param name="align"
+								select="style:list-level-properties/@fo:text-align"/>
 						</xsl:call-template>
 					</xsl:attribute>
 				</w:lvlJc>
 				<w:pPr>
 					<xsl:variable name="spaceBeforeTwip">
 						<xsl:call-template name="twips-measure">
-							<xsl:with-param name="length" select="style:list-level-properties/@text:space-before"/>
+							<xsl:with-param name="length"
+								select="style:list-level-properties/@text:space-before"/>
 						</xsl:call-template>
 					</xsl:variable>
 					<xsl:variable name="minLabelWidthTwip">
 						<xsl:call-template name="twips-measure">
-							<xsl:with-param name="length" select="style:list-level-properties/@text:min-label-width"/>
+							<xsl:with-param name="length"
+								select="style:list-level-properties/@text:min-label-width"/>
 						</xsl:call-template>
 					</xsl:variable>
 					<!-- xsl:if test="style:list-level-properties/@text:space-before"> 
@@ -145,15 +177,16 @@
 						<w:tab w:val="num" w:pos="{$spaceBeforeTwip}"/>
 						</w:tabs>
 						</xsl:if -->
-					<w:ind>	
+					<w:ind>
 						<xsl:if test="style:list-level-properties/@text:space-before">
-							<xsl:attribute name="w:left">  <!-- Margin to the text  distance -->
+							<xsl:attribute name="w:left">
+								<!-- Margin to the text  distance -->
 								<xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
 							</xsl:attribute>
 						</xsl:if>
 						<xsl:if test="style:list-level-properties/@text:min-label-width">
 							<!--Text to numbering distance to be retrieved -->
-							<xsl:attribute name="w:hanging"> 
+							<xsl:attribute name="w:hanging">
 								<xsl:value-of select="$minLabelWidthTwip"/>
 							</xsl:attribute>
 						</xsl:if>
@@ -163,8 +196,8 @@
 		</xsl:if>
 
 	</xsl:template>
-	
-	
+
+
 	<!--
 		function    : num-format
 		param       : format (string)
@@ -181,8 +214,8 @@
 			<xsl:otherwise>decimal</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
-	
+
+
 	<xsl:template name="text-align">
 		<xsl:param name="align"/>
 		<xsl:choose>
@@ -192,8 +225,8 @@
 			<xsl:otherwise>left</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
-	
+
+
 	<!-- Generate the format string for multiple levels -->
 	<xsl:template name="display-levels">
 		<xsl:param name="dlvl"/>
@@ -206,7 +239,8 @@
 				<xsl:with-param name="listStyleName" select="$listStyleName"/>
 			</xsl:call-template>
 			<!-- levels with no formatting are not displayed -->
-			<xsl:if test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $lvl]/@style:num-format != '' ">
+			<xsl:if
+				test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $lvl]/@style:num-format != '' ">
 				<xsl:if test="$dlvl &gt; 1">.</xsl:if>%<xsl:value-of select="$lvl"/>
 			</xsl:if>
 		</xsl:if>
@@ -214,9 +248,9 @@
 	<xsl:template match="text:outline-style" mode="num">
 		<w:num w:numId="1">
 			<w:abstractNumId w:val="1"/>
-		</w:num>	
+		</w:num>
 	</xsl:template>
-	
+
 	<xsl:template match="text:outline-style" mode="numbering">
 		<w:abstractNum w:abstractNumId="1">
 			<xsl:for-each select="text:outline-level-style[@text:level &lt; 10]">
@@ -233,28 +267,28 @@
 						</w:numFmt>
 						<!-- <w:pStyle w:val="{concat('Heading',number(@text:level)-1)}"/> -->
 						<w:lvlText>
-						
+
 							<xsl:attribute name="w:val">
 								<xsl:call-template name="text-format">
 									<xsl:with-param name="level" select="@text:level"/>
-								</xsl:call-template> 
+								</xsl:call-template>
 							</xsl:attribute>
 						</w:lvlText>
 						<w:lvlJc w:val="left"/>
 						<w:pPr>
 							<w:ind/>
 						</w:pPr>
-					</w:lvl>	
+					</w:lvl>
 				</xsl:if>
-			</xsl:for-each> 
+			</xsl:for-each>
 
-		
+
 		</w:abstractNum>
 	</xsl:template>
-<!--	<xsl:template match="text:outline-level-style">
+	<!--	<xsl:template match="text:outline-level-style">
 		
 	</xsl:template> -->
-	
+
 	<xsl:template name="text-format">
 		<xsl:param name="level"/>
 		<xsl:choose>
@@ -271,5 +305,23 @@
 		</xsl:choose>
 	</xsl:template>
 
-	
+	<xsl:template name="numberingId">
+		<xsl:param name="styleName"/>
+		<xsl:choose>
+			<!-- first, look for this list style into content.xml -->
+			<xsl:when test="key('list-style', $styleName)">
+				<xsl:value-of
+					select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2"/>
+			</xsl:when>
+			<!-- otherwise, look into styles.xml (add the offset) -->
+			<xsl:otherwise>
+				<xsl:for-each select="document('styles.xml')">
+					<xsl:value-of
+						select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2+$automaticListStylesCount"/>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+
 </xsl:stylesheet>

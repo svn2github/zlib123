@@ -206,10 +206,13 @@
 						<w:pStyle w:val="{@text:style-name}"/>
 						<w:numPr>
 							<w:ilvl w:val="{$level}"/>
-							<xsl:variable name="id" select="ancestor::text:list/@text:style-name"/>
-							<w:numId
-								w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+2}"
-							/>
+							<w:numId>
+								<xsl:attribute name="w:val">
+									<xsl:call-template name="numberingId">
+										<xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</w:numId>
 						</w:numPr>
 					</w:pPr>
 					<xsl:apply-templates mode="paragraph"/>
@@ -386,10 +389,13 @@
 						<w:pStyle w:val="{*[1][self::text:p]/@text:style-name}"/>
 						<w:numPr>
 							<w:ilvl w:val="{$level}"/>
-							<xsl:variable name="id" select="ancestor::text:list/@text:style-name"/>
-							<w:numId
-								w:val="{count(key('list-style',$id)/preceding-sibling::text:list-style)+2}"
-							/>
+							<w:numId>
+								<xsl:attribute name="w:val">
+									<xsl:call-template name="numberingId">
+										<xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</w:numId>
 						</w:numPr>
 
 					</w:pPr>
