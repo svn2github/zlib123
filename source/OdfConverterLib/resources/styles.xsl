@@ -857,9 +857,17 @@
 			<xsl:if test="@fo:letter-spacing">
 				<w:spacing>
 					<xsl:attribute name="w:val">
-						<xsl:call-template name="twips-measure">
-							<xsl:with-param name="length" select="@fo:letter-spacing"/>
-						</xsl:call-template>
+						<xsl:choose>
+							<xsl:when test="@fo:letter-spacing='normal'">
+								<xsl:value-of select="0"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="@fo:letter-spacing"/>
+								</xsl:call-template>		
+							</xsl:otherwise>						
+						</xsl:choose>
+						
 					</xsl:attribute>
 				</w:spacing>
 			</xsl:if>
