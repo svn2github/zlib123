@@ -15,44 +15,20 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_141334F871E7C05F6FFBA63BA4F25995"
+        "MsmKey" = "8:_27D570E6C05776C47FA4AC33B86D4F33"
+        "OwnerKey" = "8:_AD3AE0A4594963341F0E2B3CAB108BB0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_27D570E6C05776C47FA4AC33B86D4F33"
         "OwnerKey" = "8:_628611BC373C4E1994798F3FEF66CF83"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_4593738E3C0E76C332558E4A58188217"
-        "OwnerKey" = "8:_628611BC373C4E1994798F3FEF66CF83"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_4593738E3C0E76C332558E4A58188217"
-        "OwnerKey" = "8:_8F17308CA2D3F7A4C2C3F7490DF70D45"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_4593738E3C0E76C332558E4A58188217"
-        "OwnerKey" = "8:_F600FBDA4B1CA3A3E176AA01F860791A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_46279AE063064C9D86B1094DB16BFF68"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5A475EDBA660D824B5458B6B04FED4CB"
-        "OwnerKey" = "8:_BA5F0F2556338FF252D227488F48A987"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5A475EDBA660D824B5458B6B04FED4CB"
-        "OwnerKey" = "8:_628611BC373C4E1994798F3FEF66CF83"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -69,20 +45,20 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_8F17308CA2D3F7A4C2C3F7490DF70D45"
+        "MsmKey" = "8:_898840751ADC390E50F62D94ECFFD2BB"
         "OwnerKey" = "8:_628611BC373C4E1994798F3FEF66CF83"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_BA5F0F2556338FF252D227488F48A987"
+        "MsmKey" = "8:_AD3AE0A4594963341F0E2B3CAB108BB0"
         "OwnerKey" = "8:_628611BC373C4E1994798F3FEF66CF83"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_BA5F0F2556338FF252D227488F48A987"
-        "OwnerKey" = "8:_141334F871E7C05F6FFBA63BA4F25995"
+        "MsmKey" = "8:_DD4B0621C1530F0E9B91027688E41B9C"
+        "OwnerKey" = "8:_898840751ADC390E50F62D94ECFFD2BB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -93,36 +69,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_F600FBDA4B1CA3A3E176AA01F860791A"
-        "OwnerKey" = "8:_8F17308CA2D3F7A4C2C3F7490DF70D45"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F600FBDA4B1CA3A3E176AA01F860791A"
-        "OwnerKey" = "8:_628611BC373C4E1994798F3FEF66CF83"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4593738E3C0E76C332558E4A58188217"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F600FBDA4B1CA3A3E176AA01F860791A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8F17308CA2D3F7A4C2C3F7490DF70D45"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_628611BC373C4E1994798F3FEF66CF83"
         "MsmSig" = "8:_UNDEFINED"
@@ -130,19 +76,25 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_141334F871E7C05F6FFBA63BA4F25995"
+        "OwnerKey" = "8:_898840751ADC390E50F62D94ECFFD2BB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_BA5F0F2556338FF252D227488F48A987"
+        "OwnerKey" = "8:_DD4B0621C1530F0E9B91027688E41B9C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5A475EDBA660D824B5458B6B04FED4CB"
+        "OwnerKey" = "8:_AD3AE0A4594963341F0E2B3CAB108BB0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_27D570E6C05776C47FA4AC33B86D4F33"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -204,6 +156,16 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Net.Framework.2.0"
+                    {
+                    "Name" = "8:.NET Framework 2.0"
+                    "ProductCode" = "8:Microsoft.Net.Framework.2.0"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.OtkLoader.2.0"
+                    {
+                    "Name" = "8:Shared Add-in Support Update for Microsoft .NET Framework 2.0 (KB908002)"
+                    "ProductCode" = "8:Microsoft.OtkLoader.2.0"
+                    }
                 }
             }
         }
@@ -235,96 +197,14 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_141334F871E7C05F6FFBA63BA4F25995"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_27D570E6C05776C47FA4AC33B86D4F33"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfWordAddinLib, Version=0.2.2397.29113, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=0.2.2412.30620, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_141334F871E7C05F6FFBA63BA4F25995"
-                    {
-                    "Name" = "8:OdfWordAddinLib.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:OdfWordAddinLib.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_8BAD6FD173D14CB2A38B853589E745B4"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4593738E3C0E76C332558E4A58188217"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:TRUE"
-            "AssemblyAsmDisplayName" = "8:office, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
-                "ScatterAssemblies"
-                {
-                    "_4593738E3C0E76C332558E4A58188217"
-                    {
-                    "Name" = "8:office.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:office.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_8BAD6FD173D14CB2A38B853589E745B4"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_46279AE063064C9D86B1094DB16BFF68"
-            {
-            "SourcePath" = "8:README.txt"
-            "TargetName" = "8:README.txt"
-            "Tag" = "8:"
-            "Folder" = "8:_8BAD6FD173D14CB2A38B853589E745B4"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5A475EDBA660D824B5458B6B04FED4CB"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=0.2.2397.29112, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_5A475EDBA660D824B5458B6B04FED4CB"
+                    "_27D570E6C05776C47FA4AC33B86D4F33"
                     {
                     "Name" = "8:OdfZipUtils.dll"
                     "Attributes" = "3:512"
@@ -348,6 +228,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_46279AE063064C9D86B1094DB16BFF68"
+            {
+            "SourcePath" = "8:README.txt"
+            "TargetName" = "8:README.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_8BAD6FD173D14CB2A38B853589E745B4"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_756F04230FCE414DB116AE2A3D859B05"
             {
             "SourcePath" = "8:README.rtf"
@@ -368,20 +268,20 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8F17308CA2D3F7A4C2C3F7490DF70D45"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_898840751ADC390E50F62D94ECFFD2BB"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:TRUE"
-            "AssemblyAsmDisplayName" = "8:Microsoft.Office.Interop.Word, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
+            "AssemblyAsmDisplayName" = "8:Microsoft.Vbe.Interop, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
                 "ScatterAssemblies"
                 {
-                    "_8F17308CA2D3F7A4C2C3F7490DF70D45"
+                    "_898840751ADC390E50F62D94ECFFD2BB"
                     {
-                    "Name" = "8:Microsoft.Office.Interop.Word.dll"
+                    "Name" = "8:Microsoft.Vbe.Interop.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:Microsoft.Office.Interop.Word.dll"
+            "SourcePath" = "8:Microsoft.Vbe.Interop.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8BAD6FD173D14CB2A38B853589E745B4"
@@ -399,14 +299,14 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BA5F0F2556338FF252D227488F48A987"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_AD3AE0A4594963341F0E2B3CAB108BB0"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=0.2.2397.29112, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=0.2.2412.30621, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_BA5F0F2556338FF252D227488F48A987"
+                    "_AD3AE0A4594963341F0E2B3CAB108BB0"
                     {
                     "Name" = "8:OdfConverterLib.dll"
                     "Attributes" = "3:512"
@@ -430,6 +330,37 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_DD4B0621C1530F0E9B91027688E41B9C"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:TRUE"
+            "AssemblyAsmDisplayName" = "8:office, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
+                "ScatterAssemblies"
+                {
+                    "_DD4B0621C1530F0E9B91027688E41B9C"
+                    {
+                    "Name" = "8:office.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:office.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_8BAD6FD173D14CB2A38B853589E745B4"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E25C948C9ABC496AA7FB2918DB05E315"
             {
             "SourcePath" = "8:..\\..\\..\\lib\\zlibwapi.dll"
@@ -448,37 +379,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F600FBDA4B1CA3A3E176AA01F860791A"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:TRUE"
-            "AssemblyAsmDisplayName" = "8:Microsoft.Vbe.Interop, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
-                "ScatterAssemblies"
-                {
-                    "_F600FBDA4B1CA3A3E176AA01F860791A"
-                    {
-                    "Name" = "8:Microsoft.Vbe.Interop.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Microsoft.Vbe.Interop.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_8BAD6FD173D14CB2A38B853589E745B4"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
         }
@@ -1228,7 +1128,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_628611BC373C4E1994798F3FEF66CF83"
             {
-            "SourcePath" = "8:..\\obj\\Debug\\OdfWord2003Addin.dll"
+            "SourcePath" = "8:..\\obj\\Release\\OdfWord2003Addin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8BAD6FD173D14CB2A38B853589E745B4"
@@ -1254,9 +1154,6 @@
                 {
                 }
             }
-        }
-        "VJSharpPlugin"
-        {
         }
     }
 }
