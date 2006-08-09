@@ -191,7 +191,7 @@
 								<w:pStyle w:val="{@text:style-name}"/>
 							</w:pPr>
 							<xsl:choose>
-								<xsl:when test="child::draw:frame and not(parent::draw:text-box)">
+								<xsl:when test="child::draw:frame and not(parent::draw:text-box) and not(child::draw:frame/child::draw:image)">
 									<xsl:apply-templates select="draw:frame"/>
 								</xsl:when>
 								<xsl:otherwise>
@@ -361,6 +361,12 @@
 						<xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
 						<xsl:value-of select="concat('margin-left:',$marginL,'pt;')"/>
 						<xsl:value-of select="concat('margin-top:',$marginT,'pt;')"/>
+						<xsl:if
+							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos">
+							<xsl:value-of
+								select="concat('mso-position-horizontal:', key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos,';')"
+							/>
+						</xsl:if>
 					</xsl:attribute>
 					<xsl:if
 						test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:background-color">
