@@ -31,3 +31,9 @@ OdfConverterTest Usage
 	/V                 Validate the result of the transformation against OpenXML schemas
 	/DEBUG             Debug mode
 	/XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)
+
+
+Known Issues
+------------
+
+	The OdfConverterTest command line tool only works on local drives.
