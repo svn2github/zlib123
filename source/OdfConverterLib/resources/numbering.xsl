@@ -92,15 +92,9 @@
 			<w:lvl w:ilvl="{number(@text:level) - 1}">
 				<xsl:if test="name() = 'text:list-level-style-bullet' ">
 					<w:numFmt w:val="bullet"/>
-					<w:lvlText w:val="{@text:bullet-char}">
+					<w:lvlText w:val="{@text:bullet-char}">						
 						<xsl:attribute name="w:val">
-							<xsl:choose>
-								<xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
-								<xsl:when test="@text:bullet-char = '' "></xsl:when>
-								<xsl:when test="@text:bullet-char = '➢' ">➢</xsl:when>
-								<xsl:when test="@text:bullet-char = '✔' ">✔</xsl:when>
-								<xsl:otherwise>•</xsl:otherwise>
-							</xsl:choose>
+							<xsl:call-template name="textChar"/>
 						</xsl:attribute>
 					</w:lvlText>
 				</xsl:if>
@@ -199,11 +193,67 @@
 						
 					</w:ind>
 				</w:pPr>
+				<xsl:call-template name="bulletType">					
+					<xsl:with-param name="char">
+						<xsl:call-template name="textChar"/>
+					</xsl:with-param>
+				</xsl:call-template>
 			</w:lvl>
 		</xsl:if>
 
 	</xsl:template>
 
+	<xsl:template name="textChar">
+		<xsl:choose>
+			<xsl:when test="@text:bullet-char = '' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
+			<xsl:when test="@text:bullet-char = '●' "></xsl:when>											
+			<xsl:when test="@text:bullet-char = '➢' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '✔' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '■' ">■</xsl:when>
+			<xsl:when test="@text:bullet-char = '○' ">o</xsl:when>
+			<xsl:when test="@text:bullet-char = '➔' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '✗' "></xsl:when>							
+			<xsl:otherwise>•</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="bulletType">
+		<xsl:param name="char"/>
+		<xsl:choose>			
+			<xsl:when test="$char = ''  or  $char = '' or  $char = ''  or  $char = ' ✗'  or $char='■' ">
+				<w:rPr>
+					<w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>
+				</w:rPr>
+			</xsl:when>			
+			
+			<xsl:when test="$char = '' ">
+				<w:rPr>
+					<w:rFonts w:ascii="Wingdings 3" w:hAnsi="Wingdings 3" w:hint="default"/>
+				</w:rPr>
+			</xsl:when>			
+			
+			<xsl:when test="$char = '' ">
+				<w:rPr>
+					<w:rFonts w:ascii="Wingdings 2" w:hAnsi="Wingdings 2" w:hint="default"/>
+				</w:rPr>
+			</xsl:when>			
+			
+			<xsl:when test="$char  = '○' ">
+				<w:rPr>
+					<w:rFonts w:ascii="Courier New" w:hAnsi="Courier New" w:cs="Courier New"
+						w:hint="default"/>
+				</w:rPr>
+			</xsl:when>
+			<xsl:when test="$char  = '' ">
+				<w:rPr>
+					<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>
+				</w:rPr>
+			</xsl:when>
+			
+			<xsl:otherwise></xsl:otherwise>
+		</xsl:choose>				
+	</xsl:template>	
 
 	<!--
 		function    : num-format
