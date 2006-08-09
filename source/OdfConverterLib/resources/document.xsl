@@ -1156,6 +1156,10 @@
 	</xsl:template>
 
 	<xsl:template name="text" match="text()" mode="text">
+		
+		<xsl:if test="preceding-sibling::text:s[1]">
+			<w:t xml:space="preserve"><xsl:call-template name="extra-spaces"><xsl:with-param name="spaces" select="preceding-sibling::text:s[1]/@text:c"/></xsl:call-template></w:t>
+		</xsl:if>
 		<w:t>
 			<xsl:attribute name="xml:space">preserve</xsl:attribute>
 			<xsl:value-of select="."/>
