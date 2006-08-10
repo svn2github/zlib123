@@ -35,4 +35,4 @@ If you don't see the ODF entry, it could be due to missing features in Word (see
 
 * Click "Word Options" in the File menu
 * In the "Add-ins" section, select "COM Add-ins" in the list box and press the "Go" button
-* Make sure to select the chec
+* Make sure to select the checkbox "ODF Word 2007 Add-in" and validate with the "OK" button.
