@@ -1156,29 +1156,29 @@
 
 	<!-- text and spaces -->
 
-	<xsl:template match="text()" mode="paragraph">
+	<xsl:template match="text()|text:s" mode="paragraph">
 		<w:r>
 			<xsl:apply-templates select="." mode="text"/>
 		</w:r>
 
 	</xsl:template>
 
-	<xsl:template name="text" match="text()" mode="text">
+	<xsl:template name="text" match="text()|text:s" mode="text">
 
-		<xsl:if test="preceding-sibling::text:s[1]">
-			<w:t xml:space="preserve"><xsl:call-template name="extra-spaces"><xsl:with-param name="spaces" select="preceding-sibling::text:s[1]/@text:c"/></xsl:call-template></w:t>
-		</xsl:if>
-		<w:t>
-			<xsl:attribute name="xml:space">preserve</xsl:attribute>
-			<xsl:value-of select="."/>
+		<xsl:choose>
 
-			<!-- extra-spaces inclusion -->
-			<xsl:if test="following-sibling::text:s[1]">
-				<xsl:call-template name="extra-spaces">
-					<xsl:with-param name="spaces" select="following-sibling::text:s[1]/@text:c"/>
-				</xsl:call-template>
-			</xsl:if>
-		</w:t>
+			<xsl:when test="name()='text:s'">
+				<w:t xml:space="preserve"><xsl:call-template name="extra-spaces"><xsl:with-param name="spaces" select="@text:c"/></xsl:call-template></w:t>
+			</xsl:when>
+			<xsl:otherwise>
+				<w:t>
+				<xsl:attribute name="xml:space">preserve</xsl:attribute>
+				<xsl:value-of select="."/>
+
+				</w:t>
+			</xsl:otherwise>
+		</xsl:choose>
+
 
 	</xsl:template>
 
