@@ -436,7 +436,56 @@
 								</xsl:attribute>
 							</w:numId>
 						</w:numPr>
-
+						
+						<!-- override abstract num indent  if paragraph has margin defined @TODO firstline indent-->
+						<xsl:variable name="styleName" select="*[1][self::text:p]/@text:style-name" />
+						<xsl:variable name="parentStyleName" select="key('style',$styleName)/@style:parent-style-name" />
+						<xsl:variable name="listStyleName" select="key('style',$styleName)/@style:list-style-name"/>
+					
+						<xsl:variable name="paragraphMargin">
+							<xsl:choose>
+								<xsl:when test="key('style',$styleName)/paragraph-properties/@fo:left-margin">
+									<xsl:call-template name="twips-measure">
+										<xsl:with-param name="length" select="key('style',$styleName)/style:paragraph-properties/@fo:left-margin"/>
+									</xsl:call-template>
+								</xsl:when>
+								<xsl:when test="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left">
+									<xsl:call-template name="twips-measure">
+										<xsl:with-param name="length" select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left"/>
+									</xsl:call-template>
+								</xsl:when>
+								
+								<xsl:otherwise>0</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+						
+						<xsl:variable name="minLabelWidthTwip">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-width"/>
+							</xsl:call-template>
+							
+						</xsl:variable>
+						
+						<xsl:variable name="spaceBeforeTwip">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length" select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:space-before"/>
+							</xsl:call-template>
+						</xsl:variable>
+						
+						<w:ind>
+							<xsl:if test="$paragraphMargin != 0">
+								
+								<xsl:attribute name="w:left">
+									<xsl:value-of select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"/>
+								</xsl:attribute>
+								
+								<xsl:attribute name="w:hanging">
+									<xsl:value-of select="$spaceBeforeTwip"/>
+								</xsl:attribute>	
+									
+							</xsl:if>
+							
+						</w:ind>
 					</w:pPr>
 
 					<!--footnote or endnote - Include the mark to the first paragraph only when first child of text:note-body is not paragraph -->
