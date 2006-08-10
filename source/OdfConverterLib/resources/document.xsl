@@ -953,7 +953,7 @@
 					</xsl:when>
 					<xsl:when test="$merge = 2">
 						<w:gridSpan w:val="{$grid}"/>
-						<w:vmerge/>
+						<w:vmerge  w:val="continue"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:if test="@table:number-columns-spanned">
@@ -1141,7 +1141,7 @@
 
 			</w:tcPr>
 			<xsl:choose>
-				<xsl:when test="not(child::table:table)">
+				<xsl:when test="not(child::table:table) and $merge &lt; 2">
 					<xsl:apply-templates/>
 					<!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
 				</xsl:when>
