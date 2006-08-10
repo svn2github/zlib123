@@ -1,7 +1,7 @@
-ODF Add-in for Word 2007
+ODF Add-in for Word2007
 ================================
 
-Thank you for downloading ODF Add-in for Word 2007.
+Thank you for downloading ODF Add-in for Word2007.
 The purpose of the software is to enable users to open ODF Specification based documents in Word 2007 and demonstrate the interoperability between OpenXML & ODF specifications. 
 This add-in is under development (see the roadmap at http://sourceforge.net/projects/odf-converter for more details about planned releases).
 We will provide stable nightly builds. You can install and test them at your own risk!
@@ -9,11 +9,9 @@ We will provide stable nightly builds. You can install and test them at your own
 Software Requirements
 --------------------------------
 To test the add-in, you will need the following:
-
-* Word 2007 beta 2 (http://www.microsoft.com/office/preview/beta/download/en/default.mspx)
-* .NET framework 2.0 (http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&displaylang=en)
-
-Warning: if you install Word 2007 before the .NET Framework, you will need to update your Word installation after installing the  .NET Framework, by running the following steps:
+* Word 2007 beta 2
+* .NET Framework 2.0
+Warning: if you install Word 2007 before the .NET Framework, you will need to update your Word installation after installing the  .NET Framework, by running the following these steps below.
 * Open "Add or remove Programs" from the Control Panel
 * Find the Word 2007 entry and choose "Modify"
 * Within the installation process, choose "Add or remove features" then add ".NET Programmability Support" in the "Microsoft Office Word" section. 
@@ -37,4 +35,4 @@ If you don't see the ODF entry, it could be due to missing features in Word (see
 
 * Click "Word Options" in the File menu
 * In the "Add-ins" section, select "COM Add-ins" in the list box and press the "Go" button
-* Make sure to select the checkbox "ODF Word 2007 Add-in" and validate with the "OK" button.
+* Make sure to select the chec
