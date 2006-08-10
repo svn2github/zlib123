@@ -37,10 +37,3 @@ If you don’t see the ODF entry, it could be due to the Macro Security Settings. 
 4.	Check the Option “Trust all installed add-ins and templates”.
 5.	Click “Ok” of the Security Dialog and also the Options Dialog.
 6.	Close and re-open Word to see the Open ODF… entry.
-Still if you don't see the ODF entry, it could be due to missing features in Word (see the Software Requirements listed above). After completing the ODF Add-in installation, you need to activate the Add-in by doing the following actions:
-1.	Go to Tools ? Customize, and then click the Commands tab. 
-2.	In the Categories box, click Tools. 
-3.	Drag COM Add-Ins from the Commands box over the Tools menu. When the Tools menu displays the menu commands, point to the location where you want the COM Add-Ins command to appear on the menu, and then release the mouse button. 
-4.	Click Close. 
-5.	On the Tools menu, click COM Add-Ins and do any of the following: 
-5.1.	To load an add-in, select the check box next to the add-in name in the Add-Ins available list. If the add-in you want isn't in the Add-Ins available list, click Add, locate the add-in, and then click OK.
