@@ -191,7 +191,8 @@
 								<w:pStyle w:val="{@text:style-name}"/>
 							</w:pPr>
 							<xsl:choose>
-								<xsl:when test="child::draw:frame and not(parent::draw:text-box) and not(child::draw:frame/child::draw:image)">
+								<xsl:when
+									test="child::draw:frame and not(parent::draw:text-box) and child::draw:frame/child::draw:text-box">
 									<xsl:apply-templates select="draw:frame"/>
 								</xsl:when>
 								<xsl:otherwise>
@@ -201,7 +202,8 @@
 						</xsl:otherwise>
 					</xsl:choose>
 					<!-- selfstanding image before paragraph-->
-					<xsl:if test="name(preceding-sibling::*[1]) = 'draw:frame' and preceding-sibling::*[1]/draw:image">
+					<xsl:if
+						test="name(preceding-sibling::*[1]) = 'draw:frame' and preceding-sibling::*[1]/draw:image">
 						<xsl:apply-templates select="preceding-sibling::*[1]" mode="paragraph"/>
 					</xsl:if>
 				</w:p>
@@ -387,8 +389,8 @@
 			</w:pict>
 		</w:r>
 	</xsl:template>
-	
-	
+
+
 	<!-- @TODO  positioning text-boxes -->
 	<xsl:template match="draw:frame">
 		<xsl:choose>
@@ -953,7 +955,7 @@
 					</xsl:when>
 					<xsl:when test="$merge = 2">
 						<w:gridSpan w:val="{$grid}"/>
-						<w:vmerge  w:val="continue"/>
+						<w:vmerge w:val="continue"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:if test="@table:number-columns-spanned">
@@ -1162,7 +1164,7 @@
 	</xsl:template>
 
 	<xsl:template name="text" match="text()" mode="text">
-		
+
 		<xsl:if test="preceding-sibling::text:s[1]">
 			<w:t xml:space="preserve"><xsl:call-template name="extra-spaces"><xsl:with-param name="spaces" select="preceding-sibling::text:s[1]/@text:c"/></xsl:call-template></w:t>
 		</xsl:if>
