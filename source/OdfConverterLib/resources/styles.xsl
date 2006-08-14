@@ -84,16 +84,16 @@
 					<xsl:attribute name="w:type">paragraph</xsl:attribute>
 				</xsl:when>
 
-				<xsl:when test="@style-family = 'table' ">
+				<xsl:when test="@style:family = 'table' ">
 					<xsl:attribute name="w:type">table</xsl:attribute>
 				</xsl:when>
-				<xsl:when test="@style-family = 'table-cell' ">
+				<xsl:when test="@style:family = 'table-cell' ">
 					<xsl:attribute name="w:type">table</xsl:attribute>
 				</xsl:when>
-				<xsl:when test="@style-family = 'table-row' ">
+				<xsl:when test="@style:family = 'table-row' ">
 					<xsl:attribute name="w:type">table</xsl:attribute>
 				</xsl:when>
-				<xsl:when test="@style-family = 'table-column' ">
+				<xsl:when test="@style:family = 'table-column' ">
 					<xsl:attribute name="w:type">table</xsl:attribute>
 				</xsl:when>
 
