@@ -70,9 +70,9 @@
 			</xsl:apply-templates>
 		</w:numbering>
 	</xsl:template>
-
+	<xsl:variable name="stylesListStyleCount" select="count(document('styles.xml')/office:document-styles/office:styles/text:list-style)"/>
 	<xsl:template match="text:list-style" mode="numbering">
-		<xsl:param name="offset" select="0"/>
+		<xsl:param name="offset" select="$stylesListStyleCount"/>
 		<w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list-style)+2+$offset}">
 			<xsl:apply-templates
 				select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
@@ -81,7 +81,7 @@
 	</xsl:template>
 
 	<xsl:template match="text:list-style" mode="num">
-		<xsl:param name="offset" select="0"/>
+		<xsl:param name="offset" select="$stylesListStyleCount"/>
 		<w:num w:numId="{count(preceding-sibling::text:list-style)+2+$offset}">
 			<w:abstractNumId w:val="{count(preceding-sibling::text:list-style)+2+$offset}"/>
 		</w:num>
@@ -208,12 +208,12 @@
 			<xsl:when test="@text:bullet-char = '' "></xsl:when>
 			<xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
 			<xsl:when test="@text:bullet-char = '●' "></xsl:when>											
-			<xsl:when test="@text:bullet-char = '➢' "></xsl:when>
-			<xsl:when test="@text:bullet-char = '✔' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '➢' ">�??</xsl:when>
+			<xsl:when test="@text:bullet-char = '✔' ">�?�</xsl:when>
 			<xsl:when test="@text:bullet-char = '■' ">■</xsl:when>
 			<xsl:when test="@text:bullet-char = '○' ">o</xsl:when>
-			<xsl:when test="@text:bullet-char = '➔' "></xsl:when>
-			<xsl:when test="@text:bullet-char = '✗' "></xsl:when>							
+			<xsl:when test="@text:bullet-char = '➔' ">�?�</xsl:when>
+			<xsl:when test="@text:bullet-char = '✗' ">�?�</xsl:when>							
 			<xsl:otherwise>•</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -221,19 +221,19 @@
 	<xsl:template name="bulletType">
 		<xsl:param name="char"/>
 		<xsl:choose>			
-			<xsl:when test="$char = ''  or  $char = '' or  $char = ''  or  $char = ' ✗'  or $char='■' ">
+			<xsl:when test="$char = '�?�'  or  $char = '�??' or  $char = ''  or  $char = ' ✗'  or $char='■' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>
 				</w:rPr>
 			</xsl:when>			
 			
-			<xsl:when test="$char = '' ">
+			<xsl:when test="$char = '�?�' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings 3" w:hAnsi="Wingdings 3" w:hint="default"/>
 				</w:rPr>
 			</xsl:when>			
 			
-			<xsl:when test="$char = '' ">
+			<xsl:when test="$char = '�?�' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings 2" w:hAnsi="Wingdings 2" w:hint="default"/>
 				</w:rPr>
@@ -379,7 +379,7 @@
 			<!-- first, look for this list style into content.xml -->
 			<xsl:when test="key('list-style', $styleName)">
 				<xsl:value-of
-					select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2"/>
+					select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2+$stylesListStyleCount"/>
 			</xsl:when>
 			<!-- otherwise, look into styles.xml (add the offset) -->
 			<xsl:otherwise>
