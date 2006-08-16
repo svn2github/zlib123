@@ -38,6 +38,7 @@
 	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
 	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	exclude-result-prefixes="office text table fo style draw xlink">
 
 	<xsl:strip-space elements="*"/>
@@ -1310,7 +1311,65 @@
 	<xsl:template match="text:line-break" mode="text">
 		<w:br/>
 	</xsl:template>
-
+		
+	<!-- track changes -->
+	<xsl:template match="text:change" mode="paragraph">
+		<xsl:variable name="ID">
+			<xsl:value-of select="@text:change-id"/>
+		</xsl:variable>
+		<w:del>
+			<xsl:for-each select="//text:tracked-changes/text:changed-region">
+				<xsl:if test="@text:id=$ID">
+					<xsl:attribute name="w:id">
+						<xsl:value-of select="position()"/>
+					</xsl:attribute>
+					<xsl:attribute name="w:author">
+						<xsl:value-of select="text:deletion/office:change-info/dc:creator/text()"/>
+					</xsl:attribute>
+					<xsl:attribute name="w:date">
+						<xsl:value-of select="text:deletion/office:change-info/dc:date/text()"/>
+					</xsl:attribute>
+				</xsl:if>
+			</xsl:for-each>
+			<w:r>
+				<w:delText><xsl:value-of select="//text:tracked-changes/text:changed-region[@text:id=$ID]/text:deletion/office:change-info/following-sibling::*/text()"/></w:delText>
+			</w:r>
+		</w:del>
+	</xsl:template>
+	
+	<xsl:template match="text:change-start" mode="paragraph">
+		<xsl:variable name="ID">
+			<xsl:value-of select="@text:change-id"/>
+		</xsl:variable>
+		<w:ins>
+			<xsl:for-each select="//text:tracked-changes/text:changed-region">
+				<xsl:if test="@text:id=$ID">
+					<xsl:attribute name="w:id">
+						<xsl:value-of select="position()"/>
+					</xsl:attribute>
+					<xsl:attribute name="w:author">
+						<xsl:value-of select="text:insertion/office:change-info/dc:creator/text()"/>
+					</xsl:attribute>
+					<xsl:attribute name="w:date">
+						<xsl:value-of select="text:insertion/office:change-info/dc:date/text()"/>
+					</xsl:attribute>
+				</xsl:if>
+			</xsl:for-each>
+			<w:r>
+				<w:t> 
+					<xsl:variable name="pos">
+						<xsl:for-each select="following-sibling::node()">
+							<xsl:if test="@text:change-id=$ID">
+								<xsl:value-of select="position()"/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:apply-templates select="following-sibling::node()[position() &lt; $pos]" mode="paragraph"/>
+				</w:t>
+			</w:r>
+		</w:ins>
+	</xsl:template>
+	
 	<!-- footnotes and endnotes -->
 	<xsl:template match="text:note" mode="paragraph">
 		<w:r>
@@ -1417,7 +1476,8 @@
 
 	<!-- ignored -->
 	<xsl:template match="text()"/>
-
+	<xsl:template match="text:tracked-changes"/>
+	
 	<!-- odt section -->
 	<xsl:template match="text:section">
 		<xsl:choose>
