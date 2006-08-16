@@ -1313,7 +1313,8 @@
 	</xsl:template>
 		
 	<!-- track changes -->
-	<xsl:template match="text:change" mode="paragraph">
+  
+	<!--xsl:template match="text:change" mode="paragraph">
 		<xsl:variable name="ID">
 			<xsl:value-of select="@text:change-id"/>
 		</xsl:variable>
@@ -1368,7 +1369,7 @@
 				</w:t>
 			</w:r>
 		</w:ins>
-	</xsl:template>
+	</xsl:template-->
 	
 	<!-- footnotes and endnotes -->
 	<xsl:template match="text:note" mode="paragraph">
