@@ -51,7 +51,6 @@
 	<xsl:key name="images" match="draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]"
 		use="''"/>
 
-
 	<xsl:variable name="type">dxa</xsl:variable>
 
 	<xsl:template name="document">
@@ -658,6 +657,16 @@
 	</xsl:template>
 
 	<xsl:template match="table:table">
+		<xsl:variable name="styleName">
+			<xsl:value-of select="@table:style-name"/>
+		</xsl:variable>
+		<xsl:if test="//office:automatic-styles/style:style[@style:name=$styleName]/style:table-properties/@fo:break-before='page'">
+			<w:p>
+				<w:r>
+					<w:br w:type="page"/>
+				</w:r>
+			</w:p>
+		</xsl:if>
 		<w:tbl>
 			<w:tblPr>
 				<w:tblStyle w:val="{@table:style-name}"/>
