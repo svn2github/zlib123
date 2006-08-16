@@ -311,7 +311,7 @@
 
 	<xsl:template match="text:span" mode="hyperlink">
 		<w:rPr>
-			<w:rStyle w:val="{@text:style-name}"/>
+			<w:rStyle w:val="{@text:style-name}"/>			
 		</w:rPr>
 		<w:t>
 			<xsl:attribute name="xml:space">preserve</xsl:attribute>
@@ -1238,12 +1238,15 @@
 	</xsl:template>
 
 	<!-- text and spaces -->
-
 	<xsl:template match="text()|text:s" mode="paragraph">
+		<xsl:param name="styleName"/>
 		<w:r>
+			<w:rPr>
+			<xsl:apply-templates select="key('style', $styleName)/style:text-properties" mode="toggle"/>
+			</w:rPr>
 			<xsl:apply-templates select="." mode="text"/>
-		</w:r>
-
+			
+		</w:r>		
 	</xsl:template>
 
 	<xsl:template name="text" match="text()|text:s" mode="text">
@@ -1269,14 +1272,17 @@
 	<xsl:template match="text:span" mode="paragraph">
 		<w:r>
 			<w:rPr>
-				<w:rStyle w:val="{@text:style-name}"/>
+				<w:rStyle w:val="{@text:style-name}"/>				
+				<xsl:apply-templates select="key('style', @text:style-name)/style:text-properties" mode="toggle"/>				
 			</w:rPr>
 			<xsl:apply-templates mode="text"/>
 		</w:r>
 	</xsl:template>
 
 	<xsl:template match="text:span[child::*]" mode="paragraph">
-		<xsl:apply-templates mode="paragraph"/>
+		<xsl:apply-templates mode="paragraph">
+			<xsl:with-param name="styleName" select="@text:style-name"/>
+		</xsl:apply-templates>			
 	</xsl:template>
 
 	<xsl:template match="text:tab-stop" mode="paragraph">

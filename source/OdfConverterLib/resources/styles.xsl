@@ -1100,6 +1100,243 @@
 		</w:rPr>
 	</xsl:template>
 
+	<!-- toggle properties : this text properties must be applied into the template "text:span" mode="paragraph" 
+	to erase the paragraph style -->
+	<xsl:template match="style:text-properties[parent::style:style  or parent::style:default-style]" mode="toggle">
+		<xsl:if test="@fo:font-weight or @fo:font-weight-asian">
+			<xsl:choose>
+				<xsl:when test="@fo:font-weight = 'bold' or @fo:font-weight-asian = 'bold'">
+					<w:b w:val="on"/>
+				</xsl:when>
+				<xsl:when test="@fo:font-weight = 'normal' or @fo:font-weight-asian = 'normal'">
+					<w:b w:val="off"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:if>
+		
+		<xsl:if test="@fo:font-weight-complex">
+			<xsl:choose>
+				<xsl:when test="@style:font-weight-complex = 'bold'">
+					<w:bCs w:val="on"/>
+				</xsl:when>
+				<xsl:when test="@style:font-weight-complex = 'normal'">
+					<w:bCs w:val="off"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:if>
+		
+		<!-- TODO determine all the different font styles-->
+		<xsl:if test="@fo:font-style or @style:font-style-asian or @style:font-style-complex">
+			<xsl:choose>
+				<xsl:when
+					test="@fo:font-style = 'italic' or @style:font-style-asian = 'italic' or @style:font-style-complex = 'italic'">
+					<w:i w:val="on"/>
+				</xsl:when>
+				<xsl:when
+					test="@fo:font-style = 'oblique' or @style:font-style-asian = 'oblique' or @style:font-style-complex = 'oblique'">
+					<w:i w:val="on"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<w:i w:val="off"/>
+				</xsl:otherwise>
+				<!-- It could be also oblique in fo DTD, but it is not possible to set it via Ooo interface -->
+			</xsl:choose>
+		</xsl:if>
+		
+		<xsl:if test="@fo:text-transform">
+			<xsl:choose>
+				<xsl:when test="@fo:text-transform = 'uppercase'">
+					<w:caps w:val="on"/>
+				</xsl:when>
+				<xsl:when test="@fo:text-transform = 'none'">
+					<w:caps w:val="off"/>
+				</xsl:when>
+				<!-- It could be also lowercase or capitalize in fo DTD, but it is not possible to set it via word 2007 interface -->
+			</xsl:choose>
+		</xsl:if>
+		
+		<xsl:if test="@fo:font-variant">
+			<xsl:choose>
+				<xsl:when test="@fo:font-variant = 'small-caps'">
+					<w:smallCaps w:val="on"/>
+				</xsl:when>
+				<xsl:when test="@fo:font-weight = 'normal'">
+					<w:smallCaps w:val="off"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:if>
+		
+		<xsl:if test="@style:text-line-through-style">
+			<xsl:choose>
+				<xsl:when test="@style:text-line-through-type = 'double'">
+					<w:dstrike w:val="on"/>
+				</xsl:when>
+				<xsl:when test="@style:text-line-through-type = 'none'">
+					<w:strike w:val="off"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<w:strike w:val="on"/>
+				</xsl:otherwise>
+			</xsl:choose>
+	
+		</xsl:if>
+		
+		<xsl:if test="@style:text-outline">
+			<xsl:choose>
+				<xsl:when test="@style:text-outline = 'true'">
+					<w:outline w:val="on"/>
+				</xsl:when>
+				<xsl:when test="@style:text-outline = 'false'">
+					<w:outline w:val="off"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:if>
+		
+		<xsl:if test="(@fo:text-shadow)">
+			<xsl:choose>
+				<xsl:when test="@fo:text-shadow = 'none'">
+					<w:shadow w:val="off"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<w:shadow w:val="on"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
+		
+		<xsl:if test="(@style:font-relief)">
+			<xsl:choose>
+				<xsl:when test="@style:font-relief = 'embossed'">
+					<w:emboss w:val="on"/>
+				</xsl:when>
+				<xsl:when test="@style:font-relief = 'engraved'">
+					<w:imprint w:val="on"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<w:emboss w:val="off"/>
+					<w:imprint w:val="off"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
+		
+		<xsl:if test="@text:display">
+			<xsl:choose>
+				<xsl:when test="@text:display = 'true'">
+					<w:vanish w:val="on"/>
+				</xsl:when>
+				<xsl:when test="@text:display = 'none'">
+					<w:vanish w:val="off"/>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:if>
+		
+		<xsl:if test="@style:text-underline-style">
+			<xsl:choose>
+		<xsl:when test="@style:text-underline-style != 'none' ">
+			<w:u>
+				<xsl:attribute name="w:val">
+					<xsl:choose>
+						<xsl:when test="@style:text-underline-style = 'dotted'">
+							<xsl:choose>
+								<xsl:when test="@style:text-underline-width = 'thick' "
+									>dottedHeavy</xsl:when>
+								<xsl:when test="@style:text-underline-width = 'bold' "
+									>dottedHeavy</xsl:when>
+								<xsl:otherwise>dotted</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:when test="@style:text-underline-style = 'dash' ">
+							<xsl:choose>
+								<xsl:when test="@style:text-underline-width = 'thick' "
+									>dashedHeavy</xsl:when>
+								<xsl:when test="@style:text-underline-width = 'bold' "
+									>dashedHeavy</xsl:when>
+								<xsl:otherwise>dash</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:when test="@style:text-underline-style = 'long-dash'">
+							<xsl:choose>
+								<xsl:when test="@style:text-underline-width = 'thick' "
+									>dashLongHeavy</xsl:when>
+								<xsl:when test="@style:text-underline-width = 'bold' "
+									>dashLongHeavy</xsl:when>
+								<xsl:otherwise>dashLong</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:when test="@style:text-underline-style = 'dot-dash' ">
+							<xsl:choose>
+								<xsl:when test="@style:text-underline-width = 'thick' "
+									>dashDotHeavy</xsl:when>
+								<xsl:when test="@style:text-underline-width = 'bold' "
+									>dashDotHeavy</xsl:when>
+								<xsl:otherwise>dotDash</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:when test="@style:text-underline-style = 'dot-dot-dash' ">
+							<xsl:choose>
+								<xsl:when test="@style:text-underline-width = 'thick' "
+									>dashDotDotHeavy</xsl:when>
+								<xsl:when test="@style:text-underline-width = 'bold' "
+									>dashDotDotHeavy</xsl:when>
+								<xsl:otherwise>dotDotDash</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:when test="@style:text-underline-style = 'wave' ">
+							<xsl:choose>
+								<xsl:when test="@style:text-underline-type = 'double' "
+									>wavyDouble</xsl:when>
+								<xsl:when test="@style:text-underline-width = 'thick' "
+									>wavyHeavy</xsl:when>
+								<xsl:when test="@style:text-underline-width = 'bold' ">wavyHeavy</xsl:when>
+								<xsl:otherwise>wave</xsl:otherwise>
+							</xsl:choose>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:choose>
+								<xsl:when test="@style:text-underline-type = 'double' ">double</xsl:when>
+								<xsl:when test="@style:text-underline-width = 'thick' ">thick</xsl:when>
+								<xsl:when test="@style:text-underline-width = 'bold' ">thick</xsl:when>
+								<xsl:when
+									test="@style:text-underline-mode = 'skip-white-space' "
+									>words</xsl:when>
+								<xsl:otherwise>single</xsl:otherwise>
+							</xsl:choose>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+				<xsl:if test="@style:text-underline-color">
+					<xsl:attribute name="w:color">
+						<xsl:choose>
+							<xsl:when test="@style:text-underline-color = 'font-color'">auto</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of
+									select="substring(@style:text-underline-color, 2, string-length(@style:text-underline-color)-1)"
+								/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+				</xsl:if>
+			</w:u>
+			</xsl:when>
+			<xsl:otherwise>
+				<w:u w:val="none"/>
+			</xsl:otherwise>					
+			</xsl:choose>
+		</xsl:if>
+		<xsl:if test="@style:text-emphasize">
+			<w:em>
+				<xsl:attribute name="w:val">
+					<xsl:choose>
+						<xsl:when test="@style:text-emphasize = 'accent above'">comma</xsl:when>
+						<xsl:when test="@style:text-emphasize = 'dot above'">dot</xsl:when>
+						<xsl:when test="@style:text-emphasize = 'circle above'">circle</xsl:when>
+						<xsl:when test="@style:text-emphasize = 'dot below'">underDot</xsl:when>
+						<xsl:otherwise>none</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+			</w:em>
+		</xsl:if>
+	</xsl:template>
+		
 	<xsl:template match="style:graphic-properties[parent::style:style]" mode="styles">
 		<w:pPr>
 			<xsl:if test="@style:horizontal-pos">
