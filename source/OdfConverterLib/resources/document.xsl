@@ -101,14 +101,11 @@
 			<xsl:variable name="id">
 				<xsl:number/>
 			</xsl:variable>
-
-			<xsl:if test="substring-before(@text:style-name,'_')='Heading'">
-				<w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id)}"/>
-			</xsl:if>
-			<xsl:apply-templates mode="paragraph"/>
-			<xsl:if test="substring-before(@text:style-name,'_')='Heading'">
-				<w:bookmarkEnd w:id="{$id}"/>
-			</xsl:if>
+			
+			<w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id)}"/>
+				<xsl:apply-templates mode="paragraph"/>
+			<w:bookmarkEnd w:id="{$id}"/>
+			
 		</w:p>
 	</xsl:template>
 
@@ -147,7 +144,7 @@
 							<xsl:apply-templates mode="paragraph"/>
 						</xsl:when>
 						<!-- we are in table of contents -->
-						<xsl:when test="parent::text:index-body">
+						<xsl:when test="parent::text:index-body and ancestor::text:table-of-content">
 							<w:pPr>
 								<w:pStyle w:val="{@text:style-name}"/>
 							</w:pPr>
@@ -435,55 +432,69 @@
 								</xsl:attribute>
 							</w:numId>
 						</w:numPr>
-						
+
 						<!-- override abstract num indent  if paragraph has margin defined @TODO firstline indent-->
-						<xsl:variable name="styleName" select="*[1][self::text:p]/@text:style-name" />
-						<xsl:variable name="parentStyleName" select="key('style',$styleName)/@style:parent-style-name" />
-						<xsl:variable name="listStyleName" select="key('style',$styleName)/@style:list-style-name"/>
-					
+						<xsl:variable name="styleName" select="*[1][self::text:p]/@text:style-name"/>
+						<xsl:variable name="parentStyleName"
+							select="key('style',$styleName)/@style:parent-style-name"/>
+						<xsl:variable name="listStyleName"
+							select="key('style',$styleName)/@style:list-style-name"/>
+
 						<xsl:variable name="paragraphMargin">
 							<xsl:choose>
-								<xsl:when test="key('style',$styleName)/paragraph-properties/@fo:left-margin">
+								<xsl:when
+									test="key('style',$styleName)/paragraph-properties/@fo:left-margin">
 									<xsl:call-template name="twips-measure">
-										<xsl:with-param name="length" select="key('style',$styleName)/style:paragraph-properties/@fo:left-margin"/>
+										<xsl:with-param name="length"
+											select="key('style',$styleName)/style:paragraph-properties/@fo:left-margin"
+										/>
 									</xsl:call-template>
 								</xsl:when>
-								<xsl:when test="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left">
+								<xsl:when
+									test="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left">
 									<xsl:call-template name="twips-measure">
-										<xsl:with-param name="length" select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left"/>
+										<xsl:with-param name="length"
+											select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left"
+										/>
 									</xsl:call-template>
 								</xsl:when>
-								
+
 								<xsl:otherwise>0</xsl:otherwise>
 							</xsl:choose>
 						</xsl:variable>
-						
+
 						<xsl:variable name="minLabelWidthTwip">
 							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-width"/>
+								<xsl:with-param name="length"
+									select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-width"
+								/>
 							</xsl:call-template>
-							
+
 						</xsl:variable>
-						
+
 						<xsl:variable name="spaceBeforeTwip">
 							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:space-before"/>
+								<xsl:with-param name="length"
+									select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:space-before"
+								/>
 							</xsl:call-template>
 						</xsl:variable>
-						
+
 						<w:ind>
 							<xsl:if test="$paragraphMargin != 0">
-								
+
 								<xsl:attribute name="w:left">
-									<xsl:value-of select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"/>
+									<xsl:value-of
+										select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"
+									/>
 								</xsl:attribute>
-								
+
 								<xsl:attribute name="w:hanging">
 									<xsl:value-of select="$spaceBeforeTwip"/>
-								</xsl:attribute>	
-									
+								</xsl:attribute>
+
 							</xsl:if>
-							
+
 						</w:ind>
 					</w:pPr>
 
@@ -517,7 +528,11 @@
 		<w:r>
 			<xsl:choose>
 				<xsl:when test="$test=1">
-					<xsl:apply-templates select="text:a/child::text()[1]" mode="text"/>
+					<w:t>
+						<xsl:for-each select="text:a/child::text()[position() &lt; last()]">
+							<xsl:value-of select="."/>
+						</xsl:for-each>
+					</w:t>
 				</xsl:when>
 				<xsl:otherwise>
 					<w:t>
@@ -529,7 +544,7 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</w:r>
-		<xsl:apply-templates select="text:tab" mode="paragraph"/>
+		<xsl:apply-templates select="text:tab|text:a/text:tab" mode="paragraph"/>
 		<w:r>
 			<w:rPr/>
 			<w:fldChar w:fldCharType="begin">
@@ -545,7 +560,16 @@
 			<w:fldChar w:fldCharType="separate"/>
 		</w:r>
 		<w:r>
-			<xsl:apply-templates select="child::text()[last()]" mode="text"/>
+			<xsl:choose>
+				<xsl:when test="$test=1">
+					<xsl:apply-templates select="text:a/child::text()[last()]" mode="text"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="child::text()[last()]" mode="text"/>
+					<!--<xsl:apply-templates select="child::text()[1]" mode="text"/>-->
+				</xsl:otherwise>
+			</xsl:choose>
+			
 		</w:r>
 		<w:r>
 			<w:rPr/>
@@ -660,7 +684,8 @@
 		<xsl:variable name="styleName">
 			<xsl:value-of select="@table:style-name"/>
 		</xsl:variable>
-		<xsl:if test="//office:automatic-styles/style:style[@style:name=$styleName]/style:table-properties/@fo:break-before='page'">
+		<xsl:if
+			test="//office:automatic-styles/style:style[@style:name=$styleName]/style:table-properties/@fo:break-before='page'">
 			<w:p>
 				<w:r>
 					<w:br w:type="page"/>
@@ -1230,8 +1255,8 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<w:t>
-				<xsl:attribute name="xml:space">preserve</xsl:attribute>
-				<xsl:value-of select="."/>
+					<xsl:attribute name="xml:space">preserve</xsl:attribute>
+					<xsl:value-of select="."/>
 
 				</w:t>
 			</xsl:otherwise>
