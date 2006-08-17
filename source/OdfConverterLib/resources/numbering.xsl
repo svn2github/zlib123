@@ -208,12 +208,13 @@
 			<xsl:when test="@text:bullet-char = '' "></xsl:when>
 			<xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
 			<xsl:when test="@text:bullet-char = '●' "></xsl:when>
-			<xsl:when test="@text:bullet-char = '➢' "></xsl:when>
-			<xsl:when test="@text:bullet-char = '✔' "></xsl:when>
-			<xsl:when test="@text:bullet-char = '■' ">■</xsl:when>
+			<xsl:when test="@text:bullet-char = '➢' ">�??</xsl:when>
+			<xsl:when test="@text:bullet-char = '✔' ">�?�</xsl:when>
+			<xsl:when test="@text:bullet-char = '■' "></xsl:when>
 			<xsl:when test="@text:bullet-char = '○' ">o</xsl:when>
-			<xsl:when test="@text:bullet-char = '➔' "></xsl:when>
-			<xsl:when test="@text:bullet-char = '✗' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '➔' ">�?�</xsl:when>
+			<xsl:when test="@text:bullet-char = '✗' ">�?�</xsl:when>
+			<xsl:when test="@text:bullet-char = '–' ">–</xsl:when>
 			<xsl:otherwise>•</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -222,19 +223,19 @@
 		<xsl:param name="char"/>
 		<xsl:choose>			
 			<xsl:when
-				test="$char = ''  or  $char = '' or  $char = ''  or  $char = ' ✗'  or $char='■' ">
+				test="$char = '�?�'  or  $char = '�??' or  $char = ''  or  $char = ' ✗'  or $char='' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>
 				</w:rPr>
 			</xsl:when>
 
-			<xsl:when test="$char = '' ">
+			<xsl:when test="$char = '�?�' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings 3" w:hAnsi="Wingdings 3" w:hint="default"/>
 				</w:rPr>
 			</xsl:when>
 
-			<xsl:when test="$char = '' ">
+			<xsl:when test="$char = '�?�' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings 2" w:hAnsi="Wingdings 2" w:hint="default"/>
 				</w:rPr>

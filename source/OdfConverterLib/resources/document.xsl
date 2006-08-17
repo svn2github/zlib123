@@ -208,20 +208,22 @@
 			<xsl:otherwise>
 				<!-- We are in a list -->
 				<w:p>
-					<w:pPr>
-						<w:pStyle w:val="{@text:style-name}"/>
-						<w:numPr>
-							<w:ilvl w:val="{$level}"/>
-							<w:numId>
-								<xsl:attribute name="w:val">
-									<xsl:call-template name="numberingId">
-										<xsl:with-param name="styleName"
-											select="ancestor::text:list/@text:style-name"/>
-									</xsl:call-template>
-								</xsl:attribute>
-							</w:numId>
-						</w:numPr>
-					</w:pPr>
+					<xsl:if test="child::text()">
+						<w:pPr>
+							<w:pStyle w:val="{@text:style-name}"/>
+							<w:numPr>
+								<w:ilvl w:val="{$level}"/>
+								<w:numId>
+									<xsl:attribute name="w:val">
+										<xsl:call-template name="numberingId">
+											<xsl:with-param name="styleName"
+												select="ancestor::text:list/@text:style-name"/>
+										</xsl:call-template>
+									</xsl:attribute>
+								</w:numId>
+							</w:numPr>
+						</w:pPr>
+					</xsl:if> 
 					<xsl:apply-templates mode="paragraph"/>
 				</w:p>
 			</xsl:otherwise>
