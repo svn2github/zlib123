@@ -468,75 +468,21 @@
 			<xsl:if test="style:tab-stops/style:tab-stop">
 				<w:tabs>
 					<xsl:for-each select="style:tab-stops/style:tab-stop">
-						<w:tab>
-							<xsl:attribute name="w:pos">
-								<xsl:variable name="position">
-									<xsl:call-template name="twips-measure">
-										<xsl:with-param name="length" select="ancestor::style:paragraph-properties/@fo:margin-left"/>
-									</xsl:call-template>
-								</xsl:variable>
-								<xsl:variable name="position2">
-									<xsl:call-template name="twips-measure">
-										<xsl:with-param name="length" select="@style:position"/>
-									</xsl:call-template>
-								</xsl:variable>
-								<xsl:value-of select="$position+$position2"/>
-							</xsl:attribute>
-							<xsl:if test="@style:type">
-								<xsl:attribute name="w:val">
-									<xsl:value-of select="@style:type"/>
-								</xsl:attribute>
-							</xsl:if>
-							<!-- Default value -->
-							<xsl:if test="not(@style:type)">
-								<xsl:attribute name="w:val">left</xsl:attribute>
-							</xsl:if>
-							<xsl:attribute name="w:leader">
-								<xsl:choose>
-									<xsl:when test="@style:leader-text">
-										<xsl:choose>
-											<xsl:when test="@style:leader-text='.'">
-												<xsl:value-of select="'dot'"/>
-											</xsl:when>
-											<xsl:when test="@style:leader-text='-'">
-												<xsl:value-of select="'hyphen'"/>
-											</xsl:when>
-											<xsl:when test="@style:leader-text='_'">
-												<xsl:value-of select="'heavy'"/>
-											</xsl:when>
-											<xsl:otherwise>
-												<xsl:value-of select="'none'"/>
-											</xsl:otherwise>
-										</xsl:choose>
-
-									</xsl:when>
-									<xsl:when test="@style:leader-style and not(@style:leader-text)">
-										<xsl:choose>
-											<xsl:when test="@style:leader-style='dotted'">
-												<xsl:value-of select="'dot'"/>
-											</xsl:when>
-											<xsl:when test="@style:leader-style='solid'">
-												<xsl:value-of select="'heavy'"/>
-											</xsl:when>
-											<xsl:when test="@style:leader-style='dash'">
-												<xsl:value-of select="'hyphen'"/>
-											</xsl:when>
-											<xsl:when test="@style:leader-style='dotted'">
-												<xsl:value-of select="'dot'"/>
-											</xsl:when>
-											<xsl:otherwise>
-												<xsl:value-of select="'none'"/>
-											</xsl:otherwise>
-										</xsl:choose>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:value-of select="'none'"/>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:attribute>
-						</w:tab>
+						<xsl:call-template name="tabStop"/>
 					</xsl:for-each>
-
+					<xsl:variable name="styleName">
+						<xsl:value-of select="parent::node()/@style:name"/>
+					</xsl:variable>
+					<xsl:variable name="parentStyleName">
+						<xsl:value-of select="parent::node()/@style:parent-style-name"/>
+					</xsl:variable>
+					<xsl:for-each select="document('styles.xml')//style:style[@style:name=$parentStyleName]//style:tab-stop">
+						<xsl:if test="not(@style:position=document('content.xml')//style:style[@style:name=$styleName]//style:tab-stop/@style:position)">
+							<xsl:call-template name="tabStop">
+								<xsl:with-param name="styleType">clear</xsl:with-param>
+							</xsl:call-template>
+						</xsl:if>
+					</xsl:for-each>
 				</w:tabs>
 			</xsl:if>
 
@@ -1418,7 +1364,78 @@
 		</xsl:if>
 	</xsl:template>
 
-
+	<xsl:template name="tabStop">
+		<xsl:param name="styleType"/>
+		<w:tab>
+			<xsl:attribute name="w:pos">
+				<xsl:variable name="position">
+					<xsl:call-template name="twips-measure">
+						<xsl:with-param name="length" select="ancestor::style:paragraph-properties/@fo:margin-left"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:variable name="position2">
+					<xsl:call-template name="twips-measure">
+						<xsl:with-param name="length" select="@style:position"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="$position+$position2"/>
+			</xsl:attribute>
+			<xsl:attribute name="w:val">
+				<xsl:choose>
+					<xsl:when test="@style:type">	
+						<xsl:value-of select="@style:type"/>
+					</xsl:when>
+					<xsl:when test="$styleType">
+						<xsl:value-of select="$styleType"/>
+					</xsl:when>
+					<xsl:otherwise>left</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:attribute name="w:leader">
+				<xsl:choose>
+					<xsl:when test="@style:leader-text">
+						<xsl:choose>
+							<xsl:when test="@style:leader-text='.'">
+								<xsl:value-of select="'dot'"/>
+							</xsl:when>
+							<xsl:when test="@style:leader-text='-'">
+								<xsl:value-of select="'hyphen'"/>
+							</xsl:when>
+							<xsl:when test="@style:leader-text='_'">
+								<xsl:value-of select="'heavy'"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="'none'"/>
+							</xsl:otherwise>
+						</xsl:choose>
+						
+					</xsl:when>
+					<xsl:when test="@style:leader-style and not(@style:leader-text)">
+						<xsl:choose>
+							<xsl:when test="@style:leader-style='dotted'">
+								<xsl:value-of select="'dot'"/>
+							</xsl:when>
+							<xsl:when test="@style:leader-style='solid'">
+								<xsl:value-of select="'heavy'"/>
+							</xsl:when>
+							<xsl:when test="@style:leader-style='dash'">
+								<xsl:value-of select="'hyphen'"/>
+							</xsl:when>
+							<xsl:when test="@style:leader-style='dotted'">
+								<xsl:value-of select="'dot'"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="'none'"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="'none'"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+		</w:tab>		
+	</xsl:template>
 
 
 
