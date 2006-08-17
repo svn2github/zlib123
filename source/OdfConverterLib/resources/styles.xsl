@@ -473,10 +473,10 @@
 					<xsl:variable name="styleName">
 						<xsl:value-of select="parent::node()/@style:name"/>
 					</xsl:variable>
-					<xsl:variable name="parentStyleName">
+					<xsl:variable name="parentstyleName">
 						<xsl:value-of select="parent::node()/@style:parent-style-name"/>
 					</xsl:variable>
-					<xsl:for-each select="document('styles.xml')//style:style[@style:name=$parentStyleName]//style:tab-stop">
+					<xsl:for-each select="document('styles.xml')//style:style[@style:name=$parentstyleName]//style:tab-stop">
 						<xsl:if test="not(@style:position=document('content.xml')//style:style[@style:name=$styleName]//style:tab-stop/@style:position)">
 							<xsl:call-template name="tabStop">
 								<xsl:with-param name="styleType">clear</xsl:with-param>
