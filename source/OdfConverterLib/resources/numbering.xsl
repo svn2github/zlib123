@@ -208,12 +208,17 @@
 			<xsl:when test="@text:bullet-char = 'ÓÄå' ">ÓÄå</xsl:when>
 			<xsl:when test="@text:bullet-char = '‚Ä¢' ">‚Ä¢</xsl:when>
 			<xsl:when test="@text:bullet-char = '‚óè' ">ÔÇ∑</xsl:when>
+
 			<xsl:when test="@text:bullet-char = '‚û¢' ">Ô??</xsl:when>
 			<xsl:when test="@text:bullet-char = '‚úî' ">Ô?º</xsl:when>
 			<xsl:when test="@text:bullet-char = '‚ñ†' ">ÔÇß</xsl:when>
+
+
+
 			<xsl:when test="@text:bullet-char = '‚óã' ">o</xsl:when>
 			<xsl:when test="@text:bullet-char = '‚ûî' ">Ô?ö</xsl:when>
 			<xsl:when test="@text:bullet-char = '‚úó' ">Ô?è</xsl:when>
+			<xsl:when test="@text:bullet-char = '‚Äì' ">‚Äì</xsl:when>
 			<xsl:when test="@text:bullet-char = '‚Äì' ">‚Äì</xsl:when>
 			<xsl:otherwise>‚Ä¢</xsl:otherwise>
 		</xsl:choose>
@@ -223,7 +228,11 @@
 		<xsl:param name="char"/>
 		<xsl:choose>			
 			<xsl:when
+
 				test="$char = 'Ô?º'  or  $char = 'Ô??' or  $char = ''  or  $char = ' ‚úó'  or $char='ÔÇß' ">
+
+				test="$char = 'Ô?º'  or  $char = 'Ô??' or  $char = ''  or  $char = ' ‚úó'  or $char='ÔÇß' ">
+
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>
 				</w:rPr>
