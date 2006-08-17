@@ -38,7 +38,6 @@
 	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
 	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
-	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	exclude-result-prefixes="office text table fo style draw xlink">
 
 	<xsl:strip-space elements="*"/>
@@ -67,6 +66,7 @@
 		<w:body>
 			<xsl:apply-templates/>
 			<xsl:call-template name="headerFooter"/>
+			
 		</w:body>
 	</xsl:template>
 
@@ -79,7 +79,16 @@
 	<xsl:template match="text:h">
 		<w:p>
 			<w:pPr>
-				<w:pStyle w:val="{@text:style-name}"/>
+				<xsl:variable name="headerStyle">
+					<xsl:call-template name="headerStyleName">
+						<xsl:with-param name="styleName" select="@text:style-name"/>
+					</xsl:call-template>			
+				</xsl:variable>
+				
+				<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
+				
+				<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>
+				 <!-- <w:pStyle w:val="{@text:style-name}"/> -->
 				<xsl:choose>
 					<xsl:when test="not(@text:outline-level)">
 						<w:outlineLvl w:val="0"/>
@@ -130,7 +139,12 @@
 										<w:pStyle w:val="{draw:frame/@draw:style-name}"/>
 									</xsl:when>
 									<xsl:otherwise>
-										<w:pStyle w:val="{@text:style-name}"/>
+										<xsl:variable name="headerStyle">
+											<xsl:call-template name="headerStyleName"/>
+										</xsl:variable>					
+										<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
+										<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>
+										<!-- <w:pStyle w:val="{@text:style-name}"/> -->
 										<!--w:pStyle w:val="{concat($note/@text:note-class, 'Text')}"/-->
 									</xsl:otherwise>
 								</xsl:choose>
@@ -147,7 +161,15 @@
 						<!-- we are in table of contents -->
 						<xsl:when test="parent::text:index-body and ancestor::text:table-of-content">
 							<w:pPr>
-								<w:pStyle w:val="{@text:style-name}"/>
+								<xsl:variable name="headerStyle">
+									<xsl:call-template name="headerStyleName">
+										<xsl:with-param name="styleName" select="@text:style-name"/>
+									</xsl:call-template>			
+								</xsl:variable>
+								
+								<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
+								
+								<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>																
 							</w:pPr>
 							<xsl:variable name="num">
 								<xsl:number/>
@@ -185,7 +207,14 @@
 						<!-- main scenario -->
 						<xsl:otherwise>
 							<w:pPr>
-								<w:pStyle w:val="{@text:style-name}"/>
+								<xsl:variable name="headerStyle">
+									<xsl:call-template name="headerStyleName">
+										<xsl:with-param name="styleName" select="@text:style-name"/>
+									</xsl:call-template>			
+								</xsl:variable>
+								<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
+								
+								<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>								
 							</w:pPr>
 							<xsl:choose>
 								<xsl:when
@@ -208,22 +237,32 @@
 			<xsl:otherwise>
 				<!-- We are in a list -->
 				<w:p>
-					<xsl:if test="child::text()">
-						<w:pPr>
-							<w:pStyle w:val="{@text:style-name}"/>
-							<w:numPr>
-								<w:ilvl w:val="{$level}"/>
-								<w:numId>
-									<xsl:attribute name="w:val">
-										<xsl:call-template name="numberingId">
-											<xsl:with-param name="styleName"
-												select="ancestor::text:list/@text:style-name"/>
-										</xsl:call-template>
-									</xsl:attribute>
-								</w:numId>
-							</w:numPr>
-						</w:pPr>
-					</xsl:if> 
+					<w:pPr>
+						<xsl:variable name="headerStyle">
+							<xsl:call-template name="headerStyleName">
+								<xsl:with-param name="styleName" select="@text:style-name"/>
+							</xsl:call-template>			
+						</xsl:variable>
+						
+						<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
+						
+						
+							<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>
+						
+						
+						 <!-- <w:pStyle w:val="{@text:style-name}"/> --> 
+						<w:numPr>
+							<w:ilvl w:val="{$level}"/>
+							<w:numId>
+								<xsl:attribute name="w:val">
+									<xsl:call-template name="numberingId">
+										<xsl:with-param name="styleName"
+											select="ancestor::text:list/@text:style-name"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</w:numId>
+						</w:numPr>
+					</w:pPr>
 					<xsl:apply-templates mode="paragraph"/>
 				</w:p>
 			</xsl:otherwise>
@@ -314,7 +353,15 @@
 
 	<xsl:template match="text:span" mode="hyperlink">
 		<w:rPr>
-			<w:rStyle w:val="{@text:style-name}"/>			
+			<xsl:variable name="headerStyle">
+				<xsl:call-template name="headerStyleName">
+					<xsl:with-param name="styleName" select="@text:style-name"/>
+				</xsl:call-template>			
+			</xsl:variable>
+			
+			<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
+			
+			<w:rStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:rStyle>						
 		</w:rPr>
 		<w:t>
 			<xsl:attribute name="xml:space">preserve</xsl:attribute>
@@ -423,7 +470,16 @@
 			<xsl:when test="*[1][self::text:p]">
 				<w:p>
 					<w:pPr>
-						<w:pStyle w:val="{*[1][self::text:p]/@text:style-name}"/>
+						<xsl:variable name="headerStyle">
+							<xsl:call-template name="headerStyleName">
+								<xsl:with-param name="styleName" select="*[1][self::text:p]/@text:style-name"/>
+							</xsl:call-template>			
+						</xsl:variable>
+						
+						<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,*[1][self::text:p]/@text:style-name)"/></xsl:variable>
+						
+						<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>
+						<!--<w:pStyle w:val="{*[1][self::text:p]/@text:style-name}"/> -->
 						<w:numPr>
 							<w:ilvl w:val="{$level}"/>
 							<w:numId>
@@ -434,7 +490,7 @@
 									</xsl:call-template>
 								</xsl:attribute>
 							</w:numId>
-						</w:numPr>
+						</w:numPr> 
 
 						<!-- override abstract num indent  if paragraph has margin defined @TODO firstline indent-->
 						<xsl:variable name="styleName" select="*[1][self::text:p]/@text:style-name"/>
@@ -1275,7 +1331,15 @@
 	<xsl:template match="text:span" mode="paragraph">
 		<w:r>
 			<w:rPr>
-				<w:rStyle w:val="{@text:style-name}"/>				
+				<xsl:variable name="headerStyle">
+					<xsl:call-template name="headerStyleName">
+						<xsl:with-param name="styleName" select="@text:style-name"/>
+					</xsl:call-template>			
+				</xsl:variable>
+				
+				<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
+				<!-- <w:rStyle w:val="{@text:style-name}"/> -->
+				<w:rStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:rStyle>
 				<xsl:apply-templates select="key('style', @text:style-name)/style:text-properties" mode="toggle"/>				
 			</w:rPr>
 			<xsl:apply-templates mode="text"/>
@@ -1313,66 +1377,7 @@
 	<xsl:template match="text:line-break" mode="text">
 		<w:br/>
 	</xsl:template>
-		
-	<!-- track changes -->
-  
-	<!--xsl:template match="text:change" mode="paragraph">
-		<xsl:variable name="ID">
-			<xsl:value-of select="@text:change-id"/>
-		</xsl:variable>
-		<w:del>
-			<xsl:for-each select="//text:tracked-changes/text:changed-region">
-				<xsl:if test="@text:id=$ID">
-					<xsl:attribute name="w:id">
-						<xsl:value-of select="position()"/>
-					</xsl:attribute>
-					<xsl:attribute name="w:author">
-						<xsl:value-of select="text:deletion/office:change-info/dc:creator/text()"/>
-					</xsl:attribute>
-					<xsl:attribute name="w:date">
-						<xsl:value-of select="text:deletion/office:change-info/dc:date/text()"/>
-					</xsl:attribute>
-				</xsl:if>
-			</xsl:for-each>
-			<w:r>
-				<w:delText><xsl:value-of select="//text:tracked-changes/text:changed-region[@text:id=$ID]/text:deletion/office:change-info/following-sibling::*/text()"/></w:delText>
-			</w:r>
-		</w:del>
-	</xsl:template>
-	
-	<xsl:template match="text:change-start" mode="paragraph">
-		<xsl:variable name="ID">
-			<xsl:value-of select="@text:change-id"/>
-		</xsl:variable>
-		<w:ins>
-			<xsl:for-each select="//text:tracked-changes/text:changed-region">
-				<xsl:if test="@text:id=$ID">
-					<xsl:attribute name="w:id">
-						<xsl:value-of select="position()"/>
-					</xsl:attribute>
-					<xsl:attribute name="w:author">
-						<xsl:value-of select="text:insertion/office:change-info/dc:creator/text()"/>
-					</xsl:attribute>
-					<xsl:attribute name="w:date">
-						<xsl:value-of select="text:insertion/office:change-info/dc:date/text()"/>
-					</xsl:attribute>
-				</xsl:if>
-			</xsl:for-each>
-			<w:r>
-				<w:t> 
-					<xsl:variable name="pos">
-						<xsl:for-each select="following-sibling::node()">
-							<xsl:if test="@text:change-id=$ID">
-								<xsl:value-of select="position()"/>
-							</xsl:if>
-						</xsl:for-each>
-					</xsl:variable>
-					<xsl:apply-templates select="following-sibling::node()[position() &lt; $pos]" mode="paragraph"/>
-				</w:t>
-			</w:r>
-		</w:ins>
-	</xsl:template-->
-	
+
 	<!-- footnotes and endnotes -->
 	<xsl:template match="text:note" mode="paragraph">
 		<w:r>
@@ -1479,8 +1484,7 @@
 
 	<!-- ignored -->
 	<xsl:template match="text()"/>
-	<xsl:template match="text:tracked-changes"/>
-	
+
 	<!-- odt section -->
 	<xsl:template match="text:section">
 		<xsl:choose>

@@ -59,17 +59,36 @@
 			<xsl:apply-templates
 				select="document('content.xml')/office:document-content/office:automatic-styles"
 				mode="styles"/>
-			<xsl:apply-templates
-				select="document('styles.xml')/office:document-styles/office:automatic-styles"
-				mode="styles"/>
+			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:automatic-styles" mode="styles"/>			
 		</w:styles>
 	</xsl:template>
 
+	<!-- template to prefixe header / footer automatic style -->
+	<xsl:template name="headerStyleName">
+		<xsl:param name="styleName"></xsl:param>
+		<xsl:if test="key('style',$styleName)">
+			<xsl:choose>			
+				<xsl:when test="ancestor::office:document-styles/office:automatic-styles">
+					<xsl:value-of select="'STYLE_'"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="'CONTENT_'"/>
+				</xsl:otherwise>
+			</xsl:choose>	
+		</xsl:if>
+	</xsl:template>
 
-
+	
 	<xsl:template match="style:style" mode="styles">
-		<w:style w:styleId="{@style:name}">
-
+		<xsl:variable name="headerStyle">
+			<xsl:call-template name="headerStyleName">
+				<xsl:with-param name="styleName" select="@style:name"/>
+			</xsl:call-template>			
+		</xsl:variable>
+		
+		<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@style:name)"/></xsl:variable>
+		<w:style>
+			<xsl:attribute name="w:styleId"><xsl:value-of select="$nameStyle"/></xsl:attribute>
 			<xsl:choose>
 				<xsl:when test="@style:family = 'text' ">
 					<xsl:attribute name="w:type">character</xsl:attribute>
@@ -117,7 +136,10 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:if test="@style:name">
-						<w:name w:val="{@style:name}"/>
+						<!--<w:name w:val="{@style:name}"/>-->
+						<w:name>
+						<xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute>
+						</w:name>
 					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
@@ -1280,6 +1302,16 @@
 					</xsl:choose>
 				</xsl:attribute>
 			</w:em>
+		</xsl:if>
+		<xsl:if test="@style:text-position">
+			<xsl:choose>
+				<xsl:when test="substring(@style:text-position, 1, 3) = 'sub'">
+					<w:vertAlign w:val="subscript"/>
+				</xsl:when>
+				<xsl:when test="substring(@style:text-position, 1, 5) = 'super'">
+					<w:vertAlign w:val="superscript"/>
+				</xsl:when>
+			</xsl:choose>
 		</xsl:if>
 	</xsl:template>
 		
