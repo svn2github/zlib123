@@ -743,7 +743,8 @@
 					</xsl:when>
 					<xsl:when test="@fo:text-transform = 'none'">
 						<w:caps w:val="off"/>
-					</xsl:when>
+					</xsl:when>					
+					
 					<!-- It could be also lowercase or capitalize in fo DTD, but it is not possible to set it via word 2007 interface -->
 				</xsl:choose>
 			</xsl:if>
@@ -1000,18 +1001,32 @@
 					</xsl:attribute>
 				</w:em>
 			</xsl:if>
-
+			
 			<xsl:if test="@style:text-position">
 				<xsl:choose>
 					<xsl:when test="substring(@style:text-position, 1, 3) = 'sub'">
-						<w:vertAlign w:val="subscript"/>
+						<w:vertAlign w:val="subscript"/>													
 					</xsl:when>
 					<xsl:when test="substring(@style:text-position, 1, 5) = 'super'">
-						<w:vertAlign w:val="superscript"/>
+						<w:vertAlign w:val="superscript"/>											
 					</xsl:when>
-				</xsl:choose>
+					<xsl:otherwise>
+						<xsl:variable name="value"><xsl:value-of select="substring-before(@style:text-position, '%')"/></xsl:variable>
+						<xsl:choose>
+							<xsl:when test="contains($value,'-')">
+								<w:vertAlign w:val="subscript"/>	
+								<xsl:variable name="positionValue"><xsl:value-of select="round(number(substring-after($value,'-')) div 10 * 2)"/></xsl:variable>
+								<w:position><xsl:attribute name="w:val"><xsl:value-of select="concat('-',$positionValue)"/></xsl:attribute>   </w:position>																	
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:variable name="positionValue"><xsl:value-of select="round(number($value) div 10)"/></xsl:variable>
+								<w:vertAlign w:val="superscript"/>
+								<w:position><xsl:attribute name="w:val"><xsl:value-of select="$positionValue"/></xsl:attribute>   </w:position>																	
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:otherwise>
+				</xsl:choose>												
 			</xsl:if>
-
 			<xsl:if
 				test="(@fo:language and @fo:country) or (@style:language-asian and @style:country-asian) or (@style:language-complex and @style:country-complex)">
 				<w:lang>
@@ -1071,6 +1086,7 @@
 	<!-- toggle properties : this text properties must be applied into the template "text:span" mode="paragraph" 
 	to erase the paragraph style -->
 	<xsl:template match="style:text-properties[parent::style:style  or parent::style:default-style]" mode="toggle">
+		<xsl:param name="fontSize"/>
 		<xsl:if test="@fo:font-weight or @fo:font-weight-asian">
 			<xsl:choose>
 				<xsl:when test="@fo:font-weight = 'bold' or @fo:font-weight-asian = 'bold'">
@@ -1118,7 +1134,11 @@
 				</xsl:when>
 				<xsl:when test="@fo:text-transform = 'none'">
 					<w:caps w:val="off"/>
-				</xsl:when>
+				</xsl:when>				
+				<xsl:otherwise>
+					<w:caps w:val="off"/>
+				</xsl:otherwise>
+				
 				<!-- It could be also lowercase or capitalize in fo DTD, but it is not possible to set it via word 2007 interface -->
 			</xsl:choose>
 		</xsl:if>
@@ -1303,16 +1323,26 @@
 				</xsl:attribute>
 			</w:em>
 		</xsl:if>
-		<xsl:if test="@style:text-position">
-			<xsl:choose>
-				<xsl:when test="substring(@style:text-position, 1, 3) = 'sub'">
-					<w:vertAlign w:val="subscript"/>
-				</xsl:when>
-				<xsl:when test="substring(@style:text-position, 1, 5) = 'super'">
-					<w:vertAlign w:val="superscript"/>
-				</xsl:when>
-			</xsl:choose>
-		</xsl:if>
+				
+			<xsl:if test="@style:text-position ">
+				<xsl:variable name="valueFontSize"><xsl:value-of select="substring-before($fontSize, 'pt')"/></xsl:variable>
+				<xsl:if test="$fontSize and not(substring(@style:text-position, 1, 3) = 'sub' ) and not(substring(@style:text-position, 1, 5) = 'super') ">														
+					<xsl:variable name="value"><xsl:value-of select="round(number(substring-before(@style:text-position, '%')) div 100)"/></xsl:variable>									
+					<xsl:variable name="positionValue"><xsl:value-of select="number($valueFontSize) * number($value) "/></xsl:variable>
+					<w:position><xsl:attribute name="w:val"><xsl:value-of select="$positionValue"/></xsl:attribute>   </w:position>
+					<xsl:variable name="scaleFontHeight"><xsl:value-of select="substring-before(substring-after(@style:text-position,'%'),'%')"/></xsl:variable>
+					<xsl:if test="$fontSize">
+						<w:sz><xsl:attribute name="w:val"><xsl:value-of select="round(number($scaleFontHeight) div 100 * number($valueFontSize) * 2)"/></xsl:attribute></w:sz>
+					</xsl:if>
+				</xsl:if>
+				
+				<xsl:if test="substring(@style:text-position, 1, 3) = 'sub'  ">
+					<w:sz><xsl:attribute name="w:val"><xsl:value-of select="round(number(substring-before(substring-after(@style:text-position,'sub'),'%')) div 100 * number($valueFontSize) * 2)"/></xsl:attribute></w:sz>
+				</xsl:if>
+				<xsl:if test="substring(@style:text-position, 1, 5) = 'super' ">
+					<w:sz><xsl:attribute name="w:val"><xsl:value-of select="round(number(substring-before(substring-after(@style:text-position,'super'),'%')) div 100 * number($valueFontSize) * 2)"/></xsl:attribute></w:sz>
+				</xsl:if>
+			</xsl:if>	
 	</xsl:template>
 		
 	<xsl:template match="style:graphic-properties[parent::style:style]" mode="styles">
@@ -1396,6 +1426,8 @@
 		</xsl:if>
 	</xsl:template>
 
+	
+	
 	<xsl:template name="tabStop">
 		<xsl:param name="styleType"/>
 		<w:tab>

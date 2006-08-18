@@ -1351,7 +1351,20 @@
 				<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
 				<!-- <w:rStyle w:val="{@text:style-name}"/> -->
 				<w:rStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:rStyle>
-				<xsl:apply-templates select="key('style', @text:style-name)/style:text-properties" mode="toggle"/>				
+				
+				<xsl:variable name="fontSize">
+				<xsl:choose>
+					<xsl:when test="key('style',parent::*/@text:style-name)/child::style:text-properties/@fo:font-size">
+						<xsl:value-of select="key('style',parent::*/@text:style-name)/child::style:text-properties/@fo:font-size"/>	
+					</xsl:when>
+					<xsl:otherwise>						
+						<xsl:value-of select="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties/@fo:font-size"/>	
+					</xsl:otherwise>					
+				</xsl:choose>
+				</xsl:variable>
+				<xsl:apply-templates select="key('style', @text:style-name)/style:text-properties" mode="toggle">
+					<xsl:with-param name="fontSize" select="$fontSize"></xsl:with-param>
+				</xsl:apply-templates>				
 			</w:rPr>
 			<xsl:apply-templates mode="text"/>
 		</w:r>
