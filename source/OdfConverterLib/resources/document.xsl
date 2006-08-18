@@ -214,7 +214,10 @@
 								</xsl:variable>
 								<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
 								
-								<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>								
+								<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>
+								<xsl:call-template name="indent">
+									<xsl:with-param name="level" select="$level"/>
+								</xsl:call-template>
 							</w:pPr>
 							<xsl:choose>
 								<xsl:when
@@ -246,22 +249,12 @@
 						
 						<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@text:style-name)"/></xsl:variable>
 						
+						<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>
+						<!-- <w:pStyle w:val="{@text:style-name}"/> -->
 						
-							<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>
-						
-						
-						 <!-- <w:pStyle w:val="{@text:style-name}"/> --> 
-						<w:numPr>
-							<w:ilvl w:val="{$level}"/>
-							<w:numId>
-								<xsl:attribute name="w:val">
-									<xsl:call-template name="numberingId">
-										<xsl:with-param name="styleName"
-											select="ancestor::text:list/@text:style-name"/>
-									</xsl:call-template>
-								</xsl:attribute>
-							</w:numId>
-						</w:numPr>
+						<xsl:call-template name="indent">
+							<xsl:with-param name="level" select="$level"/>
+						</xsl:call-template>
 					</w:pPr>
 					<xsl:apply-templates mode="paragraph"/>
 				</w:p>
@@ -459,128 +452,142 @@
 
 	<xsl:template match="text:list">
 		<xsl:param name="level" select="-1"/>
-		<xsl:apply-templates mode="list">
+		<xsl:apply-templates>
 			<xsl:with-param name="level" select="$level+1"/>
 		</xsl:apply-templates>
 	</xsl:template>
 
-	<xsl:template match="text:list-item" mode="list">
+	<xsl:template match="text:list-item|text:list-header">
 		<xsl:param name="level"/>
-		<xsl:choose>
-			<xsl:when test="*[1][self::text:p]">
-				<w:p>
-					<w:pPr>
-						<xsl:variable name="headerStyle">
-							<xsl:call-template name="headerStyleName">
-								<xsl:with-param name="styleName" select="*[1][self::text:p]/@text:style-name"/>
-							</xsl:call-template>			
-						</xsl:variable>
-						
-						<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,*[1][self::text:p]/@text:style-name)"/></xsl:variable>
-						
-						<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>
-						<!--<w:pStyle w:val="{*[1][self::text:p]/@text:style-name}"/> -->
-						<w:numPr>
-							<w:ilvl w:val="{$level}"/>
-							<w:numId>
-								<xsl:attribute name="w:val">
-									<xsl:call-template name="numberingId">
-										<xsl:with-param name="styleName"
-											select="ancestor::text:list/@text:style-name"/>
-									</xsl:call-template>
-								</xsl:attribute>
-							</w:numId>
-						</w:numPr> 
-
-						<!-- override abstract num indent  if paragraph has margin defined @TODO firstline indent-->
-						<xsl:variable name="styleName" select="*[1][self::text:p]/@text:style-name"/>
-						<xsl:variable name="parentStyleName"
-							select="key('style',$styleName)/@style:parent-style-name"/>
-						<xsl:variable name="listStyleName"
-							select="key('style',$styleName)/@style:list-style-name"/>
-
-						<xsl:variable name="paragraphMargin">
-							<xsl:choose>
-								<xsl:when
-									test="key('style',$styleName)/paragraph-properties/@fo:left-margin">
-									<xsl:call-template name="twips-measure">
-										<xsl:with-param name="length"
-											select="key('style',$styleName)/style:paragraph-properties/@fo:left-margin"
-										/>
-									</xsl:call-template>
-								</xsl:when>
-								<xsl:when
-									test="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left">
-									<xsl:call-template name="twips-measure">
-										<xsl:with-param name="length"
-											select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left"
-										/>
-									</xsl:call-template>
-								</xsl:when>
-
-								<xsl:otherwise>0</xsl:otherwise>
-							</xsl:choose>
-						</xsl:variable>
-
-						<xsl:variable name="minLabelWidthTwip">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length"
-									select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-width"
-								/>
+		<xsl:if test="self::text:list-item">
+			<xsl:choose>
+				<xsl:when test="*[1][self::text:p]">
+					<w:p>
+						<w:pPr>
+							<xsl:variable name="headerStyle">
+								<xsl:call-template name="headerStyleName">
+									<xsl:with-param name="styleName" select="*[1][self::text:p]/@text:style-name"/>
+								</xsl:call-template>			
+							</xsl:variable>
+							
+							<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,*[1][self::text:p]/@text:style-name)"/></xsl:variable>
+							
+							<w:pStyle><xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute></w:pStyle>
+							<!--<w:pStyle w:val="{*[1][self::text:p]/@text:style-name}"/> -->
+							<w:numPr>
+								<w:ilvl w:val="{$level}"/>
+								<w:numId>
+									<xsl:attribute name="w:val">
+										<xsl:call-template name="numberingId">
+											<xsl:with-param name="styleName"
+												select="ancestor::text:list/@text:style-name"/>
+										</xsl:call-template>
+									</xsl:attribute>
+								</w:numId>
+							</w:numPr> 
+	
+							<!-- override abstract num indent  if paragraph has margin defined -->
+							<xsl:call-template name="indent">
+								<xsl:with-param name="level" select="$level"/>
 							</xsl:call-template>
-
-						</xsl:variable>
-
-						<xsl:variable name="spaceBeforeTwip">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length"
-									select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:space-before"
-								/>
-							</xsl:call-template>
-						</xsl:variable>
-
-						<w:ind>
-							<xsl:if test="$paragraphMargin != 0">
-
-								<xsl:attribute name="w:left">
-									<xsl:value-of
-										select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"
-									/>
-								</xsl:attribute>
-
-								<xsl:attribute name="w:hanging">
-									<xsl:value-of select="$spaceBeforeTwip"/>
-								</xsl:attribute>
-
-							</xsl:if>
-
-						</w:ind>
-					</w:pPr>
-
-					<!--footnote or endnote - Include the mark to the first paragraph only when first child of text:note-body is not paragraph -->
-					<xsl:if
-						test="ancestor::text:note and not(ancestor::text:note-body/child::*[position()=1]/text:p) and position() = 1">
-						<xsl:apply-templates select="ancestor::text:note/text:note-citation"/>
-					</xsl:if>
-
-					<!-- first paragraph -->
-					<xsl:apply-templates select="*[1][self::text:p]" mode="paragraph"/>
-				</w:p>
-				<!-- others (text:p or text:list) -->
-				<xsl:apply-templates select="*[position() != 1]">
-					<xsl:with-param name="level" select="$level"/>
-				</xsl:apply-templates>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:apply-templates>
-					<xsl:with-param name="level" select="$level"/>
-				</xsl:apply-templates>
-			</xsl:otherwise>
-		</xsl:choose>
+						</w:pPr>
+	
+						<!--footnote or endnote - Include the mark to the first paragraph only when first child of text:note-body is not paragraph -->
+						<xsl:if
+							test="ancestor::text:note and not(ancestor::text:note-body/child::*[position()=1]/text:p) and position() = 1">
+							<xsl:apply-templates select="ancestor::text:note/text:note-citation"/>
+						</xsl:if>
+	
+						<!-- first paragraph -->
+						<xsl:apply-templates select="*[1][self::text:p]" mode="paragraph"/>
+					</w:p>
+					<!-- others (text:p or text:list) -->
+					<xsl:apply-templates select="*[position() != 1]">
+						<xsl:with-param name="level" select="$level"/>
+					</xsl:apply-templates>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates>
+						<xsl:with-param name="level" select="$level"/>
+					</xsl:apply-templates>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
+		<xsl:if test="self::text:list-header">
+			<xsl:apply-templates>
+				<xsl:with-param name="level" select="$level"/>
+			</xsl:apply-templates>			
+		</xsl:if>
 	</xsl:template>
 
-	<xsl:template match="text:list-header" mode="list">
-		<xsl:apply-templates/>
+	<xsl:template name="indent">
+		<xsl:param name="level" select="0"/>
+		<xsl:variable name="styleName">
+			<xsl:call-template name="styleName"/>
+		</xsl:variable>
+		<xsl:variable name="parentStyleName"
+			select="key('style',$styleName)/@style:parent-style-name"/>
+		<xsl:variable name="listStyleName"
+			select="key('style',$styleName)/@style:list-style-name"/>	
+		<xsl:variable name="paragraphMargin">
+			<xsl:choose>
+				<xsl:when
+					test="key('style',$styleName)/paragraph-properties/@fo:left-margin">
+					<xsl:call-template name="twips-measure">
+						<xsl:with-param name="length"
+							select="key('style',$styleName)/style:paragraph-properties/@fo:left-margin"
+						/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when
+					test="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left">
+					<xsl:call-template name="twips-measure">
+						<xsl:with-param name="length"
+							select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left"
+						/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>0</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="minLabelWidthTwip">
+			<xsl:call-template name="twips-measure">
+				<xsl:with-param name="length"
+					select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-width"
+				/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="spaceBeforeTwip">
+			<xsl:call-template name="twips-measure">
+				<xsl:with-param name="length"
+					select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:space-before"
+				/>
+			</xsl:call-template>
+		</xsl:variable>
+		
+		<xsl:if test="parent::text:list-header|self::text:p">
+			<w:ind>
+				<xsl:attribute name="w:left">
+					<xsl:value-of
+						select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"
+					/>
+				</xsl:attribute>
+				<xsl:if test="not(ancestor-or-self::text:list)">
+					<xsl:attribute name="w:hanging">
+						<xsl:value-of select="$spaceBeforeTwip"/>
+					</xsl:attribute>
+				</xsl:if>
+			</w:ind>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="styleName">
+		<xsl:if test="self::text:list-item">
+			<xsl:value-of select="*[1][self::text:p]/@text:style-name"/>
+		</xsl:if>
+		<xsl:if test="parent::text:list-header|self::text:p">
+			<xsl:value-of select="@text:style-name"/>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- table of contents -->
