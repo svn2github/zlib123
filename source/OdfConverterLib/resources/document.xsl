@@ -459,12 +459,12 @@
 
 	<xsl:template match="text:list">
 		<xsl:param name="level" select="-1"/>
-		<xsl:apply-templates select="text:list-item">
+		<xsl:apply-templates mode="list">
 			<xsl:with-param name="level" select="$level+1"/>
 		</xsl:apply-templates>
 	</xsl:template>
 
-	<xsl:template match="text:list-item">
+	<xsl:template match="text:list-item" mode="list">
 		<xsl:param name="level"/>
 		<xsl:choose>
 			<xsl:when test="*[1][self::text:p]">
@@ -579,6 +579,10 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<xsl:template match="text:list-header" mode="list">
+		<xsl:apply-templates/>
+	</xsl:template>
+	
 	<!-- table of contents -->
 
 	<xsl:template name="tableContent">
