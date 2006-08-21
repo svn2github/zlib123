@@ -1608,6 +1608,7 @@
 
 	<!-- ignored -->
 	<xsl:template match="text()"/>
+  <xsl:template match="text:tracked-changes" />
 
 	<!-- odt section -->
 	<xsl:template match="text:section">
