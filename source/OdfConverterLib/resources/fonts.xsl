@@ -36,6 +36,7 @@
 	
 	<xsl:template name="fonts">
 		<w:fonts>
+			<!-- TODO : Check which source of font-decls to take so as not to double every declaration in OOX (content.xml or style.xml ?). -->
 			<xsl:apply-templates select="document('content.xml')/office:document-content/office:font-face-decls" mode="fonts"/>
 			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:font-face-decls" mode="fonts"/>
 		</w:fonts>
@@ -46,12 +47,21 @@
 		<w:font>
 			<!-- Make sur the 'x-symbol' charset is always '02' and the asian and complex charset are not control -->
 			<xsl:choose>
-				<xsl:when test="@svg:font-family = 'StarSymbol'">
+				<xsl:when test="@style:name = 'StarSymbol'">
 					<xsl:attribute name="w:name">Symbol</xsl:attribute>
 				</xsl:when>
 				<xsl:otherwise>
-					<!--<xsl:attribute name="w:name"><xsl:value-of select="@style:name"/></xsl:attribute>-->
-					<xsl:attribute name="w:name"><xsl:value-of select="@svg:font-family"/></xsl:attribute>
+					<xsl:attribute name="w:name"><xsl:value-of select="@style:name"/></xsl:attribute>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:choose>
+				<xsl:when test="@svg:font-family = 'StarSymbol'">
+					<w:altName w:val="Symbol"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:if test="@svg:font-family">
+						<w:altName w:val="{@svg:font-family}"/>
+					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
 			<xsl:choose>
