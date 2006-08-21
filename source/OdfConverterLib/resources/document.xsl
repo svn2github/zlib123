@@ -445,6 +445,9 @@
 								select="concat('mso-position-horizontal:', key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos,';')"
 							/>
 						</xsl:if>
+						<xsl:if test="parent::draw:frame/@fo:min-width">
+							<xsl:value-of select="'mso-wrap-style:none;'"/>
+						</xsl:if>
 					</xsl:attribute>
 					<xsl:if
 						test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:background-color">
@@ -459,6 +462,42 @@
 							<xsl:if test="@fo:min-height">
 								<xsl:value-of select="'mso-fit-shape-to-text:t'"/>
 							</xsl:if>
+						</xsl:attribute>
+						<xsl:attribute name="inset">
+							<xsl:choose>
+								<xsl:when test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding">
+									<xsl:variable name="padding">
+										<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding,'cm'))*10"/>
+									</xsl:variable>
+									<xsl:value-of select="concat($padding,'mm,',$padding,'mm,',$padding,'mm,',$padding,'mm')"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:variable name="padding-top">	
+										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
+											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top,'cm'))*10"/>
+										</xsl:if>
+									</xsl:variable>
+									<xsl:variable name="padding-right">
+										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right">
+											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right,'cm'))*10"/>
+										</xsl:if>
+									</xsl:variable>
+									<xsl:variable name="padding-bottom">
+										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom">
+											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom,'cm'))*10"/>
+										</xsl:if>	
+									</xsl:variable>
+									<xsl:variable name="padding-left">
+										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left">								
+											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left,'cm'))*10"/>
+										</xsl:if>
+									</xsl:variable>
+							
+									<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
+										<xsl:value-of select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"/>
+									</xsl:if>
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:attribute>
 						<w:txbxContent>
 							<xsl:for-each select="child::node()">
