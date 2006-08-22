@@ -398,9 +398,8 @@ If there are many odd and even page, only one is kept and odd and even pages may
 ;"Table Templates";;2;"0.2-Final";;;
 ;;"Row and Column Styles";2;"0.2-Final";;;
 ;"Font Face Declaration";;0;;;;
-;;"CSS2/SVG Font Descriptors";;"0.2-M1";"Partial";"style:font-face/@svg:font-family is converted to w:fonts/w:font/@w:name
-One special case : 'StarSymbol' value is converted to 'Symbol'";
-;;"Name";;"0.2-M1";;;
+;;"CSS2/SVG Font Descriptors";;"0.2-M1";"Partial";"One special case : 'StarSymbol' value is converted to 'Symbol'";
+;;"Name";;"0.2-M1";"Completed";"Style:font-face/@style:font-name is converted to w:fonts/w:font/@w:name, @svg:font-family conver ted to:font /w:altName";
 ;;"Adornments";;"0.2-M1";;;
 ;;"Font Family Generic";;"0.1";"Completed";"style:font-face/@svg:font-family-generic is converted to w:fonts/w:font/w:family";
 ;;"Font Pitch";;"0.1";"Completed";"style:font-face/@style:font-picth is converted to w:fonts/w:font/w:pitch";
