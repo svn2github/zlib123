@@ -39,8 +39,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 	/// An XmlUrlResolver for zip packaged files
 	/// </summary>
 	public class ZipResolver : XmlUrlResolver, IDisposable
-	{
+    {
         private const string ZIP_URI_SCHEME = "zip";
+        private const string ZIP_URI_HOST = "localhost";
 
 		private ZipReader archive;
 		private Hashtable entries;
@@ -78,7 +79,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 else
                 {
-                    Uri uri = new Uri(ZIP_URI_SCHEME + "://" + relativeUri);
+                    Uri uri = new Uri(ZIP_URI_SCHEME + "://" + ZIP_URI_HOST + "/" + relativeUri);
                     if (!entries.ContainsKey(uri.AbsoluteUri))
                     {
                         entries.Add(uri.AbsoluteUri, relativeUri);
@@ -98,7 +99,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			
 			if (entries.Contains(absoluteUri.AbsoluteUri))
 			{
-                string resource = absoluteUri.OriginalString.Remove(0, ZIP_URI_SCHEME.Length + 3).Replace("/", ".");
 			    stream = archive.GetEntry((string) entries[absoluteUri.AbsoluteUri]);
 			}
 			

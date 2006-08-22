@@ -39,8 +39,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 	/// An XmlUrlResolver for embedded resources.
 	/// </summary>
 	public class ResourceResolver : XmlUrlResolver
-	{
+    {
         public const string ASSEMBLY_URI_SCHEME = "assembly";
+        public const string ASSEMBLY_URI_HOST = "localhost";
 
 		private Assembly assembly;
 		private string prefix;
@@ -60,7 +61,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		{
 			if (baseUri == null && !relativeUri.Contains("://"))
             {
-                return new Uri(ASSEMBLY_URI_SCHEME + "://" + relativeUri);
+                return new Uri(ASSEMBLY_URI_SCHEME + "://" + ASSEMBLY_URI_HOST + "/" + relativeUri);
             }
             else
             {
@@ -72,7 +73,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		{
             if (ASSEMBLY_URI_SCHEME.Equals(absoluteUri.Scheme))
             {
-                string resource = absoluteUri.OriginalString.Remove(0, ASSEMBLY_URI_SCHEME.Length + 3).Replace("/", ".");
+                string resource = absoluteUri.OriginalString.Remove(0, ASSEMBLY_URI_SCHEME.Length + ASSEMBLY_URI_HOST.Length + 4).Replace("/", ".");
 			    Stream stream = this.assembly.GetManifestResourceStream(this.prefix + "." + resource);
                 if (stream != null)
                 {
