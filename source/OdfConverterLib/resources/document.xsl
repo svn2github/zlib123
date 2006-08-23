@@ -621,10 +621,10 @@
 		<xsl:variable name="listStyleName" select="key('style',$styleName)/@style:list-style-name"/>
 		<xsl:variable name="paragraphMargin">
 			<xsl:choose>
-				<xsl:when test="key('style',$styleName)/paragraph-properties/@fo:left-margin">
+				<xsl:when test="key('style',$styleName)/style:paragraph-properties/@fo:margin-left">
 					<xsl:call-template name="twips-measure">
 						<xsl:with-param name="length"
-							select="key('style',$styleName)/style:paragraph-properties/@fo:left-margin"
+							select="key('style',$styleName)/style:paragraph-properties/@fo:margin-left"
 						/>
 					</xsl:call-template>
 				</xsl:when>
@@ -654,7 +654,7 @@
 			</xsl:call-template>
 		</xsl:variable>
 
-		<xsl:if test="parent::text:list-header|self::text:p">
+		<xsl:if test="self::text:p|self::text:list-item|parent::text:list-header">
 			<w:ind>
 				<xsl:attribute name="w:left">
 					<xsl:value-of select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"
