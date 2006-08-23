@@ -206,11 +206,20 @@
         
         <xsl:variable name="posH" select="$style/@style:horizontal-rel"/>
         
-        <xsl:variable name="wrap" select="$style/@style:wrap"/>
-
-        <xsl:choose>
-            <xsl:when test="@svg:x or @svg:y">
-                <w:r>
+         <xsl:variable name="wrap" >
+              <xsl:choose>
+                       <xsl:when test="not($style/@style:wrap)">none</xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="$style/@style:wrap"/>        
+                        </xsl:otherwise>
+                </xsl:choose>
+          </xsl:variable>
+          
+        <xsl:variable name="horizontal-pos" select="$style/@style:horizontal-pos" />
+            
+        <xsl:variable name="vertical-pos" select="$style/@style:vertical-pos" />
+       
+            <w:r>
                     <w:drawing>
                         <wp:anchor simplePos="0" relativeHeight="251658240" behindDoc="0" locked="0"
                             layoutInCell="1" allowOverlap="1">
@@ -222,10 +231,20 @@
                                         <xsl:otherwise>column</xsl:otherwise>
                                     </xsl:choose>
                                 </xsl:attribute>
-                                <wp:posOffset>
-                                    <xsl:value-of select="$ox"/>
-                                </wp:posOffset>
+                                <xsl:choose>
+                                    <xsl:when test="$horizontal-pos !='from-left' and $horizontal-pos !='from-outside' " >
+                                        <wp:align>
+                                            <xsl:value-of select="$horizontal-pos"/>
+                                         </wp:align>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <wp:posOffset>
+                                            <xsl:value-of select="$ox"/>
+                                        </wp:posOffset>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </wp:positionH>
+                            
                             <wp:positionV>
                                 <xsl:attribute name="relativeFrom">
                                     <xsl:choose>
@@ -233,9 +252,24 @@
                                         <xsl:otherwise>paragraph</xsl:otherwise>
                                     </xsl:choose>
                                 </xsl:attribute>
-                                <wp:posOffset>
-                                    <xsl:value-of select="$oy"/>
-                                </wp:posOffset>
+                                
+                                <xsl:choose>
+                                    <xsl:when test="$vertical-pos !='from-top' and $vertical-pos !='below' " >
+                                        <wp:align>
+                                            <xsl:choose>
+                                                <xsl:when test="$vertical-pos = 'top' ">top</xsl:when>                                          
+                                                <xsl:when test="$vertical-pos = 'bottom' ">bottom</xsl:when>                                          
+                                                <xsl:when test="$vertical-pos = 'middle' ">center</xsl:when>                                          
+                                                </xsl:choose>
+                                        </wp:align>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <wp:posOffset>
+                                            <xsl:value-of select="$oy"/>
+                                        </wp:posOffset>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                                
                             </wp:positionV>
                             <wp:extent cx="{$cx}" cy="{$cy}"/>
                             <wp:effectExtent l="0" t="0" r="0" b="0"/>
@@ -296,7 +330,7 @@
                                 <xsl:when test="$wrap = 'run-through'">
                                     <wp:wrapNone/>
                                 </xsl:when>
-                                <xsl:when test="$wrap = 'none'">
+                                <xsl:when test="$wrap = 'none' "> 
                                     <wp:wrapTopAndBottom>
                                         <xsl:attribute name="distB">
                                             <xsl:choose>
@@ -366,12 +400,12 @@
                         </wp:anchor>
                     </w:drawing>
                 </w:r>
-            </xsl:when>
-            <xsl:otherwise>
+          
+            <!--  TODO
                 <w:r>
                         <w:drawing>
                             <wp:inline>
-                                <!-- width and heigth -->
+                                 width and heigth 
                                 <wp:extent cx="{$cx}" cy="{$cy}"/>
                                 <wp:effectExtent l="0" t="0" r="0" b="0"/>
                                 <wp:docPr name="{@draw:name}" id="{$intId}"/>
@@ -380,28 +414,28 @@
                                         uri="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
                                         <pic:pic
                                             xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
-                                            <!-- non visual drawing properties -->
+                                           non visual drawing properties 
                                             <pic:nvPicPr>
                                                 <pic:cNvPr name="{@draw:name}" id="{$intId}"/>
                                                 <pic:cNvPicPr>
-                                                    <!-- TODO : implement  cNvPicPr -->
+                                                 TODO : implement  cNvPicPr
                                                     <a:picLocks noChangeAspect="1"/>
                                                 </pic:cNvPicPr>
                                             </pic:nvPicPr>
                                             <pic:blipFill>
                                                 <a:blip r:embed="{generate-id(draw:image)}"/>
                                                 <a:stretch>
-                                                    <!-- TODO -->
+                                                  TODO 
                                                     <a:fillRect/>
                                                 </a:stretch>
                                             </pic:blipFill>
                                             <pic:spPr>
                                                 <a:xfrm>
                                                     <a:off x="0" y="0"/>
-                                                    <!-- TODO -->
+                                                 TODO
                                                     <a:ext cx="{$cx}" cy="{$cy}"/>
                                                 </a:xfrm>
-                                                <!-- TODO -->
+                                                TODO
                                                 <a:prstGeom prst="rect">
                                                     <a:avLst/>
                                                 </a:prstGeom>
@@ -412,9 +446,7 @@
                             </wp:inline>
                         </w:drawing>
                     </w:r>
-            </xsl:otherwise>
-        </xsl:choose>
-            
+            -->
         </xsl:if>
         
     </xsl:template>
