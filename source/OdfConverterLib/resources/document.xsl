@@ -840,7 +840,7 @@
 			</xsl:call-template>
 		</xsl:variable>
 
-		<xsl:if test="parent::text:list-header|self::text:p">
+		<xsl:if test="parent::text:list-header|self::text:p and ($minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip > 0 or $spaceBeforeTwip > 0)">
 			<w:ind>
 				<xsl:if test="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip > 0">
 					<xsl:attribute name="w:left">
