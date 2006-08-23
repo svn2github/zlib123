@@ -48,6 +48,7 @@
 		match="office:automatic-styles/style:style|office:automatic-styles/style:style"
 		use="@style:name"/>
 	<xsl:key name="hyperlinks" match="text:a" use="''"/>
+	<xsl:key name="headers" match="text:h" use="''"/>
 	<xsl:key name="images" match="draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]"
 		use="''"/>
 	<xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
@@ -116,7 +117,7 @@
 				</xsl:choose>
 			</w:pPr>
 			<xsl:variable name="id">
-				<xsl:number/>
+				<xsl:value-of select="number(count(preceding::text:h)+1)"/>
 			</xsl:variable>
 
 			<w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id)}"/>
@@ -173,7 +174,7 @@
 							<xsl:apply-templates mode="paragraph"/>
 						</xsl:when>
 						<!-- we are in table of contents -->
-						<xsl:when test="parent::text:index-body and ancestor::text:table-of-content">
+						<xsl:when test="parent::text:index-body">
 							<w:pPr>
 								<xsl:variable name="headerStyle">
 									<xsl:call-template name="headerStyleName">
@@ -192,14 +193,34 @@
 								</w:pStyle>
 							</w:pPr>
 							<xsl:variable name="num">
+								<xsl:choose>
+									<xsl:when test="ancestor::text:table-index">
+										<xsl:value-of
+											select="count(preceding-sibling::text:p)+count( key('headers',''))+1"
+										/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:number/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:variable name="ile">
 								<xsl:number/>
 							</xsl:variable>
-							<xsl:if test="$num=1">
+							
+							<xsl:if test="$ile = 1">
 								<w:r>
 									<w:fldChar w:fldCharType="begin"/>
 								</w:r>
 								<w:r>
-									<w:instrText xml:space="preserve"> TOC \o "1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
+									<xsl:choose>
+										<xsl:when test="ancestor::text:table-of-content">
+											<w:instrText xml:space="preserve"> TOC \o "1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
+										</xsl:when>
+										<xsl:otherwise>
+											<w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"/>"</w:instrText>
+										</xsl:otherwise>
+									</xsl:choose>
 								</w:r>
 								<w:r>
 									<w:fldChar w:fldCharType="separate"/>
@@ -417,7 +438,8 @@
 					</xsl:variable>
 					<xsl:variable name="frameH">
 						<xsl:call-template name="point-measure">
-							<xsl:with-param name="length" select="@fo:min-height|parent::draw:frame/@svg:height"/>
+							<xsl:with-param name="length"
+								select="@fo:min-height|parent::draw:frame/@svg:height"/>
 						</xsl:call-template>
 					</xsl:variable>
 					<xsl:variable name="marginL">
@@ -466,36 +488,56 @@
 						</xsl:attribute>
 						<xsl:attribute name="inset">
 							<xsl:choose>
-								<xsl:when test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding">
+								<xsl:when
+									test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding">
 									<xsl:variable name="padding">
-										<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding,'cm'))*10"/>
+										<xsl:value-of
+											select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding,'cm'))*10"
+										/>
 									</xsl:variable>
-									<xsl:value-of select="concat($padding,'mm,',$padding,'mm,',$padding,'mm,',$padding,'mm')"/>
+									<xsl:value-of
+										select="concat($padding,'mm,',$padding,'mm,',$padding,'mm,',$padding,'mm')"
+									/>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:variable name="padding-top">	
-										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
-											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top,'cm'))*10"/>
+									<xsl:variable name="padding-top">
+										<xsl:if
+											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
+											<xsl:value-of
+												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top,'cm'))*10"
+											/>
 										</xsl:if>
 									</xsl:variable>
 									<xsl:variable name="padding-right">
-										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right">
-											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right,'cm'))*10"/>
+										<xsl:if
+											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right">
+											<xsl:value-of
+												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right,'cm'))*10"
+											/>
 										</xsl:if>
 									</xsl:variable>
 									<xsl:variable name="padding-bottom">
-										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom">
-											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom,'cm'))*10"/>
-										</xsl:if>	
-									</xsl:variable>
-									<xsl:variable name="padding-left">
-										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left">								
-											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left,'cm'))*10"/>
+										<xsl:if
+											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom">
+											<xsl:value-of
+												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom,'cm'))*10"
+											/>
 										</xsl:if>
 									</xsl:variable>
-							
-									<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
-										<xsl:value-of select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"/>
+									<xsl:variable name="padding-left">
+										<xsl:if
+											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left">
+											<xsl:value-of
+												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left,'cm'))*10"
+											/>
+										</xsl:if>
+									</xsl:variable>
+
+									<xsl:if
+										test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
+										<xsl:value-of
+											select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"
+										/>
 									</xsl:if>
 								</xsl:otherwise>
 							</xsl:choose>
@@ -733,6 +775,25 @@
 			<w:rPr/>
 			<w:fldChar w:fldCharType="end"/>
 		</w:r>
+	</xsl:template>
+
+	<xsl:template match="text:table-index">
+		<xsl:if test="text:index-body/text:index-title/text:p">
+			<xsl:apply-templates select="text:index-body/text:index-title/text:p"/>
+		</xsl:if>
+
+		<xsl:for-each select="text:index-body/child::text:p">
+			<xsl:variable name="num">
+				<xsl:value-of select="position()+count( key('headers',''))+1"/>
+			</xsl:variable>
+			<xsl:apply-templates select="."/>
+		</xsl:for-each>
+		<w:p>
+			<w:r>
+				<w:rPr/>
+				<w:fldChar w:fldCharType="end"/>
+			</w:r>
+		</w:p>
 	</xsl:template>
 
 	<xsl:template match="text:table-of-content">
@@ -1573,6 +1634,32 @@
 		</w:fldSimple>
 	</xsl:template>-->
 
+	<xsl:template match="text:sequence" mode="paragraph">
+		<xsl:variable name="id">
+			<xsl:value-of
+				select="number(count(preceding::text:sequence)+count( key('headers','')))+1"/>
+			<!--<xsl:value-of select="count( key('headers',''))"/>-->
+		</xsl:variable>
+		<w:fldSimple>
+			<xsl:variable name="numType">
+				<xsl:choose>
+					<xsl:when test="@style:num-format = 'i'">\* roman</xsl:when>
+					<xsl:otherwise>\* arabic</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:attribute name="w:instr">
+				<xsl:value-of select="concat('SEQ ', @text:name,' ', $numType)"/>
+			</xsl:attribute>
+			<w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id)}"/>
+			<w:r>
+				<w:t>
+					<xsl:value-of select="."/>
+				</w:t>
+			</w:r>
+			<w:bookmarkEnd w:id="{$id}"/>
+		</w:fldSimple>
+	</xsl:template>
+
 	<!-- Extra spaces management, courtesy of J. David Eisenberg -->
 	<xsl:variable name="spaces" xml:space="preserve">                                       </xsl:variable>
 
@@ -1609,7 +1696,7 @@
 
 	<!-- ignored -->
 	<xsl:template match="text()"/>
-  <xsl:template match="text:tracked-changes" />
+	<xsl:template match="text:tracked-changes"/>
 
 	<!-- odt section -->
 	<xsl:template match="text:section">
