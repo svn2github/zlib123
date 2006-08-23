@@ -221,8 +221,14 @@
        
             <w:r>
                     <w:drawing>
-                        <wp:anchor simplePos="0" relativeHeight="251658240" behindDoc="0" locked="0"
+                        <wp:anchor simplePos="0" relativeHeight="251658240"  locked="0"
                             layoutInCell="1" allowOverlap="1">
+                            <xsl:attribute name="behindDoc">
+                                <xsl:choose>
+                                    <xsl:when test="$wrap = 'run-through' and $style/@style:run-through = 'background' ">1</xsl:when>                                     
+                                    <xsl:otherwise>0</xsl:otherwise>                                        
+                                </xsl:choose>
+                             </xsl:attribute>
                             <wp:simplePos x="0" y="0"/>
                             <wp:positionH>
                                 <xsl:attribute name="relativeFrom">
