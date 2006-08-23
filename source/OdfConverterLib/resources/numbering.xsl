@@ -193,11 +193,13 @@
 						
 					</w:ind>
 				</w:pPr>
-				<xsl:call-template name="bulletType">					
-					<xsl:with-param name="char">
-						<xsl:call-template name="textChar"/>
-					</xsl:with-param>
-				</xsl:call-template>
+				<xsl:if test="name() = 'text:list-level-style-bullet' ">
+					<xsl:call-template name="bulletType">					
+						<xsl:with-param name="char">
+							<xsl:call-template name="textChar"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:if>
 			</w:lvl>
 		</xsl:if>
 
@@ -206,14 +208,15 @@
 	<xsl:template name="textChar">
 		<xsl:choose>
 			<xsl:when test="@text:bullet-char = '' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '' "></xsl:when>
 			<xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
 			<xsl:when test="@text:bullet-char = '●' "></xsl:when>
-			<xsl:when test="@text:bullet-char = '➢' "></xsl:when>
-			<xsl:when test="@text:bullet-char = '✔' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '➢' ">�??</xsl:when>
+			<xsl:when test="@text:bullet-char = '✔' ">�?�</xsl:when>
 			<xsl:when test="@text:bullet-char = '■' "></xsl:when>
 			<xsl:when test="@text:bullet-char = '○' ">o</xsl:when>
-			<xsl:when test="@text:bullet-char = '➔' "></xsl:when>
-			<xsl:when test="@text:bullet-char = '✗' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '➔' ">�?�</xsl:when>
+			<xsl:when test="@text:bullet-char = '✗' ">�?�</xsl:when>
 			<xsl:when test="@text:bullet-char = '–' ">–</xsl:when>
 			<xsl:otherwise>•</xsl:otherwise>
 		</xsl:choose>
@@ -223,40 +226,85 @@
 		<xsl:param name="char"/>
 		<xsl:choose>			
 			<xsl:when
-				test="$char = ''  or  $char = '' or  $char = ''  or  $char = ' ✗'  or $char='' ">
+				test="$char = '�?�'  or  $char = '�??' or  $char = ''  or  $char = ' ✗'  or $char='' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>
+					<xsl:call-template name="bulletSize">
+						<xsl:with-param name="fontName">
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+						</xsl:with-param>
+					</xsl:call-template>
+					
+					
 				</w:rPr>
 			</xsl:when>
 
-			<xsl:when test="$char = '' ">
+			<xsl:when test="$char = '�?�' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings 3" w:hAnsi="Wingdings 3" w:hint="default"/>
+					<xsl:call-template name="bulletSize">
+						<xsl:with-param name="fontName">
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+						</xsl:with-param>
+					</xsl:call-template>
+					
+					
 				</w:rPr>
 			</xsl:when>
 
-			<xsl:when test="$char = '' ">
+			<xsl:when test="$char = '�?�' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings 2" w:hAnsi="Wingdings 2" w:hint="default"/>
+					<xsl:call-template name="bulletSize">
+						<xsl:with-param name="fontName">
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+						</xsl:with-param>
+					</xsl:call-template>
+					
 				</w:rPr>
 			</xsl:when>		
 			
-			<xsl:when test="$char  = '○' ">
+			<xsl:when test="$char  = 'o'  or $char = '•' or $char = '–' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Courier New" w:hAnsi="Courier New" w:cs="Courier New"
 						w:hint="default"/>
+					<xsl:call-template name="bulletSize">
+						<xsl:with-param name="fontName">
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+						</xsl:with-param>
+					</xsl:call-template>
+					
+					
 				</w:rPr>
 			</xsl:when>
 			<xsl:when test="$char  = '' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>
+					<xsl:call-template name="bulletSize">
+						<xsl:with-param name="fontName">
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+						</xsl:with-param>
+					</xsl:call-template>
+
 				</w:rPr>
 			</xsl:when>
 			
 			<xsl:otherwise></xsl:otherwise>
 		</xsl:choose>				
 	</xsl:template>	
-
+	<xsl:template name="bulletSize">
+		<xsl:param name="fontName"/>
+			<xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[@style:font-name = $fontName]">
+				<xsl:variable name="sz">
+					<xsl:call-template name="computeSize">
+						<xsl:with-param name="node" select="document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[@style:font-name = $fontName]"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:if test="number($sz)">
+					<w:sz w:val="{$sz}"/>
+				</xsl:if>
+			</xsl:if>
+	</xsl:template>
 	<!--
 		function    : num-format
 		param       : format (string)
