@@ -209,6 +209,7 @@
 		<xsl:choose>
 			<xsl:when test="@text:bullet-char = '' "></xsl:when>
 			<xsl:when test="@text:bullet-char = '' "></xsl:when>
+			<xsl:when test="@text:bullet-char = '☑' "></xsl:when>
 			<xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
 			<xsl:when test="@text:bullet-char = '●' "></xsl:when>
 			<xsl:when test="@text:bullet-char = '➢' "></xsl:when>
@@ -226,7 +227,7 @@
 		<xsl:param name="char"/>
 		<xsl:choose>			
 			<xsl:when
-				test="$char = ''  or  $char = '' or  $char = ''  or  $char = ' ✗'  or $char='' ">
+				test="$char = ''  or  $char = '' or  $char = ''  or  $char = ' ✗'  or $char=''  or $char='' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>
 					<xsl:call-template name="bulletSize">
