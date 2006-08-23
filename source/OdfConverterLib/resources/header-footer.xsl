@@ -183,7 +183,20 @@
 					</xsl:attribute>
 				</Relationship>
 			</xsl:for-each>
-
+			
+			<xsl:for-each select="$node/descendant::draw:frame[./draw:object-ole]">
+				<zip:copy zip:source="{substring-after(draw:object-ole/@xlink:href,'./')}" zip:target="word/embeddings/{translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')}"/>
+				<Relationship Id='{generate-id(draw:object-ole)}' 
+					Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
+					Target="embeddings/{translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')}"/>
+				<xsl:if test="draw:image">
+					<zip:copy zip:source="{substring-after(draw:image/@xlink:href,'./')}" zip:target="word/media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"/>
+					<Relationship Id='{generate-id(draw:image)}' 
+						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+						Target="media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"/>
+				</xsl:if>
+			</xsl:for-each>
+			
 			<xsl:for-each select="$node/descendant::draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]">	
 				<xsl:variable name="supported">
 					<xsl:call-template name="image-support">

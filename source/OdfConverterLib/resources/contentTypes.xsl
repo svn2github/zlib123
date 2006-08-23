@@ -37,6 +37,7 @@
           <Default Extension="png" ContentType="image/png"/>
           <Default Extension="wmf" ContentType="image/x-emf"/>
           <Default Extension="emf" ContentType="image/x-emf"/>
+          <Default Extension="bin" ContentType="application/octet-stream"/>
           <Default Extension="rels"
             ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
           <Default Extension="xml" ContentType="application/xml"/>

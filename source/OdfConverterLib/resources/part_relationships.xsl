@@ -76,9 +76,23 @@
 					<xsl:attribute name="Target">footer<xsl:value-of select="position()"/>.xml</xsl:attribute>
 				</Relationship>
 			</xsl:for-each>
-			<!-- images 
-				TODO : manage ole-objects 
-			-->
+			
+			<!-- OLE Objects -->
+			<xsl:for-each select="document('content.xml')">
+				<xsl:for-each select="key('ole-objects', '')[not(ancestor::text:note)]">
+					<zip:copy zip:source="{substring-after(draw:object-ole/@xlink:href,'./')}" zip:target="word/embeddings/{translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')}"/>
+					<Relationship Id='{generate-id(draw:object-ole)}' 
+						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
+						Target="embeddings/{translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')}"/>
+					<xsl:if test="draw:image">
+						<zip:copy zip:source="{substring-after(draw:image/@xlink:href,'./')}" zip:target="word/media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"/>
+						<Relationship Id='{generate-id(draw:image)}' 
+							Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+							Target="media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"/>
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:for-each>
+			
 			<xsl:for-each select="document('content.xml')">
 				<xsl:for-each select="key('images', '')[not(ancestor::text:note)]">	
 					<xsl:variable name="supported">
@@ -100,7 +114,7 @@
 						</xsl:when>
 						<xsl:otherwise> 
 							<!-- External image -->
-							<!-- TOTO support for external images
+							<!-- TODO support for external images
 								<Relationship Id='{generate-id(draw:image)}' 					
 								Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
 								Target="{draw:image/@xlink:href}"
