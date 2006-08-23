@@ -282,6 +282,12 @@
 						test="name(preceding-sibling::*[1]) = 'draw:frame' and preceding-sibling::*[1]/draw:image">
 						<xsl:apply-templates select="preceding-sibling::*[1]" mode="paragraph"/>
 					</xsl:if>
+					<!-- If there is a page-break-after in the paragraph style -->
+					<xsl:if test="key('style',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
+						<w:r>
+							<w:br w:type="page"/>
+						</w:r>
+					</xsl:if>
 				</w:p>
 			</xsl:when>
 			<xsl:otherwise>
