@@ -260,7 +260,7 @@ w:gridCol/@w:w is based on style:table-column-properties/@style:column-width for
 ;;"Text Box";1;"0.2-M1";"Partial";"draw:frame/draw:text-box converted to  w:pict/v:shape/v:textbox/w:txbxContent";"TODO: assign styles and position"
 ;;"Image";1;"0.2-M1";"Partial";"Internal images only, ie [starts-with(draw:frame/draw:image/@xlink:href, 'Pictures/')]. Converted to w:drawing/wp:inline.
 wp:extend attibutes @cx and @cx respectively use draw:frame/@svg:width and draw:frame/@svg:height and fail-safe with draw:text-box/@fo:min-width and draw:text-box/@fo:min-height";
-;;"Objects";;;;;
+;;"Objects";;;"Partial";"Draw:object-ole translated to o:OLEObject. An object can have an image associated to it. xlink:href translated to an Id register through part-relationships.xsl. Binary files are pu into word/embeddings/xxx.bin, while associated images are taken from ObjectReplacements/ and put into word/media/xxx.wmf.";
 ;;"Applet";;;;;
 ;;"Plugins";;;;;
 ;;"Parameters";;;;;
