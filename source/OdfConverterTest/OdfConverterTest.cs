@@ -49,8 +49,9 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         private bool recursiveMode = false;    // go in subfolders ?
         private string reportPath = null;      // file to save report
         private string xslPath = null;         // Path to an external stylesheet
+        private bool displayDuration = false;      // display time taken by conversion
 
-        private OdfConverterTest(String input, String output, bool validate, bool debug, bool recursiveMode, String reportPath, String xslPath)
+        private OdfConverterTest(String input, String output, bool validate, bool debug, bool recursiveMode, String reportPath, String xslPath, bool displayDuration)
         {
             this.input = input;
             this.output = output;
@@ -59,6 +60,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             this.recursiveMode = recursiveMode;
             this.reportPath = reportPath;
             this.xslPath = xslPath;
+            this.displayDuration = displayDuration;
         }
 
         /// <summary>
@@ -75,6 +77,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             string reportPath = null;
             string xslPath = null;
             bool doReturn = false;
+            bool displayDuration = false;
 
             //Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
             //Debug.AutoFlush = true;
@@ -103,6 +106,9 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                         break;
                     case "/V":
                         validate = true;
+                        break;
+                    case "/T":
+                        displayDuration = true;
                         break;
                     case "/DEBUG":
                         debug = true;
@@ -192,7 +198,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                     output += ".docx";
                 }
             }
-            new OdfConverterTest(input, output, validate, debug, recursiveMode, reportPath, xslPath).run();
+            new OdfConverterTest(input, output, validate, debug, recursiveMode, reportPath, xslPath, displayDuration).run();
         }
 
         private void run()
@@ -202,6 +208,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             // transformation
             try
             {
+                DateTime start = DateTime.Now;
                 if (xslPath == null)
                 {
                     new Converter().OdfToOox(this.input, this.output);
@@ -210,6 +217,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 {
                     new Converter().OdfToOoxWithExternalResources(this.input, this.output, this.xslPath);
                 }
+                TimeSpan duration = DateTime.Now - start;
 
                 // validation
                 if (this.validate)
@@ -227,6 +235,10 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                         }
                         File.Move(this.output, this.output + ".NOT_VALID");
                     }
+                }
+                if (this.displayDuration)
+                {
+                    Console.WriteLine("Total conversion time: " + duration);
                 }
             }
             catch (NotAnOdfDocumentException e)
@@ -259,6 +271,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             Console.WriteLine("     /I Filename        Name of the ODF file to transform");
             Console.WriteLine("     /O PathOrFilename  Path of the folder where to put the output file (must exist) or name of the output file");
             Console.WriteLine("     /V                 Validate the result of the transformation against OpenXML schemas");
+            Console.WriteLine("     /T                 Display conversion time");
             Console.WriteLine("     /DEBUG             Debug mode");
             Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
         }

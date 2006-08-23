@@ -29,6 +29,7 @@ OdfConverterTest Usage
 	/I Filename        Name of the ODF file to transform
 	/O PathOrFilename  Path of the folder where to put the output file (must exist) or name of the output file
 	/V                 Validate the result of the transformation against OpenXML schemas
+	/T                 Display conversion time
 	/DEBUG             Debug mode
 	/XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)
 
