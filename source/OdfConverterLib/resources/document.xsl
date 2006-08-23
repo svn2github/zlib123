@@ -655,11 +655,12 @@
 
 		<xsl:if test="parent::text:list-header|self::text:p">
 			<w:ind>
-				<xsl:attribute name="w:left">
-					<xsl:value-of select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"
-					/>
-				</xsl:attribute>
-				<xsl:if test="not(ancestor-or-self::text:list)">
+				<xsl:if test="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip > 0">
+					<xsl:attribute name="w:left">
+						<xsl:value-of select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"/>						
+					</xsl:attribute>
+				</xsl:if>
+				<xsl:if test="not(ancestor-or-self::text:list) and $spaceBeforeTwip > 0">
 					<xsl:attribute name="w:hanging">
 						<xsl:value-of select="$spaceBeforeTwip"/>
 					</xsl:attribute>

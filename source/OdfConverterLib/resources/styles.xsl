@@ -221,14 +221,14 @@
 						</xsl:attribute>
 						<xsl:if test="@fo:padding">
 							<xsl:attribute name="w:space">
-								<xsl:call-template name="point-measure">
+								<xsl:call-template name="padding-val">
 									<xsl:with-param name="length" select="@fo:padding"/>
 								</xsl:call-template>
 							</xsl:attribute>
 						</xsl:if>
 						<xsl:if test="@fo:padding-top">
 							<xsl:attribute name="w:space">
-								<xsl:call-template name="point-measure">
+								<xsl:call-template name="padding-val">
 									<xsl:with-param name="length" select="@fo:padding-top"/>
 								</xsl:call-template>
 							</xsl:attribute>
@@ -260,14 +260,14 @@
 						</xsl:attribute>
 						<xsl:if test="@fo:padding">
 							<xsl:attribute name="w:space">
-								<xsl:call-template name="point-measure">
+								<xsl:call-template name="padding-val">
 									<xsl:with-param name="length" select="@fo:padding"/>
 								</xsl:call-template>
 							</xsl:attribute>
 						</xsl:if>
 						<xsl:if test="@fo:padding-left">
 							<xsl:attribute name="w:space">
-								<xsl:call-template name="point-measure">
+								<xsl:call-template name="padding-val">
 									<xsl:with-param name="length" select="@fo:padding-left"/>
 								</xsl:call-template>
 							</xsl:attribute>
@@ -294,14 +294,14 @@
 						</xsl:attribute>
 						<xsl:if test="@fo:padding">
 							<xsl:attribute name="w:space">
-								<xsl:call-template name="point-measure">
+								<xsl:call-template name="padding-val">
 									<xsl:with-param name="length" select="@fo:padding"/>
 								</xsl:call-template>
 							</xsl:attribute>
 						</xsl:if>
 						<xsl:if test="@fo:padding-bottom">
 							<xsl:attribute name="w:space">
-								<xsl:call-template name="point-measure">
+								<xsl:call-template name="padding-val">
 									<xsl:with-param name="length" select="@fo:padding-bottom"/>
 								</xsl:call-template>
 							</xsl:attribute>
@@ -328,14 +328,14 @@
 						</xsl:attribute>
 						<xsl:if test="@fo:padding">
 							<xsl:attribute name="w:space">
-								<xsl:call-template name="point-measure">
+								<xsl:call-template name="padding-val">
 									<xsl:with-param name="length" select="@fo:padding"/>
 								</xsl:call-template>
 							</xsl:attribute>
 						</xsl:if>
 						<xsl:if test="@fo:padding-right">
 							<xsl:attribute name="w:space">
-								<xsl:call-template name="point-measure">
+								<xsl:call-template name="padding-val">
 									<xsl:with-param name="length" select="@fo:padding-right"/>
 								</xsl:call-template>
 							</xsl:attribute>
@@ -366,9 +366,16 @@
 										select="substring-before(@fo:border-top,  ' ')"/>
 								</xsl:call-template>
 							</xsl:attribute>
+							<xsl:if test="@fo:padding">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="padding-val">
+										<xsl:with-param name="length" select="@fo:padding"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:if test="@fo:padding-top">
 								<xsl:attribute name="w:space">
-									<xsl:call-template name="point-measure">
+									<xsl:call-template name="padding-val">
 										<xsl:with-param name="length" select="@fo:padding-top"/>
 									</xsl:call-template>
 								</xsl:attribute>
@@ -396,9 +403,16 @@
 										select="substring-before(@fo:border-left,  ' ')"/>
 								</xsl:call-template>
 							</xsl:attribute>
+							<xsl:if test="@fo:padding">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="padding-val">
+										<xsl:with-param name="length" select="@fo:padding"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:if test="@fo:padding-left">
 								<xsl:attribute name="w:space">
-									<xsl:call-template name="point-measure">
+									<xsl:call-template name="padding-val">
 										<xsl:with-param name="length" select="@fo:padding-left"/>
 									</xsl:call-template>
 								</xsl:attribute>
@@ -426,9 +440,16 @@
 										select="substring-before(@fo:border-bottom,  ' ')"/>
 								</xsl:call-template>
 							</xsl:attribute>
+							<xsl:if test="@fo:padding">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="padding-val">
+										<xsl:with-param name="length" select="@fo:padding"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:if test="@fo:padding-bottom">
 								<xsl:attribute name="w:space">
-									<xsl:call-template name="point-measure">
+									<xsl:call-template name="padding-val">
 										<xsl:with-param name="length" select="@fo:padding-bottom"/>
 									</xsl:call-template>
 								</xsl:attribute>
@@ -456,9 +477,16 @@
 										select="substring-before(@fo:border-right,  ' ')"/>
 								</xsl:call-template>
 							</xsl:attribute>
+							<xsl:if test="@fo:padding">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="padding-val">
+										<xsl:with-param name="length" select="@fo:padding"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:if test="@fo:padding-right">
 								<xsl:attribute name="w:space">
-									<xsl:call-template name="point-measure">
+									<xsl:call-template name="padding-val">
 										<xsl:with-param name="length" select="@fo:padding-right"/>
 									</xsl:call-template>
 								</xsl:attribute>
@@ -472,7 +500,44 @@
 					</xsl:if>
 				</w:pBdr>
 			</xsl:if>
-
+			<!-- indent generated by the borders. Limited to 620 twip. -->
+			<xsl:if test="@fo:padding">
+				<xsl:variable name="indent">
+					<xsl:call-template name="indent-val">
+						<xsl:with-param name="length" select="@fo:padding" />
+					</xsl:call-template>
+				</xsl:variable>
+				<w:ind>
+					<xsl:if test="@fo:border != 'none'">
+						<xsl:attribute name="w:left"><xsl:value-of select="$indent"/></xsl:attribute>
+						<xsl:attribute name="w:right"><xsl:value-of select="$indent"/></xsl:attribute></xsl:if>					
+					<xsl:if test="@fo:border-left != 'none'">
+						<xsl:attribute name="w:left"><xsl:value-of select="$indent"/></xsl:attribute>
+					</xsl:if>					
+					<xsl:if test="@fo:border-right != 'none'">
+						<xsl:attribute name="w:right"><xsl:value-of select="$indent"/></xsl:attribute>
+					</xsl:if>					
+				</w:ind>
+			</xsl:if>
+			<xsl:if test="@fo:padding-left">
+				<w:ind>
+					<xsl:attribute name="w:left">
+						<xsl:call-template name="indent-val">
+							<xsl:with-param name="length" select="@fo:padding-left" />
+						</xsl:call-template>
+					</xsl:attribute>
+				</w:ind>
+			</xsl:if>
+			<xsl:if test="@fo:padding-right">
+				<wind>
+					<xsl:attribute name="w:right">
+						<xsl:call-template name="indent-val">
+							<xsl:with-param name="length" select="@fo:padding-right" />
+						</xsl:call-template>
+					</xsl:attribute>
+				</wind>
+			</xsl:if>
+			
 			<!-- background color -->
 			<xsl:if test="@fo:background-color and (@fo:background-color != 'transparent')">
 				<w:shd>
@@ -507,7 +572,7 @@
 					</xsl:for-each>
 				</w:tabs>
 			</xsl:if>
-
+			
 			<xsl:if test="@style:text-autospace">
 				<w:autoSpaceDN>
 					<xsl:choose>

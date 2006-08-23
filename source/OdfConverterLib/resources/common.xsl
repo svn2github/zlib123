@@ -167,5 +167,33 @@
 		</xsl:choose>
 	</xsl:template>
 	
-  
+	<!--
+		Calculate a padding measure (limited to 31 pt)
+	-->
+	<xsl:template name="padding-val">
+		<xsl:param name="length"/>
+		<xsl:variable name="result">
+			<xsl:call-template name="point-measure">
+				<xsl:with-param name="length" select="$length"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$result > 31">31</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$result"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="indent-val">
+		<xsl:param name="length"/>
+		<xsl:variable name="result">
+			<xsl:call-template name="twips-measure">
+				<xsl:with-param name="length" select="$length"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$result > 620">620</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$result"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 </xsl:stylesheet>
