@@ -119,8 +119,25 @@
 			</xsl:variable>
 
 			<w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id)}"/>
-			<xsl:apply-templates mode="paragraph"/>
+			<xsl:choose>
+				<xsl:when
+					test="child::draw:frame and not(parent::draw:text-box) and child::draw:frame/child::draw:text-box">
+					<xsl:apply-templates select="draw:frame"/>
+				</xsl:when>
+				<xsl:when
+					test="child::draw:frame and not(child::draw:frame/draw:image)">
+					<xsl:apply-templates
+						select="child::node()[position() &gt; 1]"
+						mode="paragraph"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates mode="paragraph"/>
+				</xsl:otherwise>
+			</xsl:choose>
 			<w:bookmarkEnd w:id="{$id}"/>
+		
+			
+			
 
 		</w:p>
 	</xsl:template>
@@ -248,6 +265,12 @@
 								<xsl:when
 									test="child::draw:frame and not(parent::draw:text-box) and child::draw:frame/child::draw:text-box">
 									<xsl:apply-templates select="draw:frame"/>
+								</xsl:when>
+								<xsl:when
+									test="child::draw:frame and not(child::draw:frame/draw:image)">
+									<xsl:apply-templates
+										select="child::node()[position() &gt; 1]"
+										mode="paragraph"/>
 								</xsl:when>
 								<xsl:otherwise>
 									<xsl:apply-templates mode="paragraph"/>
@@ -399,6 +422,63 @@
 		</w:t>
 	</xsl:template>
 
+	<xsl:template name="marginX">
+		<xsl:param name="parent"/>
+		<xsl:choose>
+			<xsl:when test="$parent">
+				<xsl:variable name="recursive_result">
+					<xsl:call-template name="point-measure">
+						<xsl:with-param name="length">
+							<xsl:call-template name="marginX">
+								<xsl:with-param name="parent" select="$parent[position()>1]"/>
+							</xsl:call-template>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:variable name="svgx">
+					<xsl:call-template name="point-measure">
+						<xsl:with-param name="length">
+							<xsl:value-of select="$parent[1]/@svg:x"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="$svgx+$recursive_result"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="0"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="marginY">
+		<xsl:param name="parent"/>
+		<xsl:choose>
+			<xsl:when test="$parent">
+				<xsl:variable name="recursive_result">
+					<xsl:call-template name="point-measure">
+						<xsl:with-param name="length">
+							<xsl:call-template name="marginY">
+								<xsl:with-param name="parent" select="$parent[position()>1]"/>
+							</xsl:call-template>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:variable name="svgy">
+					<xsl:call-template name="point-measure">
+						<xsl:with-param name="length">
+							<xsl:value-of select="$parent[1]/@svg:y"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="$svgy+$recursive_result"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="0"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+
 	<xsl:template match="draw:text-box">
 		<w:r>
 			<w:rPr>
@@ -416,19 +496,58 @@
 					</xsl:variable>
 					<xsl:variable name="frameH">
 						<xsl:call-template name="point-measure">
-							<xsl:with-param name="length" select="@fo:min-height|parent::draw:frame/@svg:height"/>
+							<xsl:with-param name="length"
+								select="@fo:min-height|parent::draw:frame/@svg:height"/>
 						</xsl:call-template>
+					</xsl:variable>
+					<xsl:variable name="posL">
+						<xsl:if test="parent::draw:frame/@svg:x">
+							<xsl:variable name="leftM">
+								<xsl:call-template name="marginX">
+									<xsl:with-param name="parent" select="ancestor::draw:frame"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:value-of select="$leftM"/>
+						</xsl:if>
+					</xsl:variable>
+					<xsl:variable name="posT">
+						<xsl:if test="parent::draw:frame/@svg:y">
+							<xsl:variable name="topM">
+								<xsl:call-template name="marginY">
+									<xsl:with-param name="parent" select="ancestor::draw:frame"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:value-of select="$topM"/>
+						</xsl:if>
 					</xsl:variable>
 					<xsl:variable name="marginL">
 						<xsl:call-template name="point-measure">
-							<xsl:with-param name="length" select="parent::draw:frame/@svg:x"/>
+							<xsl:with-param name="length"
+								select="@fo:min-height|parent::draw:frame/@fo:margin-left"/>
 						</xsl:call-template>
 					</xsl:variable>
+
 					<xsl:variable name="marginT">
 						<xsl:call-template name="point-measure">
-							<xsl:with-param name="length" select="parent::draw:frame/@svg:y"/>
+							<xsl:with-param name="length"
+								select="@fo:min-height|parent::draw:frame/@fo:margin-top"/>
 						</xsl:call-template>
 					</xsl:variable>
+
+					<xsl:variable name="marginR">
+						<xsl:call-template name="point-measure">
+							<xsl:with-param name="length"
+								select="@fo:min-height|parent::draw:frame/@fo:margin-right"/>
+						</xsl:call-template>
+					</xsl:variable>
+
+					<xsl:variable name="marginB">
+						<xsl:call-template name="point-measure">
+							<xsl:with-param name="length"
+								select="@fo:min-height|parent::draw:frame/@fo:margin-bottom"/>
+						</xsl:call-template>
+					</xsl:variable>
+
 					<xsl:variable name="zIndex">
 						<xsl:value-of select="parent::draw:frame/@draw:z-index"/>
 					</xsl:variable>
@@ -437,16 +556,64 @@
 						<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
 						<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 						<xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
-						<xsl:value-of select="concat('margin-left:',$marginL,'pt;')"/>
-						<xsl:value-of select="concat('margin-top:',$marginT,'pt;')"/>
+						<xsl:if test="parent::draw:frame/@svg:x">
+							<xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
+						</xsl:if>
+						<xsl:if test="parent::draw:frame/@svg:y">
+							<xsl:value-of select="concat('margin-top:',$posT,'pt;')"/>
+						</xsl:if>
+						<xsl:if test="parent::draw:frame/@text:anchor-type = 'page'">
+							<xsl:value-of
+								select="concat('mso-position-horizontal-relative:',parent::draw:frame/@text:anchor-type,';')"/>
+							<xsl:value-of
+								select="concat('mso-position-vertical-relative:',parent::draw:frame/@text:anchor-type,';')"
+							/>
+						</xsl:if>
+
+						<!-- The same style defined in styles.xsl  TODO manage horizontal-rel-->
 						<xsl:if
 							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos">
-							<xsl:value-of
-								select="concat('mso-position-horizontal:', key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos,';')"
-							/>
+							<xsl:choose>
+								<xsl:when
+									test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos = 'center'">
+									<xsl:value-of
+										select="concat('mso-position-horizontal:', 'center',';')"/>
+								</xsl:when>
+								<xsl:when
+									test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left'">
+									<xsl:value-of
+										select="concat('mso-position-horizontal:', 'left',';')"/>
+								</xsl:when>
+								<xsl:when
+									test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right'">
+									<xsl:value-of
+										select="concat('mso-position-horizontal:', 'right',';')"/>
+								</xsl:when>
+								<!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
+							</xsl:choose>
 						</xsl:if>
 						<xsl:if test="parent::draw:frame/@fo:min-width">
 							<xsl:value-of select="'mso-wrap-style:none;'"/>
+						</xsl:if>
+						<xsl:if
+							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-left">
+							<xsl:value-of select="concat('mso-wrap-distance-left:', $marginL,'pt;')"
+							/>
+						</xsl:if>
+						<xsl:if
+							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-top">
+							<xsl:value-of select="concat('mso-wrap-distance-top:', $marginT,'pt;')"
+							/>
+						</xsl:if>
+						<xsl:if
+							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-right">
+							<xsl:value-of
+								select="concat('mso-wrap-distance-right:', $marginR,'pt;')"/>
+						</xsl:if>
+						<xsl:if
+							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-bottom">
+							<xsl:value-of
+								select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
 						</xsl:if>
 					</xsl:attribute>
 					<xsl:if
@@ -458,49 +625,69 @@
 						</xsl:attribute>
 					</xsl:if>
 					<v:textbox>
-						<xsl:attribute name="style">
+						  <xsl:attribute name="style">
 							<xsl:if test="@fo:min-height">
 								<xsl:value-of select="'mso-fit-shape-to-text:t'"/>
 							</xsl:if>
 						</xsl:attribute>
 						<xsl:attribute name="inset">
 							<xsl:choose>
-								<xsl:when test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding">
+								<xsl:when
+									test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding">
 									<xsl:variable name="padding">
-										<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding,'cm'))*10"/>
+										<xsl:value-of
+											select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding,'cm'))*10"
+										/>
 									</xsl:variable>
-									<xsl:value-of select="concat($padding,'mm,',$padding,'mm,',$padding,'mm,',$padding,'mm')"/>
+									<xsl:value-of
+										select="concat($padding,'mm,',$padding,'mm,',$padding,'mm,',$padding,'mm')"
+									/>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:variable name="padding-top">	
-										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
-											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top,'cm'))*10"/>
+									<xsl:variable name="padding-top">
+										<xsl:if
+											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
+											<xsl:value-of
+												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top,'cm'))*10"
+											/>
 										</xsl:if>
 									</xsl:variable>
 									<xsl:variable name="padding-right">
-										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right">
-											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right,'cm'))*10"/>
+										<xsl:if
+											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right">
+											<xsl:value-of
+												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right,'cm'))*10"
+											/>
 										</xsl:if>
 									</xsl:variable>
 									<xsl:variable name="padding-bottom">
-										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom">
-											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom,'cm'))*10"/>
-										</xsl:if>	
-									</xsl:variable>
-									<xsl:variable name="padding-left">
-										<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left">								
-											<xsl:value-of select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left,'cm'))*10"/>
+										<xsl:if
+											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom">
+											<xsl:value-of
+												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom,'cm'))*10"
+											/>
 										</xsl:if>
 									</xsl:variable>
-							
-									<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
-										<xsl:value-of select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"/>
+									<xsl:variable name="padding-left">
+										<xsl:if
+											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left">
+											<xsl:value-of
+												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left,'cm'))*10"
+											/>
+										</xsl:if>
+									</xsl:variable>
+
+									<xsl:if
+										test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
+										<xsl:value-of
+											select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"
+										/>
 									</xsl:if>
 								</xsl:otherwise>
 							</xsl:choose>
 						</xsl:attribute>
 						<w:txbxContent>
-							<xsl:for-each select="child::node()">
+							<xsl:for-each select="child::text:p|child::text:h">
 								<xsl:apply-templates select="."/>
 							</xsl:for-each>
 						</w:txbxContent>
@@ -514,7 +701,7 @@
 	<!-- @TODO  positioning text-boxes -->
 	<xsl:template match="draw:frame">
 		<xsl:choose>
-			<xsl:when test="not(parent::text:p)">
+			<xsl:when test="not(parent::text:p | parent::text:h)">
 				<w:p>
 					<xsl:for-each select="descendant::draw:text-box">
 						<xsl:apply-templates select="."/>
@@ -657,7 +844,8 @@
 			<w:ind>
 				<xsl:if test="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip > 0">
 					<xsl:attribute name="w:left">
-						<xsl:value-of select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"/>						
+						<xsl:value-of
+							select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"/>
 					</xsl:attribute>
 				</xsl:if>
 				<xsl:if test="not(ancestor-or-self::text:list) and $spaceBeforeTwip > 0">
@@ -907,7 +1095,7 @@
 			<xsl:when test="$nodeList">
 				<xsl:variable name="recursive_result">
 					<xsl:call-template name="colCount">
-						<xsl:with-param name="productList" select="$nodeList[position() > 1]"/>
+						<xsl:with-param name="nodeList" select="$nodeList[position() > 1]"/>
 					</xsl:call-template>
 				</xsl:variable>
 				<xsl:choose>
@@ -1609,7 +1797,7 @@
 
 	<!-- ignored -->
 	<xsl:template match="text()"/>
-  <xsl:template match="text:tracked-changes" />
+	<xsl:template match="text:tracked-changes"/>
 
 	<!-- odt section -->
 	<xsl:template match="text:section">
