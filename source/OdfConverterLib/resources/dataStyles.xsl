@@ -61,7 +61,7 @@
 					<xsl:variable name="dataStyle">
 						<xsl:apply-templates select="/*/office:automatic-styles/number:date-style[@style:name=$curStyle]" mode="dataStyle"/>
 					</xsl:variable>
-					<xsl:attribute name="w:instr"><xsl:value-of select="concat('TIME \@ &quot;',$dataStyle,'&quot;')"/></xsl:attribute>
+					<xsl:attribute name="w:instr"><xsl:value-of select="concat('DATE \@ &quot;',$dataStyle,'&quot;')"/></xsl:attribute>
 					<w:r>
 	                    <w:rPr>
 	                        <w:noProof/>
