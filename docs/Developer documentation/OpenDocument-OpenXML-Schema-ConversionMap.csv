@@ -635,7 +635,7 @@ Attribute @w:val is set to 'solid'";
 ;;"Border";1;"0.2-M1";"Partial";"style:paragraph-properties/@fo:border translated to w:styles/w:style/w:pPr/w:pBdr/@w:color and @w:sz
 Attribute @w:val is set to 'single' or 'double' only";
 ;;"Border Line Width";2;"0.2-M1";;;"not available in Word?"
-;;"Padding";2;"0.2-M1";"Partial";"style:paragraph-properties/@fo:padding translated to w:styles/w:style/w:pPr/w:pBdr/@w:space";
+;;"Padding";2;"0.2-M1";"Partial";"style:paragraph-properties/@fo:padding translated to w:styles/w:style/w:pPr/w:pBdr/@w:space. Value limited to 31pt in oox. Padding generates indent : w:ind attribute added after w:pBdr. Same value as padding (in twips).";
 ;;"Shadow";3;"0.2-M1";;;"not available in Word?"
 ;;"Keep with Next";1;"0.2-M1";;;
 ;;"Line Numbering";2;"0.2-M1";;;"cannot be mapped one-to-ont (Word automatically inserts page breaks)"
