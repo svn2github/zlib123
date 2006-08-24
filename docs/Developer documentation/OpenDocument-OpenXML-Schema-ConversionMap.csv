@@ -186,13 +186,13 @@ Text Indices;;;;;;;
 ;;Index Source;2;0.2-M1;;;
 ;;Index Body Section;2;0.2-M1;;;
 ;;Index Title Section;2;0.2-M1;;;
-;Table Of Content;;1;;Partial;text:table-of-content converted to structured document tags w:sdt/w:stdPr/w:docPartObj/w:docPartType - decide that the type of structure is table of content  and w:std/w:sdtContent which is content container;TODO: check styles for table of content
+;Table Of Content;;1;;Partial;text:table-of-content converted to structured document tags w:sdt/w:stdPr/w:docPartObj/w:docPartType - decide that the type of structure is table of content  and w:std/w:sdtContent which is content container;TODO: check styles for table of content. Problems: 1. After update styles change to defaults. 2. There is different default tab length in both formats (in odt is longer) which probably cause that page numbers are wrongly aligned.
 ;;Table of Content Source;1;0.2-M1;;;
 ;;Table of Content Entry Template;1;0.2-M1;;;
 ;Index of Illustrations;;2;;;;
 ;;Index of Illustration Source;2;0.2-M1;;;
 ;;Illustration Index Entry Template;2;0.2-M1;;;
-;Index of Tables;;1;;;;
+;Index of Tables;;1;;Partial;"text:table-index converted as a field: w:fldChar - shows where field starts and ends; w:instrText - shows the type of index (figures, tables etc.)";TODO: make possible to edit index of tables
 ;;Table Index Source;1;0.2-M1;;;
 ;;Table Index Entry Template;1;0.2-M1;;;
 ;Index of Objects;;2;;;;
@@ -257,7 +257,7 @@ Graphic Content;;;;;;;
 ;;Glue Points;;;;;
 ;;Event Listeners;;;;;
 ;Frames;;1;;;;
-;;Text Box;1;0.2-M1;Partial;draw:frame/draw:text-box converted to  w:pict/v:shape/v:textbox/w:txbxContent;TODO: assign styles and position
+;;Text Box;1;0.2-M1;Partial;draw:frame/draw:text-box converted to  w:pict/v:shape/v:textbox/w:txbxContent;TODO: correct position of text boxes
 ;;Image;1;0.2-M1;Partial;"Internal images only, ie [starts-with(draw:frame/draw:image/@xlink:href, 'Pictures/')]. Converted to w:drawing/wp:anchor.
 following style:style/style:graphic-properties attributes are transformed: 
 @style:run-through to w:drawing/wp:anchor/@behindDoc,  
