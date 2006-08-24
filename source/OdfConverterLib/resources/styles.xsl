@@ -777,7 +777,7 @@
 				</xsl:choose>
 			</xsl:if>
 
-			<!-- TODO determine all the different font styles-->
+			<!-- TODO : determine all the different font styles-->
 			<xsl:if test="@fo:font-style or @style:font-style-asian or @style:font-style-complex">
 				<xsl:choose>
 					<xsl:when
