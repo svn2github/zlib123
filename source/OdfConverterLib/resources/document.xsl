@@ -207,7 +207,7 @@
 							<xsl:variable name="ile">
 								<xsl:number/>
 							</xsl:variable>
-							
+
 							<xsl:if test="$ile = 1">
 								<w:r>
 									<w:fldChar w:fldCharType="begin"/>
@@ -217,9 +217,15 @@
 										<xsl:when test="ancestor::text:table-of-content">
 											<w:instrText xml:space="preserve"> TOC \o "1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
 										</xsl:when>
-										<xsl:otherwise>
-											<w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"/>"</w:instrText>
-										</xsl:otherwise>
+									<!--	<xsl:when test="ancestor::text:illustration-index">
+											<w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
+										</xsl:when> -->
+										<xsl:when test="ancestor::text:alphabetical-index">
+											<w:instrText xml:space="preserve"> INDEX \e "" \c "<xsl:choose><xsl:when test="key('style',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">1</xsl:when><xsl:otherwise><xsl:value-of select="key('style',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/></xsl:otherwise></xsl:choose>" \z "1045" </w:instrText>
+										</xsl:when>
+										 <xsl:otherwise>
+											<w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"/>" </w:instrText>
+											</xsl:otherwise> 
 									</xsl:choose>
 								</w:r>
 								<w:r>
@@ -283,7 +289,8 @@
 						<xsl:apply-templates select="preceding-sibling::*[1]" mode="paragraph"/>
 					</xsl:if>
 					<!-- If there is a page-break-after in the paragraph style -->
-					<xsl:if test="key('style',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
+					<xsl:if
+						test="key('style',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
 						<w:r>
 							<w:br w:type="page"/>
 						</w:r>
@@ -751,20 +758,22 @@
 			</xsl:choose>
 		</w:r>
 		<xsl:apply-templates select="text:tab|text:a/text:tab" mode="paragraph"/>
-		<w:r>
-			<w:rPr/>
-			<w:fldChar w:fldCharType="begin">
-				<w:fldData xml:space="preserve">CNDJ6nn5us4RjIIAqgBLqQsCAAAACAAAAA4AAABfAFQAbwBjADEANAAxADgAMwA5ADIANwA2AAAA</w:fldData>
-			</w:fldChar>
-		</w:r>
-		<w:r>
-			<w:rPr/>
-			<w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $num, ' \h')"/></w:instrText>
-		</w:r>
-		<w:r>
-			<w:rPr/>
-			<w:fldChar w:fldCharType="separate"/>
-		</w:r>
+		<xsl:if test="not(ancestor::text:alphabetical-index)">
+			<w:r>
+				<w:rPr/>
+				<w:fldChar w:fldCharType="begin">
+					<w:fldData xml:space="preserve">CNDJ6nn5us4RjIIAqgBLqQsCAAAACAAAAA4AAABfAFQAbwBjADEANAAxADgAMwA5ADIANwA2AAAA</w:fldData>
+				</w:fldChar>
+			</w:r>
+			<w:r>
+				<w:rPr/>
+				<w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $num, ' \h')"/></w:instrText>
+			</w:r>
+			<w:r>
+				<w:rPr/>
+				<w:fldChar w:fldCharType="separate"/>
+			</w:r>
+		</xsl:if>
 		<w:r>
 			<xsl:choose>
 				<xsl:when test="$test=1">
@@ -777,13 +786,15 @@
 			</xsl:choose>
 
 		</w:r>
-		<w:r>
-			<w:rPr/>
-			<w:fldChar w:fldCharType="end"/>
-		</w:r>
+		<xsl:if test="not(ancestor::text:alphabetical-index)">
+			<w:r>
+				<w:rPr/>
+				<w:fldChar w:fldCharType="end"/>
+			</w:r>
+		</xsl:if>
 	</xsl:template>
 
-	<xsl:template match="text:table-index">
+	<xsl:template match="text:table-index|text:alphabetical-index"> <!-- ADD  |text:illustration-index -->
 		<xsl:if test="text:index-body/text:index-title/text:p">
 			<xsl:apply-templates select="text:index-body/text:index-title/text:p"/>
 		</xsl:if>
@@ -1640,6 +1651,24 @@
 		</w:fldSimple>
 	</xsl:template>-->
 
+	<xsl:template match="text:alphabetical-index-mark-end" mode="paragraph">
+		<w:r>
+			<w:fldChar w:fldCharType="begin"/>
+		</w:r>
+		<w:r>
+			<w:instrText xml:space="preserve"> XE "</w:instrText>
+		</w:r>
+		<w:r>
+			<w:instrText><xsl:value-of select="preceding-sibling::text()"/></w:instrText>
+		</w:r>
+		<w:r>
+			<w:instrText xml:space="preserve">" </w:instrText>
+		</w:r>
+		<w:r>
+			<w:fldChar w:fldCharType="end"/>
+		</w:r>
+	</xsl:template>
+	
 	<xsl:template match="text:sequence" mode="paragraph">
 		<xsl:variable name="id">
 			<xsl:value-of
@@ -1650,6 +1679,9 @@
 			<xsl:variable name="numType">
 				<xsl:choose>
 					<xsl:when test="@style:num-format = 'i'">\* roman</xsl:when>
+					<xsl:when test="@style:num-format = 'I'">\* Roman</xsl:when>
+					<xsl:when test="@style:num-format = 'a'">\* alphabetic</xsl:when>
+					<xsl:when test="@style:num-format = 'A'">\* ALPHABETIC</xsl:when>
 					<xsl:otherwise>\* arabic</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
