@@ -694,34 +694,59 @@
 				<xsl:otherwise>0</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:variable name="minLabelWidthTwip">
-			<xsl:call-template name="twips-measure">
-				<xsl:with-param name="length"
-					select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-width"
-				/>
-			</xsl:call-template>
-		</xsl:variable>
-		<xsl:variable name="spaceBeforeTwip">
-			<xsl:call-template name="twips-measure">
-				<xsl:with-param name="length"
-					select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:space-before"
-				/>
-			</xsl:call-template>
-		</xsl:variable>
 
-		<xsl:if test="self::text:p|self::text:list-item|parent::text:list-header">
-			<w:ind>
-				<xsl:attribute name="w:left">
-					<xsl:value-of select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"
-					/>
-				</xsl:attribute>
-				<xsl:if test="not(ancestor-or-self::text:list)">
-					<xsl:attribute name="w:hanging">
-						<xsl:value-of select="$spaceBeforeTwip"/>
+		<xsl:choose>
+			<xsl:when test="ancestor-or-self::text:list">
+				<xsl:variable name="minLabelWidthTwip">
+					<xsl:call-template name="twips-measure">
+						<xsl:with-param name="length"
+							select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-width"
+						/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:variable name="spaceBeforeTwip">
+					<xsl:call-template name="twips-measure">
+						<xsl:with-param name="length"
+							select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:space-before"
+						/>
+					</xsl:call-template>
+				</xsl:variable>
+				
+				<xsl:if test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
+					<w:tabs>
+						<w:tab>
+							<xsl:attribute name="w:val">left</xsl:attribute>
+							<xsl:attribute name="w:pos">
+								<xsl:value-of select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"
+								/>
+							</xsl:attribute>
+						</w:tab>
+					</w:tabs>
+				</xsl:if>				
+				<w:ind>
+					<xsl:attribute name="w:left">
+						<xsl:value-of select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"
+						/>
 					</xsl:attribute>
+					<xsl:if test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
+						<xsl:attribute name="w:hanging">
+							<xsl:value-of select="$minLabelWidthTwip"
+							/>
+						</xsl:attribute>
+					</xsl:if>
+				</w:ind>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:if test="$paragraphMargin != 0">
+					<w:ind>
+						<xsl:attribute name="w:left">
+							<xsl:value-of select="$paragraphMargin"
+							/>
+						</xsl:attribute>
+					</w:ind>
 				</xsl:if>
-			</w:ind>
-		</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="styleName">
