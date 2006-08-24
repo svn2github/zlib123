@@ -1078,18 +1078,20 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:variable name="value"><xsl:value-of select="substring-before(@style:text-position, '%')"/></xsl:variable>
-						<xsl:choose>
-							<xsl:when test="contains($value,'-')">
-								<w:vertAlign w:val="subscript"/>	
-								<xsl:variable name="positionValue"><xsl:value-of select="round(number(substring-after($value,'-')) div 10 * 2)"/></xsl:variable>
-								<w:position><xsl:attribute name="w:val"><xsl:value-of select="concat('-',$positionValue)"/></xsl:attribute>   </w:position>																	
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:variable name="positionValue"><xsl:value-of select="round(number($value) div 10)"/></xsl:variable>
-								<w:vertAlign w:val="superscript"/>
-								<w:position><xsl:attribute name="w:val"><xsl:value-of select="$positionValue"/></xsl:attribute>   </w:position>																	
-							</xsl:otherwise>
-						</xsl:choose>
+						<xsl:if test="$value != 0">
+							<xsl:choose>
+								<xsl:when test="contains($value,'-')">
+									<w:vertAlign w:val="subscript"/>	
+									<xsl:variable name="positionValue"><xsl:value-of select="round(number(substring-after($value,'-')) div 10 * 2)"/></xsl:variable>
+									<w:position><xsl:attribute name="w:val"><xsl:value-of select="concat('-',$positionValue)"/></xsl:attribute>   </w:position>																	
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:variable name="positionValue"><xsl:value-of select="round(number($value) div 10)"/></xsl:variable>
+									<w:vertAlign w:val="superscript"/>
+									<w:position><xsl:attribute name="w:val"><xsl:value-of select="$positionValue"/></xsl:attribute>   </w:position>																	
+								</xsl:otherwise>
+							</xsl:choose>							
+						</xsl:if>
 					</xsl:otherwise>
 				</xsl:choose>												
 			</xsl:if>
@@ -1390,7 +1392,7 @@
 			</w:em>
 		</xsl:if>
 				
-			<xsl:if test="@style:text-position ">
+		<!--	<xsl:if test="@style:text-position ">
 				<xsl:variable name="valueFontSize"><xsl:value-of select="substring-before($fontSize, 'pt')"/></xsl:variable>
 				<xsl:if test="$fontSize and not(substring(@style:text-position, 1, 3) = 'sub' ) and not(substring(@style:text-position, 1, 5) = 'super') ">														
 					<xsl:variable name="value"><xsl:value-of select="round(number(substring-before(@style:text-position, '%')) div 100)"/></xsl:variable>									
@@ -1408,7 +1410,7 @@
 				<xsl:if test="substring(@style:text-position, 1, 5) = 'super' ">
 					<w:sz><xsl:attribute name="w:val"><xsl:value-of select="round(number(substring-before(substring-after(@style:text-position,'super'),'%')) div 100 * number($valueFontSize) * 2)"/></xsl:attribute></w:sz>
 				</xsl:if>
-			</xsl:if>	
+			</xsl:if>	-->
 	</xsl:template>
 		
 	<xsl:template match="style:graphic-properties[parent::style:style]" mode="styles">
