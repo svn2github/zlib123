@@ -271,7 +271,7 @@ following parent::draw:frame attributes are transformed:
 @svg:y to w:drawing/wp:anchor/wp:positionV/wp:posOffset
 @svg:width to wp:extend/@cx
 @svg:height to wp:extend/@cy";
-;;"Objects";;;"Partial";"Draw:object-ole translated to o:OLEObject. An object can have an image associated to it. xlink:href translated to an Id register through part-relationships.xsl. Binary files are pu into word/embeddings/xxx.bin, while associated images are taken from ObjectReplacements/ and put into word/media/xxx.wmf.";
+;;"Objects";;;"Partial";"Draw:object-ole translated to o:OLEObject. An object can have an image associated to it. xlink:href translated to an Id register through part-relationships.xsl. Binary files are pu into word/embeddings/xxx.bin, while associated images are taken from ObjectReplacements/ and put into word/media/xxx.wmf.";"TODO : Manage Objects that do have a xml representation (<draw:object>)"
 ;;"Applet";;;;;
 ;;"Plugins";;;;;
 ;;"Parameters";;;;;
