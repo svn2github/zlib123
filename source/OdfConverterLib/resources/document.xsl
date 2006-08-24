@@ -1478,6 +1478,11 @@
 		<xsl:param name="styleName"/>
 		<w:r>
 			<w:rPr>
+				<w:rStyle>
+					<xsl:attribute name="w:val">
+						<xsl:value-of select="$styleName"/>
+					</xsl:attribute>
+				</w:rStyle>
 				<xsl:apply-templates select="key('style', $styleName)/style:text-properties"
 					mode="toggle"/>
 			</w:rPr>
