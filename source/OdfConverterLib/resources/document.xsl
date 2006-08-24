@@ -956,7 +956,16 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:if>
-
+				<xsl:if test="key('style', @table:style-name)/style:table-properties/@fo:margin-left != '' ">
+					<w:tblInd w:type="{$type}">
+						<xsl:attribute name="w:w">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length"
+									select="key('style', @table:style-name)/style:table-properties/@fo:margin-left"/>
+							</xsl:call-template>
+						</xsl:attribute>
+					</w:tblInd>
+				</xsl:if>
 				<!--table background-->
 				<xsl:if test="$tableProp/@fo:background-color">
 					<xsl:choose>
