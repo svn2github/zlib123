@@ -945,7 +945,9 @@
 				</w:szCs>
 			</xsl:if>
 
-			<xsl:if test="@style:text-underline-style != 'none' ">
+			<xsl:if test="@style:text-underline-style">
+				<xsl:choose>
+			<xsl:when test="@style:text-underline-style != 'none' ">
 				<w:u>
 					<xsl:attribute name="w:val">
 						<xsl:choose>
@@ -1030,8 +1032,13 @@
 						</xsl:attribute>
 					</xsl:if>
 				</w:u>
+				</xsl:when>
+				<xsl:otherwise>
+					<w:u w:val="none"/>
+				</xsl:otherwise>
+			</xsl:choose>
 			</xsl:if>
-
+			
 			<xsl:if test="@fo:background-color">
 				<w:shd w:val="clear" w:color="auto">
 					<xsl:attribute name="w:fill">
@@ -1366,7 +1373,7 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<w:u w:val="none"/>
-			</xsl:otherwise>					
+			</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
 		<xsl:if test="@style:text-emphasize">
