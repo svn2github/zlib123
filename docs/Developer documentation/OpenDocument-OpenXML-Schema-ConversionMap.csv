@@ -838,25 +838,25 @@ text:min-label-width used in w:ind/@w:hanging
 ;;Shininess;;;;;
 ;3D Shadow Properties;;;;;;
 ;;Shadow;;;;;
-;Frame Formatting Properties;;;;;;
-;;Frame Widths;;;;;
-;;Frame Heights;;;;;
+;Frame Formatting Properties;;;;Partial;"frame properties are kept in style attribute of v:shape or v:textbox element, eg.  <v:shape style=""width: 100pt;height: 150pt"">";
+;;Frame Widths;;;Partial;"fixed width - draw:frame/svg:width is converted to width value of style attribute of v:shape element. Minimum width - draw:frame/fo:min-width - does not exists in .docx. It is converted like svg:width, but it is also  converted to ""mso-wrap-style:none"" value of style attribute of v:shape element which mean that width of text box can increase in size automatically when content is added.";TODO: relative width - style:rel-width
+;;Frame Heights;;;Partial;"fixed height - draw:frame/svg:height is converted to height value of style attribute of v:textbox element. Minimum height - draw:text-box/fo:min-height - does not exists in .docx, it is converted like svg:height, but it is also converted to ""mso-fit-shape-to-text:t"" value of style attribute of v:textbox element which mean that height of text box can increase in size automatically when content is added";TODO: relative height - style:rel-height
 ;;Maximum Width and Height;;;;;
-;;Left and Right Margins;;;;;
-;;Top and Bottom Margins;;;;;
+;;Left and Right Margins;;;Completed;"style:graphic-properties/fo:margin-left and style:graphic-properties/fo:margin-right are converted to ""mso-wrap-distance-left"" and ""mso-wrap-distance-left"" values of style attribute of v:shape element";
+;;Top and Bottom Margins;;;Completed;"style:graphic-properties/fo:margin-top and style:graphic-properties/fo:margin-bottom are converted to ""mso-wrap-distance-top"" and ""mso-wrap-distance-bottom"" values of style attribute of v:shape element";
 ;;Margins;;;;;
 ;;Print Content;;;;;
 ;;Protect;;;;;
-;;Horizontal Position;;;;;
+;;Horizontal Position;;;Partial;"style:graphic-properties/style:horizontal-pos is converted into ""mso-position-horizontal"" value of style attribute of  v:shape element (only values left, right and center handled). draw:frame/svg:x is converted to margin-left value of a style attribute of a v:shape element";Values of style:horizontal-pos like: from-left, from-inside, inside and outside are not converted - investigate wheater these values have their equivalent in .docx
 ;;Horizontal Relation;;;;;
-;;Vertical Position;;;;;
+;;Vertical Position;;;Partial;draw:frame/svg:y is converted to margin-top value of a style attribute of a v:shape element;TODO: style:vertical-pos
 ;;Vertical Relation;;;;;
-;;Frame Anchor;;;;;
+;;Frame Anchor;;;Partial;draw:frame/text:anchor-type is converted to mso-position-horizontal-relative and mso-position-vertical-relative values of style attribute of v:shape element.;For text:anchor-type only 'page' value converted, TODO: text:anchor-page-number
 ;;Border;;;;;
 ;;Border Line Width;;;;;
-;;Padding;;;;;
+;;Padding;;;Completed;style:graphic-properties/fo:padding, style:graphic-properties/fo:padding-left, style:graphic-properties/fo:padding-right, style:graphic-properties/fo:padding-top, style:graphic-properties/fo:padding-bottom are converted to inset attribute of a v:textbox element;
 ;;Shadow;;;;;
-;;Background;;;;;
+;;Background;;;partial;style:graphic-properties/@fo:background-color is converted to fillcolor attribute of a v:shape element;TODO: style:background-image
 ;;Columns;;;;;
 ;;Editable;;;;;
 ;;Wrapping;;;;;
