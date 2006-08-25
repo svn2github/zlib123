@@ -60,7 +60,7 @@ text:h/@text:outline-level is translated to w:p/w:pPr/w:outLineLvi";
 ;Page Sequences;;;;;;
 ;;Page;;0.2-Final;;;TODO : investigate
 ;Lists;;;;;;
-;;List Block;;0.2-M1;Partial;text:list/@text:style-name translated to w:p/w:pPr/w:pStyle/@w:val;TODO : @continue-numbering
+;;List Block;;0.2-M1;Partial;text:list/@text:style-name translated to w:p/w:pPr/w:pStyle/@w:val;TODO : @continue-numbering, @text:start-value
 ;;List Item;0;0.2-M1;Partial;"text:list-item is translated to a paragraph with w:pPr/w:numPr descendant set a follow : 
 w:ilvi child is the item level starting at 0.
 w:numId identifier is based on the relative position of this element's style. Indent w:ind of the first paragraph calculated based on the level attribute. w:tab added to the first paragraph child of list-item.";TODO: check this formatted-number, @start-value
