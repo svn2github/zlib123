@@ -475,11 +475,17 @@
 					</xsl:call-template>
 				</xsl:variable>
 				<xsl:variable name="svgx">
-					<xsl:call-template name="point-measure">
-						<xsl:with-param name="length">
-							<xsl:value-of select="$parent[1]/@svg:x"/>
-						</xsl:with-param>
-					</xsl:call-template>
+					<xsl:choose>
+						<xsl:when test="$parent[1]/@svg:x">
+							<xsl:call-template name="point-measure">
+								<xsl:with-param name="length">
+									<xsl:value-of select="$parent[1]/@svg:x"/>
+								</xsl:with-param>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>0</xsl:otherwise>
+					</xsl:choose>
+					
 				</xsl:variable>
 				<xsl:value-of select="$svgx+$recursive_result"/>
 			</xsl:when>
@@ -503,11 +509,16 @@
 					</xsl:call-template>
 				</xsl:variable>
 				<xsl:variable name="svgy">
-					<xsl:call-template name="point-measure">
-						<xsl:with-param name="length">
-							<xsl:value-of select="$parent[1]/@svg:y"/>
-						</xsl:with-param>
-					</xsl:call-template>
+					<xsl:choose>
+						<xsl:when test="$parent[1]/@svg:y">
+							<xsl:call-template name="point-measure">
+								<xsl:with-param name="length">
+									<xsl:value-of select="$parent[1]/@svg:y"/>
+								</xsl:with-param>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>0</xsl:otherwise>
+					</xsl:choose>
 				</xsl:variable>
 				<xsl:value-of select="$svgy+$recursive_result"/>
 			</xsl:when>
