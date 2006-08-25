@@ -682,7 +682,7 @@ style:table-properties/@style:width for this table style name is converted to w:
 ;;Table Margins;1;0.2-M1;;;it seems that it's not available in Word
 ;;Page Number;;0.2-M1;;;TODO: it may be conected with index of tables
 ;;Break Before and Break After;1;0.2-M1;;;these properties can be applied to paragraph but not to table in Word
-;;Table Background and Background Image;1;0.2-M1;Partial;style:style/style:table-properties/@fo:background-color is translated to w:shd;there is no such feature like background image for table in Word
+;;Table Background and Background Image;1;0.2-M1;Completed;style:style/style:table-properties/@fo:background-color is translated to w:shd;there is no such feature like background image for table in Word
 ;;Table Shadow;1;0.2-M1;;;it cannot be mapped one to one
 ;;Keep with Next;1;0.2-M1;;;these properties can be applied to paragraph but not to table in Word
 ;;May Break Between Rows;1;0.2-M1;;;"word doesn't support ""allow table to split across pages and columns"", it supports only ""allow row to break across pages or columns"" (keep together attribute)"
