@@ -196,4 +196,41 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<!--
+		Convert RGB code (#xxxxxx) to string-type color.
+	-->
+	<xsl:template name="StringType-color">
+		<xsl:param name="RGBcolor"/>
+		<xsl:variable name="code">
+			<xsl:choose>
+				<xsl:when test="substring($RGBcolor, 1,1) = '#'">
+					<xsl:value-of
+						select="translate(translate(substring($RGBcolor, 2, string-length($RGBcolor)-1),'f','F'),'c','C')"
+					/>
+				</xsl:when>
+				<xsl:otherwise><xsl:value-of select="translate(translate($RGBcolor,'f','F'),'c','C')"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$code='000000'">black</xsl:when>
+			<xsl:when test="$code='0000FF'">blue</xsl:when>
+			<xsl:when test="$code='00FFFF'">cyan</xsl:when>
+			<xsl:when test="$code='000080'">darkBlue</xsl:when>
+			<xsl:when test="$code='008080'">darkCyan</xsl:when>
+			<xsl:when test="$code='808080'">darkGray</xsl:when>
+			<xsl:when test="$code='008000'">darkGreen</xsl:when>
+			<xsl:when test="$code='800080'">darkMagenta</xsl:when>
+			<xsl:when test="$code='800000'">darkRed</xsl:when>
+			<xsl:when test="$code='808000'">darkYellow</xsl:when>
+			<xsl:when test="$code='00FF00'">green</xsl:when>
+			<xsl:when test="$code='C0C0C0'">lightGray</xsl:when>
+			<xsl:when test="$code='FF00FF'">magenta</xsl:when>
+			<xsl:when test="$code='FF0000'">red</xsl:when>
+			<xsl:when test="$code='FFFFFF'">white</xsl:when>
+			<xsl:when test="$code='FFFF00'">yellow</xsl:when>
+			<xsl:otherwise>none</xsl:otherwise>
+		</xsl:choose>
+		
+	</xsl:template>
+	
 </xsl:stylesheet>

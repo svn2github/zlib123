@@ -1040,18 +1040,20 @@
 			</xsl:if>
 			
 			<xsl:if test="@fo:background-color">
-				<w:shd w:val="clear" w:color="auto">
-					<xsl:attribute name="w:fill">
+				<w:highlight>
+					<xsl:attribute name="w:val">
+						<!-- Value must be a string (no RGB value authorized). -->
 						<xsl:choose>
-							<xsl:when test="@fo:background-color = 'transparent'">auto</xsl:when>
+							<xsl:when test="@fo:background-color = 'transparent'">none</xsl:when>
+							<xsl:when test="not(substring(@fo:background-color, 1,1)='#')"><xsl:value-of select="@fo:background-color"/></xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of
-									select="substring(@fo:background-color, 2, string-length(@fo:background-color)-1)"
-								/>
+								<xsl:call-template name="StringType-color">
+									<xsl:with-param name="RGBcolor" select="@fo:background-color"/>
+								</xsl:call-template>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute>
-				</w:shd>
+				</w:highlight>
 			</xsl:if>
 
 			<xsl:if test="@style:text-emphasize">
