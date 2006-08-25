@@ -231,9 +231,9 @@
 										<xsl:when test="ancestor::text:table-of-content">
 											<w:instrText xml:space="preserve"> TOC \o "1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
 										</xsl:when>
-										<!--	<xsl:when test="ancestor::text:illustration-index">
+											<xsl:when test="ancestor::text:illustration-index">
 											<w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
-										</xsl:when> -->
+										</xsl:when> 
 										<xsl:when test="ancestor::text:alphabetical-index">
 											<w:instrText xml:space="preserve"> INDEX \e "" \c "<xsl:choose><xsl:when test="key('style',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">1</xsl:when><xsl:otherwise><xsl:value-of select="key('style',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/></xsl:otherwise></xsl:choose>" \z "1045" </w:instrText>
 										</xsl:when>
@@ -1014,8 +1014,7 @@
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template match="text:table-index|text:alphabetical-index">
-		<!-- ADD  |text:illustration-index -->
+	<xsl:template match="text:table-index|text:alphabetical-index|text:illustration-index">
 		<xsl:if test="text:index-body/text:index-title/text:p">
 			<xsl:apply-templates select="text:index-body/text:index-title/text:p"/>
 		</xsl:if>
