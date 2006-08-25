@@ -44,6 +44,8 @@
 
 	<!-- Make sure we manage all cases -->	
 	<xsl:template match="style:font-face" mode="fonts">
+		<!-- We do not take into consideration fonts that have a name that does not match the family name. -->
+		<xsl:if test='not(@svg:font-family) or (@style:name=@svg:font-family) or (concat("&apos;",@style:name,"&apos;")=@svg:font-family)'>
 		<w:font>
 			<!-- Make sur the 'x-symbol' charset is always '02' and the asian and complex charset are not control -->
 			<xsl:choose>
@@ -52,16 +54,6 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:attribute name="w:name"><xsl:value-of select="@style:name"/></xsl:attribute>
-				</xsl:otherwise>
-			</xsl:choose>
-			<xsl:choose>
-				<xsl:when test="@svg:font-family = 'StarSymbol'">
-					<w:altName w:val="Symbol"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:if test="@svg:font-family">
-						<w:altName w:val="{@svg:font-family}"/>
-					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
 			<xsl:choose>
@@ -88,6 +80,7 @@
 				<w:pitch w:val="{@style:font-pitch}"/>
 			</xsl:if>
 		</w:font>
+		</xsl:if>
 	</xsl:template>
 	
 	<!-- ignored -->

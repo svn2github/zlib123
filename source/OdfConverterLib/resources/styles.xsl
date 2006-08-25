@@ -31,6 +31,7 @@
 	xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
 	xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
 	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+	xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
 	xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
 	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 	xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
@@ -727,16 +728,13 @@
 			<xsl:if test="@style:font-name">
 				<w:rFonts>
 					<xsl:if test="@style:font-name">
-						<xsl:attribute name="w:ascii">
+						<xsl:variable name="fontName">
 							<xsl:call-template name="computeFontName">
 								<xsl:with-param name="fontName" select="@style:font-name"/>
 							</xsl:call-template>
-						</xsl:attribute>
-						<xsl:attribute name="w:hAnsi">
-							<xsl:call-template name="computeFontName">
-								<xsl:with-param name="fontName" select="@style:font-name"/>
-							</xsl:call-template>
-						</xsl:attribute>
+						</xsl:variable>
+						<xsl:attribute name="w:ascii"><xsl:value-of select="$fontName"/></xsl:attribute>
+						<xsl:attribute name="w:hAnsi"><xsl:value-of select="$fontName"/></xsl:attribute>
 					</xsl:if>
 					<xsl:if test="@style:font-name-complex">
 						<xsl:attribute name="w:cs">
@@ -1590,7 +1588,12 @@
 		<xsl:choose>
 			<xsl:when test="$fontName = 'StarSymbol'">Symbol</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="$fontName"/>
+				<xsl:choose>
+					<xsl:when test="document('styles.xml')//style:font-face[@style:name=$fontName]/@svg:font-family">
+						<xsl:value-of select='translate(document("styles.xml")//style:font-face[@style:name=$fontName]/@svg:font-family,"&apos;","")'/>
+					</xsl:when>
+					<xsl:otherwise><xsl:value-of select="$fontName"/></xsl:otherwise>
+				</xsl:choose>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
