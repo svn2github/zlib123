@@ -110,7 +110,7 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;;
 ;Cross Reference;;Cf. Insert->Field->Others->Reference;;3;0.2-M2;;;85;;
 ;;;;;;;;;;;
-;Note;;;;2;0.2-M2;;;86;;
+;Note;;;;2;0.2-M2;partial;;86;office:annotation attribute (display,…) see ODF specs &12.1;
 ;;;;;;;;;;;
 ;Indexes and Tables - Entry;;Index;;;0.2-Final;;;;;
 ;;;Entry;;2;0.2-Final;;;;;
