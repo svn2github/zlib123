@@ -295,6 +295,9 @@
 								<xsl:call-template name="indent">
 									<xsl:with-param name="level" select="$level"/>
 								</xsl:call-template>
+								<xsl:if test="parent::node()[name()='table:table-cell' and position()=1] and ancestor::node()[name()='table:table-row' and not(preceding-sibling::node())] and key('style',ancestor::table:table/@table:style-name)/style:table-properties/@fo:break-before='page'">
+									<w:pageBreakBefore/>
+								</xsl:if>
 							</w:pPr>
 							<xsl:choose>
 								<xsl:when
@@ -1276,14 +1279,6 @@
 		<xsl:variable name="styleName">
 			<xsl:value-of select="@table:style-name"/>
 		</xsl:variable>
-		<xsl:if
-			test="//office:automatic-styles/style:style[@style:name=$styleName]/style:table-properties/@fo:break-before='page'">
-			<w:p>
-				<w:r>
-					<w:br w:type="page"/>
-				</w:r>
-			</w:p>
-		</xsl:if>
 		<w:tbl>
 			<w:tblPr>
 				<w:tblStyle w:val="{@table:style-name}"/>
