@@ -47,6 +47,7 @@
   <xsl:import href="part_relationships.xsl"/>
   <xsl:import href="package_relationships.xsl"/>
   <xsl:import href="contentTypes.xsl"/>
+  <xsl:import href="comments.xsl"/>
 
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
@@ -114,6 +115,11 @@
         <xsl:call-template name="endnotes-relationships"/>
       </zip:entry>
 
+      <!-- Comment   -->
+      <zip:entry zip:target="word/comments.xml">
+        <xsl:call-template name="comments"/>
+      </zip:entry>
+      
       <!-- headers and footers -->
       <xsl:variable name="masterPage"
         select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"

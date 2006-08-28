@@ -58,7 +58,8 @@
           <Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
           <Override PartName="/word/footnotes.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>
           <Override PartName="/word/endnotes.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml"/>
-          
+          <Override PartName="/word/comments.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/>
+                    
           <xsl:variable name="masterPage"
             select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"
             xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"

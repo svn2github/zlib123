@@ -38,12 +38,14 @@
 	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
 	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
-	exclude-result-prefixes="office text table fo style draw xlink">
+	exclude-result-prefixes="office text table fo style draw xlink v svg">
 
 	<xsl:strip-space elements="*"/>
 	<xsl:preserve-space elements="text:p"/>
 	<xsl:preserve-space elements="text:span"/>
 
+	<xsl:key name="annotation" match="//office:annotation"  use="''"/>
+	
 	<xsl:key name="style"
 		match="office:automatic-styles/style:style|office:automatic-styles/style:style"
 		use="@style:name"/>
@@ -304,6 +306,21 @@
 										select="child::node()[position() &gt; 1]"
 										mode="paragraph"/>
 								</xsl:when>
+								<!-- comments -->
+								<xsl:when test="child::office:annotation">									
+									<xsl:for-each select="child::node()">
+										<xsl:choose>
+											<xsl:when test="name() = 'office:annotation' ">
+												<xsl:apply-templates select="." mode="comment"/>									
+											</xsl:when>
+											<xsl:otherwise>
+												<w:r>
+													<xsl:apply-templates select="." mode="text"/>
+												</w:r>
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:for-each>
+								</xsl:when>
 								<xsl:otherwise>
 									<xsl:apply-templates mode="paragraph"/>
 								</xsl:otherwise>
@@ -355,6 +372,18 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<!-- comment -->
+	<xsl:template match="office:annotation" mode="comment">
+		<xsl:call-template name="reference">
+			<xsl:with-param name="id">
+				<xsl:call-template name="generateId">
+					<xsl:with-param name="node" select="."/>
+					<xsl:with-param name="nodetype" select="'annotation'"/>
+				</xsl:call-template>
+			</xsl:with-param>
+		</xsl:call-template>
+	</xsl:template>
+	
 	<xsl:template match="text:note-citation">
 		<w:r>
 			<w:rPr>

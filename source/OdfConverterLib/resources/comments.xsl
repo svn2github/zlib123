@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    * Copyright (c) 2006, Clever Age
+    * All rights reserved.
+    * 
+    * Redistribution and use in source and binary forms, with or without
+    * modification, are permitted provided that the following conditions are met:
+    *
+    *     * Redistributions of source code must retain the above copyright
+    *       notice, this list of conditions and the following disclaimer.
+    *     * Redistributions in binary form must reproduce the above copyright
+    *       notice, this list of conditions and the following disclaimer in the
+    *       documentation and/or other materials provided with the distribution.
+    *     * Neither the name of Clever Age nor the names of its contributors 
+    *       may be used to endorse or promote products derived from this software
+    *       without specific prior written permission.
+    *
+    * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
+    * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    * DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
+    * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+    * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+    * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<xsl:stylesheet  version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"  
+    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" 
+    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+    xmlns:dc="http://purl.org/dc/elements/1.1/" 
+    xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" 
+    xmlns:zip="urn:cleverage:xmlns:zip"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    exclude-result-prefixes="office text  fo style dc meta zip xlink">
+    
+    <xsl:template name="comments">
+        <w:comments>
+                <xsl:apply-templates select="document('content.xml')//office:annotation" mode="text"/>
+        </w:comments>
+    </xsl:template>
+    
+    <!-- Note -->
+    <xsl:template match="office:annotation" mode="text">     
+            <w:comment>
+                <xsl:attribute name="w:id">        
+                 <!--    <xsl:value-of select="position()"/> -->     
+                    <xsl:call-template name="generateId">
+                            <xsl:with-param name="node" select="."/>
+                            <xsl:with-param name="nodetype" select="'annotation'"/>
+                    </xsl:call-template>
+                </xsl:attribute>
+                <xsl:attribute name="w:author">
+                    <xsl:value-of select="dc:creator"/>
+                </xsl:attribute>
+            <xsl:attribute name="w:date">
+                <xsl:value-of select="dc:date"/>
+            </xsl:attribute>
+            <xsl:attribute name="w:initials">
+                <xsl:value-of select="dc:creator"/>
+            </xsl:attribute>
+                <xsl:apply-templates select="text:p" mode="comment"/>
+            </w:comment>
+    </xsl:template> 
+    
+    <!-- call body -->
+    <xsl:template name="reference">
+        <xsl:param name="id"/>
+        <w:r>
+           <!--  <w:rPr>
+                <w:rStyle w:val="CommentReference"/>
+            </w:rPr> -->            
+            <w:commentReference>
+                    <xsl:attribute name="w:id"><xsl:value-of select="$id"/></xsl:attribute>
+            </w:commentReference>
+        </w:r>
+    </xsl:template>
+    
+    <!-- 
+        Generate a decimal identifier based on the position of the current 
+        footenote/endnote among all the indexed footnotes/endnotes.
+    -->
+    <xsl:template name="generateId">
+        <xsl:param name="node"/>
+        <xsl:param name="nodetype"/>
+        <xsl:variable name="positionInGroup">
+            <xsl:for-each select="key($nodetype, '')">
+                <xsl:if test="generate-id($node) = generate-id(.)">
+                    <xsl:value-of select="position() "/>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:value-of select="$positionInGroup"/>
+    </xsl:template>
+    
+   <!--  <xsl:template name="commentId">
+            <xsl:for-each select="key('annotation', '')"> 
+                    <TEST><xsl:value-of select="position()"/></TEST>
+            </xsl:for-each>
+       </xsl:template> -->
+    <xsl:template match="text:p" mode="comment">
+     <w:p>
+         <!-- <w:pPr>
+              see to add commentText style 
+             <w:pStyle w:val="CommentText"/>
+             </w:pPr>  -->
+            <w:r >
+                <!--   <w:rPr>
+                   see to add  commentReference style
+                    <w:rStyle w:val="CommentReference"/>   
+                    </w:rPr> -->
+            <w:annotationRef/>
+            </w:r>
+            <w:r >
+               <xsl:apply-templates select="text()" mode="text"></xsl:apply-templates>
+            </w:r>
+            </w:p>         
+    </xsl:template>
+    
+</xsl:stylesheet>
