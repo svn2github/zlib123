@@ -1365,6 +1365,17 @@
 							test="key('style', @table:style-name)/style:table-row-properties/@style:keep-together = 'false'">
 							<w:cantSplit/>
 						</xsl:if>
+						
+						<xsl:if
+							test="not(key('style', @table:style-name)/style:table-properties/@style:may-break-between-rows)">
+							<w:cantSplit/>
+						</xsl:if>
+						
+						<xsl:if
+							test="key('style', @table:style-name)/style:table-properties/@style:may-break-between-rows='false'">
+							<w:cantSplit/>
+						</xsl:if>
+						
 					</w:trPr>
 					<xsl:apply-templates
 						select="table:table-cell[position() &lt; 64]|table:covered-table-cell">
