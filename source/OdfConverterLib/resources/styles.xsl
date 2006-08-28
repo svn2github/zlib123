@@ -755,7 +755,7 @@
 
 			<xsl:if test="@fo:font-weight or @fo:font-weight-asian">
 				<xsl:choose>
-					<xsl:when test="@fo:font-weight = 'bold' or @fo:font-weight-asian = 'bold'">
+					<xsl:when test="@fo:font-weight = 'bold' or @fo:font-weight != 'normal' or @fo:font-weight-asian = 'bold'">
 						<w:b w:val="on"/>
 					</xsl:when>
 					<xsl:when test="@fo:font-weight = 'normal' or @fo:font-weight-asian = 'normal'">
