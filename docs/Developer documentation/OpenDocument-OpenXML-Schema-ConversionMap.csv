@@ -604,8 +604,8 @@ style:text-properties/@fo:font-complex-weight translated to w:styles/w:style/w:r
 @w:lineRule set to 'auto' if @w:line is expressed in percentage, otherwise, it is set to 'exact'. Attribute @w:line is the twip (twentieth of a point) measure of line-height";"mapping to Word has to be defined"
 ;;"Minimum Line Height";1;"0.2-M1";"Partial";;"styles:paragraph-properties/@style:line-height-at-least translated to w:styles/w:style/w:pPr/w:spacing
 @w:lineRule set to 'atLeast' and @w:line is the twip measure of line-height ";
-;;"Line Distance";1;"0.2-M1";"Partial";;"style:paragraph-properties/@fo:keep-together='always' converted to w:styles/w:style/w:pPr/w:keepLines
-style:paragraph-properties/@style:line-spacing converted to w:styles/w:style/w:pPr/w:spacing/@w:line";"Bad result"
+;;"Line Distance";1;"0.2-M1";"Completed";"Jslaurent";"style:paragraph-properties/@fo:keep-together='always' converted to w:styles/w:style/w:pPr/w:keepLines.
+style:paragraph-properties/@style:line-spacing converted to w:styles/w:style/w:pPr/w:spacing/@w:line, distance is added to normal spacing.";"Bad result"
 ;;"Font-Independent Line Spacing";1;"0.2-M1";;;;
 ;;"Text Align";0;"0.2-M1";"Partial";;"style:paragraph-properties/@fo:text-align converted to w:styles/w:style/w:pPr/w:jc.Translated values are :
 center -> center

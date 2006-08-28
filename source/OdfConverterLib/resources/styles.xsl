@@ -562,11 +562,14 @@
 						</xsl:attribute>
 					</xsl:if>
 					<xsl:if test="@style:line-spacing">
-						<xsl:attribute name="w:lineRule">auto</xsl:attribute>
-						<xsl:attribute name="w:line">
+						<xsl:variable name="spacing">
 							<xsl:call-template name="twips-measure">
 								<xsl:with-param name="length" select="@style:line-spacing"/>
 							</xsl:call-template>
+						</xsl:variable>
+						<xsl:attribute name="w:lineRule">auto</xsl:attribute>
+						<xsl:attribute name="w:line">
+							<xsl:value-of select="240+$spacing"/>
 						</xsl:attribute>
 					</xsl:if>
 					<xsl:if test="contains(@fo:line-height, '%')">
