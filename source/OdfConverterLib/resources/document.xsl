@@ -38,8 +38,9 @@
 	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
 	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
-	exclude-result-prefixes="office text table fo style draw xlink v svg">
-
+	exclude-result-prefixes="office text table fo style draw xlink v svg"
+	xmlns:w10="urn:schemas-microsoft-com:office:word">
+	
 	<xsl:strip-space elements="*"/>
 	<xsl:preserve-space elements="text:p"/>
 	<xsl:preserve-space elements="text:span"/>
@@ -579,6 +580,8 @@
 			<w:pict>
 				<v:shapetype/>
 				<v:shape type="#_x0000_t202">
+					<xsl:variable name="styleGraphicProperties" select="key('style',parent::draw:frame/@draw:style-name)/style:graphic-properties"/>
+					
 					<xsl:variable name="frameW">
 						<xsl:call-template name="point-measure">
 							<xsl:with-param name="length"
@@ -615,36 +618,41 @@
 					<xsl:variable name="marginL">
 						<xsl:call-template name="point-measure">
 							<xsl:with-param name="length"
-								select="@fo:min-height|parent::draw:frame/@fo:margin-left"/>
+								select="$styleGraphicProperties/@fo:margin-left"/>
 						</xsl:call-template>
 					</xsl:variable>
 					
 					<xsl:variable name="marginT">
 						<xsl:call-template name="point-measure">
 							<xsl:with-param name="length"
-								select="@fo:min-height|parent::draw:frame/@fo:margin-top"/>
+								select="$styleGraphicProperties/@fo:margin-top"/>
 						</xsl:call-template>
 					</xsl:variable>
 					
 					<xsl:variable name="marginR">
 						<xsl:call-template name="point-measure">
 							<xsl:with-param name="length"
-								select="@fo:min-height|parent::draw:frame/@fo:margin-right"/>
+								select="$styleGraphicProperties/@fo:margin-right"/>
 						</xsl:call-template>
 					</xsl:variable>
 					
 					<xsl:variable name="marginB">
 						<xsl:call-template name="point-measure">
 							<xsl:with-param name="length"
-								select="@fo:min-height|parent::draw:frame/@fo:margin-bottom"/>
+								select="$styleGraphicProperties/@fo:margin-bottom"/>
 						</xsl:call-template>
 					</xsl:variable>
 					
 					<xsl:variable name="zIndex">
 						<xsl:value-of select="parent::draw:frame/@draw:z-index"/>
 					</xsl:variable>
+					
+					<xsl:variable name="frameWrap" select="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:wrap" />
+					
 					<xsl:attribute name="style">
-						<xsl:value-of select="'position:absolute;'"/>
+						<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:wrap != 'none' ">
+							<xsl:value-of select="'position:absolute;'"/>
+						</xsl:if>
 						<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
 						<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 						<xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
@@ -707,6 +715,7 @@
 							<xsl:value-of
 								select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
 						</xsl:if>
+						
 					</xsl:attribute>
 					<xsl:if
 						test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:background-color">
@@ -779,10 +788,33 @@
 							</xsl:choose>
 						</xsl:attribute>
 						<w:txbxContent>
-							<xsl:for-each select="child::text:p|child::text:h">
+							<xsl:for-each select="child::node()">
 								<xsl:apply-templates select="."/>
 							</xsl:for-each>
 						</w:txbxContent>
+						
+						<!--frame wrap-->
+						<xsl:choose>
+							<xsl:when test="$frameWrap = 'none' ">
+								<w10:wrap type="none"/>
+								<w10:anchorlock/>
+							</xsl:when>
+							<xsl:when test="$frameWrap = 'left' ">
+								<w10:wrap type="tight" side="left"/>
+							</xsl:when>
+							<xsl:when test="$frameWrap = 'right' ">
+								<w10:wrap type="tight" side="right"/>
+							</xsl:when>
+							<xsl:when test="$frameWrap = 'parallel' ">
+								<w10:wrap type="tight"/>
+							</xsl:when>
+							<xsl:when test="$frameWrap = 'dynamic' ">
+								<w10:wrap type="tight" side="largest"/>
+							</xsl:when>
+						</xsl:choose>
+						
+						
+						
 					</v:textbox>
 				</v:shape>
 			</w:pict>
