@@ -377,6 +377,7 @@
 						<w:lvlText>
 
 							<xsl:attribute name="w:val">
+								<xsl:value-of select="@style:num-prefix"/>
 								<xsl:choose>
 									<xsl:when test="@style:num-format='1'">
 										<xsl:call-template name="text-format">
@@ -384,18 +385,87 @@
 										</xsl:call-template>
 									</xsl:when>
 									<xsl:when test="@style:num-format='a'">
-										<xsl:value-of select="concat('%',string(@text:level),'/')"/>
+										<xsl:value-of select="concat('%',string(@text:level))"/>
 									</xsl:when>
 									<xsl:when test="@style:num-format='A'">
-										<xsl:value-of select="concat('%',string(@text:level),'/')"/>
+										<xsl:value-of select="concat('%',string(@text:level))"/>
 									</xsl:when>
 									<xsl:otherwise></xsl:otherwise>
 								</xsl:choose>
+								<xsl:value-of select="@style:num-suffix"/>
 							</xsl:attribute>
 						</w:lvlText>
 						<w:lvlJc w:val="left"/>
 						<w:pPr>
-							<w:ind/>
+							<xsl:variable name="spaceBeforeTwip">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length"
+										select="style:list-level-properties/@text:space-before"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<xsl:variable name="minLabelWidthTwip">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length"
+										select="style:list-level-properties/@text:min-label-width"/>
+								</xsl:call-template>
+							</xsl:variable>
+							<w:ind>
+								<xsl:choose>
+									<xsl:when test="number($spaceBeforeTwip) &lt; 0">
+										<xsl:choose>
+											<xsl:when test="style:list-level-properties/@text:min-label-width">
+												<xsl:attribute name="w:left">
+													<xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:attribute name="w:left">
+													<xsl:value-of select="$spaceBeforeTwip"/>
+												</xsl:attribute>
+											</xsl:otherwise>
+										</xsl:choose>
+										<xsl:choose>
+											<xsl:when test="style:list-level-properties/@text:space-before">
+												<xsl:attribute name="w:firstLine">
+													<xsl:value-of select="$minLabelWidthTwip"/>
+												</xsl:attribute>	
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:attribute name="w:hanging">
+													<xsl:value-of select="$minLabelWidthTwip"/>
+												</xsl:attribute>
+											</xsl:otherwise>
+										</xsl:choose>	
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:choose>
+											<xsl:when test="style:list-level-properties/@text:min-label-width">
+												<xsl:attribute name="w:left">
+													<xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:attribute name="w:left">
+													<xsl:value-of select="$spaceBeforeTwip"/>
+												</xsl:attribute>
+											</xsl:otherwise>
+										</xsl:choose>
+										<xsl:choose>
+											<xsl:when test="style:list-level-properties/@text:space-before">
+												<xsl:attribute name="w:hanging">
+													<xsl:value-of select="$minLabelWidthTwip"/>
+												</xsl:attribute>	
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:attribute name="w:hanging">
+													<xsl:value-of select="$minLabelWidthTwip"/>
+												</xsl:attribute>
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:otherwise>
+								</xsl:choose>
+							
+							</w:ind>
 						</w:pPr>
 					</w:lvl>
 				</xsl:if>
