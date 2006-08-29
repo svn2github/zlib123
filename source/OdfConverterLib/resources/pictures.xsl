@@ -62,11 +62,10 @@
 
     <!-- Get the position of an element in the draw:frame group -->
     <xsl:template name="GetPosition">
-        <xsl:param name="keyName"/>
         <xsl:param name="node"/>
         <xsl:variable name="positionInGroup">
             <xsl:for-each select="document('content.xml')">
-                <xsl:for-each select="key($keyName, 'const')">
+                <xsl:for-each select="key('images', 'const')">
                     <xsl:if test="generate-id($node) = generate-id(.)">
                         <xsl:value-of select="position()"/>
                     </xsl:if>
@@ -80,11 +79,11 @@
     	    <xsl:otherwise>
     			<xsl:variable name="countContentImages">
     	    		<xsl:for-each select="document('content.xml')">
-    					<xsl:value-of select="count(key($keyName, 'const'))"/>
+    					<xsl:value-of select="count(key('images', 'const'))"/>
     				</xsl:for-each>
     	    	</xsl:variable>
     	    	<xsl:for-each select="document('styles.xml')">
-	                <xsl:for-each select="key($keyName, 'const')">
+	                <xsl:for-each select="key('images', 'const')">
 	                    <xsl:if test="generate-id($node) = generate-id(.)">
 	                        <xsl:value-of select="$countContentImages+position()"/>
 	                    </xsl:if>
@@ -96,11 +95,10 @@
     
     <xsl:template match="draw:frame[./draw:object-ole]" mode="paragraph">
         <xsl:variable name="intId">
-<!--            <xsl:call-template name="GetPosition">
-                <xsl:with-param name="keyName" select="'ole-objects'"/>
+            <xsl:call-template name="GetPosition">
                 <xsl:with-param name="node" select="."/>
-    </xsl:call-template> -->
-            <xsl:value-of select="position()"/>
+    </xsl:call-template>
+<!--            <xsl:value-of select="position()"/>-->
         </xsl:variable>
         <xsl:variable name="width">
             <xsl:call-template name="point-measure">
@@ -127,6 +125,38 @@
             </w:object>
         </w:r>
     </xsl:template>
+    
+    <xsl:template match="draw:frame[not(./draw:object-ole) and ./draw:image[not(starts-with(@xlink:href, 'Pictures/'))]]" mode="paragraph">
+        <xsl:variable name="supported">
+            <xsl:call-template name="image-support">
+                <xsl:with-param name="name" select="./draw:image/@xlink:href"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$supported = 'true'">
+            <xsl:variable name="intId">
+                <xsl:call-template name="GetPosition">
+                    <xsl:with-param name="node" select="."/>
+                </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="width">
+                <xsl:call-template name="point-measure">
+                    <xsl:with-param name="length" select="@svg:width"/>
+                </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="height">
+                <xsl:call-template name="point-measure">
+                    <xsl:with-param name="length" select="@svg:height"/>
+                </xsl:call-template>
+            </xsl:variable>
+            <w:r>
+                <w:pict>
+                    <v:shape id="{$intId}" type="#_x0000_t75" style="width:{$width}pt;height:{$height}pt">
+                        <v:imagedata r:id="{generate-id(draw:image)}" o:title=""/>
+                    </v:shape>
+                </w:pict>                
+            </w:r>
+        </xsl:if>
+    </xsl:template>
 
     <xsl:template match="draw:frame[not(./draw:object-ole) and starts-with(./draw:image/@xlink:href, 'Pictures/')]" mode="paragraph">
         <xsl:variable name="supported">
@@ -139,7 +169,6 @@
             
             <xsl:variable name="intId">
                 <xsl:call-template name="GetPosition">
-                    <xsl:with-param name="keyName" select="'images'"/>
                     <xsl:with-param name="node" select="."/>
                 </xsl:call-template>
             </xsl:variable>

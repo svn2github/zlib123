@@ -241,7 +241,7 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;;
 ;;;"Autoformat";"selected format";;"?";;;;;
 ;;;;;;;;;;;
-;"Horizontal Ruler";;"selected style";;3;"0.2-Final";;;;;
+;"Horizontal Ruler";;"selected style";;3;"0.2-Final";"Completed";"If image is stored on the machine on which the ODF file was created, it may obviously not be converted.";244;;
 ;;;;;;;;;;;
 ;"Picture";;"X position";;0;"0.2-M1";"Completed";;19,244;;
 ;;;"Y position";;0;"0.2-M1";"Completed";;19,244;;

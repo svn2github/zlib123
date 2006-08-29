@@ -258,7 +258,7 @@ w:gridCol/@w:w is based on style:table-column-properties/@style:column-width for
 ;;"Event Listeners";;;;;;
 ;"Frames";;1;;;;;
 ;;"Text Box";1;"0.2-M1";"Partial";;"draw:frame/draw:text-box converted to  w:pict/v:shape/v:textbox/w:txbxContent";"TODO: correct position of text boxes"
-;;"Image";1;"0.2-M1";"Partial";;"Internal images only, ie [starts-with(draw:frame/draw:image/@xlink:href, 'Pictures/')]. Converted to w:drawing/wp:anchor.
+;;"Image";1;"0.2-M1";"Completed";"Jslaurent";"Internal images, ie [starts-with(draw:frame/draw:image/@xlink:href, 'Pictures/')] converted to w:drawing/wp:anchor.
 following style:style/style:graphic-properties attributes are transformed: 
 @style:run-through to w:drawing/wp:anchor/@behindDoc,  
 @style:horizontal-pos to  w:drawing/wp:anchor/wp:positionH/wp:align
@@ -270,8 +270,9 @@ following parent::draw:frame attributes are transformed:
 @svg:x to w:drawing/wp:anchor/wp:positionH/wp:posOffset
 @svg:y to w:drawing/wp:anchor/wp:positionV/wp:posOffset
 @svg:width to wp:extend/@cx
-@svg:height to wp:extend/@cy";
-;;"Objects";;;"Partial";;"Draw:object-ole translated to o:OLEObject. An object can have an image associated to it. xlink:href translated to an Id register through part-relationships.xsl. Binary files are pu into word/embeddings/xxx.bin, while associated images are taken from ObjectReplacements/ and put into word/media/xxx.wmf.";"TODO : Manage Objects that do have a xml representation (<draw:object>)"
+@svg:height to wp:extend/@cy
+External images converted to w:pict/w:shape. If link is relative, image may not be converted.";
+;;"Objects";;;"Partial";"jslaurent";"Draw:object-ole translated to o:OLEObject. An object can have an image associated to it. xlink:href translated to an Id register through part-relationships.xsl. Binary files are pu into word/embeddings/xxx.bin, while associated images are taken from ObjectReplacements/ and put into word/media/xxx.wmf.";"TODO : Manage Objects that do have a xml representation (<draw:object>)"
 ;;"Applet";;;;;;
 ;;"Plugins";;;;;;
 ;;"Parameters";;;;;;

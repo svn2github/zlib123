@@ -108,23 +108,32 @@
 					<xsl:if test="$supported = 'true' ">
 					<xsl:choose>
 						<!-- Internal image -->
-						<xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
-							
+						<xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">							
 							<!-- copy this image to the oox package -->
 							<zip:copy zip:source="{draw:image/@xlink:href}" zip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
 							<Relationship Id='{generate-id(draw:image)}' 					
 								Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-								Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>	
-							
+								Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>							
 						</xsl:when>
 						<xsl:otherwise> 
-							<!-- External image -->
-							<!-- TODO support for external images
-								<Relationship Id='{generate-id(draw:image)}' 					
-								Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-								Target="{draw:image/@xlink:href}"
-								TargetMode="External"/>
-							-->
+							<!-- External image : If relative path, image may not be converted. -->
+							<Relationship>
+								<xsl:attribute name="Id">
+									<xsl:value-of select="generate-id(draw:image)"/>
+								</xsl:attribute>
+								<xsl:attribute name="Type">http://schemas.openxmlformats.org/officeDocument/2006/relationships/image</xsl:attribute>
+								<xsl:attribute name="Target">
+									<xsl:choose>
+										<xsl:when test="contains(draw:image/@xlink:href,'./')">
+											<xsl:value-of select="concat('../../',draw:image/@xlink:href)"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="draw:image/@xlink:href"/>
+										</xsl:otherwise>
+									</xsl:choose>									
+								</xsl:attribute>
+								<xsl:attribute name="TargetMode">External</xsl:attribute>
+							</Relationship>
 						</xsl:otherwise>
 					</xsl:choose>
 					</xsl:if>
