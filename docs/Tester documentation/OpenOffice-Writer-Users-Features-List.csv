@@ -236,7 +236,7 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;Heading;;0;0.2-M1;Completed;;217;;
 ;;;Repeat heading;;1;0.2-M1;Completed;;217;;
 ;;;First (x) rows (to repeat);;2;0.2-M1;Completed;;217;;
-;;;Don't split table;;0;0.2-M2;;;583;Is there any equivalent in Word?;
+;;;Don't split table;;0;0.2-M2;;;583;;TODO : look for an equivalent in Is there any equivalent in Word
 ;;;Border;;1;0.2-M1;Completed;;584;;
 ;;;;;;;;;;;
 ;;;Autoformat;selected format;;?;;;;;
@@ -286,7 +286,7 @@ This is a must have in my opinion and effective translation of the FORMAT featur
 ;;;Hidden;;0;0.2-M1;Completed;Conditional text doesn't exist in OOX;517;;
 ;;;;;;;;;;;
 ;;Position;Position;Normal/ Subscript/ Superscript;2;0.2-M1;Completed;;401;;
-;;;Rotation / Scaling;0 deg/ 90 deg/ 270 deg;3;0.2-M1;;;512-513;might not directly exist in Word! Simulated via text boxes?;
+;;;Rotation / Scaling;0 deg/ 90 deg/ 270 deg;3;0.2-M1;Completed;Basic text rotation does not exist in OOX;512-513;;
 ;;;;Scale width (%);;?;;;;;
 ;;;Spacing;Default/ Expanded (by point)/ Condensed (by point);1;0.2-M1;Completed;;492;;
 ;;;;;;;;;;;
