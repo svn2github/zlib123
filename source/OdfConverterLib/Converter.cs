@@ -43,8 +43,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 	public class Converter
 	{
         private const string RESOURCE_LOCATION = "resources";
+        private const string ODFToOOX_LOCATION = "odf2oox";
         private const string ODFToOOX_XSL = "odf2oox.xsl";
         private const string ODFToOOX_COMPUTE_SIZE_XSL = "odf2oox-compute-size.xsl";
+        private const string OOXToODF_LOCATION = "oox2odf";
+        private const string OOXToODF_XSL = "oox2odf.xsl";
+        private const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
 		private const string SOURCE_XML = "source.xml";
 			
 		public Converter()
@@ -102,7 +106,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 xrs.ProhibitDtd = true;
 
                 if (resourceDir == null) {
-                    resourceResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCE_LOCATION);
+                    resourceResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCE_LOCATION + "." + ODFToOOX_LOCATION);
                     xslDoc = new XPathDocument(((ResourceResolver)resourceResolver).GetInnerStream(ODFToOOX_XSL));
                     xrs.XmlResolver = resourceResolver;
                     source = XmlReader.Create(SOURCE_XML, xrs);

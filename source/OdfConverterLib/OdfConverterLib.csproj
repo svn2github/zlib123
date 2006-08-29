@@ -35,34 +35,7 @@
     <Compile Include="ZipResolver.cs" />
     <Compile Include="ResourceResolver.cs" />
     <Compile Include="Converter.cs" />
-    <EmbeddedResource Include="resources\document.xsl">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\office.dtd">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\part_relationships.xsl">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\odf2oox.xsl">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\source.xml" />
-    <EmbeddedResource Include="resources\numbering.xsl" />
-    <EmbeddedResource Include="resources\common.xsl" />
-    <EmbeddedResource Include="resources\docprops.xsl" />
-    <EmbeddedResource Include="resources\fonts.xsl" />
-    <EmbeddedResource Include="resources\styles.xsl" />
-    <EmbeddedResource Include="resources\odf2oox-compute-size.xsl" />
-    <EmbeddedResource Include="resources\pictures.xsl" />
-    <EmbeddedResource Include="resources\settings.xsl" />
-    <EmbeddedResource Include="resources\contentTypes.xsl" />
-    <EmbeddedResource Include="resources\package_relationships.xsl" />
     <Compile Include="NotAnOdfDocumentException.cs" />
-    <EmbeddedResource Include="resources\footnotes.xsl" />
-    <EmbeddedResource Include="resources\header-footer.xsl" />
-    <EmbeddedResource Include="resources\dataStyles.xsl" />
-    <EmbeddedResource Include="resources\endnotes.xsl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
@@ -71,7 +44,31 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="resources\comments.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\comments.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\common.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\contentTypes.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\dataStyles.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\docprops.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\document.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\endnotes.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\fonts.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\footnotes.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\header-footer.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\numbering.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\odf2oox-compute-size.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\odf2oox.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\package_relationships.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\part_relationships.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\pictures.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\settings.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\source.xml" />
+    <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\office.dtd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="resources\oox2odf\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>
