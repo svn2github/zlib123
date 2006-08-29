@@ -1533,6 +1533,7 @@
 			</xsl:attribute>
 			<xsl:attribute name="w:val">
 				<xsl:choose>
+					<xsl:when test="@style:type = 'char' ">decimal</xsl:when>
 					<xsl:when test="@style:type">	
 						<xsl:value-of select="@style:type"/>
 					</xsl:when>
