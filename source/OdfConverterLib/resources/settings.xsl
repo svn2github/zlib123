@@ -27,11 +27,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main">
+    xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+   exclude-result-prefixes="office fo style">
 
     <xsl:template name="settings">
             <w:settings>
-                <w:view w:val="print"/>
+             <w:view w:val="print"/>
+             <xsl:if test="document('styles.xml')//style:page-layout[@style:name=//office:master-styles/style:master-page/@style:page-layout-name]/style:page-layout-properties/@fo:background-color">
+               <w:displayBackgroundShape/>
+             </xsl:if>
 
             	<!-- Header and Footer even and odd propertie -->
             	<xsl:call-template name="EvenAndOddConfiguration"/>

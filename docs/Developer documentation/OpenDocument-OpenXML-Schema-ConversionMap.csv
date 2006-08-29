@@ -507,7 +507,7 @@ bullet-relative-size"
 ;;"Border Line Width";2;"0.2-Final";;;;
 ;;"Padding";1;"0.2-Final";;;;
 ;;"Shadow";2;"0.2-Final";;;;
-;;"Background";2;"0.2-Final";;;;
+;;"Background";2;"0.2-Final";"Partial";"jslaurent";"style:page-layout-properties/@fo:background color converted to w:document/w:background/@w:color, for the master-page referring to the page-layout style (cf test).";"TODO : manage different  background color on different pages."
 ;;"Columns";0;"0.2-Final";;;;
 ;;"Register-truth";3;"0.2-Final";;;;
 ;;"Print";;"0.2-Final";;;;"refers to spreadsheets, some of the remaining also"

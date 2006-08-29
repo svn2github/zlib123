@@ -60,6 +60,13 @@
 
 	<xsl:template name="document">
 		<w:document>
+			<xsl:if test="document('styles.xml')//style:page-layout[@style:name=//office:master-styles/style:master-page/@style:page-layout-name]/style:page-layout-properties/@fo:background-color">
+				<w:background>
+					<xsl:attribute name="w:color">
+						<xsl:value-of select="translate(substring-after(document('styles.xml')//style:page-layout[@style:name=//office:master-styles/style:master-page/@style:page-layout-name]/style:page-layout-properties/@fo:background-color,'#'),'f','F')"/>
+					</xsl:attribute>
+				</w:background>
+			</xsl:if>
 			<xsl:apply-templates select="document('content.xml')/office:document-content"/>
 		</w:document>
 	</xsl:template>
