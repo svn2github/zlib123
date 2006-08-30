@@ -676,6 +676,39 @@ Attribute @w:val is set to 'single' or 'double' only";
 ;Table Formatting Properties;;1;;;;;to be analysed in more detail (some elements might not be required, e.g. Page Number element)
 ;;Table Width;1;0.1;Completed;;"The table style name table:table/@table:style-name is set to w:tbl/w:tblPr/w:tblStyle/@w:val.
 style:table-properties/@style:width for this table style name is converted to w:tbl/w:tblPr/w:tblW/@w:w";
+<<<<<<< .mine
+;;Table Alignment;1;0.2-M1;Completed;;w:jc based on style:table-properties/@table:align;
+;;Table Left and Right Margin;1;0.2-M1;;;;it seems that it's not available in Word
+;;Table Top and Bottom Margin;1;0.2-M1;;;;you cannot add spacing before or after table in Word as you can in OO, because in Word the spacing can be done only according to whole page(or text which is wrapped around the table), not according to local position of the table(which cannot be transported into word), as it is done in OO
+;;Table Margins;1;0.2-M1;;;;it seems that it's not available in Word
+;;Page Number;;0.2-M1;;;;TODO: it may be conected with index of tables
+;;Break Before and Break After;1;0.2-M1;Partial;jslaurent;style:style/style:table-properties/@fo:break-before converted to w:pageBreakBefore, inserted in the first paragraph of the table (cf template text:p).;TODO : manage page break after.
+;;Table Background and Background Image;1;0.2-M1;Completed;;style:style/style:table-properties/@fo:background-color is translated to w:shd;there is no such feature like background image for table in Word
+;;Table Shadow;1;0.2-M1;;;;it cannot be mapped one to one
+;;Keep with Next;1;0.2-M1;;;;these properties can be applied to paragraph but not to table in Word
+;;May Break Between Rows;1;0.2-M1;;;;"word doesn't support ""allow table to split across pages and columns"", it supports only ""allow row to break across pages or columns"" (keep together attribute)"
+;;Border Model Property;1;0.2-M1;;;;in Word there is only one model so this cannot be transformed
+;;Writing Mode;1;0.2-M1;Completed;; @style:writing-mode converted to w:textDirection;
+;;Display;1;0.2-M1;;;;it seems that it's not implemented in OO ????
+;Column Formatting Properties;;1;;;;;
+;;Column Width;1;0.2-Final;Partial;;w:tc/w:tcPr/w:tcW based on style:table-column-properties/@style:column-width;TODO: handle problem of merged columns or rows
+;;Optimal Table Column Width;1;0.2-Final;;;;
+;;Break Before and Break After;1;0.2-Final;;;;
+;Table Row Formatting Properties;;1;;;;;
+;;Row Height;1;0.2-Final;Partial;;w:tr/w:trPr/w:trHeight based on style:table-row-properties/@style:min-row-height | @style:row-height;TODO: handle problem of merged rows
+;;Optimal Table Row Height;1;0.2-Final;;;;
+;;Row Background;1;0.2-Final;Completed;;style:style/style:table-row-properties/@fo:background-color is converted to w:shd;
+;;Break Before and Break After;1;0.2-Final;;;;
+;;Keep Together;1;0.2-Final;Completed;;when @style:keep-together is false it is transfomed to w:cantSplit;
+;Table Cell Formatting Properties;;1;;;;;
+;;Vertical Alignment;1;0.2-Final;Completed;; w:vAlign based on style:table-cell-properties@style:vertical-align;
+;;Text Align Source;1;0.2-Final;;;;
+;;Direction;1;0.2-Final;;;;
+;;Vertical Glyph Orientation;1;0.2-Final;;;;
+;;Cell Shadow;1;0.2-Final;;;;it cannot be mapped one to one
+;;Cell Background;1;0.2-Final;Completed;;w:tc/w:tcPr/w:shd is based on @fo:background-color;
+;;Cell Border;1;0.2-Final;Partial;;"table:table-cell is converted to w:tc
+=======
 ;;Table Alignment;1;0.2-M1;Completed;;w:jc based on style:table-properties/@table:align;
 ;;Table Left and Right Margin;1;0.2-M1;;;;it seems that it's not available in Word
 ;;Table Top and Bottom Margin;1;0.2-M1;;;;you cannot add spacing before or after table in Word as you can in OO
@@ -707,6 +740,7 @@ style:table-properties/@style:width for this table style name is converted to w:
 ;;Cell Shadow;1;0.2-Final;;;;it cannot be mapped one to one
 ;;Cell Background;1;0.2-Final;Completed;;w:tc/w:tcPr/w:shd is based on @fo:background-color;
 ;;Cell Border;1;0.2-Final;Partial;;"table:table-cell is converted to w:tc
+>>>>>>> .r325
 Based on style:table-cell-properties of the table style name the following properties have been converted :
 w:tc/w:tcBorders children w:top, w:bottom, w:left, w:right have their attributes @w:val set to 'single'
 @w:color set to substring-after(style:table-cell-properties/@fo:border, '#') and  
@@ -726,6 +760,159 @@ The same applies to the elements w:bottom, w:right and w:left";
 ;;Shrink To Fit;1;0.2-Final;;;;
 ;List-Level Style Properties;;0;0.2-Final;Partial;;"text:space-before + text:min-label-width used for w:ind/@w:left
 text:min-label-width used in w:ind/@w:hanging
+<<<<<<< .mine
+@fo:text-align translated to w:lvlJc/@w:val";TODO : indentation from outside!
+;Stroke Properties;;2;;;;;how should drawing objects be processed? Converted as a picture?
+;;Stroke Style;;;;;;
+;;Dash;;;;;;
+;;Multiple Dashes;;;;;;
+;;Width;;;;;;
+;;Color;;;;;;
+;;Start Marker;;;;;;
+;;End Marker;;;;;;
+;;Start Marker Width;;;;;;
+;;End Marker Width;;;;;;
+;;Start Marker Center;;;;;;
+;;End Marker Center;;;;;;
+;;Opacity;;;;;;
+;;Line Join;;;;;;
+;Fill Properties;;;;;;;
+;;Fill Style;;;;;;
+;;Color;;;;;;
+;;Secondary Fill Color;;;;;;
+;;Gradient;;;;;;
+;;Gradient Step Count;;;;;;
+;;Hatch;;;;;;
+;;Solid Hatch;;;;;;
+;;Fill Image;;;;;;
+;;Fill Image Rendering Style;;;;;;
+;;Fill Image Size;;;;;;
+;;Fill Image Tile Reference Point;;;;;;
+;;Fill Image Tile Translation;;;;;;
+;;None and Linear Opacity;;;;;;
+;;Gradient Opacity;;;;;;
+;;Fill Rule;;;;;;
+;;Symbol color;;;;;;
+;Text Animation Properties;;;;;;;
+;;Animation;;;;;;
+;;Animation Direction;;;;;;
+;;Animation Start Inside;;;;;;
+;;Animation Stop Inside;;;;;;
+;;Animation Repeat;;;;;;
+;;Animation Delay;;;;;;
+;;Animation Steps;;;;;;
+;Text and Text Alignment Properties;;2;;;;;refers to text in drawing objects, to be analysed in more detail, especially how drawing objects are handled
+;;Auto Grow Width and Height;2;0.2-M1;;;;
+;;Fit To Size;2;0.2-M1;;;;
+;;Fit To Contour;2;0.2-M1;;;;
+;;Text Area Vertical Align;2;0.2-M1;;;;
+;;Text Area Horizontal Align;2;0.2-M1;;;;
+;;Word Wrap;2;0.2-M1;;;;
+;;List Styles;2;0.2-M1;;;;
+;Color Properties;;;;;;;might be not required at all
+;;Color Mode;;0.2-Final;;;;
+;;Color Inversion;;0.2-Final;;;;
+;;Adjust Luminance;;0.2-Final;;;;
+;;Adjust Contrast;;0.2-Final;;;;
+;;Adjust Gamma;;0.2-Final;;;;
+;;Adjust Red;;0.2-Final;;;;
+;;Adjust Green;;0.2-Final;;;;
+;;Adjust Blue;;0.2-Final;;;;
+;;Adjust Opacity;;0.2-Final;;;;
+;Shadow Properties;;;;;;;
+;;Shadow;;0.2-Final;;;;
+;;Offset;;0.2-Final;;;;
+;;Color;;0.2-Final;;;;
+;;Opacity;;0.2-Final;;;;
+;Connector Properties;;;;;;;
+;;Start Line Spacing;;;;;;
+;;End Line Spacing;;;;;;
+;Measure Properties;;;;;;;
+;;Line Distance;;;;;;
+;;Guide Overhang;;;;;;
+;;Guide Distance;;;;;;
+;;Start Guide;;;;;;
+;;End Guide;;;;;;
+;;Placing;;;;;;
+;;Parallel;;;;;;
+;;Text Alignment;;;;;;
+;;Unit;;;;;;
+;;Show Unit;;;;;;
+;;Decimal Places;;;;;;
+;Caption Properties;;;;;;;
+;;Type;;0.2-Final;;;;
+;;Angle Type;;0.2-Final;;;;
+;;Angle;;0.2-Final;;;;
+;;Gap;;0.2-Final;;;;
+;;Escape Direction;;0.2-Final;;;;
+;;Escape;;0.2-Final;;;;
+;;Line Length;;0.2-Final;;;;
+;;Fit Line Length;;0.2-Final;;;;
+;3D Geometry Properties;;;;;;;
+;;Horizontal Segments;;;;;;
+;;Vertical Segments;;;;;;
+;;Edge Rounding;;;;;;
+;;Edge Rounding Mode;;;;;;
+;;Back Scale;;;;;;
+;;Depth;;;;;;
+;;Backface Culling;;;;;;
+;;End Angle;;;;;;
+;;Close Front;;;;;;
+;;Close Back;;;;;;
+;3D Lighting Properties;;;;;;;
+;;Mode;;;;;;
+;;Normals Kind;;;;;;
+;;Normals Direction;;;;;;
+;3D Texture Properties;;;;;;;
+;;Generation Mode;;;;;;
+;;Kind;;;;;;
+;;Filter;;;;;;
+;;Mode;;;;;;
+;3D Material Properties;;;;;;;
+;;Colors;;;;;;
+;;Shininess;;;;;;
+;3D Shadow Properties;;;;;;;
+;;Shadow;;;;;;
+;Frame Formatting Properties;;;;Partial;;"frame properties are kept in style attribute of v:shape or v:textbox element, eg.  <v:shape style=""width: 100pt;height: 150pt"">";
+;;Frame Widths;;;Partial;;"fixed width - draw:frame/svg:width is converted to width value of style attribute of v:shape element. Minimum width - draw:frame/fo:min-width - does not exists in .docx. It is converted like svg:width, but it is also  converted to ""mso-wrap-style:none"" value of style attribute of v:shape element which mean that width of text box can increase in size automatically when content is added.";TODO: relative width - style:rel-width
+;;Frame Heights;;;Partial;;"fixed height - draw:frame/svg:height is converted to height value of style attribute of v:textbox element. Minimum height - draw:text-box/fo:min-height - does not exists in .docx, it is converted like svg:height, but it is also converted to ""mso-fit-shape-to-text:t"" value of style attribute of v:textbox element which mean that height of text box can increase in size automatically when content is added";TODO: relative height - style:rel-height
+;;Maximum Width and Height;;;;;;
+;;Left and Right Margins;;;Completed;;"style:graphic-properties/fo:margin-left and style:graphic-properties/fo:margin-right are converted to ""mso-wrap-distance-left"" and ""mso-wrap-distance-left"" values of style attribute of v:shape element";
+;;Top and Bottom Margins;;;Completed;;"style:graphic-properties/fo:margin-top and style:graphic-properties/fo:margin-bottom are converted to ""mso-wrap-distance-top"" and ""mso-wrap-distance-bottom"" values of style attribute of v:shape element";
+;;Margins;;;;;;
+;;Print Content;;;;;;
+;;Protect;;;;;;
+;;Horizontal Position;;;Partial;;"style:graphic-properties/style:horizontal-pos is converted into ""mso-position-horizontal"" value of style attribute of  v:shape element (only values left, right and center handled). draw:frame/svg:x is converted to margin-left value of a style attribute of a v:shape element";Values of style:horizontal-pos like: from-left, from-inside, inside and outside are not converted - investigate wheater these values have their equivalent in .docx
+;;Horizontal Relation;;;;;;
+;;Vertical Position;;;Partial;;draw:frame/svg:y is converted to margin-top value of a style attribute of a v:shape element;TODO: style:vertical-pos
+;;Vertical Relation;;;;;;
+;;Frame Anchor;;;Partial;;draw:frame/text:anchor-type is converted to mso-position-horizontal-relative and mso-position-vertical-relative values of style attribute of v:shape element.;For text:anchor-type only 'page' value converted, TODO: text:anchor-page-number
+;;Border;;;;;;
+;;Border Line Width;;;;;;
+;;Padding;;;Completed;;style:graphic-properties/fo:padding, style:graphic-properties/fo:padding-left, style:graphic-properties/fo:padding-right, style:graphic-properties/fo:padding-top, style:graphic-properties/fo:padding-bottom are converted to inset attribute of a v:textbox element;
+;;Shadow;;;;;;
+;;Background;;;partial;;style:graphic-properties/@fo:background-color is converted to fillcolor attribute of a v:shape element;TODO: style:background-image
+;;Columns;;;;;;
+;;Editable;;;;;;
+;;Wrapping;;;Completed;style:graphic-properties/@style:wrap  property is converted to w10:wrap element for draw:frame/draw:text-box;;
+;;Dynamic Wrap Threshold;;;;;;
+;;Paragraph-only Wrapping;;;;;;
+;;Contour Wrapping;;;;;;
+;;Contour Wrapping Mode;;;;;;
+;;Run Through;;;;;;
+;;Flow with Text;;;;;;
+;;Overflow behavior;;;;;;
+;;Mirroring;;;;;;
+;;Clipping;;;;;;
+;;Wrap Influence on Position;;;;;;
+;Floating Frame Formatting Properties;;;;;;;
+;;Display Scrollbar;;;;;;
+;;Display Border;;;;;;
+;;Margins;;;;;;
+;;Object Formatting Properties;;;;;;
+;;Visible Area;;;;;;
+;;Draw Aspect;;;;;;
+=======
 @fo:text-align translated to w:lvlJc/@w:val";TODO : indentation from outside!
 ;Stroke Properties;;2;;;;;how should drawing objects be processed? Converted as a picture?
 ;;Stroke Style;;;;;;
@@ -877,3 +1064,4 @@ text:min-label-width used in w:ind/@w:hanging
 ;;Object Formatting Properties;;;;;;
 ;;Visible Area;;;;;;
 ;;Draw Aspect;;;;;;
+>>>>>>> .r325
