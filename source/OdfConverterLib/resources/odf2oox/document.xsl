@@ -657,12 +657,23 @@
 					</xsl:variable>
 					
 					<xsl:variable name="frameWrap" select="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:wrap" />
+					<xsl:variable name="relWidth" select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
+					<xsl:variable name="relHeight" select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
+					
 					<xsl:attribute name="style">
 						<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:wrap != 'none' ">
 							<xsl:value-of select="'position:absolute;'"/>
 						</xsl:if>
 						<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
 						<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
+						
+						<xsl:if test="$relWidth">
+							<xsl:value-of select="concat('mso-width-percent:',$relWidth,'0;')"/>
+						</xsl:if>
+						<xsl:if test="$relHeight">
+							<xsl:value-of select="concat('mso-height-percent:',$relHeight,'0;')"/>
+						</xsl:if>
+						
 						<xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
 						<xsl:if test="parent::draw:frame/@svg:x">
 							<xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
@@ -823,6 +834,9 @@
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'right' ">
 								<w10:wrap type="tight" side="right"/>
+							</xsl:when>
+							<xsl:when test="not($frameWrap)">
+								<w10:wrap type="tight"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'parallel' ">
 								<w10:wrap type="tight"/>
