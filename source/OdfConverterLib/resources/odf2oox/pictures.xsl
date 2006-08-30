@@ -337,8 +337,10 @@
             <wp:simplePos x="0" y="0"/>
             <wp:positionH>
                 <xsl:attribute name="relativeFrom">
+                    
                     <xsl:choose>
-                        <xsl:when test="@text:anchor-type = 'page'">page</xsl:when>
+                        
+                        <xsl:when test="$style/@style:horizontal-rel='page'">page</xsl:when>      
                         <xsl:otherwise>column</xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
@@ -351,6 +353,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <wp:posOffset>
+                            <xsl:message><xsl:value-of select="$ox"/></xsl:message>
                             <xsl:value-of select="$ox"/>
                         </wp:posOffset>
                     </xsl:otherwise>
@@ -360,7 +363,8 @@
             <wp:positionV>
                 <xsl:attribute name="relativeFrom">
                     <xsl:choose>
-                        <xsl:when test="@text:anchor-type = 'page'">page</xsl:when>
+                        
+                        <xsl:when test="$style/@style:vertical-rel='page'">page</xsl:when>      
                         <xsl:otherwise>paragraph</xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>

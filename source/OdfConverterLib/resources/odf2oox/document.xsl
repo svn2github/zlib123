@@ -52,8 +52,7 @@
 		use="@style:name"/>
 	<xsl:key name="hyperlinks" match="text:a" use="''"/>
 	<xsl:key name="headers" match="text:h" use="''"/>
-	<xsl:key name="images" match="draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]"
-		use="''"/>
+	<xsl:key name="images" match="draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]" use="''"/>
 	<xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
 
 	<xsl:variable name="type">dxa</xsl:variable>
@@ -515,7 +514,7 @@
 					</xsl:call-template>
 				</xsl:variable>
 				<xsl:variable name="svgx">
-					<xsl:choose>
+					 <xsl:choose> 
 						<xsl:when test="$parent[1]/@svg:x">
 							<xsl:call-template name="point-measure">
 								<xsl:with-param name="length">
@@ -658,7 +657,6 @@
 					</xsl:variable>
 					
 					<xsl:variable name="frameWrap" select="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:wrap" />
-					
 					<xsl:attribute name="style">
 						<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:wrap != 'none' ">
 							<xsl:value-of select="'position:absolute;'"/>
@@ -735,6 +733,17 @@
 							/>
 						</xsl:attribute>
 					</xsl:if>
+					
+					<xsl:variable name="opacity" select="100 - substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:background-transparency,'%')" />
+					
+					<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:background-transparency">
+						<v:fill>
+							<xsl:attribute name="opacity">
+								<xsl:value-of select="concat($opacity,'%')"/>
+							</xsl:attribute>
+						</v:fill> 
+					</xsl:if>
+					
 					<v:textbox>
 						<xsl:attribute name="style">
 							<xsl:if test="@fo:min-height">
@@ -1881,7 +1890,7 @@
 			<xsl:otherwise>
 				<w:t>
 					<xsl:attribute name="xml:space">preserve</xsl:attribute>
-					<xsl:value-of select="."/>
+				<xsl:value-of select="."/>
 
 				</w:t>
 			</xsl:otherwise>
