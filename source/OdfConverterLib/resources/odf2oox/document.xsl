@@ -661,9 +661,13 @@
 					<xsl:variable name="relHeight" select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
 					
 					<xsl:attribute name="style">
-						<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:wrap != 'none' ">
+						<xsl:if test="$frameWrap != 'none' ">
 							<xsl:value-of select="'position:absolute;'"/>
 						</xsl:if>
+						<xsl:if test="not($frameWrap)">
+							<xsl:value-of select="'position:absolute;'"/>
+						</xsl:if>
+						
 						<xsl:value-of select="concat('width:',$frameW,'pt;')"/>
 						<xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 						
@@ -822,6 +826,8 @@
 								<xsl:apply-templates select="."/>
 							</xsl:for-each>
 						</w:txbxContent>
+						
+						<xsl:message><xsl:value-of select="$frameWrap"/></xsl:message>
 						
 						<!--frame wrap-->
 						<xsl:choose>
