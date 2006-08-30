@@ -165,10 +165,10 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;;
 ;;Sender;;;;?;;;;;
 ;;;;;;;;;;;
-;Frame;Type;Width;Relative;;0.2-M2;to be cheked;;729;;
+;Frame;Type;Width;Relative;;0.2-M2;Completed;;729;;
 ;;;;Automatic;;0.2-M2;Partial;;729;;
 ;;;;;;;;;;;
-;;;Height;Relative;;0.2-M2;to be checked;;730;;
+;;;Height;Relative;;0.2-M2;Completed;;730;;
 ;;;;Autosize;;0.2-M2;Completed;;730;;
 ;;;;;;;;;;;
 ;;;Keep ratio;;;0.2-M2;;;;;
