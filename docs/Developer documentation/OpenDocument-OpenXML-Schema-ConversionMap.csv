@@ -678,7 +678,7 @@ Attribute @w:val is set to 'single' or 'double' only";
 style:table-properties/@style:width for this table style name is converted to w:tbl/w:tblPr/w:tblW/@w:w";
 ;;Table Alignment;1;0.2-M1;Completed;;w:jc based on style:table-properties/@table:align;
 ;;Table Left and Right Margin;1;0.2-M1;;;;it seems that it's not available in Word
-;;Table Top and Bottom Margin;1;0.2-M1;;;;you cannot add spacing before or after table in Word as you can in OO
+;;Table Top and Bottom Margin;1;0.2-M1;;;;you cannot add spacing before or after table in Word as you can in OO, because in Word you can only position a table according to its position on page, or text which is wrapped around it 
 ;;Table Margins;1;0.2-M1;;;;it seems that it's not available in Word
 ;;Page Number;;0.2-M1;;;;TODO: it may be conected with index of tables
 ;;Break Before and Break After;1;0.2-M1;Partial;jslaurent;style:style/style:table-properties/@fo:break-before converted to w:pageBreakBefore, inserted in the first paragraph of the table (cf template text:p).;TODO : manage page break after.
