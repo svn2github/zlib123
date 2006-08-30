@@ -926,7 +926,7 @@
 								</w:numId>
 							</w:numPr>
 
-							<!-- override abstract num indent  if paragraph has margin defined -->
+							<!-- override abstract num indent and tab  if paragraph has margin defined -->
 							<xsl:call-template name="indent">
 								<xsl:with-param name="level" select="$level"/>
 							</xsl:call-template>
@@ -988,7 +988,7 @@
 				<xsl:otherwise>0</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-
+		
 		<xsl:choose>
 			<xsl:when test="ancestor-or-self::text:list">
 				<xsl:variable name="minLabelWidthTwip">
@@ -1029,73 +1029,165 @@
 						<xsl:otherwise>0</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-
+				<xsl:variable name="minLabelDistanceTwip">
+					<xsl:choose>
+						<xsl:when test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length"
+									select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
+								/>
+							</xsl:call-template>							
+						</xsl:when>
+						<xsl:when test="document('styles.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length"
+									select="document('styles.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
+								/>
+							</xsl:call-template>							
+						</xsl:when>
+						<xsl:when test="$listStyleName=''">
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length"
+									select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
+								/>
+							</xsl:call-template>							
+						</xsl:when>
+						<xsl:otherwise>0</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				
 				<xsl:choose>
 					<xsl:when test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
-						<xsl:variable name="textIndent">
-							<xsl:choose>
-								<xsl:when test="key('style',$styleName)/style:paragraph-properties/@fo:text-indent">
-									<xsl:call-template name="twips-measure">
-										<xsl:with-param name="length"
-											select="key('style',$styleName)/style:paragraph-properties/@fo:text-indent"
-										/>
-									</xsl:call-template>
-								</xsl:when>
-								<xsl:when
-									test="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:text-indent">
-									<xsl:call-template name="twips-measure">
-										<xsl:with-param name="length"
-											select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:text-indent"
-										/>
-									</xsl:call-template>
-								</xsl:when>
-								<xsl:otherwise>0</xsl:otherwise>
-							</xsl:choose>
-						</xsl:variable>
-						<w:tabs>
-							<w:tab>
-								<xsl:attribute name="w:val">left</xsl:attribute>
-								<xsl:attribute name="w:pos">
-									<xsl:value-of
-										select="$minLabelWidthTwip + $paragraphMargin + $textIndent  + $spaceBeforeTwip"
-									/>
-								</xsl:attribute>
-							</w:tab>
-						</w:tabs>
-						<w:ind>
+						<xsl:if test="$paragraphMargin != 0">
+							<xsl:variable name="textIndent">
+								<xsl:choose>
+									<xsl:when test="key('style',$styleName)/style:paragraph-properties/@fo:text-indent">
+										<xsl:call-template name="twips-measure">
+											<xsl:with-param name="length"
+												select="key('style',$styleName)/style:paragraph-properties/@fo:text-indent"
+											/>
+										</xsl:call-template>
+									</xsl:when>
+									<xsl:when
+										test="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:text-indent">
+										<xsl:call-template name="twips-measure">
+											<xsl:with-param name="length"
+												select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:text-indent"
+											/>
+										</xsl:call-template>
+									</xsl:when>
+									<xsl:otherwise>0</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
 							<xsl:choose>
 								<xsl:when test="$textIndent != 0">
-									<xsl:attribute name="w:left">
-										<xsl:value-of
-											select="$paragraphMargin"/>
-									</xsl:attribute>
-									<xsl:if
-										test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
-										<xsl:attribute name="w:firstLine">
-											<xsl:value-of select="$textIndent"/>
+									<w:tabs>
+										<w:tab>
+											<xsl:attribute name="w:val">clear</xsl:attribute>
+											<xsl:attribute name="w:pos">
+												<xsl:choose>
+													<xsl:when test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
+														<xsl:value-of select="$spaceBeforeTwip + $minLabelDistanceTwip"/>
+													</xsl:when>
+													<xsl:otherwise>
+														<xsl:choose>
+															<xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+																<xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
+															</xsl:when>
+															<xsl:otherwise>
+																<xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
+															</xsl:otherwise>
+														</xsl:choose>
+													</xsl:otherwise>
+												</xsl:choose>
+											</xsl:attribute>
+										</w:tab>
+										<w:tab>
+											<xsl:attribute name="w:val">num</xsl:attribute>
+											<xsl:attribute name="w:pos">
+												<xsl:value-of
+													select="$minLabelDistanceTwip + $paragraphMargin + $textIndent"
+												/>
+											</xsl:attribute>
+										</w:tab>
+									</w:tabs>
+									<w:ind>
+										<xsl:attribute name="w:left">
+											<xsl:value-of
+												select="$paragraphMargin + $spaceBeforeTwip"/>
 										</xsl:attribute>
-									</xsl:if>
+										<xsl:if
+											test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
+											<xsl:attribute name="w:firstLine">
+												<xsl:value-of select="$textIndent"/>
+											</xsl:attribute>
+										</xsl:if>
+									</w:ind>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:attribute name="w:left">
-										<xsl:value-of
-											select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"/>
-									</xsl:attribute>
-									<xsl:if
-										test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
-										<xsl:attribute name="w:hanging">
-											<xsl:value-of select="$minLabelWidthTwip"/>
+									<w:tabs>
+										<w:tab>
+											<xsl:attribute name="w:val">clear</xsl:attribute>
+											<xsl:attribute name="w:pos">
+												<xsl:choose>
+													<xsl:when test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
+														<xsl:value-of select="$spaceBeforeTwip + $minLabelDistanceTwip"/>
+													</xsl:when>
+													<xsl:otherwise>
+														<xsl:choose>
+															<xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+																<xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
+															</xsl:when>
+															<xsl:otherwise>
+																<xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
+															</xsl:otherwise>
+														</xsl:choose>
+													</xsl:otherwise>
+												</xsl:choose>
+											</xsl:attribute>
+										</w:tab>
+										<w:tab>
+											<xsl:attribute name="w:val">num</xsl:attribute>
+											<xsl:attribute name="w:pos">
+												<xsl:choose>
+													<xsl:when test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
+														<xsl:value-of select="$paragraphMargin + $spaceBeforeTwip + $minLabelDistanceTwip"/>
+													</xsl:when>
+													<xsl:otherwise>
+														<xsl:choose>
+															<xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+																<xsl:value-of select="$paragraphMargin + $spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
+															</xsl:when>
+															<xsl:otherwise>
+																<xsl:value-of select="$paragraphMargin + $spaceBeforeTwip + $minLabelWidthTwip"/>
+															</xsl:otherwise>
+														</xsl:choose>
+													</xsl:otherwise>
+												</xsl:choose>
+											</xsl:attribute>
+										</w:tab>
+									</w:tabs>
+									<w:ind>
+										<xsl:attribute name="w:left">
+											<xsl:value-of
+												select="$paragraphMargin  + $spaceBeforeTwip + $minLabelWidthTwip"/>
 										</xsl:attribute>
-									</xsl:if>
+										<xsl:if
+											test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
+											<xsl:attribute name="w:hanging">
+												<xsl:value-of select="$minLabelWidthTwip"/>
+											</xsl:attribute>
+										</xsl:if>
+									</w:ind>
 								</xsl:otherwise>
 							</xsl:choose>
-						</w:ind>
+						</xsl:if>
 					</xsl:when>
 					<xsl:otherwise>
 						<w:ind>
 							<xsl:attribute name="w:left">
 								<xsl:value-of
-									select="$minLabelWidthTwip + $paragraphMargin  + $spaceBeforeTwip"/>
+									select="$paragraphMargin  + $spaceBeforeTwip + $minLabelWidthTwip"/>
 							</xsl:attribute>
 							<xsl:if
 								test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
