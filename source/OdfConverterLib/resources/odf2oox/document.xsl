@@ -90,19 +90,19 @@
 	<xsl:template match="text:h">
 		<w:p>
 			<w:pPr>
-				<xsl:variable name="headerStyle">
-					<xsl:call-template name="headerStyleName">
+				<xsl:variable name="stylePrefix">
+					<xsl:call-template name="stylePrefix">
 						<xsl:with-param name="styleName" select="@text:style-name"/>
 					</xsl:call-template>
 				</xsl:variable>
 
-				<xsl:variable name="nameStyle">
-					<xsl:value-of select="concat($headerStyle,@text:style-name)"/>
+				<xsl:variable name="prefixedStyleName">
+					<xsl:value-of select="concat($stylePrefix,@text:style-name)"/>
 				</xsl:variable>
 
 				<w:pStyle>
 					<xsl:attribute name="w:val">
-						<xsl:value-of select="$nameStyle"/>
+						<xsl:value-of select="$prefixedStyleName"/>
 					</xsl:attribute>
 				</w:pStyle>
 				<!-- <w:pStyle w:val="{@text:style-name}"/> -->
@@ -178,16 +178,16 @@
 										<w:pStyle w:val="{draw:frame/@draw:style-name}"/>
 									</xsl:when>
 									<xsl:otherwise>
-										<xsl:variable name="headerStyle">
-											<xsl:call-template name="headerStyleName"/>
+										<xsl:variable name="stylePrefix">
+											<xsl:call-template name="stylePrefix"/>
 										</xsl:variable>
-										<xsl:variable name="nameStyle">
+										<xsl:variable name="prefixedStyleName">
 											<xsl:value-of
-												select="concat($headerStyle,@text:style-name)"/>
+												select="concat($stylePrefix,@text:style-name)"/>
 										</xsl:variable>
 										<w:pStyle>
 											<xsl:attribute name="w:val">
-												<xsl:value-of select="$nameStyle"/>
+												<xsl:value-of select="$prefixedStyleName"/>
 											</xsl:attribute>
 										</w:pStyle>
 										<!-- <w:pStyle w:val="{@text:style-name}"/> -->
@@ -207,19 +207,19 @@
 						<!-- we are in table of contents -->
 						<xsl:when test="parent::text:index-body">
 							<w:pPr>
-								<xsl:variable name="headerStyle">
-									<xsl:call-template name="headerStyleName">
+								<xsl:variable name="stylePrefix">
+									<xsl:call-template name="stylePrefix">
 										<xsl:with-param name="styleName" select="@text:style-name"/>
 									</xsl:call-template>
 								</xsl:variable>
 
-								<xsl:variable name="nameStyle">
-									<xsl:value-of select="concat($headerStyle,@text:style-name)"/>
+								<xsl:variable name="prefixedStyleName">
+									<xsl:value-of select="concat($stylePrefix,@text:style-name)"/>
 								</xsl:variable>
 
 								<w:pStyle>
 									<xsl:attribute name="w:val">
-										<xsl:value-of select="$nameStyle"/>
+										<xsl:value-of select="$prefixedStyleName"/>
 									</xsl:attribute>
 								</w:pStyle>
 							</w:pPr>
@@ -285,25 +285,25 @@
 						<!-- main scenario -->
 						<xsl:otherwise>
 							<w:pPr>
-								<xsl:variable name="headerStyle">
-									<xsl:call-template name="headerStyleName">
+								<xsl:variable name="stylePrefix">
+									<xsl:call-template name="stylePrefix">
 										<xsl:with-param name="styleName" select="@text:style-name"/>
 									</xsl:call-template>
 								</xsl:variable>
-								<xsl:variable name="nameStyle">
+								<xsl:variable name="prefixedStyleName">
 									<xsl:choose>
 										<xsl:when test="count(child::draw:frame) = 1 and count(child::text()) = 0">
-											<xsl:value-of select="concat($headerStyle,draw:frame/@draw:style-name)"/>
+											<xsl:value-of select="concat($stylePrefix,draw:frame/@draw:style-name)"/>
 										</xsl:when>
 										<xsl:otherwise>
-											<xsl:value-of select="concat($headerStyle,@text:style-name)"/>
+											<xsl:value-of select="concat($stylePrefix,@text:style-name)"/>
 										</xsl:otherwise>
 									</xsl:choose>
 								</xsl:variable>
 
 								<w:pStyle>
 									<xsl:attribute name="w:val">
-										<xsl:value-of select="$nameStyle"/>
+										<xsl:value-of select="$prefixedStyleName"/>
 									</xsl:attribute>
 								</w:pStyle>
 								<xsl:call-template name="indent">
@@ -363,19 +363,19 @@
 				<!-- We are in a list -->
 				<w:p>
 					<w:pPr>
-						<xsl:variable name="headerStyle">
-							<xsl:call-template name="headerStyleName">
+						<xsl:variable name="stylePrefix">
+							<xsl:call-template name="stylePrefix">
 								<xsl:with-param name="styleName" select="@text:style-name"/>
 							</xsl:call-template>
 						</xsl:variable>
 
-						<xsl:variable name="nameStyle">
-							<xsl:value-of select="concat($headerStyle,@text:style-name)"/>
+						<xsl:variable name="prefixedStyleName">
+							<xsl:value-of select="concat($stylePrefix,@text:style-name)"/>
 						</xsl:variable>
 
 						<w:pStyle>
 							<xsl:attribute name="w:val">
-								<xsl:value-of select="$nameStyle"/>
+								<xsl:value-of select="$prefixedStyleName"/>
 							</xsl:attribute>
 						</w:pStyle>
 						<!-- <w:pStyle w:val="{@text:style-name}"/> -->
@@ -486,19 +486,19 @@
 
 	<xsl:template match="text:span" mode="hyperlink">
 		<w:rPr>
-			<xsl:variable name="headerStyle">
-				<xsl:call-template name="headerStyleName">
+			<xsl:variable name="stylePrefix">
+				<xsl:call-template name="stylePrefix">
 					<xsl:with-param name="styleName" select="@text:style-name"/>
 				</xsl:call-template>
 			</xsl:variable>
 
-			<xsl:variable name="nameStyle">
-				<xsl:value-of select="concat($headerStyle,@text:style-name)"/>
+			<xsl:variable name="prefixedStyleName">
+				<xsl:value-of select="concat($stylePrefix,@text:style-name)"/>
 			</xsl:variable>
 
 			<w:rStyle>
 				<xsl:attribute name="w:val">
-					<xsl:value-of select="$nameStyle"/>
+					<xsl:value-of select="$prefixedStyleName"/>
 				</xsl:attribute>
 			</w:rStyle>
 		</w:rPr>
@@ -578,18 +578,18 @@
 	<xsl:template match="draw:text-box">
 		<w:r>
 			<w:rPr>
-				<xsl:variable name="headerStyle">
-					<xsl:call-template name="headerStyleName">
+				<xsl:variable name="stylePrefix">
+					<xsl:call-template name="stylePrefix">
 						<xsl:with-param name="styleName" select="parent::draw:frame/@draw:style-name"/>
 					</xsl:call-template>
 				</xsl:variable>
-				<xsl:variable name="nameStyle">
-					<xsl:value-of select="concat($headerStyle,parent::draw:frame/@draw:style-name)"/>
+				<xsl:variable name="prefixedStyleName">
+					<xsl:value-of select="concat($stylePrefix,parent::draw:frame/@draw:style-name)"/>
 				</xsl:variable>
 				
 				<w:rStyle>
 					<xsl:attribute name="w:val">
-						<xsl:value-of select="$nameStyle"/>
+						<xsl:value-of select="$prefixedStyleName"/>
 					</xsl:attribute>
 				</w:rStyle>
 				<!--<w:rStyle w:val="{parent::draw:frame/@draw:style-name}"/>-->
@@ -903,22 +903,22 @@
 				<xsl:when test="*[1][self::text:p]">
 					<w:p>
 						<w:pPr>
-							<xsl:variable name="headerStyle">
-								<xsl:call-template name="headerStyleName">
+							<xsl:variable name="stylePrefix">
+								<xsl:call-template name="stylePrefix">
 									<xsl:with-param name="styleName"
 										select="*[1][self::text:p]/@text:style-name"/>
 								</xsl:call-template>
 							</xsl:variable>
 
-							<xsl:variable name="nameStyle">
+							<xsl:variable name="prefixedStyleName">
 								<xsl:value-of
-									select="concat($headerStyle,*[1][self::text:p]/@text:style-name)"
+									select="concat($stylePrefix,*[1][self::text:p]/@text:style-name)"
 								/>
 							</xsl:variable>
 
 							<w:pStyle>
 								<xsl:attribute name="w:val">
-									<xsl:value-of select="$nameStyle"/>
+									<xsl:value-of select="$prefixedStyleName"/>
 								</xsl:attribute>
 							</w:pStyle>
 							<!--<w:pStyle w:val="{*[1][self::text:p]/@text:style-name}"/> -->
@@ -2044,19 +2044,19 @@
 	<xsl:template match="text:span" mode="paragraph">
 		<w:r>
 			<w:rPr>
-				<xsl:variable name="headerStyle">
-					<xsl:call-template name="headerStyleName">
+				<xsl:variable name="stylePrefix">
+					<xsl:call-template name="stylePrefix">
 						<xsl:with-param name="styleName" select="@text:style-name"/>
 					</xsl:call-template>
 				</xsl:variable>
 
-				<xsl:variable name="nameStyle">
-					<xsl:value-of select="concat($headerStyle,@text:style-name)"/>
+				<xsl:variable name="prefixedStyleName">
+					<xsl:value-of select="concat($stylePrefix,@text:style-name)"/>
 				</xsl:variable>
 				<!-- <w:rStyle w:val="{@text:style-name}"/> -->
 				<w:rStyle>
 					<xsl:attribute name="w:val">
-						<xsl:value-of select="$nameStyle"/>
+						<xsl:value-of select="$prefixedStyleName"/>
 					</xsl:attribute>
 				</w:rStyle>
 

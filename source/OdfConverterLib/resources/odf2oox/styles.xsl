@@ -38,8 +38,8 @@
 	exclude-result-prefixes="office style fo text draw number">
 
 	<xsl:variable name="asianLayoutId">1</xsl:variable>
-	
-	<xsl:key name="styles"
+
+  <xsl:key name="styles"
 		match="office:styles/style:style"
 		use="@style:name"/>
 
@@ -68,9 +68,9 @@
 		</w:styles>
 	</xsl:template>
 
-	<!-- template to prefixe header / footer automatic style -->
-	<xsl:template name="headerStyleName">
-		<xsl:param name="styleName"></xsl:param>
+	<!-- template to prefixe automatic styles -->
+	<xsl:template name="stylePrefix">
+		<xsl:param name="styleName"/>
 		<xsl:if test="key('automatic-styles',$styleName)">
 			<xsl:choose>			
 				<xsl:when test="ancestor::office:document-styles/office:automatic-styles">
@@ -85,15 +85,19 @@
 
 	
 	<xsl:template match="style:style" mode="styles">
-		<xsl:variable name="headerStyle">
-			<xsl:call-template name="headerStyleName">
+    
+		<xsl:variable name="stylePrefix">
+			<xsl:call-template name="stylePrefix">
 				<xsl:with-param name="styleName" select="@style:name"/>
 			</xsl:call-template>			
 		</xsl:variable>
 		
-		<xsl:variable name="nameStyle"><xsl:value-of select="concat($headerStyle,@style:name)"/></xsl:variable>
+		<xsl:variable name="prefixedStyleName">
+      <xsl:value-of select="concat($stylePrefix,@style:name)"/>
+    </xsl:variable>
+    
 		<w:style>
-			<xsl:attribute name="w:styleId"><xsl:value-of select="$nameStyle"/></xsl:attribute>
+			<xsl:attribute name="w:styleId"><xsl:value-of select="$prefixedStyleName"/></xsl:attribute>
 			<xsl:choose>
 				<xsl:when test="@style:family = 'text' ">
 					<xsl:attribute name="w:type">character</xsl:attribute>
@@ -141,14 +145,12 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:if test="@style:name">
-						<!--<w:name w:val="{@style:name}"/>-->
 						<w:name>
-						<xsl:attribute name="w:val"><xsl:value-of select="$nameStyle"/></xsl:attribute>
+						<xsl:attribute name="w:val"><xsl:value-of select="$prefixedStyleName"/></xsl:attribute>
 						</w:name>
 					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
-
 
 			<xsl:if test="@style:parent-style-name">
 				<w:basedOn w:val="{@style:parent-style-name}"/>
@@ -157,7 +159,7 @@
 				<w:next w:val="{@style:next-style-name}"/>
 			</xsl:if>
 
-			<xsl:if test=" name(parent::*) = 'office:automatic-styles' ">
+			<xsl:if test="key('automatic-styles',@style:name)">
 				<!-- Automatic-styles are not displayed -->
 				<w:hidden/>
 			</xsl:if>
@@ -172,8 +174,6 @@
 			</xsl:if>
 
 			<xsl:apply-templates mode="styles"/>
-
-
 
 		</w:style>
 	</xsl:template>

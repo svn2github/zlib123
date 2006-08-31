@@ -213,18 +213,18 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<w:rPr>
-							<xsl:variable name="headerStyle">
-								<xsl:call-template name="headerStyleName">
+							<xsl:variable name="stylePrefix">
+								<xsl:call-template name="stylePrefix">
 									<xsl:with-param name="styleName" select="@text:style-name"/>
 								</xsl:call-template>
 							</xsl:variable>
-							<xsl:variable name="nameStyle">
-								<xsl:value-of select="concat($headerStyle,@text:style-name)"/>
+							<xsl:variable name="prefixedStyleName">
+								<xsl:value-of select="concat($stylePrefix,@text:style-name)"/>
 							</xsl:variable>
 							<!-- <w:rStyle w:val="{@text:style-name}"/> -->
 							<w:rStyle>
 								<xsl:attribute name="w:val">
-									<xsl:value-of select="$nameStyle"/>
+									<xsl:value-of select="$prefixedStyleName"/>
 								</xsl:attribute>
 							</w:rStyle>
 							
