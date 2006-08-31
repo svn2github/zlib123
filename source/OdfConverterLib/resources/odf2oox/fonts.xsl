@@ -33,55 +33,60 @@
 	xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
 	xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
 	exclude-result-prefixes="office style svg">
+
+  <xsl:key name="content-fonts"
+		match="office:font-face-decls/style:font-face"
+		use="@svg:font-family"/>
 	
 	<xsl:template name="fonts">
 		<w:fonts>
-			<!-- TODO : Check which source of font-decls to take so as not to double every declaration in OOX (content.xml or style.xml ?). -->
-			<xsl:apply-templates select="document('content.xml')/office:document-content/office:font-face-decls" mode="fonts"/>
-			<xsl:apply-templates select="document('styles.xml')/office:document-styles/office:font-face-decls" mode="fonts"/>
+			<!-- We suppose that the fonts declared in content.xml and styles.xml are the same. -->
+			<xsl:apply-templates select="document('content.xml')/office:document-content/office:font-face-decls/style:font-face" mode="fonts"/>
 		</w:fonts>
 	</xsl:template>
 
 	<!-- Make sure we manage all cases -->	
 	<xsl:template match="style:font-face" mode="fonts">
-		<!-- We do not take into consideration fonts that have a name that does not match the family name. -->
-		<xsl:if test='not(@svg:font-family) or (@style:name=@svg:font-family) or (concat("&apos;",@style:name,"&apos;")=@svg:font-family)'>
-		<w:font>
-			<!-- Make sur the 'x-symbol' charset is always '02' and the asian and complex charset are not control -->
-			<xsl:choose>
-				<xsl:when test="@style:name = 'StarSymbol'">
-					<xsl:attribute name="w:name">Symbol</xsl:attribute>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:attribute name="w:name"><xsl:value-of select="@style:name"/></xsl:attribute>
-				</xsl:otherwise>
-			</xsl:choose>
-			<xsl:choose>
-				<xsl:when test="@style:font-charset = 'x-symbol'">
-					<w:charset w:val="02"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<w:charset w:val="00"/>
-				</xsl:otherwise>
-			</xsl:choose>
-			<xsl:choose>
-				
-				<!-- open xml don't know the attribute filed system : replace with auto -->
-				<xsl:when test="@style:font-family-generic='system'">
-					<w:family w:val="auto"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:if test="@style:font-family-generic">
-						<w:family w:val="{@style:font-family-generic}"/>
-					</xsl:if>	
-				</xsl:otherwise>	
-			</xsl:choose>
-			<xsl:if test="@style:font-pitch">
-				<w:pitch w:val="{@style:font-pitch}"/>
-			</xsl:if>
-		</w:font>
-		</xsl:if>
-	</xsl:template>
+    <!-- We do not take into consideration fonts that have a name that does not match the family name. -->
+    <xsl:if test='not(@svg:font-family) or (@style:name=@svg:font-family) or (concat("&apos;",@style:name,"&apos;")=@svg:font-family)'>
+      <w:font>
+        <!-- Make sur the 'x-symbol' charset is always '02' and the asian and complex charset are not control -->
+        <xsl:choose>
+          <xsl:when test="@svg:font-family = 'StarSymbol'">
+            <xsl:attribute name="w:name">Symbol</xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="w:name">
+              <xsl:value-of select="@style:name"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="@style:font-charset = 'x-symbol'">
+            <w:charset w:val="02"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:charset w:val="00"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+
+          <!-- open xml don't know the attribute filed system : replace with auto -->
+          <xsl:when test="@style:font-family-generic='system'">
+            <w:family w:val="auto"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="@style:font-family-generic">
+              <w:family w:val="{@style:font-family-generic}"/>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:if test="@style:font-pitch">
+          <w:pitch w:val="{@style:font-pitch}"/>
+        </xsl:if>
+      </w:font>
+    </xsl:if>
+  </xsl:template>
 	
 	<!-- ignored -->
 	<xsl:template match="text()" mode="fonts"/>
