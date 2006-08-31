@@ -1,7 +1,7 @@
-ODF Add-in for Word2003
+ODF Add-in for Word XP
 ================================
 
-Thank you for downloading ODF Add-in for WordXP.
+Thank you for downloading ODF Add-in for Word XP
 The purpose of the software is to enable users to open ODF Specification based documents in Word XP and demonstrate the interoperability between OpenXML & ODF specifications. 
 This add-in is under development (see the roadmap at http://sourceforge.net/projects/odf-converter for more details about planned releases).
 We will provide stable nightly builds. You can install and test them at your own risk!
@@ -13,7 +13,6 @@ To test the add-in, you will need the following:
 * .NET Framework 2.0
 * Office 2007 File Format Awareness Update for Microsoft Office XP
 * Compatibility Pack for Word, Excel, and PowerPoint 2007 File Formats (beta 2 or higher).
-* Office XP PIA
 
 Download and install the add-in
 -------------------------------
