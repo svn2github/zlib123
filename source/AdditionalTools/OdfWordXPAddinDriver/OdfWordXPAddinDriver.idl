@@ -1,0 +1,36 @@
+// OdfWordXPAddinDriver.idl : IDL source for OdfWordXPAddinDriver
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (OdfWordXPAddinDriver.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(B7770455-DE96-4DA5-8AB1-80C633B6A0F6),
+	dual,
+	nonextensible,
+	helpstring("IDriver Interface"),
+	pointer_default(unique)
+]
+interface IDriver : IDispatch{
+};
+[
+	uuid(A9EFD875-7DD6-4FC5-9118-512E987C25EF),
+	version(1.0),
+	helpstring("OdfWordXPAddinDriver 1.0 Type Library")
+]
+library OdfWordXPAddinDriverLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(B74A4002-883B-457C-883D-FC4211800E58),
+		helpstring("Driver Class")
+	]
+	coclass Driver
+	{
+		[default] interface IDriver;
+	};
+};
