@@ -1467,6 +1467,9 @@
 						</xsl:attribute>
 					</w:tblInd>
 				</xsl:if>
+				<!-- Default layout algorithm in ODF is "fixed". -->
+				<w:tblLayout w:type="fixed"/>
+				
 				<!--table background-->
 				<xsl:if test="$tableProp/@fo:background-color">
 					<xsl:choose>
@@ -1564,6 +1567,12 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<w:tr>
+					<xsl:if test="key('automatic-styles',child::table:table-cell/@table:style-name)/style:table-cell-properties/@fo:wrap-option='no-wrap'">
+						<!-- Override layout algorithm -->
+						<w:tblPrEx>
+							<w:tblLayout w:type="auto"/>
+						</w:tblPrEx>
+					</xsl:if>
 					<w:trPr>
 						<xsl:if test="name(parent::*) = 'table:table-header-rows'">
 							<w:tblHeader/>

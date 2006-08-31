@@ -714,7 +714,7 @@ w:tc/w:tcBorders children w:top, w:bottom, w:left, w:right have their attributes
 ;;"Padding";1;"0.2-Final";"Partial";;"w:tc/w:tcMar/w:top is based on @fo:padding or @fo:padding-top (whether defined or not) attribute found in style:table-cell-properties. 
 w:tc/w:tcMar/w:top/@w:type is set to 'dxa'
 The same applies to the elements w:bottom, w:right and w:left";
-;;"Wrap Option";1;"0.2-Final";;;;
+;;"Wrap Option";1;"0.2-Final";"Completed";"jslaurent";"In w:tbl/w:tblPr,@w:tblLayout is set to fixed, so that wrap option (activated by default) is converted. If option is set to 'no-wrap', w:tr/w:tblPrEx overrides Layout to 'auto'.";
 ;;"Rotation Angle";1;"0.2-Final";;;;
 ;;"Rotation Align";1;"0.2-Final";;;;
 ;;"Cell Protect";1;"0.2-Final";;;;"The property ""cell protect"" (which is available in open office) in word is not handled in the same way. The only method to protect cells from editing is to add to a cell content control (""plain text"") which can be locked from editing."
