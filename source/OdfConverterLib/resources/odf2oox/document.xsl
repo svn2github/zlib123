@@ -844,19 +844,19 @@
 								<w10:anchorlock/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'left' ">
-								<w10:wrap type="tight" side="left"/>
+								<w10:wrap type="square" side="left"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'right' ">
-								<w10:wrap type="tight" side="right"/>
+								<w10:wrap type="square" side="right"/>
 							</xsl:when>
 							<xsl:when test="not($frameWrap)">
-								<w10:wrap type="tight"/>
+								<w10:wrap type="square"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'parallel' ">
-								<w10:wrap type="tight"/>
+								<w10:wrap type="square"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'dynamic' ">
-								<w10:wrap type="tight" side="largest"/>
+								<w10:wrap type="square" side="largest"/>
 							</xsl:when>
 						</xsl:choose>
 						
