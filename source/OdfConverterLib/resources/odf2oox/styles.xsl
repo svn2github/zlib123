@@ -1605,20 +1605,4 @@
 	<xsl:template match="style:page-master" mode="styles"/>
 	<xsl:template match="number:date-style" mode="styles"/-->
 
-	<!-- Map font types -->
-	<xsl:template name="computeFontName">
-		<xsl:param name="fontName"/>
-		<xsl:choose>
-			<xsl:when test="$fontName = 'StarSymbol'">Symbol</xsl:when>
-			<xsl:otherwise>
-				<xsl:choose>
-					<xsl:when test="document('styles.xml')//style:font-face[@style:name=$fontName]/@svg:font-family">
-						<xsl:value-of select='translate(document("styles.xml")//style:font-face[@style:name=$fontName]/@svg:font-family,"&apos;","")'/>
-					</xsl:when>
-					<xsl:otherwise><xsl:value-of select="$fontName"/></xsl:otherwise>
-				</xsl:choose>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-
 </xsl:stylesheet>

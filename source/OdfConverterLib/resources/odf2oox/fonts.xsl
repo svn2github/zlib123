@@ -34,9 +34,9 @@
 	xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
 	exclude-result-prefixes="office style svg">
 
-  <xsl:key name="content-fonts"
+  <xsl:key name="fonts"
 		match="office:font-face-decls/style:font-face"
-		use="@svg:font-family"/>
+		use="@svg:font-name"/>
 	
 	<xsl:template name="fonts">
 		<w:fonts>
@@ -86,6 +86,25 @@
         </xsl:if>
       </w:font>
     </xsl:if>
+  </xsl:template>
+
+  <!-- Map font types -->
+  <xsl:template name="computeFontName">
+    <xsl:param name="fontName"/>
+    <xsl:choose>
+      <xsl:when test="$fontName = 'StarSymbol'">Symbol</xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <!--xsl:when test="document('styles.xml')//style:font-face[@style:name=$fontName]/@svg:font-family"-->
+          <xsl:when test="key('fonts',$fontName)/@svg:font-family">
+              <xsl:value-of select='translate(key("fonts",$fontName)[1]/@svg:font-family,"&apos;","")'/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$fontName"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 	
 	<!-- ignored -->
