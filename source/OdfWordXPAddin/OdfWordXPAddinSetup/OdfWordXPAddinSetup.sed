@@ -24,7 +24,7 @@ SourceFiles=SourceFiles
 InstallPrompt=
 DisplayLicense=
 FinishMessage=
-TargetName=Release\OdfWordXPAddinSetup.exe
+TargetName=OdfWordXPAddinSetup.exe
 FriendlyName=ODF Add-In for Word XP
 AppLaunched=WScript.exe SetupPrepare.js
 PostInstallCmd=<None>
@@ -37,9 +37,9 @@ FILE3="lockbackRegKey.msi"
 FILE4="office2003-kb907417sfxcab-ENU.exe"
 FILE5="SetupPrepare.js"
 [SourceFiles]
-SourceFiles0=Release\
-SourceFiles1=Release\KB908002\
-SourceFiles2=.\
+SourceFiles0=
+SourceFiles1=KB908002\
+SourceFiles2=..\
 [SourceFiles0]
 %FILE0%=
 %FILE1%=
