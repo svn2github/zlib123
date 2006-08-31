@@ -375,7 +375,7 @@ This is a must have in my opinion and effective translation of the FORMAT featur
 ;;;;;;;;;;;
 ;"Bullets and Numbering";"Bullets";"selected style";;1;"0.2-M1";"Completed";;406;;
 ;;;;;;;;;;;
-;;"Numbering style";"selected style";;1;"0.2-M1";"Completed";;405;;
+;;"Numbering style";"selected style";;1;"0.2-M1";"Completed";"Vertical numbering is not converted.";405;;
 ;;;;;;;;;;;
 ;;"Outline";"selected style";;1;"0.2-M1";"Completed";;"405-406";;
 ;;;;;;;;;;;

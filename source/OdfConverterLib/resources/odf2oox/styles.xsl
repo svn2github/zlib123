@@ -38,6 +38,10 @@
 	exclude-result-prefixes="office style fo text draw number">
 
 	<xsl:variable name="asianLayoutId">1</xsl:variable>
+	
+	<xsl:key name="styles"
+		match="office:styles/style:style"
+		use="@style:name"/>
 
 	<xsl:template name="styles">
 		<w:styles>
@@ -67,7 +71,7 @@
 	<!-- template to prefixe header / footer automatic style -->
 	<xsl:template name="headerStyleName">
 		<xsl:param name="styleName"></xsl:param>
-		<xsl:if test="key('style',$styleName)">
+		<xsl:if test="key('automatic-styles',$styleName)">
 			<xsl:choose>			
 				<xsl:when test="ancestor::office:document-styles/office:automatic-styles">
 					<xsl:value-of select="'STYLE_'"/>
@@ -527,8 +531,8 @@
 					<xsl:variable name="parentstyleName">
 						<xsl:value-of select="parent::node()/@style:parent-style-name"/>
 					</xsl:variable>
-					<xsl:for-each select="document('styles.xml')//style:style[@style:name=$parentstyleName]//style:tab-stop">
-						<xsl:if test="not(@style:position=document('content.xml')//style:style[@style:name=$styleName]//style:tab-stop/@style:position)">
+					<xsl:for-each select="key('styles',$parentstyleName)//style:tab-stop">
+						<xsl:if test="not(@style:position=key('automatic-styles',$styleName)//style:tab-stop/@style:position)">
 							<xsl:call-template name="tabStop">
 								<xsl:with-param name="styleType">clear</xsl:with-param>
 							</xsl:call-template>

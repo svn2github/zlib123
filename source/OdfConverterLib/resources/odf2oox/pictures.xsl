@@ -308,7 +308,7 @@
         
         <xsl:variable name="sName" select="@draw:style-name"/>
         
-        <xsl:variable name="style" select="key('style', $sName)/style:graphic-properties"/>
+        <xsl:variable name="style" select="key('automatic-styles', $sName)/style:graphic-properties"/>
         
         <xsl:variable name="posH" select="$style/@style:horizontal-rel"/>
         

@@ -47,8 +47,8 @@
 
 	<xsl:key name="annotation" match="//office:annotation"  use="''"/>
 	
-	<xsl:key name="style"
-		match="office:automatic-styles/style:style|office:automatic-styles/style:style"
+	<xsl:key name="automatic-styles"
+		match="office:automatic-styles/style:style"
 		use="@style:name"/>
 	<xsl:key name="hyperlinks" match="text:a" use="''"/>
 	<xsl:key name="headers" match="text:h" use="''"/>
@@ -111,13 +111,21 @@
 						<w:outlineLvl w:val="0"/>
 					</xsl:when>
 					<xsl:when test="@text:outline-level &lt;= 9">
-						<xsl:if
-							test="document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
-							<w:numPr>
-								<w:ilvl w:val="{@text:outline-level - 1}"/>
-								<w:numId w:val="1"/>
-							</w:numPr>
-						</xsl:if>
+						<xsl:variable name="styleName">
+							<xsl:value-of select="@text:style-name"/>
+						</xsl:variable>
+						<xsl:variable name="outlineLevel">
+							<xsl:value-of select="@text:outine-level"/>
+						</xsl:variable>
+						<xsl:for-each select="document('styles.xml')">
+							<xsl:if
+								test="key('styles',$styleName)/text:outline-style/text:outline-level-style/@style:num-format !=''">
+								<w:numPr>
+									<w:ilvl w:val="{$outlineLevel - 1}"/>
+									<w:numId w:val="1"/>
+								</w:numPr>
+							</xsl:if>							
+						</xsl:for-each>
 						<w:outlineLvl w:val="{@text:outline-level}"/>
 					</xsl:when>
 					<xsl:otherwise>
@@ -244,7 +252,7 @@
 											<w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
 										</xsl:when> 
 										<xsl:when test="ancestor::text:alphabetical-index">
-											<w:instrText xml:space="preserve"> INDEX \e "" \c "<xsl:choose><xsl:when test="key('style',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">1</xsl:when><xsl:otherwise><xsl:value-of select="key('style',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/></xsl:otherwise></xsl:choose>" \z "1045" </w:instrText>
+											<w:instrText xml:space="preserve"> INDEX \e "" \c "<xsl:choose><xsl:when test="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">1</xsl:when><xsl:otherwise><xsl:value-of select="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/></xsl:otherwise></xsl:choose>" \z "1045" </w:instrText>
 										</xsl:when>
 										<xsl:otherwise>
 											<w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"/>" </w:instrText>
@@ -301,7 +309,7 @@
 								<xsl:call-template name="indent">
 									<xsl:with-param name="level" select="$level"/>
 								</xsl:call-template>
-								<xsl:if test="parent::node()[name()='table:table-cell' and position()=1] and ancestor::node()[name()='table:table-row' and not(preceding-sibling::node())] and key('style',ancestor::table:table/@table:style-name)/style:table-properties/@fo:break-before='page'">
+								<xsl:if test="parent::node()[name()='table:table-cell' and position()=1] and ancestor::node()[name()='table:table-row' and not(preceding-sibling::node())] and key('automatic-styles',ancestor::table:table/@table:style-name)/style:table-properties/@fo:break-before='page'">
 									<w:pageBreakBefore/>
 								</xsl:if>
 							</w:pPr>
@@ -344,7 +352,7 @@
 					</xsl:if>
 					<!-- If there is a page-break-after in the paragraph style -->
 					<xsl:if
-						test="key('style',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
+						test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
 						<w:r>
 							<w:br w:type="page"/>
 						</w:r>
@@ -589,7 +597,7 @@
 			<w:pict>
 				<v:shapetype/>
 				<v:shape type="#_x0000_t202">
-					<xsl:variable name="styleGraphicProperties" select="key('style',parent::draw:frame/@draw:style-name)/style:graphic-properties"/>
+					<xsl:variable name="styleGraphicProperties" select="key('automatic-styles',parent::draw:frame/@draw:style-name)/style:graphic-properties"/>
 					
 					<xsl:variable name="frameW">
 						<xsl:call-template name="point-measure">
@@ -656,7 +664,7 @@
 						<xsl:value-of select="parent::draw:frame/@draw:z-index"/>
 					</xsl:variable>
 					
-					<xsl:variable name="frameWrap" select="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:wrap" />
+					<xsl:variable name="frameWrap" select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:wrap" />
 					<xsl:variable name="relWidth" select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
 					<xsl:variable name="relHeight" select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
 					
@@ -695,20 +703,20 @@
 						
 						<!-- The same style defined in styles.xsl  TODO manage horizontal-rel-->
 						<xsl:if
-							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos">
+							test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos">
 							<xsl:choose>
 								<xsl:when
-									test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos = 'center'">
+									test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos = 'center'">
 									<xsl:value-of
 										select="concat('mso-position-horizontal:', 'center',';')"/>
 								</xsl:when>
 								<xsl:when
-									test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left'">
+									test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left'">
 									<xsl:value-of
 										select="concat('mso-position-horizontal:', 'left',';')"/>
 								</xsl:when>
 								<xsl:when
-									test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right'">
+									test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right'">
 									<xsl:value-of
 										select="concat('mso-position-horizontal:', 'right',';')"/>
 								</xsl:when>
@@ -719,39 +727,39 @@
 							<xsl:value-of select="'mso-wrap-style:none;'"/>
 						</xsl:if>
 						<xsl:if
-							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-left">
+							test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-left">
 							<xsl:value-of select="concat('mso-wrap-distance-left:', $marginL,'pt;')"
 							/>
 						</xsl:if>
 						<xsl:if
-							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-top">
+							test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-top">
 							<xsl:value-of select="concat('mso-wrap-distance-top:', $marginT,'pt;')"
 							/>
 						</xsl:if>
 						<xsl:if
-							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-right">
+							test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-right">
 							<xsl:value-of
 								select="concat('mso-wrap-distance-right:', $marginR,'pt;')"/>
 						</xsl:if>
 						<xsl:if
-							test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-bottom">
+							test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-bottom">
 							<xsl:value-of
 								select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
 						</xsl:if>
 						
 					</xsl:attribute>
 					<xsl:if
-						test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:background-color">
+						test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:background-color">
 						<xsl:attribute name="fillcolor">
 							<xsl:value-of
-								select="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:background-color"
+								select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:background-color"
 							/>
 						</xsl:attribute>
 					</xsl:if>
 					
-					<xsl:variable name="opacity" select="100 - substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:background-transparency,'%')" />
+					<xsl:variable name="opacity" select="100 - substring-before(key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:background-transparency,'%')" />
 					
-					<xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:background-transparency">
+					<xsl:if test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:background-transparency">
 						<v:fill>
 							<xsl:attribute name="opacity">
 								<xsl:value-of select="concat($opacity,'%')"/>
@@ -768,10 +776,10 @@
 						<xsl:attribute name="inset">
 							<xsl:choose>
 								<xsl:when
-									test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding">
+									test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding">
 									<xsl:variable name="padding">
 										<xsl:value-of
-											select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding,'cm'))*10"
+											select="number(substring-before(key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding,'cm'))*10"
 										/>
 									</xsl:variable>
 									<xsl:value-of
@@ -781,39 +789,39 @@
 								<xsl:otherwise>
 									<xsl:variable name="padding-top">
 										<xsl:if
-											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
+											test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
 											<xsl:value-of
-												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top,'cm'))*10"
+												select="number(substring-before(key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top,'cm'))*10"
 											/>
 										</xsl:if>
 									</xsl:variable>
 									<xsl:variable name="padding-right">
 										<xsl:if
-											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right">
+											test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right">
 											<xsl:value-of
-												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right,'cm'))*10"
+												select="number(substring-before(key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right,'cm'))*10"
 											/>
 										</xsl:if>
 									</xsl:variable>
 									<xsl:variable name="padding-bottom">
 										<xsl:if
-											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom">
+											test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom">
 											<xsl:value-of
-												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom,'cm'))*10"
+												select="number(substring-before(key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom,'cm'))*10"
 											/>
 										</xsl:if>
 									</xsl:variable>
 									<xsl:variable name="padding-left">
 										<xsl:if
-											test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left">
+											test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left">
 											<xsl:value-of
-												select="number(substring-before(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left,'cm'))*10"
+												select="number(substring-before(key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left,'cm'))*10"
 											/>
 										</xsl:if>
 									</xsl:variable>
 									
 									<xsl:if
-										test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
+										test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
 										<xsl:value-of
 											select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"
 										/>
@@ -966,26 +974,32 @@
 			<xsl:call-template name="styleName"/>
 		</xsl:variable>
 		<xsl:variable name="parentStyleName"
-			select="key('style',$styleName)/@style:parent-style-name"/>
-		<xsl:variable name="listStyleName" select="key('style',$styleName)/@style:list-style-name"/>
+			select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
+		<xsl:variable name="listStyleName" select="key('automatic-styles',$styleName)/@style:list-style-name"/>
 		<xsl:variable name="paragraphMargin">
 			<xsl:choose>
-				<xsl:when test="key('style',$styleName)/style:paragraph-properties/@fo:margin-left">
+				<xsl:when test="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:margin-left">
 					<xsl:call-template name="twips-measure">
 						<xsl:with-param name="length"
-							select="key('style',$styleName)/style:paragraph-properties/@fo:margin-left"
+							select="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:margin-left"
 						/>
 					</xsl:call-template>
 				</xsl:when>
-				<xsl:when
-					test="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left">
-					<xsl:call-template name="twips-measure">
-						<xsl:with-param name="length"
-							select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:margin-left"
-						/>
-					</xsl:call-template>
-				</xsl:when>
-				<xsl:otherwise>0</xsl:otherwise>
+				<xsl:otherwise>
+					<xsl:for-each select="document('styles.xml')">
+						<xsl:choose>
+							<xsl:when
+								test="key('styles',$parentStyleName)/style:paragraph-properties/@fo:margin-left">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length"
+										select="key('styles',$parentStyleName)/style:paragraph-properties/@fo:margin-left"
+									/>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>0</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
+				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 		
@@ -1061,22 +1075,28 @@
 						<xsl:if test="$paragraphMargin != 0">
 							<xsl:variable name="textIndent">
 								<xsl:choose>
-									<xsl:when test="key('style',$styleName)/style:paragraph-properties/@fo:text-indent">
+									<xsl:when test="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:text-indent">
 										<xsl:call-template name="twips-measure">
 											<xsl:with-param name="length"
-												select="key('style',$styleName)/style:paragraph-properties/@fo:text-indent"
+												select="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:text-indent"
 											/>
 										</xsl:call-template>
 									</xsl:when>
-									<xsl:when
-										test="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:text-indent">
-										<xsl:call-template name="twips-measure">
-											<xsl:with-param name="length"
-												select="document('styles.xml')//style:style[@style:name = $parentStyleName]/style:paragraph-properties/@fo:text-indent"
-											/>
-										</xsl:call-template>
-									</xsl:when>
-									<xsl:otherwise>0</xsl:otherwise>
+									<xsl:otherwise>
+										<xsl:for-each select="document('styles.xml')">
+											<xsl:choose>
+												<xsl:when
+													test="key('styles',$parentStyleName)/style:paragraph-properties/@fo:text-indent">
+													<xsl:call-template name="twips-measure">
+														<xsl:with-param name="length"
+															select="key('styles',$parentStyleName)/style:paragraph-properties/@fo:text-indent"
+														/>
+													</xsl:call-template>
+												</xsl:when>
+												<xsl:otherwise>0</xsl:otherwise>
+											</xsl:choose>
+										</xsl:for-each>
+									</xsl:otherwise>
 								</xsl:choose>
 							</xsl:variable>
 							<xsl:choose>
@@ -1411,37 +1431,37 @@
 			<w:tblPr>
 				<w:tblStyle w:val="{@table:style-name}"/>
 				<xsl:variable name="tableProp"
-					select="key('style', @table:style-name)/style:table-properties"/>
+					select="key('automatic-styles', @table:style-name)/style:table-properties"/>
 				<w:tblW w:type="{$type}">
 					<xsl:attribute name="w:w">
 						<xsl:call-template name="twips-measure">
 							<xsl:with-param name="length"
-								select="key('style', @table:style-name)/style:table-properties/@style:width"
+								select="key('automatic-styles', @table:style-name)/style:table-properties/@style:width"
 							/>
 						</xsl:call-template>
 					</xsl:attribute>
 				</w:tblW>
-				<xsl:if test="key('style', @table:style-name)/style:table-properties/@table:align">
+				<xsl:if test="key('automatic-styles', @table:style-name)/style:table-properties/@table:align">
 					<xsl:choose>
 						<xsl:when
-							test="key('style', @table:style-name)/style:table-properties/@table:align = 'margins'">
+							test="key('automatic-styles', @table:style-name)/style:table-properties/@table:align = 'margins'">
 							<w:jc w:val="left"/>
 							<!--User agents that do not support the "margins" value, may treat this value as "left".-->
 						</xsl:when>
 						<xsl:otherwise>
 							<w:jc
-								w:val="{key('style', @table:style-name)/style:table-properties/@table:align}"
+								w:val="{key('automatic-styles', @table:style-name)/style:table-properties/@table:align}"
 							/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:if>
 				<xsl:if
-					test="key('style', @table:style-name)/style:table-properties/@fo:margin-left != '' ">
+					test="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left != '' ">
 					<w:tblInd w:type="{$type}">
 						<xsl:attribute name="w:w">
 							<xsl:call-template name="twips-measure">
 								<xsl:with-param name="length"
-									select="key('style', @table:style-name)/style:table-properties/@fo:margin-left"
+									select="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left"
 								/>
 							</xsl:call-template>
 						</xsl:attribute>
@@ -1510,7 +1530,7 @@
 				<xsl:attribute name="w:w">
 					<xsl:call-template name="twips-measure">
 						<xsl:with-param name="length"
-							select="key('style', @table:style-name)/style:table-column-properties/@style:column-width"
+							select="key('automatic-styles', @table:style-name)/style:table-column-properties/@style:column-width"
 						/>
 					</xsl:call-template>
 				</xsl:attribute>
@@ -1551,7 +1571,7 @@
 						<xsl:if test="@table:style-name">
 							<xsl:variable name="rowStyle" select="@table:style-name"/>
 							<xsl:variable name="widthType"
-								select="key('style', $rowStyle)/style:table-row-properties"/>
+								select="key('automatic-styles', $rowStyle)/style:table-row-properties"/>
 
 							<xsl:variable name="widthRow">
 								<xsl:choose>
@@ -1592,17 +1612,17 @@
 
 						<!--keep together-->
 						<xsl:if
-							test="key('style', @table:style-name)/style:table-row-properties/@style:keep-together = 'false'">
+							test="key('automatic-styles', @table:style-name)/style:table-row-properties/@style:keep-together = 'false'">
 							<w:cantSplit/>
 						</xsl:if>
 						
 						<xsl:if
-							test="not(key('style', @table:style-name)/style:table-properties/@style:may-break-between-rows)">
+							test="not(key('automatic-styles', @table:style-name)/style:table-properties/@style:may-break-between-rows)">
 							<w:cantSplit/>
 						</xsl:if>
 						
 						<xsl:if
-							test="key('style', @table:style-name)/style:table-properties/@style:may-break-between-rows='false'">
+							test="key('automatic-styles', @table:style-name)/style:table-properties/@style:may-break-between-rows='false'">
 							<w:cantSplit/>
 						</xsl:if>
 						
@@ -1636,7 +1656,7 @@
 				<xsl:variable name="width">
 					<xsl:call-template name="twips-measure">
 						<xsl:with-param name="length"
-							select="key('style', $colStyle)/style:table-column-properties/@style:column-width"
+							select="key('automatic-styles', $colStyle)/style:table-column-properties/@style:column-width"
 						/>
 					</xsl:call-template>
 				</xsl:variable>
@@ -1647,7 +1667,7 @@
 					select="$table/table:table-column[position() = $col]/@table:style-name"/>
 				<xsl:call-template name="twips-measure">
 					<xsl:with-param name="length"
-						select="key('style', $colStyle)/style:table-column-properties/@style:column-width"
+						select="key('automatic-styles', $colStyle)/style:table-column-properties/@style:column-width"
 					/>
 				</xsl:call-template>
 			</xsl:otherwise>
@@ -1752,13 +1772,13 @@
 			<w:tcPr>
 				<!-- point on the cell style properties -->
 				<xsl:variable name="cellProp"
-					select="key('style', @table:style-name)/style:table-cell-properties"/>
+					select="key('automatic-styles', @table:style-name)/style:table-cell-properties"/>
 				<xsl:variable name="tableStyle" select="substring-before(@table:style-name, '.')"/>
 				<xsl:variable name="rowStyle" select="../@table:style-name"/>
 				<xsl:variable name="tableProp"
-					select="key('style', $tableStyle)/style:table-properties"/>
+					select="key('automatic-styles', $tableStyle)/style:table-properties"/>
 				<xsl:variable name="rowProp"
-					select="key('style', $rowStyle)/style:table-row-properties"/>
+					select="key('automatic-styles', $rowStyle)/style:table-row-properties"/>
 
 				<!-- width of the cell -  @TODO handle problem of merged columns or rows-->
 				<xsl:call-template name="loopCell">
@@ -1984,7 +2004,7 @@
 						<xsl:value-of select="$styleName"/>
 					</xsl:attribute>
 				</w:rStyle>
-				<xsl:apply-templates select="key('style', $styleName)/style:text-properties"
+				<xsl:apply-templates select="key('automatic-styles', $styleName)/style:text-properties"
 					mode="toggle"/>
 			</w:rPr>
 			<xsl:apply-templates select="." mode="text"/>
@@ -2034,9 +2054,9 @@
 				<xsl:variable name="fontSize">
 					<xsl:choose>
 						<xsl:when
-							test="key('style',parent::*/@text:style-name)/child::style:text-properties/@fo:font-size">
+							test="key('automatic-styles',parent::*/@text:style-name)/child::style:text-properties/@fo:font-size">
 							<xsl:value-of
-								select="key('style',parent::*/@text:style-name)/child::style:text-properties/@fo:font-size"
+								select="key('automatic-styles',parent::*/@text:style-name)/child::style:text-properties/@fo:font-size"
 							/>
 						</xsl:when>
 						<xsl:otherwise>
@@ -2046,7 +2066,7 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-				<xsl:apply-templates select="key('style', @text:style-name)/style:text-properties"
+				<xsl:apply-templates select="key('automatic-styles', @text:style-name)/style:text-properties"
 					mode="toggle">
 					<xsl:with-param name="fontSize" select="$fontSize"/>
 				</xsl:apply-templates>

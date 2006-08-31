@@ -70,7 +70,8 @@
 			</xsl:apply-templates>
 		</w:numbering>
 	</xsl:template>
-	<xsl:variable name="stylesListStyleCount" select="count(document('styles.xml')/office:document-styles/office:styles/text:list-style)"/>
+	<xsl:variable name="stylesListStyleCount"
+		select="count(document('styles.xml')/office:document-styles/office:styles/text:list-style)"/>
 	<xsl:template match="text:list-style" mode="numbering">
 		<xsl:param name="offset" select="$stylesListStyleCount"/>
 		<w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list-style)+2+$offset}">
@@ -92,7 +93,7 @@
 			<w:lvl w:ilvl="{number(@text:level) - 1}">
 				<xsl:if test="name() = 'text:list-level-style-bullet' ">
 					<w:numFmt w:val="bullet"/>
-					<w:lvlText w:val="{@text:bullet-char}">						
+					<w:lvlText w:val="{@text:bullet-char}">
 						<xsl:attribute name="w:val">
 							<xsl:call-template name="textChar"/>
 						</xsl:attribute>
@@ -172,18 +173,22 @@
 								select="style:list-level-properties/@text:min-label-distance"/>
 						</xsl:call-template>
 					</xsl:variable>
-					
+
 					<!--If props/@style:display-levels is defined and greater than 1, the tabs may not be well converted.-->
 					<w:tabs>
 						<w:tab>
 							<xsl:attribute name="w:val">num</xsl:attribute>
 							<xsl:attribute name="w:pos">
 								<xsl:choose>
-									<xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-										<xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
+									<xsl:when
+										test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+										<xsl:value-of
+											select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"
+										/>
 									</xsl:when>
 									<xsl:otherwise>
-										<xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
+										<xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"
+										/>
 									</xsl:otherwise>
 								</xsl:choose>
 							</xsl:attribute>
@@ -200,11 +205,11 @@
 				</w:pPr>
 				<xsl:choose>
 					<xsl:when test="name() = 'text:list-level-style-bullet' ">
-						<xsl:call-template name="bulletType">					
+						<xsl:call-template name="bulletType">
 							<xsl:with-param name="char">
 								<xsl:call-template name="textChar"/>
 							</xsl:with-param>
-						</xsl:call-template>						
+						</xsl:call-template>
 					</xsl:when>
 					<xsl:otherwise>
 						<w:rPr>
@@ -222,19 +227,31 @@
 									<xsl:value-of select="$nameStyle"/>
 								</xsl:attribute>
 							</w:rStyle>
+							
 							<xsl:variable name="styleName">
 								<xsl:value-of select="@text:style-name"/>
 							</xsl:variable>
-							<xsl:if test="$styleName != 'Numbering_20_Symbols'">
-							<xsl:choose>
-								<xsl:when test="key('style',@text:style-name)/child::style:text-properties">
-									<xsl:apply-templates select="key('style',@text:style-name)/child::style:text-properties" mode="numbering"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:apply-templates select="document('styles.xml')//style:style[@style:name=$styleName]/style:text-properties" mode="numbering"/>
-								</xsl:otherwise>
-							</xsl:choose>
-							</xsl:if>
+
+							<xsl:for-each select="document('content.xml')">
+								<xsl:choose>
+									<xsl:when
+										test="key('automatic-styles',$styleName)/child::style:text-properties">
+										<xsl:apply-templates
+											select="key('automatic-styles',$styleName)/child::style:text-properties"
+											mode="numbering"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:for-each select="document('styles.xml')">
+											<xsl:if
+												test="key('styles',$styleName)/child::style:text-properties">
+												<xsl:apply-templates
+												select="key('styles',$styleName)/child::style:text-properties"
+												mode="numbering"/>
+											</xsl:if>
+										</xsl:for-each>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
 						</w:rPr>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -260,21 +277,22 @@
 			<xsl:otherwise>•</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
+
 	<xsl:template name="bulletType">
 		<xsl:param name="char"/>
-		<xsl:choose>			
+		<xsl:choose>
 			<xsl:when
 				test="$char = ''  or  $char = '' or  $char = ''  or  $char = ' ✗'  or $char=''  or $char='' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>
 					<xsl:call-template name="bulletSize">
 						<xsl:with-param name="fontName">
-							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"
+							/>
 						</xsl:with-param>
 					</xsl:call-template>
-					
-					
+
+
 				</w:rPr>
 			</xsl:when>
 
@@ -283,11 +301,12 @@
 					<w:rFonts w:ascii="Wingdings 3" w:hAnsi="Wingdings 3" w:hint="default"/>
 					<xsl:call-template name="bulletSize">
 						<xsl:with-param name="fontName">
-							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"
+							/>
 						</xsl:with-param>
 					</xsl:call-template>
-					
-					
+
+
 				</w:rPr>
 			</xsl:when>
 
@@ -296,24 +315,26 @@
 					<w:rFonts w:ascii="Wingdings 2" w:hAnsi="Wingdings 2" w:hint="default"/>
 					<xsl:call-template name="bulletSize">
 						<xsl:with-param name="fontName">
-							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"
+							/>
 						</xsl:with-param>
 					</xsl:call-template>
-					
+
 				</w:rPr>
-			</xsl:when>		
-			
+			</xsl:when>
+
 			<xsl:when test="$char  = 'o'  or $char = '•' or $char = '–' ">
 				<w:rPr>
 					<w:rFonts w:ascii="Courier New" w:hAnsi="Courier New" w:cs="Courier New"
 						w:hint="default"/>
 					<xsl:call-template name="bulletSize">
 						<xsl:with-param name="fontName">
-							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"
+							/>
 						</xsl:with-param>
 					</xsl:call-template>
-					
-					
+
+
 				</w:rPr>
 			</xsl:when>
 			<xsl:when test="$char  = '' ">
@@ -321,28 +342,32 @@
 					<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>
 					<xsl:call-template name="bulletSize">
 						<xsl:with-param name="fontName">
-							<xsl:value-of select="current()/style:text-properties/@style:font-name"/>
+							<xsl:value-of select="current()/style:text-properties/@style:font-name"
+							/>
 						</xsl:with-param>
 					</xsl:call-template>
 
 				</w:rPr>
 			</xsl:when>
-			
-			<xsl:otherwise></xsl:otherwise>
-		</xsl:choose>				
-	</xsl:template>	
+
+			<xsl:otherwise/>
+		</xsl:choose>
+	</xsl:template>
 	<xsl:template name="bulletSize">
 		<xsl:param name="fontName"/>
-			<xsl:if test="document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[@style:font-name = $fontName]">
-				<xsl:variable name="sz">
-					<xsl:call-template name="computeSize">
-						<xsl:with-param name="node" select="document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[@style:font-name = $fontName]"/>
-					</xsl:call-template>
-				</xsl:variable>
-				<xsl:if test="number($sz)">
-					<w:sz w:val="{$sz}"/>
-				</xsl:if>
+		<xsl:if
+			test="document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[@style:font-name = $fontName]">
+			<xsl:variable name="sz">
+				<xsl:call-template name="computeSize">
+					<xsl:with-param name="node"
+						select="document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[@style:font-name = $fontName]"
+					/>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:if test="number($sz)">
+				<w:sz w:val="{$sz}"/>
 			</xsl:if>
+		</xsl:if>
 	</xsl:template>
 	<!--
 		function    : num-format
@@ -428,7 +453,7 @@
 									<xsl:when test="@style:num-format='A'">
 										<xsl:value-of select="concat('%',string(@text:level))"/>
 									</xsl:when>
-									<xsl:otherwise></xsl:otherwise>
+									<xsl:otherwise/>
 								</xsl:choose>
 								<xsl:value-of select="@style:num-suffix"/>
 							</xsl:attribute>
@@ -451,58 +476,66 @@
 								<xsl:choose>
 									<xsl:when test="number($spaceBeforeTwip) &lt; 0">
 										<xsl:choose>
-											<xsl:when test="style:list-level-properties/@text:min-label-width">
+											<xsl:when
+												test="style:list-level-properties/@text:min-label-width">
 												<xsl:attribute name="w:left">
-													<xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip"/>
+												<xsl:value-of
+												select="$minLabelWidthTwip + $spaceBeforeTwip"
+												/>
 												</xsl:attribute>
 											</xsl:when>
 											<xsl:otherwise>
 												<xsl:attribute name="w:left">
-													<xsl:value-of select="$spaceBeforeTwip"/>
+												<xsl:value-of select="$spaceBeforeTwip"/>
 												</xsl:attribute>
 											</xsl:otherwise>
 										</xsl:choose>
 										<xsl:choose>
-											<xsl:when test="style:list-level-properties/@text:space-before">
+											<xsl:when
+												test="style:list-level-properties/@text:space-before">
 												<xsl:attribute name="w:firstLine">
-													<xsl:value-of select="$minLabelWidthTwip"/>
-												</xsl:attribute>	
+												<xsl:value-of select="$minLabelWidthTwip"/>
+												</xsl:attribute>
 											</xsl:when>
 											<xsl:otherwise>
 												<xsl:attribute name="w:hanging">
-													<xsl:value-of select="$minLabelWidthTwip"/>
+												<xsl:value-of select="$minLabelWidthTwip"/>
 												</xsl:attribute>
 											</xsl:otherwise>
-										</xsl:choose>	
+										</xsl:choose>
 									</xsl:when>
 									<xsl:otherwise>
 										<xsl:choose>
-											<xsl:when test="style:list-level-properties/@text:min-label-width">
+											<xsl:when
+												test="style:list-level-properties/@text:min-label-width">
 												<xsl:attribute name="w:left">
-													<xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip"/>
+												<xsl:value-of
+												select="$minLabelWidthTwip + $spaceBeforeTwip"
+												/>
 												</xsl:attribute>
 											</xsl:when>
 											<xsl:otherwise>
 												<xsl:attribute name="w:left">
-													<xsl:value-of select="$spaceBeforeTwip"/>
+												<xsl:value-of select="$spaceBeforeTwip"/>
 												</xsl:attribute>
 											</xsl:otherwise>
 										</xsl:choose>
 										<xsl:choose>
-											<xsl:when test="style:list-level-properties/@text:space-before">
+											<xsl:when
+												test="style:list-level-properties/@text:space-before">
 												<xsl:attribute name="w:hanging">
-													<xsl:value-of select="$minLabelWidthTwip"/>
-												</xsl:attribute>	
+												<xsl:value-of select="$minLabelWidthTwip"/>
+												</xsl:attribute>
 											</xsl:when>
 											<xsl:otherwise>
 												<xsl:attribute name="w:hanging">
-													<xsl:value-of select="$minLabelWidthTwip"/>
+												<xsl:value-of select="$minLabelWidthTwip"/>
 												</xsl:attribute>
 											</xsl:otherwise>
 										</xsl:choose>
 									</xsl:otherwise>
 								</xsl:choose>
-							
+
 							</w:ind>
 						</w:pPr>
 					</w:lvl>
@@ -531,8 +564,9 @@
 			<xsl:otherwise>%1</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	
-	<xsl:template match="style:text-properties[parent::style:style  or parent::style:default-style]" mode="numbering">
+
+	<xsl:template match="style:text-properties[parent::style:style  or parent::style:default-style]"
+		mode="numbering">
 		<w:rFonts>
 			<xsl:if test="@style:font-name">
 				<xsl:variable name="fontName">
@@ -540,8 +574,12 @@
 						<xsl:with-param name="fontName" select="@style:font-name"/>
 					</xsl:call-template>
 				</xsl:variable>
-				<xsl:attribute name="w:ascii"><xsl:value-of select="$fontName"/></xsl:attribute>
-				<xsl:attribute name="w:hAnsi"><xsl:value-of select="$fontName"/></xsl:attribute>
+				<xsl:attribute name="w:ascii">
+					<xsl:value-of select="$fontName"/>
+				</xsl:attribute>
+				<xsl:attribute name="w:hAnsi">
+					<xsl:value-of select="$fontName"/>
+				</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@style:font-name-complex">
 				<xsl:attribute name="w:cs">
@@ -568,12 +606,12 @@
 				<w:sz w:val="{$sz}"/>
 			</xsl:if>
 		</xsl:if>
-		
+
 		<xsl:if test="@fo:font-size-complex">
 			<w:szCs>
 				<xsl:attribute name="w:val">
-					<xsl:value-of
-						select="number(substring-before(@fo:font-size-complex, 'pt')) * 2"/>
+					<xsl:value-of select="number(substring-before(@fo:font-size-complex, 'pt')) * 2"
+					/>
 				</xsl:attribute>
 			</w:szCs>
 		</xsl:if>
@@ -600,13 +638,15 @@
 			<!-- first, look for this list style into content.xml -->
 			<xsl:when test="key('list-style', $styleName)">
 				<xsl:value-of
-					select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2+$stylesListStyleCount"/>
+					select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2+$stylesListStyleCount"
+				/>
 			</xsl:when>
 			<!-- otherwise, look into styles.xml (add the offset) -->
 			<xsl:otherwise>
 				<xsl:for-each select="document('styles.xml')">
 					<xsl:value-of
-						select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2+$automaticListStylesCount"/>
+						select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2+$automaticListStylesCount"
+					/>
 				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>
