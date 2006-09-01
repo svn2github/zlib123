@@ -35,7 +35,7 @@
 	xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
 	xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 	xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-	exclude-result-prefixes="office style fo text draw number">
+	exclude-result-prefixes="office style fo text draw number svg">
 
 	<xsl:variable name="asianLayoutId">1</xsl:variable>
 
