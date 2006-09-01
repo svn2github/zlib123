@@ -112,21 +112,13 @@
 						<w:outlineLvl w:val="0"/>
 					</xsl:when>
 					<xsl:when test="@text:outline-level &lt;= 9">
-						<xsl:variable name="outlineLevel">
-							<xsl:value-of select="@text:outine-level"/>
-						</xsl:variable>
-						<xsl:variable name="styleName">
-							<xsl:value-of select="@text:style-name"/>
-						</xsl:variable>
-						<xsl:for-each select="document('styles.xml')">
-							<xsl:if
-								test="key('styles',$styleName)/text:outline-style/text:outline-level-style/@style:num-format !=''">
-								<w:numPr>
-									<w:ilvl w:val="{$outlineLevel - 1}"/>
-									<w:numId w:val="1"/>
-								</w:numPr>
-							</xsl:if>							
-						</xsl:for-each>
+						<xsl:if
+							test="document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
+							<w:numPr>
+								<w:ilvl w:val="{@text:outline-level - 1}"/>
+								<w:numId w:val="1"/>
+							</w:numPr>
+						</xsl:if>
 						<w:outlineLvl w:val="{@text:outline-level}"/>
 					</xsl:when>
 					<xsl:otherwise>
