@@ -200,12 +200,15 @@
 				<w:pageBreakBefore/>
 			</xsl:if>
 
-			<xsl:if test="@fo:widows or @fo:orphans">
-				<w:widowControl>
-					<xsl:attribute name="w:val">off</xsl:attribute>
-				</w:widowControl>
-			</xsl:if>
-
+			<xsl:choose>
+				<xsl:when test="@fo:widows != '0' or @fo:orphans != '0'">
+					<w:widowControl w:val="on"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<w:widowControl w:val="off"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 			<!-- border color + padding  -->
 			<xsl:if test="@fo:border and @fo:border != 'none' ">
 				<w:pBdr>
