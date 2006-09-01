@@ -510,18 +510,18 @@ Table;Number Format;Category;;;;;;;;;
 ;;Format;;;;;;;;;
 ;;Language;;;;;;;;;
 ;;Format code;;;;;;;;;
-;Table Properties;Table;Properties;Name;;;Completed;;573;;
-;;;;Width;;;Completed;;575, 576;;
-;;;Spacing;;;;Completed;;574;;
-;;;Alignment;;;;Partial;;579;;TODO: page break after
-;;Text Flow;Break;;;;Completed;;583;;
-;;;Allow row to break across pages and columns;;;;;;582;;TODO: can be emulated by appling this property to paragraph
-;;;Keep with next paragraph;;;;Completed;;?;;
-;;;Repeat Heading;;;;Completed;;598;;
-;;;Vertical alignment;;;;Partial;;588;;TODO: handle this for merged columns or rows
-;;Columns;;;;;Completed;;584;;
-;;Borders;;;;;Completed;picture background;580;;
-;;Background;;;;;Completed;picture background;580;;
+;Table Properties;Table;Properties;Name;;0.2-M1;Completed;;573;;
+;;;;Width;;0.2-M1;Completed;;575, 576;;
+;;;Spacing;;;0.2-M1;Completed;;574;;
+;;;Alignment;;;0.2-Final;Partial;;579;;TODO: page break after
+;;Text Flow;Break;;;0.2-M1;Completed;;583;;
+;;;Allow row to break across pages and columns;;;0.2-Final;;;582;;TODO: can be emulated by appling this property to paragraph
+;;;Keep with next paragraph;;;0.2-M1;Completed;;?;;
+;;;Repeat Heading;;;0.2-M1;Completed;;598;;
+;;;Vertical alignment;;;0.2-Final;Partial;;588;;TODO: handle this for merged columns or rows
+;;Columns;;;;0.2-M1;Completed;;584;;
+;;Borders;;;;0.2-M1;Completed;picture background;580;;
+;;Background;;;;0.2-M1;Completed;picture background;580;;
 ;;;;;;;;;;;
 Tools;Word Count;;;;;0,1;;;;Does the converted doc have same number of words?;
 ;;;;;;;;;;;
