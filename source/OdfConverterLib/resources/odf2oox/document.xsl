@@ -316,7 +316,15 @@
 							<xsl:choose>
 								<xsl:when
 									test="child::draw:frame and not(parent::draw:text-box) and child::draw:frame/child::draw:text-box">
+									
 									<xsl:apply-templates select="draw:frame"/>
+									
+									<xsl:for-each select="child::node()">
+										<xsl:if test="not(self::draw:frame)"> 
+											<xsl:apply-templates mode="paragraph" select="." />		
+										</xsl:if>
+									</xsl:for-each>
+									
 								</xsl:when>
 								<xsl:when
 									test="child::draw:frame and not(child::draw:frame/draw:image)">
