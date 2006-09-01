@@ -319,7 +319,15 @@
 							<xsl:choose>
 								<xsl:when
 									test="child::draw:frame and not(parent::draw:text-box) and child::draw:frame/child::draw:text-box">
+									
 									<xsl:apply-templates select="draw:frame"/>
+									
+									<xsl:for-each select="child::node()">
+										<xsl:if test="not(self::draw:frame)"> 
+											<xsl:apply-templates mode="paragraph" select="." />		
+										</xsl:if>
+									</xsl:for-each>
+									
 								</xsl:when>
 								<xsl:when
 									test="child::draw:frame and not(child::draw:frame/draw:image)">
@@ -847,19 +855,19 @@
 								<w10:anchorlock/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'left' ">
-								<w10:wrap type="tight" side="left"/>
+								<w10:wrap type="square" side="left"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'right' ">
-								<w10:wrap type="tight" side="right"/>
+								<w10:wrap type="square" side="right"/>
 							</xsl:when>
 							<xsl:when test="not($frameWrap)">
-								<w10:wrap type="tight"/>
+								<w10:wrap type="square"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'parallel' ">
-								<w10:wrap type="tight"/>
+								<w10:wrap type="square"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'dynamic' ">
-								<w10:wrap type="tight" side="largest"/>
+								<w10:wrap type="square" side="largest"/>
 							</xsl:when>
 						</xsl:choose>
 						
