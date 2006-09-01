@@ -402,10 +402,10 @@ This is a must have in my opinion and effective translation of the FORMAT featur
 ;;"Graphics";"selected style";;3;"0.2-Final";;;407;;
 ;;;;;;;;;;;
 ;;"Position";"Level";"selected level";;;;;;;
-;;;"Indent";"relative or not and value";1;"0.2-M2";"Partial";;"535-536";"TODO : relative indent";
-;;;"Spacing to left";;1;"0.2-M1";"Completed";;"535-536";;
+;;;"Indent";"relative or not and value";1;"0.2-M2";"Completed";;616;;
+;;;"Spacing to left";;1;"0.2-M1";"Completed";;616;;
 ;;;"Minimum space numbering <-> text";;1;"0.2-M1";"Completed";"Can't be set in OOX";;;
-;;;"Numbering Alignment";;1;"0.2-M1";"Completed";;;;
+;;;"Numbering Alignment";;1;"0.2-M1";"Completed";;616;;
 ;;;;;;;;;;;
 ;;"Options";"Level";;;"?";;;;;
 ;;;"Numbering ";;1;"0.2-Final";"Partial";;;"TODO : image support";

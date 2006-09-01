@@ -722,9 +722,9 @@ The same applies to the elements w:bottom, w:right and w:left";
 ;;"Decimal places";1;"0.2-Final";;;;
 ;;"Repeat Content";1;"0.2-Final";;;;
 ;;"Shrink To Fit";1;"0.2-Final";;;;
-;"List-Level Style Properties";;0;"0.2-Final";"Partial";"jslaurent";"text:space-before + text:min-label-width + text:min-label-distance used for w:ind/@w:left
+;"List-Level Style Properties";;0;"0.2-Final";"Completed";"jslaurent";"text:space-before + text:min-label-width + text:min-label-distance used for w:ind/@w:left
 text:min-label-width used in w:ind/@w:hanging
-@fo:text-align translated to w:lvlJc/@w:val. Run properties are overwritten if a style is defined.";"TODO : relative indent."
+@fo:text-align translated to w:lvlJc/@w:val. Run properties are overwritten if a style is defined.";
 ;"Stroke Properties";;2;;;;;"how should drawing objects be processed? Converted as a picture?"
 ;;"Stroke Style";;;;;;
 ;;"Dash";;;;;;
