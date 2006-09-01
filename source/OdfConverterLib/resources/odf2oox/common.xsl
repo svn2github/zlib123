@@ -43,6 +43,7 @@
 		1 pica = 12 pt
 		1 dpt (didot point) = 1/72 in (almost the same as 1 pt)
 		1 px = 0.0264cm at 96dpi (Windows default)
+		1 milimeter(mm) = 0.1cm
 	-->
 	
 	
@@ -77,7 +78,37 @@
 			<xsl:otherwise><xsl:value-of select="$length"/></xsl:otherwise>
 		</xsl:choose>	
 	</xsl:template> 
-	
+	<!-- 
+		Convert various length units to milimeters
+	-->
+	<xsl:template name="milimeter-measure">
+		<xsl:param name="length"/>
+		<xsl:choose>
+			<xsl:when test="contains($length, 'cm')">
+				<xsl:value-of select="number(substring-before($length, 'cm')) * 10"/>
+			</xsl:when>
+			<xsl:when test="contains($length, 'in')">
+				<xsl:value-of select="number(substring-before($length, 'in')) * 25.4"/>
+			</xsl:when>
+			<xsl:when test="contains($length, 'pt')">
+				<xsl:value-of select="number(substring-before($length, 'pt')) * 25.4 div 72"/>
+			</xsl:when>
+			<xsl:when test="contains($length, 'twip')">
+				<xsl:value-of select="number(substring-before($length, 'twip')) * 25.4 div 1440"/>
+			</xsl:when>
+			<xsl:when test="contains($length, 'pica')">
+				<xsl:value-of select="number(substring-before($length, 'pica')) * 25.4 div 6"/>
+			</xsl:when>
+			<xsl:when test="contains($length, 'dpt')">
+				<xsl:value-of select="number(substring-before($length, 'pt')) * 25.4 div 72"/>
+			</xsl:when>
+			<xsl:when test="contains($length, 'px')">
+				<xsl:value-of select="number(substring-before($length, 'px')) * 0.264"/>
+			</xsl:when>
+			<xsl:when test="not($length)">0</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$length"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 	<!-- 
 		Convert  length units to eights of a point
 	-->
