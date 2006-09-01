@@ -625,7 +625,7 @@ style:tab-stop/@style:type converted to w:tab/@w:val. When @style:type is not pr
 Format .odt has more options for @style:leader-style for example: dot-dash, dot-dot-dash, long-dash or wave - so they can not be converted to .docx"
 ;;"Tab Stop Distance";0;"0.2-M1";;;;
 ;;"Hyphenation Keep";;"0.2-M1";"Completed";"jslaurent";;"Not available in Word."
-;;"Maximum Hyphens";;"0.2-M1";"Completed";;;"Not available in Word."
+;;"Maximum Hyphens";;"0.2-M1";"Completed";"jslaurent";"w:consecutiveHyphenLimit added to settings.xml. The value is 0, which means no-limit. It cannot be overwritten.";
 ;;"Drop Caps";2;"0.2-M1";;;;"For Word in Text Formatting Properties"
 ;;"Register True";3;"0.2-M1";;;;"mapping to Word has to be defined"
 ;;"Left and Right Margins";0;"0.1";"Completed";;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 

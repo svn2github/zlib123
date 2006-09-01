@@ -42,6 +42,8 @@
              
              <!-- overwritten in each paragraph if necessary -->
              <w:autoHyphenation w:val="true"/>
+             <w:doNotHyphenateCaps w:val="false"/>
+             <w:consecutiveHyphenLimit w:val="0"/>
 
             	<!-- Header and Footer even and odd propertie -->
             	<xsl:call-template name="EvenAndOddConfiguration"/>
