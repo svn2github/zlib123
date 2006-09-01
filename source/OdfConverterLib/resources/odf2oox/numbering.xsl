@@ -194,14 +194,6 @@
 							</xsl:attribute>
 						</w:tab>
 					</w:tabs>
-					<w:ind>
-						<xsl:attribute name="w:left">
-							<xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip "/>
-						</xsl:attribute>
-						<xsl:attribute name="w:hanging">
-							<xsl:value-of select="$minLabelWidthTwip"/>
-						</xsl:attribute>
-					</w:ind>
 					
 					<!-- disable hyphenation -->
 					<xsl:for-each select="document('content.xml')">
@@ -224,6 +216,15 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:for-each>
+					
+					<w:ind>
+						<xsl:attribute name="w:left">
+							<xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip "/>
+						</xsl:attribute>
+						<xsl:attribute name="w:hanging">
+							<xsl:value-of select="$minLabelWidthTwip"/>
+						</xsl:attribute>
+					</w:ind>
 				</w:pPr>
 				<xsl:choose>
 					<xsl:when test="name() = 'text:list-level-style-bullet' ">
