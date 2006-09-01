@@ -541,6 +541,16 @@
 				</w:tabs>
 			</xsl:if>
 			
+			<!-- Override hyphenation -->
+			<xsl:choose>
+				<xsl:when test="parent::node()/style:text-properties/@fo:hyphenate='true'">
+					<w:suppressAutoHyphens w:val="false"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<w:suppressAutoHyphens w:val="true"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			
 			<xsl:if test="@style:text-autospace">
 				<w:autoSpaceDN>
 					<xsl:choose>
@@ -683,7 +693,7 @@
 					</xsl:if>
 				</w:ind>				
 			</xsl:if>
-
+						
 			<!-- TODO this should be modified when we will manage bidi properties -->
 			<xsl:if test="@fo:text-align">
 				<w:jc>
@@ -707,7 +717,7 @@
 
 				</w:jc>
 			</xsl:if>
-
+			
 			<xsl:if test="@style:vertical-align">
 				<w:textAlignment>
 					<xsl:choose>
@@ -731,6 +741,18 @@
 
 	<xsl:template match="style:text-properties[parent::style:style  or parent::style:default-style]"
 		mode="styles">
+		<xsl:if test="not(parent::node()/style:paragraph-properties)">
+			<w:pPr>
+				<xsl:choose>
+					<xsl:when test="@fo:hyphenate='true'">
+						<w:suppressAutoHyphens w:val="false"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<w:suppressAutoHyphens w:val="true"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</w:pPr>
+		</xsl:if>
 		<w:rPr>
 			<xsl:if test="@style:font-name">
 				<w:rFonts>

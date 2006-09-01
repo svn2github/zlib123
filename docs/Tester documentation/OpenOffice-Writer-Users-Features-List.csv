@@ -316,9 +316,9 @@ This is a must have in my opinion and effective translation of the FORMAT featur
 ;;;;;;;;;;;
 ;;;"Text to text alignment";"Automatic / Base line / Top / Middle / Bottom";0;"0.2-M1";"Completed";;523;;
 ;;;;;;;;;;;
-;;"Text flow";"Hyphenation";"Chars at line end";;"0.2-M1";;;531;;"TODO : check whether automatic hyphenation is  available in OpenXML. Seems like manual hyphens is the only solution."
-;;;;"chars at line begin";;"0.2-M2";;;531;;"TODO : check whether automatic hyphenation is  available in OpenXML. Seems like manual hyphens is the only solution."
-;;;;"max number of consecutive hyphens";;"0.2-M2";;;532;;"TODO : check whether automatic hyphenation is  available in OpenXML. Seems like manual hyphens is the only solution."
+;;"Text flow";"Hyphenation";"Chars at line end";;"0.2-M1";"Completed";"Feature exists, but no options are available";515;;"TODO : check whether automatic hyphenation is  available in OpenXML. Seems like manual hyphens is the only solution."
+;;;;"chars at line begin";;"0.2-M2";"Completed";"Idem";516;;"TODO : check whether automatic hyphenation is  available in OpenXML. Seems like manual hyphens is the only solution."
+;;;;"max number of consecutive hyphens";;"0.2-M2";"Completed";"Idem";531;;"TODO : check whether automatic hyphenation is  available in OpenXML. Seems like manual hyphens is the only solution."
 ;;;;;;;;;;;
 ;;;"Breaks";"Type";0;"0.2-M1";"Completed";;540;"Column not handled yet";
 ;;;;"Position";0;"0.2-M1";"Completed";;540;"Break before doesn't exist in Word";

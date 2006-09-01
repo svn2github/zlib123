@@ -202,6 +202,28 @@
 							<xsl:value-of select="$minLabelWidthTwip"/>
 						</xsl:attribute>
 					</w:ind>
+					
+					<!-- disable hyphenation -->
+					<xsl:for-each select="document('content.xml')">
+						<xsl:choose>
+							<xsl:when test="key('automatic-styles',@text:style-name)/style:text-properties/@fo:hyphenate='true'"/>
+							<xsl:otherwise>
+								<xsl:variable name="styleName">
+									<xsl:value-of select="@text:style-name"/>
+								</xsl:variable>
+								<xsl:for-each select="document('styles.xml')">
+									<xsl:choose>
+										<xsl:when test="key('styles',$styleName)/style:text-properties/@fo:hyphenate='true'">
+											<w:suppressAutoHyphens w:val="false"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<w:suppressAutoHyphens w:val="true"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
 				</w:pPr>
 				<xsl:choose>
 					<xsl:when test="name() = 'text:list-level-style-bullet' ">
@@ -231,7 +253,7 @@
 							<xsl:variable name="styleName">
 								<xsl:value-of select="@text:style-name"/>
 							</xsl:variable>
-
+							
 							<xsl:for-each select="document('content.xml')">
 								<xsl:choose>
 									<xsl:when

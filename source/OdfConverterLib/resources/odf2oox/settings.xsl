@@ -39,6 +39,9 @@
              <xsl:if test="document('styles.xml')//style:page-layout[@style:name=//office:master-styles/style:master-page/@style:page-layout-name]/style:page-layout-properties/@fo:background-color">
                <w:displayBackgroundShape/>
              </xsl:if>
+             
+             <!-- overwritten in each paragraph if necessary -->
+             <w:autoHyphenation w:val="true"/>
 
             	<!-- Header and Footer even and odd propertie -->
             	<xsl:call-template name="EvenAndOddConfiguration"/>

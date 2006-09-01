@@ -106,16 +106,17 @@
 					</xsl:attribute>
 				</w:pStyle>
 				<!-- <w:pStyle w:val="{@text:style-name}"/> -->
+								
 				<xsl:choose>
 					<xsl:when test="not(@text:outline-level)">
 						<w:outlineLvl w:val="0"/>
 					</xsl:when>
 					<xsl:when test="@text:outline-level &lt;= 9">
-						<xsl:variable name="styleName">
-							<xsl:value-of select="@text:style-name"/>
-						</xsl:variable>
 						<xsl:variable name="outlineLevel">
 							<xsl:value-of select="@text:outine-level"/>
+						</xsl:variable>
+						<xsl:variable name="styleName">
+							<xsl:value-of select="@text:style-name"/>
 						</xsl:variable>
 						<xsl:for-each select="document('styles.xml')">
 							<xsl:if
@@ -132,6 +133,7 @@
 						<w:outlineLvl w:val="9"/>
 					</xsl:otherwise>
 				</xsl:choose>
+				
 			</w:pPr>
 			<xsl:variable name="id">
 				<xsl:value-of select="number(count(preceding::text:h)+1)"/>
@@ -306,6 +308,7 @@
 										<xsl:value-of select="$prefixedStyleName"/>
 									</xsl:attribute>
 								</w:pStyle>
+																
 								<xsl:call-template name="indent">
 									<xsl:with-param name="level" select="$level"/>
 								</xsl:call-template>
@@ -316,15 +319,7 @@
 							<xsl:choose>
 								<xsl:when
 									test="child::draw:frame and not(parent::draw:text-box) and child::draw:frame/child::draw:text-box">
-									
 									<xsl:apply-templates select="draw:frame"/>
-									
-									<xsl:for-each select="child::node()">
-										<xsl:if test="not(self::draw:frame)"> 
-											<xsl:apply-templates mode="paragraph" select="." />		
-										</xsl:if>
-									</xsl:for-each>
-									
 								</xsl:when>
 								<xsl:when
 									test="child::draw:frame and not(child::draw:frame/draw:image)">
@@ -390,7 +385,7 @@
 
 						<xsl:call-template name="indent">
 							<xsl:with-param name="level" select="$level"/>
-						</xsl:call-template>
+						</xsl:call-template>						
 					</w:pPr>
 					<xsl:apply-templates mode="paragraph"/>
 				</w:p>
@@ -852,19 +847,19 @@
 								<w10:anchorlock/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'left' ">
-								<w10:wrap type="square" side="left"/>
+								<w10:wrap type="tight" side="left"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'right' ">
-								<w10:wrap type="square" side="right"/>
+								<w10:wrap type="tight" side="right"/>
 							</xsl:when>
 							<xsl:when test="not($frameWrap)">
-								<w10:wrap type="square"/>
+								<w10:wrap type="tight"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'parallel' ">
-								<w10:wrap type="square"/>
+								<w10:wrap type="tight"/>
 							</xsl:when>
 							<xsl:when test="$frameWrap = 'dynamic' ">
-								<w10:wrap type="square" side="largest"/>
+								<w10:wrap type="tight" side="largest"/>
 							</xsl:when>
 						</xsl:choose>
 						
