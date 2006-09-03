@@ -36,7 +36,7 @@
 
   <xsl:key name="fonts"
 		match="office:font-face-decls/style:font-face"
-		use="@svg:font-name"/>
+		use="@style:name"/>
 	
 	<xsl:template name="fonts">
 		<w:fonts>
@@ -89,7 +89,7 @@
   </xsl:template>
 
   <!-- Map font types -->
-  <xsl:template name="computeFontName">
+  <xsl:template name="ComputeFontName">
     <xsl:param name="fontName"/>
     <xsl:choose>
       <xsl:when test="$fontName = 'StarSymbol'">Symbol</xsl:when>
