@@ -67,23 +67,4 @@
     </w:comment>
   </xsl:template>
 
-  <xsl:template match="text:p" mode="comment">
-    <w:p>
-      <!-- <w:pPr>
-              see to add commentText style 
-             <w:pStyle w:val="CommentText"/>
-             </w:pPr>  -->
-      <w:r>
-        <!--   <w:rPr>
-                   see to add  commentReference style
-                    <w:rStyle w:val="CommentReference"/>   
-                    </w:rPr> -->
-        <w:annotationRef/>
-      </w:r>
-      <w:r >
-        <xsl:apply-templates select="text()" mode="text"></xsl:apply-templates>
-      </w:r>
-    </w:p>
-  </xsl:template>
-
 </xsl:stylesheet>
