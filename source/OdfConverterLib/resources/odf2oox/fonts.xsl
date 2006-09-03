@@ -89,7 +89,7 @@
   </xsl:template>
 
   <!-- Map font types -->
-  <xsl:template name="computeFontName">
+  <xsl:template name="ComputeFontName">
     <xsl:param name="fontName"/>
     <xsl:choose>
       <xsl:when test="$fontName = 'StarSymbol'">Symbol</xsl:when>

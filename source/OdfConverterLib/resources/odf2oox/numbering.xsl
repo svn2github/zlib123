@@ -236,15 +236,11 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<w:rPr>
-							<xsl:variable name="stylePrefix">
-								<xsl:call-template name="stylePrefix">
+							<xsl:variable name="prefixedStyleName">
+								<xsl:call-template name="GetPrefixedStyleName">
 									<xsl:with-param name="styleName" select="@text:style-name"/>
 								</xsl:call-template>
 							</xsl:variable>
-							<xsl:variable name="prefixedStyleName">
-								<xsl:value-of select="concat($stylePrefix,@text:style-name)"/>
-							</xsl:variable>
-							<!-- <w:rStyle w:val="{@text:style-name}"/> -->
 							<w:rStyle>
 								<xsl:attribute name="w:val">
 									<xsl:value-of select="$prefixedStyleName"/>
@@ -593,7 +589,7 @@
 		<w:rFonts>
 			<xsl:if test="@style:font-name">
 				<xsl:variable name="fontName">
-					<xsl:call-template name="computeFontName">
+					<xsl:call-template name="ComputeFontName">
 						<xsl:with-param name="fontName" select="@style:font-name"/>
 					</xsl:call-template>
 				</xsl:variable>
@@ -606,14 +602,14 @@
 			</xsl:if>
 			<xsl:if test="@style:font-name-complex">
 				<xsl:attribute name="w:cs">
-					<xsl:call-template name="computeFontName">
+					<xsl:call-template name="ComputeFontName">
 						<xsl:with-param name="fontName" select="@style:font-name-complex"/>
 					</xsl:call-template>
 				</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@style:font-name-asian">
 				<xsl:attribute name="w:eastAsia">
-					<xsl:call-template name="computeFontName">
+					<xsl:call-template name="ComputeFontName">
 						<xsl:with-param name="fontName" select="@style:font-name-asian"/>
 					</xsl:call-template>
 				</xsl:attribute>

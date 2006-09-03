@@ -38,88 +38,52 @@
     xmlns:zip="urn:cleverage:xmlns:zip"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     exclude-result-prefixes="office text  fo style dc meta zip xlink">
-    
-    <xsl:template name="comments">
-        <w:comments>
-                <xsl:apply-templates select="document('content.xml')//office:annotation" mode="text"/>
-        </w:comments>
-    </xsl:template>
-    
-    <!-- Note -->
-    <xsl:template match="office:annotation" mode="text">     
-            <w:comment>
-                <xsl:attribute name="w:id">        
-                 <!--    <xsl:value-of select="position()"/> -->     
-                    <xsl:call-template name="generateId">
-                            <xsl:with-param name="node" select="."/>
-                            <xsl:with-param name="nodetype" select="'annotation'"/>
-                    </xsl:call-template>
-                </xsl:attribute>
-                <xsl:attribute name="w:author">
-                    <xsl:value-of select="dc:creator"/>
-                </xsl:attribute>
-            <xsl:attribute name="w:date">
-                <xsl:value-of select="dc:date"/>
-            </xsl:attribute>
-            <xsl:attribute name="w:initials">
-                <xsl:value-of select="dc:creator"/>
-            </xsl:attribute>
-                <xsl:apply-templates select="text:p" mode="comment"/>
-            </w:comment>
-    </xsl:template> 
-    
-    <!-- call body -->
-    <xsl:template name="reference">
-        <xsl:param name="id"/>
-        <w:r>
-           <!--  <w:rPr>
-                <w:rStyle w:val="CommentReference"/>
-            </w:rPr> -->            
-            <w:commentReference>
-                    <xsl:attribute name="w:id"><xsl:value-of select="$id"/></xsl:attribute>
-            </w:commentReference>
-        </w:r>
-    </xsl:template>
-    
-    <!-- 
-        Generate a decimal identifier based on the position of the current 
-        footenote/endnote among all the indexed footnotes/endnotes.
-    -->
-    <xsl:template name="generateId">
-        <xsl:param name="node"/>
-        <xsl:param name="nodetype"/>
-        <xsl:variable name="positionInGroup">
-            <xsl:for-each select="key($nodetype, '')">
-                <xsl:if test="generate-id($node) = generate-id(.)">
-                    <xsl:value-of select="position() "/>
-                </xsl:if>
-            </xsl:for-each>
-        </xsl:variable>
-        <xsl:value-of select="$positionInGroup"/>
-    </xsl:template>
-    
-   <!--  <xsl:template name="commentId">
-            <xsl:for-each select="key('annotation', '')"> 
-                    <TEST><xsl:value-of select="position()"/></TEST>
-            </xsl:for-each>
-       </xsl:template> -->
-    <xsl:template match="text:p" mode="comment">
-     <w:p>
-         <!-- <w:pPr>
+
+  <xsl:template name="comments">
+    <w:comments>
+      <xsl:apply-templates select="document('content.xml')//office:annotation" mode="annotation"/>
+    </w:comments>
+  </xsl:template>
+
+  <!-- annotation -->
+  <xsl:template match="office:annotation" mode="annotation">
+    <w:comment>
+      <xsl:attribute name="w:id">
+        <xsl:call-template name="GenerateId">
+          <xsl:with-param name="node" select="."/>
+          <xsl:with-param name="nodetype" select="'annotation'"/>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:attribute name="w:author">
+        <xsl:value-of select="dc:creator"/>
+      </xsl:attribute>
+      <xsl:attribute name="w:date">
+        <xsl:value-of select="dc:date"/>
+      </xsl:attribute>
+      <xsl:attribute name="w:initials">
+        <xsl:value-of select="dc:creator"/>
+      </xsl:attribute>
+      <xsl:apply-templates/>
+    </w:comment>
+  </xsl:template>
+
+  <xsl:template match="text:p" mode="comment">
+    <w:p>
+      <!-- <w:pPr>
               see to add commentText style 
              <w:pStyle w:val="CommentText"/>
              </w:pPr>  -->
-            <w:r >
-                <!--   <w:rPr>
+      <w:r>
+        <!--   <w:rPr>
                    see to add  commentReference style
                     <w:rStyle w:val="CommentReference"/>   
                     </w:rPr> -->
-            <w:annotationRef/>
-            </w:r>
-            <w:r >
-               <xsl:apply-templates select="text()" mode="text"></xsl:apply-templates>
-            </w:r>
-            </w:p>         
-    </xsl:template>
-    
+        <w:annotationRef/>
+      </w:r>
+      <w:r >
+        <xsl:apply-templates select="text()" mode="text"></xsl:apply-templates>
+      </w:r>
+    </w:p>
+  </xsl:template>
+
 </xsl:stylesheet>

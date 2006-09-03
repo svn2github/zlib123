@@ -263,5 +263,22 @@
 		</xsl:choose>
 		
 	</xsl:template>
+
+  <!-- 
+		Generate a decimal identifier based on the position of the current 
+		footenote/endnote among all the indexed footnotes/endnotes.
+	-->
+  <xsl:template name="GenerateId">
+    <xsl:param name="node"/>
+    <xsl:param name="nodetype"/>
+    <xsl:variable name="positionInGroup">
+      <xsl:for-each select="key(concat($nodetype,'s'), '')">
+        <xsl:if test="generate-id($node) = generate-id(.)">
+          <xsl:value-of select="position() + 1"/>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:value-of select="$positionInGroup"/>
+  </xsl:template>
 	
 </xsl:stylesheet>
