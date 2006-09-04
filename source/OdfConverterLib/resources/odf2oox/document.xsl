@@ -51,7 +51,11 @@
   <xsl:key name="headers" match="text:h" use="''"/>
   <xsl:key name="images" match="draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]" use="''"/>
   <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
+  <xsl:key name="master-pages" match="style:master-page" use="@style:name"/>
+  <xsl:key name="page-layouts" match="style:page-layout" use="@style:name"/>
+  <xsl:key name="master-page-based-styles" match="style:style[@style:master-page-name]" use="@style:name"/>
 
+  
   <!-- COMMENT: what is this variable for? -->
   <xsl:variable name="type">dxa</xsl:variable>
 
@@ -75,7 +79,46 @@
   <xsl:template match="office:body">
     <w:body>
       <xsl:apply-templates/>
-      <xsl:call-template name="headerFooter"/>
+      <w:sectPr>
+   
+        <!-- Header/Footer configuration -->
+        <xsl:call-template name="HeaderFooter"/>
+      
+        <!-- Footnotes and endnotes configuration -->
+        <xsl:call-template name="footnotes-configuration"/>
+        <xsl:call-template name="endnotes-configuration"/>
+        
+      
+        
+        <!-- Page layout properties -->
+        <!--- all the paragraphs tied to a master style -->
+        <xsl:variable name="mp-paragraphs" select=".//text:p[key('master-page-based-styles', @text:style-name)]"/>
+        <!-- the last one -->
+        <xsl:variable name="last-mp-paragraph" select="$mp-paragraphs[last()]"/>
+        <!-- the master page name it is related to -->
+        <xsl:variable name="master-page-name" select="key('master-page-based-styles', $last-mp-paragraph/@text:style-name)/@style:master-page-name"/>
+        
+        <xsl:for-each select="document('styles.xml')">
+          <xsl:choose>
+            <!-- if we use a master-page based style -->
+            <xsl:when test="$master-page-name">
+              <!-- get the associated page layout -->
+              <xsl:variable name="page-layout-name" select="key('master-pages', $master-page-name)/@style:page-layout-name"/>
+              <!-- apply the layout properties -->
+              <xsl:apply-templates select="key('page-layouts', $page-layout-name)/style:page-layout-properties" mode="master-page"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- use default master page -->
+              <!-- TODO : find a more reliable way to spot the default master page -->
+              <xsl:apply-templates select="key('page-layouts', 'pm1')" mode="master-page"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+        
+        <!-- Shall the header and footer be different on the first page -->
+        <xsl:call-template name="TitlePg"/>
+              
+      </w:sectPr>
     </w:body>
   </xsl:template>
 
