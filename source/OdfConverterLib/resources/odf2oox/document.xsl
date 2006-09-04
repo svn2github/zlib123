@@ -956,131 +956,18 @@
             <xsl:attribute name="inset">
 
               <xsl:choose>
-
                 <xsl:when test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding or key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
-                  <xsl:choose>
-                    <xsl:when test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding">
-                      <xsl:variable name="padding">
-                        <xsl:call-template name="milimeter-measure">
-                          <xsl:with-param name="length"
-														select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding"/>
-                        </xsl:call-template>
-                      </xsl:variable>
-                      <xsl:value-of
-												select="concat($padding,'mm,',$padding,'mm,',$padding,'mm,',$padding,'mm')"
-											/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:variable name="padding-top">
-                        <xsl:if
-													test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
-                          <xsl:call-template name="milimeter-measure">
-                            <xsl:with-param name="length"
-															select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top"/>
-                          </xsl:call-template>
-                        </xsl:if>
-                      </xsl:variable>
-                      <xsl:variable name="padding-right">
-                        <xsl:if
-													test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right">
-                          <xsl:call-template name="milimeter-measure">
-                            <xsl:with-param name="length"
-															select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-right"/>
-                          </xsl:call-template>
-                        </xsl:if>
-                      </xsl:variable>
-                      <xsl:variable name="padding-bottom">
-                        <xsl:if
-													test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom">
-                          <xsl:call-template name="milimeter-measure">
-                            <xsl:with-param name="length"
-															select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-bottom"/>
-                          </xsl:call-template>
-                        </xsl:if>
-                      </xsl:variable>
-                      <xsl:variable name="padding-left">
-                        <xsl:if
-													test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left">
-                          <xsl:call-template name="milimeter-measure">
-                            <xsl:with-param name="length"
-															select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-left"/>
-                          </xsl:call-template>
-                        </xsl:if>
-                      </xsl:variable>
-
-                      <xsl:if
-												test="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top">
-                        <xsl:value-of
-													select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"
-												/>
-                      </xsl:if>
-                    </xsl:otherwise>
-                  </xsl:choose>
+                  <xsl:call-template name="padding">
+					<xsl:with-param name="graphicProperties" select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties"/>
+                  </xsl:call-template>
                 </xsl:when>
-
                 <xsl:otherwise>
                   <xsl:variable name="parentStyleName">
                     <xsl:value-of select="key('automatic-styles', parent::draw:frame/@draw:style-name)/@style:parent-style-name"/>
                   </xsl:variable>
-                  <xsl:choose>
-                    <xsl:when
-											test="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding">
-                      <xsl:variable name="padding">
-                        <xsl:call-template name="milimeter-measure">
-                          <xsl:with-param name="length"
-														select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding"/>
-                        </xsl:call-template>
-                      </xsl:variable>
-                      <xsl:value-of
-												select="concat($padding,'mm,',$padding,'mm,',$padding,'mm,',$padding,'mm')"												/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:variable name="padding-top">
-                        <xsl:if
-													test="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding-top">
-                          <xsl:call-template name="milimeter-measure">
-                            <xsl:with-param name="length"
-															select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding-top"/>
-                          </xsl:call-template>
-                        </xsl:if>
-                      </xsl:variable>
-                      <xsl:variable name="padding-right">
-                        <xsl:if
-													test="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding-right">
-                          <xsl:call-template name="milimeter-measure">
-                            <xsl:with-param name="length"
-															select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding-right"/>
-                          </xsl:call-template>
-                        </xsl:if>
-                      </xsl:variable>
-                      <xsl:variable name="padding-bottom">
-                        <xsl:if
-													test="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding-bottom">
-                          <xsl:call-template name="milimeter-measure">
-                            <xsl:with-param name="length"
-															select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding-bottom"/>
-                          </xsl:call-template>
-                        </xsl:if>
-                      </xsl:variable>
-                      <xsl:variable name="padding-left">
-                        <xsl:if
-													test="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding-left">
-                          <xsl:call-template name="milimeter-measure">
-                            <xsl:with-param name="length"
-															select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding-left"/>
-                          </xsl:call-template>
-                        </xsl:if>
-                      </xsl:variable>
-
-                      <xsl:if
-												test="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties/@fo:padding-top">
-                        <xsl:value-of
-                          select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"
-											/>
-                      </xsl:if>
-                    </xsl:otherwise>
-                  </xsl:choose>
-
+		    		<xsl:call-template name="padding">
+					  <xsl:with-param name="graphicProperties" select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties"/>
+		    		</xsl:call-template>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
@@ -1124,7 +1011,53 @@
       </w:pict>
     </w:r>
   </xsl:template>
-
+	<!--converts padding into inset-->
+  <xsl:template name="padding">
+    <xsl:param name="graphicProperties"/>
+    <xsl:choose>
+      <xsl:when test="$graphicProperties/@fo:padding">
+	  <xsl:variable name="padding">
+	    <xsl:call-template name="milimeter-measure">
+	      <xsl:with-param name="length" select="$graphicProperties/@fo:padding"/>
+	    </xsl:call-template>
+	  </xsl:variable>
+	<xsl:value-of select="concat($padding,'mm,',$padding,'mm,',$padding,'mm,',$padding,'mm')"/>
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:variable name="padding-top">
+	  <xsl:if test="$graphicProperties/@fo:padding-top">
+	    <xsl:call-template name="milimeter-measure">
+	      <xsl:with-param name="length" select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top"/>
+	    </xsl:call-template>
+	  </xsl:if>
+	</xsl:variable>
+	<xsl:variable name="padding-right">
+	  <xsl:if test="$graphicProperties/@fo:padding-right">
+	    <xsl:call-template name="milimeter-measure">
+	      <xsl:with-param name="length" select="$graphicProperties/@fo:padding-right"/>
+	    </xsl:call-template>
+	  </xsl:if>
+	</xsl:variable>
+	<xsl:variable name="padding-bottom">
+	  <xsl:if test="$graphicProperties/@fo:padding-bottom">
+	    <xsl:call-template name="milimeter-measure">
+	      <xsl:with-param name="length" select="$graphicProperties/@fo:padding-bottom"/>
+	    </xsl:call-template>
+	  </xsl:if>
+	</xsl:variable>
+	<xsl:variable name="padding-left">
+	  <xsl:if test="$graphicProperties/@fo:padding-left">
+	    <xsl:call-template name="milimeter-measure">
+	      <xsl:with-param name="length" select="$graphicProperties/@fo:padding-left"/>
+	    </xsl:call-template>
+	  </xsl:if>
+	</xsl:variable>
+	<xsl:if test="$graphicProperties/@fo:padding-top">
+	  <xsl:value-of select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"/>
+	</xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   <!-- Inserts the style of a text box -->
   <xsl:template name="InsertTextBoxStyle">
     <xsl:variable name="prefixedStyleName">
