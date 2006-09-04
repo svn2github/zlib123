@@ -148,25 +148,9 @@
           <xsl:call-template name="InsertTocEntry"/>
         </xsl:when>
 
-        <!-- COMMENT: what is this scenario? Please create and call a template -->
-        <xsl:when
-          test="child::draw:frame and not(parent::draw:text-box) and child::draw:frame/child::draw:text-box">
-          <xsl:apply-templates select="draw:frame"/>
-          <xsl:for-each select="child::node()">
-            <xsl:if test="not(self::draw:frame)">
-              <xsl:apply-templates mode="paragraph" select="." />
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:when>
-
-        <!-- COMMENT: what is this scenario? Please create and call a template -->
-        <xsl:when
-          test="child::draw:frame and not(child::draw:frame/draw:image)">
-          <xsl:apply-templates
-            select="child::node()[position() &gt; 1]"
-            mode="paragraph"/>
-        </xsl:when>
-
+       <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
+        <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]" />
+        
         <xsl:otherwise>
           <xsl:apply-templates mode="paragraph"/>
         </xsl:otherwise>
@@ -193,7 +177,7 @@
 
     </w:p>
   </xsl:template>
-
+  
   <!-- Inserts the paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
     <xsl:param name="level"/>
@@ -769,7 +753,7 @@
 
   <!-- text boxes -->
   <!-- COMMENT: horrible mess, please try to refactor and split into smaller parts -->
-  <xsl:template match="draw:text-box">
+  <xsl:template match="draw:text-box" mode="paragraph">
     <w:r>
       <w:rPr>
         <xsl:call-template name="InsertTextBoxStyle"/>
@@ -1073,21 +1057,27 @@
   <!-- @TODO  positioning text-boxes -->
   <xsl:template match="draw:frame">
     <xsl:choose>
+    
       <xsl:when test="not(parent::text:p | parent::text:h)">
         <w:p>
-          <xsl:for-each select="descendant::draw:text-box">
-            <xsl:apply-templates select="."/>
-          </xsl:for-each>
+          <xsl:call-template name="InsertEmbeddedTextboxes" />
         </w:p>
       </xsl:when>
+      
       <xsl:otherwise>
-        <xsl:for-each select="descendant::draw:text-box">
-          <xsl:apply-templates select="."/>
-        </xsl:for-each>
+        <xsl:call-template name="InsertEmbeddedTextboxes" />
       </xsl:otherwise>
+   
     </xsl:choose>
   </xsl:template>
 
+ <!-- inserts textboxes which are embedded in odf as one after another in word -->
+  <xsl:template name="InsertEmbeddedTextboxes">
+    <xsl:for-each select="descendant::draw:text-box">
+      <xsl:apply-templates mode="paragraph"/>
+    </xsl:for-each>
+  </xsl:template>
+  
   <!-- lists -->
   <xsl:template match="text:list">
     <xsl:param name="level" select="-1"/>
@@ -1146,9 +1136,10 @@
             <xsl:apply-templates select="ancestor::text:note/text:note-citation" mode="note"/>
           </xsl:if>
 
-          <!-- first paragraph -->
-          <xsl:apply-templates select="*[1]" mode="paragraph"/>
+          <xsl:apply-templates mode="paragraph"  />
+      
         </w:p>
+        
         <!-- others (text:p or text:list) -->
         <xsl:apply-templates select="*[position() != 1]">
           <xsl:with-param name="level" select="$level"/>
