@@ -49,10 +49,14 @@
             	<xsl:call-template name="EvenAndOddConfiguration"/>
     	        
             	<!-- Footnotes document wide properties -->
-               <xsl:call-template name="footnotes-configuration"/>
+               <xsl:call-template name="footnotes-configuration">
+                <xsl:with-param name="wide">yes</xsl:with-param>
+               </xsl:call-template>
              
              <!-- Endnotes document wide properties -->
-             <xsl:call-template name="endnotes-configuration"/>
+             <xsl:call-template name="endnotes-configuration">
+              <xsl:with-param name="wide">yes</xsl:with-param>
+             </xsl:call-template>
              
             </w:settings>
     </xsl:template>

@@ -90,16 +90,14 @@
 
   <!-- footnotes configuration -->
   <xsl:template name="footnotes-configuration">
-    <xsl:variable name="config"
-            select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
+    <xsl:param name="wide">no</xsl:param>
+    <xsl:variable name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
     <w:footnotePr>
 
       <w:pos>
         <xsl:attribute name="w:val">
           <xsl:choose>
-            <xsl:when
-              test="$config/@text:footnotes-position = 'text' "
-                                                  >beneathText</xsl:when>
+            <xsl:when test="$config/@text:footnotes-position = 'text' ">beneathText</xsl:when>
             <xsl:otherwise>pageBottom</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
@@ -115,7 +113,7 @@
       </w:numFmt>
 
       <xsl:if test="$config/@text:start-value">
-        <w:numStart w:val="{$config/@text:start-value}"/>
+        <w:numStart w:val="{number($config/@text:start-value) + 1}"/>
       </xsl:if>
 
       <w:numRestart>
@@ -132,9 +130,11 @@
         </xsl:attribute>
       </w:numRestart>
 
-      <w:footnote w:id="0"/>
-      <w:footnote w:id="1"/>
-
+      <xsl:if test="$wide = 'yes' ">
+        <w:footnote w:id="0"/>
+        <w:footnote w:id="1"/>
+      </xsl:if>
+        
     </w:footnotePr>
   </xsl:template>
 
