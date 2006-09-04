@@ -80,16 +80,11 @@
     <w:body>
       <xsl:apply-templates/>
       <w:sectPr>
-   
         <!-- Header/Footer configuration -->
         <xsl:call-template name="HeaderFooter"/>
-      
         <!-- Footnotes and endnotes configuration -->
         <xsl:call-template name="footnotes-configuration"/>
         <xsl:call-template name="endnotes-configuration"/>
-        
-      
-        
         <!-- Page layout properties -->
         <!--- all the paragraphs tied to a master style -->
         <xsl:variable name="mp-paragraphs" select=".//text:p[key('master-page-based-styles', @text:style-name)]"/>
@@ -114,10 +109,8 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:for-each>
-        
         <!-- Shall the header and footer be different on the first page -->
         <xsl:call-template name="TitlePg"/>
-              
       </w:sectPr>
     </w:body>
   </xsl:template>
