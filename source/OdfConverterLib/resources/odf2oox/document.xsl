@@ -1195,9 +1195,17 @@
         </xsl:when>
         <xsl:otherwise>
           <w:t>
-            <xsl:for-each select="child::text()[position() &lt; last()]">
-              <xsl:value-of select="."/>
-            </xsl:for-each>
+           <xsl:choose>
+                <xsl:when test="number(child::text()[last()])">								
+                   <xsl:for-each select="child::node()[position() &lt; last()]">        
+                         <xsl:message><xsl:value-of select="."/></xsl:message>
+                     <xsl:value-of select="."/>      
+                   </xsl:for-each> 
+                </xsl:when>
+                <xsl:otherwise>
+             <xsl:value-of select="child::text()[last()]"/>             
+                </xsl:otherwise>
+              </xsl:choose>             
           </w:t>
           <!--<xsl:apply-templates select="child::text()[1]" mode="text"/>-->
         </xsl:otherwise>
@@ -2009,7 +2017,20 @@
 
   <!-- simple text (within a text flow) -->
   <xsl:template match="text()" mode="text">
-    <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+    
+      <xsl:choose>
+        <xsl:when test="preceding-sibling::text:tab">                
+          <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+        </xsl:when>
+<xsl:when test="not(following-sibling::text:tab)">      
+  <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+        </xsl:when>						
+        
+        <xsl:otherwise>          
+        </xsl:otherwise>
+      </xsl:choose>
+    
+
   </xsl:template>
 
   <!-- tab stops -->
