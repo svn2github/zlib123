@@ -207,14 +207,11 @@
 			<xsl:if test="@fo:border and @fo:border != 'none' ">
 				<w:pBdr>
 					<w:top>
-						<xsl:choose>
-							<xsl:when test="contains(@fo:border, 'double')">
-								<xsl:attribute name="w:val">double</xsl:attribute>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:attribute name="w:val">single</xsl:attribute>
-							</xsl:otherwise>
-						</xsl:choose>
+						<xsl:attribute name="w:val">
+							<xsl:call-template name="BorderStyle">
+								<xsl:with-param name="side" select="'top'"/>
+							</xsl:call-template>
+						</xsl:attribute>
 						<xsl:attribute name="w:sz">
 							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length"
@@ -246,14 +243,11 @@
 
 					</w:top>
 					<w:left>
-						<xsl:choose>
-							<xsl:when test="contains(@fo:border, 'double')">
-								<xsl:attribute name="w:val">double</xsl:attribute>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:attribute name="w:val">single</xsl:attribute>
-							</xsl:otherwise>
-						</xsl:choose>
+						<xsl:attribute name="w:val">
+							<xsl:call-template name="BorderStyle">
+								<xsl:with-param name="side" select="'left'"/>
+							</xsl:call-template>
+						</xsl:attribute>
 						<xsl:attribute name="w:sz">
 							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length"
@@ -280,14 +274,11 @@
 						</xsl:attribute>
 					</w:left>
 					<w:bottom>
-						<xsl:choose>
-							<xsl:when test="contains(@fo:border, 'double')">
-								<xsl:attribute name="w:val">double</xsl:attribute>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:attribute name="w:val">single</xsl:attribute>
-							</xsl:otherwise>
-						</xsl:choose>
+						<xsl:attribute name="w:val">
+							<xsl:call-template name="BorderStyle">
+								<xsl:with-param name="side" select="'bottom'"/>
+							</xsl:call-template>
+						</xsl:attribute>
 						<xsl:attribute name="w:sz">
 							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length"
@@ -314,14 +305,11 @@
 						</xsl:attribute>
 					</w:bottom>
 					<w:right>
-						<xsl:choose>
-							<xsl:when test="contains(@fo:border, 'double')">
-								<xsl:attribute name="w:val">double</xsl:attribute>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:attribute name="w:val">single</xsl:attribute>
-							</xsl:otherwise>
-						</xsl:choose>
+						<xsl:attribute name="w:val">
+							<xsl:call-template name="BorderStyle">
+								<xsl:with-param name="side" select="'right'"/>
+							</xsl:call-template>
+						</xsl:attribute>
 						<xsl:attribute name="w:sz">
 							<xsl:call-template name="eightspoint-measure">
 								<xsl:with-param name="length"
@@ -347,6 +335,32 @@
 								select="substring(@fo:border, string-length(@fo:border) -5, 6)"/>
 						</xsl:attribute>
 					</w:right>
+					<xsl:if test="@style:join-border='false'">
+						<w:between>
+							<xsl:attribute name="w:val">
+								<xsl:call-template name="BorderStyle">
+									<xsl:with-param name="side" select="'middle'"/>
+								</xsl:call-template>
+							</xsl:attribute>
+							<xsl:attribute name="w:sz">
+								<xsl:call-template name="eightspoint-measure">
+									<xsl:with-param name="length"
+										select="substring-before(@fo:border,  ' ')"/>
+								</xsl:call-template>
+							</xsl:attribute>
+							<xsl:if test="@fo:padding">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="padding-val">
+										<xsl:with-param name="length" select="@fo:padding"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:attribute name="w:color">
+								<xsl:value-of
+									select="substring(@fo:border, string-length(@fo:border) -5, 6)"/>
+							</xsl:attribute>
+						</w:between>
+					</xsl:if>
 				</w:pBdr>
 			</xsl:if>
 			<xsl:if
@@ -354,14 +368,11 @@
 				<w:pBdr>
 					<xsl:if test="@fo:border-top and (@fo:border-top != 'none')">
 						<w:top>
-							<xsl:choose>
-								<xsl:when test="contains(@fo:border-top, 'double')">
-									<xsl:attribute name="w:val">double</xsl:attribute>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:attribute name="w:val">single</xsl:attribute>
-								</xsl:otherwise>
-							</xsl:choose>
+							<xsl:attribute name="w:val">
+								<xsl:call-template name="BorderStyle">
+									<xsl:with-param name="side" select="'top'"/>
+								</xsl:call-template>
+							</xsl:attribute>
 							<xsl:attribute name="w:sz">
 								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length"
@@ -391,14 +402,11 @@
 					</xsl:if>
 					<xsl:if test="@fo:border-left and (@fo:border-left != 'none')">
 						<w:left>
-							<xsl:choose>
-								<xsl:when test="contains(@fo:border-left, 'double')">
-									<xsl:attribute name="w:val">double</xsl:attribute>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:attribute name="w:val">single</xsl:attribute>
-								</xsl:otherwise>
-							</xsl:choose>
+							<xsl:attribute name="w:val">
+								<xsl:call-template name="BorderStyle">
+									<xsl:with-param name="side" select="'left'"/>
+								</xsl:call-template>
+							</xsl:attribute>
 							<xsl:attribute name="w:sz">
 								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length"
@@ -428,14 +436,11 @@
 					</xsl:if>
 					<xsl:if test="@fo:border-bottom and (@fo:border-bottom != 'none')">
 						<w:bottom>
-							<xsl:choose>
-								<xsl:when test="contains(@fo:border-bottom, 'double')">
-									<xsl:attribute name="w:val">double</xsl:attribute>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:attribute name="w:val">single</xsl:attribute>
-								</xsl:otherwise>
-							</xsl:choose>
+							<xsl:attribute name="w:val">
+								<xsl:call-template name="BorderStyle">
+									<xsl:with-param name="side" select="'bottom'"/>
+								</xsl:call-template>
+							</xsl:attribute>
 							<xsl:attribute name="w:sz">
 								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length"
@@ -465,14 +470,11 @@
 					</xsl:if>
 					<xsl:if test="@fo:border-right and (@fo:border-right != 'none')">
 						<w:right>
-							<xsl:choose>
-								<xsl:when test="contains(@fo:border-right, 'double')">
-									<xsl:attribute name="w:val">double</xsl:attribute>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:attribute name="w:val">single</xsl:attribute>
-								</xsl:otherwise>
-							</xsl:choose>
+							<xsl:attribute name="w:val">
+								<xsl:call-template name="BorderStyle">
+									<xsl:with-param name="side" select="'right'"/>
+								</xsl:call-template>
+							</xsl:attribute>
 							<xsl:attribute name="w:sz">
 								<xsl:call-template name="eightspoint-measure">
 									<xsl:with-param name="length"
@@ -499,6 +501,52 @@
 								/>
 							</xsl:attribute>
 						</w:right>
+					</xsl:if>
+					<xsl:if test="@style:join-border='false' and (
+						(@fo:border-bottom and (@fo:border-bottom != 'none'))
+						or (@fo:border-top and (@fo:border-top != 'none')) )">
+						<w:between>
+							<xsl:attribute name="w:val">
+								<xsl:call-template name="BorderStyle">
+									<xsl:with-param name="side" select="'middle'"/>
+								</xsl:call-template>
+							</xsl:attribute>
+							<xsl:attribute name="w:sz">
+								<xsl:choose>
+									<xsl:when test="@fo:border-top != 'none'">
+										<xsl:call-template name="eightspoint-measure">
+											<xsl:with-param name="length"
+												select="substring-before(@fo:border-top,  ' ')"/>
+										</xsl:call-template>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:call-template name="eightspoint-measure">
+											<xsl:with-param name="length"
+												select="substring-before(@fo:border-bottom,  ' ')"/>
+										</xsl:call-template>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
+							<xsl:if test="@fo:padding">
+								<xsl:attribute name="w:space">
+									<xsl:call-template name="padding-val">
+										<xsl:with-param name="length" select="@fo:padding"/>
+									</xsl:call-template>
+								</xsl:attribute>
+							</xsl:if>
+							<xsl:attribute name="w:color">
+								<xsl:choose>
+									<xsl:when test="@fo:border-top != 'none'">
+										<xsl:value-of
+											select="substring(@fo:border-top, string-length(@fo:border-top) -5, 6)"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of
+											select="substring(@fo:border-bottom, string-length(@fo:border-bottom) -5, 6)"/>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:attribute>
+						</w:between>
 					</xsl:if>
 				</w:pBdr>
 			</xsl:if>
@@ -619,27 +667,87 @@
 			<xsl:if
 				test="@fo:margin-left or @fo:margin-right or @fo:text-indent or @text:space-before or @fo:padding or @fo:padding-left or @fo:padding-right">
 				<w:ind>
-					<xsl:if test="@fo:margin-left">
-						<xsl:attribute name="w:left">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:margin-left"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="@text:space-before">
-						<xsl:attribute name="w:left">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@text:space-before"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="@fo:margin-right">
-						<xsl:attribute name="w:right">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:margin-right"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
+					<!-- If there is a border, the indent will have to take it into consideration. -->
+					<xsl:variable name="leftBorderWidth">
+						<xsl:choose>
+							<xsl:when test="@fo:border">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="substring-before(@fo:border,' ')"/>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:when test="@fo:border-left">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="substring-before(@fo:border-left,' ')"/>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>0</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:variable name="rightBorderWidth">
+						<xsl:choose>
+							<xsl:when test="@fo:border">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="substring-before(@fo:border,' ')"/>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:when test="@fo:border-right">
+								<xsl:call-template name="twips-measure">
+									<xsl:with-param name="length" select="substring-before(@fo:border-right,' ')"/>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>0</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<!-- indent generated by the borders. Limited to 620 twip. -->
+					<xsl:variable name="leftPadding">
+						<xsl:choose>
+							<xsl:when test="@fo:padding">
+								<xsl:call-template name="indent-val">
+									<xsl:with-param name="length" select="@fo:padding" />
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:when test="@fo:padding-left">
+								<xsl:call-template name="indent-val">
+									<xsl:with-param name="length" select="@fo:padding-left" />
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>0</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<xsl:variable name="rightPadding">
+						<xsl:choose>
+							<xsl:when test="@fo:padding">
+								<xsl:call-template name="indent-val">
+									<xsl:with-param name="length" select="@fo:padding" />
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:when test="@fo:padding-right">
+								<xsl:call-template name="indent-val">
+									<xsl:with-param name="length" select="@fo:padding-right" />
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>0</xsl:otherwise>
+						</xsl:choose>
+					</xsl:variable>
+					<!-- paragraph margins -->
+					<xsl:variable name="leftMargin">
+						<xsl:call-template name="twips-measure">
+							<xsl:with-param name="length" select="@fo:margin-left"/>
+						</xsl:call-template>
+					</xsl:variable>
+					<xsl:variable name="rightMargin">
+						<xsl:call-template name="twips-measure">
+							<xsl:with-param name="length" select="@fo:margin-right"/>
+						</xsl:call-template>
+					</xsl:variable>
+					
+					<xsl:attribute name="w:left">
+						<xsl:value-of select="$leftMargin + $leftPadding + $leftBorderWidth"/>
+					</xsl:attribute>
+					<xsl:attribute name="w:right">
+						<xsl:value-of select="$rightMargin + $rightPadding + $rightBorderWidth"/>
+					</xsl:attribute>
+					
 					<xsl:if test="@fo:text-indent and (@style:auto-text-indent!='true')">
 						<xsl:attribute name="w:firstLine">
 							<xsl:call-template name="twips-measure">
@@ -654,37 +762,6 @@
 								<xsl:with-param name="length"
 									select="parent::style:style/style:text-properties/@fo:font-size"
 								/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<!-- indent generated by the borders. Limited to 620 twip. -->
-					<xsl:if test="@fo:padding">
-						<xsl:variable name="padding">
-							<xsl:call-template name="indent-val">
-								<xsl:with-param name="length" select="@fo:padding" />
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:if test="@fo:border != 'none'">
-							<xsl:attribute name="w:left"><xsl:value-of select="$padding"/></xsl:attribute>
-							<xsl:attribute name="w:right"><xsl:value-of select="$padding"/></xsl:attribute></xsl:if>					
-						<xsl:if test="@fo:border-left != 'none'">
-							<xsl:attribute name="w:left"><xsl:value-of select="$padding"/></xsl:attribute>
-						</xsl:if>					
-						<xsl:if test="@fo:border-right != 'none'">
-							<xsl:attribute name="w:right"><xsl:value-of select="$padding"/></xsl:attribute>
-						</xsl:if>
-					</xsl:if>
-					<xsl:if test="@fo:padding-left">
-						<xsl:attribute name="w:left">
-							<xsl:call-template name="indent-val">
-								<xsl:with-param name="length" select="@fo:padding-left" />
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="@fo:padding-right">
-						<xsl:attribute name="w:right">
-							<xsl:call-template name="indent-val">
-								<xsl:with-param name="length" select="@fo:padding-right" />
 							</xsl:call-template>
 						</xsl:attribute>
 					</xsl:if>
@@ -1373,175 +1450,6 @@
 		</w:tab>		
 	</xsl:template>
 
-	<!-- Page Layout Properties -->
-	<xsl:template match="style:page-layout-properties" mode="master-page">
-		<xsl:choose>
-			<xsl:when test="not(@style:print-orientation) and not(@fo:page-width) and not(@fo:page-height)">
-				<xsl:apply-templates
-					select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout[@style:name='pm1']/style:page-layout-properties"
-					mode="properties"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<w:pgSz>
-					<xsl:if test="@style:print-orientation != 'none' ">
-						<xsl:attribute name="w:orient">
-							<xsl:choose>
-								<xsl:when test="@style:print-orientation = 'landscape' ">landscape</xsl:when>
-								<xsl:otherwise>portrait</xsl:otherwise>
-							</xsl:choose>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="@fo:page-width != 'none' ">
-						<xsl:attribute name="w:w">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:page-width"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="@fo:page-height != 'none' ">
-						<xsl:attribute name="w:h">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:page-height"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-				</w:pgSz>
-			</xsl:otherwise>
-		</xsl:choose>
-		
-		<xsl:choose>
-			<xsl:when
-				test="@fo:margin-top ='none' and @fo:margin-left='none' and @fo:margin-bottom='none'  and @fo:margin-right='none' ">
-				<xsl:apply-templates
-					select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout[@style:name='pm1']/style:page-layout-properties"
-					mode="properties"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<w:pgMar>
-					<xsl:if test="@fo:margin-top != 'none' ">
-						<xsl:attribute name="w:top">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:margin-top"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="@fo:margin-left != 'none' ">
-						<xsl:attribute name="w:left">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:margin-left"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="@fo:margin-bottom != 'none' ">
-						<xsl:attribute name="w:bottom">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:margin-bottom"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="@fo:margin-right != 'none' ">
-						<xsl:attribute name="w:right">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:margin-right"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<!-- not in odt : header and footer distance from page -->
-					<xsl:if test="@fo:margin-top != 'none' ">
-						<xsl:attribute name="w:header">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:margin-top"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<xsl:if test="@fo:margin-bottom != 'none' ">
-						<xsl:attribute name="w:footer">
-							<xsl:call-template name="twips-measure">
-								<xsl:with-param name="length" select="@fo:margin-bottom"/>
-							</xsl:call-template>
-						</xsl:attribute>
-					</xsl:if>
-					<!-- Don't exist in odt format -->
-					<xsl:attribute name="w:gutter">0</xsl:attribute>
-				</w:pgMar>
-			</xsl:otherwise>
-		</xsl:choose>
-		
-		<w:cols>
-			<!-- nb columns -->
-			<xsl:if test="style:columns/@fo:column-count">
-				<xsl:attribute name="w:num">
-					<xsl:value-of select="style:columns/@fo:column-count"/>
-				</xsl:attribute>
-			</xsl:if>	
-			<!-- separator -->
-			<xsl:if test="style:columns/style:column-sep">
-				<xsl:attribute name="w:sep">
-					<xsl:value-of select="1"/>
-				</xsl:attribute>
-			</xsl:if>
-			
-			<xsl:attribute name="w:equalWidth">
-				<xsl:choose>
-					<xsl:when test="style:columns/@fo:column-gap">
-						<xsl:value-of select="1"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="0"/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>			
-			
-			<!-- each column -->
-			<xsl:for-each select="style:columns/style:column">
-				<w:col>
-					<!-- the left and right spaces -->
-					<xsl:variable name="start"><xsl:value-of select="number(substring-before(@fo:start-indent,'cm'))"/></xsl:variable>
-					<xsl:variable name="end"><xsl:value-of select="number(substring-before(@fo:end-indent,'cm'))"/></xsl:variable>
-					
-					<!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent -->
-					<xsl:variable name="spacesBetween">
-						<xsl:choose>
-							<xsl:when test="following-sibling::style:column/@fo:start-indent">
-								<xsl:value-of select="number(substring-before(following-sibling::style:column/@fo:start-indent,'cm')) + $end"/>
-							</xsl:when>						
-							<xsl:otherwise>
-								<xsl:value-of select="$end"/>					
-							</xsl:otherwise>
-						</xsl:choose>					
-					</xsl:variable>					
-					
-					<!-- Open xml space converted into twips -->
-					<xsl:variable name="spaceTwips">
-						<xsl:call-template name="twips-measure">
-							<xsl:with-param name="length" select="concat($spacesBetween,'cm') "/>
-						</xsl:call-template>
-					</xsl:variable>
-					
-					<!-- ODT spaces converted in twips-->
-					<xsl:variable name="widthTwips">
-						<xsl:call-template name="twips-measure">
-							<xsl:with-param name="length" select="concat($end+$start,'cm') "/>
-						</xsl:call-template>
-					</xsl:variable>
-					
-					<!-- space -->
-					<xsl:attribute name="w:space">
-						<xsl:value-of select="$spaceTwips"/>								
-					</xsl:attribute>	
-					
-					<!-- width -->
-					<xsl:attribute name="w:w">				
-						<xsl:value-of select="substring-before(@style:rel-width,'*') - $widthTwips"/>
-					</xsl:attribute>
-				</w:col>
-			</xsl:for-each>
-		</w:cols>
-		
-	</xsl:template>
-	
-	
-	
 	<!-- ignored -->
 	<xsl:template match="text()" mode="styles"/>
 

@@ -27,11 +27,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0"
-				xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-				xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"  
-				xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-        exclude-result-prefixes="style svg">
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+	xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+	xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"  
+	xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+	exclude-result-prefixes="style svg fo">
 
 
 	
@@ -262,10 +263,156 @@
 			<xsl:when test="$code='FFFF00'">yellow</xsl:when>
 			<xsl:otherwise>yellow</xsl:otherwise>
 		</xsl:choose>
-		
 	</xsl:template>
 
-  <!-- 
+	<!-- 
+		Convert the style of a paragraph border.
+	-->
+	
+	<xsl:template name="BorderStyle">
+		<xsl:param name="side"/>
+		
+		<xsl:variable name="border">
+			<xsl:choose>
+				<xsl:when test="@fo:border">
+					<xsl:value-of select="@fo:border"/>
+				</xsl:when>
+				<xsl:when test="$side='middle'">
+					<xsl:choose>
+						<xsl:when test="@fo:border-top">
+							<xsl:value-of select="@fo:border-top"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="@fo:border-bottom"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="attribute::node()[name()=concat('fo:border-',$side)]"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="borderLineWidth">
+			<xsl:choose>
+				<xsl:when test="@style:border-line-width">
+					<xsl:value-of select="@style:border-line-width"/>
+				</xsl:when>
+				<xsl:when test="$side='middle'">
+					<xsl:choose>
+						<xsl:when test="@style:border-line-width-top">
+							<xsl:value-of select="@style:border-line-width-top"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="@fo:border-line-width-bottom"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="attribute::node()[name()=concat('style:border-line-width-',$side)]"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="contains($border, 'solid')">single</xsl:when>
+			<xsl:when test="contains($border, 'double')">
+				<xsl:choose>
+					<xsl:when test="not($borderLineWidth = '')">
+						<xsl:call-template name="DoubleBorder">
+							<xsl:with-param name="borderLineWidth" select="$borderLineWidth"/>
+							<xsl:with-param name="side" select="$side"/>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>double</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="contains($border, 'groove')">thinThickMediumGap</xsl:when>
+			<xsl:when test="contains($border, 'ridge')">thickThinMediumGap</xsl:when>
+			<xsl:when test="contains($border, 'dotted')">dotted</xsl:when>
+			<xsl:when test="contains($border, 'dashed')">dashed</xsl:when>
+			<xsl:when test="contains($border, 'inset')">inset</xsl:when>
+			<xsl:when test="contains($border, 'outset')">outset</xsl:when>
+			<xsl:when test="contains($border, 'hidden')">nil</xsl:when>
+			<xsl:otherwise>none</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!-- additional template in case of 'double' style for border. -->
+
+	<xsl:template name="DoubleBorder">
+		<xsl:param name="borderLineWidth"/>
+		<xsl:param name="side"/>
+		
+		<!-- Lengths converted to common measurement so as to be compared-->
+		<xsl:variable name="inner">
+			<xsl:call-template name="twips-measure">
+				<xsl:with-param name="length" select="substring-before($borderLineWidth,' ')"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="between">
+			<xsl:call-template name="twips-measure">
+				<xsl:with-param name="length" select="substring-before(substring-after($borderLineWidth,' '),' ')"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="outer">
+			<xsl:call-template name="twips-measure">
+				<xsl:with-param name="length" select="substring-after(substring-after($borderLineWidth,' '),' ')"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$side='top' or $side='left'">
+				<xsl:choose>
+					<xsl:when test="$inner &gt; $outer">
+						<xsl:choose>
+							<xsl:when test="$inner &gt; $between">thickThinSmallGap</xsl:when>
+							<xsl:when test="$inner &lt; $between">thickThinLargeGap</xsl:when>
+							<xsl:otherwise>thickThinMediumGap</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:when test="$inner &lt; $outer">
+						<xsl:choose>
+							<xsl:when test="$outer &gt; $between">thinThickSmallGap</xsl:when>
+							<xsl:when test="$outer &lt; $between">thinThickLargeGap</xsl:when>
+							<xsl:otherwise>thinThickMediumGap</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>double</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="$side='bottom' or $side='right'">
+				<xsl:choose>
+					<xsl:when test="$inner &gt; $outer">
+						<xsl:choose>
+							<xsl:when test="$inner &gt; $between">thinThickSmallGap</xsl:when>
+							<xsl:when test="$inner &lt; $between">thinThickLargeGap</xsl:when>
+							<xsl:otherwise>thinThickMediumGap</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:when test="$inner &lt; $outer">
+						<xsl:choose>
+							<xsl:when test="$outer &gt; $between">thickThinSmallGap</xsl:when>
+							<xsl:when test="$outer &lt; $between">thickThinLargeGap</xsl:when>
+							<xsl:otherwise>thickThinMediumGap</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>double</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- side='middle' line. Only thinThickThin border in OOX. -->
+				<xsl:choose>
+					<xsl:when test="$inner &lt; $outer">
+						<xsl:choose>
+							<xsl:when test="$outer &gt; $between">thinThickThinSmallGap</xsl:when>
+							<xsl:when test="$outer &lt; $between">thinThickThinLargeGap</xsl:when>
+							<xsl:otherwise>thinThickThinMediumGap</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>triple</xsl:otherwise>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<!-- 
 		Generate a decimal identifier based on the position of the current 
 		footenote/endnote among all the indexed footnotes/endnotes.
 	-->
