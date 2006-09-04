@@ -110,10 +110,10 @@ Property lost : Time Value Truncation";
 ;;Page Number Fields;1;0.2-M1;Completed;;"text:page-number is conv to a w:fldSimple, text:page-count is converted to <w:fldSimple w:instr="" NUMPAGES "">";;
 ;;Page Continuation Text;2;;;;;"tricky feature, it allows to insert a field with ""current page number"" plus or minus 1";
 ;;Sender Fields;3;;;;;could be converted as text (instead of a field);
-;;Author Fields;1;;;;;;
+;;Author Fields;1;;Completed;;;;
 ;;Chapter Fields;2;;;;;"Note: the ""Chapter"" style can be redefined!";
 ;;File Name Fields;1;;;;;;
-;;Document Template Name Fields;2;;;;;;
+;;Document Template Name Fields;2;;Completed;;;;
 ;;Sheet Name Fields;;;;;;seems to be for spreadsheets;
 ;Variable Fields;;3;;;;;"retaining variables might be useful for roundtrip conversions
 TODO: investigate";
