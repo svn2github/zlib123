@@ -182,5 +182,17 @@
 			<xsl:apply-templates mode="paragraph"/>
 		</w:fldSimple>
 	</xsl:template>
+	
+	<xsl:template match="text:subject[not(@text:fixed='true')]" mode="paragraph">
+		<w:fldSimple w:instr=" SUBJECT ">
+			<xsl:apply-templates mode="paragraph"/>
+		</w:fldSimple>
+	</xsl:template>
+	
+	<xsl:template match="text:title[not(@text:fixed='true')]" mode="paragraph">
+		<w:fldSimple w:instr=" TITLE ">
+			<xsl:apply-templates mode="paragraph"/>
+		</w:fldSimple>
+	</xsl:template>
 </xsl:stylesheet>
 
