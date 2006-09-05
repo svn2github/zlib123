@@ -429,4 +429,25 @@
     <xsl:value-of select="$positionInGroup"/>
   </xsl:template>
 	
+
+  <xsl:template name="border">
+      <xsl:param name="borderStr"/>
+      <xsl:param name="side"/>
+      <xsl:param name="padding"/>
+      <xsl:attribute name="w:val">
+          <xsl:value-of  select="$side"/>
+      </xsl:attribute>
+      <xsl:attribute name="w:sz">
+          <xsl:call-template name="eightspoint-measure">
+              <xsl:with-param name="length"  select="substring-before($borderStr,  ' ')"/>
+          </xsl:call-template>
+      </xsl:attribute>
+      <xsl:attribute name="w:color">
+          <xsl:value-of  select="substring($borderStr, string-length($borderStr) -5, 6)"/>
+      </xsl:attribute>
+    <xsl:attribute name="w:space">
+        <xsl:value-of  select="$padding"/>
+    </xsl:attribute>
+  </xsl:template>
+	
 </xsl:stylesheet>
