@@ -1222,10 +1222,15 @@
 						<xsl:choose>
 							<xsl:when test="number(child::text()[last()])">
 								<xsl:for-each select="child::node()[position() &lt; last()]">
-									<xsl:message>
-										<xsl:value-of select="."/>
-									</xsl:message>
-									<xsl:value-of select="."/>
+									
+									<xsl:choose>
+										<xsl:when test="self::text()">
+											<xsl:value-of select="."/> 
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:apply-templates select="."/>
+										</xsl:otherwise>
+									</xsl:choose>
 								</xsl:for-each>
 							</xsl:when>
 							<xsl:otherwise>
@@ -2112,25 +2117,39 @@
 
 	<!-- alphabetical indexes -->
 	<xsl:template match="text:alphabetical-index-mark-end" mode="paragraph">
-		<w:r>
-			<w:fldChar w:fldCharType="begin"/>
-		</w:r>
-		<w:r>
-			<w:instrText xml:space="preserve"> XE "</w:instrText>
-		</w:r>
-		<w:r>
-			<w:instrText>
-				<xsl:value-of select="preceding-sibling::text()"/>
-			</w:instrText>
-		</w:r>
-		<w:r>
-			<w:instrText xml:space="preserve">" </w:instrText>
-		</w:r>
-		<w:r>
-			<w:fldChar w:fldCharType="end"/>
-		</w:r>
-	</xsl:template>
-
+    	<w:r>
+      		<w:fldChar w:fldCharType="begin"/>
+    	</w:r>
+    	<w:r>
+      		<w:instrText xml:space="preserve"> XE "</w:instrText>
+    	</w:r>
+    	<w:r>
+      		<w:instrText>        
+        			<xsl:for-each select="preceding-sibling::node()">
+         				 <xsl:choose>
+           					 <xsl:when test="self::text()">
+              						  <xsl:value-of select="."/>
+            					</xsl:when>        
+           					 <xsl:otherwise>
+                						  <xsl:apply-templates select="."></xsl:apply-templates> 
+            
+            					</xsl:otherwise>
+          				</xsl:choose>     
+        			</xsl:for-each>
+      		</w:instrText>        
+    	</w:r>
+   	 <w:r>
+    	  	<w:instrText xml:space="preserve">" </w:instrText>
+   	 </w:r>
+    	<w:r>
+      	<w:fldChar w:fldCharType="end"/>
+    	</w:r>
+   	 <!-- <xsl:apply-templates select="text:s" mode="text"></xsl:apply-templates> -->
+  	</xsl:template>
+ 	<!-- spaces -->
+  	<xsl:template match="text:s">  
+    		  <xsl:call-template name="extra-spaces"><xsl:with-param name="spaces" select="@text:c"/></xsl:call-template>
+ 	 </xsl:template> 
 	<!-- sequences -->
 	<xsl:template match="text:sequence" mode="paragraph">
 		<xsl:variable name="id">
