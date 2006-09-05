@@ -40,6 +40,7 @@
       <HintPath>System.Data.dll</HintPath>
       <Name>System.Data</Name>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML">
       <HintPath>System.XML.dll</HintPath>
@@ -52,6 +53,21 @@
     </Compile>
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DependencyChecker.cs" />
+    <Compile Include="DependencyChecker.Designer.cs">
+      <DependentUpon>DependencyChecker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmPrerequisites.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmPrerequisites.Designer.cs">
+      <DependentUpon>FrmPrerequisites.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +103,23 @@
       <Project>{0313EE78-AD27-47E0-9902-3149046E2F5D}</Project>
       <Name>OdfWordAddinLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FrmPrerequisites.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>FrmPrerequisites.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Error.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ImageInstaller.PNG" />
   </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>
