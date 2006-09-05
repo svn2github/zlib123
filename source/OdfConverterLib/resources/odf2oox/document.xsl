@@ -1206,7 +1206,7 @@
 			<xsl:choose>
 				<xsl:when test="$test=1">
 					<w:t>
-						<xsl:for-each select="text:a/child::text()[position() &lt; last()]">
+						<xsl:for-each select="text:a/child::node()[position() &lt; last()]">
 							<xsl:value-of select="."/>
 						</xsl:for-each>
 					</w:t>
