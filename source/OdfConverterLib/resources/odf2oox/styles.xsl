@@ -880,12 +880,12 @@
       </xsl:choose>
     </xsl:if>
 
-    <xsl:if test="@fo:text-transform">
+  	<xsl:if test="@fo:text-transform or @fo:font-variant">
       <xsl:choose>
         <xsl:when test="@fo:text-transform = 'uppercase'">
           <w:caps w:val="on"/>
         </xsl:when>
-        <xsl:when test="@fo:text-transform = 'none'">
+      	<xsl:when test="@fo:text-transform = 'none' or @fo:font-variant = 'small-caps'">
           <w:caps w:val="off"/>
         </xsl:when>
         <!-- It could be also lowercase or capitalize in fo DTD, but it is not possible to set it via word 2007 interface -->
