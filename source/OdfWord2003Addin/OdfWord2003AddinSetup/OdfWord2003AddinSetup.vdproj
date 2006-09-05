@@ -245,6 +245,20 @@
     {
         "CustomAction"
         {
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_46E83E51955C4C7581AB5F2C673543F2"
+            {
+            "Name" = "8:CheckDependencies"
+            "Condition" = "8:"
+            "Object" = "8:_628611BC373C4E1994798F3FEF66CF83"
+            "FileType" = "3:1"
+            "InstallAction" = "3:1"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:DependencyChecker"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_442DB948_B404_4BED_9619_B2F48C5A0568"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
         }
         "DefaultFeature"
         {
@@ -272,7 +286,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=0.2.2434.24802, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=0.2.2434.25689, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_27D6137DDE21674F1185400275A62A47"
@@ -547,7 +561,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfWordAddinLib, Version=0.2.2434.24802, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfWordAddinLib, Version=0.2.2434.25689, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_F4B7707DBF798D2E3F2A55512DF412A7"
@@ -641,7 +655,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ODF Add-in for Word 2003"
         "ProductCode" = "8:{85B35D52-430E-4890-8214-F65470E0B568}"
-        "PackageCode" = "8:{82E70A89-5A92-4896-B80E-DF54E44E54AA}"
+        "PackageCode" = "8:{B4801FC5-C399-4B75-A3F0-95CACC8F39F0}"
         "UpgradeCode" = "8:{1A8E7C0E-D6F1-40CB-B48A-2D72BAA156E4}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -1144,7 +1158,7 @@
                             "ContextData" = "8:1;True=1;False=0"
                             "Attributes" = "3:0"
                             "Setting" = "3:0"
-                            "Value" = "3:1"
+                            "Value" = "3:0"
                             "DefaultValue" = "3:1"
                             "UsePlugInResources" = "11:TRUE"
                             }

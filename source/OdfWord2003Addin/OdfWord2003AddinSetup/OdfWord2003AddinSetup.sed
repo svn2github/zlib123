@@ -26,7 +26,7 @@ DisplayLicense=
 FinishMessage=
 TargetName=OdfWord2003AddinSetup.exe
 FriendlyName=ODF Add-In for Word 2003
-AppLaunched=WScript.exe SetupPrepare.js
+AppLaunched=CMD /C SetupPrepare.bat
 PostInstallCmd=<None>
 AdminQuietInstCmd=
 UserQuietInstCmd=
@@ -35,7 +35,7 @@ FILE1="OdfWord2003AddinSetup.msi"
 FILE2="extensibilityMSM.msi"
 FILE3="lockbackRegKey.msi"
 FILE4="office2003-kb907417sfxcab-ENU.exe"
-FILE5="SetupPrepare.js"
+FILE5="SetupPrepare.bat"
 [SourceFiles]
 SourceFiles0=
 SourceFiles1=KB908002\
