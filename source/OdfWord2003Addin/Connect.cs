@@ -268,7 +268,11 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                 {
                     System.Windows.Forms.MessageBox.Show(odfFile + " " + labelsResourceManager.GetString("NotAnOdfDocumentError"));
                 }
+#if DEBUG
                 catch (Exception e)
+#else
+                catch
+#endif
                 {
 #if DEBUG
                     System.Windows.Forms.MessageBox.Show(e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");

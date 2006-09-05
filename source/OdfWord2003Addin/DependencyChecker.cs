@@ -19,8 +19,7 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
             foreach (AssemblyName assembly in Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
                 try {
                     Assembly ass = Assembly.Load(assembly);
-                } catch (Exception ex) {
-                    //System.Windows.Forms.MessageBox.Show(ex.Message, "Unable to load assembly : " + assembly);
+                } catch  {
                     cancelInstall = true;
                 }
             }
