@@ -256,7 +256,7 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;"Heading";;0;"0.2-M1";"Completed";;217;;
 ;;;"Repeat heading";;1;"0.2-M1";"Completed";;217;;
 ;;;"First (x) rows (to repeat)";;2;"0.2-M1";"Completed";;217;;
-;;;"Don't split table";;0;"0.2-M2";;;583;;"TODO : look for an equivalent in Is there any equivalent in Word"
+;;;"Don't split table";;0;"0.2-M2";"Completed";"Not available in OOX.";583;;"TODO : look for an equivalent in Is there any equivalent in Word"
 ;;;"Border";;1;"0.2-M1";"Completed";;584;;
 ;;;;;;;;;;;
 ;;;"Autoformat";"selected format";;"?";;;;;
