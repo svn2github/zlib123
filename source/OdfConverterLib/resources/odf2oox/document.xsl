@@ -1168,7 +1168,7 @@
 					</xsl:if>
 
 					<!-- first paragraph -->
-					<xsl:apply-templates select="*[1][self::text:p]" mode="paragraph"/>
+					<xsl:apply-templates select="*[1]" mode="paragraph"/>
 
 				</w:p>
 
