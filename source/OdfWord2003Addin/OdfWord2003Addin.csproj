@@ -36,6 +36,7 @@
       <HintPath>System.dll</HintPath>
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data">
       <HintPath>System.Data.dll</HintPath>
       <Name>System.Data</Name>
@@ -54,7 +55,9 @@
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DependencyChecker.cs" />
+    <Compile Include="DependencyChecker.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DependencyChecker.Designer.cs">
       <DependentUpon>DependencyChecker.cs</DependentUpon>
     </Compile>
