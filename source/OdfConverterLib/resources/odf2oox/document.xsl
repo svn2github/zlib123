@@ -559,8 +559,11 @@
 		<xsl:if test="self::text:list-item">
 			<xsl:value-of select="*[1][self::text:p]/@text:style-name"/>
 		</xsl:if>
-		<xsl:if test="parent::text:list-header|self::text:p|self::text:h">
+		<xsl:if test="parent::text:list-header|self::text:p|self::text:h|self::text:list-level-style-number">
 			<xsl:value-of select="@text:style-name"/>
+		</xsl:if>
+		<xsl:if test="ancestor::text:span">
+			<xsl:value-of select="ancestor::text:span[1]/@text:style-name"/>
 		</xsl:if>
 	</xsl:template>
 
@@ -1164,7 +1167,8 @@
 						<xsl:apply-templates select="ancestor::text:note/text:note-citation" mode="note"/>
 					</xsl:if>
 
-					<xsl:apply-templates mode="paragraph"/>
+					<!-- first paragraph -->
+					<xsl:apply-templates select="*[1][self::text:p]" mode="paragraph"/>
 
 				</w:p>
 
@@ -1959,11 +1963,17 @@
 	<!-- Inserts the Run properties -->
 	<xsl:template name="InsertRunProperties">
 		<!-- apply text properties if needed -->
-		<xsl:if test="ancestor::text:span">
+		<xsl:if test="ancestor::text:span|self::text:list-level-style-number">
 			<w:rPr>
-				<xsl:call-template name="InsertRunStyle"/>
+				<xsl:call-template name="InsertRunStyle">
+					<xsl:with-param name="styleName">
+						<xsl:call-template name="GetStyleName"/>
+					</xsl:with-param>
+				</xsl:call-template>
 				<xsl:call-template name="OverrideToggleProperties">
-					<xsl:with-param name="styleName" select="ancestor::text:span[1]/@text:style-name"/>
+					<xsl:with-param name="styleName">
+						<xsl:call-template name="GetStyleName"/>
+					</xsl:with-param>
 				</xsl:call-template>
 			</w:rPr>
 		</xsl:if>
@@ -1971,9 +1981,10 @@
 
 	<!-- Inserts the style of a run -->
 	<xsl:template name="InsertRunStyle">
+		<xsl:param name="styleName"/>
 		<xsl:variable name="prefixedStyleName">
 			<xsl:call-template name="GetPrefixedStyleName">
-				<xsl:with-param name="styleName" select="ancestor::text:span[1]/@text:style-name"/>
+				<xsl:with-param name="styleName" select="$styleName"/>
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:if test="$prefixedStyleName!=''">
@@ -1984,6 +1995,13 @@
 	<!-- Overrides toggle properties -->
 	<xsl:template name="OverrideToggleProperties">
 		<xsl:param name="styleName"/>
+		<xsl:variable name="onlyToggle">
+			<xsl:choose>
+				<xsl:when test="self::text:list-level-style-number">false</xsl:when>
+				<xsl:otherwise>true</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
 		<xsl:choose>
 			<xsl:when test="key('automatic-styles',$styleName)">
 				<!-- recursive call on parent style (not very clean) -->
@@ -1995,7 +2013,7 @@
 				</xsl:if>
 				<xsl:apply-templates select="key('automatic-styles',$styleName)/style:text-properties"
 					mode="rPr">
-					<xsl:with-param name="onlyToggle" select="'true'"/>
+					<xsl:with-param name="onlyToggle" select="'$onlyToggle'"/>
 				</xsl:apply-templates>
 			</xsl:when>
 			<xsl:otherwise>
@@ -2008,7 +2026,7 @@
 						</xsl:call-template>
 					</xsl:if>
 					<xsl:apply-templates select="key('styles',$styleName)/style:text-properties" mode="rPr">
-						<xsl:with-param name="onlyToggle" select="'true'"/>
+						<xsl:with-param name="onlyToggle" select="'$onlyToggle'"/>
 					</xsl:apply-templates>
 				</xsl:for-each>
 			</xsl:otherwise>

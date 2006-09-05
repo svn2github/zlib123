@@ -235,43 +235,7 @@
 						</xsl:call-template>
 					</xsl:when>
 					<xsl:otherwise>
-						<w:rPr>
-							<xsl:variable name="prefixedStyleName">
-								<xsl:call-template name="GetPrefixedStyleName">
-									<xsl:with-param name="styleName" select="@text:style-name"/>
-								</xsl:call-template>
-							</xsl:variable>
-							<w:rStyle>
-								<xsl:attribute name="w:val">
-									<xsl:value-of select="$prefixedStyleName"/>
-								</xsl:attribute>
-							</w:rStyle>
-							
-							<xsl:variable name="styleName">
-								<xsl:value-of select="@text:style-name"/>
-							</xsl:variable>
-							
-							<xsl:for-each select="document('content.xml')">
-								<xsl:choose>
-									<xsl:when
-										test="key('automatic-styles',$styleName)/child::style:text-properties">
-										<xsl:apply-templates
-											select="key('automatic-styles',$styleName)/child::style:text-properties"
-											mode="numbering"/>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:for-each select="document('styles.xml')">
-											<xsl:if
-												test="key('styles',$styleName)/child::style:text-properties">
-												<xsl:apply-templates
-												select="key('styles',$styleName)/child::style:text-properties"
-												mode="numbering"/>
-											</xsl:if>
-										</xsl:for-each>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:for-each>
-						</w:rPr>
+						<xsl:call-template name="InsertRunProperties"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</w:lvl>
@@ -582,73 +546,6 @@
 			<xsl:when test="$level = 1">%1</xsl:when>
 			<xsl:otherwise>%1</xsl:otherwise>
 		</xsl:choose>
-	</xsl:template>
-
-	<xsl:template match="style:text-properties[parent::style:style  or parent::style:default-style]"
-		mode="numbering">
-		<w:rFonts>
-			<xsl:if test="@style:font-name">
-				<xsl:variable name="fontName">
-					<xsl:call-template name="ComputeFontName">
-						<xsl:with-param name="fontName" select="@style:font-name"/>
-					</xsl:call-template>
-				</xsl:variable>
-				<xsl:attribute name="w:ascii">
-					<xsl:value-of select="$fontName"/>
-				</xsl:attribute>
-				<xsl:attribute name="w:hAnsi">
-					<xsl:value-of select="$fontName"/>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test="@style:font-name-complex">
-				<xsl:attribute name="w:cs">
-					<xsl:call-template name="ComputeFontName">
-						<xsl:with-param name="fontName" select="@style:font-name-complex"/>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test="@style:font-name-asian">
-				<xsl:attribute name="w:eastAsia">
-					<xsl:call-template name="ComputeFontName">
-						<xsl:with-param name="fontName" select="@style:font-name-asian"/>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-		</w:rFonts>
-		<xsl:if test="@fo:font-size">
-			<xsl:variable name="sz">
-				<xsl:call-template name="computeSize">
-					<xsl:with-param name="node" select="current()"/>
-				</xsl:call-template>
-			</xsl:variable>
-			<xsl:if test="number($sz)">
-				<w:sz w:val="{$sz}"/>
-			</xsl:if>
-		</xsl:if>
-
-		<xsl:if test="@fo:font-size-complex">
-			<w:szCs>
-				<xsl:attribute name="w:val">
-					<xsl:value-of select="number(substring-before(@fo:font-size-complex, 'pt')) * 2"
-					/>
-				</xsl:attribute>
-			</w:szCs>
-		</xsl:if>
-		<xsl:variable name="fontSize">
-			<xsl:choose>
-				<xsl:when test="@fo:font-size">
-					<xsl:value-of select="@fo:font-size"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of
-						select="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties/@fo:font-size"
-					/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<xsl:apply-templates select="." mode="toggle">
-			<xsl:with-param name="fontSize" select="$fontSize"/>
-		</xsl:apply-templates>
 	</xsl:template>
 
 	<xsl:template name="numberingId">
