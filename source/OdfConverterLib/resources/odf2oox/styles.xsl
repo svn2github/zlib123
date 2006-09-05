@@ -1450,6 +1450,176 @@
 		</w:tab>		
 	</xsl:template>
 
+  
+  <!-- Page Layout Properties -->
+  <xsl:template match="style:page-layout-properties" mode="master-page">
+    <xsl:choose>
+      <xsl:when test="not(@style:print-orientation) and not(@fo:page-width) and not(@fo:page-height)">
+        <xsl:apply-templates
+          select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout[@style:name='pm1']/style:page-layout-properties"
+          mode="properties"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:pgSz>
+          <xsl:if test="@style:print-orientation != 'none' ">
+            <xsl:attribute name="w:orient">
+              <xsl:choose>
+                <xsl:when test="@style:print-orientation = 'landscape' ">landscape</xsl:when>
+                <xsl:otherwise>portrait</xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@fo:page-width != 'none' ">
+            <xsl:attribute name="w:w">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:page-width"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@fo:page-height != 'none' ">
+            <xsl:attribute name="w:h">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:page-height"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+        </w:pgSz>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    <xsl:choose>
+      <xsl:when
+        test="@fo:margin-top ='none' and @fo:margin-left='none' and @fo:margin-bottom='none'  and @fo:margin-right='none' ">
+        <xsl:apply-templates
+          select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout[@style:name='pm1']/style:page-layout-properties"
+          mode="properties"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:pgMar>
+          <xsl:if test="@fo:margin-top != 'none' ">
+            <xsl:attribute name="w:top">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:margin-top"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@fo:margin-left != 'none' ">
+            <xsl:attribute name="w:left">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:margin-left"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@fo:margin-bottom != 'none' ">
+            <xsl:attribute name="w:bottom">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:margin-bottom"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@fo:margin-right != 'none' ">
+            <xsl:attribute name="w:right">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:margin-right"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <!-- not in odt : header and footer distance from page -->
+          <xsl:if test="@fo:margin-top != 'none' ">
+            <xsl:attribute name="w:header">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:margin-top"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@fo:margin-bottom != 'none' ">
+            <xsl:attribute name="w:footer">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:margin-bottom"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <!-- Don't exist in odt format -->
+          <xsl:attribute name="w:gutter">0</xsl:attribute>
+        </w:pgMar>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+    <w:cols>
+      <!-- nb columns -->
+      <xsl:if test="style:columns/@fo:column-count">
+        <xsl:attribute name="w:num">
+          <xsl:value-of select="style:columns/@fo:column-count"/>
+        </xsl:attribute>
+      </xsl:if>	
+      <!-- separator -->
+      <xsl:if test="style:columns/style:column-sep">
+        <xsl:attribute name="w:sep">
+          <xsl:value-of select="1"/>
+        </xsl:attribute>
+      </xsl:if>
+      
+      <xsl:attribute name="w:equalWidth">
+        <xsl:choose>
+          <xsl:when test="style:columns/@fo:column-gap">
+            <xsl:value-of select="1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="0"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>			
+      
+      <!-- each column -->
+      <xsl:for-each select="style:columns/style:column">
+        <w:col>
+          <!-- the left and right spaces -->
+          <xsl:variable name="start"><xsl:value-of select="number(substring-before(@fo:start-indent,'cm'))"/></xsl:variable>
+          <xsl:variable name="end"><xsl:value-of select="number(substring-before(@fo:end-indent,'cm'))"/></xsl:variable>
+          
+          <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent -->
+          <xsl:variable name="spacesBetween">
+            <xsl:choose>
+              <xsl:when test="following-sibling::style:column/@fo:start-indent">
+                <xsl:value-of select="number(substring-before(following-sibling::style:column/@fo:start-indent,'cm')) + $end"/>
+              </xsl:when>						
+              <xsl:otherwise>
+                <xsl:value-of select="$end"/>					
+              </xsl:otherwise>
+            </xsl:choose>					
+          </xsl:variable>					
+          
+          <!-- Open xml space converted into twips -->
+          <xsl:variable name="spaceTwips">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="concat($spacesBetween,'cm') "/>
+            </xsl:call-template>
+          </xsl:variable>
+          
+          <!-- ODT spaces converted in twips-->
+          <xsl:variable name="widthTwips">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="concat($end+$start,'cm') "/>
+            </xsl:call-template>
+          </xsl:variable>
+          
+          <!-- space -->
+          <xsl:attribute name="w:space">
+            <xsl:value-of select="$spaceTwips"/>								
+          </xsl:attribute>	
+          
+          <!-- width -->
+          <xsl:attribute name="w:w">				
+            <xsl:value-of select="substring-before(@style:rel-width,'*') - $widthTwips"/>
+          </xsl:attribute>
+        </w:col>
+      </xsl:for-each>
+    </w:cols>
+    
+  </xsl:template>
+  
+  
+  
 	<!-- ignored -->
 	<xsl:template match="text()" mode="styles"/>
 
