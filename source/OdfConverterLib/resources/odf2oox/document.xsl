@@ -1089,26 +1089,20 @@
 	</xsl:template>
 
 	<!-- @TODO  positioning text-boxes -->
-	<xsl:template match="draw:frame">
-		<xsl:choose>
-
-			<xsl:when test="not(parent::text:p | parent::text:h)">
-				<w:p>
-					<xsl:call-template name="InsertEmbeddedTextboxes"/>
-				</w:p>
-			</xsl:when>
-
-			<xsl:otherwise>
+	<xsl:template match="draw:frame" mode="paragraph">
 				<xsl:call-template name="InsertEmbeddedTextboxes"/>
-			</xsl:otherwise>
-
-		</xsl:choose>
 	</xsl:template>
-
+	
+	<xsl:template match="draw:frame">
+		<w:p>
+			<xsl:call-template name="InsertEmbeddedTextboxes"/>
+		</w:p>
+	</xsl:template>
+    
 	<!-- inserts textboxes which are embedded in odf as one after another in word -->
 	<xsl:template name="InsertEmbeddedTextboxes">
 		<xsl:for-each select="descendant::draw:text-box">
-			<xsl:apply-templates mode="paragraph"/>
+			<xsl:apply-templates mode="paragraph" select="."/>
 		</xsl:for-each>
 	</xsl:template>
 
