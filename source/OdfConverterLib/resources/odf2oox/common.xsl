@@ -277,29 +277,10 @@
 		Convert the style of a paragraph border.
 	-->
 
-  <xsl:template name="BorderStyle">
+  <xsl:template name="GetBorderStyle">
     <xsl:param name="side"/>
+    <xsl:param name="borderStr"/>
 
-    <xsl:variable name="border">
-      <xsl:choose>
-        <xsl:when test="@fo:border">
-          <xsl:value-of select="@fo:border"/>
-        </xsl:when>
-        <xsl:when test="$side='middle'">
-          <xsl:choose>
-            <xsl:when test="@fo:border-top">
-              <xsl:value-of select="@fo:border-top"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="@fo:border-bottom"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="attribute::node()[name()=concat('fo:border-',$side)]"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
     <xsl:variable name="borderLineWidth">
       <xsl:choose>
         <xsl:when test="@style:border-line-width">
@@ -321,9 +302,10 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
     <xsl:choose>
-      <xsl:when test="contains($border, 'solid')">single</xsl:when>
-      <xsl:when test="contains($border, 'double')">
+      <xsl:when test="contains($borderStr, 'solid')">single</xsl:when>
+      <xsl:when test="contains($borderStr, 'double')">
         <xsl:choose>
           <xsl:when test="not($borderLineWidth = '')">
             <xsl:call-template name="DoubleBorder">
@@ -334,18 +316,18 @@
           <xsl:otherwise>double</xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="contains($border, 'groove')">thinThickMediumGap</xsl:when>
-      <xsl:when test="contains($border, 'ridge')">thickThinMediumGap</xsl:when>
-      <xsl:when test="contains($border, 'dotted')">dotted</xsl:when>
-      <xsl:when test="contains($border, 'dashed')">dashed</xsl:when>
-      <xsl:when test="contains($border, 'inset')">inset</xsl:when>
-      <xsl:when test="contains($border, 'outset')">outset</xsl:when>
-      <xsl:when test="contains($border, 'hidden')">nil</xsl:when>
+      <xsl:when test="contains($borderStr, 'groove')">thinThickMediumGap</xsl:when>
+      <xsl:when test="contains($borderStr, 'ridge')">thickThinMediumGap</xsl:when>
+      <xsl:when test="contains($borderStr, 'dotted')">dotted</xsl:when>
+      <xsl:when test="contains($borderStr, 'dashed')">dashed</xsl:when>
+      <xsl:when test="contains($borderStr, 'inset')">inset</xsl:when>
+      <xsl:when test="contains($borderStr, 'outset')">outset</xsl:when>
+      <xsl:when test="contains($borderStr, 'hidden')">nil</xsl:when>
       <xsl:otherwise>none</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
   <!-- additional template in case of 'double' style for border. -->
-
   <xsl:template name="DoubleBorder">
     <xsl:param name="borderLineWidth"/>
     <xsl:param name="side"/>
@@ -438,27 +420,6 @@
       </xsl:for-each>
     </xsl:variable>
     <xsl:value-of select="$positionInGroup"/>
-  </xsl:template>
-
-
-  <xsl:template name="border">
-    <xsl:param name="borderStr"/>
-    <xsl:param name="side"/>
-    <xsl:param name="padding"/>
-    <xsl:attribute name="w:val">
-      <xsl:value-of select="$side"/>
-    </xsl:attribute>
-    <xsl:attribute name="w:sz">
-      <xsl:call-template name="eightspoint-measure">
-        <xsl:with-param name="length" select="substring-before($borderStr,  ' ')"/>
-      </xsl:call-template>
-    </xsl:attribute>
-    <xsl:attribute name="w:color">
-      <xsl:value-of select="substring($borderStr, string-length($borderStr) -5, 6)"/>
-    </xsl:attribute>
-    <xsl:attribute name="w:space">
-      <xsl:value-of select="$padding"/>
-    </xsl:attribute>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -213,329 +213,16 @@
     <!-- border color + padding  -->
     <xsl:if test="@fo:border and @fo:border != 'none' ">
       <w:pBdr>
-        <w:top>
-          <xsl:attribute name="w:val">
-            <xsl:call-template name="BorderStyle">
-              <xsl:with-param name="side" select="'top'"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:attribute name="w:sz">
-            <xsl:call-template name="eightspoint-measure">
-              <xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:if test="@fo:padding">
-            <xsl:attribute name="w:space">
-              <xsl:call-template name="padding-val">
-                <xsl:with-param name="length" select="@fo:padding"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:padding-top">
-            <xsl:attribute name="w:space">
-              <xsl:call-template name="padding-val">
-                <xsl:with-param name="length" select="@fo:padding-top"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-
-          <xsl:variable name="color" select="substring(@fo:border, string-length(@fo:border) -5, 6)"/>
-          <xsl:if test="$color != 'none' ">
-            <xsl:attribute name="w:color">
-              <xsl:value-of select="$color"/>
-            </xsl:attribute>
-          </xsl:if>
-
-        </w:top>
-        <w:left>
-          <xsl:attribute name="w:val">
-            <xsl:call-template name="BorderStyle">
-              <xsl:with-param name="side" select="'left'"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:attribute name="w:sz">
-            <xsl:call-template name="eightspoint-measure">
-              <xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:if test="@fo:padding">
-            <xsl:attribute name="w:space">
-              <xsl:call-template name="padding-val">
-                <xsl:with-param name="length" select="@fo:padding"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:padding-left">
-            <xsl:attribute name="w:space">
-              <xsl:call-template name="padding-val">
-                <xsl:with-param name="length" select="@fo:padding-left"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:attribute name="w:color">
-            <xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/>
-          </xsl:attribute>
-        </w:left>
-        <w:bottom>
-          <xsl:attribute name="w:val">
-            <xsl:call-template name="BorderStyle">
-              <xsl:with-param name="side" select="'bottom'"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:attribute name="w:sz">
-            <xsl:call-template name="eightspoint-measure">
-              <xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:if test="@fo:padding">
-            <xsl:attribute name="w:space">
-              <xsl:call-template name="padding-val">
-                <xsl:with-param name="length" select="@fo:padding"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:padding-bottom">
-            <xsl:attribute name="w:space">
-              <xsl:call-template name="padding-val">
-                <xsl:with-param name="length" select="@fo:padding-bottom"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:attribute name="w:color">
-            <xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/>
-          </xsl:attribute>
-        </w:bottom>
-        <w:right>
-          <xsl:attribute name="w:val">
-            <xsl:call-template name="BorderStyle">
-              <xsl:with-param name="side" select="'right'"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:attribute name="w:sz">
-            <xsl:call-template name="eightspoint-measure">
-              <xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:if test="@fo:padding">
-            <xsl:attribute name="w:space">
-              <xsl:call-template name="padding-val">
-                <xsl:with-param name="length" select="@fo:padding"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:padding-right">
-            <xsl:attribute name="w:space">
-              <xsl:call-template name="padding-val">
-                <xsl:with-param name="length" select="@fo:padding-right"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:attribute name="w:color">
-            <xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/>
-          </xsl:attribute>
-        </w:right>
-        <xsl:if test="@style:join-border='false'">
-          <w:between>
-            <xsl:attribute name="w:val">
-              <xsl:call-template name="BorderStyle">
-                <xsl:with-param name="side" select="'middle'"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before(@fo:border,  ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:if test="@fo:padding">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:attribute name="w:color">
-              <xsl:value-of select="substring(@fo:border, string-length(@fo:border) -5, 6)"/>
-            </xsl:attribute>
-          </w:between>
-        </xsl:if>
+        <xsl:call-template name="InsertBorders">
+          <xsl:with-param name="allSides">true</xsl:with-param>
+        </xsl:call-template>
       </w:pBdr>
     </xsl:if>
     <xsl:if test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
       <w:pBdr>
-        <xsl:if test="@fo:border-top and (@fo:border-top != 'none')">
-          <w:top>
-            <xsl:attribute name="w:val">
-              <xsl:call-template name="BorderStyle">
-                <xsl:with-param name="side" select="'top'"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before(@fo:border-top,  ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:if test="@fo:padding">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="@fo:padding-top">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding-top"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:attribute name="w:color">
-              <xsl:value-of select="substring(@fo:border-top, string-length(@fo:border-top) -5, 6)"
-              />
-            </xsl:attribute>
-          </w:top>
-        </xsl:if>
-        <xsl:if test="@fo:border-left and (@fo:border-left != 'none')">
-          <w:left>
-            <xsl:attribute name="w:val">
-              <xsl:call-template name="BorderStyle">
-                <xsl:with-param name="side" select="'left'"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before(@fo:border-left,  ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:if test="@fo:padding">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="@fo:padding-left">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding-left"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:attribute name="w:color">
-              <xsl:value-of
-                select="substring(@fo:border-left, string-length(@fo:border-left) -5, 6)"/>
-            </xsl:attribute>
-          </w:left>
-        </xsl:if>
-        <xsl:if test="@fo:border-bottom and (@fo:border-bottom != 'none')">
-          <w:bottom>
-            <xsl:attribute name="w:val">
-              <xsl:call-template name="BorderStyle">
-                <xsl:with-param name="side" select="'bottom'"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before(@fo:border-bottom,  ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:if test="@fo:padding">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="@fo:padding-bottom">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding-bottom"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:attribute name="w:color">
-              <xsl:value-of
-                select="substring(@fo:border-bottom, string-length(@fo:border-bottom) -5, 6)"/>
-            </xsl:attribute>
-          </w:bottom>
-        </xsl:if>
-        <xsl:if test="@fo:border-right and (@fo:border-right != 'none')">
-          <w:right>
-            <xsl:attribute name="w:val">
-              <xsl:call-template name="BorderStyle">
-                <xsl:with-param name="side" select="'right'"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before(@fo:border-right,  ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:if test="@fo:padding">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="@fo:padding-right">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding-right"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:attribute name="w:color">
-              <xsl:value-of
-                select="substring(@fo:border-right, string-length(@fo:border-right) -5, 6)"/>
-            </xsl:attribute>
-          </w:right>
-        </xsl:if>
-        <xsl:if
-          test="@style:join-border='false' and (
-						(@fo:border-bottom and (@fo:border-bottom != 'none'))
-						or (@fo:border-top and (@fo:border-top != 'none')) )">
-          <w:between>
-            <xsl:attribute name="w:val">
-              <xsl:call-template name="BorderStyle">
-                <xsl:with-param name="side" select="'middle'"/>
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:attribute name="w:sz">
-              <xsl:choose>
-                <xsl:when test="@fo:border-top != 'none'">
-                  <xsl:call-template name="eightspoint-measure">
-                    <xsl:with-param name="length" select="substring-before(@fo:border-top,  ' ')"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:call-template name="eightspoint-measure">
-                    <xsl:with-param name="length" select="substring-before(@fo:border-bottom,  ' ')"
-                    />
-                  </xsl:call-template>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:if test="@fo:padding">
-              <xsl:attribute name="w:space">
-                <xsl:call-template name="padding-val">
-                  <xsl:with-param name="length" select="@fo:padding"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:if>
-            <xsl:attribute name="w:color">
-              <xsl:choose>
-                <xsl:when test="@fo:border-top != 'none'">
-                  <xsl:value-of
-                    select="substring(@fo:border-top, string-length(@fo:border-top) -5, 6)"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of
-                    select="substring(@fo:border-bottom, string-length(@fo:border-bottom) -5, 6)"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </w:between>
-        </xsl:if>
+        <xsl:call-template name="InsertBorders">
+          <xsl:with-param name="allSides">false</xsl:with-param>
+        </xsl:call-template>
       </w:pBdr>
     </xsl:if>
 
@@ -1525,7 +1212,23 @@
         </w:pgMar>
       </xsl:otherwise>
     </xsl:choose>
-
+    
+    <!-- border -->
+    <xsl:if test="@fo:border and @fo:border != 'none' ">
+      <w:pgBorders>
+        <xsl:call-template name="InsertBorders">
+          <xsl:with-param name="allSides">true</xsl:with-param>
+        </xsl:call-template>
+      </w:pgBorders>
+    </xsl:if>
+    <xsl:if test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
+      <w:pgBorders>
+        <xsl:call-template name="InsertBorders">
+          <xsl:with-param name="allSides">false</xsl:with-param>
+        </xsl:call-template>
+      </w:pgBorders>
+    </xsl:if>
+    
     <w:cols>
       <!-- nb columns -->
       <xsl:if test="style:columns/@fo:column-count">
@@ -1602,6 +1305,129 @@
         </w:col>
       </xsl:for-each>
     </w:cols>
+
+  </xsl:template>
+
+  <!-- Insert borders, depending on allSides bool. If true, create all borders. -->
+  <xsl:template name="InsertBorders">
+    <xsl:param name="allSides" select="'false'"/>
+
+    <xsl:if test="$allSides='true' or (@fo:border-top and (@fo:border-top != 'none'))">
+      <w:top>
+        <xsl:call-template name="border">
+          <xsl:with-param name="side" select="'top'"/>
+        </xsl:call-template>
+      </w:top>
+    </xsl:if>
+    <xsl:if test="$allSides='true' or (@fo:border-left and (@fo:border-left != 'none'))">
+      <w:left>
+        <xsl:call-template name="border">
+          <xsl:with-param name="side" select="'left'"/>
+        </xsl:call-template>
+      </w:left>
+    </xsl:if>
+    <xsl:if test="$allSides='true' or (@fo:border-bottom and (@fo:border-bottom != 'none'))">
+      <w:bottom>
+        <xsl:call-template name="border">
+          <xsl:with-param name="side" select="'bottom'"/>
+        </xsl:call-template>
+      </w:bottom>
+    </xsl:if>
+    <xsl:if test="$allSides='true' or (@fo:border-right and (@fo:border-right != 'none'))">
+      <w:right>
+        <xsl:call-template name="border">
+          <xsl:with-param name="side" select="'right'"/>
+        </xsl:call-template>
+      </w:right>
+    </xsl:if>
+    <xsl:if
+      test="$allSides='true' and self::style:paragraph-properties and @style:join-border='false'">
+      <w:between>
+        <xsl:call-template name="border">
+          <xsl:with-param name="side" select="'middle'"/>
+        </xsl:call-template>
+      </w:between>
+    </xsl:if>
+    <xsl:if
+      test="$allSides='false' and @style:join-border='false' and (
+      (@fo:border-bottom and (@fo:border-bottom != 'none'))
+      or (@fo:border-top and (@fo:border-top != 'none')) )">
+      <w:between>
+        <xsl:call-template name="border">
+          <xsl:with-param name="side" select="'middle'"/>
+        </xsl:call-template>
+      </w:between>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Attributes of a border element. -->
+  <xsl:template name="border">
+    <xsl:param name="side"/>
+
+    <xsl:variable name="borderStr">
+      <xsl:choose>
+        <xsl:when test="@fo:border">
+          <xsl:value-of select="@fo:border"/>
+        </xsl:when>
+        <xsl:when test="$side='middle'">
+          <xsl:choose>
+            <xsl:when test="@fo:border-top != 'none'">
+              <xsl:value-of select="@fo:border-top"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="@fo:border-bottom"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="attribute::node()[name()=concat('fo:border-',$side)]"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:variable name="padding">
+      <xsl:choose>
+        <xsl:when test="@fo:padding">
+          <xsl:value-of select="@fo:padding"/>
+        </xsl:when>
+        <xsl:when test="$side='middle'">
+          <xsl:choose>
+            <xsl:when test="@fo:padding-top != 'none'">
+              <xsl:value-of select="@fo:padding-top"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="@fo:padding-bottom"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="attribute::node()[name()=concat('fo:padding-',$side)]"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+        
+    <xsl:attribute name="w:val">
+      <xsl:call-template name="GetBorderStyle">
+        <xsl:with-param name="side" select="$side"/>
+        <xsl:with-param name="borderStr" select="$borderStr"/>
+      </xsl:call-template>
+    </xsl:attribute>
+
+    <xsl:attribute name="w:sz">
+      <xsl:call-template name="eightspoint-measure">
+        <xsl:with-param name="length" select="substring-before($borderStr,  ' ')"/>
+      </xsl:call-template>
+    </xsl:attribute>
+
+    <xsl:attribute name="w:space">
+      <xsl:call-template name="padding-val">
+        <xsl:with-param name="length" select="$padding"/>
+      </xsl:call-template>
+    </xsl:attribute>
+
+    <xsl:attribute name="w:color">
+      <xsl:value-of select="substring($borderStr, string-length($borderStr) -5, 6)"/>
+    </xsl:attribute>
 
   </xsl:template>
 
