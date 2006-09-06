@@ -1221,7 +1221,6 @@
             <xsl:choose>
               <xsl:when test="number(child::text()[last()])">
                 <xsl:for-each select="child::node()[position() &lt; last()]">
-
                   <xsl:choose>
                     <xsl:when test="self::text()">
                       <xsl:value-of select="."/>
@@ -1241,7 +1240,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </w:r>
-    <xsl:apply-templates select="text:tab|text:a/text:tab" mode="paragraph"/>
+    <xsl:apply-templates select="text:tab|text:a/text:tab|text:span" mode="paragraph"/>
     <xsl:if test="not(ancestor::text:alphabetical-index)">
       <w:r>
         <w:rPr/>
