@@ -31,6 +31,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   exclude-result-prefixes="office fo style">
 
   <xsl:template name="settings">
@@ -52,17 +53,13 @@
       <!-- Footnotes document wide properties -->
       <xsl:call-template name="footnotes-configuration">
         <xsl:with-param name="wide">yes</xsl:with-param>
-        <xsl:with-param name="config"
-          select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
-        />
+        <xsl:with-param name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
       </xsl:call-template>
 
       <!-- Endnotes document wide properties -->
       <xsl:call-template name="endnotes-configuration">
         <xsl:with-param name="wide">yes</xsl:with-param>
-        <xsl:with-param name="config"
-          select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
-        />
+        <xsl:with-param name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"/>
       </xsl:call-template>
 
     </w:settings>
