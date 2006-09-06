@@ -82,8 +82,7 @@
   <!-- endotes configuration -->
   <xsl:template name="endnotes-configuration">
     <xsl:param name="wide">no</xsl:param>
-    <xsl:variable name="config"
-      select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"/>
+    <xsl:param name="config"/>
     <w:endnotePr>
 
       <!-- TODO endnotes for sections -->

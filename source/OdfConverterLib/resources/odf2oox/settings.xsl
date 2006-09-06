@@ -52,11 +52,17 @@
       <!-- Footnotes document wide properties -->
       <xsl:call-template name="footnotes-configuration">
         <xsl:with-param name="wide">yes</xsl:with-param>
+        <xsl:with-param name="config"
+          select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
+        />
       </xsl:call-template>
 
       <!-- Endnotes document wide properties -->
       <xsl:call-template name="endnotes-configuration">
         <xsl:with-param name="wide">yes</xsl:with-param>
+        <xsl:with-param name="config"
+          select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
+        />
       </xsl:call-template>
 
     </w:settings>

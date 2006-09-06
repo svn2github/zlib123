@@ -88,8 +88,12 @@
         <!-- Header/Footer configuration -->
         <xsl:call-template name="HeaderFooter"/>
         <!-- Footnotes and endnotes configuration -->
-        <xsl:call-template name="footnotes-configuration"/>
-        <xsl:call-template name="endnotes-configuration"/>
+        <xsl:call-template name="footnotes-configuration">
+          <xsl:with-param name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
+        </xsl:call-template>
+        <xsl:call-template name="endnotes-configuration">
+          <xsl:with-param name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"/>
+        </xsl:call-template>
         <!-- Page layout properties -->
         <!--- all the paragraphs tied to a master style -->
         <xsl:variable name="mp-paragraphs"

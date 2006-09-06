@@ -87,8 +87,7 @@
   <!-- footnotes configuration -->
   <xsl:template name="footnotes-configuration">
     <xsl:param name="wide">no</xsl:param>
-    <xsl:variable name="config"
-      select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
+    <xsl:param name="config"/>
     <w:footnotePr>
 
       <w:pos>
