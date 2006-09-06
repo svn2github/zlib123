@@ -636,9 +636,16 @@
 
   <!-- Inserts a page break before if needed -->
   <xsl:template name="InsertPageBreakBefore">
-    <xsl:if
-      test="parent::node()[name()='table:table-cell' and position()=1] and ancestor::node()[name()='table:table-row' and not(preceding-sibling::node())] and key('automatic-styles',ancestor::table:table/@table:style-name)/style:table-properties/@fo:break-before='page'">
-      <w:pageBreakBefore/>
+    <!-- in the first paragraph of a table -->
+    <xsl:if test="ancestor-or-self::table:table">
+      <xsl:if
+        test="parent::node()[name()='table:table-cell' and not(preceding-sibling::node())]
+        and ancestor::node()[name()='table:table-row' and (preceding-sibling::node()[1][name()='table:table-column' or name()='table:table-columns'] or not(preceding-sibling::node()))]
+        and (
+        key('automatic-styles',ancestor::table:table/@table:style-name)/style:table-properties/@fo:break-before = 'page'
+        or key('automatic-styles',ancestor::table:table/@table:style-name)/@style:master-page-name)">
+        <w:pageBreakBefore/>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 

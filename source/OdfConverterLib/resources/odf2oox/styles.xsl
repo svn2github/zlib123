@@ -165,12 +165,6 @@
 
       <w:pPr>
         <xsl:apply-templates mode="pPr"/>
-
-        <!-- COMMENT: explain this -->
-        <xsl:if
-          test="@style:master-page-name and not(style:paragraph-properties) and not(style:paragraph-properties = '')">
-          <w:pageBreakBefore/>
-        </xsl:if>
       </w:pPr>
 
       <w:rPr>
@@ -185,6 +179,7 @@
 
   <!-- paragraph properties -->
   <xsl:template match="style:paragraph-properties" mode="pPr">
+    
     <xsl:if test="@fo:keep-with-next='always'">
       <w:keepNext/>
     </xsl:if>
@@ -197,10 +192,10 @@
       <w:pageBreakBefore/>
     </xsl:if>
     <xsl:if
-      test="parent::node()/@style:master-page-name and not(parent::node()/@style:master-page-name = '')">
+      test="parent::node()/@style:master-page-name != ''">
       <w:pageBreakBefore/>
     </xsl:if>
-
+    
     <xsl:choose>
       <xsl:when test="@fo:widows != '0' or @fo:orphans != '0'">
         <w:widowControl w:val="on"/>
