@@ -2147,17 +2147,19 @@
       <w:instrText xml:space="preserve"> XE "</w:instrText>
     </w:r>
     <w:r>
-      <w:instrText>
+      <w:instrText>        
+        <xsl:variable name="id"  select="@text:id"/>
         <xsl:for-each select="preceding-sibling::node()">
-          <xsl:choose>
-            <xsl:when test="self::text()">
-              <xsl:value-of select="."/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:apply-templates select="."/>
-
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:if test="preceding-sibling::node()[name() = 'text:alphabetical-index-mark-start' and @text:id = $id]">
+            <xsl:choose>
+              <xsl:when test="self::text()">
+                <xsl:value-of select="."/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="."/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
         </xsl:for-each>
       </w:instrText>
     </w:r>
