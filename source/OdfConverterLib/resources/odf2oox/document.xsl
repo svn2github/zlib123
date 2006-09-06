@@ -2041,18 +2041,28 @@
 	<!-- simple text (within a text flow) -->
 	<xsl:template match="text()" mode="text">
 
-		<xsl:choose>
-			<xsl:when test="preceding-sibling::text:tab">
-				<w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
-			</xsl:when>
-			<xsl:when test="not(following-sibling::text:tab)">
-				<w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
-			</xsl:when>
+		
+	<xsl:choose>
+		<xsl:when test="ancestor::text:index-body">
+			<xsl:choose>
+				<xsl:when test="preceding-sibling::text:tab">
+					<w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+				</xsl:when>
+				<xsl:when test="not(following-sibling::text:tab)">
+					<w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+				</xsl:when>
+				<xsl:otherwise> </xsl:otherwise>
+			</xsl:choose>			
+		</xsl:when>
+		<xsl:otherwise>
+			 <w:t xml:space="preserve"><xsl:value-of select="."/></w:t> 
+		</xsl:otherwise>
 
-			<xsl:otherwise> </xsl:otherwise>
-		</xsl:choose>
-
-
+		
+		
+	</xsl:choose>		
+		
+		
 	</xsl:template>
 
 	<!-- tab stops -->
