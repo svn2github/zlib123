@@ -26,29 +26,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
-	xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-	xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-	xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-	exclude-result-prefixes="office style svg">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  exclude-result-prefixes="office style svg">
 
-  <xsl:key name="fonts"
-		match="office:font-face-decls/style:font-face"
-		use="@style:name"/>
-	
-	<xsl:template name="fonts">
-		<w:fonts>
-			<!-- We suppose that the fonts declared in content.xml and styles.xml are the same. -->
-			<xsl:apply-templates select="document('content.xml')/office:document-content/office:font-face-decls/style:font-face" mode="fonts"/>
-		</w:fonts>
-	</xsl:template>
+  <xsl:key name="fonts" match="office:font-face-decls/style:font-face" use="@style:name"/>
 
-	<!-- Make sure we manage all cases -->	
-	<xsl:template match="style:font-face" mode="fonts">
+  <xsl:template name="fonts">
+    <w:fonts>
+      <!-- We suppose that the fonts declared in content.xml and styles.xml are the same. -->
+      <xsl:apply-templates
+        select="document('content.xml')/office:document-content/office:font-face-decls/style:font-face"
+        mode="fonts"/>
+    </w:fonts>
+  </xsl:template>
+
+  <!-- Make sure we manage all cases -->
+  <xsl:template match="style:font-face" mode="fonts">
     <!-- We do not take into consideration fonts that have a name that does not match the family name. -->
-    <xsl:if test='not(@svg:font-family) or (@style:name=@svg:font-family) or (concat("&apos;",@style:name,"&apos;")=@svg:font-family)'>
+    <xsl:if
+      test="not(@svg:font-family) or (@style:name=@svg:font-family) or (concat(&quot;&apos;&quot;,@style:name,&quot;&apos;&quot;)=@svg:font-family)">
       <w:font>
         <!-- Make sur the 'x-symbol' charset is always '02' and the asian and complex charset are not control -->
         <xsl:choose>
@@ -97,7 +97,9 @@
         <xsl:choose>
           <!--xsl:when test="document('styles.xml')//style:font-face[@style:name=$fontName]/@svg:font-family"-->
           <xsl:when test="key('fonts',$fontName)/@svg:font-family">
-              <xsl:value-of select='translate(key("fonts",$fontName)[1]/@svg:font-family,"&apos;","")'/>
+            <xsl:value-of
+              select="translate(key(&quot;fonts&quot;,$fontName)[1]/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
+            />
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$fontName"/>
@@ -106,9 +108,8 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-	
-	<!-- ignored -->
-	<xsl:template match="text()" mode="fonts"/>
-	
+
+  <!-- ignored -->
+  <xsl:template match="text()" mode="fonts"/>
+
 </xsl:stylesheet>
-	

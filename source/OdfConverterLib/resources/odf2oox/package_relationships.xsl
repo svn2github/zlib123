@@ -26,26 +26,25 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-   
-    <xsl:template name="package-relationships">
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-        <Relationship Id="rId1"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"
-          Target="word/document.xml"/>
-        <Relationship Id="rId2"
-          Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"
-          Target="docProps/core.xml"/>
-        <Relationship Id="rId3"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"
-          Target="docProps/app.xml"/>
-        <xsl:if test="$docprops-custom-file > 0">
-          <Relationship Id="rId4"
-            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties"
-            Target="docProps/custom.xml"/>
-        </xsl:if>
-      </Relationships>
-    </xsl:template>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+  <xsl:template name="package-relationships">
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <Relationship Id="rId1"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"
+        Target="word/document.xml"/>
+      <Relationship Id="rId2"
+        Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"
+        Target="docProps/core.xml"/>
+      <Relationship Id="rId3"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"
+        Target="docProps/app.xml"/>
+      <xsl:if test="$docprops-custom-file > 0">
+        <Relationship Id="rId4"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties"
+          Target="docProps/custom.xml"/>
+      </xsl:if>
+    </Relationships>
+  </xsl:template>
 
 </xsl:stylesheet>

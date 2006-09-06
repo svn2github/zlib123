@@ -28,53 +28,63 @@
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-      <!-- content types -->
-      <xsl:template name="contentTypes">
-        <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-      	  <Default Extension="jpeg" ContentType="image/jpeg"/>
-          <Default Extension="jpg" ContentType="image/jpeg"/>
-          <Default Extension="gif" ContentType="image/gif"/>
-          <Default Extension="png" ContentType="image/png"/>
-          <Default Extension="wmf" ContentType="image/x-emf"/>
-          <Default Extension="emf" ContentType="image/x-emf"/>
-          <Default Extension="bin" ContentType="application/vnd.openxmlformats-officedocument.oleObject"/>
-          <Default Extension="rels"
-            ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-          <Default Extension="xml" ContentType="application/xml"/>
-          <Override PartName="/word/document.xml"
-            ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-          <Override PartName="/word/numbering.xml"
-          	ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
-          <Override PartName="/docProps/core.xml"
-            ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-          <Override PartName="/docProps/app.xml"
-            ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-          <xsl:if test="$docprops-custom-file > 0">
-            <Override PartName="/docProps/custom.xml"
-              ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml"/>
-          </xsl:if>
-          <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-          <Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/>
-          <Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
-          <Override PartName="/word/footnotes.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>
-          <Override PartName="/word/endnotes.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml"/>
-          <Override PartName="/word/comments.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/>
-                    
-          <xsl:variable name="masterPage"
-            select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"
-            xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-            xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"/>
+  <!-- content types -->
+  <xsl:template name="contentTypes">
+    <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+      <Default Extension="jpeg" ContentType="image/jpeg"/>
+      <Default Extension="jpg" ContentType="image/jpeg"/>
+      <Default Extension="gif" ContentType="image/gif"/>
+      <Default Extension="png" ContentType="image/png"/>
+      <Default Extension="wmf" ContentType="image/x-emf"/>
+      <Default Extension="emf" ContentType="image/x-emf"/>
+      <Default Extension="bin" ContentType="application/vnd.openxmlformats-officedocument.oleObject"/>
+      <Default Extension="rels"
+        ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+      <Default Extension="xml" ContentType="application/xml"/>
+      <Override PartName="/word/document.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+      <Override PartName="/word/numbering.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
+      <Override PartName="/docProps/core.xml"
+        ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+      <Override PartName="/docProps/app.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+      <xsl:if test="$docprops-custom-file > 0">
+        <Override PartName="/docProps/custom.xml"
+          ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml"/>
+      </xsl:if>
+      <Override PartName="/word/styles.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+      <Override PartName="/word/fontTable.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/>
+      <Override PartName="/word/settings.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
+      <Override PartName="/word/footnotes.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>
+      <Override PartName="/word/endnotes.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml"/>
+      <Override PartName="/word/comments.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/>
 
-          <xsl:for-each select="$masterPage">
-            <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml">
-              <xsl:attribute name="PartName">/word/header<xsl:value-of select="position()"/>.xml</xsl:attribute>
-          	</Override>
-            <Override ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml">
-              <xsl:attribute name="PartName">/word/footer<xsl:value-of select="position()"/>.xml</xsl:attribute>
-          	</Override>
-          </xsl:for-each>
-          
-        </Types>
-      </xsl:template>
-  
+      <xsl:variable name="masterPage"
+        select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"
+        xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+        xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"/>
+
+      <xsl:for-each select="$masterPage">
+        <Override
+          ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml">
+          <xsl:attribute name="PartName">/word/header<xsl:value-of select="position()"
+          />.xml</xsl:attribute>
+        </Override>
+        <Override
+          ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml">
+          <xsl:attribute name="PartName">/word/footer<xsl:value-of select="position()"
+          />.xml</xsl:attribute>
+        </Override>
+      </xsl:for-each>
+
+    </Types>
+  </xsl:template>
+
 </xsl:stylesheet>

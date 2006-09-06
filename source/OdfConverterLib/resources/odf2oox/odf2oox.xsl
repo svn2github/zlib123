@@ -26,10 +26,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odf="urn:odf"
-  xmlns:zip="urn:cleverage:xmlns:zip"
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odf="urn:odf"
+  xmlns:zip="urn:cleverage:xmlns:zip" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   exclude-result-prefixes="odf style">
 
   <xsl:import href="common.xsl"/>
@@ -42,7 +40,7 @@
   <xsl:import href="fonts.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="dataStyles.xsl"/>
-  <xsl:import href="pictures.xsl"/>	
+  <xsl:import href="pictures.xsl"/>
   <xsl:import href="settings.xsl"/>
   <xsl:import href="part_relationships.xsl"/>
   <xsl:import href="package_relationships.xsl"/>
@@ -74,9 +72,9 @@
       </zip:entry>
 
       <!-- Document app properties -->
-        <zip:entry zip:target="docProps/app.xml">
-          <xsl:call-template name="docprops-app"/>
-        </zip:entry>
+      <zip:entry zip:target="docProps/app.xml">
+        <xsl:call-template name="docprops-app"/>
+      </zip:entry>
 
       <!-- Document custom properties -->
       <xsl:if test="$docprops-custom-file > 0">
@@ -94,7 +92,7 @@
       <zip:entry zip:target="word/numbering.xml">
         <xsl:call-template name="numbering"/>
       </zip:entry>
-    	
+
       <!-- footnotes -->
       <zip:entry zip:target="word/footnotes.xml">
         <xsl:call-template name="footnotes"/>
@@ -104,12 +102,12 @@
       <zip:entry zip:target="word/_rels/footnotes.xml.rels">
         <xsl:call-template name="footnotes-relationships"/>
       </zip:entry>
-      
+
       <!-- endnotes -->
       <zip:entry zip:target="word/endnotes.xml">
         <xsl:call-template name="endnotes"/>
       </zip:entry>
-      
+
       <!-- endnotes part relationships -->
       <zip:entry zip:target="word/_rels/endnotes.xml.rels">
         <xsl:call-template name="endnotes-relationships"/>
@@ -119,7 +117,7 @@
       <zip:entry zip:target="word/comments.xml">
         <xsl:call-template name="comments"/>
       </zip:entry>
-      
+
       <!-- headers and footers -->
       <xsl:variable name="masterPage"
         select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"
@@ -129,50 +127,58 @@
       <xsl:for-each select="$masterPage">
         <xsl:variable name="position" select="position()"/>
         <zip:entry>
-          <xsl:attribute name="zip:target"><xsl:value-of select="concat('word/header',$position,'.xml')"/></xsl:attribute>
+          <xsl:attribute name="zip:target">
+            <xsl:value-of select="concat('word/header',$position,'.xml')"/>
+          </xsl:attribute>
           <xsl:call-template name="header">
             <xsl:with-param name="headerNode" select="style:header"/>
           </xsl:call-template>
         </zip:entry>
 
-      	<zip:entry>
-      	  <xsl:attribute name="zip:target"><xsl:value-of select="concat('word/_rels/header',$position,'.xml.rels')"/></xsl:attribute>
+        <zip:entry>
+          <xsl:attribute name="zip:target">
+            <xsl:value-of select="concat('word/_rels/header',$position,'.xml.rels')"/>
+          </xsl:attribute>
           <xsl:call-template name="headerFooter-relationships">
             <xsl:with-param name="node" select="style:header"/>
           </xsl:call-template>
-      	</zip:entry>
+        </zip:entry>
 
-      	<zip:entry>
-          <xsl:attribute name="zip:target"><xsl:value-of select="concat('word/footer',$position,'.xml')"/></xsl:attribute>
+        <zip:entry>
+          <xsl:attribute name="zip:target">
+            <xsl:value-of select="concat('word/footer',$position,'.xml')"/>
+          </xsl:attribute>
           <xsl:call-template name="footer">
             <xsl:with-param name="footerNode" select="style:footer"/>
           </xsl:call-template>
         </zip:entry>
 
-      	<zip:entry>
-      	  <xsl:attribute name="zip:target"><xsl:value-of select="concat('word/_rels/footer',$position,'.xml.rels')"/></xsl:attribute>
+        <zip:entry>
+          <xsl:attribute name="zip:target">
+            <xsl:value-of select="concat('word/_rels/footer',$position,'.xml.rels')"/>
+          </xsl:attribute>
           <xsl:call-template name="headerFooter-relationships">
             <xsl:with-param name="node" select="style:footer"/>
           </xsl:call-template>
-      	</zip:entry>
+        </zip:entry>
       </xsl:for-each>
 
- 
+
       <!-- styles -->
       <zip:entry zip:target="word/styles.xml">
-    	<xsl:call-template name="styles"/>
+        <xsl:call-template name="styles"/>
       </zip:entry>
-      
+
       <!-- fonts declaration -->
       <zip:entry zip:target="word/fontTable.xml">
         <xsl:call-template name="fonts"/>
       </zip:entry>
-      
+
       <!-- settings  -->
       <zip:entry zip:target="word/settings.xml">
         <xsl:call-template name="settings"/>
       </zip:entry>
-    	
+
       <!-- part relationship item -->
       <zip:entry zip:target="word/_rels/document.xml.rels">
         <xsl:call-template name="part_relationships"/>
