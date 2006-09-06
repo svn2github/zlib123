@@ -1386,9 +1386,21 @@
 		<w:tab>
 			<xsl:attribute name="w:pos">
 				<xsl:variable name="position">
-					<xsl:call-template name="twips-measure">
-						<xsl:with-param name="length" select="ancestor::style:paragraph-properties/@fo:margin-left"/>
-					</xsl:call-template>
+					<xsl:choose>
+						<xsl:when test="ancestor::office:automatic-styles">
+							<xsl:variable name="name" select="ancestor::style:style/@style:parent-style-name"/>
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length"
+									select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $name]/style:paragraph-properties/@fo:margin-left"/>
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:call-template name="twips-measure">
+								<xsl:with-param name="length"
+									select="ancestor::style:paragraph-properties/@fo:margin-left"/>
+							</xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:variable>
 				<xsl:variable name="position2">
 					<xsl:call-template name="twips-measure">
