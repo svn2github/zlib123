@@ -1247,23 +1247,16 @@
         </xsl:when>
         <xsl:otherwise>
           <w:t>
-            <xsl:choose>
-              <xsl:when test="number(child::text()[last()])">
-                <xsl:for-each select="child::node()[position() &lt; last()]">
-                  <xsl:choose>
-                    <xsl:when test="self::text()">
-                      <xsl:value-of select="."/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:apply-templates select="."/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:for-each>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="child::text()[last()]"/>
-              </xsl:otherwise>
-            </xsl:choose>
+           <xsl:for-each select="child::node()[position() &lt; last()]">
+             <xsl:choose>
+               <xsl:when test="self::text()">
+                 <xsl:value-of select="."/>
+               </xsl:when>
+               <xsl:otherwise>
+                 <xsl:apply-templates select="."/>
+               </xsl:otherwise>
+             </xsl:choose>
+           </xsl:for-each>
           </w:t>
           <!--<xsl:apply-templates select="child::text()[1]" mode="text"/>-->
         </xsl:otherwise>
