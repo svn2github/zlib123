@@ -1223,24 +1223,28 @@
         </xsl:call-template>
       </w:pgBorders>
     </xsl:if>
-    
+    <xsl:apply-templates select="style:columns" mode="columns"/>
+  </xsl:template>
+  
+  
+  <xsl:template match="style:columns" mode="columns">
     <w:cols>
       <!-- nb columns -->
-      <xsl:if test="style:columns/@fo:column-count">
+      <xsl:if test="@fo:column-count">
         <xsl:attribute name="w:num">
-          <xsl:value-of select="style:columns/@fo:column-count"/>
+          <xsl:value-of select="@fo:column-count"/>
         </xsl:attribute>
       </xsl:if>
       <!-- separator -->
-      <xsl:if test="style:columns/style:column-sep">
+      <xsl:if test="style:column-sep">
         <xsl:attribute name="w:sep">
           <xsl:value-of select="1"/>
         </xsl:attribute>
       </xsl:if>
-
+      
       <xsl:attribute name="w:equalWidth">
         <xsl:choose>
-          <xsl:when test="style:columns/@fo:column-gap">
+          <xsl:when test="@fo:column-gap">
             <xsl:value-of select="1"/>
           </xsl:when>
           <xsl:otherwise>
@@ -1248,9 +1252,9 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-
+      
       <!-- each column -->
-      <xsl:for-each select="style:columns/style:column">
+      <xsl:for-each select="style:column">
         <w:col>
           <!-- the left and right spaces -->
           <xsl:variable name="start">
@@ -1259,7 +1263,7 @@
           <xsl:variable name="end">
             <xsl:value-of select="number(substring-before(@fo:end-indent,'cm'))"/>
           </xsl:variable>
-
+          
           <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent -->
           <xsl:variable name="spacesBetween">
             <xsl:choose>
@@ -1273,26 +1277,26 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-
+          
           <!-- Open xml space converted into twips -->
           <xsl:variable name="spaceTwips">
             <xsl:call-template name="twips-measure">
               <xsl:with-param name="length" select="concat($spacesBetween,'cm') "/>
             </xsl:call-template>
           </xsl:variable>
-
+          
           <!-- ODT spaces converted in twips-->
           <xsl:variable name="widthTwips">
             <xsl:call-template name="twips-measure">
               <xsl:with-param name="length" select="concat($end+$start,'cm') "/>
             </xsl:call-template>
           </xsl:variable>
-
+          
           <!-- space -->
           <xsl:attribute name="w:space">
             <xsl:value-of select="$spaceTwips"/>
           </xsl:attribute>
-
+          
           <!-- width -->
           <xsl:attribute name="w:w">
             <xsl:value-of select="substring-before(@style:rel-width,'*') - $widthTwips"/>
@@ -1300,8 +1304,13 @@
         </w:col>
       </xsl:for-each>
     </w:cols>
-
   </xsl:template>
+  
+  
+  <xsl:template match="style:section-properties" mode="section">
+    <xsl:apply-templates select="style:columns" mode="columns"/>
+  </xsl:template>
+  
 
   <!-- Insert borders, depending on allSides bool. If true, create all borders. -->
   <xsl:template name="InsertBorders">
