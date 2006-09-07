@@ -133,7 +133,6 @@
   <xsl:template match="text:p | text:h">
     <xsl:param name="level" select="0"/>
     <xsl:message terminate="no">progress:text:p</xsl:message>
-
     <w:p>
       <xsl:call-template name="InsertParagraphProperties">
         <xsl:with-param name="level" select="$level"/>
@@ -141,15 +140,28 @@
 
       <!-- TOC id (used for headings only) -->
       <xsl:variable name="tocId">
-        <xsl:if test="self::text:h">
-          <xsl:value-of select="number(count(preceding::text:h)+1)"/>
-        </xsl:if>
+         <xsl:choose>
+          <xsl:when test="self::text:h">
+            <xsl:value-of select="number(count(preceding::text:h)+1)"/>
+          </xsl:when>
+          <xsl:otherwise>
+                <xsl:if test="self::text:p">
+                  <xsl:value-of select="number(count(preceding::text:p[@text:style-name='Standard'])+1)"/>
+                </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>      
+        
       </xsl:variable>
-
-      <xsl:if test="self::text:h">
-        <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
-      </xsl:if>
-
+      <xsl:choose>
+        <xsl:when test="self::text:h">
+          <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>          
+        </xsl:when>
+        <xsl:otherwise>          
+          <xsl:if test="@text:style-name='Standard'">
+            <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
+         </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
       <!-- footnotes or endnotes: insert the mark in the first paragraph -->
       <xsl:if test="parent::text:note-body and position() = 1">
         <xsl:apply-templates select="../../text:note-citation" mode="note"/>
@@ -185,17 +197,23 @@
         </w:r>
       </xsl:if>
 
-      <xsl:if test="self::text:h">
-        <w:bookmarkEnd w:id="{$tocId}"/>
-      </xsl:if>
-
+      <xsl:choose>
+        <xsl:when test="self::text:h">
+          <w:bookmarkEnd w:id="{$tocId}"/>
+        </xsl:when>
+        <xsl:otherwise>          
+          <xsl:if test="@text:style-name='Standard'">
+            <w:bookmarkEnd w:id="{$tocId}"/>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+      
     </w:p>
-  </xsl:template>
+    </xsl:template>
 
   <!-- Inserts the paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
     <xsl:param name="level"/>
-
     <w:pPr>
 
       <!-- insert paragraph style -->
