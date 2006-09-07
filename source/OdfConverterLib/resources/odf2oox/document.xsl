@@ -898,24 +898,27 @@
         <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-bottom"/>
       </xsl:call-template>
     </xsl:variable>
-    
-    <xsl:variable name="zIndex">
-      <xsl:value-of select="parent::draw:frame/@draw:z-index"/>
-    </xsl:variable>
-   
-    
     <xsl:variable name="frameWrap"
       select="$styleGraphicProperties/@style:wrap"/>
+    
+    <xsl:variable name="zIndex">
+      <xsl:choose>
+        <xsl:when test="$frameWrap='run-through' 
+          and $styleGraphicProperties/@style:run-through='background'">-251658240</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="parent::draw:frame/@draw:z-index"/>
+        </xsl:otherwise>
+      </xsl:choose>
+     </xsl:variable>
+   
     <xsl:variable name="relWidth"
       select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
     <xsl:variable name="relHeight"
       select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
     
     <xsl:attribute name="style">
-      <xsl:if test="$frameWrap != 'none'">
-        <xsl:value-of select="'position:absolute;'"/>
-      </xsl:if>
-      <xsl:if test="not($frameWrap)">
+     
+      <xsl:if test="(not($frameWrap) or $frameWrap != 'none') and not(parent::draw:frame/@text:anchor-type = 'as-char') "  >
         <xsl:value-of select="'position:absolute;'"/>
       </xsl:if>
       
@@ -982,8 +985,7 @@
         test="$styleGraphicProperties/@fo:margin-bottom">
         <xsl:value-of select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
       </xsl:if>
-      
-    </xsl:attribute>  
+     </xsl:attribute>  
     
     <xsl:if
       test="$styleGraphicProperties/@fo:background-color">
@@ -991,6 +993,25 @@
         <xsl:value-of
           select="$styleGraphicProperties/@fo:background-color"
         />
+      </xsl:attribute>
+    </xsl:if>
+    
+    <!--borders-->
+    <xsl:if test="$styleGraphicProperties/@fo:border">
+      <xsl:variable name="strokeColor" select="substring-after($styleGraphicProperties/@fo:border,'#')" />
+      
+      <xsl:variable name="strokeWeight" >
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="substring-before($styleGraphicProperties/@fo:border,' ')"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:attribute name="strokecolor">
+        <xsl:value-of select="concat('#', $strokeColor)"/>
+      </xsl:attribute>
+      
+      <xsl:attribute name="strokeweight">
+        <xsl:value-of select="concat($strokeWeight,'pt')"/>
       </xsl:attribute>
     </xsl:if>
     
@@ -1005,6 +1026,7 @@
         </xsl:attribute>
       </v:fill>
     </xsl:if>
+    
   </xsl:template>
   
   <!--inserts text-box into shape element --> 
@@ -1038,7 +1060,7 @@
      
       <!--frame wrap-->
       <xsl:choose>
-        <xsl:when test="$frameWrap = 'none' ">
+        <xsl:when test="parent::draw:frame/@text:anchor-type = 'as-char' or $frameWrap = 'none' ">
           <w10:wrap type="none"/>
           <w10:anchorlock/>
         </xsl:when>
