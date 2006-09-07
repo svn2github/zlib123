@@ -243,15 +243,15 @@
     <xsl:choose>
       <xsl:when test="@text:bullet-char = 'ÓÄå' ">ÓÄå</xsl:when>
       <xsl:when test="@text:bullet-char = 'ÓÄä' ">ÔÇß</xsl:when>
-      <xsl:when test="@text:bullet-char = '‚?ë' ">Ô?æ</xsl:when>
+      <xsl:when test="@text:bullet-char = '‚òë' ">ÔÉæ</xsl:when>
       <xsl:when test="@text:bullet-char = '‚Ä¢' ">‚Ä¢</xsl:when>
       <xsl:when test="@text:bullet-char = '‚óè' ">ÔÇ∑</xsl:when>
-      <xsl:when test="@text:bullet-char = '‚û¢' ">Ô??</xsl:when>
-      <xsl:when test="@text:bullet-char = '‚úî' ">Ô?º</xsl:when>
+      <xsl:when test="@text:bullet-char = '‚û¢' ">ÔÉò</xsl:when>
+      <xsl:when test="@text:bullet-char = '‚úî' ">ÔÉº</xsl:when>
       <xsl:when test="@text:bullet-char = '‚ñ†' ">ÔÇß</xsl:when>
       <xsl:when test="@text:bullet-char = '‚óã' ">o</xsl:when>
-      <xsl:when test="@text:bullet-char = '‚ûî' ">Ô?ö</xsl:when>
-      <xsl:when test="@text:bullet-char = '‚úó' ">Ô?è</xsl:when>
+      <xsl:when test="@text:bullet-char = '‚ûî' ">ÔÉö</xsl:when>
+      <xsl:when test="@text:bullet-char = '‚úó' ">ÔÅè</xsl:when>
       <xsl:when test="@text:bullet-char = '‚Äì' ">‚Äì</xsl:when>
       <xsl:otherwise>‚Ä¢</xsl:otherwise>
     </xsl:choose>
@@ -261,7 +261,7 @@
     <xsl:param name="char"/>
     <xsl:choose>
       <xsl:when
-        test="$char = 'Ô?º'  or  $char = 'Ô??' or  $char = ''  or  $char = ' ‚úó'  or $char='ÔÇß'  or $char='Ô?æ' ">
+        test="$char = 'ÔÉº'  or  $char = 'ÔÉò' or  $char = ''  or  $char = ' ‚úó'  or $char='ÔÇß'  or $char='ÔÉæ' ">
         <w:rPr>
           <w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>
           <xsl:call-template name="bulletSize">
@@ -274,7 +274,7 @@
         </w:rPr>
       </xsl:when>
 
-      <xsl:when test="$char = 'Ô?ö' ">
+      <xsl:when test="$char = 'ÔÉö' ">
         <w:rPr>
           <w:rFonts w:ascii="Wingdings 3" w:hAnsi="Wingdings 3" w:hint="default"/>
           <xsl:call-template name="bulletSize">
@@ -287,7 +287,7 @@
         </w:rPr>
       </xsl:when>
 
-      <xsl:when test="$char = 'Ô?è' ">
+      <xsl:when test="$char = 'ÔÅè' ">
         <w:rPr>
           <w:rFonts w:ascii="Wingdings 2" w:hAnsi="Wingdings 2" w:hint="default"/>
           <xsl:call-template name="bulletSize">
@@ -401,14 +401,7 @@
         <xsl:if test="@text:level">
           <w:lvl w:ilvl="{number(@text:level)-1}">
 
-            <xsl:choose>
-              <xsl:when test="@text:start-value">
-                <w:start w:val="{@text:start-value}"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <w:start w:val="1"/>
-              </xsl:otherwise>
-            </xsl:choose>
+            <w:start w:val="1"/>
             <w:numFmt>
               <xsl:attribute name="w:val">
                 <xsl:call-template name="num-format">
