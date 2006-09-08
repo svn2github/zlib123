@@ -149,12 +149,12 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;Additional Styles;1;0.2-M2;;;;;
 ;;;;Index marks;1;0.2-M2;;;;;
 ;;;;;;;;;;;
-;;Entries;Level;;;?;;;;;
+;;Entries;Level;;;?;Completed;;174-176;;
 ;;;Structure;;;?;;;;;
-;;;Chapter no;;2;0.2-M2;;;;;
-;;;Entry text;;2;0.2-M2;;;;;
-;;;Tab stop;;2;0.2-M2;;;;;
-;;;Page no;;2;0.2-M2;;;;;
+;;;Chapter no;;2;0.2-M2;TODO;;;;
+;;;Entry text;;2;0.2-M2;Completed;;174-176;;
+;;;Tab stop;;2;0.2-M2;Completed;;174-176;;
+;;;Page no;;2;0.2-M2;Completed;;174-176;;
 ;;;Character style;;2;0.2-M2;;;;;
 ;;;Format;Tab position relative to Paragraph style indent;2;0.2-M2;;;;;
 ;;;;;;;;;;;
