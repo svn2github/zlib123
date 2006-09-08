@@ -401,7 +401,14 @@
         <xsl:if test="@text:level">
           <w:lvl w:ilvl="{number(@text:level)-1}">
 
-            <w:start w:val="1"/>
+        <xsl:choose>
+              <xsl:when test="@text:start-value">
+                <w:start w:val="{@text:start-value}"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <w:start w:val="1"/>
+              </xsl:otherwise>
+            </xsl:choose>
             <w:numFmt>
               <xsl:attribute name="w:val">
                 <xsl:call-template name="num-format">
