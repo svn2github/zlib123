@@ -77,7 +77,8 @@
       </xsl:when>
       <xsl:when test="not($length)">0</xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$length"/>
+        <!-- Convert value as if centimeters. -->
+        <xsl:value-of select="round(number($length) * 1440 div 2.54)"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

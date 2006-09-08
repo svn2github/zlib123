@@ -56,7 +56,7 @@
   <xsl:key name="page-layouts" match="style:page-layout" use="@style:name"/>
   <xsl:key name="master-based-styles" match="style:style[@style:master-page-name]" use="@style:name"/>
   <xsl:key name="sections" match="style:style[@style:family='section']" use="@style:name"/>
-  
+
 
   <!-- COMMENT: what is this variable for? -->
   <xsl:variable name="type">dxa</xsl:variable>
@@ -88,9 +88,13 @@
         <!-- Header/Footer configuration -->
         <xsl:call-template name="HeaderFooter"/>
         <!-- Footnotes and endnotes configuration -->
-        <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']" mode="note"/>
-        <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']" mode="note"/> 
-       
+        <xsl:apply-templates
+          select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
+          mode="note"/>
+        <xsl:apply-templates
+          select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
+          mode="note"/>
+
         <!-- Page layout properties -->
         <!--- all the paragraphs, headings or tables tied to a master style -->
         <xsl:variable name="masterPages"
@@ -100,15 +104,16 @@
         <!-- the master page name it is related to -->
         <xsl:variable name="masterPageName"
           select="key('master-based-styles', $lastMasterPage/@text:style-name | $lastMasterPage/@table:style-name)[1]/@style:master-page-name"/>
-        
+
         <!-- 
           Continuous section. Looking up for a text:section 
           If there's no master-page used after the last text:section, then the sectPr is continuous.
         -->
         <xsl:variable name="ls" select="descendant::text:section[last()]"/>
-        <xsl:variable name="lastMP" select="$ls/following::text:p[key('master-based-styles', @text:style-name)] | $ls/following::text:h[key('master-based-styles', @text:style-name)] | $ls/following::text:table[key('master-based-styles', @table:style-name)]"/>
+        <xsl:variable name="lastMP"
+          select="$ls/following::text:p[key('master-based-styles', @text:style-name)] | $ls/following::text:h[key('master-based-styles', @text:style-name)] | $ls/following::text:table[key('master-based-styles', @table:style-name)]"/>
         <xsl:if test="$ls and not($lastMP)">
-          <w:type w:val="continuous"/>   
+          <w:type w:val="continuous"/>
         </xsl:if>
         <xsl:for-each select="document('styles.xml')">
           <xsl:choose>
@@ -141,59 +146,68 @@
     <xsl:param name="level" select="0"/>
     <xsl:message terminate="no">progress:text:p</xsl:message>
     <w:p>
-      
+
       <w:pPr>
-      <xsl:call-template name="InsertParagraphProperties">
-        <xsl:with-param name="level" select="$level"/>
-      </xsl:call-template>
-        
+        <xsl:call-template name="InsertParagraphProperties">
+          <xsl:with-param name="level" select="$level"/>
+        </xsl:call-template>
+
         <!-- Section detection  : 3 cases -->
-        
+
         <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
         <xsl:variable name="followings"
           select="following::text:p | following::text:h | following::table:table"/>
-        <xsl:variable name="masterPageStarts" select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
-        
+        <xsl:variable name="masterPageStarts"
+          select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
+
         <!-- 2 - Section starts. The following paragraph is contained in the following section -->
         <xsl:variable name="followingSection" select="following::text:section[1]"/>
         <!-- the following section is the same as the following neighbour's ancestor section -->
         <xsl:variable name="sectionStarts"
           select="$followingSection and (generate-id($followings[1]/ancestor::text:section) = generate-id($followingSection))"/>
-        
+
         <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
         <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
         <!-- the following neighbour's ancestor section and the current section are different -->
         <xsl:variable name="sectionEnds"
           select="$previousSection and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previousSection))"/>
-        
+
         <!-- section creation -->
         <xsl:if
           test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
           <w:sectPr>
-            
+
             <!-- 
               Continuous sections. Looking up for a text:section 
               If the first master style following the preceding section is the same as this paragraph's following master-style,
               then no other master style is used in-between.
             -->
             <xsl:variable name="ps" select="preceding::text:section[1]"/>
-            <xsl:variable name="stylesAfterSection" select="$ps/following::text:p[key('master-based-styles', @text:style-name)] | $ps/following::text:h[key('master-based-styles', @text:style-name)] | $ps/following::text:table[key('master-based-styles', @table:style-name)]"/>
-            <xsl:variable name="followingMasterStyle" select="$followings[key('master-based-styles', @text:style-name|@table:style-name)]"/>
-            <xsl:variable name="continuous" select="generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])"/>
+            <xsl:variable name="stylesAfterSection"
+              select="$ps/following::text:p[key('master-based-styles', @text:style-name)] | $ps/following::text:h[key('master-based-styles', @text:style-name)] | $ps/following::text:table[key('master-based-styles', @table:style-name)]"/>
+            <xsl:variable name="followingMasterStyle"
+              select="$followings[key('master-based-styles', @text:style-name|@table:style-name)]"/>
+            <xsl:variable name="continuous"
+              select="generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])"/>
             <xsl:choose>
               <xsl:when test="$sectionEnds = 'true' ">
-                <xsl:apply-templates select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration[@text:note-class='footnote']" mode="note"/>
-                <xsl:apply-templates select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration[@text:note-class='endnote']" mode="note"/>
+                <xsl:apply-templates
+                  select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration[@text:note-class='footnote']"
+                  mode="note"/>
+                <xsl:apply-templates
+                  select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration[@text:note-class='endnote']"
+                  mode="note"/>
                 <w:type w:val="continuous"/>
               </xsl:when>
               <xsl:when test="$continuous">
-                <w:type w:val="continuous"/>   
+                <w:type w:val="continuous"/>
               </xsl:when>
             </xsl:choose>
-            
+
             <!-- Determine the master style that rules this section -->
-            <xsl:variable name="currentMasterStyle" select="key('master-based-styles', @text:style-name)"/>     
-            
+            <xsl:variable name="currentMasterStyle"
+              select="key('master-based-styles', @text:style-name)"/>
+
             <xsl:choose>
               <xsl:when test="boolean($currentMasterStyle)">
                 <!-- current element style is tied to a master page -->
@@ -208,7 +222,7 @@
                 <xsl:variable name="precedings"
                   select="preceding::text:p[key('master-based-styles', @text:style-name)] | preceding::text:h[key('master-based-styles', @text:style-name)] | preceding::table:table[key('master-based-styles', @table:style-name)]"/>
                 <xsl:variable name="precedingMasterStyle"
-                  select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>      
+                  select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>
                 <xsl:choose>
                   <xsl:when test="boolean($precedingMasterStyle)">
                     <xsl:for-each select="document('styles.xml')">
@@ -228,7 +242,7 @@
                 </xsl:choose>
               </xsl:otherwise>
             </xsl:choose>
-            
+
             <xsl:if test="$sectionEnds = 'true' ">
               <xsl:apply-templates
                 select="key('sections', ancestor::text:section[1]/@text:style-name)/style:section-properties"
@@ -236,33 +250,34 @@
             </xsl:if>
           </w:sectPr>
         </xsl:if>
-        
+
         <!-- insert page break before table when required -->
         <xsl:call-template name="InsertPageBreakBefore"/>
-        
+
       </w:pPr>
       <!-- TOC id (used for headings only) -->
       <xsl:variable name="tocId">
-         <xsl:choose>
+        <xsl:choose>
           <xsl:when test="self::text:h">
             <xsl:value-of select="number(count(preceding::text:h)+1)"/>
           </xsl:when>
           <xsl:otherwise>
-                <xsl:if test="self::text:p">
-                  <xsl:value-of select="number(count(preceding::text:p[@text:style-name='Standard'])+1)"/>
-                </xsl:if>
+            <xsl:if test="self::text:p">
+              <xsl:value-of select="number(count(preceding::text:p[@text:style-name='Standard'])+1)"
+              />
+            </xsl:if>
           </xsl:otherwise>
-        </xsl:choose>      
-        
+        </xsl:choose>
+
       </xsl:variable>
       <xsl:choose>
         <xsl:when test="self::text:h">
-          <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>          
+          <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
         </xsl:when>
-        <xsl:otherwise>          
+        <xsl:otherwise>
           <xsl:if test="@text:style-name='Standard'">
             <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
-         </xsl:if>
+          </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
       <!-- footnotes or endnotes: insert the mark in the first paragraph -->
@@ -304,45 +319,45 @@
         <xsl:when test="self::text:h">
           <w:bookmarkEnd w:id="{$tocId}"/>
         </xsl:when>
-        <xsl:otherwise>          
+        <xsl:otherwise>
           <xsl:if test="@text:style-name='Standard'">
             <w:bookmarkEnd w:id="{$tocId}"/>
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
-      
+
     </w:p>
-    </xsl:template>
+  </xsl:template>
 
   <!-- Inserts the paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
     <xsl:param name="level"/>
-   
-      <!-- insert paragraph style -->
-      <xsl:call-template name="InsertParagraphStyle">
-        <xsl:with-param name="styleName">
-          <xsl:choose>
-            <xsl:when test="count(draw:frame) = 1 and count(child::text()) = 0">
-              <xsl:value-of select="draw:frame/@draw:style-name"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="@text:style-name"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:with-param>
-      </xsl:call-template>
 
-      <!-- insert heading outline level -->
-      <xsl:call-template name="InsertOutlineLevel">
-        <xsl:with-param name="node" select="."/>
-      </xsl:call-template>
+    <!-- insert paragraph style -->
+    <xsl:call-template name="InsertParagraphStyle">
+      <xsl:with-param name="styleName">
+        <xsl:choose>
+          <xsl:when test="count(draw:frame) = 1 and count(child::text()) = 0">
+            <xsl:value-of select="draw:frame/@draw:style-name"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:with-param>
+    </xsl:call-template>
 
-      <!-- insert indentation -->
-      <xsl:call-template name="InsertIndent">
-        <xsl:with-param name="level" select="$level"/>
-      </xsl:call-template>
+    <!-- insert heading outline level -->
+    <xsl:call-template name="InsertOutlineLevel">
+      <xsl:with-param name="node" select="."/>
+    </xsl:call-template>
 
-   
+    <!-- insert indentation -->
+    <xsl:call-template name="InsertIndent">
+      <xsl:with-param name="level" select="$level"/>
+    </xsl:call-template>
+
+
 
     <!-- if we are in an annotation, we may have to insert annotation reference -->
     <xsl:call-template name="InsertAnnotationReference"/>
@@ -385,9 +400,6 @@
           <w:outlineLvl w:val="9"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:if>
-    <xsl:if test="$node[child::text:toc-mark-start]">
-      <w:outlineLvl w:val="{$node/text:toc-mark-start/@text:outline-level}"/>
     </xsl:if>
   </xsl:template>
 
@@ -716,22 +728,10 @@
       <w:r>
         <xsl:choose>
           <xsl:when test="ancestor::text:table-of-content">
-            <w:instrText xml:space="preserve"> TOC \o <xsl:if test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">\u </xsl:if>"1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
+            <w:instrText xml:space="preserve"> TOC \o "1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
           </xsl:when>
           <xsl:when test="ancestor::text:illustration-index">
-            <xsl:variable name="nameElement">
-              <xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>
-            </xsl:variable>
-            <xsl:variable name="captionSequenceName">
-              <xsl:choose>
-                <xsl:when test="$nameElement = 'Illustration'">Figure</xsl:when>
-                <xsl:when test="$nameElement = 'Table'">Table</xsl:when>
-                <xsl:when test="$nameElement = 'Text'">Text</xsl:when>
-                <xsl:when test="$nameElement = 'Drawing'">Figure</xsl:when>
-              </xsl:choose>
-            </xsl:variable>
-            <!--w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText-->
-            <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="$captionSequenceName"/>" </w:instrText>
+            <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
           </xsl:when>
           <xsl:when test="ancestor::text:alphabetical-index">
             <w:instrText xml:space="preserve"> INDEX \e "" \c "<xsl:choose><xsl:when test="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">1</xsl:when><xsl:otherwise><xsl:value-of select="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/></xsl:otherwise></xsl:choose>" \z "1045" </w:instrText>
@@ -937,35 +937,36 @@
       <w:pict>
         <v:shapetype/>
         <v:shape type="#_x0000_t202">
-          
-          <xsl:variable name="styleGraphicProperties" select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties" />
-          
-          <xsl:call-template name="InsertShapeProperties" >
+
+          <xsl:variable name="styleGraphicProperties"
+            select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties"/>
+
+          <xsl:call-template name="InsertShapeProperties">
             <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
           </xsl:call-template>
-          
-          <xsl:call-template name="InsertTextBox" >
+
+          <xsl:call-template name="InsertTextBox">
             <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
           </xsl:call-template>
-      
+
         </v:shape>
       </w:pict>
     </w:r>
   </xsl:template>
-  
-  <!--converts oo frame style properties to shape properties for text-box--> 
+
+  <!--converts oo frame style properties to shape properties for text-box-->
   <xsl:template name="InsertShapeProperties">
-   <xsl:param name="styleGraphicProperties" />
-    
+    <xsl:param name="styleGraphicProperties"/>
+
     <xsl:attribute name="style">
-     
-     <!-- absolute positioning for text-box -->
-      <xsl:variable name="frameWrap"
-        select="$styleGraphicProperties/@style:wrap"/>
-      <xsl:if test="(not($frameWrap) or $frameWrap != 'none') and not(parent::draw:frame/@text:anchor-type = 'as-char') "  >
+
+      <!-- absolute positioning for text-box -->
+      <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap"/>
+      <xsl:if
+        test="(not($frameWrap) or $frameWrap != 'none') and not(parent::draw:frame/@text:anchor-type = 'as-char') ">
         <xsl:value-of select="'position:absolute;'"/>
       </xsl:if>
-   
+
       <!--  text-box width and height-->
       <xsl:variable name="frameW">
         <xsl:call-template name="point-measure">
@@ -982,32 +983,36 @@
         select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
       <xsl:variable name="relHeight"
         select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
-      
+
       <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
       <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
-      
+
       <xsl:if test="$relWidth">
         <xsl:value-of select="concat('mso-width-percent:',$relWidth,'0;')"/>
       </xsl:if>
       <xsl:if test="$relHeight">
         <xsl:value-of select="concat('mso-height-percent:',$relHeight,'0;')"/>
       </xsl:if>
-      
+
       <!--z-index that we need to convert properly openoffice wrap-throught property -->
       <xsl:variable name="zIndex">
         <xsl:choose>
-          <xsl:when test="$frameWrap='run-through' 
-            and $styleGraphicProperties/@style:run-through='background'">-251658240</xsl:when>
-          <xsl:when test="$frameWrap='run-through' 
-            and not($styleGraphicProperties/@style:run-through)">251658240</xsl:when>
+          <xsl:when
+            test="$frameWrap='run-through' 
+            and $styleGraphicProperties/@style:run-through='background'"
+            >-251658240</xsl:when>
+          <xsl:when
+            test="$frameWrap='run-through' 
+            and not($styleGraphicProperties/@style:run-through)"
+            >251658240</xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="parent::draw:frame/@draw:z-index"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
-      
+
       <!-- text-box coordinates -->
       <xsl:variable name="posL">
         <xsl:if test="parent::draw:frame/@svg:x">
@@ -1029,202 +1034,194 @@
           <xsl:value-of select="$topM"/>
         </xsl:if>
       </xsl:variable>
-      
+
       <xsl:if test="parent::draw:frame/@svg:x">
         <xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
       </xsl:if>
       <xsl:if test="parent::draw:frame/@svg:y">
         <xsl:value-of select="concat('margin-top:',$posT,'pt;')"/>
       </xsl:if>
-      
+
       <!-- text-box relative position -->
-      <xsl:choose>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-end-margin' ">mso-position-horizontal-relative: right-margin-area;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-start-margin' ">mso-position-horizontal-relative: left-margin-area;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page' ">mso-position-horizontal-relative: page;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-content' ">mso-position-horizontal-relative: column;</xsl:when>
-      </xsl:choose>
-      
-      <xsl:choose>
-        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page' ">mso-position-vertical-relative: page;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page-content' ">mso-position-vertical-relative: margin;</xsl:when>
-      </xsl:choose>
-      
+      <xsl:if test="parent::draw:frame/@text:anchor-type = 'page'">
+        <xsl:value-of
+          select="concat('mso-position-horizontal-relative:',parent::draw:frame/@text:anchor-type,';')"/>
+        <xsl:value-of
+          select="concat('mso-position-vertical-relative:',parent::draw:frame/@text:anchor-type,';')"
+        />
+      </xsl:if>
+
       <!--horizontal position-->
       <!-- The same style defined in styles.xsl  TODO manage horizontal-rel-->
-      <xsl:if
-        test="$styleGraphicProperties/@style:horizontal-pos">
+      <xsl:if test="$styleGraphicProperties/@style:horizontal-pos">
         <xsl:choose>
-          <xsl:when
-            test="$styleGraphicProperties/@style:horizontal-pos = 'center'">
+          <xsl:when test="$styleGraphicProperties/@style:horizontal-pos = 'center'">
             <xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/>
           </xsl:when>
-          <xsl:when
-            test="$styleGraphicProperties/@style:horizontal-pos='left'">
+          <xsl:when test="$styleGraphicProperties/@style:horizontal-pos='left'">
             <xsl:value-of select="concat('mso-position-horizontal:', 'left',';')"/>
           </xsl:when>
-          <xsl:when
-            test="$styleGraphicProperties/@style:horizontal-pos='right'">
+          <xsl:when test="$styleGraphicProperties/@style:horizontal-pos='right'">
             <xsl:value-of select="concat('mso-position-horizontal:', 'right',';')"/>
           </xsl:when>
           <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
         </xsl:choose>
       </xsl:if>
-      
+
       <!--text-box spacing/margins -->
       <xsl:variable name="marginL">
         <xsl:call-template name="point-measure">
           <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-left"/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:variable name="marginT">
         <xsl:call-template name="point-measure">
           <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-top"/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:variable name="marginR">
         <xsl:call-template name="point-measure">
           <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-right"/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:variable name="marginB">
         <xsl:call-template name="point-measure">
           <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-bottom"/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:if test="parent::draw:frame/@fo:min-width">
         <xsl:value-of select="'mso-wrap-style:none;'"/>
       </xsl:if>
-      <xsl:if
-        test="$styleGraphicProperties/@fo:margin-left">
+      <xsl:if test="$styleGraphicProperties/@fo:margin-left">
         <xsl:value-of select="concat('mso-wrap-distance-left:', $marginL,'pt;')"/>
       </xsl:if>
-      <xsl:if
-        test="$styleGraphicProperties/@fo:margin-top">
+      <xsl:if test="$styleGraphicProperties/@fo:margin-top">
         <xsl:value-of select="concat('mso-wrap-distance-top:', $marginT,'pt;')"/>
       </xsl:if>
-      <xsl:if
-        test="$styleGraphicProperties/@fo:margin-right">
+      <xsl:if test="$styleGraphicProperties/@fo:margin-right">
         <xsl:value-of select="concat('mso-wrap-distance-right:', $marginR,'pt;')"/>
       </xsl:if>
-      <xsl:if
-        test="$styleGraphicProperties/@fo:margin-bottom">
+      <xsl:if test="$styleGraphicProperties/@fo:margin-bottom">
         <xsl:value-of select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
       </xsl:if>
-     </xsl:attribute>  
-    
+    </xsl:attribute>
+
     <!--fill color-->
-    <xsl:if
-      test="$styleGraphicProperties/@fo:background-color">
+    <xsl:if test="$styleGraphicProperties/@fo:background-color">
       <xsl:attribute name="fillcolor">
-        <xsl:value-of
-          select="$styleGraphicProperties/@fo:background-color"
-        />
+        <xsl:value-of select="$styleGraphicProperties/@fo:background-color"/>
       </xsl:attribute>
     </xsl:if>
-    
-    
+
+
     <!--borders-->
     <xsl:if test="$styleGraphicProperties/@fo:border">
-      <xsl:variable name="strokeColor" select="substring-after($styleGraphicProperties/@fo:border,'#')" />
-      
-      <xsl:variable name="strokeWeight" >
+      <xsl:variable name="strokeColor"
+        select="substring-after($styleGraphicProperties/@fo:border,'#')"/>
+
+      <xsl:variable name="strokeWeight">
         <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="substring-before($styleGraphicProperties/@fo:border,' ')"/>
+          <xsl:with-param name="length"
+            select="substring-before($styleGraphicProperties/@fo:border,' ')"/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:if test="$strokeColor != '' ">
-      <xsl:attribute name="strokecolor">
-        <xsl:value-of select="concat('#', $strokeColor)"/>
-      </xsl:attribute>
+        <xsl:attribute name="strokecolor">
+          <xsl:value-of select="concat('#', $strokeColor)"/>
+        </xsl:attribute>
       </xsl:if>
-      
+
       <xsl:if test="$strokeWeight != '' ">
         <xsl:attribute name="strokeweight">
           <xsl:value-of select="concat($strokeWeight,'pt')"/>
         </xsl:attribute>
       </xsl:if>
-      
+
     </xsl:if>
-    
-    <xsl:if test="substring-before(substring-after($styleGraphicProperties/@fo:border,' ' ),' ' ) != 'solid' ">
+
+    <xsl:if
+      test="substring-before(substring-after($styleGraphicProperties/@fo:border,' ' ),' ' ) != 'solid' ">
       <v:stroke>
-          <xsl:attribute name="linestyle">
-             <xsl:choose>
-               <xsl:when test="$styleGraphicProperties/@style:border-line-width">
-                 
-                 <xsl:variable name="innerLineWidth">
-                   <xsl:call-template name="point-measure">
-                     <xsl:with-param name="length" select="substring-before($styleGraphicProperties/@style:border-line-width,' ' )"/>
-                   </xsl:call-template>
-                 </xsl:variable>
-                 
-                 <xsl:variable name="outerLineWidth">
-                   <xsl:call-template name="point-measure">
-                     <xsl:with-param name="length" select="substring-after(substring-after($styleGraphicProperties/@style:border-line-width,' ' ),' ' )"/>
-                   </xsl:call-template>  
-                 </xsl:variable>
-                 
-                 <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
-                 <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
-                 <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
-                 
-               </xsl:when>
-             </xsl:choose>
-          </xsl:attribute>
+        <xsl:attribute name="linestyle">
+          <xsl:choose>
+            <xsl:when test="$styleGraphicProperties/@style:border-line-width">
+
+              <xsl:variable name="innerLineWidth">
+                <xsl:call-template name="point-measure">
+                  <xsl:with-param name="length"
+                    select="substring-before($styleGraphicProperties/@style:border-line-width,' ' )"
+                  />
+                </xsl:call-template>
+              </xsl:variable>
+
+              <xsl:variable name="outerLineWidth">
+                <xsl:call-template name="point-measure">
+                  <xsl:with-param name="length"
+                    select="substring-after(substring-after($styleGraphicProperties/@style:border-line-width,' ' ),' ' )"
+                  />
+                </xsl:call-template>
+              </xsl:variable>
+
+              <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
+              <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
+              <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
+
+            </xsl:when>
+          </xsl:choose>
+        </xsl:attribute>
       </v:stroke>
-      
-     </xsl:if>
-    
+
+    </xsl:if>
+
     <!--fill  transparency-->
     <xsl:variable name="opacity"
       select="100 - substring-before($styleGraphicProperties/@style:background-transparency,'%')"/>
-    
-    <xsl:if
-      test="$styleGraphicProperties/@style:background-transparency">
+
+    <xsl:if test="$styleGraphicProperties/@style:background-transparency">
       <v:fill>
         <xsl:attribute name="opacity">
           <xsl:value-of select="concat($opacity,'%')"/>
         </xsl:attribute>
       </v:fill>
     </xsl:if>
-    
+
   </xsl:template>
-  
-  <!--inserts text-box into shape element --> 
+
+  <!--inserts text-box into shape element -->
   <xsl:template name="InsertTextBox">
-    <xsl:param name="styleGraphicProperties" />
-    
+    <xsl:param name="styleGraphicProperties"/>
+
     <v:textbox>
       <xsl:attribute name="style">
         <xsl:if test="@fo:min-height">
           <xsl:value-of select="'mso-fit-shape-to-text:t'"/>
         </xsl:if>
       </xsl:attribute>
-      
+
       <xsl:variable name="parentStyleName">
-        <xsl:value-of select="$styleGraphicProperties/@style:parent-style-name" />
+        <xsl:value-of select="$styleGraphicProperties/@style:parent-style-name"/>
       </xsl:variable>
-      <xsl:variable name="parentStyleGraphicProperties" select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties" />
-      
+      <xsl:variable name="parentStyleGraphicProperties"
+        select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties"/>
+
       <xsl:call-template name="InsertTextBoxInset">
         <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
         <xsl:with-param name="parentStyleGraphicProperties" select="$parentStyleGraphicProperties"/>
       </xsl:call-template>
-      
+
       <w:txbxContent>
         <xsl:for-each select="child::node()">
           <xsl:apply-templates select="."/>
         </xsl:for-each>
       </w:txbxContent>
-      
-      <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap" />
-     
+
+      <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap"/>
+
       <!--frame wrap-->
       <xsl:choose>
         <xsl:when test="parent::draw:frame/@text:anchor-type = 'as-char' or $frameWrap = 'none' ">
@@ -1247,41 +1244,41 @@
           <w10:wrap type="square" side="largest"/>
         </xsl:when>
       </xsl:choose>
-      
+
     </v:textbox>
   </xsl:template>
-  
+
   <!--converts oo frame padding into inset for text-box -->
   <xsl:template name="InsertTextBoxInset">
-    <xsl:param name="styleGraphicProperties" />
-    <xsl:param name="parentStyleGraphicProperties" />
-    
+    <xsl:param name="styleGraphicProperties"/>
+    <xsl:param name="parentStyleGraphicProperties"/>
+
     <xsl:attribute name="inset">
-        <xsl:choose>
-          <xsl:when
-            test="$styleGraphicProperties/@fo:padding or $styleGraphicProperties/@fo:padding-top">
-            <xsl:call-template name="CalculateTextBoxPadding">
-              <xsl:with-param name="graphicProperties" select="$styleGraphicProperties" />
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:when
-            test="$parentStyleGraphicProperties/@fo:padding or $parentStyleGraphicProperties/@fo:padding-top">
-            <xsl:call-template name="CalculateTextBoxPadding">
-              <xsl:with-param name="graphicProperties" select="$parentStyleGraphicProperties" />
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="CalculateTextBoxPadding"/>
-          </xsl:otherwise>
-        </xsl:choose>
+      <xsl:choose>
+        <xsl:when
+          test="$styleGraphicProperties/@fo:padding or $styleGraphicProperties/@fo:padding-top">
+          <xsl:call-template name="CalculateTextBoxPadding">
+            <xsl:with-param name="graphicProperties" select="$styleGraphicProperties"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when
+          test="$parentStyleGraphicProperties/@fo:padding or $parentStyleGraphicProperties/@fo:padding-top">
+          <xsl:call-template name="CalculateTextBoxPadding">
+            <xsl:with-param name="graphicProperties" select="$parentStyleGraphicProperties"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="CalculateTextBoxPadding"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-  
-  
+
+
   <!--calculates textbox inset attribute  -->
   <xsl:template name="CalculateTextBoxPadding">
-    <xsl:param name="graphicProperties" />
-    
+    <xsl:param name="graphicProperties"/>
+
     <xsl:choose>
       <xsl:when test="not($graphicProperties)">0mm,0mm,0mm,0mm</xsl:when>
       <xsl:when test="$graphicProperties/@fo:padding">
@@ -1331,7 +1328,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- Inserts the style of a text box -->
   <xsl:template name="InsertTextBoxStyle">
     <xsl:variable name="prefixedStyleName">
@@ -1470,16 +1467,16 @@
         </xsl:when>
         <xsl:otherwise>
           <w:t>
-           <xsl:for-each select="child::node()[position() &lt; last()]">
-             <xsl:choose>
-               <xsl:when test="self::text()">
-                 <xsl:value-of select="."/>
-               </xsl:when>
-               <xsl:otherwise>
-                 <xsl:apply-templates select="."/>
-               </xsl:otherwise>
-             </xsl:choose>
-           </xsl:for-each>
+            <xsl:for-each select="child::node()[position() &lt; last()]">
+              <xsl:choose>
+                <xsl:when test="self::text()">
+                  <xsl:value-of select="."/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:apply-templates select="."/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
           </w:t>
           <!--<xsl:apply-templates select="child::text()[1]" mode="text"/>-->
         </xsl:otherwise>
@@ -1631,76 +1628,78 @@
 
       </w:tblPr>
       <w:tblGrid>
-        <xsl:apply-templates select="table:table-column"/>
+        <xsl:call-template name="tblGrid"/>
       </w:tblGrid>
       <xsl:apply-templates
         select="table:table-rows|table:table-header-rows|table:table-row|table:table-header-row"/>
     </w:tbl>
-    
-    
-    
-    
+
+
+
+
     <!-- Section detection  : 3 cases -->
     <xsl:if test="not(ancestor::table:table)">
-    <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
-    <xsl:variable name="followings"
-      select="following-sibling::text:p | following-sibling::text:h | following-sibling::table:table"/>
-    <xsl:variable name="masterPageStarts" select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
-    
-    
-    <!-- section creation -->
-    <xsl:if
-      test="($masterPageStarts = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
-      <w:p>
+      <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
+      <xsl:variable name="followings"
+        select="following-sibling::text:p | following-sibling::text:h | following-sibling::table:table"/>
+      <xsl:variable name="masterPageStarts"
+        select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
+
+
+      <!-- section creation -->
+      <xsl:if
+        test="($masterPageStarts = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
+        <w:p>
           <w:pPr>
-      <w:sectPr>
-        
-        <!-- Determine the master style that rules this section -->
-        <xsl:variable name="currentMasterStyle" select="key('master-based-styles', @text:style-name)"/>     
-        
-        <xsl:choose>
-          <xsl:when test="boolean($currentMasterStyle)">
-            <!-- current element style is tied to a master page -->
-            <xsl:for-each select="document('styles.xml')">
-              <xsl:apply-templates
-                select="key('page-layouts', key('master-pages', $currentMasterStyle[1]/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
-                mode="master-page"/>
-            </xsl:for-each>
-          </xsl:when>
-          <xsl:otherwise>
-            <!-- current style is not tied to a master page, find the preceding one -->
-            <xsl:variable name="precedings"
-              select="preceding::text:p[key('master-based-styles', @text:style-name)] | preceding::text:h[key('master-based-styles', @text:style-name)] | preceding::table:table[key('master-based-styles', @table:style-name)]"/>
-            <xsl:variable name="precedingMasterStyle"
-              select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>      
-            <xsl:choose>
-              <xsl:when test="boolean($precedingMasterStyle)">
-                <xsl:for-each select="document('styles.xml')">
-                  <xsl:apply-templates
-                    select="key('page-layouts', key('master-pages', $precedingMasterStyle[1]/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
-                    mode="master-page"/>
-                </xsl:for-each>
-              </xsl:when>
-              <xsl:otherwise>
-                <!-- otherwise, apply the default master style -->
-                <xsl:for-each select="document('styles.xml')">
-                  <xsl:apply-templates
-                    select="key('page-layouts', /office:document-styles/office:master-styles/style:master-page[1]/@style:page-layout-name)/style:page-layout-properties"
-                    mode="master-page"/>
-                </xsl:for-each>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:otherwise>
-        </xsl:choose>
-        
-      </w:sectPr>
+            <w:sectPr>
+
+              <!-- Determine the master style that rules this section -->
+              <xsl:variable name="currentMasterStyle"
+                select="key('master-based-styles', @text:style-name)"/>
+
+              <xsl:choose>
+                <xsl:when test="boolean($currentMasterStyle)">
+                  <!-- current element style is tied to a master page -->
+                  <xsl:for-each select="document('styles.xml')">
+                    <xsl:apply-templates
+                      select="key('page-layouts', key('master-pages', $currentMasterStyle[1]/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
+                      mode="master-page"/>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!-- current style is not tied to a master page, find the preceding one -->
+                  <xsl:variable name="precedings"
+                    select="preceding::text:p[key('master-based-styles', @text:style-name)] | preceding::text:h[key('master-based-styles', @text:style-name)] | preceding::table:table[key('master-based-styles', @table:style-name)]"/>
+                  <xsl:variable name="precedingMasterStyle"
+                    select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>
+                  <xsl:choose>
+                    <xsl:when test="boolean($precedingMasterStyle)">
+                      <xsl:for-each select="document('styles.xml')">
+                        <xsl:apply-templates
+                          select="key('page-layouts', key('master-pages', $precedingMasterStyle[1]/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
+                          mode="master-page"/>
+                      </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <!-- otherwise, apply the default master style -->
+                      <xsl:for-each select="document('styles.xml')">
+                        <xsl:apply-templates
+                          select="key('page-layouts', /office:document-styles/office:master-styles/style:master-page[1]/@style:page-layout-name)/style:page-layout-properties"
+                          mode="master-page"/>
+                      </xsl:for-each>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
+              </xsl:choose>
+
+            </w:sectPr>
           </w:pPr>
-          </w:p>
+        </w:p>
+      </xsl:if>
     </xsl:if>
-    </xsl:if>
-    
-    
-    
+
+
+
   </xsl:template>
 
   <!-- COMMENT: please rename the template and add a description -->
@@ -1774,61 +1773,325 @@
   </xsl:template>
 
   <!-- table columns -->
-  <xsl:template match="table:table-column">
-    <xsl:param name="repeat" select="1"/>
+  <xsl:template name="tblGrid">
+    <xsl:param name="columnNumber" select="0"/>
+    <xsl:param name="currentColumnWidth" select="0"/>
+    <xsl:param name="columnWidth">
+      <select>
+        <xsl:call-template name="GetColumnWidth">
+          <xsl:with-param name="columnNumber" select="$columnNumber"/>
+        </xsl:call-template>
+      </select>
+    </xsl:param>
 
-    <xsl:variable name="columnNumber">
-      <xsl:call-template name="CountTableColumns">
-        <xsl:with-param name="nodeList" select="preceding-sibling::table:table-column"/>
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:variable name="tableId" select="@table:style-name"/>
 
     <xsl:if test="$columnNumber &lt; 63">
-      <!-- relative width not supported yet -->
-      <w:gridCol>
-        <xsl:attribute name="w:w">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length"
-              select="key('automatic-styles', @table:style-name)/style:table-column-properties/@style:column-width"
-            />
-          </xsl:call-template>
-        </xsl:attribute>
-      </w:gridCol>
-      <xsl:if test="@table:number-columns-repeated ">
-        <xsl:if test="@table:number-columns-repeated &gt; $repeat">
-          <xsl:apply-templates select=".">
-            <xsl:with-param name="repeat" select="$repeat + 1"/>
-          </xsl:apply-templates>
-        </xsl:if>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when
+          test="descendant::table:table-row[table:table-cell[$columnNumber+1]/table:table[@table:is-sub-table='true']]">
+          <xsl:variable name="addedWidth">
+            <xsl:call-template name="BrowseRowsOfTable">
+              <xsl:with-param name="nodeList"
+                select="descendant::table:table-row[child::table:table-cell[$columnNumber+1]/table:table[@table:is-sub-table='true']]"/>
+              <xsl:with-param name="tableId" select="$tableId"/>
+              <xsl:with-param name="columnNumber" select="$columnNumber"/>
+              <xsl:with-param name="currentColumnWidth" select="$currentColumnWidth"/>
+              <xsl:with-param name="columnWidth" select="$columnWidth"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <w:gridCol>
+            <xsl:attribute name="w:w">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="$addedWidth"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:gridCol>
+          <xsl:choose>
+            <xsl:when test="$currentColumnWidth + $addedWidth &lt; $columnWidth">
+              <xsl:call-template name="tblGrid">
+                <xsl:with-param name="columnNumber" select="$columnNumber"/>
+                <xsl:with-param name="currentColumnWidth" select="$currentColumnWidth + $addedWidth"/>
+                <xsl:with-param name="columnWidth" select="$columnWidth"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:variable name="nextColumnWidth">
+                <xsl:call-template name="GetColumnWidth">
+                  <xsl:with-param name="columnNumber" select="$columnNumber + 1"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:if test="$nextColumnWidth &gt; 0">
+                <xsl:call-template name="tblGrid">
+                  <xsl:with-param name="columnNumber" select="$columnNumber+1"/>
+                  <xsl:with-param name="columnWidth" select="$nextColumnWidth"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <w:gridCol>
+            <xsl:attribute name="w:w">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="$columnWidth"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:gridCol>
+          <xsl:variable name="nextColumnWidth">
+            <xsl:call-template name="GetColumnWidth">
+              <xsl:with-param name="columnNumber" select="$columnNumber + 1"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:if test="$nextColumnWidth &gt; 0">
+            <xsl:call-template name="tblGrid">
+              <xsl:with-param name="columnNumber" select="$columnNumber+1"/>
+              <xsl:with-param name="columnWidth" select="$nextColumnWidth"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 
-  <!-- Counts table:table-column (so the max number of cols is 63) -->
-  <xsl:template name="CountTableColumns">
-    <xsl:param name="nodeList"/>
+  <!-- Find the width of a column or a cell. -->
+  <!-- TODO : relative width not supported. -->
+  <xsl:template name="GetColumnWidth">
+    <xsl:param name="node" select="self::node()"/>
+    <xsl:param name="columnNumber" select="false"/>
     <xsl:choose>
-      <xsl:when test="$nodeList">
-        <xsl:variable name="recursive_result">
-          <xsl:call-template name="CountTableColumns">
+      <xsl:when test="$columnNumber != 'false' and not(name($node)='table:table-cell')">
+        <xsl:variable name="contextTable" select="self::node()"/>
+        <xsl:variable name="columnStyle">
+          <xsl:call-template name="GetColumnStyle">
+            <xsl:with-param name="toCount" select="$columnNumber + 1"/>
+            <xsl:with-param name="nodeList"
+              select="$node/descendant::table:table-column[ancestor::node()[1][name()='table:table'] = $contextTable]"
+            />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of
+          select="substring-before(key('automatic-styles',$columnStyle)/style:table-column-properties/@style:column-width,'cm')"
+        />
+      </xsl:when>
+      <xsl:when test="name($node)='table:table-cell'">
+        <xsl:variable name="columnStyle">
+          <xsl:call-template name="GetColumnStyle">
+            <xsl:with-param name="toCount" select="position()"/>
+            <xsl:with-param name="nodeList"
+              select="$node/ancestor::table:table[1]/descendant::table:table-column[ancestor::node()[name()='table:table'] = ancestor::table:table[1]]"
+            />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of
+          select="substring-before(key('automatic-styles',$columnStyle)/style:table-column-properties/@style:column-width,'cm')"
+        />
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="GetColumnStyle">
+    <xsl:param name="nodeList"/>
+    <xsl:param name="toCount"/>
+    <xsl:if test="$nodeList">
+      <xsl:choose>
+        <xsl:when test="$toCount=1">
+          <xsl:value-of select="$nodeList[1]/@table:style-name"/>
+        </xsl:when>
+        <xsl:when test="$nodeList[1]/@table:number-columns-repeated &gt;= $toCount">
+          <xsl:value-of select="$nodeList[1]/@table:style-name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetColumnStyle">
+            <xsl:with-param name="nodeList" select="$nodeList[position() >1]"/>
+            <xsl:with-param name="toCount">
+              <xsl:variable name="toSubstract">
+                <xsl:choose>
+                  <xsl:when test="$nodeList[1]/@table:number-columns-repeated">
+                    <xsl:value-of select="$nodeList[1]/@table:number-columns-repeated"/>
+                  </xsl:when>
+                  <xsl:otherwise>1</xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:value-of select="$toCount - $toSubstract"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- if resultType = length, returns the value of the next width to declare by browsing the rows of the table or subtable -->
+  <!-- if spanValue is defined, returns the number of columns to span in the current cell -->
+  <xsl:template name="BrowseRowsOfTable">
+    <xsl:param name="node" select="self::node()"/>
+    <xsl:param name="nodeList"/>
+    <xsl:param name="currentColumnWidth"/>
+    <xsl:param name="columnNumber"/>
+    <xsl:param name="tableId"/>
+    <xsl:param name="columnWidth"/>
+    <xsl:param name="spanValue"/>
+
+    <xsl:variable name="nextWidthOfRow">
+      <xsl:choose>
+        <xsl:when test="$node/@table:name=$tableId">
+          <xsl:call-template name="BrowseCellsInColumn">
+            <xsl:with-param name="nodeList"
+              select="$nodeList[1]/child::table:table-cell[$columnNumber+1]"/>
+            <xsl:with-param name="tableId" select="$tableId"/>
+            <xsl:with-param name="currentColumnWidth" select="$currentColumnWidth"/>
+            <xsl:with-param name="columnNumber" select="$columnNumber"/>
+            <xsl:with-param name="columnWidth" select="$columnWidth"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="BrowseCellsInColumn">
+            <xsl:with-param name="nodeList" select="$nodeList[1]/child::table:table-cell"/>
+            <xsl:with-param name="tableId" select="$tableId"/>
+            <xsl:with-param name="currentColumnWidth" select="$currentColumnWidth"/>
+            <xsl:with-param name="columnNumber" select="$columnNumber"/>
+            <xsl:with-param name="columnWidth" select="$columnWidth"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="count($nodeList) &gt; 1">
+        <xsl:variable name="smallestNextWidthOfOtherRows">
+          <xsl:call-template name="BrowseRowsOfTable">
             <xsl:with-param name="nodeList" select="$nodeList[position() > 1]"/>
+            <xsl:with-param name="tableId" select="$tableId"/>
+            <xsl:with-param name="columnNumber" select="$columnNumber"/>
+            <xsl:with-param name="currentColumnWidth" select="$currentColumnWidth"/>
+            <xsl:with-param name="columnWidth" select="$columnWidth"/>
           </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
-          <xsl:when test="$nodeList[1]/@table:number-columns-repeated ">
-            <xsl:value-of
-              select="number($nodeList[1]/@table:number-columns-repeated) + $recursive_result"/>
+          <xsl:when test="$spanValue">
+            <xsl:value-of select="$spanValue + 1"/>
+          </xsl:when>
+          <xsl:when test="$nextWidthOfRow &lt; $smallestNextWidthOfOtherRows">
+            <xsl:value-of select="$nextWidthOfRow"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="1 + $recursive_result"/>
+            <xsl:value-of select="$smallestNextWidthOfOtherRows"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="0"/>
+        <xsl:choose>
+          <xsl:when test="$spanValue">
+            <xsl:value-of select="$spanValue + 1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$nextWidthOfRow"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <!-- Cells of the row that has a subtable -->
+  <xsl:template name="BrowseCellsInColumn">
+    <xsl:param name="nodeList"/>
+    <xsl:param name="currentRowWidth" select="0"/>
+    <xsl:param name="currentColumnWidth"/>
+    <xsl:param name="columnNumber"/>
+    <xsl:param name="tableId"/>
+    <xsl:param name="columnWidth"/>
+
+    <xsl:variable name="cellWidth">
+      <xsl:choose>
+        <xsl:when test="$nodeList[1]/child::table:table/@table:is-sub-table='true'">
+          <xsl:call-template name="BrowseRowsOfTable">
+            <xsl:with-param name="node"
+              select="$nodeList[1]/child::table:table[@table:is-sub-table='true']"/>
+            <xsl:with-param name="nodeList"
+              select="$nodeList[1]/descendant::table:table-row[ancestor::table:table-cell[1]=$nodeList[1]]"/>
+            <xsl:with-param name="columnNumber" select="$columnNumber"/>
+            <xsl:with-param name="tableId" select="$tableId"/>
+            <xsl:with-param name="currentColumnWidth" select="$currentColumnWidth"/>
+            <xsl:with-param name="columnWidth" select="$columnWidth"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetColumnWidth">
+            <xsl:with-param name="node" select="$nodeList[1]"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="count($nodeList) &gt; 1">
+        <xsl:choose>
+          <xsl:when test="$currentRowWidth + $cellWidth &lt; $currentColumnWidth">
+            <xsl:call-template name="BrowseCellsInColumn">
+              <xsl:with-param name="nodeList" select="$nodeList[position() > 1]"/>
+              <xsl:with-param name="tableId" select="$tableId"/>
+              <xsl:with-param name="currentColumnWidth" select="$currentColumnWidth"/>
+              <xsl:with-param name="currentRowWidth" select="$currentRowWidth + $cellWidth"/>
+              <xsl:with-param name="columnWidth" select="$columnWidth"/>
+              <xsl:with-param name="columnNumber" select="$columnNumber"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$cellWidth"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$cellWidth"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Find the number of columns to span in case of subtables -->
+  <!-- TODO : Finish it.  -->
+  <xsl:template name="ComputeSpanValue">
+    <xsl:variable name="contextRow" select="parent::node()"/>
+    <xsl:choose>
+      <xsl:when test="ancestor::table:table[1]=ancestor::table:table[last()]">
+        <xsl:variable name="columnNumber">
+          <xsl:for-each select="ancestor-or-self::table:table-cell[last()]">
+            <xsl:value-of select="position()"/>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:call-template name="BrowseRowsOfTable">
+          <xsl:with-param name="spanValue" select="0"/>
+          <xsl:with-param name="nodeList"
+            select="ancestor::table:table[1]/descendant::table:table-row[not($contextRow) and child::table:table-cell[$columnNumber+1]/table:table[@table:is-sub-table='true']]"/>
+          <xsl:with-param name="tableId" select="ancestor::table:table[1]"/>
+          <xsl:with-param name="columnNumber" select="$columnNumber"/>
+          <xsl:with-param name="currentColumnWidth" select="0"/>
+          <xsl:with-param name="columnWidth">
+            <xsl:call-template name="GetColumnWidth">
+              <xsl:with-param name="columnNumber" select="$columnNumber"/>
+            </xsl:call-template>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="columnNumber" select="position()"/>
+        <xsl:call-template name="BrowseRowsOfTable">
+          <xsl:with-param name="spanValue" select="0"/>
+          <xsl:with-param name="nodeList"
+            select="ancestor::table:table[1]/descendant::table:table-row[not($contextRow) and child::table:table-cell[$columnNumber+1]/table:table[@table:is-sub-table='true']]"/>
+          <xsl:with-param name="tableId" select="ancestor::table:table[1]"/>
+          <xsl:with-param name="columnNumber" select="$columnNumber"/>
+          <xsl:with-param name="currentColumnWidth" select="0"/>
+          <xsl:with-param name="columnWidth">
+            <xsl:call-template name="GetColumnWidth">
+              <xsl:with-param name="node" select="."/>
+            </xsl:call-template>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
 
   <!-- table rows -->
   <xsl:template match="table:table-row|table:table-header-row">
@@ -2079,9 +2342,24 @@
             <w:vmerge w:val="continue"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:if test="@table:number-columns-spanned">
-              <w:gridSpan w:val="{@table:number-columns-spanned}"/>
-            </xsl:if>
+            <xsl:variable name="numberOfColumns">
+              <xsl:choose>
+                <xsl:when
+                  test="ancestor::table:table[1]/descendant::table:table-row[table:table-cell/table:table[@table:is-sub-table='true']]">
+                  <!-- TODO : Finish compute the span value of the current cell -->
+                  <xsl:call-template name="ComputeSpanValue"/>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="@table:number-columns-spanned">
+                <w:gridSpan w:val="{@table:number-columns-spanned}"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <w:gridSpan w:val="{$numberOfColumns}"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
         <w:tcBorders>
@@ -2252,7 +2530,7 @@
 
       </w:tcPr>
       <xsl:choose>
-        <xsl:when test="not(child::table:table) and $merge &lt; 2">
+        <xsl:when test="not(child::table:table[@table:is-sub-table='true']) and $merge &lt; 2">
           <xsl:apply-templates/>
           <!-- must precede a w:tc, otherwise it crashes. Xml schema validation does not check this. -->
         </xsl:when>
@@ -2265,19 +2543,10 @@
 
   <!-- text and spaces -->
   <xsl:template match="text()|text:s" mode="paragraph">
-<xsl:variable name="tocId">    
-      <xsl:value-of select="number(count(preceding::text:h)+1)"/>    
-    </xsl:variable>
-    <xsl:if test="ancestor::text:list/text:list-item/text:h">
-      <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
-   </xsl:if>
     <w:r>
       <xsl:call-template name="InsertRunProperties"/>
       <xsl:apply-templates select="." mode="text"/>
     </w:r>
- <xsl:if test="ancestor::text:list/text:list-item/text:h">      
-      <w:bookmarkEnd w:id="{$tocId}"/>
-    </xsl:if>
   </xsl:template>
 
   <!-- Inserts the Run properties -->
@@ -2374,9 +2643,6 @@
           <xsl:otherwise> </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="ancestor::text:list/text:list-item/text:h">
-         <w:t><xsl:value-of select="."></xsl:value-of></w:t>
-      </xsl:when>
       <xsl:otherwise>
         <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
       </xsl:otherwise>
@@ -2469,10 +2735,11 @@
       <w:instrText xml:space="preserve"> XE "</w:instrText>
     </w:r>
     <w:r>
-      <w:instrText>        
-        <xsl:variable name="id"  select="@text:id"/>
+      <w:instrText>
+        <xsl:variable name="id" select="@text:id"/>
         <xsl:for-each select="preceding-sibling::node()">
-          <xsl:if test="preceding-sibling::node()[name() = 'text:alphabetical-index-mark-start' and @text:id = $id]">
+          <xsl:if
+            test="preceding-sibling::node()[name() = 'text:alphabetical-index-mark-start' and @text:id = $id]">
             <xsl:choose>
               <xsl:when test="self::text()">
                 <xsl:value-of select="."/>
@@ -2515,16 +2782,8 @@
           <xsl:otherwise>\* arabic</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:variable name="textName">
-        <xsl:choose>
-          <xsl:when test="@text:name = 'Illustration'">Figure</xsl:when>
-          <xsl:when test="@text:name = 'Table'">Table</xsl:when>
-          <xsl:when test="@text:name = 'Text'">Text</xsl:when>
-          <xsl:when test="@text:name = 'Drawing'">Figure</xsl:when>
-        </xsl:choose>
-      </xsl:variable>
       <xsl:attribute name="w:instr">
-        <xsl:value-of select="concat('SEQ ', $textName,' ', $numType)"/>
+        <xsl:value-of select="concat('SEQ ', @text:name,' ', $numType)"/>
       </xsl:attribute>
       <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id)}"/>
       <w:r>
