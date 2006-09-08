@@ -1026,14 +1026,18 @@
       </xsl:if>
       
       <!-- text-box relative position -->
-       <xsl:if test="parent::draw:frame/@text:anchor-type = 'page'">
-        <xsl:value-of
-          select="concat('mso-position-horizontal-relative:',parent::draw:frame/@text:anchor-type,';')"/>
-        <xsl:value-of
-          select="concat('mso-position-vertical-relative:',parent::draw:frame/@text:anchor-type,';')"
-        />
-      </xsl:if>
-    
+      <xsl:choose>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-end-margin' ">mso-position-horizontal-relative: right-margin-area;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-start-margin' ">mso-position-horizontal-relative: left-margin-area;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page' ">mso-position-horizontal-relative: page;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-content' ">mso-position-horizontal-relative: column;</xsl:when>
+      </xsl:choose>
+      
+      <xsl:choose>
+        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page' ">mso-position-vertical-relative: page;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page-content' ">mso-position-vertical-relative: margin;</xsl:when>
+      </xsl:choose>
+      
       <!--horizontal position-->
       <!-- The same style defined in styles.xsl  TODO manage horizontal-rel-->
       <xsl:if
