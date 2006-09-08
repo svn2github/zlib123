@@ -386,6 +386,9 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
+    <xsl:if test="$node[child::text:toc-mark-start]">
+      <w:outlineLvl w:val="{$node/text:toc-mark-start/@text:outline-level}"/>
+    </xsl:if>
   </xsl:template>
 
   <!-- Inserts paragraph indentation -->
@@ -713,7 +716,7 @@
       <w:r>
         <xsl:choose>
           <xsl:when test="ancestor::text:table-of-content">
-            <w:instrText xml:space="preserve"> TOC \o "1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
+            <w:instrText xml:space="preserve"> TOC \o <xsl:if test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">\u </xsl:if>"1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
           </xsl:when>
           <xsl:when test="ancestor::text:illustration-index">
             <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
