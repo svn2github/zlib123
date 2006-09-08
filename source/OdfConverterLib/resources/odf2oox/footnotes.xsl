@@ -84,50 +84,65 @@
     </w:footnotes>
   </xsl:template>
 
+  
+
   <!-- footnotes configuration -->
-  <xsl:template name="footnotes-configuration">
-    <xsl:param name="wide">no</xsl:param>
-    <xsl:param name="config"/>
+  <xsl:template match="text:notes-configuration[@text:note-class='footnote']" mode="note">
+    <xsl:param name="wide" select="no"/>
     <w:footnotePr>
 
-      <w:pos>
-        <xsl:attribute name="w:val">
-          <xsl:choose>
-            <xsl:when test="$config/@text:footnotes-position = 'text' ">beneathText</xsl:when>
-            <xsl:otherwise>pageBottom</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </w:pos>
-
-      <w:numFmt>
-        <xsl:attribute name="w:val">
-          <xsl:call-template name="num-format">
-            <xsl:with-param name="format" select="$config/@style:num-format"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </w:numFmt>
-
-      <xsl:if test="$config/@text:start-value">
-        <w:numStart w:val="{number($config/@text:start-value) + 1}"/>
+      <xsl:choose>
+        <xsl:when test="ancestor::style:style[@style:family='section']">
+          <w:pos w:val="beneathText"/>
+        </xsl:when>
+        <xsl:when test="@text:footnotes-position">
+          <w:pos>
+            <xsl:attribute name="w:val">
+              <xsl:choose>
+                <xsl:when test="@text:footnotes-position = 'text' ">beneathText</xsl:when>
+                <xsl:otherwise>pageBottom</xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </w:pos>
+        </xsl:when>
+      </xsl:choose>
+      
+      <xsl:if test="@style:num-format">
+        <w:numFmt>
+          <xsl:attribute name="w:val">
+            <xsl:call-template name="num-format">
+              <xsl:with-param name="format" select="@style:num-format"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </w:numFmt>
       </xsl:if>
 
-      <w:numRestart>
-        <xsl:attribute name="w:val">
-          <xsl:choose>
-            <xsl:when test="$config/@text:start-numbering-at = 'page' ">eachPage</xsl:when>
-            <xsl:when test="$config/@text:start-numbering-at = 'chapter' ">eachSect</xsl:when>
-            <xsl:otherwise>continuous</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </w:numRestart>
+      <xsl:if test="@text:start-value">
+        <w:numStart w:val="{number(@text:start-value) + 1}"/>
+      </xsl:if>
+
+      <xsl:if test="@text:start-numbering-at">
+        <w:numRestart>
+          <xsl:attribute name="w:val">
+            <xsl:choose>
+              <xsl:when test="@text:start-numbering-at = 'page' ">eachPage</xsl:when>
+              <xsl:when test="@text:start-numbering-at = 'chapter' ">eachSect</xsl:when>
+              <xsl:otherwise>continuous</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </w:numRestart>
+      </xsl:if>
 
       <xsl:if test="$wide = 'yes' ">
         <w:footnote w:id="0"/>
         <w:footnote w:id="1"/>
       </xsl:if>
-
+        
     </w:footnotePr>
   </xsl:template>
+
+
+
 
   <xsl:template name="footnotes-relationships">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">

@@ -80,37 +80,40 @@
   </xsl:template>
 
   <!-- endotes configuration -->
-  <xsl:template name="endnotes-configuration">
+  <xsl:template match="text:notes-configuration[@text:note-class='endnote']" mode="note">
     <xsl:param name="wide">no</xsl:param>
-    <xsl:param name="config"/>
+
     <w:endnotePr>
 
-      <!-- TODO endnotes for sections -->
       <w:pos>
         <xsl:attribute name="w:val">docEnd</xsl:attribute>
       </w:pos>
 
-      <w:numFmt>
-        <xsl:attribute name="w:val">
-          <xsl:call-template name="num-format">
-            <xsl:with-param name="format" select="$config/@style:num-format"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </w:numFmt>
-
-      <xsl:if test="$config/@text:start-value">
-        <w:numStart w:val="{number($config/@text:start-value) + 1}"/>
+      <xsl:if test="@style:num-format">
+        <w:numFmt>
+          <xsl:attribute name="w:val">
+            <xsl:call-template name="num-format">
+              <xsl:with-param name="format" select="@style:num-format"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </w:numFmt>
       </xsl:if>
 
-      <w:numRestart>
-        <xsl:attribute name="w:val">
-          <xsl:choose>
-            <xsl:when test="$config/@text:start-numbering-at = 'page' ">eachPage</xsl:when>
-            <xsl:when test="$config/@text:start-numbering-at = 'chapter' ">eachSect</xsl:when>
-            <xsl:otherwise>continuous</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </w:numRestart>
+      <xsl:if test="@text:start-value">
+        <w:numStart w:val="{number(@text:start-value) + 1}"/>
+      </xsl:if>
+
+      <xsl:if test="@text:start-numbering-at">
+        <w:numRestart>
+          <xsl:attribute name="w:val">
+            <xsl:choose>
+              <xsl:when test="@text:start-numbering-at = 'page' ">eachPage</xsl:when>
+              <xsl:when test="@text:start-numbering-at = 'chapter' ">eachSect</xsl:when>
+              <xsl:otherwise>continuous</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </w:numRestart>
+      </xsl:if>
 
       <xsl:if test="$wide = 'yes' ">
         <w:endnote w:id="0"/>

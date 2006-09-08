@@ -88,12 +88,8 @@
         <!-- Header/Footer configuration -->
         <xsl:call-template name="HeaderFooter"/>
         <!-- Footnotes and endnotes configuration -->
-        <xsl:call-template name="footnotes-configuration">
-          <xsl:with-param name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
-        </xsl:call-template>
-        <xsl:call-template name="endnotes-configuration">
-          <xsl:with-param name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"/>
-        </xsl:call-template>
+        <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']" mode="note"/>
+        <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']" mode="note"/> 
        
         <!-- Page layout properties -->
         <!--- all the paragraphs, headings or tables tied to a master style -->
@@ -155,7 +151,7 @@
         
         <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
         <xsl:variable name="followings"
-          select="following::text:p | following::text:h  | following::table:table"/>
+          select="following::text:p | following::text:h | following::table:table"/>
         <xsl:variable name="masterPageStarts" select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
         
         <!-- 2 - Section starts. The following paragraph is contained in the following section -->
@@ -184,9 +180,16 @@
             <xsl:variable name="stylesAfterSection" select="$ps/following::text:p[key('master-based-styles', @text:style-name)] | $ps/following::text:h[key('master-based-styles', @text:style-name)] | $ps/following::text:table[key('master-based-styles', @table:style-name)]"/>
             <xsl:variable name="followingMasterStyle" select="$followings[key('master-based-styles', @text:style-name|@table:style-name)]"/>
             <xsl:variable name="continuous" select="generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])"/>
-            <xsl:if test="$continuous or $sectionEnds = 'true' ">
-              <w:type w:val="continuous"/>   
-            </xsl:if>        
+            <xsl:choose>
+              <xsl:when test="$sectionEnds = 'true' ">
+                <xsl:apply-templates select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration[@text:note-class='footnote']" mode="note"/>
+                <xsl:apply-templates select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration[@text:note-class='endnote']" mode="note"/>
+                <w:type w:val="continuous"/>
+              </xsl:when>
+              <xsl:when test="$continuous">
+                <w:type w:val="continuous"/>   
+              </xsl:when>
+            </xsl:choose>
             
             <!-- Determine the master style that rules this section -->
             <xsl:variable name="currentMasterStyle" select="key('master-based-styles', @text:style-name)"/>     

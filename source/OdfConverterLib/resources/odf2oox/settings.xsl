@@ -51,16 +51,16 @@
       <xsl:call-template name="EvenAndOddConfiguration"/>
 
       <!-- Footnotes document wide properties -->
-      <xsl:call-template name="footnotes-configuration">
+      <xsl:apply-templates
+        select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']" mode="note">
         <xsl:with-param name="wide">yes</xsl:with-param>
-        <xsl:with-param name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"/>
-      </xsl:call-template>
+      </xsl:apply-templates>
 
       <!-- Endnotes document wide properties -->
-      <xsl:call-template name="endnotes-configuration">
+      <xsl:apply-templates
+        select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']" mode="note">
         <xsl:with-param name="wide">yes</xsl:with-param>
-        <xsl:with-param name="config" select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"/>
-      </xsl:call-template>
+      </xsl:apply-templates>
 
     </w:settings>
   </xsl:template>
