@@ -139,27 +139,27 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;Apply to all similar texts;Match case;;?;;;;;
 ;;;;Whole word only;;?;;;;;
 ;;;;;;;;;;;
-;Indexes and Tables - Indexes and Tables;Index / Table;Title;;1;0.2-M1;Completed;;174-176;;
-;;;Type;;2;0.2-M2;Partial;;174-176;Table of Contents only;
+;Indexes and Tables - Indexes and Tables;Index / Table - Table of Contents;Title;;1;0.2-M1;Completed;;174-176;;
+;;;Type;;2;0.2-M2;Completed;;174-176;;
 ;;;Protected against manual changes;;;?;;;;;
 ;;;;;;;;;;;
 ;;;for;;1;0.2-M1;Partial;;174-176;Whole document only;TODO : chapter
 ;;;Evaluate upto level;;1;0.2-M1;Completed;;174-176;;
-;;;Create from;Outline;1;0.2-M2;;;;;
-;;;;Additional Styles;1;0.2-M2;;;;;
-;;;;Index marks;1;0.2-M2;;;;;
+;;;Create from;Outline;1;0.2-M2;Completed;;;;
+;;;;Additional Styles;1;0.2-M2;Completed;This feature doesn't have equivalent in Word - see Conversion Issues on Wiki page;;;
+;;;;Index marks;1;0.2-M2;Completed;;;;
 ;;;;;;;;;;;
 ;;Entries;Level;;;?;Completed;;174-176;;
 ;;;Structure;;;?;;;;;
-;;;Chapter no;;2;0.2-M2;TODO;;;;
+;;;Chapter no;;2;0.2-M2;;;;;
 ;;;Entry text;;2;0.2-M2;Completed;;174-176;;
 ;;;Tab stop;;2;0.2-M2;Completed;;174-176;;
 ;;;Page no;;2;0.2-M2;Completed;;174-176;;
 ;;;Character style;;2;0.2-M2;;;;;
 ;;;Format;Tab position relative to Paragraph style indent;2;0.2-M2;;;;;
 ;;;;;;;;;;;
-;;Styles;Levels;;2;0.2-M2;;;;;
-;;;Paragraph Styles;;2;0.2-M2;;;;;
+;;Styles;Levels;;2;0.2-M2;;;;;Has this feature equivalent in Word ?
+;;;Paragraph Styles;;2;0.2-M2;;;;;Has this feature equivalent in Word ?
 ;;;;;;;;;;;
 ;;Columns;No of columns;;2;0.2-Final;;;;;
 ;;;Column style;;2;0.2-Final;;;;;
@@ -220,7 +220,7 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;;
 ;;;Keep ratio;;;0.2-M2;Completed;;;"This feature doesn't have a equivalent in Word (Word has different feature called ""lock acpect ratio"" but it works differently then ""keep ratio"" in OO. Openoffice ""keep ratio"" feature  doesn't block ratio - it justs calculates width and height)";
 ;;;;;;;;;;;
-;;;Anchor;To (page/ para/ char) / as char;1;0.2-M2;;;741;"There is no seperate property like anchor for frame/text-box in Word - it depends on value of ""alignement relative to"" property. In OpenOffice ""anchor"" and ""alignement relative to"" property are two different things. ";
+;;;Anchor;To (page/ para/ char) / as char;1;0.2-M2;;;741;"There is no seperate property like anchor for frame/text-box in Word - it depends on value of ""alignement relative to"" property. In OpenOffice ""anchor"" and ""alignment relative to"" property are two different things. ";
 ;;;;;;;;;;;
 ;;;Position;Horizontal;;0.2-M2;Partial;;737;relative to Left page border, right page border, entire page, page text area are converted;TODO See if there are equivalent in Word for relative to: Paragraph area, Paragraph text Area, left paragrpah border, right paragraph border
 ;;;;Vertical;;0.2-M2;Partial;;739;relative to Page text area and Entire page are converted;TODO: relative to margin, paragraph text area
