@@ -212,18 +212,18 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;;
 ;;Sender;;;;?;;;;;
 ;;;;;;;;;;;
-;Frame;Type;Width;Relative;;0.2-M2;Completed;;729;;
-;;;;Automatic;;0.2-M2;Partial;;729;;
+;Frame;Type;Width;Relative;;0.2-M2;Completed;"There is a difference between openoffice and word in handling relative sizes: in openoffice the size can be set relative according to frame anchor (page, paragraph, character) but in word you can set size relativly to: page, margin, left margin and so on. So we can map only ""size relative to page"" property becouse the rest of properties  are incompatible. ";729;;
+;;;;Automatic;;0.2-M2;Completed;min-width is lost;729;;
 ;;;;;;;;;;;
-;;;Height;Relative;;0.2-M2;Completed;;730;;
-;;;;Autosize;;0.2-M2;Completed;;730;;
+;;;Height;Relative;;0.2-M2;Completed;"There is a difference between openoffice and word in handling relative sizes: in openoffice the size can be set relative according to frame anchor (page, paragraph, character) but in word you can set size relativly to: page, margin, left margin and so on. So we can map only ""size relative to page"" property becouse the rest of properties  are incompatible. ";730;;
+;;;;Autosize;;0.2-M2;Completed;min-height is lost;730;;
 ;;;;;;;;;;;
-;;;Keep ratio;;;0.2-M2;;;;;
+;;;Keep ratio;;;0.2-M2;Completed;;;"This feature doesn't have a equivalent in Word (Word has different feature called ""lock acpect ratio"" but it works differently then ""keep ratio"" in OO. Openoffice ""keep ratio"" feature  doesn't block ratio - it justs calculates width and height)";
 ;;;;;;;;;;;
-;;;Anchor;To (page/ para/ char) / as char;1;0.2-M2;;;741;;
+;;;Anchor;To (page/ para/ char) / as char;1;0.2-M2;;;741;"There is no seperate property like anchor for frame/text-box in Word - it depends on value of ""alignement relative to"" property. In OpenOffice ""anchor"" and ""alignement relative to"" property are two different things. ";
 ;;;;;;;;;;;
-;;;Position;Horizontal;;0.2-M2;Partial;;737;;
-;;;;Vertical;;0.2-M2;Partial;;739;;
+;;;Position;Horizontal;;0.2-M2;Partial;;737;relative to Left page border, right page border, entire page, page text area are converted;TODO See if there are equivalent in Word for relative to: Paragraph area, Paragraph text Area, left paragrpah border, right paragraph border
+;;;;Vertical;;0.2-M2;Partial;;739;relative to Page text area and Entire page are converted;TODO: relative to margin, paragraph text area
 ;;;;;;;;;;;
 ;;Options;Name;;;?;;;;;
 ;;;Previous Link;;;?;;;;;
@@ -237,7 +237,7 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;Print;;?;;;;;
 ;;;;Text direction;;?;;;;;
 ;;;;;;;;;;;
-;;Wrap;Settings;None/ Beforte/ After/ Parallel/ Through/ Optimal;;0.2-M2;Completed???;;;;
+;;Wrap;Settings;None/ Beforte/ After/ Parallel/ Through/ Optimal;;0.2-M2;Completed;;;;
 ;;;;;;;;;;;
 ;;;Spacing;Left;;0.2-M2;Completed;;732;;
 ;;;;Right;;0.2-M2;Completed;;732;;
