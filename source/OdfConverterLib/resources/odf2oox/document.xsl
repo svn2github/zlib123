@@ -2253,10 +2253,19 @@
 
   <!-- text and spaces -->
   <xsl:template match="text()|text:s" mode="paragraph">
+<xsl:variable name="tocId">    
+      <xsl:value-of select="number(count(preceding::text:h)+1)"/>    
+    </xsl:variable>
+    <xsl:if test="ancestor::text:list/text:list-item/text:h">
+      <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
+   </xsl:if>
     <w:r>
       <xsl:call-template name="InsertRunProperties"/>
       <xsl:apply-templates select="." mode="text"/>
     </w:r>
+ <xsl:if test="ancestor::text:list/text:list-item/text:h">      
+      <w:bookmarkEnd w:id="{$tocId}"/>
+    </xsl:if>
   </xsl:template>
 
   <!-- Inserts the Run properties -->
@@ -2352,6 +2361,9 @@
           </xsl:when>
           <xsl:otherwise> </xsl:otherwise>
         </xsl:choose>
+      </xsl:when>
+      <xsl:when test="ancestor::text:list/text:list-item/text:h">
+         <w:t><xsl:value-of select="."></xsl:value-of></w:t>
       </xsl:when>
       <xsl:otherwise>
         <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
