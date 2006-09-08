@@ -168,7 +168,7 @@
         
         <!-- section creation -->
         <xsl:if
-          test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(parent::text:note-body)">
+          test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
           <w:sectPr>
             
             <!-- 
@@ -1568,6 +1568,71 @@
       <xsl:apply-templates
         select="table:table-rows|table:table-header-rows|table:table-row|table:table-header-row"/>
     </w:tbl>
+    
+    
+    
+    
+    <!-- Section detection  : 3 cases -->
+    <xsl:if test="not(ancestor::table:table)">
+    <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
+    <xsl:variable name="followings"
+      select="following-sibling::text:p | following-sibling::text:h | following-sibling::table:table"/>
+    <xsl:variable name="masterPageStarts" select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
+    
+    
+    <!-- section creation -->
+    <xsl:if
+      test="($masterPageStarts = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
+      <w:p>
+          <w:pPr>
+      <w:sectPr>
+        
+        <!-- Determine the master style that rules this section -->
+        <xsl:variable name="currentMasterStyle" select="key('master-based-styles', @text:style-name)"/>     
+        
+        <xsl:choose>
+          <xsl:when test="boolean($currentMasterStyle)">
+            <!-- current element style is tied to a master page -->
+            <xsl:for-each select="document('styles.xml')">
+              <xsl:apply-templates
+                select="key('page-layouts', key('master-pages', $currentMasterStyle[1]/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
+                mode="master-page"/>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- current style is not tied to a master page, find the preceding one -->
+            <xsl:variable name="precedings"
+              select="preceding::text:p[key('master-based-styles', @text:style-name)] | preceding::text:h[key('master-based-styles', @text:style-name)] | preceding::table:table[key('master-based-styles', @table:style-name)]"/>
+            <xsl:variable name="precedingMasterStyle"
+              select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>      
+            <xsl:choose>
+              <xsl:when test="boolean($precedingMasterStyle)">
+                <xsl:for-each select="document('styles.xml')">
+                  <xsl:apply-templates
+                    select="key('page-layouts', key('master-pages', $precedingMasterStyle[1]/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
+                    mode="master-page"/>
+                </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>
+                <!-- otherwise, apply the default master style -->
+                <xsl:for-each select="document('styles.xml')">
+                  <xsl:apply-templates
+                    select="key('page-layouts', /office:document-styles/office:master-styles/style:master-page[1]/@style:page-layout-name)/style:page-layout-properties"
+                    mode="master-page"/>
+                </xsl:for-each>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+        
+      </w:sectPr>
+          </w:pPr>
+          </w:p>
+    </xsl:if>
+    </xsl:if>
+    
+    
+    
   </xsl:template>
 
   <!-- COMMENT: please rename the template and add a description -->
