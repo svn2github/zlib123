@@ -719,7 +719,19 @@
             <w:instrText xml:space="preserve"> TOC \o <xsl:if test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">\u </xsl:if>"1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
           </xsl:when>
           <xsl:when test="ancestor::text:illustration-index">
-            <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
+            <xsl:variable name="nameElement">
+              <xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>
+            </xsl:variable>
+            <xsl:variable name="captionSequenceName">
+              <xsl:choose>
+                <xsl:when test="$nameElement = 'Illustration'">Figure</xsl:when>
+                <xsl:when test="$nameElement = 'Table'">Table</xsl:when>
+                <xsl:when test="$nameElement = 'Text'">Text</xsl:when>
+                <xsl:when test="$nameElement = 'Drawing'">Figure</xsl:when>
+              </xsl:choose>
+            </xsl:variable>
+            <!--w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText-->
+            <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="$captionSequenceName"/>" </w:instrText>
           </xsl:when>
           <xsl:when test="ancestor::text:alphabetical-index">
             <w:instrText xml:space="preserve"> INDEX \e "" \c "<xsl:choose><xsl:when test="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">1</xsl:when><xsl:otherwise><xsl:value-of select="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/></xsl:otherwise></xsl:choose>" \z "1045" </w:instrText>
@@ -2503,8 +2515,16 @@
           <xsl:otherwise>\* arabic</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+      <xsl:variable name="textName">
+        <xsl:choose>
+          <xsl:when test="@text:name = 'Illustration'">Figure</xsl:when>
+          <xsl:when test="@text:name = 'Table'">Table</xsl:when>
+          <xsl:when test="@text:name = 'Text'">Text</xsl:when>
+          <xsl:when test="@text:name = 'Drawing'">Figure</xsl:when>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:attribute name="w:instr">
-        <xsl:value-of select="concat('SEQ ', @text:name,' ', $numType)"/>
+        <xsl:value-of select="concat('SEQ ', $textName,' ', $numType)"/>
       </xsl:attribute>
       <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id)}"/>
       <w:r>
