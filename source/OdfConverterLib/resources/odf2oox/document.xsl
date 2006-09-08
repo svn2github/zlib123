@@ -941,85 +941,32 @@
   <!--converts oo frame style properties to shape properties for text-box--> 
   <xsl:template name="InsertShapeProperties">
    <xsl:param name="styleGraphicProperties" />
-  
-    <xsl:variable name="frameW">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="parent::draw:frame/@svg:width|parent::draw:frame/@fo:min-width"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="frameH">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="@fo:min-height|parent::draw:frame/@svg:height"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="posL">
-      <xsl:if test="parent::draw:frame/@svg:x">
-        <xsl:variable name="leftM">
-          <xsl:call-template name="ComputeMarginX">
-            <xsl:with-param name="parent" select="ancestor::draw:frame"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:value-of select="$leftM"/>
-      </xsl:if>
-    </xsl:variable>
-    <xsl:variable name="posT">
-      <xsl:if test="parent::draw:frame/@svg:y">
-        <xsl:variable name="topM">
-          <xsl:call-template name="ComputeMarginY">
-            <xsl:with-param name="parent" select="ancestor::draw:frame"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:value-of select="$topM"/>
-      </xsl:if>
-    </xsl:variable>
-    
-    <xsl:variable name="marginL">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-left"/>
-      </xsl:call-template>
-    </xsl:variable>
-    
-    <xsl:variable name="marginT">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-top"/>
-      </xsl:call-template>
-    </xsl:variable>
-    
-    <xsl:variable name="marginR">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-right"/>
-      </xsl:call-template>
-    </xsl:variable>
-    
-    <xsl:variable name="marginB">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-bottom"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="frameWrap"
-      select="$styleGraphicProperties/@style:wrap"/>
-    
-    <xsl:variable name="zIndex">
-      <xsl:choose>
-        <xsl:when test="$frameWrap='run-through' 
-          and $styleGraphicProperties/@style:run-through='background'">-251658240</xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="parent::draw:frame/@draw:z-index"/>
-        </xsl:otherwise>
-      </xsl:choose>
-     </xsl:variable>
-   
-    <xsl:variable name="relWidth"
-      select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
-    <xsl:variable name="relHeight"
-      select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
     
     <xsl:attribute name="style">
      
+     <!-- absolute positioning for text-box -->
+      <xsl:variable name="frameWrap"
+        select="$styleGraphicProperties/@style:wrap"/>
       <xsl:if test="(not($frameWrap) or $frameWrap != 'none') and not(parent::draw:frame/@text:anchor-type = 'as-char') "  >
         <xsl:value-of select="'position:absolute;'"/>
       </xsl:if>
+   
+      <!--  text-box width and height-->
+      <xsl:variable name="frameW">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length"
+            select="parent::draw:frame/@svg:width|parent::draw:frame/@fo:min-width"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="frameH">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="@fo:min-height|parent::draw:frame/@svg:height"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="relWidth"
+        select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
+      <xsl:variable name="relHeight"
+        select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
       
       <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
       <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
@@ -1031,21 +978,60 @@
         <xsl:value-of select="concat('mso-height-percent:',$relHeight,'0;')"/>
       </xsl:if>
       
+      <!--z-index that we need to convert properly openoffice wrap-throught property -->
+      <xsl:variable name="zIndex">
+        <xsl:choose>
+          <xsl:when test="$frameWrap='run-through' 
+            and $styleGraphicProperties/@style:run-through='background'">-251658240</xsl:when>
+          <xsl:when test="$frameWrap='run-through' 
+            and not($styleGraphicProperties/@style:run-through)">251658240</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="parent::draw:frame/@draw:z-index"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
       <xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
+      
+      <!-- text-box coordinates -->
+      <xsl:variable name="posL">
+        <xsl:if test="parent::draw:frame/@svg:x">
+          <xsl:variable name="leftM">
+            <xsl:call-template name="ComputeMarginX">
+              <xsl:with-param name="parent" select="ancestor::draw:frame"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$leftM"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name="posT">
+        <xsl:if test="parent::draw:frame/@svg:y">
+          <xsl:variable name="topM">
+            <xsl:call-template name="ComputeMarginY">
+              <xsl:with-param name="parent" select="ancestor::draw:frame"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$topM"/>
+        </xsl:if>
+      </xsl:variable>
+      
       <xsl:if test="parent::draw:frame/@svg:x">
         <xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
       </xsl:if>
       <xsl:if test="parent::draw:frame/@svg:y">
         <xsl:value-of select="concat('margin-top:',$posT,'pt;')"/>
       </xsl:if>
-      <xsl:if test="parent::draw:frame/@text:anchor-type = 'page'">
+      
+      <!-- text-box relative position -->
+       <xsl:if test="parent::draw:frame/@text:anchor-type = 'page'">
         <xsl:value-of
           select="concat('mso-position-horizontal-relative:',parent::draw:frame/@text:anchor-type,';')"/>
         <xsl:value-of
           select="concat('mso-position-vertical-relative:',parent::draw:frame/@text:anchor-type,';')"
         />
       </xsl:if>
-      
+    
+      <!--horizontal position-->
       <!-- The same style defined in styles.xsl  TODO manage horizontal-rel-->
       <xsl:if
         test="$styleGraphicProperties/@style:horizontal-pos">
@@ -1065,6 +1051,32 @@
           <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
         </xsl:choose>
       </xsl:if>
+      
+      <!--text-box spacing/margins -->
+      <xsl:variable name="marginL">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-left"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:variable name="marginT">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-top"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:variable name="marginR">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-right"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:variable name="marginB">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-bottom"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
       <xsl:if test="parent::draw:frame/@fo:min-width">
         <xsl:value-of select="'mso-wrap-style:none;'"/>
       </xsl:if>
@@ -1086,6 +1098,7 @@
       </xsl:if>
      </xsl:attribute>  
     
+    <!--fill color-->
     <xsl:if
       test="$styleGraphicProperties/@fo:background-color">
       <xsl:attribute name="fillcolor">
@@ -1094,6 +1107,7 @@
         />
       </xsl:attribute>
     </xsl:if>
+    
     
     <!--borders-->
     <xsl:if test="$styleGraphicProperties/@fo:border">
@@ -1105,15 +1119,50 @@
         </xsl:call-template>
       </xsl:variable>
       
+      <xsl:if test="$strokeColor != '' ">
       <xsl:attribute name="strokecolor">
         <xsl:value-of select="concat('#', $strokeColor)"/>
       </xsl:attribute>
+      </xsl:if>
       
-      <xsl:attribute name="strokeweight">
-        <xsl:value-of select="concat($strokeWeight,'pt')"/>
-      </xsl:attribute>
+      <xsl:if test="$strokeWeight != '' ">
+        <xsl:attribute name="strokeweight">
+          <xsl:value-of select="concat($strokeWeight,'pt')"/>
+        </xsl:attribute>
+      </xsl:if>
+      
     </xsl:if>
     
+    <xsl:if test="substring-before(substring-after($styleGraphicProperties/@fo:border,' ' ),' ' ) != 'solid' ">
+      <v:stroke>
+          <xsl:attribute name="linestyle">
+             <xsl:choose>
+               <xsl:when test="$styleGraphicProperties/@style:border-line-width">
+                 
+                 <xsl:variable name="innerLineWidth">
+                   <xsl:call-template name="point-measure">
+                     <xsl:with-param name="length" select="substring-before($styleGraphicProperties/@style:border-line-width,' ' )"/>
+                   </xsl:call-template>
+                 </xsl:variable>
+                 
+                 <xsl:variable name="outerLineWidth">
+                   <xsl:call-template name="point-measure">
+                     <xsl:with-param name="length" select="substring-after(substring-after($styleGraphicProperties/@style:border-line-width,' ' ),' ' )"/>
+                   </xsl:call-template>  
+                 </xsl:variable>
+                 
+                 <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
+                 <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
+                 <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
+                 
+               </xsl:when>
+             </xsl:choose>
+          </xsl:attribute>
+      </v:stroke>
+      
+     </xsl:if>
+    
+    <!--fill  transparency-->
     <xsl:variable name="opacity"
       select="100 - substring-before($styleGraphicProperties/@style:background-transparency,'%')"/>
     
