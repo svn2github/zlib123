@@ -45,7 +45,21 @@
 		1 dpt (didot point) = 1/72 in (almost the same as 1 pt)
 		1 px = 0.0264cm at 96dpi (Windows default)
 		1 milimeter(mm) = 0.1cm
-	-->
+  -->
+
+  <!-- Gets the unit of a length -->
+  <xsl:template name="GetUnit">
+    <xsl:param name="length"/>
+    <xsl:choose>
+      <xsl:when test="contains($length, 'cm')">cm</xsl:when>
+      <xsl:when test="contains($length, 'in')">in</xsl:when>
+      <xsl:when test="contains($length, 'pt')">pt</xsl:when>
+      <xsl:when test="contains($length, 'twip')">twip</xsl:when>
+      <xsl:when test="contains($length, 'pica')">pica </xsl:when>
+      <xsl:when test="contains($length, 'dpt')">dpt</xsl:when>
+      <xsl:when test="contains($length, 'px')">px</xsl:when>
+    </xsl:choose>
+  </xsl:template>
 
 
   <!-- 
@@ -303,7 +317,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="contains($borderStr, 'solid')">single</xsl:when>
       <xsl:when test="contains($borderStr, 'double')">
@@ -327,7 +341,7 @@
       <xsl:otherwise>none</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- additional template in case of 'double' style for border. -->
   <xsl:template name="DoubleBorder">
     <xsl:param name="borderLineWidth"/>
