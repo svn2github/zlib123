@@ -1225,7 +1225,6 @@
     <xsl:apply-templates select="style:columns" mode="columns"/>
   </xsl:template>
 
-
   <xsl:template match="style:columns" mode="columns">
     <w:cols>
       <!-- nb columns -->
@@ -1261,48 +1260,43 @@
         <w:col>
           <!-- the left and right spaces -->
           <xsl:variable name="start">
-            <xsl:value-of select="number(substring-before(@fo:start-indent,'cm'))"/>
-          </xsl:variable>
-          <xsl:variable name="end">
-            <xsl:value-of select="number(substring-before(@fo:end-indent,'cm'))"/>
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="@fo:start-indent"/>
+            </xsl:call-template>
           </xsl:variable>
 
-          <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent -->
-          <xsl:variable name="spacesBetween">
+          <xsl:variable name="end">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="@fo:end-indent"/>
+            </xsl:call-template>
+          </xsl:variable>
+
+          <xsl:variable name="width">
+            <xsl:value-of select="number($start + $end)"/>
+          </xsl:variable>
+
+          <!-- space -->
+          <xsl:attribute name="w:space">
+            <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent -->
             <xsl:choose>
               <xsl:when test="following-sibling::style:column/@fo:start-indent">
-                <xsl:value-of
-                  select="number(substring-before(following-sibling::style:column/@fo:start-indent,'cm')) + $end"
-                />
+                <xsl:variable name="followingStart">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length"
+                      select="following-sibling::style:column/@fo:start-indent"/>
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="number($followingStart + $end)"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$end"/>
               </xsl:otherwise>
             </xsl:choose>
-          </xsl:variable>
-
-          <!-- Open xml space converted into twips -->
-          <xsl:variable name="spaceTwips">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="concat($spacesBetween,'cm') "/>
-            </xsl:call-template>
-          </xsl:variable>
-
-          <!-- ODT spaces converted in twips-->
-          <xsl:variable name="widthTwips">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="concat($end+$start,'cm') "/>
-            </xsl:call-template>
-          </xsl:variable>
-
-          <!-- space -->
-          <xsl:attribute name="w:space">
-            <xsl:value-of select="$spaceTwips"/>
           </xsl:attribute>
 
           <!-- width -->
           <xsl:attribute name="w:w">
-            <xsl:value-of select="substring-before(@style:rel-width,'*') - $widthTwips"/>
+            <xsl:value-of select="substring-before(@style:rel-width,'*') - $width"/>
           </xsl:attribute>
         </w:col>
       </xsl:for-each>
