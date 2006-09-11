@@ -104,11 +104,8 @@
 
       </w:tblPr>
       <xsl:call-template name="InsertTblGrid"/>
-      <xsl:apply-templates select="table:table-rows|table:table-header-rows|table:table-row"/>
+      <xsl:apply-templates select="table:table-row"/>
     </w:tbl>
-
-
-
 
     <!-- Section detection  : 3 cases -->
     <xsl:if test="not(ancestor::table:table)">
@@ -117,7 +114,6 @@
         select="following-sibling::text:p | following-sibling::text:h | following-sibling::table:table"/>
       <xsl:variable name="masterPageStarts"
         select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
-
 
       <!-- section creation -->
       <xsl:if
@@ -170,8 +166,6 @@
         </w:p>
       </xsl:if>
     </xsl:if>
-
-
 
   </xsl:template>
 
@@ -243,187 +237,6 @@
         <xsl:with-param name="iterator" select="$iterator +1"/>
       </xsl:call-template>
     </xsl:if>
-  </xsl:template>
-
-  <!--************************
-      ** Compute table grid **
-      ************************-->
-
-  <!-- Inserts a table grid -->
-  <xsl:template name="InsertTblGrid">
-    <xsl:variable name="unit">
-      <xsl:call-template name="GetUnit">
-        <xsl:with-param name="length"
-          select="key('automatic-styles',@table:style-name)/style:table-properties/@style:width"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <w:tblGrid>
-      <xsl:call-template name="InsertGridCols">
-        <xsl:with-param name="lastWidth">0</xsl:with-param>
-        <xsl:with-param name="unit" select="$unit"/>
-      </xsl:call-template>
-    </w:tblGrid>
-  </xsl:template>
-
-  <!-- Inserts grid columns -->
-  <xsl:template name="InsertGridCols">
-    <xsl:param name="unit"/>
-    <xsl:param name="lastWidth"/>
-    <xsl:variable name="tableWidth">
-      <xsl:value-of
-        select="substring-before(key('automatic-styles',@table:style-name)/style:table-properties/@style:width,$unit)"
-      />
-    </xsl:variable>
-    <!-- We continue until we've reached end of table (with a small incertitude of 0.005) -->
-    <xsl:if test="$tableWidth - $lastWidth > 0.005 or $tableWidth - $lastWidth &lt; -0.005">
-      <xsl:variable name="nextWidth">
-        <xsl:choose>
-          <xsl:when test="table:table-header-rows/table:table-row">
-            <xsl:apply-templates select="table:table-header-rows/table:table-row[1]"
-              mode="findNextWidth">
-              <xsl:with-param name="unit" select="$unit"/>
-              <xsl:with-param name="lastWidth" select="$lastWidth"/>
-              <xsl:with-param name="nextWidth" select="$tableWidth"/>
-              <xsl:with-param name="offset">0</xsl:with-param>
-            </xsl:apply-templates>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="table:table-row[1]" mode="findNextWidth">
-              <xsl:with-param name="unit" select="$unit"/>
-              <xsl:with-param name="lastWidth" select="$lastWidth"/>
-              <xsl:with-param name="nextWidth" select="$tableWidth"/>
-              <xsl:with-param name="offset">0</xsl:with-param>
-            </xsl:apply-templates>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      <w:gridCol>
-        <xsl:attribute name="w:w">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="concat($nextWidth - $lastWidth,$unit)"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </w:gridCol>
-      <xsl:call-template name="InsertGridCols">
-        <xsl:with-param name="unit" select="$unit"/>
-        <xsl:with-param name="lastWidth" select="$nextWidth"/>
-      </xsl:call-template>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- iterate over every row to find the next width -->
-  <!-- the next width is the smallest value that matches the following conditions:
-        - it is bigger than the last width
-        - a cell is starting at this value -->
-  <xsl:template match="table:table-row" mode="findNextWidth">
-    <xsl:param name="unit"/>
-    <xsl:param name="lastWidth"/>
-    <xsl:param name="nextWidth"/>
-    <xsl:param name="offset"/>
-    <!-- compute next width for this row -->
-    <xsl:variable name="rowNextWidth">
-      <xsl:apply-templates select="table:table-cell[1]" mode="findNextWidth">
-        <xsl:with-param name="unit" select="$unit"/>
-        <xsl:with-param name="lastWidth" select="$lastWidth"/>
-        <xsl:with-param name="currentWidth" select="$offset"/>
-      </xsl:apply-templates>
-    </xsl:variable>
-    <!-- take the smaller new width between previous rows' and current row's -->
-    <xsl:variable name="computedNextWidth">
-      <xsl:choose>
-        <xsl:when test="$rowNextWidth &lt; $nextWidth">
-          <xsl:value-of select="$rowNextWidth"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$nextWidth"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:choose>
-      <!-- iterate over next row -->
-      <xsl:when test="following-sibling::table:table-row">
-        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="findNextWidth">
-          <xsl:with-param name="unit" select="$unit"/>
-          <xsl:with-param name="lastWidth" select="$lastWidth"/>
-          <xsl:with-param name="nextWidth" select="$computedNextWidth"/>
-          <xsl:with-param name="offset" select="$offset"/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <!-- if we are in table header rows, go to normal rows -->
-      <xsl:when test="parent::table:table-header-rows and ../../table:table-row">
-        <xsl:apply-templates select="../../table:table-row[1]" mode="findNextWidth">
-          <xsl:with-param name="unit" select="$unit"/>
-          <xsl:with-param name="lastWidth" select="$lastWidth"/>
-          <xsl:with-param name="nextWidth" select="$computedNextWidth"/>
-          <xsl:with-param name="offset" select="$offset"/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <!-- end of table, use the computed value -->
-      <xsl:otherwise>
-        <xsl:value-of select="$computedNextWidth"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- iterate over every cell to find the next width -->
-  <!-- the next width is the smallest value that matches the following conditions:
-        - it is bigger than the last width
-        - a cell is starting at this value -->
-  <xsl:template match="table:table-cell" mode="findNextWidth">
-    <xsl:param name="unit"/>
-    <xsl:param name="lastWidth"/>
-    <xsl:param name="currentWidth"/>
-    <xsl:variable name="cellWidth">
-      <xsl:call-template name="GetCellWidth">
-        <xsl:with-param name="unit" select="$unit"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <!-- $nextWidth: value at which the current cell ends -->
-    <!-- we have to do this round(x*10000) div 10000 to avoid decimal artifacts -->
-    <xsl:variable name="nextWidth" select="round(($currentWidth + $cellWidth)*10000) div 10000"/>
-    <xsl:choose>
-      <!-- current cell is starting before last width, iterate over the next cell -->
-      <xsl:when test="$nextWidth &lt;= $lastWidth">
-        <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="findNextWidth">
-          <xsl:with-param name="unit" select="$unit"/>
-          <xsl:with-param name="lastWidth" select="$lastWidth"/>
-          <xsl:with-param name="currentWidth" select="$nextWidth"/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <!-- current cell is starting after last width -->
-        <xsl:choose>
-          <!-- if there is a subtable, iterate over every row of it -->
-          <xsl:when test="child::table:table[@table:is-sub-table = 'true']">
-            <xsl:choose>
-              <xsl:when test="child::table:table/table:table-header-rows/table:table-row">
-                <xsl:apply-templates
-                  select="child::table:table/table:table-header-rows/table:table-row[1]"
-                  mode="findNextWidth">
-                  <xsl:with-param name="unit" select="$unit"/>
-                  <xsl:with-param name="lastWidth" select="$lastWidth"/>
-                  <xsl:with-param name="nextWidth" select="$nextWidth"/>
-                  <xsl:with-param name="offset" select="$currentWidth"/>
-                </xsl:apply-templates>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:apply-templates select="child::table:table/table:table-row[1]"
-                  mode="findNextWidth">
-                  <xsl:with-param name="unit" select="$unit"/>
-                  <xsl:with-param name="lastWidth" select="$lastWidth"/>
-                  <xsl:with-param name="nextWidth" select="$nextWidth"/>
-                  <xsl:with-param name="offset" select="$currentWidth"/>
-                </xsl:apply-templates>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-          <!-- no subtable, use this cell's ending width -->
-          <xsl:otherwise>
-            <xsl:value-of select="$nextWidth"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
 
   <!-- Gets the width of the current cell -->
@@ -528,7 +341,7 @@
   </xsl:template>
 
   <!-- table rows -->
-  <xsl:template match="table:table-row|table:table-header-row">
+  <xsl:template match="table:table-row">
     <xsl:choose>
       <xsl:when test="table:table-cell/table:table/@table:is-sub-table='true'">
         <!-- merged cells -->
@@ -862,6 +675,191 @@
     </w:tc>
   </xsl:template>
 
+  <!--************************
+    ** Compute table grid **
+    ************************-->
+
+  <!-- Inserts a table grid -->
+  <xsl:template name="InsertTblGrid">
+    <xsl:variable name="unit">
+      <xsl:call-template name="GetUnit">
+        <xsl:with-param name="length"
+          select="key('automatic-styles',@table:style-name)/style:table-properties/@style:width"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <w:tblGrid>
+      <xsl:call-template name="InsertGridCols">
+        <xsl:with-param name="lastWidth">0</xsl:with-param>
+        <xsl:with-param name="unit" select="$unit"/>
+      </xsl:call-template>
+    </w:tblGrid>
+  </xsl:template>
+
+  <!-- Inserts grid columns -->
+  <xsl:template name="InsertGridCols">
+    <xsl:param name="unit"/>
+    <xsl:param name="lastWidth"/>
+    <xsl:variable name="tableWidth">
+      <xsl:value-of
+        select="substring-before(key('automatic-styles',@table:style-name)/style:table-properties/@style:width,$unit)"
+      />
+    </xsl:variable>
+    <!-- We continue until we've reached end of table (with a small incertitude of 0.002) -->
+    <xsl:if test="$tableWidth - $lastWidth > 0.005">
+      <xsl:variable name="nextWidth">
+        <xsl:choose>
+          <xsl:when test="table:table-header-rows/table:table-row">
+            <xsl:apply-templates select="table:table-header-rows/table:table-row[1]"
+              mode="findNextWidth">
+              <xsl:with-param name="unit" select="$unit"/>
+              <xsl:with-param name="lastWidth" select="$lastWidth"/>
+              <xsl:with-param name="nextWidth" select="$tableWidth"/>
+              <xsl:with-param name="offset">0</xsl:with-param>
+            </xsl:apply-templates>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="table:table-row[1]" mode="findNextWidth">
+              <xsl:with-param name="unit" select="$unit"/>
+              <xsl:with-param name="lastWidth" select="$lastWidth"/>
+              <xsl:with-param name="nextWidth" select="$tableWidth"/>
+              <xsl:with-param name="offset">0</xsl:with-param>
+            </xsl:apply-templates>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <w:gridCol>
+        <xsl:attribute name="w:w">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="concat($nextWidth - $lastWidth,$unit)"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </w:gridCol>
+      <xsl:call-template name="InsertGridCols">
+        <xsl:with-param name="unit" select="$unit"/>
+        <xsl:with-param name="lastWidth" select="$nextWidth"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- iterate over every row to find the next width -->
+  <!-- the next width is the smallest value that matches the following conditions:
+    - it is bigger than the last width
+    - a cell is starting at this value -->
+  <xsl:template match="table:table-row" mode="findNextWidth">
+    <xsl:param name="unit"/>
+    <xsl:param name="lastWidth"/>
+    <xsl:param name="nextWidth"/>
+    <xsl:param name="offset"/>
+    <!-- compute next width for this row -->
+    <xsl:variable name="rowNextWidth">
+      <xsl:apply-templates select="table:table-cell[1]" mode="findNextWidth">
+        <xsl:with-param name="unit" select="$unit"/>
+        <xsl:with-param name="lastWidth" select="$lastWidth"/>
+        <xsl:with-param name="currentWidth" select="$offset"/>
+      </xsl:apply-templates>
+    </xsl:variable>
+    <!-- take the smaller new width between previous rows' and current row's -->
+    <xsl:variable name="computedNextWidth">
+      <xsl:choose>
+        <xsl:when test="$rowNextWidth &lt; $nextWidth">
+          <xsl:value-of select="$rowNextWidth"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$nextWidth"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      <!-- iterate over next row -->
+      <xsl:when test="following-sibling::table:table-row">
+        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="findNextWidth">
+          <xsl:with-param name="unit" select="$unit"/>
+          <xsl:with-param name="lastWidth" select="$lastWidth"/>
+          <xsl:with-param name="nextWidth" select="$computedNextWidth"/>
+          <xsl:with-param name="offset" select="$offset"/>
+        </xsl:apply-templates>
+      </xsl:when>
+      <!-- if we are in table header rows, go to normal rows -->
+      <xsl:when test="parent::table:table-header-rows and ../../table:table-row">
+        <xsl:apply-templates select="../../table:table-row[1]" mode="findNextWidth">
+          <xsl:with-param name="unit" select="$unit"/>
+          <xsl:with-param name="lastWidth" select="$lastWidth"/>
+          <xsl:with-param name="nextWidth" select="$computedNextWidth"/>
+          <xsl:with-param name="offset" select="$offset"/>
+        </xsl:apply-templates>
+      </xsl:when>
+      <!-- end of table, use the computed value -->
+      <xsl:otherwise>
+        <xsl:value-of select="$computedNextWidth"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- iterate over every cell to find the next width -->
+  <!-- the next width is the smallest value that matches the following conditions:
+    - it is bigger than the last width
+    - a cell is starting at this value -->
+  <xsl:template match="table:table-cell" mode="findNextWidth">
+    <xsl:param name="unit"/>
+    <xsl:param name="lastWidth"/>
+    <xsl:param name="currentWidth"/>
+    <xsl:variable name="cellWidth">
+      <xsl:call-template name="GetCellWidth">
+        <xsl:with-param name="unit" select="$unit"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- $nextWidth: value at which the current cell ends -->
+    <!-- we have to do this round(x*10000) div 10000 to avoid decimal artifacts -->
+    <xsl:variable name="nextWidth" select="round(($currentWidth + $cellWidth)*10000) div 10000"/>
+    <xsl:choose>
+      <!-- current cell is starting before last width, iterate over the next cell -->
+      <!-- (with an incertitude of 0.002) -->
+      <xsl:when test="$nextWidth - $lastWidth &lt;= 0.002">
+        <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="findNextWidth">
+          <xsl:with-param name="unit" select="$unit"/>
+          <xsl:with-param name="lastWidth" select="$lastWidth"/>
+          <xsl:with-param name="currentWidth" select="$nextWidth"/>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- current cell is starting after last width -->
+        <xsl:choose>
+          <!-- if there is a subtable, iterate over every row of it -->
+          <xsl:when test="child::table:table[@table:is-sub-table = 'true']">
+            <xsl:choose>
+              <xsl:when test="child::table:table/table:table-header-rows/table:table-row">
+                <xsl:apply-templates
+                  select="child::table:table/table:table-header-rows/table:table-row[1]"
+                  mode="findNextWidth">
+                  <xsl:with-param name="unit" select="$unit"/>
+                  <xsl:with-param name="lastWidth" select="$lastWidth"/>
+                  <xsl:with-param name="nextWidth" select="$nextWidth"/>
+                  <xsl:with-param name="offset" select="$currentWidth"/>
+                </xsl:apply-templates>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="child::table:table/table:table-row[1]"
+                  mode="findNextWidth">
+                  <xsl:with-param name="unit" select="$unit"/>
+                  <xsl:with-param name="lastWidth" select="$lastWidth"/>
+                  <xsl:with-param name="nextWidth" select="$nextWidth"/>
+                  <xsl:with-param name="offset" select="$currentWidth"/>
+                </xsl:apply-templates>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <!-- no subtable, use this cell's ending width -->
+          <xsl:otherwise>
+            <xsl:value-of select="$nextWidth"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--*************************
+    ** Compute span value **
+    ****************************-->
   <!-- Computes span value -->
   <xsl:template name="ComputeSpanValue">1</xsl:template>
 
