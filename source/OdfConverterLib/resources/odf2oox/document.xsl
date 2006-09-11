@@ -1208,7 +1208,7 @@
     <xsl:variable name="opacity"
       select="100 - substring-before($styleGraphicProperties/@style:background-transparency,'%')"/>
 
-    <xsl:if test="$styleGraphicProperties/@style:background-transparency">
+    <xsl:if test="$styleGraphicProperties/@style:background-transparency and $styleGraphicProperties/@fo:background-color != 'transparent' ">
       <v:fill>
         <xsl:attribute name="opacity">
           <xsl:value-of select="concat($opacity,'%')"/>
