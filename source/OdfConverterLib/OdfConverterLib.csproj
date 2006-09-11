@@ -30,6 +30,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NotAnOoxDocumentException.cs" />
     <Compile Include="OdfEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZipResolver.cs" />
@@ -68,7 +69,19 @@
     <EmbeddedResource Include="resources\odf2oox\office.dtd" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="resources\oox2odf\" />
+    <EmbeddedResource Include="resources\oox2odf\source.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\content.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\tables.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>
