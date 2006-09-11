@@ -27,7 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odf="urn:odf"
-  xmlns:zip="urn:cleverage:xmlns:zip" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   exclude-result-prefixes="odf style">
 
   <xsl:import href="common.xsl"/>
@@ -64,59 +64,59 @@
   <xsl:template match="/odf:source">
     <xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction>
 
-    <zip:archive zip:target="{$outputFile}">
+    <pzip:archive pzip:target="{$outputFile}">
 
       <!-- Document core properties -->
-      <zip:entry zip:target="docProps/core.xml">
+      <pzip:entry pzip:target="docProps/core.xml">
         <xsl:call-template name="docprops-core"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- Document app properties -->
-      <zip:entry zip:target="docProps/app.xml">
+      <pzip:entry pzip:target="docProps/app.xml">
         <xsl:call-template name="docprops-app"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- Document custom properties -->
       <xsl:if test="$docprops-custom-file > 0">
-        <zip:entry zip:target="docProps/custom.xml">
+        <pzip:entry pzip:target="docProps/custom.xml">
           <xsl:call-template name="docprops-custom"/>
-        </zip:entry>
+        </pzip:entry>
       </xsl:if>
 
       <!-- main content -->
-      <zip:entry zip:target="word/document.xml">
+      <pzip:entry pzip:target="word/document.xml">
         <xsl:call-template name="document"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- numbering (lists) -->
-      <zip:entry zip:target="word/numbering.xml">
+      <pzip:entry pzip:target="word/numbering.xml">
         <xsl:call-template name="numbering"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- footnotes -->
-      <zip:entry zip:target="word/footnotes.xml">
+      <pzip:entry pzip:target="word/footnotes.xml">
         <xsl:call-template name="footnotes"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- footnotes part relationships -->
-      <zip:entry zip:target="word/_rels/footnotes.xml.rels">
+      <pzip:entry pzip:target="word/_rels/footnotes.xml.rels">
         <xsl:call-template name="footnotes-relationships"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- endnotes -->
-      <zip:entry zip:target="word/endnotes.xml">
+      <pzip:entry pzip:target="word/endnotes.xml">
         <xsl:call-template name="endnotes"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- endnotes part relationships -->
-      <zip:entry zip:target="word/_rels/endnotes.xml.rels">
+      <pzip:entry pzip:target="word/_rels/endnotes.xml.rels">
         <xsl:call-template name="endnotes-relationships"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- Comment   -->
-      <zip:entry zip:target="word/comments.xml">
+      <pzip:entry pzip:target="word/comments.xml">
         <xsl:call-template name="comments"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- headers and footers -->
       <xsl:variable name="masterPage"
@@ -126,75 +126,75 @@
 
       <xsl:for-each select="$masterPage">
         <xsl:variable name="position" select="position()"/>
-        <zip:entry>
-          <xsl:attribute name="zip:target">
+        <pzip:entry>
+          <xsl:attribute name="pzip:target">
             <xsl:value-of select="concat('word/header',$position,'.xml')"/>
           </xsl:attribute>
           <xsl:call-template name="header">
             <xsl:with-param name="headerNode" select="style:header"/>
           </xsl:call-template>
-        </zip:entry>
+        </pzip:entry>
 
-        <zip:entry>
-          <xsl:attribute name="zip:target">
+        <pzip:entry>
+          <xsl:attribute name="pzip:target">
             <xsl:value-of select="concat('word/_rels/header',$position,'.xml.rels')"/>
           </xsl:attribute>
           <xsl:call-template name="headerFooter-relationships">
             <xsl:with-param name="node" select="style:header"/>
           </xsl:call-template>
-        </zip:entry>
+        </pzip:entry>
 
-        <zip:entry>
-          <xsl:attribute name="zip:target">
+        <pzip:entry>
+          <xsl:attribute name="pzip:target">
             <xsl:value-of select="concat('word/footer',$position,'.xml')"/>
           </xsl:attribute>
           <xsl:call-template name="footer">
             <xsl:with-param name="footerNode" select="style:footer"/>
           </xsl:call-template>
-        </zip:entry>
+        </pzip:entry>
 
-        <zip:entry>
-          <xsl:attribute name="zip:target">
+        <pzip:entry>
+          <xsl:attribute name="pzip:target">
             <xsl:value-of select="concat('word/_rels/footer',$position,'.xml.rels')"/>
           </xsl:attribute>
           <xsl:call-template name="headerFooter-relationships">
             <xsl:with-param name="node" select="style:footer"/>
           </xsl:call-template>
-        </zip:entry>
+        </pzip:entry>
       </xsl:for-each>
 
 
       <!-- styles -->
-      <zip:entry zip:target="word/styles.xml">
+      <pzip:entry pzip:target="word/styles.xml">
         <xsl:call-template name="styles"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- fonts declaration -->
-      <zip:entry zip:target="word/fontTable.xml">
+      <pzip:entry pzip:target="word/fontTable.xml">
         <xsl:call-template name="fonts"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- settings  -->
-      <zip:entry zip:target="word/settings.xml">
+      <pzip:entry pzip:target="word/settings.xml">
         <xsl:call-template name="settings"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- part relationship item -->
-      <zip:entry zip:target="word/_rels/document.xml.rels">
+      <pzip:entry pzip:target="word/_rels/document.xml.rels">
         <xsl:call-template name="part_relationships"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- content types -->
-      <zip:entry zip:target="[Content_Types].xml">
+      <pzip:entry pzip:target="[Content_Types].xml">
         <xsl:call-template name="contentTypes"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- package relationship item -->
-      <zip:entry zip:target="_rels/.rels">
+      <pzip:entry pzip:target="_rels/.rels">
         <xsl:call-template name="package-relationships"/>
-      </zip:entry>
+      </pzip:entry>
 
-    </zip:archive>
+    </pzip:archive>
   </xsl:template>
 
 

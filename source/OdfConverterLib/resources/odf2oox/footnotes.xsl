@@ -32,8 +32,8 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:zip="urn:cleverage:xmlns:zip"
-  exclude-result-prefixes="text style office xlink draw zip">
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  exclude-result-prefixes="text style office xlink draw pzip">
 
   <!-- Group footnotes under the same key -->
   <xsl:key name="footnotes" match="text:note[@text:note-class='footnote']" use="''"/>
@@ -179,8 +179,8 @@
               <!-- Internal image -->
               <xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
                 <!-- copy this image to the oox package -->
-                <zip:copy zip:source="{draw:image/@xlink:href}"
-                  zip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
+                <pzip:copy pzip:source="{draw:image/@xlink:href}"
+                  pzip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
                 <Relationship Id="{generate-id(draw:image)}"
                   Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
                   Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>

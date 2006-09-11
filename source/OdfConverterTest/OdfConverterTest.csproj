@@ -70,7 +70,9 @@
     <EmbeddedResource Include="resources\ooxschemas\dml-styledefaults.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-stylesheet.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-table.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-tablestyle.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-tablestyle.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\ooxschemas\dml-text.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-textbullet.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-textchar.xsd" />
@@ -134,6 +136,8 @@
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="resources\tests\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />

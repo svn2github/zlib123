@@ -27,7 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:zip="urn:cleverage:xmlns:zip"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -86,14 +86,14 @@
       <!-- OLE Objects -->
       <xsl:for-each select="document('content.xml')">
         <xsl:for-each select="key('ole-objects', '')[not(ancestor::text:note)]">
-          <zip:copy zip:source="{substring-after(draw:object-ole/@xlink:href,'./')}"
-            zip:target="word/embeddings/{translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')}"/>
+          <pzip:copy pzip:source="{substring-after(draw:object-ole/@xlink:href,'./')}"
+            pzip:target="word/embeddings/{translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')}"/>
           <Relationship Id="{generate-id(draw:object-ole)}"
             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
             Target="embeddings/{translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')}"/>
           <xsl:if test="draw:image">
-            <zip:copy zip:source="{substring-after(draw:image/@xlink:href,'./')}"
-              zip:target="word/media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"/>
+            <pzip:copy pzip:source="{substring-after(draw:image/@xlink:href,'./')}"
+              pzip:target="word/media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"/>
             <Relationship Id="{generate-id(draw:image)}"
               Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
               Target="media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"
@@ -114,8 +114,8 @@
               <!-- Internal image -->
               <xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
                 <!-- copy this image to the oox package -->
-                <zip:copy zip:source="{draw:image/@xlink:href}"
-                  zip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
+                <pzip:copy pzip:source="{draw:image/@xlink:href}"
+                  pzip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
                 <Relationship Id="{generate-id(draw:image)}"
                   Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
                   Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>

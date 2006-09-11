@@ -63,17 +63,17 @@ namespace CleverAge.OdfConverter.OdfZipUtils
     /// 
     /// example :
     /// 
-    /// <c>&lt;zip:archive zip:target="path"&gt;</c>
-    /// 	<c>&lt;zip:entry zip:target="relativePath"&gt;</c>
+    /// <c>&lt;pzip:archive pzip:target="path"&gt;</c>
+    /// 	<c>&lt;pzip:entry pzip:target="relativePath"&gt;</c>
     /// 		<c>&lt;-- xml fragment --&lt;</c>
-    /// 	<c>&lt;/zip:entry&gt;</c>
+    /// 	<c>&lt;/pzip:entry&gt;</c>
     /// 	<c>&lt;-- other zip entries --&lt;</c>
-    /// <c>&lt;/zip:archive&gt;</c>
+    /// <c>&lt;/pzip:archive&gt;</c>
     /// 
     /// </summary>
     public class ZipArchiveWriter : XmlWriter
     {
-        private const string ZIP_PROCESS_PREFIX = "zip";
+        private const string ZIP_POST_PROCESS_NAMESPACE = "urn:cleverage:xmlns:post-processings:zip";
         private const string PART_ELEMENT = "entry";
         private const string ARCHIVE_ELEMENT = "archive";
         private const string COPY_ELEMENT = "copy";
@@ -154,7 +154,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             elements.Push(new Node(prefix, localName, ns));
 
             // not a zip processing instruction
-            if (!ZIP_PROCESS_PREFIX.Equals(prefix))
+            if (!ZIP_POST_PROCESS_NAMESPACE.Equals(ns))
             {
                 if (delegateWriter != null)
                 {
@@ -177,7 +177,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         {
             Node elt = (Node)elements.Pop();
 
-            if (!elt.Prefix.Equals(ZIP_PROCESS_PREFIX))
+            if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
             {
                 Debug.WriteLine("delegate - </" + elt.Name + ">");
                 if (delegateWriter != null)
@@ -238,7 +238,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             Node elt = (Node)elements.Peek();
  			Debug.WriteLine("[WriteStartAttribute] prefix="+prefix+" localName"+localName+" ns="+ns +" element="+elt.Name);
             
-            if (!elt.Prefix.Equals(ZIP_PROCESS_PREFIX))
+            if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
             {
                 if (delegateWriter != null)
                 {
@@ -257,7 +257,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             Node elt = (Node)elements.Peek();
 			Debug.WriteLine("[WriteEndAttribute] element="+elt.Name);
             
-            if (!elt.Prefix.Equals(ZIP_PROCESS_PREFIX))
+            if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
             {
                 if (delegateWriter != null)
                 {
@@ -275,13 +275,20 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         {
             Node elt = (Node)elements.Peek();
 
-            if (elt.Prefix.Equals(ZIP_PROCESS_PREFIX))
+            if (!elt.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
+            {
+                if (delegateWriter != null)
+                {
+                    delegateWriter.WriteString(text);
+                }
+            }
+            else
             {
                 // Pick up the target attribute 
                 if (attributes.Count > 0)
                 {
                     Node attr = (Node)attributes.Peek();
-                    if (attr.Prefix.Equals(ZIP_PROCESS_PREFIX))
+                    if (attr.Ns.Equals(ZIP_POST_PROCESS_NAMESPACE))
                     {
                         switch (elt.Name)
                         {
@@ -289,7 +296,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                                 // Prevent nested archive creation
                                 if (processingState == ProcessingState.None && attr.Name.Equals("target"))
                                 {
-                                    Debug.WriteLine("creating archive : "+text);
+                                    Debug.WriteLine("creating archive : " + text);
                                     zipOutputStream = ZipFactory.CreateArchive(text);
                                     processingState = ProcessingState.EntryWaiting;
                                     binaries = new Hashtable();
@@ -299,37 +306,30 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                                 // Prevent nested entry creation
                                 if (processingState == ProcessingState.EntryWaiting && attr.Name.Equals("target"))
                                 {
-                                    Debug.WriteLine("creating new part : "+text);
+                                    Debug.WriteLine("creating new part : " + text);
                                     zipOutputStream.AddEntry(text);
                                     delegateWriter = XmlWriter.Create(zipOutputStream, delegateSettings);
                                     processingState = ProcessingState.EntryStarted;
                                     delegateWriter.WriteStartDocument();
                                 }
                                 break;
-                       		case COPY_ELEMENT:
-                                if (processingState != ProcessingState.None) 
+                            case COPY_ELEMENT:
+                                if (processingState != ProcessingState.None)
                                 {
-                                	if (attr.Name.Equals("source")) 
-                                	{
-                                		binarySource += text;
-                                		Debug.WriteLine("copy source="+binarySource);
-                                	} 
-                                	if (attr.Name.Equals("target")) 
-                                	{
-                                		binaryTarget += text;
-                                		Debug.WriteLine("copy target="+binaryTarget);
-                                	}
+                                    if (attr.Name.Equals("source"))
+                                    {
+                                        binarySource += text;
+                                        Debug.WriteLine("copy source=" + binarySource);
+                                    }
+                                    if (attr.Name.Equals("target"))
+                                    {
+                                        binaryTarget += text;
+                                        Debug.WriteLine("copy target=" + binaryTarget);
+                                    }
                                 }
                                 break;
                         }
                     }
-                }
-            }
-            else
-            {
-                if (delegateWriter != null)
-                {
-                    delegateWriter.WriteString(text);
                 }
             }
         }
