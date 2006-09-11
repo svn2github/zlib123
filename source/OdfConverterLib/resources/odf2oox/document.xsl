@@ -838,20 +838,30 @@
 
   <!-- annotations -->
   <xsl:template match="office:annotation" mode="paragraph">
-    <xsl:variable name="id">
-      <xsl:call-template name="GenerateId">
-        <xsl:with-param name="node" select="."/>
-        <xsl:with-param name="nodetype" select="'annotation'"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <w:r>
-      <xsl:call-template name="InsertRunProperties"/>
-      <w:commentReference>
-        <xsl:attribute name="w:id">
-          <xsl:value-of select="$id"/>
-        </xsl:attribute>
-      </w:commentReference>
-    </w:r>
+    <xsl:choose>
+   
+      <!--annotation embedded in text-box is not supported in Word-->
+      <xsl:when test="ancestor::draw:text-box" />
+    
+      <!--default scenario-->
+      <xsl:otherwise>
+        <xsl:variable name="id">
+          <xsl:call-template name="GenerateId">
+            <xsl:with-param name="node" select="."/>
+            <xsl:with-param name="nodetype" select="'annotation'"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <w:r>
+          <xsl:call-template name="InsertRunProperties"/>
+          <w:commentReference>
+            <xsl:attribute name="w:id">
+              <xsl:value-of select="$id"/>
+            </xsl:attribute>
+          </w:commentReference>
+        </w:r>
+      </xsl:otherwise>
+      
+    </xsl:choose>
   </xsl:template>
 
   <!-- links -->
@@ -1232,7 +1242,17 @@
 
       <w:txbxContent>
         <xsl:for-each select="child::node()">
-          <xsl:apply-templates select="."/>
+          
+          <xsl:choose>
+         <!--   ignore embedded text-box becouse word doesn't support it-->
+            <xsl:when test="self::node()[name(draw:text-box)]" />
+            
+            <!--default scenario-->
+            <xsl:otherwise>
+              <xsl:apply-templates select="."/>
+            </xsl:otherwise>
+          </xsl:choose>
+          
         </xsl:for-each>
       </w:txbxContent>
 
