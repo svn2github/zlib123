@@ -277,7 +277,7 @@
           <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:if test="@text:style-name='Standard'">
+          <xsl:if test="text:toc-mark-start">
             <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
           </xsl:if>
         </xsl:otherwise>
@@ -322,7 +322,7 @@
           <w:bookmarkEnd w:id="{$tocId}"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:if test="@text:style-name='Standard'">
+          <xsl:if test="text:toc-mark-start">
             <w:bookmarkEnd w:id="{$tocId}"/>
           </xsl:if>
         </xsl:otherwise>
@@ -764,7 +764,6 @@
         </w:hyperlink>
       </xsl:when>
       <xsl:when test="preceding::text:p">
-        <xsl:message>JESTEM</xsl:message>
         <w:hyperlink w:history="1">
           <xsl:attribute name="w:anchor">
             <xsl:value-of select="concat('_Toc',$num)"/>
