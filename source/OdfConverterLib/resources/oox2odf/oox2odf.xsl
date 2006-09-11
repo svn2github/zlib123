@@ -27,7 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oox="urn:oox"
-  xmlns:zip="urn:cleverage:xmlns:zip" exclude-result-prefixes="oox">
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" exclude-result-prefixes="oox">
 
   <xsl:import href="content.xsl"/>
 
@@ -41,24 +41,24 @@
 
   <xsl:template match="/oox:source">
 
-    <zip:archive zip:target="{$outputFile}">
+    <pzip:archive pzip:target="{$outputFile}">
 
       <!-- Manifest -->
-      <zip:entry zip:target="META-INF/manifest.xml">
+      <pzip:entry pzip:target="META-INF/manifest.xml">
         <manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
           <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text"
             manifest:full-path="/"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="content.xml"/>
         </manifest:manifest>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- main content -->
-      <zip:entry zip:target="content.xml">
+      <pzip:entry pzip:target="content.xml">
         <xsl:call-template name="content"/>
-      </zip:entry>
+      </pzip:entry>
 
       <!-- styles -->
-      <zip:entry zip:target="styles.xml">
+      <pzip:entry pzip:target="styles.xml">
 
         <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
           xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
@@ -95,9 +95,9 @@
           </office:styles>
         </office:document-styles>
 
-      </zip:entry>
+      </pzip:entry>
 
-    </zip:archive>
+    </pzip:archive>
   </xsl:template>
 
 

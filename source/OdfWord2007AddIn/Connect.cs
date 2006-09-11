@@ -177,21 +177,15 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                     fileName = OdfWordAddinLib.GetTempFileName(odfFile);
 
                     // call the converter
-                    using (form = new ConverterForm(odfFile, (string)fileName, labelsResourceManager))
+                    using (form = new ConverterForm(odfFile, (string)fileName, labelsResourceManager, true))
                     {
-                        System.Windows.Forms.DialogResult dr = form.ShowDialog();
-
-                        if (form.Exception != null) {
-                            throw form.Exception;
-                        }
-
-                        if (dr == System.Windows.Forms.DialogResult.OK) {
+                        if (System.Windows.Forms.DialogResult.OK == form.ShowDialog()) {
                             // open the document
                             object readOnly = true;
                             object isVisible = true;
-                            object Format = MSword.WdOpenFormat.wdOpenFormatXML;
+                            object addToRecentFiles = false;
                             object missing = Type.Missing;
-                            Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
+                            Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
 
                             if (form.HasLostElements)
                             {
@@ -199,11 +193,16 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                                 InfoBox infoBox = new InfoBox(elements, labelsResourceManager);
                                 infoBox.ShowDialog();
                             }
+
                             // and activate it
                             doc.Activate();
                         } else {
                             if (File.Exists((string)fileName)) {
                                 File.Delete((string)fileName);
+                            }
+                            if (form.Exception != null)
+                            {
+                                throw form.Exception;
                             }
                         }
                     }
@@ -234,7 +233,96 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 
 		public void ExportODF(IRibbonControl control)
 		{
-			System.Windows.Forms.MessageBox.Show(labelsResourceManager.GetString("NotImplemented"));
+            
+            MSword.Document doc = applicationObject.ActiveDocument;
+
+            if (!doc.Saved)
+            {
+                System.Windows.Forms.MessageBox.Show("Please save your document before exporting to ODF");
+            }
+            else
+            {
+                System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+                sfd.AddExtension = true;
+                sfd.DefaultExt = "odt";
+                sfd.Filter = labelsResourceManager.GetString("OdfFileType") + " (*.odt)|*.odt|"
+                             + labelsResourceManager.GetString("AllFileType") + " (*.*)|*.*";
+                sfd.InitialDirectory = doc.Path;
+                sfd.OverwritePrompt = true;
+                sfd.Title = labelsResourceManager.GetString("OdfExportLabel");
+
+                // process the chosen documents	
+                if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
+                {
+                    // retrieve file name
+                    string odfFile = sfd.FileName; ;
+
+                    object initialName = doc.FullName;
+                    object tmpFileName = null;
+                    string docxFile = (string)initialName;
+
+                    ConverterForm form = null;
+
+                    try
+                    {
+                        applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
+                        
+                        if (doc.SaveFormat != 12)
+                        {
+                            // duplicate the file
+                            object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
+                            File.Copy((string)initialName, (string)newName);
+
+                            // open the duplicated file
+                            object addToRecentFiles = false;
+                            object readOnly = false;
+                            object isVisible = false;
+                            object missing = Type.Missing;
+                            MSword.Document newDoc = applicationObject.Documents.Open(ref newName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
+                            
+                            // generate docx file from the duplicated file (under a temporary file)
+                            tmpFileName = Path.GetTempFileName();
+                            object format = MSword.WdSaveFormat.wdFormatXMLDocument;
+                            newDoc.SaveAs(ref tmpFileName, ref format, ref missing, ref missing, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing);
+
+                            // close and remove the duplicated file
+                            object saveChanges = false;
+                            newDoc.Close(ref saveChanges, ref missing, ref missing);
+                            File.Delete((string)newName);
+
+                            docxFile = (string)tmpFileName;
+                        }
+                        
+                        // call the converter
+                        using (form = new ConverterForm(docxFile, odfFile, labelsResourceManager, false))
+                        {
+                            System.Windows.Forms.DialogResult dr = form.ShowDialog();
+
+                            if (form.Exception != null)
+                            {
+                                throw form.Exception;
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+#if DEBUG
+                    System.Windows.Forms.MessageBox.Show(e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
+#else
+                        System.Windows.Forms.MessageBox.Show(labelsResourceManager.GetString("OdfUnexpectedError"));
+#endif
+                    }
+                    finally
+                    {
+                        if (tmpFileName != null && File.Exists((string)tmpFileName))
+                        {
+                            File.Delete((string)tmpFileName);
+                        }
+                        applicationObject.System.Cursor = MSword.WdCursorType.wdCursorNormal;
+                    }
+
+                }
+            }
 		}
 
 		public stdole.IPictureDisp GetImage(IRibbonControl control)

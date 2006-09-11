@@ -49,9 +49,10 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         private bool recursiveMode = false;    // go in subfolders ?
         private string reportPath = null;      // file to save report
         private string xslPath = null;         // Path to an external stylesheet
-        private bool displayDuration = false;      // display time taken by conversion
+        private bool displayDuration = false;  // display time taken by conversion
+        private bool isDirectTransform = true; // true if the transfo is from ODF to OOX
 
-        private OdfConverterTest(String input, String output, bool validate, bool debug, bool recursiveMode, String reportPath, String xslPath, bool displayDuration)
+        private OdfConverterTest(String input, String output, bool validate, bool debug, bool recursiveMode, String reportPath, String xslPath, bool displayDuration, bool isDirectTransform)
         {
             this.input = input;
             this.output = output;
@@ -61,6 +62,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             this.reportPath = reportPath;
             this.xslPath = xslPath;
             this.displayDuration = displayDuration;
+            this.isDirectTransform = isDirectTransform;
         }
 
         /// <summary>
@@ -78,6 +80,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             string xslPath = null;
             bool doReturn = false;
             bool displayDuration = false;
+            bool isDirectTransform = true;
 
             //Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
             //Debug.AutoFlush = true;
@@ -146,6 +149,15 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 usage();
                 return;
             }
+            if (input.ToLowerInvariant().EndsWith(".docx"))
+            {
+                isDirectTransform = false;
+            }
+            string extension = ".docx";
+            if (!isDirectTransform)
+            {
+                extension = ".odt";
+            }
             if (output == null || Directory.Exists(output))
             {
                 // generate output filename
@@ -166,7 +178,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 }
                 try
                 {
-                    output = Path.Combine(rootPath, root + ".docx");
+                    output = Path.Combine(rootPath, root + extension);
                 }
                 catch (ArgumentException)
                 {
@@ -176,29 +188,29 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 int i = 1;
                 while (File.Exists(output) || Directory.Exists(output))
                 {
-                    output = Path.Combine(rootPath, root + "_" + i + ".docx");
+                    output = Path.Combine(rootPath, root + "_" + i + extension);
                     i++;
                 }
             }
             else
             {
-                string extension = null;
+                string current_extension = null;
                 try
                 {
-                    extension = Path.GetExtension(output);
+                    current_extension = Path.GetExtension(output);
                 }
                 catch (ArgumentException)
                 {
                     Console.WriteLine("Error: invalid path provided as output");
                     return;
                 }
-                if (String.IsNullOrEmpty(extension))
+                if (String.IsNullOrEmpty(current_extension))
                 {
                     // add extension
-                    output += ".docx";
+                    output += extension;
                 }
             }
-            new OdfConverterTest(input, output, validate, debug, recursiveMode, reportPath, xslPath, displayDuration).run();
+            new OdfConverterTest(input, output, validate, debug, recursiveMode, reportPath, xslPath, displayDuration, isDirectTransform).run();
         }
 
         private void run()
@@ -211,16 +223,30 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 DateTime start = DateTime.Now;
                 if (xslPath == null)
                 {
-                    new Converter().OdfToOox(this.input, this.output);
+                    if (this.isDirectTransform)
+                    {
+                        new Converter().OdfToOox(this.input, this.output);
+                    }
+                    else
+                    {
+                        new Converter().OoxToOdf(this.input, this.output);
+                    }
                 }
                 else
                 {
-                    new Converter().OdfToOoxWithExternalResources(this.input, this.output, this.xslPath);
+                    if (this.isDirectTransform)
+                    {
+                        new Converter().OdfToOoxWithExternalResources(this.input, this.output, this.xslPath);
+                    }
+                    else
+                    {
+                        new Converter().OoxToOdfWithExternalResources(this.input, this.output, this.xslPath);
+                    }
                 }
                 TimeSpan duration = DateTime.Now - start;
 
                 // validation
-                if (this.validate)
+                if (this.validate && this.isDirectTransform)
                 {
                     try
                     {
@@ -244,6 +270,11 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             catch (NotAnOdfDocumentException e)
             {
                 Console.WriteLine("Error: " + input + " is not a valid ODF file");
+
+            }
+            catch (NotAnOoxDocumentException e)
+            {
+                Console.WriteLine("Error: " + input + " is not a valid DOCX file");
 
             }
             catch (ZipException e)

@@ -50,6 +50,7 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
         private string inputFile;
         private string outputFile;
         private ResourceManager manager;
+        private bool isDirect;
         private bool computeSize;
         private int size;
         private Exception exception;
@@ -57,12 +58,13 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
         private bool converting;
         private ArrayList lostElements;
 
-        public ConverterForm(string inputFile, string outputFile, ResourceManager manager)
+        public ConverterForm(string inputFile, string outputFile, ResourceManager manager, bool isDirect)
         {
             InitializeComponent();
             this.inputFile = inputFile;
             this.outputFile = outputFile;
             this.manager = manager;
+            this.isDirect = isDirect;
             lostElements = new ArrayList();
         }
 
@@ -107,10 +109,24 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                 converter.AddProgressMessageListener(new Converter.MessageListener(ProgressMessageInterceptor));
                 converter.AddFeedbackMessageListener(new Converter.MessageListener(FeedbackMessageInterceptor));
                 this.computeSize = true;
-                converter.OdfToOoxComputeSize(this.inputFile);
+                if (isDirect)
+                {
+                    converter.OdfToOoxComputeSize(this.inputFile);
+                }
+                else
+                {
+                    converter.OoxToOdfComputeSize(this.inputFile);
+                }
                 this.progressBar1.Maximum = this.size;
                 this.computeSize = false;
-                converter.OdfToOox(this.inputFile, this.outputFile);
+                if (isDirect)
+                {
+                    converter.OdfToOox(this.inputFile, this.outputFile);
+                }
+                else
+                {
+                    converter.OoxToOdf(this.inputFile, this.outputFile);
+                }
                 WorkComplete(null);
             } catch (Exception e) {
                 WorkComplete(e);

@@ -85,6 +85,21 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             DoOdfToOoxTransform(inputFile, null, null);
         }
 
+        public void OoxToOdf(string inputFile, string outputFile)
+        {
+            DoOoxToOdfTransform(inputFile, outputFile, null);
+        }
+
+        public void OoxToOdfWithExternalResources(string inputFile, string outputFile, string resourceDir)
+        {
+            DoOoxToOdfTransform(inputFile, outputFile, resourceDir);
+        }
+
+        public void OoxToOdfComputeSize(string inputFile)
+        {
+            DoOoxToOdfTransform(inputFile, null, null);
+        }
+
         private void DoOdfToOoxTransform(string inputFile, string outputFile, string resourceDir)
         {
         	
@@ -129,16 +144,93 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 XsltArgumentList parameters = new XsltArgumentList();
 
                 parameters.XsltMessageEncountered += new XsltMessageEncounteredEventHandler(MessageCallBack);
-                if (outputFile != null) {
+                if (outputFile != null)
+                {
                     parameters.AddParam("outputFile", "", outputFile);
                     writer = new ZipArchiveWriter(zipResolver);
-                } else {
+                }
+                else
+                {
+                    writer = new XmlTextWriter(new StringWriter());
+                }
+                
+                // Apply the transformation
+                xslt.Transform(source, parameters, writer, zipResolver);
+            }
+            finally
+            {
+                if (writer != null)
+                    writer.Close();
+                if (source != null)
+                    source.Close();
+                if (zipResolver != null)
+                    zipResolver.Dispose();
+            }
+        }
+
+        private void DoOoxToOdfTransform(string inputFile, string outputFile, string resourceDir)
+        {
+
+            if (!IsOox(inputFile))
+            {
+                throw new NotAnOoxDocumentException(inputFile);
+            }
+
+            XmlUrlResolver resourceResolver;
+            XPathDocument xslDoc;
+            XmlReaderSettings xrs = new XmlReaderSettings();
+            XmlReader source = null;
+            XmlWriter writer = null;
+            ZipResolver zipResolver = null;
+
+            try
+            {
+
+                // do not look for DTD
+                xrs.ProhibitDtd = true;
+
+                if (resourceDir == null)
+                {
+                    resourceResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCE_LOCATION + "." + OOXToODF_LOCATION);
+                    xslDoc = new XPathDocument(((ResourceResolver)resourceResolver).GetInnerStream(OOXToODF_XSL));
+                    xrs.XmlResolver = resourceResolver;
+                    source = XmlReader.Create(SOURCE_XML, xrs);
+
+                }
+                else
+                {
+                    resourceResolver = new XmlUrlResolver();
+                    xslDoc = new XPathDocument(resourceDir + "/" + OOXToODF_XSL);
+                    source = XmlReader.Create(resourceDir + "/" + SOURCE_XML, xrs);
+                }
+
+                // create a xsl transformer
+                XslCompiledTransform xslt = new XslCompiledTransform();
+                // Enable xslt 'document()' function
+                XsltSettings settings = new XsltSettings(true, false);
+                // compile the stylesheet
+                xslt.Load(xslDoc, settings, resourceResolver);
+
+
+                zipResolver = new ZipResolver(inputFile);
+                XsltArgumentList parameters = new XsltArgumentList();
+
+                parameters.XsltMessageEncountered += new XsltMessageEncounteredEventHandler(MessageCallBack);
+                if (outputFile != null)
+                {
+                    parameters.AddParam("outputFile", "", outputFile);
+                    writer = new ZipArchiveWriter(zipResolver);
+                }
+                else
+                {
                     writer = new XmlTextWriter(new StringWriter());
                 }
 
                 // Apply the transformation
                 xslt.Transform(source, parameters, writer, zipResolver);
-            } finally {
+            }
+            finally
+            {
                 if (writer != null)
                     writer.Close();
                 if (source != null)
@@ -190,6 +282,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         		Debug.WriteLine(e.Message);
         	}
         	return false;
+        }
+
+        private bool IsOox(string fileName)
+        {
+            // TODO: implement
+            return true;
         }
 	}
 }
