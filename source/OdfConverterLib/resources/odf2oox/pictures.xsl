@@ -268,6 +268,7 @@
               <a:prstGeom prst="rect">
                 <a:avLst/>
               </a:prstGeom>
+              <xsl:call-template name="borders" />
             </pic:spPr>
           </pic:pic>
         </a:graphicData>
@@ -515,62 +516,7 @@
               <a:prstGeom prst="rect">
                 <a:avLst/>
               </a:prstGeom>
-              <!-- fo:border="0.101cm solid #ff0000"-->
-              <xsl:if test="$style/@fo:border  and ($style/@fo:border != 'none')">
-                <xsl:variable name="strokeColor" select="substring-after($style/@fo:border,'#')"/>
-
-                <xsl:variable name="strokeWeight">
-                  <xsl:call-template name="emu-measure">
-                    <xsl:with-param name="length" select="substring-before($style/@fo:border,' ')"/>
-                  </xsl:call-template>
-                </xsl:variable>
-
-                <a:ln>
-                  <xsl:attribute name="cmpd">
-                    <xsl:choose>
-                      <xsl:when
-                        test="substring-before(substring-after($style/@fo:border,' ' ),' ' ) != 'solid' ">
-
-                        <xsl:if test="$style/@style:border-line-width">
-
-                          <xsl:variable name="innerLineWidth">
-                            <xsl:call-template name="point-measure">
-                              <xsl:with-param name="length"
-                                select="substring-before($style/@style:border-line-width,' ' )"/>
-                            </xsl:call-template>
-                          </xsl:variable>
-
-                          <xsl:variable name="outerLineWidth">
-                            <xsl:call-template name="point-measure">
-                              <xsl:with-param name="length"
-                                select="substring-after(substring-after($style/@style:border-line-width,' ' ),' ' )"
-                              />
-                            </xsl:call-template>
-                          </xsl:variable>
-
-                          <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
-                          <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
-                          <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
-
-                        </xsl:if>
-                      </xsl:when>
-                      <xsl:otherwise>sng</xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:attribute>
-
-                  <xsl:attribute name="w">
-                    <xsl:value-of select="$strokeWeight"/>
-                  </xsl:attribute>
-                  <a:solidFill>
-                    <a:srgbClr>
-                      <xsl:attribute name="val">
-                        <xsl:value-of select="$strokeColor"/>
-                      </xsl:attribute>
-                    </a:srgbClr>
-                  </a:solidFill>
-                  <a:prstDash val="solid"/>
-                </a:ln>
-              </xsl:if>
+             <xsl:call-template name="borders" />
             </pic:spPr>
           </pic:pic>
         </a:graphicData>
@@ -579,4 +525,65 @@
 
   </xsl:template>
 
+  <xsl:template name="borders">
+    
+    <xsl:variable name="sName" select="@draw:style-name"/>
+    <xsl:variable name="style" select="key('automatic-styles', $sName)/style:graphic-properties"/>
+    
+    <xsl:if test="$style/@fo:border  and ($style/@fo:border != 'none')">
+      <xsl:variable name="strokeColor" select="substring-after($style/@fo:border,'#')"/>
+      
+      <xsl:variable name="strokeWeight">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="substring-before($style/@fo:border,' ')"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <a:ln xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
+        <xsl:attribute name="cmpd">
+          <xsl:choose>
+            <xsl:when
+              test="substring-before(substring-after($style/@fo:border,' ' ),' ' ) != 'solid' ">
+              
+              <xsl:if test="$style/@style:border-line-width">
+                
+                <xsl:variable name="innerLineWidth">
+                  <xsl:call-template name="point-measure">
+                    <xsl:with-param name="length"
+                      select="substring-before($style/@style:border-line-width,' ' )"/>
+                  </xsl:call-template>
+                </xsl:variable>
+                
+                <xsl:variable name="outerLineWidth">
+                  <xsl:call-template name="point-measure">
+                    <xsl:with-param name="length"
+                      select="substring-after(substring-after($style/@style:border-line-width,' ' ),' ' )"
+                    />
+                  </xsl:call-template>
+                </xsl:variable>
+                
+                <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
+                <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
+                <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
+                
+              </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>sng</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        
+        <xsl:attribute name="w">
+          <xsl:value-of select="$strokeWeight"/>
+        </xsl:attribute>
+        <a:solidFill>
+          <a:srgbClr>
+            <xsl:attribute name="val">
+              <xsl:value-of select="$strokeColor"/>
+            </xsl:attribute>
+          </a:srgbClr>
+        </a:solidFill>
+        <a:prstDash val="solid"/>
+      </a:ln>
+    </xsl:if>
+  </xsl:template>
 </xsl:stylesheet>
