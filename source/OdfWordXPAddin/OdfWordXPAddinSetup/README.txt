@@ -9,7 +9,7 @@ We will provide stable nightly builds. You can install and test them at your own
 Software Requirements
 --------------------------------
 To test the add-in, you will need the following:
-* Word XP – SP3 on Windows XP – SP2 or Windows 2003
+* Word XP with SP3 on Windows XP with SP2 or Windows Server 2003 with SP1
 * .NET Framework 2.0
 * Office 2007 File Format Awareness Update for Microsoft Office XP
 * Compatibility Pack for Word, Excel, and PowerPoint 2007 File Formats (beta 2 or higher).
@@ -17,7 +17,7 @@ To test the add-in, you will need the following:
 Download and install the add-in
 -------------------------------
 Visit the Download Page and download the latest binary distribution of the add-in.  
-Run the setup to install the add-in for Word XP.
+Run the downloaded executable to install the add-in for Word XP.
 
 
 
