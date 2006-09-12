@@ -733,7 +733,7 @@
       <w:r>
         <xsl:choose>
           <xsl:when test="ancestor::text:table-of-content">
-            <w:instrText xml:space="preserve"> TOC \o <xsl:if test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">\u </xsl:if>"1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a"> \h </xsl:if></w:instrText>
+            <w:instrText xml:space="preserve"> TOC \o <xsl:if test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">\u </xsl:if>"1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="text:a">\h</xsl:if><xsl:if test="ancestor::text:index-body/text:p">\h</xsl:if></w:instrText>
           </xsl:when>
           <xsl:when test="ancestor::text:illustration-index">
             <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
@@ -1512,6 +1512,10 @@
     <!-- COMMENT: what is this "test" param for??? Please use more significant name -->
     <xsl:param name="test" select="0"/>
     <w:r>
+      <w:rPr>
+        <w:rStyle w:val="Hyperlink"/>
+        <w:noProof/>        
+      </w:rPr>
       <xsl:choose>
         <xsl:when test="$test=1">
           <w:t>
@@ -1538,23 +1542,42 @@
       </xsl:choose>
     </w:r>
     <xsl:apply-templates select="text:tab|text:a/text:tab|text:span" mode="paragraph"/>
-    <xsl:if test="not(ancestor::text:alphabetical-index)">
+    <xsl:if test="not(ancestor::text:alphabetical-index)">     
       <w:r>
-        <w:rPr/>
+        <w:rPr>
+          <w:noProof/>
+          <w:webHidden/>
+        </w:rPr>
+      </w:r>
+      <w:r>        
+        <w:rPr>
+          <w:noProof/>
+          <w:webHidden/>
+        </w:rPr>
         <w:fldChar w:fldCharType="begin">
           <w:fldData xml:space="preserve">CNDJ6nn5us4RjIIAqgBLqQsCAAAACAAAAA4AAABfAFQAbwBjADEANAAxADgAMwA5ADIANwA2AAAA</w:fldData>
         </w:fldChar>
       </w:r>
       <w:r>
-        <w:rPr/>
+        <w:rPr>
+          <w:noProof/>
+          <w:webHidden/>
+        </w:rPr>
         <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $num, ' \h')"/></w:instrText>
       </w:r>
-      <w:r>
-        <w:rPr/>
+      <w:r>       
+          <w:rPr>
+            <w:noProof/>
+            <w:webHidden/>
+          </w:rPr>     
         <w:fldChar w:fldCharType="separate"/>
       </w:r>
     </xsl:if>
     <w:r>
+      <w:rPr>
+        <w:noProof/>
+        <w:webHidden/>
+      </w:rPr>
       <xsl:choose>
         <xsl:when test="$test=1">
           <xsl:apply-templates select="text:a/child::text()[last()]" mode="text"/>
@@ -1567,7 +1590,10 @@
     </w:r>
     <xsl:if test="not(ancestor::text:alphabetical-index)">
       <w:r>
-        <w:rPr/>
+        <w:rPr>
+          <w:noProof/>
+          <w:webHidden/>
+        </w:rPr>
         <w:fldChar w:fldCharType="end"/>
       </w:r>
     </xsl:if>
@@ -1744,7 +1770,11 @@
 
   <!-- tabs -->
   <xsl:template match="text:tab" mode="paragraph">
-    <w:r>
+    <w:r>     
+      <w:rPr>
+        <w:noProof/>
+        <w:webHidden/>
+      </w:rPr>
       <w:tab/>
     </w:r>
   </xsl:template>
