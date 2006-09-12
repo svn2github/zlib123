@@ -52,6 +52,7 @@
     <xsl:param name="length"/>
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">cm</xsl:when>
+      <xsl:when test="contains($length, 'mm')">mm</xsl:when>
       <xsl:when test="contains($length, 'in')">in</xsl:when>
       <xsl:when test="contains($length, 'pt')">pt</xsl:when>
       <xsl:when test="contains($length, 'twip')">twip</xsl:when>
@@ -70,6 +71,9 @@
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="round(number(substring-before($length, 'cm')) * 1440 div 2.54)"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'mm')">
+        <xsl:value-of select="round(number(substring-before($length, 'mm')) * 1440 div 25.4)"/>
       </xsl:when>
       <xsl:when test="contains($length, 'in')">
         <xsl:value-of select="round(number(substring-before($length, 'in')) * 1440)"/>
@@ -92,7 +96,7 @@
       <xsl:when test="not($length)">0</xsl:when>
       <xsl:otherwise>
         <!-- Convert value as if centimeters. -->
-        <xsl:value-of select="round(number($length) * 1440 div 2.54)"/>
+        <xsl:value-of select="$length"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -104,6 +108,9 @@
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="number(substring-before($length, 'cm')) * 10"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'mm')">
+        <xsl:value-of select="number(substring-before($length, 'mm'))"/>
       </xsl:when>
       <xsl:when test="contains($length, 'in')">
         <xsl:value-of select="number(substring-before($length, 'in')) * 25.4"/>
@@ -138,6 +145,9 @@
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="round(number(substring-before($length, 'cm')) * 576 div 2.54)"/>
       </xsl:when>
+      <xsl:when test="contains($length, 'mm')">
+        <xsl:value-of select="round(number(substring-before($length, 'mm')) * 576 div 25.4)"/>
+      </xsl:when>
       <xsl:when test="contains($length, 'in')">
         <xsl:value-of select="round(number(substring-before($length, 'in')) * 576)"/>
       </xsl:when>
@@ -168,6 +178,9 @@
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="round(number(substring-before($length, 'cm')) * 72 div 2.54)"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'mm')">
+        <xsl:value-of select="round(number(substring-before($length, 'mm')) * 72 div 25.4)"/>
       </xsl:when>
       <xsl:when test="contains($length, 'in')">
         <xsl:value-of select="round(number(substring-before($length, 'in')) * 72)"/>
@@ -200,6 +213,9 @@
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="round(number(substring-before($length, 'cm')) * 360000)"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'mm')">
+        <xsl:value-of select="round(number(substring-before($length, 'mm')) * 36000)"/>
       </xsl:when>
       <xsl:when test="contains($length, 'in')">
         <xsl:value-of select="round(number(substring-before($length, 'in')) * 360000 * 2.54)"/>
