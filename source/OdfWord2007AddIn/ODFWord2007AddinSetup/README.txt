@@ -19,7 +19,7 @@ Warning: if you install Word 2007 before the .NET Framework, you will need to up
 Download and install the add-in
 -------------------------------
 Visit the Download Page and download the latest binary distribution of the add-in.  
-Double click the the MSI file to install the add-in for Word 2007.
+Double click the MSI file to install the add-in for Word 2007.
 
 
 
