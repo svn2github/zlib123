@@ -516,7 +516,7 @@
                 <a:avLst/>
               </a:prstGeom>
               <!-- fo:border="0.101cm solid #ff0000"-->
-              <xsl:if test="$style/@fo:border">
+              <xsl:if test="$style/@fo:border  and ($style/@fo:border != 'none')">
                 <xsl:variable name="strokeColor" select="substring-after($style/@fo:border,'#')"/>
 
                 <xsl:variable name="strokeWeight">
