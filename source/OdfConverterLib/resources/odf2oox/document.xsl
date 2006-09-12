@@ -51,7 +51,7 @@
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
   <xsl:key name="hyperlinks" match="text:a" use="''"/>
   <xsl:key name="headers" match="text:h" use="''"/>
-  <xsl:key name="images" match="draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]"
+  <xsl:key name="images" match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image/@xlink:href]"
     use="''"/>
   <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
   <xsl:key name="master-pages" match="style:master-page" use="@style:name"/>
@@ -69,7 +69,7 @@
       <!-- COMMENT: how are we sure this is the correct background? -->
       <!-- COMMENT: See if we cannot use a key -->
       <xsl:if
-        test="document('styles.xml')//style:page-layout[@style:name=//office:master-styles/style:master-page/@style:page-layout-name]/style:page-layout-properties/@fo:background-color">
+        test="document('styles.xml')//style:page-layout[@style:name=//office:master-styles/style:master-page/@style:page-layout-name]/style:page-layout-properties/@fo:background-color != 'transparent'">
         <w:background>
           <xsl:attribute name="w:color">
             <xsl:value-of

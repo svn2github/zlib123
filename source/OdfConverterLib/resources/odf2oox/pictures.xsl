@@ -125,7 +125,7 @@
   </xsl:template>
 
   <xsl:template
-    match="draw:frame[not(./draw:object-ole) and ./draw:image[not(starts-with(@xlink:href, 'Pictures/'))]]"
+    match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[not(starts-with(@xlink:href, 'Pictures/'))]]"
     mode="paragraph">
     <xsl:variable name="supported">
       <xsl:call-template name="image-support">
@@ -159,7 +159,7 @@
   </xsl:template>
 
   <xsl:template
-    match="draw:frame[not(./draw:object-ole) and starts-with(./draw:image/@xlink:href, 'Pictures/')]"
+    match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]"
     mode="paragraph">
     <xsl:variable name="supported">
       <xsl:call-template name="image-support">
