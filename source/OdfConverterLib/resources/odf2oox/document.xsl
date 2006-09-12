@@ -1162,67 +1162,73 @@
       </xsl:attribute>
     </xsl:if>
 
-
     <!--borders-->
-    <xsl:if test="$styleGraphicProperties/@fo:border">
-      <xsl:variable name="strokeColor"
-        select="substring-after($styleGraphicProperties/@fo:border,'#')"/>
-
-      <xsl:variable name="strokeWeight">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length"
-            select="substring-before($styleGraphicProperties/@fo:border,' ')"/>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:if test="$strokeColor != '' ">
-        <xsl:attribute name="strokecolor">
-          <xsl:value-of select="concat('#', $strokeColor)"/>
-        </xsl:attribute>
-      </xsl:if>
-
-      <xsl:if test="$strokeWeight != '' ">
-        <xsl:attribute name="strokeweight">
-          <xsl:value-of select="concat($strokeWeight,'pt')"/>
-        </xsl:attribute>
-      </xsl:if>
-
-    </xsl:if>
-
-    <xsl:if
-      test="substring-before(substring-after($styleGraphicProperties/@fo:border,' ' ),' ' ) != 'solid' ">
-      <v:stroke>
-        <xsl:attribute name="linestyle">
-          <xsl:choose>
-            <xsl:when test="$styleGraphicProperties/@style:border-line-width">
-
-              <xsl:variable name="innerLineWidth">
-                <xsl:call-template name="point-measure">
-                  <xsl:with-param name="length"
-                    select="substring-before($styleGraphicProperties/@style:border-line-width,' ' )"
-                  />
-                </xsl:call-template>
-              </xsl:variable>
-
-              <xsl:variable name="outerLineWidth">
-                <xsl:call-template name="point-measure">
-                  <xsl:with-param name="length"
-                    select="substring-after(substring-after($styleGraphicProperties/@style:border-line-width,' ' ),' ' )"
-                  />
-                </xsl:call-template>
-              </xsl:variable>
-
-              <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
-              <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
-              <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
-
-            </xsl:when>
-          </xsl:choose>
-        </xsl:attribute>
-      </v:stroke>
-
-    </xsl:if>
-
+    <xsl:choose>
+      
+      <xsl:when test="$styleGraphicProperties/@fo:border = 'none'">
+        <xsl:attribute name="stroked">f</xsl:attribute>
+      </xsl:when>
+      
+      <!--default scenario-->
+      <xsl:otherwise>
+        <xsl:variable name="strokeColor"
+          select="substring-after($styleGraphicProperties/@fo:border,'#')"/>
+        
+        <xsl:variable name="strokeWeight">
+          <xsl:call-template name="point-measure">
+            <xsl:with-param name="length"
+              select="substring-before($styleGraphicProperties/@fo:border,' ')"/>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:if test="$strokeColor != '' ">
+          <xsl:attribute name="strokecolor">
+            <xsl:value-of select="concat('#', $strokeColor)"/>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <xsl:if test="$strokeWeight != '' ">
+          <xsl:attribute name="strokeweight">
+            <xsl:value-of select="concat($strokeWeight,'pt')"/>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <!--  line styles -->
+        <xsl:if
+          test="substring-before(substring-after($styleGraphicProperties/@fo:border,' ' ),' ' ) != 'solid' ">
+          <v:stroke>
+            <xsl:attribute name="linestyle">
+              <xsl:choose>
+                <xsl:when test="$styleGraphicProperties/@style:border-line-width">
+                  
+                  <xsl:variable name="innerLineWidth">
+                    <xsl:call-template name="point-measure">
+                      <xsl:with-param name="length"
+                        select="substring-before($styleGraphicProperties/@style:border-line-width,' ' )"
+                      />
+                    </xsl:call-template>
+                  </xsl:variable>
+                  
+                  <xsl:variable name="outerLineWidth">
+                    <xsl:call-template name="point-measure">
+                      <xsl:with-param name="length"
+                        select="substring-after(substring-after($styleGraphicProperties/@style:border-line-width,' ' ),' ' )"
+                      />
+                    </xsl:call-template>
+                  </xsl:variable>
+                  
+                  <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
+                  <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
+                  <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
+                  
+                </xsl:when>
+              </xsl:choose>
+            </xsl:attribute>
+          </v:stroke>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+   
     <!--fill  transparency-->
     <xsl:variable name="opacity"
       select="100 - substring-before($styleGraphicProperties/@style:background-transparency,'%')"/>
