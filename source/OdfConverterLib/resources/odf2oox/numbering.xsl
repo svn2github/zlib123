@@ -40,8 +40,10 @@
   <xsl:key name="list-content" match="text:list" use="@text:style-name"/>
 
   <xsl:variable name="automaticListStylesCount"
-    select="count(/office:document-content/office:automatic-styles/text:list-style)"/>
-
+    select="count(document('content.xml')/office:document-content/office:automatic-styles/text:list-style)"/>
+  <xsl:variable name="stylesListStyleCount"
+    select="count(document('styles.xml')/office:document-styles/office:styles/text:list-style)"/>
+  
 
   <xsl:template name="numbering">
     <w:numbering>
@@ -54,9 +56,14 @@
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:list-style"
         mode="numbering">
-        <xsl:with-param name="offset" select="$automaticListStylesCount"/>
+        <xsl:with-param name="offset" select="$automaticListStylesCount"/>        
       </xsl:apply-templates>
-
+      <xsl:for-each select="document('content.xml')">
+        <xsl:apply-templates select="key('restarting-lists','')" mode="numbering">
+          <xsl:with-param name="offset" select="$automaticListStylesCount + $stylesListStyleCount"/>
+        </xsl:apply-templates>
+      </xsl:for-each>
+      
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:outline-style"
         mode="num"/>
@@ -68,12 +75,16 @@
         mode="num">
         <xsl:with-param name="offset" select="$automaticListStylesCount"/>
       </xsl:apply-templates>
+      <xsl:for-each select="document('content.xml')">
+        <xsl:apply-templates select="key('restarting-lists','')" mode="num">
+          <xsl:with-param name="offset" select="$automaticListStylesCount + $stylesListStyleCount"/>
+        </xsl:apply-templates>
+      </xsl:for-each>
     </w:numbering>
   </xsl:template>
-  <xsl:variable name="stylesListStyleCount"
-    select="count(document('styles.xml')/office:document-styles/office:styles/text:list-style)"/>
+  
   <xsl:template match="text:list-style" mode="numbering">
-    <xsl:param name="offset" select="$stylesListStyleCount"/>
+    <xsl:param name="offset" select="0"/>
     <w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list-style)+2+$offset}">
       <xsl:apply-templates
         select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
@@ -82,7 +93,7 @@
   </xsl:template>
 
   <xsl:template match="text:list-style" mode="num">
-    <xsl:param name="offset" select="$stylesListStyleCount"/>
+    <xsl:param name="offset" select="0"/>
     <w:num w:numId="{count(preceding-sibling::text:list-style)+2+$offset}">
       <w:abstractNumId w:val="{count(preceding-sibling::text:list-style)+2+$offset}"/>
     </w:num>
@@ -559,11 +570,53 @@
       <xsl:otherwise>%1</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
+  <xsl:template match="text:list" mode="numbering">
+    <xsl:param name="offset" select="0"/>
+    <xsl:variable name="listStyleName" select="@text:style-name"/>
+    <w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}">
+      <xsl:choose>
+        <xsl:when
+          test="document('content.xml')/office:document-content/office:automatic-styles/text:list-style/@style:name=$listStyleName">
+          <xsl:for-each
+            select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style[@style:name=$listStyleName]">
+            <xsl:apply-templates
+              select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+              mode="numbering"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when
+          test="document('styles.xml')/office:document-styles/office:styles/text:list-style/@style:name=$listStyleName">
+          <xsl:for-each
+            select="document('styles.xml')/office:document-styles/office:styles/text:list-style[@style:name=$listStyleName]">
+            <xsl:apply-templates
+              select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+              mode="numbering"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+        </xsl:otherwise>
+      </xsl:choose>
+    </w:abstractNum>
+  </xsl:template>
+  
+  <xsl:template match="text:list" mode="num">
+    <xsl:param name="offset" select="0"/>
+    <w:num w:numId="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}">
+      <w:abstractNumId w:val="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}"/>
+    </w:num>
+  </xsl:template>
+    
   <xsl:template name="numberingId">
     <xsl:param name="styleName"/>
     <xsl:choose>
-      <!-- first, look for this list style into content.xml -->
+      <!-- first, if list is a restarting special overriding num-->
+      <xsl:when test="parent::text:list/text:list-item/@text:start-value">
+        <xsl:value-of
+          select="count(parent::text:list/preceding-sibling::text:list[text:list-item/@text:start-value])+2+$stylesListStyleCount + $automaticListStylesCount"
+        />
+      </xsl:when>
+      <!-- look for this list style into content.xml -->
       <xsl:when test="key('list-style', $styleName)">
         <xsl:value-of
           select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2+$stylesListStyleCount"
@@ -579,6 +632,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-
+  
 </xsl:stylesheet>

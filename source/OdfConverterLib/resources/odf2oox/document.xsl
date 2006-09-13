@@ -51,13 +51,15 @@
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
   <xsl:key name="hyperlinks" match="text:a" use="''"/>
   <xsl:key name="headers" match="text:h" use="''"/>
-  <xsl:key name="images" match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image/@xlink:href]"
+  <xsl:key name="images"
+    match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image/@xlink:href]"
     use="''"/>
   <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
   <xsl:key name="master-pages" match="style:master-page" use="@style:name"/>
   <xsl:key name="page-layouts" match="style:page-layout" use="@style:name"/>
   <xsl:key name="master-based-styles" match="style:style[@style:master-page-name]" use="@style:name"/>
   <xsl:key name="sections" match="style:style[@style:family='section']" use="@style:name"/>
+  <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value]" use="''"/>
 
 
   <!-- COMMENT: what is this variable for? -->
@@ -418,8 +420,8 @@
       </xsl:with-param>
     </xsl:call-template>
 
-    <!-- insert heading outline level -->
-    <xsl:call-template name="InsertOutlineLevel">
+    <!-- insert numbering properties -->
+    <xsl:call-template name="InsertNumberingProperties">
       <xsl:with-param name="node" select="."/>
     </xsl:call-template>
 
@@ -428,8 +430,12 @@
       <xsl:with-param name="level" select="$level"/>
     </xsl:call-template>
 
-
-
+    <!-- insert heading outline level -->
+    <xsl:call-template name="InsertOutlineLevel">
+      <xsl:with-param name="node" select="."/>
+    </xsl:call-template>
+    
+    
     <!-- if we are in an annotation, we may have to insert annotation reference -->
     <xsl:call-template name="InsertAnnotationReference"/>
 
@@ -448,6 +454,19 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- Inserts the list number of a list -->
+  <xsl:template name="InsertNumberingProperties">
+    <xsl:param name="node"/>
+    <!-- COMMENT: See if we cannot use a key -->
+    <xsl:if
+      test="$node[self::text:h] and $node/@text:outline-level &lt;= 9 and document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
+      <w:numPr>
+        <w:ilvl w:val="{$node/@text:outline-level - 1}"/>
+        <w:numId w:val="1"/>
+      </w:numPr>
+    </xsl:if>
+  </xsl:template>
+  
   <!-- Inserts the outline level of a heading if needed -->
   <xsl:template name="InsertOutlineLevel">
     <xsl:param name="node"/>
@@ -457,14 +476,6 @@
           <w:outlineLvl w:val="0"/>
         </xsl:when>
         <xsl:when test="$node/@text:outline-level &lt;= 9">
-          <!-- COMMENT: See if we cannot use a key -->
-          <xsl:if
-            test="document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
-            <w:numPr>
-              <w:ilvl w:val="{$node/@text:outline-level - 1}"/>
-              <w:numId w:val="1"/>
-            </w:numPr>
-          </xsl:if>
           <w:outlineLvl w:val="{$node/@text:outline-level}"/>
         </xsl:when>
         <xsl:otherwise>
@@ -908,10 +919,10 @@
   <!-- annotations -->
   <xsl:template match="office:annotation" mode="paragraph">
     <xsl:choose>
-   
+
       <!--annotation embedded in text-box is not supported in Word-->
-      <xsl:when test="ancestor::draw:text-box" />
-    
+      <xsl:when test="ancestor::draw:text-box"/>
+
       <!--default scenario-->
       <xsl:otherwise>
         <xsl:variable name="id">
@@ -929,7 +940,7 @@
           </w:commentReference>
         </w:r>
       </xsl:otherwise>
-      
+
     </xsl:choose>
   </xsl:template>
 
@@ -1139,15 +1150,21 @@
 
       <!-- text-box relative position -->
       <xsl:choose>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-end-margin' ">mso-position-horizontal-relative: right-margin-area;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-start-margin' ">mso-position-horizontal-relative: left-margin-area;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page' ">mso-position-horizontal-relative: page;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-content' ">mso-position-horizontal-relative: column;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-end-margin' "
+          >mso-position-horizontal-relative: right-margin-area;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-start-margin' "
+          >mso-position-horizontal-relative: left-margin-area;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page' "
+          >mso-position-horizontal-relative: page;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-content' "
+          >mso-position-horizontal-relative: column;</xsl:when>
       </xsl:choose>
-      
+
       <xsl:choose>
-        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page' ">mso-position-vertical-relative: page;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page-content' ">mso-position-vertical-relative: margin;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page' "
+          >mso-position-vertical-relative: page;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page-content' "
+          >mso-position-vertical-relative: margin;</xsl:when>
       </xsl:choose>
 
       <!--horizontal position-->
@@ -1166,8 +1183,8 @@
           <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
         </xsl:choose>
       </xsl:if>
-      
-     <!-- vertical position-->
+
+      <!-- vertical position-->
       <xsl:if test="$styleGraphicProperties/@style:vertical-pos">
         <xsl:choose>
           <xsl:when test="$styleGraphicProperties/@style:vertical-pos = 'middle'">
@@ -1233,35 +1250,35 @@
 
     <!--borders-->
     <xsl:choose>
-      
+
       <xsl:when test="$styleGraphicProperties/@fo:border = 'none'">
         <xsl:attribute name="stroked">f</xsl:attribute>
       </xsl:when>
-      
+
       <!--default scenario-->
       <xsl:otherwise>
         <xsl:variable name="strokeColor"
           select="substring-after($styleGraphicProperties/@fo:border,'#')"/>
-        
+
         <xsl:variable name="strokeWeight">
           <xsl:call-template name="point-measure">
             <xsl:with-param name="length"
               select="substring-before($styleGraphicProperties/@fo:border,' ')"/>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:if test="$strokeColor != '' ">
           <xsl:attribute name="strokecolor">
             <xsl:value-of select="concat('#', $strokeColor)"/>
           </xsl:attribute>
         </xsl:if>
-        
+
         <xsl:if test="$strokeWeight != '' ">
           <xsl:attribute name="strokeweight">
             <xsl:value-of select="concat($strokeWeight,'pt')"/>
           </xsl:attribute>
         </xsl:if>
-        
+
         <!--  line styles -->
         <xsl:if
           test="substring-before(substring-after($styleGraphicProperties/@fo:border,' ' ),' ' ) != 'solid' ">
@@ -1269,7 +1286,7 @@
             <xsl:attribute name="linestyle">
               <xsl:choose>
                 <xsl:when test="$styleGraphicProperties/@style:border-line-width">
-                  
+
                   <xsl:variable name="innerLineWidth">
                     <xsl:call-template name="point-measure">
                       <xsl:with-param name="length"
@@ -1277,7 +1294,7 @@
                       />
                     </xsl:call-template>
                   </xsl:variable>
-                  
+
                   <xsl:variable name="outerLineWidth">
                     <xsl:call-template name="point-measure">
                       <xsl:with-param name="length"
@@ -1285,11 +1302,11 @@
                       />
                     </xsl:call-template>
                   </xsl:variable>
-                  
+
                   <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
                   <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
                   <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
-                  
+
                 </xsl:when>
               </xsl:choose>
             </xsl:attribute>
@@ -1297,12 +1314,13 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-   
+
     <!--fill  transparency-->
     <xsl:variable name="opacity"
       select="100 - substring-before($styleGraphicProperties/@style:background-transparency,'%')"/>
 
-    <xsl:if test="$styleGraphicProperties/@style:background-transparency and $styleGraphicProperties/@fo:background-color != 'transparent' ">
+    <xsl:if
+      test="$styleGraphicProperties/@style:background-transparency and $styleGraphicProperties/@fo:background-color != 'transparent' ">
       <v:fill>
         <xsl:attribute name="opacity">
           <xsl:value-of select="concat($opacity,'%')"/>
@@ -1336,17 +1354,17 @@
 
       <w:txbxContent>
         <xsl:for-each select="child::node()">
-          
+
           <xsl:choose>
-         <!--   ignore embedded text-box becouse word doesn't support it-->
-            <xsl:when test="self::node()[name(draw:text-box)]" />
-            
+            <!--   ignore embedded text-box becouse word doesn't support it-->
+            <xsl:when test="self::node()[name(draw:text-box)]"/>
+
             <!--default scenario-->
             <xsl:otherwise>
               <xsl:apply-templates select="."/>
             </xsl:otherwise>
           </xsl:choose>
-          
+
         </xsl:for-each>
       </w:txbxContent>
 
@@ -1589,7 +1607,7 @@
     <w:r>
       <w:rPr>
         <w:rStyle w:val="Hyperlink"/>
-        <w:noProof/>        
+        <w:noProof/>
       </w:rPr>
       <xsl:choose>
         <xsl:when test="$test=1">
@@ -1617,14 +1635,14 @@
       </xsl:choose>
     </w:r>
     <xsl:apply-templates select="text:tab|text:a/text:tab|text:span" mode="paragraph"/>
-    <xsl:if test="not(ancestor::text:alphabetical-index)">     
+    <xsl:if test="not(ancestor::text:alphabetical-index)">
       <w:r>
         <w:rPr>
           <w:noProof/>
           <w:webHidden/>
         </w:rPr>
       </w:r>
-      <w:r>        
+      <w:r>
         <w:rPr>
           <w:noProof/>
           <w:webHidden/>
@@ -1640,11 +1658,11 @@
         </w:rPr>
         <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $num, ' \h')"/></w:instrText>
       </w:r>
-      <w:r>       
-          <w:rPr>
-            <w:noProof/>
-            <w:webHidden/>
-          </w:rPr>     
+      <w:r>
+        <w:rPr>
+          <w:noProof/>
+          <w:webHidden/>
+        </w:rPr>
         <w:fldChar w:fldCharType="separate"/>
       </w:r>
     </xsl:if>
@@ -1845,7 +1863,7 @@
 
   <!-- tabs -->
   <xsl:template match="text:tab" mode="paragraph">
-    <w:r>     
+    <w:r>
       <w:rPr>
         <w:noProof/>
         <w:webHidden/>
