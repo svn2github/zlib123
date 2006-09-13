@@ -1694,8 +1694,8 @@
 
   <!-- indexes -->
   <xsl:template match="text:table-index|text:alphabetical-index|text:illustration-index">
-    <xsl:if test="text:index-body/text:index-title/text:p">
-      <xsl:apply-templates select="text:index-body/text:index-title/text:p"/>
+    <xsl:if test="text:index-body/text:index-title/text:p or text:index-body/text:index-title/text:h">
+      <xsl:apply-templates select="text:index-body/text:index-title/text:p | text:index-body/text:index-title/text:h"/>
     </xsl:if>
 
     <xsl:for-each select="text:index-body/child::text:p">
