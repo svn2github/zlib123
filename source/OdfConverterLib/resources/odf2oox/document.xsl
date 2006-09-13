@@ -373,12 +373,6 @@
 
       </xsl:choose>
 
-      <!-- selfstanding image before paragraph-->
-      <xsl:if
-        test="name(preceding-sibling::*[1]) = 'draw:frame' and preceding-sibling::*[1]/draw:image">
-        <xsl:apply-templates select="preceding-sibling::*[1]" mode="paragraph"/>
-      </xsl:if>
-
       <!-- If there is a page-break-after in the paragraph style -->
       <xsl:if
         test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
@@ -1043,7 +1037,14 @@
         <xsl:call-template name="InsertTextBoxStyle"/>
       </w:rPr>
       <w:pict>
-        <v:shapetype/>
+
+        <!--this properties are needed to make z-index work properly-->
+        <v:shapetype coordsize="21600,21600" 
+          path="m,l,21600r21600,l21600,xe" xmlns:o="urn:schemas-microsoft-com:office:office">
+          <v:stroke joinstyle="miter"/>
+          <v:path gradientshapeok="t" o:connecttype="rect"/>
+        </v:shapetype>
+        
         <v:shape type="#_x0000_t202">
 
           <xsl:variable name="styleGraphicProperties"
@@ -1114,7 +1115,7 @@
             and not($styleGraphicProperties/@style:run-through)"
             >251658240</xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="parent::draw:frame/@draw:z-index"/>
+            <xsl:value-of select="2 + parent::draw:frame/@draw:z-index"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>

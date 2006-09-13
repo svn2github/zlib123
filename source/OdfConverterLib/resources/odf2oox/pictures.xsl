@@ -168,13 +168,40 @@
     </xsl:variable>
 
     <xsl:if test="$supported = 'true'">
+      <w:r>
+        <xsl:call-template name="InsertImage" />
+      </w:r>
+    </xsl:if>
 
-      <xsl:variable name="intId">
+  </xsl:template>
+  
+  <xsl:template
+    match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]">
+    
+    <xsl:variable name="supported">
+      <xsl:call-template name="image-support">
+        <xsl:with-param name="name" select="./draw:image/@xlink:href"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$supported = 'true'">
+      <w:p>
+        <w:r>
+          <xsl:call-template name="InsertImage" />
+        </w:r>
+      </w:p>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="InsertImage">
+    
+    <w:drawing>
+     <xsl:variable name="intId">
         <xsl:call-template name="GetPosition">
           <xsl:with-param name="node" select="."/>
         </xsl:call-template>
       </xsl:variable>
-
+      
       <xsl:variable name="cx">
         <xsl:choose>
           <xsl:when test="@svg:width">
@@ -189,7 +216,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-
+      
       <xsl:variable name="cy">
         <xsl:choose>
           <xsl:when test="@svg:height">
@@ -204,29 +231,24 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-
-      <w:r>
-        <w:drawing>
-          <xsl:choose>
-            <xsl:when test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote']">
-              <xsl:call-template name="inline-image">
-                <xsl:with-param name="cx" select="$cx"/>
-                <xsl:with-param name="cy" select="$cy"/>
-                <xsl:with-param name="intId" select="$intId"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="anchor-image">
-                <xsl:with-param name="cx" select="$cx"/>
-                <xsl:with-param name="cy" select="$cy"/>
-                <xsl:with-param name="intId" select="$intId"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </w:drawing>
-      </w:r>
-    </xsl:if>
-
+      
+      <xsl:choose>
+        <xsl:when test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote']">
+          <xsl:call-template name="inline-image">
+            <xsl:with-param name="cx" select="$cx"/>
+            <xsl:with-param name="cy" select="$cy"/>
+            <xsl:with-param name="intId" select="$intId"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="anchor-image">
+            <xsl:with-param name="cx" select="$cx"/>
+            <xsl:with-param name="cy" select="$cy"/>
+            <xsl:with-param name="intId" select="$intId"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </w:drawing>
   </xsl:template>
 
   <xsl:template name="inline-image">
@@ -332,7 +354,12 @@
 
     <xsl:variable name="vertical-pos" select="$style/@style:vertical-pos"/>
 
-    <wp:anchor simplePos="0" relativeHeight="251658240" locked="0" layoutInCell="1" allowOverlap="1">
+    <wp:anchor simplePos="0" locked="0" layoutInCell="1" allowOverlap="1">
+      
+      <xsl:attribute name="relativeHeight">
+        <xsl:value-of select="2 + @draw:z-index"/>
+      </xsl:attribute>
+      
       <xsl:attribute name="behindDoc">
         <xsl:choose>
           <xsl:when test="$wrap = 'run-through' and $style/@style:run-through = 'background' ">1</xsl:when>
