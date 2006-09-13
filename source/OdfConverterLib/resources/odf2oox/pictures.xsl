@@ -208,7 +208,7 @@
       <w:r>
         <w:drawing>
           <xsl:choose>
-            <xsl:when test="ancestor::draw:text-box">
+            <xsl:when test="ancestor::draw:text-box or @text:anchor-type='as-char'">
               <xsl:call-template name="inline-image">
                 <xsl:with-param name="cx" select="$cx"/>
                 <xsl:with-param name="cy" select="$cy"/>
@@ -312,6 +312,10 @@
     <xsl:variable name="sName" select="@draw:style-name"/>
 
     <xsl:variable name="style" select="key('automatic-styles', $sName)/style:graphic-properties"/>
+    
+    <xsl:variable name="sNameP" select="parent::text:p/@text:style-name"/>
+    
+    <xsl:variable name="styleP" select="key('automatic-styles', $sNameP)"/>
 
     <xsl:variable name="posH" select="$style/@style:horizontal-rel"/>
 
@@ -345,10 +349,16 @@
             <xsl:otherwise>column</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
+        <xsl:variable name="AlignH" select="$styleP/style:paragraph-properties/@fo:text-align"/>
         <xsl:choose>
           <xsl:when test="$horizontal-pos !='from-left' and $horizontal-pos !='from-outside' ">
             <wp:align>
               <xsl:value-of select="$horizontal-pos"/>
+            </wp:align>
+          </xsl:when>
+          <xsl:when test="($AlignH = 'left') or ($AlignH = 'center') or ($AlignH = 'right')">
+            <wp:align>
+              <xsl:value-of select="$AlignH"/>
             </wp:align>
           </xsl:when>
           <xsl:otherwise>
