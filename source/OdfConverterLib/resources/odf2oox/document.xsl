@@ -365,8 +365,10 @@
         </xsl:when>
 
         <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
-        <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]"/>
-
+        <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
+          <xsl:message terminate="no">feedback: Nested frames</xsl:message>
+        </xsl:when>
+          
         <xsl:otherwise>
           <xsl:apply-templates mode="paragraph"/>
         </xsl:otherwise>
@@ -466,7 +468,8 @@
   <!-- Inserts the outline level of a heading if needed -->
   <xsl:template name="InsertOutlineLevel">
     <xsl:param name="node"/>
-    <xsl:if test="$node[self::text:h]">
+    <!-- List item are first considered if exist than heading style-->
+    <xsl:if test="$node[self::text:h and (not(parent::text:list-item) or position() > 1) ]">
       <xsl:choose>
         <xsl:when test="not($node/@text:outline-level)">
           <w:outlineLvl w:val="0"/>
@@ -917,8 +920,9 @@
     <xsl:choose>
 
       <!--annotation embedded in text-box is not supported in Word-->
-      <xsl:when test="ancestor::draw:text-box"/>
-
+      <xsl:when test="ancestor::draw:text-box">
+        <xsl:message terminate="no">feedback: Nested frames</xsl:message>
+      </xsl:when>
       <!--default scenario-->
       <xsl:otherwise>
         <xsl:variable name="id">
@@ -1360,7 +1364,9 @@
 
           <xsl:choose>
             <!--   ignore embedded text-box becouse word doesn't support it-->
-            <xsl:when test="self::node()[name(draw:text-box)]"/>
+            <xsl:when test="self::node()[name(draw:text-box)]">
+              <xsl:message terminate="no">feedback: Nested frames</xsl:message>
+            </xsl:when>
 
             <!--default scenario-->
             <xsl:otherwise>
