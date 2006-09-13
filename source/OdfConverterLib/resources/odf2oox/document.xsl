@@ -143,8 +143,10 @@
           select="key('master-based-styles', $elt/@text:style-name | $elt/@table:style-name)[1]"/>
         <xsl:if test="$continuous = 'no' ">
           <!-- header/footer -->
-          <xsl:if
-            test="generate-id($elt) = generate-id($master-elts[key('master-based-styles',$elt/@text:style-name|$elt/@table:style-name) and position()=1])">
+          <!-- Is it the first time we use this master style? In which case we have to reference the header/footer -->
+          <xsl:variable name="elt-siblings" select="$master-elts[@text:style-name=$elt/@text:style-name or @table:style-name=$elt/@table:style-name]"/>
+          <xsl:variable name="first-occurrence" select="$elt-siblings[1]"/>
+          <xsl:if test="generate-id($elt) = generate-id($first-occurrence)">
             <!-- Since we must have unique header/footer references, make sure this element's master style has not been used previously -->
             <xsl:for-each select="document('styles.xml')">
               <xsl:call-template name="HeaderFooter">
