@@ -85,10 +85,16 @@
 
     <w:endnotePr>
 
-      <w:pos>
-        <xsl:attribute name="w:val">docEnd</xsl:attribute>
-      </w:pos>
-
+     <xsl:choose>
+       <xsl:when test="ancestor::style:style[@style:family='section']">
+         <w:pos w:val="sectEnd"/>
+       </xsl:when>
+       <xsl:otherwise>
+         <w:pos w:val="docEnd"/>
+       </xsl:otherwise>
+     </xsl:choose>
+      
+ 
       <xsl:if test="@style:num-format">
         <w:numFmt>
           <xsl:attribute name="w:val">
@@ -156,7 +162,6 @@
 
       <xsl:for-each select="document('content.xml')">
         <xsl:for-each select="key('images', '')[ancestor::text:note/@text:note-class = 'endnote' ]">
-          select="key('images', '')[ancestor::text:note/@text:note-class = 'footnote' ]">
             <xsl:variable name="supported">
             <xsl:call-template name="image-support">
               <xsl:with-param name="name" select="draw:image/@xlink:href"/>
