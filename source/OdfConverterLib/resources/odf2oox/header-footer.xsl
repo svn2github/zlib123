@@ -46,6 +46,8 @@
   <xsl:template name="footer">
     <xsl:param name="footerNode"/>
     <w:ftr>
+      <xsl:apply-templates select="$footerNode"/>
+      <!--
       <xsl:for-each select="child::node()">
         <xsl:choose>
           <xsl:when test="./descendant::text:page-number">
@@ -57,7 +59,7 @@
                       <xsl:attribute name="w:val">
                         <xsl:variable name="style" select="descendant::draw:frame/@draw:style-name"/>
                         <xsl:variable name="alignment" select="//office:document-styles/office:automatic-styles/style:style[@style:name= $style]/style:graphic-properties/@style:horizontal-pos"/>
-                        <!--TODO: other alignment cases -->
+                       
                         <xsl:choose>
                           <xsl:when test="($alignment = 'center') or ($alignment = 'right') or ($alignment = 'left')">
                             <xsl:value-of select="$alignment"/>
@@ -77,6 +79,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
+      -->
     </w:ftr>
   </xsl:template>
 
@@ -106,101 +109,29 @@
   </xsl:template>
 
   <xsl:template name="HeaderFooter">
-    <xsl:if
-      test="document('styles.xml')/office:document-styles/office:master-styles/style:master-page">
-
-      <xsl:variable name="masterPage"
-        select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"/>
-      <xsl:variable name="style"
-        select="document('content.xml')/office:document-content/office:automatic-styles/style:style"/>
-
-      <xsl:variable name="oddPage">
-        <xsl:call-template name="isOddEven">
-          <xsl:with-param name="masterPage" select="$masterPage"/>
-          <xsl:with-param name="style" select="$style"/>
-        </xsl:call-template>
-      </xsl:variable>
+    <xsl:param name="master-page"/>
+    
+    <xsl:variable name="type">
       <xsl:choose>
-        <xsl:when test="string-length($oddPage)>0">
-          <xsl:for-each select="$masterPage">
-            <xsl:choose>
-              <xsl:when test="@style:name=$oddPage">
-                <xsl:call-template name="headerFooterReference">
-                  <xsl:with-param name="type">default</xsl:with-param>
-                  <xsl:with-param name="pos" select="position()"/>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:when test="@style:name=$masterPage[@style:name=$oddPage]/@style:next-style-name">
-                <xsl:call-template name="headerFooterReference">
-                  <xsl:with-param name="type">even</xsl:with-param>
-                  <xsl:with-param name="pos" select="position()"/>
-                </xsl:call-template>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:for-each>
-        </xsl:when>
-
-        <xsl:otherwise>
-          <xsl:for-each select="$masterPage">
-            <xsl:if test="@style:name='Standard'">
-              <xsl:call-template name="headerFooterReference">
-                <xsl:with-param name="type">default</xsl:with-param>
-                <xsl:with-param name="pos" select="position()"/>
-              </xsl:call-template>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:otherwise>
+        <xsl:when test="@style:name='First_20_Page'">first</xsl:when>
+        <xsl:otherwise>default</xsl:otherwise>
       </xsl:choose>
-
-      <xsl:if test="$style[@style:master-page-name='First_20_Page']">
-        <xsl:for-each select="$masterPage">
-          <xsl:if test="@style:name='First_20_Page'">
-            <xsl:call-template name="headerFooterReference">
-              <xsl:with-param name="type">first</xsl:with-param>
-              <xsl:with-param name="pos" select="position()"/>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
-
+    </xsl:variable>
+    <xsl:if test="$master-page/style:header">
+      <w:headerReference w:type="{$type}" r:id="{generate-id($master-page/style:header)}"/>
+    </xsl:if>
+    <xsl:if test="$master-page/style:footer">
+      <w:footerReference w:type="{$type}" r:id="{generate-id($master-page/style:footer)}"/>
     </xsl:if>
   </xsl:template>
-
 
   <!-- Specify whether the parent section shall have a different header and footer for its first page -->
   <!-- TODO : use keys -->
   <xsl:template name="TitlePg">
-
-    <xsl:variable name="masterPage"
-      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"/>
-    <xsl:variable name="style"
-      select="document('content.xml')/office:document-content/office:automatic-styles/style:style"/>
-
-    <xsl:if test="$style[@style:master-page-name='First_20_Page']">
-      <xsl:for-each select="$masterPage">
-        <xsl:if test="@style:name='First_20_Page'">
-          <w:titlePg/>
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:if>
-  </xsl:template>
-
-
-  <xsl:template name="headerFooterReference">
-    <xsl:param name="type"/>
-    <xsl:param name="pos"/>
-    <w:headerReference>
-      <xsl:attribute name="w:type">
-        <xsl:value-of select="$type"/>
-      </xsl:attribute>
-      <xsl:attribute name="r:id">hfId<xsl:value-of select="$pos * 2 - 1"/></xsl:attribute>
-    </w:headerReference>
-    <w:footerReference>
-      <xsl:attribute name="w:type">
-        <xsl:value-of select="$type"/>
-      </xsl:attribute>
-      <xsl:attribute name="r:id">hfId<xsl:value-of select="$pos * 2"/></xsl:attribute>
-    </w:footerReference>
+    <xsl:param name="master-page"/>
+    <!--xsl:if test="$master-page[@style:name = 'First_20_Page']">
+      <w:titlePg/>
+      </xsl:if-->
   </xsl:template>
 
   <xsl:template name="EvenAndOddConfiguration">

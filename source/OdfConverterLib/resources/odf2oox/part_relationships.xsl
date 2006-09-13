@@ -65,22 +65,20 @@
       <Relationship Id="rId7"
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments"
         Target="comments.xml"/>
-
+      
       <!-- Relationship for header and footer -->
       <xsl:for-each
         select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page">
-        <Relationship>
-          <xsl:attribute name="Id">hfId<xsl:value-of select="(position() * 2) - 1"/></xsl:attribute>
-          <xsl:attribute name="Type"
-            >http://schemas.openxmlformats.org/officeDocument/2006/relationships/header</xsl:attribute>
-          <xsl:attribute name="Target">header<xsl:value-of select="position()"/>.xml</xsl:attribute>
-        </Relationship>
-        <Relationship>
-          <xsl:attribute name="Id">hfId<xsl:value-of select="position() * 2"/></xsl:attribute>
-          <xsl:attribute name="Type"
-            >http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer</xsl:attribute>
-          <xsl:attribute name="Target">footer<xsl:value-of select="position()"/>.xml</xsl:attribute>
-        </Relationship>
+        <xsl:if test="style:header">  
+          <Relationship Id="{generate-id(style:header)}" 
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header"
+            Target="header{position()}.xml"/>
+        </xsl:if>
+        <xsl:if test="style:footer">
+          <Relationship  Id="{generate-id(style:footer)}" 
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer"
+            Target="footer{position()}.xml"/>
+        </xsl:if>
       </xsl:for-each>
 
       <!-- OLE Objects -->
