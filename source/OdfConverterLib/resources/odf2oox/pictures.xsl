@@ -38,7 +38,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  exclude-result-prefixes="xlink draw svg fo">
+  exclude-result-prefixes="xlink draw svg fo office style text">
 
 
   <xsl:key name="images" match="draw:frame" use="'const'"/>
