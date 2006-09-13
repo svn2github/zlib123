@@ -62,6 +62,10 @@
 
   <!-- COMMENT: what is this variable for? -->
   <xsl:variable name="type">dxa</xsl:variable>
+  <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
+  <xsl:variable name="master-elts"
+    select="$body/descendant::text:p[key('master-based-styles', @text:style-name)] | $body/descendant::text:h[key('master-based-styles', @text:style-name)] | $body/descendant::table:table[key('master-based-styles', @table:style-name)]"/>
+  
 
   <!-- main document -->
   <xsl:template name="document">
@@ -87,17 +91,6 @@
     <w:body>
       <xsl:apply-templates/>
       <w:sectPr>
-        <!-- Header/Footer configuration -->
-        <xsl:call-template name="HeaderFooter"/>
-        <!-- Footnotes and endnotes configuration -->
-        <xsl:apply-templates
-          select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
-          mode="note"/>
-        <xsl:apply-templates
-          select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
-          mode="note"/>
-
-        <!-- Page layout properties -->
         <!--- all the paragraphs, headings or tables tied to a master style -->
         <xsl:variable name="masterPages"
           select="descendant::text:p[key('master-based-styles', @text:style-name)] | descendant::text:h[key('master-based-styles', @text:style-name)] | descendant::table:table[key('master-based-styles', @table:style-name)]"/>
@@ -105,8 +98,7 @@
         <xsl:variable name="lastMasterPage" select="$masterPages[last()]"/>
         <!-- the master page name it is related to -->
         <xsl:variable name="masterPageName"
-          select="key('master-based-styles', $lastMasterPage/@text:style-name | $lastMasterPage/@table:style-name)[1]/@style:master-page-name"/>
-
+          select="key('master-based-styles', $lastMasterPage/@text:style-name | $lastMasterPage/@table:style-name)[1]/@style:master-page-name"/> 
         <!-- 
           Continuous section. Looking up for a text:section 
           If there's no master-page used after the last text:section, then the sectPr is continuous.
@@ -114,34 +106,106 @@
         <xsl:variable name="ls" select="descendant::text:section[last()]"/>
         <xsl:variable name="lastMP"
           select="$ls/following::text:p[key('master-based-styles', @text:style-name)] | $ls/following::text:h[key('master-based-styles', @text:style-name)] | $ls/following::text:table[key('master-based-styles', @table:style-name)]"/>
-        <xsl:if test="$ls and not($lastMP)">
-          <w:type w:val="continuous"/>
-        </xsl:if>
-        <xsl:for-each select="document('styles.xml')">
+        <xsl:variable name="continuous">
           <xsl:choose>
-            <!-- if we use a master-page based style -->
-            <xsl:when test="$masterPageName">
-              <!-- get the associated page layout -->
-              <xsl:variable name="pageLayoutName"
-                select="key('master-pages', $masterPageName)/@style:page-layout-name"/>
-              <!-- apply the layout properties -->
-              <xsl:apply-templates
-                select="key('page-layouts', $pageLayoutName)/style:page-layout-properties"
-                mode="master-page"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- use default master page -->
-              <xsl:apply-templates
-                select="key('page-layouts', /office:document-styles/office:master-styles/style:master-page[1]/@style:page-layout-name)/style:page-layout-properties"
-                mode="master-page"/>
-            </xsl:otherwise>
+            <xsl:when test="$ls and not($lastMP)">yes</xsl:when>
+            <xsl:otherwise>no</xsl:otherwise>
           </xsl:choose>
-        </xsl:for-each>
+        </xsl:variable>
+        <xsl:choose>
+          <!-- if we use a master-page based style -->
+          <xsl:when test="$masterPageName">
+            <xsl:call-template name="sectionProperties">
+              <xsl:with-param name="continuous" select="$continuous"/>
+              <xsl:with-param name="elt" select="$lastMasterPage"/>
+            </xsl:call-template>
+          </xsl:when>    
+          <xsl:otherwise>
+            <!-- use default master page -->
+            <xsl:call-template name="sectionProperties">
+              <xsl:with-param name="continuous" select="$continuous"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>     
         <!-- Shall the header and footer be different on the first page -->
         <xsl:call-template name="TitlePg"/>
       </w:sectPr>
     </w:body>
   </xsl:template>
+  
+  
+  <!-- OOX section properties (header/footer, footnotes/endnotes, page layout, etc) -->
+  <xsl:template name="sectionProperties">
+    <xsl:param name="elt"/>
+    <xsl:param name="continuous" select="'no'"/>
+    <xsl:param name="notes-configuration"/>
+    
+    <xsl:choose>
+      <xsl:when test="$elt">
+        <xsl:variable name="eltstyle"
+          select="key('master-based-styles', $elt/@text:style-name | $elt/@table:style-name)[1]"/>
+        <xsl:if test="$continuous = 'no' ">
+          <!-- header/footer -->
+          <xsl:if
+            test="generate-id($elt) = generate-id($master-elts[key('master-based-styles',$elt/@text:style-name|$elt/@table:style-name) and position()=1])">
+            <!-- Since we must have unique header/footer references, make sure this element's master style has not been used previously -->
+            <xsl:for-each select="document('styles.xml')">
+              <xsl:call-template name="HeaderFooter">
+                <xsl:with-param name="master-page"
+                  select="key('master-pages', $eltstyle/@style:master-page-name)"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:if>
+        </xsl:if>
+        <!-- notes configuration -->
+        <xsl:if test="$notes-configuration">
+          <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']" mode="note"/>
+          <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']" mode="note"/>
+        </xsl:if>
+        <!-- continuous -->
+        <xsl:if test="$continuous = 'yes' ">
+          <w:type w:val="continuous"/>
+        </xsl:if>
+        <!-- page layout properties -->
+        <xsl:for-each select="document('styles.xml')">
+          <xsl:apply-templates
+            select="key('page-layouts', key('master-pages', $eltstyle/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
+            mode="master-page"/>
+        </xsl:for-each>
+      </xsl:when>
+      
+      <xsl:otherwise>
+        <!-- if we fall here, it means no master page has been explicitely used so far -->
+        <!-- header/footer -->
+        <xsl:if test="$continuous = 'no' ">
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:call-template name="HeaderFooter">
+              <xsl:with-param name="master-page"
+                select=" /office:document-styles/office:master-styles/style:master-page[1]"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:if>
+        <!-- notes configuration -->
+        <xsl:if test="$notes-configuration">
+          <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']" mode="note"/>
+          <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']" mode="note"/>
+        </xsl:if>
+        <!-- continuous -->
+        <xsl:if test="$continuous = 'yes' ">
+          <w:type w:val="continuous"/>
+        </xsl:if>
+        <!-- page layou properties -->
+        <xsl:for-each select="document('styles.xml')">
+          <xsl:apply-templates
+            select="key('page-layouts', /office:document-styles/office:master-styles/style:master-page[1]/@style:page-layout-name)/style:page-layout-properties"
+            mode="master-page"/>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
+  
 
   <!-- paragraphs and headings -->
   <xsl:template match="text:p | text:h">
@@ -155,30 +219,28 @@
         </xsl:call-template>
 
         <!-- Section detection  : 3 cases -->
-
         <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
         <xsl:variable name="followings"
           select="following::text:p | following::text:h | following::table:table"/>
         <xsl:variable name="masterPageStarts"
           select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
-
+        
         <!-- 2 - Section starts. The following paragraph is contained in the following section -->
         <xsl:variable name="followingSection" select="following::text:section[1]"/>
         <!-- the following section is the same as the following neighbour's ancestor section -->
         <xsl:variable name="sectionStarts"
           select="$followingSection and (generate-id($followings[1]/ancestor::text:section) = generate-id($followingSection))"/>
-
+        
         <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
         <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
         <!-- the following neighbour's ancestor section and the current section are different -->
         <xsl:variable name="sectionEnds"
           select="$previousSection and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previousSection))"/>
-
+        
         <!-- section creation -->
         <xsl:if
           test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
-          <w:sectPr>
-
+          <w:sectPr>   
             <!-- 
               Continuous sections. Looking up for a text:section 
               If the first master style following the preceding section is the same as this paragraph's following master-style,
@@ -189,62 +251,56 @@
               select="$ps/following::text:p[key('master-based-styles', @text:style-name)] | $ps/following::text:h[key('master-based-styles', @text:style-name)] | $ps/following::text:table[key('master-based-styles', @table:style-name)]"/>
             <xsl:variable name="followingMasterStyle"
               select="$followings[key('master-based-styles', @text:style-name|@table:style-name)]"/>
-            <xsl:variable name="continuous"
-              select="generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])"/>
-            <xsl:choose>
-              <xsl:when test="$sectionEnds = 'true' ">
-                <xsl:apply-templates
-                  select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration[@text:note-class='footnote']"
-                  mode="note"/>
-                <xsl:apply-templates
-                  select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration[@text:note-class='endnote']"
-                  mode="note"/>
-                <w:type w:val="continuous"/>
-              </xsl:when>
-              <xsl:when test="$continuous">
-                <w:type w:val="continuous"/>
-              </xsl:when>
-            </xsl:choose>
-
+            <xsl:variable name="continuous">
+              <xsl:choose>
+                <xsl:when
+                  test="$sectionEnds or ($ps and (generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])))"
+                  >yes</xsl:when>
+                <xsl:otherwise>no</xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            
+            <!-- sectionEnds et previousSection -->
+            <xsl:variable name="notes-configuration"
+              select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration"/>
+            
             <!-- Determine the master style that rules this section -->
             <xsl:variable name="currentMasterStyle"
               select="key('master-based-styles', @text:style-name)"/>
-
             <xsl:choose>
               <xsl:when test="boolean($currentMasterStyle)">
                 <!-- current element style is tied to a master page -->
-                <xsl:for-each select="document('styles.xml')">
-                  <xsl:apply-templates
-                    select="key('page-layouts', key('master-pages', $currentMasterStyle[1]/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
-                    mode="master-page"/>
-                </xsl:for-each>
+                <xsl:call-template name="sectionProperties">
+                  <xsl:with-param name="continuous" select="$continuous"/>
+                  <xsl:with-param name="elt" select="."/>
+                  <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
+                </xsl:call-template>
               </xsl:when>
               <xsl:otherwise>
-                <!-- current style is not tied to a master page, find the preceding one -->
+                <!-- current style is not tied to a master page (typically the case of an ODF section), find the preceding one -->
                 <xsl:variable name="precedings"
                   select="preceding::text:p[key('master-based-styles', @text:style-name)] | preceding::text:h[key('master-based-styles', @text:style-name)] | preceding::table:table[key('master-based-styles', @table:style-name)]"/>
                 <xsl:variable name="precedingMasterStyle"
                   select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>
                 <xsl:choose>
                   <xsl:when test="boolean($precedingMasterStyle)">
-                    <xsl:for-each select="document('styles.xml')">
-                      <xsl:apply-templates
-                        select="key('page-layouts', key('master-pages', $precedingMasterStyle[1]/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
-                        mode="master-page"/>
-                    </xsl:for-each>
+                    <xsl:call-template name="sectionProperties">
+                      <xsl:with-param name="continuous" select="$continuous"/>
+                      <xsl:with-param name="elt" select="$precedings[last()]"/>
+                      <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
+                    </xsl:call-template>
                   </xsl:when>
                   <xsl:otherwise>
                     <!-- otherwise, apply the default master style -->
-                    <xsl:for-each select="document('styles.xml')">
-                      <xsl:apply-templates
-                        select="key('page-layouts', /office:document-styles/office:master-styles/style:master-page[1]/@style:page-layout-name)/style:page-layout-properties"
-                        mode="master-page"/>
-                    </xsl:for-each>
+                    <xsl:call-template name="sectionProperties">
+                      <xsl:with-param name="continuous" select="$continuous"/>
+                      <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
+                    </xsl:call-template>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:otherwise>
             </xsl:choose>
-
+            
             <xsl:if test="$sectionEnds = 'true' ">
               <xsl:apply-templates
                 select="key('sections', ancestor::text:section[1]/@text:style-name)/style:section-properties"
