@@ -208,7 +208,7 @@
       <w:r>
         <w:drawing>
           <xsl:choose>
-            <xsl:when test="ancestor::draw:text-box or @text:anchor-type='as-char'">
+            <xsl:when test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote']">
               <xsl:call-template name="inline-image">
                 <xsl:with-param name="cx" select="$cx"/>
                 <xsl:with-param name="cy" select="$cy"/>
