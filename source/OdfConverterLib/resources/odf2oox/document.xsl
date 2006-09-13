@@ -324,9 +324,6 @@
           </w:sectPr>
         </xsl:if>
 
-        <!-- insert page break before table when required -->
-        <xsl:call-template name="InsertPageBreakBefore"/>
-
       </w:pPr>
       <!-- TOC id (used for headings only) -->
       <xsl:variable name="tocId">
@@ -419,7 +416,10 @@
         </xsl:choose>
       </xsl:with-param>
     </xsl:call-template>
-
+    
+    <!-- insert page break before table when required -->
+    <xsl:call-template name="InsertPageBreakBefore"/>
+    
     <!-- insert numbering properties -->
     <xsl:call-template name="InsertNumberingProperties">
       <xsl:with-param name="node" select="."/>

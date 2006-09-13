@@ -188,12 +188,15 @@
       <w:keepLines/>
     </xsl:if>
 
-    <xsl:if test="@fo:break-before='page'">
-      <w:pageBreakBefore/>
-    </xsl:if>
-    <xsl:if test="parent::node()/@style:master-page-name != ''">
-      <w:pageBreakBefore/>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="@fo:break-before='page'">
+        <w:pageBreakBefore/>
+      </xsl:when>
+      <xsl:when test="parent::node()/@style:master-page-name != ''">
+        <w:pageBreakBefore/>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
 
     <xsl:choose>
       <xsl:when test="@fo:widows != '0' or @fo:orphans != '0'">
