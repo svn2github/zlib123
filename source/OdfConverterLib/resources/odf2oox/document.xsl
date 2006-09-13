@@ -153,10 +153,16 @@
           </xsl:if>
         </xsl:if>
         <!-- notes configuration -->
-        <xsl:if test="$notes-configuration">
+        <xsl:choose>
+        <xsl:when test="$notes-configuration">
           <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']" mode="note"/>
           <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']" mode="note"/>
-        </xsl:if>
+        </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']" mode="note"/>
+            <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']" mode="note"/>
+          </xsl:otherwise>
+        </xsl:choose>
         <!-- continuous -->
         <xsl:if test="$continuous = 'yes' ">
           <w:type w:val="continuous"/>
@@ -186,10 +192,16 @@
           </xsl:for-each>
         </xsl:if>
         <!-- notes configuration -->
-        <xsl:if test="$notes-configuration">
-          <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']" mode="note"/>
-          <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']" mode="note"/>
-        </xsl:if>
+        <xsl:choose>
+          <xsl:when test="$notes-configuration">
+            <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']" mode="note"/>
+            <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']" mode="note"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']" mode="note"/>
+            <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']" mode="note"/>
+          </xsl:otherwise>
+        </xsl:choose>
         <!-- continuous -->
         <xsl:if test="$continuous = 'yes' ">
           <w:type w:val="continuous"/>
