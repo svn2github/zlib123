@@ -375,7 +375,6 @@
       <wp:positionV>
         <xsl:attribute name="relativeFrom">
           <xsl:choose>
-
             <xsl:when test="$style/@style:vertical-rel='page'">page</xsl:when>
             <xsl:otherwise>paragraph</xsl:otherwise>
           </xsl:choose>
@@ -393,7 +392,16 @@
           </xsl:when>
           <xsl:otherwise>
             <wp:posOffset>
-              <xsl:value-of select="$oy"/>
+              <xsl:choose>
+                <xsl:when test="@text:anchor-type='as-char' and $oy &lt; 0">
+                  <xsl:call-template name="emu-measure">
+                    <xsl:with-param name="length" select="'0.01cm'"/>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$oy"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </wp:posOffset>
           </xsl:otherwise>
         </xsl:choose>
