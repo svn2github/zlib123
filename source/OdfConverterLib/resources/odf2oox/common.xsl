@@ -95,7 +95,6 @@
       </xsl:when>
       <xsl:when test="not($length)">0</xsl:when>
       <xsl:otherwise>
-        <!-- Convert value as if centimeters. -->
         <xsl:value-of select="$length"/>
       </xsl:otherwise>
     </xsl:choose>

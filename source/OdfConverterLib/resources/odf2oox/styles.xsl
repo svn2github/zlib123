@@ -248,12 +248,15 @@
           <xsl:value-of select="parent::node()/@style:parent-style-name"/>
         </xsl:variable>
         <xsl:for-each select="key('styles',$parentstyleName)//style:tab-stop">
-          <xsl:if
-            test="not(@style:position=key('automatic-styles',$styleName)//style:tab-stop/@style:position)">
-            <xsl:call-template name="tabStop">
-              <xsl:with-param name="styleType">clear</xsl:with-param>
-            </xsl:call-template>
-          </xsl:if>
+          <xsl:variable name="parentPosition" select="@style:position"/>
+          <xsl:for-each select="document('content.xml')">
+            <xsl:if
+              test="not($parentPosition=key('automatic-styles',$styleName)//style:tab-stop/@style:position)">
+              <xsl:call-template name="tabStop">
+                <xsl:with-param name="styleType">clear</xsl:with-param>
+              </xsl:call-template>
+            </xsl:if>
+          </xsl:for-each>
         </xsl:for-each>
       </w:tabs>
     </xsl:if>
@@ -1033,30 +1036,47 @@
     <xsl:param name="styleType"/>
     <w:tab>
       <xsl:attribute name="w:pos">
-        <xsl:variable name="position">
-          <xsl:choose>
-            <xsl:when test="ancestor::office:automatic-styles">
-              <xsl:variable name="name" select="ancestor::style:style/@style:parent-style-name"/>
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length"
-                  select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $name]/style:paragraph-properties/@fo:margin-left"
-                />
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length"
-                  select="ancestor::style:paragraph-properties/@fo:margin-left"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
+        <xsl:variable name="margin">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length">
+              <xsl:choose>
+                <xsl:when test="$styleType='clear'">
+                  <xsl:variable name="parentStyleName"
+                    select="ancestor::style:style/@style:parent-style-name"/>
+                  <xsl:for-each select="document('styles.xml')">
+                    <xsl:value-of
+                      select="key('styles',$parentStyleName)/style:paragraph-properties/@fo:margin-left"
+                    />
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:when test="ancestor::style:paragraph-properties/@fo:margin-left">
+                  <xsl:value-of select="ancestor::style:paragraph-properties/@fo:margin-left"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:variable name="parentStyleName"
+                    select="ancestor::style:style/@style:parent-style-name"/>
+                  <xsl:for-each select="document('styles.xml')">
+                    <xsl:choose>
+                      <xsl:when
+                        test="key('styles',$parentStyleName)/style:paragraph-properties/@fo:margin-left">
+                        <xsl:value-of
+                          select="key('styles',$parentStyleName)/style:paragraph-properties/@fo:margin-left"
+                        />
+                      </xsl:when>
+                      <xsl:otherwise>0</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:for-each>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:variable>
-        <xsl:variable name="position2">
+        <xsl:variable name="position">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length" select="@style:position"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:value-of select="$position+$position2"/>
+        <xsl:value-of select="$margin+$position"/>
       </xsl:attribute>
       <xsl:attribute name="w:val">
         <xsl:choose>

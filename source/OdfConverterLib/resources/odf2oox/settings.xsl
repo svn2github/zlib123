@@ -42,6 +42,19 @@
         <w:displayBackgroundShape/>
       </xsl:if>
 
+      <xsl:if
+        test="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance">
+        <w:defaultTabStop>
+          <xsl:attribute name="w:val">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length"
+                select="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance"
+              />
+            </xsl:call-template>
+          </xsl:attribute>
+        </w:defaultTabStop>
+      </xsl:if>
+
       <!-- overwritten in each paragraph if necessary -->
       <w:autoHyphenation w:val="true"/>
       <w:consecutiveHyphenLimit w:val="0"/>
@@ -52,13 +65,15 @@
 
       <!-- Footnotes document wide properties -->
       <xsl:apply-templates
-        select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']" mode="note">
+        select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
+        mode="note">
         <xsl:with-param name="wide">yes</xsl:with-param>
       </xsl:apply-templates>
 
       <!-- Endnotes document wide properties -->
       <xsl:apply-templates
-        select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']" mode="note">
+        select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
+        mode="note">
         <xsl:with-param name="wide">yes</xsl:with-param>
       </xsl:apply-templates>
 
