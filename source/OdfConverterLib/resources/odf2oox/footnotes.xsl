@@ -118,20 +118,27 @@
       </xsl:if>
 
       <xsl:if test="@text:start-value">
-        <w:numStart w:val="{number(@text:start-value) + 1}"/>
+        <w:numStart w:val="{number(@text:start-value)+1}"/>
       </xsl:if>
 
-      <xsl:if test="@text:start-numbering-at">
-        <w:numRestart>
-          <xsl:attribute name="w:val">
-            <xsl:choose>
-              <xsl:when test="@text:start-numbering-at = 'page' ">eachPage</xsl:when>
-              <xsl:when test="@text:start-numbering-at = 'chapter' ">eachSect</xsl:when>
-              <xsl:otherwise>continuous</xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </w:numRestart>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="ancestor::style:style[@style:family='section']">
+          <w:numRestart w:val="eachSect"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="@text:start-numbering-at">
+            <w:numRestart>
+              <xsl:attribute name="w:val">
+                <xsl:choose>
+                  <xsl:when test="@text:start-numbering-at = 'page' ">eachPage</xsl:when>
+                  <xsl:when test="@text:start-numbering-at = 'chapter' ">eachSect</xsl:when>
+                  <xsl:otherwise>continuous</xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </w:numRestart>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <xsl:if test="$wide = 'yes' ">
         <w:footnote w:id="0"/>
