@@ -91,33 +91,30 @@
     <w:body>
       <xsl:apply-templates/>
       <w:sectPr>
-        <!--- all the paragraphs, headings or tables tied to a master style -->
-        <xsl:variable name="masterPages"
-          select="descendant::text:p[key('master-based-styles', @text:style-name)] | descendant::text:h[key('master-based-styles', @text:style-name)] | descendant::table:table[key('master-based-styles', @table:style-name)]"/>
-        <!-- the last one -->
-        <xsl:variable name="lastMasterPage" select="$masterPages[last()]"/>
-        <!-- the master page name it is related to -->
-        <xsl:variable name="masterPageName"
-          select="key('master-based-styles', $lastMasterPage/@text:style-name | $lastMasterPage/@table:style-name)[1]/@style:master-page-name"/> 
+          <!-- Last element tied to a master-style -->
+        <xsl:variable name="last-elt" select="$master-elts[last()]"/>
+        <!-- Its master page name -->
+        <xsl:variable name="master-page-name"
+          select="key('master-based-styles', $last-elt/@text:style-name | $last-elt/@table:style-name)[1]/@style:master-page-name"/> 
         <!-- 
           Continuous section. Looking up for a text:section 
           If there's no master-page used after the last text:section, then the sectPr is continuous.
         -->
-        <xsl:variable name="ls" select="descendant::text:section[last()]"/>
-        <xsl:variable name="lastMP"
-          select="$ls/following::text:p[key('master-based-styles', @text:style-name)] | $ls/following::text:h[key('master-based-styles', @text:style-name)] | $ls/following::text:table[key('master-based-styles', @table:style-name)]"/>
+        <xsl:variable name="last-section" select="descendant::text:section[last()]"/>
+        <xsl:variable name="master-elt-after-section"
+          select="$last-section/following::text:p[key('master-based-styles', @text:style-name)] | $last-section/following::text:h[key('master-based-styles', @text:style-name)] | $last-section/following::text:table[key('master-based-styles', @table:style-name)]"/>
         <xsl:variable name="continuous">
           <xsl:choose>
-            <xsl:when test="$ls and not($lastMP)">yes</xsl:when>
+            <xsl:when test="$last-section and not($master-elt-after-section)">yes</xsl:when>
             <xsl:otherwise>no</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
         <xsl:choose>
           <!-- if we use a master-page based style -->
-          <xsl:when test="$masterPageName">
+          <xsl:when test="$master-page-name">
             <xsl:call-template name="sectionProperties">
               <xsl:with-param name="continuous" select="$continuous"/>
-              <xsl:with-param name="elt" select="$lastMasterPage"/>
+              <xsl:with-param name="elt" select="$last-elt"/>
             </xsl:call-template>
           </xsl:when>    
           <xsl:otherwise>
@@ -127,8 +124,6 @@
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>     
-        <!-- Shall the header and footer be different on the first page -->
-        <xsl:call-template name="TitlePg"/>
       </w:sectPr>
     </w:body>
   </xsl:template>
@@ -171,6 +166,11 @@
           <xsl:apply-templates
             select="key('page-layouts', key('master-pages', $eltstyle/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
             mode="master-page"/>
+          
+          <!-- Shall the header and footer be different on the first page -->
+          <xsl:call-template name="TitlePg">
+            <xsl:with-param name="master-page" select="key('master-pages', $eltstyle/@style:master-page-name)[1]"/>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:when>
       
@@ -202,6 +202,7 @@
         </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
+   
   </xsl:template>
   
   

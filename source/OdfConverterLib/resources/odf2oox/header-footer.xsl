@@ -129,9 +129,9 @@
   <!-- TODO : use keys -->
   <xsl:template name="TitlePg">
     <xsl:param name="master-page"/>
-    <!--xsl:if test="$master-page[@style:name = 'First_20_Page']">
+    <xsl:if test="$master-page and $master-page[@style:name = 'First_20_Page']">
       <w:titlePg/>
-      </xsl:if-->
+      </xsl:if>
   </xsl:template>
 
   <xsl:template name="EvenAndOddConfiguration">
