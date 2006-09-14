@@ -619,7 +619,7 @@
       <!-- look for this list style into content.xml -->
       <xsl:when test="key('list-style', $styleName)">
         <xsl:value-of
-          select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2+$stylesListStyleCount"
+          select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2"
         />
       </xsl:when>
       <!-- otherwise, look into styles.xml (add the offset) -->
