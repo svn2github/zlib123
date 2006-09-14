@@ -67,7 +67,7 @@
   <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
   <xsl:variable name="master-elts"
     select="$body/descendant::text:p[key('master-based-styles', @text:style-name)] | $body/descendant::text:h[key('master-based-styles', @text:style-name)] | $body/descendant::table:table[key('master-based-styles', @table:style-name)]"/>
-  
+
 
   <!-- main document -->
   <xsl:template name="document">
@@ -93,11 +93,11 @@
     <w:body>
       <xsl:apply-templates/>
       <w:sectPr>
-          <!-- Last element tied to a master-style -->
+        <!-- Last element tied to a master-style -->
         <xsl:variable name="last-elt" select="$master-elts[last()]"/>
         <!-- Its master page name -->
         <xsl:variable name="master-page-name"
-          select="key('master-based-styles', $last-elt/@text:style-name | $last-elt/@table:style-name)[1]/@style:master-page-name"/> 
+          select="key('master-based-styles', $last-elt/@text:style-name | $last-elt/@table:style-name)[1]/@style:master-page-name"/>
         <!-- 
           Continuous section. Looking up for a text:section 
           If there's no master-page used after the last text:section, then the sectPr is continuous.
@@ -118,25 +118,25 @@
               <xsl:with-param name="continuous" select="$continuous"/>
               <xsl:with-param name="elt" select="$last-elt"/>
             </xsl:call-template>
-          </xsl:when>    
+          </xsl:when>
           <xsl:otherwise>
             <!-- use default master page -->
             <xsl:call-template name="sectionProperties">
               <xsl:with-param name="continuous" select="$continuous"/>
             </xsl:call-template>
           </xsl:otherwise>
-        </xsl:choose>     
+        </xsl:choose>
       </w:sectPr>
     </w:body>
   </xsl:template>
-  
-  
+
+
   <!-- OOX section properties (header/footer, footnotes/endnotes, page layout, etc) -->
   <xsl:template name="sectionProperties">
     <xsl:param name="elt"/>
     <xsl:param name="continuous" select="'no'"/>
     <xsl:param name="notes-configuration"/>
-    
+
     <xsl:choose>
       <xsl:when test="$elt">
         <xsl:variable name="eltstyle"
@@ -144,7 +144,8 @@
         <xsl:if test="$continuous = 'no' ">
           <!-- header/footer -->
           <!-- Is it the first time we use this master style? In which case we have to reference the header/footer -->
-          <xsl:variable name="elt-siblings" select="$master-elts[@text:style-name=$elt/@text:style-name or @table:style-name=$elt/@table:style-name]"/>
+          <xsl:variable name="elt-siblings"
+            select="$master-elts[@text:style-name=$elt/@text:style-name or @table:style-name=$elt/@table:style-name]"/>
           <xsl:variable name="first-occurrence" select="$elt-siblings[1]"/>
           <xsl:if test="generate-id($elt) = generate-id($first-occurrence)">
             <!-- Since we must have unique header/footer references, make sure this element's master style has not been used previously -->
@@ -158,13 +159,19 @@
         </xsl:if>
         <!-- notes configuration -->
         <xsl:choose>
-        <xsl:when test="$notes-configuration">
-          <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']" mode="note"/>
-          <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']" mode="note"/>
-        </xsl:when>
+          <xsl:when test="$notes-configuration">
+            <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']"
+              mode="note"/>
+            <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']"
+              mode="note"/>
+          </xsl:when>
           <xsl:otherwise>
-            <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']" mode="note"/>
-            <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']" mode="note"/>
+            <xsl:apply-templates
+              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
+              mode="note"/>
+            <xsl:apply-templates
+              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
+              mode="note"/>
           </xsl:otherwise>
         </xsl:choose>
         <!-- continuous -->
@@ -176,14 +183,15 @@
           <xsl:apply-templates
             select="key('page-layouts', key('master-pages', $eltstyle/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
             mode="master-page"/>
-          
+
           <!-- Shall the header and footer be different on the first page -->
           <xsl:call-template name="TitlePg">
-            <xsl:with-param name="master-page" select="key('master-pages', $eltstyle/@style:master-page-name)[1]"/>
+            <xsl:with-param name="master-page"
+              select="key('master-pages', $eltstyle/@style:master-page-name)[1]"/>
           </xsl:call-template>
         </xsl:for-each>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <!-- if we fall here, it means no master page has been explicitely used so far -->
         <!-- header/footer -->
@@ -198,12 +206,18 @@
         <!-- notes configuration -->
         <xsl:choose>
           <xsl:when test="$notes-configuration">
-            <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']" mode="note"/>
-            <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']" mode="note"/>
+            <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']"
+              mode="note"/>
+            <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']"
+              mode="note"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']" mode="note"/>
-            <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']" mode="note"/>
+            <xsl:apply-templates
+              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
+              mode="note"/>
+            <xsl:apply-templates
+              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
+              mode="note"/>
           </xsl:otherwise>
         </xsl:choose>
         <!-- continuous -->
@@ -218,11 +232,11 @@
         </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
-   
+
   </xsl:template>
-  
-  
-  
+
+
+
 
   <!-- paragraphs and headings -->
   <xsl:template match="text:p | text:h">
@@ -241,23 +255,23 @@
           select="following::text:p | following::text:h | following::table:table"/>
         <xsl:variable name="masterPageStarts"
           select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
-        
+
         <!-- 2 - Section starts. The following paragraph is contained in the following section -->
         <xsl:variable name="followingSection" select="following::text:section[1]"/>
         <!-- the following section is the same as the following neighbour's ancestor section -->
         <xsl:variable name="sectionStarts"
           select="$followingSection and (generate-id($followings[1]/ancestor::text:section) = generate-id($followingSection))"/>
-        
+
         <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
         <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
         <!-- the following neighbour's ancestor section and the current section are different -->
         <xsl:variable name="sectionEnds"
           select="$previousSection and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previousSection))"/>
-        
+
         <!-- section creation -->
         <xsl:if
           test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
-          <w:sectPr>   
+          <w:sectPr>
             <!-- 
               Continuous sections. Looking up for a text:section 
               If the first master style following the preceding section is the same as this paragraph's following master-style,
@@ -276,11 +290,11 @@
                 <xsl:otherwise>no</xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            
+
             <!-- sectionEnds et previousSection -->
             <xsl:variable name="notes-configuration"
               select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration"/>
-            
+
             <!-- Determine the master style that rules this section -->
             <xsl:variable name="currentMasterStyle"
               select="key('master-based-styles', @text:style-name)"/>
@@ -317,7 +331,7 @@
                 </xsl:choose>
               </xsl:otherwise>
             </xsl:choose>
-            
+
             <xsl:if test="$sectionEnds = 'true' ">
               <xsl:apply-templates
                 select="key('sections', ancestor::text:section[1]/@text:style-name)/style:section-properties"
@@ -368,7 +382,7 @@
         <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
           <xsl:message terminate="no">feedback: Nested frames</xsl:message>
         </xsl:when>
-          
+
         <xsl:otherwise>
           <xsl:apply-templates mode="paragraph"/>
         </xsl:otherwise>
@@ -414,10 +428,10 @@
         </xsl:choose>
       </xsl:with-param>
     </xsl:call-template>
-    
+
     <!-- insert page break before table when required -->
     <xsl:call-template name="InsertPageBreakBefore"/>
-    
+
     <!-- insert numbering properties -->
     <xsl:call-template name="InsertNumberingProperties">
       <xsl:with-param name="node" select="."/>
@@ -432,8 +446,8 @@
     <xsl:call-template name="InsertOutlineLevel">
       <xsl:with-param name="node" select="."/>
     </xsl:call-template>
-    
-    
+
+
     <!-- if we are in an annotation, we may have to insert annotation reference -->
     <xsl:call-template name="InsertAnnotationReference"/>
 
@@ -464,7 +478,7 @@
       </w:numPr>
     </xsl:if>
   </xsl:template>
-  
+
   <!-- Inserts the outline level of a heading if needed -->
   <xsl:template name="InsertOutlineLevel">
     <xsl:param name="node"/>
@@ -774,18 +788,26 @@
   <!-- Computes the style name to be used be InsertIndent template -->
   <!-- COMMENT: verify that all cases are matched (I just added self::text:h
        Why not simply match text:list-item and if not everything else? -->
-  <!-- COMMENT: see if we cannot reuse this template to factorise all the Set*Styles -->
+  <!-- COMMENT: template re-used to get a style name for run properties. May want to find a more suitable 'otherwise' clause. -->
   <xsl:template name="GetStyleName">
-    <xsl:if test="self::text:list-item">
-      <xsl:value-of select="*[1][self::text:p]/@text:style-name"/>
-    </xsl:if>
-    <xsl:if
-      test="parent::text:list-header|self::text:p|self::text:h|self::text:list-level-style-number">
-      <xsl:value-of select="@text:style-name"/>
-    </xsl:if>
-    <xsl:if test="ancestor::text:span">
-      <xsl:value-of select="ancestor::text:span[1]/@text:style-name"/>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="self::text:list-item">
+        <xsl:value-of select="*[1][self::text:p]/@text:style-name"/>
+      </xsl:when>
+      <xsl:when
+        test="parent::text:list-header|self::text:p|self::text:h|self::text:list-level-style-number">
+        <xsl:value-of select="@text:style-name"/>
+      </xsl:when>
+      <xsl:when test="parent::text:p|parent::text:h">
+        <xsl:value-of select="parent::node()/@text:style-name"/>
+      </xsl:when>
+      <xsl:when test="ancestor::text:span">
+        <xsl:value-of select="ancestor::text:span[1]/@text:style-name"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@text:style-name"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- Inserts a table of content entry -->
@@ -1043,12 +1065,12 @@
       <w:pict>
 
         <!--this properties are needed to make z-index work properly-->
-        <v:shapetype coordsize="21600,21600" 
-          path="m,l,21600r21600,l21600,xe" xmlns:o="urn:schemas-microsoft-com:office:office">
+        <v:shapetype coordsize="21600,21600" path="m,l,21600r21600,l21600,xe"
+          xmlns:o="urn:schemas-microsoft-com:office:office">
           <v:stroke joinstyle="miter"/>
           <v:path gradientshapeok="t" o:connecttype="rect"/>
         </v:shapetype>
-        
+
         <v:shape type="#_x0000_t202">
 
           <xsl:variable name="styleGraphicProperties"
@@ -1705,8 +1727,10 @@
 
   <!-- indexes -->
   <xsl:template match="text:table-index|text:alphabetical-index|text:illustration-index">
-    <xsl:if test="text:index-body/text:index-title/text:p or text:index-body/text:index-title/text:h">
-      <xsl:apply-templates select="text:index-body/text:index-title/text:p | text:index-body/text:index-title/text:h"/>
+    <xsl:if
+      test="text:index-body/text:index-title/text:p or text:index-body/text:index-title/text:h">
+      <xsl:apply-templates
+        select="text:index-body/text:index-title/text:p | text:index-body/text:index-title/text:h"/>
     </xsl:if>
 
     <xsl:for-each select="text:index-body/child::text:p">
@@ -1812,7 +1836,7 @@
         </xsl:if>
         <xsl:apply-templates select="key('automatic-styles',$styleName)/style:text-properties"
           mode="rPr">
-          <xsl:with-param name="onlyToggle" select="'$onlyToggle'"/>
+          <xsl:with-param name="onlyToggle" select="$onlyToggle"/>
         </xsl:apply-templates>
       </xsl:when>
       <xsl:otherwise>
@@ -1825,7 +1849,7 @@
             </xsl:call-template>
           </xsl:if>
           <xsl:apply-templates select="key('styles',$styleName)/style:text-properties" mode="rPr">
-            <xsl:with-param name="onlyToggle" select="'$onlyToggle'"/>
+            <xsl:with-param name="onlyToggle" select="$onlyToggle"/>
           </xsl:apply-templates>
         </xsl:for-each>
       </xsl:otherwise>
