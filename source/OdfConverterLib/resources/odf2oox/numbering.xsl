@@ -191,10 +191,10 @@
                   <xsl:when test="$spaceBeforeTwip &lt; 0">
                     <xsl:choose>
                       <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                        <xsl:value-of select="$minLabelWidthTwip + $minLabelDistanceTwip"/>
+                        <xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"/>
                       </xsl:when>
                       <xsl:otherwise>
-                        <xsl:value-of select="$minLabelWidthTwip"/>
+                        <xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip"/>
                       </xsl:otherwise>
                     </xsl:choose>
                   </xsl:when>
