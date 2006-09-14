@@ -963,29 +963,6 @@
     <!-- end of non-toggle properties -->
   </xsl:template>
 
-  <!-- graphic properties -->
-  <xsl:template match="style:graphic-properties[parent::style:style]" mode="pPr">
-    <xsl:if test="@style:horizontal-pos">
-      <w:jc>
-        <xsl:attribute name="w:val">
-          <xsl:choose>
-            <xsl:when test="@style:horizontal-pos = 'center'">center</xsl:when>
-            <xsl:when test="@style:horizontal-pos='left'">left</xsl:when>
-            <xsl:when test="@style:horizontal-pos='right'">right</xsl:when>
-            <xsl:otherwise>center</xsl:otherwise>
-            <!--
-							<value>from-left</value>
-							<value>inside</value>
-							<value>outside</value>
-							<value>from-inside</value>
-							-->
-            <!-- TODO manage horizontal-rel -->
-          </xsl:choose>
-        </xsl:attribute>
-      </w:jc>
-    </xsl:if>
-  </xsl:template>
-
   <!-- footnote and endnote reference and text styles -->
   <xsl:template
     match="text:notes-configuration[@text:note-class='footnote'] | text:notes-configuration[@text:note-class='endnote']"

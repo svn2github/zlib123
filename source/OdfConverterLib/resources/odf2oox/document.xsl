@@ -418,14 +418,7 @@
     <!-- insert paragraph style -->
     <xsl:call-template name="InsertParagraphStyle">
       <xsl:with-param name="styleName">
-        <xsl:choose>
-          <xsl:when test="count(draw:frame) = 1 and count(child::text()) = 0">
-            <xsl:value-of select="draw:frame/@draw:style-name"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="@text:style-name"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="@text:style-name"/>
       </xsl:with-param>
     </xsl:call-template>
 
