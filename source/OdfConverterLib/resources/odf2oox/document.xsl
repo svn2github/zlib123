@@ -1057,13 +1057,21 @@
 
           <xsl:variable name="styleGraphicProperties"
             select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties"/>
-
+         
+          <xsl:variable name="parentStyleName">
+            <xsl:value-of select="key('automatic-styles', parent::draw:frame/@draw:style-name)/@style:parent-style-name"/>
+          </xsl:variable>
+          <xsl:variable name="parentStyleGraphicProperties"
+            select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties"/>
+          
           <xsl:call-template name="InsertShapeProperties">
             <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+            <xsl:with-param name="parentStyleGraphicProperties" select="$parentStyleGraphicProperties"/>
           </xsl:call-template>
 
           <xsl:call-template name="InsertTextBox">
             <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+            <xsl:with-param name="parentStyleGraphicProperties" select="$parentStyleGraphicProperties"/>
           </xsl:call-template>
 
         </v:shape>
@@ -1074,7 +1082,9 @@
   <!--converts oo frame style properties to shape properties for text-box-->
   <xsl:template name="InsertShapeProperties">
     <xsl:param name="styleGraphicProperties"/>
-
+    <xsl:param name="parentStyleGraphicProperties"/>
+    
+    
     <xsl:attribute name="style">
 
       <!-- absolute positioning for text-box -->
@@ -1174,6 +1184,12 @@
           >mso-position-horizontal-relative: page;</xsl:when>
         <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-content' "
           >mso-position-horizontal-relative: column;</xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="parent::draw:frame/@text:anchor-type = 'page' ">mso-position-horizontal-relative: page;</xsl:when>
+            <xsl:when test="parent::draw:frame/@text:anchor-type = 'paragraph' ">mso-position-horizontal-relative: column;</xsl:when>
+          </xsl:choose>
+        </xsl:otherwise>
       </xsl:choose>
 
       <xsl:choose>
@@ -1218,38 +1234,38 @@
       <!--text-box spacing/margins -->
       <xsl:variable name="marginL">
         <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-left"/>
+          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-left | $parentStyleGraphicProperties/@fo:margin-left"/>
         </xsl:call-template>
       </xsl:variable>
 
       <xsl:variable name="marginT">
         <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-top"/>
+          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-top | $parentStyleGraphicProperties/@fo:margin-top"/>
         </xsl:call-template>
       </xsl:variable>
 
       <xsl:variable name="marginR">
         <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-right"/>
+          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-right | $parentStyleGraphicProperties/@fo:margin-right"/>
         </xsl:call-template>
       </xsl:variable>
 
       <xsl:variable name="marginB">
         <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-bottom"/>
+          <xsl:with-param name="length" select="$styleGraphicProperties/@fo:margin-bottom | $parentStyleGraphicProperties/@fo:margin-bottom"/>
         </xsl:call-template>
       </xsl:variable>
 
-      <xsl:if test="$styleGraphicProperties/@fo:margin-left">
+      <xsl:if test="$styleGraphicProperties/@fo:margin-left | $parentStyleGraphicProperties/@fo:margin-left">
         <xsl:value-of select="concat('mso-wrap-distance-left:', $marginL,'pt;')"/>
       </xsl:if>
-      <xsl:if test="$styleGraphicProperties/@fo:margin-top">
+      <xsl:if test="$styleGraphicProperties/@fo:margin-top | $parentStyleGraphicProperties/@fo:margin-top">
         <xsl:value-of select="concat('mso-wrap-distance-top:', $marginT,'pt;')"/>
       </xsl:if>
-      <xsl:if test="$styleGraphicProperties/@fo:margin-right">
+      <xsl:if test="$styleGraphicProperties/@fo:margin-right | $parentStyleGraphicProperties/@fo:margin-right">
         <xsl:value-of select="concat('mso-wrap-distance-right:', $marginR,'pt;')"/>
       </xsl:if>
-      <xsl:if test="$styleGraphicProperties/@fo:margin-bottom">
+      <xsl:if test="$styleGraphicProperties/@fo:margin-bottom | $parentStyleGraphicProperties/@fo:margin-bottom">
         <xsl:value-of select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
       </xsl:if>
     </xsl:attribute>
@@ -1346,6 +1362,7 @@
   <!--inserts text-box into shape element -->
   <xsl:template name="InsertTextBox">
     <xsl:param name="styleGraphicProperties"/>
+    <xsl:param name="parentStyleGraphicProperties"/>
 
     <v:textbox>
       <xsl:attribute name="style">
@@ -1353,12 +1370,6 @@
           <xsl:value-of select="'mso-fit-shape-to-text:t'"/>
         </xsl:if>
       </xsl:attribute>
-
-      <xsl:variable name="parentStyleName">
-        <xsl:value-of select="$styleGraphicProperties/@style:parent-style-name"/>
-      </xsl:variable>
-      <xsl:variable name="parentStyleGraphicProperties"
-        select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties"/>
 
       <xsl:call-template name="InsertTextBoxInset">
         <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
