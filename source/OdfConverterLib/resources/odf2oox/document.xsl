@@ -1119,8 +1119,13 @@
             and not($styleGraphicProperties/@style:run-through)"
             >251658240</xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="2 + parent::draw:frame/@draw:z-index"/>
-          </xsl:otherwise>
+              <xsl:choose>
+              <xsl:when test="parent::draw:frame/@draw:z-index">
+                <xsl:value-of select="2 + parent::draw:frame/@draw:z-index"/>
+              </xsl:when>
+              <xsl:otherwise>0</xsl:otherwise>
+            </xsl:choose>
+           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
@@ -1231,9 +1236,6 @@
         </xsl:call-template>
       </xsl:variable>
 
-      <xsl:if test="parent::draw:frame/@fo:min-width">
-        <xsl:value-of select="'mso-wrap-style:none;'"/>
-      </xsl:if>
       <xsl:if test="$styleGraphicProperties/@fo:margin-left">
         <xsl:value-of select="concat('mso-wrap-distance-left:', $marginL,'pt;')"/>
       </xsl:if>
