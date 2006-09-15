@@ -147,7 +147,7 @@
       <xsl:variable name="followings"
         select="following::text:p | following::text:h | following::table:table"/>
       <xsl:variable name="masterPageStarts"
-        select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name))"/>
+        select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
       
       <!-- 2 - Section starts. The following paragraph is contained in the following section -->
       <xsl:variable name="followingSection" select="following::text:section[1]"/>
@@ -173,7 +173,7 @@
               -->
               <xsl:variable name="ps" select="preceding::text:section[1]"/>
               <xsl:variable name="stylesAfterSection"
-                select="$ps/following::text:p[key('master-based-styles', @text:style-name)] | $ps/following::text:h[key('master-based-styles', @text:style-name)] | $ps/following::text:table[key('master-based-styles', @table:style-name)]"/>
+                select="$ps/following::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
               <xsl:variable name="followingMasterStyle"
                 select="$followings[key('master-based-styles', @text:style-name|@table:style-name)]"/>
               <xsl:variable name="continuous">
@@ -199,7 +199,7 @@
                 <xsl:otherwise>
                   <!-- current style is not tied to a master page (typically the case of an ODF section), find the preceding one -->
                   <xsl:variable name="precedings"
-                    select="preceding-sibling::text:p[key('master-based-styles', @text:style-name)] | preceding-sibling::text:h[key('master-based-styles', @text:style-name)] | preceding::table:table[key('master-based-styles', @table:style-name)]"/>
+                    select="preceding-sibling::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding-sibling::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding::table:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
                   <xsl:variable name="precedingMasterStyle"
                     select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>
                   <xsl:choose>
