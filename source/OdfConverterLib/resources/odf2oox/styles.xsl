@@ -192,6 +192,7 @@
       <xsl:when test="@fo:break-before='page'">
         <w:pageBreakBefore/>
       </xsl:when>
+      <!-- COMMENT: What is this for ??? -->
       <xsl:when test="parent::node()/@style:master-page-name != ''">
         <w:pageBreakBefore/>
       </xsl:when>
