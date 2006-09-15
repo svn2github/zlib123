@@ -776,7 +776,7 @@
                 <xsl:value-of select="$scale"/>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:message terminate="no">feedback: Text scale can't exceed 600%</xsl:message> 600
+                <xsl:message terminate="no">feedback:Text scale greater than 600%</xsl:message> 600
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
@@ -934,10 +934,12 @@
       <xsl:value-of select="round(number(substring-before($node/@fo:font-size, 'pt')) * 2)"/>
     </xsl:if>
     <xsl:if test="contains($node/@fo:font-size, '%')">
+      <xsl:message terminate="no">feedback:Relative font size</xsl:message>
       <xsl:variable name="parentStyleName" select="$node/../@style:parent-style-name"/>
       <xsl:variable name="value">
         <xsl:call-template name="computeSize">
           <!-- should we look for @style:name in styles.xml, otherwise in content.xml ? -->
+          <!-- COMMENT: please use a key and ensure we handle every case (see above) -->
           <xsl:with-param name="node"
             select="/office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:text-properties"
           />
