@@ -652,4 +652,34 @@
     </xsl:choose>
   </xsl:template>
   
+  <xsl:template name="ComputeNumberingIndent">
+    <xsl:param name="attribute"/>
+    <xsl:param name="level"/>
+    <xsl:param name="listStyleName"/>
+    
+    <xsl:variable name="attributeValue">
+      <xsl:choose>
+        <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
+          <xsl:value-of select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"/>
+        </xsl:when>
+        <xsl:when
+          test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]">
+          <xsl:value-of select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]"/>
+        </xsl:when>
+        <xsl:when
+          test="document('styles.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]">
+          <xsl:value-of select="document('styles.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]"/>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:call-template name="twips-measure">
+      <xsl:with-param name="length">
+        <xsl:value-of select="$attributeValue"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    
+  </xsl:template>
+  
 </xsl:stylesheet>
