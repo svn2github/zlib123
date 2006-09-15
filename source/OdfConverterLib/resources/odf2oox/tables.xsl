@@ -38,12 +38,16 @@
 
   <!-- tables -->
   <xsl:template match="table:table">
-    <xsl:variable name="styleName">
-      <xsl:value-of select="@table:style-name"/>
-    </xsl:variable>
     <w:tbl>
       <w:tblPr>
-        <xsl:call-template name="InsertTableProperties"/>
+        <xsl:choose>
+          <xsl:when test="@table:is-sub-table='true'">
+            <xsl:call-template name="InsertSubTableProperties"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertTableProperties"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </w:tblPr>
       <xsl:call-template name="InsertTblGrid"/>
       <xsl:apply-templates select="table:table-header-rows/table:table-row | table:table-row"/>
@@ -63,32 +67,62 @@
         </xsl:call-template>
       </xsl:attribute>
     </w:tblW>
-    <xsl:if test="key('automatic-styles', @table:style-name)/style:table-properties/@table:align">
+    <xsl:if test="$tableProp/@table:align">
       <xsl:choose>
-        <xsl:when
-          test="key('automatic-styles', @table:style-name)/style:table-properties/@table:align = 'margins'">
+        <xsl:when test="$tableProp/@table:align = 'margins'">
           <w:jc w:val="left"/>
           <!--User agents that do not support the "margins" value, may treat this value as "left".-->
         </xsl:when>
         <xsl:otherwise>
-          <w:jc
-            w:val="{key('automatic-styles', @table:style-name)/style:table-properties/@table:align}"
-          />
+          <w:jc w:val="{$tableProp/@table:align}"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-    <xsl:if
-      test="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left != '' ">
+    <xsl:if test="$tableProp/@fo:margin-left != '' ">
       <w:tblInd w:type="{$type}">
         <xsl:attribute name="w:w">
           <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length"
-              select="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left"
-            />
+            <xsl:with-param name="length" select="$tableProp/@fo:margin-left"/>
           </xsl:call-template>
         </xsl:attribute>
       </w:tblInd>
     </xsl:if>
+    <!-- Default layout algorithm in ODF is "fixed". -->
+    <w:tblLayout w:type="fixed"/>
+
+    <!--table background-->
+    <xsl:if test="$tableProp/@fo:background-color">
+      <xsl:choose>
+        <xsl:when test="$tableProp/@fo:background-color != 'transparent' ">
+          <w:shd w:val="clear" w:color="auto"
+            w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"
+          />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- In case the table is a subtable. Unherits a few properties of table it belongs to. -->
+  <xsl:template name="InsertSubTableProperties">
+    <xsl:variable name="tableStyleName">
+      <xsl:value-of
+        select="ancestor::table:table[1][not(@table:is-sub-table='true')]/@table:style-name"/>
+    </xsl:variable>
+    <w:tblStyle w:val="{$tableStyleName}"/>
+    <xsl:variable name="tableProp"
+      select="key('automatic-styles', $tableStyleName)/style:table-properties"/>
+    <w:tblW w:type="{$type}">
+      <xsl:attribute name="w:w">
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length">
+            <xsl:for-each select="ancestor::table:table-cell[1]">
+              <xsl:call-template name="GetCellWidth"/>
+            </xsl:for-each>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </w:tblW>
+
     <!-- Default layout algorithm in ODF is "fixed". -->
     <w:tblLayout w:type="fixed"/>
 
@@ -148,19 +182,19 @@
         select="following::text:p | following::text:h | following::table:table"/>
       <xsl:variable name="masterPageStarts"
         select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
-      
+
       <!-- 2 - Section starts. The following paragraph is contained in the following section -->
       <xsl:variable name="followingSection" select="following::text:section[1]"/>
       <!-- the following section is the same as the following neighbour's ancestor section -->
       <xsl:variable name="sectionStarts"
         select="$followingSection and (generate-id($followings[1]/ancestor::text:section) = generate-id($followingSection))"/>
-      
+
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
       <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
       <!-- the following neighbour's ancestor section and the current section are different -->
       <xsl:variable name="sectionEnds"
         select="$previousSection and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previousSection))"/>
-      
+
       <xsl:if
         test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body)">
         <w:p>
@@ -184,7 +218,7 @@
                   <xsl:otherwise>no</xsl:otherwise>
                 </xsl:choose>
               </xsl:variable>
-              
+
               <!-- Determine the master style that rules this section -->
               <xsl:variable name="currentMasterStyle"
                 select="key('master-based-styles', @text:style-name)"/>
@@ -218,7 +252,7 @@
                   </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
-              
+
               <xsl:if test="$sectionEnds = 'true' ">
                 <xsl:apply-templates
                   select="key('sections', ancestor::text:section[1]/@text:style-name)/style:section-properties"
@@ -386,6 +420,19 @@
     <xsl:variable name="colsNumber" select="count(parent::table:table-row/*)"/>
     <w:tcBorders>
       <xsl:choose>
+        <!-- if subCell, do not put border on the outer cells of the subtable it belongs -->
+        <xsl:when test="ancestor::table:table[@table:is-sub-table='true']">
+          <xsl:call-template name="GetSubCellBorders">
+            <xsl:with-param name="colsNumber" select="$colsNumber"/>
+            <xsl:with-param name="cellProp" select="$cellProp"/>
+          </xsl:call-template>
+        </xsl:when>
+        <!-- if subtable, get the border from subcells -->
+        <xsl:when test="table:table[@table:is-sub-table='true']">
+          <xsl:call-template name="GetBordersFromSubCells">
+            <xsl:with-param name="colsNumber" select="$colsNumber"/>
+          </xsl:call-template>
+        </xsl:when>
         <xsl:when test="$cellProp[@fo:border and @fo:border!='none' ]">
           <xsl:variable name="border" select="$cellProp/@fo:border"/>
           <!-- fo:border = "0.002cm solid #000000" -->
@@ -400,7 +447,6 @@
           <w:bottom w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
           <w:right w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
         </xsl:when>
-
         <xsl:otherwise>
           <xsl:if test="$cellProp[@fo:border-top and @fo:border-top != 'none']">
             <xsl:variable name="border" select="$cellProp/@fo:border-top"/>
@@ -457,6 +503,207 @@
     </w:tcBorders>
   </xsl:template>
 
+  <!-- Write borders attribute by extracting them from subcells -->
+  <xsl:template name="GetBordersFromSubCells">
+    <xsl:param name="colsNumber"/>
+
+    <xsl:variable name="SubCellsStyleName"
+      select="descendant::node()[self::table:table-cell[parent::table:table-row[1 or last()]] or self::table:table-cell[1 or last()]]/@table:style-name"/>
+    <xsl:variable name="subCellsProps"
+      select="key('automatic-styles', $SubCellsStyleName)/style:table-cell-properties"/>
+
+    <xsl:choose>
+      <xsl:when test="$subCellsProps[@fo:border and @fo:border!='none' ]">
+        <xsl:variable name="border">
+          <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
+          <xsl:value-of select="$subCellsProps[@fo:border and @fo:border != 'none']/@fo:border"/>
+        </xsl:variable>
+        <!-- fo:border = "0.002cm solid #000000" -->
+        <xsl:variable name="border-color" select="substring-after($border, '#')"/>
+        <xsl:variable name="border-size">
+          <xsl:call-template name="eightspoint-measure">
+            <xsl:with-param name="length" select="substring-before($border,' ')"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <w:top w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+        <w:left w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+        <w:bottom w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+        <w:right w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="topCellsProps"
+          select="key('automatic-styles', descendant::table:table-row[1]/table:table-cell/@table:style-name)/style:table-cell-properties"/>
+        <xsl:variable name="rightCellsProps"
+          select="key('automatic-styles', descendant::table:table-row/table:table-cell[last()]/@table:style-name)/style:table-cell-properties"/>
+        <xsl:variable name="leftCellsProps"
+          select="key('automatic-styles', descendant::table:table-row/table:table-cell[1]/@table:style-name)/style:table-cell-properties"/>
+        <xsl:variable name="bottomCellsProps"
+          select="key('automatic-styles', descendant::table:table-row[last()]/table:table-cell/@table:style-name)/style:table-cell-properties"/>
+
+        <xsl:if test="$topCellsProps[@fo:border-top and @fo:border-top != 'none']">
+          <xsl:variable name="border">
+            <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
+            <xsl:value-of
+              select="$topCellsProps[@fo:border-top and @fo:border-top != 'none']/@fo:border-top"/>
+          </xsl:variable>
+          <w:top w:val="single" w:color="{substring-after($border, '#')}">
+            <xsl:attribute name="w:sz">
+              <xsl:call-template name="eightspoint-measure">
+                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:top>
+        </xsl:if>
+        <xsl:if test="$leftCellsProps[@fo:border-left and @fo:border-left != 'none']">
+          <xsl:variable name="border">
+            <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
+            <xsl:value-of
+              select="$leftCellsProps[@fo:border-left and @fo:border-left != 'none']/@fo:border-left"
+            />
+          </xsl:variable>
+          <w:left w:val="single" w:color="{substring-after($border, '#')}">
+            <xsl:attribute name="w:sz">
+              <xsl:call-template name="eightspoint-measure">
+                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:left>
+        </xsl:if>
+        <xsl:if test="$bottomCellsProps[@fo:border-bottom and @fo:border-bottom != 'none']">
+          <xsl:variable name="border">
+            <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
+            <xsl:value-of
+              select="$leftCellsProps[@fo:border-bottom and @fo:border-bottom != 'none']/@fo:border-bottom"
+            />
+          </xsl:variable>
+          <w:bottom w:val="single" w:color="{substring-after($border, '#')}">
+            <xsl:attribute name="w:sz">
+              <xsl:call-template name="eightspoint-measure">
+                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:bottom>
+        </xsl:if>
+        <xsl:if
+          test="$rightCellsProps[(@fo:border-right and @fo:border-right != 'none')] or (position() &lt; $colsNumber and position() = 63)">
+          <xsl:variable name="border">
+            <xsl:choose>
+              <xsl:when test="position() &lt; $colsNumber and position() = 63">
+                <xsl:value-of
+                  select="$subCellsProps[(@fo:border-left and @fo:border-left != 'none')]/@fo:border-left"
+                />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of
+                  select="$rightCellsProps[(@fo:border-right and @fo:border-right != 'none')]/@fo:border-right"
+                />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <w:right w:val="single" w:color="{substring-after($border, '#')}">
+            <xsl:attribute name="w:sz">
+              <xsl:call-template name="eightspoint-measure">
+                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:right>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Write border attribute except if cell is on the border of the subtable -->
+  <xsl:template name="GetSubCellBorders">
+    <xsl:param name="cellProp"/>
+    <xsl:param name="colsNumber"/>
+
+    <xsl:choose>
+      <!-- if subtable, get the border from subcells -->
+      <xsl:when test="table:table[@table:is-sub-table='true']">
+        <xsl:call-template name="GetBordersFromSubCells">
+          <xsl:with-param name="colsNumber" select="$colsNumber"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$cellProp[@fo:border and @fo:border!='none' ]">
+        <xsl:variable name="border" select="$cellProp/@fo:border"/>
+        <!-- fo:border = "0.002cm solid #000000" -->
+        <xsl:variable name="border-color" select="substring-after($border, '#')"/>
+        <xsl:variable name="border-size">
+          <xsl:call-template name="eightspoint-measure">
+            <xsl:with-param name="length" select="substring-before($border,' ')"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="parent::table:table-row/preceding-sibling::table:table-row">
+          <w:top w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+        </xsl:if>
+        <xsl:if test="not(position()=1)">
+          <w:left w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+        </xsl:if>
+        <xsl:if test="parent::table:table-row/following-sibling::table:table-row">
+          <w:bottom w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+        </xsl:if>
+        <xsl:if test="not(position()=last())">
+          <w:right w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if
+          test="$cellProp[@fo:border-top and @fo:border-top != 'none'] and parent::table:table-row/preceding-sibling::table:table-row">
+          <xsl:variable name="border" select="$cellProp/@fo:border-top"/>
+          <w:top w:val="single" w:color="{substring-after($border, '#')}">
+            <xsl:attribute name="w:sz">
+              <xsl:call-template name="eightspoint-measure">
+                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:top>
+        </xsl:if>
+        <xsl:if
+          test="$cellProp[@fo:border-left and @fo:border-left != 'none'] and not(position()=1)">
+          <xsl:variable name="border" select="$cellProp/@fo:border-left"/>
+          <w:left w:val="single" w:color="{substring-after($border, '#')}">
+            <xsl:attribute name="w:sz">
+              <xsl:call-template name="eightspoint-measure">
+                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:left>
+        </xsl:if>
+        <xsl:if
+          test="$cellProp[@fo:border-bottom and @fo:border-bottom != 'none'] and parent::table:table-row/following-sibling::table:table-row">
+          <xsl:variable name="border" select="$cellProp/@fo:border-bottom"/>
+          <w:bottom w:val="single" w:color="{substring-after($border, '#')}">
+            <xsl:attribute name="w:sz">
+              <xsl:call-template name="eightspoint-measure">
+                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:bottom>
+        </xsl:if>
+        <xsl:if
+          test="($cellProp[(@fo:border-right and @fo:border-right != 'none')] or (position() &lt; $colsNumber and position() = 63)) and not(position()=last())">
+          <xsl:variable name="border">
+            <xsl:choose>
+              <xsl:when test="position() &lt; $colsNumber and position() = 63">
+                <xsl:value-of select="$cellProp/@fo:border-left"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$cellProp/@fo:border-right"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <w:right w:val="single" w:color="{substring-after($border, '#')}">
+            <xsl:attribute name="w:sz">
+              <xsl:call-template name="eightspoint-measure">
+                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:right>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- Inserts the cell boackground color -->
   <xsl:template name="InsertCellBgColor">
     <xsl:param name="cellProp"/>
@@ -492,51 +739,63 @@
   <!-- Inserts the cell margins -->
   <xsl:template name="InsertCellMargins">
     <xsl:param name="cellProp"/>
-    <w:tcMar>
-      <xsl:choose>
-        <xsl:when test="$cellProp[@fo:padding and @fo:padding != 'none']">
-          <xsl:variable name="padding">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="$cellProp/@fo:padding"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <w:top w:w="{$padding}" w:type="{$type}"/>
-          <w:left w:w="{$padding}" w:type="{$type}"/>
-          <w:bottom w:w="{$padding}" w:type="{$type}"/>
-          <w:right w:w="{$padding}" w:type="{$type}"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <w:top w:type="{$type}">
-            <xsl:attribute name="w:w">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="$cellProp/@fo:padding-top"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </w:top>
-          <w:left w:type="{$type}">
-            <xsl:attribute name="w:w">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="$cellProp/@fo:padding-left"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </w:left>
-          <w:bottom w:type="{$type}">
-            <xsl:attribute name="w:w">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="$cellProp/@fo:padding-bottom"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </w:bottom>
-          <w:right w:type="{$type}">
-            <xsl:attribute name="w:w">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="$cellProp/@fo:padding-right"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </w:right>
-        </xsl:otherwise>
-      </xsl:choose>
-    </w:tcMar>
+    <xsl:choose>
+      <xsl:when test="not(table:table[@table:is-sub-table='true'])">
+        <w:tcMar>
+          <w:top w:w="0" w:type="{$type}"/>
+          <w:left w:w="0" w:type="{$type}"/>
+          <w:bottom w:w="0" w:type="{$type}"/>
+          <w:right w:w="0" w:type="{$type}"/>
+        </w:tcMar>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:tcMar>
+          <xsl:choose>
+            <xsl:when test="$cellProp[@fo:padding and @fo:padding != 'none']">
+              <xsl:variable name="padding">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length" select="$cellProp/@fo:padding"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <w:top w:w="{$padding}" w:type="{$type}"/>
+              <w:left w:w="{$padding}" w:type="{$type}"/>
+              <w:bottom w:w="{$padding}" w:type="{$type}"/>
+              <w:right w:w="{$padding}" w:type="{$type}"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <w:top w:type="{$type}">
+                <xsl:attribute name="w:w">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length" select="$cellProp/@fo:padding-top"/>
+                  </xsl:call-template>
+                </xsl:attribute>
+              </w:top>
+              <w:left w:type="{$type}">
+                <xsl:attribute name="w:w">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length" select="$cellProp/@fo:padding-left"/>
+                  </xsl:call-template>
+                </xsl:attribute>
+              </w:left>
+              <w:bottom w:type="{$type}">
+                <xsl:attribute name="w:w">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length" select="$cellProp/@fo:padding-bottom"/>
+                  </xsl:call-template>
+                </xsl:attribute>
+              </w:bottom>
+              <w:right w:type="{$type}">
+                <xsl:attribute name="w:w">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length" select="$cellProp/@fo:padding-right"/>
+                  </xsl:call-template>
+                </xsl:attribute>
+              </w:right>
+            </xsl:otherwise>
+          </xsl:choose>
+        </w:tcMar>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- Inserts the cell writing mode -->
@@ -569,7 +828,7 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Inserts an emoty paragraph -->
+  <!-- Inserts an empty paragraph -->
   <xsl:template name="InsertEmptyParagraph">
     <w:p>
       <w:pPr>
