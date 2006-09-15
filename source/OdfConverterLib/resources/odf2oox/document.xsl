@@ -1844,6 +1844,11 @@
     <w:r>
       <w:rPr>
         <w:rStyle w:val="{concat(@text:note-class, 'Reference')}"/>
+        <xsl:call-template name="OverrideToggleProperties">
+          <xsl:with-param name="styleName">
+            <xsl:call-template name="GetStyleName"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </w:rPr>
       <xsl:apply-templates select="." mode="text"/>
     </w:r>
