@@ -1193,7 +1193,7 @@
     <!--borders-->
     <xsl:choose>
 
-      <xsl:when test="$styleGraphicProperties/@fo:border = 'none'">
+      <xsl:when test="not($styleGraphicProperties/@fo:border) or $styleGraphicProperties/@fo:border = 'none'">
         <xsl:attribute name="stroked">f</xsl:attribute>
       </xsl:when>
 
