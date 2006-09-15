@@ -1000,26 +1000,9 @@
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length" select="@style:position"/>
           </xsl:call-template>
+          
         </xsl:variable>
-        <xsl:variable name="columnNumber">
-          <xsl:choose>
-            <xsl:when test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-count">
-              <xsl:value-of select = "document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-count"/>
-            </xsl:when>
-            <xsl:otherwise>1</xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="columnGap">
-          <xsl:choose>
-            <xsl:when test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap"/>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:value-of select="round(($margin + $position - $columnGap) div $columnNumber)"/>
+        <xsl:value-of select="$margin+$position"/>
       </xsl:attribute>
       <xsl:attribute name="w:val">
         <xsl:choose>
