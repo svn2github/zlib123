@@ -1844,6 +1844,9 @@
     <w:r>
       <w:rPr>
         <w:rStyle w:val="{concat(@text:note-class, 'Reference')}"/>
+<xsl:variable name="fo:color"
+          select="substring-after(key('automatic-styles', parent::text:span/@text:style-name)/style:text-properties/@fo:color,'#')"/>        
+        <w:color w:val="{$fo:color}"/>        
         <xsl:call-template name="OverrideToggleProperties">
           <xsl:with-param name="styleName">
             <xsl:call-template name="GetStyleName"/>
