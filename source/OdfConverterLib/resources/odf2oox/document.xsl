@@ -726,6 +726,7 @@
     </xsl:variable>
 
     <xsl:variable name="ile">
+      <xsl:message> <xsl:number/></xsl:message>
       <xsl:number/>
     </xsl:variable>
 
@@ -772,6 +773,12 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
+    <xsl:if test="(count(following-sibling::text:p) = 0) and parent::text:index-body">
+        <w:r>
+          <w:rPr/>
+          <w:fldChar w:fldCharType="end"/>
+        </w:r>
+    </xsl:if>
   </xsl:template>
 
   <!-- Inserts a page break before if needed -->
@@ -1661,12 +1668,7 @@
       </xsl:variable>
       <xsl:apply-templates select="."/>
     </xsl:for-each>
-    <w:p>
-      <w:r>
-        <w:rPr/>
-        <w:fldChar w:fldCharType="end"/>
-      </w:r>
-    </w:p>
+
   </xsl:template>
 
   <!-- table of content -->
