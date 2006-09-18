@@ -33,7 +33,8 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  exclude-result-prefixes="office text table fo style">
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  exclude-result-prefixes="office text table fo style draw">
 
 
   <!-- tables -->
