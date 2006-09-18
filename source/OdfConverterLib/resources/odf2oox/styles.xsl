@@ -192,9 +192,8 @@
       <xsl:when test="@fo:break-before='page'">
         <w:pageBreakBefore/>
       </xsl:when>
-      <!-- COMMENT: What is this for ??? -->
-      <xsl:when test="parent::node()/@style:master-page-name != ''">
-        <w:pageBreakBefore/>
+      <xsl:when test="@fo:break-before='auto'">
+        <w:pageBreakBefore w:val="off"/>
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
@@ -209,20 +208,31 @@
     </xsl:choose>
 
     <!-- border color + padding  -->
-    <xsl:if test="@fo:border and @fo:border != 'none' ">
-      <w:pBdr>
-        <xsl:call-template name="InsertBorders">
-          <xsl:with-param name="allSides">true</xsl:with-param>
-        </xsl:call-template>
-      </w:pBdr>
-    </xsl:if>
-    <xsl:if test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
-      <w:pBdr>
-        <xsl:call-template name="InsertBorders">
-          <xsl:with-param name="allSides">false</xsl:with-param>
-        </xsl:call-template>
-      </w:pBdr>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="@fo:border and @fo:border != 'none' ">
+        <w:pBdr>
+          <xsl:call-template name="InsertBorders">
+            <xsl:with-param name="allSides">true</xsl:with-param>
+          </xsl:call-template>
+        </w:pBdr>
+      </xsl:when>
+      <xsl:when test="@fo:border = 'none'">
+        <w:pBdr>
+          <w:top w:val="none"/>
+          <w:left w:val="none"/>
+          <w:bottom w:val="none"/>
+          <w:right w:val="none"/>
+        </w:pBdr>
+      </xsl:when>
+      <xsl:when test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
+        <w:pBdr>
+          <xsl:call-template name="InsertBorders">
+            <xsl:with-param name="allSides">false</xsl:with-param>
+          </xsl:call-template>
+        </w:pBdr>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
 
     <!-- background color -->
     <xsl:if test="@fo:background-color and (@fo:background-color != 'transparent')">
@@ -1182,20 +1192,32 @@
     </xsl:choose>
 
     <!-- border -->
-    <xsl:if test="@fo:border and @fo:border != 'none' ">
-      <w:pgBorders>
-        <xsl:call-template name="InsertBorders">
-          <xsl:with-param name="allSides">true</xsl:with-param>
-        </xsl:call-template>
-      </w:pgBorders>
-    </xsl:if>
-    <xsl:if test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
-      <w:pgBorders>
-        <xsl:call-template name="InsertBorders">
-          <xsl:with-param name="allSides">false</xsl:with-param>
-        </xsl:call-template>
-      </w:pgBorders>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="@fo:border and @fo:border != 'none' ">
+        <w:pgBorders>
+          <xsl:call-template name="InsertBorders">
+            <xsl:with-param name="allSides">true</xsl:with-param>
+          </xsl:call-template>
+        </w:pgBorders>
+      </xsl:when>
+      <xsl:when test="@fo:border = 'none'">
+        <w:pgBorders>
+          <w:top w:val="none"/>
+          <w:left w:val="none"/>
+          <w:bottom w:val="none"/>
+          <w:right w:val="none"/>
+        </w:pgBorders>
+      </xsl:when>
+      <xsl:when test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
+        <w:pgBorders>
+          <xsl:call-template name="InsertBorders">
+            <xsl:with-param name="allSides">false</xsl:with-param>
+          </xsl:call-template>
+        </w:pgBorders>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
+    
     <xsl:apply-templates select="style:columns" mode="columns"/>
   </xsl:template>
 
@@ -1295,12 +1317,18 @@
         </xsl:call-template>
       </w:top>
     </xsl:if>
+    <xsl:if test="@fo:border-top = 'none'">
+      <w:top w:val="none"/>
+    </xsl:if>
     <xsl:if test="$allSides='true' or (@fo:border-left and (@fo:border-left != 'none'))">
       <w:left>
         <xsl:call-template name="border">
           <xsl:with-param name="side" select="'left'"/>
         </xsl:call-template>
       </w:left>
+    </xsl:if>
+    <xsl:if test="@fo:border-left = 'none'">
+      <w:left w:val="none"/>
     </xsl:if>
     <xsl:if test="$allSides='true' or (@fo:border-bottom and (@fo:border-bottom != 'none'))">
       <w:bottom>
@@ -1309,12 +1337,18 @@
         </xsl:call-template>
       </w:bottom>
     </xsl:if>
+    <xsl:if test="@fo:border-bottom = 'none'">
+      <w:bottom w:val="none"/>
+    </xsl:if>
     <xsl:if test="$allSides='true' or (@fo:border-right and (@fo:border-right != 'none'))">
       <w:right>
         <xsl:call-template name="border">
           <xsl:with-param name="side" select="'right'"/>
         </xsl:call-template>
       </w:right>
+    </xsl:if>
+    <xsl:if test="@fo:border-right = 'none'">
+      <w:right w:val="none"/>
     </xsl:if>
     <xsl:if
       test="$allSides='true' and self::style:paragraph-properties and @style:join-border='false'">
@@ -1339,7 +1373,7 @@
   <!-- Attributes of a border element. -->
   <xsl:template name="border">
     <xsl:param name="side"/>
-
+    
     <xsl:variable name="borderStr">
       <xsl:choose>
         <xsl:when test="@fo:border">
