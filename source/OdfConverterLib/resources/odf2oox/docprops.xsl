@@ -63,6 +63,9 @@
       <dc:description>
         <xsl:value-of select="dc:description"/>
       </dc:description>
+      <dc:language>
+        <xsl:value-of select="dc:language"/>
+      </dc:language>
       <cp:lastModifiedBy>
         <xsl:value-of select="dc:creator"/>
       </cp:lastModifiedBy>
