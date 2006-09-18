@@ -266,7 +266,7 @@
         <xsl:if test="not(ancestor::table:table)">
           <!-- Section detection  : 3 cases -->
           <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
-          <xsl:variable name="followings" select="following::text:p | following::text:h | following::table:table"/>
+          <xsl:variable name="followings" select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
           <xsl:variable name="masterPageStarts"
             select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
           
