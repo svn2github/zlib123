@@ -230,6 +230,8 @@
                   <xsl:call-template name="sectionProperties">
                     <xsl:with-param name="continuous" select="$continuous"/>
                     <xsl:with-param name="elt" select="."/>
+                    <xsl:with-param name="section-ends" select="$sectionEnds"/>
+                    <xsl:with-param name="previous-section" select="$previousSection"/>  
                   </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>
@@ -243,23 +245,21 @@
                       <xsl:call-template name="sectionProperties">
                         <xsl:with-param name="continuous" select="$continuous"/>
                         <xsl:with-param name="elt" select="$precedings[last()]"/>
+                        <xsl:with-param name="section-ends" select="$sectionEnds"/>
+                        <xsl:with-param name="previous-section" select="$previousSection"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
                       <!-- otherwise, apply the default master style -->
                       <xsl:call-template name="sectionProperties">
                         <xsl:with-param name="continuous" select="$continuous"/>
+                        <xsl:with-param name="section-ends" select="$sectionEnds"/>
+                        <xsl:with-param name="previous-section" select="$previousSection"/>
                       </xsl:call-template>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
-
-              <xsl:if test="$sectionEnds = 'true' ">
-                <xsl:apply-templates
-                  select="key('sections', ancestor::text:section[1]/@text:style-name)/style:section-properties"
-                  mode="section"/>
-              </xsl:if>
             </w:sectPr>
           </w:pPr>
         </w:p>

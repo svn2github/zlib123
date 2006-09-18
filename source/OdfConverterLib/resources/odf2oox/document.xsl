@@ -146,6 +146,8 @@
     <xsl:param name="elt"/>
     <xsl:param name="continuous" select="'no'"/>
     <xsl:param name="notes-configuration"/>
+    <xsl:param name="section-ends"/>
+    <xsl:param name="previous-section"/>
     
     <xsl:choose>
       <xsl:when test="$elt">
@@ -153,10 +155,11 @@
           select="key('master-based-styles', $elt/@text:style-name | $elt/@table:style-name)[1]"/>
         <xsl:if test="$continuous = 'no' ">
           <!-- header/footer -->
-          <!-- Is it the first time we use this master style? In which case we have to reference the header/footer -->  
+          <!-- Is it the first time we use this master style? In which case we have to reference the header/footer -->
           <xsl:choose>
             <!-- If the very first text elt is not explicitely tied to a master style, then default master style was used - do nothing -->
-            <xsl:when test="$eltstyle/@style:master-page-name = $default-master-style/@style:name and not(boolean(key('master-based-styles', $first-elt/@text:style-name | $first-elt/@table:style-name)[1]))"/>
+            <xsl:when
+              test="$eltstyle/@style:master-page-name = $default-master-style/@style:name and not(boolean(key('master-based-styles', $first-elt/@text:style-name | $first-elt/@table:style-name)[1]))"/>
             <xsl:otherwise>
               <!-- check the same master style has not been used before -->
               <!-- elts tied to the same master style -->
@@ -201,6 +204,13 @@
           <xsl:apply-templates
             select="key('page-layouts', key('master-pages', $eltstyle/@style:master-page-name)/@style:page-layout-name)/style:page-layout-properties"
             mode="master-page"/>
+        </xsl:for-each>
+        <xsl:if test="$section-ends = 'true' ">
+          <xsl:apply-templates
+            select="key('sections', $previous-section/@text:style-name)/style:section-properties"
+            mode="section"/>
+        </xsl:if>
+        <xsl:for-each select="document('styles.xml')">
           <!-- Shall the header and footer be different on the first page -->
           <xsl:call-template name="TitlePg">
             <xsl:with-param name="master-page"
@@ -246,6 +256,11 @@
             select="key('page-layouts', /office:document-styles/office:master-styles/style:master-page[1]/@style:page-layout-name)/style:page-layout-properties"
             mode="master-page"/>
         </xsl:for-each>
+        <xsl:if test="$section-ends">
+          <xsl:apply-templates
+            select="key('sections', $previous-section/@text:style-name)/style:section-properties"
+            mode="section"/>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -318,6 +333,8 @@
                     <xsl:with-param name="continuous" select="$continuous"/>
                     <xsl:with-param name="elt" select="."/>
                     <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
+                    <xsl:with-param name="section-ends" select="$sectionEnds"/>
+                    <xsl:with-param name="previous-section" select="$previousSection"/>
                   </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>
@@ -332,6 +349,8 @@
                         <xsl:with-param name="continuous" select="$continuous"/>
                         <xsl:with-param name="elt" select="$precedings[last()]"/>
                         <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
+                        <xsl:with-param name="section-ends" select="$sectionEnds"/>
+                        <xsl:with-param name="previous-section" select="$previousSection"/>
                       </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
@@ -339,17 +358,13 @@
                       <xsl:call-template name="sectionProperties">
                         <xsl:with-param name="continuous" select="$continuous"/>
                         <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
+                        <xsl:with-param name="section-ends" select="$sectionEnds"/>
+                        <xsl:with-param name="previous-section" select="$previousSection"/>
                       </xsl:call-template>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
-              
-              <xsl:if test="$sectionEnds = 'true' ">
-                <xsl:apply-templates
-                  select="key('sections', ancestor::text:section[1]/@text:style-name)/style:section-properties"
-                  mode="section"/>
-              </xsl:if>
             </w:sectPr>
           </xsl:if>
         </xsl:if>
