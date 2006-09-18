@@ -113,7 +113,7 @@
     
     <xsl:variable name="type">
       <xsl:choose>
-        <xsl:when test="@style:name='First_20_Page'">first</xsl:when>
+        <xsl:when test="$master-page/@style:name='First_20_Page'">first</xsl:when>
         <xsl:otherwise>default</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
