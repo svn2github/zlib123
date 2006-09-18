@@ -32,7 +32,9 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  exclude-result-prefixes="office fo style">
+  xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
+  xmlns:ooo="http://openoffice.org/2004/office"
+  exclude-result-prefixes="office fo style config ooo">
 
   <xsl:template name="settings">
     <w:settings>
@@ -77,6 +79,24 @@
         <xsl:with-param name="wide">yes</xsl:with-param>
       </xsl:apply-templates>
 
+      <!-- Compatibility settings -->
+      <w:compat>
+        <!-- Keep space before at top of page. -->
+        <w:suppressTopSpacing>
+          <xsl:attribute name="w:val">
+            <xsl:choose>
+              <xsl:when
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false'">
+                <xsl:value-of select="'true'"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="'false'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </w:suppressTopSpacing>
+        <w:doNotUseHTMLParagraphAutoSpacing/>
+      </w:compat>
     </w:settings>
   </xsl:template>
 
