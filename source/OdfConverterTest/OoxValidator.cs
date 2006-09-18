@@ -227,7 +227,6 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 					// 4.3. If it's an xml file, it has to be valid
 					if (ct.EndsWith("+xml"))
 					{
-						Console.WriteLine("validating "+target);
 						this.validateXml(item);
 					}
 				}
@@ -281,7 +280,6 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 							// 5.2. If it's an xml file, it has to be valid
 							if (ct.EndsWith("+xml"))
 							{
-								Console.WriteLine("validating "+target);
 								this.validateXml(item);
 							}
 						}

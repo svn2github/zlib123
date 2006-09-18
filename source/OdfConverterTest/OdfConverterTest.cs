@@ -42,28 +42,20 @@ namespace CleverAge.OdfConverter.OdfConverterTest
     /// </summary>
     public class OdfConverterTest
     {
-        private string input = null;           // input path
-        private string output = null;          // output path
-        private bool validate = false;         // validate the result of the transformations
-        private bool debug = false;            // debug mode
-        private bool recursiveMode = false;    // go in subfolders ?
-        private string reportPath = null;      // file to save report
-        private string xslPath = null;         // Path to an external stylesheet
-        private bool displayDuration = false;  // display time taken by conversion
-        private bool isDirectTransform = true; // true if the transfo is from ODF to OOX
+        private string input = null;                     // input path
+        private string output = null;                    // output path
+        private bool batchOdt = false;                   // do batch transform on ODT files
+        private bool batchDocx = false;                  // do batch transform on DOCX files
+        private bool validate = false;                   // validate the result of the transformations
+        private bool open = false;                       // try to open the result of the transformations
+        private bool recursiveMode = false;              // go in subfolders ?
+        private string reportPath = null;                // file to save report
+        private int reportLevel = Report.INFO_LEVEL;     // file to save report
+        private string xslPath = null;                   // Path to an external stylesheet
 
-        private OdfConverterTest(String input, String output, bool validate, bool debug, bool recursiveMode, String reportPath, String xslPath, bool displayDuration, bool isDirectTransform)
-        {
-            this.input = input;
-            this.output = output;
-            this.validate = validate;
-            this.debug = debug;
-            this.recursiveMode = recursiveMode;
-            this.reportPath = reportPath;
-            this.xslPath = xslPath;
-            this.displayDuration = displayDuration;
-            this.isDirectTransform = isDirectTransform;
-        }
+        private bool isDirectTransform = true; // conversion from ODT to DOCX (default)
+        private Report report = null;
+        private object wordApp = null;
 
         /// <summary>
         /// Main program.
@@ -71,22 +63,272 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         /// <param name="args">Command Line arguments</param>
         public static void Main(String[] args)
         {
-            string input = null;
-            string output = null;
-            bool validate = false;
-            bool debug = false;
-            bool recursiveMode = false;
-            string reportPath = null;
-            string xslPath = null;
-            bool doReturn = false;
-            bool displayDuration = false;
-            bool isDirectTransform = true;
+            OdfConverterTest tester = new OdfConverterTest();
+            try
+            {
+                tester.ParseCommandLine(args);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error when parsing command line: " + e.Message);
+                usage();
+                return;
+            }
+            tester.Proceed();
+        }
 
-            //Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
-            //Debug.AutoFlush = true;
-            //Debug.Indent();
+        private void Proceed()
+        {
+            this.report = new Report(this.reportPath, this.reportLevel);
+            if (this.batchOdt)
+            {
+                this.ProceedBatchOdt();
+            }
+            else if (this.batchDocx)
+            {
+                this.ProceedBatchDocx();
+            }
+            else
+            {
+                this.ProceedSingleFile(this.input, this.output, this.isDirectTransform);
+            }
+            this.report.Close();
+        }
 
+        private void ProceedBatchOdt()
+        {
+            // instanciate word if needed
+            if (this.open)
+            {
+                this.wordApp = new Microsoft.Office.Interop.Word.Application();
+                Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
+                msWord.Visible = false;
+            }
 
+            SearchOption option = SearchOption.TopDirectoryOnly;
+            if (this.recursiveMode)
+            {
+                option = SearchOption.AllDirectories;
+            }
+            string[] files = Directory.GetFiles(this.input, "*.odt", option);
+            int nbFiles = files.Length;
+            int nbConverted = 0;
+            int nbValidatedAndOpened = 0;
+            int nbValidatedAndNotOpened = 0;
+            int nbNotValidatedAndOpened = 0;
+            int nbNotValidatedAndNotOpened = 0;
+            this.report.AddComment("Processing " + nbFiles + " ODT file(s)");
+            foreach (string input in files)
+            {
+                string output = this.GenerateOutputName(this.output, input, "docx", true);
+                int result = this.ProceedSingleFile(input, output, true);
+                switch(result)
+                {
+                    case NOT_CONVERTED:
+                        break;
+                    case VALIDATED_AND_OPENED:
+                        nbConverted++;
+                        nbValidatedAndOpened++;
+                        break;
+                    case VALIDATED_AND_NOT_OPENED:
+                        nbConverted++;
+                        nbValidatedAndNotOpened++;
+                        break;
+                    case NOT_VALIDATED_AND_OPENED:
+                        nbConverted++;
+                        nbNotValidatedAndOpened++;
+                        break;
+                    case NOT_VALIDATED_AND_NOT_OPENED:
+                        nbNotValidatedAndNotOpened++;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // close word if needed
+            if (this.open)
+            {
+                Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
+                object missing = System.Reflection.Missing.Value;
+                msWord.Quit(ref missing, ref missing, ref missing);
+            }
+            this.report.AddComment("Results: " + nbConverted + " file(s) over " + nbFiles + " were converted, among them:");
+            this.report.AddComment("   " + nbValidatedAndOpened + " were validated and sucessfully opened in Word");
+            this.report.AddComment("   " + nbValidatedAndNotOpened + " were validated but could not be opened in Word");
+            this.report.AddComment("   " + nbNotValidatedAndOpened + " were not validated but were sucessfully opened in Word");
+            this.report.AddComment("   " + nbNotValidatedAndNotOpened + " were not validated and could not be opened in Word");
+        }
+
+        private void ProceedBatchDocx()
+        {
+            SearchOption option = SearchOption.TopDirectoryOnly;
+            if (this.recursiveMode)
+            {
+                option = SearchOption.AllDirectories;
+            }
+            string[] files = Directory.GetFiles(this.input, "*.docx", option);
+            foreach (string input in files)
+            {
+                string output = this.GenerateOutputName(this.output, input, "odt", true);
+                this.ProceedSingleFile(input, output, false);
+            }
+        }
+
+        private int ProceedSingleFile(string input, string output, bool isDirectTransform)
+        {
+            bool converted = false;
+            bool validated = false;
+            bool opened = false;
+            report.AddLog(input, "Converting file: " + input + " into " + output, Report.INFO_LEVEL);
+            converted = ConvertFile(input, output, isDirectTransform);
+            if (converted && this.validate)
+            {
+                validated = ValidateFile(input, output, isDirectTransform);
+            }
+            if (converted && this.open)
+            {
+                opened = TryToOpen(input, output, isDirectTransform);
+            }
+            if (!converted) return NOT_CONVERTED;
+            else if (validated && opened) return VALIDATED_AND_OPENED;
+            else if (validated && !opened) return VALIDATED_AND_NOT_OPENED;
+            else if (!validated && opened) return NOT_VALIDATED_AND_OPENED;
+            else return NOT_VALIDATED_AND_NOT_OPENED;
+        }
+
+        private bool ConvertFile(string input, string output, bool isDirectTransform)
+        {
+            try
+            {
+                DateTime start = DateTime.Now;
+                if (xslPath == null)
+                {
+                    if (isDirectTransform)
+                    {
+                        new Converter().OdfToOox(input, output);
+                    }
+                    else
+                    {
+                        new Converter().OoxToOdf(input, output);
+                    }
+                }
+                else
+                {
+                    if (isDirectTransform)
+                    {
+                        new Converter().OdfToOoxWithExternalResources(input, output, this.xslPath);
+                    }
+                    else
+                    {
+                        new Converter().OoxToOdfWithExternalResources(input, output, this.xslPath);
+                    }
+                }
+                TimeSpan duration = DateTime.Now - start;
+                this.report.AddLog(input, "Conversion succeeded", Report.INFO_LEVEL);
+                this.report.AddLog(input, "Total conversion time: " + duration, Report.INFO_LEVEL);
+                return true;
+            }
+            catch (NotAnOdfDocumentException e)
+            {
+                this.report.AddLog(input, "Conversion failed - Input file is not a valid ODF file", Report.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                return false;
+            }
+            catch (NotAnOoxDocumentException e)
+            {
+                this.report.AddLog(input, "Conversion failed - Input file is not a valid DOCX file", Report.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                return false;
+            }
+            catch (ZipException e)
+            {
+                this.report.AddLog(input, "Conversion failed - Error during conversion (ZipException)", Report.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                return false;
+            }
+            catch (Exception e)
+            {
+                this.report.AddLog(input, "Conversion failed - Error during conversion", Report.ERROR_LEVEL);
+                this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                return false;
+            }
+        }
+
+        private bool ValidateFile(string input, string output, bool isDirectTransform)
+        {
+            if (this.isDirectTransform)
+            {
+                try
+                {
+                    new OoxValidator().validate(output);
+                    this.report.AddLog(input, "Converted file (" + output + ") is valid", Report.INFO_LEVEL);
+                    return true;
+                }
+                catch (OoxValidatorException e)
+                {
+                    this.report.AddLog(input, "Converted file (" + output + ") is invalid", Report.WARNING_LEVEL);
+                    this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                    return false;
+                }
+                catch (Exception e)
+                {
+                    this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, Report.ERROR_LEVEL);
+                    this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        private bool TryToOpen(string input, string output, bool isDirectTransform)
+        {
+            if (isDirectTransform)
+            {
+                Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
+                try
+                {
+                    object missing = System.Reflection.Missing.Value;
+                    object filename = Path.GetFullPath(output);
+                    Microsoft.Office.Interop.Word.Document doc = msWord.Documents.Open(ref filename, ref missing, ref missing,
+                        ref missing, ref missing, ref missing, ref missing, ref missing,
+                        ref missing, ref missing, ref missing, ref missing, ref missing,
+                        ref missing, ref missing, ref missing);
+                    this.report.AddLog(input, "Converted file opened successfully in Word", Report.INFO_LEVEL);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    this.report.AddLog(input, "Converted file (" + output + ") could not be opened in Word", Report.ERROR_LEVEL);
+                    this.report.AddLog(input, e.GetType().Name + ": " + e.Message, Report.DEBUG_LEVEL);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        private static void usage()
+        {
+            Console.WriteLine("Usage: OdfConverterTest.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] [/V] [/OPEN] [/LEVEL Level] [/REPORT Filename]");
+            Console.WriteLine("  Where options are:");
+            Console.WriteLine("     /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)");
+            Console.WriteLine("     /O PathOrFilename  Name of the output file (or output folder)");
+            Console.WriteLine("     /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (note: existing files will be replaced)");
+            Console.WriteLine("     /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (note: existing files will be replaced)");
+            Console.WriteLine("     /V                 Validate the result of the transformation against the schemas");
+            Console.WriteLine("     /OPEN              Try to open the converted files");
+            Console.WriteLine("     /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR");
+            Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
+            Console.WriteLine("     /REPORT Filename   Name of the report file that must be generated (existing files will be replaced)");
+        }
+
+        private void ParseCommandLine(string[] args)
+        {
+            this.RetrieveArgs(args);
+            this.CheckPaths();
+        }
+
+        private void RetrieveArgs(string[] args)
+        {
             for (int i = 0; i < args.Length; i++)
             {
                 switch (args[i])
@@ -94,217 +336,234 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                     case "/I":
                         if (++i == args.Length)
                         {
-                            usage();
-                            return;
+                            throw new OdfCommandLineException("Input missing");
                         }
-                        input = args[i];
+                        this.input = args[i];
                         break;
                     case "/O":
                         if (++i == args.Length)
                         {
-                            usage();
-                            return;
+                            throw new OdfCommandLineException("Output missing");
                         }
-                        output = args[i];
+                        this.output = args[i];
                         break;
                     case "/V":
-                        validate = true;
+                        this.validate = true;
                         break;
-                    case "/T":
-                        displayDuration = true;
+                    case "/OPEN":
+                        this.open = true;
                         break;
-                    case "/DEBUG":
-                        debug = true;
+                    case "/LEVEL":
+                        if (++i == args.Length)
+                        {
+                            throw new OdfCommandLineException("Level missing");
+                        }
+                        try
+                        {
+                            this.reportLevel = int.Parse(args[i]);
+                        }
+                        catch (Exception)
+                        {
+                            throw new OdfCommandLineException("Wrong level (must be 1,2 3 or 4)");
+                        }
+                        if (this.reportLevel < 1 || this.reportLevel > 4)
+                        {
+                            throw new OdfCommandLineException("Wrong level (must be 1,2 3 or 4)");
+                        }
                         break;
                     case "/R":
-                        recursiveMode = true;
+                        this.recursiveMode = true;
+                        break;
+                    case "/BATCH-ODT":
+                        this.batchOdt = true;
+                        break;
+                    case "/BATCH-DOCX":
+                        this.batchDocx = true;
                         break;
                     case "/REPORT":
                         if (++i == args.Length)
                         {
-                            usage();
-                            return;
+                            throw new OdfCommandLineException("Report file missing");
                         }
-                        reportPath = args[i];
+                        this.reportPath = args[i];
                         break;
                     case "/XSLT":
                         if (++i == args.Length)
                         {
-                            usage();
-                            return;
+                            throw new OdfCommandLineException("XSLT path missing");
                         }
-                        xslPath = args[i];
+                        this.xslPath = args[i];
                         break;
                     case "/CV":
                         OoxValidator.test();
-                        doReturn = true;
                         break;
                     default:
                         break;
                 }
             }
-            if (doReturn) { return; }
-            if (input == null)
+        }
+
+        private void CheckPaths()
+        {
+            if (this.input == null)
             {
-                usage();
-                return;
+                throw new OdfCommandLineException("Input is missing");
             }
-            if (input.ToLowerInvariant().EndsWith(".docx"))
+            if (this.batchDocx || this.batchOdt)
             {
-                isDirectTransform = false;
-            }
-            string extension = ".docx";
-            if (!isDirectTransform)
-            {
-                extension = ".odt";
-            }
-            if (output == null || Directory.Exists(output))
-            {
-                // generate output filename
-                string rootPath = "";
-                if (output != null)
-                {
-                    rootPath = output;
-                }
-                int index = input.LastIndexOf(".");
-                string root;
-                if (index > 0)
-                {
-                    root = input.Substring(0, index);
-                }
-                else
-                {
-                    root = input;
-                }
-                try
-                {
-                    output = Path.Combine(rootPath, root + extension);
-                }
-                catch (ArgumentException)
-                {
-                    Console.WriteLine("Error: invalid filename provided as input");
-                    return;
-                }
-                int i = 1;
-                while (File.Exists(output) || Directory.Exists(output))
-                {
-                    output = Path.Combine(rootPath, root + "_" + i + extension);
-                    i++;
-                }
+                this.CheckBatch();
             }
             else
             {
-                string current_extension = null;
+                this.CheckSingleFile();
+            }
+        }
+
+        private void CheckBatch()
+        {
+            if (!Directory.Exists(this.input))
+            {
+                throw new OdfCommandLineException("Input folder does not exist");
+            }
+            if (File.Exists(this.output))
+            {
+                throw new OdfCommandLineException("Output must be a folder");
+            }
+            if (this.output == null || this.output.Length == 0)
+            {
+                // use input folder as output folder
+                this.output = this.input;
+            }
+            if (!Directory.Exists(this.output))
+            {
                 try
                 {
-                    current_extension = Path.GetExtension(output);
+                    Directory.CreateDirectory(this.output);
                 }
-                catch (ArgumentException)
+                catch (Exception)
                 {
-                    Console.WriteLine("Error: invalid path provided as output");
-                    return;
-                }
-                if (String.IsNullOrEmpty(current_extension))
-                {
-                    // add extension
-                    output += extension;
+                    throw new OdfCommandLineException("Cannot create output folder");
                 }
             }
-            new OdfConverterTest(input, output, validate, debug, recursiveMode, reportPath, xslPath, displayDuration, isDirectTransform).run();
         }
 
-        private void run()
+        private void CheckSingleFile()
         {
-            Console.WriteLine("Running with " + this.input + " > " + this.output);
-
-            // transformation
-            try
+            if (!File.Exists(this.input))
             {
-                DateTime start = DateTime.Now;
-                if (xslPath == null)
-                {
-                    if (this.isDirectTransform)
-                    {
-                        new Converter().OdfToOox(this.input, this.output);
-                    }
-                    else
-                    {
-                        new Converter().OoxToOdf(this.input, this.output);
-                    }
-                }
-                else
-                {
-                    if (this.isDirectTransform)
-                    {
-                        new Converter().OdfToOoxWithExternalResources(this.input, this.output, this.xslPath);
-                    }
-                    else
-                    {
-                        new Converter().OoxToOdfWithExternalResources(this.input, this.output, this.xslPath);
-                    }
-                }
-                TimeSpan duration = DateTime.Now - start;
-
-                // validation
-                if (this.validate && this.isDirectTransform)
-                {
-                    try
-                    {
-                        new OoxValidator().validate(this.output);
-                    }
-                    catch (OoxValidatorException e)
-                    {
-                        Console.WriteLine("The file is not valid: " + e.Message);
-                        if (File.Exists(this.output + ".NOT_VALID"))
-                        {
-                            File.Delete(this.output + ".NOT_VALID");
-                        }
-                        File.Move(this.output, this.output + ".NOT_VALID");
-                    }
-                }
-                if (this.displayDuration)
-                {
-                    Console.WriteLine("Total conversion time: " + duration);
-                }
+                throw new OdfCommandLineException("Input file does not exist");
             }
-            catch (NotAnOdfDocumentException e)
-            {
-                Console.WriteLine("Error: " + input + " is not a valid ODF file");
 
-            }
-            catch (NotAnOoxDocumentException e)
+            if ("docx".Equals(Path.GetExtension(this.input).ToLowerInvariant()))
             {
-                Console.WriteLine("Error: " + input + " is not a valid DOCX file");
+                this.isDirectTransform = false;
+            }
 
-            }
-            catch (ZipException e)
+            string extension = "docx";
+            if (!this.isDirectTransform)
             {
-                Console.WriteLine(e.Message);
-                if (debug)
-                {
-                    Console.WriteLine(e.StackTrace);
-                }
+                extension = "odt";
             }
-            catch (Exception e)
+
+            if (!File.Exists(this.output) && !(this.output != null && extension.Equals(Path.GetExtension(this.output))))
             {
-                Console.WriteLine("An error occured during the process (" + e.Message + ")");
-                if (debug)
+                string outputPath = this.output;
+                if (outputPath == null)
                 {
-                    Console.WriteLine(e.StackTrace);
+                    outputPath = ".";
                 }
+                this.output = GenerateOutputName(outputPath, this.input, extension, false);
             }
         }
 
-        private static void usage()
+        private string GenerateOutputName(string rootPath, string input, string extension, bool replace)
         {
-            Console.WriteLine("Usage: OdfConverterTest.exe /I Filename [/O PathOrFilename] [/V] [/XSLT Path]");
-            Console.WriteLine("  Where:");
-            Console.WriteLine("     /I Filename        Name of the ODF file to transform");
-            Console.WriteLine("     /O PathOrFilename  Path of the folder where to put the output file (must exist) or name of the output file");
-            Console.WriteLine("     /V                 Validate the result of the transformation against OpenXML schemas");
-            Console.WriteLine("     /T                 Display conversion time");
-            Console.WriteLine("     /DEBUG             Debug mode");
-            Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
+            string rawFileName = Path.GetFileNameWithoutExtension(input);
+            string output = Path.Combine(rootPath, rawFileName + "." + extension);
+            int num = 0;
+            while (!replace && File.Exists(output))
+            {
+                output = Path.Combine(rootPath, rawFileName + "_" + ++num + "." + extension);
+            }
+            return output;
         }
+
+        private class Report
+        {
+            public const int DEBUG_LEVEL = 1;
+            public const int INFO_LEVEL = 2;
+            public const int WARNING_LEVEL = 3;
+            public const int ERROR_LEVEL = 4;
+
+            private StreamWriter writer = null;
+            private int level = INFO_LEVEL;
+
+            public Report(string filename, int level)
+            {
+                this.level = level;
+                if (filename != null)
+                {
+                    this.writer = new StreamWriter(new FileStream(filename, FileMode.Create, FileAccess.Write));
+                    Console.WriteLine("Using report file: " + filename);
+                }
+            }
+
+            public void AddComment(string message)
+            {
+                string text = "*** " + message;
+
+                if (this.writer != null)
+                {
+                    this.writer.WriteLine(text);
+                }
+                Console.WriteLine(text);
+            }
+
+            public void AddLog(string filename, string message, int level)
+            {
+                if (level >= this.level)
+                {
+                    string label = null;
+                    switch (level)
+                    {
+                        case 4:
+                            label = "ERROR";
+                            break;
+                        case 3:
+                            label = "WARNING";
+                            break;
+                        case 2:
+                            label = "INFO";
+                            break;
+                        default:
+                            label = "DEBUG";
+                            break;
+                    }
+                    string text = "[" + label + "]" + "[" + filename + "] " + message;
+
+                    if (this.writer != null)
+                    {
+                        this.writer.WriteLine(text);
+                    }
+                    Console.WriteLine(text);
+                }
+            }
+
+            public void Close()
+            {
+                if (this.writer != null)
+                {
+                    this.writer.Close();
+                    this.writer = null;
+                }
+            }
+
+        }
+
+        private const int NOT_CONVERTED = 0;
+        private const int VALIDATED_AND_OPENED = 1;
+        private const int VALIDATED_AND_NOT_OPENED = 2;
+        private const int NOT_VALIDATED_AND_OPENED = 3;
+        private const int NOT_VALIDATED_AND_NOT_OPENED = 4;
     }
 }

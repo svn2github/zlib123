@@ -24,10 +24,13 @@
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.Word, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OdfCommandLineException.cs" />
     <Compile Include="OoxValidator.cs" />
     <EmbeddedResource Include="resources\ooxschemas\opc-contenttypes.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\opc-coreproperties.xsd" />
