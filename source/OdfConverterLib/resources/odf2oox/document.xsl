@@ -1725,7 +1725,7 @@
   <!-- Inserts the Run properties -->
   <xsl:template name="InsertRunProperties">
     <!-- apply text properties if needed -->
-    <xsl:if test="ancestor::text:span|self::text:list-level-style-number">
+    <xsl:if test="ancestor::text:span|ancestor::text:a|self::text:list-level-style-number">
       <w:rPr>
         <xsl:call-template name="InsertRunStyle">
           <xsl:with-param name="styleName">
@@ -1751,6 +1751,9 @@
     </xsl:variable>
     <xsl:if test="$prefixedStyleName!=''">
       <w:rStyle w:val="{$prefixedStyleName}"/>
+    </xsl:if>
+    <xsl:if test="ancestor::text:a">
+      <w:rStyle w:val="Hyperlink"/>
     </xsl:if>
   </xsl:template>
 

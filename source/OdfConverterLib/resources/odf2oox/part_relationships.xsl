@@ -117,6 +117,10 @@
                 <Relationship Id="{generate-id(draw:image)}"
                   Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
                   Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
+                <Relationship Id="{generate-id(ancestor::draw:a)}"
+                  Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+                  TargetMode="External"
+                  Target="{ancestor::draw:a/@xlink:href}"/>
               </xsl:when>
               <xsl:otherwise>
                 <!-- External image : If relative path, image may not be converted. -->
@@ -138,6 +142,10 @@
                   </xsl:attribute>
                   <xsl:attribute name="TargetMode">External</xsl:attribute>
                 </Relationship>
+                <Relationship Id="{generate-id(ancestor::draw:a)}"
+                  Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+                  TargetMode="External"
+                  Target="{ancestor::draw:a/@xlink:href}"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:if>

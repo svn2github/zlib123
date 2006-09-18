@@ -261,8 +261,10 @@
       <!--   width and heigth -->
       <wp:extent cx="{$cx}" cy="{$cy}"/>
       <wp:effectExtent l="0" t="0" r="0" b="0"/>
-      <wp:docPr name="{@draw:name}" id="{$intId}"/>
-      <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
+      <wp:docPr name="{@draw:name}" id="{$intId}">
+        <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main" r:id="{generate-id(ancestor::draw:a)}" />
+      </wp:docPr>
+        <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
         <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
           <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
             <!--    non visual drawing properties -->
@@ -533,8 +535,10 @@
           <wp:wrapNone/>
         </xsl:otherwise>
       </xsl:choose>
-      <wp:docPr name="{@draw:name}" id="{$intId}"/>
-      <wp:cNvGraphicFramePr>
+      <wp:docPr name="{@draw:name}" id="{$intId}">
+        <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main" r:id="{generate-id(ancestor::draw:a)}" />
+      </wp:docPr>
+        <wp:cNvGraphicFramePr>
         <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
           noChangeAspect="1"/>
       </wp:cNvGraphicFramePr>
