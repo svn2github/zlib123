@@ -87,8 +87,6 @@
         </xsl:attribute>
       </w:tblInd>
     </xsl:if>
-    <!-- Default layout algorithm in ODF is "fixed". -->
-    <w:tblLayout w:type="fixed"/>
 
     <!--table background-->
     <xsl:if test="$tableProp/@fo:background-color">
@@ -100,6 +98,9 @@
         </xsl:when>
       </xsl:choose>
     </xsl:if>
+    
+    <!-- Default layout algorithm in ODF is "fixed". -->
+    <w:tblLayout w:type="fixed"/>
   </xsl:template>
 
   <!-- In case the table is a subtable. Unherits a few properties of table it belongs to. -->
@@ -123,9 +124,6 @@
       </xsl:attribute>
     </w:tblW>
 
-    <!-- Default layout algorithm in ODF is "fixed". -->
-    <w:tblLayout w:type="fixed"/>
-
     <!--table background-->
     <xsl:if test="$tableProp/@fo:background-color">
       <xsl:choose>
@@ -136,6 +134,9 @@
         </xsl:when>
       </xsl:choose>
     </xsl:if>
+    
+    <!-- Default layout algorithm in ODF is "fixed". -->
+    <w:tblLayout w:type="fixed"/>
   </xsl:template>
 
   <!-- Inserts a table grid -->
@@ -726,7 +727,7 @@
             />
           </xsl:when>
           <xsl:when
-            test="not($rowProp/@fo:background-color) and $tableProp/@fo:background-color != 'transparent'  and $tableProp/@fo:background-color">
+            test="$tableProp/@fo:background-color and $tableProp/@fo:background-color != 'transparent' ">
             <w:shd w:val="clear" w:color="auto"
               w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"
             />
