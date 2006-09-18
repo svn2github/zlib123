@@ -370,31 +370,35 @@
         </xsl:if>
 
       </w:pPr>
-      <!-- TOC id (used for headings only) -->
+
+      <!-- TOC id  -->
+      <xsl:variable name="isBookmarked">
+        <xsl:call-template name="IsTOCBookmark">
+          <xsl:with-param name="sourceStyleNum"
+            select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
+          <xsl:with-param name="styleName" select="@text:style-name"/>
+        </xsl:call-template>
+      </xsl:variable>
+
       <xsl:variable name="tocId">
         <xsl:choose>
-          <xsl:when test="self::text:h">
-            <xsl:value-of select="number(count(preceding::text:h)+1)"/>
+          <xsl:when test="$isBookmarked = 'true' ">
+            <xsl:call-template name="CalculateBookmarkId">
+              <xsl:with-param name="sourceStyleNum"
+                select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
+              <xsl:with-param name="counter" select="1"/>
+            </xsl:call-template>
           </xsl:when>
-          <xsl:otherwise>
-            <xsl:if test="self::text:p">
-              <xsl:value-of select="number(count(preceding::text:p[@text:style-name='Standard'])+1)"
-              />
-            </xsl:if>
-          </xsl:otherwise>
+          <xsl:otherwise/>
         </xsl:choose>
-
       </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="self::text:h">
-          <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:if test="text:toc-mark-start">
-            <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
-          </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
+
+      <xsl:if test="$isBookmarked = 'true' ">
+        <xsl:call-template name="InsertBookmarkStartTOC">
+          <xsl:with-param name="tocId" select="$tocId"/>
+        </xsl:call-template>
+      </xsl:if>
+      
       <!-- footnotes or endnotes: insert the mark in the first paragraph -->
       <xsl:if test="parent::text:note-body and position() = 1">
         <xsl:apply-templates select="../../text:note-citation" mode="note"/>
@@ -425,19 +429,110 @@
           <w:br w:type="page"/>
         </w:r>
       </xsl:if>
-
-      <xsl:choose>
-        <xsl:when test="self::text:h">
-          <w:bookmarkEnd w:id="{$tocId}"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:if test="text:toc-mark-start">
-            <w:bookmarkEnd w:id="{$tocId}"/>
-          </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
+     
+      <xsl:if test="$isBookmarked = 'true' ">
+        <xsl:call-template name="InsertBookmarkEndTOC">
+          <xsl:with-param name="tocId" select="$tocId"/>
+        </xsl:call-template>
+      </xsl:if>
 
     </w:p>
+  </xsl:template>
+
+  <xsl:template name="InsertBookmarkStartTOC">
+    <xsl:param name="tocId"/>
+
+    <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
+   </xsl:template>
+
+  
+  <xsl:template name="InsertBookmarkEndTOC">
+    <xsl:param name="tocId"/>
+    
+    <w:bookmarkEnd w:id="{$tocId}"/>
+    </xsl:template>
+  
+  <xsl:template name="IsTOCBookmark">
+    <xsl:param name="sourceStyleNum"/>
+    <xsl:param name="styleName"/>
+
+    <xsl:choose>
+      <xsl:when test="self::text:h">
+        <xsl:choose>
+          <xsl:when test="//text:table-of-content/text:table-of-content-source/@text:use-outline-level = 'false' ">false</xsl:when>
+          <xsl:otherwise>true</xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="not(child::node())">false</xsl:when>
+      <xsl:when test="ancestor::text:index-body">false</xsl:when>
+      <xsl:when test="$sourceStyleNum > 0">
+
+        <xsl:variable name="sourceStyleName"
+          select="//text:table-of-content/text:table-of-content-source/text:index-source-styles[$sourceStyleNum]/text:index-source-style/@text:style-name"/>
+
+        <xsl:choose>
+          <xsl:when test="not(key('automatic-styles',$styleName))">
+            <xsl:choose>
+              <xsl:when test="$styleName != $sourceStyleName">
+                <xsl:call-template name="IsTOCBookmark">
+                  <xsl:with-param name="sourceStyleNum" select="$sourceStyleNum - 1"/>
+                  <xsl:with-param name="styleName" select="$styleName"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>true</xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when
+                test="key('automatic-styles',$styleName)/@style:parent-style-name != $sourceStyleName">
+                <xsl:call-template name="IsTOCBookmark">
+                  <xsl:with-param name="sourceStyleNum" select="$sourceStyleNum - 1"/>
+                  <xsl:with-param name="styleName" select="$styleName"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>true</xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+
+      <xsl:otherwise>false</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="CalculateBookmarkId">
+    <xsl:param name="counter"/>
+    <xsl:param name="sourceStyleNum"/>
+
+    <xsl:choose>
+
+      <xsl:when test="$sourceStyleNum = 0">
+        <xsl:value-of
+          select="$counter + count(preceding::text:h[child::node() and not(ancestor::text:index-body)])"
+        />
+      </xsl:when>
+
+      <xsl:when test="$sourceStyleNum > 0">
+        <xsl:variable name="sourceStyleName"
+          select="//text:table-of-content/text:table-of-content-source/text:index-source-styles[$sourceStyleNum]/text:index-source-style/@text:style-name"/>
+        <xsl:variable name="elementSum">
+          <xsl:value-of
+            select="$counter + count(preceding::text:p[@text:style-name = $sourceStyleName and child::node() and not(ancestor::text:index-body)]) +
+            count(preceding::text:p[key('automatic-styles',@text:style-name)/@style:parent-style-name = $sourceStyleName and child::node() and not(ancestor::text:index-body)])"
+          />
+        </xsl:variable>
+
+        <xsl:call-template name="CalculateBookmarkId">
+          <xsl:with-param name="sourceStyleNum" select="$sourceStyleNum - 1"/>
+          <xsl:with-param name="counter" select="$elementSum"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$counter"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- Inserts the paragraph properties -->
@@ -741,7 +836,6 @@
     </xsl:variable>
 
     <xsl:variable name="ile">
-      <xsl:message> <xsl:number/></xsl:message>
       <xsl:number/>
     </xsl:variable>
 
@@ -752,7 +846,9 @@
       <w:r>
         <xsl:choose>
           <xsl:when test="ancestor::text:table-of-content">
-            <w:instrText xml:space="preserve"> TOC \o "1-<xsl:choose><xsl:when test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">9</xsl:when><xsl:otherwise><xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/></xsl:otherwise></xsl:choose>"<xsl:if test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">\u </xsl:if><xsl:if test="text:a">\h</xsl:if></w:instrText>
+            <w:instrText>
+              <xsl:call-template name="InsertTocPreferences"/>
+            </w:instrText>
           </xsl:when>
           <xsl:when test="ancestor::text:illustration-index">
             <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
@@ -789,10 +885,51 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:if test="(count(following-sibling::text:p) = 0) and parent::text:index-body">
-        <w:r>
-          <w:rPr/>
-          <w:fldChar w:fldCharType="end"/>
-        </w:r>
+      <w:r>
+        <w:rPr/>
+        <w:fldChar w:fldCharType="end"/>
+      </w:r>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertTocPreferences">
+
+    <xsl:text>TOC \o "1-</xsl:text>
+
+    <xsl:choose>
+      <xsl:when
+        test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">
+        <xsl:text>9"</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of
+          select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/>
+        <xsl:text>"</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+
+    <xsl:if
+      test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">
+      <xsl:text>\u  </xsl:text>
+    </xsl:if>
+    <xsl:if test="text:a">
+      <xsl:text> \h </xsl:text>
+    </xsl:if>
+
+    <xsl:if test="//text:table-of-content/text:table-of-content-source/text:index-source-styles">
+      <xsl:text> \t "</xsl:text>
+      <xsl:for-each
+        select="//text:table-of-content/text:table-of-content-source/text:index-source-styles">
+        <xsl:variable name="additionalStyleName" select="./text:index-source-style/@text:style-name"/>
+        <xsl:variable name="mainStyle"
+          select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Contents_20_1']"/>
+
+        <xsl:value-of select="$mainStyle/@style:display-name"/>
+        <xsl:text>; </xsl:text>
+        <xsl:value-of select="@text:outline-level"/>
+        <xsl:text>"</xsl:text>
+
+      </xsl:for-each>
     </xsl:if>
   </xsl:template>
 
@@ -1232,7 +1369,8 @@
     <!--borders-->
     <xsl:choose>
 
-      <xsl:when test="not($styleGraphicProperties/@fo:border) or $styleGraphicProperties/@fo:border = 'none'">
+      <xsl:when
+        test="not($styleGraphicProperties/@fo:border) or $styleGraphicProperties/@fo:border = 'none'">
         <xsl:attribute name="stroked">f</xsl:attribute>
       </xsl:when>
 
@@ -1533,6 +1671,38 @@
             <xsl:call-template name="InsertPageBreakBefore"/>
           </w:pPr>
 
+          <!--TOC-->
+          <xsl:message>p-node: <xsl:value-of select="child::*[1]/@text:style-name"/> -id:
+              <xsl:value-of select="generate-id(.)"/></xsl:message>
+
+          <xsl:variable name="isBookmarked">
+            <xsl:call-template name="IsTOCBookmark">
+              <xsl:with-param name="sourceStyleNum"
+                select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
+              <xsl:with-param name="styleName" select="child::*[1]/@text:style-name"/>
+            </xsl:call-template>
+          </xsl:variable>
+
+          <xsl:variable name="tocId">
+
+            <xsl:choose>
+              <xsl:when test="$isBookmarked = 'true' ">
+                <xsl:call-template name="CalculateBookmarkId">
+                  <xsl:with-param name="sourceStyleNum"
+                    select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
+                  <xsl:with-param name="counter" select="1"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise/>
+            </xsl:choose>
+          </xsl:variable>
+          
+          <xsl:if test="$isBookmarked = 'true' ">
+            <xsl:call-template name="InsertBookmarkStartTOC">
+              <xsl:with-param name="tocId" select="$tocId"/>
+            </xsl:call-template>
+          </xsl:if>
+
           <!-- if we are in an annotation, we may have to insert annotation reference -->
           <xsl:call-template name="InsertAnnotationReference"/>
 
@@ -1545,6 +1715,13 @@
 
           <!-- first paragraph -->
           <xsl:apply-templates select="*[1]" mode="paragraph"/>
+
+          <!--TOC end-->
+          <xsl:if test="$isBookmarked = 'true' ">
+            <xsl:call-template name="InsertBookmarkEndTOC">
+              <xsl:with-param name="tocId" select="$tocId"/>
+            </xsl:call-template>
+          </xsl:if>
 
         </w:p>
 
