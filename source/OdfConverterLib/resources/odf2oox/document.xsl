@@ -263,7 +263,7 @@
         </xsl:call-template>
 
         <!-- Section detection  : 3 cases -->
-        <xsl:if test="not(ancestor::table:table)">
+        <xsl:if test="not(ancestor::table:table) and not(ancestor::draw:frame)">
           <!-- Section detection  : 3 cases -->
           <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
           <xsl:variable name="followings" select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
