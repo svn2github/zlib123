@@ -90,7 +90,24 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             }
             else
             {
+
+                // instanciate word if needed
+                if (this.isDirectTransform && this.open)
+                {
+                    this.wordApp = new Microsoft.Office.Interop.Word.Application();
+                    Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
+                    msWord.Visible = false;
+                }
+
                 this.ProceedSingleFile(this.input, this.output, this.isDirectTransform);
+
+                // close word if needed
+                if (this.open)
+                {
+                    Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
+                    object missing = System.Reflection.Missing.Value;
+                    msWord.Quit(ref missing, ref missing, ref missing);
+                }
             }
             this.report.Close();
         }
