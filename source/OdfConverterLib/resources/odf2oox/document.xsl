@@ -1589,9 +1589,20 @@
       <xsl:choose>
         <xsl:when test="$test=1">
           <w:t>
+            <xsl:choose>
+              <xsl:when test="text:a/text:tab"> 
+              	<xsl:if test="text:a/child::node()">
             <xsl:for-each select="text:a/child::node()[position() &lt; last()]">
-              <xsl:value-of select="."/>
+                  <xsl:value-of select="."/>             
             </xsl:for-each>
+              </xsl:if>
+              </xsl:when>              
+              <xsl:otherwise>
+                <xsl:if test="text:a">
+                  <xsl:value-of select="text:a"/>
+                </xsl:if>
+              </xsl:otherwise>
+              </xsl:choose>             
           </w:t>
         </xsl:when>
         <xsl:otherwise>
@@ -1814,7 +1825,14 @@
             <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
           </xsl:when>
           <xsl:when test="not(following-sibling::text:tab)">
-            <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+             <xsl:choose>
+              <xsl:when test="not(ancestor::text:a)">
+                <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+              </xsl:when>
+              <xsl:otherwise>                
+                  <w:t><xsl:value-of select="ancestor::text:p/text()"/></w:t>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:when>
           <xsl:otherwise> </xsl:otherwise>
         </xsl:choose>
