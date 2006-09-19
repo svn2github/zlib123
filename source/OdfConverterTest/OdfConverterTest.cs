@@ -471,15 +471,15 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 throw new OdfCommandLineException("Input file does not exist");
             }
 
-            if ("docx".Equals(Path.GetExtension(this.input).ToLowerInvariant()))
+            if (".docx".Equals(Path.GetExtension(this.input).ToLowerInvariant()))
             {
                 this.isDirectTransform = false;
             }
 
-            string extension = "docx";
+            string extension = ".docx";
             if (!this.isDirectTransform)
             {
-                extension = "odt";
+                extension = ".odt";
             }
 
             if (!File.Exists(this.output) && !(this.output != null && extension.Equals(Path.GetExtension(this.output))))
@@ -496,11 +496,11 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         private string GenerateOutputName(string rootPath, string input, string extension, bool replace)
         {
             string rawFileName = Path.GetFileNameWithoutExtension(input);
-            string output = Path.Combine(rootPath, rawFileName + "." + extension);
+            string output = Path.Combine(rootPath, rawFileName + extension);
             int num = 0;
             while (!replace && File.Exists(output))
             {
-                output = Path.Combine(rootPath, rawFileName + "_" + ++num + "." + extension);
+                output = Path.Combine(rootPath, rawFileName + "_" + ++num + extension);
             }
             return output;
         }
