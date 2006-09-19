@@ -227,7 +227,7 @@
               <xsl:choose>
                 <xsl:when test="boolean($currentMasterStyle)">
                   <!-- current element style is tied to a master page -->
-                  <xsl:call-template name="sectionProperties">
+                  <xsl:call-template name="InsertSectionProperties">
                     <xsl:with-param name="continuous" select="$continuous"/>
                     <xsl:with-param name="elt" select="."/>
                     <xsl:with-param name="section-ends" select="$sectionEnds"/>
@@ -242,7 +242,7 @@
                     select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>
                   <xsl:choose>
                     <xsl:when test="boolean($precedingMasterStyle)">
-                      <xsl:call-template name="sectionProperties">
+                      <xsl:call-template name="InsertSectionProperties">
                         <xsl:with-param name="continuous" select="$continuous"/>
                         <xsl:with-param name="elt" select="$precedings[last()]"/>
                         <xsl:with-param name="section-ends" select="$sectionEnds"/>
@@ -251,7 +251,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                       <!-- otherwise, apply the default master style -->
-                      <xsl:call-template name="sectionProperties">
+                      <xsl:call-template name="InsertSectionProperties">
                         <xsl:with-param name="continuous" select="$continuous"/>
                         <xsl:with-param name="section-ends" select="$sectionEnds"/>
                         <xsl:with-param name="previous-section" select="$previousSection"/>

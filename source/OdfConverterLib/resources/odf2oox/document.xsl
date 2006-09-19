@@ -101,48 +101,55 @@
   <xsl:template match="office:body">
     <w:body>
       <xsl:apply-templates/>
-      <w:sectPr>
-        <!-- Last element tied to a master-style -->
-        <xsl:variable name="last-elt" select="$master-elts[last()]"/>
-        <!-- Its master page name -->
-        <xsl:variable name="master-page-name"
-          select="key('master-based-styles', $last-elt/@text:style-name | $last-elt/@table:style-name)[1]/@style:master-page-name"/>
-        <!-- 
-          Continuous section. Looking up for a text:section 
-          If there's no master-page used after the last text:section, then the sectPr is continuous.
-        -->
-        <xsl:variable name="last-section" select="descendant::text:section[last()]"/>
-        <xsl:variable name="elts-after-section"
-          select="$last-section/following::*[name() = 'text:p' or name() = 'text:h' or name='table:table']"/>
-        <xsl:variable name="master-elt-after-section"
-          select="$elts-after-section[key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name != '' ]"/>
-        <xsl:variable name="continuous">
-          <xsl:choose>
-            <xsl:when test="$last-section and not($master-elt-after-section)">yes</xsl:when>
-            <xsl:otherwise>no</xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:choose>
-          <!-- if we use a master-page based style -->
-          <xsl:when test="$master-page-name">
-            <xsl:call-template name="sectionProperties">
-              <xsl:with-param name="continuous" select="$continuous"/>
-              <xsl:with-param name="elt" select="$last-elt"/>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>
-            <!-- use default master page -->
-            <xsl:call-template name="sectionProperties">
-              <xsl:with-param name="continuous" select="$continuous"/>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-      </w:sectPr>
+      
+      <xsl:call-template name="InsertDocumentBodySection" />
+      
     </w:body>
   </xsl:template>
 
+  <!--TODO comment-->
+  <xsl:template name="InsertDocumentBodySection">
+    <w:sectPr>
+      <!-- Last element tied to a master-style -->
+      <xsl:variable name="last-elt" select="$master-elts[last()]"/>
+      <!-- Its master page name -->
+      <xsl:variable name="master-page-name"
+        select="key('master-based-styles', $last-elt/@text:style-name | $last-elt/@table:style-name)[1]/@style:master-page-name"/>
+      <!-- 
+        Continuous section. Looking up for a text:section 
+        If there's no master-page used after the last text:section, then the sectPr is continuous.
+      -->
+      <xsl:variable name="last-section" select="descendant::text:section[last()]"/>
+      <xsl:variable name="elts-after-section"
+        select="$last-section/following::*[name() = 'text:p' or name() = 'text:h' or name='table:table']"/>
+      <xsl:variable name="master-elt-after-section"
+        select="$elts-after-section[key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name != '' ]"/>
+      <xsl:variable name="continuous">
+        <xsl:choose>
+          <xsl:when test="$last-section and not($master-elt-after-section)">yes</xsl:when>
+          <xsl:otherwise>no</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:choose>
+        <!-- if we use a master-page based style -->
+        <xsl:when test="$master-page-name">
+          <xsl:call-template name="InsertSectionProperties">
+            <xsl:with-param name="continuous" select="$continuous"/>
+            <xsl:with-param name="elt" select="$last-elt"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- use default master page -->
+          <xsl:call-template name="InsertSectionProperties">
+            <xsl:with-param name="continuous" select="$continuous"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </w:sectPr>
+  </xsl:template>
+  
   <!-- OOX section properties (header/footer, footnotes/endnotes, page layout, etc) -->
-  <xsl:template name="sectionProperties">
+  <xsl:template name="InsertSectionProperties">
     <xsl:param name="elt"/>
     <xsl:param name="continuous" select="'no'"/>
     <xsl:param name="notes-configuration"/>
@@ -277,101 +284,11 @@
           <xsl:with-param name="level" select="$level"/>
         </xsl:call-template>
 
-        <!-- Section detection  : 3 cases -->
-        <xsl:if test="not(ancestor::table:table) and not(ancestor::draw:frame)">
-          <!-- Section detection  : 3 cases -->
-          <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
-          <xsl:variable name="followings" select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
-          <xsl:variable name="masterPageStarts"
-            select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
-          
-          <!-- 2 - Section starts. The following paragraph is contained in the following section -->
-          <xsl:variable name="followingSection" select="following::text:section[1]"/>
-          <!-- the following section is the same as the following neighbour's ancestor section -->
-          <xsl:variable name="sectionStarts"
-            select="$followingSection and (generate-id($followings[1]/ancestor::text:section) = generate-id($followingSection))"/>
-          
-          <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
-          <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
-          <!-- the following neighbour's ancestor section and the current section are different -->
-          <xsl:variable name="sectionEnds"
-            select="$previousSection and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previousSection))"/>
-          
-          <!-- section creation -->
-          <xsl:if
-            test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
-            <w:sectPr>
-              <!-- 
-                Continuous sections. Looking up for a text:section 
-                If the first master style following the preceding section is the same as this paragraph's following master-style,
-                then no other master style is used in-between.
-              -->
-              <xsl:variable name="ps" select="preceding::text:section[1]"/>
-              <xsl:variable name="stylesAfterSection"
-                select="$ps/following::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
-              <xsl:variable name="followingMasterStyle"
-                select="$followings[key('master-based-styles', @text:style-name|@table:style-name)]"/>
-              <xsl:variable name="continuous">
-                <xsl:choose>
-                  <xsl:when
-                    test="$sectionEnds or ($ps and (generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])))"
-                    >yes</xsl:when>
-                  <xsl:otherwise>no</xsl:otherwise>
-                </xsl:choose>
-              </xsl:variable>
-              
-              <!-- sectionEnds et previousSection -->
-              <xsl:variable name="notes-configuration"
-                select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration"/>
-              
-              <xsl:variable name="currentMasterStyle" select="key('master-based-styles', @text:style-name)"/>
-              
-              <xsl:choose>
-                <xsl:when test="boolean($currentMasterStyle)">
-                  <!-- current element style is tied to a master page -->
-                  <xsl:call-template name="sectionProperties">
-                    <xsl:with-param name="continuous" select="$continuous"/>
-                    <xsl:with-param name="elt" select="."/>
-                    <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
-                    <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                    <xsl:with-param name="previous-section" select="$previousSection"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <!-- current style is not tied to a master page (typically the case of an ODF section), find the preceding one -->
-                  <xsl:variable name="precedings"
-                    select="preceding::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding::table:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
-                  <xsl:variable name="precedingMasterStyle"
-                    select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>
-                  <xsl:choose>
-                    <xsl:when test="boolean($precedingMasterStyle)">
-                      <xsl:call-template name="sectionProperties">
-                        <xsl:with-param name="continuous" select="$continuous"/>
-                        <xsl:with-param name="elt" select="$precedings[last()]"/>
-                        <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
-                        <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                        <xsl:with-param name="previous-section" select="$previousSection"/>
-                      </xsl:call-template>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <!-- otherwise, apply the default master style -->
-                      <xsl:call-template name="sectionProperties">
-                        <xsl:with-param name="continuous" select="$continuous"/>
-                        <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
-                        <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                        <xsl:with-param name="previous-section" select="$previousSection"/>
-                      </xsl:call-template>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:otherwise>
-              </xsl:choose>
-            </w:sectPr>
-          </xsl:if>
-        </xsl:if>
-
+        <xsl:call-template name="InsertParagraphSection"/> 
+        
       </w:pPr>
 
-      <!-- TOC id  -->
+      <!-- check if element is contained in TOC  -->
       <xsl:variable name="isBookmarked">
         <xsl:call-template name="IsTOCBookmark">
           <xsl:with-param name="sourceStyleNum"
@@ -380,19 +297,18 @@
         </xsl:call-template>
       </xsl:variable>
 
+      <!-- calculate TOC id for bookmark -->
       <xsl:variable name="tocId">
-        <xsl:choose>
-          <xsl:when test="$isBookmarked = 'true' ">
+         <xsl:if test="$isBookmarked = 'true' ">
             <xsl:call-template name="CalculateBookmarkId">
               <xsl:with-param name="sourceStyleNum"
                 select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
               <xsl:with-param name="counter" select="1"/>
             </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise/>
-        </xsl:choose>
+          </xsl:if>
       </xsl:variable>
-
+    
+    <!--   insert bookmark start for element which is contained in TOC-->
       <xsl:if test="$isBookmarked = 'true' ">
         <xsl:call-template name="InsertBookmarkStartTOC">
           <xsl:with-param name="tocId" select="$tocId"/>
@@ -404,32 +320,13 @@
         <xsl:apply-templates select="../../text:note-citation" mode="note"/>
       </xsl:if>
 
-      <xsl:choose>
-
-        <!-- we are in table of contents -->
-        <xsl:when test="parent::text:index-body">
-          <xsl:call-template name="InsertTocEntry"/>
-        </xsl:when>
-
-        <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
-        <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
-          <xsl:message terminate="no">feedback: Nested frames</xsl:message>
-        </xsl:when>
-
-        <xsl:otherwise>
-          <xsl:apply-templates mode="paragraph"/>
-        </xsl:otherwise>
-
-      </xsl:choose>
-
+     <!-- paragraph content-->
+      <xsl:call-template name="InsertParagraphContent"/>
+      
       <!-- If there is a page-break-after in the paragraph style -->
-      <xsl:if
-        test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
-        <w:r>
-          <w:br w:type="page"/>
-        </w:r>
-      </xsl:if>
+      <xsl:call-template name="InsertPageBreakAfter" />
      
+      <!--   insert bookmark end for element which is contained in TOC-->
       <xsl:if test="$isBookmarked = 'true' ">
         <xsl:call-template name="InsertBookmarkEndTOC">
           <xsl:with-param name="tocId" select="$tocId"/>
@@ -438,20 +335,149 @@
 
     </w:p>
   </xsl:template>
-
+  
+  <!-- section detection and insertion for paragraph-->
+  <xsl:template name="InsertParagraphSection">
+    <!-- Section detection  : 3 cases -->
+    <xsl:if test="not(ancestor::table:table) and not(ancestor::draw:frame)">
+      <!-- Section detection  : 3 cases -->
+      <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
+      <xsl:variable name="followings" select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
+      <xsl:variable name="masterPageStarts"
+        select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
+      
+      <!-- 2 - Section starts. The following paragraph is contained in the following section -->
+      <xsl:variable name="followingSection" select="following::text:section[1]"/>
+      <!-- the following section is the same as the following neighbour's ancestor section -->
+      <xsl:variable name="sectionStarts"
+        select="$followingSection and (generate-id($followings[1]/ancestor::text:section) = generate-id($followingSection))"/>
+      
+      <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
+      <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
+      <!-- the following neighbour's ancestor section and the current section are different -->
+      <xsl:variable name="sectionEnds"
+        select="$previousSection and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previousSection))"/>
+      
+      <!-- section creation -->
+      <xsl:if
+        test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
+        <w:sectPr>
+          <!-- 
+            Continuous sections. Looking up for a text:section 
+            If the first master style following the preceding section is the same as this paragraph's following master-style,
+            then no other master style is used in-between.
+          -->
+          <xsl:variable name="ps" select="preceding::text:section[1]"/>
+          <xsl:variable name="stylesAfterSection"
+            select="$ps/following::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
+          <xsl:variable name="followingMasterStyle"
+            select="$followings[key('master-based-styles', @text:style-name|@table:style-name)]"/>
+          <xsl:variable name="continuous">
+            <xsl:choose>
+              <xsl:when
+                test="$sectionEnds or ($ps and (generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])))"
+                >yes</xsl:when>
+              <xsl:otherwise>no</xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          
+          <!-- sectionEnds et previousSection -->
+          <xsl:variable name="notes-configuration"
+            select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration"/>
+          
+          <xsl:variable name="currentMasterStyle" select="key('master-based-styles', @text:style-name)"/>
+          
+          <xsl:choose>
+            <xsl:when test="boolean($currentMasterStyle)">
+              <!-- current element style is tied to a master page -->
+              <xsl:call-template name="InsertSectionProperties">
+                <xsl:with-param name="continuous" select="$continuous"/>
+                <xsl:with-param name="elt" select="."/>
+                <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
+                <xsl:with-param name="section-ends" select="$sectionEnds"/>
+                <xsl:with-param name="previous-section" select="$previousSection"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- current style is not tied to a master page (typically the case of an ODF section), find the preceding one -->
+              <xsl:variable name="precedings"
+                select="preceding::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding::table:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
+              <xsl:variable name="precedingMasterStyle"
+                select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>
+              <xsl:choose>
+                <xsl:when test="boolean($precedingMasterStyle)">
+                  <xsl:call-template name="InsertSectionProperties">
+                    <xsl:with-param name="continuous" select="$continuous"/>
+                    <xsl:with-param name="elt" select="$precedings[last()]"/>
+                    <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
+                    <xsl:with-param name="section-ends" select="$sectionEnds"/>
+                    <xsl:with-param name="previous-section" select="$previousSection"/>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!-- otherwise, apply the default master style -->
+                  <xsl:call-template name="InsertSectionProperties">
+                    <xsl:with-param name="continuous" select="$continuous"/>
+                    <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
+                    <xsl:with-param name="section-ends" select="$sectionEnds"/>
+                    <xsl:with-param name="previous-section" select="$previousSection"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </w:sectPr>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+  
+   <!-- conversion of paragraph content excluding not supported elements -->
+  <xsl:template name="InsertParagraphContent">
+    <xsl:choose>
+      
+      <!-- we are in table of contents -->
+      <xsl:when test="parent::text:index-body">
+        <xsl:call-template name="InsertIndexItem"/>
+      </xsl:when>
+      
+      <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
+      <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
+        <xsl:message terminate="no">feedback: Nested frames</xsl:message>
+      </xsl:when>
+      
+      <xsl:otherwise>
+        <xsl:apply-templates mode="paragraph"/>
+      </xsl:otherwise>
+      
+    </xsl:choose>
+    
+  </xsl:template>
+  
+  <!-- inserts page-break-after if defined for paragraph  -->
+    <xsl:template name="InsertPageBreakAfter">
+    <xsl:if
+      test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
+      <w:r>
+        <w:br w:type="page"/>
+      </w:r>
+    </xsl:if>
+  </xsl:template>
+  
+   <!-- bookmark start mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkStartTOC">
     <xsl:param name="tocId"/>
 
     <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
    </xsl:template>
 
-  
+  <!-- bookmark end mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkEndTOC">
     <xsl:param name="tocId"/>
     
     <w:bookmarkEnd w:id="{$tocId}"/>
     </xsl:template>
   
+  <!-- checks if element is contained in TOC - used for paragraphs with "Additional styles" defined for generating TOC  -->
   <xsl:template name="IsTOCBookmark">
     <xsl:param name="sourceStyleNum"/>
     <xsl:param name="styleName"/>
@@ -502,6 +528,7 @@
     </xsl:choose>
   </xsl:template>
 
+  <!--calculate bookmark id for element contained in TOC -->
   <xsl:template name="CalculateBookmarkId">
     <xsl:param name="counter"/>
     <xsl:param name="sourceStyleNum"/>
@@ -822,76 +849,73 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Inserts a table of content entry -->
-  <xsl:template name="InsertTocEntry">
-    <xsl:variable name="num">
-      <xsl:choose>
-        <xsl:when test="ancestor::text:table-index">
-          <xsl:value-of select="count(preceding-sibling::text:p)+count( key('headers',''))+1"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:number/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:variable name="ile">
+  <!-- Inserts item for all types of index  -->
+  <xsl:template name="InsertIndexItem">
+    
+    <xsl:variable name="indexElementPosition">
       <xsl:number/>
     </xsl:variable>
 
-    <xsl:if test="$ile = 1">
-      <w:r>
-        <w:fldChar w:fldCharType="begin"/>
-      </w:r>
-      <w:r>
-        <xsl:choose>
-          <xsl:when test="ancestor::text:table-of-content">
-            <w:instrText>
-              <xsl:call-template name="InsertTocPreferences"/>
-            </w:instrText>
-          </xsl:when>
-          <xsl:when test="ancestor::text:illustration-index">
-            <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
-          </xsl:when>
-          <xsl:when test="ancestor::text:alphabetical-index">
-            <w:instrText xml:space="preserve"> INDEX \e "" \c "<xsl:choose><xsl:when test="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">1</xsl:when><xsl:otherwise><xsl:value-of select="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/></xsl:otherwise></xsl:choose>" \z "1045" </w:instrText>
-          </xsl:when>
-          <xsl:otherwise>
-            <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"/>" </w:instrText>
-          </xsl:otherwise>
-        </xsl:choose>
-      </w:r>
-      <w:r>
-        <w:fldChar w:fldCharType="separate"/>
-      </w:r>
+   <!-- inserts field code of index to first index element -->
+    <xsl:if test="$indexElementPosition = 1">
+      <xsl:call-template name="InsertIndexFieldCodeStart" />
     </xsl:if>
+    
     <xsl:choose>
-      <!-- COMMENT: duplicate with text:a matching? -->
+      
+      <!-- when hyperlink option is on in TOC -->
       <xsl:when test="text:a">
-        <w:hyperlink w:history="1">
-          <xsl:attribute name="w:anchor">
-            <xsl:value-of select="concat('_Toc',$num)"/>
-          </xsl:attribute>
-          <xsl:call-template name="tableContent">
-            <xsl:with-param name="num" select="$num"/>
-            <xsl:with-param name="test">1</xsl:with-param>
-          </xsl:call-template>
-        </w:hyperlink>
+        <xsl:apply-templates select="text:a" mode="paragraph" />
       </xsl:when>
+     
+      <!--default scenario-->
       <xsl:otherwise>
-        <xsl:call-template name="tableContent">
-          <xsl:with-param name="num" select="$num"/>
-        </xsl:call-template>
+        <xsl:call-template name="tableContent" />
       </xsl:otherwise>
-    </xsl:choose>
+      
+      </xsl:choose>
+    
+    <!-- inserts field code end in last index paragraph -->
     <xsl:if test="(count(following-sibling::text:p) = 0) and parent::text:index-body">
-      <w:r>
-        <w:rPr/>
-        <w:fldChar w:fldCharType="end"/>
-      </w:r>
+          <xsl:call-template name="InsertIndexFieldCodeEnd" />
     </xsl:if>
+    
   </xsl:template>
-
+    
+  <xsl:template name="InsertIndexFieldCodeEnd">
+    <w:r>
+      <w:rPr/>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
+ </xsl:template>
+  
+  <xsl:template name="InsertIndexFieldCodeStart">
+    <w:r>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r>
+      <xsl:choose>
+        <xsl:when test="ancestor::text:table-of-content">
+          <w:instrText>
+            <xsl:call-template name="InsertTocPreferences"/>
+          </w:instrText>
+        </xsl:when>
+        <xsl:when test="ancestor::text:illustration-index">
+          <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
+        </xsl:when>
+        <xsl:when test="ancestor::text:alphabetical-index">
+          <w:instrText xml:space="preserve"> INDEX \e "" \c "<xsl:choose><xsl:when test="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">1</xsl:when><xsl:otherwise><xsl:value-of select="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/></xsl:otherwise></xsl:choose>" \z "1045" </w:instrText>
+        </xsl:when>
+        <xsl:otherwise>
+          <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"/>" </w:instrText>
+        </xsl:otherwise>
+      </xsl:choose>
+    </w:r>
+    <w:r>
+      <w:fldChar w:fldCharType="separate"/>
+    </w:r>
+  </xsl:template>
+  
   <xsl:template name="InsertTocPreferences">
 
     <xsl:text>TOC \o "1-</xsl:text>
@@ -1022,16 +1046,21 @@
   <!-- links -->
   <xsl:template match="text:a" mode="paragraph">
     <xsl:choose>
-      <!-- COMMENT: duplicate with TOC handling within paragraphs? -->
-      <xsl:when test="ancestor::text:index-body">
-        <xsl:variable name="num" select="count(parent::*/preceding-sibling::*)"/>
+      
+       <!-- TOC hyperlink -->
+      <xsl:when test="ancestor::text:index-body and position() = 1">
+        <xsl:variable name="tocId" select="count(../preceding-sibling::text:p)+1"/>
         <w:hyperlink w:history="1">
           <xsl:attribute name="w:anchor">
-            <xsl:value-of select="concat('_Toc',$num)"/>
+            <xsl:value-of select="concat('_Toc',$tocId)"/>
           </xsl:attribute>
-          <xsl:apply-templates mode="paragraph"/>
+          <xsl:call-template name="tableContent">
+            <xsl:with-param name="tocId" select="$tocId" />
+          </xsl:call-template>
         </w:hyperlink>
       </xsl:when>
+      
+      <!--text body link-->
       <xsl:otherwise>
         <w:hyperlink r:id="{generate-id()}">
           <xsl:apply-templates mode="paragraph"/>
@@ -1672,9 +1701,6 @@
           </w:pPr>
 
           <!--TOC-->
-          <xsl:message>p-node: <xsl:value-of select="child::*[1]/@text:style-name"/> -id:
-              <xsl:value-of select="generate-id(.)"/></xsl:message>
-
           <xsl:variable name="isBookmarked">
             <xsl:call-template name="IsTOCBookmark">
               <xsl:with-param name="sourceStyleNum"
@@ -1756,57 +1782,31 @@
   <!-- COMMENT: please be more explicit about the goal of this template and find a more explicit name -->
   <!-- table of contents -->
   <xsl:template name="tableContent">
-    <xsl:param name="num"/>
-    <!-- COMMENT: what is this "test" param for??? Please use more significant name -->
-    <xsl:param name="test" select="0"/>
+   
+    <!-- references to TOC bookmark id in text -->
+    <xsl:param name="tocId" select="count(preceding-sibling::text:p)+1" />
+    
     <w:r>
       <w:rPr>
         <w:noProof/>
       </w:rPr>
-      <xsl:choose>
-        <xsl:when test="$test=1">
-          <w:t>
-            <xsl:choose>
-              <xsl:when test="text:a/text:tab"> 
-              	<xsl:if test="text:a/child::node()">
-            <xsl:for-each select="text:a/child::node()[position() &lt; last()]">
-                  <xsl:value-of select="."/>             
-            </xsl:for-each>
-              </xsl:if>
-              </xsl:when>              
-              <xsl:otherwise>
-                <xsl:if test="text:a">
-                  <xsl:value-of select="text:a"/>
-                </xsl:if>
-              </xsl:otherwise>
-              </xsl:choose>             
-          </w:t>
-        </xsl:when>
-        <xsl:otherwise>
-          <w:t>
-            <xsl:for-each select="child::node()[position() &lt; last()]">
-              <xsl:choose>
-                <xsl:when test="self::text()">
-                  <xsl:value-of select="."/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:apply-templates select="."/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-          </w:t>
-          <!--<xsl:apply-templates select="child::text()[1]" mode="text"/>-->
-        </xsl:otherwise>
-      </xsl:choose>
+      <w:t>
+        <xsl:for-each select="child::node()[position() &lt; last()]">
+          <xsl:choose>
+            <xsl:when test="self::text()">
+              <xsl:value-of select="."/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="."/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </w:t>
     </w:r>
+    
     <xsl:apply-templates select="text:tab|text:a/text:tab|text:span" mode="paragraph"/>
+    
     <xsl:if test="not(ancestor::text:alphabetical-index)">
-      <w:r>
-        <w:rPr>
-          <w:noProof/>
-          <w:webHidden/>
-        </w:rPr>
-      </w:r>
       <w:r>
         <w:rPr>
           <w:noProof/>
@@ -1821,7 +1821,7 @@
           <w:noProof/>
           <w:webHidden/>
         </w:rPr>
-        <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $num, ' \h')"/></w:instrText>
+        <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $tocId, ' \h')"/></w:instrText>
       </w:r>
       <w:r>
         <w:rPr>
@@ -1831,21 +1831,23 @@
         <w:fldChar w:fldCharType="separate"/>
       </w:r>
     </xsl:if>
+    
     <w:r>
       <w:rPr>
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
       <xsl:choose>
-        <xsl:when test="$test=1">
+        <xsl:when test="self::text:a">
           <xsl:apply-templates select="text:a/child::text()[last()]" mode="text"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="child::text()[last()]" mode="text"/>
-          <!--<xsl:apply-templates select="child::text()[1]" mode="text"/>-->
+          <xsl:apply-templates select="child::text()[1]" mode="text"/>
         </xsl:otherwise>
       </xsl:choose>
     </w:r>
+    
     <xsl:if test="not(ancestor::text:alphabetical-index)">
       <w:r>
         <w:rPr>
@@ -1855,6 +1857,7 @@
         <w:fldChar w:fldCharType="end"/>
       </w:r>
     </xsl:if>
+    
   </xsl:template>
 
   <!-- indexes -->
@@ -1866,7 +1869,7 @@
     </xsl:if>
 
     <xsl:for-each select="text:index-body/child::text:p">
-      <xsl:variable name="num">
+      <xsl:variable name="tocId">
         <xsl:value-of select="position()+count( key('headers',''))+1"/>
       </xsl:variable>
       <xsl:apply-templates select="."/>
