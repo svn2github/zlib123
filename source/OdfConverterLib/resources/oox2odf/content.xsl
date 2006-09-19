@@ -46,12 +46,46 @@
       </office:body>
     </office:document-content>
   </xsl:template>
-
-  <xsl:template match="w:t">
-    <xsl:message terminate="no">progress:w:t</xsl:message>
-    <text:p text:style-name="Standard">
-      <xsl:value-of select="."/>
-    </text:p>
+  
+  <xsl:template name="w:p">
+    <xsl:apply-templates/>
   </xsl:template>
-
+  
+  <xsl:template match="w:r">
+    <xsl:apply-templates/>
+  </xsl:template>  
+  
+  <xsl:template match="w:t">
+    
+    <xsl:message terminate="no">progress:w:t</xsl:message>
+    <xsl:variable name="outline">
+      <xsl:value-of select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when  test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val">
+        <text:h>
+          <xsl:attribute name="text:outline-level">
+            <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val+1"/>
+          </xsl:attribute>
+          <xsl:attribute name="text:style-name">
+            <xsl:value-of select="."/>
+          </xsl:attribute>
+          <xsl:value-of select="."/>
+        </text:h>
+      </xsl:when>
+      <xsl:when test="ancestor::w:p/w:pPr/w:rPr/w:rStyle/@w:val">
+        <text:p>
+          <xsl:attribute name="text:style-name">
+            <xsl:value-of select="ancestor::w:p/w:pPr/w:rPr/w:rStyle/@w:val"/>
+          </xsl:attribute>
+          <xsl:value-of select="."/>
+        </text:p>
+      </xsl:when>
+      <xsl:otherwise>
+        <text:p text:style-name="Standard">
+          <xsl:value-of select="."/>
+        </text:p>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>
