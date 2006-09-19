@@ -169,39 +169,39 @@
 
     <xsl:if test="$supported = 'true'">
       <w:r>
-        <xsl:call-template name="InsertImage" />
+        <xsl:call-template name="InsertImage"/>
       </w:r>
     </xsl:if>
 
   </xsl:template>
-  
+
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]">
-    
+
     <xsl:variable name="supported">
       <xsl:call-template name="image-support">
         <xsl:with-param name="name" select="./draw:image/@xlink:href"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:if test="$supported = 'true'">
       <w:p>
         <w:r>
-          <xsl:call-template name="InsertImage" />
+          <xsl:call-template name="InsertImage"/>
         </w:r>
       </w:p>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertImage">
-    
+
     <w:drawing>
-     <xsl:variable name="intId">
+      <xsl:variable name="intId">
         <xsl:call-template name="GetPosition">
           <xsl:with-param name="node" select="."/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:variable name="cx">
         <xsl:choose>
           <xsl:when test="@svg:width">
@@ -216,7 +216,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:variable name="cy">
         <xsl:choose>
           <xsl:when test="@svg:height">
@@ -231,9 +231,10 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:choose>
-        <xsl:when test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote']">
+        <xsl:when
+          test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote']">
           <xsl:call-template name="inline-image">
             <xsl:with-param name="cx" select="$cx"/>
             <xsl:with-param name="cy" select="$cy"/>
@@ -262,9 +263,12 @@
       <wp:extent cx="{$cx}" cy="{$cy}"/>
       <wp:effectExtent l="0" t="0" r="0" b="0"/>
       <wp:docPr name="{@draw:name}" id="{$intId}">
-        <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main" r:id="{generate-id(ancestor::draw:a)}" />
+        <xsl:if test="ancestor::draw:a">
+          <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
+            r:id="{generate-id(ancestor::draw:a)}"/>
+        </xsl:if>
       </wp:docPr>
-        <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
+      <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
         <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
           <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
             <!--    non visual drawing properties -->
@@ -292,7 +296,7 @@
               <a:prstGeom prst="rect">
                 <a:avLst/>
               </a:prstGeom>
-              <xsl:call-template name="borders" />
+              <xsl:call-template name="borders"/>
             </pic:spPr>
           </pic:pic>
         </a:graphicData>
@@ -336,9 +340,9 @@
     <xsl:variable name="sName" select="@draw:style-name"/>
 
     <xsl:variable name="style" select="key('automatic-styles', $sName)/style:graphic-properties"/>
-    
+
     <xsl:variable name="sNameP" select="parent::text:p/@text:style-name"/>
-    
+
     <xsl:variable name="styleP" select="key('automatic-styles', $sNameP)"/>
 
     <xsl:variable name="posH" select="$style/@style:horizontal-rel"/>
@@ -357,11 +361,11 @@
     <xsl:variable name="vertical-pos" select="$style/@style:vertical-pos"/>
 
     <wp:anchor simplePos="0" locked="0" layoutInCell="1" allowOverlap="1">
-      
+
       <xsl:attribute name="relativeHeight">
         <xsl:value-of select="2 + @draw:z-index"/>
       </xsl:attribute>
-      
+
       <xsl:attribute name="behindDoc">
         <xsl:choose>
           <xsl:when test="$wrap = 'run-through' and $style/@style:run-through = 'background' ">1</xsl:when>
@@ -536,9 +540,12 @@
         </xsl:otherwise>
       </xsl:choose>
       <wp:docPr name="{@draw:name}" id="{$intId}">
-        <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main" r:id="{generate-id(ancestor::draw:a)}" />
+        <xsl:if test="ancestor::draw:a">
+          <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
+            r:id="{generate-id(ancestor::draw:a)}"/>
+        </xsl:if>
       </wp:docPr>
-        <wp:cNvGraphicFramePr>
+      <wp:cNvGraphicFramePr>
         <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
           noChangeAspect="1"/>
       </wp:cNvGraphicFramePr>
@@ -565,7 +572,7 @@
               <a:prstGeom prst="rect">
                 <a:avLst/>
               </a:prstGeom>
-             <xsl:call-template name="borders" />
+              <xsl:call-template name="borders"/>
             </pic:spPr>
           </pic:pic>
         </a:graphicData>
@@ -575,34 +582,34 @@
   </xsl:template>
 
   <xsl:template name="borders">
-    
+
     <xsl:variable name="sName" select="@draw:style-name"/>
     <xsl:variable name="style" select="key('automatic-styles', $sName)/style:graphic-properties"/>
-    
+
     <xsl:if test="$style/@fo:border  and ($style/@fo:border != 'none')">
       <xsl:variable name="strokeColor" select="substring-after($style/@fo:border,'#')"/>
-      
+
       <xsl:variable name="strokeWeight">
         <xsl:call-template name="emu-measure">
           <xsl:with-param name="length" select="substring-before($style/@fo:border,' ')"/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <a:ln xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
         <xsl:attribute name="cmpd">
           <xsl:choose>
             <xsl:when
               test="substring-before(substring-after($style/@fo:border,' ' ),' ' ) != 'solid' ">
-              
+
               <xsl:if test="$style/@style:border-line-width">
-                
+
                 <xsl:variable name="innerLineWidth">
                   <xsl:call-template name="point-measure">
                     <xsl:with-param name="length"
                       select="substring-before($style/@style:border-line-width,' ' )"/>
                   </xsl:call-template>
                 </xsl:variable>
-                
+
                 <xsl:variable name="outerLineWidth">
                   <xsl:call-template name="point-measure">
                     <xsl:with-param name="length"
@@ -610,17 +617,17 @@
                     />
                   </xsl:call-template>
                 </xsl:variable>
-                
+
                 <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
                 <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
                 <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
-                
+
               </xsl:if>
             </xsl:when>
             <xsl:otherwise>sng</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
-        
+
         <xsl:attribute name="w">
           <xsl:value-of select="$strokeWeight"/>
         </xsl:attribute>
