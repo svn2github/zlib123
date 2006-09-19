@@ -32,6 +32,8 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
   exclude-result-prefixes="w">
 
+  <xsl:import href="tables.xsl"/>
+  
   <xsl:template name="content">
     <office:document-content>
       <office:scripts/>
