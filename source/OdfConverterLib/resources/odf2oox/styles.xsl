@@ -69,6 +69,13 @@
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:automatic-styles" mode="styles"
       />
+      <w:style w:type="character" w:styleId="Hyperlink">
+        <w:name w:val="Hyperlink"/>
+        <w:rPr>
+          <w:color w:val="000080"/>
+          <w:u w:val="single"/>
+        </w:rPr>
+      </w:style>
     </w:styles>
   </xsl:template>
 
