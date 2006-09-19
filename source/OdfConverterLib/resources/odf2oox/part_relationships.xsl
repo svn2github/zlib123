@@ -96,6 +96,12 @@
               Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
               Target="media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"
             />
+            <xsl:if test="ancestor::draw:a">
+              <Relationship Id="{generate-id(ancestor::draw:a)}"
+                Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+                TargetMode="External"
+                Target="{ancestor::draw:a/@xlink:href}"/>
+            </xsl:if>
           </xsl:if>
         </xsl:for-each>
       </xsl:for-each>
@@ -144,10 +150,12 @@
                   </xsl:attribute>
                   <xsl:attribute name="TargetMode">External</xsl:attribute>
                 </Relationship>
-                <Relationship Id="{generate-id(ancestor::draw:a)}"
+                <xsl:if test="ancestor::draw:a">
+                  <Relationship Id="{generate-id(ancestor::draw:a)}"
                   Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
                   TargetMode="External"
                   Target="{ancestor::draw:a/@xlink:href}"/>
+                </xsl:if>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:if>
