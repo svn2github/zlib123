@@ -137,7 +137,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             this.report.AddComment("Processing " + nbFiles + " ODT file(s)");
             foreach (string input in files)
             {
-                string output = this.GenerateOutputName(this.output, input, "docx", true);
+                string output = this.GenerateOutputName(this.output, input, ".docx", true);
                 int result = this.ProceedSingleFile(input, output, true);
                 switch(result)
                 {
@@ -186,7 +186,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             string[] files = Directory.GetFiles(this.input, "*.docx", option);
             foreach (string input in files)
             {
-                string output = this.GenerateOutputName(this.output, input, "odt", true);
+                string output = this.GenerateOutputName(this.output, input, ".odt", true);
                 this.ProceedSingleFile(input, output, false);
             }
         }
