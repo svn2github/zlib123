@@ -29,7 +29,9 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oox="urn:oox"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" exclude-result-prefixes="oox">
 
+  <xsl:import href="common.xsl"/>
   <xsl:import href="content.xsl"/>
+  <xsl:import href="pictures.xsl"/>
 
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
