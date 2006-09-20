@@ -157,72 +157,25 @@
 
   <xsl:template name="headerFooter-relationships">
     <xsl:param name="node"/>
+    <xsl:variable name="masterPageName" select="$node/ancestor::style:master-page[1]/@style:name"/>
+    
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      
       <!-- hyperlinks relationships. -->
-      <xsl:for-each select="key('hyperlinks', '')[not(ancestor::text:note)]">
-        <Relationship Id="{generate-id()}"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-          TargetMode="External">
-          <xsl:attribute name="Target">
-            <!-- having Target empty makes Word Beta 2007 crash -->
-            <xsl:choose>
-              <xsl:when test="string-length(@xlink:href) &gt; 0">
-                <xsl:value-of select="@xlink:href"/>
-              </xsl:when>
-              <xsl:otherwise>/</xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </Relationship>
-      </xsl:for-each>
-
-      <xsl:for-each select="$node/descendant::draw:frame[./draw:object-ole]">
-        <pzip:copy pzip:source="{substring-after(draw:object-ole/@xlink:href,'./')}"
-          pzip:target="word/embeddings/{translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')}"/>
-        <Relationship Id="{generate-id(draw:object-ole)}"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
-          Target="embeddings/{translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')}"/>
-        <xsl:if test="draw:image">
-          <pzip:copy pzip:source="{substring-after(draw:image/@xlink:href,'./')}"
-            pzip:target="word/media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"/>
-          <Relationship Id="{generate-id(draw:image)}"
-            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-            Target="media/{translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')}"
-          />
-        </xsl:if>
-      </xsl:for-each>
-
-      <xsl:for-each
-        select="$node/descendant::draw:frame[not(./draw:object-ole) and ./draw:image/@xlink:href]">
-        <xsl:variable name="supported">
-          <xsl:call-template name="image-support">
-            <xsl:with-param name="name" select="./draw:image/@xlink:href"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:if test="$supported = 'true' ">
-          <xsl:choose>
-            <!-- Internal image -->
-            <xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
-              <!-- copy this image to the oox package -->
-              <pzip:copy pzip:source="{draw:image/@xlink:href}"
-                pzip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
-              <Relationship Id="{generate-id(draw:image)}"
-                Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-                Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- External image -->
-              <!-- TOTO support for external images
-					                        <Relationship Id='{generate-id(draw:image)}' 					
-					                        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-					                        Target="{draw:image/@xlink:href}"
-					                        TargetMode="External"/>
-					                -->
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:if>
-      </xsl:for-each>
-
+      <xsl:call-template name="InsertHyperlinksRelationships">
+        <xsl:with-param name="hyperlinks" select="key('hyperlinks', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"/>
+      </xsl:call-template>
+      
+      <!-- OLE objects relationships -->
+      <xsl:call-template name="InsertOleObjectsRelationships">
+        <xsl:with-param name="oleObjects" select="key('ole-objects', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"/>
+      </xsl:call-template>
+      
+      <!-- Images relationships -->
+      <xsl:call-template name="InsertImagesRelationships">
+        <xsl:with-param name="images" select="key('images', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"/>
+      </xsl:call-template>
+      
     </Relationships>
-
   </xsl:template>
 </xsl:stylesheet>

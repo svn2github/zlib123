@@ -82,9 +82,8 @@
   <!-- endotes configuration -->
   <xsl:template match="text:notes-configuration[@text:note-class='endnote']" mode="note">
     <xsl:param name="wide">no</xsl:param>
-
     <w:endnotePr>
-
+      
      <xsl:choose>
        <xsl:when test="ancestor::style:style[@style:family='section']">
          <w:pos w:val="sectEnd"/>
@@ -93,7 +92,6 @@
          <w:pos w:val="docEnd"/>
        </xsl:otherwise>
      </xsl:choose>
-      
  
       <xsl:if test="@style:num-format">
         <w:numFmt>
@@ -132,66 +130,27 @@
         <w:endnote w:id="0"/>
         <w:endnote w:id="1"/>
       </xsl:if>
-
+      
     </w:endnotePr>
   </xsl:template>
 
 
   <xsl:template name="endnotes-relationships">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      <!-- hyperlinks relationships. 
-                Do not pick up hyperlinks other than those coming from footnotes.  -->
+      
+      <!-- hyperlinks relationships. Do not pick up hyperlinks other than those coming from footnotes.  -->
       <xsl:for-each select="document('content.xml')">
-        <xsl:for-each
-          select="key('hyperlinks', '')[ancestor::text:note/@text:note-class = 'endnote' ]">
-          <Relationship Id="{generate-id()}"
-            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-            TargetMode="External">
-            <xsl:attribute name="Target">
-              <!-- having Target empty makes Word Beta 2007 crash -->
-              <xsl:choose>
-                <xsl:when test="string-length(@xlink:href) &gt; 0">
-                  <xsl:value-of select="@xlink:href"/>
-                </xsl:when>
-                <xsl:otherwise>/</xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </Relationship>
-        </xsl:for-each>
+        <xsl:call-template name="InsertHyperlinksRelationships">
+          <xsl:with-param name="hyperlinks" select="key('hyperlinks', '')[ancestor::text:note/@text:note-class = 'endnote' ]"/>
+        </xsl:call-template>  
       </xsl:for-each>
-
+      
       <xsl:for-each select="document('content.xml')">
-        <xsl:for-each select="key('images', '')[ancestor::text:note/@text:note-class = 'endnote' ]">
-            <xsl:variable name="supported">
-            <xsl:call-template name="image-support">
-              <xsl:with-param name="name" select="draw:image/@xlink:href"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:if test="$supported = 'true' ">
-            <xsl:choose>
-              <!-- Internal image -->
-              <xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
-                <!-- copy this image to the oox package -->
-                <pzip:copy pzip:source="{draw:image/@xlink:href}"
-                  pzip:target="word/media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
-                <Relationship Id="{generate-id(draw:image)}"
-                  Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-                  Target="media/{substring-after(draw:image/@xlink:href, 'Pictures/')}"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <!-- External image -->
-                <!-- TOTO support for external images
-                                <Relationship Id='{generate-id(draw:image)}' 					
-                                Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-                                Target="{draw:image/@xlink:href}"
-                                TargetMode="External"/>
-                            -->
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
-        </xsl:for-each>
+        <xsl:call-template name="InsertImagesRelationships">
+          <xsl:with-param name="images" select="key('images', '')[ancestor::text:note/@text:note-class = 'endnote' ]"/>
+        </xsl:call-template>
       </xsl:for-each>
-
+      
     </Relationships>
   </xsl:template>
 
