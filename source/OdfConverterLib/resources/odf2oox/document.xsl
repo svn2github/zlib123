@@ -101,9 +101,9 @@
   <xsl:template match="office:body">
     <w:body>
       <xsl:apply-templates/>
-      
-      <xsl:call-template name="InsertDocumentBodySection" />
-      
+
+      <xsl:call-template name="InsertDocumentBodySection"/>
+
     </w:body>
   </xsl:template>
 
@@ -147,7 +147,7 @@
       </xsl:choose>
     </w:sectPr>
   </xsl:template>
-  
+
   <!-- OOX section properties (header/footer, footnotes/endnotes, page layout, etc) -->
   <xsl:template name="InsertSectionProperties">
     <xsl:param name="elt"/>
@@ -155,7 +155,7 @@
     <xsl:param name="notes-configuration"/>
     <xsl:param name="section-ends"/>
     <xsl:param name="previous-section"/>
-    
+
     <xsl:choose>
       <xsl:when test="$elt">
         <xsl:variable name="eltstyle"
@@ -272,7 +272,7 @@
     </xsl:choose>
   </xsl:template>
 
-  
+
   <!-- paragraphs and headings -->
   <xsl:template match="text:p | text:h">
     <xsl:param name="level" select="0"/>
@@ -284,8 +284,8 @@
           <xsl:with-param name="level" select="$level"/>
         </xsl:call-template>
 
-        <xsl:call-template name="InsertParagraphSection"/> 
-        
+        <xsl:call-template name="InsertParagraphSection"/>
+
       </w:pPr>
 
       <!-- check if element is contained in TOC  -->
@@ -299,33 +299,33 @@
 
       <!-- calculate TOC id for bookmark -->
       <xsl:variable name="tocId">
-         <xsl:if test="$isBookmarked = 'true' ">
-            <xsl:call-template name="CalculateBookmarkId">
-              <xsl:with-param name="sourceStyleNum"
-                select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
-              <xsl:with-param name="counter" select="1"/>
-            </xsl:call-template>
-          </xsl:if>
+        <xsl:if test="$isBookmarked = 'true' ">
+          <xsl:call-template name="CalculateBookmarkId">
+            <xsl:with-param name="sourceStyleNum"
+              select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
+            <xsl:with-param name="counter" select="1"/>
+          </xsl:call-template>
+        </xsl:if>
       </xsl:variable>
-    
-    <!--   insert bookmark start for element which is contained in TOC-->
+
+      <!--   insert bookmark start for element which is contained in TOC-->
       <xsl:if test="$isBookmarked = 'true' ">
         <xsl:call-template name="InsertBookmarkStartTOC">
           <xsl:with-param name="tocId" select="$tocId"/>
         </xsl:call-template>
       </xsl:if>
-      
+
       <!-- footnotes or endnotes: insert the mark in the first paragraph -->
       <xsl:if test="parent::text:note-body and position() = 1">
         <xsl:apply-templates select="../../text:note-citation" mode="note"/>
       </xsl:if>
 
-     <!-- paragraph content-->
+      <!-- paragraph content-->
       <xsl:call-template name="InsertParagraphContent"/>
-      
+
       <!-- If there is a page-break-after in the paragraph style -->
-      <xsl:call-template name="InsertPageBreakAfter" />
-     
+      <xsl:call-template name="InsertPageBreakAfter"/>
+
       <!--   insert bookmark end for element which is contained in TOC-->
       <xsl:if test="$isBookmarked = 'true' ">
         <xsl:call-template name="InsertBookmarkEndTOC">
@@ -335,29 +335,30 @@
 
     </w:p>
   </xsl:template>
-  
+
   <!-- section detection and insertion for paragraph-->
   <xsl:template name="InsertParagraphSection">
     <!-- Section detection  : 3 cases -->
     <xsl:if test="not(ancestor::table:table) and not(ancestor::draw:frame)">
       <!-- Section detection  : 3 cases -->
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
-      <xsl:variable name="followings" select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
+      <xsl:variable name="followings"
+        select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
       <xsl:variable name="masterPageStarts"
         select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
-      
+
       <!-- 2 - Section starts. The following paragraph is contained in the following section -->
       <xsl:variable name="followingSection" select="following::text:section[1]"/>
       <!-- the following section is the same as the following neighbour's ancestor section -->
       <xsl:variable name="sectionStarts"
         select="$followingSection and (generate-id($followings[1]/ancestor::text:section) = generate-id($followingSection))"/>
-      
+
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
       <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
       <!-- the following neighbour's ancestor section and the current section are different -->
       <xsl:variable name="sectionEnds"
         select="$previousSection and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previousSection))"/>
-      
+
       <!-- section creation -->
       <xsl:if
         test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
@@ -380,13 +381,14 @@
               <xsl:otherwise>no</xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          
+
           <!-- sectionEnds et previousSection -->
           <xsl:variable name="notes-configuration"
             select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration"/>
-          
-          <xsl:variable name="currentMasterStyle" select="key('master-based-styles', @text:style-name)"/>
-          
+
+          <xsl:variable name="currentMasterStyle"
+            select="key('master-based-styles', @text:style-name)"/>
+
           <xsl:choose>
             <xsl:when test="boolean($currentMasterStyle)">
               <!-- current element style is tied to a master page -->
@@ -430,31 +432,31 @@
       </xsl:if>
     </xsl:if>
   </xsl:template>
-  
-   <!-- conversion of paragraph content excluding not supported elements -->
+
+  <!-- conversion of paragraph content excluding not supported elements -->
   <xsl:template name="InsertParagraphContent">
     <xsl:choose>
-      
+
       <!-- we are in table of contents -->
       <xsl:when test="parent::text:index-body">
         <xsl:call-template name="InsertIndexItem"/>
       </xsl:when>
-      
+
       <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
       <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
         <xsl:message terminate="no">feedback: Nested frames</xsl:message>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:apply-templates mode="paragraph"/>
       </xsl:otherwise>
-      
+
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <!-- inserts page-break-after if defined for paragraph  -->
-    <xsl:template name="InsertPageBreakAfter">
+  <xsl:template name="InsertPageBreakAfter">
     <xsl:if
       test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
       <w:r>
@@ -462,21 +464,21 @@
       </w:r>
     </xsl:if>
   </xsl:template>
-  
-   <!-- bookmark start mark for elements contained in TOC -->
+
+  <!-- bookmark start mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkStartTOC">
     <xsl:param name="tocId"/>
 
     <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
-   </xsl:template>
+  </xsl:template>
 
   <!-- bookmark end mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkEndTOC">
     <xsl:param name="tocId"/>
-    
+
     <w:bookmarkEnd w:id="{$tocId}"/>
-    </xsl:template>
-  
+  </xsl:template>
+
   <!-- checks if element is contained in TOC - used for paragraphs with "Additional styles" defined for generating TOC  -->
   <xsl:template name="IsTOCBookmark">
     <xsl:param name="sourceStyleNum"/>
@@ -485,7 +487,9 @@
     <xsl:choose>
       <xsl:when test="self::text:h">
         <xsl:choose>
-          <xsl:when test="//text:table-of-content/text:table-of-content-source/@text:use-outline-level = 'false' ">false</xsl:when>
+          <xsl:when
+            test="//text:table-of-content/text:table-of-content-source/@text:use-outline-level = 'false' "
+            >false</xsl:when>
           <xsl:otherwise>true</xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -851,44 +855,44 @@
 
   <!-- Inserts item for all types of index  -->
   <xsl:template name="InsertIndexItem">
-    
+
     <xsl:variable name="indexElementPosition">
       <xsl:number/>
     </xsl:variable>
 
-   <!-- inserts field code of index to first index element -->
+    <!-- inserts field code of index to first index element -->
     <xsl:if test="$indexElementPosition = 1">
-      <xsl:call-template name="InsertIndexFieldCodeStart" />
+      <xsl:call-template name="InsertIndexFieldCodeStart"/>
     </xsl:if>
-    
+
     <xsl:choose>
-      
+
       <!-- when hyperlink option is on in TOC -->
       <xsl:when test="text:a">
-        <xsl:apply-templates select="text:a" mode="paragraph" />
+        <xsl:apply-templates select="text:a" mode="paragraph"/>
       </xsl:when>
-     
+
       <!--default scenario-->
       <xsl:otherwise>
-        <xsl:call-template name="tableContent" />
+        <xsl:call-template name="InsertIndexItemContent"/>
       </xsl:otherwise>
-      
-      </xsl:choose>
-    
-    <!-- inserts field code end in last index paragraph -->
+
+    </xsl:choose>
+
+    <!-- inserts field code end in last index element -->
     <xsl:if test="(count(following-sibling::text:p) = 0) and parent::text:index-body">
-          <xsl:call-template name="InsertIndexFieldCodeEnd" />
+      <xsl:call-template name="InsertIndexFieldCodeEnd"/>
     </xsl:if>
-    
+
   </xsl:template>
-    
+
   <xsl:template name="InsertIndexFieldCodeEnd">
     <w:r>
       <w:rPr/>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
- </xsl:template>
-  
+  </xsl:template>
+
   <xsl:template name="InsertIndexFieldCodeStart">
     <w:r>
       <w:fldChar w:fldCharType="begin"/>
@@ -896,65 +900,94 @@
     <w:r>
       <xsl:choose>
         <xsl:when test="ancestor::text:table-of-content">
-          <w:instrText>
-            <xsl:call-template name="InsertTocPreferences"/>
-          </w:instrText>
-        </xsl:when>
+            <xsl:call-template name="InsertTocPrefs"/>
+      </xsl:when>
         <xsl:when test="ancestor::text:illustration-index">
-          <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" </w:instrText>
+          <xsl:call-template name="InsertIllustrationInPrefs" />
         </xsl:when>
         <xsl:when test="ancestor::text:alphabetical-index">
-          <w:instrText xml:space="preserve"> INDEX \e "" \c "<xsl:choose><xsl:when test="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">1</xsl:when><xsl:otherwise><xsl:value-of select="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/></xsl:otherwise></xsl:choose>" \z "1045" </w:instrText>
+          <xsl:call-template name="insertAlphabeticalPrefs"/>
         </xsl:when>
         <xsl:otherwise>
-          <w:instrText xml:space="preserve"> TOC  \c "<xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"/>" </w:instrText>
-        </xsl:otherwise>
+          <xsl:call-template name="InsertIndexFiguresPrefs" />
+          </xsl:otherwise>
       </xsl:choose>
     </w:r>
     <w:r>
       <w:fldChar w:fldCharType="separate"/>
     </w:r>
   </xsl:template>
+
+  <xsl:template name="InsertIndexFiguresPrefs">
+    <w:instrText xml:space="preserve">
+      <xsl:text>TOC  \c "</xsl:text>
+      <xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"/>
+      <xsl:text> " </xsl:text> 
+    </w:instrText>
+  </xsl:template>
   
-  <xsl:template name="InsertTocPreferences">
-
-    <xsl:text>TOC \o "1-</xsl:text>
-
-    <xsl:choose>
-      <xsl:when
-        test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">
-        <xsl:text>9"</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of
-          select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/>
-        <xsl:text>"</xsl:text>
-      </xsl:otherwise>
-    </xsl:choose>
-
-    <xsl:if
-      test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">
-      <xsl:text>\u  </xsl:text>
-    </xsl:if>
-    <xsl:if test="text:a">
-      <xsl:text> \h </xsl:text>
-    </xsl:if>
-
-    <xsl:if test="//text:table-of-content/text:table-of-content-source/text:index-source-styles">
-      <xsl:text> \t "</xsl:text>
-      <xsl:for-each
-        select="//text:table-of-content/text:table-of-content-source/text:index-source-styles">
-        <xsl:variable name="additionalStyleName" select="./text:index-source-style/@text:style-name"/>
-        <xsl:variable name="mainStyle"
-          select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Contents_20_1']"/>
-
-        <xsl:value-of select="$mainStyle/@style:display-name"/>
-        <xsl:text>; </xsl:text>
-        <xsl:value-of select="@text:outline-level"/>
-        <xsl:text>"</xsl:text>
-
-      </xsl:for-each>
-    </xsl:if>
+  <xsl:template name="insertAlphabeticalPrefs">
+    <w:instrText xml:space="preserve">
+      <xsl:text>INDEX \e "" \c "</xsl:text>
+      <xsl:choose>
+        <xsl:when test="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">
+          <xsl:text> 1 </xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:text>x " \z "1045" </xsl:text> 
+    </w:instrText>
+   </xsl:template>
+  
+  <xsl:template name="InsertIllustrationInPrefs">
+    <w:instrText xml:space="preserve"> 
+      <xsl:text> TOC  \c "</xsl:text>
+     <xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" 
+    </w:instrText>
+    </xsl:template>
+  
+  <xsl:template name="InsertTocPrefs">
+    <w:instrText>
+      <xsl:text>TOC \o "1-</xsl:text>
+      
+      <xsl:choose>
+        <xsl:when
+          test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">
+          <xsl:text>9"</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of
+            select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/>
+          <xsl:text>"</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+      
+      <xsl:if
+        test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">
+        <xsl:text>\u  </xsl:text>
+      </xsl:if>
+      <xsl:if test="text:a">
+        <xsl:text> \h </xsl:text>
+      </xsl:if>
+      
+      <xsl:if test="//text:table-of-content/text:table-of-content-source/text:index-source-styles">
+        <xsl:text> \t "</xsl:text>
+        <xsl:for-each
+          select="//text:table-of-content/text:table-of-content-source/text:index-source-styles">
+          <xsl:variable name="additionalStyleName" select="./text:index-source-style/@text:style-name"/>
+          <xsl:variable name="mainStyle"
+            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Contents_20_1']"/>
+          
+          <xsl:value-of select="$mainStyle/@style:display-name"/>
+          <xsl:text>; </xsl:text>
+          <xsl:value-of select="@text:outline-level"/>
+          <xsl:text>"</xsl:text>
+          
+        </xsl:for-each>
+      </xsl:if>
+    </w:instrText>
   </xsl:template>
 
   <!-- Inserts a page break before if needed -->
@@ -1046,20 +1079,20 @@
   <!-- links -->
   <xsl:template match="text:a" mode="paragraph">
     <xsl:choose>
-      
-       <!-- TOC hyperlink -->
+
+      <!-- TOC hyperlink -->
       <xsl:when test="ancestor::text:index-body and position() = 1">
         <xsl:variable name="tocId" select="count(../preceding-sibling::text:p)+1"/>
         <w:hyperlink w:history="1">
           <xsl:attribute name="w:anchor">
             <xsl:value-of select="concat('_Toc',$tocId)"/>
           </xsl:attribute>
-          <xsl:call-template name="tableContent">
-            <xsl:with-param name="tocId" select="$tocId" />
+          <xsl:call-template name="InsertIndexItemContent">
+            <xsl:with-param name="tocId" select="$tocId"/>
           </xsl:call-template>
         </w:hyperlink>
       </xsl:when>
-      
+
       <!--text body link-->
       <xsl:otherwise>
         <w:hyperlink r:id="{generate-id()}">
@@ -1183,210 +1216,238 @@
     </w:r>
   </xsl:template>
 
-  <!--converts oo frame style properties to shape properties for text-box-->
-  <xsl:template name="InsertShapeProperties">
+  <xsl:template name="InsertShapePositionProperties">
     <xsl:param name="styleGraphicProperties"/>
-    <xsl:param name="parentStyleGraphicProperties"/>
+    <xsl:param name="frameWrap"/>
 
+    <!-- absolute positioning for text-box -->
 
-    <xsl:attribute name="style">
+    <xsl:if
+      test="(not($frameWrap) or $frameWrap != 'none') and not(parent::draw:frame/@text:anchor-type = 'as-char') ">
+      <xsl:value-of select="'position:absolute;'"/>
+    </xsl:if>
+  </xsl:template>
 
-      <!-- absolute positioning for text-box -->
-      <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap"/>
-      <xsl:if
-        test="(not($frameWrap) or $frameWrap != 'none') and not(parent::draw:frame/@text:anchor-type = 'as-char') ">
-        <xsl:value-of select="'position:absolute;'"/>
-      </xsl:if>
+  <xsl:template name="InsertShapeSize">
+    <xsl:param name="styleGraphicProperties"/>
 
-      <!--  text-box width and height-->
-      <xsl:variable name="frameW">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length"
-            select="parent::draw:frame/@svg:width|parent::draw:frame/@fo:min-width"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="frameH">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="@fo:min-height|parent::draw:frame/@svg:height"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="relWidth"
-        select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
-      <xsl:variable name="relHeight"
-        select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
+    <!--  text-box width and height-->
+    <xsl:variable name="frameW">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="parent::draw:frame/@svg:width|parent::draw:frame/@fo:min-width"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="frameH">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@fo:min-height|parent::draw:frame/@svg:height"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="relWidth" select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
+    <xsl:variable name="relHeight"
+      select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
 
-      <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
-      <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
+    <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
+    <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 
-      <xsl:if test="$relWidth">
-        <xsl:value-of select="concat('mso-width-percent:',$relWidth,'0;')"/>
-      </xsl:if>
-      <xsl:if test="$relHeight">
-        <xsl:value-of select="concat('mso-height-percent:',$relHeight,'0;')"/>
-      </xsl:if>
+    <xsl:if test="$relWidth">
+      <xsl:value-of select="concat('mso-width-percent:',$relWidth,'0;')"/>
+    </xsl:if>
+    <xsl:if test="$relHeight">
+      <xsl:value-of select="concat('mso-height-percent:',$relHeight,'0;')"/>
+    </xsl:if>
+  </xsl:template>
 
-      <!--z-index that we need to convert properly openoffice wrap-throught property -->
-      <xsl:variable name="zIndex">
-        <xsl:choose>
-          <xsl:when
-            test="$frameWrap='run-through' 
-            and $styleGraphicProperties/@style:run-through='background'"
-            >-251658240</xsl:when>
-          <xsl:when
-            test="$frameWrap='run-through' 
-            and not($styleGraphicProperties/@style:run-through)"
-            >251658240</xsl:when>
-          <xsl:otherwise>
-            <xsl:choose>
-              <xsl:when test="parent::draw:frame/@draw:z-index">
-                <xsl:value-of select="2 + parent::draw:frame/@draw:z-index"/>
-              </xsl:when>
-              <xsl:otherwise>0</xsl:otherwise>
-            </xsl:choose>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
+  <xsl:template name="InsertShapeZindex">
+    <xsl:param name="styleGraphicProperties"/>
+    <xsl:param name="frameWrap"/>
 
-      <xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
-
-      <!-- text-box coordinates -->
-      <xsl:variable name="posL">
-        <xsl:if test="parent::draw:frame/@svg:x">
-          <xsl:variable name="leftM">
-            <xsl:call-template name="ComputeMarginX">
-              <xsl:with-param name="parent" select="ancestor::draw:frame"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="$leftM"/>
-        </xsl:if>
-      </xsl:variable>
-      <xsl:variable name="posT">
-        <xsl:if test="parent::draw:frame/@svg:y">
-          <xsl:variable name="topM">
-            <xsl:call-template name="ComputeMarginY">
-              <xsl:with-param name="parent" select="ancestor::draw:frame"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="$topM"/>
-        </xsl:if>
-      </xsl:variable>
-
-      <xsl:if test="parent::draw:frame/@svg:x">
-        <xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
-      </xsl:if>
-      <xsl:if test="parent::draw:frame/@svg:y">
-        <xsl:value-of select="concat('margin-top:',$posT,'pt;')"/>
-      </xsl:if>
-
-      <!-- text-box relative position -->
+    <!--z-index that we need to convert properly openoffice wrap-throught property -->
+    <xsl:variable name="zIndex">
       <xsl:choose>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-end-margin' "
-          >mso-position-horizontal-relative: right-margin-area;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-start-margin' "
-          >mso-position-horizontal-relative: left-margin-area;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page' "
-          >mso-position-horizontal-relative: page;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-content' "
-          >mso-position-horizontal-relative: column;</xsl:when>
+        <xsl:when
+          test="$frameWrap='run-through' 
+          and $styleGraphicProperties/@style:run-through='background'"
+          >-251658240</xsl:when>
+        <xsl:when
+          test="$frameWrap='run-through' 
+          and not($styleGraphicProperties/@style:run-through)"
+          >251658240</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
-            <xsl:when test="parent::draw:frame/@text:anchor-type = 'page' "
-              >mso-position-horizontal-relative: page;</xsl:when>
-            <xsl:when test="parent::draw:frame/@text:anchor-type = 'paragraph' "
-              >mso-position-horizontal-relative: column;</xsl:when>
+            <xsl:when test="parent::draw:frame/@draw:z-index">
+              <xsl:value-of select="2 + parent::draw:frame/@draw:z-index"/>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>
 
+    <xsl:value-of select="concat('z-index:', $zIndex, ';')"/>
+  </xsl:template>
+
+  <xsl:template name="InsertShapeCoordinates">
+    <xsl:param name="styleGraphicProperties"/>
+
+    <!-- text-box coordinates -->
+    <xsl:variable name="posL">
+      <xsl:if test="parent::draw:frame/@svg:x">
+        <xsl:variable name="leftM">
+          <xsl:call-template name="ComputeMarginX">
+            <xsl:with-param name="parent" select="ancestor::draw:frame"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="$leftM"/>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="posT">
+      <xsl:if test="parent::draw:frame/@svg:y">
+        <xsl:variable name="topM">
+          <xsl:call-template name="ComputeMarginY">
+            <xsl:with-param name="parent" select="ancestor::draw:frame"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="$topM"/>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:if test="parent::draw:frame/@svg:x">
+      <xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
+    </xsl:if>
+    <xsl:if test="parent::draw:frame/@svg:y">
+      <xsl:value-of select="concat('margin-top:',$posT,'pt;')"/>
+    </xsl:if>
+
+  </xsl:template>
+
+  <xsl:template name="InsertShapePositionRelative">
+    <xsl:param name="styleGraphicProperties"/>
+
+    <!-- text-box relative position -->
+    <xsl:choose>
+      <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-end-margin' "
+        >mso-position-horizontal-relative: right-margin-area;</xsl:when>
+      <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-start-margin' "
+        >mso-position-horizontal-relative: left-margin-area;</xsl:when>
+      <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page' "
+        >mso-position-horizontal-relative: page;</xsl:when>
+      <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-content' "
+        >mso-position-horizontal-relative: column;</xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="parent::draw:frame/@text:anchor-type = 'page' "
+            >mso-position-horizontal-relative: page;</xsl:when>
+          <xsl:when test="parent::draw:frame/@text:anchor-type = 'paragraph' "
+            >mso-position-horizontal-relative: column;</xsl:when>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+
+    <xsl:choose>
+      <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page' "
+        >mso-position-vertical-relative: page;</xsl:when>
+      <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page-content' "
+        >mso-position-vertical-relative: margin;</xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertShapePosition">
+    <xsl:param name="styleGraphicProperties"/>
+
+    <!--horizontal position-->
+    <!-- The same style defined in styles.xsl  TODO manage horizontal-rel-->
+    <xsl:if test="$styleGraphicProperties/@style:horizontal-pos">
       <xsl:choose>
-        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page' "
-          >mso-position-vertical-relative: page;</xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page-content' "
-          >mso-position-vertical-relative: margin;</xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-pos = 'center'">
+          <xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/>
+        </xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-pos='left'">
+          <xsl:value-of select="concat('mso-position-horizontal:', 'left',';')"/>
+        </xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:horizontal-pos='right'">
+          <xsl:value-of select="concat('mso-position-horizontal:', 'right',';')"/>
+        </xsl:when>
+        <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
       </xsl:choose>
+    </xsl:if>
 
-      <!--horizontal position-->
-      <!-- The same style defined in styles.xsl  TODO manage horizontal-rel-->
-      <xsl:if test="$styleGraphicProperties/@style:horizontal-pos">
-        <xsl:choose>
-          <xsl:when test="$styleGraphicProperties/@style:horizontal-pos = 'center'">
-            <xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/>
-          </xsl:when>
-          <xsl:when test="$styleGraphicProperties/@style:horizontal-pos='left'">
-            <xsl:value-of select="concat('mso-position-horizontal:', 'left',';')"/>
-          </xsl:when>
-          <xsl:when test="$styleGraphicProperties/@style:horizontal-pos='right'">
-            <xsl:value-of select="concat('mso-position-horizontal:', 'right',';')"/>
-          </xsl:when>
-          <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
-        </xsl:choose>
-      </xsl:if>
+    <!-- vertical position-->
+    <xsl:if test="$styleGraphicProperties/@style:vertical-pos">
+      <xsl:choose>
+        <xsl:when test="$styleGraphicProperties/@style:vertical-pos = 'middle'">
+          <xsl:value-of select="concat('mso-position-vertical:', 'center',';')"/>
+        </xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:vertical-pos='top'">
+          <xsl:value-of select="concat('mso-position-vertical:', 'top',';')"/>
+        </xsl:when>
+        <xsl:when test="$styleGraphicProperties/@style:vertical-pos='bottom'">
+          <xsl:value-of select="concat('mso-position-vertical:', 'bottom',';')"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
 
-      <!-- vertical position-->
-      <xsl:if test="$styleGraphicProperties/@style:vertical-pos">
-        <xsl:choose>
-          <xsl:when test="$styleGraphicProperties/@style:vertical-pos = 'middle'">
-            <xsl:value-of select="concat('mso-position-vertical:', 'center',';')"/>
-          </xsl:when>
-          <xsl:when test="$styleGraphicProperties/@style:vertical-pos='top'">
-            <xsl:value-of select="concat('mso-position-vertical:', 'top',';')"/>
-          </xsl:when>
-          <xsl:when test="$styleGraphicProperties/@style:vertical-pos='bottom'">
-            <xsl:value-of select="concat('mso-position-vertical:', 'bottom',';')"/>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:if>
+  <xsl:template name="InsertShapeMargin">
+    <xsl:param name="styleGraphicProperties"/>
+    <xsl:param name="parentStyleGraphicProperties"/>
 
-      <!--text-box spacing/margins -->
-      <xsl:variable name="marginL">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length"
-            select="$styleGraphicProperties/@fo:margin-left | $parentStyleGraphicProperties/@fo:margin-left"
-          />
-        </xsl:call-template>
-      </xsl:variable>
+    <!--text-box spacing/margins -->
+    <xsl:variable name="marginL">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="$styleGraphicProperties/@fo:margin-left | $parentStyleGraphicProperties/@fo:margin-left"
+        />
+      </xsl:call-template>
+    </xsl:variable>
 
-      <xsl:variable name="marginT">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length"
-            select="$styleGraphicProperties/@fo:margin-top | $parentStyleGraphicProperties/@fo:margin-top"
-          />
-        </xsl:call-template>
-      </xsl:variable>
+    <xsl:variable name="marginT">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="$styleGraphicProperties/@fo:margin-top | $parentStyleGraphicProperties/@fo:margin-top"
+        />
+      </xsl:call-template>
+    </xsl:variable>
 
-      <xsl:variable name="marginR">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length"
-            select="$styleGraphicProperties/@fo:margin-right | $parentStyleGraphicProperties/@fo:margin-right"
-          />
-        </xsl:call-template>
-      </xsl:variable>
+    <xsl:variable name="marginR">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="$styleGraphicProperties/@fo:margin-right | $parentStyleGraphicProperties/@fo:margin-right"
+        />
+      </xsl:call-template>
+    </xsl:variable>
 
-      <xsl:variable name="marginB">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length"
-            select="$styleGraphicProperties/@fo:margin-bottom | $parentStyleGraphicProperties/@fo:margin-bottom"
-          />
-        </xsl:call-template>
-      </xsl:variable>
+    <xsl:variable name="marginB">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="$styleGraphicProperties/@fo:margin-bottom | $parentStyleGraphicProperties/@fo:margin-bottom"
+        />
+      </xsl:call-template>
+    </xsl:variable>
 
-      <xsl:if
-        test="$styleGraphicProperties/@fo:margin-left | $parentStyleGraphicProperties/@fo:margin-left">
-        <xsl:value-of select="concat('mso-wrap-distance-left:', $marginL,'pt;')"/>
-      </xsl:if>
-      <xsl:if
-        test="$styleGraphicProperties/@fo:margin-top | $parentStyleGraphicProperties/@fo:margin-top">
-        <xsl:value-of select="concat('mso-wrap-distance-top:', $marginT,'pt;')"/>
-      </xsl:if>
-      <xsl:if
-        test="$styleGraphicProperties/@fo:margin-right | $parentStyleGraphicProperties/@fo:margin-right">
-        <xsl:value-of select="concat('mso-wrap-distance-right:', $marginR,'pt;')"/>
-      </xsl:if>
-      <xsl:if
-        test="$styleGraphicProperties/@fo:margin-bottom | $parentStyleGraphicProperties/@fo:margin-bottom">
-        <xsl:value-of select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
-      </xsl:if>
-    </xsl:attribute>
+    <xsl:if
+      test="$styleGraphicProperties/@fo:margin-left | $parentStyleGraphicProperties/@fo:margin-left">
+      <xsl:value-of select="concat('mso-wrap-distance-left:', $marginL,'pt;')"/>
+    </xsl:if>
+    <xsl:if
+      test="$styleGraphicProperties/@fo:margin-top | $parentStyleGraphicProperties/@fo:margin-top">
+      <xsl:value-of select="concat('mso-wrap-distance-top:', $marginT,'pt;')"/>
+    </xsl:if>
+    <xsl:if
+      test="$styleGraphicProperties/@fo:margin-right | $parentStyleGraphicProperties/@fo:margin-right">
+      <xsl:value-of select="concat('mso-wrap-distance-right:', $marginR,'pt;')"/>
+    </xsl:if>
+    <xsl:if
+      test="$styleGraphicProperties/@fo:margin-bottom | $parentStyleGraphicProperties/@fo:margin-bottom">
+      <xsl:value-of select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
+    </xsl:if>
+
+
+  </xsl:template>
+
+  <xsl:template name="InsertShapeFill">
+    <xsl:param name="styleGraphicProperties"/>
+
 
     <!--fill color-->
     <xsl:if test="$styleGraphicProperties/@fo:background-color">
@@ -1394,6 +1455,13 @@
         <xsl:value-of select="$styleGraphicProperties/@fo:background-color"/>
       </xsl:attribute>
     </xsl:if>
+
+  </xsl:template>
+
+  <xsl:template name="InsertShapeBorders">
+    <xsl:param name="styleGraphicProperties"/>
+    <xsl:param name="parentStyleGraphicProperties"/>
+
 
     <!--borders-->
     <xsl:choose>
@@ -1463,6 +1531,11 @@
       </xsl:otherwise>
     </xsl:choose>
 
+  </xsl:template>
+
+  <xsl:template name="InsertShapeTransparency">
+    <xsl:param name="styleGraphicProperties"/>
+
     <!--fill  transparency-->
     <xsl:variable name="opacity"
       select="100 - substring-before($styleGraphicProperties/@style:background-transparency,'%')"/>
@@ -1475,7 +1548,92 @@
         </xsl:attribute>
       </v:fill>
     </xsl:if>
+  </xsl:template>
 
+  <!--converts oo frame style properties to shape properties for text-box-->
+  <xsl:template name="InsertShapeProperties">
+    <xsl:param name="styleGraphicProperties"/>
+    <xsl:param name="parentStyleGraphicProperties"/>
+
+    <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap"/>
+
+    <xsl:attribute name="style">
+
+      <xsl:call-template name="InsertShapePositionProperties">
+        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+        <xsl:with-param name="frameWrap" select="$frameWrap"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertShapeSize">
+        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertShapeZindex">
+        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+        <xsl:with-param name="frameWrap" select="$frameWrap"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertShapeCoordinates">
+        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertShapePositionRelative">
+        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertShapePosition">
+        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertShapeMargin">
+        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+        <xsl:with-param name="parentStyleGraphicProperties" select="$styleGraphicProperties"/>
+      </xsl:call-template>
+
+    </xsl:attribute>
+
+    <xsl:call-template name="InsertShapeFill">
+      <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+    </xsl:call-template>
+
+    <xsl:call-template name="InsertShapeBorders">
+      <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+      <xsl:with-param name="parentStyleGraphicProperties" select="$styleGraphicProperties"/>
+    </xsl:call-template>
+
+    <xsl:call-template name="InsertShapeTransparency">
+      <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+    </xsl:call-template>
+
+  </xsl:template>
+
+  <xsl:template name="InsertTextBoxWrap">
+    <xsl:param name="styleGraphicProperties"/>
+
+    <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap"/>
+
+    <!--frame wrap-->
+    <xsl:choose>
+      <xsl:when test="parent::draw:frame/@text:anchor-type = 'as-char' or $frameWrap = 'none' ">
+        <w10:wrap type="none"/>
+        <w10:anchorlock/>
+      </xsl:when>
+      <xsl:when test="$frameWrap = 'left' ">
+        <w10:wrap type="square" side="left"/>
+      </xsl:when>
+      <xsl:when test="$frameWrap = 'right' ">
+        <w10:wrap type="square" side="right"/>
+      </xsl:when>
+      <xsl:when test="not($frameWrap)">
+        <w10:wrap type="square"/>
+      </xsl:when>
+      <xsl:when test="$frameWrap = 'parallel' ">
+        <w10:wrap type="square"/>
+      </xsl:when>
+      <xsl:when test="$frameWrap = 'dynamic' ">
+        <w10:wrap type="square" side="largest"/>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <!--inserts text-box into shape element -->
@@ -1513,30 +1671,9 @@
         </xsl:for-each>
       </w:txbxContent>
 
-      <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap"/>
-
-      <!--frame wrap-->
-      <xsl:choose>
-        <xsl:when test="parent::draw:frame/@text:anchor-type = 'as-char' or $frameWrap = 'none' ">
-          <w10:wrap type="none"/>
-          <w10:anchorlock/>
-        </xsl:when>
-        <xsl:when test="$frameWrap = 'left' ">
-          <w10:wrap type="square" side="left"/>
-        </xsl:when>
-        <xsl:when test="$frameWrap = 'right' ">
-          <w10:wrap type="square" side="right"/>
-        </xsl:when>
-        <xsl:when test="not($frameWrap)">
-          <w10:wrap type="square"/>
-        </xsl:when>
-        <xsl:when test="$frameWrap = 'parallel' ">
-          <w10:wrap type="square"/>
-        </xsl:when>
-        <xsl:when test="$frameWrap = 'dynamic' ">
-          <w10:wrap type="square" side="largest"/>
-        </xsl:when>
-      </xsl:choose>
+      <xsl:call-template name="InsertTextBoxWrap">
+        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+      </xsl:call-template>
 
     </v:textbox>
   </xsl:template>
@@ -1722,7 +1859,7 @@
               <xsl:otherwise/>
             </xsl:choose>
           </xsl:variable>
-          
+
           <xsl:if test="$isBookmarked = 'true' ">
             <xsl:call-template name="InsertBookmarkStartTOC">
               <xsl:with-param name="tocId" select="$tocId"/>
@@ -1779,130 +1916,86 @@
     </w:numPr>
   </xsl:template>
 
-  <!-- COMMENT: please be more explicit about the goal of this template and find a more explicit name -->
-  <!-- table of contents -->
-  <xsl:template name="tableContent">
-   
-    <!-- references to TOC bookmark id in text -->
-    <xsl:param name="tocId" select="count(preceding-sibling::text:p)+1" />
-    
+  <!--inserts index item content for all types of index-->
+  <xsl:template name="InsertIndexItemContent">
+
+    <!-- references to index bookmark id in text -->
+    <xsl:param name="tocId" select="count(preceding-sibling::text:p)+1"/>
+
+    <!-- insert text from the beginning of index item-->
     <w:r>
       <w:rPr>
         <w:noProof/>
       </w:rPr>
       <w:t>
         <xsl:for-each select="child::node()[position() &lt; last()]">
-          <xsl:choose>
-            <xsl:when test="self::text()">
-              <xsl:value-of select="."/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:apply-templates select="."/>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:value-of select="."/>
         </xsl:for-each>
       </w:t>
     </w:r>
-    
-    <xsl:apply-templates select="text:tab|text:a/text:tab|text:span" mode="paragraph"/>
-    
+
+    <!-- insert tab in between if there is any -->
+    <xsl:apply-templates select="text:tab|self::text:a/text:tab|text:span" mode="paragraph"/>
+
+    <!-- alphabetical index doesn't support page reference link -->
     <xsl:if test="not(ancestor::text:alphabetical-index)">
-      <w:r>
-        <w:rPr>
-          <w:noProof/>
-          <w:webHidden/>
-        </w:rPr>
-        <w:fldChar w:fldCharType="begin">
-          <w:fldData xml:space="preserve">CNDJ6nn5us4RjIIAqgBLqQsCAAAACAAAAA4AAABfAFQAbwBjADEANAAxADgAMwA5ADIANwA2AAAA</w:fldData>
-        </w:fldChar>
-      </w:r>
-      <w:r>
-        <w:rPr>
-          <w:noProof/>
-          <w:webHidden/>
-        </w:rPr>
-        <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $tocId, ' \h')"/></w:instrText>
-      </w:r>
-      <w:r>
-        <w:rPr>
-          <w:noProof/>
-          <w:webHidden/>
-        </w:rPr>
-        <w:fldChar w:fldCharType="separate"/>
-      </w:r>
+      <xsl:call-template name="InsertIndexPageRefStart">
+        <xsl:with-param name="tocId" select="$tocId"/>
+      </xsl:call-template>
     </xsl:if>
-    
+
+    <!-- insert text at the end of index item -->
     <w:r>
       <w:rPr>
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
-      <xsl:choose>
-        <xsl:when test="self::text:a">
-          <xsl:apply-templates select="text:a/child::text()[last()]" mode="text"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="child::text()[last()]" mode="text"/>
-          <xsl:apply-templates select="child::text()[1]" mode="text"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:apply-templates select="descendant::text()[last()]" mode="text"/>
     </w:r>
-    
+
+    <!-- alphabetical index doesn't support page reference link -->
     <xsl:if test="not(ancestor::text:alphabetical-index)">
-      <w:r>
-        <w:rPr>
-          <w:noProof/>
-          <w:webHidden/>
-        </w:rPr>
-        <w:fldChar w:fldCharType="end"/>
-      </w:r>
+      <xsl:call-template name="InsertIndexPageRefEnd"/>
     </xsl:if>
-    
-  </xsl:template>
-
-  <!-- indexes -->
-  <xsl:template match="text:table-index|text:alphabetical-index|text:illustration-index">
-    <xsl:if
-      test="text:index-body/text:index-title/text:p or text:index-body/text:index-title/text:h">
-      <xsl:apply-templates
-        select="text:index-body/text:index-title/text:p | text:index-body/text:index-title/text:h"/>
-    </xsl:if>
-
-    <xsl:for-each select="text:index-body/child::text:p">
-      <xsl:variable name="tocId">
-        <xsl:value-of select="position()+count( key('headers',''))+1"/>
-      </xsl:variable>
-      <xsl:apply-templates select="."/>
-    </xsl:for-each>
 
   </xsl:template>
 
-  <!-- table of content -->
-  <xsl:template match="text:table-of-content">
-    <w:sdt>
-      <w:sdtPr>
-        <w:docPartObj>
-          <w:docPartType w:val="'Table of Contents'"/>
-        </w:docPartObj>
-      </w:sdtPr>
-      <w:sdtContent>
-        <xsl:if test="text:index-body/text:index-title/text:p">
-          <xsl:apply-templates select="text:index-body/text:index-title/text:p"/>
-        </xsl:if>
-        <xsl:for-each select="text:index-body/child::text:p">
-          <xsl:variable name="num">
-            <xsl:number/>
-          </xsl:variable>
-          <xsl:apply-templates select="."/>
-        </xsl:for-each>
-        <w:p>
-          <w:r>
-            <w:rPr/>
-            <w:fldChar w:fldCharType="end"/>
-          </w:r>
-        </w:p>
-      </w:sdtContent>
-    </w:sdt>
+  <xsl:template name="InsertIndexPageRefEnd">
+    <w:r>
+      <w:rPr>
+        <w:noProof/>
+        <w:webHidden/>
+      </w:rPr>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
+  </xsl:template>
+
+  <xsl:template name="InsertIndexPageRefStart">
+    <xsl:param name="tocId"/>
+
+    <w:r>
+      <w:rPr>
+        <w:noProof/>
+        <w:webHidden/>
+      </w:rPr>
+      <w:fldChar w:fldCharType="begin">
+        <w:fldData xml:space="preserve">CNDJ6nn5us4RjIIAqgBLqQsCAAAACAAAAA4AAABfAFQAbwBjADEANAAxADgAMwA5ADIANwA2AAAA</w:fldData>
+      </w:fldChar>
+    </w:r>
+    <w:r>
+      <w:rPr>
+        <w:noProof/>
+        <w:webHidden/>
+      </w:rPr>
+      <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $tocId, ' \h')"/></w:instrText>
+    </w:r>
+    <w:r>
+      <w:rPr>
+        <w:noProof/>
+        <w:webHidden/>
+      </w:rPr>
+      <w:fldChar w:fldCharType="separate"/>
+    </w:r>
   </xsl:template>
 
   <!-- text and spaces -->
@@ -2005,12 +2098,14 @@
             <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
           </xsl:when>
           <xsl:when test="not(following-sibling::text:tab)">
-             <xsl:choose>
+            <xsl:choose>
               <xsl:when test="not(ancestor::text:a)">
                 <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
               </xsl:when>
-              <xsl:otherwise>                
-                  <w:t><xsl:value-of select="ancestor::text:p/text()"/></w:t>
+              <xsl:otherwise>
+                <w:t>
+                  <xsl:value-of select="ancestor::text:p/text()"/>
+                </w:t>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
@@ -2065,8 +2160,8 @@
     <w:r>
       <w:rPr>
         <w:rStyle w:val="{concat(@text:note-class, 'Reference')}"/>
-          <xsl:variable name="fo:color"
-            select="substring-after(key('automatic-styles', parent::text:span/@text:style-name)/style:text-properties/@fo:color,'#')"/>
+        <xsl:variable name="fo:color"
+          select="substring-after(key('automatic-styles', parent::text:span/@text:style-name)/style:text-properties/@fo:color,'#')"/>
         <xsl:if test="$fo:color">
           <w:color w:val="{$fo:color}"/>
         </xsl:if>
@@ -2114,7 +2209,7 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- alphabetical indexes -->
+  <!-- alphabetical indexes creating mark entry -->
   <xsl:template match="text:alphabetical-index-mark-end" mode="paragraph">
     <w:r>
       <w:fldChar w:fldCharType="begin"/>
