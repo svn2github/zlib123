@@ -498,7 +498,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             string rawFileName = Path.GetFileNameWithoutExtension(input);
             string output = Path.Combine(rootPath, rawFileName + extension);
             int num = 0;
-            while (!replace && File.Exists(output))
+            while (!replace && (File.Exists(output) || Directory.Exists(output)))
             {
                 output = Path.Combine(rootPath, rawFileName + "_" + ++num + extension);
             }
