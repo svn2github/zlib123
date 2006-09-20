@@ -176,7 +176,7 @@
 
       <!-- settings  -->
       <pzip:entry pzip:target="word/settings.xml">
-        <xsl:call-template name="settings"/>
+        <xsl:call-template name="InsertSettings"/>
       </pzip:entry>
 
       <!-- part relationship item -->

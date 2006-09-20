@@ -33,16 +33,17 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
-  xmlns:ooo="http://openoffice.org/2004/office"
-  exclude-result-prefixes="office fo style config ooo">
+  xmlns:ooo="http://openoffice.org/2004/office" exclude-result-prefixes="office fo style config ooo">
 
-  <xsl:template name="settings">
+  <xsl:template name="InsertSettings">
     <w:settings>
       <w:view w:val="print"/>
-      <xsl:if
-        test="document('styles.xml')//style:page-layout[@style:name=//office:master-styles/style:master-page/@style:page-layout-name]/style:page-layout-properties/@fo:background-color">
-        <w:displayBackgroundShape/>
-      </xsl:if>
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:if
+          test="key('page-layouts', $default-master-style/@style:page-layout-name)/style:page-layout-properties/@fo:background-color">
+          <w:displayBackgroundShape/>
+        </xsl:if>
+      </xsl:for-each>
 
       <xsl:if
         test="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance">
