@@ -32,7 +32,8 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   exclude-result-prefixes="text style office xlink draw pzip">
 
   <xsl:key name="endnotes" match="text:note[@text:note-class='endnote']" use="''"/>
@@ -83,16 +84,16 @@
   <xsl:template match="text:notes-configuration[@text:note-class='endnote']" mode="note">
     <xsl:param name="wide">no</xsl:param>
     <w:endnotePr>
-      
-     <xsl:choose>
-       <xsl:when test="ancestor::style:style[@style:family='section']">
-         <w:pos w:val="sectEnd"/>
-       </xsl:when>
-       <xsl:otherwise>
-         <w:pos w:val="docEnd"/>
-       </xsl:otherwise>
-     </xsl:choose>
- 
+
+      <xsl:choose>
+        <xsl:when test="ancestor::style:style[@style:family='section']">
+          <w:pos w:val="sectEnd"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <w:pos w:val="docEnd"/>
+        </xsl:otherwise>
+      </xsl:choose>
+
       <xsl:if test="@style:num-format">
         <w:numFmt>
           <xsl:attribute name="w:val">
@@ -106,7 +107,7 @@
       <xsl:if test="@text:start-value">
         <w:numStart w:val="{number(@text:start-value)+1}"/>
       </xsl:if>
-      
+
       <xsl:choose>
         <xsl:when test="ancestor::style:style[@style:family='section']">
           <w:numRestart w:val="eachSect"/>
@@ -130,27 +131,27 @@
         <w:endnote w:id="0"/>
         <w:endnote w:id="1"/>
       </xsl:if>
-      
+
     </w:endnotePr>
   </xsl:template>
 
 
-  <xsl:template name="endnotes-relationships">
+  <xsl:template name="InsertEndnotesInternalRelationships">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      
-      <!-- hyperlinks relationships. Do not pick up hyperlinks other than those coming from footnotes.  -->
       <xsl:for-each select="document('content.xml')">
+
+        <!-- hyperlinks relationships. Do not pick up hyperlinks other than those coming from footnotes.  -->
         <xsl:call-template name="InsertHyperlinksRelationships">
-          <xsl:with-param name="hyperlinks" select="key('hyperlinks', '')[ancestor::text:note/@text:note-class = 'endnote' ]"/>
-        </xsl:call-template>  
-      </xsl:for-each>
-      
-      <xsl:for-each select="document('content.xml')">
-        <xsl:call-template name="InsertImagesRelationships">
-          <xsl:with-param name="images" select="key('images', '')[ancestor::text:note/@text:note-class = 'endnote' ]"/>
+          <xsl:with-param name="hyperlinks"
+            select="key('hyperlinks', '')[ancestor::text:note/@text:note-class = 'endnote' ]"/>
         </xsl:call-template>
+
+        <xsl:call-template name="InsertImagesRelationships">
+          <xsl:with-param name="images"
+            select="key('images', '')[ancestor::text:note/@text:note-class = 'endnote' ]"/>
+        </xsl:call-template>
+
       </xsl:for-each>
-      
     </Relationships>
   </xsl:template>
 

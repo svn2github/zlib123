@@ -110,7 +110,7 @@
 
   <xsl:template name="HeaderFooter">
     <xsl:param name="master-page"/>
-    
+
     <xsl:variable name="type">
       <xsl:choose>
         <xsl:when test="$master-page/@style:name='First_20_Page'">first</xsl:when>
@@ -131,7 +131,7 @@
     <xsl:param name="master-page"/>
     <xsl:if test="$master-page and $master-page[@style:name = 'First_20_Page']">
       <w:titlePg/>
-      </xsl:if>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="EvenAndOddConfiguration">
@@ -155,27 +155,35 @@
     </w:fldSimple>
   </xsl:template>
 
-  <xsl:template name="headerFooter-relationships">
+  <!-- Headers/Footers part relationships construction -->
+  <xsl:template name="InsertHeaderFooterInternalRelationships">
     <xsl:param name="node"/>
     <xsl:variable name="masterPageName" select="$node/ancestor::style:master-page[1]/@style:name"/>
-    
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      
-      <!-- hyperlinks relationships. -->
-      <xsl:call-template name="InsertHyperlinksRelationships">
-        <xsl:with-param name="hyperlinks" select="key('hyperlinks', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"/>
-      </xsl:call-template>
-      
-      <!-- OLE objects relationships -->
-      <xsl:call-template name="InsertOleObjectsRelationships">
-        <xsl:with-param name="oleObjects" select="key('ole-objects', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"/>
-      </xsl:call-template>
-      
-      <!-- Images relationships -->
-      <xsl:call-template name="InsertImagesRelationships">
-        <xsl:with-param name="images" select="key('images', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"/>
-      </xsl:call-template>
-      
+      <xsl:for-each select="document('styles.xml')">
+
+        <!-- hyperlinks -->
+        <xsl:call-template name="InsertHyperlinksRelationships">
+          <xsl:with-param name="hyperlinks"
+            select="key('hyperlinks', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"
+          />
+        </xsl:call-template>
+
+        <!-- OLE -->
+        <xsl:call-template name="InsertOleObjectsRelationships">
+          <xsl:with-param name="oleObjects"
+            select="key('ole-objects', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"
+          />
+        </xsl:call-template>
+
+        <!-- Images -->
+        <xsl:call-template name="InsertImagesRelationships">
+          <xsl:with-param name="images"
+            select="key('images', '')[ancestor::style:master-page[@style:name=$masterPageName] and ancestor::*[name()=name($node)]]"
+          />
+        </xsl:call-template>
+
+      </xsl:for-each>
     </Relationships>
   </xsl:template>
 </xsl:stylesheet>

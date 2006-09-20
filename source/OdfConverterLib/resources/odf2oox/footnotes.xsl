@@ -32,7 +32,8 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   exclude-result-prefixes="text style office xlink draw pzip">
 
   <!-- Group footnotes under the same key -->
@@ -84,7 +85,7 @@
     </w:footnotes>
   </xsl:template>
 
-  
+
 
   <!-- footnotes configuration -->
   <xsl:template match="text:notes-configuration[@text:note-class='footnote']" mode="note">
@@ -106,7 +107,7 @@
           </w:pos>
         </xsl:when>
       </xsl:choose>
-      
+
       <xsl:if test="@style:num-format">
         <w:numFmt>
           <xsl:attribute name="w:val">
@@ -144,30 +145,30 @@
         <w:footnote w:id="0"/>
         <w:footnote w:id="1"/>
       </xsl:if>
-        
+
     </w:footnotePr>
   </xsl:template>
 
 
 
-
-  <xsl:template name="footnotes-relationships">
+  <!-- Footnotes internal relationships -->
+  <xsl:template name="InsertFootnotesInternalRelationships">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      
-      <!-- hyperlinks relationships. Do not pick up hyperlinks other than those coming from footnotes.  -->
       <xsl:for-each select="document('content.xml')">
-        <xsl:call-template name="InsertHyperlinksRelationships">
-          <xsl:with-param name="hyperlinks" select="key('hyperlinks', '')[ancestor::text:note/@text:note-class = 'footnote' ]"/>
-        </xsl:call-template>  
-      </xsl:for-each>
 
-      <xsl:for-each select="document('content.xml')">
-        <xsl:call-template name="InsertImagesRelationships">
-          <xsl:with-param name="images" select="key('images', '')[ancestor::text:note/@text:note-class = 'footnote' ]"/>
+        <!-- hyperlinks relationships. Do not pick up hyperlinks other than those coming from footnotes.  -->
+        <xsl:call-template name="InsertHyperlinksRelationships">
+          <xsl:with-param name="hyperlinks"
+            select="key('hyperlinks', '')[ancestor::text:note/@text:note-class = 'footnote' ]"/>
         </xsl:call-template>
+
+        <xsl:call-template name="InsertImagesRelationships">
+          <xsl:with-param name="images"
+            select="key('images', '')[ancestor::text:note/@text:note-class = 'footnote' ]"/>
+        </xsl:call-template>
+        
       </xsl:for-each>
-      
-      </Relationships>
+    </Relationships>
   </xsl:template>
 
 </xsl:stylesheet>

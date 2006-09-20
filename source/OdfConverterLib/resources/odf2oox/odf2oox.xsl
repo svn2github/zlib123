@@ -100,7 +100,7 @@
 
       <!-- footnotes part relationships -->
       <pzip:entry pzip:target="word/_rels/footnotes.xml.rels">
-        <xsl:call-template name="footnotes-relationships"/>
+        <xsl:call-template name="InsertFootnotesInternalRelationships"/>
       </pzip:entry>
 
       <!-- endnotes -->
@@ -110,7 +110,7 @@
 
       <!-- endnotes part relationships -->
       <pzip:entry pzip:target="word/_rels/endnotes.xml.rels">
-        <xsl:call-template name="endnotes-relationships"/>
+        <xsl:call-template name="InsertEndnotesInternalRelationships"/>
       </pzip:entry>
 
       <!-- Comment   -->
@@ -139,7 +139,7 @@
           <xsl:attribute name="pzip:target">
             <xsl:value-of select="concat('word/_rels/header',$position,'.xml.rels')"/>
           </xsl:attribute>
-          <xsl:call-template name="headerFooter-relationships">
+          <xsl:call-template name="InsertHeaderFooterInternalRelationships">
             <xsl:with-param name="node" select="style:header"/>
           </xsl:call-template>
         </pzip:entry>
@@ -157,7 +157,7 @@
           <xsl:attribute name="pzip:target">
             <xsl:value-of select="concat('word/_rels/footer',$position,'.xml.rels')"/>
           </xsl:attribute>
-          <xsl:call-template name="headerFooter-relationships">
+          <xsl:call-template name="InsertHeaderFooterInternalRelationships">
             <xsl:with-param name="node" select="style:footer"/>
           </xsl:call-template>
         </pzip:entry>
@@ -181,7 +181,7 @@
 
       <!-- part relationship item -->
       <pzip:entry pzip:target="word/_rels/document.xml.rels">
-        <xsl:call-template name="part_relationships"/>
+        <xsl:call-template name="InsertPartRelationships"/>
       </pzip:entry>
 
       <!-- content types -->
