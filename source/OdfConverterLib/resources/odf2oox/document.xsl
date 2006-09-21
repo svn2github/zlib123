@@ -665,23 +665,20 @@
 
       <!-- Indent to add to numbering values. -->
       <xsl:variable name="addLeftIndent">
-        <xsl:call-template name="ComputeParagraphIndent">
+        <xsl:call-template name="ComputeAdditionalIndent">
           <xsl:with-param name="side" select="'left'"/>
-          <xsl:with-param name="node" select="key('automatic-styles',$styleName)"/>
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="addRightIndent">
-        <xsl:call-template name="ComputeParagraphIndent">
+        <xsl:call-template name="ComputeAdditionalIndent">
           <xsl:with-param name="side" select="'right'"/>
-          <xsl:with-param name="node" select="key('automatic-styles',$styleName)"/>
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="firstLineIndent">
         <xsl:call-template name="GetFirstLineIndent">
-          <xsl:with-param name="node" select="key('automatic-styles',$styleName)"/>
-          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
         </xsl:call-template>
       </xsl:variable>
 

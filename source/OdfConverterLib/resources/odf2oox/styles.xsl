@@ -42,6 +42,7 @@
   <!-- keys definition -->
   <xsl:key name="styles" match="office:styles/style:style" use="@style:name"/>
 
+  
   <xsl:template name="styles">
     <w:styles>
       <w:docDefaults>
@@ -67,8 +68,7 @@
         select="document('content.xml')/office:document-content/office:automatic-styles"
         mode="styles"/>
       <xsl:apply-templates
-        select="document('styles.xml')/office:document-styles/office:automatic-styles" mode="styles"
-      />
+        select="document('styles.xml')/office:document-styles/office:automatic-styles" mode="styles"/>
       <w:style w:type="character" w:styleId="Hyperlink">
         <w:name w:val="Hyperlink"/>
         <w:rPr>
@@ -99,19 +99,20 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- styles -->
-  <xsl:template match="style:style" mode="styles">
 
+  <xsl:template match="style:style" mode="styles">
     <xsl:variable name="prefixedStyleName">
       <xsl:call-template name="GetPrefixedStyleName">
         <xsl:with-param name="styleName" select="@style:name"/>
       </xsl:call-template>
     </xsl:variable>
-
     <w:style>
+      <!-- Logical name -->
       <xsl:attribute name="w:styleId">
         <xsl:value-of select="$prefixedStyleName"/>
       </xsl:attribute>
+      
+      <!-- Style family -->
       <xsl:choose>
         <xsl:when test="@style:family = 'text' ">
           <xsl:attribute name="w:type">character</xsl:attribute>
@@ -141,9 +142,8 @@
           <xsl:attribute name="w:type">character</xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
-
-      <!-- Nested elements-->
-
+      
+      <!-- Display name-->
       <xsl:choose>
         <xsl:when test="@style:display-name">
           <w:name w:val="{@style:display-name}"/>
@@ -154,47 +154,53 @@
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
-
+      
+      <!-- Parent style name -->
       <xsl:if test="@style:parent-style-name">
         <w:basedOn w:val="{@style:parent-style-name}"/>
       </xsl:if>
+      
+      <!-- Next style name -->
       <xsl:if test="@style:next-style-name">
         <w:next w:val="{@style:next-style-name}"/>
       </xsl:if>
-
-      <!-- Automatic-styles are not displayed -->
-      <xsl:if test="key('automatic-styles',@style:name)">
+      
+      <!-- Hide automatic-styles -->
+      <xsl:if test="key('automatic-styles', @style:name)">
         <w:hidden/>
       </xsl:if>
-
-      <!-- COMMENT: what is this for? -->
+      
+      <!-- QuickFormat style -->
       <w:qFormat/>
-
+      
+      <!-- style's paragraph properties -->
       <w:pPr>
         <xsl:apply-templates mode="pPr"/>
       </w:pPr>
-
+      
+      <!-- style's text properties -->
       <w:rPr>
         <xsl:apply-templates mode="rPr"/>
       </w:rPr>
-
+      
     </w:style>
   </xsl:template>
 
-  <!-- ignored (default styles already managed) -->
-  <xsl:template match="style:default-style" mode="styles"/>
 
-  <!-- paragraph properties -->
+
+  <!-- Paragraph properties -->
   <xsl:template match="style:paragraph-properties" mode="pPr">
-
+    <!-- keep with next -->
     <xsl:if test="@fo:keep-with-next='always'">
       <w:keepNext/>
     </xsl:if>
-
+    
+    <!-- keep together -->
     <xsl:if test="@fo:keep-together='always'">
       <w:keepLines/>
     </xsl:if>
-
+    
+    <!-- page break before -->
     <xsl:choose>
       <xsl:when test="@fo:break-before='page'">
         <w:pageBreakBefore/>
@@ -204,7 +210,8 @@
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
-
+    
+    <!-- widow/orphan control -->
     <xsl:choose>
       <xsl:when test="@fo:widows != '0' or @fo:orphans != '0'">
         <w:widowControl w:val="on"/>
@@ -213,7 +220,7 @@
         <w:widowControl w:val="off"/>
       </xsl:otherwise>
     </xsl:choose>
-
+    
     <!-- border color + padding  -->
     <xsl:choose>
       <xsl:when test="@fo:border and @fo:border != 'none' ">
@@ -240,8 +247,8 @@
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
-
-    <!-- background color -->
+    
+    <!-- Background color -->
     <xsl:if test="@fo:background-color and (@fo:background-color != 'transparent')">
       <w:shd>
         <xsl:attribute name="w:val">clear</xsl:attribute>
@@ -252,42 +259,12 @@
         </xsl:attribute>
       </w:shd>
     </xsl:if>
-
-    <!-- tabs -->
+    
+    <!-- Tabs -->
     <xsl:if test="style:tab-stops/style:tab-stop">
-      <w:tabs>
-        <xsl:for-each select="style:tab-stops/style:tab-stop">
-          <xsl:call-template name="tabStop"/>
-        </xsl:for-each>
-        <!-- clear parent tabs if needed. -->
-        <xsl:variable name="styleName">
-          <xsl:value-of select="parent::node()/@style:name"/>
-        </xsl:variable>
-        <xsl:variable name="parentstyleName">
-          <xsl:value-of select="parent::node()/@style:parent-style-name"/>
-        </xsl:variable>
-        <xsl:for-each select="document('styles.xml')">
-          <xsl:for-each select="key('styles',$parentstyleName)//style:tab-stop">
-            <xsl:variable name="parentPosition" select="@style:position"/>
-            <xsl:variable name="clear">
-              <xsl:for-each select="document('content.xml')">
-                <xsl:if
-                  test="not($parentPosition=key('automatic-styles',$styleName)//style:tab-stop/@style:position)">
-                  <xsl:value-of select="'true'"/>
-                </xsl:if>
-              </xsl:for-each>
-            </xsl:variable>
-            <!-- clear the tab, from the parent style context. -->
-            <xsl:if test="$clear='true'">
-              <xsl:call-template name="tabStop">
-                <xsl:with-param name="styleType">clear</xsl:with-param>
-              </xsl:call-template>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:for-each>
-      </w:tabs>
+      <xsl:call-template name="ComputeParagraphTabs"/>
     </xsl:if>
-
+    
     <!-- Override hyphenation -->
     <xsl:choose>
       <xsl:when test="parent::node()/style:text-properties/@fo:hyphenate='true'">
@@ -297,7 +274,8 @@
         <w:suppressAutoHyphens w:val="true"/>
       </xsl:otherwise>
     </xsl:choose>
-
+    
+    <!-- Auto space -->
     <xsl:if test="@style:text-autospace">
       <w:autoSpaceDN>
         <xsl:choose>
@@ -310,111 +288,20 @@
         </xsl:choose>
       </w:autoSpaceDN>
     </xsl:if>
-
+    
+    <!-- Spacing -->
     <xsl:if
       test="@style:line-height-at-least or @fo:line-height or @fo:margin-bottom or @fo:margin-top or @style:line-spacing">
-      <w:spacing>
-        <xsl:if test="@style:line-height-at-least">
-          <xsl:attribute name="w:lineRule">atLeast</xsl:attribute>
-          <xsl:attribute name="w:line">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@style:line-height-at-least"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="@style:line-spacing">
-          <xsl:variable name="spacing">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@style:line-spacing"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:attribute name="w:lineRule">auto</xsl:attribute>
-          <xsl:attribute name="w:line">
-            <xsl:value-of select="240+$spacing"/>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="contains(@fo:line-height, '%')">
-          <xsl:attribute name="w:lineRule">auto</xsl:attribute>
-          <xsl:attribute name="w:line">
-            <xsl:value-of
-              select="round(number(substring-before(@fo:line-height, '%')) * 240 div 100)"/>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="contains(@fo:line-height, 'cm')">
-          <xsl:attribute name="w:lineRule">exact</xsl:attribute>
-          <xsl:attribute name="w:line">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@fo:line-height"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="@fo:margin-bottom">
-          <xsl:attribute name="w:after">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@fo:margin-bottom"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="@fo:margin-top">
-          <xsl:attribute name="w:before">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@fo:margin-top"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-      </w:spacing>
+      <xsl:call-template name="ComputeParagraphSpacing"/>
     </xsl:if>
-
+    
+    <!-- indent -->
     <xsl:if
       test="@fo:margin-left or @fo:margin-right or @fo:text-indent or @text:space-before or @fo:padding or @fo:padding-left or @fo:padding-right">
-      <w:ind>
-        <xsl:variable name="parentStyleName" select="parent::style:style/@style:parent-style-name"/>
-        <xsl:variable name="leftIndent">
-          <xsl:call-template name="ComputeParagraphIndent">
-            <xsl:with-param name="side" select="'left'"/>
-            <xsl:with-param name="node" select="parent::style:style"/>
-            <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="rightIndent">
-          <xsl:call-template name="ComputeParagraphIndent">
-            <xsl:with-param name="side" select="'right'"/>
-            <xsl:with-param name="node" select="parent::style:style"/>
-            <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
-          </xsl:call-template>
-        </xsl:variable>
-
-        <xsl:attribute name="w:left">
-          <xsl:value-of select="$leftIndent"/>
-        </xsl:attribute>
-        <xsl:attribute name="w:right">
-          <xsl:value-of select="$rightIndent"/>
-        </xsl:attribute>
-
-        <xsl:variable name="firstLineIndent">
-          <xsl:call-template name="GetFirstLineIndent">
-            <xsl:with-param name="node" select="parent::style:style"/>
-            <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:if test="$firstLineIndent != 0">
-          <xsl:choose>
-            <xsl:when test="$firstLineIndent &lt; 0">
-              <xsl:attribute name="w:hanging">
-                <xsl:value-of select="-$firstLineIndent"/>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:attribute name="w:firstLine">
-                <xsl:value-of select="$firstLineIndent"/>
-              </xsl:attribute>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:if>
-      </w:ind>
+      <xsl:call-template name="ComputeParagraphIndent"/>
     </xsl:if>
-
-    <!-- TODO this should be modified when we will manage bidi properties -->
+    
+    <!-- Paragraph alignment -->
     <xsl:if test="@fo:text-align">
       <w:jc>
         <xsl:choose>
@@ -434,10 +321,10 @@
             <xsl:attribute name="w:val">start</xsl:attribute>
           </xsl:otherwise>
         </xsl:choose>
-
       </w:jc>
     </xsl:if>
-
+    
+    <!-- Vertical alignment of all text on each line of the paragraph -->
     <xsl:if test="@style:vertical-align">
       <w:textAlignment>
         <xsl:choose>
@@ -458,7 +345,9 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- paragraph properties from text-properties -->
+  
+  
+  <!-- Paragraph properties from text-properties -->
   <xsl:template match="style:text-properties" mode="pPr">
     <xsl:if test="not(parent::node()/style:paragraph-properties)">
       <xsl:choose>
@@ -472,12 +361,152 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- text-properties -->
+  
+  
+  <!-- Paragraph tabs property -->
+  <xsl:template name="ComputeParagraphTabs">
+    <w:tabs>
+      <xsl:for-each select="style:tab-stops/style:tab-stop">
+        <xsl:call-template name="tabStop"/>
+      </xsl:for-each>
+      
+      <!-- clear parent tabs if needed. -->
+      <xsl:variable name="styleName">
+        <xsl:value-of select="parent::node()/@style:name"/>
+      </xsl:variable>
+      <xsl:variable name="parentstyleName">
+        <xsl:value-of select="parent::node()/@style:parent-style-name"/>
+      </xsl:variable>
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:for-each select="key('styles', $parentstyleName)[1]//style:tab-stop">
+          <xsl:variable name="parentPosition" select="@style:position"/>
+          <xsl:variable name="clear">
+            <xsl:for-each select="document('content.xml')">
+              <!-- TODO : Aren't key('automatic-styles', $styleName)[1] and parent::node() the same, here ? -->
+              <xsl:if
+                test="not($parentPosition = key('automatic-styles', $styleName)[1]//style:tab-stop/@style:position)">
+                <xsl:value-of select="'true'"/>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:variable>
+          <!-- clear the tab, from the parent style context. -->
+          <xsl:if test="$clear = 'true' ">
+            <xsl:call-template name="tabStop">
+              <xsl:with-param name="styleType">clear</xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:for-each>
+    </w:tabs>
+  </xsl:template>
+
+
+  
+  <!-- Paragraph spacing property -->
+  <xsl:template name="ComputeParagraphSpacing">
+    <w:spacing>
+      <xsl:if test="@style:line-height-at-least">
+        <xsl:attribute name="w:lineRule">atLeast</xsl:attribute>
+        <xsl:attribute name="w:line">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@style:line-height-at-least"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@style:line-spacing">
+        <xsl:variable name="spacing">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@style:line-spacing"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:attribute name="w:lineRule">auto</xsl:attribute>
+        <xsl:attribute name="w:line">
+          <xsl:value-of select="240+$spacing"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="contains(@fo:line-height, '%')">
+        <xsl:attribute name="w:lineRule">auto</xsl:attribute>
+        <xsl:attribute name="w:line">
+          <!-- w:line expressed in 240ths of a line height when w:lineRule='auto' -->
+          <xsl:value-of select="round(number(substring-before(@fo:line-height, '%')) * 240 div 100)"
+          />
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="contains(@fo:line-height, 'cm')">
+        <xsl:attribute name="w:lineRule">exact</xsl:attribute>
+        <xsl:attribute name="w:line">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:line-height"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@fo:margin-bottom">
+        <xsl:attribute name="w:after">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:margin-bottom"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@fo:margin-top">
+        <xsl:attribute name="w:before">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:margin-top"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+    </w:spacing>
+  </xsl:template>
+
+  
+  
+  <!-- Paragraph indent property -->
+  <xsl:template name="ComputeParagraphIndent">
+    <w:ind>
+      <xsl:variable name="parentStyleName" select="parent::style:style/@style:parent-style-name"/>
+      <!-- left indent -->
+      <xsl:attribute name="w:left">
+        <xsl:call-template name="ComputeAdditionalIndent">
+          <xsl:with-param name="side" select="'left'"/>
+          <xsl:with-param name="style" select="parent::style:style"/>
+        </xsl:call-template>
+      </xsl:attribute>
+      <!-- right indent -->
+      <xsl:attribute name="w:right">
+        <xsl:call-template name="ComputeAdditionalIndent">
+          <xsl:with-param name="side" select="'right'"/>
+          <xsl:with-param name="style" select="parent::style:style"/>
+        </xsl:call-template>
+      </xsl:attribute>
+      <!-- first line indent -->
+      <xsl:variable name="firstLineIndent">
+        <xsl:call-template name="GetFirstLineIndent">
+          <xsl:with-param name="style" select="parent::style:style"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="$firstLineIndent != 0">
+        <xsl:choose>
+          <xsl:when test="$firstLineIndent &lt; 0">
+            <xsl:attribute name="w:hanging">
+              <xsl:value-of select="-$firstLineIndent"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="w:firstLine">
+              <xsl:value-of select="$firstLineIndent"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </w:ind>
+  </xsl:template>
+
+
+  
+  <!-- Text properties 
+         param onlyToggle : only process "toggle properties" when 'true' -->
   <xsl:template match="style:text-properties" mode="rPr">
     <xsl:param name="onlyToggle"/>
-
     <!-- toggle properties -->
-
     <xsl:if test="@fo:font-weight">
       <xsl:choose>
         <xsl:when test="@fo:font-weight != 'normal'">
@@ -530,7 +559,6 @@
         <xsl:when test="@fo:text-transform = 'none' or @fo:font-variant = 'small-caps'">
           <w:caps w:val="off"/>
         </xsl:when>
-        <!-- It could be also lowercase or capitalize in fo DTD, but it is not possible to set it via word 2007 interface -->
       </xsl:choose>
     </xsl:if>
 
@@ -692,8 +720,8 @@
         <xsl:attribute name="w:val">
           <!-- Value must be a string (no RGB value authorized). -->
           <xsl:choose>
-            <xsl:when test="@fo:background-color = 'transparent'">none</xsl:when>
-            <xsl:when test="not(substring(@fo:background-color, 1,1)='#')">
+            <xsl:when test="@fo:background-color = 'transparent' ">none</xsl:when>
+            <xsl:when test="not(substring(@fo:background-color, 1,1) = '#' )">
               <xsl:value-of select="@fo:background-color"/>
             </xsl:when>
             <xsl:otherwise>
@@ -710,22 +738,19 @@
       <w:em>
         <xsl:attribute name="w:val">
           <xsl:choose>
-            <xsl:when test="@style:text-emphasize = 'accent above'">comma</xsl:when>
-            <xsl:when test="@style:text-emphasize = 'dot above'">dot</xsl:when>
-            <xsl:when test="@style:text-emphasize = 'circle above'">circle</xsl:when>
-            <xsl:when test="@style:text-emphasize = 'dot below'">underDot</xsl:when>
+            <xsl:when test="@style:text-emphasize = 'accent above' ">comma</xsl:when>
+            <xsl:when test="@style:text-emphasize = 'dot above' ">dot</xsl:when>
+            <xsl:when test="@style:text-emphasize = 'circle above' ">circle</xsl:when>
+            <xsl:when test="@style:text-emphasize = 'dot below' ">underDot</xsl:when>
             <xsl:otherwise>none</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
       </w:em>
     </xsl:if>
-
     <!-- end of toggle properties -->
 
     <!-- non-toggle properties -->
-
-    <xsl:if test="$onlyToggle!='true'">
-
+    <xsl:if test="$onlyToggle != 'true' ">
       <xsl:if test="@style:font-name">
         <w:rFonts>
           <xsl:if test="@style:font-name">
@@ -779,7 +804,6 @@
                 </xsl:call-template>
               </xsl:otherwise>
             </xsl:choose>
-
           </xsl:attribute>
         </w:spacing>
       </xsl:if>
@@ -801,7 +825,7 @@
         </w:w>
       </xsl:if>
 
-      <xsl:if test="@style:letter-kerning = 'true'">
+      <xsl:if test="@style:letter-kerning = 'true' ">
         <w:kern w:val="16"/>
       </xsl:if>
 
@@ -826,10 +850,10 @@
 
       <xsl:if test="@style:text-position">
         <xsl:choose>
-          <xsl:when test="substring(@style:text-position, 1, 3) = 'sub'">
+          <xsl:when test="substring(@style:text-position, 1, 3) = 'sub' ">
             <w:vertAlign w:val="subscript"/>
           </xsl:when>
-          <xsl:when test="substring(@style:text-position, 1, 5) = 'super'">
+          <xsl:when test="substring(@style:text-position, 1, 5) = 'super' ">
             <w:vertAlign w:val="superscript"/>
           </xsl:when>
           <xsl:otherwise>
@@ -899,7 +923,7 @@
               <xsl:attribute name="w:combine">lines</xsl:attribute>
               <xsl:choose>
                 <xsl:when
-                  test="@style:text-combine-start-char = '&lt;' and @style:text-combine-end-char = '&gt;'">
+                  test="@style:text-combine-start-char = '&lt;' and @style:text-combine-end-char = '&gt;' ">
                   <xsl:attribute name="w:combineBrackets">angle</xsl:attribute>
                 </xsl:when>
                 <xsl:when
@@ -922,11 +946,12 @@
           </xsl:when>
         </xsl:choose>
       </xsl:if>
-
     </xsl:if>
     <!-- end of non-toggle properties -->
   </xsl:template>
 
+
+  
   <!-- footnote and endnote reference and text styles -->
   <xsl:template
     match="text:notes-configuration[@text:note-class='footnote'] | text:notes-configuration[@text:note-class='endnote']"
@@ -946,6 +971,11 @@
     </w:style>
   </xsl:template>
 
+  
+
+  <!-- Font size computation 
+        Context must be document('styles.xml')
+    -->
   <xsl:template name="computeSize">
     <xsl:param name="node"/>
     <xsl:if test="contains($node/@fo:font-size, 'pt')">
@@ -957,10 +987,8 @@
       <xsl:variable name="value">
         <xsl:call-template name="computeSize">
           <!-- should we look for @style:name in styles.xml, otherwise in content.xml ? -->
-          <!-- COMMENT: please use a key and ensure we handle every case (see above) -->
           <xsl:with-param name="node"
-            select="/office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:text-properties"
-          />
+            select="key('styles', $parentStyleName)[1]/style:text-properties"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:choose>
@@ -980,13 +1008,15 @@
           />
         </xsl:otherwise>
       </xsl:choose>
-
     </xsl:if>
   </xsl:template>
 
+  
+  <!-- Single tab-stop processing -->
   <xsl:template name="tabStop">
     <xsl:param name="styleType"/>
     <w:tab>
+      <!-- position of the tab stop with respect to the current page margin -->
       <xsl:attribute name="w:pos">
         <xsl:variable name="margin">
           <xsl:call-template name="twips-measure">
@@ -1018,34 +1048,40 @@
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length" select="@style:position"/>
           </xsl:call-template>
-          
         </xsl:variable>
         <xsl:variable name="columnNumber">
           <xsl:choose>
-            <xsl:when test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns[@fo:column-count > 0]">
-              <xsl:value-of select = "document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-count"/>
+            <!-- TODO : There can be many page-layouts in the document.
+                We need to know the master page in which our object is located. Then, we'll get the right page-layout.
+                pageLayoutName = key('master-pages', $masterPageName)[1]/@style:page-layout-name
+                key('page-layouts', $pageLayoutName)[1]/style:page-layout-properties/style:columns[@fo:column-count > 0]
+              -->
+            <xsl:when
+              test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns[@fo:column-count > 0]">
+              <xsl:value-of
+                select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-count"
+              />
             </xsl:when>
             <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
         <xsl:variable name="columnGap">
           <xsl:choose>
-            <xsl:when test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap">
+            <xsl:when
+              test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap">
               <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap"/>
+                <xsl:with-param name="length"
+                  select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap"
+                />
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
-
-          
-
         </xsl:variable>
-
-        <xsl:value-of select="round(($margin + $position - $columnGap) div $columnNumber)"/> 
-
-       
+        <xsl:value-of select="round(($margin + $position - $columnGap) div $columnNumber)"/>
       </xsl:attribute>
+      
+      <!-- tab stop type -->
       <xsl:attribute name="w:val">
         <xsl:choose>
           <xsl:when test="@style:type">
@@ -1057,37 +1093,38 @@
           <xsl:otherwise>left</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
+      
+      <!-- tab leader character -->
       <xsl:attribute name="w:leader">
         <xsl:choose>
           <xsl:when test="@style:leader-text">
             <xsl:choose>
-              <xsl:when test="@style:leader-text='.'">
+              <xsl:when test="@style:leader-text = '.' ">
                 <xsl:value-of select="'dot'"/>
               </xsl:when>
-              <xsl:when test="@style:leader-text='-'">
+              <xsl:when test="@style:leader-text = '-' ">
                 <xsl:value-of select="'hyphen'"/>
               </xsl:when>
-              <xsl:when test="@style:leader-text='_'">
+              <xsl:when test="@style:leader-text = '_' ">
                 <xsl:value-of select="'heavy'"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="'none'"/>
               </xsl:otherwise>
             </xsl:choose>
-
           </xsl:when>
           <xsl:when test="@style:leader-style and not(@style:leader-text)">
             <xsl:choose>
-              <xsl:when test="@style:leader-style='dotted'">
+              <xsl:when test="@style:leader-style = 'dotted' ">
                 <xsl:value-of select="'dot'"/>
               </xsl:when>
-              <xsl:when test="@style:leader-style='solid'">
+              <xsl:when test="@style:leader-style = 'solid' ">
                 <xsl:value-of select="'heavy'"/>
               </xsl:when>
-              <xsl:when test="@style:leader-style='dash'">
+              <xsl:when test="@style:leader-style = 'dash' ">
                 <xsl:value-of select="'hyphen'"/>
               </xsl:when>
-              <xsl:when test="@style:leader-style='dotted'">
+              <xsl:when test="@style:leader-style = 'dotted' ">
                 <xsl:value-of select="'dot'"/>
               </xsl:when>
               <xsl:otherwise>
@@ -1105,100 +1142,31 @@
 
   <!-- Page Layout Properties -->
   <xsl:template match="style:page-layout-properties" mode="master-page">
+    <!-- page size -->
     <xsl:choose>
       <xsl:when
         test="not(@style:print-orientation) and not(@fo:page-width) and not(@fo:page-height)">
         <xsl:apply-templates
-          select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout[@style:name='pm1']/style:page-layout-properties"
-          mode="properties"/>
+          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties"
+          mode="master-page"/>
       </xsl:when>
       <xsl:otherwise>
-        <w:pgSz>
-          <xsl:if test="@style:print-orientation != 'none' ">
-            <xsl:attribute name="w:orient">
-              <xsl:choose>
-                <xsl:when test="@style:print-orientation = 'landscape' ">landscape</xsl:when>
-                <xsl:otherwise>portrait</xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:page-width != 'none' ">
-            <xsl:attribute name="w:w">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:page-width"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:page-height != 'none' ">
-            <xsl:attribute name="w:h">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:page-height"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-        </w:pgSz>
+        <xsl:call-template name="ComputePageSize"/>
       </xsl:otherwise>
     </xsl:choose>
-
+    <!-- page margins -->
     <xsl:choose>
       <xsl:when
         test="@fo:margin-top ='none' and @fo:margin-left='none' and @fo:margin-bottom='none'  and @fo:margin-right='none' ">
         <xsl:apply-templates
-          select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout[@style:name='pm1']/style:page-layout-properties"
-          mode="properties"/>
+          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties"
+          mode="master-page"/>
       </xsl:when>
       <xsl:otherwise>
-        <w:pgMar>
-          <xsl:if test="@fo:margin-top != 'none' ">
-            <xsl:attribute name="w:top">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:margin-top"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:margin-left != 'none' ">
-            <xsl:attribute name="w:left">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:margin-left"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:margin-bottom != 'none' ">
-            <xsl:attribute name="w:bottom">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:margin-bottom"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:margin-right != 'none' ">
-            <xsl:attribute name="w:right">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:margin-right"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <!-- not in odt : header and footer distance from page -->
-          <xsl:if test="@fo:margin-top != 'none' ">
-            <xsl:attribute name="w:header">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:margin-top"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@fo:margin-bottom != 'none' ">
-            <xsl:attribute name="w:footer">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:margin-bottom"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <!-- Don't exist in odt format -->
-          <xsl:attribute name="w:gutter">0</xsl:attribute>
-        </w:pgMar>
+        <xsl:call-template name="ComputePageMargins"/>
       </xsl:otherwise>
     </xsl:choose>
-
-    <!-- border -->
+    <!-- page borders -->
     <xsl:choose>
       <xsl:when test="@fo:border and @fo:border != 'none' ">
         <w:pgBorders>
@@ -1224,9 +1192,89 @@
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
-    
+    <!-- page columns -->
     <xsl:apply-templates select="style:columns" mode="columns"/>
   </xsl:template>
+
+  <!-- Page size and orientation properties -->
+  <xsl:template name="ComputePageSize">
+    <w:pgSz>
+      <xsl:if test="@style:print-orientation != 'none' ">
+        <xsl:attribute name="w:orient">
+          <xsl:choose>
+            <xsl:when test="@style:print-orientation = 'landscape' ">landscape</xsl:when>
+            <xsl:otherwise>portrait</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@fo:page-width != 'none' ">
+        <xsl:attribute name="w:w">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:page-width"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@fo:page-height != 'none' ">
+        <xsl:attribute name="w:h">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:page-height"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+    </w:pgSz>
+  </xsl:template>
+
+  <!-- Page margin properties -->
+  <xsl:template name="ComputePageMargins">
+    <w:pgMar>
+      <xsl:if test="@fo:margin-top != 'none' ">
+        <xsl:attribute name="w:top">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:margin-top"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@fo:margin-left != 'none' ">
+        <xsl:attribute name="w:left">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:margin-left"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@fo:margin-bottom != 'none' ">
+        <xsl:attribute name="w:bottom">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:margin-bottom"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@fo:margin-right != 'none' ">
+        <xsl:attribute name="w:right">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:margin-right"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <!-- not in odt : header and footer distance from page -->
+      <xsl:if test="@fo:margin-top != 'none' ">
+        <xsl:attribute name="w:header">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:margin-top"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@fo:margin-bottom != 'none' ">
+        <xsl:attribute name="w:footer">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="@fo:margin-bottom"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <!-- Don't exist in odt format -->
+      <xsl:attribute name="w:gutter">0</xsl:attribute>
+    </w:pgMar>
+  </xsl:template>
+
 
   <xsl:template match="style:columns" mode="columns">
     <w:cols>
@@ -1242,7 +1290,6 @@
           <xsl:value-of select="1"/>
         </xsl:attribute>
       </xsl:if>
-
       <xsl:choose>
         <xsl:when test="@fo:column-gap">
           <xsl:attribute name="w:space">
@@ -1257,8 +1304,7 @@
           </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
-
-      <!-- each column -->
+      <!-- for each column -->
       <xsl:for-each select="style:column">
         <w:col>
           <!-- the left and right spaces -->
@@ -1267,20 +1313,17 @@
               <xsl:with-param name="length" select="@fo:start-indent"/>
             </xsl:call-template>
           </xsl:variable>
-
           <xsl:variable name="end">
             <xsl:call-template name="twips-measure">
               <xsl:with-param name="length" select="@fo:end-indent"/>
             </xsl:call-template>
           </xsl:variable>
-
           <xsl:variable name="width">
             <xsl:value-of select="number($start + $end)"/>
           </xsl:variable>
-
           <!-- space -->
           <xsl:attribute name="w:space">
-            <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent -->
+            <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent ) -->
             <xsl:choose>
               <xsl:when test="following-sibling::style:column/@fo:start-indent">
                 <xsl:variable name="followingStart">
@@ -1296,18 +1339,17 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
-
           <!-- width -->
           <xsl:attribute name="w:w">
             <xsl:value-of select="substring-before(@style:rel-width,'*') - $width"/>
           </xsl:attribute>
         </w:col>
       </xsl:for-each>
-
     </w:cols>
   </xsl:template>
 
 
+  <!-- Section properties -->
   <xsl:template match="style:section-properties" mode="section">
     <xsl:apply-templates select="style:columns" mode="columns"/>
   </xsl:template>
@@ -1316,7 +1358,6 @@
   <!-- Insert borders, depending on allSides bool. If true, create all borders. -->
   <xsl:template name="InsertBorders">
     <xsl:param name="allSides" select="'false'"/>
-
     <xsl:if test="$allSides='true' or (@fo:border-top and (@fo:border-top != 'none'))">
       <w:top>
         <xsl:call-template name="border">
@@ -1377,6 +1418,7 @@
     </xsl:if>
   </xsl:template>
 
+
   <!-- Attributes of a border element. -->
   <xsl:template name="border">
     <xsl:param name="side"/>
@@ -1397,17 +1439,17 @@
           </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="attribute::node()[name()=concat('fo:border-',$side)]"/>
+          <xsl:value-of select="@*[name()=concat('fo:border-', $side)]"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+    
     <xsl:variable name="padding">
       <xsl:choose>
         <xsl:when test="@fo:padding">
           <xsl:value-of select="@fo:padding"/>
         </xsl:when>
-        <xsl:when test="$side='middle'">
+        <xsl:when test="$side = 'middle' ">
           <xsl:choose>
             <xsl:when test="@fo:padding-top != 'none'">
               <xsl:value-of select="@fo:padding-top"/>
@@ -1418,100 +1460,95 @@
           </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="attribute::node()[name()=concat('fo:padding-',$side)]"/>
+          <xsl:value-of select="@*[name()=concat('fo:padding-', $side)]"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+    
     <xsl:attribute name="w:val">
       <xsl:call-template name="GetBorderStyle">
         <xsl:with-param name="side" select="$side"/>
         <xsl:with-param name="borderStr" select="$borderStr"/>
       </xsl:call-template>
     </xsl:attribute>
-
+    
     <xsl:attribute name="w:sz">
       <xsl:call-template name="eightspoint-measure">
         <xsl:with-param name="length" select="substring-before($borderStr,  ' ')"/>
       </xsl:call-template>
     </xsl:attribute>
-
+    
     <xsl:attribute name="w:space">
       <xsl:call-template name="padding-val">
         <xsl:with-param name="length" select="$padding"/>
       </xsl:call-template>
     </xsl:attribute>
-
+    
     <xsl:attribute name="w:color">
       <xsl:value-of select="substring($borderStr, string-length($borderStr) -5, 6)"/>
     </xsl:attribute>
-
   </xsl:template>
 
-  <!-- Compute values to be added for indent value. -->
-  <xsl:template name="ComputeParagraphIndent">
-    <xsl:param name="side"/>
-    <xsl:param name="node"/>
-    <xsl:param name="parentStyleName"/>
 
+  <!-- Compute values to be added for indent value. -->
+  <xsl:template name="ComputeAdditionalIndent">
+    <xsl:param name="side"/>
+    <xsl:param name="style"/>
     <!-- If there is a border, the indent will have to take it into consideration. -->
     <xsl:variable name="BorderWidth">
       <xsl:call-template name="GetBorderWidth">
-        <xsl:with-param name="side" select="$side"/>
-        <xsl:with-param name="node" select="$node"/>
-        <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+        <xsl:with-param name="style" select="$style"/>
       </xsl:call-template>
     </xsl:variable>
     <!-- indent generated by the borders. Limited to 620 twip. -->
     <xsl:variable name="Padding">
       <xsl:call-template name="ComputePaddingValue">
         <xsl:with-param name="side" select="$side"/>
-        <xsl:with-param name="node" select="$node"/>
-        <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+        <xsl:with-param name="style" select="$style"/>
       </xsl:call-template>
     </xsl:variable>
     <!-- paragraph margins -->
     <xsl:variable name="Margin">
       <xsl:call-template name="GetParagraphMargin">
         <xsl:with-param name="side" select="$side"/>
-        <xsl:with-param name="node" select="$node"/>
-        <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
+        <xsl:with-param name="style" select="$style"/>
       </xsl:call-template>
     </xsl:variable>
-
     <xsl:value-of select="$BorderWidth + $Padding + $Margin"/>
   </xsl:template>
+
 
   <!-- Compute the value of a border width -->
   <xsl:template name="GetBorderWidth">
     <xsl:param name="side"/>
-    <xsl:param name="node"/>
-    <xsl:param name="parentStyleName"/>
-
+    <xsl:param name="style"/>
+    <xsl:variable name="styleName" select="$style/@style:parent-style-name"/>
     <xsl:variable name="borderWidth">
       <xsl:choose>
-        <xsl:when test="$node/style:paragraph-properties/@fo:border and $node/style:paragraph-properties/@fo:border!='none'">
-          <xsl:value-of select="substring-before($node/style:paragraph-properties/@fo:border,' ')"/>
+        <xsl:when
+          test="$style/style:paragraph-properties/@fo:border and $style/style:paragraph-properties/@fo:border!='none'">
+          <xsl:value-of
+            select="substring-before($style/style:paragraph-properties/@fo:border,' ')"/>
         </xsl:when>
         <xsl:when
-          test="$node/style:paragraph-properties/attribute::node()[name()=concat('fo:border-',$side)] and $node/style:paragraph-properties/attribute::node()[name()=concat('fo:border-',$side)]!='none'">
+          test="$style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)] and $style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)] != 'none' ">
           <xsl:value-of
-            select="substring-before($node/style:paragraph-properties/attribute::node()[name()=concat('fo:border-',$side)],' ')"
+            select="substring-before($style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)],' ')"
           />
         </xsl:when>
-        <xsl:when test="$node/ancestor::office:automatic-styles">
+        <xsl:when test="$style/ancestor::office:automatic-styles">
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
               <xsl:when
-                test="key('styles',$parentStyleName)/style:paragraph-properties/@fo:border and key('styles',$parentStyleName)/style:paragraph-properties/@fo:border!='none'">
+                test="key('styles',$styleName)[1]/style:paragraph-properties/@fo:border and key('styles',$styleName)[1]/style:paragraph-properties/@fo:border != 'none' ">
                 <xsl:value-of
-                  select="substring-before(key('styles',$parentStyleName)/style:paragraph-properties/@fo:border,' ')"
+                  select="substring-before(key('styles', $styleName)/style:paragraph-properties/@fo:border,' ')"
                 />
               </xsl:when>
               <xsl:when
-                test="key('styles',$parentStyleName)/style:paragraph-properties/attribute::node()[name()=concat('fo:border-',$side)] and key('styles',$parentStyleName)/style:paragraph-properties/attribute::node()[name()=concat('fo:border-',$side)]!='none'">
+                test="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:border-',$side)] and key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:border-',$side)] != 'none'">
                 <xsl:value-of
-                  select="substring-before(key('styles',$parentStyleName)/style:paragraph-properties/attribute::node()[name()=concat('fo:border-',$side)],' ')"
+                  select="substring-before(key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:border-',$side)],' ')"
                 />
               </xsl:when>
               <xsl:otherwise>0</xsl:otherwise>
@@ -1521,7 +1558,6 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
     <xsl:call-template name="twips-measure">
       <xsl:with-param name="length">
         <xsl:value-of select="$borderWidth"/>
@@ -1529,31 +1565,34 @@
     </xsl:call-template>
   </xsl:template>
 
+  
   <!-- Compute the value of padding -->
   <xsl:template name="ComputePaddingValue">
     <xsl:param name="side"/>
-    <xsl:param name="node"/>
-    <xsl:param name="parentStyleName"/>
-
+    <xsl:param name="style"/>
+    <xsl:variable name="styleName" select="$style/@style:parent-style-name"/>
     <xsl:variable name="paddingVal">
       <xsl:choose>
-        <xsl:when test="$node/style:paragraph-properties/@fo:padding">
-          <xsl:value-of select="$node/style:paragraph-properties/@fo:padding"/>
+        <xsl:when test="$style/style:paragraph-properties/@fo:padding">
+          <xsl:value-of select="$style/style:paragraph-properties/@fo:padding"/>
         </xsl:when>
-        <xsl:when test="$node/style:paragraph-properties/attribute::node()[name()=concat('fo:padding-',$side)]">
-          <xsl:value-of select="$node/style:paragraph-properties/attribute::node()[name()=concat('fo:padding-',$side)]"/>
+        <xsl:when
+          test="$style/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]">
+          <xsl:value-of
+            select="$style/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]"
+          />
         </xsl:when>
-        <xsl:when test="$node/ancestor::office:automatic-styles">
+        <xsl:when test="$style/ancestor::office:automatic-styles">
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
-              <xsl:when test="key('styles',$parentStyleName)/style:paragraph-properties/@fo:padding">
+              <xsl:when test="key('styles', $styleName)/style:paragraph-properties/@fo:padding">
                 <xsl:value-of
-                  select="key('styles',$parentStyleName)/style:paragraph-properties/@fo:padding"/>
+                  select="key('styles', $styleName)/style:paragraph-properties/@fo:padding"/>
               </xsl:when>
               <xsl:when
-                test="key('styles',$parentStyleName)/style:paragraph-properties/attribute::node()[name()=concat('fo:padding-',$side)]">
+                test="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]">
                 <xsl:value-of
-                  select="key('styles',$parentStyleName)/style:paragraph-properties/attribute::node()[name()=concat('fo:padding-',$side)]"
+                  select="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]"
                 />
               </xsl:when>
               <xsl:otherwise>0</xsl:otherwise>
@@ -1563,33 +1602,33 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
     <xsl:call-template name="indent-val">
       <xsl:with-param name="length">
         <xsl:value-of select="$paddingVal"/>
       </xsl:with-param>
     </xsl:call-template>
-
   </xsl:template>
+
 
   <!-- Compute a paragraph margin value -->
   <xsl:template name="GetParagraphMargin">
     <xsl:param name="side"/>
-    <xsl:param name="node"/>
-    <xsl:param name="parentStyleName"/>
-
+    <xsl:param name="style"/>
+    <xsl:variable name="styleName" select="$style/@style:parent-style-name"/>
     <xsl:variable name="marginVal">
       <xsl:choose>
-        <xsl:when test="$node/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$side)]">
-          <xsl:value-of select="$node/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$side)]"/>
+        <xsl:when
+          test="$style/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]">
+          <xsl:value-of
+            select="$style/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]"/>
         </xsl:when>
-        <xsl:when test="$node/ancestor::office:automatic-styles">
+        <xsl:when test="$style/ancestor::office:automatic-styles">
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
               <xsl:when
-                test="key('styles',$parentStyleName)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$side)]">
+                test="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]">
                 <xsl:value-of
-                  select="key('styles',$parentStyleName)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$side)]"
+                  select="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:margin-',$side)]"
                 />
               </xsl:when>
               <xsl:otherwise>0</xsl:otherwise>
@@ -1599,43 +1638,42 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
     <xsl:call-template name="twips-measure">
       <xsl:with-param name="length">
         <xsl:value-of select="$marginVal"/>
       </xsl:with-param>
     </xsl:call-template>
-
   </xsl:template>
+
 
   <!-- calculate a first line indent -->
   <xsl:template name="GetFirstLineIndent">
-    <xsl:param name="node"/>
-    <xsl:param name="parentStyleName"/>
-
+    <xsl:param name="style"/>
+    <xsl:variable name="styleName" select="$style/@style:parent-style-name"/>
     <xsl:call-template name="twips-measure">
       <xsl:with-param name="length">
         <xsl:choose>
-          <xsl:when test="$node/style:paragraph-properties/@fo:text-indent and ($node/style:paragraph-properties/@style:auto-text-indent!='true')">
-            <xsl:value-of select="$node/style:paragraph-properties/@fo:text-indent"/>
+          <xsl:when
+            test="$style/style:paragraph-properties/@fo:text-indent and ($style/style:paragraph-properties/@style:auto-text-indent!='true')">
+            <xsl:value-of select="$style/style:paragraph-properties/@fo:text-indent"/>
           </xsl:when>
           <xsl:when
-            test="$node/style:paragraph-properties/@style:auto-text-indent='true' and $node/style:text-properties/@fo:font-size">
-            <xsl:value-of select="$node/style:text-properties/@fo:font-size"/>
+            test="$style/style:paragraph-properties/@style:auto-text-indent='true' and $style/style:text-properties/@fo:font-size">
+            <xsl:value-of select="$style/style:text-properties/@fo:font-size"/>
           </xsl:when>
-          <xsl:when test="$node/ancestor::office:automatic-styles">
+          <xsl:when test="$style/ancestor::office:automatic-styles">
             <xsl:for-each select="document('styles.xml')">
               <xsl:choose>
                 <xsl:when
-                  test="key('styles',$parentStyleName)/style:paragraph-properties/@fo:text-indent and (key('styles',$parentStyleName)/style:paragraph-properties/@style:auto-text-indent!='true')">
+                  test="key('styles', $styleName)/style:paragraph-properties/@fo:text-indent and (key('styles', $styleName)/style:paragraph-properties/@style:auto-text-indent!='true')">
                   <xsl:value-of
-                    select="key('styles',$parentStyleName)/style:paragraph-properties/@fo:text-indent"
+                    select="key('styles', $styleName)/style:paragraph-properties/@fo:text-indent"
                   />
                 </xsl:when>
                 <xsl:when
-                  test="key('styles',$parentStyleName)/style:paragraph-properties/@fo:auto-text-indent='true' and key('styles',$parentStyleName)/style:text-properties/@fo:font-size">
+                  test="key('styles', $styleName)/style:paragraph-properties/@fo:auto-text-indent='true' and key('styles',$styleName)/style:text-properties/@fo:font-size">
                   <xsl:value-of
-                    select="key('styles',$parentStyleName)/style:text-properties/@fo:font-size"/>
+                    select="key('styles', $styleName)/style:text-properties/@fo:font-size"/>
                 </xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
@@ -1646,6 +1684,7 @@
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
+
 
   <!-- ignored -->
   <xsl:template match="text()" mode="styles"/>
