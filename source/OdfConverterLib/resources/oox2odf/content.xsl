@@ -31,6 +31,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
   exclude-result-prefixes="w">
 
@@ -52,8 +53,8 @@
   <!--  Check if the paragraf is heading -->
   <xsl:template name="GetOutlineLevel">
     <xsl:choose>
-      <xsl:when test="../w:pPr/w:outlineLvl/@w:val">
-        <xsl:value-of select="../w:pPr/w:outlineLvl/@w:val"/>
+      <xsl:when test="w:pPr/w:outlineLvl/@w:val">
+        <xsl:value-of select="w:pPr/w:outlineLvl/@w:val"/>
       </xsl:when>
 
       <xsl:when test="w:pPr/w:pStyle/@w:val">
@@ -94,7 +95,24 @@
       <xsl:attribute name="text:outline-level">
         <xsl:value-of select="$outlineLevel+1"/>
       </xsl:attribute>
+      <xsl:for-each select="w:bookmarkStart">
+        <text:bookmark-start>
+          <xsl:attribute name="text:name">
+            <xsl:value-of select="@w:name"/>
+          </xsl:attribute>
+        </text:bookmark-start>
+      </xsl:for-each>
       <xsl:value-of select="."/>
+      <xsl:for-each select="w:bookmarkEnd">
+        <text:bookmark-end>
+          <xsl:attribute name="text:name">
+             <xsl:variable name="bookmarkId">
+               <xsl:value-of select="@w:id"/>
+             </xsl:variable>
+            <xsl:value-of select="preceding::w:bookmarkStart[@w:id = $bookmarkId]/@w:name"/>
+          </xsl:attribute>
+        </text:bookmark-end>
+      </xsl:for-each>
     </text:h>
   </xsl:template>
 
@@ -125,6 +143,24 @@
   <xsl:template match="w:r">
 
     <xsl:apply-templates/>
+
+  </xsl:template>
+  <xsl:template match="w:hyperlink">
+  <xsl:call-template name="hyperlink"/>
+  </xsl:template>
+  <xsl:template name="hyperlink">
+    <text:a xlink:type="simple"><xsl:if test="@w:anchor">
+      
+      <xsl:attribute name="xlink:href">
+        
+          <xsl:value-of select="concat('#',@w:anchor)"/>
+      
+      </xsl:attribute>
+      <text:span text:style-name="Internet_20_link">
+        <xsl:value-of select="w:r/w:t"/>
+      </text:span>
+    </xsl:if>
+    </text:a>
 
   </xsl:template>
   <xsl:template match="w:t">
