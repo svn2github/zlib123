@@ -989,17 +989,15 @@
 
   <!-- Inserts a page break before if needed -->
   <xsl:template name="InsertPageBreakBefore">
-    <!-- in the first paragraph of a table -->
-    <!-- COMMENT: please try to simplify this and ensure it is correct:
-         - first paragraph?
-         - current table? -->
+    <!-- in the first paragraph of a table : first cell of row AND first row of table AND with a pgBreakBefore or master-page-name in paragraph style. -->
     <xsl:if test="ancestor-or-self::table:table">
       <xsl:if
-        test="parent::node()[name()='table:table-cell' and not(preceding-sibling::node())]
-        and ancestor::node()[name()='table:table-row' and (preceding-sibling::node()[1][name()='table:table-column' or name()='table:table-columns'] or not(preceding-sibling::node()))]
+        test="parent::table:table-cell[not(preceding-sibling::node())]
+        and ancestor::table:table-row[preceding-sibling::node()[1][name()='table:table-column' or name()='table:table-columns'] or not(preceding-sibling::node())]
         and (
         key('automatic-styles',ancestor::table:table[1]/@table:style-name)/style:table-properties/@fo:break-before = 'page'
-        or key('automatic-styles',ancestor::table:table[1]/@table:style-name)/@style:master-page-name != '')">
+        or key('automatic-styles',ancestor::table:table[1]/@table:style-name)/@style:master-page-name != ''
+        )">
         <w:pageBreakBefore/>
       </xsl:if>
     </xsl:if>
