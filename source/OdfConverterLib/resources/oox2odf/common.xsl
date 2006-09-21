@@ -47,7 +47,7 @@
 		1 milimeter(mm) = 0.1cm
                1cm = 360000 emu
   -->
-  
+
   <!-- Convert a measure in twips to a 'unit' measure -->
   <xsl:template name="ConvertTwips">
     <xsl:param name="length"/>
@@ -85,7 +85,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- Convert a measure in points to a 'unit' measure -->
   <xsl:template name="ConvertPoints">
     <xsl:param name="length"/>
@@ -120,7 +120,42 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
+  <!-- Convert a measure in half points to a 'unit' measure -->
+  <xsl:template name="ConvertHalfPoints">
+    <xsl:param name="length"/>
+    <xsl:param name="unit"/>
+    <xsl:choose>
+      <xsl:when test="$unit = 'cm'">
+        <xsl:value-of select="concat(format-number($length * 2.54 div 144,'#.###'),'cm')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'mm'">
+        <xsl:value-of select="concat(format-number($length * 25.4 div 144,'#.###'),'mm')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'in'">
+        <xsl:value-of select="concat(format-number($length div 144,'#.###'),'in')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'pt'">
+        <xsl:value-of select="concat($length div 2,'pt')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'pica'">
+        <xsl:value-of select="concat(format-number($length div 144,'#.###'),'pica')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'dpt'">
+        <xsl:value-of select="concat($length div 2,'dpt')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'px'">
+        <xsl:value-of select="concat(format-number($length * 96.19 div 144,'#.###'),'px')"/>
+      </xsl:when>
+      <xsl:when test="not($length)">
+        <xsl:value-of select="concat(0,'cm')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$length"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- Convert a measure in eigths of a point to a 'unit' measure -->
   <xsl:template name="ConvertEighthsPoints">
     <xsl:param name="length"/>
@@ -155,7 +190,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="emu-measure">
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
@@ -165,5 +200,5 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>
