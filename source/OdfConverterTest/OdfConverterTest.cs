@@ -29,6 +29,7 @@
 using System;
 using System.IO;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using CleverAge.OdfConverter.OdfZipUtils;
@@ -46,6 +47,51 @@ namespace CleverAge.OdfConverter.OdfConverterTest
     };
 
     delegate int ControlHandlerFonction(ControlType control);
+
+    class Word
+    {
+        Type _type;
+        object _instance;
+        Type _docsType;
+        object _documents;
+
+        public Word()
+        {
+            _type = Type.GetTypeFromProgID("Word.Application");
+            _instance = Activator.CreateInstance(_type);
+            _docsType = null;
+            _documents = null;
+        }
+
+        public bool Visible
+        {
+            set
+            {
+                object[] args = new object[] { value };
+                _type.InvokeMember("Visible", BindingFlags.SetProperty, null, _instance, args);
+            }
+        }
+
+        public void Quit()
+        {
+            object[] args = new object[] { Missing.Value,
+                                            Missing.Value,
+                                            Missing.Value };
+            _type.InvokeMember("Quit", BindingFlags.InvokeMethod, null, _instance, args);
+        }
+
+        public void Open(string document)
+        {
+            if (_documents == null)
+            {
+                _documents = _type.InvokeMember("Documents", BindingFlags.GetProperty, null, _instance, null);
+                _docsType = _documents.GetType();
+            }
+            object[] args = new object[] { document };
+            _docsType.InvokeMember("Open", BindingFlags.InvokeMethod, null, _documents, args);
+
+        }
+    }
 
     /// <summary>
     /// ODFConverterTest is a CommandLine Program to test the conversion
@@ -68,7 +114,8 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 
         private bool isDirectTransform = true; // conversion from ODT to DOCX (default)
         private Report report = null;
-        private object wordApp = null;
+        private Word word = null;
+
 
         [DllImport("kernel32")]
         static extern bool SetConsoleCtrlHandler(ControlHandlerFonction handlerRoutine, bool add);
@@ -76,13 +123,11 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         int MyHandler(ControlType control)
         {
             //Console.WriteLine("MyHandler: " + control.ToString());
-            if (wordApp != null)
+            if (word != null)
             {
                 try
                 {
-                    Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
-                    object missing = System.Reflection.Missing.Value;
-                    msWord.Quit(ref missing, ref missing, ref missing);
+                    word.Quit();
                 }
                 catch
                 {
@@ -140,9 +185,8 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 // instanciate word if needed
                 if (this.isDirectTransform && this.open)
                 {
-                    this.wordApp = new Microsoft.Office.Interop.Word.Application();
-                    Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
-                    msWord.Visible = false;
+                    word = new Word();
+                    word.Visible = false;
                 }
 
                 this.ProceedSingleFile(this.input, this.output, this.isDirectTransform);
@@ -150,9 +194,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 // close word if needed
                 if (this.open)
                 {
-                    Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
-                    object missing = System.Reflection.Missing.Value;
-                    msWord.Quit(ref missing, ref missing, ref missing);
+                    word.Quit();
                 }
             }
             this.report.Close();
@@ -163,9 +205,8 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             // instanciate word if needed
             if (this.open)
             {
-                this.wordApp = new Microsoft.Office.Interop.Word.Application();
-                Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
-                msWord.Visible = false;
+                word = new Word();
+                word.Visible = false;
             }
 
             SearchOption option = SearchOption.TopDirectoryOnly;
@@ -211,9 +252,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             // close word if needed
             if (this.open)
             {
-                Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
-                object missing = System.Reflection.Missing.Value;
-                msWord.Quit(ref missing, ref missing, ref missing);
+                word.Quit();
             }
             this.report.AddComment("Results: " + nbConverted + " file(s) over " + nbFiles + " were converted, among them:");
             this.report.AddComment("   " + nbValidatedAndOpened + " were validated and sucessfully opened in Word");
@@ -347,15 +386,11 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         {
             if (isDirectTransform)
             {
-                Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
+                //  Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
                 try
                 {
-                    object missing = System.Reflection.Missing.Value;
-                    object filename = Path.GetFullPath(output);
-                    Microsoft.Office.Interop.Word.Document doc = msWord.Documents.Open(ref filename, ref missing, ref missing,
-                        ref missing, ref missing, ref missing, ref missing, ref missing,
-                        ref missing, ref missing, ref missing, ref missing, ref missing,
-                        ref missing, ref missing, ref missing);
+                    string filename = Path.GetFullPath(output);
+                    word.Open(filename);
                     this.report.AddLog(input, "Converted file opened successfully in Word", Report.INFO_LEVEL);
                     return true;
                 }
