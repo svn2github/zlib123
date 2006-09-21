@@ -43,7 +43,7 @@
 
   <xsl:key name="images" match="draw:frame" use="'const'"/>
 
-
+  <!-- check if image type is supported in word  -->
   <xsl:template name="image-support">
     <xsl:param name="name"/>
     <xsl:variable name="support">
@@ -91,11 +91,11 @@
   </xsl:template>
 
   <xsl:template match="draw:frame[./draw:object-ole]" mode="paragraph">
-    <xsl:variable name="intId">
+    <xsl:variable name="imageId">
       <xsl:call-template name="GetPosition">
         <xsl:with-param name="node" select="."/>
       </xsl:call-template>
-      <!--            <xsl:value-of select="position()"/>-->
+
     </xsl:variable>
     <xsl:variable name="width">
       <xsl:call-template name="point-measure">
@@ -113,12 +113,12 @@
 
     <w:r>
       <w:object>
-        <v:shape id="{$intId}" type="#_x0000_t75" style="width:{$width}pt;height:{$height}pt"
+        <v:shape id="{$imageId}" type="#_x0000_t75" style="width:{$width}pt;height:{$height}pt"
           o:ole="" filled="t">
           <v:fill color2="black"/>
           <v:imagedata r:id="{generate-id(./draw:image)}" o:title=""/>
         </v:shape>
-        <o:OLEObject Type="{$OleObjType}" ProgID="" ShapeID="{$intId}" DrawAspect="Content"
+        <o:OLEObject Type="{$OleObjType}" ProgID="" ShapeID="{$imageId}" DrawAspect="Content"
           ObjectID="" r:id="{generate-id(draw:object-ole)}"/>
       </w:object>
     </w:r>
@@ -132,8 +132,9 @@
         <xsl:with-param name="name" select="./draw:image/@xlink:href"/>
       </xsl:call-template>
     </xsl:variable>
+
     <xsl:if test="$supported = 'true'">
-      <xsl:variable name="intId">
+      <xsl:variable name="imageId">
         <xsl:call-template name="GetPosition">
           <xsl:with-param name="node" select="."/>
         </xsl:call-template>
@@ -150,7 +151,7 @@
       </xsl:variable>
       <w:r>
         <w:pict>
-          <v:shape id="{$intId}" type="#_x0000_t75" style="width:{$width}pt;height:{$height}pt">
+          <v:shape id="{$imageId}" type="#_x0000_t75" style="width:{$width}pt;height:{$height}pt">
             <v:imagedata r:id="{generate-id(draw:image)}" o:title=""/>
           </v:shape>
         </w:pict>
@@ -158,6 +159,7 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- frame containing an image -->
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]"
     mode="paragraph">
@@ -175,6 +177,7 @@
 
   </xsl:template>
 
+  <!-- frame containing an image -->
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]">
 
@@ -193,10 +196,11 @@
     </xsl:if>
   </xsl:template>
 
+  <!--   word has two types of images: inline (positioned with text) and anchor (can be aligned relative to page, margin etc); -->
   <xsl:template name="InsertImage">
 
     <w:drawing>
-      <xsl:variable name="intId">
+      <xsl:variable name="imageId">
         <xsl:call-template name="GetPosition">
           <xsl:with-param name="node" select="."/>
         </xsl:call-template>
@@ -233,83 +237,164 @@
       </xsl:variable>
 
       <xsl:choose>
+        <!-- image embedded in draw:frame/draw:text-box or in text:note element has to be inline with text -->
         <xsl:when
           test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote']">
-          <xsl:call-template name="inline-image">
+          <xsl:call-template name="InsertInlineImage">
             <xsl:with-param name="cx" select="$cx"/>
             <xsl:with-param name="cy" select="$cy"/>
-            <xsl:with-param name="intId" select="$intId"/>
+            <xsl:with-param name="imageId" select="$imageId"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="anchor-image">
+          <xsl:call-template name="InsertAnchorImage">
             <xsl:with-param name="cx" select="$cx"/>
             <xsl:with-param name="cy" select="$cy"/>
-            <xsl:with-param name="intId" select="$intId"/>
+            <xsl:with-param name="imageId" select="$imageId"/>
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </w:drawing>
   </xsl:template>
 
-  <xsl:template name="inline-image">
+  <!--image positioned with text -->
+  <xsl:template name="InsertInlineImage">
 
     <xsl:param name="cx"/>
     <xsl:param name="cy"/>
-    <xsl:param name="intId"/>
+    <xsl:param name="imageId"/>
 
     <wp:inline>
-      <!--   width and heigth -->
+
+      <!--image height and width-->
       <wp:extent cx="{$cx}" cy="{$cy}"/>
       <wp:effectExtent l="0" t="0" r="0" b="0"/>
-      <wp:docPr name="{@draw:name}" id="{$intId}">
-        <xsl:if test="ancestor::draw:a">
-          <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
-            r:id="{generate-id(ancestor::draw:a)}"/>
-        </xsl:if>
-      </wp:docPr>
-      <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
-        <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
-          <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
-            <!--    non visual drawing properties -->
-            <pic:nvPicPr>
-              <pic:cNvPr name="{@draw:name}" id="{$intId}"/>
-              <pic:cNvPicPr>
-                <!--           TODO : implement  cNvPicPr-->
-                <a:picLocks noChangeAspect="1"/>
-              </pic:cNvPicPr>
-            </pic:nvPicPr>
-            <pic:blipFill>
-              <a:blip r:embed="{generate-id(draw:image)}"/>
-              <a:stretch>
-                <!--            TODO -->
-                <a:fillRect/>
-              </a:stretch>
-            </pic:blipFill>
-            <pic:spPr>
-              <a:xfrm>
-                <a:off x="0" y="0"/>
-                <!--TODO-->
-                <a:ext cx="{$cx}" cy="{$cy}"/>
-              </a:xfrm>
-              <!--TODO-->
-              <a:prstGeom prst="rect">
-                <a:avLst/>
-              </a:prstGeom>
-              <xsl:call-template name="borders"/>
-            </pic:spPr>
-          </pic:pic>
-        </a:graphicData>
-      </a:graphic>
+
+      <!-- image graphical properties: borders, fill, ratio blocking etc -->
+      <xsl:call-template name="InsertImageGraphicProperties">
+        <xsl:with-param name="cx" select="$cx"/>
+        <xsl:with-param name="cy" select="$cy"/>
+        <xsl:with-param name="imageId" select="$imageId"/>
+      </xsl:call-template>
     </wp:inline>
 
   </xsl:template>
 
-  <xsl:template name="anchor-image">
+  <!-- anchor images can be aligned relative to page, margin etc -->
+  <xsl:template name="InsertAnchorImage">
 
     <xsl:param name="cx"/>
     <xsl:param name="cy"/>
-    <xsl:param name="intId"/>
+    <xsl:param name="imageId"/>
+
+    <xsl:variable name="style"
+      select="key('automatic-styles', @draw:style-name)/style:graphic-properties"/>
+    <xsl:variable name="styleP" select="key('automatic-styles', parent::text:p/@text:style-name)"/>
+
+    <xsl:variable name="wrap">
+      <xsl:choose>
+        <xsl:when test="not($style/@style:wrap)">none</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$style/@style:wrap"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <wp:anchor simplePos="0" locked="0" layoutInCell="1" allowOverlap="1">
+
+      <!-- image z-index-->
+      <xsl:attribute name="relativeHeight">
+        <xsl:value-of select="2 + @draw:z-index"/>
+      </xsl:attribute>
+
+      <xsl:attribute name="behindDoc">
+        <xsl:choose>
+          <xsl:when test="$wrap = 'run-through' and $style/@style:run-through = 'background' ">1</xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+
+      <!-- position -->
+      <xsl:call-template name="InsertAnchorImagePosition">
+        <xsl:with-param name="style" select="$style"/>
+        <xsl:with-param name="styleP" select="$styleP"/>
+      </xsl:call-template>
+
+      <!--height and width -->
+      <wp:extent cx="{$cx}" cy="{$cy}"/>
+      <wp:effectExtent l="0" t="0" r="0" b="0"/>
+
+      <!--image wrapping-->
+      <xsl:call-template name="InsertAnchorImageWrapping">
+        <xsl:with-param name="wrap" select="$wrap"/>
+        <xsl:with-param name="style" select="$style"/>
+      </xsl:call-template>
+
+      <!-- image graphical properties: borders, fill, ratio blocking etc-->
+      <xsl:call-template name="InsertImageGraphicProperties">
+        <xsl:with-param name="cx" select="$cx"/>
+        <xsl:with-param name="cy" select="$cy"/>
+        <xsl:with-param name="imageId" select="$imageId"/>
+      </xsl:call-template>
+    </wp:anchor>
+
+  </xsl:template>
+
+  <xsl:template name="InsertImageGraphicProperties">
+    <xsl:param name="imageId"/>
+    <xsl:param name="cx"/>
+    <xsl:param name="cy"/>
+
+    <!--drawing non-visual properties-->
+    <wp:docPr name="{@draw:name}" id="{$imageId}">
+
+      <!--drawing element onclick hyperlink-->
+      <xsl:if test="ancestor::draw:a">
+        <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
+          r:id="{generate-id(ancestor::draw:a)}"/>
+      </xsl:if>
+    </wp:docPr>
+
+    <!--drawing aspect ratio blocking-->
+    <wp:cNvGraphicFramePr>
+      <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
+        noChangeAspect="1"/>
+    </wp:cNvGraphicFramePr>
+
+    <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
+      <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
+        <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
+          <pic:nvPicPr>
+            <pic:cNvPr name="{@draw:name}" id="{$imageId}"/>
+            <pic:cNvPicPr>
+              <a:picLocks noChangeAspect="1"/>
+            </pic:cNvPicPr>
+          </pic:nvPicPr>
+          <pic:blipFill>
+            <a:blip r:embed="{generate-id(draw:image)}"/>
+            <a:stretch>
+              <a:fillRect/>
+            </a:stretch>
+          </pic:blipFill>
+          <pic:spPr>
+            <a:xfrm>
+              <a:off x="0" y="0"/>
+              <a:ext cx="{$cx}" cy="{$cy}"/>
+            </a:xfrm>
+            <a:prstGeom prst="rect">
+              <a:avLst/>
+            </a:prstGeom>
+            <xsl:call-template name="InsertImageBorders"/>
+          </pic:spPr>
+        </pic:pic>
+      </a:graphicData>
+    </a:graphic>
+  </xsl:template>
+
+  <!--  image vertical and horizontal position-->
+  <xsl:template name="InsertAnchorImagePosition">
+    <xsl:param name="style"/>
+    <xsl:param name="styleP"/>
 
     <xsl:variable name="ox">
       <xsl:choose>
@@ -337,251 +422,250 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:variable name="sName" select="@draw:style-name"/>
+    <xsl:call-template name="InsertAnchorImagePosH">
+      <xsl:with-param name="style" select="$style"/>
+      <xsl:with-param name="styleP" select="$styleP"/>
+      <xsl:with-param name="ox" select="$ox"/>
+      <xsl:with-param name="oy" select="$oy"/>
+    </xsl:call-template>
 
-    <xsl:variable name="style" select="key('automatic-styles', $sName)/style:graphic-properties"/>
 
-    <xsl:variable name="sNameP" select="parent::text:p/@text:style-name"/>
+    <xsl:call-template name="InsertAnchorImagePosV">
+      <xsl:with-param name="style" select="$style"/>
+      <xsl:with-param name="ox" select="$ox"/>
+      <xsl:with-param name="oy" select="$oy"/>
+    </xsl:call-template>
 
-    <xsl:variable name="styleP" select="key('automatic-styles', $sNameP)"/>
-
-    <xsl:variable name="posH" select="$style/@style:horizontal-rel"/>
-
-    <xsl:variable name="wrap">
-      <xsl:choose>
-        <xsl:when test="not($style/@style:wrap)">none</xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$style/@style:wrap"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:variable name="horizontal-pos" select="$style/@style:horizontal-pos"/>
-
-    <xsl:variable name="vertical-pos" select="$style/@style:vertical-pos"/>
-
-    <wp:anchor simplePos="0" locked="0" layoutInCell="1" allowOverlap="1">
-
-      <xsl:attribute name="relativeHeight">
-        <xsl:value-of select="2 + @draw:z-index"/>
-      </xsl:attribute>
-
-      <xsl:attribute name="behindDoc">
-        <xsl:choose>
-          <xsl:when test="$wrap = 'run-through' and $style/@style:run-through = 'background' ">1</xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      <wp:simplePos x="0" y="0"/>
-      <wp:positionH>
-        <xsl:attribute name="relativeFrom">
-
-          <xsl:choose>
-
-            <xsl:when test="$style/@style:horizontal-rel='page'">page</xsl:when>
-            <xsl:otherwise>column</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:variable name="AlignH" select="$styleP/style:paragraph-properties/@fo:text-align"/>
-        <xsl:choose>
-          <xsl:when test="$horizontal-pos !='from-left' and $horizontal-pos !='from-outside' ">
-            <wp:align>
-              <xsl:value-of select="$horizontal-pos"/>
-            </wp:align>
-          </xsl:when>
-          <xsl:when test="($AlignH = 'left') or ($AlignH = 'center') or ($AlignH = 'right')">
-            <wp:align>
-              <xsl:value-of select="$AlignH"/>
-            </wp:align>
-          </xsl:when>
-          <xsl:otherwise>
-            <wp:posOffset>
-              <xsl:message>
-                <xsl:value-of select="$ox"/>
-              </xsl:message>
-              <xsl:value-of select="$ox"/>
-            </wp:posOffset>
-          </xsl:otherwise>
-        </xsl:choose>
-      </wp:positionH>
-
-      <wp:positionV>
-        <xsl:attribute name="relativeFrom">
-          <xsl:choose>
-            <xsl:when test="$style/@style:vertical-rel='page'">page</xsl:when>
-            <xsl:otherwise>paragraph</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-
-        <xsl:choose>
-          <xsl:when test="$vertical-pos !='from-top' and $vertical-pos !='below' ">
-            <wp:align>
-              <xsl:choose>
-                <xsl:when test="$vertical-pos = 'top' ">top</xsl:when>
-                <xsl:when test="$vertical-pos = 'bottom' ">bottom</xsl:when>
-                <xsl:when test="$vertical-pos = 'middle' ">center</xsl:when>
-              </xsl:choose>
-            </wp:align>
-          </xsl:when>
-          <xsl:otherwise>
-            <wp:posOffset>
-              <xsl:choose>
-                <xsl:when test="@text:anchor-type='as-char' and $oy &lt; 0">
-                  <xsl:call-template name="emu-measure">
-                    <xsl:with-param name="length" select="'0.01cm'"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$oy"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </wp:posOffset>
-          </xsl:otherwise>
-        </xsl:choose>
-
-      </wp:positionV>
-      <wp:extent cx="{$cx}" cy="{$cy}"/>
-      <wp:effectExtent l="0" t="0" r="0" b="0"/>
-      <xsl:choose>
-        <xsl:when test="$wrap = 'parallel' or $wrap ='left' or $wrap = 'right' or $wrap ='dynamic'">
-          <wp:wrapSquare>
-            <xsl:attribute name="wrapText">
-              <xsl:choose>
-                <xsl:when test="$wrap = 'parallel'">bothSides</xsl:when>
-                <xsl:when test="$wrap = 'dynamic'">largest</xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$wrap"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:attribute name="distB">
-              <xsl:choose>
-                <xsl:when test="$style/@fo:margin-bottom">
-                  <xsl:call-template name="emu-measure">
-                    <xsl:with-param name="length" select="$style/@fo:margin-bottom"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="0"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:attribute name="distT">
-              <xsl:choose>
-                <xsl:when test="$style/@fo:margin-top">
-                  <xsl:call-template name="emu-measure">
-                    <xsl:with-param name="length" select="$style/@fo:margin-top"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="0"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:attribute name="distL">
-              <xsl:choose>
-                <xsl:when test="$style/@fo:margin-left">
-                  <xsl:call-template name="emu-measure">
-                    <xsl:with-param name="length" select="$style/@fo:margin-left"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="0"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:attribute name="distR">
-              <xsl:choose>
-                <xsl:when test="$style/@fo:margin-right">
-                  <xsl:call-template name="emu-measure">
-                    <xsl:with-param name="length" select="$style/@fo:margin-right"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="0"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </wp:wrapSquare>
-        </xsl:when>
-        <xsl:when test="$wrap = 'run-through'">
-          <wp:wrapNone/>
-        </xsl:when>
-        <xsl:when test="$wrap = 'none' ">
-          <wp:wrapTopAndBottom>
-            <xsl:attribute name="distB">
-              <xsl:choose>
-                <xsl:when test="$style/@fo:margin-bottom">
-                  <xsl:call-template name="emu-measure">
-                    <xsl:with-param name="length" select="$style/@fo:margin-bottom"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="0"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:attribute name="distT">
-              <xsl:choose>
-                <xsl:when test="$style/@fo:margin-top">
-                  <xsl:call-template name="emu-measure">
-                    <xsl:with-param name="length" select="$style/@fo:margin-top"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="0"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </wp:wrapTopAndBottom>
-        </xsl:when>
-        <xsl:otherwise>
-          <wp:wrapNone/>
-        </xsl:otherwise>
-      </xsl:choose>
-      <wp:docPr name="{@draw:name}" id="{$intId}">
-        <xsl:if test="ancestor::draw:a">
-          <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
-            r:id="{generate-id(ancestor::draw:a)}"/>
-        </xsl:if>
-      </wp:docPr>
-      <wp:cNvGraphicFramePr>
-        <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
-          noChangeAspect="1"/>
-      </wp:cNvGraphicFramePr>
-      <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
-        <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
-          <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
-            <pic:nvPicPr>
-              <pic:cNvPr name="{@draw:name}" id="{$intId}"/>
-              <pic:cNvPicPr>
-                <a:picLocks noChangeAspect="1"/>
-              </pic:cNvPicPr>
-            </pic:nvPicPr>
-            <pic:blipFill>
-              <a:blip r:embed="{generate-id(draw:image)}"/>
-              <a:stretch>
-                <a:fillRect/>
-              </a:stretch>
-            </pic:blipFill>
-            <pic:spPr>
-              <a:xfrm>
-                <a:off x="0" y="0"/>
-                <a:ext cx="{$cx}" cy="{$cy}"/>
-              </a:xfrm>
-              <a:prstGeom prst="rect">
-                <a:avLst/>
-              </a:prstGeom>
-              <xsl:call-template name="borders"/>
-            </pic:spPr>
-          </pic:pic>
-        </a:graphicData>
-      </a:graphic>
-    </wp:anchor>
 
   </xsl:template>
 
-  <xsl:template name="borders">
+  <!--vertical position-->
+  <xsl:template name="InsertAnchorImagePosV">
+    <xsl:param name="style"/>
+    <xsl:param name="ox"/>
+    <xsl:param name="oy"/>
+
+    <xsl:variable name="vertical-pos" select="$style/@style:vertical-pos"/>
+
+    <wp:positionV>
+      <xsl:attribute name="relativeFrom">
+        <xsl:choose>
+          <xsl:when test="$style/@style:vertical-rel='page'">page</xsl:when>
+          <xsl:otherwise>paragraph</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+
+      <xsl:choose>
+        <xsl:when test="$vertical-pos !='from-top' and $vertical-pos !='below' ">
+          <wp:align>
+            <xsl:choose>
+              <xsl:when test="$vertical-pos = 'top' ">top</xsl:when>
+              <xsl:when test="$vertical-pos = 'bottom' ">bottom</xsl:when>
+              <xsl:when test="$vertical-pos = 'middle' ">center</xsl:when>
+            </xsl:choose>
+          </wp:align>
+        </xsl:when>
+        <xsl:otherwise>
+          <wp:posOffset>
+            <xsl:choose>
+              <xsl:when test="@text:anchor-type='as-char' and $oy &lt; 0">
+                <xsl:call-template name="emu-measure">
+                  <xsl:with-param name="length" select="'0.01cm'"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$oy"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </wp:posOffset>
+        </xsl:otherwise>
+      </xsl:choose>
+
+    </wp:positionV>
+  </xsl:template>
+
+  <!-- horizontal position-->
+  <xsl:template name="InsertAnchorImagePosH">
+    <xsl:param name="style"/>
+    <xsl:param name="styleP"/>
+    <xsl:param name="ox"/>
+    <xsl:param name="oy"/>
+
+
+    <xsl:variable name="horizontal-pos" select="$style/@style:horizontal-pos"/>
+
+    <wp:simplePos x="0" y="0"/>
+    <wp:positionH>
+      <xsl:attribute name="relativeFrom">
+
+        <xsl:choose>
+
+          <xsl:when test="$style/@style:horizontal-rel='page'">page</xsl:when>
+          <xsl:otherwise>column</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:variable name="AlignH" select="$styleP/style:paragraph-properties/@fo:text-align"/>
+      <xsl:choose>
+        <xsl:when test="$horizontal-pos !='from-left' and $horizontal-pos !='from-outside' ">
+          <wp:align>
+            <xsl:value-of select="$horizontal-pos"/>
+          </wp:align>
+        </xsl:when>
+        <xsl:when test="($AlignH = 'left') or ($AlignH = 'center') or ($AlignH = 'right')">
+          <wp:align>
+            <xsl:value-of select="$AlignH"/>
+          </wp:align>
+        </xsl:when>
+        <xsl:otherwise>
+          <wp:posOffset>
+            <xsl:message>
+              <xsl:value-of select="$ox"/>
+            </xsl:message>
+            <xsl:value-of select="$ox"/>
+          </wp:posOffset>
+        </xsl:otherwise>
+      </xsl:choose>
+    </wp:positionH>
+  </xsl:template>
+
+
+  <!--image wrap type-->
+  <xsl:template name="InsertAnchorImageWrapping">
+    <xsl:param name="style"/>
+    <xsl:param name="wrap"/>
+
+    <xsl:choose>
+      <xsl:when test="$wrap = 'parallel' or $wrap ='left' or $wrap = 'right' or $wrap ='dynamic'">
+        <xsl:call-template name="InsertSquareWrap">
+          <xsl:with-param name="wrap" select="$wrap"/>
+          <xsl:with-param name="style" select="$style"/>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:when test="$wrap = 'run-through'">
+        <wp:wrapNone/>
+      </xsl:when>
+
+      <xsl:when test="$wrap = 'none' ">
+        <xsl:call-template name="InsertTopBottomWrap">
+          <xsl:with-param name="wrap" select="$wrap"/>
+          <xsl:with-param name="style" select="$style"/>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <wp:wrapNone/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- square wrap type for anchor image -->
+  <xsl:template name="InsertSquareWrap">
+    <xsl:param name="style"/>
+    <xsl:param name="wrap"/>
+    
+    <wp:wrapSquare>
+      <xsl:attribute name="wrapText">
+        <xsl:choose>
+          <xsl:when test="$wrap = 'parallel'">bothSides</xsl:when>
+          <xsl:when test="$wrap = 'dynamic'">largest</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$wrap"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <!--bottom distance from text-->
+      <xsl:attribute name="distB">
+        <xsl:choose>
+          <xsl:when test="$style/@fo:margin-bottom">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="$style/@fo:margin-bottom"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="0"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <!--top distance from text-->
+      <xsl:attribute name="distT">
+        <xsl:choose>
+          <xsl:when test="$style/@fo:margin-top">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="$style/@fo:margin-top"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="0"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <!--left distance from text-->
+      <xsl:attribute name="distL">
+        <xsl:choose>
+          <xsl:when test="$style/@fo:margin-left">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="$style/@fo:margin-left"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="0"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <!--right distance from text-->
+      <xsl:attribute name="distR">
+        <xsl:choose>
+          <xsl:when test="$style/@fo:margin-right">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="$style/@fo:margin-right"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="0"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </wp:wrapSquare>
+  </xsl:template>
+  
+  <!-- top-bottom wrap type for anchor image -->
+  <xsl:template name="InsertTopBottomWrap">
+    <xsl:param name="style"/>
+    <xsl:param name="wrap"/>
+    
+    <wp:wrapTopAndBottom>
+      <!--bottom distance from text-->
+      <xsl:attribute name="distB">
+        <xsl:choose>
+          <xsl:when test="$style/@fo:margin-bottom">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="$style/@fo:margin-bottom"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="0"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <!--top distance from text-->
+      <xsl:attribute name="distT">
+        <xsl:choose>
+          <xsl:when test="$style/@fo:margin-top">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="$style/@fo:margin-top"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="0"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </wp:wrapTopAndBottom>
+  </xsl:template>
+  
+  <!--image border width and line style-->
+  <xsl:template name="InsertImageBorders">
 
     <xsl:variable name="sName" select="@draw:style-name"/>
     <xsl:variable name="style" select="key('automatic-styles', $sName)/style:graphic-properties"/>
