@@ -52,39 +52,35 @@
   <!--  Check if the paragraf is heading -->
   <xsl:template name="GetOutlineLevel">
     <xsl:choose>
-
-      <xsl:when test="../w:pPr/w:outlineLvl/@w:val">
+<xsl:when test="../w:pPr/w:outlineLvl/@w:val">
         <xsl:value-of select="../w:pPr/w:outlineLvl/@w:val"/>
       </xsl:when>
-
-      <xsl:when test="../w:pPr/w:pStyle/@w:val">
-
+      
+      <xsl:when test="w:pPr/w:pStyle/@w:val">
+        
         <xsl:variable name="outline">
-          <xsl:value-of select="../w:pPr/w:pStyle/@w:val"/>
+          <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
         </xsl:variable>
-
-        <xsl:value-of
-          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val"
-        />
+        
+        <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val"/>
+        <xsl:message> lvl val:  <xsl:value-of select="$outline"/> </xsl:message>
       </xsl:when>
-
+      
       <xsl:otherwise>
-
+     
         <xsl:variable name="outline">
-          <xsl:value-of select="w:rPr/w:rStyle/@w:val"/>
+          <xsl:value-of select="w:r/w:rPr/w:rStyle/@w:val"/>
         </xsl:variable>
-
+        
         <xsl:variable name="linkedStyleOutline">
           <xsl:value-of
             select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:link/@w:val"
           />
         </xsl:variable>
-
-        <xsl:value-of
-          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val"
-        />
+        
+        <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val"/>
       </xsl:otherwise>
-
+      
     </xsl:choose>
   </xsl:template>
 
@@ -98,38 +94,38 @@
     </text:h>
   </xsl:template>
 
-  <xsl:template name="w:p">
-    <xsl:apply-templates/>
-  </xsl:template>
-
-  <xsl:template match="w:r">
-    <xsl:variable name="outlineLevel">
+  <xsl:template match="w:p">
+      <xsl:variable name="outlineLevel">
       <xsl:call-template name="GetOutlineLevel"/>
     </xsl:variable>
+    
     <xsl:choose>
-
+      
       <!--  check if the paragraf is heading -->
       <xsl:when test="$outlineLevel != '' ">
         <xsl:call-template name="InsertHeading">
-          <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
-        </xsl:call-template>
+          <xsl:with-param name="outlineLevel" select="$outlineLevel" />
+          </xsl:call-template>        
       </xsl:when>
-
+      
       <!--  default scenario -->
       <xsl:otherwise>
+        <text:p text:style-name="Standard">
+          <!-- todo without styles -->
         <xsl:apply-templates/>
+        </text:p>
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
 
+  <xsl:template match="w:r">
+   
+	<xsl:apply-templates></xsl:apply-templates>
 
+  </xsl:template>
   <xsl:template match="w:t">
-    <xsl:message terminate="no">progress:w:t</xsl:message>
-    <text:p text:style-name="Standard">
-      <!-- todo without styles -->
-      <xsl:value-of select="."/>
-    </text:p>
+    <xsl:message terminate="no">progress:w:t</xsl:message>  
+      <xsl:value-of select="."/>  
   </xsl:template>
 
 
