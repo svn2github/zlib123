@@ -28,12 +28,25 @@
 
 using System;
 using System.IO;
-using CleverAge.OdfConverter.OdfConverterLib;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading;
 using CleverAge.OdfConverter.OdfZipUtils;
+using CleverAge.OdfConverter.OdfConverterLib;
 
 namespace CleverAge.OdfConverter.OdfConverterTest
 {
+    enum ControlType : int
+    {
+        CTRL_C_EVENT = 0,
+        CTRL_BREAK_EVENT = 1,
+        CTRL_CLOSE_EVENT = 2,
+        CTRL_LOGOFF_EVENT = 5,
+        CTRL_SHUTDOWN_EVENT = 6
+    };
+
+    delegate int ControlHandlerFonction(ControlType control);
+
     /// <summary>
     /// ODFConverterTest is a CommandLine Program to test the conversion
     /// of an OpenDocument file into an OpenXML file.
@@ -57,6 +70,28 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         private Report report = null;
         private object wordApp = null;
 
+        [DllImport("kernel32")]
+        static extern bool SetConsoleCtrlHandler(ControlHandlerFonction handlerRoutine, bool add);
+
+        int MyHandler(ControlType control)
+        {
+            //Console.WriteLine("MyHandler: " + control.ToString());
+            if (wordApp != null)
+            {
+                try
+                {
+                    Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
+                    object missing = System.Reflection.Missing.Value;
+                    msWord.Quit(ref missing, ref missing, ref missing);
+                }
+                catch
+                {
+                    Console.WriteLine("Unable to close Word, please close it manually");
+                }
+            }
+            return 0;
+        }
+
         /// <summary>
         /// Main program.
         /// </summary>
@@ -64,6 +99,8 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         public static void Main(String[] args)
         {
             OdfConverterTest tester = new OdfConverterTest();
+            ControlHandlerFonction myHandler = new ControlHandlerFonction(tester.MyHandler);
+            SetConsoleCtrlHandler(myHandler, true);
             try
             {
                 tester.ParseCommandLine(args);
@@ -74,7 +111,16 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 usage();
                 return;
             }
-            tester.Proceed();
+            try
+            {
+                tester.Proceed();
+                Console.WriteLine("Terminé...");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception raised when running test : " + ex.Message);
+                Console.WriteLine(ex.StackTrace);
+            }
         }
 
         private void Proceed()
@@ -139,7 +185,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             {
                 string output = this.GenerateOutputName(this.output, input, ".docx", true);
                 int result = this.ProceedSingleFile(input, output, true);
-                switch(result)
+                switch (result)
                 {
                     case NOT_CONVERTED:
                         break;
@@ -498,7 +544,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             string rawFileName = Path.GetFileNameWithoutExtension(input);
             string output = Path.Combine(rootPath, rawFileName + extension);
             int num = 0;
-            while (!replace && (File.Exists(output) || Directory.Exists(output)))
+            while (!replace && File.Exists(output))
             {
                 output = Path.Combine(rootPath, rawFileName + "_" + ++num + extension);
             }
