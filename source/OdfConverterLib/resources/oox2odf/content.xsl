@@ -211,68 +211,9 @@
 
       <!-- borders. -->
       <xsl:if test="w:pBdr">
-        <!-- TODO : if the four borders are equal, then create adequate attributes. -->
-        <xsl:apply-templates select="w:pBdr/child::node()"/>
+        <xsl:call-template name="InsertParagraphBorder"/>
         <!-- add shadow -->
-        <xsl:variable name="firstVal">
-          <xsl:choose>
-            <xsl:when
-              test="w:pBdr/w:right/@w:shadow='true' or w:pBdr/w:right/@w:shadow=1 or w:pBdr/w:right/@w:shadow='on'">
-              <xsl:call-template name="ConvertPoints">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pBdr/w:right/@w:space"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:choose>
-                <xsl:when
-                  test="w:pBdr/w:left/@w:shadow='true' or w:pBdr/w:left/@w:shadow=1 or w:pBdr/w:left/@w:shadow='on'">
-                  <xsl:call-template name="ConvertPoints">
-                    <xsl:with-param name="length">
-                      <xsl:value-of select="w:pBdr/w:left/@w:space"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="unit">cm</xsl:with-param>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="secondVal">
-          <xsl:choose>
-            <xsl:when
-              test="w:pBdr/w:bottom/@w:shadow='true' or w:pBdr/w:bottom/@w:shadow=1 or w:pBdr/w:bottom/@w:shadow='on'">
-              <xsl:call-template name="ConvertPoints">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pBdr/w:bottom/@w:space"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:choose>
-                <xsl:when
-                  test="w:pBdr/w:top/@w:shadow='true' or w:pBdr/w:top/@w:shadow=1 or w:pBdr/w:top/@w:shadow='on'">
-                  <xsl:call-template name="ConvertPoints">
-                    <xsl:with-param name="length">
-                      <xsl:value-of select="w:pBdr/w:top/@w:space"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="unit">cm</xsl:with-param>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:if test="$firstVal !=0 and $secondVal != 0">
-          <xsl:attribute name="style:shadow">
-            <xsl:value-of select="concat('#000000 ',$firstVal,' ',$secondVal)"/>
-          </xsl:attribute>
-        </xsl:if>
+        <xsl:call-template name="InsertParagraphShadow"/>
       </xsl:if>
 
       <!-- bg color -->
@@ -309,8 +250,8 @@
       </xsl:if>
 
       <!-- space before/after -->
-      <!-- TODO : Check how to use the w:spacing/w:afterLines or w:beforeLines elements -->
-      <xsl:if test="w:spacing/@w:before">
+      <!-- w:afterLines and w:beforeLines elements are lost -->
+      <xsl:if test="not(w:spacing/@w:beforeAutospacing='on' or w:spacing/@w:beforeAutospacing='1' or w:spacing/@w:beforeAutospacing='true') and w:spacing/@w:before">
         <xsl:attribute name="fo:margin-top">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
@@ -320,7 +261,7 @@
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="w:spacing/@w:after">
+      <xsl:if test="not(w:spacing/@w:afterAutospacing='on' or w:spacing/@w:afterAutospacing='1' or w:spacing/@w:afterAutospacing='true') and w:spacing/@w:after">
         <xsl:attribute name="fo:margin-bottom">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
@@ -418,7 +359,7 @@
         </xsl:attribute>
       </xsl:if>
 
-      <!-- tabs. TODO : write a template to handle tab stops. -->
+      <!-- tab stops -->
       <xsl:if test="w:tabs/w:tab">
         <style:tab-stops>
           <xsl:apply-templates select="w:tabs/w:tab"/>
@@ -429,16 +370,40 @@
 
   </xsl:template>
 
+  <xsl:template name="InsertParagraphBorder">
+    <xsl:if test="w:pBdr/w:between">
+      <xsl:attribute name="style:join-border">false</xsl:attribute>
+    </xsl:if>
+
+    <xsl:for-each select="w:pBdr">
+      <xsl:choose>
+        <!-- if the four borders are equal, then create adequate attributes. -->
+        <xsl:when
+          test="w:top/@color=w:bottom/@color and w:top/@space=w:bottom/@space and w:top/@sz=w:bottom/@sz and w:top/@val=w:bottom/@val
+          and w:top/@color=w:left/@color and w:top/@space=w:left/@space and w:top/@sz=w:left/@sz and w:top/@val=w:left/@val
+          and w:top/@color=w:right/@color and w:top/@space=w:right/@space and w:top/@sz=w:right/@sz and w:top/@val=w:right/@val">
+          <xsl:call-template name="InsertBorderAttributes"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:for-each select="child::node()[name() != 'w:between']">
+            <xsl:call-template name="InsertBorderAttributes">
+              <xsl:with-param name="side" select="substring-after(name(),'w:')"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+
   <!-- compute attributes defining borders : color, style, width, padding... -->
-  <xsl:template match="node()[parent::w:pBdr]">
+  <xsl:template name="InsertBorderAttributes">
+    <xsl:param name="side"/>
+
     <xsl:choose>
-      <xsl:when test="name()='w:between'">
-        <xsl:attribute name="style:join-border">false</xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="$side">
         <!-- add padding -->
         <xsl:if test="@w:space">
-          <xsl:attribute name="{concat('fo:padding-',substring-after(name(),'w:'))}">
+          <xsl:attribute name="{concat('fo:padding-',$side)}">
             <xsl:call-template name="ConvertPoints">
               <xsl:with-param name="length">
                 <xsl:value-of select="@w:space"/>
@@ -453,7 +418,7 @@
             <xsl:with-param name="style" select="@w:val"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:attribute name="{concat('fo:border-',substring-after(name(),'w:'))}">
+        <xsl:attribute name="{concat('fo:border-',$side)}">
           <xsl:variable name="size">
             <xsl:call-template name="ConvertEighthsPoints">
               <xsl:with-param name="length">
@@ -476,15 +441,129 @@
           <xsl:value-of select="concat($size,' ',$style,' ',$color)"/>
         </xsl:attribute>
         <xsl:if test="$style='double' ">
-          <xsl:attribute name="{concat('fo:border-line-width-',substring-after(name(),'w:'))}">
+          <xsl:attribute name="{concat('fo:border-line-width-',$side)}">
             <xsl:call-template name="ComputeDoubleBorderWidth">
               <xsl:with-param name="style" select="@w:val"/>
               <xsl:with-param name="borderWidth" select="@w:sz"/>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- add padding -->
+        <xsl:if test="w:top/@w:space">
+          <xsl:attribute name="fo:padding">
+            <xsl:call-template name="ConvertPoints">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:top/@w:space"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <!-- add border with style, width and color -->
+        <xsl:variable name="style">
+          <xsl:call-template name="GetParagraphBorderStyle">
+            <xsl:with-param name="style" select="w:top/@w:val"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:attribute name="fo:border">
+          <xsl:variable name="size">
+            <xsl:call-template name="ConvertEighthsPoints">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:top/@w:sz"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="color">
+            <xsl:choose>
+              <xsl:when test="w:top/@w:color='auto'">
+                <xsl:value-of select="'transparent'"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat('#',w:top/@w:color)"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <xsl:value-of select="concat($size,' ',$style,' ',$color)"/>
+        </xsl:attribute>
+        <xsl:if test="$style='double' ">
+          <xsl:attribute name="fo:border-line-width">
+            <xsl:call-template name="ComputeDoubleBorderWidth">
+              <xsl:with-param name="style" select="w:top/@w:val"/>
+              <xsl:with-param name="borderWidth" select="w:top/@w:sz"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="InsertParagraphShadow">
+
+    <xsl:variable name="firstVal">
+      <xsl:choose>
+        <xsl:when
+          test="w:pBdr/w:right/@w:shadow='true' or w:pBdr/w:right/@w:shadow=1 or w:pBdr/w:right/@w:shadow='on'">
+          <xsl:call-template name="ConvertPoints">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:pBdr/w:right/@w:space"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when
+              test="w:pBdr/w:left/@w:shadow='true' or w:pBdr/w:left/@w:shadow=1 or w:pBdr/w:left/@w:shadow='on'">
+              <xsl:call-template name="ConvertPoints">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pBdr/w:left/@w:space"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="secondVal">
+      <xsl:choose>
+        <xsl:when
+          test="w:pBdr/w:bottom/@w:shadow='true' or w:pBdr/w:bottom/@w:shadow=1 or w:pBdr/w:bottom/@w:shadow='on'">
+          <xsl:call-template name="ConvertPoints">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:pBdr/w:bottom/@w:space"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when
+              test="w:pBdr/w:top/@w:shadow='true' or w:pBdr/w:top/@w:shadow=1 or w:pBdr/w:top/@w:shadow='on'">
+              <xsl:call-template name="ConvertPoints">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pBdr/w:top/@w:space"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:if test="$firstVal !=0 and $secondVal != 0">
+      <xsl:attribute name="style:shadow">
+        <xsl:value-of select="concat('#000000 ',$firstVal,' ',$secondVal)"/>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <!-- convert the style of a border -->
@@ -620,6 +699,46 @@
     </xsl:variable>
 
     <xsl:value-of select="concat($inner,' ',$middle,' ',$outer)"/>
+  </xsl:template>
+
+  <!-- Handle tab stops -->
+  <!-- TODO : check how to deal with tab stops inside a list -->
+  <xsl:template match="w:tab">
+    <xsl:if test="@w:val != 'num' and @w:val != 'clear'">
+      <!-- type -->
+      <xsl:attribute name="style:type">
+        <xsl:choose>
+          <xsl:when test="@w:val='center'">center</xsl:when>
+          <xsl:when test="@w:val='right'">right</xsl:when>
+          <xsl:when test="@w:val='left'">left</xsl:when>
+          <xsl:otherwise>left</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <!-- position -->
+      <!-- TODO : what if @w:pos < 0 ? -->
+      <xsl:if test="@w:pos >= 0">
+        <xsl:attribute name="style:position">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length" select="@w:pos"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <!-- leader char -->
+      <xsl:if test="@w:leader">
+        <xsl:attribute name="style:leader-style">
+          <xsl:choose>
+            <xsl:when test="@w:leader='dot'">dotted</xsl:when>
+            <xsl:when test="@w:leader='heavy'">solid</xsl:when>
+            <xsl:when test="@w:leader='hyphen'">dash</xsl:when>
+            <xsl:when test="@w:leader='middleDot'">dotted</xsl:when>
+            <xsl:when test="@w:leader='none'">none</xsl:when>
+            <xsl:when test="@w:leader='underscore'">solid</xsl:when>
+            <xsl:otherwise>none</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>
