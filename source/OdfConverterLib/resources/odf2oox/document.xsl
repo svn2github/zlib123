@@ -1903,7 +1903,7 @@
       <w:ilvl w:val="{$level}"/>
       <w:numId>
         <xsl:attribute name="w:val">
-          <xsl:call-template name="numberingId">
+          <xsl:call-template name="GetNumberingId">
             <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
           </xsl:call-template>
         </xsl:attribute>

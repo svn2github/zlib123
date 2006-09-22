@@ -90,6 +90,7 @@
     </xsl:choose>
   </xsl:template>
 
+   <!--draw:object-ole element represents objects that only have a binary representation -->
   <xsl:template match="draw:frame[./draw:object-ole]" mode="paragraph">
     <xsl:variable name="imageId">
       <xsl:call-template name="GetPosition">
@@ -124,6 +125,7 @@
     </w:r>
   </xsl:template>
 
+  <!--TODO comment: what it is used for ?-->
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[not(starts-with(@xlink:href, 'Pictures/'))]]"
     mode="paragraph">

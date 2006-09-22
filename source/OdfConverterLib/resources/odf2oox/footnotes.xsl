@@ -111,7 +111,7 @@
       <xsl:if test="@style:num-format">
         <w:numFmt>
           <xsl:attribute name="w:val">
-            <xsl:call-template name="num-format">
+            <xsl:call-template name="GetNumFormat">
               <xsl:with-param name="format" select="@style:num-format"/>
             </xsl:call-template>
           </xsl:attribute>

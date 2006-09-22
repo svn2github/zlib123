@@ -43,8 +43,8 @@
     select="count(document('content.xml')/office:document-content/office:automatic-styles/text:list-style)"/>
   <xsl:variable name="stylesListStyleCount"
     select="count(document('styles.xml')/office:document-styles/office:styles/text:list-style|document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style)"/>
-  
 
+  <!--generate numbering definitions: abstract numbering w:abstractNumbering and numbering instances w:num -->
   <xsl:template name="numbering">
     <w:numbering>
       <xsl:apply-templates
@@ -56,19 +56,19 @@
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:list-style"
         mode="numbering">
-        <xsl:with-param name="offset" select="$automaticListStylesCount"/>        
+        <xsl:with-param name="offset" select="$automaticListStylesCount"/>
       </xsl:apply-templates>
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style"
         mode="numbering">
-        <xsl:with-param name="offset" select="$automaticListStylesCount"/>        
+        <xsl:with-param name="offset" select="$automaticListStylesCount"/>
       </xsl:apply-templates>
       <xsl:for-each select="document('content.xml')">
         <xsl:apply-templates select="key('restarting-lists','')" mode="numbering">
           <xsl:with-param name="offset" select="$automaticListStylesCount + $stylesListStyleCount"/>
         </xsl:apply-templates>
       </xsl:for-each>
-      
+
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:outline-style"
         mode="num"/>
@@ -92,7 +92,7 @@
       </xsl:for-each>
     </w:numbering>
   </xsl:template>
-  
+
   <xsl:template match="text:list-style" mode="numbering">
     <xsl:param name="offset" select="0"/>
     <w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list-style)+2+$offset}">
@@ -109,182 +109,163 @@
     </w:num>
   </xsl:template>
 
+  <!--bullet or numbered lists properties-->
   <xsl:template match="text:list-level-style-bullet|text:list-level-style-number" mode="numbering">
+
+    <!-- odf supports list level up to 10-->
     <xsl:if test="number(@text:level) &lt; 10">
       <w:lvl w:ilvl="{number(@text:level) - 1}">
+
+        <!--bullet style list-->
         <xsl:if test="name() = 'text:list-level-style-bullet' ">
           <w:numFmt w:val="bullet"/>
           <w:lvlText w:val="{@text:bullet-char}">
             <xsl:attribute name="w:val">
-              <xsl:call-template name="textChar"/>
+              <xsl:call-template name="InsertBulletChar"/>
             </xsl:attribute>
           </w:lvlText>
         </xsl:if>
+
+        <!--numbered list-->
         <xsl:if test="name() = 'text:list-level-style-number' ">
-          <xsl:choose>
-            <xsl:when test="@text:start-value">
-              <w:start w:val="{@text:start-value}"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <w:start w:val="1"/>
-            </xsl:otherwise>
-          </xsl:choose>
-          <w:numFmt>
-            <xsl:attribute name="w:val">
-              <xsl:call-template name="num-format">
-                <xsl:with-param name="format">
-                  <xsl:value-of select="@style:num-format"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </w:numFmt>
-          <!-- xsl:if test="ancestor::text:list-style/@text:consecutive-numbering = 'true' ">
-						<w:lvlRestart w:val="1"/>
-						</xsl:if -->
-          <w:lvlText>
-            <xsl:attribute name="w:val">
-              <xsl:choose>
-                <xsl:when test="@style:num-format = '' "/>
-                <xsl:otherwise>
-                  <xsl:value-of select="@style:num-prefix"/>
-                  <xsl:choose>
-                    <xsl:when test="@text:display-levels">
-                      <xsl:call-template name="display-levels">
-                        <xsl:with-param name="dlvl" select="@text:display-levels"/>
-                        <xsl:with-param name="lvl" select="@text:level"/>
-                        <xsl:with-param name="listStyleName"
-                          select="ancestor::text:list-style/@style:name"/>
-                      </xsl:call-template>
-                    </xsl:when>
-                    <xsl:otherwise>%<xsl:value-of select="@text:level"/></xsl:otherwise>
-                  </xsl:choose>
-                  <xsl:value-of select="@style:num-suffix"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </w:lvlText>
+          <xsl:call-template name="InsertNumberedListProperties"/>
         </xsl:if>
 
-        <w:lvlJc>
-          <xsl:attribute name="w:val">
-            <xsl:call-template name="text-align">
-              <xsl:with-param name="align" select="style:list-level-properties/@fo:text-align"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </w:lvlJc>
+        <!--list justification-->
+        <xsl:call-template name="InsertListJustification"/>
+
+        <!--list paragraph properties like tab, indent-->
         <w:pPr>
-          <xsl:variable name="spaceBeforeTwip">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="style:list-level-properties/@text:space-before"
-              />
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="minLabelWidthTwip">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length"
-                select="style:list-level-properties/@text:min-label-width"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="minLabelDistanceTwip">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length"
-                select="style:list-level-properties/@text:min-label-distance"/>
-            </xsl:call-template>
-          </xsl:variable>
-
-          <!--If props/@style:display-levels is defined and greater than 1, the tabs may not be well converted.-->
-          <w:tabs>
-            <w:tab>
-              <xsl:attribute name="w:val">num</xsl:attribute>
-              <xsl:attribute name="w:pos">
-                <xsl:choose>
-                  <xsl:when test="$spaceBeforeTwip &lt; 0">
-                    <xsl:choose>
-                      <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                        <xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:choose>
-                      <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                        <xsl:value-of
-                          select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
-            </w:tab>
-          </w:tabs>
-
-          <!-- disable hyphenation -->
-          <xsl:for-each select="document('content.xml')">
-            <xsl:choose>
-              <xsl:when
-                test="key('automatic-styles',@text:style-name)/style:text-properties/@fo:hyphenate='true'"/>
-              <xsl:otherwise>
-                <xsl:variable name="styleName">
-                  <xsl:value-of select="@text:style-name"/>
-                </xsl:variable>
-                <xsl:for-each select="document('styles.xml')">
-                  <xsl:choose>
-                    <xsl:when
-                      test="key('styles',$styleName)/style:text-properties/@fo:hyphenate='true'">
-                      <w:suppressAutoHyphens w:val="false"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <w:suppressAutoHyphens w:val="true"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:for-each>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:for-each>
-
-          <w:ind>
-            <xsl:attribute name="w:left">
-              <xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip "/>
-            </xsl:attribute>
-            <xsl:choose>
-              <xsl:when test="$spaceBeforeTwip &lt; 0">
-                <xsl:attribute name="w:firstLine">
-                  <xsl:value-of select="$minLabelWidthTwip"/>
-                </xsl:attribute>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:attribute name="w:hanging">
-                  <xsl:value-of select="$minLabelWidthTwip"/>
-                </xsl:attribute>
-              </xsl:otherwise>
-            </xsl:choose>
-          </w:ind>
+          <xsl:call-template name="InsertListParagraphProperties"/>
         </w:pPr>
+
+        <!-- bullet type for bullet list-->
         <xsl:choose>
           <xsl:when test="name() = 'text:list-level-style-bullet' ">
-            <xsl:call-template name="bulletType">
+            <xsl:call-template name="InsertBulletType">
               <xsl:with-param name="char">
-                <xsl:call-template name="textChar"/>
+                <xsl:call-template name="InsertBulletChar"/>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:when>
+          <!-- run properties for numbered list-->
           <xsl:otherwise>
             <xsl:call-template name="InsertRunProperties"/>
           </xsl:otherwise>
         </xsl:choose>
+
       </w:lvl>
     </xsl:if>
 
   </xsl:template>
 
-  <xsl:template name="textChar">
-    <xsl:choose>
+  
+  <xsl:template name="InsertListParagraphProperties">
+    <xsl:variable name="spaceBeforeTwip">
+      <xsl:call-template name="twips-measure">
+        <xsl:with-param name="length" select="style:list-level-properties/@text:space-before"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="minLabelWidthTwip">
+      <xsl:call-template name="twips-measure">
+        <xsl:with-param name="length" select="style:list-level-properties/@text:min-label-width"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="minLabelDistanceTwip">
+      <xsl:call-template name="twips-measure">
+        <xsl:with-param name="length" select="style:list-level-properties/@text:min-label-distance"
+        />
+      </xsl:call-template>
+    </xsl:variable>
+
+    <!--If props/@style:display-levels is defined and greater than 1, the tabs may not be well converted.-->
+    <w:tabs>
+      <w:tab>
+        <xsl:attribute name="w:val">num</xsl:attribute>
+        <xsl:attribute name="w:pos">
+          <xsl:choose>
+            <xsl:when test="$spaceBeforeTwip &lt; 0">
+              <xsl:choose>
+                <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                  <xsl:value-of
+                    select="$minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                  <xsl:value-of
+                    select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </w:tab>
+    </w:tabs>
+
+    <!-- disable hyphenation -->
+    <xsl:for-each select="document('content.xml')">
+      <xsl:choose>
+        <xsl:when
+          test="key('automatic-styles',@text:style-name)/style:text-properties/@fo:hyphenate='true'"/>
+        <xsl:otherwise>
+          <xsl:variable name="styleName">
+            <xsl:value-of select="@text:style-name"/>
+          </xsl:variable>
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:choose>
+              <xsl:when test="key('styles',$styleName)/style:text-properties/@fo:hyphenate='true'">
+                <w:suppressAutoHyphens w:val="false"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <w:suppressAutoHyphens w:val="true"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+
+    <w:ind>
+      <xsl:attribute name="w:left">
+        <xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip "/>
+      </xsl:attribute>
+      <xsl:choose>
+        <xsl:when test="$spaceBeforeTwip &lt; 0">
+          <xsl:attribute name="w:firstLine">
+            <xsl:value-of select="$minLabelWidthTwip"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="w:hanging">
+            <xsl:value-of select="$minLabelWidthTwip"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+    </w:ind>
+  </xsl:template>
+
+  <!-- list justification -->
+  <xsl:template name="InsertListJustification">
+    <w:lvlJc>
+      <xsl:attribute name="w:val">
+        <xsl:call-template name="InsertTextAlign">
+          <xsl:with-param name="align" select="style:list-level-properties/@fo:text-align"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </w:lvlJc>
+  </xsl:template>
+
+  <xsl:template name="InsertBulletChar">
+  <xsl:choose>
       <xsl:when test="@text:bullet-char = '' "></xsl:when>
       <xsl:when test="@text:bullet-char = '' "></xsl:when>
       <xsl:when test="@text:bullet-char = '☑' "></xsl:when>
@@ -301,76 +282,111 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template name="bulletType">
+  <xsl:template name="InsertBulletType">
     <xsl:param name="char"/>
     <xsl:choose>
       <xsl:when
         test="$char = ''  or  $char = '' or  $char = ''  or  $char = ' ✗'  or $char=''  or $char='' ">
         <w:rPr>
           <w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>
-          <xsl:call-template name="bulletSize">
+          <xsl:call-template name="GetBulletSize">
             <xsl:with-param name="fontName">
               <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
             </xsl:with-param>
           </xsl:call-template>
-
-
         </w:rPr>
       </xsl:when>
 
       <xsl:when test="$char = '' ">
         <w:rPr>
           <w:rFonts w:ascii="Wingdings 3" w:hAnsi="Wingdings 3" w:hint="default"/>
-          <xsl:call-template name="bulletSize">
+          <xsl:call-template name="GetBulletSize">
             <xsl:with-param name="fontName">
               <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
             </xsl:with-param>
           </xsl:call-template>
-
-
         </w:rPr>
       </xsl:when>
 
       <xsl:when test="$char = '' ">
         <w:rPr>
           <w:rFonts w:ascii="Wingdings 2" w:hAnsi="Wingdings 2" w:hint="default"/>
-          <xsl:call-template name="bulletSize">
+          <xsl:call-template name="GetBulletSize">
             <xsl:with-param name="fontName">
               <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
             </xsl:with-param>
           </xsl:call-template>
-
-        </w:rPr>
+       </w:rPr>
       </xsl:when>
 
       <xsl:when test="$char  = 'o'  or $char = '•' or $char = '–' ">
         <w:rPr>
           <w:rFonts w:ascii="Courier New" w:hAnsi="Courier New" w:cs="Courier New" w:hint="default"/>
-          <xsl:call-template name="bulletSize">
+          <xsl:call-template name="GetBulletSize">
             <xsl:with-param name="fontName">
               <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
             </xsl:with-param>
           </xsl:call-template>
-
-
-        </w:rPr>
+       </w:rPr>
       </xsl:when>
       <xsl:when test="$char  = '' ">
         <w:rPr>
           <w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>
-          <xsl:call-template name="bulletSize">
+          <xsl:call-template name="GetBulletSize">
             <xsl:with-param name="fontName">
               <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
             </xsl:with-param>
           </xsl:call-template>
-
-        </w:rPr>
+       </w:rPr>
       </xsl:when>
-
-      <xsl:otherwise/>
+     <xsl:otherwise/>
     </xsl:choose>
   </xsl:template>
-  <xsl:template name="bulletSize">
+
+  <xsl:template name="InsertNumberedListProperties">
+    <xsl:choose>
+      <xsl:when test="@text:start-value">
+        <w:start w:val="{@text:start-value}"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:start w:val="1"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <w:numFmt>
+      <xsl:attribute name="w:val">
+        <xsl:call-template name="GetNumFormat">
+          <xsl:with-param name="format">
+            <xsl:value-of select="@style:num-format"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </w:numFmt>
+    <!-- xsl:if test="ancestor::text:list-style/@text:consecutive-numbering = 'true' ">
+      <w:lvlRestart w:val="1"/>
+      </xsl:if -->
+    <w:lvlText>
+      <xsl:attribute name="w:val">
+        <xsl:value-of select="@style:num-prefix"/>
+        <xsl:choose>
+          <xsl:when test="@style:num-format='1'">
+            <xsl:call-template name="GetNumberingLevelText">
+              <xsl:with-param name="level" select="@text:level"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="@style:num-format='a'">
+            <xsl:value-of select="concat('%',string(@text:level))"/>
+          </xsl:when>
+          <xsl:when test="@style:num-format='A'">
+            <xsl:value-of select="concat('%',string(@text:level))"/>
+          </xsl:when>
+          <xsl:otherwise/>
+        </xsl:choose>
+        <xsl:value-of select="@style:num-suffix"/>
+      </xsl:attribute>
+    </w:lvlText>
+  </xsl:template>
+
+  <xsl:template name="GetBulletSize">
     <xsl:param name="fontName"/>
     <xsl:if
       test="document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[@style:font-name = $fontName]">
@@ -391,7 +407,7 @@
 		param       : format (string)
 		description : convert the ODF numFormat to OOX numFormat
 	-->
-  <xsl:template name="num-format">
+  <xsl:template name="GetNumFormat">
     <xsl:param name="format"/>
     <xsl:choose>
       <xsl:when test="$format= '1' ">decimal</xsl:when>
@@ -404,7 +420,7 @@
   </xsl:template>
 
 
-  <xsl:template name="text-align">
+  <xsl:template name="InsertTextAlign">
     <xsl:param name="align"/>
     <xsl:choose>
       <xsl:when test="left">left</xsl:when>
@@ -414,158 +430,107 @@
     </xsl:choose>
   </xsl:template>
 
-
-  <!-- Generate the format string for multiple levels -->
-  <xsl:template name="display-levels">
-    <xsl:param name="dlvl"/>
-    <xsl:param name="lvl"/>
-    <xsl:param name="listStyleName"/>
-    <xsl:if test="$dlvl &gt; 0">
-      <xsl:call-template name="display-levels">
-        <xsl:with-param name="dlvl" select="$dlvl - 1"/>
-        <xsl:with-param name="lvl" select="$lvl - 1"/>
-        <xsl:with-param name="listStyleName" select="$listStyleName"/>
-      </xsl:call-template>
-      <!-- levels with no formatting are not displayed -->
-      <xsl:if
-        test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $lvl]/@style:num-format != '' ">
-        <xsl:if test="$dlvl &gt; 1">.</xsl:if>%<xsl:value-of select="$lvl"/>
-      </xsl:if>
-    </xsl:if>
-  </xsl:template>
+  <!-- outline style is applied to headings : generate numbering instance -->
   <xsl:template match="text:outline-style" mode="num">
     <w:num w:numId="1">
       <w:abstractNumId w:val="1"/>
     </w:num>
   </xsl:template>
 
+  <!-- outline style applied to headings : generate abstract num definition-->
   <xsl:template match="text:outline-style" mode="numbering">
     <w:abstractNum w:abstractNumId="1">
       <xsl:for-each select="text:outline-level-style[@text:level &lt; 10]">
         <xsl:if test="@text:level">
           <w:lvl w:ilvl="{number(@text:level)-1}">
 
-            <xsl:choose>
-              <xsl:when test="@text:start-value">
-                <w:start w:val="{@text:start-value}"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <w:start w:val="1"/>
-              </xsl:otherwise>
-            </xsl:choose>
-            <w:numFmt>
-              <xsl:attribute name="w:val">
-                <xsl:call-template name="num-format">
-                  <xsl:with-param name="format" select="@style:num-format"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </w:numFmt>
-            <!-- <w:pStyle w:val="{concat('Heading',number(@text:level)-1)}"/> -->
-            <w:lvlText>
+            <!--numbered list properties: num start, level, num type-->
+            <xsl:call-template name="InsertNumberedListProperties"/>
 
-              <xsl:attribute name="w:val">
-                <xsl:value-of select="@style:num-prefix"/>
-                <xsl:choose>
-                  <xsl:when test="@style:num-format='1'">
-                    <xsl:call-template name="text-format">
-                      <xsl:with-param name="level" select="@text:level"/>
-                    </xsl:call-template>
-                  </xsl:when>
-                  <xsl:when test="@style:num-format='a'">
-                    <xsl:value-of select="concat('%',string(@text:level))"/>
-                  </xsl:when>
-                  <xsl:when test="@style:num-format='A'">
-                    <xsl:value-of select="concat('%',string(@text:level))"/>
-                  </xsl:when>
-                  <xsl:otherwise/>
-                </xsl:choose>
-                <xsl:value-of select="@style:num-suffix"/>
-              </xsl:attribute>
-            </w:lvlText>
+            <!--justification-->
             <w:lvlJc w:val="left"/>
-            <w:pPr>
-              <xsl:variable name="spaceBeforeTwip">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length"
-                    select="style:list-level-properties/@text:space-before"/>
-                </xsl:call-template>
-              </xsl:variable>
-              <xsl:variable name="minLabelWidthTwip">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length"
-                    select="style:list-level-properties/@text:min-label-width"/>
-                </xsl:call-template>
-              </xsl:variable>
-              <w:ind>
-                <xsl:choose>
-                  <xsl:when test="number($spaceBeforeTwip) &lt; 0">
-                    <xsl:choose>
-                      <xsl:when test="style:list-level-properties/@text:min-label-width">
-                        <xsl:attribute name="w:left">
-                          <xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:attribute name="w:left">
-                          <xsl:value-of select="$spaceBeforeTwip"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                    <xsl:choose>
-                      <xsl:when test="style:list-level-properties/@text:space-before">
-                        <xsl:attribute name="w:firstLine">
-                          <xsl:value-of select="$minLabelWidthTwip"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:attribute name="w:hanging">
-                          <xsl:value-of select="$minLabelWidthTwip"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:choose>
-                      <xsl:when test="style:list-level-properties/@text:min-label-width">
-                        <xsl:attribute name="w:left">
-                          <xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:attribute name="w:left">
-                          <xsl:value-of select="$spaceBeforeTwip"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                    <xsl:choose>
-                      <xsl:when test="style:list-level-properties/@text:space-before">
-                        <xsl:attribute name="w:hanging">
-                          <xsl:value-of select="$minLabelWidthTwip"/>
-                        </xsl:attribute>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:attribute name="w:hanging">
-                          <xsl:value-of select="$minLabelWidthTwip"/>
-                        </xsl:attribute>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:otherwise>
-                </xsl:choose>
 
-              </w:ind>
+            <!--  list paragraph properties: indent -->
+            <w:pPr>
+              <xsl:call-template name="InsertOutlineParagraphProperties"/>
             </w:pPr>
           </w:lvl>
         </xsl:if>
       </xsl:for-each>
-
-
     </w:abstractNum>
   </xsl:template>
-  <!--	<xsl:template match="text:outline-level-style">
-		
-	</xsl:template> -->
 
-  <xsl:template name="text-format">
+  <xsl:template name="InsertOutlineParagraphProperties">
+    <xsl:variable name="spaceBeforeTwip">
+      <xsl:call-template name="twips-measure">
+        <xsl:with-param name="length" select="style:list-level-properties/@text:space-before"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="minLabelWidthTwip">
+      <xsl:call-template name="twips-measure">
+        <xsl:with-param name="length" select="style:list-level-properties/@text:min-label-width"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <w:ind>
+      <xsl:choose>
+        <xsl:when test="number($spaceBeforeTwip) &lt; 0">
+          <xsl:choose>
+            <xsl:when test="style:list-level-properties/@text:min-label-width">
+              <xsl:attribute name="w:left">
+                <xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="w:left">
+                <xsl:value-of select="$spaceBeforeTwip"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:choose>
+            <xsl:when test="style:list-level-properties/@text:space-before">
+              <xsl:attribute name="w:firstLine">
+                <xsl:value-of select="$minLabelWidthTwip"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="w:hanging">
+                <xsl:value-of select="$minLabelWidthTwip"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="style:list-level-properties/@text:min-label-width">
+              <xsl:attribute name="w:left">
+                <xsl:value-of select="$minLabelWidthTwip + $spaceBeforeTwip"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="w:left">
+                <xsl:value-of select="$spaceBeforeTwip"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:choose>
+            <xsl:when test="style:list-level-properties/@text:space-before">
+              <xsl:attribute name="w:hanging">
+                <xsl:value-of select="$minLabelWidthTwip"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="w:hanging">
+                <xsl:value-of select="$minLabelWidthTwip"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </w:ind>
+  </xsl:template>
+
+  <xsl:template name="GetNumberingLevelText">
     <xsl:param name="level"/>
     <xsl:choose>
       <xsl:when test="$level = 9">%1.%2.%3.%4.%5.%6.%7.%8.%9</xsl:when>
@@ -580,12 +545,16 @@
       <xsl:otherwise>%1</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
+  <!-- appearance and behaviour for set of list paragraphs -->
   <xsl:template match="text:list" mode="numbering">
     <xsl:param name="offset" select="0"/>
     <xsl:variable name="listStyleName" select="@text:style-name"/>
-    <w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}">
+    <w:abstractNum
+      w:abstractNumId="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}">
       <xsl:choose>
+
+        <!--  look for list style in content.xml in automatic-styles-->
         <xsl:when
           test="document('content.xml')/office:document-content/office:automatic-styles/text:list-style/@style:name=$listStyleName">
           <xsl:for-each
@@ -595,6 +564,8 @@
               mode="numbering"/>
           </xsl:for-each>
         </xsl:when>
+
+        <!-- look for list style in styles.xml in styles-->
         <xsl:when
           test="document('styles.xml')/office:document-styles/office:styles/text:list-style/@style:name=$listStyleName">
           <xsl:for-each
@@ -604,6 +575,8 @@
               mode="numbering"/>
           </xsl:for-each>
         </xsl:when>
+
+        <!--look for list style in styles.xml in automatic-styles-->
         <xsl:when
           test="document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style/@style:name=$listStyleName">
           <xsl:for-each
@@ -613,34 +586,40 @@
               mode="numbering"/>
           </xsl:for-each>
         </xsl:when>
-        <xsl:otherwise>
-        </xsl:otherwise>
+        <xsl:otherwise> </xsl:otherwise>
       </xsl:choose>
     </w:abstractNum>
   </xsl:template>
-  
+
+  <!-- numbering definition which references particular abstractNum and can be applied to a list paragraph -->
   <xsl:template match="text:list" mode="num">
     <xsl:param name="offset" select="0"/>
-    <w:num w:numId="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}">
-      <w:abstractNumId w:val="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}"/>
+    <w:num
+      w:numId="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}">
+      <w:abstractNumId
+        w:val="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}"/>
     </w:num>
   </xsl:template>
-    
-  <xsl:template name="numberingId">
+
+  <!-- numbering id put in paragraph which reference to numbering definition -->
+  <xsl:template name="GetNumberingId">
     <xsl:param name="styleName"/>
     <xsl:choose>
+
       <!-- first, if list is a restarting special overriding num-->
       <xsl:when test="parent::text:list/text:list-item/@text:start-value">
         <xsl:value-of
           select="count(parent::text:list/preceding-sibling::text:list[text:list-item/@text:start-value])+2+$stylesListStyleCount + $automaticListStylesCount"
         />
       </xsl:when>
+
       <!-- look for this list style into content.xml -->
-      <xsl:when test="key('list-style', $styleName) and not(ancestor::style:header) and not(ancestor::style:footer)">
+      <xsl:when
+        test="key('list-style', $styleName) and not(ancestor::style:header) and not(ancestor::style:footer)">
         <xsl:value-of
-          select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2"
-        />
+          select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2"/>
       </xsl:when>
+
       <!-- otherwise, look into styles.xml (add the offset) -->
       <xsl:otherwise>
         <xsl:for-each select="document('styles.xml')">
@@ -651,35 +630,42 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
+  <!-- computes numbering indent which is applied in list paragraph properties -->
   <xsl:template name="ComputeNumberingIndent">
     <xsl:param name="attribute"/>
     <xsl:param name="level"/>
     <xsl:param name="listStyleName"/>
-    
+
     <xsl:variable name="attributeValue">
       <xsl:choose>
         <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
-          <xsl:value-of select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"/>
+          <xsl:value-of
+            select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
+          />
         </xsl:when>
         <xsl:when
           test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]">
-          <xsl:value-of select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]"/>
+          <xsl:value-of
+            select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]"
+          />
         </xsl:when>
         <xsl:when
           test="document('styles.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]">
-          <xsl:value-of select="document('styles.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]"/>
+          <xsl:value-of
+            select="document('styles.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]"
+          />
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:call-template name="twips-measure">
       <xsl:with-param name="length">
         <xsl:value-of select="$attributeValue"/>
       </xsl:with-param>
     </xsl:call-template>
-    
+
   </xsl:template>
-  
+
 </xsl:stylesheet>
