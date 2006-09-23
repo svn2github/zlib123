@@ -361,27 +361,26 @@
         </xsl:call-template>
       </xsl:attribute>
     </w:numFmt>
-    <!-- xsl:if test="ancestor::text:list-style/@text:consecutive-numbering = 'true' ">
-      <w:lvlRestart w:val="1"/>
-      </xsl:if -->
     <w:lvlText>
       <xsl:attribute name="w:val">
-        <xsl:value-of select="@style:num-prefix"/>
         <xsl:choose>
-          <xsl:when test="@style:num-format='1'">
-            <xsl:call-template name="GetNumberingLevelText">
-              <xsl:with-param name="level" select="@text:level"/>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:when test="@style:num-format='a'">
-            <xsl:value-of select="concat('%',string(@text:level))"/>
-          </xsl:when>
-          <xsl:when test="@style:num-format='A'">
-            <xsl:value-of select="concat('%',string(@text:level))"/>
-          </xsl:when>
-          <xsl:otherwise/>
+          <xsl:when test="@style:num-format = '' "/>
+          <xsl:otherwise>
+            <xsl:value-of select="@style:num-prefix"/>
+            <xsl:choose>
+              <xsl:when test="@text:display-levels">
+                <xsl:call-template name="GetLevelText">
+                  <xsl:with-param name="displayLevels" select="@text:display-levels"/>
+                  <xsl:with-param name="level" select="@text:level"/>
+                  <xsl:with-param name="listStyleName"
+                    select="ancestor::text:list-style/@style:name"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>%<xsl:value-of select="@text:level"/></xsl:otherwise>
+            </xsl:choose>
+            <xsl:value-of select="@style:num-suffix"/>
+          </xsl:otherwise>
         </xsl:choose>
-        <xsl:value-of select="@style:num-suffix"/>
       </xsl:attribute>
     </w:lvlText>
   </xsl:template>
@@ -546,48 +545,66 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Generate the format string for multiple levels -->
+  <!--  level : current level -->
+  <!-- displayLevels : number of preceding levels displayed at this level -->
+  <xsl:template name="GetLevelText">
+    <xsl:param name="displayLevels"/>
+    <xsl:param name="level"/>
+    <xsl:param name="listStyleName"/>
+    
+    <xsl:if test="$displayLevels &gt; 0">
+      <xsl:call-template name="GetLevelText">
+        <xsl:with-param name="displayLevels" select="$displayLevels - 1"/>
+        <xsl:with-param name="level" select="$level - 1"/>
+        <xsl:with-param name="listStyleName" select="$listStyleName"/>
+      </xsl:call-template>
+      <!-- levels with no formatting are not displayed -->
+      <xsl:if
+        test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level]/@style:num-format != '' ">
+        <xsl:if test="$displayLevels &gt; 1">.</xsl:if>%<xsl:value-of select="$level"/>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+  
+  
+  
   <!-- appearance and behaviour for set of list paragraphs -->
   <xsl:template match="text:list" mode="numbering">
     <xsl:param name="offset" select="0"/>
     <xsl:variable name="listStyleName" select="@text:style-name"/>
     <w:abstractNum
       w:abstractNumId="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}">
-      <xsl:choose>
-
-        <!--  look for list style in content.xml in automatic-styles-->
-        <xsl:when
-          test="document('content.xml')/office:document-content/office:automatic-styles/text:list-style/@style:name=$listStyleName">
-          <xsl:for-each
-            select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style[@style:name=$listStyleName]">
-            <xsl:apply-templates
-              select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
-              mode="numbering"/>
-          </xsl:for-each>
-        </xsl:when>
-
-        <!-- look for list style in styles.xml in styles-->
-        <xsl:when
-          test="document('styles.xml')/office:document-styles/office:styles/text:list-style/@style:name=$listStyleName">
-          <xsl:for-each
-            select="document('styles.xml')/office:document-styles/office:styles/text:list-style[@style:name=$listStyleName]">
-            <xsl:apply-templates
-              select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
-              mode="numbering"/>
-          </xsl:for-each>
-        </xsl:when>
-
-        <!--look for list style in styles.xml in automatic-styles-->
-        <xsl:when
-          test="document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style/@style:name=$listStyleName">
-          <xsl:for-each
-            select="document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style[@style:name=$listStyleName]">
-            <xsl:apply-templates
-              select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
-              mode="numbering"/>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:otherwise> </xsl:otherwise>
-      </xsl:choose>
+        <xsl:choose>
+          
+          <!--  look for list style in content.xml -->
+          <xsl:when test="key('list-style', $listStyleName)">
+            <xsl:for-each select="key('list-style', $listStyleName)">
+              <xsl:apply-templates
+                select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+                mode="numbering"/>
+            </xsl:for-each>
+          </xsl:when>
+          
+          <xsl:otherwise>
+            <!-- look for list style in styles.xml -->
+            <xsl:for-each select="document('styles.xml')">
+              <xsl:choose>
+                
+                <xsl:when test="key('list-style', $listStyleName)">
+                  <xsl:for-each select="key('list-style', $listStyleName)">
+                    <xsl:apply-templates
+                      select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+                      mode="numbering"/>
+                  </xsl:for-each>
+                </xsl:when>
+                
+                <xsl:otherwise> </xsl:otherwise>
+              
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
     </w:abstractNum>
   </xsl:template>
 
@@ -617,14 +634,14 @@
       <xsl:when
         test="key('list-style', $styleName) and not(ancestor::style:header) and not(ancestor::style:footer)">
         <xsl:value-of
-          select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2"/>
+          select="count(key('list-style', $styleName)/preceding-sibling::text:list-style)+2"/>
       </xsl:when>
 
       <!-- otherwise, look into styles.xml (add the offset) -->
       <xsl:otherwise>
         <xsl:for-each select="document('styles.xml')">
           <xsl:value-of
-            select="count(key('list-style',$styleName)/preceding-sibling::text:list-style)+2+$automaticListStylesCount"
+            select="count(key('list-style', $styleName)/preceding-sibling::text:list-style)+2+$automaticListStylesCount"
           />
         </xsl:for-each>
       </xsl:otherwise>
@@ -637,35 +654,38 @@
     <xsl:param name="level"/>
     <xsl:param name="listStyleName"/>
 
-    <xsl:variable name="attributeValue">
-      <xsl:choose>
-        <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
-          <xsl:value-of
-            select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
-          />
-        </xsl:when>
-        <xsl:when
-          test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]">
-          <xsl:value-of
-            select="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]"
-          />
-        </xsl:when>
-        <xsl:when
-          test="document('styles.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]">
-          <xsl:value-of
-            select="document('styles.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-properties/attribute::node()[name()=$attribute]"
-          />
-        </xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:call-template name="twips-measure">
-      <xsl:with-param name="length">
-        <xsl:value-of select="$attributeValue"/>
-      </xsl:with-param>
-    </xsl:call-template>
-
+     <xsl:call-template name="twips-measure">
+       <xsl:with-param name="length">
+         <xsl:choose>
+           <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
+             <!--   text:outline-style -->
+             <xsl:value-of
+               select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
+             />
+           </xsl:when>
+           <!-- look into content.xml -->
+           <xsl:when
+             test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
+             <xsl:value-of
+               select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]"/>
+           </xsl:when>
+           <xsl:otherwise>
+             <!-- look into styles.xml -->
+             <xsl:for-each select="document('styles.xml')">
+               <xsl:choose>
+               <xsl:when
+                 test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
+                 <xsl:value-of
+                   select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]"/>
+               </xsl:when>
+               <xsl:otherwise>0</xsl:otherwise>
+               </xsl:choose>
+             </xsl:for-each>
+           </xsl:otherwise>
+         </xsl:choose>
+       
+       </xsl:with-param>
+     </xsl:call-template>
   </xsl:template>
 
 </xsl:stylesheet>
