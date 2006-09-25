@@ -42,6 +42,8 @@
       <office:scripts/>
       <office:font-face-decls/>
       <office:automatic-styles>
+        <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
+                  mode="automaticstyles"/>
         <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr]">
           <xsl:apply-templates select="document('word/numbering.xml')/w:numbering"/>
         </xsl:if>
@@ -54,6 +56,48 @@
     </office:document-content>
   </xsl:template>
 
+  <xsl:template match="w:rPr" mode="automaticstyles">
+    <xsl:message terminate="no">progress:w:pPr</xsl:message>
+    <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
+      <xsl:choose>
+        <xsl:when test="self::node()/w:b">
+          <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold"
+            style:font-weight-complex="bold"/>
+        </xsl:when>
+        <xsl:when test="self::node()/w:i">
+          <style:text-properties fo:font-style="italic" style:font-style-asian="italic"
+            style:font-style-complex="italic"/>
+        </xsl:when>
+        <xsl:when test="self::node()/w:color">
+          <style:text-properties fo:color="{self::node()/w:color/@w:val}" />
+        </xsl:when>
+      </xsl:choose>
+    </style:style>
+  </xsl:template>
+
+  <xsl:template match="w:r" mode="text">
+    <xsl:message terminate="no">progress:w:r</xsl:message>
+    <text:span text:style-name="{generate-id(self::node())}">
+      <xsl:apply-templates mode="text"/>
+    </text:span>
+  </xsl:template>
+
+  <xsl:template match="w:p">
+    <xsl:message terminate="no">progress:w:p</xsl:message>
+    <xsl:apply-templates select="." mode="text"/>
+  </xsl:template>
+
+  <xsl:template match="w:t" mode="automaticstyles"/>
+
+  <xsl:template match="w:t" mode="text">
+    <xsl:apply-templates select="."/>
+  </xsl:template>
+
+  <xsl:template match="text()" mode="text">
+    <xsl:message terminate="no">progress:text()</xsl:message>
+    <xsl:value-of select="."/>
+  </xsl:template>
+  
   <!--  Check if the paragraf is heading -->
   
   <xsl:template name="CheckHeading">
