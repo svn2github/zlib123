@@ -107,10 +107,8 @@
       <!-- Its master page name -->
       <xsl:variable name="master-page-name"
         select="key('master-based-styles', $last-elt/@text:style-name | $last-elt/@table:style-name)[1]/@style:master-page-name"/>
-      <!-- 
-        Continuous section. Looking up for a text:section 
-        If there's no master-page used after the last text:section, then the sectPr is continuous.
-      -->
+      <!--  Continuous section. Looking up for a text:section 
+        If there's no master-page used after the last text:section, then the sectPr is continuous. -->
       <xsl:variable name="last-section" select="descendant::text:section[last()]"/>
       <xsl:variable name="elts-after-section"
         select="$last-section/following::*[name() = 'text:p' or name() = 'text:h' or name='table:table']"/>
@@ -140,7 +138,12 @@
     </w:sectPr>
   </xsl:template>
 
-  <!-- OOX section properties (header/footer, footnotes/endnotes, page layout, etc) -->
+  <!-- OOX section properties (header/footer, footnotes/endnotes, page layout, etc) 
+       param elt : specifies the element whose style references the master page to be transformed in OOX section properties
+       param continuous : specifies if this OOX section should be continuous
+       param section-ends : specifies if this OOX section corresponds to an ending ODF section
+       param previous-section : specifies the ancestor ODF section 
+   -->
   <xsl:template name="InsertSectionProperties">
     <xsl:param name="elt"/>
     <xsl:param name="continuous" select="'no'"/>
@@ -177,27 +180,24 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>
+        
         <!-- notes configuration -->
         <xsl:choose>
           <xsl:when test="$notes-configuration">
-            <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']"
-              mode="note"/>
-            <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']"
-              mode="note"/>
+            <xsl:apply-templates select="$notes-configuration" mode="note"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:apply-templates
-              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
-              mode="note"/>
-            <xsl:apply-templates
-              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
+              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration"
               mode="note"/>
           </xsl:otherwise>
         </xsl:choose>
+        
         <!-- continuous -->
         <xsl:if test="$continuous = 'yes' ">
           <w:type w:val="continuous"/>
         </xsl:if>
+        
         <!-- page layout properties -->
         <xsl:for-each select="document('styles.xml')">
           <xsl:apply-templates
@@ -228,27 +228,24 @@
             </xsl:call-template>
           </xsl:for-each>
         </xsl:if>
+        
         <!-- notes configuration -->
         <xsl:choose>
           <xsl:when test="$notes-configuration">
-            <xsl:apply-templates select="$notes-configuration[@text:note-class='footnote']"
-              mode="note"/>
-            <xsl:apply-templates select="$notes-configuration[@text:note-class='endnote']"
-              mode="note"/>
+            <xsl:apply-templates select="$notes-configuration" mode="note"/>
           </xsl:when>
-          <xsl:otherwise>
+          <xsl:otherwise>  
             <xsl:apply-templates
-              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']"
-              mode="note"/>
-            <xsl:apply-templates
-              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='endnote']"
+              select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration"
               mode="note"/>
           </xsl:otherwise>
         </xsl:choose>
+        
         <!-- continuous -->
         <xsl:if test="$continuous = 'yes' ">
           <w:type w:val="continuous"/>
         </xsl:if>
+        
         <!-- page layou properties -->
         <xsl:for-each select="document('styles.xml')">
           <xsl:apply-templates
@@ -275,15 +272,13 @@
         <xsl:call-template name="InsertParagraphProperties">
           <xsl:with-param name="level" select="$level"/>
         </xsl:call-template>
-
         <xsl:call-template name="InsertParagraphSectionProperties"/>
-
       </w:pPr>
 
       <!-- check if element is contained in TOC  -->
       <xsl:variable name="isBookmarked">
         <xsl:call-template name="IsTOCBookmark">
-          <!-- TODO : are we sure there can't be more than one text:table-of-content in the document? -->
+          <!-- TODO : Can't we find more than one text:table-of-content in the document? -->
           <xsl:with-param name="sourceStyleNum"
             select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
           <xsl:with-param name="styleName" select="@text:style-name"/>
@@ -610,7 +605,6 @@
   <!-- Inserts the list number of a list -->
   <xsl:template name="InsertNumberingProperties">
     <xsl:param name="node"/>
-    <!-- COMMENT: See if we cannot use a key -->
     <xsl:if
       test="$node[self::text:h] and $node/@text:outline-level &lt;= 9 and document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
       <w:numPr>
