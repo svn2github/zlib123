@@ -47,7 +47,7 @@
   <xsl:preserve-space elements="text:p"/>
   <xsl:preserve-space elements="text:span"/>
 
-  <xsl:key name="annotations" match="//office:annotation" use="''"/>
+  <xsl:key name="annotations" match="office:annotation" use="''"/>
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
   <xsl:key name="hyperlinks" match="text:a" use="''"/>
   <xsl:key name="headers" match="text:h" use="''"/>
@@ -62,8 +62,6 @@
   <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value]" use="''"/>
 
 
-  <!-- COMMENT: what is this variable for? -->
-  <xsl:variable name="type">dxa</xsl:variable>
   <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
   <!-- Set of text elements potentially tied to a master style -->
   <xsl:variable name="elts"
@@ -81,18 +79,14 @@
   <!-- main document -->
   <xsl:template name="document">
     <w:document>
-      <!-- COMMENT: how are we sure this is the correct background? -->
-      <!-- COMMENT: See if we cannot use a key -->
-      <xsl:if
-        test="document('styles.xml')//style:page-layout[@style:name=//office:master-styles/style:master-page/@style:page-layout-name]/style:page-layout-properties/@fo:background-color != 'transparent'">
-        <w:background>
-          <xsl:attribute name="w:color">
-            <xsl:value-of
-              select="translate(substring-after(document('styles.xml')//style:page-layout[@style:name=//office:master-styles/style:master-page/@style:page-layout-name]/style:page-layout-properties/@fo:background-color,'#'),'f','F')"
-            />
-          </xsl:attribute>
-        </w:background>
-      </xsl:if>
+      <!-- Translate the default master page color as the document background color -->
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:variable name="defaultBgColor"
+          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:background-color"/>
+        <xsl:if test="$defaultBgColor != 'transparent'">
+          <w:background w:color="{translate(substring-after($defaultBgColor,'#'),'f','F')}"/>
+        </xsl:if>
+      </xsl:for-each>
       <xsl:apply-templates select="document('content.xml')/office:document-content"/>
     </w:document>
   </xsl:template>
@@ -101,14 +95,12 @@
   <xsl:template match="office:body">
     <w:body>
       <xsl:apply-templates/>
-
-      <xsl:call-template name="InsertDocumentBodySection"/>
-
+      <xsl:call-template name="InsertDocumentFinalSectionProperties"/>
     </w:body>
   </xsl:template>
 
-  <!--TODO comment-->
-  <xsl:template name="InsertDocumentBodySection">
+  <!-- Document final section properties -->
+  <xsl:template name="InsertDocumentFinalSectionProperties">
     <w:sectPr>
       <!-- Last element tied to a master-style -->
       <xsl:variable name="last-elt" select="$master-elts[last()]"/>
@@ -284,13 +276,14 @@
           <xsl:with-param name="level" select="$level"/>
         </xsl:call-template>
 
-        <xsl:call-template name="InsertParagraphSection"/>
+        <xsl:call-template name="InsertParagraphSectionProperties"/>
 
       </w:pPr>
 
       <!-- check if element is contained in TOC  -->
       <xsl:variable name="isBookmarked">
         <xsl:call-template name="IsTOCBookmark">
+          <!-- TODO : are we sure there can't be more than one text:table-of-content in the document? -->
           <xsl:with-param name="sourceStyleNum"
             select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
           <xsl:with-param name="styleName" select="@text:style-name"/>
@@ -337,7 +330,7 @@
   </xsl:template>
 
   <!-- section detection and insertion for paragraph-->
-  <xsl:template name="InsertParagraphSection">
+  <xsl:template name="InsertParagraphSectionProperties">
     <!-- Section detection  : 3 cases -->
     <xsl:if test="not(ancestor::table:table) and not(ancestor::draw:frame)">
       <!-- Section detection  : 3 cases -->
@@ -649,186 +642,9 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Inserts paragraph indentation -->
-  <!-- COMMENT: please try to split this template into smaller ones -->
-  <xsl:template name="InsertIndent">
-    <xsl:param name="level" select="0"/>
-
-    <xsl:if test="ancestor-or-self::text:list">
-      <xsl:variable name="styleName">
-        <xsl:call-template name="GetStyleName"/>
-      </xsl:variable>
-      <xsl:variable name="parentStyleName"
-        select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
-      <xsl:variable name="listStyleName"
-        select="key('automatic-styles',$styleName)/@style:list-style-name"/>
-
-      <!-- Indent to add to numbering values. -->
-      <xsl:variable name="addLeftIndent">
-        <xsl:call-template name="ComputeAdditionalIndent">
-          <xsl:with-param name="side" select="'left'"/>
-          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="addRightIndent">
-        <xsl:call-template name="ComputeAdditionalIndent">
-          <xsl:with-param name="side" select="'right'"/>
-          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="firstLineIndent">
-        <xsl:call-template name="GetFirstLineIndent">
-          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <!-- Indent extracted from numbering properties -->
-      <xsl:variable name="minLabelWidthTwip">
-        <xsl:call-template name="ComputeNumberingIndent">
-          <xsl:with-param name="attribute" select="'text:min-label-width'"/>
-          <xsl:with-param name="level" select="$level"/>
-          <xsl:with-param name="listStyleName" select="$listStyleName"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="spaceBeforeTwip">
-        <xsl:call-template name="ComputeNumberingIndent">
-          <xsl:with-param name="attribute" select="'text:space-before'"/>
-          <xsl:with-param name="level" select="$level"/>
-          <xsl:with-param name="listStyleName" select="$listStyleName"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="minLabelDistanceTwip">
-        <xsl:call-template name="ComputeNumberingIndent">
-          <xsl:with-param name="attribute" select="'text:min-label-distance'"/>
-          <xsl:with-param name="level" select="$level"/>
-          <xsl:with-param name="listStyleName" select="$listStyleName"/>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <!-- Override tabs if margin defined. -->
-      <xsl:if
-        test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())) and $addLeftIndent != 0">
-        <w:tabs>
-          <w:tab>
-            <xsl:attribute name="w:val">clear</xsl:attribute>
-            <xsl:attribute name="w:pos">
-              <xsl:choose>
-                <xsl:when
-                  test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
-                  <xsl:value-of select="$spaceBeforeTwip + $minLabelDistanceTwip"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:choose>
-                    <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                      <xsl:value-of
-                        select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </w:tab>
-          <xsl:choose>
-            <xsl:when test="$firstLineIndent != 0">
-              <w:tab>
-                <xsl:attribute name="w:val">num</xsl:attribute>
-                <xsl:attribute name="w:pos">
-                  <xsl:value-of select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent"/>
-                </xsl:attribute>
-              </w:tab>
-            </xsl:when>
-            <xsl:otherwise>
-              <w:tab>
-                <xsl:attribute name="w:val">num</xsl:attribute>
-                <xsl:attribute name="w:pos">
-                  <xsl:choose>
-                    <xsl:when
-                      test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
-                      <xsl:value-of
-                        select="$addLeftIndent + $spaceBeforeTwip + $minLabelDistanceTwip"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:choose>
-                        <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                          <xsl:value-of
-                            select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"
-                          />
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of
-                            select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:attribute>
-              </w:tab>
-            </xsl:otherwise>
-          </xsl:choose>
-        </w:tabs>
-      </xsl:if>
-
-      <!-- insert indent with paragraph and numbering properties
-        if any value affects the numbering style defined, or if list element has no numberig -->
-      <xsl:choose>
-        <!-- List element with numbering -->
-        <xsl:when
-          test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
-          <xsl:if test="$addLeftIndent != 0 or $addRightIndent !=  0 or $firstLineIndent != 0">
-            <w:ind>
-              <xsl:attribute name="w:left">
-                <xsl:value-of select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
-              </xsl:attribute>
-              <xsl:attribute name="w:right">
-                <xsl:value-of select="$addRightIndent"/>
-              </xsl:attribute>
-              <xsl:choose>
-                <xsl:when test="$firstLineIndent !=0">
-                  <xsl:attribute name="w:firstLine">
-                    <xsl:value-of select="$firstLineIndent - $minLabelWidthTwip"/>
-                  </xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:choose>
-                    <xsl:when test="$spaceBeforeTwip &lt; 0">
-                      <xsl:attribute name="w:firstLine">
-                        <xsl:value-of select="$minLabelWidthTwip"/>
-                      </xsl:attribute>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:attribute name="w:hanging">
-                        <xsl:value-of select="$minLabelWidthTwip"/>
-                      </xsl:attribute>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:otherwise>
-              </xsl:choose>
-            </w:ind>
-          </xsl:if>
-        </xsl:when>
-        <!-- Othe list element -->
-        <xsl:otherwise>
-          <w:ind>
-            <xsl:attribute name="w:left">
-              <xsl:value-of select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
-            </xsl:attribute>
-            <xsl:attribute name="w:right">
-              <xsl:value-of select="$addRightIndent"/>
-            </xsl:attribute>
-          </w:ind>
-        </xsl:otherwise>
-      </xsl:choose>
-
-    </xsl:if>
-  </xsl:template>
+ 
 
   <!-- Computes the style name to be used be InsertIndent template -->
-  <!-- COMMENT: verify that all cases are matched (I just added self::text:h
-       Why not simply match text:list-item and if not everything else? -->
-  <!-- COMMENT: template re-used to get a style name for run properties. May want to find a more suitable 'otherwise' clause. -->
   <xsl:template name="GetStyleName">
     <xsl:choose>
       <xsl:when test="self::text:list-item">

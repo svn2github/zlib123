@@ -608,6 +608,7 @@
     </w:abstractNum>
   </xsl:template>
 
+ 
   <!-- numbering definition which references particular abstractNum and can be applied to a list paragraph -->
   <xsl:template match="text:list" mode="num">
     <xsl:param name="offset" select="0"/>
@@ -688,4 +689,182 @@
      </xsl:call-template>
   </xsl:template>
 
+  
+  <!-- Inserts paragraph indentation -->
+  <xsl:template name="InsertIndent">
+    <xsl:param name="level" select="0"/>
+    
+    <xsl:if test="ancestor-or-self::text:list">
+      <xsl:variable name="styleName">
+        <xsl:call-template name="GetStyleName"/>
+      </xsl:variable>
+      <xsl:variable name="parentStyleName"
+        select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
+      <xsl:variable name="listStyleName"
+        select="key('automatic-styles',$styleName)/@style:list-style-name"/>
+      
+      <!-- Indent to add to numbering values. -->
+      <xsl:variable name="addLeftIndent">
+        <xsl:call-template name="ComputeAdditionalIndent">
+          <xsl:with-param name="side" select="'left'"/>
+          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="addRightIndent">
+        <xsl:call-template name="ComputeAdditionalIndent">
+          <xsl:with-param name="side" select="'right'"/>
+          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="firstLineIndent">
+        <xsl:call-template name="GetFirstLineIndent">
+          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <!-- Indent extracted from numbering properties -->
+      <xsl:variable name="minLabelWidthTwip">
+        <xsl:call-template name="ComputeNumberingIndent">
+          <xsl:with-param name="attribute" select="'text:min-label-width'"/>
+          <xsl:with-param name="level" select="$level"/>
+          <xsl:with-param name="listStyleName" select="$listStyleName"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="spaceBeforeTwip">
+        <xsl:call-template name="ComputeNumberingIndent">
+          <xsl:with-param name="attribute" select="'text:space-before'"/>
+          <xsl:with-param name="level" select="$level"/>
+          <xsl:with-param name="listStyleName" select="$listStyleName"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="minLabelDistanceTwip">
+        <xsl:call-template name="ComputeNumberingIndent">
+          <xsl:with-param name="attribute" select="'text:min-label-distance'"/>
+          <xsl:with-param name="level" select="$level"/>
+          <xsl:with-param name="listStyleName" select="$listStyleName"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <!-- Override tabs if margin defined. -->
+      <xsl:if
+        test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())) and $addLeftIndent != 0">
+        <w:tabs>
+          <w:tab>
+            <xsl:attribute name="w:val">clear</xsl:attribute>
+            <xsl:attribute name="w:pos">
+              <xsl:choose>
+                <xsl:when
+                  test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
+                  <xsl:value-of select="$spaceBeforeTwip + $minLabelDistanceTwip"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:choose>
+                    <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                      <xsl:value-of
+                        select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </w:tab>
+          <xsl:choose>
+            <xsl:when test="$firstLineIndent != 0">
+              <w:tab>
+                <xsl:attribute name="w:val">num</xsl:attribute>
+                <xsl:attribute name="w:pos">
+                  <xsl:value-of select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent"/>
+                </xsl:attribute>
+              </w:tab>
+            </xsl:when>
+            <xsl:otherwise>
+              <w:tab>
+                <xsl:attribute name="w:val">num</xsl:attribute>
+                <xsl:attribute name="w:pos">
+                  <xsl:choose>
+                    <xsl:when
+                      test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
+                      <xsl:value-of
+                        select="$addLeftIndent + $spaceBeforeTwip + $minLabelDistanceTwip"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:choose>
+                        <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                          <xsl:value-of
+                            select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"
+                          />
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of
+                            select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </w:tab>
+            </xsl:otherwise>
+          </xsl:choose>
+        </w:tabs>
+      </xsl:if>
+      
+      <!-- insert indent with paragraph and numbering properties
+        if any value affects the numbering style defined, or if list element has no numberig -->
+      <xsl:choose>
+        <!-- List element with numbering -->
+        <xsl:when
+          test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
+          <xsl:if test="$addLeftIndent != 0 or $addRightIndent !=  0 or $firstLineIndent != 0">
+            <w:ind>
+              <xsl:attribute name="w:left">
+                <xsl:value-of select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
+              </xsl:attribute>
+              <xsl:attribute name="w:right">
+                <xsl:value-of select="$addRightIndent"/>
+              </xsl:attribute>
+              <xsl:choose>
+                <xsl:when test="$firstLineIndent !=0">
+                  <xsl:attribute name="w:firstLine">
+                    <xsl:value-of select="$firstLineIndent - $minLabelWidthTwip"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:choose>
+                    <xsl:when test="$spaceBeforeTwip &lt; 0">
+                      <xsl:attribute name="w:firstLine">
+                        <xsl:value-of select="$minLabelWidthTwip"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name="w:hanging">
+                        <xsl:value-of select="$minLabelWidthTwip"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
+              </xsl:choose>
+            </w:ind>
+          </xsl:if>
+        </xsl:when>
+        <!-- Othe list element -->
+        <xsl:otherwise>
+          <w:ind>
+            <xsl:attribute name="w:left">
+              <xsl:value-of select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
+            </xsl:attribute>
+            <xsl:attribute name="w:right">
+              <xsl:value-of select="$addRightIndent"/>
+            </xsl:attribute>
+          </w:ind>
+        </xsl:otherwise>
+      </xsl:choose>
+      
+    </xsl:if>
+  </xsl:template>
+  
+  
+  
 </xsl:stylesheet>
