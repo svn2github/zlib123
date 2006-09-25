@@ -38,7 +38,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Clever Age")]
 [assembly: AssemblyProduct("CleverAge.OdfConverter.OdfConverterTest.Properties")]
-[assembly: AssemblyCopyright("Copyright © 2006")]
+[assembly: AssemblyCopyright("Copyright © Clever Age 2006")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -57,5 +57,5 @@ using System.Runtime.InteropServices;
 //      Numéro de build
 //      Révision
 //
-[assembly: AssemblyVersion("0.2.*")]
+[assembly: AssemblyVersion("0.2.3.*")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
