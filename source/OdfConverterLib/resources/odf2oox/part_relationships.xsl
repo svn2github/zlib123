@@ -196,7 +196,7 @@
   <!-- Headers / footers relationships -->
   <xsl:template name="InsertHeaderFooterRelationships">
     <xsl:for-each
-      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page">
+      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[style:header or style:header-left or style:footer or style:footer-left]">
       <xsl:if test="style:header">
         <Relationship
           xmlns="http://schemas.openxmlformats.org/package/2006/relationships"  
