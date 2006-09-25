@@ -117,6 +117,24 @@
   </xsl:template>
 
   <xsl:template match="w:p">
+    <xsl:choose>
+      
+      <!-- check if list starts -->
+      <xsl:when test="w:pPr/w:numPr">
+        <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
+        <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
+        <xsl:if test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
+          <xsl:apply-templates select="." mode="list"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="." mode="paragraph"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+  </xsl:template>
+  
+  <xsl:template match="w:p" mode="paragraph">
     <xsl:variable name="outlineLevel">
       <xsl:call-template name="GetOutlineLevel"/>
     </xsl:variable>
@@ -136,6 +154,37 @@
           <!-- todo without styles -->
           <xsl:apply-templates/>
         </text:p>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- paragraph has  numbering properties - is a list item -->
+  <xsl:template match="w:p" mode="list">
+    <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
+    <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
+    <xsl:choose>
+      <!-- Is first  element at list -->
+      <xsl:when test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
+        <text:list text:style-name="L1">
+          <xsl:if test="preceding-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId]">
+            <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
+          </xsl:if>
+          <text:list-item>
+            <xsl:apply-templates select="." mode="paragraph"/>
+          </text:list-item>
+          <!-- next paragraph in same list member -->
+          <xsl:if test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]">
+            <xsl:apply-templates select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]" mode="list"/>
+          </xsl:if>
+        </text:list>
+      </xsl:when>
+      <xsl:otherwise>
+        <text:list-item>
+          <xsl:apply-templates select="." mode="paragraph"/>
+        </text:list-item>
+        <xsl:if test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]">
+          <xsl:apply-templates select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]" mode="list"/>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
