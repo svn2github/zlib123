@@ -36,8 +36,11 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   exclude-result-prefixes="office text table fo style draw">
 
+  
+  <!-- Specifies that measurement of table properties are interpreted as twentieths of a point -->
+  <xsl:variable name="type">dxa</xsl:variable>
 
-  <!-- tables -->
+  <!-- Tables -->
   <xsl:template match="table:table">
     <w:tbl>
       <w:tblPr>
