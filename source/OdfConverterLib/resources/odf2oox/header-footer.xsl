@@ -126,7 +126,6 @@
   </xsl:template>
 
   <!-- Specify whether the parent section shall have a different header and footer for its first page -->
-  <!-- TODO : use keys -->
   <xsl:template name="TitlePg">
     <xsl:param name="master-page"/>
     <xsl:if test="$master-page and $master-page[@style:name = 'First_20_Page']">
@@ -156,6 +155,7 @@
   </xsl:template>
 
   <!-- Headers/Footers part relationships construction -->
+  <!-- param node : style:header / style:footer -->
   <xsl:template name="InsertHeaderFooterInternalRelationships">
     <xsl:param name="node"/>
     <xsl:variable name="masterPageName" select="$node/ancestor::style:master-page[1]/@style:name"/>
