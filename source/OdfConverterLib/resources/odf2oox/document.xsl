@@ -332,76 +332,74 @@
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
       <xsl:variable name="followings"
         select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
-      <xsl:variable name="masterPageStarts"
+      <xsl:variable name="master-page-starts"
         select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
 
       <!-- 2 - Section starts. The following paragraph is contained in the following section -->
-      <xsl:variable name="followingSection" select="following::text:section[1]"/>
+      <xsl:variable name="following-section" select="following::text:section[1]"/>
       <!-- the following section is the same as the following neighbour's ancestor section -->
-      <xsl:variable name="sectionStarts"
-        select="$followingSection and (generate-id($followings[1]/ancestor::text:section) = generate-id($followingSection))"/>
+      <xsl:variable name="section-starts"
+        select="$following-section and (generate-id($followings[1]/ancestor::text:section) = generate-id($following-section))"/>
 
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
-      <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
+      <xsl:variable name="previous-section" select="ancestor::text:section[1]"/>
       <!-- the following neighbour's ancestor section and the current section are different -->
-      <xsl:variable name="sectionEnds"
-        select="$previousSection and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previousSection))"/>
+      <xsl:variable name="section-ends"
+        select="$previous-section and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previous-section))"/>
 
       <!-- section creation -->
       <xsl:if
-        test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
+        test="($master-page-starts = 'true' or $section-starts = 'true' or $section-ends = 'true') and not(ancestor::text:note-body) and not(ancestor::table:table)">
         <w:sectPr>
-          <!-- 
-            Continuous sections. Looking up for a text:section 
+          <!--  Continuous sections. Looking up for a text:section 
             If the first master style following the preceding section is the same as this paragraph's following master-style,
-            then no other master style is used in-between.
-          -->
+            then no other master style is used in-between. -->
           <xsl:variable name="ps" select="preceding::text:section[1]"/>
-          <xsl:variable name="stylesAfterSection"
+          <xsl:variable name="styles-after-section"
             select="$ps/following::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
-          <xsl:variable name="followingMasterStyle"
+          <xsl:variable name="following-master-style"
             select="$followings[key('master-based-styles', @text:style-name|@table:style-name)]"/>
           <xsl:variable name="continuous">
             <xsl:choose>
               <xsl:when
-                test="$sectionEnds or ($ps and (generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])))"
+                test="$section-ends or ($ps and (generate-id($styles-after-section[1]) = generate-id($following-master-style[1])))"
                 >yes</xsl:when>
               <xsl:otherwise>no</xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
 
-          <!-- sectionEnds et previousSection -->
+          <!-- notes configuration -->
           <xsl:variable name="notes-configuration"
-            select="key('sections', $previousSection/@text:style-name)[1]/style:section-properties/text:notes-configuration"/>
+            select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration"/>
 
-          <xsl:variable name="currentMasterStyle"
+          <xsl:variable name="current-master-style"
             select="key('master-based-styles', @text:style-name)"/>
 
           <xsl:choose>
-            <xsl:when test="boolean($currentMasterStyle)">
+            <xsl:when test="boolean($current-master-style)">
               <!-- current element style is tied to a master page -->
               <xsl:call-template name="InsertSectionProperties">
                 <xsl:with-param name="continuous" select="$continuous"/>
                 <xsl:with-param name="elt" select="."/>
                 <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
-                <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                <xsl:with-param name="previous-section" select="$previousSection"/>
+                <xsl:with-param name="section-ends" select="$section-ends"/>
+                <xsl:with-param name="previous-section" select="$previous-section"/>
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
               <!-- current style is not tied to a master page (typically the case of an ODF section), find the preceding one -->
               <xsl:variable name="precedings"
                 select="preceding::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding::table:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
-              <xsl:variable name="precedingMasterStyle"
+              <xsl:variable name="preceding-master-style"
                 select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>
               <xsl:choose>
-                <xsl:when test="boolean($precedingMasterStyle)">
+                <xsl:when test="boolean($preceding-master-style)">
                   <xsl:call-template name="InsertSectionProperties">
                     <xsl:with-param name="continuous" select="$continuous"/>
                     <xsl:with-param name="elt" select="$precedings[last()]"/>
                     <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
-                    <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                    <xsl:with-param name="previous-section" select="$previousSection"/>
+                    <xsl:with-param name="section-ends" select="$section-ends"/>
+                    <xsl:with-param name="previous-section" select="$previous-section"/>
                   </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>
@@ -409,8 +407,8 @@
                   <xsl:call-template name="InsertSectionProperties">
                     <xsl:with-param name="continuous" select="$continuous"/>
                     <xsl:with-param name="notes-configuration" select="$notes-configuration"/>
-                    <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                    <xsl:with-param name="previous-section" select="$previousSection"/>
+                    <xsl:with-param name="section-ends" select="$section-ends"/>
+                    <xsl:with-param name="previous-section" select="$previous-section"/>
                   </xsl:call-template>
                 </xsl:otherwise>
               </xsl:choose>
