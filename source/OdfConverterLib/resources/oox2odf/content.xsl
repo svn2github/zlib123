@@ -36,7 +36,8 @@
   exclude-result-prefixes="w">
 
   <xsl:import href="tables.xsl"/>
-
+  
+  <xsl:key name="numId" match="w:num" use="w:abstractNumId/@w:val"/>
   <xsl:template name="content">
     <office:document-content>
       <office:scripts/>
@@ -258,15 +259,15 @@
 
   <!-- paragraph has  numbering properties - is a list item -->
   <xsl:template match="w:p" mode="list">
-    <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
+    <xsl:variable name="NumberingId2" select="w:pPr/w:numPr/w:numId/@w:val"/>
   
-    <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
+    <xsl:variable name="position2" select="count(preceding-sibling::w:p)"/>
     <xsl:choose>
       <!-- Is first  element at list -->
       <xsl:when
-        test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
-        <text:list text:style-name="L1">
-          <xsl:if test="preceding-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId]">
+        test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2 and  count(preceding-sibling::w:p)= $position2 -1])">
+        <text:list text:style-name="{concat('L',$NumberingId2)}">
+          <xsl:if test="preceding-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2]">
             <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
           </xsl:if>
           <text:list-item>
@@ -274,9 +275,9 @@
           </text:list-item>
           <!-- next paragraph in same list member -->
           <xsl:if
-            test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]">
+            test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2 and  count(preceding-sibling::w:p)= $position2 +1]">
             <xsl:apply-templates
-              select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]"
+              select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2 and  count(preceding-sibling::w:p)= $position2 +1]"
               mode="list"/>
           </xsl:if>
         </text:list>
@@ -286,9 +287,9 @@
           <xsl:apply-templates select="." mode="paragraph"/>
         </text:list-item>
         <xsl:if
-          test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]">
+          test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2 and  count(preceding-sibling::w:p)= $position2 +1]">
           <xsl:apply-templates
-            select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]"
+            select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2 and  count(preceding-sibling::w:p)= $position2 +1]"
             mode="list"/>
         </xsl:if>
       </xsl:otherwise>
@@ -320,9 +321,13 @@
   <xsl:template match="w:hyperlink">
     <xsl:call-template name="hyperlink"/>
   </xsl:template>
+  
+  <!-- hyperlink template -->
+  
   <xsl:template name="hyperlink">
     <text:a xlink:type="simple">
       <xsl:choose>
+        <!-- simple hyperlink -->
       <xsl:when test="@w:anchor">
 
         <xsl:attribute name="xlink:href">
@@ -330,11 +335,12 @@
           <xsl:value-of select="concat('#',@w:anchor)"/>
 
       
-      </xsl:attribute>
-      <text:span text:style-name="Internet_20_link">
-        <xsl:apply-templates select="w:r/w:t"/>
-      </text:span>
-   </xsl:when>
+      	</xsl:attribute>
+        <text:span text:style-name="Internet_20_link">
+          <xsl:apply-templates select="w:r/w:t"/>
+        </text:span>
+      </xsl:when>
+        <!-- fieldchar hyperlink -->
       <xsl:when test="self::w:r">
         <xsl:attribute name="xlink:href">
           <xsl:value-of select="concat('#_',substring-before(substring-after(preceding::w:instrText[last()],'_'),'&quot;'))"/>
@@ -347,7 +353,7 @@
           
         </xsl:otherwise>
       </xsl:choose>
-      <!-- anyone knows how to resolve xml nodes from .rels files? -->
+      <!-- TODO internet hyperlinks - problem with resolving xml nodes from *.rels files -->
       <!-- <xsl:if test="@r:id">
         <xsl:variable name="relationshipId">
           <xsl:value-of select="@r:id"/>
@@ -1647,8 +1653,10 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  <!-- following templates are from numbering.xml -->
   <xsl:template match="w:abstractNum">
-    <text:list-style style:name="L1">
+ 
+    <text:list-style style:name="{concat('L',key('numId',@w:abstractNumId)/@w:numId)}">
       <xsl:apply-templates select="w:lvl"/>
     </text:list-style>
   </xsl:template>
@@ -1690,6 +1698,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  <!-- numbering format -->
   <xsl:template name="num-format">
     <xsl:param name="format"/>
     <xsl:choose>
@@ -1710,6 +1719,7 @@
       <xsl:value-of select="number($Ind/@w:hanging)"/>
     </xsl:attribute>
   </xsl:template>
+  <!-- types of bullets -->
   <xsl:template name="textChar">
     <xsl:choose>
       <xsl:when test="w:lvlText[@w:val = ''] "></xsl:when>
