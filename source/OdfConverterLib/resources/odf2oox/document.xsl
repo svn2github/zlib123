@@ -803,21 +803,6 @@
     </w:instrText>
   </xsl:template>
 
-  <!-- Inserts a page break before if needed -->
-  <xsl:template name="InsertPageBreakBefore">
-    <!-- in the first paragraph of a table : first cell of row AND first row of table AND with a pgBreakBefore or master-page-name in paragraph style. -->
-    <xsl:if test="ancestor-or-self::table:table">
-      <xsl:if
-        test="parent::table:table-cell[not(preceding-sibling::node())]
-        and ancestor::table:table-row[preceding-sibling::node()[1][name()='table:table-column' or name()='table:table-columns'] or not(preceding-sibling::node())]
-        and (
-        key('automatic-styles',ancestor::table:table[1]/@table:style-name)/style:table-properties/@fo:break-before = 'page'
-        or key('automatic-styles',ancestor::table:table[1]/@table:style-name)/@style:master-page-name != ''
-        )">
-        <w:pageBreakBefore/>
-      </xsl:if>
-    </xsl:if>
-  </xsl:template>
 
   <!-- Inserts an annotation reference if needed -->
   <xsl:template name="InsertAnnotationReference">

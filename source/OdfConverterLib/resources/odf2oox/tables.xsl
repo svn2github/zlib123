@@ -36,7 +36,7 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   exclude-result-prefixes="office text table fo style draw">
 
-  
+
   <!-- Specifies that measurement of table properties are interpreted as twentieths of a point -->
   <xsl:variable name="type">dxa</xsl:variable>
 
@@ -102,7 +102,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:if>
-    
+
     <!-- Default layout algorithm in ODF is "fixed". -->
     <w:tblLayout w:type="fixed"/>
   </xsl:template>
@@ -138,7 +138,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:if>
-    
+
     <!-- Default layout algorithm in ODF is "fixed". -->
     <w:tblLayout w:type="fixed"/>
   </xsl:template>
@@ -234,7 +234,7 @@
                     <xsl:with-param name="continuous" select="$continuous"/>
                     <xsl:with-param name="elt" select="."/>
                     <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                    <xsl:with-param name="previous-section" select="$previousSection"/>  
+                    <xsl:with-param name="previous-section" select="$previousSection"/>
                   </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>
@@ -916,5 +916,27 @@
       select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1"
     />
   </xsl:template>
+
+
+  <!-- Inserts a page break before if needed -->
+  <xsl:template name="InsertPageBreakBefore">
+    <!-- in the first paragraph of a table -->
+    <xsl:if test="not(preceding-sibling::text:p) and ancestor-or-self::table:table">
+      <!-- if first cell -->
+      <xsl:if test="parent::table:table-cell[not(preceding-sibling::node())]">
+        <!-- if first row -->
+        <xsl:if
+          test="ancestor::table:table-row[preceding-sibling::node()[1][name()='table:table-column' or name()='table:table-columns'] or not(preceding-sibling::node())]">
+          <!-- if associated style has a pgBreakBefore property -->
+          <xsl:if
+            test="key('automatic-styles', ancestor::table:table[1]/@table:style-name)/style:table-properties/@fo:break-before = 'page'
+        or key('automatic-styles', ancestor::table:table[1]/@table:style-name)/@style:master-page-name != ''">
+            <w:pageBreakBefore/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+
 
 </xsl:stylesheet>
