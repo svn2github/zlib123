@@ -120,7 +120,7 @@
 
       <!-- headers and footers -->
       <xsl:variable name="masterPage"
-        select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"
+        select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[style:header or style:header-left or style:footer or style:footer-left]"
         xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
         xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"/>
 
