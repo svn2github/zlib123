@@ -51,6 +51,33 @@
   </xsl:template>
 
   <!--  Check if the paragraf is heading -->
+  
+  <xsl:template name="CheckHeading">
+    <xsl:param name="outline"/>
+    <xsl:variable name="basedOn">
+      <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"/>      
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$basedOn]/w:pPr/w:outlineLvl/@w:val">
+        <xsl:value-of
+          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$basedOn]/w:pPr/w:outlineLvl/@w:val"
+        />    
+      </xsl:when>
+      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val">
+        <xsl:call-template name="CheckHeading">
+          <xsl:with-param name="outline">
+            <xsl:value-of
+              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"
+            />    
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+    
+  </xsl:template>
+  
+
   <xsl:template name="GetOutlineLevel">
     <xsl:choose>
       <xsl:when test="w:pPr/w:outlineLvl/@w:val">
@@ -63,11 +90,20 @@
           <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
         </xsl:variable>
 
-        <xsl:value-of
-          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val"/>
-        <xsl:message> lvl val: <xsl:value-of select="$outline"/>
-        </xsl:message>
-      </xsl:when>
+              <xsl:choose>                
+                <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val">
+                    <xsl:value-of
+                          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val"/>        
+                </xsl:when>                
+             <xsl:otherwise>
+                  <xsl:call-template name="CheckHeading">
+                    <xsl:with-param name="outline">
+                      <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+               </xsl:otherwise>
+              </xsl:choose>
+           </xsl:when>
 
       <xsl:otherwise>
 
@@ -80,10 +116,22 @@
             select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:link/@w:val"
           />
         </xsl:variable>
-
-        <xsl:value-of
-          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val"
-        />
+        
+        <xsl:choose>          
+          <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val">
+            <xsl:value-of
+              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val" /> 
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="CheckHeading">
+              <xsl:with-param name="outline">
+                <xsl:value-of
+                  select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:link/@w:val"
+                />
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>       
       </xsl:otherwise>
 
     </xsl:choose>
@@ -190,10 +238,20 @@
   </xsl:template>
 
   <xsl:template match="w:r">
-
-    <xsl:apply-templates/>
-
+    
+    <xsl:choose>
+      <xsl:when test="w:rPr">
+      <text:span>
+        <xsl:apply-templates/>
+      </text:span>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
+
   <xsl:template match="w:hyperlink">
   <xsl:call-template name="hyperlink"/>
   </xsl:template>
@@ -211,10 +269,16 @@
     </xsl:if>
     </text:a>
 
-  </xsl:template>
+</xsl:template>
+
   <xsl:template match="w:t">
     <xsl:message terminate="no">progress:w:t</xsl:message>
     <xsl:value-of select="."/>
+  </xsl:template>
+  
+  <!-- line breaks  (page-break todo)-->
+  <xsl:template match="w:br">
+    <text:line-break/>
   </xsl:template>
 
 
