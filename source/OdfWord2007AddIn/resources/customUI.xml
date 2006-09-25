@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 * Copyright (c) 2006, Clever Age
 * All rights reserved.
@@ -27,12 +27,12 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui"> 
-   <ribbon> 
-      <fileMenu>
-		<menu id="OdfMenu" getLabel="GetLabel" insertAfterMso="FileSaveAsMenu" itemSize="large" getImage="GetImage">
-			<button id="OdfImport" imageMso="Open" getLabel="GetLabel" onAction="ImportODF" getDescription="GetDescription"/>
-			<button id="OdfExport" imageMso="Save" getLabel="GetLabel" onAction="ExportODF" getDescription="GetDescription" enabled="false"/>
-		</menu>
-      </fileMenu> 
+   <ribbon>
+	   <officeMenu>
+			<menu id="OdfMenu" getLabel="GetLabel" insertAfterMso="FileSaveAsMenu" itemSize="large" getImage="GetImage">
+				<button id="OdfImport" imageMso="FileOpen" getLabel="GetLabel" onAction="ImportODF" getDescription="GetDescription" />
+				<button id="OdfExport" imageMso="FileSave" getLabel="GetLabel" onAction="ExportODF" getDescription="GetDescription" enabled="false" />
+			</menu>
+	   </officeMenu>
    </ribbon> 
 </customUI>
