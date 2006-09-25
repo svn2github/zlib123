@@ -154,9 +154,9 @@
       <xsl:for-each select="w:bookmarkEnd">
         <text:bookmark-end>
           <xsl:attribute name="text:name">
-             <xsl:variable name="bookmarkId">
-               <xsl:value-of select="@w:id"/>
-             </xsl:variable>
+            <xsl:variable name="bookmarkId">
+              <xsl:value-of select="@w:id"/>
+            </xsl:variable>
             <xsl:value-of select="preceding::w:bookmarkStart[@w:id = $bookmarkId]/@w:name"/>
           </xsl:attribute>
         </text:bookmark-end>
@@ -166,12 +166,13 @@
 
   <xsl:template match="w:p">
     <xsl:choose>
-      
+
       <!-- check if list starts -->
       <xsl:when test="w:pPr/w:numPr">
         <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
         <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
-        <xsl:if test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
+        <xsl:if
+          test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
           <xsl:apply-templates select="." mode="list"/>
         </xsl:if>
       </xsl:when>
@@ -179,9 +180,9 @@
         <xsl:apply-templates select="." mode="paragraph"/>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <xsl:template match="w:p" mode="paragraph">
     <xsl:variable name="outlineLevel">
       <xsl:call-template name="GetOutlineLevel"/>
@@ -205,14 +206,15 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- paragraph has  numbering properties - is a list item -->
   <xsl:template match="w:p" mode="list">
     <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
     <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
     <xsl:choose>
       <!-- Is first  element at list -->
-      <xsl:when test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
+      <xsl:when
+        test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
         <text:list text:style-name="L1">
           <xsl:if test="preceding-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId]">
             <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
@@ -221,8 +223,11 @@
             <xsl:apply-templates select="." mode="paragraph"/>
           </text:list-item>
           <!-- next paragraph in same list member -->
-          <xsl:if test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]">
-            <xsl:apply-templates select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]" mode="list"/>
+          <xsl:if
+            test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]">
+            <xsl:apply-templates
+              select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]"
+              mode="list"/>
           </xsl:if>
         </text:list>
       </xsl:when>
@@ -230,8 +235,11 @@
         <text:list-item>
           <xsl:apply-templates select="." mode="paragraph"/>
         </text:list-item>
-        <xsl:if test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]">
-          <xsl:apply-templates select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]" mode="list"/>
+        <xsl:if
+          test="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]">
+          <xsl:apply-templates
+            select="following-sibling::w:p[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position +1]"
+            mode="list"/>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
@@ -253,20 +261,21 @@
   </xsl:template>
 
   <xsl:template match="w:hyperlink">
-  <xsl:call-template name="hyperlink"/>
+    <xsl:call-template name="hyperlink"/>
   </xsl:template>
   <xsl:template name="hyperlink">
-    <text:a xlink:type="simple"><xsl:if test="@w:anchor">
-      
-      <xsl:attribute name="xlink:href">
-        
+    <text:a xlink:type="simple">
+      <xsl:if test="@w:anchor">
+
+        <xsl:attribute name="xlink:href">
+
           <xsl:value-of select="concat('#',@w:anchor)"/>
-      
-      </xsl:attribute>
-      <text:span text:style-name="Internet_20_link">
-        <xsl:value-of select="w:r/w:t"/>
-      </text:span>
-    </xsl:if>
+
+        </xsl:attribute>
+        <text:span text:style-name="Internet_20_link">
+          <xsl:value-of select="w:r/w:t"/>
+        </text:span>
+      </xsl:if>
     </text:a>
 
 </xsl:template>
@@ -288,7 +297,7 @@
     <style:style>
       <xsl:if test="w:pPr">
         <style:paragraph-properties>
-          <xsl:for-each select="w:pPr">
+    <xsl:for-each select="w:pPr">
             <xsl:call-template name="InsertParagraphProperties"/>
           </xsl:for-each>
         </style:paragraph-properties>
@@ -307,7 +316,8 @@
     </style:style>
   </xsl:template>
   
--->
+  -->
+
   <!-- conversion of paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
 
@@ -510,6 +520,73 @@
           <xsl:otherwise>
             <xsl:value-of select="'auto'"/>
           </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
+
+    <xsl:if test="w:snapToGrid">
+      <xsl:attribute name="style:snap-to-layout-grid">
+        <xsl:choose>
+          <xsl:when
+            test="w:snapToGrid/@w:val='off' or w:snapToGrid/@w:val='false' or w:snapToGrid/@w:val=0">
+            <xsl:value-of select="'false'"/>
+          </xsl:when>
+          <xsl:when
+            test="w:snapToGrid/@w:val='on' or w:snapToGrid/@w:val='true' or w:snapToGrid/@w:val=1">
+            <xsl:value-of select="'true'"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'true'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
+
+    <xsl:if test="w:suppressLineNumbers">
+      <xsl:attribute name="text:number-lines">
+        <xsl:choose>
+          <xsl:when
+            test="w:suppressLineNumbers/@w:val='off' or w:suppressLineNumbers/@w:val='false' or w:suppressLineNumbers/@w:val=0">
+            <xsl:value-of select="'true'"/>
+          </xsl:when>
+          <xsl:when
+            test="w:suppressLineNumbers/@w:val='on' or w:suppressLineNumbers/@w:val='true' or w:suppressLineNumbers/@w:val=1">
+            <xsl:value-of select="'false'"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'false'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
+
+    <xsl:if test="w:overflowPunct">
+      <xsl:attribute name="style:punctuation-wrap">
+        <xsl:choose>
+          <xsl:when
+            test="w:overflowPunct/@w:val='off' or w:overflowPunct/@w:val='false' or w:overflowPunct/@w:val=0">
+            <xsl:value-of select="'hanging'"/>
+          </xsl:when>
+          <xsl:when
+            test="w:overflowPunct/@w:val='on' or w:overflowPunct/@w:val='true' or w:overflowPunct/@w:val=1">
+            <xsl:value-of select="'simple'"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'simple'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!-- text direction. btLr and tbLrV directions are lost. -->
+    <xsl:if test="w:textDirection">
+      <xsl:attribute name="style:writing-mode">
+        <xsl:choose>
+          <xsl:when test="w:textDirection/@w:val='lrTb'">lr-tb</xsl:when>
+          <xsl:when test="w:textDirection/@w:val='lrTbV'">lr-tb</xsl:when>
+          <xsl:when test="w:textDirection/@w:val='tbRl'">rl-tb</xsl:when>
+          <xsl:when test="w:textDirection/@w:val='tbRlV'">tb-rl</xsl:when>
+          <xsl:otherwise/>
         </xsl:choose>
       </xsl:attribute>
     </xsl:if>
@@ -896,6 +973,7 @@
     </style:tab-stop>
   </xsl:template>
 
+  <!-- ODF Text properties contained in OOX pPr element -->
   <xsl:template name="InsertpPrTextProperties">
     <!-- hyphenation -->
     <xsl:if test="w:suppressAutoHyphens">
@@ -1275,6 +1353,15 @@
       </xsl:if>
     </xsl:if>
 
+    <!-- script type -->
+    <xsl:if test="w:cs/@w:val='on' or w:cs/@w:val='true' or w:cs/@w:val=1">
+      <xsl:attribute name="style:script-type">complex</xsl:attribute>
+    </xsl:if>
+    
+    <!-- text effect. Mostly lost. -->
+    <xsl:if test="w:effect/@w:val='blinkBackground'">
+      <xsl:attribute name="style:text-blinking">true</xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <!-- insert underline attributes -->
