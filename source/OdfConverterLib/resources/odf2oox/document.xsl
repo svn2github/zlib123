@@ -371,7 +371,7 @@
           <!-- notes configuration -->
           <xsl:variable name="notes-configuration"
             select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration"/>
-
+  
           <xsl:variable name="current-master-style"
             select="key('master-based-styles', @text:style-name)"/>
 
@@ -1948,6 +1948,7 @@
     <w:r>
       <w:rPr>
         <w:rStyle w:val="{concat(@text:note-class, 'Reference')}"/>
+        <!-- COMMENT : why this color as a direct formatting property here ? -->
         <xsl:variable name="fo:color"
           select="substring-after(key('automatic-styles', parent::text:span/@text:style-name)/style:text-properties/@fo:color,'#')"/>
         <xsl:if test="$fo:color">
