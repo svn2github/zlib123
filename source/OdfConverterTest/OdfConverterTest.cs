@@ -379,6 +379,27 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                     return false;
                 }
             }
+            else
+            {
+                try
+                {
+                    new OdfValidator().validate(output);
+                    this.report.AddLog(input, "Converted file (" + output + ") is valid", Report.INFO_LEVEL);
+                    return true;
+                }
+                catch (OdfValidatorException e)
+                {
+                    this.report.AddLog(input, "Converted file (" + output + ") is invalid", Report.WARNING_LEVEL);
+                    this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                    return false;
+                }
+                catch (Exception e)
+                {
+                    this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, Report.ERROR_LEVEL);
+                    this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                    return false;
+                }
+            }
             return false;
         }
 
