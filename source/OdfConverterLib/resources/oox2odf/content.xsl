@@ -33,7 +33,8 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
-  exclude-result-prefixes="w">
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns="http://schemas.openxmlformats.org/package/2006/relationships" exclude-result-prefixes="w">
 
   <xsl:import href="tables.xsl"/>
   <xsl:import href="lists.xsl"/>
@@ -349,17 +350,23 @@
         </xsl:when>
         <xsl:otherwise> </xsl:otherwise>
       </xsl:choose>
-
-      <!-- TODO internet hyperlinks - problem with resolving xml nodes from *.rels files -->
-      <!-- <xsl:if test="@r:id">
+      
+      <!-- Internet hyperlink -->
+      
+      <xsl:if test="@r:id">
         <xsl:variable name="relationshipId">
           <xsl:value-of select="@r:id"/>
         </xsl:variable>
-        <xsl:attribute name="xlink:href">
-            <xsl:value-of select="document('word/_rels/document.xml.rels')/rels/Relationships/@xmlns"/>
-        </xsl:attribute>
+        <xsl:for-each
+          select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
+          <xsl:if test="./@Id=$relationshipId">
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="./@Target"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:for-each>
         <xsl:apply-templates select="w:r/w:t"/>
-      </xsl:if> -->
+      </xsl:if>
 
     </text:a>
 

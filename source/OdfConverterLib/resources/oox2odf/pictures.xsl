@@ -39,7 +39,8 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" 
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
-  xmlns="http://schemas.openxmlformats.org/package/2006/relationships" exclude-result-prefixes="w">
+  xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+  exclude-result-prefixes="w">
 
   <!-- Pictures conversion needs copy of image files in zipEnrty to work correctly (but id does't crash  -->
 
@@ -53,23 +54,17 @@
       <xsl:value-of select="wp:docPr/@name"/>
     </xsl:variable>
     
+    <!--  Copy Pictures Files to the picture catalog -->
+    
     <xsl:variable name="id">
       <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
     </xsl:variable>
     
     <xsl:for-each select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
       
-      <xsl:variable name="target">
-        <xsl:value-of select="./@Target"/>
-      </xsl:variable>
-      
-      <xsl:variable name="IdTest">
-        <xsl:value-of select="./@Id"/>
-      </xsl:variable>
-      
-      <xsl:if test="$IdTest=$id">
+          <xsl:if test="./@Id=$id">
         <xsl:variable name="pzipsource">
-          <xsl:value-of select="$target"/>
+          <xsl:value-of select="./@Target"/>
         </xsl:variable>
         <pzip:copy pzip:source="word/{$pzipsource}" pzip:target="pictures/{$pziptarget}"/>
       </xsl:if>
