@@ -101,7 +101,7 @@
         select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"
       />
     </xsl:variable>
-
+    <!--  Search outlineLvl in style based on style -->
     <xsl:choose>
       <xsl:when
         test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$basedOn]/w:pPr/w:outlineLvl/@w:val">
@@ -123,6 +123,7 @@
 
   </xsl:template>
 
+  <!-- Check outlineLvl if the paragraf is heading-->
   <xsl:template name="GetOutlineLevel">
     <xsl:choose>
       <xsl:when test="w:pPr/w:outlineLvl/@w:val">
@@ -132,7 +133,7 @@
         <xsl:variable name="outline">
           <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
         </xsl:variable>
-
+     <!--Search outlineLvl in styles.xml  -->
         <xsl:choose>
           <xsl:when
             test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val">
@@ -159,7 +160,7 @@
             select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:link/@w:val"
           />
         </xsl:variable>
-
+    <!--if outlineLvl is not defined search in parent style by w:link-->
         <xsl:choose>
           <xsl:when
             test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val">
