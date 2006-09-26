@@ -36,6 +36,7 @@
   exclude-result-prefixes="w">
 
   <xsl:import href="tables.xsl"/>
+  <xsl:import href="lists.xsl"/>
 
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="w:p"/>
@@ -70,6 +71,14 @@
         <xsl:call-template name="InsertTextProperties"/>
       </style:text-properties>
     </style:style>
+  </xsl:template>
+
+
+  <xsl:template match="w:r" mode="text">
+    <xsl:message terminate="no">progress:w:r</xsl:message>
+    <text:span text:style-name="{generate-id(self::node())}">
+      <xsl:apply-templates mode="text"/>
+    </text:span>
   </xsl:template>
 
   <xsl:template match="w:t" mode="automaticstyles"/>
@@ -114,15 +123,12 @@
 
   </xsl:template>
 
-
   <xsl:template name="GetOutlineLevel">
     <xsl:choose>
       <xsl:when test="w:pPr/w:outlineLvl/@w:val">
         <xsl:value-of select="w:pPr/w:outlineLvl/@w:val"/>
       </xsl:when>
-
       <xsl:when test="w:pPr/w:pStyle/@w:val">
-
         <xsl:variable name="outline">
           <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
         </xsl:variable>
@@ -145,11 +151,9 @@
       </xsl:when>
 
       <xsl:otherwise>
-
         <xsl:variable name="outline">
           <xsl:value-of select="w:r/w:rPr/w:rStyle/@w:val"/>
         </xsl:variable>
-
         <xsl:variable name="linkedStyleOutline">
           <xsl:value-of
             select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:link/@w:val"
@@ -174,7 +178,6 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
-
     </xsl:choose>
   </xsl:template>
 
@@ -292,10 +295,13 @@
   <xsl:template match="w:r">
     <xsl:message terminate="no">progress:w:r</xsl:message>
     <xsl:choose>
-      <xsl:when
-        test="count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and contains(preceding::w:instrText[last()],'HYPERLINK')">
 
-        <xsl:call-template name="hyperlink"/>
+      <!-- check if we are in a fieldchar hyperlink -->
+      <xsl:when test="count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and contains(preceding::w:instrText[last()],'HYPERLINK')">
+        <xsl:call-template name="InsertHyperlink"/>
+      </xsl:when>
+      <!-- don't show text in w:instrText tag -->
+      <xsl:when test="w:instrText">    
 
       </xsl:when>
       <xsl:when test="w:instrText"> </xsl:when>
@@ -311,23 +317,22 @@
 
   </xsl:template>
 
+  <!-- inserting simple hyperlink -->
+  
   <xsl:template match="w:hyperlink">
-    <xsl:call-template name="hyperlink"/>
+    <xsl:call-template name="InsertHyperlink"/>
   </xsl:template>
 
   <!-- hyperlink template -->
 
-  <xsl:template name="hyperlink">
+  <xsl:template name="InsertHyperlink">
     <text:a xlink:type="simple">
       <xsl:choose>
         <!-- simple hyperlink -->
         <xsl:when test="@w:anchor">
 
           <xsl:attribute name="xlink:href">
-
             <xsl:value-of select="concat('#',@w:anchor)"/>
-
-
           </xsl:attribute>
           <text:span text:style-name="Internet_20_link">
             <xsl:apply-templates select="w:r/w:t"/>
@@ -346,6 +351,7 @@
         </xsl:when>
         <xsl:otherwise> </xsl:otherwise>
       </xsl:choose>
+
       <!-- TODO internet hyperlinks - problem with resolving xml nodes from *.rels files -->
       <!-- <xsl:if test="@r:id">
         <xsl:variable name="relationshipId">
@@ -371,94 +377,7 @@
     <text:line-break/>
   </xsl:template>
 
-  <!-- following templates are from numbering.xml -->
-  <xsl:template match="w:abstractNum">
-
-    <text:list-style style:name="{concat('L',key('numId',@w:abstractNumId)/@w:numId)}">
-      <xsl:apply-templates select="w:lvl"/>
-    </text:list-style>
-  </xsl:template>
-
-  <xsl:template match="w:lvl">
-    <xsl:choose>
-      <xsl:when test="w:numFmt[@w:val = 'bullet']">
-        <text:list-level-style-bullet text:level="{number(@w:ilvl)+1}"
-          text:style-name="Bullet_20_Symbols">
-          <xsl:attribute name="text:bullet-char">
-            <xsl:call-template name="textChar"/>
 
 
-          </xsl:attribute>
-          <style:list-level-properties>
-            <xsl:call-template name="listLevelProperties"/>
-          </style:list-level-properties>
-          <style:text-properties style:font-name="StarSymbol"/>
-
-
-        </text:list-level-style-bullet>
-      </xsl:when>
-      <xsl:otherwise>
-        <text:list-level-style-number text:level="{number(@w:ilvl)+1}">
-          <xsl:if test="not(number(substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))))">
-            <xsl:attribute name="style:num-suffix">
-
-              <xsl:value-of select="substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))"/>
-
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:attribute name="style:num-format">
-            <xsl:call-template name="num-format">
-              <xsl:with-param name="format" select="w:numFmt/@w:val"/>
-            </xsl:call-template>
-          </xsl:attribute>
-          <style:list-level-properties>
-            <xsl:call-template name="listLevelProperties"/>
-          </style:list-level-properties>
-        </text:list-level-style-number>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- numbering format -->
-  <xsl:template name="num-format">
-    <xsl:param name="format"/>
-    <xsl:choose>
-      <xsl:when test="$format= 'decimal' ">1</xsl:when>
-      <xsl:when test="$format= 'lowerRoman' ">i</xsl:when>
-      <xsl:when test="$format= 'upperRoman' ">I</xsl:when>
-      <xsl:when test="$format= 'lowerLetter' ">a</xsl:when>
-      <xsl:when test="$format= 'upperLetter' ">A</xsl:when>
-      <xsl:otherwise>1</xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="listLevelProperties">
-    <xsl:variable name="Ind" select="w:pPr/w:ind"/>
-    <xsl:attribute name="text:space-before">
-      <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:hanging)"/>
-    </xsl:attribute>
-    <xsl:attribute name="text:min-label-width">
-      <xsl:value-of select="number($Ind/@w:hanging)"/>
-    </xsl:attribute>
-  </xsl:template>
-
-  <!-- types of bullets -->
-  <xsl:template name="textChar">
-    <xsl:choose>
-      <xsl:when test="w:lvlText[@w:val = ''] "></xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]"></xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">☑</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '•' ]">•</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">●</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">➢</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">✔</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">■</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = 'o' ]">○</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">➔</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">✗</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '–' ]">–</xsl:when>
-      <xsl:otherwise>•</xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
 
 </xsl:stylesheet>
