@@ -295,15 +295,12 @@
   <xsl:template match="w:r">
     <xsl:message terminate="no">progress:w:r</xsl:message>
     <xsl:choose>
-
       <!-- check if we are in a fieldchar hyperlink -->
-      <xsl:when test="count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and contains(preceding::w:instrText[last()],'HYPERLINK')">
+      <xsl:when
+        test="count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and contains(preceding::w:instrText[last()],'HYPERLINK')">
         <xsl:call-template name="InsertHyperlink"/>
       </xsl:when>
       <!-- don't show text in w:instrText tag -->
-      <xsl:when test="w:instrText">    
-
-      </xsl:when>
       <xsl:when test="w:instrText"> </xsl:when>
       <xsl:when test="w:rPr">
         <text:span text:style-name="{generate-id(self::node())}">
@@ -318,7 +315,7 @@
   </xsl:template>
 
   <!-- inserting simple hyperlink -->
-  
+
   <xsl:template match="w:hyperlink">
     <xsl:call-template name="InsertHyperlink"/>
   </xsl:template>
@@ -365,6 +362,70 @@
 
     </text:a>
 
+  </xsl:template>
+
+  <!-- footnotes -->
+  <xsl:template match="w:r[w:footnoteReference]">
+    <xsl:variable name="footnoteId" select="w:footnoteReference/@w:id"/>
+
+    <!-- change context to get the footnote content -->
+    <xsl:for-each select="document('word/footnotes.xml')/w:footnotes/w:footnote[@w:id=$footnoteId]">
+      <text:span>
+        <text:note text:id="{concat('ftn',count(preceding-sibling::w:footnote) - 1)}"
+          text:note-class="footnote">
+          <text:note-citation>
+            <xsl:choose>
+              <xsl:when
+                test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On' ">
+                <xsl:attribute name="text:label">
+                  <xsl:apply-templates select="w:t"/>
+                </xsl:attribute>
+                <xsl:apply-templates select="w:t"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="count(preceding-sibling::w:footnote) - 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </text:note-citation>
+          <text:note-body>
+            <!-- TODO : only take relevant content (ignore runs concerning footnoteproperties). -->
+            <xsl:apply-templates select="."/>
+          </text:note-body>
+        </text:note>
+      </text:span>
+    </xsl:for-each>
+  </xsl:template>
+
+  <!-- endnote -->
+  <xsl:template match="w:r[w:endnoteReference]">
+    <xsl:variable name="endnoteId" select="w:endnoteReference/@w:id"/>
+
+    <!-- change context to get the footnote content -->
+    <xsl:for-each select="document('word/endnotes.xml')/w:endnotes/w:endnote[@w:id=$endnoteId]">
+      <text:span>
+        <text:note text:id="{concat('edn',count(preceding-sibling::w:endnote) - 1)}"
+          text:note-class="endnote">
+          <text:note-citation>
+            <xsl:choose>
+              <xsl:when
+                test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On' ">
+                <xsl:attribute name="text:label">
+                  <xsl:apply-templates select="w:t"/>
+                </xsl:attribute>
+                <xsl:apply-templates select="w:t"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="count(preceding-sibling::w:endnote) - 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </text:note-citation>
+          <text:note-body>
+            <!-- TODO : only take relevant content (ignore runs concerning footnoteproperties). -->
+            <xsl:apply-templates select="."/>
+          </text:note-body>
+        </text:note>
+      </text:span>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="w:t">

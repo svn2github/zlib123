@@ -34,8 +34,7 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  exclude-result-prefixes="w">
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" exclude-result-prefixes="w">
 
   <xsl:template name="styles">
     <office:document-styles>
@@ -700,7 +699,7 @@
 
   <!-- Handle tab stops -->
   <!-- TODO : check how to deal with tab stops inside a list -->
-  <xsl:template match="w:tab">
+  <xsl:template match="w:tab[parent::w:tabs]">
     <style:tab-stop>
       <xsl:if test="@w:val != 'num' and @w:val != 'clear'">
         <!-- type -->
