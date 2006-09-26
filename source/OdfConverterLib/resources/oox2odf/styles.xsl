@@ -28,22 +28,317 @@
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" exclude-result-prefixes="w">
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" exclude-result-prefixes="w r">
 
   <xsl:template name="styles">
     <office:document-styles>
+      <!-- document styles -->
       <office:styles>
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
       </office:styles>
+      <!-- automatic styles -->
+      <office:automatic-styles>
+        <!-- TODO : create other automatic styles. This one handles only the default (last w:sectPr of document.xml). -->
+        <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr">
+          <xsl:call-template name="InsertDefaultPageLayout"/>
+        </xsl:if>
+      </office:automatic-styles>
+      <!-- master styles -->
+      <office:master-styles>
+        <!-- TODO : create other master-page styles. This one handles only the default (last w:sectPr of document.xml). -->
+        <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr">
+          <xsl:call-template name="InsertDefaultMasterPage"/>
+        </xsl:if>
+      </office:master-styles>
     </office:document-styles>
   </xsl:template>
 
+  <!-- handle default master page style -->
+  <xsl:template name="InsertDefaultMasterPage">
+    <style:master-page style:name="Standard" style:page-layout-name="pm1">
+      <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
+        <xsl:if test="w:headerReference">
+          <style:header>
+            <xsl:variable name="headerId" select="w:headerReference/@r:id"/>
+            <xsl:variable name="headerXmlDocument"
+              select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+            <!-- change context to get header content -->
+            <xsl:for-each select="document($headerXmlDocument)">
+              <xsl:apply-templates/>
+            </xsl:for-each>
+          </style:header>
+        </xsl:if>
+        <xsl:if test="w:footerReference">
+          <style:footer>
+            <xsl:variable name="footerId" select="w:footerReference/@r:id"/>
+            <xsl:variable name="footerXmlDocument"
+              select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+            <!-- change context to get header content -->
+            <xsl:for-each select="document($footerXmlDocument)">
+              <xsl:apply-templates/>
+            </xsl:for-each>
+          </style:footer>
+        </xsl:if>
+      </xsl:for-each>
+    </style:master-page>
+  </xsl:template>
+
+  <!-- handle default page layout -->
+  <xsl:template name="InsertDefaultPageLayout">
+    <style:page-layout style:name="pm1">
+      <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
+        <style:page-layout-properties>
+          <xsl:call-template name="InsertPageLayoutProperties"/>
+        </style:page-layout-properties>
+        <style:header-style>
+          <style:header-footer-properties>
+            <xsl:call-template name="InsertHeaderFooterProperties">
+              <xsl:with-param name="object">header</xsl:with-param>
+            </xsl:call-template>
+          </style:header-footer-properties>
+        </style:header-style>
+        <style:footer-style>
+          <style:header-footer-properties>
+            <xsl:call-template name="InsertHeaderFooterProperties">
+              <xsl:with-param name="object">footer</xsl:with-param>
+            </xsl:call-template>
+          </style:header-footer-properties>
+        </style:footer-style>
+      </xsl:for-each>
+    </style:page-layout>
+  </xsl:template>
+
+  <!-- conversion of page properties -->
+  <!-- TODO : handle other properties -->
+  <xsl:template name="InsertPageLayoutProperties">
+
+    <!-- page size -->
+    <xsl:if test="w:pgSz">
+      <xsl:attribute name="style:page-width">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length" select="w:pgSz/@w:w"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:attribute name="style:page-height">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length" select="w:pgSz/@w:h"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:if test="w:pgSz/@w:orient">
+        <xsl:attribute name="style:print-orientation">
+          <xsl:value-of select="w:pgSz/@w:orient"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:if>
+
+    <!-- page margins -->
+    <xsl:if test="w:pgMar">
+      <xsl:call-template name="ComputePageMargins"/>
+    </xsl:if>
+
+    <!-- page numbering style. -->
+    <!-- TODO : handle chapter numbering -->
+    <xsl:if test="w:pgNumType">
+      <xsl:call-template name="InsertPageNumbering"/>
+    </xsl:if>
+
+  </xsl:template>
+
+  <!-- page margins -->
+  <xsl:template name="ComputePageMargins">
+    <xsl:attribute name="fo:margin-top">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="unit">cm</xsl:with-param>
+        <xsl:with-param name="length">
+          <xsl:choose>
+            <xsl:when test="w:pgMar/@w:top &lt; 0">
+              <xsl:value-of select="w:pgMar/@w:top"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">
+                  <xsl:value-of select="w:pgMar/@w:header"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="w:pgMar/@w:top"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
+    <xsl:attribute name="fo:margin-left">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length" select="w:pgMar/@w:left"/>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
+    <xsl:attribute name="fo:margin-bottom">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="unit">cm</xsl:with-param>
+        <xsl:with-param name="length">
+          <xsl:choose>
+            <xsl:when test="w:pgMar/@w:bottom &lt; 0">
+              <xsl:value-of select="w:pgMar/@w:bottom"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">
+                  <xsl:value-of select="w:pgMar/@w:footer"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="w:pgMar/@w:bottom"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
+    <xsl:attribute name="fo:margin-right">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length" select="w:pgMar/@w:right"/>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
+  </xsl:template>
+
+  <!-- page numbers -->
+  <xsl:template name="InsertPageNumbering">
+    <xsl:if test="w:pgNumType/@w:fmt">
+      <!-- Most number format are lost. -->
+      <xsl:choose>
+        <xsl:when
+          test="contains(w:pgNumType/@w:fmt,'decimal') or w:pgNumType/@w:fmt = 'numberInDash' or w:pgNumType/@w:fmt = 'ordinal' ">
+          <!-- prefix and suffix -->
+          <xsl:choose>
+            <xsl:when test="w:pgNumType/@w:fmt = 'numberInDash' ">
+              <xsl:attribute name="style:num-prefix">- </xsl:attribute>
+              <xsl:attribute name="style:num-suffix"> -</xsl:attribute>
+            </xsl:when>
+            <xsl:when test="w:pgNumType/@w:fmt = 'decimalEnclosedParen' ">
+              <xsl:attribute name="style:num-prefix">(</xsl:attribute>
+              <xsl:attribute name="style:num-suffix">)</xsl:attribute>
+            </xsl:when>
+            <xsl:when test="w:pgNumType/@w:fmt = 'decimalEnclosedFullstop' ">
+              <xsl:attribute name="style:num-suffix">.</xsl:attribute>
+            </xsl:when>
+            <xsl:when test="contains(w:pgNumType/@w:fmt,'decimalEnclosedCircle')">
+              <xsl:attribute name="style:num-prefix">(</xsl:attribute>
+              <xsl:attribute name="style:num-suffix">)</xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise/>
+          </xsl:choose>
+          <!-- start number -->
+          <xsl:choose>
+            <xsl:when test="w:pgNumType/@w:start">
+              <xsl:attribute name="style:num-format">
+                <xsl:value-of select="w:pgNumType/@w:start"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="w:pgNumType/@w:fmt = 'lowerLetter' ">
+          <xsl:attribute name="style:num-format">a</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="w:pgNumType/@w:fmt = 'upperLetter' ">
+          <xsl:attribute name="style:num-format">A</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="w:pgNumType/@w:fmt = 'lowerRoman' ">
+          <xsl:attribute name="style:num-format">i</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="w:pgNumType/@w:fmt = 'upperRoman' ">
+          <xsl:attribute name="style:num-format">I</xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- header / footer properties -->
+  <!-- TODO : handle other properties -->
+  <xsl:template name="InsertHeaderFooterProperties">
+    <xsl:param name="object"/>
+
+    <!-- dynamic spacing always false : no spacing defined in OOX -->
+    <xsl:attribute name="style:dynamic-spacing">false</xsl:attribute>
+
+    <!-- no spacing in OOX. -->
+    <xsl:choose>
+      <xsl:when test="$object = 'header' ">
+        <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:attribute name="fo:margin-left">0cm</xsl:attribute>
+    <xsl:attribute name="fo:margin-right">0cm</xsl:attribute>
+
+    <!-- min height calculated with page Margins properties. -->
+    <xsl:attribute name="fo:min-height">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="unit">cm</xsl:with-param>
+        <xsl:with-param name="length">
+          <xsl:choose>
+            <xsl:when test="$object = 'header' ">
+              <xsl:choose>
+                <xsl:when test="w:pgMar/@w:top &lt; 0">
+                  <xsl:choose>
+                    <xsl:when test=" - w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select=" - w:pgMar/@w:top - w:pgMar/@w:header"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:choose>
+                    <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="w:pgMar/@w:top - w:pgMar/@w:header"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="w:pgMar/@w:bottom &lt; 0">
+                  <xsl:choose>
+                    <xsl:when test=" - w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">0</xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select=" - w:pgMar/@w:bottom - w:pgMar/@w:footer"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:choose>
+                    <xsl:when test="w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">0</xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="w:pgMar/@w:bottom - w:pgMar/@w:footer"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
+  </xsl:template>
+
+  <!-- create styles -->
   <xsl:template match="w:style">
     <xsl:message terminate="no">progress:w:style</xsl:message>
     <xsl:choose>
