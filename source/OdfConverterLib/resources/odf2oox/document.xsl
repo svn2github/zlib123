@@ -260,8 +260,81 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-
+  
+  <!--checks if element has style used to generate table of contents in document  TODO bookmarks for index marks -->
+  <xsl:template name="IsTOCBookmark">
+    <xsl:param name="styleName" />
+    <xsl:param name="tableOfContentsNum" select="count(//text:table-of-content)"/>
+    <xsl:param name="isTocStyle"/>
+    
+    <xsl:variable name="tableOfContent" select="//text:table-of-content[$tableOfContentsNum]" />
+    
+    <xsl:choose>
+      <xsl:when test="$tableOfContentsNum > 0 and $isTocStyle != 'true'">
+        
+        <xsl:variable name="tocStyle">
+          <xsl:call-template name="IsTOCStyle">
+            <xsl:with-param name="sourceStyleNum"
+              select="count($tableOfContent/text:table-of-content-source/text:index-source-styles)"/>
+            <xsl:with-param name="styleName" select="$styleName"/>
+            <xsl:with-param name="tableOfContent" select="$tableOfContent" />
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:call-template name="IsTOCBookmark">
+          <xsl:with-param name="tableOfContentsNum" select="$tableOfContentsNum - 1" />
+          <xsl:with-param name="styleName" select="$styleName"/>
+          <xsl:with-param name="isTocStyle" select="$tocStyle"/>
+        </xsl:call-template>
+      </xsl:when>
+      
+    <xsl:otherwise>
+      <xsl:choose>
+        <xsl:when test="$isTocStyle = 'true'">true</xsl:when>
+        <xsl:otherwise>false</xsl:otherwise>
+      </xsl:choose>
+   </xsl:otherwise>
+  </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertTOCBookmark">
+    <xsl:param name="tableOfContentsNum" select="count(//text:table-of-content)" />
+    <xsl:param name="bookmarkType" />
+    
+    
+    <xsl:choose>
+      <xsl:when test="$tableOfContentsNum > 0">
+        
+        <xsl:variable name="bookmarkId">
+          <xsl:call-template name="CalculateBookmarkId">
+            <xsl:with-param name="counter" select="1"/>
+            <xsl:with-param name="tableOfContent" select="//text:table-of-content[$tableOfContentsNum]" />
+          </xsl:call-template>
+        </xsl:variable>
+        
+           <xsl:choose>
+             <xsl:when test="$bookmarkType = 'start' " >
+               <xsl:call-template name="InsertBookmarkStartTOC">
+                 <xsl:with-param name="tocId" select="$bookmarkId"/>
+                 <xsl:with-param name="tableOfContentsNum" select="$tableOfContentsNum"/>
+               </xsl:call-template>
+             </xsl:when>
+             <xsl:when test="$bookmarkType = 'end' ">
+               <xsl:call-template name="InsertBookmarkEndTOC">
+                 <xsl:with-param name="tocId" select="$bookmarkId"/>
+              </xsl:call-template>
+             </xsl:when>
+            </xsl:choose>
+        
+        <xsl:call-template name="InsertTOCBookmark">
+          <xsl:with-param name="tableOfContentsNum" select="$tableOfContentsNum - 1"/>
+          <xsl:with-param name="bookmarkType" select="$bookmarkType" />
+        </xsl:call-template>
+        
+      </xsl:when>
+     </xsl:choose>
+  </xsl:template>
+  
   <!-- paragraphs and headings -->
   <xsl:template match="text:p | text:h">
     <xsl:param name="level" select="0"/>
@@ -278,31 +351,18 @@
       <!-- check if element is contained in TOC  -->
       <xsl:variable name="isBookmarked">
         <xsl:call-template name="IsTOCBookmark">
-          <!-- TODO : Can't we find more than one text:table-of-content in the document? -->
-          <xsl:with-param name="sourceStyleNum"
-            select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
-          <xsl:with-param name="styleName" select="@text:style-name"/>
+           <xsl:with-param name="styleName" select="@text:style-name"/>
         </xsl:call-template>
-      </xsl:variable>
-
-      <!-- calculate TOC id for bookmark -->
-      <xsl:variable name="tocId">
-        <xsl:if test="$isBookmarked = 'true' ">
-          <xsl:call-template name="CalculateBookmarkId">
-            <xsl:with-param name="sourceStyleNum"
-              select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
-            <xsl:with-param name="counter" select="1"/>
-          </xsl:call-template>
-        </xsl:if>
       </xsl:variable>
 
       <!--   insert bookmark start for element which is contained in TOC-->
       <xsl:if test="$isBookmarked = 'true' ">
-        <xsl:call-template name="InsertBookmarkStartTOC">
-          <xsl:with-param name="tocId" select="$tocId"/>
+        <xsl:variable name="bookmarkType">start</xsl:variable>
+         <xsl:call-template name="InsertTOCBookmark">
+          <xsl:with-param name="bookmarkType" select="$bookmarkType" />
         </xsl:call-template>
       </xsl:if>
-
+      
       <!-- footnotes or endnotes: insert the mark in the first paragraph -->
       <xsl:if test="parent::text:note-body and position() = 1">
         <xsl:apply-templates select="../../text:note-citation" mode="note"/>
@@ -316,11 +376,12 @@
 
       <!--   insert bookmark end for element which is contained in TOC-->
       <xsl:if test="$isBookmarked = 'true' ">
-        <xsl:call-template name="InsertBookmarkEndTOC">
-          <xsl:with-param name="tocId" select="$tocId"/>
+        <xsl:variable name="bookmarkType">end</xsl:variable>
+        <xsl:call-template name="InsertTOCBookmark">
+           <xsl:with-param name="bookmarkType" select="$bookmarkType" />
         </xsl:call-template>
       </xsl:if>
-
+      
     </w:p>
   </xsl:template>
 
@@ -454,8 +515,9 @@
   <!-- bookmark start mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkStartTOC">
     <xsl:param name="tocId"/>
+    <xsl:param name="tableOfContentsNum"/>
 
-    <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId)}"/>
+    <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId,$tableOfContentsNum)}"/>
   </xsl:template>
 
   <!-- bookmark end mark for elements contained in TOC -->
@@ -465,55 +527,50 @@
     <w:bookmarkEnd w:id="{$tocId}"/>
   </xsl:template>
 
-  <!-- checks if element is contained in TOC - used for paragraphs with "Additional styles" defined for generating TOC  -->
-  <xsl:template name="IsTOCBookmark">
+  <!-- checks if element has style used to generate TOC -->
+  <xsl:template name="IsTOCStyle">
     <xsl:param name="sourceStyleNum"/>
     <xsl:param name="styleName"/>
-
+    <xsl:param name="tableOfContent" />
+    
     <xsl:choose>
+      
+      <!--checks if headings are used to generate TOC -->
       <xsl:when test="self::text:h">
         <xsl:choose>
           <xsl:when
-            test="//text:table-of-content/text:table-of-content-source/@text:use-outline-level = 'false' "
+            test="$tableOfContent/text:table-of-content-source/@text:use-outline-level = 'false' "
             >false</xsl:when>
           <xsl:otherwise>true</xsl:otherwise>
         </xsl:choose>
       </xsl:when>
+      
+      <!-- empty elements are never bookmarked -->
       <xsl:when test="not(child::node())">false</xsl:when>
+      
+      <!--content of index body is never bookmarked-->
       <xsl:when test="ancestor::text:index-body">false</xsl:when>
+      
       <xsl:when test="$sourceStyleNum > 0">
-
         <xsl:variable name="sourceStyleName"
-          select="//text:table-of-content/text:table-of-content-source/text:index-source-styles[$sourceStyleNum]/text:index-source-style/@text:style-name"/>
-
+          select="$tableOfContent/text:table-of-content-source/text:index-source-styles[$sourceStyleNum]/text:index-source-style/@text:style-name"/>
+        
         <xsl:choose>
-          <xsl:when test="not(key('automatic-styles',$styleName))">
-            <xsl:choose>
-              <xsl:when test="$styleName != $sourceStyleName">
-                <xsl:call-template name="IsTOCBookmark">
-                  <xsl:with-param name="sourceStyleNum" select="$sourceStyleNum - 1"/>
-                  <xsl:with-param name="styleName" select="$styleName"/>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>true</xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-
+          <!--  checks if style or parent style is used as a source style for TOC-->
+          <xsl:when
+            test="(key('automatic-styles',$styleName) and key('automatic-styles',$styleName)/@style:parent-style-name = $sourceStyleName) 
+            or $styleName = $sourceStyleName">true</xsl:when>
+          
+          <!--  checks next source style-->
           <xsl:otherwise>
-            <xsl:choose>
-              <xsl:when
-                test="key('automatic-styles',$styleName)/@style:parent-style-name != $sourceStyleName">
-                <xsl:call-template name="IsTOCBookmark">
-                  <xsl:with-param name="sourceStyleNum" select="$sourceStyleNum - 1"/>
-                  <xsl:with-param name="styleName" select="$styleName"/>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>true</xsl:otherwise>
-            </xsl:choose>
+            <xsl:call-template name="IsTOCStyle">
+              <xsl:with-param name="sourceStyleNum" select="$sourceStyleNum - 1"/>
+              <xsl:with-param name="styleName" select="$styleName"/>
+              <xsl:with-param name="tableOfContent" select="$tableOfContent" />
+            </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
       <xsl:otherwise>false</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -521,7 +578,8 @@
   <!--calculate bookmark id for element contained in TOC -->
   <xsl:template name="CalculateBookmarkId">
     <xsl:param name="counter"/>
-    <xsl:param name="sourceStyleNum"/>
+    <xsl:param name="tableOfContent"/>
+    <xsl:param name="sourceStyleNum"  select="count($tableOfContent/text:table-of-content-source/text:index-source-styles)"/>
 
     <xsl:choose>
 
@@ -544,6 +602,7 @@
         <xsl:call-template name="CalculateBookmarkId">
           <xsl:with-param name="sourceStyleNum" select="$sourceStyleNum - 1"/>
           <xsl:with-param name="counter" select="$elementSum"/>
+          <xsl:with-param name="tableOfContent" select="$tableOfContent"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
@@ -1628,29 +1687,14 @@
           <!--TOC-->
           <xsl:variable name="isBookmarked">
             <xsl:call-template name="IsTOCBookmark">
-              <xsl:with-param name="sourceStyleNum"
-                select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
               <xsl:with-param name="styleName" select="child::*[1]/@text:style-name"/>
             </xsl:call-template>
           </xsl:variable>
 
-          <xsl:variable name="tocId">
-
-            <xsl:choose>
-              <xsl:when test="$isBookmarked = 'true' ">
-                <xsl:call-template name="CalculateBookmarkId">
-                  <xsl:with-param name="sourceStyleNum"
-                    select="count(//text:table-of-content/text:table-of-content-source/text:index-source-styles)"/>
-                  <xsl:with-param name="counter" select="1"/>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise/>
-            </xsl:choose>
-          </xsl:variable>
-
           <xsl:if test="$isBookmarked = 'true' ">
-            <xsl:call-template name="InsertBookmarkStartTOC">
-              <xsl:with-param name="tocId" select="$tocId"/>
+            <xsl:variable name="bookmarkType">start</xsl:variable>
+            <xsl:call-template name="InsertTOCBookmark">
+              <xsl:with-param name="bookmarkType" select="$bookmarkType" />
             </xsl:call-template>
           </xsl:if>
 
@@ -1669,8 +1713,9 @@
 
           <!--TOC end-->
           <xsl:if test="$isBookmarked = 'true' ">
-            <xsl:call-template name="InsertBookmarkEndTOC">
-              <xsl:with-param name="tocId" select="$tocId"/>
+            <xsl:variable name="bookmarkType">end</xsl:variable>
+            <xsl:call-template name="InsertTOCBookmark">
+              <xsl:with-param name="bookmarkType" select="$bookmarkType" />
             </xsl:call-template>
           </xsl:if>
 
@@ -1775,7 +1820,7 @@
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
-      <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $tocId, ' \h')"/></w:instrText>
+      <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $tocId,count(ancestor::text:table-of-content/preceding-sibling::text:table-of-content)+1, ' \h')"/></w:instrText>
     </w:r>
     <w:r>
       <w:rPr>

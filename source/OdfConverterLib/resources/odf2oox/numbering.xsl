@@ -343,6 +343,7 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- numbered list properties like: numbering format, start value -->
   <xsl:template name="InsertNumberedListProperties">
     <xsl:choose>
       <xsl:when test="@text:start-value">
@@ -361,29 +362,55 @@
         </xsl:call-template>
       </xsl:attribute>
     </w:numFmt>
-    <w:lvlText>
-      <xsl:attribute name="w:val">
-        <xsl:choose>
-          <xsl:when test="@style:num-format = '' "/>
-          <xsl:otherwise>
+    <xsl:choose>
+      <xsl:when test="ancestor::text:outline-style">
+        <w:lvlText>
+            <xsl:attribute name="w:val">
             <xsl:value-of select="@style:num-prefix"/>
             <xsl:choose>
-              <xsl:when test="@text:display-levels">
-                <xsl:call-template name="GetLevelText">
-                  <xsl:with-param name="displayLevels" select="@text:display-levels"/>
+              <xsl:when test="@style:num-format='1'">
+                <xsl:call-template name="GetNumberingLevelText">
                   <xsl:with-param name="level" select="@text:level"/>
-                  <xsl:with-param name="listStyleName"
-                    select="ancestor::text:list-style/@style:name"/>
                 </xsl:call-template>
               </xsl:when>
-              <xsl:otherwise>%<xsl:value-of select="@text:level"/></xsl:otherwise>
+              <xsl:when test="@style:num-format='a'">
+                <xsl:value-of select="concat('%',string(@text:level))"/>
+              </xsl:when>
+              <xsl:when test="@style:num-format='A'">
+                <xsl:value-of select="concat('%',string(@text:level))"/>
+              </xsl:when>
+              <xsl:otherwise/>
             </xsl:choose>
             <xsl:value-of select="@style:num-suffix"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </w:lvlText>
-  </xsl:template>
+          </xsl:attribute>
+        </w:lvlText>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:lvlText>
+          <xsl:attribute name="w:val">
+            <xsl:choose>
+              <xsl:when test="@style:num-format = '' "/>
+              <xsl:otherwise>
+                <xsl:value-of select="@style:num-prefix"/>
+                <xsl:choose>
+                  <xsl:when test="@text:display-levels">
+                    <xsl:call-template name="GetLevelText">
+                      <xsl:with-param name="displayLevels" select="@text:display-levels"/>
+                      <xsl:with-param name="level" select="@text:level"/>
+                      <xsl:with-param name="listStyleName"
+                        select="ancestor::text:list-style/@style:name"/>
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:otherwise>%<xsl:value-of select="@text:level"/></xsl:otherwise>
+                </xsl:choose>
+                <xsl:value-of select="@style:num-suffix"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </w:lvlText>
+      </xsl:otherwise>
+    </xsl:choose>
+   </xsl:template>
 
   <xsl:template name="GetBulletSize">
     <xsl:param name="fontName"/>
