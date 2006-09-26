@@ -51,21 +51,21 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 
 		// namespaces and related schemas
         private static string OOX_CONTENT_TYPE_NS = "http://schemas.openxmlformats.org/package/2006/content-types";
-        private static string OOX_CONTENT_TYPE_SCHEMA = "ooxschemas/opc-contenttypes.xsd";
+        private static string OOX_CONTENT_TYPE_SCHEMA = "ooxschemas/opc-contentTypeItem.xsd";
         private static string OOX_RELATIONSHIP_NS = "http://schemas.openxmlformats.org/package/2006/relationships";
-        private static string OOX_RELATIONSHIP_SCHEMA = "ooxschemas/opc-relationships.xsd";
+        private static string OOX_RELATIONSHIP_SCHEMA = "ooxschemas/opc-relationshipPart.xsd";
         private static string OOX_META_CORE_NS = "http://schemas.openxmlformats.org/package/2006/metadata/core-properties";
-        private static string OOX_META_CORE_SCHEMA = "ooxschemas/opc-coreproperties.xsd";
+        private static string OOX_META_CORE_SCHEMA = "ooxschemas/opc-coreProperties.xsd";
         private static string OOX_META_APP_NS = "http://schemas.openxmlformats.org/officeDocument/2006/extended-properties";
-        private static string OOX_META_APP_SCHEMA = "ooxschemas/shared-docpropertiesextended.xsd";
-        private static string OOX_WORDML_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/3/main";
+        private static string OOX_META_APP_SCHEMA = "ooxschemas/shared-documentPropertiesExtended.xsd";
+        private static string OOX_WORDML_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         private static string OOX_WORDML_SCHEMA = "ooxschemas/wml.xsd";
-        private static string OOX_DML_NS = "http://schemas.openxmlformats.org/drawingml/2006/3/main";
+        private static string OOX_DML_NS = "http://schemas.openxmlformats.org/drawingml/2006/main";
         private static string OOX_DML_STYLE_SCHEMA = "ooxschemas/dml-stylesheet.xsd";
 		private static string OOX_DOC_REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
-		private static string OOX_WPDRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/3/wordprocessingDrawing";
-		private static string OOX_DML_WPDRAWING_SCHEMA = "ooxschemas/dml-wordprocessingdrawing.xsd";
-		private static string OOX_PICTURE_NS = "http://schemas.openxmlformats.org/drawingml/2006/3/picture";
+		private static string OOX_WPDRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
+        private static string OOX_DML_WPDRAWING_SCHEMA = "ooxschemas/dml-wordprocessingDrawing.xsd";
+		private static string OOX_PICTURE_NS = "http://schemas.openxmlformats.org/drawingml/2006/picture";
 		private static string OOX_DML_PICTURE_SCHEMA = "ooxschemas/dml-picture.xsd";	
 		// OOX special files
         private static string OOX_CONTENT_TYPE_FILE = "[Content_Types].xml";
