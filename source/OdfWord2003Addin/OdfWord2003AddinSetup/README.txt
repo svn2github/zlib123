@@ -1,7 +1,7 @@
 ODF Add-in for Word2003
 ================================
 
-Thank you for downloading ODF Add-in for Word2007.
+Thank you for downloading ODF Add-in for Word2003.
 The purpose of the software is to enable users to open ODF Specification based documents in Word 2003 and demonstrate the interoperability between OpenXML & ODF specifications. 
 This add-in is under development (see the roadmap at http://sourceforge.net/projects/odf-converter for more details about planned releases).
 We will provide stable nightly builds. You can install and test them at your own risk!
