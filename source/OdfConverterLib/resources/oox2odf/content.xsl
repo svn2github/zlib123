@@ -36,15 +36,20 @@
   exclude-result-prefixes="w">
 
   <xsl:import href="tables.xsl"/>
-  
+
+  <xsl:strip-space elements="*"/>
+  <xsl:preserve-space elements="w:p"/>
+  <xsl:preserve-space elements="w:r"/>
+
   <xsl:key name="numId" match="w:num" use="w:abstractNumId/@w:val"/>
+
   <xsl:template name="content">
     <office:document-content>
       <office:scripts/>
       <office:font-face-decls/>
       <office:automatic-styles>
         <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
-                  mode="automaticstyles"/>
+          mode="automaticstyles"/>
         <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr]">
           <xsl:apply-templates select="document('word/numbering.xml')/w:numbering"/>
         </xsl:if>
@@ -57,35 +62,14 @@
     </office:document-content>
   </xsl:template>
 
-  <xsl:template match="w:rPr" mode="automaticstyles">
+  <!-- create a style for each run. Do not take w:pPr/w:rPr into consideration. -->
+  <xsl:template match="w:rPr[parent::w:r]" mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
-      <xsl:choose>
-        <xsl:when test="self::node()/w:b">
-          <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold"
-            style:font-weight-complex="bold"/>
-        </xsl:when>
-        <xsl:when test="self::node()/w:i">
-          <style:text-properties fo:font-style="italic" style:font-style-asian="italic"
-            style:font-style-complex="italic"/>
-        </xsl:when>
-        <xsl:when test="self::node()/w:color">
-          <style:text-properties fo:color="{self::node()/w:color/@w:val}" />
-        </xsl:when>
-      </xsl:choose>
+      <style:text-properties>
+        <xsl:call-template name="InsertTextProperties"/>
+      </style:text-properties>
     </style:style>
-  </xsl:template>
-
-  <xsl:template match="w:r" mode="text">
-    <xsl:message terminate="no">progress:w:r</xsl:message>
-    <text:span text:style-name="{generate-id(self::node())}">
-      <xsl:apply-templates mode="text"/>
-    </text:span>
-  </xsl:template>
-
-  <xsl:template match="w:p">
-    <xsl:message terminate="no">progress:w:p</xsl:message>
-    <xsl:apply-templates select="." mode="text"/>
   </xsl:template>
 
   <xsl:template match="w:t" mode="automaticstyles"/>
@@ -98,34 +82,38 @@
     <xsl:message terminate="no">progress:text()</xsl:message>
     <xsl:value-of select="."/>
   </xsl:template>
-  
+
   <!--  Check if the paragraf is heading -->
-  
+
   <xsl:template name="CheckHeading">
     <xsl:param name="outline"/>
     <xsl:variable name="basedOn">
-      <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"/>      
+      <xsl:value-of
+        select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"
+      />
     </xsl:variable>
-    
+
     <xsl:choose>
-      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$basedOn]/w:pPr/w:outlineLvl/@w:val">
+      <xsl:when
+        test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$basedOn]/w:pPr/w:outlineLvl/@w:val">
         <xsl:value-of
           select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$basedOn]/w:pPr/w:outlineLvl/@w:val"
-        />    
+        />
       </xsl:when>
-      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val">
+      <xsl:when
+        test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val">
         <xsl:call-template name="CheckHeading">
           <xsl:with-param name="outline">
             <xsl:value-of
               select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"
-            />    
+            />
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
 
   <xsl:template name="GetOutlineLevel">
     <xsl:choose>
@@ -139,20 +127,22 @@
           <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
         </xsl:variable>
 
-              <xsl:choose>                
-                <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val">
-                    <xsl:value-of
-                          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val"/>        
-                </xsl:when>                
-             <xsl:otherwise>
-                  <xsl:call-template name="CheckHeading">
-                    <xsl:with-param name="outline">
-                      <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
-                    </xsl:with-param>
-                  </xsl:call-template>
-               </xsl:otherwise>
-              </xsl:choose>
-           </xsl:when>
+        <xsl:choose>
+          <xsl:when
+            test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val">
+            <xsl:value-of
+              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val"
+            />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="CheckHeading">
+              <xsl:with-param name="outline">
+                <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
 
       <xsl:otherwise>
 
@@ -165,11 +155,13 @@
             select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:link/@w:val"
           />
         </xsl:variable>
-        
-        <xsl:choose>          
-          <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val">
+
+        <xsl:choose>
+          <xsl:when
+            test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val">
             <xsl:value-of
-              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val" /> 
+              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val"
+            />
           </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name="CheckHeading">
@@ -180,7 +172,7 @@
               </xsl:with-param>
             </xsl:call-template>
           </xsl:otherwise>
-        </xsl:choose>       
+        </xsl:choose>
       </xsl:otherwise>
 
     </xsl:choose>
@@ -214,12 +206,13 @@
   </xsl:template>
 
   <xsl:template match="w:p">
+    <xsl:message terminate="no">progress:w:p</xsl:message>
     <xsl:choose>
 
       <!-- check if list starts -->
       <xsl:when test="w:pPr/w:numPr">
         <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
-        
+
         <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
         <xsl:if
           test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
@@ -260,7 +253,7 @@
   <!-- paragraph has  numbering properties - is a list item -->
   <xsl:template match="w:p" mode="list">
     <xsl:variable name="NumberingId2" select="w:pPr/w:numPr/w:numId/@w:val"/>
-  
+
     <xsl:variable name="position2" select="count(preceding-sibling::w:p)"/>
     <xsl:choose>
       <!-- Is first  element at list -->
@@ -297,61 +290,61 @@
   </xsl:template>
 
   <xsl:template match="w:r">
+    <xsl:message terminate="no">progress:w:r</xsl:message>
     <xsl:choose>
-      <xsl:when test="count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and contains(preceding::w:instrText[last()],'HYPERLINK')">
- 
+      <xsl:when
+        test="count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and contains(preceding::w:instrText[last()],'HYPERLINK')">
+
         <xsl:call-template name="hyperlink"/>
-        
+
       </xsl:when>
-      <xsl:when test="w:instrText">
-        
-      </xsl:when>
+      <xsl:when test="w:instrText"> </xsl:when>
       <xsl:when test="w:rPr">
-      <text:span>
-        <xsl:apply-templates/>
-      </text:span>
+        <text:span text:style-name="{generate-id(self::node())}">
+          <xsl:apply-templates/>
+        </text:span>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates/>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
 
   <xsl:template match="w:hyperlink">
     <xsl:call-template name="hyperlink"/>
   </xsl:template>
-  
+
   <!-- hyperlink template -->
-  
+
   <xsl:template name="hyperlink">
     <text:a xlink:type="simple">
       <xsl:choose>
         <!-- simple hyperlink -->
-      <xsl:when test="@w:anchor">
+        <xsl:when test="@w:anchor">
 
-        <xsl:attribute name="xlink:href">
+          <xsl:attribute name="xlink:href">
 
-          <xsl:value-of select="concat('#',@w:anchor)"/>
+            <xsl:value-of select="concat('#',@w:anchor)"/>
 
-      
-      	</xsl:attribute>
-        <text:span text:style-name="Internet_20_link">
-          <xsl:apply-templates select="w:r/w:t"/>
-        </text:span>
-      </xsl:when>
+
+          </xsl:attribute>
+          <text:span text:style-name="Internet_20_link">
+            <xsl:apply-templates select="w:r/w:t"/>
+          </text:span>
+        </xsl:when>
         <!-- fieldchar hyperlink -->
-      <xsl:when test="self::w:r">
-        <xsl:attribute name="xlink:href">
-          <xsl:value-of select="concat('#_',substring-before(substring-after(preceding::w:instrText[last()],'_'),'&quot;'))"/>
-        </xsl:attribute>
-        <text:span text:style-name="Internet_20_link">
-          <xsl:apply-templates select="w:t"/>
-        </text:span>
-      </xsl:when>
-        <xsl:otherwise>
-          
-        </xsl:otherwise>
+        <xsl:when test="self::w:r">
+          <xsl:attribute name="xlink:href">
+            <xsl:value-of
+              select="concat('#_',substring-before(substring-after(preceding::w:instrText[last()],'_'),'&quot;'))"
+            />
+          </xsl:attribute>
+          <text:span text:style-name="Internet_20_link">
+            <xsl:apply-templates select="w:t"/>
+          </text:span>
+        </xsl:when>
+        <xsl:otherwise> </xsl:otherwise>
       </xsl:choose>
       <!-- TODO internet hyperlinks - problem with resolving xml nodes from *.rels files -->
       <!-- <xsl:if test="@r:id">
@@ -364,1326 +357,53 @@
         <xsl:apply-templates select="w:r/w:t"/>
       </xsl:if> -->
 
-
-      
     </text:a>
 
-</xsl:template>
+  </xsl:template>
 
   <xsl:template match="w:t">
     <xsl:message terminate="no">progress:w:t</xsl:message>
     <xsl:value-of select="."/>
   </xsl:template>
-  
+
   <!-- line breaks  (page-break todo)-->
   <xsl:template match="w:br">
     <text:line-break/>
   </xsl:template>
 
-
-  <!-- Piece of code used to call style properties templates.
-  
-  <xsl:template match="w:style">
-    <style:style>
-      <xsl:if test="w:pPr">
-        <style:paragraph-properties>
-    <xsl:for-each select="w:pPr">
-            <xsl:call-template name="InsertParagraphProperties"/>
-          </xsl:for-each>
-        </style:paragraph-properties>
-      </xsl:if>
-
-      <xsl:if test="w:rPr">
-        <style:text-properties>
-          <xsl:for-each select="w:rPr">
-            <xsl:call-template name="InsertTextProperties"/>
-          </xsl:for-each>
-          <xsl:for-each select="w:pPr">
-            <xsl:call-template name="InsertpPrTextProperties"/>
-          </xsl:for-each>
-        </style:text-properties>
-      </xsl:if>
-    </style:style>
-  </xsl:template>
-  
-  -->
-
-  <!-- conversion of paragraph properties -->
-  <xsl:template name="InsertParagraphProperties">
-
-    <xsl:if test="w:keepNext">
-      <xsl:attribute name="fo:keep-with-next">
-        <xsl:choose>
-          <xsl:when
-            test="w:keepNext/@w:val='off' or w:keepNext/@w:val='false' or w:keepNext/@w:val=0">
-            <xsl:value-of select="'auto'"/>
-          </xsl:when>
-          <xsl:when test="w:keepNext/@w:val='on' or w:keepNext/@w:val='true' or w:keepNext/@w:val=1">
-            <xsl:value-of select="'always'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'always'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:keepLines">
-      <xsl:attribute name="fo:keep-together">
-        <xsl:choose>
-          <xsl:when
-            test="w:keepLines/@w:val='off' or w:keepLines/@w:val='false' or w:keepLines/@w:val=0">
-            <xsl:value-of select="'auto'"/>
-          </xsl:when>
-          <xsl:when
-            test="w:keepLines/@w:val='on' or w:keepLines/@w:val='true' or w:keepLines/@w:val=1">
-            <xsl:value-of select="'always'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'always'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- break before paragraph -->
-    <xsl:if test="w:pageBreakBefore">
-      <xsl:attribute name="fo:break-before">
-        <xsl:choose>
-          <xsl:when
-            test="w:pageBreakBefore/@w:val='off' or w:pageBreakBefore/@w:val='false' or w:pageBreakBefore/@w:val=0">
-            <xsl:value-of select="'auto'"/>
-          </xsl:when>
-          <xsl:when
-            test="w:pageBreakBefore/@w:val='on' or w:pageBreakBefore/@w:val='true' or w:pageBreakBefore/@w:val=1">
-            <xsl:value-of select="'page'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'page'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- widows and orphans -->
-    <xsl:if test="w:widowControl">
-      <xsl:choose>
-        <xsl:when
-          test="w:widowControl/@w:val='on' or w:widowControl/@w:val='true' or w:widowControl/@w:val=1 or not(w:widowControl/@w:val)">
-          <xsl:attribute name="fo:widows">
-            <xsl:value-of select="1"/>
-          </xsl:attribute>
-          <xsl:attribute name="fo:orphans">
-            <xsl:value-of select="1"/>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise/>
-      </xsl:choose>
-    </xsl:if>
-
-    <!-- borders. -->
-    <xsl:if test="w:pBdr">
-      <xsl:call-template name="InsertParagraphBorder"/>
-      <!-- add shadow -->
-      <xsl:call-template name="InsertParagraphShadow"/>
-    </xsl:if>
-
-    <!-- bg color -->
-    <xsl:if test="w:shd">
-      <xsl:attribute name="fo:background-color">
-        <xsl:choose>
-          <xsl:when test="w:shd/@w:fill='auto' or not(w:shd/@w:fill)">
-            <xsl:value-of select="'transparent'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="concat('#',w:shd/@w:fill)"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- text autospace -->
-    <xsl:if test="w:autoSpaceDN or w:autoSpaceDE">
-      <xsl:attribute name="style:text-autospace">
-        <xsl:choose>
-          <xsl:when
-            test="w:autoSpaceDN/@w:val='off' or w:autoSpaceDN/@w:val='false' or w:autoSpaceDN/@w:val=0 or w:autoSpaceDE/@w:val='off' or w:autoSpaceDE/@w:val='false' or w:autoSpaceDE/@w:val=0">
-            <xsl:value-of select="'none'"/>
-          </xsl:when>
-          <xsl:when
-            test="w:autoSpaceDN/@w:val='on' or w:autoSpaceDN/@w:val='true' or w:autoSpaceDN/@w:val=1 or w:autoSpaceDE/@w:val='on' or w:autoSpaceDE/@w:val='true' or w:autoSpaceDE/@w:val=1">
-            <xsl:value-of select="'ideograph-alpha'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'ideograph-alpha'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- space before/after -->
-    <!-- w:afterLines and w:beforeLines elements are lost -->
-    <xsl:if
-      test="not(w:spacing/@w:beforeAutospacing='on' or w:spacing/@w:beforeAutospacing='1' or w:spacing/@w:beforeAutospacing='true') and w:spacing/@w:before">
-      <xsl:attribute name="fo:margin-top">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="w:spacing/@w:before"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if
-      test="not(w:spacing/@w:afterAutospacing='on' or w:spacing/@w:afterAutospacing='1' or w:spacing/@w:afterAutospacing='true') and w:spacing/@w:after">
-      <xsl:attribute name="fo:margin-bottom">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="w:spacing/@w:after"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- line spacing -->
-    <xsl:if test="w:spacing/@w:line">
-      <xsl:choose>
-        <xsl:when test="w:spacing/@w:lineRule='atLeast'">
-          <xsl:attribute name="style:line-height-at-least">
-            <!-- convert 20th pt to centimeter -->
-            <xsl:value-of select="concat(w:spacing/@w:line * 2.54 div (1440 * 20),'cm')"/>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:spacing/@w:lineRule='exact'">
-          <xsl:attribute name="style:line-height">
-            <!-- convert 20th pt to centimeter -->
-            <xsl:value-of select="concat(w:spacing/@w:line * 2.54 div (1440 * 20),'cm')"/>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <!-- value of lineRule is 'auto' -->
-          <xsl:attribute name="style:line-height">
-            <!-- convert 240th of line to percent -->
-            <xsl:value-of select="concat(w:spacing/@w:line div 240,'%')"/>
-          </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
-
-    <!-- text:align -->
-    <xsl:if test="w:jc">
-      <xsl:attribute name="fo:text-align">
-        <xsl:choose>
-          <xsl:when test="w:jc/@w:val='center'">
-            <xsl:value-of select="'center'"/>
-          </xsl:when>
-          <xsl:when test="w:jc/@w:val='left'">
-            <xsl:value-of select="'start'"/>
-          </xsl:when>
-          <xsl:when test="w:jc/@w:val='right'">
-            <xsl:value-of select="'end'"/>
-          </xsl:when>
-          <xsl:when test="w:jc/@w:val='both' or w:jc/@w:val='distribute'">
-            <xsl:value-of select="'justify'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'start'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- vertical alignment of text -->
-    <xsl:if test="w:textAlignment">
-      <xsl:attribute name="style:vertical-align">
-        <xsl:choose>
-          <xsl:when test="w:textAlignment/@w:val='bottom'">
-            <xsl:value-of select="'bottom'"/>
-          </xsl:when>
-          <xsl:when test="w:textAlignment/@w:val='top'">
-            <xsl:value-of select="'top'"/>
-          </xsl:when>
-          <xsl:when test="w:textAlignment/@w:val='center'">
-            <xsl:value-of select="'middle'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'auto'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:snapToGrid">
-      <xsl:attribute name="style:snap-to-layout-grid">
-        <xsl:choose>
-          <xsl:when
-            test="w:snapToGrid/@w:val='off' or w:snapToGrid/@w:val='false' or w:snapToGrid/@w:val=0">
-            <xsl:value-of select="'false'"/>
-          </xsl:when>
-          <xsl:when
-            test="w:snapToGrid/@w:val='on' or w:snapToGrid/@w:val='true' or w:snapToGrid/@w:val=1">
-            <xsl:value-of select="'true'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'true'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:suppressLineNumbers">
-      <xsl:attribute name="text:number-lines">
-        <xsl:choose>
-          <xsl:when
-            test="w:suppressLineNumbers/@w:val='off' or w:suppressLineNumbers/@w:val='false' or w:suppressLineNumbers/@w:val=0">
-            <xsl:value-of select="'true'"/>
-          </xsl:when>
-          <xsl:when
-            test="w:suppressLineNumbers/@w:val='on' or w:suppressLineNumbers/@w:val='true' or w:suppressLineNumbers/@w:val=1">
-            <xsl:value-of select="'false'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'false'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:overflowPunct">
-      <xsl:attribute name="style:punctuation-wrap">
-        <xsl:choose>
-          <xsl:when
-            test="w:overflowPunct/@w:val='off' or w:overflowPunct/@w:val='false' or w:overflowPunct/@w:val=0">
-            <xsl:value-of select="'hanging'"/>
-          </xsl:when>
-          <xsl:when
-            test="w:overflowPunct/@w:val='on' or w:overflowPunct/@w:val='true' or w:overflowPunct/@w:val=1">
-            <xsl:value-of select="'simple'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'simple'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- text direction. btLr and tbLrV directions are lost. -->
-    <xsl:if test="w:textDirection">
-      <xsl:attribute name="style:writing-mode">
-        <xsl:choose>
-          <xsl:when test="w:textDirection/@w:val='lrTb'">lr-tb</xsl:when>
-          <xsl:when test="w:textDirection/@w:val='lrTbV'">lr-tb</xsl:when>
-          <xsl:when test="w:textDirection/@w:val='tbRl'">rl-tb</xsl:when>
-          <xsl:when test="w:textDirection/@w:val='tbRlV'">tb-rl</xsl:when>
-          <xsl:otherwise/>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- tab stops -->
-    <xsl:if test="w:tabs/w:tab">
-      <style:tab-stops>
-        <xsl:apply-templates select="w:tabs/w:tab"/>
-      </style:tab-stops>
-    </xsl:if>
-
-  </xsl:template>
-
-  <xsl:template name="InsertParagraphBorder">
-    <xsl:if test="w:pBdr/w:between">
-      <xsl:attribute name="style:join-border">false</xsl:attribute>
-    </xsl:if>
-
-    <xsl:for-each select="w:pBdr">
-      <xsl:choose>
-        <!-- if the four borders are equal, then create adequate attributes. -->
-        <xsl:when
-          test="w:top/@color=w:bottom/@color and w:top/@space=w:bottom/@space and w:top/@sz=w:bottom/@sz and w:top/@val=w:bottom/@val
-          and w:top/@color=w:left/@color and w:top/@space=w:left/@space and w:top/@sz=w:left/@sz and w:top/@val=w:left/@val
-          and w:top/@color=w:right/@color and w:top/@space=w:right/@space and w:top/@sz=w:right/@sz and w:top/@val=w:right/@val">
-          <xsl:call-template name="InsertBorderAttributes"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:for-each
-            select="child::node()[name() = 'w:top' or name() = 'w:left' or name() = 'w:bottom' or name() = 'w:right']">
-            <xsl:call-template name="InsertBorderAttributes">
-              <xsl:with-param name="side" select="substring-after(name(),'w:')"/>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:for-each>
-  </xsl:template>
-
-  <!-- compute attributes defining borders : color, style, width, padding... -->
-  <xsl:template name="InsertBorderAttributes">
-    <xsl:param name="side"/>
-
-    <xsl:choose>
-      <xsl:when test="$side">
-        <!-- add padding -->
-        <xsl:if test="@w:space">
-          <xsl:attribute name="{concat('fo:padding-',$side)}">
-            <xsl:call-template name="ConvertPoints">
-              <xsl:with-param name="length">
-                <xsl:value-of select="@w:space"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-        <!-- add border with style, width and color -->
-        <xsl:variable name="style">
-          <xsl:call-template name="GetParagraphBorderStyle">
-            <xsl:with-param name="style" select="@w:val"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:attribute name="{concat('fo:border-',$side)}">
-          <xsl:variable name="size">
-            <xsl:call-template name="ConvertEighthsPoints">
-              <xsl:with-param name="length">
-                <xsl:value-of select="@w:sz"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="@w:color='auto'">
-              <xsl:value-of select="concat($size,' ',$style)"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:variable name="color">
-                <xsl:value-of select="concat('#',@w:color)"/>
-              </xsl:variable>
-              <xsl:value-of select="concat($size,' ',$style,' ',$color)"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:if test="$style='double' ">
-          <xsl:attribute name="{concat('fo:border-line-width-',$side)}">
-            <xsl:call-template name="ComputeDoubleBorderWidth">
-              <xsl:with-param name="style" select="@w:val"/>
-              <xsl:with-param name="borderWidth" select="@w:sz"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-      </xsl:when>
-      <xsl:otherwise>
-        <!-- add padding -->
-        <xsl:if test="w:top/@w:space">
-          <xsl:attribute name="fo:padding">
-            <xsl:call-template name="ConvertPoints">
-              <xsl:with-param name="length">
-                <xsl:value-of select="w:top/@w:space"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-        <!-- add border with style, width and color -->
-        <xsl:variable name="style">
-          <xsl:call-template name="GetParagraphBorderStyle">
-            <xsl:with-param name="style" select="w:top/@w:val"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:attribute name="fo:border">
-          <xsl:variable name="size">
-            <xsl:call-template name="ConvertEighthsPoints">
-              <xsl:with-param name="length">
-                <xsl:value-of select="w:top/@w:sz"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="@w:color='auto'">
-              <xsl:value-of select="concat($size,' ',$style)"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:variable name="color">
-                <xsl:value-of select="concat('#',w:top/@w:color)"/>
-              </xsl:variable>
-              <xsl:value-of select="concat($size,' ',$style,' ',$color)"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:if test="$style='double' ">
-          <xsl:attribute name="fo:border-line-width">
-            <xsl:call-template name="ComputeDoubleBorderWidth">
-              <xsl:with-param name="style" select="w:top/@w:val"/>
-              <xsl:with-param name="borderWidth" select="w:top/@w:sz"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
-
-  </xsl:template>
-
-  <xsl:template name="InsertParagraphShadow">
-
-    <xsl:variable name="firstVal">
-      <xsl:choose>
-        <xsl:when
-          test="w:pBdr/w:right/@w:shadow='true' or w:pBdr/w:right/@w:shadow=1 or w:pBdr/w:right/@w:shadow='on'">
-          <xsl:call-template name="ConvertPoints">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pBdr/w:right/@w:space"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when
-              test="w:pBdr/w:left/@w:shadow='true' or w:pBdr/w:left/@w:shadow=1 or w:pBdr/w:left/@w:shadow='on'">
-              <xsl:call-template name="ConvertPoints">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pBdr/w:left/@w:space"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
-          </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:variable name="secondVal">
-      <xsl:choose>
-        <xsl:when
-          test="w:pBdr/w:bottom/@w:shadow='true' or w:pBdr/w:bottom/@w:shadow=1 or w:pBdr/w:bottom/@w:shadow='on'">
-          <xsl:call-template name="ConvertPoints">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pBdr/w:bottom/@w:space"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when
-              test="w:pBdr/w:top/@w:shadow='true' or w:pBdr/w:top/@w:shadow=1 or w:pBdr/w:top/@w:shadow='on'">
-              <xsl:call-template name="ConvertPoints">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pBdr/w:top/@w:space"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
-          </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:if test="$firstVal !=0 and $secondVal != 0">
-      <xsl:attribute name="style:shadow">
-        <xsl:value-of select="concat('#000000 ',$firstVal,' ',$secondVal)"/>
-      </xsl:attribute>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- convert the style of a border -->
-  <xsl:template name="GetParagraphBorderStyle">
-    <xsl:param name="style"/>
-    <xsl:choose>
-      <xsl:when test="$style='basicBlackDashes'">dashed</xsl:when>
-      <xsl:when test="$style='basicBlackDots'">dotted</xsl:when>
-      <xsl:when test="$style='basicThinLines'">double</xsl:when>
-      <xsl:when test="$style='basicWideInLine'">double</xsl:when>
-      <xsl:when test="$style='basicWideOutLine'">double</xsl:when>
-      <xsl:when test="$style='dashed'">dashed</xsl:when>
-      <xsl:when test="$style='dashSmallGap'">dashed</xsl:when>
-      <xsl:when test="$style='dotted'">dotted</xsl:when>
-      <xsl:when test="$style='double'">double</xsl:when>
-      <xsl:when test="$style='inset'">inset</xsl:when>
-      <xsl:when test="$style='nil'">hidden</xsl:when>
-      <xsl:when test="$style='outset'">outset</xsl:when>
-      <xsl:when test="$style='single'">solid</xsl:when>
-      <xsl:when test="$style='thick'">solid</xsl:when>
-      <xsl:when test="$style='thickThinSmallGap'">double</xsl:when>
-      <xsl:when test="$style='thickThinMediumGap'">double</xsl:when>
-      <xsl:when test="$style='thickThinLargeGap'">double</xsl:when>
-      <xsl:when test="$style='thinThickSmallGap'">double</xsl:when>
-      <xsl:when test="$style='thinThickMediumGap'">double</xsl:when>
-      <xsl:when test="$style='thinThickLargeGap'">double</xsl:when>
-      <xsl:otherwise>
-        <!-- empty string -->
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- return a three arguments string defining the widths of a 'double' border -->
-  <xsl:template name="ComputeDoubleBorderWidth">
-    <xsl:param name="style"/>
-    <xsl:param name="borderWidth"/>
-    <!-- Approximate the width of each line : inner, middle (blank space), outer -->
-    <xsl:variable name="inner">
-      <xsl:call-template name="ConvertEighthsPoints">
-        <xsl:with-param name="length">
-          <xsl:choose>
-            <xsl:when test="$style='basicWideInLine'">
-              <xsl:value-of select="$borderWidth * 50 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='basicWideOutLine'">
-              <xsl:value-of select="$borderWidth div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='double' or $style='basicThinLines'">
-              <xsl:value-of select="$borderWidth div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thickThinSmallGap'">
-              <xsl:value-of select="$borderWidth * 67 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thickThinMediumGap'">
-              <xsl:value-of select="$borderWidth * 47 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thickThinLargeGap'">
-              <xsl:value-of select="$borderWidth * 27 div 100"/>
-            </xsl:when>
-            <xsl:when test="contains($style,'thinThick')">
-              <xsl:value-of select="$borderWidth * 3 div 100"/>
-            </xsl:when>
-            <xsl:otherwise/>
-          </xsl:choose>
-        </xsl:with-param>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="middle">
-      <xsl:call-template name="ConvertEighthsPoints">
-        <xsl:with-param name="length">
-          <xsl:choose>
-            <xsl:when test="$style='basicWideInLine' or $style='basicWideOutLine'">
-              <xsl:value-of select="$borderWidth * 49 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='double' or $style='basicThinLines'">
-              <xsl:value-of select="$borderWidth * 98 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thickThinSmallGap'">
-              <xsl:value-of select="$borderWidth * 30 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thickThinMediumGap'">
-              <xsl:value-of select="$borderWidth * 50 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thickThinLargeGap'">
-              <xsl:value-of select="$borderWidth * 70 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thinThickSmallGap'">
-              <xsl:value-of select="$borderWidth * 30 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thinThickMediumGap'">
-              <xsl:value-of select="$borderWidth * 50 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thinThickLargeGap'">
-              <xsl:value-of select="$borderWidth * 70 div 100"/>
-            </xsl:when>
-            <xsl:otherwise/>
-          </xsl:choose>
-        </xsl:with-param>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="outer">
-      <xsl:call-template name="ConvertEighthsPoints">
-        <xsl:with-param name="length">
-          <xsl:choose>
-            <xsl:when test="$style='basicWideInLine'">
-              <xsl:value-of select="$borderWidth div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='basicWideOutLine'">
-              <xsl:value-of select="$borderWidth * 50 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='double' or $style='basicThinLines'">
-              <xsl:value-of select="$borderWidth div 100"/>
-            </xsl:when>
-            <xsl:when test="contains($style,'thickThin')">
-              <xsl:value-of select="$borderWidth * 3 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thinThickSmallGap'">
-              <xsl:value-of select="$borderWidth * 67 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thinThickMediumGap'">
-              <xsl:value-of select="$borderWidth * 47 div 100"/>
-            </xsl:when>
-            <xsl:when test="$style='thinThickLargeGap'">
-              <xsl:value-of select="$borderWidth * 27 div 100"/>
-            </xsl:when>
-            <xsl:otherwise/>
-          </xsl:choose>
-        </xsl:with-param>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:value-of select="concat($inner,' ',$middle,' ',$outer)"/>
-  </xsl:template>
-
-  <!-- Handle tab stops -->
-  <!-- TODO : check how to deal with tab stops inside a list -->
-  <xsl:template match="w:tab">
-    <style:tab-stop>
-      <xsl:if test="@w:val != 'num' and @w:val != 'clear'">
-        <!-- type -->
-        <xsl:attribute name="style:type">
-          <xsl:choose>
-            <xsl:when test="@w:val='center'">center</xsl:when>
-            <xsl:when test="@w:val='right'">right</xsl:when>
-            <xsl:when test="@w:val='left'">left</xsl:when>
-            <xsl:otherwise>left</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <!-- position -->
-        <!-- TODO : what if @w:pos < 0 ? -->
-        <xsl:if test="@w:pos >= 0">
-          <xsl:attribute name="style:position">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length" select="@w:pos"/>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-        <!-- leader char -->
-        <xsl:if test="@w:leader">
-          <xsl:attribute name="style:leader-style">
-            <xsl:choose>
-              <xsl:when test="@w:leader='dot'">dotted</xsl:when>
-              <xsl:when test="@w:leader='heavy'">solid</xsl:when>
-              <xsl:when test="@w:leader='hyphen'">dash</xsl:when>
-              <xsl:when test="@w:leader='middleDot'">dotted</xsl:when>
-              <xsl:when test="@w:leader='none'">none</xsl:when>
-              <xsl:when test="@w:leader='underscore'">solid</xsl:when>
-              <xsl:otherwise>none</xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </xsl:if>
-      </xsl:if>
-    </style:tab-stop>
-  </xsl:template>
-
-  <!-- ODF Text properties contained in OOX pPr element -->
-  <xsl:template name="InsertpPrTextProperties">
-    <!-- hyphenation -->
-    <xsl:if test="w:suppressAutoHyphens">
-      <xsl:choose>
-        <xsl:when
-          test="w:suppressAutoHyphens/@w:val='off' or w:suppressAutoHyphens/@w:val='false' or w:suppressAutoHyphens/@w:val=0">
-          <xsl:attribute name="fo:hyphenate">true</xsl:attribute>
-          <xsl:attribute name="fo:hyphenation-remain-char-count">2</xsl:attribute>
-          <xsl:attribute name="fo:hyphenation-push-char-count">2</xsl:attribute>
-        </xsl:when>
-        <xsl:when
-          test="w:suppressAutoHyphens/@w:val='on' or w:suppressAutoHyphens/@w:val='true' or w:suppressAutoHyphens/@w:val=1">
-          <xsl:attribute name="fo:hyphenate">false</xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="fo:hyphenate">false</xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- conversion of text properties -->
-  <xsl:template name="InsertTextProperties">
-
-    <xsl:if test="w:b">
-      <xsl:attribute name="fo:font-weight">
-        <xsl:choose>
-          <xsl:when test="w:b/@w:val='off' or w:b/@w:val='false' or w:b/@w:val=0">
-            <xsl:value-of select="'normal'"/>
-          </xsl:when>
-          <xsl:when test="w:b/@w:val='on' or w:b/@w:val='true' or w:b/@w:val=1">
-            <xsl:value-of select="'bold'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'bold'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:bCs">
-      <xsl:attribute name="fo:font-weight-complex">
-        <xsl:choose>
-          <xsl:when test="w:bCs/@w:val='off' or w:bCs/@w:val='false' or w:bCs/@w:val=0">
-            <xsl:value-of select="'normal'"/>
-          </xsl:when>
-          <xsl:when test="w:bCs/@w:val='on' or w:bCs/@w:val='true' or w:bCs/@w:val=1">
-            <xsl:value-of select="'bold'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'bold'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:i">
-      <xsl:attribute name="fo:font-style">
-        <xsl:choose>
-          <xsl:when test="w:i/@w:val='off' or w:i/@w:val='false' or w:i/@w:val=0">
-            <xsl:value-of select="'normal'"/>
-          </xsl:when>
-          <xsl:when test="w:i/@w:val='on' or w:i/@w:val='true' or w:i/@w:val=1">
-            <xsl:value-of select="'italic'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'italic'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:iCs">
-      <xsl:attribute name="fo:font-style-complex">
-        <xsl:choose>
-          <xsl:when test="w:iCs/@w:val='off' or w:iCs/@w:val='false' or w:iCs/@w:val=0">
-            <xsl:value-of select="'normal'"/>
-          </xsl:when>
-          <xsl:when test="w:iCs/@w:val='on' or w:iCs/@w:val='true' or w:iCs/@w:val=1">
-            <xsl:value-of select="'italic'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'italic'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:caps">
-      <xsl:attribute name="fo:text-transform">
-        <xsl:choose>
-          <xsl:when test="w:caps/@w:val='off' or w:caps/@w:val='false' or w:caps/@w:val=0">
-            <xsl:value-of select="'none'"/>
-          </xsl:when>
-          <xsl:when test="w:caps/@w:val='on' or w:caps/@w:val='true' or w:caps/@w:val=1">
-            <xsl:value-of select="'uppercase'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'uppercase'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:smallCaps">
-      <xsl:attribute name="fo:font-variant">
-        <xsl:choose>
-          <xsl:when
-            test="w:smallCaps/@w:val='off' or w:smallCaps/@w:val='false' or w:smallCaps/@w:val=0">
-            <xsl:value-of select="'normal'"/>
-          </xsl:when>
-          <xsl:when
-            test="w:smallCaps/@w:val='on' or w:smallCaps/@w:val='true' or w:smallCaps/@w:val=1">
-            <xsl:value-of select="'small-caps'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'small-caps'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:dstrike or w:strike">
-      <xsl:choose>
-        <xsl:when test="w:strike/@w:val='on' or w:strike/@w:val='true' or w:strike/@w:val=1">
-          <xsl:attribute name="style:text-line-through-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-line-through-style">solid</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:dstrike/@w:val='on' or w:dstrike/@w:val='true' or w:dstrike/@w:val=1">
-          <xsl:attribute name="style:text-line-through-type">double</xsl:attribute>
-          <xsl:attribute name="style:text-line-through-style">solid</xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise/>
-      </xsl:choose>
-    </xsl:if>
-
-    <xsl:if test="w:outline">
-      <xsl:attribute name="style:text-outline">
-        <xsl:choose>
-          <xsl:when test="w:outline/@w:val='off' or w:outline/@w:val='false' or w:outline/@w:val=0">
-            <xsl:value-of select="'false'"/>
-          </xsl:when>
-          <xsl:when test="w:outline/@w:val='on' or w:outline/@w:val='true' or w:outline/@w:val=1">
-            <xsl:value-of select="'true'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'true'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:shadow">
-      <xsl:attribute name="fo:text-shadow">
-        <xsl:choose>
-          <xsl:when test="w:shadow/@w:val='off' or w:shadow/@w:val='false' or w:shadow/@w:val=0">
-            <xsl:value-of select="'none'"/>
-          </xsl:when>
-          <xsl:when test="w:shadow/@w:val='on' or w:shadow/@w:val='true' or w:shadow/@w:val=1">
-            <xsl:value-of select="'#000000 0.2em 0.2em'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'#000000 0.2em 0.2em'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:emboss or w:imprint">
-      <xsl:attribute name="style:font-relief">
-        <xsl:choose>
-          <xsl:when test="w:imprint/@w:val='on' or w:imprint/@w:val='true' or w:imprint/@w:val=1">
-            <xsl:value-of select="'engraved'"/>
-          </xsl:when>
-          <xsl:when test="w:emboss/@w:val='on' or w:emboss/@w:val='true' or w:emboss/@w:val=1">
-            <xsl:value-of select="'embossed'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'none'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:vanish">
-      <xsl:attribute name="text:display">
-        <xsl:choose>
-          <xsl:when test="w:vanish/@w:val='off' or w:vanish/@w:val='false' or w:vanish/@w:val=0">
-            <xsl:value-of select="'true'"/>
-          </xsl:when>
-          <xsl:when test="w:vanish/@w:val='on' or w:vanish/@w:val='true' or w:vanish/@w:val=1">
-            <xsl:value-of select="'none'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'true'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:em">
-      <xsl:attribute name="style:text-emphasize">
-        <xsl:choose>
-          <xsl:when test="w:em/@w:val = 'circle'">circle above</xsl:when>
-          <xsl:when test="w:em/@w:val = 'comma'">accent above</xsl:when>
-          <xsl:when test="w:em/@w:val = 'dot'">dot above</xsl:when>
-          <xsl:when test="w:em/@w:val = 'underDot'">dot below</xsl:when>
-          <xsl:when test="w:em/@w:val = 'none'">none</xsl:when>
-          <xsl:otherwise>none</xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- text bg color -->
-    <xsl:if test="w:highlight">
-      <xsl:attribute name="fo:background-color">
-        <xsl:choose>
-          <xsl:when test="w:highlight/@w:val = 'black'">#000000</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'blue'">#0000FF</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'cyan'">#00FFFF</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'darkBlue'">#000080</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'darkCyan'">#008080</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'darkGray'">#808080</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'darkGreen'">#008000</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'darkMagenta'">#800080</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'darkRed'">#800000</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'darkYellow'">#808000</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'green'">#00FF00</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'lightGray'">#C0C0C0</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'magenta'">#FF00FF</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'red'">#FF0000</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'white'">#FFFFFF</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'yellow'">#FFFF00</xsl:when>
-          <xsl:when test="w:highlight/@w:val = 'none'">transparent</xsl:when>
-          <xsl:otherwise>transparent</xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- underline -->
-    <xsl:if test="w:u">
-      <xsl:call-template name="InsertUnderline"/>
-    </xsl:if>
-
-    <!-- fonts -->
-    <xsl:if test="w:rFonts/@w:ascii">
-      <xsl:attribute name="style:font-name">
-        <xsl:call-template name="ComputeFontName">
-          <xsl:with-param name="fontName" select="w:rFonts/@w:ascii"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if test="w:rFonts/@w:cs">
-      <xsl:attribute name="style:font-name-complex">
-        <xsl:call-template name="ComputeFontName">
-          <xsl:with-param name="fontName" select="w:rFonts/@w:cs"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if test="w:rFonts/@w:eastAsia">
-      <xsl:attribute name="style:font-name-asian">
-        <xsl:call-template name="ComputeFontName">
-          <xsl:with-param name="fontName" select="w:rFonts/@w:eastAsia"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- text color -->
-    <xsl:if test="w:color/@w:val != 'auto'">
-      <xsl:attribute name="fo:color">
-        <xsl:value-of select="concat('#',w:color/@w:val)"/>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- letter spacing -->
-    <xsl:if test="w:spacing">
-      <xsl:attribute name="fo:letter-spacing">
-        <xsl:choose>
-          <xsl:when test="w:spacing/@w:val=0">normal</xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length" select="w:spacing/@w:val"/>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:w/@w:val">
-      <xsl:attribute name="style:text-scale">
-        <xsl:value-of select="w:w/@w:val"/>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:kern">
-      <xsl:attribute name="style:letter-kerning">true</xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:sz">
-      <xsl:attribute name="fo:font-size">
-        <xsl:call-template name="ConvertHalfPoints">
-          <xsl:with-param name="length" select="w:sz/@w:val"/>
-          <xsl:with-param name="unit">pt</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-
-    <xsl:if test="w:szCs">
-      <xsl:attribute name="fo:font-size-complex">
-        <xsl:call-template name="ConvertHalfPoints">
-          <xsl:with-param name="length" select="w:szCs/@w:val"/>
-          <xsl:with-param name="unit">pt</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-
-    <!-- text vertical positionning -->
-    <xsl:if test="w:vertAlign or w:position">
-      <xsl:call-template name="InsertTextPosition"/>
-    </xsl:if>
-
-    <!-- languages and countries -->
-    <xsl:if test="w:lang">
-      <xsl:if test="w:lang/@w:val">
-        <xsl:attribute name="fo:language">
-          <xsl:value-of select="substring-before(w:lang/@w:val,'-')"/>
-        </xsl:attribute>
-        <xsl:attribute name="fo:country">
-          <xsl:value-of select="substring-after(w:lang/@w:val,'-')"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test="w:lang/@w:bidi">
-        <xsl:attribute name="style:language-complex">
-          <xsl:value-of select="substring-before(w:lang/@w:bidi,'-')"/>
-        </xsl:attribute>
-        <xsl:attribute name="style:country-complex">
-          <xsl:value-of select="substring-after(w:lang/@w:bidi,'-')"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test="w:lang/@w:eastAsia">
-        <xsl:attribute name="style:language-asian">
-          <xsl:value-of select="substring-before(w:lang/@w:eastAsia,'-')"/>
-        </xsl:attribute>
-        <xsl:attribute name="style:country-asian">
-          <xsl:value-of select="substring-after(w:lang/@w:eastAsia,'-')"/>
-        </xsl:attribute>
-      </xsl:if>
-    </xsl:if>
-
-    <xsl:if test="w:eastAsianLayout">
-      <xsl:if test="w:eastAsianLayout/@w:combine = 'lines'">
-        <xsl:attribute name="style:text-combine">lines</xsl:attribute>
-        <xsl:choose>
-          <xsl:when test="w:combineBrackets = 'angle'">
-            <xsl:attribute name="style:text-combine-start-char">
-              <xsl:value-of select="'&lt;'"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:text-combine-end-char">
-              <xsl:value-of select="'&gt;'"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="w:combineBrackets = 'curly'">
-            <xsl:attribute name="style:text-combine-start-char">{</xsl:attribute>
-            <xsl:attribute name="style:text-combine-end-char">}</xsl:attribute>
-          </xsl:when>
-          <xsl:when test="w:combineBrackets = 'round'">
-            <xsl:attribute name="style:text-combine-start-char">(</xsl:attribute>
-            <xsl:attribute name="style:text-combine-end-char">)</xsl:attribute>
-          </xsl:when>
-          <xsl:when test="w:combineBrackets = 'square'">
-            <xsl:attribute name="style:text-combine-start-char">[</xsl:attribute>
-            <xsl:attribute name="style:text-combine-end-char">]</xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise/>
-        </xsl:choose>
-      </xsl:if>
-    </xsl:if>
-
-    <!-- script type -->
-    <xsl:if test="w:cs/@w:val='on' or w:cs/@w:val='true' or w:cs/@w:val=1">
-      <xsl:attribute name="style:script-type">complex</xsl:attribute>
-    </xsl:if>
-    
-    <!-- text effect. Mostly lost. -->
-    <xsl:if test="w:effect/@w:val='blinkBackground'">
-      <xsl:attribute name="style:text-blinking">true</xsl:attribute>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- insert underline attributes -->
-  <xsl:template name="InsertUnderline">
-    <xsl:if test="w:u/@w:val">
-      <xsl:choose>
-        <xsl:when test="w:u/@w:val = 'dash'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">dash</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'dashDotDotHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">dot-dot-dash</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'dashDotHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">dot-dash</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'dashedHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">dash</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'dashLong'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">long-dash</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'dashLongHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">long-dash</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'dotDash'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">dot-dash</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'dotDotDash'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">dot-dot-dash</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'dotted'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">dotted</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'dottedHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">dotted</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'double'">
-          <xsl:attribute name="style:text-underline-type">double</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'single'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'thick'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'wave'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">wave</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'wavyDouble'">
-          <xsl:attribute name="style:text-underline-type">double</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">wave</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'wavyHeavy'">
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">wave</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">thick</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'words'">
-          <xsl:attribute name="style:text-underline-mode">skip-white-space</xsl:attribute>
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="w:u/@w:val = 'none'">
-          <xsl:attribute name="style:text-underline-type">none</xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="style:text-underline-type">single</xsl:attribute>
-          <xsl:attribute name="style:text-underline-style">solid</xsl:attribute>
-          <xsl:attribute name="style:text-underline-width">normal</xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
-    <xsl:if test="w:u/@w:color">
-      <xsl:attribute name="style:text-underline-color">
-        <xsl:choose>
-          <xsl:when test="w:u/@w:color = 'auto'">font-color</xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="concat('#',w:u/@w:color)"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- compute positionning of text -->
-  <xsl:template name="InsertTextPosition">
-    <xsl:variable name="percentValue">
-      <xsl:choose>
-        <xsl:when test="w:position/@w:val">
-          <xsl:choose>
-            <xsl:when test="w:sz/@w:val != 0">
-              <xsl:value-of select="round(w:position/@w:val * 100 div w:sz/@w:val)"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="round(w:position/@w:val * 100 div 24)"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>none</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:choose>
-
-      <xsl:when test="w:vertAlign = 'superscript'">
-        <xsl:choose>
-          <xsl:when test="$percentValue > 0">
-            <xsl:attribute name="style:text-position">
-              <xsl:value-of select="concat('super ',$percentValue)"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="style:text-position">super</xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-
-      <xsl:when test="w:vertAlign = 'subscript'">
-        <xsl:choose>
-          <xsl:when test="$percentValue &lt; 0">
-            <xsl:attribute name="style:text-position">
-              <xsl:value-of select="concat('sub ',number( - $percentValue))"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="style:text-position">sub</xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-
-      <xsl:when test="w:vertAlign = 'baseline'">
-        <xsl:choose>
-          <xsl:when test="$percentValue > 0">
-            <xsl:attribute name="style:text-position">
-              <xsl:value-of select="concat('super ',$percentValue)"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="$percentValue &lt; 0">
-            <xsl:attribute name="style:text-position">
-              <xsl:value-of select="concat('sub ',number( - $percentValue))"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise/>
-        </xsl:choose>
-      </xsl:when>
-
-      <xsl:when test="$percentValue > 0">
-        <xsl:attribute name="style:text-position">
-          <xsl:value-of select="concat('super ',$percentValue)"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:when test="$percentValue &lt; 0">
-        <xsl:attribute name="style:text-position">
-          <xsl:value-of select="concat('sub ',number( - $percentValue))"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise/>
-
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- return the name of the font -->
-  <xsl:template name="ComputeFontName">
-    <xsl:param name="fontName"/>
-    <xsl:choose>
-      <xsl:when test="$fontName = 'Symbol'">StarSymbol</xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$fontName"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
   <!-- following templates are from numbering.xml -->
   <xsl:template match="w:abstractNum">
- 
+
     <text:list-style style:name="{concat('L',key('numId',@w:abstractNumId)/@w:numId)}">
       <xsl:apply-templates select="w:lvl"/>
     </text:list-style>
   </xsl:template>
+
   <xsl:template match="w:lvl">
     <xsl:choose>
       <xsl:when test="w:numFmt[@w:val = 'bullet']">
-        <text:list-level-style-bullet text:level="{number(@w:ilvl)+1}" text:style-name="Bullet_20_Symbols">
+        <text:list-level-style-bullet text:level="{number(@w:ilvl)+1}"
+          text:style-name="Bullet_20_Symbols">
           <xsl:attribute name="text:bullet-char">
             <xsl:call-template name="textChar"/>
-            
-            
+
+
           </xsl:attribute>
           <style:list-level-properties>
             <xsl:call-template name="listLevelProperties"/>
           </style:list-level-properties>
           <style:text-properties style:font-name="StarSymbol"/>
-          
-          
+
+
         </text:list-level-style-bullet>
       </xsl:when>
       <xsl:otherwise>
         <text:list-level-style-number text:level="{number(@w:ilvl)+1}">
           <xsl:if test="not(number(substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))))">
             <xsl:attribute name="style:num-suffix">
-              
+
               <xsl:value-of select="substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))"/>
-              
+
             </xsl:attribute>
           </xsl:if>
           <xsl:attribute name="style:num-format">
@@ -1698,6 +418,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <!-- numbering format -->
   <xsl:template name="num-format">
     <xsl:param name="format"/>
@@ -1710,8 +431,9 @@
       <xsl:otherwise>1</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template name="listLevelProperties">
-    <xsl:variable name="Ind" select="w:pPr/w:ind"/> 
+    <xsl:variable name="Ind" select="w:pPr/w:ind"/>
     <xsl:attribute name="text:space-before">
       <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:hanging)"/>
     </xsl:attribute>
@@ -1719,6 +441,7 @@
       <xsl:value-of select="number($Ind/@w:hanging)"/>
     </xsl:attribute>
   </xsl:template>
+
   <!-- types of bullets -->
   <xsl:template name="textChar">
     <xsl:choose>
@@ -1737,4 +460,5 @@
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
 </xsl:stylesheet>

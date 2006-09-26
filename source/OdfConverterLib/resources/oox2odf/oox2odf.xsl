@@ -32,6 +32,7 @@
   <xsl:import href="common.xsl"/>
   <xsl:import href="content.xsl"/>
   <xsl:import href="pictures.xsl"/>
+  <xsl:import href="styles.xsl"/>
 
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
@@ -51,6 +52,7 @@
           <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text"
             manifest:full-path="/"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="content.xml"/>
+          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="styles.xml"/>
         </manifest:manifest>
       </pzip:entry>
 
@@ -61,42 +63,7 @@
 
       <!-- styles -->
       <pzip:entry pzip:target="styles.xml">
-
-        <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-          xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-          xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-          xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
-          <office:font-face-decls>
-            <style:font-face style:name="Tahoma1" svg:font-family="Tahoma"/>
-            <style:font-face style:name="Arial Unicode MS" svg:font-family="'Arial Unicode MS'"
-              style:font-pitch="variable"/>
-            <style:font-face style:name="MS Mincho" svg:font-family="'MS Mincho'"
-              style:font-pitch="variable"/>
-            <style:font-face style:name="Tahoma" svg:font-family="Tahoma"
-              style:font-pitch="variable"/>
-            <style:font-face style:name="Times New Roman" svg:font-family="'Times New Roman'"
-              style:font-family-generic="roman" style:font-pitch="variable"/>
-            <style:font-face style:name="Arial" svg:font-family="Arial"
-              style:font-family-generic="swiss" style:font-pitch="variable"/>
-          </office:font-face-decls>
-          <office:styles>
-            <style:default-style style:family="paragraph">
-              <style:paragraph-properties fo:hyphenation-ladder-count="no-limit"
-                style:text-autospace="ideograph-alpha" style:punctuation-wrap="hanging"
-                style:line-break="strict" style:tab-stop-distance="1.251cm"
-                style:writing-mode="page"/>
-              <style:text-properties style:use-window-font-color="true"
-                style:font-name="Times New Roman" fo:font-size="12pt" fo:language="fr"
-                fo:country="FR" style:font-name-asian="Arial Unicode MS"
-                style:font-size-asian="12pt" style:language-asian="none" style:country-asian="none"
-                style:font-name-complex="Tahoma" style:font-size-complex="12pt"
-                style:language-complex="none" style:country-complex="none" fo:hyphenate="false"
-                fo:hyphenation-remain-char-count="2" fo:hyphenation-push-char-count="2"/>
-            </style:default-style>
-            <style:style style:name="Standard" style:family="paragraph" style:class="text"/>
-          </office:styles>
-        </office:document-styles>
-
+        <xsl:call-template name="styles"/>
       </pzip:entry>
 
     </pzip:archive>

@@ -83,5 +83,11 @@
   <ItemGroup>
     <EmbeddedResource Include="resources\odf2oox\tables.xsl" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\common.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\pictures.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\tables.xsl" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>

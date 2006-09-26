@@ -31,7 +31,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-  exclude-result-prefixes="style svg fo">
+  exclude-result-prefixes="w">
 
 
 
