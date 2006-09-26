@@ -1866,12 +1866,14 @@
         <xsl:with-param name="styleName" select="$styleName"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:if test="$prefixedStyleName!=''">
-      <w:rStyle w:val="{$prefixedStyleName}"/>
-    </xsl:if>
-    <xsl:if test="ancestor::text:a">
-      <w:rStyle w:val="Hyperlink"/>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="$prefixedStyleName!=''">
+        <w:rStyle w:val="{$prefixedStyleName}"/>
+      </xsl:when>
+      <xsl:when test="ancestor::text:a">
+        <w:rStyle w:val="Hyperlink"/>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <!-- Overrides toggle properties -->
