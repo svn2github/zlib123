@@ -27,12 +27,12 @@
     * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   exclude-result-prefixes="text style office xlink draw pzip">
 
@@ -65,13 +65,9 @@
       </w:endnote>
 
       <!-- normal endnotes -->
-
       <xsl:for-each select="document('content.xml')">
         <xsl:for-each select="key('endnotes', '')">
           <w:endnote w:type="normal" w:id="{position() + 1}">
-            <xsl:if test="text:note-citation/@text:label">
-              <xsl:attribute name="w:suppressRef">1</xsl:attribute>
-            </xsl:if>
             <xsl:apply-templates select="text:note-body"/>
           </w:endnote>
         </xsl:for-each>
@@ -135,7 +131,28 @@
     </w:endnotePr>
   </xsl:template>
 
+  
+  <!-- Reference from the document -->
+  <xsl:template match="text:note[@text:note-class='endnote']" mode="text">
+    <w:endnoteReference>
+      <xsl:attribute name="w:id">
+        <xsl:call-template name="GenerateId">
+          <xsl:with-param name="node" select="."/>
+          <xsl:with-param name="nodetype" select="@text:note-class"/>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:if test="text:note-citation/@text:label">
+        <xsl:attribute name="w:customMarkFollows">1</xsl:attribute>
+      </xsl:if>
+    </w:endnoteReference>
+    <xsl:if test="text:note-citation/@text:label">
+      <w:t>
+        <xsl:value-of select="text:note-citation"/>
+      </w:t>
+    </xsl:if>
+  </xsl:template>
 
+  
   <xsl:template name="InsertEndnotesInternalRelationships">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <xsl:for-each select="document('content.xml')">

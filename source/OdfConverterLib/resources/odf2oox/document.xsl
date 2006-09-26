@@ -27,7 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -1883,17 +1883,18 @@
         <xsl:otherwise>true</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+    
     <xsl:choose>
       <xsl:when test="key('automatic-styles',$styleName)">
         <!-- recursive call on parent style (not very clean) -->
-        <xsl:if test="key('automatic-styles',$styleName)/@style:parent-style-name">
+        <!-- TODO : postprocess direct formatting. Duplicate run properties are not valid anymore in Beta 2 TR -->
+        <!--xsl:if test="key('automatic-styles',$styleName)/@style:parent-style-name">
           <xsl:call-template name="OverrideToggleProperties">
-            <xsl:with-param name="styleName"
-              select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
+          <xsl:with-param name="styleName"
+          select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
           </xsl:call-template>
-        </xsl:if>
-        <xsl:apply-templates select="key('automatic-styles',$styleName)/style:text-properties"
+          </xsl:if-->
+        <xsl:apply-templates select="key('automatic-styles',$styleName)[1]/style:text-properties"
           mode="rPr">
           <xsl:with-param name="onlyToggle" select="$onlyToggle"/>
         </xsl:apply-templates>
@@ -1901,13 +1902,14 @@
       <xsl:otherwise>
         <xsl:for-each select="document('styles.xml')">
           <!-- recursive call on parent style (not very clean) -->
-          <xsl:if test="key('styles',$styleName)/@style:parent-style-name">
+          <!-- TODO : postprocess direct formatting. Duplicate run properties are not valid anymore in Beta 2 TR -->
+          <!--xsl:if test="key('styles',$styleName)/@style:parent-style-name">
             <xsl:call-template name="OverrideToggleProperties">
-              <xsl:with-param name="styleName"
-                select="key('styles',$styleName)/@style:parent-style-name"/>
+            <xsl:with-param name="styleName"
+            select="key('styles',$styleName)/@style:parent-style-name"/>
             </xsl:call-template>
-          </xsl:if>
-          <xsl:apply-templates select="key('styles',$styleName)/style:text-properties" mode="rPr">
+            </xsl:if-->
+          <xsl:apply-templates select="key('styles',$styleName)[1]/style:text-properties" mode="rPr">
             <xsl:with-param name="onlyToggle" select="$onlyToggle"/>
           </xsl:apply-templates>
         </xsl:for-each>
@@ -2009,39 +2011,6 @@
     </w:r>
   </xsl:template>
 
-  <!-- footnotes -->
-  <xsl:template match="text:note[@text:note-class='footnote']" mode="text">
-    <w:footnoteReference>
-      <xsl:attribute name="w:id">
-        <xsl:call-template name="GenerateId">
-          <xsl:with-param name="node" select="."/>
-          <xsl:with-param name="nodetype" select="@text:note-class"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </w:footnoteReference>
-    <xsl:if test="text:note-citation/@text:label">
-      <w:t>
-        <xsl:value-of select="text:note-citation"/>
-      </w:t>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- endnotes -->
-  <xsl:template match="text:note[@text:note-class='endnote']" mode="text">
-    <w:endnoteReference>
-      <xsl:attribute name="w:id">
-        <xsl:call-template name="GenerateId">
-          <xsl:with-param name="node" select="."/>
-          <xsl:with-param name="nodetype" select="@text:note-class"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </w:endnoteReference>
-    <xsl:if test="text:note-citation/@text:label">
-      <w:t>
-        <xsl:value-of select="text:note-citation"/>
-      </w:t>
-    </xsl:if>
-  </xsl:template>
 
   <!-- alphabetical indexes creating mark entry -->
   <xsl:template match="text:alphabetical-index-mark-end" mode="paragraph">

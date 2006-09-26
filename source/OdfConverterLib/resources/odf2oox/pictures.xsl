@@ -28,10 +28,11 @@
   -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"
-  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/3/wordprocessingDrawing"
+  xmlns:v="urn:schemas-microsoft-com:vml" 
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
@@ -359,13 +360,13 @@
 
     <!--drawing aspect ratio blocking-->
     <wp:cNvGraphicFramePr>
-      <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
+      <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
         noChangeAspect="1"/>
     </wp:cNvGraphicFramePr>
 
-    <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
-      <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
-        <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/3/picture">
+    <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+      <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+        <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
           <pic:nvPicPr>
             <pic:cNvPr name="{@draw:name}" id="{$imageId}"/>
             <pic:cNvPicPr>
@@ -681,7 +682,7 @@
         </xsl:call-template>
       </xsl:variable>
 
-      <a:ln xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main">
+      <a:ln xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
         <xsl:attribute name="cmpd">
           <xsl:choose>
             <xsl:when

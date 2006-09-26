@@ -27,13 +27,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
-  xmlns:ooo="http://openoffice.org/2004/office" exclude-result-prefixes="office fo style config ooo">
+  xmlns:ooo="http://openoffice.org/2004/office" 
+  exclude-result-prefixes="office fo style config ooo">
 
   <xsl:template name="InsertSettings">
     <w:settings>

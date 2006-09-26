@@ -27,7 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
@@ -409,7 +409,7 @@
     <!--xsl:choose>
       <xsl:when test="$vmerge != ''">
         <w:gridSpan w:val="{$grid}"/>
-        <w:vmerge w:val="{$vmerge}"/>
+        <w:vMerge w:val="{$vmerge}"/>
       </xsl:when>
       <xsl:otherwise-->
     <xsl:if test="@table:number-columns-spanned">
