@@ -25,12 +25,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Office.Interop.Word, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
+    <Reference Include="relaxngDatatype, Version=1.2.0.0, Culture=neutral, PublicKeyToken=01f76833cb3d9b58">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\relaxngDatatype.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="tenuto.core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=666de9dd91bf6401">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\tenuto.core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OdfCommandLineException.cs" />
+    <Compile Include="OdfValidator.cs" />
     <Compile Include="OoxValidator.cs" />
     <EmbeddedResource Include="resources\ooxschemas\opc-contenttypes.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\opc-coreproperties.xsd" />
@@ -40,7 +49,9 @@
     <EmbeddedResource Include="resources\ooxschemas\dcterms.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-audiovideo.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-basestylesheet.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-basetypes.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-basetypes.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\ooxschemas\dml-chart.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-chartDrawing.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-compat.xsd" />
@@ -51,7 +62,9 @@
     <EmbeddedResource Include="resources\ooxschemas\dml-diagramlayoutvariables.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-diagramstyledefinition.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-diagramtypes.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-docproperties.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-docproperties.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\ooxschemas\dml-graphicalobject.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-graphicalobjectanimation.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-graphicalobjectformat.xsd" />
@@ -78,7 +91,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="resources\ooxschemas\dml-text.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-textbullet.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-textchar.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\dml-textchar.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\ooxschemas\dml-textpara.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-textrun.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\dml-wordprocessingdrawing.xsd" />
@@ -95,10 +110,14 @@
     <EmbeddedResource Include="resources\ooxschemas\shared-activex.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\shared-customxmlprops.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiescustom.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiesextended.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiesextended.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiesvectortypes.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\shared-math.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\shared-relationships.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\shared-relationships.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\ooxschemas\shared-schemalibrary.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\sml-autofilter.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\sml-basictypes.xsd" />
@@ -109,7 +128,9 @@
     <EmbeddedResource Include="resources\ooxschemas\sml-pivot.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\sml-pivotshared.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\sml-qsi.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-sheet.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\sml-sheet.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\ooxschemas\sml-shrrev.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\sml-shrusr.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\sml-singlecells.xsd" />
@@ -123,12 +144,15 @@
     <EmbeddedResource Include="resources\ooxschemas\vml-officedrawing.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\vml-wordprocessingdrawing.xsd" />
     <EmbeddedResource Include="resources\ooxschemas\vml.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\wml.xsd" />
+    <EmbeddedResource Include="resources\ooxschemas\wml.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <Compile Include="OdfConverterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="README.TXT">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="resources\odfschemas\OpenDocumentSchema10.rng" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
