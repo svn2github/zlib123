@@ -133,10 +133,14 @@
     <value>ODF...</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>Une erreur inattendue s'est produite. Vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur.</value>
+    <value>Une erreur inattendue s'est produite. Vous
+pouvez signaler une anomalie sur le site du
+projet (http://odf-converter.sourceforge.net)
+en joignant le fichier qui a déclenché l'erreur.</value>
   </data>
-  <data name="NotAnOdfDocumentError" xml:space="preserve">
-    <value>n'est pas un document ODF.</value>
+  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
+    <value>Ce document ne semble pas être un document
+ODF valide.</value>
   </data>
   <data name="AllFileType" xml:space="preserve">
     <value>Tous les fichiers</value>
@@ -149,5 +153,19 @@
   </data>
   <data name="ConversionFormTitle" xml:space="preserve">
     <value>Conversion de %1...</value>
+  </data>
+  <data name="FeedbackLabel" xml:space="preserve">
+    <value>Certains éléments ont pu être perdus durant la
+transformation. Pour voir la liste de ces éléments,
+cliquez sur "Détails".</value>
+  </data>
+  <data name="EncryptedDocumentDetail" xml:space="preserve">
+    <value>Cette fonctionnalité n'est pas implémentée dans la version actuelle du plug-in.</value>
+  </data>
+  <data name="EncryptedDocumentLabel" xml:space="preserve">
+    <value>Le document est protégé par un mot de passe.</value>
+  </data>
+  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
+    <value>Si vous pensez que ce document est un document ODF valide, vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur.</value>
   </data>
 </root>

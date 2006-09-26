@@ -30,6 +30,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EncryptedDocumentException.cs" />
     <Compile Include="NotAnOoxDocumentException.cs" />
     <Compile Include="OdfEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

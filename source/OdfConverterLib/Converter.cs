@@ -102,11 +102,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void DoOdfToOoxTransform(string inputFile, string outputFile, string resourceDir)
         {
-        	
-        	if (!IsOdf(inputFile)) 
-        	{
-        		throw new NotAnOdfDocumentException(inputFile);
-        	}
+        	// this throws an exception in the the following cases:
+            // - input file is not an ODF file
+            // - input file is an encrypted ODF file
+        	CheckOdf(inputFile);
         	
             XmlUrlResolver resourceResolver;
             XPathDocument xslDoc;
@@ -171,10 +170,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private void DoOoxToOdfTransform(string inputFile, string outputFile, string resourceDir)
         {
 
-            if (!IsOox(inputFile))
-            {
-                throw new NotAnOoxDocumentException(inputFile);
-            }
+            // this throws an exception in the the following cases:
+            // - input file is not an OOX file
+            // - input file is an encrypted OOX file
+            CheckOox(inputFile);
 
             XmlUrlResolver resourceResolver;
             XPathDocument xslDoc;
@@ -258,36 +257,33 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
         
-        /// <summary>
-        /// Test if the specified file is an ODF file. 
-        /// We check the existence of "META-INF/manifest.xml".
-        /// </summary>
-        /// <param name="fileName">The file to be checked</param>
-        /// <returns></returns>
-        private bool IsOdf(string fileName) {
-        	
+        private void CheckOdf(string fileName) {
+            Stream stream = null;
         	try 
         	{
         		ZipReader reader = ZipFactory.OpenArchive(fileName);
         		// Look for manifest.xml
-        		reader.GetEntry("META-INF/manifest.xml");
-        		
-        		// Look for mimetype
-        		// Stream mtStream = reader.GetEntry("mimetype");
-        	
-        		return true;
-        	}
-        	catch (Exception e) 
-        	{
-        		Debug.WriteLine(e.Message);
-        	}
-        	return false;
+                stream = reader.GetEntry("META-INF/manifest.xml");
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw new NotAnOdfDocumentException(e.Message);
+            }
+
+            XmlTextReader xmlReader = new XmlTextReader(stream);
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xmlReader);
+            XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
+            if (nodes.Count > 0)
+            {
+                throw new EncryptedDocumentException(fileName + " is an encrypted document");
+            }
         }
 
-        private bool IsOox(string fileName)
+        private void CheckOox(string fileName)
         {
             // TODO: implement
-            return true;
         }
 	}
 }

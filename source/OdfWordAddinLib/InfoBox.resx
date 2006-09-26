@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="textBox1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="textBox1.Location" type="System.Drawing.Point, System.Drawing">
     <value>10, 104</value>
@@ -125,12 +129,11 @@
   <data name="textBox1.Multiline" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="textBox1.ScrollBars" type="System.Windows.Forms.ScrollBars, System.Windows.Forms">
     <value>Vertical</value>
   </data>
   <data name="textBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>271, 189</value>
+    <value>275, 154</value>
   </data>
   <data name="textBox1.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -148,24 +151,28 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;textBox1.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>2</value>
   </data>
   <data name="label.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="label.Location" type="System.Drawing.Point, System.Drawing">
-    <value>33, 9</value>
+    <value>12, 9</value>
+  </data>
+  <data name="label.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 3, 3, 3</value>
+  </data>
+  <data name="label.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 10</value>
   </data>
   <data name="label.Size" type="System.Drawing.Size, System.Drawing">
-    <value>224, 39</value>
+    <value>158, 23</value>
   </data>
   <data name="label.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
   <data name="label.Text" xml:space="preserve">
-    <value>Some elements may have been lost during the
-transformation.To see a list of potentially lost
-elements, click on "Details".</value>
+    <value>Label label label label label label</value>
   </data>
   <data name="&gt;&gt;label.Name" xml:space="preserve">
     <value>label</value>
@@ -177,37 +184,16 @@ elements, click on "Details".</value>
     <value>$this</value>
   </data>
   <data name="&gt;&gt;label.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
-  <data name="Details.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+  <data name="OK.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="OK.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
-  <data name="Details.Location" type="System.Drawing.Point, System.Drawing">
-    <value>35, 71</value>
-  </data>
-  <data name="Details.Size" type="System.Drawing.Size, System.Drawing">
-    <value>96, 27</value>
-  </data>
-  <data name="Details.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="Details.Text" xml:space="preserve">
-    <value>Details &gt;&gt;&gt;</value>
-  </data>
-  <data name="&gt;&gt;Details.Name" xml:space="preserve">
-    <value>Details</value>
-  </data>
-  <data name="&gt;&gt;Details.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;Details.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;Details.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <data name="OK.Location" type="System.Drawing.Point, System.Drawing">
-    <value>159, 71</value>
+    <value>156, 71</value>
   </data>
   <data name="OK.Size" type="System.Drawing.Size, System.Drawing">
     <value>97, 27</value>
@@ -230,6 +216,33 @@ elements, click on "Details".</value>
   <data name="&gt;&gt;OK.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="Details.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="Details.Location" type="System.Drawing.Point, System.Drawing">
+    <value>41, 71</value>
+  </data>
+  <data name="Details.Size" type="System.Drawing.Size, System.Drawing">
+    <value>96, 27</value>
+  </data>
+  <data name="Details.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="Details.Text" xml:space="preserve">
+    <value>Details &gt;&gt;&gt;</value>
+  </data>
+  <data name="&gt;&gt;Details.Name" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="&gt;&gt;Details.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;Details.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;Details.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -243,7 +256,13 @@ elements, click on "Details".</value>
     <value>GrowAndShrink</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>290, 305</value>
+    <value>294, 268</value>
+  </data>
+  <data name="$this.MaximumSize" type="System.Drawing.Size, System.Drawing">
+    <value>300, 500</value>
+  </data>
+  <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
+    <value>300, 100</value>
   </data>
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterParent</value>

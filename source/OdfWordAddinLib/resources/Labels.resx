@@ -133,10 +133,10 @@
     <value>ODF...</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>An unexpected error occured. Please feel free to fill a bug report on the project web site (http://odf-converter.sourceforge.net) with your file attached.</value>
-  </data>
-  <data name="NotAnOdfDocumentError" xml:space="preserve">
-    <value>is not an ODF document.</value>
+    <value>An unexpected error occured. Please feel
+free to fill a bug report on the project web
+site (http://odf-converter.sourceforge.net)
+with your file attached.</value>
   </data>
   <data name="AllFileType" xml:space="preserve">
     <value>All Files</value>
@@ -149,5 +149,23 @@
   </data>
   <data name="ConversionFormTitle" xml:space="preserve">
     <value>Converting %1...</value>
+  </data>
+  <data name="FeedbackLabel" xml:space="preserve">
+    <value>Some elements may have been lost during the
+transformation.To see a list of potentially lost
+elements, click on "Details".</value>
+  </data>
+  <data name="EncryptedDocumentDetail" xml:space="preserve">
+    <value>This feature is not implemented by the current version of the add-in.</value>
+  </data>
+  <data name="EncryptedDocumentLabel" xml:space="preserve">
+    <value>This document is password protected.</value>
+  </data>
+  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
+    <value>If you think it is a valid ODF document, you should fill a bug report on the project web site  (http://odf-converter.sourceforge.net) with your file attached.</value>
+  </data>
+  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
+    <value>This document doesn't seem to be a valid
+ODF document.</value>
   </data>
 </root>

@@ -163,9 +163,7 @@
     <value>1</value>
   </data>
   <data name="label.Text" xml:space="preserve">
-    <value>Certains éléments ont pu être perdus durant la
-transformation. Pour voir la liste de ces éléments,
-cliquez sur "Détails".</value>
+    <value />
   </data>
   <data name="&gt;&gt;label.Name" xml:space="preserve">
     <value>label</value>

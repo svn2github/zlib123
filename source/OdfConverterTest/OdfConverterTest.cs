@@ -330,6 +330,11 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 this.report.AddLog(input, "Total conversion time: " + duration, Report.INFO_LEVEL);
                 return true;
             }
+            catch (EncryptedDocumentException)
+            {
+                this.report.AddLog(input, "Conversion failed - Input file is encrypted", Report.WARNING_LEVEL);
+                return false;
+            }
             catch (NotAnOdfDocumentException e)
             {
                 this.report.AddLog(input, "Conversion failed - Input file is not a valid ODF file", Report.ERROR_LEVEL);

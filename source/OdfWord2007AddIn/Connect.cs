@@ -179,7 +179,8 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                     // call the converter
                     using (form = new ConverterForm(odfFile, (string)fileName, labelsResourceManager, true))
                     {
-                        if (System.Windows.Forms.DialogResult.OK == form.ShowDialog()) {
+                        if (System.Windows.Forms.DialogResult.OK == form.ShowDialog())
+                        {
                             // open the document
                             object readOnly = true;
                             object isVisible = true;
@@ -190,14 +191,17 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                             if (form.HasLostElements)
                             {
                                 ArrayList elements = form.LostElements;
-                                InfoBox infoBox = new InfoBox(elements, labelsResourceManager);
+                                InfoBox infoBox = new InfoBox("feedbackLabel", elements, labelsResourceManager);
                                 infoBox.ShowDialog();
                             }
 
                             // and activate it
                             doc.Activate();
-                        } else {
-                            if (File.Exists((string)fileName)) {
+                        }
+                        else
+                        {
+                            if (File.Exists((string)fileName))
+                            {
                                 File.Delete((string)fileName);
                             }
                             if (form.Exception != null)
@@ -207,17 +211,21 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                         }
                     }
                 }
+                catch (EncryptedDocumentException)
+                {
+                    InfoBox infoBox = new InfoBox("EncryptedDocumentLabel", "EncryptedDocumentDetail", labelsResourceManager);
+                    infoBox.ShowDialog();
+                }
                 catch (NotAnOdfDocumentException)
                 {
-                    System.Windows.Forms.MessageBox.Show(odfFile + " " + labelsResourceManager.GetString("NotAnOdfDocumentError"));
+                    InfoBox infoBox = new InfoBox("NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail", labelsResourceManager);
+                    infoBox.ShowDialog();
                 }
                 catch (Exception e)
                 {
-#if DEBUG
-                    System.Windows.Forms.MessageBox.Show(e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
-#else
-                    System.Windows.Forms.MessageBox.Show(labelsResourceManager.GetString("OdfUnexpectedError"));
-#endif
+                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", labelsResourceManager);
+                    infoBox.ShowDialog();
+
                     if (File.Exists((string)fileName))
                     {
                         File.Delete((string)fileName);
