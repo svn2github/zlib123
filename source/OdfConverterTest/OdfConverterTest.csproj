@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>CleverAge.OdfConverter.OdfConverterTest</RootNamespace>
@@ -41,117 +41,275 @@
     <Compile Include="OdfCommandLineException.cs" />
     <Compile Include="OdfValidator.cs" />
     <Compile Include="OoxValidator.cs" />
-    <EmbeddedResource Include="resources\ooxschemas\opc-contenttypes.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\opc-coreproperties.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\opc-relationships.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dc.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dcmitype.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dcterms.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-audiovideo.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-basestylesheet.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-basetypes.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\ooxschemas\dml-chart.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-chartDrawing.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-compat.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-diagramcolortransform.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-diagramdatamodel.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-diagramdefinition.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-diagramelementpropertyset.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-diagramlayoutvariables.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-diagramstyledefinition.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-diagramtypes.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-docproperties.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\ooxschemas\dml-graphicalobject.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-graphicalobjectanimation.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-graphicalobjectformat.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-gvml.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-lockedcanvas.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-picture.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dcamera.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dlight.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dscene.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dsceneplane.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shape3dstyles.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shapeeffects.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shapegeometry.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shapelineproperties.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shapemisc.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shapeproperties.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-shapestyle.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-spreadsheetdrawing.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-styledefaults.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-stylesheet.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-table.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-tablestyle.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\ooxschemas\dml-text.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-textbullet.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-textchar.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\ooxschemas\dml-textpara.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-textrun.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\dml-wordprocessingdrawing.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-animationinfo.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-base.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-comments.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-ole.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-presentation.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-presentationproperties.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-ptags.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-slide.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-slidesyncinfo.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\pml-viewproperties.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\shared-activex.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\shared-customxmlprops.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiescustom.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiesextended.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\ooxschemas\shared-docpropertiesvectortypes.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\shared-math.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\shared-relationships.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\ooxschemas\shared-schemalibrary.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-autofilter.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-basictypes.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-calcchain.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-comments.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-extconns.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-metadata.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-pivot.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-pivotshared.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-qsi.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-sheet.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="resources\ooxschemas\sml-shrrev.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-shrusr.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-singlecells.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-sst.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-styles.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-supbook.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-table.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-voldeps.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-workbook.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\sml-xmlmaps.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\vml-officedrawing.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\vml-wordprocessingdrawing.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\vml.xsd" />
-    <EmbeddedResource Include="resources\ooxschemas\wml.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <Compile Include="OdfConverterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="README.TXT">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="resources\ooxschemas\dml-compatibility.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-documentProperties.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3DLighting.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapeMiscellaneous.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-textCharacter.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-textParagraph.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\opc-contentTypeItem.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\opc-relationshipPart.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-baseTypes.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-embedding.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-slideSynchronizationData.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-userDefinedTags.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\shared-bibliography.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\shared-customXmlDataProperties.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\shared-customXmlSchemaProperties.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\shared-documentPropertiesCustom.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\shared-documentPropertiesExtended.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\shared-documentPropertiesVariantTypes.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\shared-relationshipReference.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-baseTypes.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-calculationChain.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-customXmlMappings.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-externalConnections.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-pivotTable.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-pivotTableShared.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-queryTable.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-sharedStringTable.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-sharedWorkbookRevisions.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-sharedWorkbookUserNames.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-sheetMetadata.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-singleCellTable.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-supplementaryWorkbooks.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-volatileDependencies.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\vml-main.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\vml-spreadsheetDrawing.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-audioVideo.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-baseStylesheet.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-baseTypes.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-chart.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-chartDrawing.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramColorTransform.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramDataModel.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramDefinition.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramElementPropertySet.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramLayoutVariables.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramStyleDefinition.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-diagramTypes.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-graphicalObject.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-graphicalObjectAnimation.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-graphicalObjectFormat.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-gvml.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-lockedCanvas.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-picture.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3DCamera.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3DScene.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3DScenePlane.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shape3DStyles.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapeEffects.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapeGeometry.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapeLineProperties.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapeProperties.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-shapeStyle.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-spreadSheetDrawing.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-styleDefaults.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-stylesheet.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-table.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-tableStyle.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-text.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-textBullet.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-textRun.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\dml-wordprocessingDrawing.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\opc-coreProperties.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-animationInfo.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-comments.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-presentation.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-presentationProperties.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-slide.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\pml-viewProperties.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\shared-math.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-autoFilter.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-comments.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-sheet.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-styles.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-table.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\sml-workbook.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\vml-officeDrawing.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\vml-wordprocessingDrawing.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\ooxschemas\wml.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\odfschemas\OpenDocumentSchema10.rng" />
   </ItemGroup>
   <ItemGroup>
