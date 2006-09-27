@@ -344,7 +344,7 @@
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="concat('#',@w:anchor)"/>
           </xsl:attribute>
-          <text:span text:style-name="Internet_20_link">
+          <text:span>
             <xsl:apply-templates select="w:r/w:t"/>
           </text:span>
         </xsl:when>
@@ -355,7 +355,7 @@
               select="concat('#_',substring-before(substring-after(preceding::w:instrText[last()],'_'),'&quot;'))"
             />
           </xsl:attribute>
-          <text:span text:style-name="Internet_20_link">
+          <text:span>
             <xsl:apply-templates select="w:t"/>
           </text:span>
         </xsl:when>
@@ -377,6 +377,28 @@
         <xsl:apply-templates select="w:r/w:t"/>
       </xsl:if>
     </text:a>
+  </xsl:template>
+  
+  <!-- Insert bookmarks -->
+  
+  <xsl:template match="w:bookmarkStart">  
+    <text:bookmark-start>    
+      <xsl:attribute name="text:name">
+      <xsl:value-of select="@w:name"/>     
+    </xsl:attribute>
+    </text:bookmark-start>
+  </xsl:template>
+  
+  <xsl:template match="w:bookmarkEnd">
+    <text:bookmark-end>
+      <xsl:variable name="IdBookmark">
+        <xsl:value-of select="@w:id"/>
+      </xsl:variable>     
+      <xsl:attribute name="text:name">    
+        <xsl:value-of select="ancestor::w:body/w:p/w:bookmarkStart[@w:id=$IdBookmark]/@w:name"/>      
+      </xsl:attribute>  
+      <xsl:message><xsl:value-of select="ancestor::w:body/w:p/w:bookmarkStart[@w:id=$IdBookmark]/@w:name"/></xsl:message>
+    </text:bookmark-end>
   </xsl:template>
 
   <!-- footnotes -->
