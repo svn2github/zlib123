@@ -1454,7 +1454,7 @@
 
   </xsl:template>
 
-  <xsl:template name="InsertTextBoxWrap">
+  <xsl:template name="InsertShapeWrap">
     <xsl:param name="styleGraphicProperties"/>
 
     <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap"/>
@@ -1472,7 +1472,7 @@
         <w10:wrap type="square" side="right"/>
       </xsl:when>
       <xsl:when test="not($frameWrap)">
-        <w10:wrap type="square"/>
+        <w10:wrap type="topAndBottom"/>
       </xsl:when>
       <xsl:when test="$frameWrap = 'parallel' ">
         <w10:wrap type="square"/>
@@ -1518,7 +1518,7 @@
         </xsl:for-each>
       </w:txbxContent>
 
-      <xsl:call-template name="InsertTextBoxWrap">
+      <xsl:call-template name="InsertShapeWrap">
         <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
       </xsl:call-template>
 

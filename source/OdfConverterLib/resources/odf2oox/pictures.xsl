@@ -126,7 +126,7 @@
     </w:r>
   </xsl:template>
 
-  <!--TODO comment: what it is used for ?-->
+ <!-- conversion of external images -->
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[not(starts-with(@xlink:href, 'Pictures/'))]]"
     mode="paragraph">
@@ -142,23 +142,41 @@
           <xsl:with-param name="node" select="."/>
         </xsl:call-template>
       </xsl:variable>
-      <xsl:variable name="width">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="@svg:width"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="height">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length" select="@svg:height"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <w:r>
-        <w:pict>
-          <v:shape id="{$imageId}" type="#_x0000_t75" style="width:{$width}pt;height:{$height}pt">
-            <v:imagedata r:id="{generate-id(draw:image)}" o:title=""/>
-          </v:shape>
-        </w:pict>
-      </w:r>
+   
+      <xsl:for-each select="draw:image">
+        <w:r>
+          <w:pict>
+            <v:shape id="{$imageId}" type="#_x0000_t75">
+              
+              <xsl:variable name="styleGraphicProperties"
+                select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties"/>
+               
+              <xsl:variable name="parentStyleName">
+                <xsl:value-of
+                  select="key('automatic-styles', parent::draw:frame/@draw:style-name)/@style:parent-style-name"
+                />
+                </xsl:variable>
+              
+              <xsl:variable name="parentStyleGraphicProperties"
+                select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties"/>
+              
+             <!-- shape properties: size, z-index, coordinates, position, margin etc -->
+              <xsl:call-template name="InsertShapeProperties">
+                <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+                <xsl:with-param name="parentStyleGraphicProperties"
+                  select="$parentStyleGraphicProperties"/>
+              </xsl:call-template>
+              
+              <v:imagedata r:id="{generate-id(.)}" o:title=""/>
+              <!-- wrapping -->
+              <xsl:call-template name="InsertShapeWrap">
+                <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+              </xsl:call-template>
+              
+            </v:shape>
+          </w:pict>
+        </w:r>
+      </xsl:for-each>
     </xsl:if>
   </xsl:template>
 
