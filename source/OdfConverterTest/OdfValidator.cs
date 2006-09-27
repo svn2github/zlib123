@@ -57,7 +57,6 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 
         private XmlReader grammarName = null;
         private Grammar grammar = null;
-        private XmlReaderSettings settings = null; // global settings to open the xml files
 
 		/// <summary>
 		/// Initialize the validator

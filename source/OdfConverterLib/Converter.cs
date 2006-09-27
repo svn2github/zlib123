@@ -258,7 +258,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
         
         private void CheckOdf(string fileName) {
-            Stream stream = null;
 
             // Test for encryption
             XmlReaderSettings settings = new XmlReaderSettings();
