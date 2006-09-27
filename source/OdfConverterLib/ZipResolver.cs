@@ -104,7 +104,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			
 			if (stream == null)
 			{
-				return base.GetEntity(absoluteUri, role, ofObjectToReturn);
+                stream = new MemoryStream();
 			}
 			return stream;
 		}

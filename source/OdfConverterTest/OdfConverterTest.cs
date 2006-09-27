@@ -405,7 +405,6 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                     return false;
                 }
             }
-            return false;
         }
 
         private bool TryToOpen(string input, string output, bool isDirectTransform)

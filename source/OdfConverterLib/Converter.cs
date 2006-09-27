@@ -259,21 +259,23 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         
         private void CheckOdf(string fileName) {
             Stream stream = null;
-        	try 
-        	{
-        		ZipReader reader = ZipFactory.OpenArchive(fileName);
-        		// Look for manifest.xml
-                stream = reader.GetEntry("META-INF/manifest.xml");
+
+            // Test for encryption
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.XmlResolver = new ZipResolver(fileName);
+            settings.ProhibitDtd = false;
+            XmlDocument doc;
+            try
+            {
+                doc = new XmlDocument();
+                XmlReader reader = XmlReader.Create("META-INF/manifest.xml", settings);
+                doc.Load(reader);
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
                 throw new NotAnOdfDocumentException(e.Message);
             }
-
-            XmlTextReader xmlReader = new XmlTextReader(stream);
-            XmlDocument doc = new XmlDocument();
-            doc.Load(xmlReader);
             XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
             if (nodes.Count > 0)
             {
