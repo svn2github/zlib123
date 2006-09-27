@@ -159,7 +159,7 @@
 
   </xsl:template>
 
-  
+
   <xsl:template name="InsertListParagraphProperties">
     <xsl:variable name="spaceBeforeTwip">
       <xsl:call-template name="twips-measure">
@@ -265,7 +265,7 @@
   </xsl:template>
 
   <xsl:template name="InsertBulletChar">
-  <xsl:choose>
+    <xsl:choose>
       <xsl:when test="@text:bullet-char = '' "></xsl:when>
       <xsl:when test="@text:bullet-char = '' "></xsl:when>
       <xsl:when test="@text:bullet-char = '☑' "></xsl:when>
@@ -316,7 +316,7 @@
               <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
             </xsl:with-param>
           </xsl:call-template>
-       </w:rPr>
+        </w:rPr>
       </xsl:when>
 
       <xsl:when test="$char  = 'o'  or $char = '•' or $char = '–' ">
@@ -327,7 +327,7 @@
               <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
             </xsl:with-param>
           </xsl:call-template>
-       </w:rPr>
+        </w:rPr>
       </xsl:when>
       <xsl:when test="$char  = '' ">
         <w:rPr>
@@ -337,9 +337,9 @@
               <xsl:value-of select="current()/style:text-properties/@style:font-name"/>
             </xsl:with-param>
           </xsl:call-template>
-       </w:rPr>
+        </w:rPr>
       </xsl:when>
-     <xsl:otherwise/>
+      <xsl:otherwise/>
     </xsl:choose>
   </xsl:template>
 
@@ -365,7 +365,7 @@
     <xsl:choose>
       <xsl:when test="ancestor::text:outline-style">
         <w:lvlText>
-            <xsl:attribute name="w:val">
+          <xsl:attribute name="w:val">
             <xsl:value-of select="@style:num-prefix"/>
             <xsl:choose>
               <xsl:when test="@style:num-format='1'">
@@ -410,7 +410,7 @@
         </w:lvlText>
       </xsl:otherwise>
     </xsl:choose>
-   </xsl:template>
+  </xsl:template>
 
   <xsl:template name="GetBulletSize">
     <xsl:param name="fontName"/>
@@ -579,7 +579,7 @@
     <xsl:param name="displayLevels"/>
     <xsl:param name="level"/>
     <xsl:param name="listStyleName"/>
-    
+
     <xsl:if test="$displayLevels &gt; 0">
       <xsl:call-template name="GetLevelText">
         <xsl:with-param name="displayLevels" select="$displayLevels - 1"/>
@@ -593,49 +593,49 @@
       </xsl:if>
     </xsl:if>
   </xsl:template>
-  
-  
-  
+
+
+
   <!-- appearance and behaviour for set of list paragraphs -->
   <xsl:template match="text:list" mode="numbering">
     <xsl:param name="offset" select="0"/>
     <xsl:variable name="listStyleName" select="@text:style-name"/>
     <w:abstractNum
       w:abstractNumId="{count(preceding-sibling::text:list[text:list-item/@text:start-value])+2+$offset}">
-        <xsl:choose>
-          
-          <!--  look for list style in content.xml -->
-          <xsl:when test="key('list-style', $listStyleName)">
-            <xsl:for-each select="key('list-style', $listStyleName)">
-              <xsl:apply-templates
-                select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
-                mode="numbering"/>
-            </xsl:for-each>
-          </xsl:when>
-          
-          <xsl:otherwise>
-            <!-- look for list style in styles.xml -->
-            <xsl:for-each select="document('styles.xml')">
-              <xsl:choose>
-                
-                <xsl:when test="key('list-style', $listStyleName)">
-                  <xsl:for-each select="key('list-style', $listStyleName)">
-                    <xsl:apply-templates
-                      select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
-                      mode="numbering"/>
-                  </xsl:for-each>
-                </xsl:when>
-                
-                <xsl:otherwise> </xsl:otherwise>
-              
-              </xsl:choose>
-            </xsl:for-each>
-          </xsl:otherwise>
-        </xsl:choose>
+      <xsl:choose>
+
+        <!--  look for list style in content.xml -->
+        <xsl:when test="key('list-style', $listStyleName)">
+          <xsl:for-each select="key('list-style', $listStyleName)">
+            <xsl:apply-templates
+              select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+              mode="numbering"/>
+          </xsl:for-each>
+        </xsl:when>
+
+        <xsl:otherwise>
+          <!-- look for list style in styles.xml -->
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:choose>
+
+              <xsl:when test="key('list-style', $listStyleName)">
+                <xsl:for-each select="key('list-style', $listStyleName)">
+                  <xsl:apply-templates
+                    select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+                    mode="numbering"/>
+                </xsl:for-each>
+              </xsl:when>
+
+              <xsl:otherwise> </xsl:otherwise>
+
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
     </w:abstractNum>
   </xsl:template>
 
- 
+
   <!-- numbering definition which references particular abstractNum and can be applied to a list paragraph -->
   <xsl:template match="text:list" mode="num">
     <xsl:param name="offset" select="0"/>
@@ -682,45 +682,47 @@
     <xsl:param name="level"/>
     <xsl:param name="listStyleName"/>
 
-     <xsl:call-template name="twips-measure">
-       <xsl:with-param name="length">
-         <xsl:choose>
-           <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
-             <!--   text:outline-style -->
-             <xsl:value-of
-               select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
-             />
-           </xsl:when>
-           <!-- look into content.xml -->
-           <xsl:when
-             test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
-             <xsl:value-of
-               select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]"/>
-           </xsl:when>
-           <xsl:otherwise>
-             <!-- look into styles.xml -->
-             <xsl:for-each select="document('styles.xml')">
-               <xsl:choose>
-               <xsl:when
-                 test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
-                 <xsl:value-of
-                   select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]"/>
-               </xsl:when>
-               <xsl:otherwise>0</xsl:otherwise>
-               </xsl:choose>
-             </xsl:for-each>
-           </xsl:otherwise>
-         </xsl:choose>
-       
-       </xsl:with-param>
-     </xsl:call-template>
+    <xsl:call-template name="twips-measure">
+      <xsl:with-param name="length">
+        <xsl:choose>
+          <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
+            <!--   text:outline-style -->
+            <xsl:value-of
+              select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
+            />
+          </xsl:when>
+          <!-- look into content.xml -->
+          <xsl:when
+            test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
+            <xsl:value-of
+              select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]"
+            />
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- look into styles.xml -->
+            <xsl:for-each select="document('styles.xml')">
+              <xsl:choose>
+                <xsl:when
+                  test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]">
+                  <xsl:value-of
+                    select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-properties/@*[name()=$attribute]"
+                  />
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
-  
+
   <!-- Inserts paragraph indentation -->
   <xsl:template name="InsertIndent">
     <xsl:param name="level" select="0"/>
-    
+
     <xsl:if test="ancestor-or-self::text:list">
       <xsl:variable name="styleName">
         <xsl:call-template name="GetStyleName"/>
@@ -729,7 +731,7 @@
         select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
       <xsl:variable name="listStyleName"
         select="key('automatic-styles',$styleName)/@style:list-style-name"/>
-      
+
       <!-- Indent to add to numbering values. -->
       <xsl:variable name="addLeftIndent">
         <xsl:call-template name="ComputeAdditionalIndent">
@@ -748,8 +750,8 @@
           <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
         </xsl:call-template>
       </xsl:variable>
-      
-      <!-- Indent extracted from numbering properties -->
+
+      <!-- Minimum width of a number -->
       <xsl:variable name="minLabelWidthTwip">
         <xsl:call-template name="ComputeNumberingIndent">
           <xsl:with-param name="attribute" select="'text:min-label-width'"/>
@@ -757,6 +759,8 @@
           <xsl:with-param name="listStyleName" select="$listStyleName"/>
         </xsl:call-template>
       </xsl:variable>
+
+      <!-- Space before the number for all paragraphs at this level. -->
       <xsl:variable name="spaceBeforeTwip">
         <xsl:call-template name="ComputeNumberingIndent">
           <xsl:with-param name="attribute" select="'text:space-before'"/>
@@ -764,6 +768,8 @@
           <xsl:with-param name="listStyleName" select="$listStyleName"/>
         </xsl:call-template>
       </xsl:variable>
+
+      <!-- Minimum distance between the number and the text -->
       <xsl:variable name="minLabelDistanceTwip">
         <xsl:call-template name="ComputeNumberingIndent">
           <xsl:with-param name="attribute" select="'text:min-label-distance'"/>
@@ -771,96 +777,96 @@
           <xsl:with-param name="listStyleName" select="$listStyleName"/>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <!-- Override tabs if margin defined. -->
+      <!-- COMMENT : what are we testing ? -->
       <xsl:if
         test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())) and $addLeftIndent != 0">
-        <w:tabs>
-          <w:tab>
-            <xsl:attribute name="w:val">clear</xsl:attribute>
-            <xsl:attribute name="w:pos">
+        <xsl:for-each select="document('content.xml')">
+          <w:tabs>
+            <!-- COMMENT : why do we need this tab and the other below ? -->
+            <w:tab w:val="clear">
+              <xsl:attribute name="w:pos">
+                <xsl:choose>
+                  <!-- COMMENT : what are we testing ? -->
+                  <xsl:when
+                    test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
+                    <xsl:value-of select="$spaceBeforeTwip + $minLabelDistanceTwip"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:choose>
+                      <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                        <xsl:value-of
+                          select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </w:tab>
+            <w:tab>
               <xsl:choose>
-                <xsl:when
-                  test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
-                  <xsl:value-of select="$spaceBeforeTwip + $minLabelDistanceTwip"/>
+                <xsl:when test="$firstLineIndent != 0">
+                  <xsl:attribute name="w:val">num</xsl:attribute>
+                  <xsl:attribute name="w:pos">
+                    <xsl:value-of select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent"
+                    />
+                  </xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:choose>
-                    <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                      <xsl:value-of
-                        select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
+                  <xsl:attribute name="w:val">num</xsl:attribute>
+                  <xsl:attribute name="w:pos">
+                    <xsl:choose>
+                      <xsl:when
+                        test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
+                        <xsl:value-of
+                          select="$addLeftIndent + $spaceBeforeTwip + $minLabelDistanceTwip"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:choose>
+                          <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                            <xsl:value-of
+                              select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"
+                            />
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of
+                              select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:attribute>
                 </xsl:otherwise>
               </xsl:choose>
-            </xsl:attribute>
-          </w:tab>
-          <xsl:choose>
-            <xsl:when test="$firstLineIndent != 0">
-              <w:tab>
-                <xsl:attribute name="w:val">num</xsl:attribute>
-                <xsl:attribute name="w:pos">
-                  <xsl:value-of select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent"/>
-                </xsl:attribute>
-              </w:tab>
-            </xsl:when>
-            <xsl:otherwise>
-              <w:tab>
-                <xsl:attribute name="w:val">num</xsl:attribute>
-                <xsl:attribute name="w:pos">
-                  <xsl:choose>
-                    <xsl:when
-                      test="document('content.xml')//text:list-style[@style:name = $listStyleName]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
-                      <xsl:value-of
-                        select="$addLeftIndent + $spaceBeforeTwip + $minLabelDistanceTwip"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:choose>
-                        <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                          <xsl:value-of
-                            select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"
-                          />
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of
-                            select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:attribute>
-              </w:tab>
-            </xsl:otherwise>
-          </xsl:choose>
-        </w:tabs>
+            </w:tab>
+          </w:tabs>
+        </xsl:for-each>
       </xsl:if>
-      
+
       <!-- insert indent with paragraph and numbering properties
-        if any value affects the numbering style defined, or if list element has no numberig -->
+        if any value affects the numbering style defined, or if list element has no numbering -->
       <xsl:choose>
         <!-- List element with numbering -->
         <xsl:when
           test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
           <xsl:if test="$addLeftIndent != 0 or $addRightIndent !=  0 or $firstLineIndent != 0">
-            <w:ind>
-              <xsl:attribute name="w:left">
-                <xsl:value-of select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
-              </xsl:attribute>
-              <xsl:attribute name="w:right">
-                <xsl:value-of select="$addRightIndent"/>
-              </xsl:attribute>
+            <w:ind 
+              w:left="{$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip}"
+              w:right="{$addRightIndent}">
+              <!-- first line and hanging indent -->
               <xsl:choose>
-                <xsl:when test="$firstLineIndent !=0">
+                <xsl:when test="($firstLineIndent - $minLabelWidthTwip) &gt; 0">
                   <xsl:attribute name="w:firstLine">
                     <xsl:value-of select="$firstLineIndent - $minLabelWidthTwip"/>
                   </xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:choose>
-                    <xsl:when test="$spaceBeforeTwip &lt; 0">
+                    <xsl:when test="$minLabelWidthTwip &lt; 0">
                       <xsl:attribute name="w:firstLine">
                         <xsl:value-of select="$minLabelWidthTwip"/>
                       </xsl:attribute>
@@ -888,10 +894,10 @@
           </w:ind>
         </xsl:otherwise>
       </xsl:choose>
-      
+
     </xsl:if>
   </xsl:template>
-  
-  
-  
+
+
+
 </xsl:stylesheet>
