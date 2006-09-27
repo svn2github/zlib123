@@ -345,12 +345,22 @@
       <xsl:when test="self::node()/@w:default">
         <style:default-style style:name="{self::node()/@w:styleId}"
           style:family="{self::node()/@w:type}" style:display-name="{self::node()/w:name/@w:val}">
+          <xsl:if test="w:basedOn">
+            <xsl:attribute name="style:parent-style-name">
+              <xsl:value-of select="w:basedOn/@w:val"/>
+            </xsl:attribute>
+          </xsl:if>
           <xsl:call-template name="InsertStyleProperties"/>
         </style:default-style>
       </xsl:when>
       <xsl:otherwise>
         <style:style style:name="{self::node()/@w:styleId}" style:family="{self::node()/@w:type}"
           style:display-name="{self::node()/w:name/@w:val}">
+          <xsl:if test="w:basedOn">
+            <xsl:attribute name="style:parent-style-name">
+              <xsl:value-of select="w:basedOn/@w:val"/>
+            </xsl:attribute>
+          </xsl:if>
           <xsl:call-template name="InsertStyleProperties"/>
         </style:style>
       </xsl:otherwise>
@@ -493,9 +503,9 @@
     </xsl:if>
 
     <!-- space before/after -->
-    <!-- w:afterLines and w:beforeLines elements are lost -->
-    <xsl:if
-      test="not(w:spacing/@w:beforeAutospacing='on' or w:spacing/@w:beforeAutospacing='1' or w:spacing/@w:beforeAutospacing='true') and w:spacing/@w:before">
+    <!-- w:afterAutospacing and w:beforeAutospacing attributes are lost -->
+    <!-- w:afterLines and w:beforeLines attributes are lost -->
+    <xsl:if test="w:spacing/@w:before">
       <xsl:attribute name="fo:margin-top">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">
@@ -505,8 +515,7 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-    <xsl:if
-      test="not(w:spacing/@w:afterAutospacing='on' or w:spacing/@w:afterAutospacing='1' or w:spacing/@w:afterAutospacing='true') and w:spacing/@w:after">
+    <xsl:if test="w:spacing/@w:after">
       <xsl:attribute name="fo:margin-bottom">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">

@@ -64,9 +64,31 @@
     </office:document-content>
   </xsl:template>
 
+  <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
+  <xsl:template match="w:pPr[parent::w:p]" mode="automaticstyles">
+    <xsl:message terminate="no">progress:w:pPr</xsl:message>
+    <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
+      <xsl:if test="w:pStyle">
+        <xsl:attribute name="style:parent-style-name">
+          <xsl:value-of select="w:pStyle/@w:val"/>
+        </xsl:attribute>
+      </xsl:if>
+      <style:paragraph-properties>
+        <xsl:call-template name="InsertParagraphProperties"/>
+      </style:paragraph-properties>
+      <xsl:if test="w:rPr">
+        <xsl:for-each select="w:rPr">
+          <style:text-properties>
+            <xsl:call-template name="InsertTextProperties"/>
+          </style:text-properties>
+        </xsl:for-each>
+      </xsl:if>
+    </style:style>
+  </xsl:template>
+
   <!-- create a style for each run. Do not take w:pPr/w:rPr into consideration. -->
   <xsl:template match="w:rPr[parent::w:r]" mode="automaticstyles">
-    <xsl:message terminate="no">progress:w:pPr</xsl:message>
+    <xsl:message terminate="no">progress:w:rPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
       <style:text-properties>
         <xsl:call-template name="InsertTextProperties"/>
@@ -74,27 +96,12 @@
     </style:style>
   </xsl:template>
 
-
-  <xsl:template match="w:r" mode="text">
-    <xsl:message terminate="no">progress:w:r</xsl:message>
-    <text:span text:style-name="{generate-id(self::node())}">
-      <xsl:apply-templates mode="text"/>
-    </text:span>
-  </xsl:template>
-
-  <xsl:template match="w:t" mode="automaticstyles"/>
-
-  <xsl:template match="w:t" mode="text">
-    <xsl:apply-templates select="."/>
-  </xsl:template>
-
-  <xsl:template match="text()" mode="text">
-    <xsl:message terminate="no">progress:text()</xsl:message>
-    <xsl:value-of select="."/>
+  <!-- ignore text in automatic styles mode. -->
+  <xsl:template match="w:t" mode="automaticstyles">
+    <!-- do nothing. -->
   </xsl:template>
 
   <!--  Check if the paragraf is heading -->
-
   <xsl:template name="CheckHeading">
     <xsl:param name="outline"/>
     <xsl:variable name="basedOn">
@@ -102,6 +109,7 @@
         select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"
       />
     </xsl:variable>
+
     <!--  Search outlineLvl in style based on style -->
     <xsl:choose>
       <xsl:when
@@ -121,7 +129,6 @@
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
-
   </xsl:template>
 
   <!-- Check outlineLvl if the paragraf is heading-->
@@ -134,7 +141,7 @@
         <xsl:variable name="outline">
           <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
         </xsl:variable>
-     <!--Search outlineLvl in styles.xml  -->
+        <!--Search outlineLvl in styles.xml  -->
         <xsl:choose>
           <xsl:when
             test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val">
@@ -161,7 +168,7 @@
             select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:link/@w:val"
           />
         </xsl:variable>
-    <!--if outlineLvl is not defined search in parent style by w:link-->
+        <!--if outlineLvl is not defined search in parent style by w:link-->
         <xsl:choose>
           <xsl:when
             test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val">
@@ -186,6 +193,11 @@
   <xsl:template name="InsertHeading">
     <xsl:param name="outlineLevel"/>
     <text:h>
+      <xsl:if test="w:pPr">
+        <xsl:attribute name="text:style-name">
+          <xsl:value-of select="generate-id(self::node())"/>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:attribute name="text:outline-level">
         <xsl:value-of select="$outlineLevel+1"/>
       </xsl:attribute>
@@ -212,12 +224,11 @@
 
   <xsl:template match="w:p">
     <xsl:message terminate="no">progress:w:p</xsl:message>
-    <xsl:choose>
 
+    <xsl:choose>
       <!-- check if list starts -->
       <xsl:when test="w:pPr/w:numPr">
         <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
-
         <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
         <xsl:if
           test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
@@ -228,7 +239,6 @@
         <xsl:apply-templates select="." mode="paragraph"/>
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
 
   <xsl:template match="w:p" mode="paragraph">
@@ -237,18 +247,20 @@
     </xsl:variable>
 
     <xsl:choose>
-
       <!--  check if the paragraf is heading -->
       <xsl:when test="$outlineLevel != '' ">
         <xsl:call-template name="InsertHeading">
           <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
         </xsl:call-template>
       </xsl:when>
-
       <!--  default scenario -->
       <xsl:otherwise>
-        <text:p text:style-name="Standard">
-          <!-- todo without styles -->
+        <text:p>
+          <xsl:if test="w:pPr">
+            <xsl:attribute name="text:style-name">
+              <xsl:value-of select="generate-id(self::node())"/>
+            </xsl:attribute>
+          </xsl:if>
           <xsl:apply-templates/>
         </text:p>
       </xsl:otherwise>
@@ -329,7 +341,6 @@
       <xsl:choose>
         <!-- simple hyperlink -->
         <xsl:when test="@w:anchor">
-
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="concat('#',@w:anchor)"/>
           </xsl:attribute>
@@ -350,9 +361,7 @@
         </xsl:when>
         <xsl:otherwise> </xsl:otherwise>
       </xsl:choose>
-      
       <!-- Internet hyperlink -->
-      
       <xsl:if test="@r:id">
         <xsl:variable name="relationshipId">
           <xsl:value-of select="@r:id"/>
@@ -367,9 +376,7 @@
         </xsl:for-each>
         <xsl:apply-templates select="w:r/w:t"/>
       </xsl:if>
-
     </text:a>
-
   </xsl:template>
 
   <!-- footnotes -->
@@ -445,8 +452,5 @@
   <xsl:template match="w:br">
     <text:line-break/>
   </xsl:template>
-
-
-
 
 </xsl:stylesheet>
