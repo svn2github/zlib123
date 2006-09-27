@@ -725,12 +725,15 @@
         <xsl:if
           test="not(substring(@style:text-position, 1, 3) = 'sub') and not(substring(@style:text-position, 1, 5) = 'super') ">
           <xsl:variable name="textPosition">
-            <xsl:value-of select="substring-before(substring-after(@style:text-position, ' '), '%')"/>
+            <xsl:value-of select="substring-before(substring-after(@style:text-position, ' '), '%')"
+            />
           </xsl:variable>
           <xsl:if test="$textPosition != 0">
             <xsl:choose>
               <xsl:when test="contains($textPosition, '-')">
-                <w:position w:val="{concat('-', round(number(substring-after($textPosition, '-')) div 10 * 2))}"/>
+                <w:position
+                  w:val="{concat('-', round(number(substring-after($textPosition, '-')) div 10 * 2))}"
+                />
               </xsl:when>
               <xsl:otherwise>
                 <w:position w:val="{round(number($textPosition) div 10)}"/>
@@ -758,7 +761,7 @@
           </xsl:attribute>
         </w:szCs>
       </xsl:if>
-      
+
     </xsl:if>
     <!-- end non toggle properties -->
 
@@ -1513,9 +1516,13 @@
       </xsl:choose>
     </xsl:variable>
 
+    <!-- padding = 0 if side border not defined ! -->
     <xsl:variable name="padding">
       <xsl:choose>
-        <xsl:when test="@fo:padding">
+        <xsl:when test="@fo:border and @fo:padding">
+          <xsl:value-of select="@fo:padding"/>
+        </xsl:when>
+        <xsl:when test="@*[name()=concat('fo:border-', $side)] != 'none' and @fo:padding">
           <xsl:value-of select="@fo:padding"/>
         </xsl:when>
         <xsl:when test="$side = 'middle' ">
@@ -1528,9 +1535,10 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        <xsl:otherwise>
+        <xsl:when test="@*[name()=concat('fo:padding-', $side)]">
           <xsl:value-of select="@*[name()=concat('fo:padding-', $side)]"/>
-        </xsl:otherwise>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 
@@ -1640,9 +1648,16 @@
     <xsl:param name="side"/>
     <xsl:param name="style"/>
     <xsl:variable name="styleName" select="$style/@style:parent-style-name"/>
+
+    <!-- padding = 0 if side border not defined ! -->
     <xsl:variable name="paddingVal">
       <xsl:choose>
-        <xsl:when test="$style/style:paragraph-properties/@fo:padding">
+        <xsl:when
+          test="$style/style:paragraph-properties/@fo:border and $style/style:paragraph-properties/@fo:padding">
+          <xsl:value-of select="$style/style:paragraph-properties/@fo:padding"/>
+        </xsl:when>
+        <xsl:when
+          test="$style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)] != 'none' and $style/style:paragraph-properties/@fo:padding">
           <xsl:value-of select="$style/style:paragraph-properties/@fo:padding"/>
         </xsl:when>
         <xsl:when test="$style/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]">
@@ -1652,7 +1667,13 @@
         <xsl:when test="$style/ancestor::office:automatic-styles">
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
-              <xsl:when test="key('styles', $styleName)/style:paragraph-properties/@fo:padding">
+              <xsl:when
+                test="key('styles', $styleName)/style:paragraph-properties/@fo:border and key('styles', $styleName)/style:paragraph-properties/@fo:padding">
+                <xsl:value-of
+                  select="key('styles', $styleName)/style:paragraph-properties/@fo:padding"/>
+              </xsl:when>
+              <xsl:when
+                test="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:border-',$side)] != 'none' and key('styles', $styleName)/style:paragraph-properties/@fo:padding">
                 <xsl:value-of
                   select="key('styles', $styleName)/style:paragraph-properties/@fo:padding"/>
               </xsl:when>
