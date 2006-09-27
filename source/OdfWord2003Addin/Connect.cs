@@ -242,7 +242,7 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                             if (form.HasLostElements)
                             {
                                 ArrayList elements = form.LostElements;
-                                InfoBox infoBox = new InfoBox("feedbackLabel", elements, labelsResourceManager);
+                                InfoBox infoBox = new InfoBox("FeedbackLabel", elements, labelsResourceManager);
                                 infoBox.ShowDialog();
                             }
 
