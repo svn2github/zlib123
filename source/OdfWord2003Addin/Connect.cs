@@ -230,28 +230,22 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                     // call the converter
                     using (form = new ConverterForm(odfFile, (string)fileName, labelsResourceManager, true))
                     {
-                        System.Windows.Forms.DialogResult dr = form.ShowDialog();
-
-                        if (form.Exception != null)
-                        {
-                            throw form.Exception;
-                        }
-
-                        if (dr == System.Windows.Forms.DialogResult.OK)
+                        if (System.Windows.Forms.DialogResult.OK == form.ShowDialog())
                         {
                             // open the document
                             object readOnly = true;
                             object isVisible = true;
-                            object Format = MSword.WdOpenFormat.wdOpenFormatXML;
+                            object addToRecentFiles = false;
                             object missing = Type.Missing;
-                            Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
+                            Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
 
                             if (form.HasLostElements)
                             {
                                 ArrayList elements = form.LostElements;
-                                InfoBox infoBox = new InfoBox(elements, labelsResourceManager);
+                                InfoBox infoBox = new InfoBox("feedbackLabel", elements, labelsResourceManager);
                                 infoBox.ShowDialog();
                             }
+
                             // and activate it
                             doc.Activate();
                         }
@@ -261,24 +255,28 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                             {
                                 File.Delete((string)fileName);
                             }
+                            if (form.Exception != null)
+                            {
+                                throw form.Exception;
+                            }
                         }
                     }
                 }
+                catch (EncryptedDocumentException)
+                {
+                    InfoBox infoBox = new InfoBox("EncryptedDocumentLabel", "EncryptedDocumentDetail", labelsResourceManager);
+                    infoBox.ShowDialog();
+                }
                 catch (NotAnOdfDocumentException)
                 {
-                    System.Windows.Forms.MessageBox.Show(odfFile + " " + labelsResourceManager.GetString("NotAnOdfDocumentError"));
+                    InfoBox infoBox = new InfoBox("NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail", labelsResourceManager);
+                    infoBox.ShowDialog();
                 }
-#if DEBUG
                 catch (Exception e)
-#else
-                catch
-#endif
                 {
-#if DEBUG
-                    System.Windows.Forms.MessageBox.Show(e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
-#else
-                    System.Windows.Forms.MessageBox.Show(labelsResourceManager.GetString("OdfUnexpectedError"));
-#endif
+                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", labelsResourceManager);
+                    infoBox.ShowDialog();
+
                     if (File.Exists((string)fileName))
                     {
                         File.Delete((string)fileName);
