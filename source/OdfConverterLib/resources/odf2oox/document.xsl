@@ -491,7 +491,7 @@
 
       <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
       <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
-        <xsl:message terminate="no">feedback: Nested frames</xsl:message>
+        <xsl:message terminate="no">feedback:Nested frames</xsl:message>
       </xsl:when>
 
       <xsl:otherwise>
