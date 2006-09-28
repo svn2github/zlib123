@@ -60,6 +60,7 @@
   <xsl:key name="master-based-styles" match="style:style[@style:master-page-name]" use="@style:name"/>
   <xsl:key name="sections" match="style:style[@style:family='section']" use="@style:name"/>
   <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value]" use="''"/>
+  <xsl:key name="toc" match="text:table-of-content" use="''"/>
 
 
   <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
@@ -75,6 +76,8 @@
     select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[1]"/>
   <!-- The very first text element -->
   <xsl:variable name="first-elt" select="$elts[1]"/>
+  <!-- table of content count -->
+  <xsl:variable name="tocCount" select="count(key('toc', ''))"/>
 
   <!-- main document -->
   <xsl:template name="document">
@@ -264,10 +267,10 @@
   <!--checks if element has style used to generate table of contents in document  TODO bookmarks for index marks -->
   <xsl:template name="IsTOCBookmark">
     <xsl:param name="styleName" />
-    <xsl:param name="tableOfContentsNum" select="count(//text:table-of-content)"/>
+    <xsl:param name="tableOfContentsNum" select="$tocCount"/>
     <xsl:param name="isTocStyle"/>
     
-    <xsl:variable name="tableOfContent" select="//text:table-of-content[$tableOfContentsNum]" />
+    <xsl:variable name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]" />
     
     <xsl:choose>
       <xsl:when test="$tableOfContentsNum > 0 and $isTocStyle != 'true'">
@@ -298,7 +301,7 @@
   </xsl:template>
   
   <xsl:template name="InsertTOCBookmark">
-    <xsl:param name="tableOfContentsNum" select="count(//text:table-of-content)" />
+    <xsl:param name="tableOfContentsNum" select="$tocCount" />
     <xsl:param name="bookmarkType" />
     
     
@@ -308,7 +311,7 @@
         <xsl:variable name="bookmarkId">
           <xsl:call-template name="CalculateBookmarkId">
             <xsl:with-param name="counter" select="1"/>
-            <xsl:with-param name="tableOfContent" select="//text:table-of-content[$tableOfContentsNum]" />
+            <xsl:with-param name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]" />
           </xsl:call-template>
         </xsl:variable>
         
