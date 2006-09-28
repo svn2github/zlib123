@@ -1312,73 +1312,110 @@
 
     <!--borders-->
     <xsl:choose>
-
+      
+      <!-- borders are defined in current style -->
       <xsl:when
-        test="not($styleGraphicProperties/@fo:border) or $styleGraphicProperties/@fo:border = 'none'">
-        <xsl:attribute name="stroked">f</xsl:attribute>
+        test="$styleGraphicProperties/@fo:border">
+        <xsl:choose>
+          
+          <!-- no border in current style -->
+          <xsl:when test="$styleGraphicProperties/@fo:border = 'none' ">
+            <xsl:attribute name="stroked">f</xsl:attribute>
+          </xsl:when>
+          
+        <xsl:otherwise>
+        <xsl:call-template name="FoBorder">
+          <xsl:with-param name="graphicProperties" select="$styleGraphicProperties"/>
+        </xsl:call-template>
+        </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
-
+      
+      <!-- borders are defined in parent style -->
+      <xsl:when
+        test="$parentStyleGraphicProperties/@fo:border">
+        <xsl:choose>
+          
+          <!-- no border in parent style -->
+          <xsl:when test="$parentStyleGraphicProperties/@fo:border = 'none' ">
+            <xsl:attribute name="stroked">f</xsl:attribute>
+          </xsl:when>
+          
+          <xsl:otherwise>
+            <xsl:call-template name="FoBorder">
+              <xsl:with-param name="graphicProperties" select="$parentStyleGraphicProperties"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
       <!--default scenario-->
       <xsl:otherwise>
-        <xsl:variable name="strokeColor"
-          select="substring-after($styleGraphicProperties/@fo:border,'#')"/>
-
-        <xsl:variable name="strokeWeight">
-          <xsl:call-template name="point-measure">
-            <xsl:with-param name="length"
-              select="substring-before($styleGraphicProperties/@fo:border,' ')"/>
-          </xsl:call-template>
-        </xsl:variable>
-
-        <xsl:if test="$strokeColor != '' ">
-          <xsl:attribute name="strokecolor">
-            <xsl:value-of select="concat('#', $strokeColor)"/>
-          </xsl:attribute>
-        </xsl:if>
-
-        <xsl:if test="$strokeWeight != '' ">
-          <xsl:attribute name="strokeweight">
-            <xsl:value-of select="concat($strokeWeight,'pt')"/>
-          </xsl:attribute>
-        </xsl:if>
-
-        <!--  line styles -->
-        <xsl:if
-          test="substring-before(substring-after($styleGraphicProperties/@fo:border,' ' ),' ' ) != 'solid' ">
-          <v:stroke>
-            <xsl:attribute name="linestyle">
-              <xsl:choose>
-                <xsl:when test="$styleGraphicProperties/@style:border-line-width">
-
-                  <xsl:variable name="innerLineWidth">
-                    <xsl:call-template name="point-measure">
-                      <xsl:with-param name="length"
-                        select="substring-before($styleGraphicProperties/@style:border-line-width,' ' )"
-                      />
-                    </xsl:call-template>
-                  </xsl:variable>
-
-                  <xsl:variable name="outerLineWidth">
-                    <xsl:call-template name="point-measure">
-                      <xsl:with-param name="length"
-                        select="substring-after(substring-after($styleGraphicProperties/@style:border-line-width,' ' ),' ' )"
-                      />
-                    </xsl:call-template>
-                  </xsl:variable>
-
-                  <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
-                  <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
-                  <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
-
-                </xsl:when>
-              </xsl:choose>
-            </xsl:attribute>
-          </v:stroke>
-        </xsl:if>
+        <xsl:attribute name="stroked">f</xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
-
+    <xsl:text></xsl:text>
   </xsl:template>
+  
+    <!-- border template -->
+    
+    <xsl:template name="FoBorder">
+      <xsl:param name="graphicProperties"/>
+      <xsl:variable name="strokeColor" select="substring-after($graphicProperties/@fo:border,'#')"/>
+      <xsl:variable name="strokeWeight">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length"
+            select="substring-before($graphicProperties/@fo:border,' ')"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:if test="$strokeColor != '' ">
+        <xsl:attribute name="strokecolor">
+          <xsl:value-of select="concat('#', $strokeColor)"/>
+        </xsl:attribute>
+      </xsl:if>
+      
+      <xsl:if test="$strokeWeight != '' ">
+        <xsl:attribute name="strokeweight">
+          <xsl:value-of select="concat($strokeWeight,'pt')"/>
+        </xsl:attribute>
+      </xsl:if>
+      
+      <!--  line styles -->
+      <xsl:if
+        test="substring-before(substring-after($graphicProperties/@fo:border,' ' ),' ' ) != 'solid' ">
+        <v:stroke>
+          <xsl:attribute name="linestyle">
+            <xsl:choose>
+              <xsl:when test="$graphicProperties/@style:border-line-width">
+                
+                <xsl:variable name="innerLineWidth">
+                  <xsl:call-template name="point-measure">
+                    <xsl:with-param name="length"
+                      select="substring-before($graphicProperties/@style:border-line-width,' ' )"
+                    />
+                  </xsl:call-template>
+                </xsl:variable>
+                
+                <xsl:variable name="outerLineWidth">
+                  <xsl:call-template name="point-measure">
+                    <xsl:with-param name="length"
+                      select="substring-after(substring-after($graphicProperties/@style:border-line-width,' ' ),' ' )"
+                    />
+                  </xsl:call-template>
+                </xsl:variable>
+                
+                <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
+                <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
+                <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
+                
+              </xsl:when>
+            </xsl:choose>
+          </xsl:attribute>
+        </v:stroke>
+      </xsl:if>
+
+    </xsl:template>
 
   <xsl:template name="InsertShapeTransparency">
     <xsl:param name="styleGraphicProperties"/>
@@ -1445,7 +1482,7 @@
 
     <xsl:call-template name="InsertShapeBorders">
       <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-      <xsl:with-param name="parentStyleGraphicProperties" select="$styleGraphicProperties"/>
+      <xsl:with-param name="parentStyleGraphicProperties" select="$parentStyleGraphicProperties"/>
     </xsl:call-template>
 
     <xsl:call-template name="InsertShapeTransparency">
