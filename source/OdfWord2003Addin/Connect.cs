@@ -235,9 +235,9 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                             // open the document
                             object readOnly = true;
                             object isVisible = true;
-                            object addToRecentFiles = false;
+                            object Format = MSword.WdOpenFormat.wdOpenFormatXML;
                             object missing = Type.Missing;
-                            Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
+                            Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
 
                             if (form.HasLostElements)
                             {
@@ -245,7 +245,6 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                                 InfoBox infoBox = new InfoBox("FeedbackLabel", elements, labelsResourceManager);
                                 infoBox.ShowDialog();
                             }
-
                             // and activate it
                             doc.Activate();
                         }
