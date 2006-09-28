@@ -1194,6 +1194,7 @@
         <xsl:call-template name="ComputePageMargins"/>
       </xsl:otherwise>
     </xsl:choose>
+   
     <!-- page borders -->
     <xsl:choose>
       <xsl:when test="@fo:border and @fo:border != 'none' ">
@@ -1219,6 +1220,21 @@
         </w:pgBorders>
       </xsl:when>
       <xsl:otherwise/>
+    </xsl:choose>
+    <!-- style of page number -->
+    <xsl:choose>
+      <xsl:when test="@style:num-format='i'">        
+        <w:pgNumType w:fmt="lowerRoman"/>
+      </xsl:when>
+      <xsl:when test="@style:num-format='I'">
+        <w:pgNumType w:fmt="upperRoman"/>  
+      </xsl:when>
+      <xsl:when test="@style:num-format='a'">
+        <w:pgNumType w:fmt="lowerLetter"/>      
+      </xsl:when>
+      <xsl:when test="@style:num-format='A'">    
+        <w:pgNumType w:fmt="upperLetter"/>      
+      </xsl:when>
     </xsl:choose>
     <!-- page columns -->
     <xsl:apply-templates select="style:columns" mode="columns"/>

@@ -770,7 +770,7 @@
           <xsl:call-template name="InsertIllustrationInPrefs" />
         </xsl:when>
         <xsl:when test="ancestor::text:alphabetical-index">
-          <xsl:call-template name="insertAlphabeticalPrefs"/>
+        <xsl:call-template name="insertAlphabeticalPrefs"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="InsertIndexFiguresPrefs" />
@@ -790,7 +790,7 @@
     </w:instrText>
   </xsl:template>
   
-  <xsl:template name="insertAlphabeticalPrefs">
+ <xsl:template name="insertAlphabeticalPrefs">
     <w:instrText xml:space="preserve">
       <xsl:text>INDEX \e "" \c "</xsl:text>
       <xsl:choose>
@@ -1798,14 +1798,21 @@
         <w:noProof/>
       </w:rPr>
       <w:t>
-        <xsl:for-each select="child::node()[position() &lt; last()]">
-          <xsl:value-of select="."/>
-        </xsl:for-each>
+       <xsl:choose>
+          <xsl:when test="child::node()[position() &lt; last()]">
+            <xsl:for-each select="child::node()[position() &lt; last()]">    
+              <xsl:value-of select="."/>
+            </xsl:for-each>    
+       </xsl:when>
+       <xsl:otherwise>
+            <xsl:value-of select="."/>
+       </xsl:otherwise>
+       </xsl:choose>
       </w:t>
     </w:r>
 
     <!-- insert tab in between if there is any -->
-    <xsl:apply-templates select="text:tab|self::text:a/text:tab|text:span" mode="paragraph"/>
+    <xsl:apply-templates select="text:tab|self::text:a/text:tab|text:span|parent::text:p/text:tab" mode="paragraph"/>
 
     <!-- alphabetical index doesn't support page reference link -->
     <xsl:if test="not(ancestor::text:alphabetical-index)">
@@ -2015,7 +2022,7 @@
       <w:tab/>
     </w:r>
   </xsl:template>
-
+  
   <!-- line breaks -->
   <xsl:template match="text:line-break" mode="paragraph">
     <w:r>
