@@ -1274,9 +1274,18 @@
       <xsl:if
         test="@fo:margin != 'none' or @fo:margin-top != 'none' or @fo:padding != 'none' or @fo:padding-top != 'none' ">
         <xsl:attribute name="w:top">
-          <xsl:call-template name="GetPageMargin">
-            <xsl:with-param name="side">top</xsl:with-param>
-          </xsl:call-template>
+          <xsl:variable name="marginTop">
+            <xsl:call-template name="GetPageMargin">
+              <xsl:with-param name="side">top</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <!-- If there is a header, add header width + distance from text -->
+          <xsl:variable name="headerDistance">
+            <xsl:call-template name="ComputeHeaderFooterWidth">
+              <xsl:with-param name="side">top</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$marginTop + $headerDistance"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if
@@ -1290,9 +1299,18 @@
       <xsl:if
         test="@fo:margin != 'none' or @fo:margin-bottom != 'none' or @fo:padding != 'none' or @fo:padding-bottom != 'none' ">
         <xsl:attribute name="w:bottom">
-          <xsl:call-template name="GetPageMargin">
-            <xsl:with-param name="side">bottom</xsl:with-param>
-          </xsl:call-template>
+          <xsl:variable name="marginBottom">
+            <xsl:call-template name="GetPageMargin">
+              <xsl:with-param name="side">bottom</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <!-- If there is a footer, add footer width + distance from text -->
+          <xsl:variable name="footerDistance">
+            <xsl:call-template name="ComputeHeaderFooterWidth">
+              <xsl:with-param name="side">bottom</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$marginBottom + $footerDistance"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:if
@@ -1303,15 +1321,17 @@
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <!-- not in odt : header and footer distance from page -->
-      <xsl:if test="@fo:margin-top != 'none' ">
+      <!-- header and footer distance from page : get page margin -->
+      <xsl:if
+        test="@fo:margin != 'none' or @fo:margin-top != 'none' or @fo:padding != 'none' or @fo:padding-top != 'none' ">
         <xsl:attribute name="w:header">
           <xsl:call-template name="GetPageMargin">
             <xsl:with-param name="side">top</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="@fo:margin-bottom != 'none' ">
+      <xsl:if
+        test="@fo:margin != 'none' or @fo:margin-bottom != 'none' or @fo:padding != 'none' or @fo:padding-bottom != 'none' ">
         <xsl:attribute name="w:footer">
           <xsl:call-template name="GetPageMargin">
             <xsl:with-param name="side">bottom</xsl:with-param>
@@ -1362,6 +1382,56 @@
     </xsl:variable>
 
     <xsl:value-of select="$padding + $margin"/>
+  </xsl:template>
+
+  <!-- distance to be added to top and bottom margins. -->
+  <xsl:template name="ComputeHeaderFooterWidth">
+    <xsl:param name="side"/>
+
+    <xsl:choose>
+      <xsl:when test="$side = 'top' ">
+        <xsl:choose>
+          <xsl:when
+            test="following-sibling::style:header-style/style:header-footer-properties/@svg:height">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length"
+                select="following-sibling::style:header-style/style:header-footer-properties/@svg:height"
+              />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when
+            test="following-sibling::style:header-style/style:header-footer-properties/@fo:min-height">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length"
+                select="following-sibling::style:header-style/style:header-footer-properties/@fo:min-height"
+              />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when
+            test="following-sibling::style:footer-style/style:header-footer-properties/@svg:height">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length"
+                select="following-sibling::style:footer-style/style:header-footer-properties/@svg:height"
+              />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when
+            test="following-sibling::style:footer-style/style:header-footer-properties/@fo:min-height">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length"
+                select="following-sibling::style:footer-style/style:header-footer-properties/@fo:min-height"
+              />
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="style:columns" mode="columns">
