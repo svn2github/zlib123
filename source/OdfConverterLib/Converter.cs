@@ -146,7 +146,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
-                    writer = new ZipArchiveWriter(zipResolver);
+                    //writer = new ZipArchiveWriter(zipResolver);
+                    writer = new OoxCharactersPostProcessor(new ZipArchiveWriter(zipResolver));
                 }
                 else
                 {

@@ -33,6 +33,7 @@
     <Compile Include="EncryptedDocumentException.cs" />
     <Compile Include="NotAnOoxDocumentException.cs" />
     <Compile Include="OdfEventArgs.cs" />
+    <Compile Include="OoxCharactersPostProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZipResolver.cs" />
     <Compile Include="ResourceResolver.cs" />
