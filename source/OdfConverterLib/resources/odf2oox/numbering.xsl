@@ -778,20 +778,26 @@
         </xsl:call-template>
       </xsl:variable>
 
-      <!-- Override tabs if margin defined. -->
-      <!-- COMMENT : what are we testing ? -->
+      <!-- Override tabs of numbered elements ('num' tabs) if additional value (left margin or first line indent) defined. -->
       <xsl:if
-        test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())) and $addLeftIndent != 0">
+        test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())) and ($addLeftIndent != 0 or $firstLineIndent != 0)">
         <xsl:for-each select="document('content.xml')">
           <w:tabs>
-            <!-- COMMENT : why do we need this tab and the other below ? -->
+            <!-- clear tab calculated without additional value -->
             <w:tab w:val="clear">
               <xsl:attribute name="w:pos">
+                <!--If props/@style:display-levels is defined and greater than 1, the tabs may not be well converted.-->
                 <xsl:choose>
-                  <!-- COMMENT : what are we testing ? -->
-                  <xsl:when
-                    test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
-                    <xsl:value-of select="$spaceBeforeTwip + $minLabelDistanceTwip"/>
+                  <xsl:when test="$spaceBeforeTwip &lt; 0">
+                    <xsl:choose>
+                      <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                        <xsl:value-of
+                          select="$minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:choose>
@@ -807,12 +813,13 @@
                 </xsl:choose>
               </xsl:attribute>
             </w:tab>
+            <!-- replace with same distance + additional value -->
             <w:tab>
               <xsl:choose>
                 <xsl:when test="$firstLineIndent != 0">
                   <xsl:attribute name="w:val">num</xsl:attribute>
                   <xsl:attribute name="w:pos">
-                    <xsl:value-of select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent"
+                    <xsl:value-of select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent + $minLabelWidthTwip"
                     />
                   </xsl:attribute>
                 </xsl:when>
@@ -820,10 +827,18 @@
                   <xsl:attribute name="w:val">num</xsl:attribute>
                   <xsl:attribute name="w:pos">
                     <xsl:choose>
-                      <xsl:when
-                        test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/style:list-level-style-number/@text:display-levels">
-                        <xsl:value-of
-                          select="$addLeftIndent + $spaceBeforeTwip + $minLabelDistanceTwip"/>
+                      <xsl:when test="$spaceBeforeTwip &lt; 0">
+                        <xsl:choose>
+                          <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                            <xsl:value-of
+                              select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"
+                            />
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of
+                              select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
                       </xsl:when>
                       <xsl:otherwise>
                         <xsl:choose>
@@ -854,8 +869,7 @@
         <xsl:when
           test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node()))">
           <xsl:if test="$addLeftIndent != 0 or $addRightIndent !=  0 or $firstLineIndent != 0">
-            <w:ind 
-              w:left="{$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip}"
+            <w:ind w:left="{$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip}"
               w:right="{$addRightIndent}">
               <!-- first line and hanging indent -->
               <xsl:choose>
@@ -882,7 +896,7 @@
             </w:ind>
           </xsl:if>
         </xsl:when>
-        <!-- Othe list element -->
+        <!-- Other list element -->
         <xsl:otherwise>
           <w:ind>
             <xsl:attribute name="w:left">
