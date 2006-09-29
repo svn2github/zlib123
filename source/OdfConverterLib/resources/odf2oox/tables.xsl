@@ -82,15 +82,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-    <xsl:if test="$tableProp/@fo:margin-left != '' ">
-      <w:tblInd w:type="{$type}">
-        <xsl:attribute name="w:w">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="$tableProp/@fo:margin-left"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </w:tblInd>
-    </xsl:if>
+    <xsl:call-template name="InsertTableIndent"/>
 
     <!--table background-->
     <xsl:if test="$tableProp/@fo:background-color">
@@ -105,6 +97,55 @@
 
     <!-- Default layout algorithm in ODF is "fixed". -->
     <w:tblLayout w:type="fixed"/>
+  </xsl:template>
+
+  <!-- Insert the table indent if margin-left defined, or if cell-padding greater than 0. -->
+  <xsl:template name="InsertTableIndent">
+    <xsl:variable name="marginLeft">
+      <xsl:choose>
+        <xsl:when
+          test="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left != '' ">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length"
+              select="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left"
+            />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- get left padding from cells (ignore subcells padding) -->
+    <xsl:variable name="padding">
+      <xsl:choose>
+        <xsl:when
+          test="key('automatic-styles', descendant::table:table-cell[not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding and @fo:padding != 'none']">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length">
+              <xsl:value-of
+                select="key('automatic-styles', descendant::table:table-cell[not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when
+          test="key('automatic-styles', descendant::table:table-cell[not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding-left and @fo:padding-left != 'none']">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length">
+              <xsl:value-of
+                select="key('automatic-styles', descendant::table:table-cell[not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding-left"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <w:tblInd w:type="{$type}">
+      <xsl:attribute name="w:w">
+        <xsl:value-of select="$marginLeft + $padding"/>
+      </xsl:attribute>
+    </w:tblInd>
   </xsl:template>
 
   <!-- In case the table is a subtable. Unherits a few properties of table it belongs to. -->
@@ -745,7 +786,7 @@
   <xsl:template name="InsertCellMargins">
     <xsl:param name="cellProp"/>
     <xsl:choose>
-      <xsl:when test="not(table:table[@table:is-sub-table='true'])">
+      <xsl:when test="table:table[@table:is-sub-table='true']">
         <w:tcMar>
           <w:top w:w="0" w:type="{$type}"/>
           <w:left w:w="0" w:type="{$type}"/>
