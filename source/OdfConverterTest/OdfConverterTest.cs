@@ -159,7 +159,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             try
             {
                 tester.Proceed();
-                Console.WriteLine("Terminé...");
+                Console.WriteLine("Done.");
             }
             catch (Exception ex)
             {
@@ -243,6 +243,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                         nbNotValidatedAndOpened++;
                         break;
                     case NOT_VALIDATED_AND_NOT_OPENED:
+                        nbConverted++;
                         nbNotValidatedAndNotOpened++;
                         break;
                     default:
