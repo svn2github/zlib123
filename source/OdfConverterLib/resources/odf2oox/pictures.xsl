@@ -363,7 +363,7 @@
 
       <!--drawing element onclick hyperlink-->
       <xsl:if test="ancestor::draw:a">
-        <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/3/main"
+        <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
           r:id="{generate-id(ancestor::draw:a)}"/>
       </xsl:if>
     </wp:docPr>

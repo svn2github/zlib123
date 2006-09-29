@@ -157,8 +157,29 @@
                 xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                 Id="{generate-id(ancestor::draw:a)}"
                 Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-                TargetMode="External" 
-                Target="{ancestor::draw:a/@xlink:href}"/>
+                TargetMode="External">
+              <xsl:attribute name="Target">
+                <xsl:choose>
+
+<!-- converting relative path -->
+                <xsl:when test="starts-with(ancestor::draw:a/@xlink:href,'../')">
+                <xsl:call-template name="HandlingSpaces">
+                <xsl:with-param name="path">
+                  <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'../')"/>
+                </xsl:with-param>
+                </xsl:call-template>
+                </xsl:when>
+
+                <xsl:otherwise>
+                  <xsl:call-template name="HandlingSpaces">
+                    <xsl:with-param name="path">
+                      <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:otherwise>
+                </xsl:choose>
+                </xsl:attribute>
+                </Relationship>
             </xsl:if>
           </xsl:when>
           <xsl:otherwise>
@@ -192,7 +213,27 @@
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
-
+  
+  <!--handling spaces in paths-->
+  
+  <xsl:template name="HandlingSpaces">
+    <xsl:param name="path"/>
+    <xsl:choose>
+    <xsl:when test="contains($path,' ')">
+      <xsl:variable name="subPath">
+        <xsl:call-template name="HandlingSpaces">
+          <xsl:with-param name="path" select="substring-after($path,' ')"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:value-of select="concat(substring-before($path,' '),'%20',$subPath)"/>
+    </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$path"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+ 
+ 
   <!-- Headers / footers relationships -->
   <xsl:template name="InsertHeaderFooterRelationships">
     <xsl:for-each
