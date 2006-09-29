@@ -9,7 +9,7 @@ We will provide stable nightly builds. You can install and test them at your own
 Software Requirements
 --------------------------------
 To test the add-in, you will need the following:
-* Word 2007 beta 2
+* Word 2007 beta 2 Technical Refresh
 * .NET Framework 2.0
 Warning: if you install Word 2007 before the .NET Framework, you will need to update your Word installation after installing the  .NET Framework, by running the following these steps below.
 * Open "Add or remove Programs" from the Control Panel
