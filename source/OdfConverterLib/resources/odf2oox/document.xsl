@@ -1096,12 +1096,31 @@
     <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
     <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
 
+    <!--relative width and hight-->
     <xsl:if test="$relWidth">
       <xsl:value-of select="concat('mso-width-percent:',$relWidth,'0;')"/>
     </xsl:if>
     <xsl:if test="$relHeight">
       <xsl:value-of select="concat('mso-height-percent:',$relHeight,'0;')"/>
     </xsl:if>
+    
+    <xsl:variable name="relativeTo">
+      <xsl:choose>
+        <xsl:when test="parent::draw:frame/@text:anchor-type = 'page'">
+            <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="parent::draw:frame/@text:anchor-type = 'paragraph'">
+          <xsl:text>margin</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>margin</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:value-of select="concat('mso-width-relative:',$relativeTo,';')"/>
+    <xsl:value-of select="concat('mso-height-relative:',$relativeTo,';')"/>
+    
   </xsl:template>
 
   <xsl:template name="InsertShapeZindex">
