@@ -267,7 +267,7 @@
   <!--checks if element has style used to generate table of contents in document  TODO bookmarks for index marks -->
   <xsl:template name="IsTOCBookmark">
     <xsl:param name="styleName" />
-    <xsl:param name="tableOfContentsNum" select="$tocCount"/>
+    <xsl:param name="tableOfContentsNum" select="count(key('toc',''))"/>
     <xsl:param name="isTocStyle"/>
     
     <xsl:variable name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]" />
@@ -301,7 +301,7 @@
   </xsl:template>
   
   <xsl:template name="InsertTOCBookmark">
-    <xsl:param name="tableOfContentsNum" select="$tocCount" />
+    <xsl:param name="tableOfContentsNum" select="count(key('toc',''))" />
     <xsl:param name="bookmarkType" />
     
     
@@ -816,43 +816,46 @@
     </xsl:template>
   
   <xsl:template name="InsertTocPrefs">
+    <xsl:variable name="tocSource" select="ancestor::text:table-of-content/text:table-of-content-source" />
+    
     <w:instrText>
       <xsl:text>TOC \o "1-</xsl:text>
       
+      <!-- include elements with outline styles up to selected level  -->
       <xsl:choose>
         <xsl:when
-          test="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level=10">
+          test="$tocSource/@text:outline-level=10">
           <xsl:text>9"</xsl:text>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of
-            select="parent::text:index-body/preceding-sibling::text:table-of-content-source/@text:outline-level"/>
+            select="$tocSource/@text:outline-level"/>
           <xsl:text>"</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
       
+      <!--include index marks-->
       <xsl:if
-        test="not(parent::text:index-body/preceding-sibling::text:table-of-content-source[@text:use-index-marks = 'false'])">
+        test="not($tocSource[@text:use-index-marks = 'false'])">
         <xsl:text>\u  </xsl:text>
       </xsl:if>
+      
+      <!--use hyperlinks -->
       <xsl:if test="text:a">
         <xsl:text> \h </xsl:text>
       </xsl:if>
       
-      <xsl:if test="//text:table-of-content/text:table-of-content-source/text:index-source-styles">
+     <!-- include elements with additional styles-->
+      <xsl:if test="$tocSource/text:index-source-styles">
         <xsl:text> \t "</xsl:text>
         <xsl:for-each
-          select="//text:table-of-content/text:table-of-content-source/text:index-source-styles">
+          select="$tocSource/text:index-source-styles">
           <xsl:variable name="additionalStyleName" select="./text:index-source-style/@text:style-name"/>
-          <xsl:variable name="mainStyle"
-            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Contents_20_1']"/>
-          
-          <xsl:value-of select="$mainStyle/@style:display-name"/>
+          <xsl:value-of select="$additionalStyleName"/>
           <xsl:text>; </xsl:text>
           <xsl:value-of select="@text:outline-level"/>
           <xsl:text>"</xsl:text>
-          
-        </xsl:for-each>
+       </xsl:for-each>
       </xsl:if>
     </w:instrText>
   </xsl:template>
