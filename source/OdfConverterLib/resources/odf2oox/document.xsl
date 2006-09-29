@@ -1038,27 +1038,19 @@
 
         <v:shape type="#_x0000_t202">
 
-          <xsl:variable name="styleGraphicProperties"
-            select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties"/>
-
-          <xsl:variable name="parentStyleName">
-            <xsl:value-of
-              select="key('automatic-styles', parent::draw:frame/@draw:style-name)/@style:parent-style-name"
-            />
-          </xsl:variable>
-          <xsl:variable name="parentStyleGraphicProperties"
-            select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties"/>
-
+          <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name" />
+          <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)" />
+          <xsl:variable name="officeStyle" select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+          
+          <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle" />
+          
           <xsl:call-template name="InsertShapeProperties">
-            <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-            <xsl:with-param name="parentStyleGraphicProperties"
-              select="$parentStyleGraphicProperties"/>
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
           </xsl:call-template>
 
-          <xsl:call-template name="InsertTextBox">
-            <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-            <xsl:with-param name="parentStyleGraphicProperties"
-              select="$parentStyleGraphicProperties"/>
+          <!--insert text-box-->
+           <xsl:call-template name="InsertTextBox">
+                  <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
           </xsl:call-template>
 
         </v:shape>
@@ -1067,19 +1059,23 @@
   </xsl:template>
 
   <xsl:template name="InsertShapePositionProperties">
-    <xsl:param name="styleGraphicProperties"/>
-    <xsl:param name="frameWrap"/>
+    <xsl:param name="shapeStyle" />
 
+    <xsl:variable name="frameWrap">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">style:wrap</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable> 
+    
     <!-- absolute positioning for text-box -->
-
-    <xsl:if
-      test="(not($frameWrap) or $frameWrap != 'none') and not(parent::draw:frame/@text:anchor-type = 'as-char') ">
+     <xsl:if
+      test="not(parent::draw:frame/@text:anchor-type = 'as-char') ">
       <xsl:value-of select="'position:absolute;'"/>
     </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertShapeSize">
-    <xsl:param name="styleGraphicProperties"/>
 
     <!--  text-box width and height-->
     <xsl:variable name="frameW">
@@ -1109,19 +1105,33 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeZindex">
-    <xsl:param name="styleGraphicProperties"/>
-    <xsl:param name="frameWrap"/>
+    <xsl:param name="shapeStyle"/>
+    
+    <xsl:variable name="frameWrap">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">style:wrap</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable> 
+    
+    <xsl:variable name="runThrought">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">style:run-through</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable> 
+    
 
     <!--z-index that we need to convert properly openoffice wrap-throught property -->
     <xsl:variable name="zIndex">
       <xsl:choose>
         <xsl:when
           test="$frameWrap='run-through' 
-          and $styleGraphicProperties/@style:run-through='background'"
+          and $runThrought='background'"
           >-251658240</xsl:when>
         <xsl:when
           test="$frameWrap='run-through' 
-          and not($styleGraphicProperties/@style:run-through)"
+          and not($runThrought)"
           >251658240</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
@@ -1138,7 +1148,6 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeCoordinates">
-    <xsl:param name="styleGraphicProperties"/>
 
     <!-- text-box coordinates -->
     <xsl:variable name="posL">
@@ -1172,17 +1181,31 @@
   </xsl:template>
 
   <xsl:template name="InsertShapePositionRelative">
-    <xsl:param name="styleGraphicProperties"/>
-
+<xsl:param name="shapeStyle"></xsl:param>
+    
+    <xsl:variable name="horizontalRel">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">style:horizontal-rel</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="verticalRel">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">style:vertical-rel</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <!-- text-box relative position -->
     <xsl:choose>
-      <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-end-margin' "
+      <xsl:when test="$horizontalRel = 'page-end-margin' "
         >mso-position-horizontal-relative: right-margin-area;</xsl:when>
-      <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-start-margin' "
+      <xsl:when test="$horizontalRel = 'page-start-margin' "
         >mso-position-horizontal-relative: left-margin-area;</xsl:when>
-      <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page' "
+      <xsl:when test="$horizontalRel = 'page' "
         >mso-position-horizontal-relative: page;</xsl:when>
-      <xsl:when test="$styleGraphicProperties/@style:horizontal-rel = 'page-content' "
+      <xsl:when test="$horizontalRel = 'page-content' "
         >mso-position-horizontal-relative: column;</xsl:when>
       <xsl:otherwise>
         <xsl:choose>
@@ -1195,27 +1218,41 @@
     </xsl:choose>
 
     <xsl:choose>
-      <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page' "
+      <xsl:when test="$verticalRel = 'page' "
         >mso-position-vertical-relative: page;</xsl:when>
-      <xsl:when test="$styleGraphicProperties/@style:vertical-rel = 'page-content' "
+      <xsl:when test="$verticalRel = 'page-content' "
         >mso-position-vertical-relative: margin;</xsl:when>
     </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertShapePosition">
-    <xsl:param name="styleGraphicProperties"/>
+    <xsl:param name="shapeStyle" />
 
+    <xsl:variable name="horizontalPos">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="verticalPos">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">style:vertical-pos</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <!--horizontal position-->
     <!-- The same style defined in styles.xsl  TODO manage horizontal-rel-->
-    <xsl:if test="$styleGraphicProperties/@style:horizontal-pos">
+    <xsl:if test="$horizontalPos">
       <xsl:choose>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-pos = 'center'">
+        <xsl:when test="$horizontalPos = 'center'">
           <xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/>
         </xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-pos='left'">
+        <xsl:when test="$horizontalPos='left'">
           <xsl:value-of select="concat('mso-position-horizontal:', 'left',';')"/>
         </xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:horizontal-pos='right'">
+        <xsl:when test="$horizontalPos='right'">
           <xsl:value-of select="concat('mso-position-horizontal:', 'right',';')"/>
         </xsl:when>
         <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
@@ -1223,15 +1260,15 @@
     </xsl:if>
 
     <!-- vertical position-->
-    <xsl:if test="$styleGraphicProperties/@style:vertical-pos">
+    <xsl:if test="$verticalPos">
       <xsl:choose>
-        <xsl:when test="$styleGraphicProperties/@style:vertical-pos = 'middle'">
+        <xsl:when test="$verticalPos = 'middle'">
           <xsl:value-of select="concat('mso-position-vertical:', 'center',';')"/>
         </xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:vertical-pos='top'">
+        <xsl:when test="$verticalPos='top'">
           <xsl:value-of select="concat('mso-position-vertical:', 'top',';')"/>
         </xsl:when>
-        <xsl:when test="$styleGraphicProperties/@style:vertical-pos='bottom'">
+        <xsl:when test="$verticalPos='bottom'">
           <xsl:value-of select="concat('mso-position-vertical:', 'bottom',';')"/>
         </xsl:when>
       </xsl:choose>
@@ -1239,56 +1276,67 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeMargin">
-    <xsl:param name="styleGraphicProperties"/>
-    <xsl:param name="parentStyleGraphicProperties"/>
+    <xsl:param name="shapeStyle" />
 
     <!--text-box spacing/margins -->
     <xsl:variable name="marginL">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="$styleGraphicProperties/@fo:margin-left | $parentStyleGraphicProperties/@fo:margin-left"
-        />
+        <xsl:with-param name="length">
+          <xsl:call-template name="GetShapeGraphicProperties">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+            <xsl:with-param name="attribName">fo:margin-left</xsl:with-param>
+          </xsl:call-template>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="marginT">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="$styleGraphicProperties/@fo:margin-top | $parentStyleGraphicProperties/@fo:margin-top"
-        />
+        <xsl:with-param name="length" >
+          <xsl:call-template name="GetShapeGraphicProperties">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+            <xsl:with-param name="attribName">fo:margin-top</xsl:with-param>
+          </xsl:call-template>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="marginR">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="$styleGraphicProperties/@fo:margin-right | $parentStyleGraphicProperties/@fo:margin-right"
-        />
+        <xsl:with-param name="length" >
+          <xsl:call-template name="GetShapeGraphicProperties">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+            <xsl:with-param name="attribName">fo:margin-right</xsl:with-param>
+          </xsl:call-template>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="marginB">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="$styleGraphicProperties/@fo:margin-bottom | $parentStyleGraphicProperties/@fo:margin-bottom"
-        />
+        <xsl:with-param name="length">
+          <xsl:call-template name="GetShapeGraphicProperties">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+            <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
+          </xsl:call-template>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:if
-      test="$styleGraphicProperties/@fo:margin-left | $parentStyleGraphicProperties/@fo:margin-left">
+      test="$marginL">
       <xsl:value-of select="concat('mso-wrap-distance-left:', $marginL,'pt;')"/>
     </xsl:if>
     <xsl:if
-      test="$styleGraphicProperties/@fo:margin-top | $parentStyleGraphicProperties/@fo:margin-top">
+      test="$marginT">
       <xsl:value-of select="concat('mso-wrap-distance-top:', $marginT,'pt;')"/>
     </xsl:if>
     <xsl:if
-      test="$styleGraphicProperties/@fo:margin-right | $parentStyleGraphicProperties/@fo:margin-right">
+      test="$marginR">
       <xsl:value-of select="concat('mso-wrap-distance-right:', $marginR,'pt;')"/>
     </xsl:if>
     <xsl:if
-      test="$styleGraphicProperties/@fo:margin-bottom | $parentStyleGraphicProperties/@fo:margin-bottom">
+      test="$marginB">
       <xsl:value-of select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
     </xsl:if>
 
@@ -1296,139 +1344,133 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeFill">
-    <xsl:param name="styleGraphicProperties"/>
+    <xsl:param name="shapeStyle" />
 
-
+    <xsl:variable name="fillColor">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">fo:background-color</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <!--fill color-->
-    <xsl:if test="$styleGraphicProperties/@fo:background-color">
+    <xsl:if test="$fillColor">
       <xsl:attribute name="fillcolor">
-        <xsl:value-of select="$styleGraphicProperties/@fo:background-color"/>
+        <xsl:value-of select="$fillColor"/>
       </xsl:attribute>
     </xsl:if>
 
   </xsl:template>
 
   <xsl:template name="InsertShapeBorders">
-    <xsl:param name="styleGraphicProperties"/>
-    <xsl:param name="parentStyleGraphicProperties"/>
-
+  <xsl:param name="shapeStyle" />
+    
+    <xsl:variable name="border">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">fo:border</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
 
     <!--borders-->
     <xsl:choose>
-      
-      <!-- borders are defined in current style -->
-      <xsl:when
-        test="$styleGraphicProperties/@fo:border">
-        <xsl:choose>
-          
-          <!-- no border in current style -->
-          <xsl:when test="$styleGraphicProperties/@fo:border = 'none' ">
-            <xsl:attribute name="stroked">f</xsl:attribute>
-          </xsl:when>
-          
-        <xsl:otherwise>
-        <xsl:call-template name="FoBorder">
-          <xsl:with-param name="graphicProperties" select="$styleGraphicProperties"/>
-        </xsl:call-template>
-        </xsl:otherwise>
-        </xsl:choose>
+        <!-- no border in current style -->
+      <xsl:when test="$border='' or $border = 'none' ">
+        <xsl:attribute name="stroked">f</xsl:attribute>
       </xsl:when>
-      
-      <!-- borders are defined in parent style -->
-      <xsl:when
-        test="$parentStyleGraphicProperties/@fo:border">
-        <xsl:choose>
-          
-          <!-- no border in parent style -->
-          <xsl:when test="$parentStyleGraphicProperties/@fo:border = 'none' ">
-            <xsl:attribute name="stroked">f</xsl:attribute>
-          </xsl:when>
-          
-          <xsl:otherwise>
-            <xsl:call-template name="FoBorder">
-              <xsl:with-param name="graphicProperties" select="$parentStyleGraphicProperties"/>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="strokeColor" select="substring-after($border,'#')"/>
+        <xsl:variable name="strokeWeight">
+          <xsl:call-template name="point-measure">
+            <xsl:with-param name="length"
+              select="substring-before($border,' ')"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="styleBorderLine">
+          <xsl:call-template name="GetShapeGraphicProperties">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+            <xsl:with-param name="attribName">style:border-line-width</xsl:with-param>
+          </xsl:call-template>
+         </xsl:variable>
+        
+        <xsl:if test="$strokeColor != '' ">
+          <xsl:attribute name="strokecolor">
+            <xsl:value-of select="concat('#', $strokeColor)"/>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <xsl:if test="$strokeWeight != '' ">
+          <xsl:attribute name="strokeweight">
+            <xsl:value-of select="concat($strokeWeight,'pt')"/>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <!--  line styles -->
+        <xsl:if
+          test="substring-before(substring-after($border,' ' ),' ' ) != 'solid' ">
+          <v:stroke>
+            <xsl:attribute name="linestyle">
+              <xsl:choose>
+                <xsl:when test="$styleBorderLine">
+                  
+                  <xsl:variable name="innerLineWidth">
+                    <xsl:call-template name="point-measure">
+                      <xsl:with-param name="length"
+                        select="substring-before($styleBorderLine,' ' )"
+                      />
+                    </xsl:call-template>
+                  </xsl:variable>
+                  
+                  <xsl:variable name="outerLineWidth">
+                    <xsl:call-template name="point-measure">
+                      <xsl:with-param name="length"
+                        select="substring-after(substring-after($styleBorderLine,' ' ),' ' )"
+                      />
+                    </xsl:call-template>
+                  </xsl:variable>
+                  
+                  <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
+                  <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
+                  <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
+                  
+                </xsl:when>
+              </xsl:choose>
+            </xsl:attribute>
+          </v:stroke>
+        </xsl:if>
+      </xsl:otherwise>
       
       <!--default scenario-->
-      <xsl:otherwise>
+      <!--     <xsl:otherwise>
         <xsl:attribute name="stroked">f</xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:text></xsl:text>
+        </xsl:otherwise>
+       -->
+      </xsl:choose>
   </xsl:template>
-  
-    <!-- border template -->
-    
-    <xsl:template name="FoBorder">
-      <xsl:param name="graphicProperties"/>
-      <xsl:variable name="strokeColor" select="substring-after($graphicProperties/@fo:border,'#')"/>
-      <xsl:variable name="strokeWeight">
-        <xsl:call-template name="point-measure">
-          <xsl:with-param name="length"
-            select="substring-before($graphicProperties/@fo:border,' ')"/>
-        </xsl:call-template>
-      </xsl:variable>
-      
-      <xsl:if test="$strokeColor != '' ">
-        <xsl:attribute name="strokecolor">
-          <xsl:value-of select="concat('#', $strokeColor)"/>
-        </xsl:attribute>
-      </xsl:if>
-      
-      <xsl:if test="$strokeWeight != '' ">
-        <xsl:attribute name="strokeweight">
-          <xsl:value-of select="concat($strokeWeight,'pt')"/>
-        </xsl:attribute>
-      </xsl:if>
-      
-      <!--  line styles -->
-      <xsl:if
-        test="substring-before(substring-after($graphicProperties/@fo:border,' ' ),' ' ) != 'solid' ">
-        <v:stroke>
-          <xsl:attribute name="linestyle">
-            <xsl:choose>
-              <xsl:when test="$graphicProperties/@style:border-line-width">
-                
-                <xsl:variable name="innerLineWidth">
-                  <xsl:call-template name="point-measure">
-                    <xsl:with-param name="length"
-                      select="substring-before($graphicProperties/@style:border-line-width,' ' )"
-                    />
-                  </xsl:call-template>
-                </xsl:variable>
-                
-                <xsl:variable name="outerLineWidth">
-                  <xsl:call-template name="point-measure">
-                    <xsl:with-param name="length"
-                      select="substring-after(substring-after($graphicProperties/@style:border-line-width,' ' ),' ' )"
-                    />
-                  </xsl:call-template>
-                </xsl:variable>
-                
-                <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
-                <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
-                <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
-                
-              </xsl:when>
-            </xsl:choose>
-          </xsl:attribute>
-        </v:stroke>
-      </xsl:if>
-
-    </xsl:template>
-
+ 
   <xsl:template name="InsertShapeTransparency">
-    <xsl:param name="styleGraphicProperties"/>
+    <xsl:param name="shapeStyle" />
 
+    <xsl:variable name="backgroundColor">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">fo:background-color</xsl:with-param>
+      </xsl:call-template>
+     </xsl:variable>
+    
+    <xsl:variable name="backgroundTransparency">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">style:background-transparency</xsl:with-param>
+      </xsl:call-template>
+     </xsl:variable>
+    
     <!--fill  transparency-->
     <xsl:variable name="opacity"
-      select="100 - substring-before($styleGraphicProperties/@style:background-transparency,'%')"/>
+      select="100 - substring-before($backgroundTransparency,'%')"/>
 
     <xsl:if
-      test="$styleGraphicProperties/@style:background-transparency and $styleGraphicProperties/@fo:background-color != 'transparent' ">
+      test="$backgroundTransparency and $backgroundColor != 'transparent' ">
       <v:fill>
         <xsl:attribute name="opacity">
           <xsl:value-of select="concat($opacity,'%')"/>
@@ -1439,69 +1481,91 @@
 
   <!--converts oo frame style properties to shape properties for text-box-->
   <xsl:template name="InsertShapeProperties">
-    <xsl:param name="styleGraphicProperties"/>
-    <xsl:param name="parentStyleGraphicProperties"/>
-
-    <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap"/>
+    <xsl:param name="shapeStyle" />
 
     <xsl:attribute name="style">
 
       <xsl:call-template name="InsertShapePositionProperties">
-        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-        <xsl:with-param name="frameWrap" select="$frameWrap"/>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
       </xsl:call-template>
 
-      <xsl:call-template name="InsertShapeSize">
-        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-      </xsl:call-template>
-
+      <xsl:call-template name="InsertShapeSize" />
+         
       <xsl:call-template name="InsertShapeZindex">
-        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-        <xsl:with-param name="frameWrap" select="$frameWrap"/>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
       </xsl:call-template>
 
-      <xsl:call-template name="InsertShapeCoordinates">
-        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-      </xsl:call-template>
-
+      <xsl:call-template name="InsertShapeCoordinates" />
+    
       <xsl:call-template name="InsertShapePositionRelative">
-        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
       </xsl:call-template>
 
       <xsl:call-template name="InsertShapePosition">
-        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
       </xsl:call-template>
 
       <xsl:call-template name="InsertShapeMargin">
-        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-        <xsl:with-param name="parentStyleGraphicProperties" select="$styleGraphicProperties"/>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
       </xsl:call-template>
 
     </xsl:attribute>
 
     <xsl:call-template name="InsertShapeFill">
-      <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+      <xsl:with-param name="shapeStyle" select="$shapeStyle" />
     </xsl:call-template>
 
     <xsl:call-template name="InsertShapeBorders">
-      <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-      <xsl:with-param name="parentStyleGraphicProperties" select="$parentStyleGraphicProperties"/>
+      <xsl:with-param name="shapeStyle" select="$shapeStyle" />
     </xsl:call-template>
 
     <xsl:call-template name="InsertShapeTransparency">
-      <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+      <xsl:with-param name="shapeStyle" select="$shapeStyle" />
     </xsl:call-template>
 
   </xsl:template>
 
+  <!-- finds shape graphic property in styles -->
+  <xsl:template name="GetShapeGraphicProperties">
+    <xsl:param name="attribName"/>
+    <xsl:param name="shapeStyle" />
+    
+    <xsl:choose>
+      <xsl:when test="$shapeStyle/style:graphic-properties/attribute::node()[name() = $attribName] ">
+        <xsl:value-of select="$shapeStyle/style:graphic-properties/attribute::node()[name() = $attribName]"/>
+      </xsl:when>
+      
+      <xsl:when test="$shapeStyle/@style:parent-style-name">
+         <xsl:variable name="parentStyleName">
+          <xsl:value-of
+            select="$shapeStyle/@style:parent-style-name"  />
+        </xsl:variable>
+        
+        <xsl:variable name="parentStyle"
+          select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]"/>
+        
+        <xsl:call-template name="GetShapeGraphicProperties">
+          <xsl:with-param name="shapeStyle" select="$parentStyle" />
+          <xsl:with-param name="attribName" select="$attribName" />
+        </xsl:call-template>
+      </xsl:when>
+  <!--    <xsl:otherwise></xsl:otherwise>-->
+    </xsl:choose>
+    </xsl:template>
+  
   <xsl:template name="InsertShapeWrap">
-    <xsl:param name="styleGraphicProperties"/>
-
-    <xsl:variable name="frameWrap" select="$styleGraphicProperties/@style:wrap"/>
+    <xsl:param name="shapeStyle" />
+    
+    <xsl:variable name="frameWrap" >
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">style:wrap</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
 
     <!--frame wrap-->
     <xsl:choose>
-      <xsl:when test="parent::draw:frame/@text:anchor-type = 'as-char' or $frameWrap = 'none' ">
+      <xsl:when test="parent::draw:frame/@text:anchor-type = 'as-char' ">
         <w10:wrap type="none"/>
         <w10:anchorlock/>
       </xsl:when>
@@ -1511,7 +1575,7 @@
       <xsl:when test="$frameWrap = 'right' ">
         <w10:wrap type="square" side="right"/>
       </xsl:when>
-      <xsl:when test="not($frameWrap)">
+      <xsl:when test="$frameWrap = 'none'">
         <w10:wrap type="topAndBottom"/>
       </xsl:when>
       <xsl:when test="$frameWrap = 'parallel' ">
@@ -1525,8 +1589,7 @@
 
   <!--inserts text-box into shape element -->
   <xsl:template name="InsertTextBox">
-    <xsl:param name="styleGraphicProperties"/>
-    <xsl:param name="parentStyleGraphicProperties"/>
+    <xsl:param name="shapeStyle"/>
 
     <v:textbox>
       <xsl:attribute name="style">
@@ -1536,8 +1599,7 @@
       </xsl:attribute>
 
       <xsl:call-template name="InsertTextBoxInset">
-        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-        <xsl:with-param name="parentStyleGraphicProperties" select="$parentStyleGraphicProperties"/>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
       </xsl:call-template>
 
       <w:txbxContent>
@@ -1559,7 +1621,7 @@
       </w:txbxContent>
 
       <xsl:call-template name="InsertShapeWrap">
-        <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
       </xsl:call-template>
 
     </v:textbox>
@@ -1567,21 +1629,62 @@
 
   <!--converts oo frame padding into inset for text-box -->
   <xsl:template name="InsertTextBoxInset">
-    <xsl:param name="styleGraphicProperties"/>
-    <xsl:param name="parentStyleGraphicProperties"/>
+    <xsl:param name="shapeStyle" />
+    
+    <xsl:variable name="padding">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">fo:padding</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="paddingTop">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">fo:padding-top</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
 
+    <xsl:variable name="paddingRight">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">fo:padding-right</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="paddingLeft">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">fo:padding-left</xsl:with-param>
+      </xsl:call-template>    </xsl:variable>
+    
+    <xsl:variable name="paddingBottom">
+      <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+        <xsl:with-param name="attribName">fo:padding-bottom</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <xsl:attribute name="inset">
       <xsl:choose>
         <xsl:when
-          test="$styleGraphicProperties/@fo:padding or $styleGraphicProperties/@fo:padding-top">
+          test="$padding or $paddingTop">
           <xsl:call-template name="CalculateTextBoxPadding">
-            <xsl:with-param name="graphicProperties" select="$styleGraphicProperties"/>
+            <xsl:with-param name="padding" select="$padding" />
+            <xsl:with-param name="paddingTop" select="$paddingTop" />
+            <xsl:with-param name="paddingLeft" select="$paddingLeft" />
+            <xsl:with-param name="paddingRight" select="$paddingRight" />
+            <xsl:with-param name="paddingBottom" select="$paddingBottom" />
           </xsl:call-template>
         </xsl:when>
         <xsl:when
-          test="$parentStyleGraphicProperties/@fo:padding or $parentStyleGraphicProperties/@fo:padding-top">
+          test="$padding or $paddingTop">
           <xsl:call-template name="CalculateTextBoxPadding">
-            <xsl:with-param name="graphicProperties" select="$parentStyleGraphicProperties"/>
+            <xsl:with-param name="padding" select="$padding" />
+            <xsl:with-param name="paddingTop" select="$paddingTop" />
+            <xsl:with-param name="paddingLeft" select="$paddingLeft" />
+            <xsl:with-param name="paddingRight" select="$paddingRight" />
+            <xsl:with-param name="paddingBottom" select="$paddingBottom" />
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
@@ -1594,50 +1697,55 @@
 
   <!--calculates textbox inset attribute  -->
   <xsl:template name="CalculateTextBoxPadding">
-    <xsl:param name="graphicProperties"/>
+    <xsl:param name="padding" />
+    <xsl:param name="paddingBottom" />
+    <xsl:param name="paddingLeft" />
+    <xsl:param name="paddingRight" />
+    <xsl:param name="paddingTop" />
+    
 
     <xsl:choose>
-      <xsl:when test="not($graphicProperties)">0mm,0mm,0mm,0mm</xsl:when>
-      <xsl:when test="$graphicProperties/@fo:padding">
-        <xsl:variable name="padding">
+      <xsl:when test="not($padding)">0mm,0mm,0mm,0mm</xsl:when>
+      <xsl:when test="$padding">
+        <xsl:variable name="paddingVal">
           <xsl:call-template name="milimeter-measure">
-            <xsl:with-param name="length" select="$graphicProperties/@fo:padding"/>
+            <xsl:with-param name="length" select="$padding"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:value-of select="concat($padding,'mm,',$padding,'mm,',$padding,'mm,',$padding,'mm')"/>
+        <xsl:value-of select="concat($paddingVal,'mm,',$paddingVal,'mm,',$paddingVal,'mm,',$paddingVal,'mm')"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="padding-top">
-          <xsl:if test="$graphicProperties/@fo:padding-top">
+          <xsl:if test="$paddingTop">
             <xsl:call-template name="milimeter-measure">
               <xsl:with-param name="length"
-                select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:padding-top"
+                select="$paddingTop"
               />
             </xsl:call-template>
           </xsl:if>
         </xsl:variable>
         <xsl:variable name="padding-right">
-          <xsl:if test="$graphicProperties/@fo:padding-right">
+          <xsl:if test="$paddingRight">
             <xsl:call-template name="milimeter-measure">
-              <xsl:with-param name="length" select="$graphicProperties/@fo:padding-right"/>
+              <xsl:with-param name="length" select="$paddingRight"/>
             </xsl:call-template>
           </xsl:if>
         </xsl:variable>
         <xsl:variable name="padding-bottom">
-          <xsl:if test="$graphicProperties/@fo:padding-bottom">
+          <xsl:if test="$paddingBottom">
             <xsl:call-template name="milimeter-measure">
-              <xsl:with-param name="length" select="$graphicProperties/@fo:padding-bottom"/>
+              <xsl:with-param name="length" select="$paddingBottom"/>
             </xsl:call-template>
           </xsl:if>
         </xsl:variable>
         <xsl:variable name="padding-left">
-          <xsl:if test="$graphicProperties/@fo:padding-left">
+          <xsl:if test="$paddingLeft">
             <xsl:call-template name="milimeter-measure">
-              <xsl:with-param name="length" select="$graphicProperties/@fo:padding-left"/>
+              <xsl:with-param name="length" select="$paddingLeft"/>
             </xsl:call-template>
           </xsl:if>
         </xsl:variable>
-        <xsl:if test="$graphicProperties/@fo:padding-top">
+        <xsl:if test="$paddingTop">
           <xsl:value-of
             select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"
           />
@@ -1658,7 +1766,6 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- @TODO  positioning text-boxes -->
   <xsl:template match="draw:frame" mode="paragraph">
     <xsl:call-template name="InsertEmbeddedTextboxes"/>
   </xsl:template>

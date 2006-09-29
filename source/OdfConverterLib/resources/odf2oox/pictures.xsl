@@ -30,8 +30,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:v="urn:schemas-microsoft-com:vml" 
-  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
@@ -91,7 +90,7 @@
     </xsl:choose>
   </xsl:template>
 
-   <!--draw:object-ole element represents objects that only have a binary representation -->
+  <!--draw:object-ole element represents objects that only have a binary representation -->
   <xsl:template match="draw:frame[./draw:object-ole]" mode="paragraph">
     <xsl:variable name="imageId">
       <xsl:call-template name="GetPosition">
@@ -126,7 +125,7 @@
     </w:r>
   </xsl:template>
 
- <!-- conversion of external images -->
+  <!-- conversion of external images -->
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[not(starts-with(@xlink:href, 'Pictures/'))]]"
     mode="paragraph">
@@ -142,37 +141,30 @@
           <xsl:with-param name="node" select="."/>
         </xsl:call-template>
       </xsl:variable>
-   
+
       <xsl:for-each select="draw:image">
         <w:r>
           <w:pict>
             <v:shape id="{$imageId}" type="#_x0000_t75">
+
+              <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name" />
+              <xsl:variable name="automaticStyle" select="key('automatic-styles', parent::draw:frame/@draw:style-name)" />
+              <xsl:variable name="officeStyle" select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+             
+              <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle" />
               
-              <xsl:variable name="styleGraphicProperties"
-                select="key('automatic-styles', parent::draw:frame/@draw:style-name)/style:graphic-properties"/>
-               
-              <xsl:variable name="parentStyleName">
-                <xsl:value-of
-                  select="key('automatic-styles', parent::draw:frame/@draw:style-name)/@style:parent-style-name"
-                />
-                </xsl:variable>
-              
-              <xsl:variable name="parentStyleGraphicProperties"
-                select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]/style:graphic-properties"/>
-              
-             <!-- shape properties: size, z-index, coordinates, position, margin etc -->
+            <!-- shape properties: size, z-index, coordinates, position, margin etc -->
               <xsl:call-template name="InsertShapeProperties">
-                <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
-                <xsl:with-param name="parentStyleGraphicProperties"
-                  select="$parentStyleGraphicProperties"/>
+                <xsl:with-param name="shapeStyle" select="$shapeStyle" />
               </xsl:call-template>
-              
+            
               <v:imagedata r:id="{generate-id(.)}" o:title=""/>
+              
               <!-- wrapping -->
               <xsl:call-template name="InsertShapeWrap">
-                <xsl:with-param name="styleGraphicProperties" select="$styleGraphicProperties"/>
+                <xsl:with-param name="shapeStyle" select="$shapeStyle" />
               </xsl:call-template>
-              
+
             </v:shape>
           </w:pict>
         </w:r>
@@ -584,7 +576,7 @@
   <xsl:template name="InsertSquareWrap">
     <xsl:param name="style"/>
     <xsl:param name="wrap"/>
-    
+
     <wp:wrapSquare>
       <xsl:attribute name="wrapText">
         <xsl:choose>
@@ -649,12 +641,12 @@
       </xsl:attribute>
     </wp:wrapSquare>
   </xsl:template>
-  
+
   <!-- top-bottom wrap type for anchor image -->
   <xsl:template name="InsertTopBottomWrap">
     <xsl:param name="style"/>
     <xsl:param name="wrap"/>
-    
+
     <wp:wrapTopAndBottom>
       <!--bottom distance from text-->
       <xsl:attribute name="distB">
@@ -684,7 +676,7 @@
       </xsl:attribute>
     </wp:wrapTopAndBottom>
   </xsl:template>
-  
+
   <!--image border width and line style-->
   <xsl:template name="InsertImageBorders">
 
