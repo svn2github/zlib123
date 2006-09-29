@@ -589,12 +589,13 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 extension = ".odt";
             }
 
-            if (!File.Exists(this.output) && !(this.output != null && extension.Equals(Path.GetExtension(this.output))))
+            if (!File.Exists(this.output) && (this.output == null || !extension.Equals(Path.GetExtension(this.output))))
             {
                 string outputPath = this.output;
                 if (outputPath == null)
                 {
-                    outputPath = ".";
+                    // we take input path
+                    outputPath = Path.GetDirectoryName(this.input);
                 }
                 this.output = GenerateOutputName(outputPath, this.input, extension, false);
             }
