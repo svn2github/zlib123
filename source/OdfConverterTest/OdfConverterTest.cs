@@ -640,6 +640,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 if (this.writer != null)
                 {
                     this.writer.WriteLine(text);
+                    this.writer.Flush();
                 }
                 Console.WriteLine(text);
             }
@@ -669,6 +670,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                     if (this.writer != null)
                     {
                         this.writer.WriteLine(text);
+                        this.writer.Flush();
                     }
                     Console.WriteLine(text);
                 }

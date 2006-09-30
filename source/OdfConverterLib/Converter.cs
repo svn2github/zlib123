@@ -33,15 +33,16 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 using System.Reflection;
+using System.Collections;
 using CleverAge.OdfConverter.OdfZipUtils;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
-	/// <summary>
-	/// Core conversion methods 
-	/// </summary>
-	public class Converter
-	{
+    /// <summary>
+    /// Core conversion methods 
+    /// </summary>
+    public class Converter
+    {
         private const string RESOURCE_LOCATION = "resources";
         private const string ODFToOOX_LOCATION = "odf2oox";
         private const string ODFToOOX_XSL = "odf2oox.xsl";
@@ -49,11 +50,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private const string OOXToODF_LOCATION = "oox2odf";
         private const string OOXToODF_XSL = "oox2odf.xsl";
         private const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
-		private const string SOURCE_XML = "source.xml";
-			
-		public Converter()
-		{
-		}
+        private const string SOURCE_XML = "source.xml";
+
+        private string[] OOX_POST_PROCESSORS = { "OoxAutomaticStylesPostProcessor", "OoxCharactersPostProcessor" };
+        private string[] ODF_POST_PROCESSORS = { };
+
+        public Converter()
+        {
+        }
 
         public delegate void MessageListener(object sender, EventArgs e);
 
@@ -69,14 +73,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             feedbackMessageIntercepted += listener;
         }
-		
-		public void OdfToOox(string inputFile, string outputFile)
-		{
+
+        public void OdfToOox(string inputFile, string outputFile)
+        {
             DoOdfToOoxTransform(inputFile, outputFile, null);
-		}     
-		
-		public void OdfToOoxWithExternalResources(string inputFile, string outputFile, string resourceDir)
-		{
+        }
+
+        public void OdfToOoxWithExternalResources(string inputFile, string outputFile, string resourceDir)
+        {
             DoOdfToOoxTransform(inputFile, outputFile, resourceDir);
         }
 
@@ -102,11 +106,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void DoOdfToOoxTransform(string inputFile, string outputFile, string resourceDir)
         {
-        	// this throws an exception in the the following cases:
+            // this throws an exception in the the following cases:
             // - input file is not an ODF file
             // - input file is an encrypted ODF file
-        	CheckOdf(inputFile);
-        	
+            CheckOdf(inputFile);
+
             XmlUrlResolver resourceResolver;
             XPathDocument xslDoc;
             XmlReaderSettings xrs = new XmlReaderSettings();
@@ -114,18 +118,22 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             XmlWriter writer = null;
             ZipResolver zipResolver = null;
 
-            try {
+            try
+            {
 
                 // do not look for DTD
                 xrs.ProhibitDtd = true;
 
-                if (resourceDir == null) {
+                if (resourceDir == null)
+                {
                     resourceResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCE_LOCATION + "." + ODFToOOX_LOCATION);
                     xslDoc = new XPathDocument(((ResourceResolver)resourceResolver).GetInnerStream(ODFToOOX_XSL));
                     xrs.XmlResolver = resourceResolver;
                     source = XmlReader.Create(SOURCE_XML, xrs);
 
-                } else {
+                }
+                else
+                {
                     resourceResolver = new XmlUrlResolver();
                     xslDoc = new XPathDocument(resourceDir + "/" + ODFToOOX_XSL);
                     source = XmlReader.Create(resourceDir + "/" + SOURCE_XML, xrs);
@@ -147,13 +155,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     parameters.AddParam("outputFile", "", outputFile);
                     //writer = new ZipArchiveWriter(zipResolver);
-                    writer = new OoxCharactersPostProcessor(new ZipArchiveWriter(zipResolver));
+                    writer = GetOoxWriter(zipResolver);
                 }
                 else
                 {
                     writer = new XmlTextWriter(new StringWriter());
                 }
-                
+
                 // Apply the transformation
                 xslt.Transform(source, parameters, writer, zipResolver);
             }
@@ -219,7 +227,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
-                    writer = new ZipArchiveWriter(zipResolver);
+                    writer = GetOdfWriter(zipResolver);
                 }
                 else
                 {
@@ -257,8 +265,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
             }
         }
-        
-        private void CheckOdf(string fileName) {
+
+        private void CheckOdf(string fileName)
+        {
 
             // Test for encryption
             XmlReaderSettings settings = new XmlReaderSettings();
@@ -287,5 +296,28 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             // TODO: implement
         }
-	}
+
+        private XmlWriter GetOoxWriter(XmlResolver resolver)
+        {
+            return InstanciatePostProcessors(OOX_POST_PROCESSORS, new ZipArchiveWriter(resolver));
+        }
+
+        private XmlWriter GetOdfWriter(XmlResolver resolver)
+        {
+            return InstanciatePostProcessors(ODF_POST_PROCESSORS, new ZipArchiveWriter(resolver));
+        }
+
+        private XmlWriter InstanciatePostProcessors(string[] procNames, XmlWriter lastProcessor)
+        {
+            XmlWriter currentProc = lastProcessor;
+            for (int i = procNames.Length - 1; i >= 0; --i)
+            {
+                Type type = Type.GetType("CleverAge.OdfConverter.OdfConverterLib." + procNames[i]);
+                object[] parameters = { currentProc };
+                XmlWriter newProc = (XmlWriter)Activator.CreateInstance(type, parameters);
+                currentProc = newProc;
+            }
+            return currentProc;
+        }
+    }
 }

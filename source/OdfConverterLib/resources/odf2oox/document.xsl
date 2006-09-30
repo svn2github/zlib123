@@ -2025,11 +2025,6 @@
             <xsl:call-template name="GetStyleName"/>
           </xsl:with-param>
         </xsl:call-template>
-        <xsl:call-template name="OverrideToggleProperties">
-          <xsl:with-param name="styleName">
-            <xsl:call-template name="GetStyleName"/>
-          </xsl:with-param>
-        </xsl:call-template>
       </w:rPr>
     </xsl:if>
   </xsl:template>
@@ -2049,49 +2044,6 @@
       <xsl:when test="ancestor::text:a">
         <w:rStyle w:val="Hyperlink"/>
       </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- Overrides toggle properties -->
-  <xsl:template name="OverrideToggleProperties">
-    <xsl:param name="styleName"/>
-    <xsl:variable name="onlyToggle">
-      <xsl:choose>
-        <xsl:when test="self::text:list-level-style-number">false</xsl:when>
-        <xsl:otherwise>true</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    
-    <xsl:choose>
-      <xsl:when test="key('automatic-styles',$styleName)">
-        <!-- recursive call on parent style (not very clean) -->
-        <!-- TODO : postprocess direct formatting. Duplicate run properties are not valid anymore in Beta 2 TR -->
-        <!--xsl:if test="key('automatic-styles',$styleName)/@style:parent-style-name">
-          <xsl:call-template name="OverrideToggleProperties">
-          <xsl:with-param name="styleName"
-          select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
-          </xsl:call-template>
-          </xsl:if-->
-        <xsl:apply-templates select="key('automatic-styles',$styleName)[1]/style:text-properties"
-          mode="rPr">
-          <xsl:with-param name="onlyToggle" select="$onlyToggle"/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each select="document('styles.xml')">
-          <!-- recursive call on parent style (not very clean) -->
-          <!-- TODO : postprocess direct formatting. Duplicate run properties are not valid anymore in Beta 2 TR -->
-          <!--xsl:if test="key('styles',$styleName)/@style:parent-style-name">
-            <xsl:call-template name="OverrideToggleProperties">
-            <xsl:with-param name="styleName"
-            select="key('styles',$styleName)/@style:parent-style-name"/>
-            </xsl:call-template>
-            </xsl:if-->
-          <xsl:apply-templates select="key('styles',$styleName)[1]/style:text-properties" mode="rPr">
-            <xsl:with-param name="onlyToggle" select="$onlyToggle"/>
-          </xsl:apply-templates>
-        </xsl:for-each>
-      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -2179,11 +2131,6 @@
         <xsl:if test="$fo:color">
           <w:color w:val="{$fo:color}"/>
         </xsl:if>
-        <xsl:call-template name="OverrideToggleProperties">
-          <xsl:with-param name="styleName">
-            <xsl:call-template name="GetStyleName"/>
-          </xsl:with-param>
-        </xsl:call-template>
       </w:rPr>
       <xsl:apply-templates select="." mode="text"/>
     </w:r>

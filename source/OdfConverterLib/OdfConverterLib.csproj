@@ -30,9 +30,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractPostProcessor.cs" />
     <Compile Include="EncryptedDocumentException.cs" />
     <Compile Include="NotAnOoxDocumentException.cs" />
     <Compile Include="OdfEventArgs.cs" />
+    <Compile Include="OoxAutomaticStylesPostProcessor.cs" />
     <Compile Include="OoxCharactersPostProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZipResolver.cs" />

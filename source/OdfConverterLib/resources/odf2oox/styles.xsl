@@ -502,47 +502,41 @@
 
 
 
-  <!-- Text properties 
-         param onlyToggle : only process "toggle properties" when 'true' -->
+  <!-- Text properties -->
   <xsl:template match="style:text-properties" mode="rPr">
-    <xsl:param name="onlyToggle"/>
 
-    <xsl:if test="$onlyToggle != 'true' ">
-      <xsl:if test="@style:font-name">
-        <w:rFonts>
-          <xsl:if test="@style:font-name">
-            <xsl:variable name="fontName">
-              <xsl:call-template name="ComputeFontName">
-                <xsl:with-param name="fontName" select="@style:font-name"/>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:attribute name="w:ascii">
-              <xsl:value-of select="$fontName"/>
-            </xsl:attribute>
-            <xsl:attribute name="w:hAnsi">
-              <xsl:value-of select="$fontName"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@style:font-name-complex">
-            <xsl:attribute name="w:cs">
-              <xsl:call-template name="ComputeFontName">
-                <xsl:with-param name="fontName" select="@style:font-name-complex"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@style:font-name-asian">
-            <xsl:attribute name="w:eastAsia">
-              <xsl:call-template name="ComputeFontName">
-                <xsl:with-param name="fontName" select="@style:font-name-asian"/>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-        </w:rFonts>
-      </xsl:if>
+    <xsl:if test="@style:font-name">
+      <w:rFonts>
+        <xsl:if test="@style:font-name">
+          <xsl:variable name="fontName">
+            <xsl:call-template name="ComputeFontName">
+              <xsl:with-param name="fontName" select="@style:font-name"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:attribute name="w:ascii">
+            <xsl:value-of select="$fontName"/>
+          </xsl:attribute>
+          <xsl:attribute name="w:hAnsi">
+            <xsl:value-of select="$fontName"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="@style:font-name-complex">
+          <xsl:attribute name="w:cs">
+            <xsl:call-template name="ComputeFontName">
+              <xsl:with-param name="fontName" select="@style:font-name-complex"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="@style:font-name-asian">
+          <xsl:attribute name="w:eastAsia">
+            <xsl:call-template name="ComputeFontName">
+              <xsl:with-param name="fontName" select="@style:font-name-asian"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+      </w:rFonts>
     </xsl:if>
 
-
-    <!-- toggle properties -->
     <xsl:if test="@fo:font-weight">
       <xsl:choose>
         <xsl:when test="@fo:font-weight != 'normal'">
@@ -671,101 +665,92 @@
       </xsl:choose>
     </xsl:if>
 
-
-    <!-- non-toggle properties -->
-    <xsl:if test="$onlyToggle != 'true' ">
-
-      <xsl:if test="@fo:color">
-        <w:color>
-          <xsl:attribute name="w:val">
-            <xsl:value-of select="substring(@fo:color, 2, string-length(@fo:color) -1)"/>
-          </xsl:attribute>
-        </w:color>
-      </xsl:if>
-
-      <xsl:if test="@fo:letter-spacing">
-        <w:spacing>
-          <xsl:attribute name="w:val">
-            <xsl:choose>
-              <xsl:when test="@fo:letter-spacing='normal'">
-                <xsl:value-of select="0"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length" select="@fo:letter-spacing"/>
-                </xsl:call-template>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </w:spacing>
-      </xsl:if>
-
-      <xsl:if test="@style:text-scale">
-        <w:w>
-          <xsl:attribute name="w:val">
-            <xsl:variable name="scale"
-              select="substring(@style:text-scale, 1, string-length(@style:text-scale)-1)"/>
-            <xsl:choose>
-              <xsl:when test="number($scale) &lt; 600">
-                <xsl:value-of select="$scale"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:message terminate="no">feedback:Text scale greater than 600%</xsl:message> 600
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </w:w>
-      </xsl:if>
-
-      <xsl:if test="@style:letter-kerning = 'true' ">
-        <w:kern w:val="16"/>
-      </xsl:if>
-
-      <xsl:if test="@style:text-position">
-        <xsl:if
-          test="not(substring(@style:text-position, 1, 3) = 'sub') and not(substring(@style:text-position, 1, 5) = 'super') ">
-          <xsl:variable name="textPosition">
-            <xsl:value-of select="substring-before(substring-after(@style:text-position, ' '), '%')"
-            />
-          </xsl:variable>
-          <xsl:if test="$textPosition != 0">
-            <xsl:choose>
-              <xsl:when test="contains($textPosition, '-')">
-                <w:position
-                  w:val="{concat('-', round(number(substring-after($textPosition, '-')) div 10 * 2))}"
-                />
-              </xsl:when>
-              <xsl:otherwise>
-                <w:position w:val="{round(number($textPosition) div 10)}"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
-        </xsl:if>
-      </xsl:if>
-
-      <xsl:if test="@fo:font-size">
-        <xsl:variable name="sz">
-          <xsl:call-template name="computeSize">
-            <xsl:with-param name="node" select="current()"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:if test="number($sz)">
-          <w:sz w:val="{$sz}"/>
-        </xsl:if>
-      </xsl:if>
-
-      <xsl:if test="@fo:font-size-complex">
-        <w:szCs>
-          <xsl:attribute name="w:val">
-            <xsl:value-of select="number(substring-before(@fo:font-size-complex, 'pt')) * 2"/>
-          </xsl:attribute>
-        </w:szCs>
-      </xsl:if>
-
+    <xsl:if test="@fo:color">
+      <w:color>
+        <xsl:attribute name="w:val">
+          <xsl:value-of select="substring(@fo:color, 2, string-length(@fo:color) -1)"/>
+        </xsl:attribute>
+      </w:color>
     </xsl:if>
-    <!-- end non toggle properties -->
 
+    <xsl:if test="@fo:letter-spacing">
+      <w:spacing>
+        <xsl:attribute name="w:val">
+          <xsl:choose>
+            <xsl:when test="@fo:letter-spacing='normal'">
+              <xsl:value-of select="0"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:letter-spacing"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </w:spacing>
+    </xsl:if>
 
+    <xsl:if test="@style:text-scale">
+      <w:w>
+        <xsl:attribute name="w:val">
+          <xsl:variable name="scale"
+            select="substring(@style:text-scale, 1, string-length(@style:text-scale)-1)"/>
+          <xsl:choose>
+            <xsl:when test="number($scale) &lt; 600">
+              <xsl:value-of select="$scale"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:message terminate="no">feedback:Text scale greater than 600%</xsl:message> 600
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </w:w>
+    </xsl:if>
+
+    <xsl:if test="@style:letter-kerning = 'true' ">
+      <w:kern w:val="16"/>
+    </xsl:if>
+
+    <xsl:if test="@style:text-position">
+      <xsl:if
+        test="not(substring(@style:text-position, 1, 3) = 'sub') and not(substring(@style:text-position, 1, 5) = 'super') ">
+        <xsl:variable name="textPosition">
+          <xsl:value-of select="substring-before(substring-after(@style:text-position, ' '), '%')"
+          />
+        </xsl:variable>
+        <xsl:if test="$textPosition != 0">
+          <xsl:choose>
+            <xsl:when test="contains($textPosition, '-')">
+              <w:position
+                w:val="{concat('-', round(number(substring-after($textPosition, '-')) div 10 * 2))}"
+              />
+            </xsl:when>
+            <xsl:otherwise>
+              <w:position w:val="{round(number($textPosition) div 10)}"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+      </xsl:if>
+    </xsl:if>
+
+    <xsl:if test="@fo:font-size">
+      <xsl:variable name="sz">
+        <xsl:call-template name="computeSize">
+          <xsl:with-param name="node" select="current()"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="number($sz)">
+        <w:sz w:val="{$sz}"/>
+      </xsl:if>
+    </xsl:if>
+
+    <xsl:if test="@fo:font-size-complex">
+      <w:szCs>
+        <xsl:attribute name="w:val">
+          <xsl:value-of select="number(substring-before(@fo:font-size-complex, 'pt')) * 2"/>
+        </xsl:attribute>
+      </w:szCs>
+    </xsl:if>
 
     <xsl:if test="@fo:background-color">
       <w:highlight>
@@ -785,7 +770,6 @@
         </xsl:attribute>
       </w:highlight>
     </xsl:if>
-
 
     <xsl:if test="@style:text-underline-style">
       <xsl:choose>
@@ -867,37 +851,31 @@
       </xsl:choose>
     </xsl:if>
 
-
-    <!-- non-toggle properties -->
-    <xsl:if test="$onlyToggle != 'true' ">
-      <xsl:if test="@style:text-position">
-        <xsl:choose>
-          <xsl:when test="substring(@style:text-position, 1, 3) = 'sub' ">
-            <w:vertAlign w:val="subscript"/>
-          </xsl:when>
-          <xsl:when test="substring(@style:text-position, 1, 5) = 'super' ">
-            <w:vertAlign w:val="superscript"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:variable name="value">
-              <xsl:value-of select="substring-before(@style:text-position, '%')"/>
-            </xsl:variable>
-            <xsl:if test="$value != 0">
-              <xsl:choose>
-                <xsl:when test="contains($value,'-')">
-                  <w:vertAlign w:val="subscript"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <w:vertAlign w:val="superscript"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:if>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:if>
+    <xsl:if test="@style:text-position">
+      <xsl:choose>
+        <xsl:when test="substring(@style:text-position, 1, 3) = 'sub' ">
+          <w:vertAlign w:val="subscript"/>
+        </xsl:when>
+        <xsl:when test="substring(@style:text-position, 1, 5) = 'super' ">
+          <w:vertAlign w:val="superscript"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="value">
+            <xsl:value-of select="substring-before(@style:text-position, '%')"/>
+          </xsl:variable>
+          <xsl:if test="$value != 0">
+            <xsl:choose>
+              <xsl:when test="contains($value,'-')">
+                <w:vertAlign w:val="subscript"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <w:vertAlign w:val="superscript"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
-    <!-- end non toggle property -->
-
 
     <xsl:if test="@style:text-emphasize">
       <w:em>
@@ -912,70 +890,63 @@
         </xsl:attribute>
       </w:em>
     </xsl:if>
-    <!-- end of toggle properties -->
 
-
-    <!-- non-toggle properties -->
-    <xsl:if test="$onlyToggle != 'true' ">
-
-      <xsl:if
-        test="(@fo:language and @fo:country) or (@style:language-asian and @style:country-asian) or (@style:language-complex and @style:country-complex)">
-        <w:lang>
-          <xsl:if test="(@fo:language and @fo:country)">
-            <xsl:attribute name="w:val">
-              <xsl:value-of select="@fo:language"/>-<xsl:value-of select="@fo:country"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="(@style:language-asian and @style:country-asian)">
-            <xsl:attribute name="w:eastAsia">
-              <xsl:value-of select="@style:language-asian"/>-<xsl:value-of
-                select="@style:country-asian"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="(@style:language-complex and @style:country-complex)">
-            <xsl:attribute name="w:bidi">
-              <xsl:value-of select="@style:language-complex"/>-<xsl:value-of
-                select="@style:country-complex"/>
-            </xsl:attribute>
-          </xsl:if>
-        </w:lang>
-      </xsl:if>
-
-      <xsl:if test="@style:text-combine">
-        <xsl:choose>
-          <xsl:when test="@style:text-combine = 'lines'">
-            <w:eastAsianLayout>
-              <xsl:attribute name="w:id">
-                <xsl:number count="style:style"/>
-              </xsl:attribute>
-              <xsl:attribute name="w:combine">lines</xsl:attribute>
-              <xsl:choose>
-                <xsl:when
-                  test="@style:text-combine-start-char = '&lt;' and @style:text-combine-end-char = '&gt;' ">
-                  <xsl:attribute name="w:combineBrackets">angle</xsl:attribute>
-                </xsl:when>
-                <xsl:when
-                  test="@style:text-combine-start-char = '{' and @style:text-combine-end-char = '}'">
-                  <xsl:attribute name="w:combineBrackets">curly</xsl:attribute>
-                </xsl:when>
-                <xsl:when
-                  test="@style:text-combine-start-char = '(' and @style:text-combine-end-char = ')'">
-                  <xsl:attribute name="w:combineBrackets">round</xsl:attribute>
-                </xsl:when>
-                <xsl:when
-                  test="@style:text-combine-start-char = '[' and @style:text-combine-end-char = ']'">
-                  <xsl:attribute name="w:combineBrackets">square</xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:attribute name="w:combineBrackets">none</xsl:attribute>
-                </xsl:otherwise>
-              </xsl:choose>
-            </w:eastAsianLayout>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:if>
+    <xsl:if
+      test="(@fo:language and @fo:country) or (@style:language-asian and @style:country-asian) or (@style:language-complex and @style:country-complex)">
+      <w:lang>
+        <xsl:if test="(@fo:language and @fo:country)">
+          <xsl:attribute name="w:val">
+            <xsl:value-of select="@fo:language"/>-<xsl:value-of select="@fo:country"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="(@style:language-asian and @style:country-asian)">
+          <xsl:attribute name="w:eastAsia">
+            <xsl:value-of select="@style:language-asian"/>-<xsl:value-of
+              select="@style:country-asian"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="(@style:language-complex and @style:country-complex)">
+          <xsl:attribute name="w:bidi">
+            <xsl:value-of select="@style:language-complex"/>-<xsl:value-of
+              select="@style:country-complex"/>
+          </xsl:attribute>
+        </xsl:if>
+      </w:lang>
     </xsl:if>
-    <!-- end of non-toggle properties -->
+
+    <xsl:if test="@style:text-combine">
+      <xsl:choose>
+        <xsl:when test="@style:text-combine = 'lines'">
+          <w:eastAsianLayout>
+            <xsl:attribute name="w:id">
+              <xsl:number count="style:style"/>
+            </xsl:attribute>
+            <xsl:attribute name="w:combine">lines</xsl:attribute>
+            <xsl:choose>
+              <xsl:when
+                test="@style:text-combine-start-char = '&lt;' and @style:text-combine-end-char = '&gt;' ">
+                <xsl:attribute name="w:combineBrackets">angle</xsl:attribute>
+              </xsl:when>
+              <xsl:when
+                test="@style:text-combine-start-char = '{' and @style:text-combine-end-char = '}'">
+                <xsl:attribute name="w:combineBrackets">curly</xsl:attribute>
+              </xsl:when>
+              <xsl:when
+                test="@style:text-combine-start-char = '(' and @style:text-combine-end-char = ')'">
+                <xsl:attribute name="w:combineBrackets">round</xsl:attribute>
+              </xsl:when>
+              <xsl:when
+                test="@style:text-combine-start-char = '[' and @style:text-combine-end-char = ']'">
+                <xsl:attribute name="w:combineBrackets">square</xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="w:combineBrackets">none</xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+          </w:eastAsianLayout>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
 
 
@@ -986,13 +957,17 @@
     mode="styles">
     <w:style w:styleId="{concat(@text:note-class, 'Reference')}" w:type="character">
       <w:name w:val="note reference"/>
-      <w:basedOn w:val="{@text:citation-body-style-name}"/>
+      <xsl:if test="@text:citation-body-style-name">
+        <w:basedOn w:val="{@text:citation-body-style-name}"/>
+      </xsl:if>
       <w:semiHidden/>
       <w:unhideWhenUsed/>
     </w:style>
     <w:style w:styleId="{concat(@text:note-class, 'Text')}" w:type="paragraph">
       <w:name w:val="note text"/>
-      <w:basedOn w:val="{@text:citation-style-name}"/>
+      <xsl:if test="@text:citation-style-name">
+        <w:basedOn w:val="{@text:citation-style-name}"/>
+      </xsl:if>
       <!--w:link w:val="FootnoteTextChar"/-->
       <w:semiHidden/>
       <w:unhideWhenUsed/>

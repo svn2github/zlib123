@@ -84,6 +84,11 @@
         </pzip:entry>
       </xsl:if>
 
+      <!-- styles -->
+      <pzip:entry pzip:target="word/styles.xml">
+        <xsl:call-template name="styles"/>
+      </pzip:entry>
+
       <!-- main content -->
       <pzip:entry pzip:target="word/document.xml">
         <xsl:call-template name="document"/>
@@ -163,12 +168,6 @@
           </xsl:call-template>
         </pzip:entry>
       </xsl:for-each>
-
-
-      <!-- styles -->
-      <pzip:entry pzip:target="word/styles.xml">
-        <xsl:call-template name="styles"/>
-      </pzip:entry>
 
       <!-- fonts declaration -->
       <pzip:entry pzip:target="word/fontTable.xml">
