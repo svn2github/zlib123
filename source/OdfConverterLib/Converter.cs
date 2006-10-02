@@ -76,35 +76,55 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public void OdfToOox(string inputFile, string outputFile)
         {
-            DoOdfToOoxTransform(inputFile, outputFile, null);
+            DoOdfToOoxTransform(inputFile, outputFile, null, null);
+        }
+
+        public void OdfToOoxSkipPostProcess(string inputFile, string outputFile, string skipPostProcessor)
+        {
+            DoOdfToOoxTransform(inputFile, outputFile, null, skipPostProcessor);
         }
 
         public void OdfToOoxWithExternalResources(string inputFile, string outputFile, string resourceDir)
         {
-            DoOdfToOoxTransform(inputFile, outputFile, resourceDir);
+            DoOdfToOoxTransform(inputFile, outputFile, resourceDir, null);
+        }
+
+        public void OdfToOoxSkipPostProcessWithExternalResources(string inputFile, string outputFile, string resourceDir, string skipPostProcessor)
+        {
+            DoOdfToOoxTransform(inputFile, outputFile, resourceDir, skipPostProcessor);
         }
 
         public void OdfToOoxComputeSize(string inputFile)
         {
-            DoOdfToOoxTransform(inputFile, null, null);
+            DoOdfToOoxTransform(inputFile, null, null, null);
         }
 
         public void OoxToOdf(string inputFile, string outputFile)
         {
-            DoOoxToOdfTransform(inputFile, outputFile, null);
+            DoOoxToOdfTransform(inputFile, outputFile, null, null);
+        }
+
+        public void OoxToOdfSkipPostProcess(string inputFile, string outputFile, string skipPostProcessor)
+        {
+            DoOoxToOdfTransform(inputFile, outputFile, null, skipPostProcessor);
         }
 
         public void OoxToOdfWithExternalResources(string inputFile, string outputFile, string resourceDir)
         {
-            DoOoxToOdfTransform(inputFile, outputFile, resourceDir);
+            DoOoxToOdfTransform(inputFile, outputFile, resourceDir, null);
+        }
+
+        public void OoxToOdfSkipPostProcessWithExternalResources(string inputFile, string outputFile, string resourceDir, string skipPostProcessor)
+        {
+            DoOoxToOdfTransform(inputFile, outputFile, resourceDir, skipPostProcessor);
         }
 
         public void OoxToOdfComputeSize(string inputFile)
         {
-            DoOoxToOdfTransform(inputFile, null, null);
+            DoOoxToOdfTransform(inputFile, null, null, null);
         }
 
-        private void DoOdfToOoxTransform(string inputFile, string outputFile, string resourceDir)
+        private void DoOdfToOoxTransform(string inputFile, string outputFile, string resourceDir, string skipPostProcessor)
         {
             // this throws an exception in the the following cases:
             // - input file is not an ODF file
@@ -154,8 +174,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
-                    //writer = new ZipArchiveWriter(zipResolver);
-                    writer = GetOoxWriter(zipResolver);
+                    writer = GetOoxWriter(zipResolver, skipPostProcessor);
                 }
                 else
                 {
@@ -176,7 +195,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void DoOoxToOdfTransform(string inputFile, string outputFile, string resourceDir)
+        private void DoOoxToOdfTransform(string inputFile, string outputFile, string resourceDir, string skipPostProcessor)
         {
 
             // this throws an exception in the the following cases:
@@ -227,7 +246,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
-                    writer = GetOdfWriter(zipResolver);
+                    writer = GetOdfWriter(zipResolver, skipPostProcessor);
                 }
                 else
                 {
@@ -297,25 +316,28 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             // TODO: implement
         }
 
-        private XmlWriter GetOoxWriter(XmlResolver resolver)
+        private XmlWriter GetOoxWriter(XmlResolver resolver, string skipPostProcessor)
         {
-            return InstanciatePostProcessors(OOX_POST_PROCESSORS, new ZipArchiveWriter(resolver));
+            return InstanciatePostProcessors(OOX_POST_PROCESSORS, new ZipArchiveWriter(resolver), skipPostProcessor);
         }
 
-        private XmlWriter GetOdfWriter(XmlResolver resolver)
+        private XmlWriter GetOdfWriter(XmlResolver resolver, string skipPostProcessor)
         {
-            return InstanciatePostProcessors(ODF_POST_PROCESSORS, new ZipArchiveWriter(resolver));
+            return InstanciatePostProcessors(ODF_POST_PROCESSORS, new ZipArchiveWriter(resolver), skipPostProcessor);
         }
 
-        private XmlWriter InstanciatePostProcessors(string[] procNames, XmlWriter lastProcessor)
+        private XmlWriter InstanciatePostProcessors(string[] procNames, XmlWriter lastProcessor, string skipPostProcessor)
         {
             XmlWriter currentProc = lastProcessor;
             for (int i = procNames.Length - 1; i >= 0; --i)
             {
-                Type type = Type.GetType("CleverAge.OdfConverter.OdfConverterLib." + procNames[i]);
-                object[] parameters = { currentProc };
-                XmlWriter newProc = (XmlWriter)Activator.CreateInstance(type, parameters);
-                currentProc = newProc;
+                if (!procNames[i].Equals(skipPostProcessor))
+                {
+                    Type type = Type.GetType("CleverAge.OdfConverter.OdfConverterLib." + procNames[i]);
+                    object[] parameters = { currentProc };
+                    XmlWriter newProc = (XmlWriter)Activator.CreateInstance(type, parameters);
+                    currentProc = newProc;
+                }
             }
             return currentProc;
         }

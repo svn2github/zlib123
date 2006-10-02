@@ -111,6 +111,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         private string reportPath = null;                // file to save report
         private int reportLevel = Report.INFO_LEVEL;     // file to save report
         private string xslPath = null;                   // Path to an external stylesheet
+        private string skipPostProcessor = null;         // Post processing to skip (identified by its name)
 
         private bool isDirectTransform = true; // conversion from ODT to DOCX (default)
         private Report report = null;
@@ -308,22 +309,22 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 {
                     if (isDirectTransform)
                     {
-                        new Converter().OdfToOox(input, output);
+                        new Converter().OdfToOoxSkipPostProcess(input, output, this.skipPostProcessor);
                     }
                     else
                     {
-                        new Converter().OoxToOdf(input, output);
+                        new Converter().OoxToOdfSkipPostProcess(input, output, this.skipPostProcessor);
                     }
                 }
                 else
                 {
                     if (isDirectTransform)
                     {
-                        new Converter().OdfToOoxWithExternalResources(input, output, this.xslPath);
+                        new Converter().OdfToOoxSkipPostProcessWithExternalResources(input, output, this.xslPath, this.skipPostProcessor);
                     }
                     else
                     {
-                        new Converter().OoxToOdfWithExternalResources(input, output, this.xslPath);
+                        new Converter().OoxToOdfSkipPostProcessWithExternalResources(input, output, this.xslPath, this.skipPostProcessor);
                     }
                 }
                 TimeSpan duration = DateTime.Now - start;
@@ -503,6 +504,13 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                         break;
                     case "/BATCH-DOCX":
                         this.batchDocx = true;
+                        break;
+                    case "/SKIP":
+                        if (++i == args.Length)
+                        {
+                            throw new OdfCommandLineException("Post processing name missing");
+                        }
+                        this.skipPostProcessor = args[i];
                         break;
                     case "/REPORT":
                         if (++i == args.Length)
