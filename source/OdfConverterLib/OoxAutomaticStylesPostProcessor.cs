@@ -343,7 +343,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (this.currentParagraphStyleName != null && IsAutomaticStyle((Element)pStyles[this.currentParagraphStyleName]))
                 {
                     Element rPr = new Element("w", "rPr", NAMESPACE);
-                    AddRunStyleProperties(rPr, this.currentParagraphStyleName, true);
+                    AddRunStyleProperties(rPr, this.currentParagraphStyleName, false);
                     DoWriteRunProperties(rPr);
                     this.context.Pop();
                     this.context.Push("r-with-properties");
