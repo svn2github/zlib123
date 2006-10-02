@@ -1255,12 +1255,15 @@
             </xsl:call-template>
           </xsl:variable>
           <!-- If there is a header, add header width + distance from text -->
-          <xsl:variable name="headerDistance">
+          <xsl:variable name="headerMinHeight">
             <xsl:call-template name="ComputeHeaderFooterWidth">
               <xsl:with-param name="side">top</xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
-          <xsl:value-of select="$marginTop + $headerDistance"/>
+          <xsl:call-template name="max">
+            <xsl:with-param name="a" select="$marginTop"/>
+            <xsl:with-param name="b" select="$headerMinHeight"/>
+          </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
       <xsl:if
@@ -1280,12 +1283,15 @@
             </xsl:call-template>
           </xsl:variable>
           <!-- If there is a footer, add footer width + distance from text -->
-          <xsl:variable name="footerDistance">
+          <xsl:variable name="footerMinHeight">
             <xsl:call-template name="ComputeHeaderFooterWidth">
               <xsl:with-param name="side">bottom</xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
-          <xsl:value-of select="$marginBottom + $footerDistance"/>
+          <xsl:call-template name="max">
+            <xsl:with-param name="a" select="$marginBottom"/>
+            <xsl:with-param name="b" select="$footerMinHeight"/>
+          </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
       <xsl:if

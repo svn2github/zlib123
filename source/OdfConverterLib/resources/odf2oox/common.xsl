@@ -451,5 +451,17 @@
     </xsl:variable>
     <xsl:value-of select="$positionInGroup"/>
   </xsl:template>
+  
+  
+  <!-- Max function -->
+  <xsl:template name="max">
+    <xsl:param name="a"/>
+    <xsl:param name="b"/>
+    <xsl:choose>
+      <xsl:when test="$a = $b"><xsl:value-of select="$a"/></xsl:when>
+      <xsl:when test="$a &gt; $b"><xsl:value-of select="$a"/></xsl:when>
+      <xsl:otherwise><xsl:value-of select="$b"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
 </xsl:stylesheet>
