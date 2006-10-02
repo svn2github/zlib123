@@ -608,15 +608,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 string pStyleName = pStyle.GetAttributeValue("val", NAMESPACE);
                 if (pStyleName.Length > 0)
                 {
-                    Element style = (Element)this.pStyles[pStyleName];
-                    if (style != null)
-                    {
-                        AddParagraphProperties(pPr, style);
-                        AddRunStyleProperties(rPr, pStyleName, false);
-                        this.currentParagraphStyleName = pStyleName;
-                        // add style declaration
-                        AddStyleDeclaration(pPr, pStyleName, "pStyle");
-                    }
+                    AddParagraphStyleProperties(pPr, pStyleName);
+                    AddRunStyleProperties(rPr, pStyleName, false);
+                    this.currentParagraphStyleName = pStyleName;
+                    // add style declaration
+                    AddStyleDeclaration(pPr, pStyleName, "pStyle");
                 }
             }
             // add run properties
