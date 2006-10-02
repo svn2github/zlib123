@@ -266,7 +266,7 @@
 
   <xsl:template name="InsertBulletChar">
     <xsl:choose>
-      <xsl:when test="@text:bullet-char = '' "></xsl:when>
+      <xsl:when test="@text:bullet-char = '' "></xsl:when>
       <xsl:when test="@text:bullet-char = '' "></xsl:when>
       <xsl:when test="@text:bullet-char = '☑' "></xsl:when>
       <xsl:when test="@text:bullet-char = '•' ">•</xsl:when>
@@ -278,6 +278,7 @@
       <xsl:when test="@text:bullet-char = '➔' "></xsl:when>
       <xsl:when test="@text:bullet-char = '✗' "></xsl:when>
       <xsl:when test="@text:bullet-char = '–' ">–</xsl:when>
+      
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -329,7 +330,7 @@
           </xsl:call-template>
         </w:rPr>
       </xsl:when>
-      <xsl:when test="$char  = '' ">
+      <xsl:when test="$char  = ''  or $char ='' ">
         <w:rPr>
           <w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>
           <xsl:call-template name="GetBulletSize">
