@@ -397,7 +397,7 @@
   <!-- section detection and insertion for paragraph-->
   <xsl:template name="InsertParagraphSectionProperties">
     <!-- Section detection  : 3 cases -->
-    <xsl:if test="not(ancestor::table:table) and not(ancestor::draw:frame)">
+    <xsl:if test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::style:master-page)">
       <!-- Section detection  : 3 cases -->
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
       <xsl:variable name="followings"
