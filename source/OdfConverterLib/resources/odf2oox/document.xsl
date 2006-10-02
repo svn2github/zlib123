@@ -77,7 +77,7 @@
   <!-- The very first text element -->
   <xsl:variable name="first-elt" select="$elts[1]"/>
   <!-- table of content count -->
-  <xsl:variable name="tocCount" select="count(key('toc', ''))"/>
+  <xsl:variable name="tocCount" select="$body//text:table-of-content"/>
 
   <!-- main document -->
   <xsl:template name="document">
@@ -270,35 +270,41 @@
     <xsl:param name="tableOfContentsNum" select="count(key('toc',''))"/>
     <xsl:param name="isTocStyle"/>
     
-    <xsl:variable name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]" />
-    
     <xsl:choose>
-      <xsl:when test="$tableOfContentsNum > 0 and $isTocStyle != 'true'">
-        
-        <xsl:variable name="tocStyle">
-          <xsl:call-template name="IsTOCStyle">
-            <xsl:with-param name="sourceStyleNum"
-              select="count($tableOfContent/text:table-of-content-source/text:index-source-styles)"/>
-            <xsl:with-param name="styleName" select="$styleName"/>
-            <xsl:with-param name="tableOfContent" select="$tableOfContent" />
-          </xsl:call-template>
-        </xsl:variable>
-        
-        <xsl:call-template name="IsTOCBookmark">
-          <xsl:with-param name="tableOfContentsNum" select="$tableOfContentsNum - 1" />
-          <xsl:with-param name="styleName" select="$styleName"/>
-          <xsl:with-param name="isTocStyle" select="$tocStyle"/>
-        </xsl:call-template>
-      </xsl:when>
-      
-    <xsl:otherwise>
-      <xsl:choose>
-        <xsl:when test="$isTocStyle = 'true'">true</xsl:when>
-        <xsl:otherwise>false</xsl:otherwise>
-      </xsl:choose>
-   </xsl:otherwise>
-  </xsl:choose>
+      <xsl:when test="$tocCount &lt; 1">false</xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]" />
+        <xsl:choose>
+          <xsl:when test="$tableOfContentsNum > 0 and $isTocStyle != 'true'">
+            <xsl:variable name="tocStyle">
+              <xsl:call-template name="IsTOCStyle">
+                <xsl:with-param name="sourceStyleNum"
+                  select="count($tableOfContent/text:table-of-content-source/text:index-source-styles)"/>
+                <xsl:with-param name="styleName" select="$styleName"/>
+                <xsl:with-param name="tableOfContent" select="$tableOfContent" />
+              </xsl:call-template>
+            </xsl:variable>
+            
+            <xsl:call-template name="IsTOCBookmark">
+              <xsl:with-param name="tableOfContentsNum" select="$tableOfContentsNum - 1" />
+              <xsl:with-param name="styleName" select="$styleName"/>
+              <xsl:with-param name="isTocStyle" select="$tocStyle"/>
+            </xsl:call-template>
+          </xsl:when>
+          
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="$isTocStyle = 'true'">true</xsl:when>
+              <xsl:otherwise>false</xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
+
+  
   
   <xsl:template name="InsertTOCBookmark">
     <xsl:param name="tableOfContentsNum" select="count(key('toc',''))" />
@@ -428,6 +434,7 @@
               <xsl:when
                 test="$section-ends or ($ps and (generate-id($styles-after-section[1]) = generate-id($following-master-style[1])))"
                 >yes</xsl:when>
+              <xsl:when test="ancestor::text:section[1]">yes</xsl:when>
               <xsl:otherwise>no</xsl:otherwise>
             </xsl:choose>
           </xsl:variable>

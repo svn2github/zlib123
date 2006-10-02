@@ -261,6 +261,7 @@
                   <xsl:when
                     test="$sectionEnds or ($ps and (generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])))"
                     >yes</xsl:when>
+                  <xsl:when test="ancestor::text:section[1]">yes</xsl:when>
                   <xsl:otherwise>no</xsl:otherwise>
                 </xsl:choose>
               </xsl:variable>
