@@ -715,8 +715,7 @@
       <xsl:if
         test="not(substring(@style:text-position, 1, 3) = 'sub') and not(substring(@style:text-position, 1, 5) = 'super') ">
         <xsl:variable name="textPosition">
-          <xsl:value-of select="substring-before(substring-after(@style:text-position, ' '), '%')"
-          />
+          <xsl:value-of select="substring-before(substring-after(@style:text-position, ' '), '%')"/>
         </xsl:variable>
         <xsl:if test="$textPosition != 0">
           <xsl:choose>
@@ -1169,7 +1168,7 @@
         <xsl:call-template name="ComputePageMargins"/>
       </xsl:otherwise>
     </xsl:choose>
-   
+
     <!-- page borders -->
     <xsl:choose>
       <xsl:when test="@fo:border and @fo:border != 'none' ">
@@ -1198,17 +1197,17 @@
     </xsl:choose>
     <!-- style of page number -->
     <xsl:choose>
-      <xsl:when test="@style:num-format='i'">        
+      <xsl:when test="@style:num-format='i'">
         <w:pgNumType w:fmt="lowerRoman"/>
       </xsl:when>
       <xsl:when test="@style:num-format='I'">
-        <w:pgNumType w:fmt="upperRoman"/>  
+        <w:pgNumType w:fmt="upperRoman"/>
       </xsl:when>
       <xsl:when test="@style:num-format='a'">
-        <w:pgNumType w:fmt="lowerLetter"/>      
+        <w:pgNumType w:fmt="lowerLetter"/>
       </xsl:when>
-      <xsl:when test="@style:num-format='A'">    
-        <w:pgNumType w:fmt="upperLetter"/>      
+      <xsl:when test="@style:num-format='A'">
+        <w:pgNumType w:fmt="upperLetter"/>
       </xsl:when>
     </xsl:choose>
     <!-- page columns -->
@@ -1622,11 +1621,13 @@
       </xsl:call-template>
     </xsl:attribute>
 
-    <xsl:attribute name="w:space">
-      <xsl:call-template name="padding-val">
-        <xsl:with-param name="length" select="$padding"/>
-      </xsl:call-template>
-    </xsl:attribute>
+    <xsl:if test="$padding != '' ">
+      <xsl:attribute name="w:space">
+        <xsl:call-template name="padding-val">
+          <xsl:with-param name="length" select="$padding"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
 
     <xsl:attribute name="w:color">
       <xsl:value-of select="substring($borderStr, string-length($borderStr) -5, 6)"/>
