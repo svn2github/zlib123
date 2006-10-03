@@ -278,5 +278,25 @@
       </Relationship>
     </xsl:for-each>
   </xsl:template>
+  
+  <!-- Bullet-image relationships -->  
+ <xsl:template name="InsertBuletRelationships">
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <xsl:for-each select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image">
+        <xsl:variable name="ImageBulletName">
+          <xsl:value-of select="substring-after(@xlink:href, 'Pictures/')"/>
+        </xsl:variable>
+        <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+          <xsl:attribute name="Id">
+            <xsl:value-of select="generate-id(.)"/>
+          </xsl:attribute>
+          <xsl:attribute name="Target">
+            <xsl:value-of select="concat('media/', $ImageBulletName)"/>
+          </xsl:attribute>
+        </Relationship>        
+        <pzip:copy pzip:source="{@xlink:href}" pzip:target="word/media/{$ImageBulletName}"/>
+      </xsl:for-each>   
+    </Relationships>
+    </xsl:template> 
 
 </xsl:stylesheet>

@@ -30,9 +30,12 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  exclude-result-prefixes="office text style fo">
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:o="urn:schemas-microsoft-com:office:office" exclude-result-prefixes="office text style fo">
 
   <xsl:output method="xml" encoding="UTF-8"/>
 
@@ -46,7 +49,22 @@
 
   <!--generate numbering definitions: abstract numbering w:abstractNumbering and numbering instances w:num -->
   <xsl:template name="numbering">
-    <w:numbering>
+    <w:numbering xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:o12="http://schemas.microsoft.com/office/2004/7/core"
+      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+      xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
+      xmlns:v="urn:schemas-microsoft-com:vml"
+      xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+      xmlns:w10="urn:schemas-microsoft-com:office:word"
+      xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
+
+      <xsl:for-each
+        select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image">
+        <xsl:call-template name="numPicBullet">
+          <xsl:with-param name="numPicBulletId" select="position()"/>
+        </xsl:call-template>
+      </xsl:for-each>
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:outline-style"
         mode="numbering"/>
@@ -97,7 +115,7 @@
     <xsl:param name="offset" select="0"/>
     <w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list-style)+2+$offset}">
       <xsl:apply-templates
-        select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+        select="text:list-level-style-number|text:list-level-style-bullet|text:list-level-style-image|list-level-style-image"
         mode="numbering"/>
     </w:abstractNum>
   </xsl:template>
@@ -110,7 +128,9 @@
   </xsl:template>
 
   <!--bullet or numbered lists properties-->
-  <xsl:template match="text:list-level-style-bullet|text:list-level-style-number" mode="numbering">
+  <xsl:template
+    match="text:list-level-style-bullet|text:list-level-style-number|text:list-level-style-image"
+    mode="numbering">
 
     <!-- odf supports list level up to 10-->
     <xsl:if test="number(@text:level) &lt; 10">
@@ -124,6 +144,20 @@
               <xsl:call-template name="InsertBulletChar"/>
             </xsl:attribute>
           </w:lvlText>
+        </xsl:if>
+
+        <!-- image list -->
+        <xsl:if test="name()='text:list-level-style-image' ">
+          <w:start w:val="1"/>
+          <w:numFmt w:val="bullet"/>
+          <w:lvlText w:val=""/>
+          <w:lvlPicBulletId>
+            <xsl:attribute name="w:val">
+              <xsl:value-of
+                select="count(parent::node()/text:list-level-style-image)+count(parent::text:list-style/preceding-sibling::node()/text:list-level-style-image)"
+              />
+            </xsl:attribute>
+          </w:lvlPicBulletId>
         </xsl:if>
 
         <!--numbered list-->
@@ -159,6 +193,46 @@
 
   </xsl:template>
 
+  <!-- Picture numbering symbol -->
+  <xsl:template name="numPicBullet">
+    <xsl:param name="numPicBulletId"/>
+    <w:numPicBullet>
+      <xsl:attribute name="w:numPicBulletId">
+        <xsl:value-of select="$numPicBulletId"/>
+      </xsl:attribute>
+      <w:pict>
+        <v:shape id="_x0000_i1032" type="#_x0000_t75" o:bullet="t">
+          <xsl:variable name="fowidth">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="style:list-level-properties/@fo:width"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="foheight">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="style:list-level-properties/@fo:height"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:attribute name="style">
+            <xsl:value-of select="concat('width:', $fowidth, ';', 'height:', $fowidth)"/>
+          </xsl:attribute>
+          <v:imagedata>
+            <xsl:attribute name="r:id">
+              <xsl:value-of select="generate-id(.)"/>
+            </xsl:attribute>
+            <xsl:attribute name="o:title">
+              <xsl:value-of
+                select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image/@xlink:href"
+              />
+            </xsl:attribute>
+          </v:imagedata>
+        </v:shape>
+      </w:pict>
+    </w:numPicBullet>
+  </xsl:template>
 
   <xsl:template name="InsertListParagraphProperties">
     <xsl:variable name="spaceBeforeTwip">
@@ -278,7 +352,7 @@
       <xsl:when test="@text:bullet-char = '➔' "></xsl:when>
       <xsl:when test="@text:bullet-char = '✗' "></xsl:when>
       <xsl:when test="@text:bullet-char = '–' ">–</xsl:when>
-      
+
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
   </xsl:template>

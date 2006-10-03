@@ -194,6 +194,11 @@
         <xsl:call-template name="package-relationships"/>
       </pzip:entry>
 
+	<!-- numbering relationships item-->
+      <pzip:entry pzip:target="word/_rels/numbering.xml.rels">
+        <xsl:call-template name="InsertBuletRelationships"/>
+        </pzip:entry>
+
     </pzip:archive>
   </xsl:template>
 
