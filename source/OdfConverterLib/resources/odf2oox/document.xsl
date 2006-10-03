@@ -397,7 +397,8 @@
   <!-- section detection and insertion for paragraph-->
   <xsl:template name="InsertParagraphSectionProperties">
     <!-- Section detection  : 3 cases -->
-    <xsl:if test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::style:master-page)">
+    <xsl:if
+      test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::style:master-page)">
       <!-- Section detection  : 3 cases -->
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
       <xsl:variable name="followings"
@@ -2106,6 +2107,31 @@
       </w:rPr>
       <w:fldChar w:fldCharType="separate"/>
     </w:r>
+  </xsl:template>
+
+  <!-- chapter field. -->
+  <xsl:template match="text:chapter" mode="paragraph">
+    <!-- if field displays name, convert into a reference to default heading style. -->
+    <xsl:if test="@text:display='name' and @text:outline-level">
+      <xsl:variable name="outline-level" select="@text:outline-level"/>
+      <!-- COMMENT : if the style changes name in the application, it may not be found and cause an error. -->
+      <xsl:variable name="style">
+        <xsl:value-of
+          select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:display-name"
+        />
+      </xsl:variable>
+      <w:fldSimple>
+        <xsl:attribute name="w:instr">
+          <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \*MERGEFORMAT')"/>
+        </xsl:attribute>
+        <w:r>
+          <w:rPr>
+            <w:noProof/>
+          </w:rPr>
+          <xsl:apply-templates mode="text"/>
+        </w:r>
+      </w:fldSimple>
+    </xsl:if>
   </xsl:template>
 
   <!-- text and spaces -->
