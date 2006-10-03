@@ -483,20 +483,26 @@
           <xsl:with-param name="style" select="parent::style:style"/>
         </xsl:call-template>
       </xsl:variable>
-      <xsl:if test="$firstLineIndent != 0">
-        <xsl:choose>
-          <xsl:when test="$firstLineIndent &lt; 0">
-            <xsl:attribute name="w:hanging">
-              <xsl:value-of select="-$firstLineIndent"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="w:firstLine">
-              <xsl:value-of select="$firstLineIndent"/>
-            </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="$firstLineIndent != 0">
+          <xsl:choose>
+            <xsl:when test="$firstLineIndent &lt; 0">
+              <xsl:attribute name="w:hanging">
+                <xsl:value-of select="-$firstLineIndent"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="w:firstLine">
+                <xsl:value-of select="$firstLineIndent"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- default value is hanging=0 if nothing is specified -->
+          <xsl:attribute name="w:hanging">0</xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
     </w:ind>
   </xsl:template>
 
