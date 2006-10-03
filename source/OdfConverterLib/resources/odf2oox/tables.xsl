@@ -233,13 +233,13 @@
       <xsl:variable name="followingSection" select="following::text:section[1]"/>
       <!-- the following section is the same as the following neighbour's ancestor section -->
       <xsl:variable name="sectionStarts"
-        select="$followingSection and (generate-id($followings[1]/ancestor::text:section) = generate-id($followingSection))"/>
+        select="$followingSection and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id($followingSection))"/>
 
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
       <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
       <!-- the following neighbour's ancestor section and the current section are different -->
       <xsl:variable name="sectionEnds"
-        select="$previousSection and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previousSection))"/>
+        select="$previousSection and not(generate-id($followings[1]/ancestor::text:section[1]) = generate-id($previousSection))"/>
 
       <xsl:if
         test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body)">

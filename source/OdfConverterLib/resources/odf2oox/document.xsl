@@ -409,13 +409,13 @@
       <xsl:variable name="following-section" select="following::text:section[1]"/>
       <!-- the following section is the same as the following neighbour's ancestor section -->
       <xsl:variable name="section-starts"
-        select="$following-section and (generate-id($followings[1]/ancestor::text:section) = generate-id($following-section))"/>
+        select="$following-section and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id($following-section))"/>
 
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
       <xsl:variable name="previous-section" select="ancestor::text:section[1]"/>
       <!-- the following neighbour's ancestor section and the current section are different -->
       <xsl:variable name="section-ends"
-        select="$previous-section and not(generate-id($followings[1]/ancestor::text:section) = generate-id($previous-section))"/>
+        select="$previous-section and not(generate-id($followings[1]/ancestor::text:section[1]) = generate-id($previous-section))"/>
 
       <!-- section creation -->
       <xsl:if
@@ -916,14 +916,14 @@
   <xsl:template name="insertAlphabeticalPrefs">
     <w:instrText xml:space="preserve">
       <xsl:text>INDEX \e "" \c "</xsl:text>
-      <xsl:choose>
+      <!--xsl:choose>
         <xsl:when test="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">
           <xsl:text> 1 </xsl:text>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/>
         </xsl:otherwise>
-      </xsl:choose>
+      </xsl:choose-->
       <xsl:text>x " \z "1045" </xsl:text> 
     </w:instrText>
   </xsl:template>
