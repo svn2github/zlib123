@@ -1185,7 +1185,7 @@
     <xsl:param name="shapeStyle"/>
 
     <xsl:variable name="frameWrap">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:wrap</xsl:with-param>
       </xsl:call-template>
@@ -1249,14 +1249,14 @@
     <xsl:param name="shapeStyle"/>
 
     <xsl:variable name="frameWrap">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:wrap</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="runThrought">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:run-through</xsl:with-param>
       </xsl:call-template>
@@ -1322,14 +1322,14 @@
     <xsl:param name="shapeStyle"/>
 
     <xsl:variable name="horizontalRel">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:horizontal-rel</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="verticalRel">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:vertical-rel</xsl:with-param>
       </xsl:call-template>
@@ -1364,14 +1364,14 @@
     <xsl:param name="shapeStyle"/>
 
     <xsl:variable name="horizontalPos">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="verticalPos">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:vertical-pos</xsl:with-param>
       </xsl:call-template>
@@ -1417,7 +1417,7 @@
     <xsl:variable name="marginL">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length">
-          <xsl:call-template name="GetShapeGraphicProperties">
+          <xsl:call-template name="GetGraphicProperties">
             <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
             <xsl:with-param name="attribName">fo:margin-left</xsl:with-param>
           </xsl:call-template>
@@ -1428,7 +1428,7 @@
     <xsl:variable name="marginT">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length">
-          <xsl:call-template name="GetShapeGraphicProperties">
+          <xsl:call-template name="GetGraphicProperties">
             <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
             <xsl:with-param name="attribName">fo:margin-top</xsl:with-param>
           </xsl:call-template>
@@ -1439,7 +1439,7 @@
     <xsl:variable name="marginR">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length">
-          <xsl:call-template name="GetShapeGraphicProperties">
+          <xsl:call-template name="GetGraphicProperties">
             <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
             <xsl:with-param name="attribName">fo:margin-right</xsl:with-param>
           </xsl:call-template>
@@ -1450,7 +1450,7 @@
     <xsl:variable name="marginB">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length">
-          <xsl:call-template name="GetShapeGraphicProperties">
+          <xsl:call-template name="GetGraphicProperties">
             <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
             <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
           </xsl:call-template>
@@ -1478,7 +1478,7 @@
     <xsl:param name="shapeStyle"/>
 
     <xsl:variable name="fillColor">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:background-color</xsl:with-param>
       </xsl:call-template>
@@ -1497,7 +1497,7 @@
     <xsl:param name="shapeStyle"/>
 
     <xsl:variable name="border">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:border</xsl:with-param>
       </xsl:call-template>
@@ -1517,7 +1517,7 @@
           </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="styleBorderLine">
-          <xsl:call-template name="GetShapeGraphicProperties">
+          <xsl:call-template name="GetGraphicProperties">
             <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
             <xsl:with-param name="attribName">style:border-line-width</xsl:with-param>
           </xsl:call-template>
@@ -1579,14 +1579,14 @@
     <xsl:param name="shapeStyle"/>
 
     <xsl:variable name="backgroundColor">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:background-color</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="backgroundTransparency">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:background-transparency</xsl:with-param>
       </xsl:call-template>
@@ -1595,7 +1595,7 @@
     <!--fill  transparency-->
     <xsl:variable name="opacity" select="100 - substring-before($backgroundTransparency,'%')"/>
 
-    <xsl:if test="$backgroundTransparency and $backgroundColor != 'transparent' ">
+    <xsl:if test="$backgroundTransparency != '' and $backgroundColor != 'transparent' ">
       <v:fill>
         <xsl:attribute name="opacity">
           <xsl:value-of select="concat($opacity,'%')"/>
@@ -1650,8 +1650,8 @@
 
   </xsl:template>
 
-  <!-- finds shape graphic property in styles -->
-  <xsl:template name="GetShapeGraphicProperties">
+  <!-- finds shape graphic property recursively in style or parent style -->
+  <xsl:template name="GetGraphicProperties">
     <xsl:param name="attribName"/>
     <xsl:param name="shapeStyle"/>
 
@@ -1669,7 +1669,7 @@
         <xsl:variable name="parentStyle"
           select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $parentStyleName]"/>
 
-        <xsl:call-template name="GetShapeGraphicProperties">
+        <xsl:call-template name="GetGraphicProperties">
           <xsl:with-param name="shapeStyle" select="$parentStyle"/>
           <xsl:with-param name="attribName" select="$attribName"/>
         </xsl:call-template>
@@ -1682,7 +1682,7 @@
     <xsl:param name="shapeStyle"/>
 
     <xsl:variable name="frameWrap">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:wrap</xsl:with-param>
       </xsl:call-template>
@@ -1757,35 +1757,35 @@
     <xsl:param name="shapeStyle"/>
 
     <xsl:variable name="padding">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:padding</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="paddingTop">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:padding-top</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="paddingRight">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:padding-right</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="paddingLeft">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:padding-left</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="paddingBottom">
-      <xsl:call-template name="GetShapeGraphicProperties">
+      <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:padding-bottom</xsl:with-param>
       </xsl:call-template>
