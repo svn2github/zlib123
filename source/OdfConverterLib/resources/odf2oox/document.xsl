@@ -1480,21 +1480,38 @@
 
   <xsl:template name="InsertShapeFill">
     <xsl:param name="shapeStyle"/>
-
-    <xsl:variable name="fillColor">
+    
+    <xsl:variable name="shapefillColor">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:background-color</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
+    
+    <!-- frame color is dependent on page background color in some cases -->
+    <xsl:variable name="fillColor">
+      <xsl:choose>
+        <xsl:when test="$shapefillColor = 'transparent' or $shapefillColor = '' ">
+          <!-- when no fill is set for frame it should take background color of page (as it is in ODF) -->
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:variable name="defaultBgColor"
+              select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:background-color"/>
+            <xsl:value-of select="$defaultBgColor"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$shapefillColor"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
     <!--fill color-->
-    <xsl:if test="$fillColor">
+    <xsl:if test="$fillColor != '' ">
       <xsl:attribute name="fillcolor">
         <xsl:value-of select="$fillColor"/>
       </xsl:attribute>
     </xsl:if>
-
+    
   </xsl:template>
 
   <xsl:template name="InsertShapeBorders">
