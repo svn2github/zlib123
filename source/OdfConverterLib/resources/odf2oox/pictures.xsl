@@ -494,7 +494,7 @@
       <!--relative position-->
       <xsl:attribute name="relativeFrom">
         <xsl:choose>
-          <xsl:when test="$verticalRel='page'">page</xsl:when>
+          <xsl:when test="contains($verticalRel,'page')">page</xsl:when>
           <xsl:otherwise>paragraph</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
