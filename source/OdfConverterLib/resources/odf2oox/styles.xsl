@@ -592,6 +592,13 @@
         <xsl:when test="@fo:text-transform = 'uppercase'">
           <w:caps w:val="on"/>
         </xsl:when>
+        <xsl:when test="@fo:text-transform = 'capitalize'">
+          <!-- no equivalent of capitalize in OOX spec -->
+          <w:caps w:val="off"/>
+        </xsl:when>
+        <xsl:when test="@fo:text-transform = 'lowercase'">
+          <w:caps w:val="off"/>
+        </xsl:when>
         <xsl:when test="@fo:text-transform = 'none' or @fo:font-variant = 'small-caps'">
           <w:caps w:val="off"/>
         </xsl:when>
