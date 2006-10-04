@@ -37,6 +37,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   exclude-result-prefixes="xlink draw svg fo office style text">
 
@@ -404,6 +405,11 @@
           </pic:nvPicPr>
           <pic:blipFill>
             <a:blip r:embed="{generate-id(draw:image)}"/>
+            <xsl:variable name="styleCrop" select="./@draw:style-name"/>
+            <xsl:variable name="clip" select="//office:document-content/office:automatic-styles/style:style[@style:name = $styleCrop]"/>
+            <xsl:if test="$clip/style:graphic-properties/@fo:clip">
+              <xsl:call-template name="InsertImageCropProperties"/>
+            </xsl:if>
             <a:stretch>
               <a:fillRect/>
             </a:stretch>
@@ -573,7 +579,32 @@
     </wp:positionH>
   </xsl:template>
 
-
+  <!--image crop-->
+  <xsl:template name="InsertImageCropProperties">
+    <a:srcRect>
+      <xsl:variable name="styleCrop" select="./@draw:style-name"/>
+      <xsl:variable name="clip" select="//office:document-content/office:automatic-styles/style:style[@style:name = $styleCrop]"/>
+      <xsl:variable name="t"><xsl:value-of select="substring-before(substring-after($clip/style:graphic-properties/@fo:clip,'('),'cm' )"/></xsl:variable>
+      <xsl:variable name="b"><xsl:value-of select="substring-before(substring-after(substring-after($clip/style:graphic-properties/@fo:clip,'cm'),'cm'),'cm')"/></xsl:variable>
+      <xsl:variable name="r"><xsl:value-of select="substring-before(substring-after($clip/style:graphic-properties/@fo:clip,'cm'),'cm')"/></xsl:variable>
+      <xsl:variable name="l"><xsl:value-of select="substring-before(substring-after(substring-after(substring-after($clip/style:graphic-properties/@fo:clip,'cm'),'cm'),'cm'),'cm')"/></xsl:variable>
+      <xsl:variable name="height"><xsl:value-of select="substring-before(./@svg:height,'cm')"/></xsl:variable>
+      <xsl:variable name="width"><xsl:value-of select="substring-before(./@svg:width,'cm')"/></xsl:variable>
+      <xsl:attribute name="t">
+        <xsl:value-of select=" round(($t * 100 div ($t + $b + $height)) * 1000)"/>
+      </xsl:attribute>
+      <xsl:attribute name="b">
+        <xsl:value-of select=" round(($b * 100 div ($t + $b + $height)) * 1000)"/>
+      </xsl:attribute>
+      <xsl:attribute name="r">
+        <xsl:value-of select=" round(($r * 100 div ($r + $l + $width)) * 1000)"/>
+      </xsl:attribute>
+      <xsl:attribute name="l">
+        <xsl:value-of select=" round(($l * 100 div ($l + $r + $width)) * 1000)"/>
+      </xsl:attribute>
+    </a:srcRect>
+  </xsl:template>
+  
   <!--image wrap type-->
   <xsl:template name="InsertAnchorImageWrapping">
     <xsl:param name="imageStyle" />
