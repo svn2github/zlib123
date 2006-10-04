@@ -32,13 +32,14 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="office text table fo style draw xlink v svg"
+  exclude-result-prefixes="office text table fo style draw xlink v svg number"
   xmlns:w10="urn:schemas-microsoft-com:office:word">
 
   <xsl:import href="tables.xsl"/>
@@ -61,6 +62,7 @@
   <xsl:key name="sections" match="style:style[@style:family='section']" use="@style:name"/>
   <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value]" use="''"/>
   <xsl:key name="toc" match="text:table-of-content" use="''"/>
+  <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
 
 
   <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
@@ -1480,14 +1482,14 @@
 
   <xsl:template name="InsertShapeFill">
     <xsl:param name="shapeStyle"/>
-    
+
     <xsl:variable name="shapefillColor">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">fo:background-color</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <!-- frame color is dependent on page background color in some cases -->
     <xsl:variable name="fillColor">
       <xsl:choose>
@@ -1504,14 +1506,14 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!--fill color-->
     <xsl:if test="$fillColor != '' ">
       <xsl:attribute name="fillcolor">
         <xsl:value-of select="$fillColor"/>
       </xsl:attribute>
     </xsl:if>
-    
+
   </xsl:template>
 
   <xsl:template name="InsertShapeBorders">
@@ -2128,31 +2130,6 @@
       </w:rPr>
       <w:fldChar w:fldCharType="separate"/>
     </w:r>
-  </xsl:template>
-
-  <!-- chapter field. -->
-  <xsl:template match="text:chapter" mode="paragraph">
-    <!-- if field displays name, convert into a reference to default heading style. -->
-    <xsl:if test="@text:display='name' and @text:outline-level">
-      <xsl:variable name="outline-level" select="@text:outline-level"/>
-      <!-- COMMENT : if the style changes name in the application, it may not be found and cause an error. -->
-      <xsl:variable name="style">
-        <xsl:value-of
-          select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:display-name"
-        />
-      </xsl:variable>
-      <w:fldSimple>
-        <xsl:attribute name="w:instr">
-          <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \*MERGEFORMAT')"/>
-        </xsl:attribute>
-        <w:r>
-          <w:rPr>
-            <w:noProof/>
-          </w:rPr>
-          <xsl:apply-templates mode="text"/>
-        </w:r>
-      </w:fldSimple>
-    </xsl:if>
   </xsl:template>
 
   <!-- text and spaces -->
