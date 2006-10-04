@@ -1025,7 +1025,11 @@
 
       <!--annotation embedded in text-box is not supported in Word-->
       <xsl:when test="ancestor::draw:text-box">
-        <xsl:message terminate="no">feedback: Nested frames</xsl:message>
+        <xsl:message terminate="no">feedback:Annotations in text-box</xsl:message>
+      </xsl:when>
+      <xsl:when
+        test="ancestor::style:header or ancestor::style:header-left or ancestor::style:footer or ancestor::style:footer-left">
+        <xsl:message terminate="no">feedback:Annotations in header or footer</xsl:message>
       </xsl:when>
       <!--default scenario-->
       <xsl:otherwise>
