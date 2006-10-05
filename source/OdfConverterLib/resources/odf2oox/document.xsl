@@ -327,7 +327,7 @@
           <xsl:when test="$bookmarkType = 'start' ">
             <xsl:call-template name="InsertBookmarkStartTOC">
               <xsl:with-param name="tocId" select="$bookmarkId"/>
-              <xsl:with-param name="tableOfContentsNum" select="$tableOfContentsNum"/>
+              <xsl:with-param name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]"/>
             </xsl:call-template>
           </xsl:when>
           <xsl:when test="$bookmarkType = 'end' ">
@@ -528,9 +528,9 @@
   <!-- bookmark start mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkStartTOC">
     <xsl:param name="tocId"/>
-    <xsl:param name="tableOfContentsNum"/>
+    <xsl:param name="tableOfContent"/>
 
-    <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId,$tableOfContentsNum)}"/>
+    <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId,generate-id($tableOfContent))}"/>
   </xsl:template>
 
   <!-- bookmark end mark for elements contained in TOC -->
@@ -551,10 +551,19 @@
       <!--checks if headings are used to generate TOC -->
       <xsl:when test="self::text:h">
         <xsl:choose>
+          <!-- headings aren't used -->
           <xsl:when
             test="$tableOfContent/text:table-of-content-source/@text:use-outline-level = 'false' "
             >false</xsl:when>
-          <xsl:otherwise>true</xsl:otherwise>
+          <!-- check is current heading level is used to generate TOC -->
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="@text:outline-level &lt; ($tableOfContent/text:table-of-content-source/@text:outline-level+1)">
+                <xsl:text>true</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>false</xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
 
@@ -598,12 +607,14 @@
 
     <xsl:choose>
 
+      <!--after counting source styles elements add headings number up to proper level defined in TOC-->
       <xsl:when test="$sourceStyleNum = 0">
         <xsl:value-of
-          select="$counter + count(preceding::text:h[child::node() and not(ancestor::text:index-body)])"
+          select="$counter + count(preceding::text:h[child::node() and not(ancestor::text:index-body) and @text:outline-level &lt; ($tableOfContent/text:table-of-content-source/@text:outline-level+1)])"
         />
       </xsl:when>
 
+      <!--count element with source styles-->
       <xsl:when test="$sourceStyleNum > 0">
         <xsl:variable name="sourceStyleName"
           select="//text:table-of-content/text:table-of-content-source/text:index-source-styles[$sourceStyleNum]/text:index-source-style/@text:style-name"/>
@@ -1057,13 +1068,12 @@
   <!-- links -->
   <xsl:template match="text:a" mode="paragraph">
     <xsl:choose>
-
-      <!-- TOC hyperlink -->
+    <!-- TOC hyperlink -->
       <xsl:when test="ancestor::text:index-body and position() = 1">
         <xsl:variable name="tocId" select="count(../preceding-sibling::text:p)+1"/>
         <w:hyperlink w:history="1">
           <xsl:attribute name="w:anchor">
-            <xsl:value-of select="concat('_Toc',$tocId)"/>
+            <xsl:value-of select="concat('_Toc',$tocId,generate-id(ancestor::text:table-of-content))"/>
           </xsl:attribute>
           <xsl:call-template name="InsertIndexItemContent">
             <xsl:with-param name="tocId" select="$tocId"/>
@@ -2121,7 +2131,7 @@
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
-      <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $tocId,count(ancestor::text:table-of-content/preceding-sibling::text:table-of-content)+1, ' \h')"/></w:instrText>
+      <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $tocId,generate-id(ancestor::text:table-of-content), ' \h')"/></w:instrText>
     </w:r>
     <w:r>
       <w:rPr>
