@@ -63,6 +63,9 @@
   <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value]" use="''"/>
   <xsl:key name="toc" match="text:table-of-content" use="''"/>
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
+  <!-- key to find mailto hyperlinks. -->
+  <xsl:key name="mailto-hyperlinks" match="text:a[contains(@xlink:href,'mailto')]"
+    use="text:span/@text:style-name"/>
 
 
   <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>

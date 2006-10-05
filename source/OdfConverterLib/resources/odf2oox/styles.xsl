@@ -156,9 +156,22 @@
       </xsl:choose>
 
       <!-- Parent style name -->
-      <xsl:if test="@style:parent-style-name">
-        <w:basedOn w:val="{@style:parent-style-name}"/>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="@style:parent-style-name">
+          <w:basedOn w:val="{@style:parent-style-name}"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- if a mailto-hyperlink has current style, set basedOn to Internet_20_link -->
+          <xsl:if test="@style:family = 'text' ">
+            <xsl:variable name="styleName" select="@style:name"/>
+            <xsl:for-each select="document('content.xml')">
+              <xsl:if test="key('mailto-hyperlinks',$styleName)">
+                <w:basedOn w:val="Internet_20_link"/>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <!-- Next style name -->
       <xsl:if test="@style:next-style-name">
