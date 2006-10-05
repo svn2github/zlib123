@@ -658,8 +658,8 @@
     <xsl:call-template name="InsertPageBreakBefore"/>
 
     <!-- insert numbering properties -->
-    <xsl:call-template name="InsertNumberingProperties">
-      <xsl:with-param name="node" select="."/>
+    <xsl:call-template name="InsertNumbering">
+      <xsl:with-param name="level" select="."/>
     </xsl:call-template>
 
     <!-- override spacing before/after when required -->
@@ -696,23 +696,15 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Inserts the list number of a list -->
-  <xsl:template name="InsertNumberingProperties">
-    <xsl:param name="node"/>
-    <xsl:if
-      test="$node[self::text:h] and $node/@text:outline-level &lt;= 9 and document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
-      <w:numPr>
-        <w:ilvl w:val="{$node/@text:outline-level - 1}"/>
-        <w:numId w:val="1"/>
-      </w:numPr>
-    </xsl:if>
-  </xsl:template>
-
   <!-- Inserts the outline level of a heading if needed -->
   <xsl:template name="InsertOutlineLevel">
     <xsl:param name="node"/>
     <!-- List item are first considered if exist than heading style-->
-    <xsl:if test="$node[self::text:h and (not(parent::text:list-item) or position() > 1) ]">
+    <xsl:variable name="stylename" select="./@text:style-name"/>
+    <xsl:variable name="list"
+      select="//office:document-content/office:automatic-styles/style:style[@style:name = $stylename]"/>
+    <xsl:if
+      test="$node[self::text:h and not($list/@style:list-style-name) and (not(parent::text:list-item) or position() > 1) ]">
       <xsl:choose>
         <xsl:when test="not($node/@text:outline-level)">
           <w:outlineLvl w:val="0"/>
@@ -1993,16 +1985,8 @@
     </xsl:apply-templates>
   </xsl:template>
 
-  <!-- list headers -->
-  <xsl:template match="text:list-header">
-    <xsl:param name="level"/>
-    <xsl:apply-templates>
-      <xsl:with-param name="level" select="$level"/>
-    </xsl:apply-templates>
-  </xsl:template>
-
   <!-- list items -->
-  <xsl:template match="text:list-item">
+  <xsl:template match="text:list-item|text:list-header">
     <xsl:param name="level"/>
     <xsl:choose>
       <xsl:when test="*[1][self::text:p or self::text:h]">
@@ -2015,7 +1999,7 @@
             </xsl:call-template>
 
             <!-- insert number -->
-            <xsl:call-template name="InsertListItemNumber">
+            <xsl:call-template name="InsertNumbering">
               <xsl:with-param name="level" select="$level"/>
             </xsl:call-template>
 
@@ -2084,18 +2068,56 @@
   </xsl:template>
 
   <!-- Inserts the number of a list item -->
-  <xsl:template name="InsertListItemNumber">
+  <xsl:template name="InsertNumbering">
     <xsl:param name="level"/>
-    <w:numPr>
-      <w:ilvl w:val="{$level}"/>
-      <w:numId>
-        <xsl:attribute name="w:val">
-          <xsl:call-template name="GetNumberingId">
-            <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </w:numId>
-    </w:numPr>
+    <xsl:variable name="stylename" select="./@text:style-name"/>
+    <xsl:variable name="list"
+      select="//office:document-content/office:automatic-styles/style:style[@style:name = $stylename]"/>
+    <xsl:choose>
+      <xsl:when
+        test="self::text:list-item or self::text:list-header or $list/@style:list-style-name">
+        <xsl:if test="not(self::text:list-header)">
+          <w:numPr>
+            <xsl:choose>
+              <xsl:when test="self::text:list-item">
+                <w:ilvl w:val="{$level}"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <w:ilvl w:val="{$level/@text:outline-level - 1}"/>
+              </xsl:otherwise>
+            </xsl:choose>
+            <w:numId>
+              <xsl:attribute name="w:val">
+                <xsl:choose>
+                  <xsl:when test="self::text:list-item">
+                    <xsl:call-template name="GetNumberingId">
+                      <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"
+                      />
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:otherwise>
+
+                    <xsl:call-template name="GetNumberingId">
+                      <xsl:with-param name="styleName" select="$list/@style:list-style-name"/>
+                    </xsl:call-template>
+
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </w:numId>
+          </w:numPr>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if
+          test="$level[self::text:h] and $level/@text:outline-level &lt;= 9 and document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
+          <w:numPr>
+            <w:ilvl w:val="{$level/@text:outline-level - 1}"/>
+            <w:numId w:val="1"/>
+          </w:numPr>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!--inserts index item content for all types of index-->
