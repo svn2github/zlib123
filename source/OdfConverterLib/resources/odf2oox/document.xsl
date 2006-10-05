@@ -520,6 +520,11 @@
     <xsl:if
       test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='page'">
       <w:r>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:rPr>
+            <w:vanish/>
+          </w:rPr>
+        </xsl:if>
         <w:br w:type="page"/>
       </w:r>
     </xsl:if>
@@ -558,7 +563,8 @@
           <!-- check is current heading level is used to generate TOC -->
           <xsl:otherwise>
             <xsl:choose>
-              <xsl:when test="@text:outline-level &lt; ($tableOfContent/text:table-of-content-source/@text:outline-level+1)">
+              <xsl:when
+                test="@text:outline-level &lt; ($tableOfContent/text:table-of-content-source/@text:outline-level+1)">
                 <xsl:text>true</xsl:text>
               </xsl:when>
               <xsl:otherwise>false</xsl:otherwise>
@@ -673,6 +679,8 @@
     <!-- if we are in an annotation, we may have to insert annotation reference -->
     <xsl:call-template name="InsertAnnotationReference"/>
 
+    <!-- insert run properties -->
+    <xsl:call-template name="InsertRunProperties"/>
   </xsl:template>
 
   <!-- Inserts the style of a paragraph -->
@@ -889,16 +897,30 @@
 
   <xsl:template name="InsertIndexFieldCodeEnd">
     <w:r>
-      <w:rPr/>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
   </xsl:template>
 
   <xsl:template name="InsertIndexFieldCodeStart">
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:fldChar w:fldCharType="begin"/>
     </w:r>
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <xsl:choose>
         <xsl:when test="ancestor::text:table-of-content">
           <xsl:call-template name="InsertTocPrefs"/>
@@ -915,6 +937,11 @@
       </xsl:choose>
     </w:r>
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:fldChar w:fldCharType="separate"/>
     </w:r>
   </xsl:template>
@@ -997,6 +1024,11 @@
   <xsl:template name="InsertAnnotationReference">
     <xsl:if test="ancestor::office:annotation and position() = 1">
       <w:r>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:rPr>
+            <w:vanish/>
+          </w:rPr>
+        </xsl:if>
         <w:annotationRef/>
       </w:r>
     </xsl:if>
@@ -1007,6 +1039,9 @@
     <w:r>
       <w:rPr>
         <w:rStyle w:val="{concat(../@text:note-class, 'Reference')}"/>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:vanish/>
+        </xsl:if>
       </w:rPr>
       <xsl:choose>
         <xsl:when test="../text:note-citation/@text:label">
@@ -1028,6 +1063,11 @@
     </w:r>
     <!-- add an extra tab -->
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:tab/>
     </w:r>
   </xsl:template>
@@ -1068,12 +1108,13 @@
   <!-- links -->
   <xsl:template match="text:a" mode="paragraph">
     <xsl:choose>
-    <!-- TOC hyperlink -->
+      <!-- TOC hyperlink -->
       <xsl:when test="ancestor::text:index-body and position() = 1">
         <xsl:variable name="tocId" select="count(../preceding-sibling::text:p)+1"/>
         <w:hyperlink w:history="1">
           <xsl:attribute name="w:anchor">
-            <xsl:value-of select="concat('_Toc',$tocId,generate-id(ancestor::text:table-of-content))"/>
+            <xsl:value-of
+              select="concat('_Toc',$tocId,generate-id(ancestor::text:table-of-content))"/>
           </xsl:attribute>
           <xsl:call-template name="InsertIndexItemContent">
             <xsl:with-param name="tocId" select="$tocId"/>
@@ -1163,6 +1204,11 @@
   <xsl:template match="draw:text-box" mode="paragraph">
     <w:r>
       <w:rPr>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:rPr>
+            <w:vanish/>
+          </w:rPr>
+        </xsl:if>
         <xsl:call-template name="InsertTextBoxStyle"/>
       </w:rPr>
       <w:pict>
@@ -2061,6 +2107,9 @@
     <!-- insert text from the beginning of index item-->
     <w:r>
       <w:rPr>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:vanish/>
+        </xsl:if>
         <w:noProof/>
       </w:rPr>
       <w:t>
@@ -2091,6 +2140,9 @@
     <!-- insert text at the end of index item -->
     <w:r>
       <w:rPr>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:vanish/>
+        </xsl:if>
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
@@ -2107,6 +2159,9 @@
   <xsl:template name="InsertIndexPageRefEnd">
     <w:r>
       <w:rPr>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:vanish/>
+        </xsl:if>
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
@@ -2119,6 +2174,9 @@
 
     <w:r>
       <w:rPr>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:vanish/>
+        </xsl:if>
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
@@ -2128,6 +2186,9 @@
     </w:r>
     <w:r>
       <w:rPr>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:vanish/>
+        </xsl:if>
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
@@ -2135,6 +2196,9 @@
     </w:r>
     <w:r>
       <w:rPr>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:vanish/>
+        </xsl:if>
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
@@ -2153,15 +2217,27 @@
   <!-- Inserts the Run properties -->
   <xsl:template name="InsertRunProperties">
     <!-- apply text properties if needed -->
-    <xsl:if test="ancestor::text:span|ancestor::text:a|self::text:list-level-style-number">
-      <w:rPr>
-        <xsl:call-template name="InsertRunStyle">
-          <xsl:with-param name="styleName">
-            <xsl:call-template name="GetStyleName"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </w:rPr>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="ancestor::text:span|ancestor::text:a|self::text:list-level-style-number">
+        <w:rPr>
+          <xsl:call-template name="InsertRunStyle">
+            <xsl:with-param name="styleName">
+              <xsl:call-template name="GetStyleName"/>
+            </xsl:with-param>
+          </xsl:call-template>
+          <xsl:if test="ancestor::text:section/@text:display='none'">
+            <w:vanish/>
+          </xsl:if>
+        </w:rPr>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:rPr>
+            <w:vanish/>
+          </w:rPr>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- Inserts the style of a run -->
@@ -2226,6 +2302,9 @@
   <!-- tab stops -->
   <xsl:template match="text:tab-stop" mode="paragraph">
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:vanish/>
+      </xsl:if>
       <w:tab/>
       <w:t/>
     </w:r>
@@ -2235,6 +2314,9 @@
   <xsl:template match="text:tab" mode="paragraph">
     <w:r>
       <w:rPr>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:vanish/>
+        </xsl:if>
         <w:noProof/>
         <w:webHidden/>
       </w:rPr>
@@ -2245,6 +2327,11 @@
   <!-- line breaks -->
   <xsl:template match="text:line-break" mode="paragraph">
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:br/>
       <w:t/>
     </w:r>
@@ -2266,6 +2353,9 @@
         <xsl:if test="$fo:color">
           <w:color w:val="{$fo:color}"/>
         </xsl:if>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:vanish/>
+        </xsl:if>
       </w:rPr>
       <xsl:apply-templates select="." mode="text"/>
     </w:r>
@@ -2275,12 +2365,27 @@
   <!-- alphabetical indexes creating mark entry -->
   <xsl:template match="text:alphabetical-index-mark-end" mode="paragraph">
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:fldChar w:fldCharType="begin"/>
     </w:r>
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:instrText xml:space="preserve"> XE "</w:instrText>
     </w:r>
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:instrText>
         <xsl:variable name="id" select="@text:id"/>
         <xsl:for-each select="preceding-sibling::node()">
@@ -2299,9 +2404,19 @@
       </w:instrText>
     </w:r>
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:instrText xml:space="preserve">" </w:instrText>
     </w:r>
     <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
     <!-- <xsl:apply-templates select="text:s" mode="text"></xsl:apply-templates> -->
@@ -2335,6 +2450,11 @@
       </xsl:attribute>
       <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id)}"/>
       <w:r>
+        <xsl:if test="ancestor::text:section/@text:display='none'">
+          <w:rPr>
+            <w:vanish/>
+          </w:rPr>
+        </xsl:if>
         <w:t>
           <xsl:value-of select="."/>
         </w:t>
@@ -2345,12 +2465,8 @@
 
   <!-- sections -->
   <xsl:template match="text:section">
-    <xsl:choose>
-      <xsl:when test="@text:display='none'"> </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates/>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:message terminate="no">progress:text:section</xsl:message>
+    <xsl:apply-templates/>
   </xsl:template>
 
   <!-- Extra spaces management, courtesy of J. David Eisenberg -->
