@@ -174,32 +174,43 @@
 	-->
   <xsl:template name="point-measure">
     <xsl:param name="length"/>
+    <xsl:param name="round">true</xsl:param>
+    <xsl:variable name="newlength">
+        <xsl:choose>
+          <xsl:when test="contains($length, 'cm')">
+            <xsl:value-of select="number(substring-before($length, 'cm')) * 72 div 2.54"/>
+          </xsl:when>
+          <xsl:when test="contains($length, 'mm')">
+            <xsl:value-of select="number(substring-before($length, 'mm')) * 72 div 25.4"/>
+          </xsl:when>
+          <xsl:when test="contains($length, 'in')">
+            <xsl:value-of select="number(substring-before($length, 'in')) * 72"/>
+          </xsl:when>
+          <xsl:when test="contains($length, 'pt')">
+            <xsl:value-of select="number(substring-before($length, 'pt'))"/>
+          </xsl:when>
+          <xsl:when test="contains($length, 'pica')">
+            <xsl:value-of select="number(substring-before($length, 'pica')) * 12"/>
+          </xsl:when>
+          <xsl:when test="contains($length, 'dpt')">
+            <xsl:value-of select="number(substring-before($length, 'dpt'))"/>
+          </xsl:when>
+          <xsl:when test="contains($length, 'px')">
+            <xsl:value-of select="number(substring-before($length, 'px')) * 72 div 96.19"/>
+          </xsl:when>
+          <xsl:when test="not($length)">0</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$length"/>
+          </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
-      <xsl:when test="contains($length, 'cm')">
-        <xsl:value-of select="round(number(substring-before($length, 'cm')) * 72 div 2.54)"/>
+      <xsl:when test="$round='true'">
+        <xsl:value-of select="round($newlength)" />   
       </xsl:when>
-      <xsl:when test="contains($length, 'mm')">
-        <xsl:value-of select="round(number(substring-before($length, 'mm')) * 72 div 25.4)"/>
-      </xsl:when>
-      <xsl:when test="contains($length, 'in')">
-        <xsl:value-of select="round(number(substring-before($length, 'in')) * 72)"/>
-      </xsl:when>
-      <xsl:when test="contains($length, 'pt')">
-        <xsl:value-of select="round(number(substring-before($length, 'pt')))"/>
-      </xsl:when>
-      <xsl:when test="contains($length, 'pica')">
-        <xsl:value-of select="round(number(substring-before($length, 'pica')) * 12)"/>
-      </xsl:when>
-      <xsl:when test="contains($length, 'dpt')">
-        <xsl:value-of select="round(number(substring-before($length, 'dpt')))"/>
-      </xsl:when>
-      <xsl:when test="contains($length, 'px')">
-        <xsl:value-of select="round(number(substring-before($length, 'px')) * 72 div 96.19)"/>
-      </xsl:when>
-      <xsl:when test="not($length)">0</xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$length"/>
-      </xsl:otherwise>
+    <xsl:otherwise>
+      <xsl:value-of select="(round($newlength * 100)) div 100" />
+    </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 

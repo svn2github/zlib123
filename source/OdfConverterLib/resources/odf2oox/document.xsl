@@ -1479,6 +1479,9 @@
             <xsl:with-param name="attribName">fo:margin-left</xsl:with-param>
           </xsl:call-template>
         </xsl:with-param>
+        <xsl:with-param name="round">
+        <xsl:text>false</xsl:text>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
@@ -1489,6 +1492,9 @@
             <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
             <xsl:with-param name="attribName">fo:margin-top</xsl:with-param>
           </xsl:call-template>
+          </xsl:with-param>
+        <xsl:with-param name="round">
+          <xsl:text>false</xsl:text>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1501,6 +1507,9 @@
             <xsl:with-param name="attribName">fo:margin-right</xsl:with-param>
           </xsl:call-template>
         </xsl:with-param>
+        <xsl:with-param name="round">
+          <xsl:text>false</xsl:text>
+        </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
@@ -1511,6 +1520,9 @@
             <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
             <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
           </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="round">
+          <xsl:text>false</xsl:text>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1588,6 +1600,9 @@
         <xsl:variable name="strokeWeight">
           <xsl:call-template name="point-measure">
             <xsl:with-param name="length" select="substring-before($border,' ')"/>
+            <xsl:with-param name="round">
+              <xsl:text>false</xsl:text>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="styleBorderLine">
