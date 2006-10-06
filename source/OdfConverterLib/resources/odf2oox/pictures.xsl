@@ -862,4 +862,191 @@
       </a:ln>
     </xsl:if>
   </xsl:template>
+  
+  <!--custom shapes -->
+  
+  <xsl:template match="draw:custom-shape" mode="shapes">
+    <xsl:call-template name="InsertShapes">
+      <xsl:with-param name="shapeType">
+        <xsl:value-of select="draw:enhanced-geometry/@draw:type"/>
+      </xsl:with-param> 
+    </xsl:call-template>
+  </xsl:template>
+  
+  <!-- basic shapes - ellipse and rect -->
+  
+  <xsl:template match="draw:rect|draw:ellipse" mode="shapes">
+    <xsl:call-template name="InsertShapes">
+      <xsl:with-param name="shapeType" select="name()"/>
+    </xsl:call-template>
+  </xsl:template>
+  
+  <!-- shapes template -->
+  
+  <xsl:template name="InsertShapes">
+    <xsl:param name="shapeType"/>
+    <w:r>
+      <w:pict>
+        <xsl:choose>
+          
+          <!-- rectangle -->
+          <xsl:when test="$shapeType = 'draw:rect' or $shapeType = 'rectangle' ">
+            <v:rect>
+              <xsl:call-template name="SimpleShape"/>
+            </v:rect>
+          </xsl:when>
+          
+          <!-- ellipse -->
+          <xsl:when test="$shapeType = 'draw:ellipse' or $shapeType = 'ellipse' ">
+            <v:oval>
+              <xsl:call-template name="SimpleShape"/>
+            </v:oval>
+          </xsl:when>
+          
+          <!-- round-rectangle -->
+          
+          <xsl:when test="$shapeType = 'round-rectangle' ">
+            <v:roundrect>
+              <xsl:call-template name="SimpleShape"/>
+            </v:roundrect>
+          </xsl:when>
+          
+          <!-- TODO - other shapes -->
+          <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
+      </w:pict>
+    </w:r>
+  </xsl:template>
+  
+  <!-- TODO
+  <xsl:template name="GenerateShapeId">
+    <xsl:param name="shape"></xsl:param>
+    </xsl:template> -->
+  
+  <!-- simple shape properties -->
+  
+  <xsl:template name="SimpleShape">
+    <xsl:variable name="styleName" select="@draw:style-name" />
+    <xsl:variable name="automaticStyle" select="document('content.xml')//office:document-content/office:automatic-styles/style:style[@style:name = $styleName]"/>
+    <xsl:variable name="officeStyle" select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+    <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle" />
+    
+    <!-- shape properties: size, z-index, color, position, stroke, etc --> 
+    <xsl:call-template name="InsertDrawnShapeProperties">
+      <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+    </xsl:call-template>
+    <xsl:attribute name="fillcolor">
+      <xsl:call-template name="FillColor">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
+    </xsl:attribute>
+    <xsl:call-template name="Stroke">
+      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+    </xsl:call-template>
+  </xsl:template>
+  
+  <!-- shape fill color -->
+  
+  <xsl:template name="FillColor">
+    <xsl:param name="shapeStyle"/>
+    <xsl:call-template name="GetDrawnGraphicProperties">
+      <xsl:with-param name="attrib">draw:fill-color</xsl:with-param>
+      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+    </xsl:call-template>
+  </xsl:template>
+  
+  <!-- shape stroke color and stroke width -->
+  
+  <xsl:template name="Stroke">
+    <xsl:param name="shapeStyle"/>
+    <xsl:attribute name="strokecolor">
+      <xsl:call-template name="GetDrawnGraphicProperties">
+        <xsl:with-param name="attrib">svg:stroke-color</xsl:with-param>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
+    </xsl:attribute>
+    <xsl:attribute name="strokeweight">
+      <xsl:variable name="strokeWeight">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length">
+            <xsl:call-template name="GetDrawnGraphicProperties">
+              <xsl:with-param name="attrib">svg:stroke-width</xsl:with-param>
+              <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            </xsl:call-template>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:value-of select="concat($strokeWeight,'pt')"/>
+    </xsl:attribute>
+  </xsl:template>
+  
+  <!-- get graphic properties for shapes -->
+  
+  <xsl:template name="GetDrawnGraphicProperties">
+    <xsl:param name="attrib"/>
+    <xsl:param name="shapeStyle"/>
+    <xsl:choose>
+      <xsl:when test="attribute::node()[name()=$attrib]">
+        <xsl:value-of select="attribute::node()[name()=$attrib]"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="GetGraphicProperties">
+          <xsl:with-param name="attribName" select="$attrib"/>
+          <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- shape properties -->
+  
+  <xsl:template name="InsertDrawnShapeProperties">
+    <xsl:param name="shapeStyle"/>
+    <xsl:attribute name="style">
+     <xsl:call-template name="InsertPosition"/>
+      <xsl:call-template name="InsertDrawnShapeSize"/>
+      <xsl:call-template name="InsertDrawnShapeZindex"/>
+      <xsl:call-template name="InsertShapeCoordinates"/>
+    </xsl:attribute>
+  </xsl:template>
+  
+  <!-- shape position -->
+  
+  <xsl:template name="InsertPosition">
+    <xsl:variable name="x">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@svg:x"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="y">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@svg:y"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;')"/>
+  </xsl:template>
+  <xsl:template name="InsertDrawnShapeZindex">
+    <xsl:value-of select="concat('z-index:',@draw:z-index)"/>
+  </xsl:template>
+  
+  <!--  shape width and height-->  
+  
+  <xsl:template name="InsertDrawnShapeSize">
+   <xsl:variable name="frameW">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="@svg:width|@fo:min-width"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="frameH">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@fo:min-height|@svg:height"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="relWidth" select="substring-before(@style:rel-width,'%')"/>
+    <xsl:variable name="relHeight"
+      select="substring-before(@style:rel-height,'%')"/> 
+    <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
+    <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
+  </xsl:template>
 </xsl:stylesheet>

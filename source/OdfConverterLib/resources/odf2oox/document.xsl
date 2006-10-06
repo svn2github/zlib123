@@ -509,7 +509,12 @@
       <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
         <xsl:message terminate="no">feedback:Nested frames</xsl:message>
       </xsl:when>
-
+      
+      <!-- drawing shapes -->
+      <xsl:when test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape">
+        <xsl:apply-templates mode="shapes"/>
+      </xsl:when>
+      
       <xsl:otherwise>
         <xsl:apply-templates mode="paragraph"/>
       </xsl:otherwise>
@@ -2256,8 +2261,15 @@
       <w:fldChar w:fldCharType="separate"/>
     </w:r>
   </xsl:template>
+  
+  <!-- dealing with text next to shapes -->
+  
+  <xsl:template match="text()|text:s" mode="shapes">
+    <xsl:apply-templates select="." mode="paragraph"/>
+  </xsl:template>
 
   <!-- text and spaces -->
+  
   <xsl:template match="text()|text:s" mode="paragraph">
     <w:r>
       <xsl:call-template name="InsertRunProperties"/>
@@ -2316,8 +2328,6 @@
 
   <!-- simple text (within a text flow) -->
   <xsl:template match="text()" mode="text">
-
-
     <xsl:choose>
       <xsl:when test="ancestor::text:index-body">
         <xsl:choose>
@@ -2342,12 +2352,7 @@
       <xsl:otherwise>
         <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
       </xsl:otherwise>
-
-
-
     </xsl:choose>
-
-
   </xsl:template>
 
   <!-- tab stops -->
