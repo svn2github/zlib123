@@ -60,6 +60,7 @@
   <xsl:key name="page-layouts" match="style:page-layout" use="@style:name"/>
   <xsl:key name="master-based-styles" match="style:style[@style:master-page-name]" use="@style:name"/>
   <xsl:key name="sections" match="style:style[@style:family='section']" use="@style:name"/>
+  <xsl:key name="Index" match="style:style" use="@style:name"/>
   <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value]" use="''"/>
   <xsl:key name="toc" match="text:table-of-content" use="''"/>
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
@@ -955,18 +956,40 @@
   </xsl:template>
 
   <xsl:template name="insertAlphabeticalPrefs">
-    <w:instrText xml:space="preserve">
-      <xsl:text>INDEX \e "" \c "</xsl:text>
-      <!--xsl:choose>
-        <xsl:when test="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count=0">
-          <xsl:text> 1 </xsl:text>
-        </xsl:when>
+      <xsl:choose>
+        <xsl:when test="key('Index', @text:style-name)/style:paragraph-properties/style:tab-stops/style:tab-stop/@style:type='right'">
+          <w:instrText xml:space="preserve">INDEX \e "</w:instrText>
+          <w:tab/><!--Right Align Page Number-->                        
+            <xsl:choose>              
+              <xsl:when test="key('Index', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count>4">4 
+                <w:instrText xml:space="preserve">" \c "4" \z "1045"</w:instrText>
+              </xsl:when>
+              <xsl:when test="key('Index', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count>1">
+                <w:instrText xml:space="preserve">" \c "
+                <xsl:value-of select="key('Index', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/>
+                  " \z "1045"</w:instrText>
+              </xsl:when>
+              <xsl:otherwise>
+                <w:instrText xml:space="preserve">" \c "1" \z "1045"</w:instrText>
+              </xsl:otherwise>                
+            </xsl:choose>
+        </xsl:when>        
         <xsl:otherwise>
-          <xsl:value-of select="key('automatic-styles',ancestor::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/>
+            <xsl:choose>              
+              <xsl:when test="key('Index', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count>4">
+                <w:instrText xml:space="preserve">INDEX \c "4"\z "1045" </w:instrText>
+              </xsl:when>
+              <xsl:when test="key('Index', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count>1">
+                <w:instrText xml:space="preserve">INDEX \c "
+                <xsl:value-of select="key('Index', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"/>
+                  "\z "1045" </w:instrText>
+              </xsl:when>
+              <xsl:otherwise>
+                <w:instrText xml:space="preserve">INDEX \c "1"\z "1045" </w:instrText>
+              </xsl:otherwise>                
+            </xsl:choose>
         </xsl:otherwise>
-      </xsl:choose-->
-      <xsl:text>x " \z "1045" </xsl:text> 
-    </w:instrText>
+      </xsl:choose>    
   </xsl:template>
 
   <xsl:template name="InsertIllustrationInPrefs">
