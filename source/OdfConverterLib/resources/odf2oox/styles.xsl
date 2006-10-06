@@ -418,41 +418,39 @@
   <!-- Paragraph spacing property -->
   <xsl:template name="ComputeParagraphSpacing">
     <w:spacing>
-      <xsl:if test="@style:line-height-at-least">
-        <xsl:attribute name="w:lineRule">atLeast</xsl:attribute>
-        <xsl:attribute name="w:line">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="@style:line-height-at-least"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test="@style:line-spacing">
-        <xsl:variable name="spacing">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="@style:line-spacing"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:attribute name="w:lineRule">auto</xsl:attribute>
-        <xsl:attribute name="w:line">
-          <xsl:value-of select="240+$spacing"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test="contains(@fo:line-height, '%')">
-        <xsl:attribute name="w:lineRule">auto</xsl:attribute>
-        <xsl:attribute name="w:line">
-          <!-- w:line expressed in 240ths of a line height when w:lineRule='auto' -->
-          <xsl:value-of select="round(number(substring-before(@fo:line-height, '%')) * 240 div 100)"
-          />
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test="contains(@fo:line-height, 'cm')">
-        <xsl:attribute name="w:lineRule">exact</xsl:attribute>
-        <xsl:attribute name="w:line">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="@fo:line-height"/>
-          </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
+      <!-- line spacing -->
+      <xsl:choose>
+        <xsl:when test="@style:line-spacing">
+          <xsl:variable name="spacing">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="@style:line-spacing"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:attribute name="w:lineRule">auto</xsl:attribute>
+          <xsl:attribute name="w:line">
+            <xsl:value-of select="240+$spacing"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="contains(@fo:line-height, '%')">
+          <xsl:attribute name="w:lineRule">auto</xsl:attribute>
+          <xsl:attribute name="w:line">
+            <!-- w:line expressed in 240ths of a line height when w:lineRule='auto' -->
+            <xsl:value-of
+              select="round(number(substring-before(@fo:line-height, '%')) * 240 div 100)"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="@fo:line-height">
+            <xsl:attribute name="w:lineRule">exact</xsl:attribute>
+            <xsl:attribute name="w:line">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:line-height"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+      <!-- top / bottom spacing -->
       <xsl:if test="@fo:margin-bottom">
         <xsl:attribute name="w:after">
           <xsl:call-template name="eightspoint-measure">
