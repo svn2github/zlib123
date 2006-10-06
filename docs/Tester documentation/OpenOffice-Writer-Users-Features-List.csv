@@ -156,9 +156,9 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;Tab stop;;2;0.2-M2;Completed;;174-176;;
 ;;;Page no;;2;0.2-M2;Completed;;174-176;;
 ;;;Character style;;2;0.2-M2;;;;;
-;;;Format;Tab position relative to Paragraph style indent;2;0.2-M2;;;;;
+;;;Format;Tab position relative to Paragraph style indent;2;0.2-M2;;;;;Has this feature equivalent in Word ?
 ;;;;;;;;;;;
-;;Styles;Levels;;2;0.2-M2;;;;;Has this feature equivalent in Word ?
+;;Styles;Levels;;2;0.2-M2;Completed;;174-176;;This feature doesn't have equivalent in Word
 ;;;Paragraph Styles;;2;0.2-M2;;;;;Has this feature equivalent in Word ?
 ;;;;;;;;;;;
 ;;Columns;No of columns;;2;0.2-Final;;;;;
