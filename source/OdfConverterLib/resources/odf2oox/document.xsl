@@ -2401,6 +2401,51 @@
     </w:r>
   </xsl:template>
 
+  <!-- empty alphabetical indexes creating mark entry -->
+  <xsl:template match="text:alphabetical-index-mark" mode="paragraph">
+    <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
+      <w:instrText xml:space="preserve"> XE "</w:instrText>
+    </w:r>
+    <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
+      <w:instrText>
+        <xsl:value-of select="./@text:string-value"/>
+      </w:instrText>
+    </w:r>
+    <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
+      <w:instrText xml:space="preserve">" </w:instrText>
+    </w:r>
+    <w:r>
+      <xsl:if test="ancestor::text:section/@text:display='none'">
+        <w:rPr>
+          <w:vanish/>
+        </w:rPr>
+      </xsl:if>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
+   </xsl:template>
 
   <!-- alphabetical indexes creating mark entry -->
   <xsl:template match="text:alphabetical-index-mark-end" mode="paragraph">
