@@ -132,8 +132,8 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;;
 ;Note;;;;2;0.2-M2;Completed;;86;;
 ;;;;;;;;;;;
-;Indexes and Tables - Entry;;Index;;;0.2-Final;;;;;
-;;;Entry;;2;0.2-Final;;;;;
+;Indexes and Tables - Entry;;Index;;;0.2-Final;Partial;;;;TODO: investigate if user-defined index has equivalent in Word
+;;;Entry;;2;0.2-Final;Completed;;;;
 ;;;1st Key;;;?;;;;;
 ;;;Main Entry;;;?;;;;;
 ;;;Apply to all similar texts;Match case;;?;;;;;
@@ -181,7 +181,6 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;Protected against manual changes;;;?;;;;;
 ;;;;;;;;;;;
 ;;;for;;1;0.2-M1;;;;;
-;;;Evaluate upto level;;1;0.2-M1;;;;;
 ;;;Options;Combine identical entries;1;0.2-M2;Completed;;;;
 ;;;;Combine with;1;0.2-M2;Completed;;;;
 ;;;;Case sensitive;1;0.2-M2;Completed;;;;
@@ -193,7 +192,6 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;Key type;;0.2-M2;;;;;
 ;;Entries;Level;;;0.2-M2;;;;;
 ;;;Structure;;;0.2-M2;Completed;;;;
-;;;Chapter no;;2;0.2-M2;;;;;
 ;;;Entry text;;2;0.2-M2;Completed;;;;
 ;;;Tab stop;;2;0.2-M2;Completed;;;;
 ;;;Page no;;2;0.2-M2;Completed;;;;
@@ -220,10 +218,10 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;;
 ;;;Keep ratio;;;0.2-M2;Completed;;;"This feature doesn't have a equivalent in Word (Word has different feature called ""lock acpect ratio"" but it works differently then ""keep ratio"" in OO. Openoffice ""keep ratio"" feature  doesn't block ratio - it justs calculates width and height)";
 ;;;;;;;;;;;
-;;;Anchor;To (page/ para/ char) / as char;1;0.2-M2;;;741;"There is no seperate property like anchor for frame/text-box in Word - it depends on value of ""alignement relative to"" property. In OpenOffice ""anchor"" and ""alignment relative to"" property are two different things. ";
+;;;Anchor;To (page/ para/ char) / as char;1;0.2-M2;Completed;;741;"There is no seperate property like anchor for frame/text-box in Word - it depends on value of ""alignement relative to"" property. In OpenOffice ""anchor"" and ""alignment relative to"" property are two different things. ";
 ;;;;;;;;;;;
-;;;Position;Horizontal;;0.2-M2;Partial;;737;relative to Left page border, right page border, entire page, page text area are converted;TODO See if there are equivalent in Word for relative to: Paragraph area, Paragraph text Area, left paragrpah border, right paragraph border
-;;;;Vertical;;0.2-M2;Partial;;739;relative to Page text area and Entire page are converted;TODO: relative to margin, paragraph text area
+;;;Position;Horizontal;;0.2-M2;Completed;There is no equivalent in Word for frame aligned as: right to left page border, center to page left border, center to right page border, from left to right page border ;737;relative to Left page border, right page border, entire page, page text area,paragraph text-area are converted;
+;;;;Vertical;;0.2-M2;Completed; Relative to margin, relative to Paragraph text area are interpreted differently in Word and in OO;739;;
 ;;;;;;;;;;;
 ;;Options;Name;;;?;;;;;
 ;;;Previous Link;;;?;;;;;
