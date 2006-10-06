@@ -1216,7 +1216,18 @@
         </v:shapetype>
 
         <v:shape type="#_x0000_t202">
-
+          <xsl:if test="ancestor::draw:a/@xlink:href">
+            <xsl:attribute name="href">
+              <xsl:choose>
+                <xsl:when test="substring-before(ancestor::draw:a/@xlink:href,'/')='..'">
+                  <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'/')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
           <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name"/>
           <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
           <xsl:variable name="officeStyle"
