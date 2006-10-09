@@ -2128,7 +2128,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:if
-          test="self[self::text:h] and ./@text:outline-level &lt;= 9 and document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
+          test="self::text:h and ./@text:outline-level &lt;= 9 and document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
           <w:numPr>
             <w:ilvl w:val="{./@text:outline-level - 1}"/>
             <w:numId w:val="1"/>
