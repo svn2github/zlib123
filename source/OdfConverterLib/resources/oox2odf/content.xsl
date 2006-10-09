@@ -32,7 +32,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships" exclude-result-prefixes="w">
 
@@ -45,6 +45,7 @@
 
   <xsl:key name="numId" match="w:num" use="w:abstractNumId/@w:val"/>
 
+  <!--main document-->
   <xsl:template name="content">
     <office:document-content>
       <office:scripts/>
@@ -131,7 +132,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Check outlineLvl if the paragraf is heading-->
+  <!-- Get outlineLvl if the paragraf is heading -->
   <xsl:template name="GetOutlineLevel">
     <xsl:choose>
       <xsl:when test="w:pPr/w:outlineLvl/@w:val">
@@ -190,41 +191,14 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template name="InsertHeading">
-    <xsl:param name="outlineLevel"/>
-    <text:h>
-      <xsl:if test="w:pPr">
-        <xsl:attribute name="text:style-name">
-          <xsl:value-of select="generate-id(self::node())"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:attribute name="text:outline-level">
-        <xsl:value-of select="$outlineLevel+1"/>
-      </xsl:attribute>
-      <xsl:for-each select="w:bookmarkStart">
-        <text:bookmark-start>
-          <xsl:attribute name="text:name">
-            <xsl:value-of select="@w:name"/>
-          </xsl:attribute>
-        </text:bookmark-start>
-      </xsl:for-each>
-      <xsl:value-of select="."/>
-      <xsl:for-each select="w:bookmarkEnd">
-        <text:bookmark-end>
-          <xsl:attribute name="text:name">
-            <xsl:variable name="bookmarkId">
-              <xsl:value-of select="@w:id"/>
-            </xsl:variable>
-            <xsl:value-of select="preceding::w:bookmarkStart[@w:id = $bookmarkId]/@w:name"/>
-          </xsl:attribute>
-        </text:bookmark-end>
-      </xsl:for-each>
-    </text:h>
-  </xsl:template>
-
+<!--  paragraphs, lists, headings-->
   <xsl:template match="w:p">
     <xsl:message terminate="no">progress:w:p</xsl:message>
-
+  
+    <xsl:variable name="outlineLevel">
+      <xsl:call-template name="GetOutlineLevel"/>
+    </xsl:variable>
+    
     <xsl:choose>
       <!-- check if list starts -->
       <xsl:when test="w:pPr/w:numPr">
@@ -235,39 +209,50 @@
           <xsl:apply-templates select="." mode="list"/>
         </xsl:if>
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select="." mode="paragraph"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template match="w:p" mode="paragraph">
-    <xsl:variable name="outlineLevel">
-      <xsl:call-template name="GetOutlineLevel"/>
-    </xsl:variable>
-
-    <xsl:choose>
+      
       <!--  check if the paragraf is heading -->
       <xsl:when test="$outlineLevel != '' ">
-        <xsl:call-template name="InsertHeading">
+        <xsl:apply-templates select="." mode="heading">
           <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
-        </xsl:call-template>
+        </xsl:apply-templates>
       </xsl:when>
-      <!--  default scenario -->
+      
       <xsl:otherwise>
-        <text:p>
-          <xsl:if test="w:pPr">
-            <xsl:attribute name="text:style-name">
-              <xsl:value-of select="generate-id(self::node())"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:apply-templates/>
-        </text:p>
+      <!--  default scenario - paragraph-->
+         <xsl:apply-templates select="." mode="paragraph" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  <!--paragraph with ouline level is a heading-->
+  <xsl:template match="w:p" mode="heading">
+    <xsl:param name="outlineLevel"/>
+    <text:h>
+      <xsl:if test="w:pPr">
+        <xsl:attribute name="text:style-name">
+          <xsl:value-of select="generate-id(self::node())"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="text:outline-level">
+        <xsl:value-of select="$outlineLevel+1"/>
+      </xsl:attribute>
+      <xsl:apply-templates />
+    </text:h>
+  </xsl:template>
+  
+<!--  paragraphs-->
+  <xsl:template match="w:p" mode="paragraph">
+    <text:p>
+      <xsl:if test="w:pPr">
+        <xsl:attribute name="text:style-name">
+          <xsl:value-of select="generate-id(self::node())"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:apply-templates /> 
+    </text:p>
+  </xsl:template>
 
-  <!-- paragraph has  numbering properties - is a list item -->
+  <!-- paragraph which has  numbering properties is a list item -->
   <xsl:template match="w:p" mode="list">
     <xsl:variable name="NumberingId2" select="w:pPr/w:numPr/w:numId/@w:val"/>
 
@@ -305,62 +290,39 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
+  <!-- run -->
   <xsl:template match="w:r">
     <xsl:message terminate="no">progress:w:r</xsl:message>
+    
     <xsl:choose>
-      <!-- check if we are in a fieldchar hyperlink -->
-      <xsl:when
-        test="count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and contains(preceding::w:instrText[last()],'HYPERLINK')">
-        <xsl:call-template name="InsertHyperlink"/>
-      </xsl:when>
-      <!-- don't show text in w:instrText tag -->
-      <xsl:when test="w:instrText"> </xsl:when>
+      <!-- attach formatting properties-->
       <xsl:when test="w:rPr">
         <text:span text:style-name="{generate-id(self::node())}">
           <xsl:apply-templates/>
         </text:span>
       </xsl:when>
+      
+      <!--default scenario-->
       <xsl:otherwise>
         <xsl:apply-templates/>
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
-
-  <!-- inserting simple hyperlink -->
-
+  
+  <!-- ignore text inside a field code -->
+  <xsl:template match="w:instrText" />
+  
+  <!-- hyperlinks -->
   <xsl:template match="w:hyperlink">
-    <xsl:call-template name="InsertHyperlink"/>
-  </xsl:template>
-
-  <!-- hyperlink template -->
-
-  <xsl:template name="InsertHyperlink">
     <text:a xlink:type="simple">
-      <xsl:choose>
-        <!-- simple hyperlink -->
-        <xsl:when test="@w:anchor">
-          <xsl:attribute name="xlink:href">
-            <xsl:value-of select="concat('#',@w:anchor)"/>
-          </xsl:attribute>
-          <text:span>
-            <xsl:apply-templates select="w:r/w:t"/>
-          </text:span>
-        </xsl:when>
-        <!-- fieldchar hyperlink -->
-        <xsl:when test="self::w:r">
-          <xsl:attribute name="xlink:href">
-            <xsl:value-of
-              select="concat('#_',substring-before(substring-after(preceding::w:instrText[last()],'_'),'&quot;'))"
-            />
-          </xsl:attribute>
-          <text:span>
-            <xsl:apply-templates select="w:t"/>
-          </text:span>
-        </xsl:when>
-        <xsl:otherwise> </xsl:otherwise>
-      </xsl:choose>
+      <!-- simple hyperlink -->
+      <xsl:if test="@w:anchor">
+        <xsl:attribute name="xlink:href">
+          <xsl:value-of select="concat('#',@w:anchor)"/>
+        </xsl:attribute>
+      </xsl:if>
+      
       <!-- Internet hyperlink -->
       <xsl:if test="@r:id">
         <xsl:variable name="relationshipId">
@@ -374,13 +336,19 @@
             </xsl:attribute>
           </xsl:if>
         </xsl:for-each>
-        <xsl:apply-templates select="w:r/w:t"/>
       </xsl:if>
+      
+      <!--  @TODO check if we are in a fieldchar hyperlink -->
+<!--      <xsl:when
+        test="count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and contains(preceding::w:instrText[last()],'HYPERLINK')">
+        <xsl:call-template name="InsertHyperlink"/>
+      </xsl:when>-->
+      
+      <xsl:apply-templates  />
     </text:a>
   </xsl:template>
   
-  <!-- Insert bookmarks -->
-  
+  <!--  text bookmark mark start -->
   <xsl:template match="w:bookmarkStart">  
     <text:bookmark-start>    
       <xsl:attribute name="text:name">
@@ -389,6 +357,7 @@
     </text:bookmark-start>
   </xsl:template>
   
+<!--  text bookmark mark end-->
   <xsl:template match="w:bookmarkEnd">
     <text:bookmark-end>
       <xsl:variable name="IdBookmark">
@@ -464,7 +433,8 @@
       </text:span>
     </xsl:for-each>
   </xsl:template>
-
+  
+  <!-- simple text  -->
   <xsl:template match="w:t">
     <xsl:message terminate="no">progress:w:t</xsl:message>
     <xsl:value-of select="."/>
