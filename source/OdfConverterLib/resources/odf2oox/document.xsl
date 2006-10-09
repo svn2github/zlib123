@@ -645,7 +645,7 @@
 
     <!-- insert numbering properties -->
     <xsl:call-template name="InsertNumbering">
-      <xsl:with-param name="level" select="."/>
+      <xsl:with-param name="level" select="$level"/>
     </xsl:call-template>
 
     <!-- override spacing before/after when required -->
@@ -2090,18 +2090,18 @@
     <xsl:param name="level"/>
     <xsl:variable name="stylename" select="./@text:style-name"/>
     <xsl:variable name="list"
-      select="//office:document-content/office:automatic-styles/style:style[@style:name = $stylename]"/>
+      select="key('automatic-styles', $stylename)"/>
     <xsl:choose>
       <xsl:when
         test="self::text:list-item or self::text:list-header or $list/@style:list-style-name">
-        <xsl:if test="not(self::text:list-header)">
+        <xsl:if test="not(self::text:list-header) and not(parent::text:list-header)">
           <w:numPr>
             <xsl:choose>
-              <xsl:when test="self::text:list-item">
+              <xsl:when test="self::text:list-item or parent::text:list-item">
                 <w:ilvl w:val="{$level}"/>
               </xsl:when>
               <xsl:otherwise>
-                <w:ilvl w:val="{$level/@text:outline-level - 1}"/>
+                <w:ilvl w:val="{./@text:outline-level - 1}"/>
               </xsl:otherwise>
             </xsl:choose>
             <w:numId>
@@ -2128,9 +2128,9 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:if
-          test="$level[self::text:h] and $level/@text:outline-level &lt;= 9 and document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
+          test="self[self::text:h] and ./@text:outline-level &lt;= 9 and document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
           <w:numPr>
-            <w:ilvl w:val="{$level/@text:outline-level - 1}"/>
+            <w:ilvl w:val="{./@text:outline-level - 1}"/>
             <w:numId w:val="1"/>
           </w:numPr>
         </xsl:if>
