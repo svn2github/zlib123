@@ -32,7 +32,7 @@
     <officeMenu>
       <menu id="OdfMenu" getLabel="GetLabel" insertAfterMso="FileSaveAsMenu" itemSize="large" getImage="GetImage">
         <button id="OdfImport" imageMso="FileOpen" getLabel="GetLabel" onAction="ImportODF" getDescription="GetDescription" />
-        <button id="OdfExport" imageMso="FileSave" getLabel="GetLabel" onAction="ExportODF" getDescription="GetDescription" enabled="false" />
+        <button id="OdfExport" imageMso="FileSave" getLabel="GetLabel" onAction="ExportODF" getDescription="GetDescription" enabled="true" />
       </menu>
     </officeMenu>
   </ribbon>
