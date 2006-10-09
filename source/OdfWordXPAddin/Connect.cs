@@ -173,7 +173,7 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
             // set action
             exportButton.OnAction = "!<OdfWordXPAddin.Connect>";
             exportButton.Visible = true;
-            exportButton.Enabled = false;
+            exportButton.Enabled = true;
             exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
 		}
 
