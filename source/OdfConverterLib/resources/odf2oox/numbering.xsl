@@ -856,85 +856,95 @@
       <!-- Override tabs of numbered elements ('num' tabs) if additional value (left margin or first line indent) defined. -->
       <xsl:if
         test="not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())) and ($addLeftIndent != 0 or $firstLineIndent != 0)">
-        <xsl:for-each select="document('content.xml')">
-          <w:tabs>
-            <!-- clear tab calculated without additional value -->
-            <w:tab w:val="clear">
-              <xsl:attribute name="w:pos">
-                <!--If props/@style:display-levels is defined and greater than 1, the tabs may not be well converted.-->
-                <xsl:choose>
-                  <xsl:when test="$spaceBeforeTwip &lt; 0">
-                    <xsl:choose>
-                      <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                        <xsl:value-of
-                          select="$minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:choose>
-                      <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                        <xsl:value-of
-                          select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
-            </w:tab>
-            <!-- replace with same distance + additional value -->
-            <w:tab>
+        <w:tabs>
+          <!-- clear tab calculated without additional value -->
+          <w:tab w:val="clear">
+            <xsl:attribute name="w:pos">
+              <!--If props/@style:display-levels is defined and greater than 1, the tabs may not be well converted.-->
               <xsl:choose>
-                <xsl:when test="$firstLineIndent != 0">
-                  <xsl:attribute name="w:val">num</xsl:attribute>
-                  <xsl:attribute name="w:pos">
-                    <xsl:value-of select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent + $minLabelWidthTwip"
-                    />
-                  </xsl:attribute>
+                <xsl:when test="$spaceBeforeTwip &lt; 0">
+                  <xsl:choose>
+                    <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                      <xsl:value-of
+                        select="$minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:attribute name="w:val">num</xsl:attribute>
-                  <xsl:attribute name="w:pos">
-                    <xsl:choose>
-                      <xsl:when test="$spaceBeforeTwip &lt; 0">
-                        <xsl:choose>
-                          <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                            <xsl:value-of
-                              select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"
-                            />
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:value-of
-                              select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip"/>
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:choose>
-                          <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                            <xsl:value-of
-                              select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"
-                            />
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:value-of
-                              select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                      <xsl:value-of
+                        select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
-            </w:tab>
-          </w:tabs>
-        </xsl:for-each>
+            </xsl:attribute>
+          </w:tab>
+          <!-- replace with same distance + additional value -->
+          <w:tab>
+            <xsl:choose>
+              <xsl:when test="$firstLineIndent != 0">
+                <xsl:attribute name="w:val">num</xsl:attribute>
+                <xsl:attribute name="w:pos">
+                  <xsl:value-of
+                    select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent + $minLabelWidthTwip"
+                  />
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="w:val">num</xsl:attribute>
+                <xsl:attribute name="w:pos">
+                  <xsl:choose>
+                    <xsl:when test="$spaceBeforeTwip &lt; 0">
+                      <xsl:choose>
+                        <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                          <xsl:value-of
+                            select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"
+                          />
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of
+                            select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:choose>
+                        <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                          <xsl:value-of
+                            select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"
+                          />
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of
+                            select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+          </w:tab>
+          <!-- add tabs of current paragraph so as not to lose them in post-processing -->
+          <xsl:if test="key('automatic-styles',$styleName)//style:tab-stop">
+            <xsl:for-each select="key('automatic-styles',$styleName)/style:paragraph-properties">
+              <xsl:call-template name="ComputeParagraphTabs"/>
+            </xsl:for-each>
+          </xsl:if>
+          <xsl:if test="key('styles',$styleName)//style:tab-stop">
+            <xsl:for-each select="key('styles',$styleName)/style:paragraph-properties">
+              <xsl:call-template name="ComputeParagraphTabs"/>
+            </xsl:for-each>
+          </xsl:if>
+        </w:tabs>
       </xsl:if>
 
       <!-- insert indent with paragraph and numbering properties

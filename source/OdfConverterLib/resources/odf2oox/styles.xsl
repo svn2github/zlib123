@@ -275,7 +275,9 @@
 
     <!-- Tabs -->
     <xsl:if test="style:tab-stops/style:tab-stop">
-      <xsl:call-template name="ComputeParagraphTabs"/>
+      <w:tabs>
+        <xsl:call-template name="ComputeParagraphTabs"/>
+      </w:tabs>
     </xsl:if>
 
     <!-- Override hyphenation -->
@@ -378,39 +380,68 @@
 
   <!-- Paragraph tabs property -->
   <xsl:template name="ComputeParagraphTabs">
-    <w:tabs>
-      <xsl:for-each select="style:tab-stops/style:tab-stop">
-        <xsl:call-template name="tabStop"/>
-      </xsl:for-each>
+    <xsl:for-each select="style:tab-stops/style:tab-stop">
+      <xsl:call-template name="tabStop"/>
+    </xsl:for-each>
 
-      <!-- clear parent tabs if needed. -->
-      <xsl:variable name="styleName">
-        <xsl:value-of select="parent::node()/@style:name"/>
-      </xsl:variable>
-      <xsl:variable name="parentstyleName">
-        <xsl:value-of select="parent::node()/@style:parent-style-name"/>
-      </xsl:variable>
-      <xsl:for-each select="document('styles.xml')">
-        <xsl:for-each select="key('styles', $parentstyleName)[1]//style:tab-stop">
-          <xsl:variable name="parentPosition" select="@style:position"/>
-          <xsl:variable name="clear">
-            <xsl:for-each select="document('content.xml')">
-              <!-- TODO : Aren't key('automatic-styles', $styleName)[1] and parent::node() the same, here ? -->
+    <!-- clear parent tabs if needed. -->
+    <xsl:variable name="styleName">
+      <xsl:value-of select="parent::node()/@style:name"/>
+    </xsl:variable>
+    <xsl:variable name="parentstyleName">
+      <xsl:value-of select="parent::node()/@style:parent-style-name"/>
+    </xsl:variable>
+    <!-- remember original context -->
+    <xsl:variable name="styleContext">
+      <xsl:choose>
+        <xsl:when test="ancestor::office:document-content">content</xsl:when>
+        <xsl:when test="ancestor::office:document-styles">
+          <xsl:choose>
+            <xsl:when test="ancestor::office:automatic-styles">automaticStyles</xsl:when>
+            <xsl:when test="ancestor::office:styles">styles</xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- change context to see if it is necessary to clear parent tabs -->
+    <xsl:for-each select="document('styles.xml')">
+      <xsl:for-each select="key('styles', $parentstyleName)[1]//style:tab-stop">
+        <xsl:variable name="parentPosition" select="@style:position"/>
+        <xsl:variable name="clear">
+          <!-- go back to original context, and check if parent tab is also present in unheriting style -->
+          <xsl:choose>
+            <xsl:when test="$styleContext='content' ">
+              <xsl:for-each select="document('content.xml')">
+                <xsl:if
+                  test="not($parentPosition = key('automatic-styles', $styleName)[1]//style:tab-stop/@style:position)">
+                  <xsl:value-of select="'true'"/>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="$styleContext='automaticStyles' ">
               <xsl:if
                 test="not($parentPosition = key('automatic-styles', $styleName)[1]//style:tab-stop/@style:position)">
                 <xsl:value-of select="'true'"/>
               </xsl:if>
-            </xsl:for-each>
-          </xsl:variable>
-          <!-- clear the tab, from the parent style context. -->
-          <xsl:if test="$clear = 'true' ">
-            <xsl:call-template name="tabStop">
-              <xsl:with-param name="styleType">clear</xsl:with-param>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="$styleContext='styles' ">
+                <xsl:if
+                  test="not($parentPosition = key('styles', $styleName)[1]//style:tab-stop/@style:position)">
+                  <xsl:value-of select="'true'"/>
+                </xsl:if>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <!-- clear the tab, from the parent style context. -->
+        <xsl:if test="$clear = 'true' ">
+          <xsl:call-template name="tabStop">
+            <xsl:with-param name="styleType">clear</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
       </xsl:for-each>
-    </w:tabs>
+    </xsl:for-each>
   </xsl:template>
 
 
@@ -1110,11 +1141,11 @@
       <!-- tab stop type -->
       <xsl:attribute name="w:val">
         <xsl:choose>
-          <xsl:when test="@style:type">
-            <xsl:value-of select="@style:type"/>
-          </xsl:when>
           <xsl:when test="$styleType">
             <xsl:value-of select="$styleType"/>
+          </xsl:when>
+          <xsl:when test="@style:type">
+            <xsl:value-of select="@style:type"/>
           </xsl:when>
           <xsl:otherwise>left</xsl:otherwise>
         </xsl:choose>
