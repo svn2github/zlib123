@@ -55,6 +55,7 @@
     </Compile>
     <Compile Include="Connect.cs">
     </Compile>
+    <Compile Include="ConverterInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
