@@ -2121,6 +2121,10 @@
         <xsl:if test="not(self::text:list-header) and not(parent::text:list-header)">
           <w:numPr>
             <xsl:choose>
+              <xsl:when
+                test="self::text:list-item and *[1][self::text:h and @text:outline-level &lt;= 9]">
+                <w:ilvl w:val="{text:h[1]/@text:outline-level - 1}"/>
+              </xsl:when>
               <xsl:when test="self::text:list-item or parent::text:list-item">
                 <w:ilvl w:val="{$level}"/>
               </xsl:when>
@@ -2131,6 +2135,9 @@
             <w:numId>
               <xsl:attribute name="w:val">
                 <xsl:choose>
+                  <xsl:when
+                    test="self::text:list-item and *[1][self::text:h and @text:outline-level &lt;= 9]"
+                    >1</xsl:when>
                   <xsl:when test="self::text:list-item">
                     <xsl:call-template name="GetNumberingId">
                       <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"
