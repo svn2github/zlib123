@@ -27,8 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xlink="http://www.w3.org/1999/xlink" 
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
@@ -93,39 +92,35 @@
 
   <!-- OLE Objects relationships -->
   <xsl:template name="InsertOleObjectsRelationships">
-     <xsl:param name="oleObjects"/>
-    
-      <xsl:for-each select="$oleObjects">
-        <xsl:variable name="oleName"
-          select="translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')"/>
-        <pzip:copy pzip:source="{substring-after(draw:object-ole/@xlink:href,'./')}"
-          pzip:target="word/embeddings/{$oleName}"/>
-        <Relationship 
-          xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-          Id="{generate-id(draw:object-ole)}"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
-          Target="embeddings/{$oleName}"/>
+    <xsl:param name="oleObjects"/>
 
-        <xsl:if test="draw:image">
-          <xsl:variable name="objectReplacement"
-            select="translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')"/>
-          <pzip:copy pzip:source="{substring-after(draw:image/@xlink:href,'./')}"
-            pzip:target="word/media/{$objectReplacement}"/>
-          <Relationship 
-            xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-            Id="{generate-id(draw:image)}"
-            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-            Target="media/{$objectReplacement}"/>
-          <xsl:if test="ancestor::draw:a">
-            <Relationship 
-              xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-              Id="{generate-id(ancestor::draw:a)}"
-              Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-              TargetMode="External" 
-              Target="{ancestor::draw:a/@xlink:href}"/>
-          </xsl:if>
+    <xsl:for-each select="$oleObjects">
+      <xsl:variable name="oleName"
+        select="translate(concat(substring-after(draw:object-ole/@xlink:href,'./'),'.bin'),' ','')"/>
+      <pzip:copy pzip:source="{substring-after(draw:object-ole/@xlink:href,'./')}"
+        pzip:target="word/embeddings/{$oleName}"/>
+      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+        Id="{generate-id(draw:object-ole)}"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/oleObject"
+        Target="embeddings/{$oleName}"/>
+
+      <xsl:if test="draw:image">
+        <xsl:variable name="objectReplacement"
+          select="translate(concat(substring-after(draw:image/@xlink:href,'ObjectReplacements/'),'.wmf'),' ','')"/>
+        <pzip:copy pzip:source="{substring-after(draw:image/@xlink:href,'./')}"
+          pzip:target="word/media/{$objectReplacement}"/>
+        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+          Id="{generate-id(draw:image)}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+          Target="media/{$objectReplacement}"/>
+        <xsl:if test="ancestor::draw:a">
+          <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+            Id="{generate-id(ancestor::draw:a)}"
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+            TargetMode="External" Target="{ancestor::draw:a/@xlink:href}"/>
         </xsl:if>
-      </xsl:for-each>
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
 
 
@@ -147,46 +142,44 @@
             <xsl:variable name="imageName"
               select="substring-after(draw:image/@xlink:href, 'Pictures/')"/>
             <pzip:copy pzip:source="{draw:image/@xlink:href}" pzip:target="word/media/{$imageName}"/>
-            <Relationship 
-              xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
               Id="{generate-id(draw:image)}"
               Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
               Target="media/{$imageName}"/>
             <xsl:if test="ancestor::draw:a">
-              <Relationship 
-                xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+              <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                 Id="{generate-id(ancestor::draw:a)}"
                 Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
                 TargetMode="External">
-              <xsl:attribute name="Target">
-                <xsl:choose>
+                <xsl:attribute name="Target">
+                  <xsl:choose>
 
-<!-- converting relative path -->
-                <xsl:when test="starts-with(ancestor::draw:a/@xlink:href,'../')">
-                <xsl:call-template name="HandlingSpaces">
-                <xsl:with-param name="path">
-                  <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'../')"/>
-                </xsl:with-param>
-                </xsl:call-template>
-                </xsl:when>
+                    <!-- converting relative path -->
+                    <xsl:when test="starts-with(ancestor::draw:a/@xlink:href,'../')">
+                      <xsl:call-template name="HandlingSpaces">
+                        <xsl:with-param name="path">
+                          <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'../')"
+                          />
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:when>
 
-                <xsl:otherwise>
-                  <xsl:call-template name="HandlingSpaces">
-                    <xsl:with-param name="path">
-                      <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:otherwise>
-                </xsl:choose>
+                    <xsl:otherwise>
+                      <xsl:call-template name="HandlingSpaces">
+                        <xsl:with-param name="path">
+                          <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:attribute>
-                </Relationship>
+              </Relationship>
             </xsl:if>
           </xsl:when>
           <xsl:otherwise>
 
             <!-- External image : If relative path, image may not be converted. -->
-            <Relationship 
-              xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
               Id="{generate-id(draw:image)}"
               Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
               <xsl:attribute name="Target">
@@ -202,8 +195,7 @@
               <xsl:attribute name="TargetMode">External</xsl:attribute>
             </Relationship>
             <xsl:if test="ancestor::draw:a">
-              <Relationship 
-                xmlns="http://schemas.openxmlformats.org/package/2006/relationships" 
+              <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
                 Id="{generate-id(ancestor::draw:a)}"
                 Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
                 TargetMode="External" Target="{ancestor::draw:a/@xlink:href}"/>
@@ -213,41 +205,39 @@
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
-  
+
   <!--handling spaces in paths-->
-  
+
   <xsl:template name="HandlingSpaces">
     <xsl:param name="path"/>
     <xsl:choose>
-    <xsl:when test="contains($path,' ')">
-      <xsl:variable name="subPath">
-        <xsl:call-template name="HandlingSpaces">
-          <xsl:with-param name="path" select="substring-after($path,' ')"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:value-of select="concat(substring-before($path,' '),'%20',$subPath)"/>
-    </xsl:when>
+      <xsl:when test="contains($path,' ')">
+        <xsl:variable name="subPath">
+          <xsl:call-template name="HandlingSpaces">
+            <xsl:with-param name="path" select="substring-after($path,' ')"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="concat(substring-before($path,' '),'%20',$subPath)"/>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$path"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
- 
- 
+
+
   <!-- Headers / footers relationships -->
   <xsl:template name="InsertHeaderFooterRelationships">
     <xsl:for-each
       select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[style:header or style:header-left or style:footer or style:footer-left]">
       <xsl:if test="style:header">
-        <Relationship
-          xmlns="http://schemas.openxmlformats.org/package/2006/relationships"  
+        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
           Id="{generate-id(style:header)}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header"
           Target="header{position()}.xml"/>
       </xsl:if>
       <xsl:if test="style:footer">
-        <Relationship 
-          xmlns="http://schemas.openxmlformats.org/package/2006/relationships" 
+        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
           Id="{generate-id(style:footer)}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer"
           Target="footer{position()}.xml"/>
@@ -261,8 +251,7 @@
     <xsl:param name="hyperlinks"/>
 
     <xsl:for-each select="$hyperlinks">
-      <Relationship 
-        xmlns="http://schemas.openxmlformats.org/package/2006/relationships" 
+      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
         Id="{generate-id()}"
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
         TargetMode="External">
@@ -278,25 +267,45 @@
       </Relationship>
     </xsl:for-each>
   </xsl:template>
-  
-  <!-- Bullet-image relationships -->  
- <xsl:template name="InsertBuletRelationships">
+
+  <!-- Bullet-image relationships -->
+  <xsl:template name="InsertBuletRelationships">
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      <xsl:for-each select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image">
-        <xsl:variable name="ImageBulletName">
-          <xsl:value-of select="substring-after(@xlink:href, 'Pictures/')"/>
-        </xsl:variable>
-        <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
-          <xsl:attribute name="Id">
-            <xsl:value-of select="generate-id(.)"/>
-          </xsl:attribute>
-          <xsl:attribute name="Target">
-            <xsl:value-of select="concat('media/', $ImageBulletName)"/>
-          </xsl:attribute>
-        </Relationship>        
-        <pzip:copy pzip:source="{@xlink:href}" pzip:target="word/media/{$ImageBulletName}"/>
-      </xsl:for-each>   
+      <xsl:for-each select="document('content.xml')">
+        <xsl:for-each select="key('bullets','')">
+          <xsl:variable name="ImageBulletName">
+            <xsl:value-of select="substring-after(@xlink:href, 'Pictures/')"/>
+          </xsl:variable>
+          <Relationship
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+            <xsl:attribute name="Id">
+              <xsl:value-of select="generate-id(.)"/>
+            </xsl:attribute>
+            <xsl:attribute name="Target">
+              <xsl:value-of select="concat('media/', $ImageBulletName)"/>
+            </xsl:attribute>
+          </Relationship>
+          <pzip:copy pzip:source="{@xlink:href}" pzip:target="word/media/{$ImageBulletName}"/>
+        </xsl:for-each>
+      </xsl:for-each>
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:for-each select="key('bullets','')">
+          <xsl:variable name="ImageBulletName">
+            <xsl:value-of select="substring-after(@xlink:href, 'Pictures/')"/>
+          </xsl:variable>
+          <Relationship
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+            <xsl:attribute name="Id">
+              <xsl:value-of select="generate-id(.)"/>
+            </xsl:attribute>
+            <xsl:attribute name="Target">
+              <xsl:value-of select="concat('media/', $ImageBulletName)"/>
+            </xsl:attribute>
+          </Relationship>
+          <pzip:copy pzip:source="{@xlink:href}" pzip:target="word/media/{$ImageBulletName}"/>
+        </xsl:for-each>
+      </xsl:for-each>
     </Relationships>
-    </xsl:template> 
+  </xsl:template>
 
 </xsl:stylesheet>

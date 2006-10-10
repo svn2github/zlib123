@@ -41,6 +41,7 @@
 
   <xsl:key name="list-style" match="text:list-style" use="@style:name"/>
   <xsl:key name="list-content" match="text:list" use="@text:style-name"/>
+  <xsl:key name="bullets" match="text:list-level-style-image" use="''"/>
 
   <xsl:variable name="automaticListStylesCount"
     select="count(document('content.xml')/office:document-content/office:automatic-styles/text:list-style)"/>
@@ -59,11 +60,19 @@
       xmlns:w10="urn:schemas-microsoft-com:office:word"
       xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
 
-      <xsl:for-each
-        select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image">
-        <xsl:call-template name="numPicBullet">
-          <xsl:with-param name="numPicBulletId" select="position()"/>
-        </xsl:call-template>
+      <xsl:for-each select="document('content.xml')">
+        <xsl:for-each select="key('bullets','')">
+          <xsl:call-template name="numPicBullet">
+            <xsl:with-param name="numPicBulletId" select="position()"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:for-each>
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:for-each select="key('bullets','')">
+          <xsl:call-template name="numPicBullet">
+            <xsl:with-param name="numPicBulletId" select="position()"/>
+          </xsl:call-template>
+        </xsl:for-each>
       </xsl:for-each>
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:outline-style"
@@ -224,9 +233,7 @@
               <xsl:value-of select="generate-id(.)"/>
             </xsl:attribute>
             <xsl:attribute name="o:title">
-              <xsl:value-of
-                select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image/@xlink:href"
-              />
+              <xsl:value-of select="@xlink:href"/>
             </xsl:attribute>
           </v:imagedata>
         </v:shape>
