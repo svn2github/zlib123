@@ -451,6 +451,14 @@
     <w:spacing>
       <!-- line spacing -->
       <xsl:choose>
+        <xsl:when test="@style:line-height-at-least">
+          <xsl:attribute name="w:lineRule">atLeast</xsl:attribute>
+          <xsl:attribute name="w:line">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="@style:line-height-at-least"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:when>
         <xsl:when test="@style:line-spacing">
           <xsl:variable name="spacing">
             <xsl:call-template name="twips-measure">
