@@ -484,14 +484,14 @@
       <!-- top / bottom spacing -->
       <xsl:if test="@fo:margin-bottom">
         <xsl:attribute name="w:after">
-          <xsl:call-template name="eightspoint-measure">
+          <xsl:call-template name="twips-measure">
             <xsl:with-param name="length" select="@fo:margin-bottom"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
       <xsl:if test="@fo:margin-top">
         <xsl:attribute name="w:before">
-          <xsl:call-template name="eightspoint-measure">
+          <xsl:call-template name="twips-measure">
             <xsl:with-param name="length" select="@fo:margin-top"/>
           </xsl:call-template>
         </xsl:attribute>
