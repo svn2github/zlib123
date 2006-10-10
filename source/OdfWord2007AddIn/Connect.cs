@@ -306,6 +306,13 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                         {
                             System.Windows.Forms.DialogResult dr = form.ShowDialog();
 
+                            if (form.HasLostElements)
+                            {
+                                ArrayList elements = form.LostElements;
+                                InfoBox infoBox = new InfoBox("FeedbackLabel", elements, labelsResourceManager);
+                                infoBox.ShowDialog();
+                            }
+
                             if (form.Exception != null)
                             {
                                 throw form.Exception;
@@ -314,11 +321,8 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                     }
                     catch (Exception e)
                     {
-#if DEBUG
-                    System.Windows.Forms.MessageBox.Show(e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")");
-#else
-                        System.Windows.Forms.MessageBox.Show(labelsResourceManager.GetString("OdfUnexpectedError"));
-#endif
+                        InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", labelsResourceManager);
+                        infoBox.ShowDialog();
                     }
                     finally
                     {
