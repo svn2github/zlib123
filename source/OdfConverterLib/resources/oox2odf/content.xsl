@@ -34,7 +34,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns="http://schemas.openxmlformats.org/package/2006/relationships" exclude-result-prefixes="w">
+  xmlns="http://schemas.openxmlformats.org/package/2006/relationships" exclude-result-prefixes="w"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
 
   <xsl:import href="tables.xsl"/>
   <xsl:import href="lists.xsl"/>
@@ -49,7 +50,10 @@
   <xsl:template name="content">
     <office:document-content>
       <office:scripts/>
-      <office:font-face-decls/>
+      <office:font-face-decls>
+        <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
+          mode="fontfacedecls"/>
+      </office:font-face-decls>
       <office:automatic-styles>
         <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
           mode="automaticstyles"/>
@@ -65,6 +69,26 @@
     </office:document-content>
   </xsl:template>
 
+ <xsl:template match="w:rPr[parent::w:r]|w:rPr[parent::w:pPr]" mode="fontfacedecls">
+    <xsl:if test="w:rFonts">
+      <xsl:variable name="ascii" select="w:rFonts/@w:ascii"/>
+      <xsl:if test="not(preceding::w:rFonts[@w:ascii = $ascii])">
+        <style:font-face>
+          <xsl:attribute name="style:name">
+            <xsl:value-of select="$ascii"/>
+          </xsl:attribute>
+          <xsl:attribute name="svg:font-family">
+            <xsl:value-of select="w:rFonts/@w:hAnsi"/>
+          </xsl:attribute>
+        </style:font-face>
+       </xsl:if>
+    </xsl:if>
+ </xsl:template>
+  
+  <xsl:template match="w:t" mode="fontfacedecls">
+    <!--do nothing-->
+  </xsl:template>
+  
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
   <xsl:template match="w:pPr[parent::w:p]" mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
