@@ -128,6 +128,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             delegateSettings.ConformanceLevel = ConformanceLevel.Document;
         	
             resolver = res;
+
+            //Debug.Listeners.Add(new TextWriterTraceListener("debug.txt"));
+   
         }
 
         protected override void Dispose(bool disposing) {

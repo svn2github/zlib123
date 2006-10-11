@@ -75,13 +75,15 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         private static string OOX_DOCUMENT_RELATIONSHIP_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
     
         private XmlReaderSettings settings = null; // global settings to open the xml files
+        private Report report;
 		
 		/// <summary>
 		/// Initialize the validator
 		/// </summary>
-		public OoxValidator()
+		public OoxValidator(Report report)
 		{
 			this.settings = new XmlReaderSettings();
+            this.report = report;
 			
 			// resolver
 			ResourceResolver resolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCES_LOCATION);
@@ -108,8 +110,9 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 		/// </summary>
 		public static void test()
 		{
+            Report report = new Report(null, Report.DEBUG_LEVEL);
 			// the validator
-			OoxValidator v = new OoxValidator();
+            OoxValidator v = new OoxValidator(report);
 			
 			// valid package
 			v.validate("tests/valid.docx");
@@ -136,7 +139,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 				}
 				catch (OoxValidatorException) {}
 			}
-			Console.WriteLine("All tests succeed");
+			report.AddLog("test", "All tests succeed", Report.INFO_LEVEL);
 		}
 		
 	    /// <summary>

@@ -216,7 +216,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             if (this.validate)
             {
                 this.report.AddComment("Instanciating validator, please wait...");
-                this.ooxValidator = new OoxValidator();
+                this.ooxValidator = new OoxValidator(this.report);
                 this.report.AddComment("Validator instanciated");
             }
 
@@ -357,13 +357,13 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             catch (NotAnOdfDocumentException e)
             {
                 this.report.AddLog(input, "Conversion failed - Input file is not a valid ODF file", Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                 return false;
             }
             catch (NotAnOoxDocumentException e)
             {
                 this.report.AddLog(input, "Conversion failed - Input file is not a valid DOCX file", Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                 return false;
             }
             catch (ZipException e)
@@ -375,7 +375,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             catch (Exception e)
             {
                 this.report.AddLog(input, "Conversion failed - Error during conversion", Report.ERROR_LEVEL);
-                this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                 return false;
             }
         }
@@ -389,7 +389,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                     if (this.ooxValidator == null)
                     {
                         this.report.AddComment("Instanciating validator, please wait...");
-                        this.ooxValidator = new OoxValidator();
+                        this.ooxValidator = new OoxValidator(this.report);
                         this.report.AddComment("Validator instanciated");
                     }
                     this.ooxValidator.validate(output);
@@ -399,13 +399,13 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 catch (OoxValidatorException e)
                 {
                     this.report.AddLog(input, "Converted file (" + output + ") is invalid", Report.WARNING_LEVEL);
-                    this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                     return false;
                 }
                 catch (Exception e)
                 {
                     this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, Report.ERROR_LEVEL);
-                    this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                     return false;
                 }
             }
@@ -426,13 +426,13 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 catch (OdfValidatorException e)
                 {
                     this.report.AddLog(input, "Converted file (" + output + ") is invalid", Report.WARNING_LEVEL);
-                    this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                     return false;
                 }
                 catch (Exception e)
                 {
                     this.report.AddLog(input, "An unexpected exception occured when trying to validate " + output, Report.ERROR_LEVEL);
-                    this.report.AddLog(input, e.Message, Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                     return false;
                 }
             }
@@ -453,7 +453,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 catch (Exception e)
                 {
                     this.report.AddLog(input, "Converted file (" + output + ") could not be opened in Word", Report.ERROR_LEVEL);
-                    this.report.AddLog(input, e.GetType().Name + ": " + e.Message, Report.DEBUG_LEVEL);
+                    this.report.AddLog(input, e.GetType().Name + ": " + e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                     return false;
                 }
             }

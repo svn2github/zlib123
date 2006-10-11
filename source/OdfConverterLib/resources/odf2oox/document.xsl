@@ -1269,9 +1269,7 @@
     <w:r>
       <w:rPr>
         <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:rPr>
-            <w:vanish/>
-          </w:rPr>
+          <w:vanish/>
         </xsl:if>
         <xsl:call-template name="InsertTextBoxStyle"/>
       </w:rPr>

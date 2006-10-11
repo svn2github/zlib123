@@ -329,6 +329,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private XmlWriter InstanciatePostProcessors(string[] procNames, XmlWriter lastProcessor, string skipPostProcessor)
         {
             XmlWriter currentProc = lastProcessor;
+            //XmlWriter currentProc = XmlWriter.Create("output.xml");
             for (int i = procNames.Length - 1; i >= 0; --i)
             {
                 if (!procNames[i].Equals(skipPostProcessor))
