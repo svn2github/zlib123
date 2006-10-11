@@ -1,6 +1,6 @@
 OOX Experience / Scenario;Feature;Priority ;Delivery Milestone ;Completion Status;Developer;Technical description;Remarks/Questions
 Main Document Story;;;;;;;
-;background (Document Background) ;;;;;;
+;background (Document Background) ;;;"color works; TODO: investigate what's more needed";rebet;;
 ;body (Document Body);;;;;;
 ;document (Document) ;;;;;;
 Paragraphs;;;;;;;
@@ -15,7 +15,7 @@ Paragraphs;;;;;;;
 ;contextualSpacing (Ignore Spacing Above and Below When Using Identical Styles) ;;;;;;
 ; divId (Associated HTML DIV ID) ;;;;;;
 ; framePr (Text Frame Properties) ;;;;;;
-; ind (Paragraph indentation) ;;;;;;
+; ind (Paragraph indentation) ;;;completed;rebet;;
 ; jc (Paragraph Alignment) ;;;;;;
 ; keepLines (Keep All Lines On One Page) ;;;;;;
 ; keepNext (Keep Paragraph With Next Paragraph) ;;;;;;
@@ -221,9 +221,9 @@ Sections;;;;;;;
 ;lnNumType (Line Numbering Settings) ;;;;;;
 ;paperSrc (Paper Source Information) ;;;;;;
 ;pgBorders (Page Borders) ;;;;;;
-;pgMar (Page Margins) ;;;;;;
+;pgMar (Page Margins) ;;;completed;rebet;;
 ;pgNumType (Page Numbering Settings) ;;;;;;
-;pgSz (Page Size) ;;;;;;
+;pgSz (Page Size) ;;;completed;rebet;;
 ;right (Right Border) ;;;;;;
 ;rtlGutter (Gutter on Right Side of Page) ;;;;;;
 ;sectPr (Previous Section Properties) ;;;;;;
