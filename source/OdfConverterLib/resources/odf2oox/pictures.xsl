@@ -148,22 +148,24 @@
           <w:pict>
             <v:shape id="{$imageId}" type="#_x0000_t75">
 
-              <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name" />
-              <xsl:variable name="automaticStyle" select="key('automatic-styles', parent::draw:frame/@draw:style-name)" />
-              <xsl:variable name="officeStyle" select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
-             
-              <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle" />
-              
-            <!-- shape properties: size, z-index, coordinates, position, margin etc -->
+              <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name"/>
+              <xsl:variable name="automaticStyle"
+                select="key('automatic-styles', parent::draw:frame/@draw:style-name)"/>
+              <xsl:variable name="officeStyle"
+                select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+
+              <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+
+              <!-- shape properties: size, z-index, coordinates, position, margin etc -->
               <xsl:call-template name="InsertShapeProperties">
-                <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
               </xsl:call-template>
-            
+
               <v:imagedata r:id="{generate-id(.)}" o:title=""/>
-              
+
               <!-- wrapping -->
               <xsl:call-template name="InsertShapeWrap">
-                <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
               </xsl:call-template>
 
             </v:shape>
@@ -254,7 +256,7 @@
       <xsl:variable name="officeStyle"
         select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = @draw:style-name]"/>
       <xsl:variable name="imageStyle" select="$automaticStyle | $officeStyle"/>
-      
+
       <xsl:choose>
         <!-- image embedded in draw:frame/draw:text-box or in text:note element has to be inline with text -->
         <xsl:when
@@ -284,7 +286,7 @@
     <xsl:param name="cx"/>
     <xsl:param name="cy"/>
     <xsl:param name="imageId"/>
-    <xsl:param name="imageStyle" />
+    <xsl:param name="imageStyle"/>
 
     <wp:inline>
 
@@ -309,18 +311,18 @@
     <xsl:param name="cx"/>
     <xsl:param name="cy"/>
     <xsl:param name="imageId"/>
-    <xsl:param name="imageStyle" />
+    <xsl:param name="imageStyle"/>
 
     <wp:anchor simplePos="0" locked="0" layoutInCell="1" allowOverlap="1">
 
       <!-- image z-index-->
-      <xsl:call-template name="InsertZindex" >
-        <xsl:with-param name="imageStyle" select="$imageStyle" />
+      <xsl:call-template name="InsertZindex">
+        <xsl:with-param name="imageStyle" select="$imageStyle"/>
       </xsl:call-template>
-      
+
       <!-- position -->
       <xsl:call-template name="InsertAnchorImagePosition">
-        <xsl:with-param name="imageStyle" select="$imageStyle" />
+        <xsl:with-param name="imageStyle" select="$imageStyle"/>
       </xsl:call-template>
 
       <!--height and width -->
@@ -329,7 +331,7 @@
 
       <!--image wrapping-->
       <xsl:call-template name="InsertAnchorImageWrapping">
-        <xsl:with-param name="imageStyle" select="$imageStyle" />
+        <xsl:with-param name="imageStyle" select="$imageStyle"/>
       </xsl:call-template>
 
       <!-- image graphical properties: borders, fill, ratio blocking etc-->
@@ -337,7 +339,7 @@
         <xsl:with-param name="cx" select="$cx"/>
         <xsl:with-param name="cy" select="$cy"/>
         <xsl:with-param name="imageId" select="$imageId"/>
-        <xsl:with-param name="imageStyle" select="$imageStyle" />
+        <xsl:with-param name="imageStyle" select="$imageStyle"/>
       </xsl:call-template>
     </wp:anchor>
 
@@ -345,25 +347,25 @@
 
   <xsl:template name="InsertZindex">
     <xsl:param name="imageStyle"/>
-    
+
     <xsl:variable name="inBackground">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$imageStyle"/>
         <xsl:with-param name="attribName">style:run-through</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="wrap">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$imageStyle"/>
         <xsl:with-param name="attribName">style:wrap</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:attribute name="relativeHeight">
       <xsl:value-of select="2 + @draw:z-index"/>
     </xsl:attribute>
-    
+
     <xsl:attribute name="behindDoc">
       <xsl:choose>
         <xsl:when test="$wrap = 'run-through' and $inBackground = 'background' ">1</xsl:when>
@@ -371,12 +373,12 @@
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-  
+
   <xsl:template name="InsertImageGraphicProperties">
     <xsl:param name="imageId"/>
     <xsl:param name="cx"/>
     <xsl:param name="cy"/>
-    <xsl:param name="imageStyle" />
+    <xsl:param name="imageStyle"/>
 
     <!--drawing non-visual properties-->
     <wp:docPr name="{@draw:name}" id="{$imageId}">
@@ -405,10 +407,13 @@
           </pic:nvPicPr>
           <pic:blipFill>
             <a:blip r:embed="{generate-id(draw:image)}"/>
-            <xsl:variable name="styleCrop" select="./@draw:style-name"/>
-            <xsl:variable name="clip" select="//office:document-content/office:automatic-styles/style:style[@style:name = $styleCrop]"/>
-            <xsl:if test="$clip/style:graphic-properties/@fo:clip">
-              <xsl:call-template name="InsertImageCropProperties"/>
+            <xsl:if
+              test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip">
+              <xsl:call-template name="InsertImageCropProperties">
+                <xsl:with-param name="clip"
+                  select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip"
+                />
+              </xsl:call-template>
             </xsl:if>
             <a:stretch>
               <a:fillRect/>
@@ -423,7 +428,7 @@
               <a:avLst/>
             </a:prstGeom>
             <xsl:call-template name="InsertImageBorders">
-              <xsl:with-param name="imageStyle" select="$imageStyle" />
+              <xsl:with-param name="imageStyle" select="$imageStyle"/>
             </xsl:call-template>
           </pic:spPr>
         </pic:pic>
@@ -433,7 +438,7 @@
 
   <!--  image vertical and horizontal position-->
   <xsl:template name="InsertAnchorImagePosition">
-    <xsl:param name="imageStyle" />
+    <xsl:param name="imageStyle"/>
 
     <xsl:variable name="ox">
       <xsl:choose>
@@ -462,14 +467,14 @@
     </xsl:variable>
 
     <xsl:call-template name="InsertAnchorImagePosH">
-      <xsl:with-param name="imageStyle" select="$imageStyle" />
+      <xsl:with-param name="imageStyle" select="$imageStyle"/>
       <xsl:with-param name="ox" select="$ox"/>
       <xsl:with-param name="oy" select="$oy"/>
     </xsl:call-template>
 
 
     <xsl:call-template name="InsertAnchorImagePosV">
-      <xsl:with-param name="imageStyle" select="$imageStyle" />
+      <xsl:with-param name="imageStyle" select="$imageStyle"/>
       <xsl:with-param name="ox" select="$ox"/>
       <xsl:with-param name="oy" select="$oy"/>
     </xsl:call-template>
@@ -481,8 +486,8 @@
   <xsl:template name="InsertAnchorImagePosV">
     <xsl:param name="ox"/>
     <xsl:param name="oy"/>
-    <xsl:param name="imageStyle" />
-    
+    <xsl:param name="imageStyle"/>
+
     <xsl:variable name="verticalRel">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$imageStyle"/>
@@ -507,7 +512,8 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:choose>
-        <xsl:when test="$vertical-pos != '' and $vertical-pos !='from-top' and $vertical-pos !='below' ">
+        <xsl:when
+          test="$vertical-pos != '' and $vertical-pos !='from-top' and $vertical-pos !='below' ">
           <wp:align>
             <xsl:choose>
               <xsl:when test="$vertical-pos = 'top' ">top</xsl:when>
@@ -531,16 +537,16 @@
           </wp:posOffset>
         </xsl:otherwise>
       </xsl:choose>
-  </wp:positionV>
+    </wp:positionV>
   </xsl:template>
 
   <!-- horizontal position-->
   <xsl:template name="InsertAnchorImagePosH">
     <xsl:param name="ox"/>
     <xsl:param name="oy"/>
-    <xsl:param name="imageStyle" />
+    <xsl:param name="imageStyle"/>
 
-    <xsl:variable name="horizontal-pos" >
+    <xsl:variable name="horizontal-pos">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$imageStyle"/>
         <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
@@ -557,15 +563,16 @@
             <xsl:with-param name="attribName">style:horizontal-rel</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-          <xsl:choose>
+        <xsl:choose>
           <xsl:when test="$horizontalRel='page'">page</xsl:when>
           <xsl:otherwise>margin</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      
-       <!--align-->
+
+      <!--align-->
       <xsl:choose>
-        <xsl:when test="$horizontal-pos != '' and $horizontal-pos !='from-left' and $horizontal-pos !='from-outside' ">
+        <xsl:when
+          test="$horizontal-pos != '' and $horizontal-pos !='from-left' and $horizontal-pos !='from-outside' ">
           <wp:align>
             <xsl:value-of select="$horizontal-pos"/>
           </wp:align>
@@ -581,15 +588,45 @@
 
   <!--image crop-->
   <xsl:template name="InsertImageCropProperties">
+    <xsl:param name="clip"/>
     <a:srcRect>
-      <xsl:variable name="styleCrop" select="./@draw:style-name"/>
-      <xsl:variable name="clip" select="//office:document-content/office:automatic-styles/style:style[@style:name = $styleCrop]"/>
-      <xsl:variable name="t"><xsl:value-of select="substring-before(substring-after($clip/style:graphic-properties/@fo:clip,'('),'cm' )"/></xsl:variable>
-      <xsl:variable name="b"><xsl:value-of select="substring-before(substring-after(substring-after($clip/style:graphic-properties/@fo:clip,'cm'),'cm'),'cm')"/></xsl:variable>
-      <xsl:variable name="r"><xsl:value-of select="substring-before(substring-after($clip/style:graphic-properties/@fo:clip,'cm'),'cm')"/></xsl:variable>
-      <xsl:variable name="l"><xsl:value-of select="substring-before(substring-after(substring-after(substring-after($clip/style:graphic-properties/@fo:clip,'cm'),'cm'),'cm'),'cm')"/></xsl:variable>
-      <xsl:variable name="height"><xsl:value-of select="substring-before(./@svg:height,'cm')"/></xsl:variable>
-      <xsl:variable name="width"><xsl:value-of select="substring-before(./@svg:width,'cm')"/></xsl:variable>
+      <xsl:variable name="firstVal" select="substring-before(substring-after($clip,'('),' ' )"/>
+      <xsl:variable name="secondVal"
+        select="substring-before(substring-after($clip,concat('(',$firstVal,' ')),' ')"/>
+      <xsl:variable name="thirdVal"
+        select="substring-before(substring-after($clip,concat('(',$firstVal,' ',$secondVal,' ')),' ')"/>
+      <xsl:variable name="fourthVal"
+        select="substring-before(substring-after($clip,concat('(',$firstVal,' ',$secondVal,' ',$thirdVal,' ')),')')"/>
+      <xsl:variable name="t">
+        <xsl:call-template name="GetValue">
+          <xsl:with-param name="length" select="$firstVal"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="b">
+        <xsl:call-template name="GetValue">
+          <xsl:with-param name="length" select="$thirdVal"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="r">
+        <xsl:call-template name="GetValue">
+          <xsl:with-param name="length" select="$secondVal"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="l">
+        <xsl:call-template name="GetValue">
+          <xsl:with-param name="length" select="$fourthVal"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="height">
+        <xsl:call-template name="GetValue">
+          <xsl:with-param name="length" select="@svg:height"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="width">
+        <xsl:call-template name="GetValue">
+          <xsl:with-param name="length" select="@svg:width"/>
+        </xsl:call-template>
+      </xsl:variable>
       <xsl:attribute name="t">
         <xsl:value-of select=" round(($t * 100 div ($t + $b + $height)) * 1000)"/>
       </xsl:attribute>
@@ -604,10 +641,10 @@
       </xsl:attribute>
     </a:srcRect>
   </xsl:template>
-  
+
   <!--image wrap type-->
   <xsl:template name="InsertAnchorImageWrapping">
-    <xsl:param name="imageStyle" />
+    <xsl:param name="imageStyle"/>
 
     <xsl:variable name="wrap">
       <xsl:call-template name="GetGraphicProperties">
@@ -615,12 +652,12 @@
         <xsl:with-param name="attribName">style:wrap</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="$wrap = 'parallel' or $wrap ='left' or $wrap = 'right' or $wrap ='dynamic'">
         <xsl:call-template name="InsertSquareWrap">
           <xsl:with-param name="wrap" select="$wrap"/>
-          <xsl:with-param name="imageStyle" select="$imageStyle" />
+          <xsl:with-param name="imageStyle" select="$imageStyle"/>
         </xsl:call-template>
       </xsl:when>
 
@@ -631,7 +668,7 @@
       <xsl:when test="$wrap = 'none' ">
         <xsl:call-template name="InsertTopBottomWrap">
           <xsl:with-param name="wrap" select="$wrap"/>
-          <xsl:with-param name="imageStyle" select="$imageStyle" />
+          <xsl:with-param name="imageStyle" select="$imageStyle"/>
         </xsl:call-template>
       </xsl:when>
 
@@ -644,7 +681,7 @@
   <!-- square wrap type for anchor image -->
   <xsl:template name="InsertSquareWrap">
     <xsl:param name="wrap"/>
-    <xsl:param name="imageStyle" />
+    <xsl:param name="imageStyle"/>
 
     <wp:wrapSquare>
       <xsl:attribute name="wrapText">
@@ -656,16 +693,16 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-    
+
       <!--bottom distance from text-->
       <xsl:attribute name="distB">
-       <xsl:variable name="marginB">
+        <xsl:variable name="marginB">
           <xsl:call-template name="GetGraphicProperties">
             <xsl:with-param name="shapeStyle" select="$imageStyle"/>
             <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-         <xsl:choose>
+        <xsl:choose>
           <xsl:when test="$marginB != ''">
             <xsl:call-template name="emu-measure">
               <xsl:with-param name="length" select="$marginB"/>
@@ -676,7 +713,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-     
+
       <!--top distance from text-->
       <xsl:variable name="marginT">
         <xsl:call-template name="GetGraphicProperties">
@@ -684,7 +721,7 @@
           <xsl:with-param name="attribName">fo:margin-top</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-     <xsl:attribute name="distT">
+      <xsl:attribute name="distT">
         <xsl:choose>
           <xsl:when test="$marginT != ''">
             <xsl:call-template name="emu-measure">
@@ -696,7 +733,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      
+
       <!--left distance from text-->
       <xsl:variable name="marginL">
         <xsl:call-template name="GetGraphicProperties">
@@ -704,7 +741,7 @@
           <xsl:with-param name="attribName">fo:margin-left</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-        <xsl:attribute name="distL">
+      <xsl:attribute name="distL">
         <xsl:choose>
           <xsl:when test="$marginL != ''">
             <xsl:call-template name="emu-measure">
@@ -715,8 +752,8 @@
             <xsl:value-of select="0"/>
           </xsl:otherwise>
         </xsl:choose>
-        </xsl:attribute>
-      
+      </xsl:attribute>
+
       <!--right distance from text-->
       <xsl:variable name="marginR">
         <xsl:call-template name="GetGraphicProperties">
@@ -742,10 +779,10 @@
   <!-- top-bottom wrap type for anchor image -->
   <xsl:template name="InsertTopBottomWrap">
     <xsl:param name="wrap"/>
-    <xsl:param name="imageStyle" />
+    <xsl:param name="imageStyle"/>
 
     <wp:wrapTopAndBottom>
- 
+
       <!--bottom distance from text-->
       <xsl:variable name="marginB">
         <xsl:call-template name="GetGraphicProperties">
@@ -753,7 +790,7 @@
           <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-     <xsl:attribute name="distB">
+      <xsl:attribute name="distB">
         <xsl:choose>
           <xsl:when test="$marginB != ''">
             <xsl:call-template name="emu-measure">
@@ -764,8 +801,8 @@
             <xsl:value-of select="0"/>
           </xsl:otherwise>
         </xsl:choose>
-  </xsl:attribute>
-      
+      </xsl:attribute>
+
       <!--top distance from text-->
       <xsl:variable name="marginT">
         <xsl:call-template name="GetGraphicProperties">
@@ -790,7 +827,7 @@
 
   <!--image border width and line style-->
   <xsl:template name="InsertImageBorders">
-    <xsl:param name="imageStyle" />
+    <xsl:param name="imageStyle"/>
 
     <xsl:variable name="border">
       <xsl:call-template name="GetGraphicProperties">
@@ -798,10 +835,10 @@
         <xsl:with-param name="attribName">fo:border</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
-    <xsl:if test="$border != '' and $border != 'none'"> 
+
+    <xsl:if test="$border != '' and $border != 'none'">
       <xsl:variable name="strokeColor" select="substring-after($border,'#')"/>
-    
+
       <xsl:variable name="strokeWeight">
         <xsl:call-template name="emu-measure">
           <xsl:with-param name="length" select="substring-before($border,' ')"/>
@@ -811,8 +848,7 @@
       <a:ln xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
         <xsl:attribute name="cmpd">
           <xsl:choose>
-            <xsl:when
-              test="substring-before(substring-after($border,' ' ),' ' ) != 'solid' ">
+            <xsl:when test="substring-before(substring-after($border,' ' ),' ' ) != 'solid' ">
 
               <xsl:variable name="borderLineWidth">
                 <xsl:call-template name="GetGraphicProperties">
@@ -820,21 +856,19 @@
                   <xsl:with-param name="attribName">style:border-line-width</xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
-              
+
               <xsl:if test="$borderLineWidth != ''">
 
                 <xsl:variable name="innerLineWidth">
                   <xsl:call-template name="point-measure">
-                    <xsl:with-param name="length"
-                      select="substring-before($borderLineWidth,' ' )"/>
+                    <xsl:with-param name="length" select="substring-before($borderLineWidth,' ' )"/>
                   </xsl:call-template>
                 </xsl:variable>
 
                 <xsl:variable name="outerLineWidth">
                   <xsl:call-template name="point-measure">
                     <xsl:with-param name="length"
-                      select="substring-after(substring-after($borderLineWidth,' ' ),' ' )"
-                    />
+                      select="substring-after(substring-after($borderLineWidth,' ' ),' ' )"/>
                   </xsl:call-template>
                 </xsl:variable>
 
@@ -862,78 +896,80 @@
       </a:ln>
     </xsl:if>
   </xsl:template>
-  
+
   <!--custom shapes -->
-  
+
   <xsl:template match="draw:custom-shape" mode="shapes">
     <xsl:call-template name="InsertShapes">
       <xsl:with-param name="shapeType">
         <xsl:value-of select="draw:enhanced-geometry/@draw:type"/>
-      </xsl:with-param> 
+      </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
-  
+
   <!-- basic shapes - ellipse and rect -->
-  
+
   <xsl:template match="draw:rect|draw:ellipse" mode="shapes">
     <xsl:call-template name="InsertShapes">
       <xsl:with-param name="shapeType" select="name()"/>
     </xsl:call-template>
   </xsl:template>
-  
+
   <!-- shapes template -->
-  
+
   <xsl:template name="InsertShapes">
     <xsl:param name="shapeType"/>
     <w:r>
       <w:pict>
         <xsl:choose>
-          
+
           <!-- rectangle -->
           <xsl:when test="$shapeType = 'draw:rect' or $shapeType = 'rectangle' ">
             <v:rect>
               <xsl:call-template name="SimpleShape"/>
             </v:rect>
           </xsl:when>
-          
+
           <!-- ellipse -->
           <xsl:when test="$shapeType = 'draw:ellipse' or $shapeType = 'ellipse' ">
             <v:oval>
               <xsl:call-template name="SimpleShape"/>
             </v:oval>
           </xsl:when>
-          
+
           <!-- round-rectangle -->
-          
+
           <xsl:when test="$shapeType = 'round-rectangle' ">
             <v:roundrect>
               <xsl:call-template name="SimpleShape"/>
             </v:roundrect>
           </xsl:when>
-          
+
           <!-- TODO - other shapes -->
-          <xsl:otherwise></xsl:otherwise>
+          <xsl:otherwise/>
         </xsl:choose>
       </w:pict>
     </w:r>
   </xsl:template>
-  
+
   <!-- TODO
   <xsl:template name="GenerateShapeId">
     <xsl:param name="shape"></xsl:param>
     </xsl:template> -->
-  
+
   <!-- simple shape properties -->
-  
+
   <xsl:template name="SimpleShape">
-    <xsl:variable name="styleName" select="@draw:style-name" />
-    <xsl:variable name="automaticStyle" select="document('content.xml')//office:document-content/office:automatic-styles/style:style[@style:name = $styleName]"/>
-    <xsl:variable name="officeStyle" select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
-    <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle" />
-    
-    <!-- shape properties: size, z-index, color, position, stroke, etc --> 
+    <xsl:variable name="styleName" select="@draw:style-name"/>
+    <xsl:variable name="automaticStyle"
+      select="document('content.xml')//office:document-content/office:automatic-styles/style:style[@style:name = $styleName]"/>
+    <xsl:variable name="officeStyle"
+      select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+    <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+
+    <!-- shape properties: size, z-index, color, position, stroke, etc -->
     <xsl:call-template name="InsertDrawnShapeProperties">
-      <xsl:with-param name="shapeStyle" select="$shapeStyle" />
+      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
     </xsl:call-template>
     <xsl:attribute name="fillcolor">
       <xsl:call-template name="FillColor">
@@ -944,9 +980,9 @@
       <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
     </xsl:call-template>
   </xsl:template>
-  
+
   <!-- shape fill color -->
-  
+
   <xsl:template name="FillColor">
     <xsl:param name="shapeStyle"/>
     <xsl:call-template name="GetDrawnGraphicProperties">
@@ -954,9 +990,9 @@
       <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
     </xsl:call-template>
   </xsl:template>
-  
+
   <!-- shape stroke color and stroke width -->
-  
+
   <xsl:template name="Stroke">
     <xsl:param name="shapeStyle"/>
     <xsl:attribute name="strokecolor">
@@ -979,9 +1015,9 @@
       <xsl:value-of select="concat($strokeWeight,'pt')"/>
     </xsl:attribute>
   </xsl:template>
-  
+
   <!-- get graphic properties for shapes -->
-  
+
   <xsl:template name="GetDrawnGraphicProperties">
     <xsl:param name="attrib"/>
     <xsl:param name="shapeStyle"/>
@@ -997,21 +1033,21 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- shape properties -->
-  
+
   <xsl:template name="InsertDrawnShapeProperties">
     <xsl:param name="shapeStyle"/>
     <xsl:attribute name="style">
-     <xsl:call-template name="InsertPosition"/>
+      <xsl:call-template name="InsertPosition"/>
       <xsl:call-template name="InsertDrawnShapeSize"/>
       <xsl:call-template name="InsertDrawnShapeZindex"/>
       <xsl:call-template name="InsertShapeCoordinates"/>
     </xsl:attribute>
   </xsl:template>
-  
+
   <!-- shape position -->
-  
+
   <xsl:template name="InsertPosition">
     <xsl:variable name="x">
       <xsl:call-template name="point-measure">
@@ -1028,14 +1064,13 @@
   <xsl:template name="InsertDrawnShapeZindex">
     <xsl:value-of select="concat('z-index:',@draw:z-index)"/>
   </xsl:template>
-  
-  <!--  shape width and height-->  
-  
+
+  <!--  shape width and height-->
+
   <xsl:template name="InsertDrawnShapeSize">
-   <xsl:variable name="frameW">
+    <xsl:variable name="frameW">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length"
-          select="@svg:width|@fo:min-width"/>
+        <xsl:with-param name="length" select="@svg:width|@fo:min-width"/>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="frameH">
@@ -1044,8 +1079,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="relWidth" select="substring-before(@style:rel-width,'%')"/>
-    <xsl:variable name="relHeight"
-      select="substring-before(@style:rel-height,'%')"/> 
+    <xsl:variable name="relHeight" select="substring-before(@style:rel-height,'%')"/>
     <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
     <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
   </xsl:template>
