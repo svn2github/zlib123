@@ -1791,7 +1791,8 @@
           test="$style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)] != 'none' and $style/style:paragraph-properties/@fo:padding">
           <xsl:value-of select="$style/style:paragraph-properties/@fo:padding"/>
         </xsl:when>
-        <xsl:when test="$style/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]">
+        <xsl:when
+          test="$style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)] != 'none' and $style/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]">
           <xsl:value-of
             select="$style/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]"/>
         </xsl:when>
@@ -1809,7 +1810,7 @@
                   select="key('styles', $styleName)/style:paragraph-properties/@fo:padding"/>
               </xsl:when>
               <xsl:when
-                test="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]">
+                test="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:border-',$side)] != 'none' and key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]">
                 <xsl:value-of
                   select="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:padding-',$side)]"
                 />
