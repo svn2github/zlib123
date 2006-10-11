@@ -121,13 +121,13 @@
 
     <!-- page size -->
     <xsl:if test="w:pgSz">
-      <xsl:attribute name="style:page-width">
+      <xsl:attribute name="fo:page-width">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length" select="w:pgSz/@w:w"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
-      <xsl:attribute name="style:page-height">
+      <xsl:attribute name="fo:page-height">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length" select="w:pgSz/@w:h"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
@@ -143,6 +143,14 @@
     <!-- page margins -->
     <xsl:if test="w:pgMar">
       <xsl:call-template name="ComputePageMargins"/>
+    </xsl:if>
+    
+    <!--  page color  -->
+    <xsl:if test="//w:document//w:background/@w:color">
+      <xsl:attribute name="fo:background-color">
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="//w:document//w:background/@w:color"/>
+      </xsl:attribute>
     </xsl:if>
 
     <!-- page numbering style. -->
@@ -391,7 +399,7 @@
 
   <!-- conversion of paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
-
+    
     <xsl:if test="w:keepNext">
       <xsl:attribute name="fo:keep-with-next">
         <xsl:choose>
@@ -503,6 +511,39 @@
     </xsl:if>
 
     <!-- space before/after -->
+    <xsl:if test="w:ind">
+      <xsl:if test="w:ind/@w:left">
+        <xsl:attribute name="fo:margin-left">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:ind/@w:left"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="w:ind/@w:right">
+        <xsl:attribute name="fo:margin-right">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:ind/@w:right"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="w:ind/@w:firstLine">
+        <xsl:attribute name="fo:text-indent">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:ind/@w:firstLine"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:if>
+    
     <!-- w:afterAutospacing and w:beforeAutospacing attributes are lost -->
     <!-- w:afterLines and w:beforeLines attributes are lost -->
     <xsl:if test="w:spacing/@w:before">
@@ -530,22 +571,22 @@
     <xsl:if test="w:spacing/@w:line">
       <xsl:choose>
         <xsl:when test="w:spacing/@w:lineRule='atLeast'">
-          <xsl:attribute name="style:line-height-at-least">
+          <xsl:attribute name="fo:line-height-at-least">
             <!-- convert 20th pt to centimeter -->
             <xsl:value-of select="concat(w:spacing/@w:line * 2.54 div (1440 * 20),'cm')"/>
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="w:spacing/@w:lineRule='exact'">
-          <xsl:attribute name="style:line-height">
+          <xsl:attribute name="fo:line-height">
             <!-- convert 20th pt to centimeter -->
             <xsl:value-of select="concat(w:spacing/@w:line * 2.54 div (1440 * 20),'cm')"/>
           </xsl:attribute>
         </xsl:when>
         <xsl:otherwise>
           <!-- value of lineRule is 'auto' -->
-          <xsl:attribute name="style:line-height">
+          <xsl:attribute name="fo:line-height">
             <!-- convert 240th of line to percent -->
-            <xsl:value-of select="concat(w:spacing/@w:line div 240,'%')"/>
+            <xsl:value-of select="concat(w:spacing/@w:line div 240 * 100,'%')"/>
           </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
