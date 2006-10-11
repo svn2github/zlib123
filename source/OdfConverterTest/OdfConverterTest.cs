@@ -116,6 +116,8 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         private bool isDirectTransform = true; // conversion from ODT to DOCX (default)
         private Report report = null;
         private Word word = null;
+        private OoxValidator ooxValidator = null;
+        private OdfValidator odfValidator = null;
 
 
         [DllImport("kernel32")]
@@ -206,8 +208,16 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             // instanciate word if needed
             if (this.open)
             {
-                word = new Word();
-                word.Visible = false;
+                this.word = new Word();
+                this.word.Visible = false;
+            }
+
+            // instanciate validator if needed
+            if (this.validate)
+            {
+                this.report.AddComment("Instanciating validator, please wait...");
+                this.ooxValidator = new OoxValidator();
+                this.report.AddComment("Validator instanciated");
             }
 
             SearchOption option = SearchOption.TopDirectoryOnly;
@@ -265,6 +275,13 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 
         private void ProceedBatchDocx()
         {
+            // instanciate validator if needed
+            if (this.validate)
+            {
+                this.report.AddComment("Instanciating validator, please wait...");
+                this.odfValidator = new OdfValidator(this.report);
+                this.report.AddComment("Validator instanciated");
+            }
             SearchOption option = SearchOption.TopDirectoryOnly;
             if (this.recursiveMode)
             {
@@ -369,7 +386,13 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             {
                 try
                 {
-                    new OoxValidator().validate(output);
+                    if (this.ooxValidator == null)
+                    {
+                        this.report.AddComment("Instanciating validator, please wait...");
+                        this.ooxValidator = new OoxValidator();
+                        this.report.AddComment("Validator instanciated");
+                    }
+                    this.ooxValidator.validate(output);
                     this.report.AddLog(input, "Converted file (" + output + ") is valid", Report.INFO_LEVEL);
                     return true;
                 }
@@ -390,7 +413,13 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             {
                 try
                 {
-                    new OdfValidator().validate(output);
+                    if (this.odfValidator == null)
+                    {
+                        this.report.AddComment("Instanciating validator, please wait...");
+                        this.odfValidator = new OdfValidator(this.report);
+                        this.report.AddComment("Validator instanciated");
+                    }
+                    this.odfValidator.validate(output);
                     this.report.AddLog(input, "Converted file (" + output + ") is valid", Report.INFO_LEVEL);
                     return true;
                 }
@@ -621,29 +650,66 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             return output;
         }
 
-        private class Report
+        private const int NOT_CONVERTED = 0;
+        private const int VALIDATED_AND_OPENED = 1;
+        private const int VALIDATED_AND_NOT_OPENED = 2;
+        private const int NOT_VALIDATED_AND_OPENED = 3;
+        private const int NOT_VALIDATED_AND_NOT_OPENED = 4;
+    }
+
+    public class Report
+    {
+        public const int DEBUG_LEVEL = 1;
+        public const int INFO_LEVEL = 2;
+        public const int WARNING_LEVEL = 3;
+        public const int ERROR_LEVEL = 4;
+
+        private StreamWriter writer = null;
+        private int level = INFO_LEVEL;
+
+        public Report(string filename, int level)
         {
-            public const int DEBUG_LEVEL = 1;
-            public const int INFO_LEVEL = 2;
-            public const int WARNING_LEVEL = 3;
-            public const int ERROR_LEVEL = 4;
-
-            private StreamWriter writer = null;
-            private int level = INFO_LEVEL;
-
-            public Report(string filename, int level)
+            this.level = level;
+            if (filename != null)
             {
-                this.level = level;
-                if (filename != null)
-                {
-                    this.writer = new StreamWriter(new FileStream(filename, FileMode.Create, FileAccess.Write));
-                    Console.WriteLine("Using report file: " + filename);
-                }
+                this.writer = new StreamWriter(new FileStream(filename, FileMode.Create, FileAccess.Write));
+                Console.WriteLine("Using report file: " + filename);
             }
+        }
 
-            public void AddComment(string message)
+        public void AddComment(string message)
+        {
+            string text = "*** " + message;
+
+            if (this.writer != null)
             {
-                string text = "*** " + message;
+                this.writer.WriteLine(text);
+                this.writer.Flush();
+            }
+            Console.WriteLine(text);
+        }
+
+        public void AddLog(string filename, string message, int level)
+        {
+            if (level >= this.level)
+            {
+                string label = null;
+                switch (level)
+                {
+                    case 4:
+                        label = "ERROR";
+                        break;
+                    case 3:
+                        label = "WARNING";
+                        break;
+                    case 2:
+                        label = "INFO";
+                        break;
+                    default:
+                        label = "DEBUG";
+                        break;
+                }
+                string text = "[" + label + "]" + "[" + filename + "] " + message;
 
                 if (this.writer != null)
                 {
@@ -652,53 +718,16 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 }
                 Console.WriteLine(text);
             }
-
-            public void AddLog(string filename, string message, int level)
-            {
-                if (level >= this.level)
-                {
-                    string label = null;
-                    switch (level)
-                    {
-                        case 4:
-                            label = "ERROR";
-                            break;
-                        case 3:
-                            label = "WARNING";
-                            break;
-                        case 2:
-                            label = "INFO";
-                            break;
-                        default:
-                            label = "DEBUG";
-                            break;
-                    }
-                    string text = "[" + label + "]" + "[" + filename + "] " + message;
-
-                    if (this.writer != null)
-                    {
-                        this.writer.WriteLine(text);
-                        this.writer.Flush();
-                    }
-                    Console.WriteLine(text);
-                }
-            }
-
-            public void Close()
-            {
-                if (this.writer != null)
-                {
-                    this.writer.Close();
-                    this.writer = null;
-                }
-            }
-
         }
 
-        private const int NOT_CONVERTED = 0;
-        private const int VALIDATED_AND_OPENED = 1;
-        private const int VALIDATED_AND_NOT_OPENED = 2;
-        private const int NOT_VALIDATED_AND_OPENED = 3;
-        private const int NOT_VALIDATED_AND_NOT_OPENED = 4;
+        public void Close()
+        {
+            if (this.writer != null)
+            {
+                this.writer.Close();
+                this.writer = null;
+            }
+        }
+
     }
 }

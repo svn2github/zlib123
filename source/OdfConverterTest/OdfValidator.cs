@@ -57,18 +57,27 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 
         private XmlReader grammarName = null;
         private Grammar grammar = null;
+        private Report report;
 
 		/// <summary>
 		/// Initialize the validator
 		/// </summary>
-		public OdfValidator()
+		public OdfValidator(Report report)
 		{
             ResourceResolver resolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCES_LOCATION);
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.ValidationType = ValidationType.None;
             settings.XmlResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCES_LOCATION);
-            XmlReader xmlReader = XmlReader.Create(ODF_SCHEMA, settings);
-            this.grammarName = xmlReader;
+            this.grammarName = XmlReader.Create(ODF_SCHEMA, settings);
+            this.report = report;
+            try
+            {
+                this.grammar = new GrammarReader(new ReportController(this.report)).parse(this.grammarName);
+            }
+            catch (Exception e)
+            {
+                throw new OdfValidatorException("Problem parsing grammar file : " + e.Message);
+            }
         }
 		
 	    /// <summary>
@@ -77,15 +86,8 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 	    /// <param name="fileName">The path of the docx file.</param>
 		public void validate(String fileName)
 		{
-            try 
-            {
-                this.grammar = new GrammarReader(new ConsoleController()).parse(this.grammarName);
-            }
-            catch (Exception e)
-			{
-				throw new OdfValidatorException("Problem parsing grammar file : " + e.Message);
-			}
             ZipReader reader = null;
+            bool isValid = true;
             try
             {
                 reader = ZipFactory.OpenArchive(fileName);
@@ -95,16 +97,12 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             {
                 throw new OdfValidatorException("Problem opening the odt file : " + e.Message);
             }
-            //content.xml
-            //styles.xml
-            //meta.xml
-            //settings.xml
             try
             {
                 Stream content = null;
                 content = reader.GetEntry("content.xml");
                 XmlReader xmlReader = XmlReader.Create(content);
-                bool wasValid = Verifier.Verify(xmlReader, this.grammar, new ConsoleErrorReporter());
+                isValid &= Verifier.Verify(xmlReader, this.grammar, new ErrorReporter (this.report, fileName + "|" + "content.xml"));
             }
             catch (ZipEntryNotFoundException e)
             {
@@ -112,79 +110,96 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             }
             catch (Exception e)
             {
-                throw new OdfValidatorException("Problem validating ODT file [content.xml]: " + e.Message);
+                this.report.AddLog(fileName, "Problem validating ODT file [content.xml]: " + e.Message, Report.DEBUG_LEVEL);
             }
             try
             {
                 Stream content = null;
                 content = reader.GetEntry("styles.xml");
                 XmlReader xmlReader = XmlReader.Create(content);
-                bool wasValid = Verifier.Verify(xmlReader, this.grammar, new ConsoleErrorReporter());
+                isValid &= Verifier.Verify(xmlReader, this.grammar, new ErrorReporter(this.report, fileName + "|" + "styles.xml"));
             }
-            catch (ZipEntryNotFoundException e)
+            catch (ZipEntryNotFoundException)
             {
-                throw new OdfValidatorException("Entry not found in ODT file [styles.xml]: " + e.Message);
+                this.report.AddLog(fileName, "Entry not found: styles.xml", Report.DEBUG_LEVEL);
             }
             catch (Exception e)
             {
-                throw new OdfValidatorException("Problem validating ODT file [styles.xml]: " + e.Message);
+                this.report.AddLog(fileName, "Problem validating ODT file [styles.xml]: " + e.Message, Report.DEBUG_LEVEL);
             }
             try
             {
                 Stream content = null;
                 content = reader.GetEntry("meta.xml");
                 XmlReader xmlReader = XmlReader.Create(content);
-                bool wasValid = Verifier.Verify(xmlReader, this.grammar, new ConsoleErrorReporter());
+                isValid &= Verifier.Verify(xmlReader, this.grammar, new ErrorReporter(this.report, fileName + "|" + "meta.xml"));
             }
-            catch (ZipEntryNotFoundException e)
+            catch (ZipEntryNotFoundException)
             {
-                Console.WriteLine("Entry not found in ODT file [meta.xml]: " + e.Message);
+                this.report.AddLog(fileName, "Entry not found: meta.xml", Report.DEBUG_LEVEL);
             }
             catch (Exception e)
             {
-                throw new OdfValidatorException("Problem validating ODT file [styles.xml]: " + e.Message);
+                this.report.AddLog(fileName, "Problem validating ODT file [meta.xml]: " + e.Message, Report.DEBUG_LEVEL);
             }
             try
             {
                 Stream content = null;
                 content = reader.GetEntry("settings.xml");
                 XmlReader xmlReader = XmlReader.Create(content);
-                bool wasValid = Verifier.Verify(xmlReader, this.grammar, new ConsoleErrorReporter());
+                isValid &= Verifier.Verify(xmlReader, this.grammar, new ErrorReporter(this.report, fileName + "|" + "settings.xml"));
             }
-            catch (ZipEntryNotFoundException e)
+            catch (ZipEntryNotFoundException)
             {
-                Console.WriteLine("Entry not found in ODT file [settings.xml]: " + e.Message);
+                this.report.AddLog(fileName, "Entry not found: settings.xml", Report.DEBUG_LEVEL);
             }
             catch (Exception e)
             {
-                throw new OdfValidatorException("Problem validating ODT file [styles.xml]: " + e.Message);
+                this.report.AddLog(fileName, "Problem validating ODT file [settings.xml]: " + e.Message, Report.DEBUG_LEVEL);
+            }
+            if (!isValid)
+            {
+                throw new OdfValidatorException("File is not valid");
             }
         }
-				
-        public void ValidationHandler(object sender, ValidationEventArgs args)
-      	{
-        	throw new OdfValidatorException("XML Schema Validation error : " + args.Message);
-      	}
-	}
-    
-    public class ConsoleController : GrammarReaderController
-    {
-        public void error(string msg, IXmlLineInfo loc)
+
+        private class ErrorReporter:Tenuto.Verifier.ErrorHandler
         {
-            Console.WriteLine("Error: " + msg);
+            private Report report;
+            private string filename;
+
+            public ErrorReporter(Report report, string filename)
+            {
+                this.report = report;
+                this.filename = filename;
+            }
+
+            public void Error(string msg)
+            {
+                this.report.AddLog(this.filename, msg, Report.DEBUG_LEVEL);
+            }
+
         }
 
-        public void warning(string msg, IXmlLineInfo loc)
+        private class ReportController : GrammarReaderController
         {
-            Console.WriteLine("Warning: " + msg);
+            private Report report;
+
+            public ReportController(Report report)
+            {
+                this.report = report;
+            }
+
+            public void error(string msg, IXmlLineInfo loc)
+            {
+                this.report.AddComment("Error: " + msg);
+            }
+
+            public void warning(string msg, IXmlLineInfo loc)
+            {
+                this.report.AddComment("Warning: " + msg);
+            }
+
         }
-    }
-    
-    public class ConsoleErrorReporter : Tenuto.Verifier.ErrorHandler
-    {
-        public void Error(string msg)
-        {
-            Console.WriteLine(msg);
-        }
-    }
+	}
 }
