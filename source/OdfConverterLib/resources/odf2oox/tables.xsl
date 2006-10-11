@@ -222,7 +222,8 @@
   <!-- Manages sections within table -->
   <xsl:template name="ManageSectionsInTable">
     <!-- Section detection  : 3 cases -->
-    <xsl:if test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::style:master-page)">
+    <xsl:if
+      test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::style:master-page)">
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
       <xsl:variable name="followings"
         select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
@@ -326,6 +327,9 @@
         <xsl:call-template name="InsertRowProperties"/>
       </w:trPr>
       <xsl:apply-templates select="*[position() &lt; 64]"/>
+      <xsl:if test="*[position() &gt;= 64]">
+        <xsl:message terminate="no">feedback: table with more than 64 columns</xsl:message>
+      </xsl:if>
     </w:tr>
   </xsl:template>
 
