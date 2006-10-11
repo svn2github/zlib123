@@ -1152,18 +1152,75 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
+        <xsl:variable name="fo_margins_left">
+          <xsl:value-of
+            select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-left"
+          />
+        </xsl:variable>
+        <xsl:variable name="fo_page_width">
+          <xsl:value-of
+            select="document('styles.xml')//office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:page-width"
+          />
+        </xsl:variable>
+        <xsl:variable name="fo_margin_left">
+          <xsl:value-of
+            select="document('styles.xml')//office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-left"
+          />
+        </xsl:variable>
+        <xsl:variable name="fo_margin_right">
+          <xsl:value-of
+            select="document('styles.xml')//office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-right"
+          />
+        </xsl:variable>
+        <xsl:variable name="fo_margin_right_frame">
+          <xsl:value-of
+            select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-right"
+          />          
+        </xsl:variable>
+        <xsl:variable name="style_horizontal_pos">
+          <xsl:value-of select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos"/>
+        </xsl:variable>
+        <xsl:variable name="style_horizontal_rel">
+          <xsl:value-of select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel"/>
+        </xsl:variable>
         <xsl:variable name="svgx">
           <xsl:choose>
-            <xsl:when test="$parent[1]/@svg:x">
+            <xsl:when
+              test="$parent[1]/@svg:x or ($style_horizontal_pos='left' and not($style_horizontal_rel='page-end-margin')) or ($style_horizontal_pos='right' and not($style_horizontal_rel='page-start-margin'))">
               <xsl:call-template name="point-measure">
                 <xsl:with-param name="length">
-                  <xsl:value-of select="$parent[1]/@svg:x"/>
+                  <xsl:choose>
+                    <xsl:when
+                      test="$style_horizontal_pos='left'">
+                      <xsl:value-of select="$fo_margins_left"/>
+                    </xsl:when>
+                    <xsl:when
+                      test="($style_horizontal_pos='right' ) and ($style_horizontal_rel='page') and not($style_horizontal_rel='page-start-margin') ">
+                      <xsl:value-of
+                        select="concat(substring-before($fo_page_width, 'cm')-substring-before($fo_margin_left, 'cm')+substring-before($fo_margin_right, 'cm')-substring-before(parent::draw:frame/@svg:width, 'cm')-substring-before($fo_margin_right_frame, 'cm'), 'cm')"
+                      />
+                    </xsl:when>
+                    <xsl:when
+                      test="($style_horizontal_pos='right' ) and ($style_horizontal_rel='page-end-margin' )  and not($style_horizontal_rel='page-start-margin') ">
+                      <xsl:value-of
+                        select="concat(-substring-before($fo_margin_right_frame, 'cm')+substring-before($fo_margin_right, 'cm')-substring-before(parent::draw:frame/@svg:width, 'cm'), 'cm')"
+                      />
+                    </xsl:when>
+                    <xsl:when
+                      test="$style_horizontal_pos='right' ">
+                      <xsl:value-of
+                        select="concat(substring-before($fo_page_width, 'cm')-substring-before($fo_margin_left, 'cm')-substring-before($fo_margin_right, 'cm')-substring-before(parent::draw:frame/@svg:width, 'cm')-substring-before($fo_margin_right_frame, 'cm'), 'cm')"
+                      />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$parent[1]/@svg:x"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
-
         </xsl:variable>
         <xsl:value-of select="$svgx+$recursive_result"/>
       </xsl:when>
@@ -1369,7 +1426,8 @@
 
     <!-- text-box coordinates -->
     <xsl:variable name="posL">
-      <xsl:if test="parent::draw:frame/@svg:x">
+      <xsl:if
+        test="parent::draw:frame/@svg:x or ((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left') or ((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right')  and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-start-margin')) and (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-left or @fo:margin-right))">
         <xsl:variable name="leftM">
           <xsl:call-template name="ComputeMarginX">
             <xsl:with-param name="parent" select="ancestor::draw:frame"/>
@@ -1389,7 +1447,8 @@
       </xsl:if>
     </xsl:variable>
 
-    <xsl:if test="parent::draw:frame/@svg:x">
+    <xsl:if
+      test="parent::draw:frame/@svg:x or ((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left') or ((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right')  and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-start-margin'))) ">
       <xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
     </xsl:if>
     <xsl:if test="parent::draw:frame/@svg:y">
@@ -1464,10 +1523,12 @@
         <xsl:when test="$horizontalPos = 'center'">
           <xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/>
         </xsl:when>
-        <xsl:when test="$horizontalPos='left'">
+        <xsl:when
+          test="$horizontalPos='left' and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left' and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-left='0cm')) or (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right' and (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-start-margin'))">
           <xsl:value-of select="concat('mso-position-horizontal:', 'left',';')"/>
         </xsl:when>
-        <xsl:when test="$horizontalPos='right'">
+        <xsl:when
+          test="$horizontalPos='right' and not((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right' and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-right='0cm') and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-start-margin')) ) or (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left' and (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-end-margin'))">
           <xsl:value-of select="concat('mso-position-horizontal:', 'right',';')"/>
         </xsl:when>
         <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
