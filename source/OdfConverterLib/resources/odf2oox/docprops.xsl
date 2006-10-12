@@ -31,7 +31,8 @@
   xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" exclude-result-prefixes="office meta">
 
   <xsl:template name="docprops-core">
-    <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta" mode="core"/>
+    <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta" mode="core"
+    />
   </xsl:template>
 
   <xsl:template name="docprops-app">
@@ -39,7 +40,8 @@
   </xsl:template>
 
   <xsl:template name="docprops-custom">
-    <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta" mode="custom"/>
+    <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta"
+      mode="custom"/>
   </xsl:template>
 
   <xsl:template match="/office:document-meta/office:meta" mode="core">
@@ -72,14 +74,16 @@
       <cp:revision>
         <xsl:value-of select="meta:editing-cycles"/>
       </cp:revision>
-      <dcterms:created xsi:type="dcterms:W3CDTF">
-        <xsl:value-of select="meta:creation-date"/>
-      </dcterms:created>
+      <xsl:if test="meta:creation-date">
+        <dcterms:created xsi:type="dcterms:W3CDTF">
+          <xsl:value-of select="meta:creation-date"/>
+        </dcterms:created>
+      </xsl:if>
       <xsl:if test="dc:date">
         <dcterms:modified xsi:type="dcterms:W3CDTF">
           <xsl:value-of select="dc:date"/>
         </dcterms:modified>
-        </xsl:if>
+      </xsl:if>
     </cp:coreProperties>
   </xsl:template>
 
@@ -95,17 +99,35 @@
       xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
       <!-- todo: conversion from duration data type into seconds -->
       <!--TotalTime>0</TotalTime-->
-      <Pages><xsl:value-of select="meta:document-statistic/@meta:page-count"/></Pages>
-      <Words><xsl:value-of select="meta:document-statistic/@meta:word-count"/></Words>
+      <xsl:if test="meta:document-statistic/@meta:page-count">
+        <Pages>
+          <xsl:value-of select="meta:document-statistic/@meta:page-count"/>
+        </Pages>
+      </xsl:if>
+      <xsl:if test="meta:document-statistic/@meta:word-count">
+        <Words>
+          <xsl:value-of select="meta:document-statistic/@meta:word-count"/>
+        </Words>
+      </xsl:if>
       <Application>ODF Converter</Application>
       <DocSecurity>0</DocSecurity>
-      <Paragraphs><xsl:value-of select="meta:document-statistic/@meta:paragraph-count"/></Paragraphs>
+      <xsl:if test="meta:document-statistic/@meta:paragraph-count">
+        <Paragraphs>
+          <xsl:value-of select="meta:document-statistic/@meta:paragraph-count"/>
+        </Paragraphs>
+      </xsl:if>
       <ScaleCrop>false</ScaleCrop>
       <LinksUpToDate>false</LinksUpToDate>
-      <CharactersWithSpaces><xsl:value-of select="meta:document-statistic/@meta:character-count"/></CharactersWithSpaces>
+      <xsl:if test="meta:document-statistic/@meta:character-count">
+        <CharactersWithSpaces>
+          <xsl:value-of select="meta:document-statistic/@meta:character-count"/>
+        </CharactersWithSpaces>
+      </xsl:if>
       <SharedDoc>false</SharedDoc>
       <HyperlinksChanged>false</HyperlinksChanged>
-      <AppVersion><xsl:value-of select="$app-version"/></AppVersion>
+      <AppVersion>
+        <xsl:value-of select="$app-version"/>
+      </AppVersion>
     </Properties>
   </xsl:template>
 

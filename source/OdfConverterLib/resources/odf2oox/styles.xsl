@@ -348,7 +348,7 @@
             <xsl:attribute name="w:val">both</xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:attribute name="w:val">start</xsl:attribute>
+            <xsl:attribute name="w:val">left</xsl:attribute>
           </xsl:otherwise>
         </xsl:choose>
       </w:jc>
@@ -795,7 +795,7 @@
         <xsl:variable name="textPosition">
           <xsl:value-of select="substring-before(substring-after(@style:text-position, ' '), '%')"/>
         </xsl:variable>
-        <xsl:if test="$textPosition != 0">
+        <xsl:if test="$textPosition != '' and $textPosition != 0">
           <xsl:choose>
             <xsl:when test="contains($textPosition, '-')">
               <w:position
