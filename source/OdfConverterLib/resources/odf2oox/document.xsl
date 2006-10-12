@@ -668,6 +668,11 @@
 
     <!-- insert run properties -->
     <xsl:call-template name="InsertRunProperties"/>
+    
+    <!-- picture in a frame -->
+    <xsl:call-template name="InsertPicturePropertiesInFrame"></xsl:call-template>
+    
+    
   </xsl:template>
 
   <!-- Inserts the style of a paragraph -->
@@ -746,6 +751,28 @@
       </xsl:if>
     </xsl:if>
   </xsl:template>
+
+  <!-- Insert Picture's Properties in frame, if needed -->  
+ <xsl:template name="InsertPicturePropertiesInFrame">
+   <xsl:if test="ancestor::draw:text-box and descendant::draw:image"> 
+         <xsl:choose>
+           <xsl:when test="key('automatic-styles', draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='center'">
+             <w:jc> 
+               <xsl:attribute name="w:val">
+                   <xsl:text>center</xsl:text>
+               </xsl:attribute>
+               </w:jc>
+           </xsl:when>
+           <xsl:when test="key('automatic-styles', draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right'">
+             <w:jc> 
+               <xsl:attribute name="w:val">
+                 <xsl:text>right</xsl:text>
+               </xsl:attribute>
+             </w:jc>             
+           </xsl:when>
+         </xsl:choose>
+   </xsl:if>   
+ </xsl:template>
 
   <!-- compare values of spacing before/after and return 0 or the spacing value to override -->
   <xsl:template name="CompareSpacingValues">
