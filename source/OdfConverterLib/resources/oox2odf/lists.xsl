@@ -32,7 +32,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/3/main"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   exclude-result-prefixes="w">
   
   <xsl:template match="w:abstractNum">
