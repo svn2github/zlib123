@@ -234,6 +234,21 @@
       </xsl:otherwise>
     </xsl:choose>
 
+    <!-- line numbers -->
+    <xsl:if
+      test="not(document('styles.xml')/office:document-styles/office:styles/text:linenumbering-configuration/@text:number-lines='false' )">
+      <xsl:choose>
+        <xsl:when test="@text:number-lines='false' ">
+          <w:suppressLineNumbers w:val="true"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="@text:number-lines='true' ">
+            <w:suppressLineNumbers w:val="false"/>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+
     <!-- border color + padding  -->
     <xsl:choose>
       <xsl:when test="@fo:border and @fo:border != 'none' ">
@@ -1258,6 +1273,27 @@
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
+    <!-- line numbering -->
+    <xsl:for-each
+      select="document('styles.xml')/office:document-styles/office:styles/text:linenumbering-configuration">
+      <xsl:if test="not(@text:number-lines='false')">
+        <w:lnNumType>
+          <xsl:if test="@text:increment">
+            <xsl:attribute name="w:countBy">
+              <xsl:value-of select="@text:increment"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@text:offset">
+            <xsl:attribute name="w:distance">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@text:offset"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:attribute name="w:restart">continuous</xsl:attribute>
+        </w:lnNumType>
+      </xsl:if>
+    </xsl:for-each>
     <!-- style of page number -->
     <xsl:choose>
       <xsl:when test="@style:num-format='i'">

@@ -586,6 +586,7 @@
               <w:pPr>
                 <xsl:call-template name="InsertOutlineParagraphProperties"/>
               </w:pPr>
+              <xsl:call-template name="InsertRunProperties"/>
             </w:lvl>
           </xsl:for-each>
         </xsl:when>

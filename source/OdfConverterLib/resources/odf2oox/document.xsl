@@ -649,6 +649,9 @@
       <xsl:with-param name="level" select="$level"/>
     </xsl:call-template>
 
+    <!-- line numbering -->
+    <xsl:call-template name="InsertSupressLineNumbers"/>
+
     <!-- override spacing before/after when required -->
     <xsl:call-template name="InsertParagraphSpacing"/>
 
@@ -668,11 +671,11 @@
 
     <!-- insert run properties -->
     <xsl:call-template name="InsertRunProperties"/>
-    
+
     <!-- picture in a frame -->
-    <xsl:call-template name="InsertPicturePropertiesInFrame"></xsl:call-template>
-    
-    
+    <xsl:call-template name="InsertPicturePropertiesInFrame"/>
+
+
   </xsl:template>
 
   <!-- Inserts the style of a paragraph -->
@@ -715,6 +718,14 @@
   </xsl:template>
 
 
+  <!-- suppress line numbering if required by configuration -->
+  <xsl:template name="InsertSupressLineNumbers">
+    <xsl:if
+      test="document('styles.xml')/office:document-styles/office:styles/text:linenumbering-configuration/@text:count-empty-lines='false' and not(descendant::text())">
+      <w:suppressLineNumbers w:val="true"/>
+    </xsl:if>
+  </xsl:template>
+
 
   <!-- Insert spacing in paragraph properties if table before/after w:p element has spacing after/before -->
   <xsl:template name="InsertParagraphSpacing">
@@ -752,27 +763,29 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Insert Picture's Properties in frame, if needed -->  
- <xsl:template name="InsertPicturePropertiesInFrame">
-   <xsl:if test="ancestor::draw:text-box and descendant::draw:image"> 
-         <xsl:choose>
-           <xsl:when test="key('automatic-styles', draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='center'">
-             <w:jc> 
-               <xsl:attribute name="w:val">
-                   <xsl:text>center</xsl:text>
-               </xsl:attribute>
-               </w:jc>
-           </xsl:when>
-           <xsl:when test="key('automatic-styles', draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right'">
-             <w:jc> 
-               <xsl:attribute name="w:val">
-                 <xsl:text>right</xsl:text>
-               </xsl:attribute>
-             </w:jc>             
-           </xsl:when>
-         </xsl:choose>
-   </xsl:if>   
- </xsl:template>
+  <!-- Insert Picture's Properties in frame, if needed -->
+  <xsl:template name="InsertPicturePropertiesInFrame">
+    <xsl:if test="ancestor::draw:text-box and descendant::draw:image">
+      <xsl:choose>
+        <xsl:when
+          test="key('automatic-styles', draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='center'">
+          <w:jc>
+            <xsl:attribute name="w:val">
+              <xsl:text>center</xsl:text>
+            </xsl:attribute>
+          </w:jc>
+        </xsl:when>
+        <xsl:when
+          test="key('automatic-styles', draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right'">
+          <w:jc>
+            <xsl:attribute name="w:val">
+              <xsl:text>right</xsl:text>
+            </xsl:attribute>
+          </w:jc>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
 
   <!-- compare values of spacing before/after and return 0 or the spacing value to override -->
   <xsl:template name="CompareSpacingValues">
@@ -853,7 +866,7 @@
         <xsl:value-of select="*[1][self::text:p]/@text:style-name"/>
       </xsl:when>
       <xsl:when
-        test="parent::text:list-header|self::text:p|self::text:h|self::text:list-level-style-number">
+        test="parent::text:list-header|self::text:p|self::text:h|self::text:list-level-style-number|self::text:outline-level-style">
         <xsl:value-of select="@text:style-name"/>
       </xsl:when>
       <xsl:when test="parent::text:p|parent::text:h">
@@ -1202,13 +1215,17 @@
         <xsl:variable name="fo_margin_right_frame">
           <xsl:value-of
             select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-right"
-          />          
+          />
         </xsl:variable>
         <xsl:variable name="style_horizontal_pos">
-          <xsl:value-of select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos"/>
+          <xsl:value-of
+            select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos"
+          />
         </xsl:variable>
         <xsl:variable name="style_horizontal_rel">
-          <xsl:value-of select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel"/>
+          <xsl:value-of
+            select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel"
+          />
         </xsl:variable>
         <xsl:variable name="svgx">
           <xsl:choose>
@@ -1217,8 +1234,7 @@
               <xsl:call-template name="point-measure">
                 <xsl:with-param name="length">
                   <xsl:choose>
-                    <xsl:when
-                      test="$style_horizontal_pos='left'">
+                    <xsl:when test="$style_horizontal_pos='left'">
                       <xsl:value-of select="$fo_margins_left"/>
                     </xsl:when>
                     <xsl:when
@@ -1233,8 +1249,7 @@
                         select="concat(-substring-before($fo_margin_right_frame, 'cm')+substring-before($fo_margin_right, 'cm')-substring-before(parent::draw:frame/@svg:width, 'cm'), 'cm')"
                       />
                     </xsl:when>
-                    <xsl:when
-                      test="$style_horizontal_pos='right' ">
+                    <xsl:when test="$style_horizontal_pos='right' ">
                       <xsl:value-of
                         select="concat(substring-before($fo_page_width, 'cm')-substring-before($fo_margin_left, 'cm')-substring-before($fo_margin_right, 'cm')-substring-before(parent::draw:frame/@svg:width, 'cm')-substring-before($fo_margin_right_frame, 'cm'), 'cm')"
                       />
@@ -2382,7 +2397,8 @@
   <xsl:template name="InsertRunProperties">
     <!-- apply text properties if needed -->
     <xsl:choose>
-      <xsl:when test="ancestor::text:span|ancestor::text:a|self::text:list-level-style-number">
+      <xsl:when
+        test="ancestor::text:span|ancestor::text:a|self::text:list-level-style-number|self::text:outline-level-style">
         <w:rPr>
           <xsl:call-template name="InsertRunStyle">
             <xsl:with-param name="styleName">
