@@ -43,6 +43,7 @@
   <!-- Tables -->
   <xsl:template match="table:table">
     <w:tbl>
+      <xsl:call-template name="MarkMasterPage"/>
       <w:tblPr>
         <xsl:choose>
           <xsl:when test="@table:is-sub-table='true'">
@@ -219,99 +220,7 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Manages sections within table -->
-  <xsl:template name="ManageSectionsInTable">
-    <!-- Section detection  : 3 cases -->
-    <xsl:if
-      test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::style:master-page)">
-      <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
-      <xsl:variable name="followings"
-        select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
-      <xsl:variable name="masterPageStarts"
-        select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
-
-      <!-- 2 - Section starts. The following paragraph is contained in the following section -->
-      <xsl:variable name="followingSection" select="following::text:section[1]"/>
-      <!-- the following section is the same as the following neighbour's ancestor section -->
-      <xsl:variable name="sectionStarts"
-        select="$followingSection and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id($followingSection))"/>
-
-      <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
-      <xsl:variable name="previousSection" select="ancestor::text:section[1]"/>
-      <!-- the following neighbour's ancestor section and the current section are different -->
-      <xsl:variable name="sectionEnds"
-        select="$previousSection and not(generate-id($followings[1]/ancestor::text:section[1]) = generate-id($previousSection))"/>
-
-      <xsl:if
-        test="($masterPageStarts = 'true' or $sectionStarts = 'true' or $sectionEnds = 'true') and not(ancestor::text:note-body)">
-        <w:p>
-          <w:pPr>
-            <w:sectPr>
-              <!-- 
-                Continuous sections. Looking up for a text:section 
-                If the first master style following the preceding section is the same as this table's following master-style,
-                then no other master style is used in-between.
-              -->
-              <xsl:variable name="ps" select="preceding::text:section[1]"/>
-              <xsl:variable name="stylesAfterSection"
-                select="$ps/following::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | $ps/following::text:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
-              <xsl:variable name="followingMasterStyle"
-                select="$followings[key('master-based-styles', @text:style-name|@table:style-name)]"/>
-              <xsl:variable name="continuous">
-                <xsl:choose>
-                  <xsl:when
-                    test="$sectionEnds or ($ps and (generate-id($stylesAfterSection[1]) = generate-id($followingMasterStyle[1])))"
-                    >yes</xsl:when>
-                  <xsl:when test="ancestor::text:section[1]">yes</xsl:when>
-                  <xsl:otherwise>no</xsl:otherwise>
-                </xsl:choose>
-              </xsl:variable>
-
-              <!-- Determine the master style that rules this section -->
-              <xsl:variable name="currentMasterStyle"
-                select="key('master-based-styles', @text:style-name)"/>
-              <xsl:choose>
-                <xsl:when test="boolean($currentMasterStyle)">
-                  <!-- current element style is tied to a master page -->
-                  <xsl:call-template name="InsertSectionProperties">
-                    <xsl:with-param name="continuous" select="$continuous"/>
-                    <xsl:with-param name="elt" select="."/>
-                    <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                    <xsl:with-param name="previous-section" select="$previousSection"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <!-- current style is not tied to a master page (typically the case of an ODF section), find the preceding one -->
-                  <xsl:variable name="precedings"
-                    select="preceding-sibling::text:p[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding-sibling::text:h[key('master-based-styles', @text:style-name)[1]/@style:master-page-name != ''] | preceding::table:table[key('master-based-styles', @table:style-name)[1]/@style:master-page-name != '']"/>
-                  <xsl:variable name="precedingMasterStyle"
-                    select="key('master-based-styles', $precedings[last()]/@text:style-name | $precedings[last()]/@table:style-name)"/>
-                  <xsl:choose>
-                    <xsl:when test="boolean($precedingMasterStyle)">
-                      <xsl:call-template name="InsertSectionProperties">
-                        <xsl:with-param name="continuous" select="$continuous"/>
-                        <xsl:with-param name="elt" select="$precedings[last()]"/>
-                        <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                        <xsl:with-param name="previous-section" select="$previousSection"/>
-                      </xsl:call-template>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <!-- otherwise, apply the default master style -->
-                      <xsl:call-template name="InsertSectionProperties">
-                        <xsl:with-param name="continuous" select="$continuous"/>
-                        <xsl:with-param name="section-ends" select="$sectionEnds"/>
-                        <xsl:with-param name="previous-section" select="$previousSection"/>
-                      </xsl:call-template>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:otherwise>
-              </xsl:choose>
-            </w:sectPr>
-          </w:pPr>
-        </w:p>
-      </xsl:if>
-    </xsl:if>
-  </xsl:template>
+  
 
   <!-- table rows -->
   <xsl:template match="table:table-row">

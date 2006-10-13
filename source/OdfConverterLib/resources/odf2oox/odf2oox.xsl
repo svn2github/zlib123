@@ -43,6 +43,7 @@
   <xsl:import href="dataStyles.xsl"/>
   <xsl:import href="pictures.xsl"/>
   <xsl:import href="settings.xsl"/>
+  <xsl:import href="sections.xsl"/>
   <xsl:import href="part_relationships.xsl"/>
   <xsl:import href="package_relationships.xsl"/>
   <xsl:import href="contentTypes.xsl"/>
@@ -65,6 +66,9 @@
   <xsl:template match="/odf:source">
     <xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction>
 
+    <!-- sections preformatting -->
+    <xsl:call-template name="sectionsPreProcessing"/>
+    
     <pzip:archive pzip:target="{$outputFile}">
 
       <!-- Document core properties -->
