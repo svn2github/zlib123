@@ -2015,10 +2015,10 @@
     <!-- insert text from the beginning of index item-->
     <w:r>
       <w:rPr>
+        <w:noProof/>
         <xsl:if test="ancestor::text:section/@text:display='none'">
           <w:vanish/>
         </xsl:if>
-        <w:noProof/>
       </w:rPr>
       <w:t>
         <xsl:choose>
@@ -2048,10 +2048,10 @@
     <!-- insert text at the end of index item -->
     <w:r>
       <w:rPr>
+        <w:noProof/>
         <xsl:if test="ancestor::text:section/@text:display='none'">
           <w:vanish/>
         </xsl:if>
-        <w:noProof/>
         <w:webHidden/>
       </w:rPr>
       <xsl:apply-templates select="descendant::text()[last()]" mode="text"/>
@@ -2067,10 +2067,10 @@
   <xsl:template name="InsertIndexPageRefEnd">
     <w:r>
       <w:rPr>
+        <w:noProof/>
         <xsl:if test="ancestor::text:section/@text:display='none'">
           <w:vanish/>
         </xsl:if>
-        <w:noProof/>
         <w:webHidden/>
       </w:rPr>
       <w:fldChar w:fldCharType="end"/>
@@ -2082,10 +2082,10 @@
 
     <w:r>
       <w:rPr>
+        <w:noProof/>
         <xsl:if test="ancestor::text:section/@text:display='none'">
           <w:vanish/>
         </xsl:if>
-        <w:noProof/>
         <w:webHidden/>
       </w:rPr>
       <w:fldChar w:fldCharType="begin">
@@ -2094,20 +2094,20 @@
     </w:r>
     <w:r>
       <w:rPr>
+        <w:noProof/>
         <xsl:if test="ancestor::text:section/@text:display='none'">
           <w:vanish/>
         </xsl:if>
-        <w:noProof/>
         <w:webHidden/>
       </w:rPr>
       <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $tocId,generate-id(ancestor::node()[child::text:index-body]), ' \h')"/></w:instrText>
     </w:r>
     <w:r>
       <w:rPr>
+        <w:noProof/>
         <xsl:if test="ancestor::text:section/@text:display='none'">
           <w:vanish/>
         </xsl:if>
-        <w:noProof/>
         <w:webHidden/>
       </w:rPr>
       <w:fldChar w:fldCharType="separate"/>
@@ -2223,10 +2223,10 @@
   <xsl:template match="text:tab" mode="paragraph">
     <w:r>
       <w:rPr>
+        <w:noProof/>
         <xsl:if test="ancestor::text:section/@text:display='none'">
           <w:vanish/>
         </xsl:if>
-        <w:noProof/>
         <w:webHidden/>
       </w:rPr>
       <w:tab/>
