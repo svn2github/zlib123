@@ -99,6 +99,7 @@
         </xsl:attribute>
       </xsl:if>
       <style:paragraph-properties>
+        <xsl:call-template name="InsertDefaultParagraphProperties"/>
         <xsl:call-template name="InsertParagraphProperties"/>
       </style:paragraph-properties>
     <!--  <xsl:if test="w:rPr">

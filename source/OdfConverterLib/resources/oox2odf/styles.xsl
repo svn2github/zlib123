@@ -35,7 +35,7 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" exclude-result-prefixes="w r">
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" exclude-result-prefixes="w r draw number">
 
   <xsl:template name="styles">
     <office:document-styles>
@@ -376,20 +376,7 @@
   <!-- Compute style and text properties of context style. -->
   <xsl:template name="InsertStyleProperties">
   <style:paragraph-properties>
-    <xsl:choose>
-      <xsl:when test="w:widowControl/@w:val='0'">
-        <!-- do nothing   -->
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="fo:widows">
-          <xsl:value-of select="1"/>
-        </xsl:attribute>
-        <xsl:attribute name="fo:orphans">
-          <xsl:value-of select="1"/>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
-    
+    <xsl:call-template name="InsertDefaultParagraphProperties"/>
       <xsl:if test="w:pPr">
         <xsl:for-each select="w:pPr">
           <xsl:call-template name="InsertParagraphProperties"/>
@@ -409,6 +396,93 @@
     </style:text-properties>
  </xsl:template>
 
+  
+  
+<!--   Default paragraph properties -->
+  <xsl:template name="InsertDefaultParagraphProperties">
+    
+<!--    default widow and orphan  -->
+    <xsl:choose>
+      <xsl:when test="w:widowControl/@w:val='0'">
+        <!-- do nothing   -->
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:widows">
+          <xsl:value-of select="1"/>
+        </xsl:attribute>
+        <xsl:attribute name="fo:orphans">
+          <xsl:value-of select="1"/>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+<!--    default align  -->
+    <xsl:choose>
+      <xsl:when test="w:jc">
+        <!--  do nothing      -->
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:text-align">
+          <xsl:choose>
+            <xsl:when test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='center'">
+              <xsl:value-of select="'center'"/>
+            </xsl:when>
+            <xsl:when test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='left'">
+              <xsl:value-of select="'start'"/>
+            </xsl:when>
+            <xsl:when test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='right'">
+              <xsl:value-of select="'end'"/>
+            </xsl:when>
+            <xsl:when test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='both' or document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='distribute'">
+              <xsl:value-of select="'justify'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'center'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          </xsl:attribute>
+        </xsl:otherwise>
+    </xsl:choose>
+    
+<!--    dafault spacing -->
+    <xsl:choose>
+      <xsl:when test="w:spacing/@w:line">
+    <!--     do nothing  -->
+      </xsl:when>
+    <xsl:otherwise>
+      <xsl:choose>
+        <xsl:when test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:lineRule='atLeast'">
+          <xsl:attribute name="style:line-height-at-least">
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:value-of select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:line"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:lineRule='exact'">
+          <xsl:attribute name="fo:line-height">
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:value-of select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:line"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- value of lineRule is 'auto' -->
+          <xsl:attribute name="fo:line-height">
+            <!-- convert 240th of line to percent -->
+            <xsl:value-of select="concat(document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:line div 240 * 100,'%')"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <!-- conversion of paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
     
@@ -577,15 +651,23 @@
     <xsl:if test="w:spacing/@w:line">
       <xsl:choose>
         <xsl:when test="w:spacing/@w:lineRule='atLeast'">
-          <xsl:attribute name="fo:line-height-at-least">
-            <!-- convert 20th pt to centimeter -->
-            <xsl:value-of select="concat(w:spacing/@w:line * 2.54 div (1440 * 20),'cm')"/>
+          <xsl:attribute name="style:line-height-at-least">
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:spacing/@w:line"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="w:spacing/@w:lineRule='exact'">
           <xsl:attribute name="fo:line-height">
-            <!-- convert 20th pt to centimeter -->
-            <xsl:value-of select="concat(w:spacing/@w:line * 2.54 div (1440 * 20),'cm')"/>
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:spacing/@w:line"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
           </xsl:attribute>
         </xsl:when>
         <xsl:otherwise>
@@ -615,7 +697,7 @@
             <xsl:value-of select="'justify'"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="'start'"/>
+            <xsl:value-of select="'center'"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
@@ -710,9 +792,9 @@
 
     <!-- tab stops -->
     <xsl:if test="w:tabs/w:tab">
-      <style:tab-stops>
-        <xsl:apply-templates select="w:tabs/w:tab"/>
-      </style:tab-stops>
+    <style:tab-stops>
+        <xsl:call-template name="InsertTabs"/>
+    </style:tab-stops>
     </xsl:if>
 
   </xsl:template>
@@ -1050,44 +1132,44 @@
 
   <!-- Handle tab stops -->
   <!-- TODO : check how to deal with tab stops inside a list -->
-  <xsl:template match="w:tab[parent::w:tabs]">
+  <xsl:template name="InsertTabs">
     <style:tab-stop>
-      <xsl:if test="@w:val != 'num' and @w:val != 'clear'">
-        <!-- type -->
+      <xsl:if test="w:tabs/w:tab/@w:val != 'num' and w:tabs/w:tab/@w:val != 'clear'">
+      <!--   type -->
         <xsl:attribute name="style:type">
           <xsl:choose>
-            <xsl:when test="@w:val='center'">center</xsl:when>
-            <xsl:when test="@w:val='right'">right</xsl:when>
-            <xsl:when test="@w:val='left'">left</xsl:when>
+            <xsl:when test="w:tabs/w:tab/@w:val='center'">center</xsl:when>
+            <xsl:when test="w:tabs/w:tab/@w:val='right'">right</xsl:when>
+            <xsl:when test="w:tabs/w:tab/@w:val='left'">left</xsl:when>
             <xsl:otherwise>left</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
-        <!-- position -->
-        <!-- TODO : what if @w:pos < 0 ? -->
-        <xsl:if test="@w:pos >= 0">
+        <!-- position 
+         TODO : what if @w:pos < 0 ? -->
+        <xsl:if test="w:tabs/w:tab/@w:pos >= 0">
           <xsl:attribute name="style:position">
             <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length" select="@w:pos"/>
+              <xsl:with-param name="length" select="w:tabs/w:tab/@w:pos"/>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
         <!-- leader char -->
-        <xsl:if test="@w:leader">
+        <xsl:if test="w:tabs/w:tab/@w:leader">
           <xsl:attribute name="style:leader-style">
             <xsl:choose>
-              <xsl:when test="@w:leader='dot'">dotted</xsl:when>
-              <xsl:when test="@w:leader='heavy'">solid</xsl:when>
-              <xsl:when test="@w:leader='hyphen'">dash</xsl:when>
-              <xsl:when test="@w:leader='middleDot'">dotted</xsl:when>
-              <xsl:when test="@w:leader='none'">none</xsl:when>
-              <xsl:when test="@w:leader='underscore'">solid</xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='dot'">dotted</xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='heavy'">solid</xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='hyphen'">dash</xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='middleDot'">dotted</xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='none'">none</xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='underscore'">solid</xsl:when>
               <xsl:otherwise>none</xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
         </xsl:if>
       </xsl:if>
-    </style:tab-stop>
+     </style:tab-stop>
   </xsl:template>
 
   <!-- ODF Text properties contained in OOX pPr element -->
