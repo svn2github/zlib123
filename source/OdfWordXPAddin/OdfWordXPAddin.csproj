@@ -65,6 +65,7 @@
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ConverterInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfConverterLib\OdfConverterLib.csproj">

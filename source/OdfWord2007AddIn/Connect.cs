@@ -75,7 +75,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 		/// </summary>
         public Connect()
 		{
-            this.labelsResourceManager = OdfWordAddinLib.GetResourceManager();
+            this.addinLib = new OdfWordAddinLib();
 		}
 
 		/// <summary>
@@ -111,7 +111,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 		public void OnDisconnection(Extensibility.ext_DisconnectMode disconnectMode, ref System.Array custom)
         {
             this.applicationObject = null;
-            this.labelsResourceManager = null;
+            this.addinLib = null;
 		}
 
 		/// <summary>
@@ -160,15 +160,15 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
         public void ImportODF(IRibbonControl control)
         {
 
-            FileDialog fd = applicationObject.get_FileDialog(MsoFileDialogType.msoFileDialogFilePicker);
+            FileDialog fd = this.applicationObject.get_FileDialog(MsoFileDialogType.msoFileDialogFilePicker);
             // allow multiple file opening
 			fd.AllowMultiSelect = true;
             // add filter for ODT files
             fd.Filters.Clear();
-            fd.Filters.Add(labelsResourceManager.GetString("OdfFileType"), "*.odt", Type.Missing);
-            fd.Filters.Add(labelsResourceManager.GetString("AllFileType"), "*.*", Type.Missing);
+            fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.odt", Type.Missing);
+            fd.Filters.Add(this.addinLib.GetString("AllFileType"), "*.*", Type.Missing);
             // set title
-            fd.Title = labelsResourceManager.GetString("OdfImportLabel");
+            fd.Title = this.addinLib.GetString("OdfImportLabel");
             // display the dialog
             fd.Show();
 
@@ -178,16 +178,19 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 // retrieve file name
                 String odfFile = fd.SelectedItems.Item(i);
 
-                object fileName = OdfWordAddinLib.GetTempFileName(odfFile);
+                // create a temporary file
+                object fileName = this.addinLib.GetTempFileName(odfFile);
+
+                this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
                 OdfToOox(odfFile, (string)fileName, true);
+                this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorNormal;
 
                 // open the document
                 object readOnly = true;
-                object isVisible = true;
                 object addToRecentFiles = false;
+                object isVisible = true;
                 object missing = Type.Missing;
-                Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
-
+                Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
 
                 // and activate it
                 doc.Activate();
@@ -198,7 +201,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 		public void ExportODF(IRibbonControl control)
 		{
             
-            MSword.Document doc = applicationObject.ActiveDocument;
+            MSword.Document doc = this.applicationObject.ActiveDocument;
 
             if (!doc.Saved)
             {
@@ -209,11 +212,11 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
                 sfd.AddExtension = true;
                 sfd.DefaultExt = "odt";
-                sfd.Filter = labelsResourceManager.GetString("OdfFileType") + " (*.odt)|*.odt|"
-                             + labelsResourceManager.GetString("AllFileType") + " (*.*)|*.*";
+                sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.odt)|*.odt|"
+                             + this.addinLib.GetString("AllFileType") + " (*.*)|*.*";
                 sfd.InitialDirectory = doc.Path;
                 sfd.OverwritePrompt = true;
-                sfd.Title = labelsResourceManager.GetString("OdfExportLabel");
+                sfd.Title = this.addinLib.GetString("OdfExportLabel");
 
                 // process the chosen documents	
                 if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
@@ -225,7 +228,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                     object tmpFileName = null;
                     string docxFile = (string)initialName;
 
-                    applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
+                    this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
                     
                     if (doc.SaveFormat != 12)
                     {
@@ -238,7 +241,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                         object readOnly = false;
                         object isVisible = false;
                         object missing = Type.Missing;
-                        MSword.Document newDoc = applicationObject.Documents.Open(ref newName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
+                        MSword.Document newDoc = this.applicationObject.Documents.Open(ref newName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
                         
                         // generate docx file from the duplicated file (under a temporary file)
                         tmpFileName = Path.GetTempFileName();
@@ -259,7 +262,6 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                     {
                         File.Delete((string)tmpFileName);
                     }
-                    applicationObject.System.Cursor = MSword.WdCursorType.wdCursorNormal;
 
                 }
             }
@@ -267,17 +269,17 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 
 		public stdole.IPictureDisp GetImage(IRibbonControl control)
 		{
-            return OdfWordAddinLib.GetLogo();
+            return this.addinLib.GetLogo();
 		}
 
 		public string getLabel(IRibbonControl control)
 		{
-            return labelsResourceManager.GetString(control.Id + "Label");
+            return this.addinLib.GetString(control.Id + "Label");
 		}
 
 		public string getDescription(IRibbonControl control)
 		{
-            return labelsResourceManager.GetString(control.Id + "Description");
+            return this.addinLib.GetString(control.Id + "Description");
 		}
 
         private Stream GetCustomUI()
@@ -294,137 +296,17 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
         }
 
 		private MSword.Application applicationObject;
-		private System.Resources.ResourceManager labelsResourceManager;
+        private OdfWordAddinLib addinLib;
 
         #region IOdfConverter Members
 
         public void OdfToOox(string inputFile, string outputFile, bool showUserInterface)
         {
-            if (showUserInterface)
-            {
-                try
-                {
-                    if (applicationObject != null) applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
-                    // create a temporary file
-
-                    // call the converter
-                    using (ConverterForm form = new ConverterForm(inputFile, outputFile, this.labelsResourceManager, true))
-                    {
-                        if (System.Windows.Forms.DialogResult.OK == form.ShowDialog())
-                        {
-                            if (form.HasLostElements)
-                            {
-                                ArrayList elements = form.LostElements;
-                                InfoBox infoBox = new InfoBox("FeedbackLabel", elements, labelsResourceManager);
-                                infoBox.ShowDialog();
-                            }
-                        }
-                        else
-                        {
-                            if (File.Exists(outputFile))
-                            {
-                                File.Delete(outputFile);
-                            }
-                            if (form.Exception != null)
-                            {
-                                throw form.Exception;
-                            }
-                        }
-                    }
-                }
-                catch (EncryptedDocumentException)
-                {
-                    InfoBox infoBox = new InfoBox("EncryptedDocumentLabel", "EncryptedDocumentDetail", labelsResourceManager);
-                    infoBox.ShowDialog();
-                }
-                catch (NotAnOdfDocumentException)
-                {
-                    InfoBox infoBox = new InfoBox("NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail", labelsResourceManager);
-                    infoBox.ShowDialog();
-                }
-                catch (Exception e)
-                {
-                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", labelsResourceManager);
-                    infoBox.ShowDialog();
-
-                    if (File.Exists(outputFile))
-                    {
-                        File.Delete(outputFile);
-                    }
-                }
-                finally
-                {
-                    if (applicationObject != null) applicationObject.System.Cursor = MSword.WdCursorType.wdCursorNormal;
-                }
-            }
-            else
-            {
-                try
-                {
-                    Converter conv = new Converter();
-                    conv.OdfToOox(inputFile, outputFile);
-                }
-                catch (Exception e)
-                {
-                    if (File.Exists(outputFile))
-                    {
-                        File.Delete(outputFile);
-                    }
-                    throw e;
-                }
-            }
+            this.addinLib.OdfToOox(inputFile, outputFile, showUserInterface);
         }
-
         public void OoxToOdf(string inputFile, string outputFile, bool showUserInterface)
         {
-            if (showUserInterface)
-            {
-                try
-                {
-                    using (ConverterForm form = new ConverterForm(inputFile, outputFile, this.labelsResourceManager, false))
-                    {
-                        System.Windows.Forms.DialogResult dr = form.ShowDialog();
-
-                        if (form.HasLostElements)
-                        {
-                            ArrayList elements = form.LostElements;
-                            InfoBox infoBox = new InfoBox("FeedbackLabel", elements, labelsResourceManager);
-                            infoBox.ShowDialog();
-                        }
-
-                        if (form.Exception != null)
-                        {
-                            throw form.Exception;
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", labelsResourceManager);
-                    infoBox.ShowDialog();
-
-                    if (File.Exists(outputFile))
-                    {
-                        File.Delete(outputFile);
-                    }
-                }
-            }
-            else
-            {
-                try
-                {
-                    Converter conv = new Converter();
-                    conv.OoxToOdf(inputFile, outputFile);
-                }
-                catch (Exception e)
-                {
-                    if (File.Exists(outputFile))
-                    {
-                        File.Delete(outputFile);
-                    }
-                    throw e;
-                }
-            }
+            this.addinLib.OoxToOdf(inputFile, outputFile, showUserInterface);
         }
 
         #endregion

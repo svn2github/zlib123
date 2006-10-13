@@ -55,14 +55,15 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
 	/// </summary>
 	/// <seealso class='IDTExtensibility2' />
     [GuidAttribute("A77A8471-D758-457E-BD12-03E9FCBF25F4"), ProgId("OdfWordXPAddin.Connect")]
-	public class Connect : Object, Extensibility.IDTExtensibility2
+	public class Connect : Object, Extensibility.IDTExtensibility2, IOdfConverter
 	{
 		/// <summary>
 		///		Implements the constructor for the Add-in object.
 		///		Place your initialization code within this method.
 		/// </summary>
 		public Connect()
-		{
+        {
+            this.addinLib = new OdfWordAddinLib();
 		}
 
 		/// <summary>
@@ -82,7 +83,6 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
 		public void OnConnection(object application, Extensibility.ext_ConnectMode connectMode, object addInInst, ref System.Array custom)
 		{
             this.applicationObject = (MSword.Application)application;
-            this.labelsResourceManager = OdfWordAddinLib.GetResourceManager();
 
             if (connectMode != Extensibility.ext_ConnectMode.ext_cm_Startup)
             {
@@ -108,7 +108,7 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                 OnBeginShutdown(ref custom);
             }
             this.applicationObject = null;
-            this.labelsResourceManager = null;
+            this.addinLib = null;
 		}
 
 		/// <summary>
@@ -141,7 +141,7 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
             try
             {
                 // if item already exists, use it (should never happen)
-                importButton = (CommandBarButton)commandBar.Controls[labelsResourceManager.GetString("OdfImportLabel")];
+                importButton = (CommandBarButton)commandBar.Controls[this.addinLib.GetString("OdfImportLabel")];
             }
             catch (Exception)
             {
@@ -149,8 +149,8 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                 importButton = (CommandBarButton)commandBar.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 3, true);
             }
             // set item's label
-            importButton.Caption = labelsResourceManager.GetString("OdfImportLabel");
-            importButton.Tag = labelsResourceManager.GetString("OdfImportLabel");
+            importButton.Caption = this.addinLib.GetString("OdfImportLabel");
+            importButton.Tag = this.addinLib.GetString("OdfImportLabel");
             // set action
             importButton.OnAction = "!<OdfWordXPAddin.Connect>";
             importButton.Visible = true;
@@ -160,7 +160,7 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
             try
             {
                 // if item already exists, use it (should never happen)
-                exportButton = (CommandBarButton)commandBar.Controls[labelsResourceManager.GetString("OdfExportLabel")];
+                exportButton = (CommandBarButton)commandBar.Controls[this.addinLib.GetString("OdfExportLabel")];
             }
             catch (Exception)
             {
@@ -168,8 +168,8 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                 exportButton = (CommandBarButton)commandBar.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 4, true);
             }
             // set item's label
-            exportButton.Caption = labelsResourceManager.GetString("OdfExportLabel");
-            exportButton.Tag = labelsResourceManager.GetString("OdfExportLabel");
+            exportButton.Caption = this.addinLib.GetString("OdfExportLabel");
+            exportButton.Tag = this.addinLib.GetString("OdfExportLabel");
             // set action
             exportButton.OnAction = "!<OdfWordXPAddin.Connect>";
             exportButton.Visible = true;
@@ -189,9 +189,9 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
         {
             // remove menu items (use FindControl instead of referenced object
             // in order to actually remove the items - this is a workaround)
-            CommandBarButton button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, labelsResourceManager.GetString("OdfImportLabel"), Type.Missing);
+            CommandBarButton button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfImportLabel"), Type.Missing);
             button.Delete(Type.Missing);
-            button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, labelsResourceManager.GetString("OdfExportLabel"), Type.Missing);
+            button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfExportLabel"), Type.Missing);
             button.Delete(Type.Missing);
             applicationObject.NormalTemplate.Save();
         }
@@ -203,10 +203,10 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
             fd.AllowMultiSelect = true;
             // add filter for ODT files
             fd.Filters.Clear();
-            fd.Filters.Add(labelsResourceManager.GetString("OdfFileType"), "*.odt", Type.Missing);
-            fd.Filters.Add(labelsResourceManager.GetString("AllFileType"), "*.*", Type.Missing);
+            fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.odt", Type.Missing);
+            fd.Filters.Add(this.addinLib.GetString("AllFileType"), "*.*", Type.Missing);
             // set title
-            fd.Title = labelsResourceManager.GetString("OdfImportLabel");
+            fd.Title = this.addinLib.GetString("OdfImportLabel");
             // display the dialog
             fd.Show();
 
@@ -216,86 +216,110 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                 // retrieve file name
                 String odfFile = fd.SelectedItems.Item(i);
 
-                // instanciate tranformer and process the file
-                object fileName = null;
-                ConverterForm form = null;
+                // create a temporary file
+                object fileName = this.addinLib.GetTempFileName(odfFile);
 
-                try
-                {
-                    applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
-                    // create a temporary file
-                    fileName = OdfWordAddinLib.GetTempFileName(odfFile);
+                this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
+                OdfToOox(odfFile, (string)fileName, true);
+                this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorNormal;
 
-                    // call the converter
-                    using (form = new ConverterForm(odfFile, (string)fileName, labelsResourceManager, true))
-                    {
-                        if (System.Windows.Forms.DialogResult.OK == form.ShowDialog())
-                        {
-                            // open the document
-                            object addToRecentFiles = false;
-                            object readOnly = true;
-                            object isVisible = true;
-                            object missing = Type.Missing;
-                            Microsoft.Office.Interop.Word.Document doc = applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing);
+                // open the document
+                object readOnly = true;
+                object addToRecentFiles = false;
+                object isVisible = true;
+                object missing = Type.Missing;
+                Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing);
 
-                            if (form.HasLostElements)
-                            {
-                                ArrayList elements = form.LostElements;
-                                InfoBox infoBox = new InfoBox("FeedbackLabel", elements, labelsResourceManager);
-                                infoBox.ShowDialog();
-                            }
-
-                            // and activate it
-                            doc.Activate();
-                        }
-                        else
-                        {
-                            if (File.Exists((string)fileName))
-                            {
-                                File.Delete((string)fileName);
-                            }
-                            if (form.Exception != null)
-                            {
-                                throw form.Exception;
-                            }
-                        }
-                    }
-                }
-                catch (EncryptedDocumentException)
-                {
-                    InfoBox infoBox = new InfoBox("EncryptedDocumentLabel", "EncryptedDocumentDetail", labelsResourceManager);
-                    infoBox.ShowDialog();
-                }
-                catch (NotAnOdfDocumentException)
-                {
-                    InfoBox infoBox = new InfoBox("NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail", labelsResourceManager);
-                    infoBox.ShowDialog();
-                }
-                catch (Exception e)
-                {
-                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", labelsResourceManager);
-                    infoBox.ShowDialog();
-
-                    if (File.Exists((string)fileName))
-                    {
-                        File.Delete((string)fileName);
-                    }
-                }
-                finally
-                {
-                    applicationObject.System.Cursor = MSword.WdCursorType.wdCursorNormal;
-                }
+                // and activate it
+                doc.Activate();
 
             }
         }
 
         private void exportButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
         {
-            System.Windows.Forms.MessageBox.Show(labelsResourceManager.GetString("NotImplemented"));
+
+            MSword.Document doc = this.applicationObject.ActiveDocument;
+
+            if (!doc.Saved || doc.SaveFormat != 12)
+            {
+                System.Windows.Forms.MessageBox.Show("Please save your document as DOCX before exporting to ODF");
+            }
+            else
+            {
+                System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+                sfd.AddExtension = true;
+                sfd.DefaultExt = "odt";
+                sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.odt)|*.odt|"
+                             + this.addinLib.GetString("AllFileType") + " (*.*)|*.*";
+                sfd.InitialDirectory = doc.Path;
+                sfd.OverwritePrompt = true;
+                sfd.Title = this.addinLib.GetString("OdfExportLabel");
+
+                // process the chosen documents	
+                if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
+                {
+                    // retrieve file name
+                    string odfFile = sfd.FileName; ;
+
+                    object initialName = doc.FullName;
+                    object tmpFileName = null;
+                    string docxFile = (string)initialName;
+
+                    this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
+
+                    if (doc.SaveFormat != 12)
+                    {
+                        // duplicate the file
+                        object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
+                        File.Copy((string)initialName, (string)newName);
+
+                        // open the duplicated file
+                        object addToRecentFiles = false;
+                        object readOnly = false;
+                        object isVisible = false;
+                        object missing = Type.Missing;
+                        MSword.Document newDoc = this.applicationObject.Documents.Open(ref newName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing);
+
+                        // generate docx file from the duplicated file (under a temporary file)
+                        tmpFileName = Path.GetTempFileName();
+                        object format = MSword.WdSaveFormat.wdFormatDocument;
+                        newDoc.SaveAs(ref tmpFileName, ref format, ref missing, ref missing, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing);
+
+                        // close and remove the duplicated file
+                        object saveChanges = false;
+                        newDoc.Close(ref saveChanges, ref missing, ref missing);
+                        File.Delete((string)newName);
+
+                        docxFile = (string)tmpFileName;
+                    }
+
+                    OoxToOdf(docxFile, odfFile, true);
+
+                    if (tmpFileName != null && File.Exists((string)tmpFileName))
+                    {
+                        File.Delete((string)tmpFileName);
+                    }
+
+                }
+            }
         }
 
         private MSword.Application applicationObject;
-        private System.Resources.ResourceManager labelsResourceManager;
+        private OdfWordAddinLib addinLib;
         private CommandBarButton importButton, exportButton;
+
+        #region IOdfConverter Members
+
+        public void OdfToOox(string inputFile, string outputFile, bool showUserInterface)
+        {
+            this.addinLib.OdfToOox(inputFile, outputFile, showUserInterface);
+        }
+        public void OoxToOdf(string inputFile, string outputFile, bool showUserInterface)
+        {
+            this.addinLib.OoxToOdf(inputFile, outputFile, showUserInterface);
+        }
+
+        #endregion
 	}
 }

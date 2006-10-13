@@ -92,7 +92,7 @@ namespace OdfConverterLauncher
                 string input = args[0];
                 try
                 {
-                    string output = OdfWordAddinLib.GetTempFileName(input);
+                    string output = new OdfWordAddinLib().GetTempFileName(input);
                     Converter converter = new CleverAge.OdfConverter.OdfConverterLib.Converter();
                     converter.OdfToOox(input, output);
                     Word word = new Word();

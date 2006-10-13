@@ -27,30 +27,176 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.IO;
+using CleverAge.OdfConverter.OdfConverterLib;
 
 namespace CleverAge.OdfConverter.OdfWordAddinLib
 {
     public class OdfWordAddinLib
     {
 
+        private System.Resources.ResourceManager labelsResourceManager;
+
+        public OdfWordAddinLib()
+        {
+            this.labelsResourceManager = new System.Resources.ResourceManager("OdfWordAddinLib.resources.Labels", Assembly.GetExecutingAssembly());
+        }
+
         /// <summary>
         /// Returns the ResourceManager containing the labels of the application.
         /// </summary>
         /// <returns>The ResourceManager.</returns>
-        public static System.Resources.ResourceManager GetResourceManager()
+        public string GetString(string name)
         {
-            return new System.Resources.ResourceManager("OdfWordAddinLib.resources.Labels", Assembly.GetExecutingAssembly());
+            return this.labelsResourceManager.GetString(name);
         }
+
+        /// <summary>
+        /// Transforms an ODF document into an OOX document.
+        /// </summary>
+        /// <param name="inputFile">The path of the input file to convert.</param>
+        /// <param name="outputFile">The path of the resulting file.</param>
+        /// <param name="showUserInterface">True if a progress bar has to be shown, along with a feedback.</param>
+        public void OdfToOox(string inputFile, string outputFile, bool showUserInterface)
+        {
+            if (showUserInterface)
+            {
+                try
+                {
+                    // create a temporary file
+
+                    // call the converter
+                    using (ConverterForm form = new ConverterForm(inputFile, outputFile, this.labelsResourceManager, true))
+                    {
+                        if (System.Windows.Forms.DialogResult.OK == form.ShowDialog())
+                        {
+                            if (form.HasLostElements)
+                            {
+                                ArrayList elements = form.LostElements;
+                                InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.labelsResourceManager);
+                                infoBox.ShowDialog();
+                            }
+                        }
+                        else
+                        {
+                            if (File.Exists(outputFile))
+                            {
+                                File.Delete(outputFile);
+                            }
+                            if (form.Exception != null)
+                            {
+                                throw form.Exception;
+                            }
+                        }
+                    }
+                }
+                catch (EncryptedDocumentException)
+                {
+                    InfoBox infoBox = new InfoBox("EncryptedDocumentLabel", "EncryptedDocumentDetail", this.labelsResourceManager);
+                    infoBox.ShowDialog();
+                }
+                catch (NotAnOdfDocumentException)
+                {
+                    InfoBox infoBox = new InfoBox("NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail", this.labelsResourceManager);
+                    infoBox.ShowDialog();
+                }
+                catch (Exception e)
+                {
+                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.labelsResourceManager);
+                    infoBox.ShowDialog();
+
+                    if (File.Exists(outputFile))
+                    {
+                        File.Delete(outputFile);
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    Converter conv = new Converter();
+                    conv.OdfToOox(inputFile, outputFile);
+                }
+                catch (Exception e)
+                {
+                    if (File.Exists(outputFile))
+                    {
+                        File.Delete(outputFile);
+                    }
+                    throw e;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Transforms an OOX document into an ODF document.
+        /// </summary>
+        /// <param name="inputFile">The path of the input file to convert.</param>
+        /// <param name="outputFile">The path of the resulting file.</param>
+        /// <param name="showUserInterface">True if a progress bar has to be shown, along with a feedback.</param>
+        public void OoxToOdf(string inputFile, string outputFile, bool showUserInterface)
+        {
+            if (showUserInterface)
+            {
+                try
+                {
+                    using (ConverterForm form = new ConverterForm(inputFile, outputFile, this.labelsResourceManager, false))
+                    {
+                        System.Windows.Forms.DialogResult dr = form.ShowDialog();
+
+                        if (form.HasLostElements)
+                        {
+                            ArrayList elements = form.LostElements;
+                            InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.labelsResourceManager);
+                            infoBox.ShowDialog();
+                        }
+
+                        if (form.Exception != null)
+                        {
+                            throw form.Exception;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.labelsResourceManager);
+                    infoBox.ShowDialog();
+
+                    if (File.Exists(outputFile))
+                    {
+                        File.Delete(outputFile);
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    Converter conv = new Converter();
+                    conv.OoxToOdf(inputFile, outputFile);
+                }
+                catch (Exception e)
+                {
+                    if (File.Exists(outputFile))
+                    {
+                        File.Delete(outputFile);
+                    }
+                    throw e;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Returns the logo of the application.
         /// </summary>
         /// <returns>The logo of the application.</returns>
-        public static stdole.IPictureDisp GetLogo()
+        public stdole.IPictureDisp GetLogo()
         {
             Assembly asm = Assembly.GetExecutingAssembly();
             Stream stream = null;
@@ -75,7 +221,7 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
         /// </summary>
         /// <param name="input">The orginal odf file name</param>
         /// <returns>A temporary file name pointing to the user's \Temp folder</returns>
-        public static string GetTempFileName(string input)
+        public string GetTempFileName(string input)
         {
             // Get the \Temp path
             string tempPath = Path.GetTempPath().ToString();

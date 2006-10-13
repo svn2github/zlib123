@@ -67,6 +67,7 @@
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ConverterInterface.cs" />
     <Compile Include="DependencyChecker.cs">
       <SubType>Component</SubType>
     </Compile>
