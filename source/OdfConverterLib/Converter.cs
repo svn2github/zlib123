@@ -289,12 +289,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
 
             // Test for encryption
-            XmlReaderSettings settings = new XmlReaderSettings();
-            settings.XmlResolver = new ZipResolver(fileName);
-            settings.ProhibitDtd = false;
             XmlDocument doc;
             try
             {
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.XmlResolver = new ZipResolver(fileName);
+                settings.ProhibitDtd = false;
                 doc = new XmlDocument();
                 XmlReader reader = XmlReader.Create("META-INF/manifest.xml", settings);
                 doc.Load(reader);
