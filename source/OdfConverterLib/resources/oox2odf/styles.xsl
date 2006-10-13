@@ -39,6 +39,7 @@
 
   <xsl:template name="styles">
     <office:document-styles>
+      <office:font-face-decls/>
       <!-- document styles -->
       <office:styles>
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
@@ -379,12 +380,25 @@
   <xsl:template name="InsertStyleProperties">
     <xsl:if test="w:pPr">
       <style:paragraph-properties>
+        <xsl:choose>
+          <xsl:when test="w:widowControl/@w:val='0'">
+            <!-- do nothing   -->
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:widows">
+              <xsl:value-of select="1"/>
+            </xsl:attribute>
+            <xsl:attribute name="fo:orphans">
+              <xsl:value-of select="1"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
         <xsl:for-each select="w:pPr">
           <xsl:call-template name="InsertParagraphProperties"/>
         </xsl:for-each>
       </style:paragraph-properties>
     </xsl:if>
-
+    
     <xsl:if test="w:rPr">
       <style:text-properties>
         <xsl:for-each select="w:rPr">
@@ -452,22 +466,6 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-    </xsl:if>
-
-    <!-- widows and orphans -->
-    <xsl:if test="w:widowControl">
-      <xsl:choose>
-        <xsl:when
-          test="w:widowControl/@w:val='on' or w:widowControl/@w:val='true' or w:widowControl/@w:val=1 or not(w:widowControl/@w:val)">
-          <xsl:attribute name="fo:widows">
-            <xsl:value-of select="1"/>
-          </xsl:attribute>
-          <xsl:attribute name="fo:orphans">
-            <xsl:value-of select="1"/>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise/>
-      </xsl:choose>
     </xsl:if>
 
     <!-- borders. -->
