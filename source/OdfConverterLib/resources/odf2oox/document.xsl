@@ -862,7 +862,7 @@
   <!-- Computes the style name to be used be InsertIndent template -->
   <xsl:template name="GetStyleName">
     <xsl:choose>
-      <xsl:when test="self::text:list-item">
+      <xsl:when test="self::text:list-item|self::text:list-header">
         <xsl:value-of select="*[1][self::text:p]/@text:style-name"/>
       </xsl:when>
       <xsl:when
@@ -2214,31 +2214,38 @@
   <!-- Inserts the number of a list item -->
   <xsl:template name="InsertNumbering">
     <xsl:param name="level"/>
-    <xsl:variable name="stylename" select="./@text:style-name"/>
-    <xsl:variable name="list" select="key('automatic-styles', $stylename)"/>
+    <xsl:variable name="listStyleName">
+      <xsl:choose>
+        <xsl:when test="key('automatic-styles', @text:style-name)/@style:list-style-name">
+          <xsl:value-of select="key('automatic-styles', @text:style-name)/@style:list-style-name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="stylename" select="@text:style-name"/>
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:if test="key('styles', $stylename)/@style:list-style-name">
+              <xsl:value-of select="key('styles', $stylename)/@style:list-style-name"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
-      <xsl:when
-        test="self::text:list-item or self::text:list-header or $list/@style:list-style-name">
-        <xsl:if test="not(self::text:list-header) and not(parent::text:list-header)">
+      <xsl:when test="self::text:list-item or self::text:list-header or $listStyleName != '' ">
+        <!-- test : do not number list-headers, and do not number paragraph in the middle of a list-item or list-header -->
+        <xsl:if
+          test="not(self::text:list-header) and not(parent::text:list-header) and not(preceding-sibling::node()[name() != 'text:list-item' and name() != 'text:list-header'])">
           <w:numPr>
             <xsl:choose>
-              <xsl:when
-                test="self::text:list-item and *[1][self::text:h and @text:outline-level &lt;= 9]">
-                <w:ilvl w:val="{text:h[1]/@text:outline-level - 1}"/>
-              </xsl:when>
               <xsl:when test="self::text:list-item or parent::text:list-item">
                 <w:ilvl w:val="{$level}"/>
               </xsl:when>
               <xsl:otherwise>
-                <w:ilvl w:val="{./@text:outline-level - 1}"/>
+                <w:ilvl w:val="{@text:outline-level - 1}"/>
               </xsl:otherwise>
             </xsl:choose>
             <w:numId>
               <xsl:attribute name="w:val">
                 <xsl:choose>
-                  <xsl:when
-                    test="self::text:list-item and *[1][self::text:h and @text:outline-level &lt;= 9]"
-                    >1</xsl:when>
                   <xsl:when test="self::text:list-item">
                     <xsl:call-template name="GetNumberingId">
                       <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"
@@ -2248,7 +2255,7 @@
                   <xsl:otherwise>
 
                     <xsl:call-template name="GetNumberingId">
-                      <xsl:with-param name="styleName" select="$list/@style:list-style-name"/>
+                      <xsl:with-param name="styleName" select="$listStyleName"/>
                     </xsl:call-template>
 
                   </xsl:otherwise>
@@ -2260,9 +2267,9 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:if
-          test="self::text:h and ./@text:outline-level &lt;= 9 and document('styles.xml')//office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !=''">
+          test="self::text:h and @text:outline-level &lt;= 9 and document('styles.xml')/office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !='' ">
           <w:numPr>
-            <w:ilvl w:val="{./@text:outline-level - 1}"/>
+            <w:ilvl w:val="{@text:outline-level - 1}"/>
             <w:numId w:val="1"/>
           </w:numPr>
         </xsl:if>

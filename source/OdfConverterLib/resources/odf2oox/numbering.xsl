@@ -193,7 +193,7 @@
           </xsl:when>
           <!-- run properties for numbered list-->
           <xsl:otherwise>
-            <xsl:call-template name="InsertRunProperties"/>
+            <xsl:call-template name="InsertListRunProperties"/>
           </xsl:otherwise>
         </xsl:choose>
 
@@ -335,6 +335,21 @@
         </xsl:otherwise>
       </xsl:choose>
     </w:ind>
+  </xsl:template>
+
+  <!-- list run properties are created as in w:style -->
+  <xsl:template name="InsertListRunProperties">
+    <xsl:if test="@text:style-name">
+      <xsl:variable name="styleName" select="@text:style-name"/>
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:if test="key('styles',$styleName)/style:text-properties">
+          <w:rPr>
+            <xsl:apply-templates select="key('styles',$styleName)/style:text-properties"
+              mode="rPr"/>
+          </w:rPr>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
   <!-- list justification -->
