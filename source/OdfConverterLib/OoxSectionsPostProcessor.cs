@@ -30,10 +30,7 @@ using System.Xml;
 using System.Collections;
 using System;
 
-// TODO : default master style = first master style
-// TODO : handle continuous
-// continuity :
-//				- ancestor::text:section[1]
+
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
 
