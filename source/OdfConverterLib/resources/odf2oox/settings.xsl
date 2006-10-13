@@ -33,12 +33,24 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
-  xmlns:ooo="http://openoffice.org/2004/office" 
-  exclude-result-prefixes="office fo style config ooo">
+  xmlns:ooo="http://openoffice.org/2004/office" exclude-result-prefixes="office fo style config ooo">
 
   <xsl:template name="InsertSettings">
     <w:settings>
-      <w:view w:val="print"/>
+      <!-- view layout -->
+      <xsl:variable name="view-settings"
+        select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:view-settings']"/>
+      <w:view>
+        <xsl:attribute name="w:val">
+          <xsl:choose>
+            <xsl:when
+              test="$view-settings/config:config-item[@config:name='InBrowseMode' and @config:type='boolean'] = 'true' ">web</xsl:when>
+            
+              <xsl:otherwise>print</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </w:view>
+
       <xsl:for-each select="document('styles.xml')">
         <xsl:if
           test="key('page-layouts', $default-master-style/@style:page-layout-name)/style:page-layout-properties/@fo:background-color">
