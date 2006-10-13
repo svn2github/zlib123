@@ -352,16 +352,13 @@
     <xsl:message terminate="no">progress:w:style</xsl:message>
     <xsl:choose>
       <xsl:when test="self::node()/@w:default">
-        <style:default-style style:name="{self::node()/@w:styleId}"
-          style:family="{self::node()/@w:type}" style:display-name="{self::node()/w:name/@w:val}">
-          <xsl:if test="w:basedOn">
-            <xsl:attribute name="style:parent-style-name">
-              <xsl:value-of select="w:basedOn/@w:val"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:call-template name="InsertStyleProperties"/>
+        <xsl:if test="@w:type='paragraph'">
+        <style:default-style style:family="paragraph">
+                <xsl:call-template name="InsertStyleProperties"/>
         </style:default-style>
-      </xsl:when>
+        </xsl:if>
+        <!--@TODO style:family: table, graphic, text etc-->
+       </xsl:when>
       <xsl:otherwise>
         <style:style style:name="{self::node()/@w:styleId}" style:family="{self::node()/@w:type}"
           style:display-name="{self::node()/w:name/@w:val}">
@@ -378,38 +375,39 @@
 
   <!-- Compute style and text properties of context style. -->
   <xsl:template name="InsertStyleProperties">
-    <xsl:if test="w:pPr">
-      <style:paragraph-properties>
-        <xsl:choose>
-          <xsl:when test="w:widowControl/@w:val='0'">
-            <!-- do nothing   -->
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="fo:widows">
-              <xsl:value-of select="1"/>
-            </xsl:attribute>
-            <xsl:attribute name="fo:orphans">
-              <xsl:value-of select="1"/>
-            </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
+  <style:paragraph-properties>
+    <xsl:choose>
+      <xsl:when test="w:widowControl/@w:val='0'">
+        <!-- do nothing   -->
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:widows">
+          <xsl:value-of select="1"/>
+        </xsl:attribute>
+        <xsl:attribute name="fo:orphans">
+          <xsl:value-of select="1"/>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+      <xsl:if test="w:pPr">
         <xsl:for-each select="w:pPr">
           <xsl:call-template name="InsertParagraphProperties"/>
         </xsl:for-each>
-      </style:paragraph-properties>
-    </xsl:if>
+      </xsl:if>
+    </style:paragraph-properties>
     
-    <xsl:if test="w:rPr">
-      <style:text-properties>
+    <style:text-properties>
+      <xsl:if test="w:rPr">
         <xsl:for-each select="w:rPr">
           <xsl:call-template name="InsertTextProperties"/>
         </xsl:for-each>
         <xsl:for-each select="w:pPr">
           <xsl:call-template name="InsertpPrTextProperties"/>
         </xsl:for-each>
-      </style:text-properties>
-    </xsl:if>
-  </xsl:template>
+      </xsl:if>
+    </style:text-properties>
+ </xsl:template>
 
   <!-- conversion of paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
