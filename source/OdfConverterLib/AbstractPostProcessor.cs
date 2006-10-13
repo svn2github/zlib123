@@ -228,7 +228,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 : base(prefix, name, ns)
             {
             }
-
+            
+          	public Attribute(string prefix, string name, string val, string ns)
+                : base(prefix, name, ns)
+            {
+              	this.value = val;
+            }
+              
             public string Value
             {
                 get { return this.value; }

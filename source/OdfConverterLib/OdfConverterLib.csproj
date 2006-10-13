@@ -41,14 +41,6 @@
     <Compile Include="ResourceResolver.cs" />
     <Compile Include="Converter.cs" />
     <Compile Include="NotAnOdfDocumentException.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
-      <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
-      <Name>OdfZipUtils</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\odf2oox\comments.xsl" />
     <EmbeddedResource Include="resources\odf2oox\common.xsl" />
     <EmbeddedResource Include="resources\odf2oox\contentTypes.xsl" />
@@ -68,36 +60,26 @@
     <EmbeddedResource Include="resources\odf2oox\settings.xsl" />
     <EmbeddedResource Include="resources\odf2oox\source.xml" />
     <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\odf2oox\office.dtd" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\source.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\odf2oox\tables.xsl" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\common.xsl" />
     <EmbeddedResource Include="resources\oox2odf\pictures.xsl" />
     <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
     <EmbeddedResource Include="resources\oox2odf\tables.xsl" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\lists.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\meta.xsl" />
+    <Compile Include="OoxSectionsPostProcessor.cs" />
+    <EmbeddedResource Include="resources\odf2oox\sections.xsl" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="resources\oox2odf\meta.xsl" />
+    <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
+      <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
+      <Name>OdfZipUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>
