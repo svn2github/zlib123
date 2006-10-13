@@ -538,6 +538,16 @@
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
+      <xsl:if test="w:ind/@w:hanging">
+        <xsl:attribute name="fo:text-indent">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="-w:ind/@w:hanging"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
     </xsl:if>
     
     <!-- w:afterAutospacing and w:beforeAutospacing attributes are lost -->
