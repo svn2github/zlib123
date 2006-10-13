@@ -52,7 +52,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
         private const string SOURCE_XML = "source.xml";
 
-        private string[] OOX_POST_PROCESSORS = { "OoxAutomaticStylesPostProcessor", "OoxCharactersPostProcessor" };
+        private string[] OOX_POST_PROCESSORS = 
+        {
+        	"OoxSectionsPostProcessor", 
+        	"OoxAutomaticStylesPostProcessor", 
+        	"OoxCharactersPostProcessor" 
+        };
         private string[] ODF_POST_PROCESSORS = { };
 
         public Converter()
