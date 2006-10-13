@@ -39,6 +39,7 @@
 
   <xsl:import href="tables.xsl"/>
   <xsl:import href="lists.xsl"/>
+  <xsl:import href="fonts.xsl"/>
 
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="w:p"/>
@@ -51,8 +52,7 @@
     <office:document-content>
       <office:scripts/>
       <office:font-face-decls>
-        <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
-          mode="fontfacedecls"/>
+        <xsl:apply-templates select="document('word/fontTable.xml')/w:fonts" />
       </office:font-face-decls>
       <office:automatic-styles>
         <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
@@ -69,26 +69,6 @@
     </office:document-content>
   </xsl:template>
 
- <xsl:template match="w:rPr[parent::w:r]|w:rPr[parent::w:pPr]" mode="fontfacedecls">
-    <xsl:if test="w:rFonts">
-      <xsl:variable name="ascii" select="w:rFonts/@w:ascii"/>
-      <xsl:if test="not(preceding::w:rFonts[@w:ascii = $ascii])">
-        <style:font-face>
-          <xsl:attribute name="style:name">
-            <xsl:value-of select="$ascii"/>
-          </xsl:attribute>
-          <xsl:attribute name="svg:font-family">
-            <xsl:value-of select="w:rFonts/@w:hAnsi"/>
-          </xsl:attribute>
-        </style:font-face>
-       </xsl:if>
-    </xsl:if>
- </xsl:template>
-  
-  <xsl:template match="w:t" mode="fontfacedecls">
-    <!--do nothing-->
-  </xsl:template>
-  
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
   <xsl:template match="w:pPr[parent::w:p]" mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
@@ -102,13 +82,6 @@
         <xsl:call-template name="InsertDefaultParagraphProperties"/>
         <xsl:call-template name="InsertParagraphProperties"/>
       </style:paragraph-properties>
-    <!--  <xsl:if test="w:rPr">
-        <xsl:for-each select="w:rPr">
-          <style:text-properties>
-            <xsl:call-template name="InsertTextProperties"/>
-          </style:text-properties>
-        </xsl:for-each>
-      </xsl:if>-->
     </style:style>
   </xsl:template>
 

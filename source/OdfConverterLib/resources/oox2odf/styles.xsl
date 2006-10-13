@@ -39,7 +39,9 @@
 
   <xsl:template name="styles">
     <office:document-styles>
-      <office:font-face-decls/>
+      <office:font-face-decls>
+        <xsl:apply-templates select="document('word/fontTable.xml')/w:fonts" />
+      </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
@@ -347,6 +349,13 @@
     </xsl:attribute>
   </xsl:template>
 
+  <!-- document defaults -->
+  <xsl:template match="w:rPrDefault | w:pPrDefault">
+    <style:default-style style:family="paragraph">
+      <xsl:call-template name="InsertStyleProperties"/>
+    </style:default-style>
+  </xsl:template>
+  
   <!-- create styles -->
   <xsl:template match="w:style">
     <xsl:message terminate="no">progress:w:style</xsl:message>
@@ -1425,6 +1434,13 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
+    <xsl:if test="w:rFonts/@w:asciiTheme">
+      <xsl:attribute name="style:font-name">
+        <xsl:call-template name="ComputeThemeFontName">
+          <xsl:with-param name="fontTheme" select="w:rFonts/@w:asciiTheme"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
     <xsl:if test="w:rFonts/@w:cs">
       <xsl:attribute name="style:font-name-complex">
         <xsl:call-template name="ComputeFontName">
@@ -1763,4 +1779,23 @@
     </xsl:choose>
   </xsl:template>
 
+ <!-- get font name from theme -->
+  <xsl:template name="ComputeThemeFontName" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" >
+    <xsl:param name="fontTheme" />
+    <xsl:variable name="fontScheme" select="document('word/theme/theme1.xml')/a:theme/a:themeElements/a:fontScheme" />
+    
+    <xsl:variable name="fontName">
+      <xsl:choose>
+        <xsl:when test="contains($fontTheme,'minor')">
+          <xsl:value-of select="$fontScheme/a:minorFont/a:latin/@typeface"/>
+        </xsl:when>
+        <xsl:when test="contains($fontTheme,'major')">
+          <xsl:value-of select="$fontScheme/a:majorFont/a:latin/@typeface"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:value-of select="$fontName"/>
+  </xsl:template>
+  
 </xsl:stylesheet>
