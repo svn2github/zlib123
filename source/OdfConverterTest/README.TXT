@@ -24,17 +24,19 @@ To test the program, you need :
 OdfConverterTest Usage
 ----------------------
 
-OdfConverterTest.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] [/V] [/OPEN] [/LEVEL Level] [/REPORT Filename]");
+OdfConverterTest.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level]
     Where options are:
-         /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)
-         /O PathOrFilename  Name of the output file (or output folder)
-         /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (note: existing files will be replaced)
-         /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (note: existing files will be replaced)
-         /V                 Validate the result of the transformation against the schemas
-         /OPEN              Try to open the converted files
-         /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR
-         /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)
-         /REPORT Filename   Name of the report file that must be generated (existing files will be replaced)
+       /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)
+       /O PathOrFilename  Name of the output file (or output folder)
+       /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (note: existing files will be replaced)
+       /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (note: existing files will be replaced)
+       /V                 Validate the result of the transformation against the schemas
+       /OPEN              Try to open the converted files (works only for ODF->OOX, Microsoft Word required)
+       /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)
+       /NOPACKAGING       Don't package the result of the transformation into a ZIP archive (produce raw XML)
+       /SKIP name         Skip a post-processing (provide the post-processor's name)
+       /REPORT Filename   Name of the report file that must be generated (existing files will be replaced)
+       /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR
 
 
 Known Issues
