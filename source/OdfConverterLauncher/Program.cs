@@ -94,7 +94,8 @@ namespace OdfConverterLauncher
                 {
                     string output = new OdfWordAddinLib().GetTempFileName(input);
                     Converter converter = new CleverAge.OdfConverter.OdfConverterLib.Converter();
-                    converter.OdfToOox(input, output);
+                    converter.DirectTransform = true;
+                    converter.Transform(input, output);
                     Word word = new Word();
                     word.Visible = true;
                     word.Open(output);

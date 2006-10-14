@@ -58,10 +58,37 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         	"OoxAutomaticStylesPostProcessor", 
         	"OoxCharactersPostProcessor" 
         };
+
         private string[] ODF_POST_PROCESSORS = { };
+
+        private bool isDirectTransform = true;
+        private ArrayList skipedPostProcessors = null;
+        private string externalResource = null;
+        private bool packaging = true;
 
         public Converter()
         {
+            this.skipedPostProcessors = new ArrayList();
+        }
+
+        public bool DirectTransform
+        {
+            set { this.isDirectTransform = value; }
+        }
+
+        public ArrayList SkipedPostProcessors
+        {
+            set { this.skipedPostProcessors = value; }
+        }
+
+        public string ExternalResources
+        {
+            set { this.externalResource = value; }
+        }
+
+        public bool Packaging
+        {
+            set { this.packaging = value; }
         }
 
         public delegate void MessageListener(object sender, EventArgs e);
@@ -79,62 +106,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             feedbackMessageIntercepted += listener;
         }
 
-        public void OdfToOox(string inputFile, string outputFile)
+        public void ComputeSize(string inputFile)
         {
-            DoOdfToOoxTransform(inputFile, outputFile, null, null);
+            Transform(inputFile, null);
         }
 
-        public void OdfToOoxSkipPostProcess(string inputFile, string outputFile, string skipPostProcessor)
-        {
-            DoOdfToOoxTransform(inputFile, outputFile, null, skipPostProcessor);
-        }
-
-        public void OdfToOoxWithExternalResources(string inputFile, string outputFile, string resourceDir)
-        {
-            DoOdfToOoxTransform(inputFile, outputFile, resourceDir, null);
-        }
-
-        public void OdfToOoxSkipPostProcessWithExternalResources(string inputFile, string outputFile, string resourceDir, string skipPostProcessor)
-        {
-            DoOdfToOoxTransform(inputFile, outputFile, resourceDir, skipPostProcessor);
-        }
-
-        public void OdfToOoxComputeSize(string inputFile)
-        {
-            DoOdfToOoxTransform(inputFile, null, null, null);
-        }
-
-        public void OoxToOdf(string inputFile, string outputFile)
-        {
-            DoOoxToOdfTransform(inputFile, outputFile, null, null);
-        }
-
-        public void OoxToOdfSkipPostProcess(string inputFile, string outputFile, string skipPostProcessor)
-        {
-            DoOoxToOdfTransform(inputFile, outputFile, null, skipPostProcessor);
-        }
-
-        public void OoxToOdfWithExternalResources(string inputFile, string outputFile, string resourceDir)
-        {
-            DoOoxToOdfTransform(inputFile, outputFile, resourceDir, null);
-        }
-
-        public void OoxToOdfSkipPostProcessWithExternalResources(string inputFile, string outputFile, string resourceDir, string skipPostProcessor)
-        {
-            DoOoxToOdfTransform(inputFile, outputFile, resourceDir, skipPostProcessor);
-        }
-
-        public void OoxToOdfComputeSize(string inputFile)
-        {
-            DoOoxToOdfTransform(inputFile, null, null, null);
-        }
-
-        private void DoOdfToOoxTransform(string inputFile, string outputFile, string resourceDir, string skipPostProcessor)
+        public void Transform(string inputFile, string outputFile)
         {
             // this throws an exception in the the following cases:
-            // - input file is not an ODF file
-            // - input file is an encrypted ODF file
-            CheckOdf(inputFile);
+            // - input file is not a valid file
+            // - input file is an encrypted file
+            CheckFile(inputFile);
 
             XmlUrlResolver resourceResolver;
             XPathDocument xslDoc;
@@ -148,11 +130,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
                 // do not look for DTD
                 xrs.ProhibitDtd = true;
-
-                if (resourceDir == null)
+                string resourcesLocation = ODFToOOX_LOCATION;
+                string xslLocation = ODFToOOX_XSL;
+                if (!this.isDirectTransform)
                 {
-                    resourceResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCE_LOCATION + "." + ODFToOOX_LOCATION);
-                    xslDoc = new XPathDocument(((ResourceResolver)resourceResolver).GetInnerStream(ODFToOOX_XSL));
+                    resourcesLocation = OOXToODF_LOCATION;
+                    xslLocation = OOXToODF_XSL;
+                }
+
+                if (this.externalResource == null)
+                {
+
+                    resourceResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCE_LOCATION + "." + resourcesLocation);
+                    xslDoc = new XPathDocument(((ResourceResolver)resourceResolver).GetInnerStream(xslLocation));
                     xrs.XmlResolver = resourceResolver;
                     source = XmlReader.Create(SOURCE_XML, xrs);
 
@@ -160,8 +150,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 else
                 {
                     resourceResolver = new XmlUrlResolver();
-                    xslDoc = new XPathDocument(resourceDir + "/" + ODFToOOX_XSL);
-                    source = XmlReader.Create(resourceDir + "/" + SOURCE_XML, xrs);
+                    xslDoc = new XPathDocument(this.externalResource + "/" + xslLocation);
+                    source = XmlReader.Create(this.externalResource + "/" + SOURCE_XML, xrs);
                 }
 
                 // create a xsl transformer
@@ -179,79 +169,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
-                    writer = GetOoxWriter(zipResolver, skipPostProcessor);
-                }
-                else
-                {
-                    writer = new XmlTextWriter(new StringWriter());
-                }
-
-                // Apply the transformation
-                xslt.Transform(source, parameters, writer, zipResolver);
-            }
-            finally
-            {
-                if (writer != null)
-                    writer.Close();
-                if (source != null)
-                    source.Close();
-                if (zipResolver != null)
-                    zipResolver.Dispose();
-            }
-        }
-
-        private void DoOoxToOdfTransform(string inputFile, string outputFile, string resourceDir, string skipPostProcessor)
-        {
-
-            // this throws an exception in the the following cases:
-            // - input file is not an OOX file
-            // - input file is an encrypted OOX file
-            CheckOox(inputFile);
-
-            XmlUrlResolver resourceResolver;
-            XPathDocument xslDoc;
-            XmlReaderSettings xrs = new XmlReaderSettings();
-            XmlReader source = null;
-            XmlWriter writer = null;
-            ZipResolver zipResolver = null;
-
-            try
-            {
-
-                // do not look for DTD
-                xrs.ProhibitDtd = true;
-
-                if (resourceDir == null)
-                {
-                    resourceResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCE_LOCATION + "." + OOXToODF_LOCATION);
-                    xslDoc = new XPathDocument(((ResourceResolver)resourceResolver).GetInnerStream(OOXToODF_XSL));
-                    xrs.XmlResolver = resourceResolver;
-                    source = XmlReader.Create(SOURCE_XML, xrs);
-
-                }
-                else
-                {
-                    resourceResolver = new XmlUrlResolver();
-                    xslDoc = new XPathDocument(resourceDir + "/" + OOXToODF_XSL);
-                    source = XmlReader.Create(resourceDir + "/" + SOURCE_XML, xrs);
-                }
-
-                // create a xsl transformer
-                XslCompiledTransform xslt = new XslCompiledTransform();
-                // Enable xslt 'document()' function
-                XsltSettings settings = new XsltSettings(true, false);
-                // compile the stylesheet
-                xslt.Load(xslDoc, settings, resourceResolver);
-
-
-                zipResolver = new ZipResolver(inputFile);
-                XsltArgumentList parameters = new XsltArgumentList();
-
-                parameters.XsltMessageEncountered += new XsltMessageEncounteredEventHandler(MessageCallBack);
-                if (outputFile != null)
-                {
-                    parameters.AddParam("outputFile", "", outputFile);
-                    writer = GetOdfWriter(zipResolver, skipPostProcessor);
+                    XmlWriter finalWriter;
+                    if (this.packaging)
+                    {
+                        finalWriter = new ZipArchiveWriter(zipResolver);
+                    }
+                    else
+                    {
+                        finalWriter = new XmlTextWriter(outputFile, System.Text.Encoding.UTF8);
+                    }
+                    writer = GetWriter(finalWriter);
                 }
                 else
                 {
@@ -290,7 +217,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void CheckOdf(string fileName)
+        private void CheckFile(string fileName)
+        {
+            if (this.isDirectTransform)
+            {
+                CheckOdfFile(fileName);
+            }
+            else
+            {
+                CheckOoxFile(fileName);
+            }
+        }
+
+        private void CheckOdfFile(string fileName)
         {
 
             // Test for encryption
@@ -316,28 +255,27 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void CheckOox(string fileName)
+        private void CheckOoxFile(string fileName)
         {
             // TODO: implement
         }
 
-        private XmlWriter GetOoxWriter(XmlResolver resolver, string skipPostProcessor)
+        private XmlWriter GetWriter(XmlWriter writer)
         {
-            return InstanciatePostProcessors(OOX_POST_PROCESSORS, new ZipArchiveWriter(resolver), skipPostProcessor);
+            string [] postProcessors = OOX_POST_PROCESSORS;
+            if (!this.isDirectTransform)
+            {
+                postProcessors = ODF_POST_PROCESSORS;
+            }
+            return InstanciatePostProcessors(postProcessors, writer);
         }
 
-        private XmlWriter GetOdfWriter(XmlResolver resolver, string skipPostProcessor)
-        {
-            return InstanciatePostProcessors(ODF_POST_PROCESSORS, new ZipArchiveWriter(resolver), skipPostProcessor);
-        }
-
-        private XmlWriter InstanciatePostProcessors(string[] procNames, XmlWriter lastProcessor, string skipPostProcessor)
+        private XmlWriter InstanciatePostProcessors(string[] procNames, XmlWriter lastProcessor)
         {
             XmlWriter currentProc = lastProcessor;
-            //XmlWriter currentProc = XmlWriter.Create("output.xml");
             for (int i = procNames.Length - 1; i >= 0; --i)
             {
-                if (!procNames[i].Equals(skipPostProcessor))
+                if (!this.skipedPostProcessors.Contains(procNames[i]))
                 {
                     Type type = Type.GetType("CleverAge.OdfConverter.OdfConverterLib." + procNames[i]);
                     object[] parameters = { currentProc };

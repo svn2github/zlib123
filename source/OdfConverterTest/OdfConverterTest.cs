@@ -30,6 +30,7 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Reflection;
+using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
 using CleverAge.OdfConverter.OdfZipUtils;
@@ -111,7 +112,8 @@ namespace CleverAge.OdfConverter.OdfConverterTest
         private string reportPath = null;                // file to save report
         private int reportLevel = Report.INFO_LEVEL;     // file to save report
         private string xslPath = null;                   // Path to an external stylesheet
-        private string skipPostProcessor = null;         // Post processing to skip (identified by its name)
+        private ArrayList skipedPostProcessors = null;   // Post processors to skip (identified by their names)
+        private bool packaging = true;                   // Build the zip archive after conversion
 
         private bool isDirectTransform = true; // conversion from ODT to DOCX (default)
         private Report report = null;
@@ -169,6 +171,11 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 Console.WriteLine("Exception raised when running test : " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
             }
+        }
+
+        private OdfConverterTest()
+        {
+            this.skipedPostProcessors = new ArrayList();
         }
 
         private void Proceed()
@@ -322,28 +329,12 @@ namespace CleverAge.OdfConverter.OdfConverterTest
             try
             {
                 DateTime start = DateTime.Now;
-                if (xslPath == null)
-                {
-                    if (isDirectTransform)
-                    {
-                        new Converter().OdfToOoxSkipPostProcess(input, output, this.skipPostProcessor);
-                    }
-                    else
-                    {
-                        new Converter().OoxToOdfSkipPostProcess(input, output, this.skipPostProcessor);
-                    }
-                }
-                else
-                {
-                    if (isDirectTransform)
-                    {
-                        new Converter().OdfToOoxSkipPostProcessWithExternalResources(input, output, this.xslPath, this.skipPostProcessor);
-                    }
-                    else
-                    {
-                        new Converter().OoxToOdfSkipPostProcessWithExternalResources(input, output, this.xslPath, this.skipPostProcessor);
-                    }
-                }
+                Converter converter = new Converter();
+                converter.ExternalResources = this.xslPath;
+                converter.SkipedPostProcessors = this.skipedPostProcessors;
+                converter.DirectTransform = this.isDirectTransform;
+                converter.Packaging = this.packaging;
+                converter.Transform(input, output);
                 TimeSpan duration = DateTime.Now - start;
                 this.report.AddLog(input, "Conversion succeeded", Report.INFO_LEVEL);
                 this.report.AddLog(input, "Total conversion time: " + duration, Report.INFO_LEVEL);
@@ -462,17 +453,19 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 
         private static void usage()
         {
-            Console.WriteLine("Usage: OdfConverterTest.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] [/V] [/OPEN] [/LEVEL Level] [/REPORT Filename]");
+            Console.WriteLine("Usage: OdfConverterTest.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level] ");
             Console.WriteLine("  Where options are:");
             Console.WriteLine("     /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)");
             Console.WriteLine("     /O PathOrFilename  Name of the output file (or output folder)");
             Console.WriteLine("     /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (note: existing files will be replaced)");
             Console.WriteLine("     /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (note: existing files will be replaced)");
             Console.WriteLine("     /V                 Validate the result of the transformation against the schemas");
-            Console.WriteLine("     /OPEN              Try to open the converted files");
-            Console.WriteLine("     /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR");
+            Console.WriteLine("     /OPEN              Try to open the converted files (works only for ODF->OOX, Microsoft Word required)");
             Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
+            Console.WriteLine("     /NOPACKAGING       Don't package the result of the transformation into a ZIP archive (produce raw XML)");
+            Console.WriteLine("     /SKIP name         Skip a post-processing (provide the post-processor's name)");
             Console.WriteLine("     /REPORT Filename   Name of the report file that must be generated (existing files will be replaced)");
+            Console.WriteLine("     /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR");
         }
 
         private void ParseCommandLine(string[] args)
@@ -528,6 +521,9 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                     case "/R":
                         this.recursiveMode = true;
                         break;
+                    case "/NOPACKAGING":
+                        this.packaging = false;
+                        break;
                     case "/BATCH-ODT":
                         this.batchOdt = true;
                         break;
@@ -539,7 +535,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                         {
                             throw new OdfCommandLineException("Post processing name missing");
                         }
-                        this.skipPostProcessor = args[i];
+                        this.skipedPostProcessors.Add(args[i]);
                         break;
                     case "/REPORT":
                         if (++i == args.Length)
@@ -615,18 +611,18 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 throw new OdfCommandLineException("Input file does not exist");
             }
 
-            if (".docx".Equals(Path.GetExtension(this.input).ToLowerInvariant()))
+            string extension = ".docx";
+            if (extension.Equals(Path.GetExtension(this.input).ToLowerInvariant()))
             {
                 this.isDirectTransform = false;
-            }
-
-            string extension = ".docx";
-            if (!this.isDirectTransform)
-            {
                 extension = ".odt";
             }
+            if (!this.packaging)
+            {
+                extension = ".xml";
+            }
 
-            if (!File.Exists(this.output) && (this.output == null || !extension.Equals(Path.GetExtension(this.output))))
+            if (!File.Exists(this.output) && (this.output == null || !extension.Equals(Path.GetExtension(this.output).ToLowerInvariant())))
             {
                 string outputPath = this.output;
                 if (outputPath == null)

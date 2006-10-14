@@ -108,25 +108,12 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                 Converter converter = new Converter();
                 converter.AddProgressMessageListener(new Converter.MessageListener(ProgressMessageInterceptor));
                 converter.AddFeedbackMessageListener(new Converter.MessageListener(FeedbackMessageInterceptor));
+                converter.DirectTransform = this.isDirect;
                 this.computeSize = true;
-                if (isDirect)
-                {
-                    converter.OdfToOoxComputeSize(this.inputFile);
-                }
-                else
-                {
-                    converter.OoxToOdfComputeSize(this.inputFile);
-                }
+                converter.ComputeSize(this.inputFile);
                 this.progressBar1.Maximum = this.size;
                 this.computeSize = false;
-                if (isDirect)
-                {
-                    converter.OdfToOox(this.inputFile, this.outputFile);
-                }
-                else
-                {
-                    converter.OoxToOdf(this.inputFile, this.outputFile);
-                }
+                converter.Transform(this.inputFile, this.outputFile);
                 WorkComplete(null);
             } catch (Exception e) {
                 WorkComplete(e);

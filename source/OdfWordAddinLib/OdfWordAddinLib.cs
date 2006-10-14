@@ -120,7 +120,8 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                 try
                 {
                     Converter conv = new Converter();
-                    conv.OdfToOox(inputFile, outputFile);
+                    conv.DirectTransform = true;
+                    conv.Transform(inputFile, outputFile);
                 }
                 catch (Exception e)
                 {
@@ -178,7 +179,8 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                 try
                 {
                     Converter conv = new Converter();
-                    conv.OoxToOdf(inputFile, outputFile);
+                    conv.DirectTransform = false;
+                    conv.Transform(inputFile, outputFile);
                 }
                 catch (Exception e)
                 {
