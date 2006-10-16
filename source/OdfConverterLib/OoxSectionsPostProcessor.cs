@@ -472,14 +472,22 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 					// header / footer reference
 					if (page.Use == 1)
 					{
-						Element hdr = (Element) page.GetChild("headerReference", OOX_MAIN_NS);
-						if (hdr != null) {
-							hdr.Write(nextWriter);
+						ArrayList hdr = page.GetChildren("headerReference", OOX_MAIN_NS);
+						if (hdr.Count > 0) 
+						{
+							foreach (Element e in hdr)
+							{
+								e.Write(nextWriter);
+							}
 						}
 						
-						Element ftr = (Element) page.GetChild("footerReference", OOX_MAIN_NS);
-						if (ftr != null) {
-							ftr.Write(nextWriter);
+						ArrayList ftr = page.GetChildren("footerReference", OOX_MAIN_NS);
+						if (ftr.Count > 0) 
+						{
+							foreach (Element e in ftr)
+							{
+								e.Write(nextWriter);
+							}
 						}
 					}
 					

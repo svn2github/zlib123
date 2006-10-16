@@ -358,6 +358,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
                 return null;
             }
+            
+            public ArrayList GetChildren(string name, string ns)
+            {
+            	ArrayList elements = new ArrayList();
+            	
+            	foreach (object node in this.children)
+            	{
+            		if (node is Element)
+            		{
+            			Element element = (Element)node;
+            			if (element.Name.Equals(name) && element.Ns.Equals(ns))
+            			{
+            				elements.Add(element);
+            			}
+            		}
+            	}
+            	return elements;
+            }
 
             public Attribute GetAttribute(string name, string ns)
             {
