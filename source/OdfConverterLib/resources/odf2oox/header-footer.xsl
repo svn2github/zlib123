@@ -200,49 +200,42 @@
     <xsl:variable name="masterPages"
       select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"/>
 
-    <xsl:for-each
-      select="$masterPages/style:header|$masterPages/style:header-left|$masterPages/style:footer|$masterPages/style:footer-left">
-      <xsl:variable name="position" select="position()"/>
-      <xsl:if test="self::style:header or self::style:header-left">
-        <pzip:entry>
-          <xsl:attribute name="pzip:target">
-            <xsl:value-of select="concat('word/header',$position,'.xml')"/>
-          </xsl:attribute>
-          <xsl:call-template name="header">
-            <xsl:with-param name="headerNode" select="."/>
-          </xsl:call-template>
-        </pzip:entry>
+    <xsl:for-each select="$masterPages/style:header | $masterPages/style:header-left">
+      <pzip:entry>
+        <xsl:attribute name="pzip:target">
+          <xsl:value-of select="concat('word/header', position(), '.xml')"/>
+        </xsl:attribute>
+        <xsl:call-template name="header">
+          <xsl:with-param name="headerNode" select="."/>
+        </xsl:call-template>
+      </pzip:entry>
+      <pzip:entry>
+        <xsl:attribute name="pzip:target">
+          <xsl:value-of select="concat('word/_rels/header', position(), '.xml.rels')"/>
+        </xsl:attribute>
+        <xsl:call-template name="InsertHeaderFooterInternalRelationships">
+          <xsl:with-param name="node" select="."/>
+        </xsl:call-template>
+      </pzip:entry>
+    </xsl:for-each>
 
-        <pzip:entry>
-          <xsl:attribute name="pzip:target">
-            <xsl:value-of select="concat('word/_rels/header',$position,'.xml.rels')"/>
-          </xsl:attribute>
-          <xsl:call-template name="InsertHeaderFooterInternalRelationships">
-            <xsl:with-param name="node" select="."/>
-          </xsl:call-template>
-        </pzip:entry>
-      </xsl:if>
-
-      <xsl:if test="self::style:footer or self::footer-left">
-        <pzip:entry>
-          <xsl:attribute name="pzip:target">
-            <xsl:value-of select="concat('word/footer',$position,'.xml')"/>
-          </xsl:attribute>
-          <xsl:call-template name="footer">
-            <xsl:with-param name="footerNode" select="."/>
-          </xsl:call-template>
-        </pzip:entry>
-
-        <pzip:entry>
-          <xsl:attribute name="pzip:target">
-            <xsl:value-of select="concat('word/_rels/footer',$position,'.xml.rels')"/>
-          </xsl:attribute>
-          <xsl:call-template name="InsertHeaderFooterInternalRelationships">
-            <xsl:with-param name="node" select="."/>
-          </xsl:call-template>
-        </pzip:entry>
-      </xsl:if>
-
+    <xsl:for-each select="$masterPages/style:footer | $masterPages/style:footer-left">
+      <pzip:entry>
+        <xsl:attribute name="pzip:target">
+          <xsl:value-of select="concat('word/footer', position(), '.xml')"/>
+        </xsl:attribute>
+        <xsl:call-template name="footer">
+          <xsl:with-param name="footerNode" select="."/>
+        </xsl:call-template>
+      </pzip:entry>
+      <pzip:entry>
+        <xsl:attribute name="pzip:target">
+          <xsl:value-of select="concat('word/_rels/footer', position(), '.xml.rels')"/>
+        </xsl:attribute>
+        <xsl:call-template name="InsertHeaderFooterInternalRelationships">
+          <xsl:with-param name="node" select="."/>
+        </xsl:call-template>
+      </pzip:entry>
     </xsl:for-each>
   </xsl:template>
 
@@ -253,20 +246,17 @@
     <xsl:variable name="masterPages"
       select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"/>
 
-    <xsl:for-each
-      select="$masterPages/style:header|$masterPages/style:header-left|$masterPages/style:footer|$masterPages/style:footer-left">
-      <xsl:if test="self::style:header or self::style:header-left">
-        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-          Id="{generate-id()}"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header"
-          Target="header{position()}.xml"/>
-      </xsl:if>
-      <xsl:if test="self::style:footer or self::style:footer-left">
-        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-          Id="{generate-id()}"
-          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer"
-          Target="footer{position()}.xml"/>
-      </xsl:if>
+    <xsl:for-each select="$masterPages/style:header | $masterPages/style:header-left">
+      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+        Id="{generate-id()}"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header"
+        Target="header{position()}.xml"/>
+    </xsl:for-each>
+    <xsl:for-each select="$masterPages/style:footer | $masterPages/style:footer-left">
+      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+        Id="{generate-id()}"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer"
+        Target="footer{position()}.xml"/>
     </xsl:for-each>
   </xsl:template>
 
