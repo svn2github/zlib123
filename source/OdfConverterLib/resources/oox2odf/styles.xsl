@@ -480,12 +480,14 @@
             </xsl:call-template>
           </xsl:attribute>
         </xsl:when>
-        <xsl:otherwise>
+          <xsl:when test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:lineRule='auto'">
           <!-- value of lineRule is 'auto' -->
           <xsl:attribute name="fo:line-height">
             <!-- convert 240th of line to percent -->
             <xsl:value-of select="concat(document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:line div 240 * 100,'%')"/>
           </xsl:attribute>
+          </xsl:when>
+        <xsl:otherwise>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:otherwise>
