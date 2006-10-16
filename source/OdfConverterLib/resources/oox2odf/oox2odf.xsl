@@ -34,7 +34,8 @@
   <xsl:import href="pictures.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="meta.xsl"/>
-
+  <xsl:import href="settings.xsl"/>
+  
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
 
@@ -70,6 +71,11 @@
       <!-- meta -->
       <pzip:entry pzip:target="meta.xml">
         <xsl:call-template name="meta"/>
+      </pzip:entry>
+      
+      <!-- settings -->
+      <pzip:entry pzip:target="setings.xml">
+        <xsl:call-template name="settings"/>
       </pzip:entry>
       
     </pzip:archive>
