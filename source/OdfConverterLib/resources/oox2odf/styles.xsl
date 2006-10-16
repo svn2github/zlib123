@@ -446,7 +446,7 @@
               <xsl:value-of select="'justify'"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="'center'"/>
+              <xsl:value-of select="'start'"/>
             </xsl:otherwise>
           </xsl:choose>
           </xsl:attribute>
@@ -706,7 +706,7 @@
             <xsl:value-of select="'justify'"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="'center'"/>
+            <xsl:value-of select="'start'"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
@@ -1150,9 +1150,15 @@
             <xsl:when test="w:tabs/w:tab/@w:val='center'">center</xsl:when>
             <xsl:when test="w:tabs/w:tab/@w:val='right'">right</xsl:when>
             <xsl:when test="w:tabs/w:tab/@w:val='left'">left</xsl:when>
+            <xsl:when test="w:tabs/w:tab/@w:val='decimal'">char</xsl:when>
             <xsl:otherwise>left</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
+        <xsl:if test="w:tabs/w:tab/@w:val='decimal'">
+          <xsl:attribute name="style:char">
+            <xsl:value-of select="','"/>
+          </xsl:attribute>
+         </xsl:if>
         <!-- position 
          TODO : what if @w:pos < 0 ? -->
         <xsl:if test="w:tabs/w:tab/@w:pos >= 0">
@@ -1169,10 +1175,24 @@
             <xsl:choose>
               <xsl:when test="w:tabs/w:tab/@w:leader='dot'">dotted</xsl:when>
               <xsl:when test="w:tabs/w:tab/@w:leader='heavy'">solid</xsl:when>
-              <xsl:when test="w:tabs/w:tab/@w:leader='hyphen'">dash</xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='hyphen'">solid</xsl:when>
               <xsl:when test="w:tabs/w:tab/@w:leader='middleDot'">dotted</xsl:when>
               <xsl:when test="w:tabs/w:tab/@w:leader='none'">none</xsl:when>
               <xsl:when test="w:tabs/w:tab/@w:leader='underscore'">solid</xsl:when>
+              <xsl:otherwise>none</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
+<!--        leader text  -->
+        <xsl:if test="w:tabs/w:tab/@w:leader">
+          <xsl:attribute name="style:leader-text">
+            <xsl:choose>
+              <xsl:when test="w:tabs/w:tab/@w:leader='dot'">.</xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='heavy'"></xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='hyphen'">-</xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='middleDot'"></xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='none'"></xsl:when>
+              <xsl:when test="w:tabs/w:tab/@w:leader='underscore'">_</xsl:when>
               <xsl:otherwise>none</xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>

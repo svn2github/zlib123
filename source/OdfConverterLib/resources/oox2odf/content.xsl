@@ -354,7 +354,9 @@
   <!-- run -->
   <xsl:template match="w:r">
     <xsl:message terminate="no">progress:w:r</xsl:message>
-    
+    <xsl:if test="w:tab">
+      <text:tab/>
+    </xsl:if>
     <xsl:choose>
       <!-- attach formatting properties-->
       <xsl:when test="w:rPr">
