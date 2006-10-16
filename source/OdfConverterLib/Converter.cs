@@ -54,6 +54,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private string[] OOX_POST_PROCESSORS = 
         {
+            "OoxChangeTrackingPostProcessor",
         	"OoxSectionsPostProcessor", 
         	"OoxAutomaticStylesPostProcessor", 
         	"OoxCharactersPostProcessor" 

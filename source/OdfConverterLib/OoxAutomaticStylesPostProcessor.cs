@@ -43,7 +43,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private string[] TOGGLE_PROPERTIES = 
             { "b", "bCs", "caps", "emboss", "i", "iCs", "imprint", "outline", "shadow", "smallCaps", "strike", "vanish" };
 
-        private string[] RUN_PROPERTIES = { "rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath", "rPrChange"};
+        private string[] RUN_PROPERTIES = { "ins", "del", "moveFrom", "moveTo", "rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath", "rPrChange" };
         private string[] PARAGRAPH_PROPERTIES = { "pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr", "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap", "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid", "spacing", "ind", "contextualSpacing", "mirrorIndents", "textboxTightWrap", "suppressOverlap", "jc", "textDirection", "textAlignment", "outlineLvl", "divId", "cnfStyle", "rPr", "sectPr", "pPrChange"};
 
         private Stack currentNode;
@@ -76,9 +76,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 StartRunProperties();
             }
-            else if (IsInParagraph() && IsParagraphProperties(localName, ns))
+            else if ((IsInParagraph() || IsInPPrChange()) && IsParagraphProperties(localName, ns))
             {
                 StartParagraphProperties();
+            }
+            else if (IsPPrChange(localName, ns))
+            {
+                StartPPrChange();
             }
             else if (IsInRunProperties() || IsInParagraphProperties() || IsInStyle())
             {
@@ -116,6 +120,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 EndElementInParagraphProperties();
             }
+            else if (IsInPPrChange())
+            {
+                EndElementInPPrChange();
+            }
             else
             {
                 if (IsInRun())
@@ -136,7 +144,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             this.currentNode.Push(new Attribute(prefix, localName, ns));
 
-            if (IsInRunProperties() || IsInParagraphProperties() || IsInStyle())
+            if (IsInRunProperties() || IsInParagraphProperties() || IsInPPrChange() || IsInStyle())
             {
                 // do nothing
             }
@@ -156,7 +164,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 EndAttributeInRunProperties();
             }
-            else if (IsInParagraphProperties())
+            else if (IsInParagraphProperties() || IsInPPrChange())
             {
                 EndAttributeInParagraphProperties();
             }
@@ -178,7 +186,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 StringInRunProperties(text);
             }
-            else if (IsInParagraphProperties())
+            else if (IsInParagraphProperties() || IsInPPrChange())
             {
                 StringInParagraphProperties(text);
             }
@@ -315,6 +323,199 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.currentParagraphStyleName = null;
                 this.context.Pop();
             }
+        }
+
+        /*
+         * Paragraph properties
+         */
+
+        private bool IsParagraphProperties(string localName, string ns)
+        {
+            return NAMESPACE.Equals(ns) && "pPr".Equals(localName);
+        }
+
+        private bool IsInParagraphProperties()
+        {
+            return "pPr".Equals(this.context.Peek());
+        }
+
+        private void StartParagraphProperties()
+        {
+            this.context.Push("pPr");
+        }
+
+        private void EndElementInParagraphProperties()
+        {
+            Element element = (Element)this.currentNode.Pop();
+            if (IsParagraphProperties(element.Name, element.Ns))
+            {
+                this.context.Pop();
+                WriteParagraphProperties(element);
+            }
+            else
+            {
+                Element parent = (Element)this.currentNode.Peek();
+                parent.AddChild(element);
+            }
+            this.currentNode.Push(element);
+        }
+
+        private void EndAttributeInParagraphProperties()
+        {
+            Attribute attribute = (Attribute)this.currentNode.Pop();
+            Element element = (Element)this.currentNode.Peek();
+            element.AddAttribute(attribute);
+            this.currentNode.Push(attribute);
+        }
+
+        private void StringInParagraphProperties(string text)
+        {
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Attribute)
+            {
+                Attribute attribute = (Attribute)node;
+                attribute.Value = text;
+            }
+            else if (node is Element)
+            {
+                Element element = (Element)node;
+                element.AddChild(text);
+            }
+        }
+
+        private void WriteParagraphProperties(Element pPr)
+        {
+            Element rPr = pPr.GetChild("rPr", NAMESPACE);
+            if (rPr == null)
+            {
+                rPr = new Element("w", "rPr", NAMESPACE);
+            }
+            else
+            {
+                pPr.RemoveChild(rPr);
+            }
+            Element pStyle = pPr.GetChild("pStyle", NAMESPACE);
+            if (pStyle != null)
+            {
+                // remove style declaration (will be added later back)
+                pPr.RemoveChild(pStyle);
+                // add paragraph style properties
+                string pStyleName = pStyle.GetAttributeValue("val", NAMESPACE);
+                if (pStyleName.Length > 0)
+                {
+                    AddParagraphStyleProperties(pPr, pStyleName);
+                    if (!IsInPPrChange())
+                    {
+                        AddRunStyleProperties(rPr, pStyleName, false);
+                        this.currentParagraphStyleName = pStyleName;
+                    }
+                    // add style declaration
+                    AddStyleDeclaration(pPr, pStyleName, "pStyle");
+                }
+            }
+            // add run properties
+            if (rPr.HasChild())
+            {
+                pPr.AddChild(rPr);
+            }
+            if (IsInPPrChange())
+            {
+                // attach properties to parent
+                Element pPrChange = (Element)this.currentNode.Peek();
+                pPrChange.AddChild(pPr);
+            }
+            else
+            {
+                // write properties
+                DoWriteParagraphProperties(pPr);
+            }
+        }
+
+        private void AddParagraphStyleProperties(Element pPr, string styleName)
+        {
+            Element style = (Element)pStyles[styleName];
+            // to avoid crash when wrong styles applied
+            if (style == null)
+            {
+                return;
+            }
+            if (IsAutomaticStyle(style))
+            {
+                // add run properties
+                AddParagraphProperties(pPr, style);
+
+                // add parent style properties
+                Element basedOn = (Element)style.GetChild("basedOn", NAMESPACE);
+                if (basedOn != null)
+                {
+                    string val = basedOn.GetAttributeValue("val", NAMESPACE);
+                    if (val.Length > 0)
+                    {
+                        AddParagraphStyleProperties(pPr, val);
+                    }
+                }
+            }
+        }
+
+        private void AddParagraphProperties(Element pPr, Element style)
+        {
+            Element stylePPr = (Element)style.GetChild("pPr", NAMESPACE);
+            if (stylePPr != null)
+            {
+                foreach (Element prop in stylePPr.Children)
+                {
+                    if (!IsInPPrChange() || !"rPr".Equals(prop.Name))
+                    {
+                        pPr.AddChildIfNotExist(prop);
+                    }
+                }
+            }
+        }
+
+        private void DoWriteParagraphProperties(Element pPr)
+        {
+            this.nextWriter.WriteStartElement(pPr.Prefix, pPr.Name, pPr.Ns);
+            foreach (string propName in PARAGRAPH_PROPERTIES)
+            {
+                Element prop = pPr.GetChild(propName, NAMESPACE);
+                if (prop != null)
+                {
+                    if ("rPr".Equals(propName))
+                    {
+                        DoWriteRunProperties(prop);
+                    }
+                    else
+                    {
+                        prop.Write(this.nextWriter);
+                    }
+                }
+            }
+            this.nextWriter.WriteEndElement();
+        }
+
+        /*
+         * Paragraph changes
+         */
+
+        private bool IsPPrChange(string localName, string ns)
+        {
+            return NAMESPACE.Equals(ns) && "pPrChange".Equals(localName);
+        }
+
+        private bool IsInPPrChange()
+        {
+            return "pPrChange".Equals(this.context.Peek());
+        }
+
+        private void StartPPrChange()
+        {
+            this.context.Push("pPrChange");
+        }
+
+        private void EndElementInPPrChange()
+        {
+            this.context.Pop();
+            EndElementInParagraphProperties();
         }
 
         /*
@@ -528,159 +729,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
             }
             return false;
-        }
-
-        /*
-         * Paragraph properties
-         */
-
-        private bool IsParagraphProperties(string localName, string ns)
-        {
-            return NAMESPACE.Equals(ns) && "pPr".Equals(localName);
-        }
-
-        private bool IsInParagraphProperties()
-        {
-            return "pPr".Equals(this.context.Peek());
-        }
-
-        private void StartParagraphProperties()
-        {
-            this.context.Push("pPr");
-        }
-
-        private void EndElementInParagraphProperties()
-        {
-            Element element = (Element)this.currentNode.Pop();
-            if (IsParagraphProperties(element.Name, element.Ns))
-            {
-                WriteParagraphProperties(element);
-                this.context.Pop();
-            }
-            else
-            {
-                Element parent = (Element)this.currentNode.Peek();
-                parent.AddChild(element);
-            }
-            this.currentNode.Push(element);
-        }
-
-        private void EndAttributeInParagraphProperties()
-        {
-            Attribute attribute = (Attribute)this.currentNode.Pop();
-            Element element = (Element)this.currentNode.Peek();
-            element.AddAttribute(attribute);
-            this.currentNode.Push(attribute);
-        }
-
-        private void StringInParagraphProperties(string text)
-        {
-            Node node = (Node)this.currentNode.Peek();
-            if (node is Attribute)
-            {
-                Attribute attribute = (Attribute)node;
-                attribute.Value = text;
-            }
-            else if (node is Element)
-            {
-                Element element = (Element)node;
-                element.AddChild(text);
-            }
-        }
-
-        private void WriteParagraphProperties(Element pPr)
-        {
-            Element rPr = pPr.GetChild("rPr", NAMESPACE);
-            if (rPr == null)
-            {
-                rPr = new Element("w", "rPr", NAMESPACE);
-            }
-            else
-            {
-                pPr.RemoveChild(rPr);
-            }
-            Element pStyle = pPr.GetChild("pStyle", NAMESPACE);
-            if (pStyle != null)
-            {
-                // remove style declaration (will be added later back)
-                pPr.RemoveChild(pStyle);
-                // add paragraph style properties
-                string pStyleName = pStyle.GetAttributeValue("val", NAMESPACE);
-                if (pStyleName.Length > 0)
-                {
-                    AddParagraphStyleProperties(pPr, pStyleName);
-                    AddRunStyleProperties(rPr, pStyleName, false);
-                    this.currentParagraphStyleName = pStyleName;
-                    // add style declaration
-                    AddStyleDeclaration(pPr, pStyleName, "pStyle");
-                }
-            }
-            // add run properties
-            if (rPr.HasChild())
-            {
-                pPr.AddChild(rPr);
-            }
-            // Write paragraph properties
-            DoWriteParagraphProperties(pPr);
-        }
-
-        private void AddParagraphStyleProperties(Element pPr, string styleName)
-        {
-            Element style = (Element)pStyles[styleName];
-            // to avoid crash when wrong styles applied
-            if (style == null)
-            {
-                return;
-            }
-            if (IsAutomaticStyle(style))
-            {
-                // add run properties
-                AddParagraphProperties(pPr, style);
-
-                // add parent style properties
-                Element basedOn = (Element)style.GetChild("basedOn", NAMESPACE);
-                if (basedOn != null)
-                {
-                    string val = basedOn.GetAttributeValue("val", NAMESPACE);
-                    if (val.Length > 0)
-                    {
-                        AddParagraphStyleProperties(pPr, val);
-                    }
-                }
-            }
-        }
-
-        private void AddParagraphProperties(Element pPr, Element style)
-        {
-            Element stylePPr = (Element)style.GetChild("pPr", NAMESPACE);
-            if (stylePPr != null)
-            {
-                foreach (Element prop in stylePPr.Children)
-                {
-                    pPr.AddChildIfNotExist(prop);
-                }
-            }
-        }
-
-        private void DoWriteParagraphProperties(Element pPr)
-        {
-            this.nextWriter.WriteStartElement(pPr.Prefix, pPr.Name, pPr.Ns);
-            foreach (string propName in PARAGRAPH_PROPERTIES)
-            {
-                Element prop = pPr.GetChild(propName, NAMESPACE);
-                if (prop != null)
-                {
-                    if ("rPr".Equals(propName))
-                    {
-                        DoWriteRunProperties(prop);
-                    }
-                    else
-                    {
-                        prop.Write(this.nextWriter);
-                    }
-                }
-            }
-            this.nextWriter.WriteEndElement();
         }
 
 

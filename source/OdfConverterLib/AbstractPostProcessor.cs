@@ -218,6 +218,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.ns = ns;
             }
 
+            public Node(Node node)
+            {
+                this.prefix = node.Prefix;
+                this.name = node.Name;
+                this.ns = node.Ns;
+            }
+
         }
 
         protected class Attribute : Node
@@ -227,18 +234,25 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             public Attribute(string prefix, string name, string ns)
                 : base(prefix, name, ns)
             {
+                this.value = "";
             }
-            
-          	public Attribute(string prefix, string name, string val, string ns)
+
+            public Attribute(string prefix, string name, string val, string ns)
                 : base(prefix, name, ns)
             {
-              	this.value = val;
+                this.value = val;
+            }
+
+            public Attribute(Node node)
+                : base(node)
+            {
+                this.value = "";
             }
               
             public string Value
             {
                 get { return this.value; }
-                set { this.value = value; }
+                set { this.value = value; if (value == null) this.value = ""; }
             }
 
             public void Write(XmlWriter writer)
@@ -256,6 +270,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             public Element(string prefix, string name, string ns)
                 : base(prefix, name, ns)
+            {
+                this.attributes = new ArrayList();
+                this.children = new ArrayList();
+            }
+
+            public Element(Node node)
+                : base(node)
             {
                 this.attributes = new ArrayList();
                 this.children = new ArrayList();
@@ -370,6 +391,38 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             public bool HasChild()
             {
                 return this.children.Count > 0;
+            }
+
+            public bool IsEqualTo(Element e)
+            {
+                if (e == null) return false;
+                foreach (Attribute attribute in Attributes)
+                {
+                    string value = attribute.Value;
+                    string comparedValue = e.GetAttributeValue(attribute.Name, attribute.Ns);
+                    if ((value == null || "".Equals(value)) && comparedValue != null && !"".Equals(comparedValue))
+                    {
+                        return false;
+                    }
+                    if (!value.Equals(comparedValue))
+                    {
+                        return false;
+                    }
+                }
+                foreach (Attribute attribute in e.Attributes)
+                {
+                    string value = attribute.Value;
+                    string comparedValue = e.GetAttributeValue(attribute.Name, attribute.Ns);
+                    if ((value == null || "".Equals(value)) && comparedValue != null && !"".Equals(comparedValue))
+                    {
+                        return false;
+                    }
+                    if (!value.Equals(comparedValue))
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
 
             public void Write(XmlWriter writer)

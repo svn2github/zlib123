@@ -48,6 +48,7 @@
   <xsl:import href="package_relationships.xsl"/>
   <xsl:import href="contentTypes.xsl"/>
   <xsl:import href="comments.xsl"/>
+  <xsl:import href="change-tracking.xsl"/>
 
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
