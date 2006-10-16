@@ -33,8 +33,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" 
-  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="text style office pzip xlink draw">
 
   <xsl:template name="header">
@@ -84,57 +83,64 @@
     </w:ftr>
   </xsl:template>
 
-  <!-- we have odd and even pages if a style who conbine 2 styles and if they are used in the document -->
+  <!-- Look for even and odd definitions -->
   <xsl:template name="isOddEven">
     <xsl:param name="pos">0</xsl:param>
     <xsl:param name="masterPage"
       select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"/>
-    <xsl:param name="style"
-      select="document('content.xml')/office:document-content/office:automatic-styles/style:style"/>
-    <xsl:variable name="curStyle" select="$masterPage[$pos]/@style:name"/>
+    <xsl:variable name="mp" select="$masterPage[$pos]"/>
     <xsl:choose>
-      <xsl:when
-        test="not($masterPage[$pos]/@style:next-style-name=$curStyle) and $masterPage[@style:name=($masterPage[$pos]/@style:next-style-name)]/@style:next-style-name=$curStyle and ($curStyle='Standard' or $masterPage[$pos]/@style:next-style-name='Standard' or $style[@style:master-page-name=$curStyle] or $style[@style:master-page-name=$masterPage[@style:name=$curStyle]/@style:next-style-name])">
-        <xsl:value-of select="$curStyle"/>
+      <xsl:when test="$mp/style:header-left or $mp/style:footer-left">
+        <xsl:value-of select="$mp/@style:name"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="$masterPage[$pos]/following-sibling::*">
+        <xsl:if test="$mp/following-sibling::*">
           <xsl:call-template name="isOddEven">
             <xsl:with-param name="pos" select="$pos + 1"/>
-            <xsl:with-param name="masterPage" select="$masterPage"/>
-            <xsl:with-param name="style" select="$style"/>
           </xsl:call-template>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
+  <!-- Header/footer document references -->
   <xsl:template name="HeaderFooter">
     <xsl:param name="master-page"/>
 
-    <xsl:variable name="type">
-      <xsl:choose>
-        <xsl:when test="$master-page/@style:name='First_20_Page'">first</xsl:when>
-        <xsl:otherwise>default</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:if test="$master-page/style:header">
-      <w:headerReference w:type="{$type}" r:id="{generate-id($master-page/style:header)}"/>
-    </xsl:if>
-    <xsl:if test="$master-page/style:footer">
-      <w:footerReference w:type="{$type}" r:id="{generate-id($master-page/style:footer)}"/>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="$master-page/@style:name = 'First_20_Page' ">
+        <xsl:if test="$master-page/style:header">
+          <w:headerReference w:type="first" r:id="{generate-id($master-page/style:header)}"/>
+        </xsl:if>
+        <xsl:if test="$master-page/style:footer">
+          <w:footerReference w:type="first" r:id="{generate-id($master-page/style:footer)}"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$master-page/style:header-left and $master-page/style:header">
+            <w:headerReference w:type="default" r:id="{generate-id($master-page/style:header)}"/>
+            <w:headerReference w:type="even" r:id="{generate-id($master-page/style:header-left)}"/>
+          </xsl:when>
+          <xsl:when test="$master-page/style:header">
+            <w:headerReference w:type="default" r:id="{generate-id($master-page/style:header)}"/>
+          </xsl:when>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="$master-page/style:footer and $master-page/style:footer-left">
+            <w:footerReference w:type="default" r:id="{generate-id($master-page/style:footer)}"/>
+            <w:footerReference w:type="even" r:id="{generate-id($master-page/style:footer-left)}"/>
+          </xsl:when>
+          <xsl:when test="$master-page/style:footer">
+            <w:footerReference w:type="default" r:id="{generate-id($master-page/style:footer)}"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
-  <!-- Specify whether the parent section shall have a different header and footer for its first page -->
-  <xsl:template name="TitlePg">
-    <xsl:param name="master-page"/>
-    <xsl:if test="$master-page and $master-page[@style:name = 'First_20_Page']">
-      <w:titlePg/>
-    </xsl:if>
-  </xsl:template>
 
-  <xsl:template name="EvenAndOddConfiguration">
+  <xsl:template name="InsertHeaderFooterSettings">
     <xsl:variable name="oddPage">
       <xsl:call-template name="isOddEven"/>
     </xsl:variable>
@@ -187,4 +193,82 @@
       </xsl:for-each>
     </Relationships>
   </xsl:template>
+
+
+  <!-- header and footer definition files / part relationships files -->
+  <xsl:template name="InsertHeaderFooterParts">
+    <xsl:variable name="masterPages"
+      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"/>
+
+    <xsl:for-each
+      select="$masterPages/style:header|$masterPages/style:header-left|$masterPages/style:footer|$masterPages/style:footer-left">
+      <xsl:variable name="position" select="position()"/>
+      <xsl:if test="self::style:header or self::style:header-left">
+        <pzip:entry>
+          <xsl:attribute name="pzip:target">
+            <xsl:value-of select="concat('word/header',$position,'.xml')"/>
+          </xsl:attribute>
+          <xsl:call-template name="header">
+            <xsl:with-param name="headerNode" select="."/>
+          </xsl:call-template>
+        </pzip:entry>
+
+        <pzip:entry>
+          <xsl:attribute name="pzip:target">
+            <xsl:value-of select="concat('word/_rels/header',$position,'.xml.rels')"/>
+          </xsl:attribute>
+          <xsl:call-template name="InsertHeaderFooterInternalRelationships">
+            <xsl:with-param name="node" select="."/>
+          </xsl:call-template>
+        </pzip:entry>
+      </xsl:if>
+
+      <xsl:if test="self::style:footer or self::footer-left">
+        <pzip:entry>
+          <xsl:attribute name="pzip:target">
+            <xsl:value-of select="concat('word/footer',$position,'.xml')"/>
+          </xsl:attribute>
+          <xsl:call-template name="footer">
+            <xsl:with-param name="footerNode" select="."/>
+          </xsl:call-template>
+        </pzip:entry>
+
+        <pzip:entry>
+          <xsl:attribute name="pzip:target">
+            <xsl:value-of select="concat('word/_rels/footer',$position,'.xml.rels')"/>
+          </xsl:attribute>
+          <xsl:call-template name="InsertHeaderFooterInternalRelationships">
+            <xsl:with-param name="node" select="."/>
+          </xsl:call-template>
+        </pzip:entry>
+      </xsl:if>
+
+    </xsl:for-each>
+  </xsl:template>
+
+
+
+  <!-- Headers / footers relationships -->
+  <xsl:template name="InsertHeaderFooterRelationships">
+    <xsl:variable name="masterPages"
+      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"/>
+
+    <xsl:for-each
+      select="$masterPages/style:header|$masterPages/style:header-left|$masterPages/style:footer|$masterPages/style:footer-left">
+      <xsl:if test="self::style:header or self::style:header-left">
+        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+          Id="{generate-id()}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header"
+          Target="header{position()}.xml"/>
+      </xsl:if>
+      <xsl:if test="self::style:footer or self::style:footer-left">
+        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+          Id="{generate-id()}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer"
+          Target="footer{position()}.xml"/>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+
+
 </xsl:stylesheet>

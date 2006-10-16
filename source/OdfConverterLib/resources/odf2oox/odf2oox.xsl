@@ -27,9 +27,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odf="urn:odf"
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" 
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  exclude-result-prefixes="odf style">
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" exclude-result-prefixes="odf style">
 
   <xsl:import href="common.xsl"/>
   <xsl:import href="docprops.xsl"/>
@@ -69,7 +68,7 @@
 
     <!-- sections preformatting -->
     <xsl:call-template name="sectionsPreProcessing"/>
-    
+
     <pzip:archive pzip:target="{$outputFile}">
 
       <!-- Document core properties -->
@@ -130,49 +129,7 @@
       </pzip:entry>
 
       <!-- headers and footers -->
-      <xsl:variable name="masterPage"
-        select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[style:header or style:header-left or style:footer or style:footer-left]"
-        xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-        xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"/>
-
-      <xsl:for-each select="$masterPage">
-        <xsl:variable name="position" select="position()"/>
-        <pzip:entry>
-          <xsl:attribute name="pzip:target">
-            <xsl:value-of select="concat('word/header',$position,'.xml')"/>
-          </xsl:attribute>
-          <xsl:call-template name="header">
-            <xsl:with-param name="headerNode" select="style:header"/>
-          </xsl:call-template>
-        </pzip:entry>
-
-        <pzip:entry>
-          <xsl:attribute name="pzip:target">
-            <xsl:value-of select="concat('word/_rels/header',$position,'.xml.rels')"/>
-          </xsl:attribute>
-          <xsl:call-template name="InsertHeaderFooterInternalRelationships">
-            <xsl:with-param name="node" select="style:header"/>
-          </xsl:call-template>
-        </pzip:entry>
-
-        <pzip:entry>
-          <xsl:attribute name="pzip:target">
-            <xsl:value-of select="concat('word/footer',$position,'.xml')"/>
-          </xsl:attribute>
-          <xsl:call-template name="footer">
-            <xsl:with-param name="footerNode" select="style:footer"/>
-          </xsl:call-template>
-        </pzip:entry>
-
-        <pzip:entry>
-          <xsl:attribute name="pzip:target">
-            <xsl:value-of select="concat('word/_rels/footer',$position,'.xml.rels')"/>
-          </xsl:attribute>
-          <xsl:call-template name="InsertHeaderFooterInternalRelationships">
-            <xsl:with-param name="node" select="style:footer"/>
-          </xsl:call-template>
-        </pzip:entry>
-      </xsl:for-each>
+      <xsl:call-template name="InsertHeaderFooterParts"/>
 
       <!-- fonts declaration -->
       <pzip:entry pzip:target="word/fontTable.xml">
@@ -199,10 +156,10 @@
         <xsl:call-template name="package-relationships"/>
       </pzip:entry>
 
-	<!-- numbering relationships item-->
+      <!-- numbering relationships item-->
       <pzip:entry pzip:target="word/_rels/numbering.xml.rels">
         <xsl:call-template name="InsertBuletRelationships"/>
-        </pzip:entry>
+      </pzip:entry>
 
     </pzip:archive>
   </xsl:template>

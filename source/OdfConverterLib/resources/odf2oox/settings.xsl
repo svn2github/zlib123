@@ -77,8 +77,8 @@
       <w:consecutiveHyphenLimit w:val="0"/>
       <w:doNotHyphenateCaps w:val="false"/>
 
-      <!-- Header and Footer even and odd propertie -->
-      <xsl:call-template name="EvenAndOddConfiguration"/>
+      <!-- Header and Footer settings -->
+      <xsl:call-template name="InsertHeaderFooterSettings"/>
 
       <!-- Footnotes document wide properties -->
       <xsl:apply-templates
