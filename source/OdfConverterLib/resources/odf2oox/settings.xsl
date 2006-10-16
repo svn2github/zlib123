@@ -44,9 +44,10 @@
         <xsl:attribute name="w:val">
           <xsl:choose>
             <xsl:when
-              test="$view-settings/config:config-item[@config:name='InBrowseMode' and @config:type='boolean'] = 'true' ">web</xsl:when>
-            
-              <xsl:otherwise>print</xsl:otherwise>
+              test="$view-settings/config:config-item[@config:name='InBrowseMode' and @config:type='boolean'] = 'true' "
+              >web</xsl:when>
+
+            <xsl:otherwise>print</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
       </w:view>
@@ -101,6 +102,7 @@
             <xsl:choose>
               <xsl:when
                 test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false'">
+                <xsl:message terminate="no">feedback:Spacing at top of page/table</xsl:message>
                 <xsl:value-of select="'true'"/>
               </xsl:when>
               <xsl:otherwise>

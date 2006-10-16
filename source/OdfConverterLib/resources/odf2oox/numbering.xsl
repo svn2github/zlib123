@@ -258,6 +258,10 @@
         />
       </xsl:call-template>
     </xsl:variable>
+    <!-- report lost min-label-distance -->
+    <xsl:if test="$minLabelDistanceTwip != 0">
+      <xsl:message terminate="no">feedback:Distance between numbering and text</xsl:message>
+    </xsl:if>
 
     <!-- If @text:display-levels is defined and greater than 1, the tabs may not be well converted. -->
     <xsl:if
@@ -344,8 +348,8 @@
       <xsl:for-each select="document('styles.xml')">
         <xsl:if test="key('styles',$styleName)/style:text-properties">
           <w:rPr>
-            <xsl:apply-templates select="key('styles',$styleName)/style:text-properties"
-              mode="rPr"/>
+            <xsl:apply-templates select="key('styles',$styleName)/style:text-properties" mode="rPr"
+            />
           </w:rPr>
         </xsl:if>
       </xsl:for-each>
@@ -915,6 +919,10 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+      <!-- report lost distance because of displayed levels -->
+      <xsl:if test="$displayedLevels &gt; 1">
+        <xsl:message terminate="no">feedback:Distance between numbering and text</xsl:message>
+      </xsl:if>
 
       <!-- Minimum width of a number -->
       <xsl:variable name="minLabelWidthTwip">
@@ -942,6 +950,10 @@
           <xsl:with-param name="listStyleName" select="$listStyleName"/>
         </xsl:call-template>
       </xsl:variable>
+      <!-- report lost min-label-distance -->
+      <xsl:if test="$minLabelDistanceTwip != 0">
+        <xsl:message terminate="no">feedback:Distance between numbering and text</xsl:message>
+      </xsl:if>
 
       <!-- Override tabs of numbered elements ('num' tabs) if additional value (left margin or first line indent) defined. -->
       <xsl:if

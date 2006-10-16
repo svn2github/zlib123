@@ -93,7 +93,7 @@
     </w:body>
   </xsl:template>
 
-  
+
 
 
   <!--checks if element has style used to generate table of contents in document  -->
@@ -110,6 +110,11 @@
         <xsl:with-param name="tableOfContent" select="$tableOfContent"/>
       </xsl:call-template>
     </xsl:variable>
+
+    <!-- report loss of toc protection -->
+    <xsl:if test="$tableOfContent/@text:protected = 'true' ">
+      <xsl:message terminate="no">feedback:Table of content protection</xsl:message>
+    </xsl:if>
 
     <xsl:choose>
       <xsl:when test="$tocStyle = 'true'">true</xsl:when>
@@ -189,20 +194,26 @@
       <xsl:call-template name="InsertPageBreakAfter"/>
     </w:p>
   </xsl:template>
-  
-<!-- Insert BookmarkStart Id or BookmarkEnd Id -->
+
+  <!-- Insert BookmarkStart Id or BookmarkEnd Id -->
   <xsl:template name="GenerateBookmarkId">
-    <xsl:param name="TextName"></xsl:param> 
+    <xsl:param name="TextName"/>
     <xsl:choose>
-      <xsl:when test="../text:bookmark-start[@text:name=$TextName] or ../text:bookmark-end[@text:name=$TextName]"> 
-        <xsl:value-of select="count(//text:bookmark-start[@text:name=$TextName]/preceding-sibling::text:bookmark-start)+count(//text:bookmark-start[@text:name=$TextName]/parent::text:p/preceding-sibling::node()/text:bookmark-start)+count(//text:bookmark-start[@text:name=$TextName]/preceding-sibling::text:reference-mark-start )+count(//text:bookmark-start[@text:name=$TextName]/parent::text:p/preceding-sibling::node()/text:reference-mark-start )"/>       
+      <xsl:when
+        test="../text:bookmark-start[@text:name=$TextName] or ../text:bookmark-end[@text:name=$TextName]">
+        <xsl:value-of
+          select="count(//text:bookmark-start[@text:name=$TextName]/preceding-sibling::text:bookmark-start)+count(//text:bookmark-start[@text:name=$TextName]/parent::text:p/preceding-sibling::node()/text:bookmark-start)+count(//text:bookmark-start[@text:name=$TextName]/preceding-sibling::text:reference-mark-start )+count(//text:bookmark-start[@text:name=$TextName]/parent::text:p/preceding-sibling::node()/text:reference-mark-start )"
+        />
       </xsl:when>
-      <xsl:when test="../text:reference-mark-start[@text:name=$TextName] or ../text:reference-mark-end[@text:name=$TextName]">
-        <xsl:value-of select="count(//text:reference-mark-start[@text:name=$TextName]/preceding-sibling::text:reference-mark-start )+count(//text:reference-mark-start[@text:name=$TextName]/parent::text:p/preceding-sibling::node()/text:reference-mark-start )+count(//text:reference-mark-start[@text:name=$TextName]/preceding-sibling::text:bookmark-start)+count(//text:reference-mark-start [@text:name=$TextName]/parent::text:p/preceding-sibling::node()/text:bookmark-start)"/>        
+      <xsl:when
+        test="../text:reference-mark-start[@text:name=$TextName] or ../text:reference-mark-end[@text:name=$TextName]">
+        <xsl:value-of
+          select="count(//text:reference-mark-start[@text:name=$TextName]/preceding-sibling::text:reference-mark-start )+count(//text:reference-mark-start[@text:name=$TextName]/parent::text:p/preceding-sibling::node()/text:reference-mark-start )+count(//text:reference-mark-start[@text:name=$TextName]/preceding-sibling::text:bookmark-start)+count(//text:reference-mark-start [@text:name=$TextName]/parent::text:p/preceding-sibling::node()/text:bookmark-start)"
+        />
       </xsl:when>
-    </xsl:choose>    
+    </xsl:choose>
   </xsl:template>
-  
+
   <!-- Insert BookmarkStart or ReferenceMarkStart-->
   <xsl:template match="text:bookmark-start|text:reference-mark-start " mode="paragraph">
     <w:bookmarkStart>
@@ -216,76 +227,79 @@
       <xsl:attribute name="w:name">
         <xsl:value-of select="concat(@text:name, generate-id())"/>
       </xsl:attribute>
-    </w:bookmarkStart>     
+    </w:bookmarkStart>
   </xsl:template>
-  
+
   <!-- Insert BookmarkEnd-->
   <xsl:template match="text:bookmark-end|text:reference-mark-end" mode="paragraph">
     <w:bookmarkEnd>
-      <xsl:attribute name="w:id">        
+      <xsl:attribute name="w:id">
         <xsl:call-template name="GenerateBookmarkId">
           <xsl:with-param name="TextName">
             <xsl:value-of select="@text:name"/>
           </xsl:with-param>
         </xsl:call-template>
-        </xsl:attribute>
+      </xsl:attribute>
     </w:bookmarkEnd>
   </xsl:template>
-  
+
   <!-- Insert Cross References (Bookmark) -->
   <xsl:template match="text:bookmark-ref|text:reference-ref" mode="paragraph">
-   <xsl:variable name="TextName">
-     <xsl:value-of select="@text:ref-name"/>
-   </xsl:variable>
+    <xsl:variable name="TextName">
+      <xsl:value-of select="@text:ref-name"/>
+    </xsl:variable>
     <xsl:variable name="CrossReferences">
       <xsl:choose>
-        <xsl:when test="@text:reference-format='page'">          
-          <xsl:text>PAGEREF </xsl:text>  
+        <xsl:when test="@text:reference-format='page'">
+          <xsl:text>PAGEREF </xsl:text>
         </xsl:when>
-        <xsl:otherwise>REF </xsl:otherwise>         
-      </xsl:choose> 
+        <xsl:otherwise>REF </xsl:otherwise>
+      </xsl:choose>
       <xsl:choose>
-        <xsl:when test="../text:bookmark-ref[@text:ref-name=$TextName]">       
-          <xsl:value-of select="concat($TextName, generate-id(//text:bookmark-start[@text:name=$TextName]))"/>
+        <xsl:when test="../text:bookmark-ref[@text:ref-name=$TextName]">
+          <xsl:value-of
+            select="concat($TextName, generate-id(//text:bookmark-start[@text:name=$TextName]))"/>
         </xsl:when>
         <xsl:when test="../text:reference-ref[@text:ref-name=$TextName]">
-          <xsl:value-of select="concat($TextName, generate-id(//text:reference-mark-start[@text:name=$TextName]))"/>         
+          <xsl:value-of
+            select="concat($TextName, generate-id(//text:reference-mark-start[@text:name=$TextName]))"
+          />
         </xsl:when>
-      </xsl:choose>      
+      </xsl:choose>
       <xsl:if test="@text:reference-format='direction'">
         <xsl:text>\p</xsl:text>
       </xsl:if>
       <xsl:text> \h</xsl:text>
     </xsl:variable>
-      <w:r w:rsidR="00A62ACC">        
-        <w:fldChar w:fldCharType="begin"/>
-      </w:r>
-      <w:r w:rsidR="00A62ACC">
-        <w:rPr>
-          <w:lang/>
-        </w:rPr>
-        <w:instrText xml:space="preserve">
+    <w:r w:rsidR="00A62ACC">
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r w:rsidR="00A62ACC">
+      <w:rPr>
+        <w:lang/>
+      </w:rPr>
+      <w:instrText xml:space="preserve">
           <xsl:value-of select="$CrossReferences"/>
         </w:instrText>
-      </w:r>    
-      <w:r w:rsidR="00A62ACC">
-        <w:rPr>
-          <w:lang/>
-        </w:rPr>
-        <w:fldChar w:fldCharType="separate"/>
-      </w:r>
-      <w:r w:rsidR="00A62ACC">
-        <xsl:call-template name="InsertRunProperties"></xsl:call-template>
-        <w:t>
-          <xsl:value-of select="."/>
-        </w:t>
-      </w:r>
-      <w:r w:rsidR="00A62ACC">
-        <w:rPr>
-          <w:lang/>
-        </w:rPr>
-        <w:fldChar w:fldCharType="end"/>
-      </w:r>
+    </w:r>
+    <w:r w:rsidR="00A62ACC">
+      <w:rPr>
+        <w:lang/>
+      </w:rPr>
+      <w:fldChar w:fldCharType="separate"/>
+    </w:r>
+    <w:r w:rsidR="00A62ACC">
+      <xsl:call-template name="InsertRunProperties"/>
+      <w:t>
+        <xsl:value-of select="."/>
+      </w:t>
+    </w:r>
+    <w:r w:rsidR="00A62ACC">
+      <w:rPr>
+        <w:lang/>
+      </w:rPr>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
   </xsl:template>
 
   <!-- conversion of paragraph content excluding not supported elements -->

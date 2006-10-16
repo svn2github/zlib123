@@ -203,6 +203,11 @@
 
   <!-- Paragraph properties -->
   <xsl:template match="style:paragraph-properties" mode="pPr">
+    <!-- report lost attributes -->
+    <xsl:if test="@fo:text-align-last">
+      <xsl:message terminate="no">feedback:Alignment of last line</xsl:message>
+    </xsl:if>
+
     <!-- keep with next -->
     <xsl:if test="@fo:keep-with-next='always'">
       <w:keepNext/>
@@ -219,6 +224,7 @@
         <w:pageBreakBefore/>
       </xsl:when>
       <xsl:when test="@fo:break-before='auto'">
+        <xsl:message terminate="no">feedback:Automatic page break</xsl:message>
         <w:pageBreakBefore w:val="off"/>
       </xsl:when>
       <xsl:otherwise/>
@@ -227,6 +233,9 @@
     <!-- widow/orphan control -->
     <xsl:choose>
       <xsl:when test="@fo:widows != '0' or @fo:orphans != '0'">
+        <xsl:if test="@fo:widows &gt; 2 or @fo:orphans &gt; 2">
+          <xsl:message terminate="no">feedback:Widows and Orphans number</xsl:message>
+        </xsl:if>
         <w:widowControl w:val="on"/>
       </xsl:when>
       <xsl:otherwise>
@@ -576,6 +585,15 @@
   <!-- Text properties -->
   <xsl:template match="style:text-properties" mode="rPr">
 
+    <!-- report lost attributes -->
+    <xsl:if test="@style:text-blinking">
+      <xsl:message terminate="no">feedback:Text blinking</xsl:message>
+    </xsl:if>
+    <xsl:if test="@style:text-rotation-angle or @style:text-rotation-scale">
+      <xsl:message terminate="no">feedback:Rotated text</xsl:message>
+    </xsl:if>
+
+    <!-- fonts -->
     <xsl:if test="@style:font-name">
       <w:rFonts>
         <xsl:if test="@style:font-name">
@@ -611,6 +629,9 @@
     <xsl:if test="@fo:font-weight">
       <xsl:choose>
         <xsl:when test="@fo:font-weight != 'normal'">
+          <xsl:if test="@fo:font-weight != 'bold'">
+            <xsl:message terminate="no">feedback:Font weight</xsl:message>
+          </xsl:if>
           <w:b w:val="on"/>
         </xsl:when>
         <xsl:otherwise>
@@ -659,9 +680,11 @@
         </xsl:when>
         <xsl:when test="@fo:text-transform = 'capitalize'">
           <!-- no equivalent of capitalize in OOX spec -->
+          <xsl:message terminate="no">feedback:Capitalized text</xsl:message>
           <w:caps w:val="off"/>
         </xsl:when>
         <xsl:when test="@fo:text-transform = 'lowercase'">
+          <xsl:message terminate="no">feedback:Lowercase text</xsl:message>
           <w:caps w:val="off"/>
         </xsl:when>
         <xsl:when test="@fo:text-transform = 'none' or @fo:font-variant = 'small-caps'">
@@ -1189,6 +1212,7 @@
                 <xsl:value-of select="'heavy'"/>
               </xsl:when>
               <xsl:otherwise>
+                <xsl:message terminate="no">feedback:Leader text</xsl:message>
                 <xsl:value-of select="'none'"/>
               </xsl:otherwise>
             </xsl:choose>
@@ -1222,6 +1246,11 @@
 
   <!-- Page Layout Properties -->
   <xsl:template match="style:page-layout-properties" mode="master-page">
+    <!-- background color lost if it is not main layout -->
+    <xsl:if
+      test="@fo:background-color != 'transparent' and parent::style:page-layout/@style:name != $default-master-style/@style:page-layout-name">
+      <xsl:message terminate="no">feedback:Page background color</xsl:message>
+    </xsl:if>
     <!-- page size -->
     <xsl:choose>
       <xsl:when
@@ -1278,6 +1307,10 @@
       select="document('styles.xml')/office:document-styles/office:styles/text:linenumbering-configuration">
       <xsl:if test="not(@text:number-lines='false')">
         <w:lnNumType>
+          <xsl:if
+            test="@text:style-name or @style:num-format or @text:number-position or @text:count-text-boxes or @text:restart-on-page or @text:linenumbering-separator">
+            <xsl:message terminate="no">feedback:Line numbering</xsl:message>
+          </xsl:if>
           <xsl:if test="@text:increment">
             <xsl:attribute name="w:countBy">
               <xsl:value-of select="@text:increment"/>

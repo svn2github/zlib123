@@ -55,6 +55,13 @@
         </xsl:choose>
       </w:tblPr>
       <xsl:call-template name="InsertTblGrid"/>
+      <!-- Header rows not handled the same way in OOX -->
+      <xsl:if test="table:table-header-rows/table:table-row">
+        <xsl:message terminate="no">feedback:Table header repeated on every page</xsl:message>
+      </xsl:if>
+      <xsl:if test="count(table:table-header-rows/table:table-row) &gt; 1">
+        <xsl:message terminate="no">feedback:Table header rows</xsl:message>
+      </xsl:if>
       <xsl:apply-templates select="table:table-header-rows/table:table-row | table:table-row"/>
     </w:tbl>
     <xsl:call-template name="ManageSectionsInTable"/>
@@ -65,6 +72,21 @@
     <w:tblStyle w:val="{@table:style-name}"/>
     <xsl:variable name="tableProp"
       select="key('automatic-styles', @table:style-name)/style:table-properties"/>
+
+    <!-- report lost attributes -->
+    <xsl:if test="$tableProp/@fo:keep-with-next">
+      <xsl:message terminate="no">feedback:Table together with next paragraph</xsl:message>
+    </xsl:if>
+    <xsl:if test="not($tableProp/@style:may-break-between-rows='true')">
+      <xsl:message terminate="no">feedback:Unsplitable table</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:background-image">
+      <xsl:message terminate="no">feedback:Table background image</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:shadow">
+      <xsl:message terminate="no">feedback:Table shadow</xsl:message>
+    </xsl:if>
+    
     <w:tblW w:type="{$type}">
       <xsl:attribute name="w:w">
         <xsl:call-template name="twips-measure">
@@ -75,8 +97,9 @@
     <xsl:if test="$tableProp/@table:align">
       <xsl:choose>
         <xsl:when test="$tableProp/@table:align = 'margins'">
-          <w:jc w:val="left"/>
           <!--User agents that do not support the "margins" value, may treat this value as "left".-->
+          <xsl:message terminate="no">feedback:Manual alignment of table</xsl:message>
+          <w:jc w:val="left"/>
         </xsl:when>
         <xsl:otherwise>
           <w:jc w:val="{$tableProp/@table:align}"/>
@@ -158,6 +181,21 @@
     <w:tblStyle w:val="{$tableStyleName}"/>
     <xsl:variable name="tableProp"
       select="key('automatic-styles', $tableStyleName)/style:table-properties"/>
+
+    <!-- report lost attributes -->
+    <xsl:if test="$tableProp/@fo:keep-with-next">
+      <xsl:message terminate="no">feedback:Table together with next paragraph</xsl:message>
+    </xsl:if>
+    <xsl:if test="not($tableProp/@style:may-break-between-rows='true')">
+      <xsl:message terminate="no">feedback:Unsplitable table</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:background-image">
+      <xsl:message terminate="no">feedback:Table background image</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:shadow">
+      <xsl:message terminate="no">feedback:Table shadow</xsl:message>
+    </xsl:if>
+    
     <w:tblW w:type="{$type}">
       <xsl:attribute name="w:w">
         <xsl:call-template name="twips-measure">
@@ -220,7 +258,7 @@
     </xsl:if>
   </xsl:template>
 
-  
+
 
   <!-- table rows -->
   <xsl:template match="table:table-row">
@@ -244,6 +282,12 @@
 
   <!-- Inserts row properties -->
   <xsl:template name="InsertRowProperties">
+    <!-- report lost attributes -->
+    <xsl:if
+      test="key('automatic-styles',@table:style-name)/style:table-row-properties/@style:background-image">
+      <xsl:message terminate="no">feedback:Row background image</xsl:message>
+    </xsl:if>
+
     <xsl:call-template name="InsertRowHeaderMark"/>
     <xsl:call-template name="InsertRowHeight"/>
     <xsl:call-template name="InsertRowKeepTogether"/>
@@ -326,6 +370,17 @@
     <xsl:variable name="tableProp"
       select="key('automatic-styles', ancestor::table:table[@table:style-name][1]/@table:style-name)/style:table-properties"/>
 
+    <!-- report lost attributes -->
+    <xsl:if test="$cellProp/@style:cell-protect">
+      <xsl:message terminate="no">feedback:Protected cell</xsl:message>
+    </xsl:if>
+    <xsl:if test="$cellProp/@style:background-image">
+      <xsl:message terminate="no">feedback:Cell background image</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:shadow">
+      <xsl:message terminate="no">feedback:Cell shadow</xsl:message>
+    </xsl:if>
+    
     <xsl:call-template name="InsertCellWidth"/>
     <xsl:call-template name="InsertCellSpan">
       <xsl:with-param name="vmerge"/>

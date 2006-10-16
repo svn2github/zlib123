@@ -286,7 +286,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$result > 31">31</xsl:when>
+      <xsl:when test="$result > 31"><xsl:message terminate="no">feedback:Padding shortened</xsl:message>31</xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$result"/>
       </xsl:otherwise>
@@ -301,7 +301,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$result > 620">620</xsl:when>
+      <xsl:when test="$result > 620"><xsl:message terminate="no">feedback:Padding shortened</xsl:message>620</xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$result"/>
       </xsl:otherwise>
@@ -342,7 +342,7 @@
       <xsl:when test="$code='FF0000'">red</xsl:when>
       <xsl:when test="$code='FFFFFF'">white</xsl:when>
       <xsl:when test="$code='FFFF00'">yellow</xsl:when>
-      <xsl:otherwise>yellow</xsl:otherwise>
+      <xsl:otherwise><xsl:message terminate="no">feedback:Text background color</xsl:message>yellow</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 

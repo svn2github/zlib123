@@ -409,6 +409,7 @@
             <a:blip r:embed="{generate-id(draw:image)}"/>
             <xsl:if
               test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip">
+              <xsl:message terminate="no">feedback:Cropped image</xsl:message>
               <xsl:call-template name="InsertImageCropProperties">
                 <xsl:with-param name="clip"
                   select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip"
