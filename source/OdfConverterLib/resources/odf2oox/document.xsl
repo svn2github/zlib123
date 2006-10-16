@@ -244,7 +244,7 @@
   </xsl:template>
 
   <!-- Insert Cross References (Bookmark) -->
-  <xsl:template match="text:bookmark-ref|text:reference-ref" mode="paragraph">
+  <!--xsl:template match="text:bookmark-ref|text:reference-ref" mode="paragraph">
     <xsl:variable name="TextName">
       <xsl:value-of select="@text:ref-name"/>
     </xsl:variable>
@@ -300,7 +300,7 @@
       </w:rPr>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
-  </xsl:template>
+  </xsl:template-->
 
   <!-- conversion of paragraph content excluding not supported elements -->
   <xsl:template name="InsertParagraphContent">
