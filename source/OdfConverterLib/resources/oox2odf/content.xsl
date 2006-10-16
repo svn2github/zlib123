@@ -358,7 +358,12 @@
       <text:tab/>
     </xsl:if>
     <xsl:choose>
-      <!-- attach formatting properties-->
+      <!--  fieldchar hyperlink -->
+      <xsl:when test="contains(preceding::w:instrText[1],'HYPERLINK') and 
+        count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end'])">
+        <xsl:call-template name="InsertHyperlink"/>
+      </xsl:when>
+      <!-- attach automatic style-->
       <xsl:when test="w:rPr">
         <text:span text:style-name="{generate-id(self::node())}">
           <xsl:apply-templates/>
@@ -373,41 +378,76 @@
   </xsl:template>
   
   <!-- ignore text inside a field code -->
-  <xsl:template match="w:instrText" />
+  <xsl:template match="w:instrText"/>
+  
+  <!-- path for hyperlinks-->
+  <xsl:template name="GetLinkPath">
+    <xsl:param name="linkHref" />
+    
+    <xsl:choose>
+      <xsl:when test="contains($linkHref, 'file:///') or contains($linkHref, 'http://') or contains($linkHref, 'mailto:')">
+        <xsl:value-of select="$linkHref"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat('../',$linkHref)"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   
   <!-- hyperlinks -->
-  <xsl:template match="w:hyperlink">
+  <xsl:template name="InsertHyperlink">
     <text:a xlink:type="simple">
-      <!-- simple hyperlink -->
+      <!-- document hyperlink -->
       <xsl:if test="@w:anchor">
         <xsl:attribute name="xlink:href">
           <xsl:value-of select="concat('#',@w:anchor)"/>
         </xsl:attribute>
       </xsl:if>
       
-      <!-- Internet hyperlink -->
+      <!-- file or web page hyperlink with relationship id -->
       <xsl:if test="@r:id">
         <xsl:variable name="relationshipId">
           <xsl:value-of select="@r:id"/>
         </xsl:variable>
+        
         <xsl:for-each
           select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
           <xsl:if test="./@Id=$relationshipId">
             <xsl:attribute name="xlink:href">
-              <xsl:value-of select="./@Target"/>
+              <xsl:call-template name="GetLinkPath">
+                <xsl:with-param name="linkHref" select="@Target" />
+              </xsl:call-template>
             </xsl:attribute>
           </xsl:if>
         </xsl:for-each>
       </xsl:if>
       
-      <!--  @TODO check if we are in a fieldchar hyperlink -->
-<!--      <xsl:when
-        test="count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and contains(preceding::w:instrText[last()],'HYPERLINK')">
-        <xsl:call-template name="InsertHyperlink"/>
-      </xsl:when>-->
+      <!-- file or web page hyperlink -  fieldchar type (can contain several paragraphs in Word) -->
+      <xsl:if test="self::w:r">
+        <xsl:attribute name="xlink:href">
+          <xsl:call-template name="GetLinkPath">
+            <xsl:with-param name="linkHref"><xsl:value-of select="substring-before(substring-after(preceding::w:instrText[1],'&quot;'),'&quot;')"/></xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
       
-      <xsl:apply-templates  />
+      <xsl:choose>
+        <!-- attach automatic style-->
+        <xsl:when test="w:rPr">
+          <text:span text:style-name="{generate-id(self::node())}">
+            <xsl:apply-templates/>
+          </text:span>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates/>
+        </xsl:otherwise>
+      </xsl:choose>
     </text:a>
+  </xsl:template>
+  
+  <!-- hyperlinks -->
+  <xsl:template match="w:hyperlink">
+    <xsl:call-template name="InsertHyperlink"/>
   </xsl:template>
   
   <!--  text bookmark mark start -->
