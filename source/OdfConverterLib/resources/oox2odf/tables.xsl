@@ -32,8 +32,7 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  exclude-result-prefixes="w table">
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" exclude-result-prefixes="w table">
 
   <xsl:template match="w:tbl">
     <table:table>
@@ -45,7 +44,7 @@
       <xsl:apply-templates select="w:tr"/>
     </table:table>
   </xsl:template>
-  
+
   <xsl:template match="w:gridCol">
     <table:table-column>
       <xsl:attribute name="table:style-name">
@@ -54,24 +53,24 @@
       <!--TODO: @table:style-name -->
     </table:table-column>
   </xsl:template>
-  
+
   <xsl:template match="w:tr">
     <xsl:choose>
       <xsl:when test="child::w:trPr/w:tblHeader">
         <table:table-header-rows>
           <table:table-row>
-            <xsl:apply-templates select="w:tc"/>      
+            <xsl:apply-templates select="w:tc"/>
           </table:table-row>
         </table:table-header-rows>
       </xsl:when>
       <xsl:otherwise>
         <table:table-row>
-          <xsl:apply-templates select="w:tc"/>      
+          <xsl:apply-templates select="w:tc"/>
         </table:table-row>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template match="w:tc">
     <table:table-cell>
       <xsl:attribute name="table:style-name">
@@ -94,8 +93,8 @@
       </style:table-properties>
     </style:style>
   </xsl:template>
-  
-  
+
+
   <xsl:template match="w:tcPr" mode="automaticstyles">
     <style:style style:name="{generate-id(parent::w:tc)}" style:family="table-cell">
       <xsl:if test="w:tcStyle">
@@ -108,8 +107,8 @@
       </style:table-cell-properties>
     </style:style>
   </xsl:template>
-  
-  
+
+
   <xsl:template match="w:gridCol" mode="automaticstyles">
     <style:style style:name="{generate-id(self::w:gridCol)}" style:family="table-column">
       <!--<xsl:if test="w:tblStyle">
@@ -122,7 +121,7 @@
       </style:table-column-properties>
     </style:style>
   </xsl:template>
-  
+
   <xsl:template name="InsertTableProperties">
     <xsl:if test="w:tblW/@w:type = 'dxa'">
       <xsl:attribute name="style:width">
@@ -175,7 +174,7 @@
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertColumnProperties">
     <xsl:attribute name="style:column-width">
       <xsl:call-template name="ConvertTwips">
@@ -186,6 +185,6 @@
       </xsl:call-template>
     </xsl:attribute>
   </xsl:template>
-  
-  <xsl:template name="InsertCellsProperties"></xsl:template>
+
+  <xsl:template name="InsertCellsProperties"/>
 </xsl:stylesheet>

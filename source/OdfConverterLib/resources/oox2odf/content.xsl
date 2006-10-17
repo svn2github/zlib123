@@ -52,7 +52,7 @@
     <office:document-content>
       <office:scripts/>
       <office:font-face-decls>
-        <xsl:apply-templates select="document('word/fontTable.xml')/w:fonts" />
+        <xsl:apply-templates select="document('word/fontTable.xml')/w:fonts"/>
       </office:font-face-decls>
       <office:automatic-styles>
         <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
@@ -189,7 +189,7 @@
     </xsl:choose>
   </xsl:template>
 
-<!--  paragraphs, lists, headings-->
+  <!--  paragraphs, lists, headings-->
   <xsl:template match="w:p">
     <xsl:message terminate="no">progress:w:p</xsl:message>
   
@@ -204,7 +204,8 @@
         <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
         <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
         <xsl:variable name="level" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
-        <xsl:if test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])"> 
+        <xsl:if
+          test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
           <xsl:apply-templates select="." mode="list">
             <xsl:with-param name="nestedLevel">
               <xsl:value-of select="$level"/>
@@ -224,8 +225,8 @@
       </xsl:when>
       
       <xsl:otherwise>
-      <!--  default scenario - paragraph-->
-         <xsl:apply-templates select="." mode="paragraph" />
+        <!--  default scenario - paragraph-->
+        <xsl:apply-templates select="." mode="paragraph"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -246,16 +247,25 @@
     </text:h>
   </xsl:template>
   
-<!--  paragraphs-->
+  <!--  paragraphs-->
   <xsl:template match="w:p" mode="paragraph">
-    <text:p>
-      <xsl:if test="w:pPr">
-        <xsl:attribute name="text:style-name">
-          <xsl:value-of select="generate-id(self::node())"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:apply-templates /> 
-    </text:p>
+    <xsl:choose>
+      <!--avoid nested paragaraphs-->
+      <xsl:when test="ancestor::w:p">
+        <xsl:apply-templates select="child::node()"/>
+      </xsl:when>
+      <!--default scenario-->
+      <xsl:otherwise>
+        <text:p>
+          <xsl:if test="w:pPr">
+            <xsl:attribute name="text:style-name">
+              <xsl:value-of select="generate-id(self::node())"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:apply-templates/>
+        </text:p>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- paragraph which is the first element of a list-->
@@ -266,39 +276,41 @@
     <xsl:variable name="NumberingId2" select="w:pPr/w:numPr/w:numId/@w:val"/>
     <xsl:variable name="position2" select="count(preceding-sibling::w:p)"/>
     
-      <!-- if first element of a list -->
-      <xsl:if test ="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2 and count(preceding-sibling::w:p)= $position2 -1])">
-        <xsl:if test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $NumberingId2 and w:ilvl/@w:val = $level2]]">
-          <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
-        </xsl:if>
-        <text:list text:style-name="{concat('L',$NumberingId2)}">
-          
-          <!-- convert element as list item -->
-          <xsl:apply-templates select="." mode="list-item">
-            <xsl:with-param name="nestedLevel" select="$nestedLevel"/>
-            <xsl:with-param name="level2">
-              <xsl:value-of select="w:pPr/w:numPr/w:ilvl/@w:val"/>
-            </xsl:with-param>
-          </xsl:apply-templates>
+    <!-- if first element of a list -->
+    <xsl:if
+      test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2 and count(preceding-sibling::w:p)= $position2 -1])">
+      <xsl:if
+        test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $NumberingId2 and w:ilvl/@w:val = $level2]]">
+        <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
+      </xsl:if>
+      <text:list text:style-name="{concat('L',$NumberingId2)}">
+
+        <!-- convert element as list item -->
+        <xsl:apply-templates select="." mode="list-item">
+          <xsl:with-param name="nestedLevel" select="$nestedLevel"/>
+          <xsl:with-param name="level2">
+            <xsl:value-of select="w:pPr/w:numPr/w:ilvl/@w:val"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
           
         </text:list>
       </xsl:if>
- 
+
   </xsl:template>
-  
+
   <!-- pargraph which is a list-item -->
-  
+
   <xsl:template match="w:p" mode="list-item">
     <xsl:param name="nestedLevel"/>
     <xsl:param name="level2"/>
     <xsl:variable name="NumberingId2" select="w:pPr/w:numPr/w:numId/@w:val"/>
     <xsl:variable name="position2" select="count(preceding-sibling::w:p)"/>
-    <xsl:variable name="notHigherLevelPosition" select="count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level2 - $nestedLevel)])"/>
+    <xsl:variable name="notHigherLevelPosition"
+      select="count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level2 - $nestedLevel)])"/>
     <xsl:choose>
-      
+
       <!-- if there's a nested list we call the template recursively -->
-      <xsl:when
-        test="$nestedLevel &gt; 0">
+      <xsl:when test="$nestedLevel &gt; 0">
         <text:list-item>
           <text:list text:style-name="{concat('L',$NumberingId2)}">
             <xsl:apply-templates select="." mode="list-item">
@@ -307,50 +319,53 @@
             </xsl:apply-templates>
           </text:list>
         </text:list-item>
-        
+
         <!-- next paragraph on this level in same list -->
-        <xsl:variable name="nextElement" select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId2 and w:ilvl/@w:val = $level2 - $nestedLevel] and count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level2 - $nestedLevel)])= $notHigherLevelPosition]"/>
-         <xsl:if
-           test="$nextElement">
+        <xsl:variable name="nextElement"
+          select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId2 and w:ilvl/@w:val = $level2 - $nestedLevel] and count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level2 - $nestedLevel)])= $notHigherLevelPosition]"/>
+        <xsl:if test="$nextElement">
           <xsl:apply-templates select="$nextElement" mode="list-item">
             <xsl:with-param name="nestedLevel">
-              <xsl:value-of select="$nextElement/w:pPr/w:numPr/w:ilvl/@w:val - $level2+$nestedLevel"/>
+              <xsl:value-of select="$nextElement/w:pPr/w:numPr/w:ilvl/@w:val - $level2+$nestedLevel"
+              />
             </xsl:with-param>
             <xsl:with-param name="level2">
               <xsl:value-of select="$nextElement/w:pPr/w:numPr/w:ilvl/@w:val"/>
             </xsl:with-param>
           </xsl:apply-templates>
-         </xsl:if> 
-        
+        </xsl:if>
+
       </xsl:when>
 
       <xsl:otherwise>
-        <xsl:if test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $NumberingId2 and w:ilvl/@w:val = $level2]]">
+        <xsl:if
+          test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $NumberingId2 and w:ilvl/@w:val = $level2]]">
           <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
         </xsl:if>
         <text:list-item>
           <xsl:apply-templates select="." mode="paragraph"/>
         </text:list-item>
-        
+
         <!-- next paragraph  in same list -->
-        <xsl:variable name="nextListItem" select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId2 and not(w:ilvl/@w:val &lt; $level2 - $nestedLevel)] and count(preceding-sibling::w:p)= $position2 +1]"/>
-        <xsl:if
-          test="$nextListItem">
+        <xsl:variable name="nextListItem"
+          select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId2 and not(w:ilvl/@w:val &lt; $level2 - $nestedLevel)] and count(preceding-sibling::w:p)= $position2 +1]"/>
+        <xsl:if test="$nextListItem">
           <xsl:apply-templates select="$nextListItem" mode="list-item">
             <xsl:with-param name="nestedLevel">
-              <xsl:value-of select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val - $level2+$nestedLevel"/>
+              <xsl:value-of
+                select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val - $level2+$nestedLevel"/>
             </xsl:with-param>
             <xsl:with-param name="level2">
               <xsl:value-of select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val"/>
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>
-        
+
       </xsl:otherwise>
-      
+
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- run -->
   <xsl:template match="w:r">
     <xsl:message terminate="no">progress:w:r</xsl:message>
@@ -359,33 +374,36 @@
     </xsl:if>
     <xsl:choose>
       <!--  fieldchar hyperlink -->
-      <xsl:when test="contains(preceding::w:instrText[1],'HYPERLINK') and 
+      <xsl:when
+        test="contains(preceding::w:instrText[1],'HYPERLINK') and 
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end'])">
         <xsl:call-template name="InsertHyperlink"/>
       </xsl:when>
       <!-- attach automatic style-->
       <xsl:when test="w:rPr">
         <text:span text:style-name="{generate-id(self::node())}">
-          <xsl:apply-templates/>
+          <xsl:apply-templates select="w:t"/>
         </text:span>
       </xsl:when>
-      
+
       <!--default scenario-->
       <xsl:otherwise>
         <xsl:apply-templates/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- ignore text inside a field code -->
   <xsl:template match="w:instrText"/>
-  
+  <xsl:template match="w:instrText" mode="automaticstyles"/>
+
   <!-- path for hyperlinks-->
   <xsl:template name="GetLinkPath">
-    <xsl:param name="linkHref" />
-    
+    <xsl:param name="linkHref"/>
+
     <xsl:choose>
-      <xsl:when test="contains($linkHref, 'file:///') or contains($linkHref, 'http://') or contains($linkHref, 'mailto:')">
+      <xsl:when
+        test="contains($linkHref, 'file:///') or contains($linkHref, 'http://') or contains($linkHref, 'mailto:')">
         <xsl:value-of select="$linkHref"/>
       </xsl:when>
       <xsl:otherwise>
@@ -393,7 +411,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- hyperlinks -->
   <xsl:template name="InsertHyperlink">
     <text:a xlink:type="simple">
@@ -403,34 +421,38 @@
           <xsl:value-of select="concat('#',@w:anchor)"/>
         </xsl:attribute>
       </xsl:if>
-      
+
       <!-- file or web page hyperlink with relationship id -->
       <xsl:if test="@r:id">
         <xsl:variable name="relationshipId">
           <xsl:value-of select="@r:id"/>
         </xsl:variable>
-        
+
         <xsl:for-each
           select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
           <xsl:if test="./@Id=$relationshipId">
             <xsl:attribute name="xlink:href">
               <xsl:call-template name="GetLinkPath">
-                <xsl:with-param name="linkHref" select="@Target" />
+                <xsl:with-param name="linkHref" select="@Target"/>
               </xsl:call-template>
             </xsl:attribute>
           </xsl:if>
         </xsl:for-each>
       </xsl:if>
-      
+
       <!-- file or web page hyperlink -  fieldchar type (can contain several paragraphs in Word) -->
       <xsl:if test="self::w:r">
         <xsl:attribute name="xlink:href">
           <xsl:call-template name="GetLinkPath">
-            <xsl:with-param name="linkHref"><xsl:value-of select="substring-before(substring-after(preceding::w:instrText[1],'&quot;'),'&quot;')"/></xsl:with-param>
+            <xsl:with-param name="linkHref">
+              <xsl:value-of
+                select="substring-before(substring-after(preceding::w:instrText[1],'&quot;'),'&quot;')"
+              />
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      
+
       <xsl:choose>
         <!-- attach automatic style-->
         <xsl:when test="w:rPr">
@@ -444,31 +466,33 @@
       </xsl:choose>
     </text:a>
   </xsl:template>
-  
+
   <!-- hyperlinks -->
   <xsl:template match="w:hyperlink">
     <xsl:call-template name="InsertHyperlink"/>
   </xsl:template>
-  
+
   <!--  text bookmark mark start -->
-  <xsl:template match="w:bookmarkStart">  
-    <text:bookmark-start>    
+  <xsl:template match="w:bookmarkStart">
+    <text:bookmark-start>
       <xsl:attribute name="text:name">
-      <xsl:value-of select="@w:name"/>     
-    </xsl:attribute>
+        <xsl:value-of select="@w:name"/>
+      </xsl:attribute>
     </text:bookmark-start>
   </xsl:template>
-  
-<!--  text bookmark mark end-->
+
+  <!--  text bookmark mark end-->
   <xsl:template match="w:bookmarkEnd">
     <text:bookmark-end>
       <xsl:variable name="IdBookmark">
         <xsl:value-of select="@w:id"/>
-      </xsl:variable>     
-      <xsl:attribute name="text:name">    
-        <xsl:value-of select="ancestor::w:body/w:p/w:bookmarkStart[@w:id=$IdBookmark]/@w:name"/>      
-      </xsl:attribute>  
-      <xsl:message><xsl:value-of select="ancestor::w:body/w:p/w:bookmarkStart[@w:id=$IdBookmark]/@w:name"/></xsl:message>
+      </xsl:variable>
+      <xsl:attribute name="text:name">
+        <xsl:value-of select="ancestor::w:body/w:p/w:bookmarkStart[@w:id=$IdBookmark]/@w:name"/>
+      </xsl:attribute>
+      <xsl:message>
+        <xsl:value-of select="ancestor::w:body/w:p/w:bookmarkStart[@w:id=$IdBookmark]/@w:name"/>
+      </xsl:message>
     </text:bookmark-end>
   </xsl:template>
 
@@ -535,19 +559,19 @@
       </text:span>
     </xsl:for-each>
   </xsl:template>
-  
+
   <!-- simple text  -->
   <xsl:template match="w:t">
     <xsl:message terminate="no">progress:w:t</xsl:message>
-      <xsl:call-template name="InsertWhiteSpaces">
-          <xsl:with-param name="string">
-            <xsl:value-of select="."/>
-          </xsl:with-param>
-          <xsl:with-param name="length">
-            <xsl:value-of select="string-length(.)"/>
-          </xsl:with-param>
-      </xsl:call-template>
-    </xsl:template>
+    <xsl:call-template name="InsertWhiteSpaces">
+      <xsl:with-param name="string">
+        <xsl:value-of select="."/>
+      </xsl:with-param>
+      <xsl:with-param name="length">
+        <xsl:value-of select="string-length(.)"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
 
   <!--   white spaces  -->
   <xsl:template name="InsertWhiteSpaces">
@@ -564,14 +588,15 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:if test="not($before = '')">
-     <xsl:value-of select="concat($before,' ')"/>
+      <xsl:value-of select="concat($before,' ')"/>
     </xsl:if>
-    <xsl:if test="string-length(concat($before,' ', $after)) &lt; $length " >
-     <xsl:choose>
+    <xsl:if test="string-length(concat($before,' ', $after)) &lt; $length ">
+      <xsl:choose>
         <xsl:when test="($length - string-length(concat($before, $after))) = 1">
           <text:s/>
         </xsl:when>
-        <xsl:when test="($length - string-length(concat($before, $after))) = $length and substring-after($string,' ') =''">
+        <xsl:when
+          test="($length - string-length(concat($before, $after))) = $length and substring-after($string,' ') =''">
           <xsl:value-of select="$string"/>
         </xsl:when>
         <xsl:otherwise>
@@ -582,8 +607,8 @@
                   <xsl:value-of select="$length - string-length($after)"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="$length - string-length(concat($before,' ', $after))"/>
-                 </xsl:otherwise>
+                  <xsl:value-of select="$length - string-length(concat($before,' ', $after))"/>
+                </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
           </text:s>
@@ -593,7 +618,7 @@
     <xsl:if test="$string = ' '">
       <text:s/>
     </xsl:if>
-     <xsl:if test="$length &gt; 0">
+    <xsl:if test="$length &gt; 0">
       <xsl:call-template name="InsertWhiteSpaces">
         <xsl:with-param name="string">
           <xsl:value-of select="$after"/>
@@ -604,8 +629,8 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-  
-<!--  cut start spaces -->
+
+  <!--  cut start spaces -->
   <xsl:template name="CutStartSpaces">
     <xsl:param name="cuted"/>
     <xsl:choose>
@@ -621,10 +646,12 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- line breaks  (page-break todo)-->
   <xsl:template match="w:br">
     <text:line-break/>
   </xsl:template>
 
+  <!--ignore text in automatic styles mode-->
+  <xsl:template match="text()" mode="automaticstyles"/>
 </xsl:stylesheet>
