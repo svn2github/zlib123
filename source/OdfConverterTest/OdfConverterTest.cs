@@ -373,7 +373,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
 
         private bool ValidateFile(string input, string output, bool isDirectTransform)
         {
-            if (this.isDirectTransform)
+            if (isDirectTransform)
             {
                 try
                 {
