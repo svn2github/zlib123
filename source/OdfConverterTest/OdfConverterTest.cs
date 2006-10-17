@@ -332,7 +332,7 @@ namespace CleverAge.OdfConverter.OdfConverterTest
                 Converter converter = new Converter();
                 converter.ExternalResources = this.xslPath;
                 converter.SkipedPostProcessors = this.skipedPostProcessors;
-                converter.DirectTransform = this.isDirectTransform;
+                converter.DirectTransform = isDirectTransform;
                 converter.Packaging = this.packaging;
                 converter.Transform(input, output);
                 TimeSpan duration = DateTime.Now - start;
