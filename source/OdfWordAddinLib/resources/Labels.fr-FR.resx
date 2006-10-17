@@ -168,4 +168,16 @@ cliquez sur "Détails".</value>
   <data name="NotAnOdfDocumentDetail" xml:space="preserve">
     <value>Si vous pensez que ce document est un document ODF valide, vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur.</value>
   </data>
+  <data name="OdfConverterNotInstalled" xml:space="preserve">
+    <value>La prise en charge des formats Office 2007 n'est pas installée et elle est indispensable pour les conversions ODF</value>
+  </data>
+  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
+    <value>Une erreur est survenue pendant la conversion. Essayez de sauvegarder votre document au format Word 2007 avant de lancer l'export vers ODF</value>
+  </data>
+  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
+    <value>Sauvegardez votre document avant de lancer l'export vers ODF</value>
+  </data>
+  <data name="OdfConverterTitle" xml:space="preserve">
+    <value>Convertisseur ODF</value>
+  </data>
 </root>

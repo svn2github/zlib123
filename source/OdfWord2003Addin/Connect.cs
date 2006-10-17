@@ -50,6 +50,9 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
     // right click the project in the Solution Explorer, then choose install.
     #endregion
 
+
+
+
     /// <summary>
     ///   The object for implementing an Add-in.
     /// </summary>
@@ -57,6 +60,43 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
     [GuidAttribute("0A2B8EBA-9B2D-43D7-B82C-CC2D85936BE4"), ProgId("OdfWord2003Addin.Connect")]
     public class Connect : Object, Extensibility.IDTExtensibility2, IOdfConverter
     {
+
+        private string DialogBoxTitle = "ODF Converter";
+
+        /// <summary>
+        /// Class name for Word12 documents
+        /// </summary>
+        private const string Word12Class = "Word12";
+
+        /// <summary>
+        /// Format Id for Word12 documents in current configuration
+        /// </summary>
+        private int Word12SaveFormat = -1;
+
+        /// <summary>
+        /// Initializes Word12Format field
+        /// </summary>
+        private void FindWord12SaveFormat()
+        {
+            try
+            {
+                MSword.FileConverters converters = this.applicationObject.FileConverters;
+                foreach (MSword.FileConverter converter in converters)
+                {
+                    if (converter.ClassName == Word12Class)
+                    {
+                        // Converter found
+                        Word12SaveFormat = converter.SaveFormat;
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+                // No user disturbance...
+            }
+        }
+
         /// <summary>
         ///		Implements the constructor for the Add-in object.
         ///		Place your initialization code within this method.
@@ -83,6 +123,8 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
         public void OnConnection(object application, Extensibility.ext_ConnectMode connectMode, object addInInst, ref System.Array custom)
         {
             this.applicationObject = (MSword.Application)application;
+            FindWord12SaveFormat();
+            DialogBoxTitle = addinLib.GetString("OdfConverterTitle");
 
             if (connectMode != Extensibility.ext_ConnectMode.ext_cm_Startup)
             {
@@ -239,12 +281,18 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
 
         private void exportButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
         {
+            // 1. Check if Word12 converter is installed
+            if (Word12SaveFormat == -1)
+            {
+                System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfConverterNotInstalled"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                return;
+            }
 
             MSword.Document doc = this.applicationObject.ActiveDocument;
 
-            if (!doc.Saved || doc.SaveFormat != 12)
+            if (!doc.Saved)
             {
-                System.Windows.Forms.MessageBox.Show("Please save your document as DOCX before exporting to ODF");
+                System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
             }
             else
             {
@@ -260,47 +308,68 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                 // process the chosen documents	
                 if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
                 {
-                    // retrieve file name
-                    string odfFile = sfd.FileName; ;
-
-                    object initialName = doc.FullName;
-                    object tmpFileName = null;
-                    string docxFile = (string)initialName;
-
+                    // name of the file to create
+                    string odfFileName = sfd.FileName;
+                    // name of the document to convert
+                    object sourceFileName = doc.FullName;
+                    // name of the temporary Word12 file created if current file is not already a Word12 document
+                    object tempDocxName = null;
+                    // store current cursor
+                    MSword.WdCursorType currentCursor = applicationObject.System.Cursor;
+                    // display hourglass
                     this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
 
-                    if (doc.SaveFormat != 12)
+
+                    if (doc.SaveFormat != Word12SaveFormat)
                     {
-                        // duplicate the file
-                        object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
-                        File.Copy((string)initialName, (string)newName);
+                        try
+                        {
+                            // if file is not currently in Word12 format
+                            // 1. Create a copy
+                            // 2. Open it and do a "Save as Word12" (copy needed not to perturb current openened document
+                            // 3. Convert the Word12 copy to odf
+                            // 4. Remove both temporary created files
 
-                        // open the duplicated file
-                        object addToRecentFiles = false;
-                        object readOnly = false;
-                        object isVisible = false;
-                        object missing = Type.Missing;
-                        MSword.Document newDoc = this.applicationObject.Documents.Open(ref newName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
+                            // duplicate the file to keep current file "as is"
+                            object tempCopyName = Path.GetTempFileName() + Path.GetExtension((string)sourceFileName);
+                            File.Copy((string)sourceFileName, (string)tempCopyName);
 
-                        // generate docx file from the duplicated file (under a temporary file)
-                        tmpFileName = Path.GetTempFileName();
-                        object format = MSword.WdSaveFormat.wdFormatDocument;
-                        newDoc.SaveAs(ref tmpFileName, ref format, ref missing, ref missing, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing);
+                            // open the duplicated file
+                            object addToRecentFiles = false;
+                            object readOnly = false;
+                            object isVisible = false;
+                            object missing = Type.Missing;
+                            MSword.Document newDoc = this.applicationObject.Documents.Open(ref tempCopyName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
 
-                        // close and remove the duplicated file
-                        object saveChanges = false;
-                        newDoc.Close(ref saveChanges, ref missing, ref missing);
-                        File.Delete((string)newName);
+                            // generate docx file from the duplicated file (under a temporary file)
+                            tempDocxName = Path.GetTempFileName();
+                            object word12 = Word12SaveFormat;
+                            newDoc.SaveAs(ref tempDocxName, ref word12, ref missing, ref missing, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing);
 
-                        docxFile = (string)tmpFileName;
+                            // close and remove the duplicated file
+                            object saveChanges = false;
+                            newDoc.Close(ref saveChanges, ref missing, ref missing);
+                            File.Delete((string)tempCopyName);
+
+                            // Now the file to be converted is
+                            sourceFileName = tempDocxName;
+                        }
+                        catch (Exception ex)
+                        {
+                            this.applicationObject.System.Cursor = currentCursor;
+                            System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
+                            System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfExportErrorTryDocxFirst"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                            return;
+                        }
                     }
 
-                    OoxToOdf(docxFile, odfFile, true);
+                    OoxToOdf((string)sourceFileName, odfFileName, true);
 
-                    if (tmpFileName != null && File.Exists((string)tmpFileName))
+                    if (tempDocxName != null && File.Exists((string)tempDocxName))
                     {
-                        File.Delete((string)tmpFileName);
+                        File.Delete((string)tempDocxName);
                     }
+                    this.applicationObject.System.Cursor = currentCursor;
 
                 }
             }

@@ -168,4 +168,16 @@ elements, click on "Details".</value>
     <value>This document doesn't seem to be a valid
 ODF document.</value>
   </data>
+  <data name="OdfConverterNotInstalled" xml:space="preserve">
+    <value>Office 2007 File converters are not installed : the ODF convertion cannot work without.</value>
+  </data>
+  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
+    <value>Conversion failed, please try to save the document in Word 2007 format first.</value>
+  </data>
+  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
+    <value>Please save your document before exporting to ODF</value>
+  </data>
+  <data name="OdfConverterTitle" xml:space="preserve">
+    <value>ODF Converter</value>
+  </data>
 </root>
