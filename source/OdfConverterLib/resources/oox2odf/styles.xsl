@@ -36,7 +36,6 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" exclude-result-prefixes="w r draw number">
-
   <xsl:template name="styles">
     <office:document-styles>
       <office:font-face-decls>
@@ -1245,7 +1244,7 @@
     </xsl:if>
 
     <xsl:if test="w:bCs">
-      <xsl:attribute name="fo:font-weight-complex">
+      <xsl:attribute name="style:font-weight-complex">
         <xsl:choose>
           <xsl:when test="w:bCs/@w:val='off' or w:bCs/@w:val='false' or w:bCs/@w:val=0">
             <xsl:value-of select="'normal'"/>
@@ -1277,7 +1276,7 @@
     </xsl:if>
 
     <xsl:if test="w:iCs">
-      <xsl:attribute name="fo:font-style-complex">
+      <xsl:attribute name="style:font-style-complex">
         <xsl:choose>
           <xsl:when test="w:iCs/@w:val='off' or w:iCs/@w:val='false' or w:iCs/@w:val=0">
             <xsl:value-of select="'normal'"/>
@@ -1326,13 +1325,14 @@
       </xsl:attribute>
     </xsl:if>
 
+    <!-- line through text -->
     <xsl:if test="w:dstrike or w:strike">
       <xsl:choose>
-        <xsl:when test="w:strike/@w:val='on' or w:strike/@w:val='true' or w:strike/@w:val=1">
+        <xsl:when test="w:strike/@w:val='on' or w:strike/@w:val='true' or w:strike/@w:val=1 or w:strike/@w:val=1 or (w:strike and (not(w:strike/@w:val) or w:strike/@w:val = ''))">
           <xsl:attribute name="style:text-line-through-type">single</xsl:attribute>
           <xsl:attribute name="style:text-line-through-style">solid</xsl:attribute>
         </xsl:when>
-        <xsl:when test="w:dstrike/@w:val='on' or w:dstrike/@w:val='true' or w:dstrike/@w:val=1">
+        <xsl:when test="w:dstrike/@w:val='on' or w:dstrike/@w:val='true' or w:dstrike/@w:val=1 or w:dstrike/@w:val=1 or (w:dstrike and (not(w:dstrike/@w:val) or w:dstrike/@w:val = ''))">
           <xsl:attribute name="style:text-line-through-type">double</xsl:attribute>
           <xsl:attribute name="style:text-line-through-style">solid</xsl:attribute>
         </xsl:when>
@@ -1520,7 +1520,7 @@
     </xsl:if>
 
     <xsl:if test="w:szCs">
-      <xsl:attribute name="fo:font-size-complex">
+      <xsl:attribute name="style:font-size-complex">
         <xsl:call-template name="ConvertHalfPoints">
           <xsl:with-param name="length" select="w:szCs/@w:val"/>
           <xsl:with-param name="unit">pt</xsl:with-param>
@@ -1591,7 +1591,7 @@
     </xsl:if>
 
     <!-- script type -->
-    <xsl:if test="w:cs/@w:val='on' or w:cs/@w:val='true' or w:cs/@w:val=1">
+    <xsl:if test="w:cs/@w:val='on' or w:cs/@w:val='true' or w:cs/@w:val=1 or (w:cs and (not(w:cs/@w:val) or w:cs/@w:val = ''))">
       <xsl:attribute name="style:script-type">complex</xsl:attribute>
     </xsl:if>
 
@@ -1723,70 +1723,45 @@
               <xsl:value-of select="round(w:position/@w:val * 100 div w:sz/@w:val)"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="round(w:position/@w:val * 100 div 24)"/>
+              <xsl:variable name="defaultFontSize">
+                <xsl:value-of select="document('word/styles.xml')/w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz/@w:val"/>
+              </xsl:variable>
+              <xsl:value-of select="round(w:position/@w:val * 100 div number($defaultFontSize))"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        <xsl:otherwise>none</xsl:otherwise>
+        <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 
     <xsl:choose>
 
-      <xsl:when test="w:vertAlign = 'superscript'">
-        <xsl:choose>
-          <xsl:when test="$percentValue > 0">
-            <xsl:attribute name="style:text-position">
-              <xsl:value-of select="concat('super ',$percentValue)"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="style:text-position">super</xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
+      <!-- positioning of superscript -->
+      <xsl:when test="w:vertAlign/@w:val = 'superscript'">
+        <xsl:attribute name="style:text-position">
+          <xsl:value-of select="concat('super ',number(33 + $percentValue))"/>
+        </xsl:attribute>
       </xsl:when>
 
-      <xsl:when test="w:vertAlign = 'subscript'">
-        <xsl:choose>
-          <xsl:when test="$percentValue &lt; 0">
-            <xsl:attribute name="style:text-position">
-              <xsl:value-of select="concat('sub ',number( - $percentValue))"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="style:text-position">sub</xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
+      <!-- positioning of subscript -->
+      <xsl:when test="w:vertAlign/@w:val = 'subscript'">     
+        <xsl:attribute name="style:text-position">
+          <xsl:value-of select="concat('sub ',number(33 - $percentValue))"/>
+        </xsl:attribute>
       </xsl:when>
 
+      <!-- positioning of normal text -->
       <xsl:when test="w:vertAlign = 'baseline'">
-        <xsl:choose>
-          <xsl:when test="$percentValue > 0">
-            <xsl:attribute name="style:text-position">
-              <xsl:value-of select="concat('super ',$percentValue)"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="$percentValue &lt; 0">
-            <xsl:attribute name="style:text-position">
-              <xsl:value-of select="concat('sub ',number( - $percentValue))"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise/>
-        </xsl:choose>
-      </xsl:when>
-
-      <xsl:when test="$percentValue > 0">
         <xsl:attribute name="style:text-position">
-          <xsl:value-of select="concat('super ',$percentValue)"/>
+          <xsl:value-of select="concat(number($percentValue),' 100')"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test="$percentValue &lt; 0">
+      <xsl:otherwise>
         <xsl:attribute name="style:text-position">
-          <xsl:value-of select="concat('sub ',number( - $percentValue))"/>
+          <xsl:value-of select="concat(number($percentValue),' 100')"/>
         </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise/>
-
+      </xsl:otherwise>
+      
     </xsl:choose>
   </xsl:template>
 
