@@ -865,7 +865,8 @@
   <xsl:template name="InsertIndent">
     <xsl:param name="level" select="0"/>
 
-    <xsl:if test="ancestor-or-self::text:list">
+    <!-- A text:note-body does not depend on its parent list indentation anymore -->
+    <xsl:if test="not(parent::text:note-body) and ancestor-or-self::text:list">
       <xsl:variable name="styleName">
         <xsl:call-template name="GetStyleName"/>
       </xsl:variable>
