@@ -74,7 +74,7 @@
       </pzip:entry>
       
       <!-- settings -->
-      <pzip:entry pzip:target="setings.xml">
+      <pzip:entry pzip:target="settings.xml">
         <xsl:call-template name="settings"/>
       </pzip:entry>
       
