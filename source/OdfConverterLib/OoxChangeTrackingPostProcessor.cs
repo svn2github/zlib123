@@ -70,7 +70,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
             this.currentNode.Push(new Element(prefix, localName, ns));
-
+           
             if (IsParagraph(prefix, localName, ns))
             {
                 StartParagraph();
@@ -186,7 +186,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             else
             {
                 Attribute attribute = (Attribute)node;
-                attribute.Value = text;
+                attribute.Value += text;
             }
         }
 
