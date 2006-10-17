@@ -37,6 +37,9 @@
   <xsl:preserve-space elements="number:text"/>
 
   <xsl:template match="text:page-number" mode="paragraph">
+    <xsl:if test="@text:page-adjust">
+      <xsl:message terminate="no">feedback:Page number offset</xsl:message>
+    </xsl:if>
     <w:fldSimple w:instr=" PAGE ">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>

@@ -1754,6 +1754,7 @@
         <w10:wrap type="square" side="right"/>
       </xsl:when>
       <xsl:when test="$frameWrap = 'none'">
+        <xsl:message terminate="no">feedback:Shape top-and-bottom wrapping</xsl:message>
         <w10:wrap type="topAndBottom"/>
       </xsl:when>
       <xsl:when test="$frameWrap = 'parallel' ">
@@ -2545,6 +2546,9 @@
   <!-- sections -->
   <xsl:template match="text:section">
     <xsl:message terminate="no">progress:text:section</xsl:message>
+    <xsl:if test="@text:display='none'">
+      <xsl:message terminate="no">feedback:Hidden section</xsl:message>
+    </xsl:if>
     <xsl:apply-templates/>
   </xsl:template>
 

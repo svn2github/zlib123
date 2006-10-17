@@ -76,6 +76,10 @@
           <w:u w:val="single"/>
         </w:rPr>
       </w:style>
+      <!-- warn if more than one master page style -->
+      <xsl:if test="count(document('styles.xml')/office:document-styles/office:master-styles/style:master-page) &gt; 1">
+        <xsl:message terminate="no">feedback:Page layout</xsl:message>
+      </xsl:if>
     </w:styles>
   </xsl:template>
 
@@ -207,7 +211,10 @@
     <xsl:if test="@fo:text-align-last">
       <xsl:message terminate="no">feedback:Alignment of last line</xsl:message>
     </xsl:if>
-
+    <xsl:if test="@style:background-image">
+      <xsl:message terminate="no">feedback:Paragraph background image</xsl:message>
+    </xsl:if>
+    
     <!-- keep with next -->
     <xsl:if test="@fo:keep-with-next='always'">
       <w:keepNext/>
