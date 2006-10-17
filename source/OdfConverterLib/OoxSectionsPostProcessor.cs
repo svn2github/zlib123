@@ -547,7 +547,21 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 					{
 						pgBorders.Write(nextWriter);
 					}
-					
+
+                    // lnNumType
+                    Element lnNumType = (Element)page.GetChild("lnNumType", OOX_MAIN_NS);
+                    if (lnNumType != null)
+                    {
+                        lnNumType.Write(nextWriter);
+                    }
+
+                    // pgNumType
+                    Element pgNumType = (Element)page.GetChild("pgNumType", OOX_MAIN_NS);
+                    if (pgNumType != null)
+                    {
+                        pgNumType.Write(nextWriter);
+                    }
+
 					// columns
 					Element cols = (Element) page.GetChild("cols", OOX_MAIN_NS);
 					if (cols != null)
