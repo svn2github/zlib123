@@ -30,12 +30,13 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:o="urn:schemas-microsoft-com:office:office" exclude-result-prefixes="office text style fo">
+  xmlns:o="urn:schemas-microsoft-com:office:office" 
+  exclude-result-prefixes="office text style fo xlink">
 
   <xsl:output method="xml" encoding="UTF-8"/>
 
