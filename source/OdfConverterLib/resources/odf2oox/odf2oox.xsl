@@ -30,6 +30,7 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" exclude-result-prefixes="odf style">
 
+ 
   <xsl:import href="common.xsl"/>
   <xsl:import href="docprops.xsl"/>
   <xsl:import href="document.xsl"/>
@@ -40,7 +41,7 @@
   <xsl:import href="fonts.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="dataStyles.xsl"/>
-  <xsl:import href="pictures.xsl"/>
+  <xsl:import href="frames.xsl"/>
   <xsl:import href="settings.xsl"/>
   <xsl:import href="sections.xsl"/>
   <xsl:import href="part_relationships.xsl"/>
@@ -48,6 +49,7 @@
   <xsl:import href="contentTypes.xsl"/>
   <xsl:import href="comments.xsl"/>
   <xsl:import href="change-tracking.xsl"/>
+ 
 
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>

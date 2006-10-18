@@ -948,5 +948,75 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- compare values of spacing before/after and return 0 or the spacing value to override -->
+  <xsl:template name="CompareSpacingValues">
+    <xsl:param name="tableSide"/>
+    <xsl:param name="paraSide"/>
+    
+    <!-- get spacing value of table properties -->
+    <xsl:variable name="tableSpace">
+      <xsl:choose>
+        <xsl:when
+          test="$tableSide='top' and key('automatic-styles',following-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length"
+              select="key('automatic-styles',following-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]"
+            />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when
+          test="$tableSide='bottom' and key('automatic-styles',preceding-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length"
+              select="key('automatic-styles',preceding-sibling::node()[1][name()='table:table']/@table:style-name)/style:table-properties/attribute::node()[name()=concat('fo:margin-',$tableSide)]"
+            />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <!-- if spacing value of table is 0, do not override. -->
+    <xsl:choose>
+      <xsl:when test="$tableSpace != 0">
+        <!-- get spacing value of paragraph style -->
+        <xsl:variable name="paraSpace">
+          <xsl:choose>
+            <xsl:when
+              test="key('automatic-styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)]">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length"
+                  select="key('automatic-styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)]"
+                />
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:for-each select="document('styles.xml')">
+                <xsl:choose>
+                  <xsl:when
+                    test="key('styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)]">
+                    <xsl:call-template name="twips-measure">
+                      <xsl:with-param name="length"
+                        select="key('styles',@text:style-name)/style:paragraph-properties/attribute::node()[name()=concat('fo:margin-',$paraSide)]"
+                      />
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:otherwise>0</xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <!-- compare those two values and choose which one is best -->
+        <xsl:choose>
+          <xsl:when test="$tableSpace &gt; $paraSpace">
+            <xsl:value-of select="$tableSpace"/>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
 </xsl:stylesheet>

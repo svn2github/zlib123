@@ -36,6 +36,8 @@
 
   <xsl:preserve-space elements="number:text"/>
 
+  <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
+  
   <xsl:template match="text:page-number" mode="paragraph">
     <xsl:if test="@text:page-adjust">
       <xsl:message terminate="no">feedback:Page number offset</xsl:message>
@@ -248,6 +250,16 @@
         </w:r>
       </w:fldSimple>
     </xsl:if>
+  </xsl:template>
+  
+  <!--numbering type for sequence-->
+  <xsl:template name="InsertSequenceFieldNumType">
+    <xsl:variable name="numType">
+      <xsl:call-template name="GetNumberFormattingSwitch"/>
+    </xsl:variable>
+    <xsl:attribute name="w:instr">
+      <xsl:value-of select="concat('SEQ ', @text:name,' ', $numType)"/>
+    </xsl:attribute>
   </xsl:template>
 
 </xsl:stylesheet>
