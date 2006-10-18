@@ -382,7 +382,7 @@
       <!-- attach automatic style-->
       <xsl:when test="w:rPr">
         <text:span text:style-name="{generate-id(self::node())}">
-          <xsl:apply-templates select="w:t"/>
+          <xsl:apply-templates/>
         </text:span>
       </xsl:when>
 
