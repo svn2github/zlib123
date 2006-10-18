@@ -77,7 +77,8 @@
         </w:rPr>
       </w:style>
       <!-- warn if more than one master page style -->
-      <xsl:if test="count(document('styles.xml')/office:document-styles/office:master-styles/style:master-page) &gt; 1">
+      <xsl:if
+        test="count(document('styles.xml')/office:document-styles/office:master-styles/style:master-page) &gt; 1">
         <xsl:message terminate="no">feedback:Page layout</xsl:message>
       </xsl:if>
     </w:styles>
@@ -193,6 +194,7 @@
       <!-- style's paragraph properties -->
       <w:pPr>
         <xsl:apply-templates mode="pPr"/>
+        <xsl:call-template name="InsertOutlineLevel"/>
       </w:pPr>
 
       <!-- style's text properties -->
@@ -214,7 +216,7 @@
     <xsl:if test="@style:background-image">
       <xsl:message terminate="no">feedback:Paragraph background image</xsl:message>
     </xsl:if>
-    
+
     <!-- keep with next -->
     <xsl:if test="@fo:keep-with-next='always'">
       <w:keepNext/>
@@ -249,6 +251,13 @@
         <w:widowControl w:val="off"/>
       </xsl:otherwise>
     </xsl:choose>
+
+    <!-- numbering properties -->
+    <xsl:if test="parent::style:style/@style:default-outline-level">
+      <xsl:for-each select="parent::node()">
+        <xsl:call-template name="InsertOutlineNumPr"/>
+      </xsl:for-each>
+    </xsl:if>
 
     <!-- line numbers -->
     <xsl:if
@@ -389,13 +398,52 @@
         </xsl:choose>
       </w:textAlignment>
     </xsl:if>
+
+    <!-- outline level for numbering -->
+    <xsl:if test="parent::style:style/@style:default-outline-level">
+      <w:outlineLvl w:val="{number(parent::style:style/@style:default-outline-level) - 1}"/>
+    </xsl:if>
+
   </xsl:template>
 
+
+  <!--  Paragraph properties from attributes -->
+  <xsl:template name="InsertOutlineLevel">
+    <xsl:if test="not(style:paragraph-properties) and @style:default-outline-level">
+      <xsl:if test="not(style:text-properties)">
+        <xsl:call-template name="InsertOutlineNumPr"/>
+      </xsl:if>
+      <!-- outline level for numbering -->
+      <w:outlineLvl w:val="{number(@style:default-outline-level) - 1}"/>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertOutlineNumPr">
+    <!-- numbering properties -->
+    <w:numPr>
+      <w:ilvl w:val="{number(@style:default-outline-level) - 1}"/>
+      <xsl:choose>
+        <xsl:when test="@style:list-style-name">
+          <!-- chapter numbering defined -->
+          <w:numId w:val="2"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- default numbering -->
+          <w:numId w:val="1"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </w:numPr>
+  </xsl:template>
 
 
   <!-- Paragraph properties from text-properties -->
   <xsl:template match="style:text-properties" mode="pPr">
     <xsl:if test="not(parent::node()/style:paragraph-properties)">
+      <xsl:if test="parent::node()/@style:default-outline-level">
+        <xsl:for-each select="parent::node()">
+          <xsl:call-template name="InsertOutlineNumPr"/>
+        </xsl:for-each>
+      </xsl:if>
       <xsl:choose>
         <xsl:when test="@fo:hyphenate='true'">
           <w:suppressAutoHyphens w:val="false"/>

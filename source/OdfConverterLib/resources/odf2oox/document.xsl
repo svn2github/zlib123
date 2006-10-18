@@ -64,7 +64,7 @@
   <!-- key to find mailto hyperlinks. -->
   <xsl:key name="mailto-hyperlinks" match="text:a[contains(@xlink:href,'mailto')]"
     use="text:span/@text:style-name"/>
-<!-- key to find bookmarkt or reference-mark -->
+  <!-- key to find bookmarkt or reference-mark -->
   <xsl:key name="bookmark-reference-start"
     match="text:bookmark-start|text:reference-mark-start|text:sequence"
     use="@text:name|@text:ref-name"/>
@@ -239,7 +239,7 @@
     </w:bookmarkEnd>
   </xsl:template>
 
- <!-- Insert Cross References (Bookmark) -->
+  <!-- Insert Cross References (Bookmark) -->
   <xsl:template match="text:bookmark-ref|text:reference-ref|text:sequence-ref" mode="paragraph">
     <xsl:variable name="TextName">
       <xsl:value-of select="@text:ref-name"/>
@@ -320,12 +320,13 @@
       </xsl:when>
 
       <!-- drawing shapes -->
-      <xsl:when test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape|child::draw:frame">
+      <xsl:when
+        test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape|child::draw:frame">
         <xsl:if test="child::draw:frame">
-          <xsl:apply-templates select="draw:frame" mode="paragraph"></xsl:apply-templates>
+          <xsl:apply-templates select="draw:frame" mode="paragraph"/>
         </xsl:if>
-      <xsl:if test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape">
-        <xsl:apply-templates mode="shapes"/>
+        <xsl:if test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape">
+          <xsl:apply-templates mode="shapes"/>
         </xsl:if>
       </xsl:when>
 
@@ -1952,7 +1953,7 @@
   </xsl:template>
 
   <xsl:template match="draw:frame" mode="paragraph">
- 	<xsl:call-template name="InsertEmbeddedTextboxes"/>
+    <xsl:call-template name="InsertEmbeddedTextboxes"/>
   </xsl:template>
 
   <xsl:template match="draw:frame">
@@ -2079,7 +2080,9 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="self::text:list-item or self::text:list-header or $listStyleName != '' ">
+      <!-- list element -->
+      <xsl:when
+        test="(self::text:list-item and not(child::node()[1][self::text:h])) or self::text:list-header or $listStyleName != '' ">
         <!-- test : do not number list-headers, and do not number paragraph in the middle of a list-item or list-header -->
         <xsl:if
           test="not(self::text:list-header) and not(parent::text:list-header) and not(preceding-sibling::node()[name() != 'text:list-item' and name() != 'text:list-header'])">
@@ -2115,13 +2118,96 @@
         </xsl:if>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if
-          test="self::text:h and @text:outline-level &lt;= 9 and document('styles.xml')/office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !='' ">
-          <w:numPr>
-            <w:ilvl w:val="{@text:outline-level - 1}"/>
-            <w:numId w:val="1"/>
-          </w:numPr>
+        <!-- if element is a header, or list element with header properties (outline) -->
+        <xsl:if test="self::text:h or (self::text:list-item and child::node()[1][self::text:h])">
+          <xsl:call-template name="InsertHeaderNumbering">
+            <xsl:with-param name="style-name" select="@text:style-name"/>
+            <xsl:with-param name="list-style-name" select="$listStyleName"/>
+          </xsl:call-template>
         </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- insert numbering properties of header element -->
+  <xsl:template name="InsertHeaderNumbering">
+    <xsl:param name="style-name"/>
+    <xsl:param name="list-style-name"/>
+    <xsl:variable name="styleName">
+      <xsl:choose>
+        <xsl:when test="$style-name">
+          <xsl:value-of select="$style-name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="text:h[1]/@text:style-name">
+            <xsl:value-of select="text:h[1]/@text:style-name"/>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="listStyleName">
+      <xsl:choose>
+        <xsl:when test="not($list-style-name = '' or count($list-style-name) = 0)">
+          <xsl:value-of select="$list-style-name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="key('automatic-styles', $styleName)/@style:list-style-name">
+              <xsl:value-of select="key('automatic-styles', $styleName)/@style:list-style-name"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:for-each select="document('styles.xml')">
+                <xsl:if test="key('styles', $styleName)/@style:list-style-name">
+                  <xsl:value-of select="key('styles', $styleName)/@style:list-style-name"/>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="key('automatic-styles', $styleName)/@style:default-outline-level">
+        <w:numPr>
+          <w:ilvl w:val="{key('automatic-styles', $styleName)/@style:default-outline-level - 1}"/>
+          <xsl:choose>
+            <xsl:when test="$listStyleName != '' ">
+              <w:numId w:val="2"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <w:numId w:val="1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </w:numPr>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each select="document('styles.xml')">
+          <xsl:choose>
+            <xsl:when test="key('styles', $styleName)/@style:default-outline-level">
+              <w:numPr>
+                <w:ilvl w:val="{key('styles', $styleName)/@style:default-outline-level - 1}"/>
+                <xsl:choose>
+                  <xsl:when test="$listStyleName != '' ">
+                    <w:numId w:val="2"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <w:numId w:val="1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </w:numPr>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if
+                test="@text:outline-level &lt;= 9 and office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !='' ">
+                <w:numPr>
+                  <w:ilvl w:val="{@text:outline-level - 1}"/>
+                  <w:numId w:val="1"/>
+                </w:numPr>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -2238,8 +2324,8 @@
 
   <xsl:template match="text()|text:s" mode="shapes">
     <xsl:if test="not(ancestor::draw:frame)">
-    <xsl:apply-templates select="." mode="paragraph"/>
-    </xsl:if>    
+      <xsl:apply-templates select="." mode="paragraph"/>
+    </xsl:if>
   </xsl:template>
 
   <!-- text and spaces -->
