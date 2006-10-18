@@ -2602,13 +2602,7 @@
   <!--numbering type for sequence-->
   <xsl:template name="InsertSequenceFieldNumType">
     <xsl:variable name="numType">
-      <xsl:choose>
-        <xsl:when test="@style:num-format = 'i'">\* roman</xsl:when>
-        <xsl:when test="@style:num-format = 'I'">\* Roman</xsl:when>
-        <xsl:when test="@style:num-format = 'a'">\* alphabetic</xsl:when>
-        <xsl:when test="@style:num-format = 'A'">\* ALPHABETIC</xsl:when>
-        <xsl:otherwise>\* arabic</xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="GetNumberFormattingSwitch"/>
     </xsl:variable>
     <xsl:attribute name="w:instr">
       <xsl:value-of select="concat('SEQ ', @text:name,' ', $numType)"/>
