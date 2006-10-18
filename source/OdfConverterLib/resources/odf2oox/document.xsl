@@ -1250,20 +1250,24 @@
     <xsl:variable name="frameW">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length"
-          select="parent::draw:frame/@svg:width|parent::draw:frame/@fo:min-width"/>
+          select="parent::draw:frame/@svg:width"/>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="frameH">
       <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="@fo:min-height|parent::draw:frame/@svg:height"/>
+        <xsl:with-param name="length" select="parent::draw:frame/@svg:height"/>
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="relWidth" select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
     <xsl:variable name="relHeight"
       select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
 
-    <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
-    <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
+    <xsl:if test="not(parent::draw:frame/@fo:min-width)">
+      <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
+    </xsl:if>
+    <xsl:if test="not(@fo:min-height)">
+      <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
+    </xsl:if>
 
     <!--relative width and hight-->
     <xsl:if test="$relWidth">
@@ -1451,11 +1455,11 @@
           <xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/>
         </xsl:when>
         <xsl:when
-          test="($horizontalPos='left' and not($graphicProps/@style:horizontal-pos='left' and not($fo_margin_left=0))) or ($graphicProps/@style:horizontal-pos='right' and $graphicProps/@style:horizontal-rel='page-start-margin')">
+          test="($horizontalPos='left' and ($fo_margin_left='' or not($fo_margin_left != 0))) or ($graphicProps/@style:horizontal-pos='right' and $graphicProps/@style:horizontal-rel='page-start-margin')">
           <xsl:value-of select="concat('mso-position-horizontal:', 'left',';')"/>
         </xsl:when>
         <xsl:when
-          test="($horizontalPos='right' and not($graphicProps/@style:horizontal-pos='right' and not($fo_margin_right=0) and not($graphicProps/@style:horizontal-rel='page-start-margin'))) or ($graphicProps/@style:horizontal-pos='left' and ($graphicProps/@style:horizontal-rel='page-end-margin'))">
+          test="($horizontalPos='right' and ($fo_margin_right='' or not($fo_margin_right != 0)) and not($graphicProps/@style:horizontal-rel='page-start-margin')) or ($graphicProps/@style:horizontal-pos='left' and ($graphicProps/@style:horizontal-rel='page-end-margin'))">
           <xsl:value-of select="concat('mso-position-horizontal:', 'right',';')"/>
         </xsl:when>
         <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
