@@ -96,9 +96,6 @@
     </w:body>
   </xsl:template>
 
-
-
-
   <!--checks if element has style used to generate table of contents in document  -->
   <xsl:template name="IsTOCBookmark">
     <xsl:param name="styleName"/>
@@ -320,10 +317,10 @@
       </xsl:when>
 
       <!-- drawing shapes -->
-      <xsl:when
+     <xsl:when
         test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape|child::draw:frame">
         <xsl:if test="child::draw:frame">
-          <xsl:apply-templates select="draw:frame" mode="paragraph"/>
+          <xsl:apply-templates mode="paragraph"/>
         </xsl:if>
         <xsl:if test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape">
           <xsl:apply-templates mode="shapes"/>
@@ -2349,9 +2346,9 @@
   <!-- dealing with text next to shapes -->
 
   <xsl:template match="text()|text:s" mode="shapes">
-    <xsl:if test="not(ancestor::draw:frame)">
+  <xsl:if test="not(ancestor::draw:frame)">
       <xsl:apply-templates select="." mode="paragraph"/>
-    </xsl:if>
+  </xsl:if>
   </xsl:template>
 
   <!-- text and spaces -->
