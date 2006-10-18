@@ -921,6 +921,12 @@
 
   <xsl:template name="InsertShapes">
     <xsl:param name="shapeType"/>
+    <xsl:variable name="styleName" select=" @draw:style-name"/>
+    <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
+    <xsl:variable name="officeStyle"
+      select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+    <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+    
     <w:r>
       <w:pict>
         <xsl:choose>
@@ -929,6 +935,10 @@
           <xsl:when test="$shapeType = 'draw:rect' or $shapeType = 'rectangle' ">
             <v:rect>
               <xsl:call-template name="SimpleShape"/>
+              <!--insert text-box-->
+              <xsl:call-template name="InsertTextBox">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+              </xsl:call-template>
             </v:rect>
           </xsl:when>
 
@@ -1049,19 +1059,16 @@
   </xsl:template>
 
   <!-- shape position -->
-
   <xsl:template name="InsertPosition">
-    <xsl:variable name="x">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="@svg:x"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="y">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length" select="@svg:y"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:value-of select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;')"/>
+    <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name"/>
+    <xsl:variable name="automaticStyle"
+      select="key('automatic-styles', parent::draw:frame/@draw:style-name)"/>
+    <xsl:variable name="officeStyle"
+      select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>    
+    <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+    <xsl:call-template name="InsertShapePosition">
+      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+    </xsl:call-template>
   </xsl:template>
   <xsl:template name="InsertDrawnShapeZindex">
     <xsl:value-of select="concat('z-index:',@draw:z-index)"/>
