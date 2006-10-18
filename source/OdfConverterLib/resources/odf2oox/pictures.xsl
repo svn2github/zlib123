@@ -964,9 +964,9 @@
   <xsl:template name="SimpleShape">
     <xsl:variable name="styleName" select="@draw:style-name"/>
     <xsl:variable name="automaticStyle"
-      select="document('content.xml')//office:document-content/office:automatic-styles/style:style[@style:name = $styleName]"/>
+      select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name = $styleName]"/>
     <xsl:variable name="officeStyle"
-      select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+      select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
     <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
 
     <!-- shape properties: size, z-index, color, position, stroke, etc -->

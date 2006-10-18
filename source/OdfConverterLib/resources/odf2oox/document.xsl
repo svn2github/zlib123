@@ -1047,24 +1047,47 @@
           />
         </xsl:variable>
         <xsl:variable name="fo_page_width">
-          <xsl:value-of
-            select="document('styles.xml')//office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:page-width"
-          />
+          <xsl:call-template name="GetValue">
+            <xsl:with-param name="length">
+              <xsl:value-of
+                select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:page-width"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="fo_margin_left">
-          <xsl:value-of
-            select="document('styles.xml')//office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-left"
-          />
+          <xsl:call-template name="GetValue">
+            <xsl:with-param name="length">
+              <xsl:value-of
+                select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-left"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="fo_margin_right">
-          <xsl:value-of
-            select="document('styles.xml')//office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-right"
-          />
+          <xsl:call-template name="GetValue">
+            <xsl:with-param name="length">
+              <xsl:value-of
+                select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/@fo:margin-right"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="fo_margin_right_frame">
-          <xsl:value-of
-            select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-right"
-          />
+          <xsl:call-template name="GetValue">
+            <xsl:with-param name="length">
+              <xsl:value-of
+                select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-right"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="svg_width">
+          <xsl:call-template name="GetValue">
+            <xsl:with-param name="length">
+              <xsl:value-of select="parent::draw:frame/@svg:width"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="style_horizontal_pos">
           <xsl:value-of
@@ -1089,18 +1112,18 @@
                     <xsl:when
                       test="($style_horizontal_pos='right' ) and ($style_horizontal_rel='page') and not($style_horizontal_rel='page-start-margin') ">
                       <xsl:value-of
-                        select="concat(substring-before($fo_page_width, 'cm')-substring-before($fo_margin_left, 'cm')+substring-before($fo_margin_right, 'cm')-substring-before(parent::draw:frame/@svg:width, 'cm')-substring-before($fo_margin_right_frame, 'cm'), 'cm')"
+                        select="concat($fo_page_width - $fo_margin_left + $fo_margin_right - $svg_width - $fo_margin_right_frame, 'cm')"
                       />
                     </xsl:when>
                     <xsl:when
                       test="($style_horizontal_pos='right' ) and ($style_horizontal_rel='page-end-margin' )  and not($style_horizontal_rel='page-start-margin') ">
                       <xsl:value-of
-                        select="concat(-substring-before($fo_margin_right_frame, 'cm')+substring-before($fo_margin_right, 'cm')-substring-before(parent::draw:frame/@svg:width, 'cm'), 'cm')"
+                        select="concat( - $fo_margin_right_frame + $fo_margin_right - $svg_width, 'cm')"
                       />
                     </xsl:when>
                     <xsl:when test="$style_horizontal_pos='right' ">
                       <xsl:value-of
-                        select="concat(substring-before($fo_page_width, 'cm')-substring-before($fo_margin_left, 'cm')-substring-before($fo_margin_right, 'cm')-substring-before(parent::draw:frame/@svg:width, 'cm')-substring-before($fo_margin_right_frame, 'cm'), 'cm')"
+                        select="concat($fo_page_width - $fo_margin_left - $fo_margin_right - $svg_width - $fo_margin_right_frame, 'cm')"
                       />
                     </xsl:when>
                     <xsl:otherwise>
@@ -1115,9 +1138,7 @@
         </xsl:variable>
         <xsl:value-of select="$svgx+$recursive_result"/>
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="0"/>
-      </xsl:otherwise>
+      <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -1189,7 +1210,7 @@
           <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name"/>
           <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
           <xsl:variable name="officeStyle"
-            select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
+            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
 
           <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
 
@@ -1312,11 +1333,12 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeCoordinates">
+    <xsl:param name="graphicProps"/>
 
     <!-- text-box coordinates -->
     <xsl:variable name="posL">
       <xsl:if
-        test="parent::draw:frame/@svg:x or ((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left') or ((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right')  and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-start-margin')) and (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-left or @fo:margin-right))">
+        test="parent::draw:frame/@svg:x or (($graphicProps/@style:horizontal-pos='left' or ($graphicProps/@style:horizontal-pos='right'  and not($graphicProps/@style:horizontal-rel='page-start-margin'))) and ($graphicProps/@fo:margin-left or $graphicProps/@fo:margin-right))">
         <xsl:variable name="leftM">
           <xsl:call-template name="ComputeMarginX">
             <xsl:with-param name="parent" select="ancestor::draw:frame"/>
@@ -1337,7 +1359,7 @@
     </xsl:variable>
 
     <xsl:if
-      test="parent::draw:frame/@svg:x or ((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left') or ((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right')  and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-start-margin'))) ">
+      test="parent::draw:frame/@svg:x or (($graphicProps/@style:horizontal-pos='left' or ($graphicProps/@style:horizontal-pos='right'  and not($graphicProps/@style:horizontal-rel='page-start-margin'))) and ($graphicProps/@fo:margin-left or $graphicProps/@fo:margin-right)) ">
       <xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
     </xsl:if>
     <xsl:if test="parent::draw:frame/@svg:y">
@@ -1390,6 +1412,7 @@
 
   <xsl:template name="InsertShapePosition">
     <xsl:param name="shapeStyle"/>
+    <xsl:variable name="graphicProps" select="$shapeStyle/style:graphic-properties"/>
 
     <xsl:variable name="horizontalPos">
       <xsl:call-template name="GetGraphicProperties">
@@ -1405,6 +1428,21 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <xsl:variable name="fo_margin_left">
+      <xsl:call-template name="GetValue">
+        <xsl:with-param name="length">
+          <xsl:value-of select="$graphicProps/@fo:margin-left"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="fo_margin_right">
+      <xsl:call-template name="GetValue">
+        <xsl:with-param name="length">
+          <xsl:value-of select="$graphicProps/@fo:margin-right"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
     <!--horizontal position-->
     <!-- The same style defined in styles.xsl  TODO manage horizontal-rel-->
     <xsl:if test="$horizontalPos">
@@ -1413,11 +1451,11 @@
           <xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/>
         </xsl:when>
         <xsl:when
-          test="$horizontalPos='left' and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left' and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-left='0cm')) or (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right' and (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-start-margin'))">
+          test="($horizontalPos='left' and not($graphicProps/@style:horizontal-pos='left' and not($fo_margin_left=0))) or ($graphicProps/@style:horizontal-pos='right' and $graphicProps/@style:horizontal-rel='page-start-margin')">
           <xsl:value-of select="concat('mso-position-horizontal:', 'left',';')"/>
         </xsl:when>
         <xsl:when
-          test="$horizontalPos='right' and not((key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right' and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-right='0cm') and not(key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-start-margin')) ) or (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='left' and (key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-rel='page-end-margin'))">
+          test="($horizontalPos='right' and not($graphicProps/@style:horizontal-pos='right' and not($fo_margin_right=0) and not($graphicProps/@style:horizontal-rel='page-start-margin'))) or ($graphicProps/@style:horizontal-pos='left' and ($graphicProps/@style:horizontal-rel='page-end-margin'))">
           <xsl:value-of select="concat('mso-position-horizontal:', 'right',';')"/>
         </xsl:when>
         <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
@@ -1445,74 +1483,65 @@
 
     <!--text-box spacing/margins -->
     <xsl:variable name="marginL">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="GetGraphicProperties">
-            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-            <xsl:with-param name="attribName">fo:margin-left</xsl:with-param>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="round">
-          <xsl:text>false</xsl:text>
-        </xsl:with-param>
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">fo:margin-left</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="marginT">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="GetGraphicProperties">
-            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-            <xsl:with-param name="attribName">fo:margin-top</xsl:with-param>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="round">
-          <xsl:text>false</xsl:text>
-        </xsl:with-param>
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">fo:margin-top</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="marginR">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="GetGraphicProperties">
-            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-            <xsl:with-param name="attribName">fo:margin-right</xsl:with-param>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="round">
-          <xsl:text>false</xsl:text>
-        </xsl:with-param>
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">fo:margin-right</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:variable name="marginB">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="GetGraphicProperties">
-            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-            <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="round">
-          <xsl:text>false</xsl:text>
-        </xsl:with-param>
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">fo:margin-bottom</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:if test="$marginL">
-      <xsl:value-of select="concat('mso-wrap-distance-left:', $marginL,'pt;')"/>
+    <xsl:if test="$marginL != '' ">
+      <xsl:text>mso-wrap-distance-left:</xsl:text>
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="$marginL"/>
+        <xsl:with-param name="round" select="'false'"/>
+      </xsl:call-template>
+      <xsl:text>pt;</xsl:text>
     </xsl:if>
-    <xsl:if test="$marginT">
-      <xsl:value-of select="concat('mso-wrap-distance-top:', $marginT,'pt;')"/>
+    <xsl:if test="$marginT != '' ">
+      <xsl:text>mso-wrap-distance-top:</xsl:text>
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="$marginT"/>
+        <xsl:with-param name="round" select="'false'"/>
+      </xsl:call-template>
+      <xsl:text>pt;</xsl:text>
     </xsl:if>
-    <xsl:if test="$marginR">
-      <xsl:value-of select="concat('mso-wrap-distance-right:', $marginR,'pt;')"/>
+    <xsl:if test="$marginR != '' ">
+      <xsl:text>mso-wrap-distance-right:</xsl:text>
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="$marginR"/>
+        <xsl:with-param name="round" select="'false'"/>
+      </xsl:call-template>
+      <xsl:text>pt;</xsl:text>
     </xsl:if>
-    <xsl:if test="$marginB">
-      <xsl:value-of select="concat('mso-wrap-distance-bottom:', $marginB,'pt;')"/>
+    <xsl:if test="$marginB != '' ">
+      <xsl:text>mso-wrap-distance-bottom:</xsl:text>
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="$marginB"/>
+        <xsl:with-param name="round" select="'false'"/>
+      </xsl:call-template>
+      <xsl:text>pt;</xsl:text>
     </xsl:if>
-
 
   </xsl:template>
 
@@ -1682,7 +1711,9 @@
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
       </xsl:call-template>
 
-      <xsl:call-template name="InsertShapeCoordinates"/>
+      <xsl:call-template name="InsertShapeCoordinates">
+        <xsl:with-param name="graphicProps" select="$shapeStyle/style:graphic-properties"/>
+      </xsl:call-template>
 
       <xsl:call-template name="InsertShapePositionRelative">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
@@ -1856,16 +1887,7 @@
 
     <xsl:attribute name="inset">
       <xsl:choose>
-        <xsl:when test="$padding or $paddingTop">
-          <xsl:call-template name="CalculateTextBoxPadding">
-            <xsl:with-param name="padding" select="$padding"/>
-            <xsl:with-param name="paddingTop" select="$paddingTop"/>
-            <xsl:with-param name="paddingLeft" select="$paddingLeft"/>
-            <xsl:with-param name="paddingRight" select="$paddingRight"/>
-            <xsl:with-param name="paddingBottom" select="$paddingBottom"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:when test="$padding or $paddingTop">
+        <xsl:when test="$padding != '' or $paddingTop != '' ">
           <xsl:call-template name="CalculateTextBoxPadding">
             <xsl:with-param name="padding" select="$padding"/>
             <xsl:with-param name="paddingTop" select="$paddingTop"/>
