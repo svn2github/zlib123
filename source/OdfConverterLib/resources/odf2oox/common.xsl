@@ -478,6 +478,17 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Get the number formatting switch -->
+  <xsl:template name="GetNumberFormattingSwitch">
+    <xsl:choose>
+      <xsl:when test="@style:num-format = 'i' ">\* roman</xsl:when>
+      <xsl:when test="@style:num-format = 'I' ">\* Roman</xsl:when>
+      <xsl:when test="@style:num-format = 'a' ">\* alphabetic</xsl:when>
+      <xsl:when test="@style:num-format = 'A' ">\* ALPHABETIC</xsl:when>
+      <xsl:otherwise>\* arabic</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <!-- 
 		Generate a decimal identifier based on the position of the current 
 		footenote/endnote among all the indexed footnotes/endnotes.
