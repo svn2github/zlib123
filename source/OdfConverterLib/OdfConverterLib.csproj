@@ -57,7 +57,7 @@
     <EmbeddedResource Include="resources\odf2oox\odf2oox.xsl" />
     <EmbeddedResource Include="resources\odf2oox\package_relationships.xsl" />
     <EmbeddedResource Include="resources\odf2oox\part_relationships.xsl" />
-    <EmbeddedResource Include="resources\odf2oox\pictures.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\frames.xsl" />
     <EmbeddedResource Include="resources\odf2oox\settings.xsl" />
     <EmbeddedResource Include="resources\odf2oox\source.xml" />
     <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
@@ -75,19 +75,17 @@
     <EmbeddedResource Include="resources\oox2odf\meta.xsl" />
     <Compile Include="OoxSectionsPostProcessor.cs" />
     <EmbeddedResource Include="resources\odf2oox\sections.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\change-tracking.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\fonts.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\indexes.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\bookmarks.xsl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
       <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
       <Name>OdfZipUtils</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\odf2oox\change-tracking.xsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\oox2odf\fonts.xsl" />
-    <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>
