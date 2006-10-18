@@ -684,10 +684,14 @@
     <xsl:if test="@fo:font-weight">
       <xsl:choose>
         <xsl:when test="@fo:font-weight != 'normal'">
-          <xsl:if test="@fo:font-weight != 'bold'">
-            <xsl:message terminate="no">feedback:Font weight</xsl:message>
-          </xsl:if>
-          <w:b w:val="on"/>
+          <xsl:choose>
+            <xsl:when test="@fo:font-weight != 'bold' and number(@fo:font-weight)">
+              <xsl:message terminate="no">feedback:Font weight</xsl:message>
+            </xsl:when>
+            <xsl:otherwise>
+              <w:b w:val="on"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
           <w:b w:val="off"/>
