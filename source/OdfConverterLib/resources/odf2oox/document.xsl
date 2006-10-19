@@ -406,6 +406,11 @@
       <!--text body link-->
       <xsl:otherwise>
         <w:hyperlink r:id="{generate-id()}">
+          <xsl:if test="@office:target-frame-name">
+            <xsl:attribute name="w:tgtFrame">
+              <xsl:value-of select="@office:target-frame-name"/>
+            </xsl:attribute>
+          </xsl:if>
           <xsl:apply-templates mode="paragraph"/>
         </w:hyperlink>
       </xsl:otherwise>
@@ -548,7 +553,14 @@
         <w:rStyle w:val="{$prefixedStyleName}"/>
       </xsl:when>
       <xsl:when test="ancestor::text:a">
-        <w:rStyle w:val="Hyperlink"/>
+        <xsl:choose>
+          <xsl:when test="ancestor::text:a[1][@text:style-name]">
+            <w:rStyle w:val="{ancestor::text:a[1][@text:style-name]}"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:rStyle w:val="Hyperlink"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
