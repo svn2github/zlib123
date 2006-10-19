@@ -37,16 +37,16 @@
   <xsl:preserve-space elements="number:text"/>
 
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
-  
+
   <xsl:template match="text:page-number" mode="paragraph">
     <xsl:if test="@text:page-adjust">
       <xsl:message terminate="no">feedback:Page number offset</xsl:message>
     </xsl:if>
     <w:fldSimple w:instr=" PAGE ">
       <xsl:attribute name="w:instr">PAGE 
-        <xsl:choose>
+		<xsl:choose>
           <xsl:when test="not(@style:num-format)"> \* Roman</xsl:when>
-          <xsl:otherwise> <xsl:call-template name="GetNumberFormattingSwitch"/></xsl:otherwise>
+          <xsl:otherwise><xsl:call-template name="GetNumberFormattingSwitch"/></xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
       <xsl:apply-templates mode="paragraph"/>
@@ -251,7 +251,21 @@
       </w:fldSimple>
     </xsl:if>
   </xsl:template>
-  
+
+  <xsl:template match="text:file-name" mode="paragraph">
+    <w:fldSimple>
+      <xsl:attribute name="w:instr">
+        <xsl:text>FILENAME   \* MERGEFORMAT</xsl:text>
+      </xsl:attribute>
+      <w:r>
+        <w:rPr>
+          <w:noProof/>
+        </w:rPr>
+        <xsl:apply-templates mode="text"/>
+      </w:r>
+    </w:fldSimple>
+  </xsl:template>
+
   <!--numbering type for sequence-->
   <xsl:template name="InsertSequenceFieldNumType">
     <xsl:variable name="numType">
