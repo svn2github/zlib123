@@ -89,6 +89,11 @@
   <xsl:template match="w:rPr[parent::w:r]" mode="automaticstyles">
     <xsl:message terminate="no">progress:w:rPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
+      <xsl:if test="w:rStyle">
+        <xsl:attribute name="style:parent-style-name">
+          <xsl:value-of select="w:rStyle/@w:val"/>
+        </xsl:attribute>
+      </xsl:if>
       <style:text-properties>
         <xsl:call-template name="InsertTextProperties"/>
       </style:text-properties>

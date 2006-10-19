@@ -438,7 +438,7 @@
       </style:paragraph-properties>
     </xsl:if>
 
-    <xsl:if test="self::node()/@w:type = 'paragraph' or self::node()/@w:type = 'text'">
+    <xsl:if test="self::node()/@w:type = 'paragraph' or self::node()/@w:type = 'character'">
       <style:text-properties>
         <xsl:if test="w:rPr">
           <xsl:for-each select="w:rPr">
