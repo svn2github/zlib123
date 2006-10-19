@@ -938,7 +938,9 @@
           <!-- rectangle -->
           <xsl:when test="$shapeType = 'draw:rect' or $shapeType = 'rectangle' ">
             <v:rect>
-              <xsl:call-template name="SimpleShape"/>
+              <xsl:call-template name="SimpleShape">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+              </xsl:call-template>
               <!--insert text-box-->
               <xsl:call-template name="InsertTextBox">
                 <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
@@ -949,7 +951,9 @@
           <!-- ellipse -->
           <xsl:when test="$shapeType = 'draw:ellipse' or $shapeType = 'ellipse' ">
             <v:oval>
-              <xsl:call-template name="SimpleShape"/>
+              <xsl:call-template name="SimpleShape">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+              </xsl:call-template>
             </v:oval>
           </xsl:when>
 
@@ -957,7 +961,9 @@
 
           <xsl:when test="$shapeType = 'round-rectangle' ">
             <v:roundrect>
-              <xsl:call-template name="SimpleShape"/>
+              <xsl:call-template name="SimpleShape">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+              </xsl:call-template>
             </v:roundrect>
           </xsl:when>
 
@@ -974,62 +980,70 @@
     </xsl:template> -->
 
   <!-- simple shape properties -->
-
   <xsl:template name="SimpleShape">
-    <xsl:variable name="styleName" select="@draw:style-name"/>
-    <xsl:variable name="automaticStyle"
-      select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name = $styleName]"/>
-    <xsl:variable name="officeStyle"
-      select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
-    <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
+    <xsl:param name="shapeStyle"/>
 
-    <!-- shape properties: size, z-index, color, position, stroke, etc -->
-    <xsl:call-template name="InsertDrawnShapeProperties">
-      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-    </xsl:call-template>
-    <xsl:attribute name="fillcolor">
+    <xsl:if test="$shapeStyle != 0 or count($shapeStyle) &gt; 1">
+      <!-- shape properties: size, z-index, color, position, stroke, etc -->
+      <xsl:call-template name="InsertDrawnShapeProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
+
       <xsl:call-template name="FillColor">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
       </xsl:call-template>
-    </xsl:attribute>
-    <xsl:call-template name="Stroke">
-      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-    </xsl:call-template>
+
+      <xsl:call-template name="Stroke">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
 
   <!-- shape fill color -->
-
   <xsl:template name="FillColor">
     <xsl:param name="shapeStyle"/>
-    <xsl:call-template name="GetDrawnGraphicProperties">
-      <xsl:with-param name="attrib">draw:fill-color</xsl:with-param>
-      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-    </xsl:call-template>
+    <xsl:variable name="fillColor">
+      <xsl:call-template name="GetDrawnGraphicProperties">
+        <xsl:with-param name="attrib">draw:fill-color</xsl:with-param>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:if test="$fillColor != '' ">
+      <xsl:attribute name="fillcolor">
+        <xsl:value-of select="$fillColor"/>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <!-- shape stroke color and stroke width -->
-
   <xsl:template name="Stroke">
     <xsl:param name="shapeStyle"/>
-    <xsl:attribute name="strokecolor">
+    <xsl:variable name="strokeColor">
       <xsl:call-template name="GetDrawnGraphicProperties">
         <xsl:with-param name="attrib">svg:stroke-color</xsl:with-param>
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
       </xsl:call-template>
-    </xsl:attribute>
-    <xsl:attribute name="strokeweight">
-      <xsl:variable name="strokeWeight">
+    </xsl:variable>
+    <xsl:variable name="strokeWeight">
+      <xsl:call-template name="GetDrawnGraphicProperties">
+        <xsl:with-param name="attrib">svg:stroke-width</xsl:with-param>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- insert attributes -->
+    <xsl:if test="$strokeColor != '' ">
+      <xsl:attribute name="strokecolor">
+        <xsl:value-of select="$strokeColor"/>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="$strokeWeight != '' ">
+      <xsl:attribute name="strokeweight">
         <xsl:call-template name="point-measure">
-          <xsl:with-param name="length">
-            <xsl:call-template name="GetDrawnGraphicProperties">
-              <xsl:with-param name="attrib">svg:stroke-width</xsl:with-param>
-              <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-            </xsl:call-template>
-          </xsl:with-param>
+          <xsl:with-param name="length" select="$strokeWeight"/>
         </xsl:call-template>
-      </xsl:variable>
-      <xsl:value-of select="concat($strokeWeight,'pt')"/>
-    </xsl:attribute>
+        <xsl:text>pt</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <!-- get graphic properties for shapes -->
@@ -1051,29 +1065,24 @@
   </xsl:template>
 
   <!-- shape properties -->
-
   <xsl:template name="InsertDrawnShapeProperties">
     <xsl:param name="shapeStyle"/>
     <xsl:attribute name="style">
-      <xsl:call-template name="InsertPosition"/>
+      <xsl:call-template name="InsertShapePosition">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
+
       <xsl:call-template name="InsertDrawnShapeSize"/>
+
       <xsl:call-template name="InsertDrawnShapeZindex"/>
-      <xsl:call-template name="InsertShapeCoordinates"/>
+
+      <xsl:call-template name="InsertShapeCoordinates">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
     </xsl:attribute>
   </xsl:template>
 
-  <!-- shape position -->
-  <xsl:template name="InsertPosition">
-    <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name"/>
-    <xsl:variable name="automaticStyle"
-      select="key('automatic-styles', parent::draw:frame/@draw:style-name)"/>
-    <xsl:variable name="officeStyle"
-      select="document('styles.xml')//office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
-    <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
-    <xsl:call-template name="InsertShapePosition">
-      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-    </xsl:call-template>
-  </xsl:template>
+  <!-- z-index -->
   <xsl:template name="InsertDrawnShapeZindex">
     <xsl:value-of select="concat('z-index:',@draw:z-index)"/>
   </xsl:template>
@@ -1407,39 +1416,38 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeCoordinates">
-    <xsl:param name="graphicProps"/>
+    <xsl:param name="shapeStyle"/>
+    <xsl:variable name="graphicProps" select="$shapeStyle/style:graphic-properties"/>
 
-    <xsl:if test="$graphicProps">
-      <!-- text-box coordinates -->
-      <xsl:variable name="posL">
-        <xsl:if
-          test="parent::draw:frame/@svg:x or (($graphicProps/@style:horizontal-pos='left' or ($graphicProps/@style:horizontal-pos='right'  and not($graphicProps/@style:horizontal-rel='page-start-margin'))) and ($graphicProps/@fo:margin-left or $graphicProps/@fo:margin-right))">
-          <xsl:variable name="leftM">
-            <xsl:call-template name="ComputeMarginX">
-              <xsl:with-param name="parent" select="ancestor::draw:frame"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="$leftM"/>
-        </xsl:if>
-      </xsl:variable>
-      <xsl:variable name="posT">
-        <xsl:if test="parent::draw:frame/@svg:y">
-          <xsl:variable name="topM">
-            <xsl:call-template name="ComputeMarginY">
-              <xsl:with-param name="parent" select="ancestor::draw:frame"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="$topM"/>
-        </xsl:if>
-      </xsl:variable>
-
+    <!-- text-box coordinates -->
+    <xsl:variable name="posL">
       <xsl:if
-        test="parent::draw:frame/@svg:x or (($graphicProps/@style:horizontal-pos='left' or ($graphicProps/@style:horizontal-pos='right'  and not($graphicProps/@style:horizontal-rel='page-start-margin'))) and ($graphicProps/@fo:margin-left or $graphicProps/@fo:margin-right)) ">
-        <xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
+        test="parent::draw:frame/@svg:x or (($graphicProps/@style:horizontal-pos='left' or ($graphicProps/@style:horizontal-pos='right'  and not($graphicProps/@style:horizontal-rel='page-start-margin'))) and ($graphicProps/@fo:margin-left or $graphicProps/@fo:margin-right))">
+        <xsl:variable name="leftM">
+          <xsl:call-template name="ComputeMarginX">
+            <xsl:with-param name="parent" select="ancestor::draw:frame"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="$leftM"/>
       </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="posT">
       <xsl:if test="parent::draw:frame/@svg:y">
-        <xsl:value-of select="concat('margin-top:',$posT,'pt;')"/>
+        <xsl:variable name="topM">
+          <xsl:call-template name="ComputeMarginY">
+            <xsl:with-param name="parent" select="ancestor::draw:frame"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="$topM"/>
       </xsl:if>
+    </xsl:variable>
+
+    <xsl:if
+      test="parent::draw:frame/@svg:x or (($graphicProps/@style:horizontal-pos='left' or ($graphicProps/@style:horizontal-pos='right'  and not($graphicProps/@style:horizontal-rel='page-start-margin'))) and ($graphicProps/@fo:margin-left or $graphicProps/@fo:margin-right)) ">
+      <xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
+    </xsl:if>
+    <xsl:if test="parent::draw:frame/@svg:y">
+      <xsl:value-of select="concat('margin-top:',$posT,'pt;')"/>
     </xsl:if>
   </xsl:template>
 
@@ -1787,7 +1795,7 @@
       </xsl:call-template>
 
       <xsl:call-template name="InsertShapeCoordinates">
-        <xsl:with-param name="graphicProps" select="$shapeStyle/style:graphic-properties"/>
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
       </xsl:call-template>
 
       <xsl:call-template name="InsertShapePositionRelative">
@@ -1886,11 +1894,11 @@
     <xsl:param name="shapeStyle"/>
 
     <v:textbox>
-      <xsl:attribute name="style">
-        <xsl:if test="@fo:min-height">
+      <xsl:if test="@fo:min-height">
+        <xsl:attribute name="style">
           <xsl:value-of select="'mso-fit-shape-to-text:t'"/>
-        </xsl:if>
-      </xsl:attribute>
+        </xsl:attribute>
+      </xsl:if>
 
       <xsl:call-template name="InsertTextBoxInset">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
