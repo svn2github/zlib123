@@ -172,15 +172,36 @@
         <xsl:with-param name="length">
           <xsl:choose>
             <xsl:when test="w:pgMar/@w:top &lt; 0">
-              <xsl:value-of select="w:pgMar/@w:top"/>
+              <xsl:choose>
+                <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
+                  <xsl:value-of select="w:pgMar/@w:top + w:pgMar/@w:gutter"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="w:pgMar/@w:top"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
                 <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">
-                  <xsl:value-of select="w:pgMar/@w:header"/>
+                  <xsl:choose>
+                    <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
+                      <xsl:value-of select="w:pgMar/@w:header + w:pgMar/@w:gutter"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="w:pgMar/@w:header"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="w:pgMar/@w:top"/>
+                  <xsl:choose>
+                    <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
+                      <xsl:value-of select="w:pgMar/@w:top + w:pgMar/@w:gutter"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="w:pgMar/@w:top"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
@@ -190,7 +211,16 @@
     </xsl:attribute>
     <xsl:attribute name="fo:margin-left">
       <xsl:call-template name="ConvertTwips">
-        <xsl:with-param name="length" select="w:pgMar/@w:left"/>
+        <xsl:with-param name="length">
+          <xsl:choose>
+            <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
+              <xsl:value-of select="w:pgMar/@w:left"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="w:pgMar/@w:left + w:pgMar/@w:gutter"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
