@@ -43,10 +43,13 @@
       <xsl:message terminate="no">feedback:Page number offset</xsl:message>
     </xsl:if>
     <w:fldSimple w:instr=" PAGE ">
-      <xsl:attribute name="w:instr">PAGE 
-		<xsl:choose>
+      <xsl:attribute name="w:instr">
+        <xsl:text>PAGE </xsl:text>
+        <xsl:choose>
           <xsl:when test="not(@style:num-format)"> \* Roman</xsl:when>
-          <xsl:otherwise><xsl:call-template name="GetNumberFormattingSwitch"/></xsl:otherwise>
+          <xsl:otherwise>
+            <xsl:call-template name="GetNumberFormattingSwitch"/>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
       <xsl:apply-templates mode="paragraph"/>
@@ -60,7 +63,8 @@
   </xsl:template>
 
   <!-- Date Fields -->
-  <xsl:template match="text:date" mode="paragraph">
+  <xsl:template match="text:date|text:creation-date|text:print-date|text:modification-date"
+    mode="paragraph">
     <xsl:choose>
       <xsl:when test="@text:fixed='true'">
         <w:r>
@@ -71,14 +75,25 @@
       </xsl:when>
       <xsl:otherwise>
         <w:fldSimple>
+          <xsl:if test="@number:automatic-order='true' ">
+            <xsl:message terminate="no">feedback:Date format</xsl:message>
+          </xsl:if>
           <xsl:variable name="curStyle" select="@style:data-style-name"/>
+          <xsl:variable name="fieldType">
+            <xsl:choose>
+              <xsl:when test="self::text:creation-date">CREATEDATE</xsl:when>
+              <xsl:when test="self::text:print-date">PRINTDATE</xsl:when>
+              <xsl:when test="self::text:modification-date">SAVEDATE</xsl:when>
+              <xsl:otherwise>DATE</xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
           <xsl:variable name="dataStyle">
             <xsl:apply-templates
               select="/*/office:automatic-styles/number:date-style[@style:name=$curStyle]"
               mode="dataStyle"/>
           </xsl:variable>
           <xsl:attribute name="w:instr">
-            <xsl:value-of select="concat('DATE \@ &quot;',$dataStyle,'&quot;')"/>
+            <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
           </xsl:attribute>
           <w:r>
             <w:rPr>
@@ -127,7 +142,9 @@
   </xsl:template>
 
   <!-- Time Fields -->
-  <xsl:template match="text:time" mode="paragraph">
+  <xsl:template
+    match="text:time|text:creation-time|text:editing-duration|text:print-duration|text:modification-time"
+    mode="paragraph">
     <xsl:choose>
       <xsl:when test="@text:fixed='true'">
         <w:r>
@@ -139,13 +156,22 @@
       <xsl:otherwise>
         <w:fldSimple>
           <xsl:variable name="curStyle" select="@style:data-style-name"/>
+          <xsl:variable name="fieldType">
+            <xsl:choose>
+              <xsl:when test="self::text:creation-time">CREATEDATE</xsl:when>
+              <xsl:when test="self::text:editing-duration">EDITTIME</xsl:when>
+              <xsl:when test="self::text:print-time">PRINTDATE</xsl:when>
+              <xsl:when test="self::text:modification-time">SAVEDATE</xsl:when>
+              <xsl:otherwise>TIME</xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
           <xsl:variable name="dataStyle">
             <xsl:apply-templates
               select="/*/office:automatic-styles/number:time-style[@style:name=$curStyle]"
               mode="dataStyle"/>
           </xsl:variable>
           <xsl:attribute name="w:instr">
-            <xsl:value-of select="concat('TIME \@ &quot;',$dataStyle,'&quot;')"/>
+            <xsl:value-of select="concat($fieldType,' \@ &quot;',$dataStyle,'&quot;')"/>
           </xsl:attribute>
           <w:r>
             <w:rPr>
@@ -215,14 +241,32 @@
     </w:fldSimple>
   </xsl:template>
 
+  <xsl:template match="text:creator[not(@text:fixed='true')]" mode="paragraph">
+    <w:fldSimple w:instr=" LASTSAVEDBY ">
+      <xsl:apply-templates mode="paragraph"/>
+    </w:fldSimple>
+  </xsl:template>
+
   <xsl:template match="text:subject[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" SUBJECT ">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
+  <xsl:template match="text:keywords[not(@text:fixed='true')]" mode="paragraph">
+    <w:fldSimple w:instr=" KEYWORDS ">
+      <xsl:apply-templates mode="paragraph"/>
+    </w:fldSimple>
+  </xsl:template>
+
   <xsl:template match="text:title[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" TITLE ">
+      <xsl:apply-templates mode="paragraph"/>
+    </w:fldSimple>
+  </xsl:template>
+
+  <xsl:template match="text:editing-cycles[not(@text:fixed='true')]" mode="paragraph">
+    <w:fldSimple w:instr=" REVNUM ">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
@@ -274,6 +318,15 @@
     <xsl:attribute name="w:instr">
       <xsl:value-of select="concat('SEQ ', @text:name,' ', $numType)"/>
     </xsl:attribute>
+  </xsl:template>
+
+  <!-- report lost fields -->
+  <xsl:template match="text:description" mode="paragraph">
+    <xsl:message terminate="no">feedback:description field</xsl:message>
+  </xsl:template>
+
+  <xsl:template match="text:printed-by" mode="paragraph">
+    <xsl:message terminate="no">feedback:Printed-by field</xsl:message>
   </xsl:template>
 
 </xsl:stylesheet>
