@@ -143,7 +143,7 @@
 
   <!-- Time Fields -->
   <xsl:template
-    match="text:time|text:creation-time|text:editing-duration|text:print-duration|text:modification-time"
+    match="text:time|text:creation-time|text:editing-duration|text:print-time|text:modification-time"
     mode="paragraph">
     <xsl:choose>
       <xsl:when test="@text:fixed='true'">
@@ -227,14 +227,14 @@
     </w:fldSimple>
   </xsl:template>
 
-  <!-- User Fields -->
-  <!-- TODO : comment csv file -->
   <xsl:template match="text:author-initials[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" USERINITIALS \* Upper  \* MERGEFORMAT ">
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
-
+  
+  <!-- User Fields -->
+  <!-- TODO : comment csv file -->
   <xsl:template match="text:initial-creator[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" AUTHOR ">
       <xsl:apply-templates mode="paragraph"/>
@@ -247,6 +247,12 @@
     </w:fldSimple>
   </xsl:template>
 
+  <xsl:template match="text:description[not(@text:fixed='true')]" mode="paragraph">
+    <w:fldSimple w:instr=" COMMENTS ">
+      <xsl:apply-templates mode="paragraph"/>
+    </w:fldSimple>
+  </xsl:template>
+  
   <xsl:template match="text:subject[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" SUBJECT ">
       <xsl:apply-templates mode="paragraph"/>
@@ -328,5 +334,5 @@
   <xsl:template match="text:printed-by" mode="paragraph">
     <xsl:message terminate="no">feedback:Printed-by field</xsl:message>
   </xsl:template>
-
+  
 </xsl:stylesheet>
