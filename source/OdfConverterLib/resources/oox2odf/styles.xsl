@@ -1510,9 +1510,7 @@
     <!-- fonts -->
     <xsl:if test="w:rFonts/@w:ascii">
       <xsl:attribute name="style:font-name">
-        <xsl:call-template name="ComputeFontName">
-          <xsl:with-param name="fontName" select="w:rFonts/@w:ascii"/>
-        </xsl:call-template>
+        <xsl:value-of select="w:rFonts/@w:ascii"/>
       </xsl:attribute>
     </xsl:if>
     <xsl:if test="w:rFonts/@w:asciiTheme">
@@ -1524,16 +1522,12 @@
     </xsl:if>
     <xsl:if test="w:rFonts/@w:cs">
       <xsl:attribute name="style:font-name-complex">
-        <xsl:call-template name="ComputeFontName">
-          <xsl:with-param name="fontName" select="w:rFonts/@w:cs"/>
-        </xsl:call-template>
-      </xsl:attribute>
+        <xsl:value-of select="w:rFonts/@w:cs"/>
+       </xsl:attribute>
     </xsl:if>
     <xsl:if test="w:rFonts/@w:eastAsia">
       <xsl:attribute name="style:font-name-asian">
-        <xsl:call-template name="ComputeFontName">
-          <xsl:with-param name="fontName" select="w:rFonts/@w:eastAsia"/>
-        </xsl:call-template>
+        <xsl:value-of select="w:rFonts/@w:eastAsia"/>
       </xsl:attribute>
     </xsl:if>
 
@@ -1821,17 +1815,6 @@
         </xsl:attribute>
       </xsl:otherwise>
       
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- return the name of the font -->
-  <xsl:template name="ComputeFontName">
-    <xsl:param name="fontName"/>
-    <xsl:choose>
-      <xsl:when test="$fontName = 'Symbol'">StarSymbol</xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$fontName"/>
-      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
