@@ -82,16 +82,12 @@
 
       <xsl:for-each select="document('content.xml')">
         <xsl:for-each select="key('bullets','')">
-          <xsl:call-template name="numPicBullet">
-            <xsl:with-param name="numPicBulletId" select="position()"/>
-          </xsl:call-template>
+          <xsl:call-template name="numPicBullet"/>
         </xsl:for-each>
       </xsl:for-each>
       <xsl:for-each select="document('styles.xml')">
         <xsl:for-each select="key('bullets','')">
-          <xsl:call-template name="numPicBullet">
-            <xsl:with-param name="numPicBulletId" select="position()"/>
-          </xsl:call-template>
+          <xsl:call-template name="numPicBullet"/>
         </xsl:for-each>
       </xsl:for-each>
       <!-- default list for chapters -->
@@ -155,7 +151,7 @@
     <xsl:param name="offset" select="0"/>
     <w:abstractNum w:abstractNumId="{count(preceding-sibling::text:list-style)+2+$offset}">
       <xsl:apply-templates
-        select="text:list-level-style-number|text:list-level-style-bullet|text:list-level-style-image|list-level-style-image"
+        select="text:list-level-style-number|text:list-level-style-bullet|text:list-level-style-image"
         mode="numbering"/>
     </w:abstractNum>
   </xsl:template>
@@ -194,9 +190,7 @@
           <w:lvlText w:val=""/>
           <w:lvlPicBulletId>
             <xsl:attribute name="w:val">
-              <xsl:value-of
-                select="count(parent::node()/text:list-level-style-image)+count(parent::text:list-style/preceding-sibling::node()/text:list-level-style-image)"
-              />
+              <xsl:call-template name="GetBulletId"/>
             </xsl:attribute>
           </w:lvlPicBulletId>
         </xsl:if>
@@ -238,29 +232,31 @@
 
   <!-- Picture numbering symbol -->
   <xsl:template name="numPicBullet">
-    <xsl:param name="numPicBulletId"/>
     <w:numPicBullet>
       <xsl:attribute name="w:numPicBulletId">
-        <xsl:value-of select="$numPicBulletId"/>
+        <xsl:call-template name="GetBulletId"/>
       </xsl:attribute>
       <w:pict>
         <v:shape id="_x0000_i1032" type="#_x0000_t75" o:bullet="t">
-          <xsl:variable name="fowidth">
-            <xsl:call-template name="point-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="style:list-level-properties/@fo:width"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="foheight">
-            <xsl:call-template name="point-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="style:list-level-properties/@fo:height"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
           <xsl:attribute name="style">
-            <xsl:value-of select="concat('width:', $fowidth, ';', 'height:', $fowidth)"/>
+            <xsl:if test="style:list-level-properties/@fo:width">
+              <xsl:text>width:</xsl:text>
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="style:list-level-properties/@fo:width"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <xsl:text>pt;</xsl:text>
+            </xsl:if>
+            <xsl:if test="style:list-level-properties/@fo:height">
+              <xsl:text>height:</xsl:text>
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="style:list-level-properties/@fo:height"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <xsl:text>pt</xsl:text>
+            </xsl:if>
           </xsl:attribute>
           <v:imagedata>
             <xsl:attribute name="r:id">
@@ -273,6 +269,40 @@
         </v:shape>
       </w:pict>
     </w:numPicBullet>
+  </xsl:template>
+
+  <!-- compute id of a bullet. Must be called from list-level-style-image context -->
+  <xsl:template name="GetBulletId">
+    <xsl:choose>
+      <!-- first, if bullet is in styles -->
+      <xsl:when test="ancestor::office:styles">
+        <xsl:value-of
+          select="1+count(preceding-sibling::text:list-level-style-image)+count(parent::node()/preceding-sibling::text:list-style/text:list-level-style-image)"
+        />
+      </xsl:when>
+      <!-- if list is in automatic styles of styles.xml -->
+      <xsl:when test="ancestor::office:automatic-styles and ancestor::office:document-styles">
+        <xsl:variable name="bulletsCount">
+          <xsl:value-of
+            select="count(/office:document-styles/office:styles/text:list-style/text:list-level-style-image)"
+          />
+        </xsl:variable>
+        <xsl:value-of
+          select="1+$bulletsCount+count(preceding-sibling::text:list-level-style-image)+count(parent::node()/preceding-sibling::text:list-style/text:list-level-style-image)"
+        />
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- list is in content.xml -->
+        <xsl:variable name="bulletsCount">
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:value-of select="count(key('bullets',''))"/>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:value-of
+          select="1+$bulletsCount+count(preceding-sibling::text:list-level-style-image)+count(parent::node()/preceding-sibling::text:list-style/text:list-level-style-image)"
+        />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertListParagraphProperties">
@@ -838,7 +868,7 @@
         <xsl:when test="key('list-style', $listStyleName)">
           <xsl:for-each select="key('list-style', $listStyleName)">
             <xsl:apply-templates
-              select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+              select="text:list-level-style-number|text:list-level-style-bullet|text:list-level-style-image"
               mode="numbering"/>
           </xsl:for-each>
         </xsl:when>
@@ -851,7 +881,7 @@
               <xsl:when test="key('list-style', $listStyleName)">
                 <xsl:for-each select="key('list-style', $listStyleName)">
                   <xsl:apply-templates
-                    select="text:list-level-style-number|text:list-level-style-bullet|list-level-style-image"
+                    select="text:list-level-style-number|text:list-level-style-bullet|text:list-level-style-image"
                     mode="numbering"/>
                 </xsl:for-each>
               </xsl:when>
