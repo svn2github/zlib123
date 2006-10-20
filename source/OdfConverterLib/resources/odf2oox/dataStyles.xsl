@@ -63,8 +63,8 @@
     </w:fldSimple>
   </xsl:template>
   
-  <xsl:template match="text:word-count|text:character-count" mode="paragraph">
-    <w:fldSimple w:instr=" NUMWORDS  \* MERGEFORMAT">
+  <xsl:template match="text:word-count|text:character-count|text:paragraph-count " mode="paragraph">
+    <w:fldSimple>
       <xsl:attribute name="w:instr">
         <xsl:choose>
           <xsl:when test="../text:word-count">
@@ -73,30 +73,14 @@
           <xsl:when test="../text:character-count">
             NUMCHARS
           </xsl:when>
+          <xsl:when test="../text:paragraph-count ">
+            DOCPROPERTY  Paragraphs
+          </xsl:when>
         </xsl:choose>
-        <xsl:choose>
-          <xsl:when test="not(@style:num-format)"> \* Roman</xsl:when>
-          <xsl:otherwise><xsl:call-template name="GetNumberFormattingSwitch"/></xsl:otherwise>
-        </xsl:choose>
+      <xsl:call-template name="GetNumberFormattingSwitch"/>
         \* MERGEFORMAT
       </xsl:attribute>
-      <w:r>
-      <w:rPr>
-        <w:noProof/>
-      </w:rPr>
-      <xsl:apply-templates mode="text"/>
-      </w:r>      
-    </w:fldSimple>
-  </xsl:template>
-  
-  <xsl:template match="text:template-name">
-    <w:fldSimple w:instr=" TEMPLATE   \* MERGEFORMAT ">
-      <w:r w:rsidR="00ED1E8B">
-        <w:rPr>
-          <w:noProof/>
-        </w:rPr>
-          <xsl:apply-templates mode="text"/>
-      </w:r>
+      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>      
     </w:fldSimple>
   </xsl:template>
 
@@ -318,16 +302,11 @@
       <xsl:attribute name="w:instr">
         <xsl:value-of select="concat('USERNAME ' ,$username,'\* MERGEFORMAT')"/>
       </xsl:attribute>
-      <w:r>
-        <w:rPr>
-          <w:noProof/>
-        </w:rPr>
-        <xsl:apply-templates mode="text"/>
-      </w:r>
+      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>    
     </w:fldSimple>
   </xsl:template>
   
-  <xsl:template match="text:sender-initials" mode="paragraph">
+  <xsl:template match="text:sender-initials[not(@text:fixed='true')]" mode="paragraph">
     <xsl:variable name="userinitial">
       <xsl:value-of select="."/>
     </xsl:variable>
@@ -335,12 +314,36 @@
       <xsl:attribute name="w:instr">
         <xsl:value-of select="concat('USERINITIALS ' ,$userinitial,'\* MERGEFORMAT')"/>
       </xsl:attribute>
-      <w:r>
-        <w:rPr>
-          <w:noProof/>
-        </w:rPr>
-        <xsl:apply-templates mode="text"/>
-      </w:r>
+      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>    
+    </w:fldSimple>
+  </xsl:template>
+  
+  <xsl:template match="text:sender-street[not(@text:fixed='true')]|text:sender-country[not(@text:fixed='true')]|text:sender-postal-code[not(@text:fixed='true')]|text:sender-city[not(@text:fixed='true')]" mode="paragraph">
+    <xsl:variable name="adress">
+      <xsl:value-of select="."/>
+    </xsl:variable>
+    <w:fldSimple>
+      <xsl:attribute name="w:instr">
+        <xsl:value-of select="concat('USERADDRESS ' ,$adress,'\* MERGEFORMAT')"/>
+      </xsl:attribute>
+      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>      
+    </w:fldSimple>
+  </xsl:template>  
+  
+  <xsl:template match="text:sender-title" mode="paragraph">
+    <xsl:variable name="title">
+      <xsl:value-of select="."/>
+    </xsl:variable>
+    <w:fldSimple>
+      <xsl:attribute name="w:instr">
+        <xsl:value-of select="concat('TITLE ' ,$title,'\* MERGEFORMAT')"/>
+      </xsl:attribute>     
+    </w:fldSimple>
+  </xsl:template> 
+  
+  <xsl:template match="text:sender-company" mode="paragraph">
+    <w:fldSimple w:instr=" DOCPROPERTY  Company  \* MERGEFORMAT ">
+      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>      
     </w:fldSimple>
   </xsl:template>
 
@@ -388,12 +391,7 @@
   <!-- file name fields-->
   <xsl:template match="text:file-name" mode="paragraph">
     <w:fldSimple w:instr="FILENAME   \* MERGEFORMAT">      
-      <w:r>
-        <w:rPr>
-          <w:noProof/>
-        </w:rPr>
-        <xsl:apply-templates mode="text"/>
-      </w:r>
+      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>
     </w:fldSimple>
   </xsl:template>
   
