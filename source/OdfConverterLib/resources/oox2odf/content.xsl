@@ -35,8 +35,8 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-  exclude-result-prefixes="w office text fo style xlink svg"
-  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  exclude-result-prefixes="w">
 
   <xsl:import href="tables.xsl"/>
   <xsl:import href="lists.xsl"/>
@@ -269,23 +269,23 @@
 
   <xsl:template match="w:p" mode="list">
     <xsl:param name="nestedLevel" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
-    <xsl:param name="level2" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
-    <xsl:variable name="NumberingId2" select="w:pPr/w:numPr/w:numId/@w:val"/>
-    <xsl:variable name="position2" select="count(preceding-sibling::w:p)"/>
+    <xsl:param name="level" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
+    <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
+    <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
 
     <!-- if first element of a list -->
     <xsl:if
-      test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2 and count(preceding-sibling::w:p)= $position2 -1])">
+      test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and count(preceding-sibling::w:p)= $position -1])">
       <xsl:if
-        test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $NumberingId2 and w:ilvl/@w:val = $level2]]">
+        test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $NumberingId and w:ilvl/@w:val = $level]]">
         <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
       </xsl:if>
-      <text:list text:style-name="{concat('L',$NumberingId2)}">
+      <text:list text:style-name="{concat('L',$NumberingId)}">
 
         <!-- convert element as list item -->
         <xsl:apply-templates select="." mode="list-item">
           <xsl:with-param name="nestedLevel" select="$nestedLevel"/>
-          <xsl:with-param name="level2">
+          <xsl:with-param name="level">
             <xsl:value-of select="w:pPr/w:numPr/w:ilvl/@w:val"/>
           </xsl:with-param>
         </xsl:apply-templates>
@@ -297,34 +297,34 @@
 
   <xsl:template match="w:p" mode="list-item">
     <xsl:param name="nestedLevel"/>
-    <xsl:param name="level2"/>
-    <xsl:variable name="NumberingId2" select="w:pPr/w:numPr/w:numId/@w:val"/>
-    <xsl:variable name="position2" select="count(preceding-sibling::w:p)"/>
+    <xsl:param name="level"/>
+    <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
+    <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
     <xsl:variable name="notHigherLevelPosition"
-      select="count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level2 - $nestedLevel)])"/>
+      select="count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level - $nestedLevel)])"/>
     <xsl:choose>
 
       <!-- if there's a nested list we call the template recursively -->
       <xsl:when test="$nestedLevel &gt; 0">
         <text:list-item>
-          <text:list text:style-name="{concat('L',$NumberingId2)}">
+          <text:list text:style-name="{concat('L',$NumberingId)}">
             <xsl:apply-templates select="." mode="list-item">
               <xsl:with-param name="nestedLevel" select="$nestedLevel -1"/>
-              <xsl:with-param name="level2" select="$level2"/>
+              <xsl:with-param name="level" select="$level"/>
             </xsl:apply-templates>
           </text:list>
         </text:list-item>
 
         <!-- next paragraph on this level in same list -->
         <xsl:variable name="nextElement"
-          select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId2 and w:ilvl/@w:val = $level2 - $nestedLevel] and count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level2 - $nestedLevel)])= $notHigherLevelPosition]"/>
+          select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId and w:ilvl/@w:val = $level - $nestedLevel] and count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level - $nestedLevel)])= $notHigherLevelPosition]"/>
         <xsl:if test="$nextElement">
           <xsl:apply-templates select="$nextElement" mode="list-item">
             <xsl:with-param name="nestedLevel">
-              <xsl:value-of select="$nextElement/w:pPr/w:numPr/w:ilvl/@w:val - $level2+$nestedLevel"
+              <xsl:value-of select="$nextElement/w:pPr/w:numPr/w:ilvl/@w:val - $level+$nestedLevel"
               />
             </xsl:with-param>
-            <xsl:with-param name="level2">
+            <xsl:with-param name="level">
               <xsl:value-of select="$nextElement/w:pPr/w:numPr/w:ilvl/@w:val"/>
             </xsl:with-param>
           </xsl:apply-templates>
@@ -333,7 +333,7 @@
 
       <xsl:otherwise>
         <xsl:if
-          test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $NumberingId2 and w:ilvl/@w:val = $level2]]">
+          test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $NumberingId and w:ilvl/@w:val = $level]]">
           <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
         </xsl:if>
         <text:list-item>
@@ -342,14 +342,14 @@
 
         <!-- next paragraph  in same list -->
         <xsl:variable name="nextListItem"
-          select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId2 and not(w:ilvl/@w:val &lt; $level2 - $nestedLevel)] and count(preceding-sibling::w:p)= $position2 +1]"/>
+          select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId and not(w:ilvl/@w:val &lt; $level - $nestedLevel)] and count(preceding-sibling::w:p)= $position +1]"/>
         <xsl:if test="$nextListItem">
           <xsl:apply-templates select="$nextListItem" mode="list-item">
             <xsl:with-param name="nestedLevel">
               <xsl:value-of
-                select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val - $level2+$nestedLevel"/>
+                select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val - $level+$nestedLevel"/>
             </xsl:with-param>
-            <xsl:with-param name="level2">
+            <xsl:with-param name="level">
               <xsl:value-of select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val"/>
             </xsl:with-param>
           </xsl:apply-templates>
@@ -358,7 +358,8 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:tab">
+  <!--tabs-->
+  <xsl:template match="w:tab[not(parent::w:tabs)]">
     <text:tab/>
   </xsl:template>
 
