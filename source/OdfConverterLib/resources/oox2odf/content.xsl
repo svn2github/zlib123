@@ -34,7 +34,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns="http://schemas.openxmlformats.org/package/2006/relationships" exclude-result-prefixes="w"
+  xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+  exclude-result-prefixes="w office text fo style xlink svg"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
 
   <xsl:import href="tables.xsl"/>
@@ -197,13 +198,13 @@
   <!--  paragraphs, lists, headings-->
   <xsl:template match="w:p">
     <xsl:message terminate="no">progress:w:p</xsl:message>
-  
+
     <xsl:variable name="outlineLevel">
       <xsl:call-template name="GetOutlineLevel"/>
     </xsl:variable>
-    
+
     <xsl:choose>
-      
+
       <!-- check if list starts -->
       <xsl:when test="w:pPr/w:numPr">
         <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
@@ -221,40 +222,37 @@
           </xsl:apply-templates>
         </xsl:if>
       </xsl:when>
-      
+
       <!--  check if the paragraf is heading -->
       <xsl:when test="$outlineLevel != '' ">
         <xsl:apply-templates select="." mode="heading">
           <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
         </xsl:apply-templates>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <!--  default scenario - paragraph-->
         <xsl:apply-templates select="." mode="paragraph"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!--paragraph with ouline level is a heading-->
   <xsl:template match="w:p" mode="heading">
     <xsl:param name="outlineLevel"/>
     <text:h>
-      
-      <!-- insert style-name -->
-      <xsl:if test="w:pPr or w:r[preceding::w:r[1]/w:br]">
+      <xsl:if test="w:pPr">
         <xsl:attribute name="text:style-name">
           <xsl:value-of select="generate-id(self::node())"/>
         </xsl:attribute>
       </xsl:if>
-      
       <xsl:attribute name="text:outline-level">
         <xsl:value-of select="$outlineLevel+1"/>
       </xsl:attribute>
-      <xsl:apply-templates />
+      <xsl:apply-templates/>
     </text:h>
   </xsl:template>
-  
+
   <!--  paragraphs-->
   <xsl:template match="w:p" mode="paragraph">
     <xsl:choose>
@@ -265,14 +263,11 @@
       <!--default scenario-->
       <xsl:otherwise>
         <text:p>
-          
-          <!-- insert style-name -->
-          <xsl:if test="w:pPr or w:r[preceding::w:r[1]/w:br]">
+          <xsl:if test="w:pPr">
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="generate-id(self::node())"/>
             </xsl:attribute>
           </xsl:if>
-          
           <xsl:apply-templates/>
         </text:p>
       </xsl:otherwise>
@@ -280,13 +275,13 @@
   </xsl:template>
 
   <!-- paragraph which is the first element of a list-->
-  
+
   <xsl:template match="w:p" mode="list">
     <xsl:param name="nestedLevel"/>
     <xsl:param name="level2"/>
     <xsl:variable name="NumberingId2" select="w:pPr/w:numPr/w:numId/@w:val"/>
     <xsl:variable name="position2" select="count(preceding-sibling::w:p)"/>
-    
+
     <!-- if first element of a list -->
     <xsl:if
       test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId2 and count(preceding-sibling::w:p)= $position2 -1])">
@@ -303,9 +298,9 @@
             <xsl:value-of select="w:pPr/w:numPr/w:ilvl/@w:val"/>
           </xsl:with-param>
         </xsl:apply-templates>
-          
-        </text:list>
-      </xsl:if>
+
+      </text:list>
+    </xsl:if>
 
   </xsl:template>
 
@@ -423,7 +418,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- hyperlinks -->
+  <!-- hyperlinks - w:hyperlink and fieldchar types-->
   <xsl:template name="InsertHyperlink">
     <text:a xlink:type="simple">
       <!-- document hyperlink -->
@@ -575,7 +570,7 @@
     <xsl:choose>
       <!--check whether string contains  whitespace sequence-->
       <xsl:when test="not(contains(.,'  '))">
-          <xsl:value-of select="."/>
+        <xsl:value-of select="."/>
       </xsl:when>
       <xsl:otherwise>
         <!--converts whitespaces sequence to text:s-->
@@ -589,25 +584,25 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
-   </xsl:template>
+  </xsl:template>
 
   <!--  convert multiple white spaces  -->
   <xsl:template name="InsertWhiteSpaces">
     <xsl:param name="string"/>
     <xsl:param name="length"/>
-    
+
     <!-- string which doesn't contain whitespaces-->
     <xsl:choose>
       <xsl:when test="not(contains($string,' '))">
         <xsl:value-of select="$string"/>
       </xsl:when>
-      
+
       <!-- convert white spaces  -->
       <xsl:otherwise>
-         <xsl:variable name="before">
+        <xsl:variable name="before">
           <xsl:value-of select="substring-before($string,' ')"/>
         </xsl:variable>
-        
+
         <xsl:variable name="after">
           <xsl:call-template name="CutStartSpaces">
             <xsl:with-param name="cuted">
@@ -615,11 +610,11 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:if test="$before != '' ">
           <xsl:value-of select="concat($before,' ')"/>
         </xsl:if>
-        
+
         <!--add remaining whitespaces as text:s if there are any-->
         <xsl:if test="string-length(concat($before,' ', $after)) &lt; $length ">
           <xsl:choose>
@@ -642,7 +637,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>
-        
+
         <!--repeat it for substring which has whitespaces-->
         <xsl:if test="contains($string,' ') and $length &gt; 0">
           <xsl:call-template name="InsertWhiteSpaces">
@@ -656,7 +651,7 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-   </xsl:template>
+  </xsl:template>
 
   <!--  cut start spaces -->
   <xsl:template name="CutStartSpaces">
@@ -675,26 +670,9 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- line breaks  -->
+  <!-- line breaks  (page-break todo)-->
   <xsl:template match="w:br">
-    <xsl:choose>
-      <xsl:when test="@w:type = 'textWrapping' or not(@w:type) or @w:type = '' ">
     <text:line-break/>
-      </xsl:when>
-      <xsl:otherwise/>
-    </xsl:choose>
-  </xsl:template>
-  
-  <!-- page and column breaks -->
-  
-  <xsl:template match="w:br[ancestor::w:p]" mode="automaticstyles">
-    <xsl:variable name="position2" select="count(preceding::w:r)"/>
-   <xsl:if test="@w:type and @w:type != 'textWrapping' and @w:type != '' ">
-    <style:style style:name="{generate-id(following::w:r[count(preceding::w:r)=$position2 +1]/parent::w:p)}" style:family="paragraph">
-        <xsl:attribute name="style:parent-style-name">Standard</xsl:attribute>
-      <style:paragraph-properties fo:break-before="{@w:type}"/>
-    </style:style>
-   </xsl:if>
   </xsl:template>
 
   <!--ignore text in automatic styles mode-->
