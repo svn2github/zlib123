@@ -56,9 +56,47 @@
     </w:fldSimple>
   </xsl:template>
 
+  <!--  STATISTICS FIELDS  -->
   <xsl:template match="text:page-count" mode="paragraph">
     <w:fldSimple w:instr=" NUMPAGES ">
       <xsl:apply-templates mode="paragraph"/>
+    </w:fldSimple>
+  </xsl:template>
+  
+  <xsl:template match="text:word-count|text:character-count" mode="paragraph">
+    <w:fldSimple w:instr=" NUMWORDS  \* MERGEFORMAT">
+      <xsl:attribute name="w:instr">
+        <xsl:choose>
+          <xsl:when test="../text:word-count">
+            NUMWORDS
+          </xsl:when>
+          <xsl:when test="../text:character-count">
+            NUMCHARS
+          </xsl:when>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="not(@style:num-format)"> \* Roman</xsl:when>
+          <xsl:otherwise><xsl:call-template name="GetNumberFormattingSwitch"/></xsl:otherwise>
+        </xsl:choose>
+        \* MERGEFORMAT
+      </xsl:attribute>
+      <w:r>
+      <w:rPr>
+        <w:noProof/>
+      </w:rPr>
+      <xsl:apply-templates mode="text"/>
+      </w:r>      
+    </w:fldSimple>
+  </xsl:template>
+  
+  <xsl:template match="text:template-name">
+    <w:fldSimple w:instr=" TEMPLATE   \* MERGEFORMAT ">
+      <w:r w:rsidR="00ED1E8B">
+        <w:rPr>
+          <w:noProof/>
+        </w:rPr>
+          <xsl:apply-templates mode="text"/>
+      </w:r>
     </w:fldSimple>
   </xsl:template>
 
@@ -271,6 +309,41 @@
     </w:fldSimple>
   </xsl:template>
 
+  <!-- Sender Fields -->
+  <xsl:template match="text:sender-firstname[not(@text:fixed='true')]|text:sender-lastname[not(@text:fixed='true')]" mode="paragraph">    
+      <xsl:variable name="username">
+        <xsl:value-of select="."/>
+      </xsl:variable>
+    <w:fldSimple>
+      <xsl:attribute name="w:instr">
+        <xsl:value-of select="concat('USERNAME ' ,$username,'\* MERGEFORMAT')"/>
+      </xsl:attribute>
+      <w:r>
+        <w:rPr>
+          <w:noProof/>
+        </w:rPr>
+        <xsl:apply-templates mode="text"/>
+      </w:r>
+    </w:fldSimple>
+  </xsl:template>
+  
+  <xsl:template match="text:sender-initials" mode="paragraph">
+    <xsl:variable name="userinitial">
+      <xsl:value-of select="."/>
+    </xsl:variable>
+    <w:fldSimple>
+      <xsl:attribute name="w:instr">
+        <xsl:value-of select="concat('USERINITIALS ' ,$userinitial,'\* MERGEFORMAT')"/>
+      </xsl:attribute>
+      <w:r>
+        <w:rPr>
+          <w:noProof/>
+        </w:rPr>
+        <xsl:apply-templates mode="text"/>
+      </w:r>
+    </w:fldSimple>
+  </xsl:template>
+
   <xsl:template match="text:editing-cycles[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" REVNUM ">
       <xsl:apply-templates mode="paragraph"/>
@@ -302,20 +375,6 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="text:file-name" mode="paragraph">
-    <w:fldSimple>
-      <xsl:attribute name="w:instr">
-        <xsl:text>FILENAME   \* MERGEFORMAT</xsl:text>
-      </xsl:attribute>
-      <w:r>
-        <w:rPr>
-          <w:noProof/>
-        </w:rPr>
-        <xsl:apply-templates mode="text"/>
-      </w:r>
-    </w:fldSimple>
-  </xsl:template>
-
   <!--numbering type for sequence-->
   <xsl:template name="InsertSequenceFieldNumType">
     <xsl:variable name="numType">
@@ -325,7 +384,19 @@
       <xsl:value-of select="concat('SEQ ', @text:name,' ', $numType)"/>
     </xsl:attribute>
   </xsl:template>
-
+  
+  <!-- file name fields-->
+  <xsl:template match="text:file-name" mode="paragraph">
+    <w:fldSimple w:instr="FILENAME   \* MERGEFORMAT">      
+      <w:r>
+        <w:rPr>
+          <w:noProof/>
+        </w:rPr>
+        <xsl:apply-templates mode="text"/>
+      </w:r>
+    </w:fldSimple>
+  </xsl:template>
+  
   <!-- report lost fields -->
   <xsl:template match="text:description" mode="paragraph">
     <xsl:message terminate="no">feedback:description field</xsl:message>
