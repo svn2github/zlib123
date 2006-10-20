@@ -346,7 +346,15 @@
       <xsl:apply-templates mode="paragraph"></xsl:apply-templates>      
     </w:fldSimple>
   </xsl:template>
-
+  
+  <!-- Templates Fields -->
+  <xsl:template match="text:template-name" mode="paragraph">
+  <w:fldSimple w:instr=" TEMPLATE   \* MERGEFORMAT ">
+    <xsl:apply-templates mode="paragraph"></xsl:apply-templates>
+   </w:fldSimple>
+  </xsl:template>
+  
+  
   <xsl:template match="text:editing-cycles[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" REVNUM ">
       <xsl:apply-templates mode="paragraph"/>
