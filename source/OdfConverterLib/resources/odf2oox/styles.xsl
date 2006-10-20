@@ -274,7 +274,7 @@
       </xsl:choose>
     </xsl:if>
 
-    <!-- border color + padding  -->
+    <!-- border color + padding + shadow -->
     <xsl:choose>
       <xsl:when test="@fo:border and @fo:border != 'none' ">
         <w:pBdr>
@@ -283,12 +283,9 @@
           </xsl:call-template>
         </w:pBdr>
       </xsl:when>
-      <xsl:when test="@fo:border = 'none'">
+      <xsl:when test="@fo:border = 'none' ">
         <w:pBdr>
-          <w:top w:val="none"/>
-          <w:left w:val="none"/>
-          <w:bottom w:val="none"/>
-          <w:right w:val="none"/>
+          <xsl:call-template name="InsertEmptyBorders"/>
         </w:pBdr>
       </xsl:when>
       <xsl:when test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
@@ -298,7 +295,13 @@
           </xsl:call-template>
         </w:pBdr>
       </xsl:when>
-      <xsl:otherwise/>
+      <xsl:otherwise>
+        <xsl:if test="@style:shadow">
+          <w:pBdr>
+            <xsl:call-template name="InsertEmptyBorders"/>
+          </w:pBdr>
+        </xsl:if>
+      </xsl:otherwise>
     </xsl:choose>
 
     <!-- Background color -->
@@ -1346,10 +1349,7 @@
       </xsl:when>
       <xsl:when test="@fo:border = 'none'">
         <w:pgBorders>
-          <w:top w:val="none"/>
-          <w:left w:val="none"/>
-          <w:bottom w:val="none"/>
-          <w:right w:val="none"/>
+          <xsl:call-template name="InsertEmptyBorders"/>
         </w:pgBorders>
       </xsl:when>
       <xsl:when test="@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right">
@@ -1359,7 +1359,13 @@
           </xsl:call-template>
         </w:pgBorders>
       </xsl:when>
-      <xsl:otherwise/>
+      <xsl:otherwise>
+        <xsl:if test="@style:shadow">
+          <w:pgBorders>
+            <xsl:call-template name="InsertEmptyBorders"/>
+          </w:pgBorders>
+        </xsl:if>
+      </xsl:otherwise>
     </xsl:choose>
     <!-- line numbering -->
     <xsl:for-each
@@ -1695,7 +1701,11 @@
       </w:top>
     </xsl:if>
     <xsl:if test="@fo:border-top = 'none'">
-      <w:top w:val="none"/>
+      <w:top>
+        <xsl:call-template name="InsertEmptyBorder">
+          <xsl:with-param name="side" select="'top'"/>
+        </xsl:call-template>
+      </w:top>
     </xsl:if>
     <xsl:if test="$allSides='true' or (@fo:border-left and (@fo:border-left != 'none'))">
       <w:left>
@@ -1705,7 +1715,11 @@
       </w:left>
     </xsl:if>
     <xsl:if test="@fo:border-left = 'none'">
-      <w:left w:val="none"/>
+      <w:left>
+        <xsl:call-template name="InsertEmptyBorder">
+          <xsl:with-param name="side" select="'left'"/>
+        </xsl:call-template>
+      </w:left>
     </xsl:if>
     <xsl:if test="$allSides='true' or (@fo:border-bottom and (@fo:border-bottom != 'none'))">
       <w:bottom>
@@ -1715,7 +1729,11 @@
       </w:bottom>
     </xsl:if>
     <xsl:if test="@fo:border-bottom = 'none'">
-      <w:bottom w:val="none"/>
+      <w:bottom>
+        <xsl:call-template name="InsertEmptyBorder">
+          <xsl:with-param name="side" select="'bottom'"/>
+        </xsl:call-template>
+      </w:bottom>
     </xsl:if>
     <xsl:if test="$allSides='true' or (@fo:border-right and (@fo:border-right != 'none'))">
       <w:right>
@@ -1725,7 +1743,11 @@
       </w:right>
     </xsl:if>
     <xsl:if test="@fo:border-right = 'none'">
-      <w:right w:val="none"/>
+      <w:right>
+        <xsl:call-template name="InsertEmptyBorder">
+          <xsl:with-param name="side" select="'right'"/>
+        </xsl:call-template>
+      </w:right>
     </xsl:if>
     <xsl:if
       test="$allSides='true' and self::style:paragraph-properties and @style:join-border='false'">
@@ -1747,6 +1769,84 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- insert borders with 'none' value (used to override parent properties) -->
+  <xsl:template name="InsertEmptyBorders">
+    <xsl:choose>
+      <xsl:when test="not(@style:shadow != 'none')">
+        <w:top w:val="none"/>
+        <w:left w:val="none"/>
+        <w:bottom w:val="none"/>
+        <w:right w:val="none"/>
+      </xsl:when>
+      <xsl:when test="@style:shadow != 'none' ">
+        <!-- border shadow may not be displayed properly -->
+        <xsl:message terminate="no">feedback:Paragraph/page shadow</xsl:message>
+        <xsl:variable name="firstShadow">
+          <xsl:value-of select=" substring-before(substring-after(@style:shadow, ' '), ' ')"/>
+        </xsl:variable>
+        <xsl:variable name="secondShadow">
+          <xsl:value-of select=" substring-after(substring-after(@style:shadow, ' '), ' ')"/>
+        </xsl:variable>
+        <w:top>
+          <xsl:attribute name="w:val">none</xsl:attribute>
+          <xsl:if test="contains($secondShadow,'-')">
+            <xsl:attribute name="w:shadow">true</xsl:attribute>
+          </xsl:if>
+        </w:top>
+        <w:left>
+          <xsl:attribute name="w:val">none</xsl:attribute>
+          <xsl:if test="contains($firstShadow,'-')">
+            <xsl:attribute name="w:shadow">true</xsl:attribute>
+          </xsl:if>
+        </w:left>
+        <w:bottom>
+          <xsl:attribute name="w:val">none</xsl:attribute>
+          <xsl:if test="not(contains($secondShadow,'-'))">
+            <xsl:attribute name="w:shadow">true</xsl:attribute>
+          </xsl:if>
+        </w:bottom>
+        <w:right>
+          <xsl:attribute name="w:val">none</xsl:attribute>
+          <xsl:if test="not(contains($firstShadow,'-'))">
+            <xsl:attribute name="w:shadow">true</xsl:attribute>
+          </xsl:if>
+        </w:right>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- insert one empty border attributes -->
+  <xsl:template name="InsertEmptyBorder">
+    <xsl:param name="side"/>
+
+    <xsl:attribute name="w:val">none</xsl:attribute>
+
+    <!-- insert shadow -->
+    <xsl:if test="@style:shadow != 'none' ">
+      <!-- border shadow may not be displayed properly -->
+      <xsl:message terminate="no">feedback:Paragraph/page shadow</xsl:message>
+      <xsl:variable name="firstShadow">
+        <xsl:value-of select=" substring-before(substring-after(@style:shadow, ' '), ' ')"/>
+      </xsl:variable>
+      <xsl:variable name="secondShadow">
+        <xsl:value-of select=" substring-after(substring-after(@style:shadow, ' '), ' ')"/>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$side = 'top' and contains($secondShadow,'-')">
+          <xsl:attribute name="w:shadow">true</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$side = 'left' and contains($firstShadow,'-')">
+          <xsl:attribute name="w:shadow">true</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$side = 'bottom' and not(contains($secondShadow,'-'))">
+          <xsl:attribute name="w:shadow">true</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$side = 'top' and not(contains($firstShadow,'-'))">
+          <xsl:attribute name="w:shadow">true</xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
 
   <!-- Attributes of a border element. -->
   <xsl:template name="border">
@@ -1772,6 +1872,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+
 
     <!-- padding = 0 if side border not defined ! -->
     <xsl:variable name="padding">
@@ -1799,6 +1900,7 @@
       </xsl:choose>
     </xsl:variable>
 
+
     <xsl:attribute name="w:val">
       <xsl:call-template name="GetBorderStyle">
         <xsl:with-param name="side" select="$side"/>
@@ -1823,6 +1925,34 @@
     <xsl:attribute name="w:color">
       <xsl:value-of select="substring($borderStr, string-length($borderStr) -5, 6)"/>
     </xsl:attribute>
+
+    <xsl:if test="@style:shadow != 'none' ">
+      <xsl:variable name="firstShadow">
+        <xsl:value-of select=" substring-before(substring-after(@style:shadow, ' '), ' ')"/>
+      </xsl:variable>
+      <xsl:variable name="secondShadow">
+        <xsl:value-of select=" substring-after(substring-after(@style:shadow, ' '), ' ')"/>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$side = 'top' and contains($secondShadow,'-')">
+          <!-- border shadow may not be displayed properly -->
+          <xsl:message terminate="no">feedback:Paragraph/page shadow</xsl:message>
+          <xsl:attribute name="w:shadow">true</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$side = 'left' and contains($firstShadow,'-')">
+          <!-- border shadow may not be displayed properly -->
+          <xsl:message terminate="no">feedback:Paragraph/page shadow</xsl:message>
+          <xsl:attribute name="w:shadow">true</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$side = 'bottom' and not(contains($secondShadow,'-'))">
+          <xsl:attribute name="w:shadow">true</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$side = 'right' and not(contains($firstShadow,'-'))">
+          <xsl:attribute name="w:shadow">true</xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+
   </xsl:template>
 
 
