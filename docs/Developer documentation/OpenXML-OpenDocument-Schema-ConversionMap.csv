@@ -93,7 +93,7 @@ Runs;;;;;;;
 ;w (Expanded/Compressed Text) ;;;Completed;;style:text-properties/@style:text-scale;
 ;webHidden (Web Hidden Text) ;;;;;;
 Run Content;;;;;;;
-;br (Break) ;;;Completed;;text:line-break;
+;br (Break) ;;;Completed;;text:line-break, style:paragraph-properties/@fo:break-before;
 ;cr (Carriage Return) ;;;;;;
 ;dayLong (Date Block - Long Day Format) ;;;;;;
 ;dayShort (Date Block - Short Day Format) ;;;;;;

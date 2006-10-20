@@ -240,11 +240,14 @@
   <xsl:template match="w:p" mode="heading">
     <xsl:param name="outlineLevel"/>
     <text:h>
-      <xsl:if test="w:pPr">
+      
+      <!-- insert style-name -->
+      <xsl:if test="w:pPr or w:r[preceding::w:r[1]/w:br]">
         <xsl:attribute name="text:style-name">
           <xsl:value-of select="generate-id(self::node())"/>
         </xsl:attribute>
       </xsl:if>
+      
       <xsl:attribute name="text:outline-level">
         <xsl:value-of select="$outlineLevel+1"/>
       </xsl:attribute>
@@ -262,11 +265,14 @@
       <!--default scenario-->
       <xsl:otherwise>
         <text:p>
-          <xsl:if test="w:pPr">
+          
+          <!-- insert style-name -->
+          <xsl:if test="w:pPr or w:r[preceding::w:r[1]/w:br]">
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="generate-id(self::node())"/>
             </xsl:attribute>
           </xsl:if>
+          
           <xsl:apply-templates/>
         </text:p>
       </xsl:otherwise>
@@ -669,9 +675,26 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- line breaks  (page-break todo)-->
+  <!-- line breaks  -->
   <xsl:template match="w:br">
+    <xsl:choose>
+      <xsl:when test="@w:type = 'textWrapping' or not(@w:type) or @w:type = '' ">
     <text:line-break/>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- page and column breaks -->
+  
+  <xsl:template match="w:br[ancestor::w:p]" mode="automaticstyles">
+    <xsl:variable name="position2" select="count(preceding::w:r)"/>
+   <xsl:if test="@w:type and @w:type != 'textWrapping' and @w:type != '' ">
+    <style:style style:name="{generate-id(following::w:r[count(preceding::w:r)=$position2 +1]/parent::w:p)}" style:family="paragraph">
+        <xsl:attribute name="style:parent-style-name">Standard</xsl:attribute>
+      <style:paragraph-properties fo:break-before="{@w:type}"/>
+    </style:style>
+   </xsl:if>
   </xsl:template>
 
   <!--ignore text in automatic styles mode-->
