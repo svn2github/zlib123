@@ -1442,22 +1442,25 @@
   <!-- Page margin properties -->
   <xsl:template name="ComputePageMargins">
     <!-- report loss of header/footer properties -->
-    <xsl:if test="following-sibling::*/style:header-footer-properties[@fo:min-height or @svg:height]">
+    <xsl:if
+      test="following-sibling::*/style:header-footer-properties[@fo:min-height or @svg:height]">
       <xsl:message terminate="no">feedback:Header/footer height</xsl:message>
     </xsl:if>
-    <xsl:if test="following-sibling::style:header-style/style:header-footer-properties/@fo:margin-bottom">
+    <xsl:if
+      test="following-sibling::style:header-style/style:header-footer-properties/@fo:margin-bottom">
       <xsl:message terminate="no">feedback:Header distance</xsl:message>
     </xsl:if>
-    <xsl:if test="following-sibling::style:footer-style/style:header-footer-properties/@fo:margin-top">
+    <xsl:if
+      test="following-sibling::style:footer-style/style:header-footer-properties/@fo:margin-top">
       <xsl:message terminate="no">feedback:Footer distance</xsl:message>
     </xsl:if>
     <w:pgMar>
       <xsl:if
         test="@fo:margin != 'none' or @fo:margin-top != 'none' or @fo:padding != 'none' or @fo:padding-top != 'none' ">
         <xsl:attribute name="w:top">
-            <xsl:call-template name="GetPageMargin">
-              <xsl:with-param name="side">top</xsl:with-param>
-            </xsl:call-template>
+          <xsl:call-template name="GetPageMargin">
+            <xsl:with-param name="side">top</xsl:with-param>
+          </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
       <xsl:if
@@ -1471,9 +1474,9 @@
       <xsl:if
         test="@fo:margin != 'none' or @fo:margin-bottom != 'none' or @fo:padding != 'none' or @fo:padding-bottom != 'none' ">
         <xsl:attribute name="w:bottom">
-            <xsl:call-template name="GetPageMargin">
-              <xsl:with-param name="side">bottom</xsl:with-param>
-            </xsl:call-template>
+          <xsl:call-template name="GetPageMargin">
+            <xsl:with-param name="side">bottom</xsl:with-param>
+          </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
       <xsl:if
@@ -1557,6 +1560,8 @@
       </xsl:if>
       <!-- separator -->
       <xsl:if test="style:column-sep">
+        <!-- report lost attributes -->
+        <xsl:message terminate="no">feedback:Column separator attributes</xsl:message>
         <xsl:attribute name="w:sep">
           <xsl:value-of select="1"/>
         </xsl:attribute>
