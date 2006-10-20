@@ -132,7 +132,7 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;
 ;Note;;;;2;0.2-M2;Completed;;86;
 ;;;;;;;;;;
-;Indexes and Tables - Entry;;Index;;;0.2-Final;Partial;;;
+;Indexes and Tables - Entry;;Index;;;0.2-Final;Partial;;;TODO user-defined index
 ;;;Entry;;2;0.2-Final;Completed;;;
 ;;;1st Key;;;?;;;;
 ;;;Main Entry;;;?;;;;
@@ -141,25 +141,25 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;
 ;Indexes and Tables - Indexes and Tables;Index / Table - Table of Contents;Title;;1;0.2-M1;Completed;;174-176;
 ;;;Type;;2;0.2-M2;Completed;;174-176;
-;;;Protected against manual changes;;;?;;;;
+;;;Protected against manual changes;;;?;Completed;Not supported in OOX;;
 ;;;;;;;;;;
-;;;for;;1;0.2-M1;Partial;;174-176;Whole document only
+;;;for;;1;0.2-M1;Partial;;174-176;Whole document only TODO chapter
 ;;;Evaluate upto level;;1;0.2-M1;Completed;;174-176;
 ;;;Create from;Outline;1;0.2-M2;Completed;;;
-;;;;Additional Styles;1;0.2-M2;Completed;This feature doesn't have equivalent in Word - see Conversion Issues on Wiki page;;
+;;;;Additional Styles;1;0.2-M2;Completed;;;
 ;;;;Index marks;1;0.2-M2;Completed;;;
 ;;;;;;;;;;
 ;;Entries;Level;;;?;Completed;;174-176;
-;;;Structure;;;?;;;;
-;;;Chapter no;;2;0.2-M2;;;;
+;;;Structure;;;?;Completed;Stucture is converted properly but in Word structure cannot be changed - after TOC update it restores default settings;;
+;;;Chapter no;;2;0.2-M2;;;;TODO investigate
 ;;;Entry text;;2;0.2-M2;Completed;;174-176;
 ;;;Tab stop;;2;0.2-M2;Completed;;174-176;
 ;;;Page no;;2;0.2-M2;Completed;;174-176;
-;;;Character style;;2;0.2-M2;;;;
-;;;Format;Tab position relative to Paragraph style indent;2;0.2-M2;;;;
+;;;Character style;;2;0.2-M2;Completed;;;
+;;;Format;Tab position relative to Paragraph style indent;2;0.2-M2;;;;is there equivalent in OOX
 ;;;;;;;;;;
 ;;Styles;Levels;;2;0.2-M2;Completed;;174-176;
-;;;Paragraph Styles;;2;0.2-M2;;;;
+;;;Paragraph Styles;;2;0.2-M2;Completed;;;
 ;;;;;;;;;;
 ;;Columns;No of columns;;2;0.2-Final;;;;
 ;;;Column style;;2;0.2-Final;;;;
@@ -178,9 +178,9 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;;;;;;;;
 ;Indexes and Tables - Indexes and Tables;Index / Table - Alphabetical Index;Title;;1;0.2-M1;Completed;;;
 ;;;Type;;2;0.2-M2;Completed;;;
-;;;Protected against manual changes;;;?;;;;
+;;;Protected against manual changes;;;?;Completed;Not supported in OOX;;
 ;;;;;;;;;;
-;;;for;;1;0.2-M1;;;;
+;;;for;;1;0.2-M1;Partial;;;whole document only TODO chapter
 ;;;Options;Combine identical entries;1;0.2-M2;Completed;;;
 ;;;;Combine with;1;0.2-M2;Completed;;;
 ;;;;Case sensitive;1;0.2-M2;Completed;;;
@@ -195,7 +195,7 @@ We should try to identify the equivalent for all the insert menu options and tra
 ;;;Entry text;;2;0.2-M2;Completed;;;
 ;;;Tab stop;;2;0.2-M2;Completed;;;
 ;;;Page no;;2;0.2-M2;Completed;;;
-;;;Character style;;2;0.2-M2;;;;
+;;;Character style;;2;0.2-M2;;;;is there equivalent in Word
 ;;;Format;Character style for main entries;2;0.2-M2;;;;
 ;;;;Alphabetical delimited;;0.2-M2;Completed;;;
 ;;;;Key seperated byt commas;;0.2-M2;Completed;;;
