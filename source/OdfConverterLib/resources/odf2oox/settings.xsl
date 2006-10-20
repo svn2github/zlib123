@@ -59,6 +59,12 @@
         </xsl:if>
       </xsl:for-each>
 
+      <!-- track changes -->
+      <xsl:if
+        test="document('content.xml')/office:document-content/office:body/office:text/office:forms">
+        <w:trackRevisions/>
+      </xsl:if>
+
       <xsl:if
         test="document('styles.xml')/office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties/@style:tab-stop-distance">
         <w:defaultTabStop>
