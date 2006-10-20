@@ -204,22 +204,13 @@
     </xsl:variable>
 
     <xsl:choose>
-
       <!-- check if list starts -->
       <xsl:when test="w:pPr/w:numPr">
         <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
         <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
-        <xsl:variable name="level" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
         <xsl:if
           test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
-          <xsl:apply-templates select="." mode="list">
-            <xsl:with-param name="nestedLevel">
-              <xsl:value-of select="$level"/>
-            </xsl:with-param>
-            <xsl:with-param name="level2">
-              <xsl:value-of select="$level"/>
-            </xsl:with-param>
-          </xsl:apply-templates>
+          <xsl:apply-templates select="." mode="list"/>
         </xsl:if>
       </xsl:when>
 
@@ -230,8 +221,8 @@
         </xsl:apply-templates>
       </xsl:when>
 
+      <!--  default scenario - paragraph-->
       <xsl:otherwise>
-        <!--  default scenario - paragraph-->
         <xsl:apply-templates select="." mode="paragraph"/>
       </xsl:otherwise>
     </xsl:choose>
@@ -277,8 +268,8 @@
   <!-- paragraph which is the first element of a list-->
 
   <xsl:template match="w:p" mode="list">
-    <xsl:param name="nestedLevel"/>
-    <xsl:param name="level2"/>
+    <xsl:param name="nestedLevel" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
+    <xsl:param name="level2" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
     <xsl:variable name="NumberingId2" select="w:pPr/w:numPr/w:numId/@w:val"/>
     <xsl:variable name="position2" select="count(preceding-sibling::w:p)"/>
 
@@ -298,10 +289,8 @@
             <xsl:value-of select="w:pPr/w:numPr/w:ilvl/@w:val"/>
           </xsl:with-param>
         </xsl:apply-templates>
-
       </text:list>
     </xsl:if>
-
   </xsl:template>
 
   <!-- pargraph which is a list-item -->
@@ -340,7 +329,6 @@
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>
-
       </xsl:when>
 
       <xsl:otherwise>
@@ -366,18 +354,17 @@
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>
-
       </xsl:otherwise>
-
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="w:tab">
+    <text:tab/>
   </xsl:template>
 
   <!-- run -->
   <xsl:template match="w:r">
     <xsl:message terminate="no">progress:w:r</xsl:message>
-    <xsl:if test="w:tab">
-      <text:tab/>
-    </xsl:if>
     <xsl:choose>
       <!--  fieldchar hyperlink -->
       <xsl:when
@@ -406,7 +393,6 @@
   <!-- path for hyperlinks-->
   <xsl:template name="GetLinkPath">
     <xsl:param name="linkHref"/>
-
     <xsl:choose>
       <xsl:when
         test="contains($linkHref, 'file:///') or contains($linkHref, 'http://') or contains($linkHref, 'mailto:')">
@@ -459,8 +445,8 @@
         </xsl:attribute>
       </xsl:if>
 
+      <!-- attach automatic style-->
       <xsl:choose>
-        <!-- attach automatic style-->
         <xsl:when test="w:rPr">
           <text:span text:style-name="{generate-id(self::node())}">
             <xsl:apply-templates/>
@@ -574,22 +560,15 @@
       </xsl:when>
       <xsl:otherwise>
         <!--converts whitespaces sequence to text:s-->
-        <xsl:call-template name="InsertWhiteSpaces">
-          <xsl:with-param name="string">
-            <xsl:value-of select="."/>
-          </xsl:with-param>
-          <xsl:with-param name="length">
-            <xsl:value-of select="string-length(.)"/>
-          </xsl:with-param>
-        </xsl:call-template>
+        <xsl:call-template name="InsertWhiteSpaces"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
   <!--  convert multiple white spaces  -->
   <xsl:template name="InsertWhiteSpaces">
-    <xsl:param name="string"/>
-    <xsl:param name="length"/>
+    <xsl:param name="string" select="."/>
+    <xsl:param name="length" select="string-length(.)"/>
 
     <!-- string which doesn't contain whitespaces-->
     <xsl:choose>
