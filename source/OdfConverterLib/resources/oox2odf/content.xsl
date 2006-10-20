@@ -610,6 +610,10 @@
           </xsl:call-template>
         </xsl:variable>
         
+        <xsl:if test="$before != '' ">
+          <xsl:value-of select="concat($before,' ')"/>
+        </xsl:if>
+        
         <!--add remaining whitespaces as text:s if there are any-->
         <xsl:if test="string-length(concat($before,' ', $after)) &lt; $length ">
           <xsl:choose>
