@@ -36,6 +36,8 @@
 
   <xsl:key name="changed-regions" match="text:tracked-changes/text:changed-region" use="@text:id"/>
 
+  <!-- change starts -->
+  
   <xsl:template match="text:change-start">
     <xsl:call-template name="InsertChangeStart"/>
   </xsl:template>
@@ -44,6 +46,7 @@
     <xsl:call-template name="InsertChangeStart"/>
   </xsl:template>
 
+  <!-- Insert a change start item -->
   <xsl:template name="InsertChangeStart">
     <xsl:variable name="changed-region" select="key('changed-regions', @text:change-id)"/>
     <xsl:choose>
@@ -54,6 +57,8 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+  
+  <!-- change ends -->
 
   <xsl:template match="text:change-end">
     <xsl:call-template name="InsertChangeEnd"/>
@@ -63,6 +68,7 @@
     <xsl:call-template name="InsertChangeEnd"/>
   </xsl:template>
 
+  <!-- Insert a change end item -->
   <xsl:template name="InsertChangeEnd">
     <xsl:variable name="changed-region" select="key('changed-regions', @text:change-id)"/>
     <xsl:choose>
@@ -72,14 +78,51 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- changes -->
+
+  <xsl:template match="text:change">
+    <xsl:call-template name="InsertChange"/>
+  </xsl:template>
+
+  <xsl:template match="text:change" mode="paragraph">
+    <xsl:call-template name="InsertChange"/>
+  </xsl:template>
+
+  <!-- Insert a change item -->
+  <xsl:template name="InsertChange">
+    <xsl:variable name="changed-region" select="key('changed-regions', @text:change-id)"/>
+    <xsl:choose>
+      <xsl:when test="$changed-region/text:deletion">
+        <xsl:call-template name="InsertDeletion">
+          <xsl:with-param name="changed-region" select="$changed-region"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- insertions -->
+  
+  <!-- Insert start insertion item -->
   <xsl:template name="InsertStartInsertion">
     <xsl:param name="changed-region"/>
     <pct:start-insert pct:id="{@text:change-id}" pct:creator="{$changed-region/text:insertion/office:change-info/dc:creator}" pct:date="{$changed-region/text:insertion/office:change-info/dc:date}"/>
   </xsl:template>
 
+  <!-- Insert end insertion item -->
   <xsl:template name="InsertEndInsertion">
-    <xsl:param name="changed-region"/>
     <pct:end-insert pct:id="{@text:change-id}"/>
   </xsl:template>
+  
+  <!-- deletions -->
+
+  <!-- Insert a deletion -->
+  <xsl:template name="InsertDeletion">
+    <xsl:param name="changed-region"/>
+    <pct:deletion pct:creator="{$changed-region/text:deletion/office:change-info/dc:creator}" pct:date="{$changed-region/text:deletion/office:change-info/dc:date}">
+      <xsl:apply-templates select="$changed-region/text:deletion"/>
+    </pct:deletion>
+  </xsl:template>
+  
+  
   
 </xsl:stylesheet>

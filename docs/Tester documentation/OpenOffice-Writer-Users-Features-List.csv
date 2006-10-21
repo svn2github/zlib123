@@ -15,8 +15,8 @@ File;Properties;General;Digital Signature;;;;;;;<Vijay> These are the meta data 
 ;;;Info 4;;;0.1;Completed;;49;
 ;;Internet;Auto refresh proprty;;;;;;;
 ;;;;;;;;;;
-Edit;Changes;;Record;;;0.2-Final;;;;
-;;;Show;;;0.2-Final;;;;
+Edit;Changes;;Record;;;0.2-Final;Partial;;69-75;TODO: format changes
+;;;Show;;;-;;;;Show changes is not available in OpenXML, it is an application property
 ;;;;;;;;;;
 View;;;Layout Print;;;0.2-Final;;;;"All these basically only change the way you will see the document in the editing environmnet - this is not formatting applied to the text in the document, nor the page settings - its what toolbars are accessible and how big/small the doc looks and whether its in print layout or web layout etc
 My assumption is that we can leave out all these for conversion scenario (at least for now) - would like to know what people think

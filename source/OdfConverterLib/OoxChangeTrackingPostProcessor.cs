@@ -42,14 +42,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private const string PCT_NAMESPACE = "urn:cleverage:xmlns:post-processings:change-tracking";
 
         private string[] PPRCHANGE_CHILDREN = { "pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr", "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap", "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid", "spacing", "ind", "contextualSpacing", "mirrorIndents", "textboxTightWrap", "suppressOverlap", "jc", "textDirection", "textAlignment", "outlineLvl" };
+        private string[] DEL_CHILDREN = { "bookmarkEnd", "bookmarkStart", "commentRangeEnd", "commentRangeStart", "customXml", "customXmlDelRangeEnd", "customXmlDelRangeStart", "customXmlInsRangeEnd", "customXmlInsRangeStart", "customXmlMoveFromRangeEnd", "customXmlMoveFromRangeStart", "customXmlMoveToRangeEnd", "customXmlMoveToRangeStart", "del", "ins", "moveFrom", "moveFromRangeEnd", "moveFromRangeStart", "moveTo", "moveToRangeEnd", "moveToRangeStart", "permEnd", "permStart", "proofErr", "r", "sdt", "smartTag"};
 
         private Stack currentNode;
         private Stack context;
-        private Stack regionContext;
         private Stack currentChangedRegion;
+        private Stack currentDeletion;
         private int currentId = 0;
         private Stack previousParagraph;
         private Element lastRegion;
+        private Stack dontWrites;
 
         /// <summary>
         /// Constructor
@@ -60,36 +62,36 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.currentNode = new Stack();
             this.context = new Stack();
             this.context.Push("root");
-            this.regionContext = new Stack();
-            this.regionContext.Push("root");
             this.currentChangedRegion = new Stack();
+            this.currentDeletion = new Stack();
             this.previousParagraph = new Stack();
             this.lastRegion = null;
+            this.dontWrites = new Stack();
+
         }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
             this.currentNode.Push(new Element(prefix, localName, ns));
-           
-            if (IsParagraph(prefix, localName, ns))
+            if (IsRun())
+            {
+                StartRun();
+            }
+            else if (IsTInDeletion())
+            {
+                StartTInDeletion();
+            }
+            else if (IsDeletion())
+            {
+                StartDeletion();
+            }
+            else if (IsParagraph())
             {
                 StartParagraph();
             }
-            else if (IsStartInsert(prefix, localName, ns))
+            else if (IsStartInsert() || IsEndInsert() || DontWrite())
             {
-                StartStartInsert();
-            }
-            else if (IsEndInsert(prefix, localName, ns))
-            {
-                StartEndInsert();
-            }
-            else if (IsInInsert())
-            {
-                StartElementInInsert(prefix, localName, ns);
-            }
-            else if (IsInParagraph())
-            {
-                StartElementInParagraph(prefix, localName, ns);
+                // do nothing
             }
             else
             {
@@ -99,27 +101,34 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteEndElement()
         {
-            if (IsInStartInsert())
+            if (IsParagraph())
             {
-                EndElementInStartInsert();
+                EndParagraph();
             }
-            else if (IsInEndInsert())
+            else if (IsDeletion())
             {
-                EndElementInEndInsert();
+                EndDeletion();
             }
-            else if (IsInInsert() || IsInRunInsert())
+            else if (IsRun())
             {
-                EndElementInInsert();
+                EndRun();
             }
-            else if (IsInParagraph())
+            else if (IsStartInsert())
             {
-                EndElementInParagraph();
+                EndStartInsert();
+            }
+            else if (IsEndInsert())
+            {
+                EndEndInsert();
+            }
+            else if (DontWrite())
+            {
+                AddChildToElement();
             }
             else
             {
                 this.nextWriter.WriteEndElement();
             }
-
             this.currentNode.Pop();
         }
 
@@ -127,7 +136,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             this.currentNode.Push(new Attribute(prefix, localName, ns));
 
-            if (IsInStartInsert() || IsInEndInsert() || IsInParagraph())
+            if (IsStartInsert() || IsEndInsert() || DontWrite())
             {
                 // do nothing
             }
@@ -139,7 +148,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteEndAttribute()
         {
-            if (IsInStartInsert() || IsInEndInsert() || IsInParagraph())
+            if (IsStartInsert() || IsEndInsert() || DontWrite())
             {
                 AddAttributeToElement();
             }
@@ -153,7 +162,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteString(string text)
         {
-            if (IsInStartInsert() || IsInEndInsert() || IsInParagraph())
+            if (IsStartInsert() || IsEndInsert() || DontWrite())
             {
                 AddStringToNode(text);
             }
@@ -198,13 +207,29 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.currentNode.Push(child);
         }
 
+        private bool DontWrite()
+        {
+            return this.dontWrites.Count > 0;
+        }
+
         /*
          * Paragraphs
          */
 
-        private bool IsParagraph(string prefix, string localName, string ns)
+        private bool IsParagraph()
         {
-            return W_NAMESPACE.Equals(ns) && "p".Equals(localName);
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                return W_NAMESPACE.Equals(node.Ns) && "p".Equals(node.Name);
+            }
+            else
+            {
+                this.currentNode.Pop();
+                bool result = IsParagraph();
+                this.currentNode.Push(node);
+                return result;
+            }
         }
 
         private bool IsInParagraph()
@@ -222,30 +247,137 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 this.context.Push("p");
             }
-        }
-
-        private void StartElementInParagraph(string prefix, string localName, string ns)
-        {
-            // do nothing
-        }
-
-        private void EndElementInParagraph()
-        {
-            Element element = (Element)this.currentNode.Peek();
-            if (IsParagraph(element.Prefix, element.Name, element.Ns))
-            {
-                EndParagraph();
-            }
-            else
-            {
-                AddChildToElement();
-            }
+            this.dontWrites.Push("p");
         }
 
         private void EndParagraph()
         {
-            Element paragraph = (Element)this.currentNode.Peek();
             string context = (string)this.context.Pop();
+            string dontWrite = (string)this.dontWrites.Pop();
+            if (IsInInsert())
+            {
+                EndParagraphInInsert();
+            }
+            Element paragraph = (Element)this.currentNode.Peek();
+            Element deletion = (Element)paragraph.GetChild("deletion", PCT_NAMESPACE);
+            ArrayList followingParagraphs = new ArrayList();
+            ArrayList remainingChildren = null;
+            // deletion is not null if there were more than one paragraph in it
+            if (deletion != null)
+            {
+                // retrieve all elements after deletion (for insertion in the last paragraph)
+                remainingChildren = new ArrayList();
+                bool beforeDeletion = true;
+                foreach (Object child in paragraph.Children)
+                {
+                    if (!beforeDeletion)
+                    {
+                        remainingChildren.Add(child);
+                    }
+                    else if (child.Equals(deletion))
+                    {
+                        beforeDeletion = false;
+                    }
+                }
+                // remove all elements after deletion
+                foreach (Object child in remainingChildren)
+                {
+                    paragraph.RemoveChild(child);
+                }
+                paragraph.RemoveChild(deletion);
+
+                // build w:del element for insertion into paragraphs properties
+                Element del = new Element("w", "del", W_NAMESPACE);
+                del.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+                del.AddAttribute(new Attribute("w", "author", deletion.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
+                del.AddAttribute(new Attribute("w", "date", deletion.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
+                // retrieve first paragraph properties
+                Element pPr = paragraph.GetChild("pPr", W_NAMESPACE);
+                if (pPr == null)
+                {
+                    pPr = new Element("w", "pPr", W_NAMESPACE);
+                    paragraph.AddChild(pPr);
+                }
+
+                // extract paragraphs from deletion block
+                Element p = deletion.GetChild("p", W_NAMESPACE);
+                while (p != null)
+                {
+                    deletion.RemoveChild(p);
+                    followingParagraphs.Add(p);
+
+                    // replace each element with w:del
+                    ArrayList children = new ArrayList();
+                    foreach (object child in p.Children)
+                    {
+                        if (child is Element)
+                        {
+                            Element elChild = (Element)child;
+                            if (W_NAMESPACE.Equals(elChild.Ns) && "pPr".Equals(elChild.Name))
+                            {
+                                children.Add(child);
+                            }
+                            else
+                            {
+                                children.Add(ReplaceElementWithDel((Element)child, deletion));
+                            }
+                        }
+                        else
+                        {
+                            children.Add(child);
+                        }
+                    }
+                    p.Children = children;
+
+                    // replace pPr with first paragraph's one
+                    Element pPPr = p.GetChild("pPr", W_NAMESPACE);
+                    if (pPPr != null)
+                    {
+                        p.RemoveChild(pPPr);
+                    }
+                    Element newPPPr = pPr.Clone();
+                    p.AddFirstChild(newPPPr);
+
+                    // add pPrChange if needed
+                    if (!CompareParagraphProperties(pPPr, newPPPr))
+                    {
+                        newPPPr.AddChild(BuildPPrChange(pPPr, deletion));
+                    }
+
+                    // is it the last paragraph?
+                    Element nextP = deletion.GetChild("p", W_NAMESPACE);
+                    if (nextP == null)
+                    {
+                        // last paragraph: add remaining children
+                        foreach (Object child in remainingChildren)
+                        {
+                            p.AddChild(child);
+                        }
+                    }
+                    else
+                    {
+                        // previous paragraphs
+                        // add w:del to paragraph run properties
+                        Element pRPr = newPPPr.GetChild("rPr", W_NAMESPACE);
+                        if (pRPr == null)
+                        {
+                            pRPr = new Element("w", "rPr", W_NAMESPACE);
+                            newPPPr.AddChild(pRPr);
+                        }
+                        pRPr.AddChild(del);
+                    }
+                    p = nextP;
+                }
+
+                // add w:del to paragraph run properties
+                Element rPr = pPr.GetChild("rPr", W_NAMESPACE);
+                if (rPr == null)
+                {
+                    rPr = new Element("w", "rPr", W_NAMESPACE);
+                    pPr.AddChild(rPr);
+                }
+                rPr.AddChild(del);
+            }
             if ("p-with-ins".Equals(context))
             {
                 // we started the paragraph inside an insert region
@@ -255,7 +387,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     previousParagraph = (Element)this.previousParagraph.Peek();
                 }   
-                if (previousParagraph != null && !CompareParagraphProperties(paragraph, previousParagraph))
+                if (previousParagraph != null && !CompareParagraphProperties(paragraph.GetChild("pPr", W_NAMESPACE), previousParagraph.GetChild("pPr", W_NAMESPACE)))
                 {
                     Element pPr = paragraph.GetChild("pPr", W_NAMESPACE);
                     if (pPr == null)
@@ -263,39 +395,30 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         pPr = new Element("w", "pPr", W_NAMESPACE);
                         paragraph.AddChild(pPr);
                     }
-                    Element pPrChange = new Element("w", "pPrChange", W_NAMESPACE);
                     Element region = this.lastRegion;
                     if (this.currentChangedRegion.Count > 0)
                     {
                         region = (Element)this.currentChangedRegion.Peek();
                     }
-                    pPrChange.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
-                    pPrChange.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
-                    pPrChange.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
-                    Element newPreviousPPr = new Element("w", "pPr", W_NAMESPACE);
-                    Element realPreviousPPr = previousParagraph.GetChild("pPr", W_NAMESPACE);
-                    if (realPreviousPPr != null)
-                    {
-                        for (int i = 0; i < PPRCHANGE_CHILDREN.Length; ++i)
-                        {
-                            Element prop = realPreviousPPr.GetChild(PPRCHANGE_CHILDREN[i], W_NAMESPACE);
-                            if (prop != null)
-                            {
-                                newPreviousPPr.AddChild(prop);
-                            }
-                        }
-                    }
-                    pPrChange.AddChild(newPreviousPPr);
-                    pPr.AddChild(pPrChange);
+                    pPr.AddChild(BuildPPrChange(previousParagraph.GetChild("pPr", W_NAMESPACE), region));
                 }
             }
-            if (this.context.Contains("p") || this.context.Contains("p-with-ins"))
+            if (DontWrite())
             {
                 AddChildToElement();
             }
             else
             {
                 paragraph.Write(this.nextWriter);
+            }
+            // add other paragraphs (deletion)
+            foreach (Element p in followingParagraphs)
+            {
+                this.currentNode.Pop();
+                this.currentNode.Push(p);
+                this.dontWrites.Push(dontWrite);
+                this.context.Push(context);
+                EndParagraph();
             }
             if (this.previousParagraph.Count > 0)
             {
@@ -325,13 +448,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             ins.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
             ins.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
             rPr.AddFirstChild(ins);
-            EndParagraph();
         }
 
-        private bool CompareParagraphProperties(Element p1, Element p2)
+        private bool CompareParagraphProperties(Element pPr1, Element pPr2)
         {
-            Element pPr1 = p1.GetChild("pPr", W_NAMESPACE);
-            Element pPr2 = p2.GetChild("pPr", W_NAMESPACE);
             if (pPr1 == null && pPr2 != null && pPr2.HasChild() || pPr1 != null && (pPr2 == null || !pPr2.HasChild()))
             {
                 return false;
@@ -356,48 +476,195 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return true;
         }
 
+        private Element BuildPPrChange(Element pPr, Element region)
+        {
+            Element pPrChange = new Element("w", "pPrChange", W_NAMESPACE);
+            pPrChange.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+            pPrChange.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
+            pPrChange.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
+            Element newPPr = new Element("w", "pPr", W_NAMESPACE);
+            if (pPr != null)
+            {
+                for (int i = 0; i < PPRCHANGE_CHILDREN.Length; ++i)
+                {
+                    Element prop = pPr.GetChild(PPRCHANGE_CHILDREN[i], W_NAMESPACE);
+                    if (prop != null)
+                    {
+                        newPPr.AddChild(prop);
+                    }
+                }
+            }
+            pPrChange.AddChild(newPPr);
+            return pPrChange;
+        }
+
+        /*
+         * Runs
+         */
+
+        private bool IsRun()
+        {
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                return W_NAMESPACE.Equals(node.Ns) && "r".Equals(node.Name);
+            }
+            else
+            {
+                this.currentNode.Pop();
+                bool result = IsRun();
+                this.currentNode.Push(node);
+                return result;
+            }
+        }
+
+        private bool IsRunInsert()
+        {
+            return "r-with-ins".Equals(this.context.Peek());
+        }
+
+        private void StartRun()
+        {
+            if (DontWrite())
+            {
+                if (IsInInsert())
+                {
+                    // run start: we add a w:ins before
+                    Element ins = new Element("w", "ins", W_NAMESPACE);
+                    ins.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+                    Element region = (Element)this.currentChangedRegion.Peek();
+                    ins.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
+                    ins.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
+                    object current = this.currentNode.Pop();
+                    this.currentNode.Push(ins);
+                    this.currentNode.Push(current);
+                    this.context.Push("r-with-ins");
+                }
+                else
+                {
+                    this.context.Push("r");
+                }
+            }
+            else
+            {
+                // not sure that can hapens (in a run but not in a paragraph), but in case of...
+                if (IsInInsert())
+                {
+                    
+                    this.nextWriter.WriteStartElement("w", "ins", W_NAMESPACE);
+                    new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE).Write(this.nextWriter);
+                    Element region = (Element)this.currentChangedRegion.Peek();
+                    new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE).Write(this.nextWriter);
+                    new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE).Write(this.nextWriter);
+                    this.context.Push("r-with-ins");
+                }
+                else
+                {
+                    this.context.Push("r");
+                }
+                this.nextWriter.WriteStartElement("w", "r", W_NAMESPACE);
+            }
+        }
+
+        private void EndRun()
+        {
+            if (DontWrite())
+            {
+                AddChildToElement();
+                if (IsRunInsert())
+                {
+                    // close the w:ins
+                    this.currentNode.Pop();
+                    AddChildToElement();
+                }
+            }
+            else
+            {
+                // not sure that can happen (end run not in a paragraph...)
+                this.nextWriter.WriteEndElement();
+                if (IsRunInsert())
+                {
+                    // close the w:ins
+                    this.nextWriter.WriteEndElement();
+                }
+            }
+            this.context.Pop();
+        }
+
+        /*
+         * t in deletion
+         */
+
+        private bool IsTInDeletion()
+        {
+            if (!IsInDeletion())
+            {
+                return false;
+            }
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                return W_NAMESPACE.Equals(node.Ns) && "t".Equals(node.Name);
+            }
+            else
+            {
+                this.currentNode.Pop();
+                bool result = IsTInDeletion();
+                this.currentNode.Push(node);
+                return result;
+            }
+        }
+
+        private void StartTInDeletion()
+        {
+            Element t = (Element)this.currentNode.Peek();
+            t.Name = "delText";
+        }
+
+
         /*
          * StartInsert and EndInsert elements
          */
 
-        private bool IsStartInsert(string prefix, string localName, string ns)
+        private bool IsStartInsert()
         {
-            return PCT_NAMESPACE.Equals(ns) && "start-insert".Equals(localName);
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                return PCT_NAMESPACE.Equals(node.Ns) && "start-insert".Equals(node.Name);
+            }
+            else
+            {
+                this.currentNode.Pop();
+                bool result = IsStartInsert();
+                this.currentNode.Push(node);
+                return result;
+            }
         }
 
-        private bool IsEndInsert(string prefix, string localName, string ns)
+        private bool IsEndInsert()
         {
-            return PCT_NAMESPACE.Equals(ns) && "end-insert".Equals(localName);
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                return PCT_NAMESPACE.Equals(node.Ns) && "end-insert".Equals(node.Name);
+            }
+            else
+            {
+                this.currentNode.Pop();
+                bool result = IsEndInsert();
+                this.currentNode.Push(node);
+                return result;
+            }
         }
 
-        private bool IsInStartInsert()
-        {
-            return "start-insert".Equals(this.regionContext.Peek());
-        }
-
-        private bool IsInEndInsert()
-        {
-            return "end-insert".Equals(this.regionContext.Peek());
-        }
-
-        private void StartStartInsert()
-        {
-            this.regionContext.Push("start-insert");
-        }
-
-        private void StartEndInsert()
-        {
-            this.regionContext.Push("end-insert");
-        }
-
-        private void EndElementInStartInsert()
+        private void EndStartInsert()
         {
             // add the region on the stack
             this.currentChangedRegion.Push(this.currentNode.Peek());
-            this.regionContext.Pop();
         }
 
-        private void EndElementInEndInsert()
+        private void EndEndInsert()
         {
             // remove the region from the regions stack
             Stack tmp = new Stack();
@@ -413,7 +680,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 this.currentChangedRegion.Push(tmp.Pop());
             }
-            this.regionContext.Pop();
             // save the last region in case we need it before closing a paragraph
             this.lastRegion = region;
         }
@@ -428,82 +694,128 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return this.currentChangedRegion.Count > 0;
         }
 
-        private bool IsInRunInsert()
-        {
-             return "r-with-ins".Equals(this.context.Peek());
-        }
+        /*
+         * Deletions
+         */
 
-        private void StartElementInInsert(string prefix, string localName, string ns)
+        private bool IsDeletion()
         {
-            if (IsInParagraph())
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
             {
-                // normally we should always be in a paragraph
-                if (W_NAMESPACE.Equals(ns) && "r".Equals(localName))
-                {
-                    // run start: we add a w:ins before
-                    Element ins = new Element("w", "ins", W_NAMESPACE);
-                    ins.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
-                    Element region = (Element)this.currentChangedRegion.Peek();
-                    ins.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
-                    ins.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
-                    object current = this.currentNode.Pop();
-                    this.currentNode.Push(ins);
-                    this.currentNode.Push(current);
-                    this.context.Push("r-with-ins");
-                }
-                StartElementInParagraph(prefix, localName, ns);
+                return PCT_NAMESPACE.Equals(node.Ns) && "deletion".Equals(node.Name);
             }
             else
             {
-                // not sure that can hapens (in a run but not in a paragraph), but in case of...
-                if (W_NAMESPACE.Equals(ns) && "r".Equals(localName))
-                {
-                    this.nextWriter.WriteStartElement("w", "ins", W_NAMESPACE);
-                    new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE).Write(this.nextWriter);
-                    Element region = (Element)this.currentChangedRegion.Peek();
-                    new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE).Write(this.nextWriter);
-                    new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE).Write(this.nextWriter);
-                    this.context.Push("r-with-ins");
-                }
-                this.nextWriter.WriteStartElement(prefix, localName, ns);
+                this.currentNode.Pop();
+                bool result = IsDeletion();
+                this.currentNode.Push(node);
+                return result;
             }
         }
 
-        private void EndElementInInsert()
+        private bool IsInDeletion()
         {
-            Node currentNode = (Node)this.currentNode.Peek();
-            if (IsInParagraph())
+            return this.context.Contains("del");
+        }
+
+        private void StartDeletion()
+        {
+            this.context.Push("del");
+            this.dontWrites.Push("del");
+        }
+
+        private void EndDeletion()
+        {
+            this.context.Pop();
+            this.dontWrites.Pop();
+            Element deletion = (Element)this.currentNode.Pop();
+            Element p = deletion.GetChild("p", W_NAMESPACE);
+            // insert elements from first paragraph
+            if (p != null)
             {
-                // that is what should normally happen
-                if (IsParagraph(currentNode.Prefix, currentNode.Name, currentNode.Ns))
+                // remove the paragraph from the deletion element
+                deletion.RemoveChild(p);
+                Element parentP = (Element)this.currentNode.Peek();
+                foreach (object child in p.Children)
                 {
-                    EndParagraphInInsert();
-                }
-                else
-                {
-                    AddChildToElement();
-                    if (W_NAMESPACE.Equals(currentNode.Ns) && "r".Equals(currentNode.Name))
+                    if (child is Element)
                     {
-                        // run end : we close the w:ins
-                        this.currentNode.Pop();
-                        AddChildToElement();
-                        this.context.Pop();
+                        Element element = (Element)child;
+                        if (!"pPr".Equals(element.Name) || !W_NAMESPACE.Equals(element.Ns))
+                        {
+                            // insert a w:del
+                            parentP.AddChild(ReplaceElementWithDel(element, deletion));
+                        }
+                        /* commented out by jgoffinet to prevent formatting bugs */
+                        /*
+                        else
+                        {
+                            // replace paragraph properties from the parent paragraph
+                            // (normally they should be the same but sometimes they are not)
+                            Element parentPPr = parentP.GetChild("pPr", W_NAMESPACE);
+                            if (parentPPr != null)
+                            {
+                                parentP.RemoveChild(parentPPr);
+                            }
+                            parentP.AddFirstChild(element);
+                        }
+                        */
                     }
                 }
             }
-            else
+            this.currentNode.Push(deletion);
+            // attach deletion to previous element if not empty
+            if (deletion.GetChild("p", W_NAMESPACE) != null)
             {
-                // not sure that can happen
-                this.nextWriter.WriteEndElement();
-                if (W_NAMESPACE.Equals(currentNode.Ns) && "r".Equals(currentNode.Name))
-                {
-                    // run end : we close the w:ins
-                    this.nextWriter.WriteEndElement();
-                    this.context.Pop();
-                }
+                AddChildToElement();
             }
         }
 
+        private Element ReplaceElementWithDel(Element element, Element deletion)
+        {
+            if (W_NAMESPACE.Equals(element.Ns) && Contains(DEL_CHILDREN, element.Name))
+            {
+                // insert w:del element
+                Element del = new Element("w", "del", W_NAMESPACE);
+                del.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+                del.AddAttribute(new Attribute("w", "author", deletion.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
+                del.AddAttribute(new Attribute("w", "date", deletion.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
+                del.AddChild(element);
+                return del;
+            }
+            else
+            {
+                // recursive call on all children
+                ArrayList newChildren = new ArrayList();
+                foreach (object child in element.Children)
+                {
+                    if (child is Element)
+                    {
+                        Element replaced = ReplaceElementWithDel((Element)child, deletion);
+                        newChildren.Add(replaced);
+                    }
+                    else
+                    {
+                        newChildren.Add(child);
+                    }
+                }
+                element.Children = newChildren;
+                return element;
+            }
+        }
+
+        private static bool Contains(string[] tab, string s)
+        {
+            for (int i = 0; i < tab.Length; ++i)
+            {
+                if (tab[i].Equals(s))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
 
     }

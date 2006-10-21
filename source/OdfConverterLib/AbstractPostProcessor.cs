@@ -196,19 +196,22 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             private string name;
             public string Name
             {
-                get { return name; }
+                set { this.name = value; }
+                get { return this.name; }
             }
 
             private string prefix;
             public string Prefix
             {
-                get { return prefix; }
+                set { this.prefix = value; }
+                get { return this.prefix; }
             }
 
             private string ns;
             public string Ns
             {
-                get { return ns; }
+                set { this.ns = value; }
+                get { return this.ns; }
             }
 
             public Node(string prefix, string name, string ns)
@@ -300,11 +303,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             public ArrayList Attributes
             {
                 get { return this.attributes; }
+                set { this.attributes = value; }
             }
 
             public ArrayList Children
             {
                 get { return this.children; }
+                set { this.children = value; }
             }
 
             public void AddAttribute(Attribute attribute)
@@ -312,9 +317,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.attributes.Add(attribute);
             }
 
-            public void AddChild(Element element)
+            public void AddChild(Object child)
             {
-                this.children.Add(element);
+                this.children.Add(child);
+            }
+
+            public void AddFirstChild(Object element)
+            {
+                this.children.Insert(0, element);
             }
 
             public void AddFirstChild(Element element)
@@ -335,11 +345,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.children.Add(text);
             }
 
-            public void RemoveChild(Element element)
+            public void RemoveChild(Object child)
             {
-                if (this.GetChild(element.Name, element.Ns) != null)
+                if (this.children.Contains(child))
                 {
-                    this.children.Remove(element);
+                    this.children.Remove(child);
                 }
             }
 
@@ -443,6 +453,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 return true;
             }
 
+            public void Replace(object child, object newChild)
+            {
+                if (this.children.Contains(child))
+                {
+                    int index = this.children.IndexOf(child);
+                    this.children.Remove(child);
+                    this.children.Insert(index, newChild);
+                }
+            }
+
             public void Write(XmlWriter writer)
             {
                 writer.WriteStartElement(this.Prefix, this.Name, this.Ns);
@@ -466,6 +486,33 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     }
                 }
                 writer.WriteEndElement();
+            }
+
+            public Element Clone()
+            {
+                Element result = new Element(this);
+                // copy attributes
+                foreach (Attribute attr in this.attributes)
+                {
+                    Attribute attr2 = new Attribute(attr);
+                    attr2.Value = attr.Value;
+                    result.AddAttribute(attr2);
+                }
+                // copy children
+                foreach (Object obj in this.children)
+                {
+                    if (obj is Element)
+                    {
+                        Element child = (Element)obj;
+                        result.AddChild(child.Clone());
+                    }
+                    else if (obj is string)
+                    {
+                        string child = (string)obj;
+                        result.AddChild(child.Clone());
+                    }
+                }
+                return result;
             }
 
         }
