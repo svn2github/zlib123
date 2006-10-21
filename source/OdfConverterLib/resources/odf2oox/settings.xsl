@@ -61,8 +61,8 @@
 
       <!-- track changes -->
       <xsl:if
-        test="document('content.xml')/office:document-content/office:body/office:text/office:forms">
-        <w:trackRevisions/>
+        test="document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes">
+        <w:trackRevisions w:val="{document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes}"/>
       </xsl:if>
 
       <xsl:if
