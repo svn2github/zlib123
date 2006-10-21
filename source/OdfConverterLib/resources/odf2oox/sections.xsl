@@ -37,8 +37,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  exclude-result-prefixes="office text table fo style v draw"
-  xmlns:w10="urn:schemas-microsoft-com:office:word">
+  exclude-result-prefixes="office text table fo style v draw">
 
 
   <xsl:strip-space elements="*"/>

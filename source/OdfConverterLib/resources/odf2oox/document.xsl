@@ -39,8 +39,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="office text table fo style draw xlink v svg number"
-  xmlns:w10="urn:schemas-microsoft-com:office:word">
+  exclude-result-prefixes="office text table fo style draw xlink v svg number">
 
   <xsl:import href="tables.xsl"/>
   <xsl:import href="indexes.xsl"/>
@@ -876,5 +875,6 @@
   <!-- ignored -->
   <xsl:template match="text()"/>
   <xsl:template match="text:tracked-changes"/>
+  <xsl:template match="office:change-info"/>
 
 </xsl:stylesheet>

@@ -77,7 +77,6 @@
       xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
       xmlns:v="urn:schemas-microsoft-com:vml"
       xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
-      xmlns:w10="urn:schemas-microsoft-com:office:word"
       xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
 
       <xsl:for-each select="document('content.xml')">
