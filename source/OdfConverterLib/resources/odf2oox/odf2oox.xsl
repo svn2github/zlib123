@@ -105,6 +105,11 @@
         <xsl:call-template name="numbering"/>
       </pzip:entry>
 
+      <!-- numbering relationships item-->
+      <pzip:entry pzip:target="word/_rels/numbering.xml.rels">
+        <xsl:call-template name="InsertNumberingInternalRelationships"/>
+      </pzip:entry>
+      
       <!-- footnotes -->
       <pzip:entry pzip:target="word/footnotes.xml">
         <xsl:call-template name="footnotes"/>
@@ -156,11 +161,6 @@
       <!-- package relationship item -->
       <pzip:entry pzip:target="_rels/.rels">
         <xsl:call-template name="package-relationships"/>
-      </pzip:entry>
-
-      <!-- numbering relationships item-->
-      <pzip:entry pzip:target="word/_rels/numbering.xml.rels">
-        <xsl:call-template name="InsertBuletRelationships"/>
       </pzip:entry>
 
     </pzip:archive>

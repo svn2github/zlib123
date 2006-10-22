@@ -5,7 +5,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ *  
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -43,9 +43,9 @@
   exclude-result-prefixes="xlink draw svg fo office style text">
 
   <xsl:key name="images"
-    match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image/@xlink:href]"
+    match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]"
     use="''"/>
-  <xsl:key name="images" match="draw:frame" use="'const'"/>
+  <xsl:key name="frames" match="draw:frame" use="''"/>
   <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
 
   <!-- check if image type is supported in word  -->
@@ -64,10 +64,10 @@
 
   <!-- Get the position of an element in the draw:frame group -->
   <xsl:template name="GetPosition">
-    <xsl:param name="node"/>
+    <xsl:variable name="node" select="."/>
     <xsl:variable name="positionInGroup">
       <xsl:for-each select="document('content.xml')">
-        <xsl:for-each select="key('images', 'const')">
+        <xsl:for-each select="key('frames', '')">
           <xsl:if test="generate-id($node) = generate-id(.)">
             <xsl:value-of select="position()"/>
           </xsl:if>
@@ -81,11 +81,11 @@
       <xsl:otherwise>
         <xsl:variable name="countContentImages">
           <xsl:for-each select="document('content.xml')">
-            <xsl:value-of select="count(key('images', 'const'))"/>
+            <xsl:value-of select="count(key('frames', ''))"/>
           </xsl:for-each>
         </xsl:variable>
         <xsl:for-each select="document('styles.xml')">
-          <xsl:for-each select="key('images', 'const')">
+          <xsl:for-each select="key('frames', '')">
             <xsl:if test="generate-id($node) = generate-id(.)">
               <xsl:value-of select="$countContentImages+position()"/>
             </xsl:if>
@@ -98,10 +98,7 @@
   <!--draw:object-ole element represents objects that only have a binary representation -->
   <xsl:template match="draw:frame[./draw:object-ole]" mode="paragraph">
     <xsl:variable name="imageId">
-      <xsl:call-template name="GetPosition">
-        <xsl:with-param name="node" select="."/>
-      </xsl:call-template>
-
+      <xsl:call-template name="GetPosition"/>
     </xsl:variable>
     <xsl:variable name="width">
       <xsl:call-template name="point-measure">
@@ -142,9 +139,7 @@
 
     <xsl:if test="$supported = 'true'">
       <xsl:variable name="imageId">
-        <xsl:call-template name="GetPosition">
-          <xsl:with-param name="node" select="."/>
-        </xsl:call-template>
+        <xsl:call-template name="GetPosition"/>
       </xsl:variable>
 
       <xsl:for-each select="draw:image">
@@ -221,9 +216,7 @@
 
     <w:drawing>
       <xsl:variable name="imageId">
-        <xsl:call-template name="GetPosition">
-          <xsl:with-param name="node" select="."/>
-        </xsl:call-template>
+        <xsl:call-template name="GetPosition"/>
       </xsl:variable>
 
       <xsl:variable name="cx">

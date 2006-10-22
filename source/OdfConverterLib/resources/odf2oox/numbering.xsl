@@ -1410,4 +1410,21 @@
   </xsl:template>
 
 
+  <!-- Numbering part relationships -->
+  <xsl:template name="InsertNumberingInternalRelationships">
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <xsl:for-each select="document('content.xml')">
+        <xsl:call-template name="InsertImagesRelationships">
+          <xsl:with-param name="images" select="key('bullets', '')"/>
+        </xsl:call-template>
+      </xsl:for-each>
+
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:call-template name="InsertImagesRelationships">
+          <xsl:with-param name="images" select="key('bullets', '')"/>
+        </xsl:call-template>
+      </xsl:for-each>
+    </Relationships>
+  </xsl:template>
+
 </xsl:stylesheet>

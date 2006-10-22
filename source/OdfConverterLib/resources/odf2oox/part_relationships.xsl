@@ -129,10 +129,80 @@
     <xsl:param name="images"/>
 
     <xsl:for-each select="$images">
-      <xsl:call-template name="InsertImageRelationship">
-        <xsl:with-param name="context" select="draw:image"/>
-        <xsl:with-param name="xlink" select="draw:image/@xlink:href"/>
-      </xsl:call-template>
+      <xsl:variable name="supported">
+        <xsl:call-template name="image-support">
+          <xsl:with-param name="name" select="@xlink:href"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="$supported = 'true' ">
+        <xsl:choose>
+          <!-- Internal image -->
+          <xsl:when test="starts-with(@xlink:href, 'Pictures/')">
+            <!-- copy this image to the oox package -->
+            <xsl:variable name="imageName"
+              select="substring-after(@xlink:href, 'Pictures/')"/>
+            <pzip:copy pzip:source="{@xlink:href}" pzip:target="word/media/{$imageName}"/>
+            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+              Id="{generate-id(.)}"
+              Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+              Target="media/{$imageName}"/>
+            <xsl:if test="ancestor::draw:a">
+              <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+                Id="{generate-id(ancestor::draw:a)}"
+                Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+                TargetMode="External">
+                <xsl:attribute name="Target">
+                  <xsl:choose>
+
+                    <!-- converting relative path -->
+                    <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '../')">
+                      <xsl:call-template name="HandlingSpaces">
+                        <xsl:with-param name="path">
+                          <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'../')"
+                          />
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:when>
+
+                    <xsl:otherwise>
+                      <xsl:call-template name="HandlingSpaces">
+                        <xsl:with-param name="path">
+                          <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </Relationship>
+            </xsl:if>
+          </xsl:when>
+          <xsl:otherwise>
+
+            <!-- External image : If relative path, image may not be converted. -->
+            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+              Id="{generate-id(.)}"
+              Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+              <xsl:attribute name="Target">
+                <xsl:choose>
+                  <xsl:when test="contains(@xlink:href, './')">
+                    <xsl:value-of select="concat('../../', @xlink:href)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="@xlink:href"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+              <xsl:attribute name="TargetMode">External</xsl:attribute>
+            </Relationship>
+            <xsl:if test="ancestor::draw:a">
+              <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+                Id="{generate-id(ancestor::draw:a)}"
+                Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+                TargetMode="External" Target="{ancestor::draw:a/@xlink:href}"/>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
 
@@ -179,107 +249,6 @@
     </xsl:for-each>
   </xsl:template>
 
-  <!-- Bullet-image relationships -->
-  <xsl:template name="InsertBuletRelationships">
-    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      <xsl:for-each select="document('content.xml')">
-        <xsl:for-each select="key('bullets','')">
-          <xsl:call-template name="InsertImageRelationship">
-            <xsl:with-param name="context" select="."/>
-            <xsl:with-param name="xlink" select="@xlink:href"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:for-each>
-      <xsl:for-each select="document('styles.xml')">
-        <xsl:for-each select="key('bullets','')">
-          <xsl:call-template name="InsertImageRelationship">
-            <xsl:with-param name="context" select="."/>
-            <xsl:with-param name="xlink" select="@xlink:href"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:for-each>
-    </Relationships>
-  </xsl:template>
-
-  <!-- insert the relationship for one image -->
-  <xsl:template name="InsertImageRelationship">
-    <xsl:param name="xlink"/>
-    <xsl:param name="context"/>
-
-    <xsl:variable name="supported">
-      <xsl:call-template name="image-support">
-        <xsl:with-param name="name" select="$xlink"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:if test="$supported = 'true' ">
-      <xsl:choose>
-        <!-- Internal image -->
-        <xsl:when test="starts-with($xlink, 'Pictures/')">
-          <!-- copy this image to the oox package -->
-          <xsl:variable name="imageName" select="substring-after($xlink, 'Pictures/')"/>
-          <pzip:copy pzip:source="{$xlink}" pzip:target="word/media/{$imageName}"/>
-          <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-            Id="{generate-id($context)}"
-            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-            Target="media/{$imageName}"/>
-          <!-- particular case -->
-          <xsl:if test="ancestor::draw:a">
-            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-              Id="{generate-id(ancestor::draw:a)}"
-              Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-              TargetMode="External">
-              <xsl:attribute name="Target">
-                <xsl:choose>
-
-                  <!-- converting relative path -->
-                  <xsl:when test="starts-with(ancestor::draw:a/@xlink:href,'../')">
-                    <xsl:call-template name="HandlingSpaces">
-                      <xsl:with-param name="path">
-                        <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'../')"/>
-                      </xsl:with-param>
-                    </xsl:call-template>
-                  </xsl:when>
-
-                  <xsl:otherwise>
-                    <xsl:call-template name="HandlingSpaces">
-                      <xsl:with-param name="path">
-                        <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
-                      </xsl:with-param>
-                    </xsl:call-template>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
-            </Relationship>
-          </xsl:if>
-        </xsl:when>
-        <xsl:otherwise>
-
-          <!-- External image : If relative path, image may not be converted. -->
-          <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-            Id="{generate-id($context)}"
-            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
-            <xsl:attribute name="Target">
-              <xsl:choose>
-                <xsl:when test="contains($xlink,'./')">
-                  <xsl:value-of select="concat('../../',$xlink)"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$xlink"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:attribute name="TargetMode">External</xsl:attribute>
-          </Relationship>
-          <!-- particular case -->
-          <xsl:if test="ancestor::draw:a">
-            <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-              Id="{generate-id(ancestor::draw:a)}"
-              Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
-              TargetMode="External" Target="{ancestor::draw:a/@xlink:href}"/>
-          </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
-  </xsl:template>
+  
 
 </xsl:stylesheet>
