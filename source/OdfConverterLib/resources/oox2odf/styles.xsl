@@ -382,7 +382,7 @@
   <!-- document defaults -->
   <xsl:template match="w:rPrDefault | w:pPrDefault">
     <style:default-style style:family="paragraph">
-      <xsl:call-template name="InsertStyleProperties"/>
+      <xsl:call-template name="InsertDocDefaults"/>
     </style:default-style>
   </xsl:template>
 
@@ -424,10 +424,32 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="InsertDocDefaults">
+     <style:paragraph-properties>
+        <xsl:call-template name="InsertDefaultParagraphProperties"/>
+        <xsl:if test="w:pPr">
+          <xsl:for-each select="w:pPr">
+            <xsl:call-template name="InsertParagraphProperties"/>
+          </xsl:for-each>
+        </xsl:if>
+      </style:paragraph-properties>
+   
+    <style:text-properties>
+        <xsl:if test="w:rPr">
+          <xsl:for-each select="w:rPr">
+            <xsl:call-template name="InsertTextProperties"/>
+          </xsl:for-each>
+          <xsl:for-each select="w:pPr">
+            <xsl:call-template name="InsertpPrTextProperties"/>
+          </xsl:for-each>
+        </xsl:if>
+      </style:text-properties>
+  </xsl:template>
+  
   <!-- Compute style and text properties of context style. -->
   <xsl:template name="InsertStyleProperties">
 
-    <xsl:if test="self::node()/@w:type = 'paragraph' ">
+    <xsl:if test="self::node()/@w:type = 'paragraph'">
       <style:paragraph-properties>
         <xsl:call-template name="InsertDefaultParagraphProperties"/>
         <xsl:if test="w:pPr">
@@ -1508,22 +1530,39 @@
     </xsl:if>
 
     <!-- fonts -->
+    <xsl:if test="w:rFonts/@w:asciiTheme">
+        <xsl:attribute name="style:font-name">
+        <xsl:call-template name="ComputeThemeFontName">
+          <xsl:with-param name="fontTheme" select="w:rFonts/@w:asciiTheme"/>
+          <xsl:with-param name="fontType">a:latin</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
     <xsl:if test="w:rFonts/@w:ascii">
       <xsl:attribute name="style:font-name">
         <xsl:value-of select="w:rFonts/@w:ascii"/>
       </xsl:attribute>
     </xsl:if>
-    <xsl:if test="w:rFonts/@w:asciiTheme">
-      <xsl:attribute name="style:font-name">
+    <xsl:if test="w:rFonts/@w:cstheme">
+      <xsl:attribute name="style:font-name-complex">
         <xsl:call-template name="ComputeThemeFontName">
-          <xsl:with-param name="fontTheme" select="w:rFonts/@w:asciiTheme"/>
+          <xsl:with-param name="fontTheme" select="w:rFonts/@w:cstheme"/>
+          <xsl:with-param name="fontType">a:cs</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-    <xsl:if test="w:rFonts/@w:cs">
+     <xsl:if test="w:rFonts/@w:cs">
       <xsl:attribute name="style:font-name-complex">
         <xsl:value-of select="w:rFonts/@w:cs"/>
        </xsl:attribute>
+     </xsl:if>
+    <xsl:if test="w:rFonts/@w:eastAsiaTheme">
+      <xsl:attribute name="style:font-name-asian">
+        <xsl:call-template name="ComputeThemeFontName">
+          <xsl:with-param name="fontTheme" select="w:rFonts/@w:eastAsiaTheme"/>
+          <xsl:with-param name="fontType">a:ea</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
     </xsl:if>
     <xsl:if test="w:rFonts/@w:eastAsia">
       <xsl:attribute name="style:font-name-asian">
@@ -1822,21 +1861,29 @@
   <xsl:template name="ComputeThemeFontName"
     xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
     <xsl:param name="fontTheme"/>
+    <xsl:param name="fontType" />
     <xsl:variable name="fontScheme"
       select="document('word/theme/theme1.xml')/a:theme/a:themeElements/a:fontScheme"/>
-
+    
     <xsl:variable name="fontName">
       <xsl:choose>
         <xsl:when test="contains($fontTheme,'minor')">
-          <xsl:value-of select="$fontScheme/a:minorFont/a:latin/@typeface"/>
+          <xsl:value-of select="$fontScheme/a:minorFont/child::node()[name() = $fontType]/@typeface"/>
         </xsl:when>
         <xsl:when test="contains($fontTheme,'major')">
-          <xsl:value-of select="$fontScheme/a:majorFont/a:latin/@typeface"/>
+          <xsl:value-of select="$fontScheme/a:majorFont/child::node()[name() = $fontType]/@typeface"/>
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-
-    <xsl:value-of select="$fontName"/>
+    
+    <xsl:choose>
+      <xsl:when test="$fontName = ''">
+        <xsl:text>none</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$fontName"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
