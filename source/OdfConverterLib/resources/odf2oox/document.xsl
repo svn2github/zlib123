@@ -291,6 +291,9 @@
       <xsl:when test="parent::text:p|parent::text:h">
         <xsl:value-of select="parent::node()/@text:style-name"/>
       </xsl:when>
+      <xsl:when test="ancestor::text:a[1][@text:style-name]">
+        <xsl:value-of select="ancestor::text:a[1]/@text:style-name"/>
+      </xsl:when>
       <xsl:when test="ancestor::text:span">
         <xsl:value-of select="ancestor::text:span[1]/@text:style-name"/>
       </xsl:when>
@@ -553,16 +556,11 @@
       <xsl:when test="$prefixedStyleName!=''">
         <w:rStyle w:val="{$prefixedStyleName}"/>
       </xsl:when>
-      <xsl:when test="ancestor::text:a">
-        <xsl:choose>
-          <xsl:when test="ancestor::text:a[1][@text:style-name]">
-            <w:rStyle w:val="{ancestor::text:a[1][@text:style-name]}"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <w:rStyle w:val="Hyperlink"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="ancestor::text:a">
+          <w:rStyle w:val="Hyperlink"/>
+        </xsl:if>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -661,7 +659,8 @@
           </w:r>
         </xsl:when>
         <!-- if preceding is a list whose last element has break-after -->
-        <xsl:when test="preceding-sibling::node()[1][self::text:list and descendant::node()[last()][(self::text:p or self::text:h) and key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='column' ]]">
+        <xsl:when
+          test="preceding-sibling::node()[1][self::text:list and descendant::node()[last()][(self::text:p or self::text:h) and key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='column' ]]">
           <w:r>
             <xsl:if test="ancestor::text:section/@text:display='none'">
               <w:rPr>
@@ -672,7 +671,8 @@
           </w:r>
         </xsl:when>
         <!-- if preceding is a table with break-after property -->
-        <xsl:when test="preceding-sibling::node()[1][self::table:table and key('automatic-styles',@table:name)/style:table-properties/@fo:break-after='column' ]">
+        <xsl:when
+          test="preceding-sibling::node()[1][self::table:table and key('automatic-styles',@table:name)/style:table-properties/@fo:break-after='column' ]">
           <w:r>
             <xsl:if test="ancestor::text:section/@text:display='none'">
               <w:rPr>
@@ -697,11 +697,13 @@
         <xsl:otherwise>
           <xsl:variable name="styleName" select="@text:style-name"/>
           <xsl:variable name="precStyleName">
-            <xsl:value-of select="preceding-sibling::node()[1][self::text:p or self::text:h]/@text:style-name"/>
+            <xsl:value-of
+              select="preceding-sibling::node()[1][self::text:p or self::text:h]/@text:style-name"/>
           </xsl:variable>
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
-              <xsl:when test="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:break-before='column' ">
+              <xsl:when
+                test="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:break-before='column' ">
                 <w:r>
                   <xsl:if test="ancestor::text:section/@text:display='none'">
                     <w:rPr>
@@ -712,7 +714,8 @@
                 </w:r>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:if test="key('automatic-styles',$precStyleName)/style:paragraph-properties/@fo:break-after='column' ">
+                <xsl:if
+                  test="key('automatic-styles',$precStyleName)/style:paragraph-properties/@fo:break-after='column' ">
                   <w:r>
                     <xsl:if test="ancestor::text:section/@text:display='none'">
                       <w:rPr>
@@ -735,7 +738,8 @@
   <xsl:template name="InsertColumnBreakAfter">
     <xsl:choose>
       <!-- if following is a list whose first element has break-before -->
-      <xsl:when test="following-sibling::node()[1][self::text:list and descendant::node()[1][(self::text:p or self::text:h) and key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-before='column' ]]">
+      <xsl:when
+        test="following-sibling::node()[1][self::text:list and descendant::node()[1][(self::text:p or self::text:h) and key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-before='column' ]]">
         <w:r>
           <xsl:if test="ancestor::text:section/@text:display='none'">
             <w:rPr>
@@ -746,7 +750,8 @@
         </w:r>
       </xsl:when>
       <!-- if following is a table with break-before property -->
-      <xsl:when test="following-sibling::node()[1][self::table:table and key('automatic-styles',@table:name)/style:table-properties/@fo:break-before='column' ]">
+      <xsl:when
+        test="following-sibling::node()[1][self::table:table and key('automatic-styles',@table:name)/style:table-properties/@fo:break-before='column' ]">
         <w:r>
           <xsl:if test="ancestor::text:section/@text:display='none'">
             <w:rPr>
