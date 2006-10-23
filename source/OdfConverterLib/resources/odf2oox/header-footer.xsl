@@ -108,35 +108,24 @@
     <xsl:param name="master-page"/>
 
     <xsl:choose>
-      <xsl:when test="$master-page/@style:name = 'First_20_Page' ">
-        <xsl:if test="$master-page/style:header">
-          <w:headerReference w:type="first" r:id="{generate-id($master-page/style:header)}"/>
-        </xsl:if>
-        <xsl:if test="$master-page/style:footer">
-          <w:footerReference w:type="first" r:id="{generate-id($master-page/style:footer)}"/>
-        </xsl:if>
+      <xsl:when test="$master-page/style:header-left and $master-page/style:header">
+        <w:headerReference w:type="default" r:id="{generate-id($master-page/style:header)}"/>
+        <w:headerReference w:type="even" r:id="{generate-id($master-page/style:header-left)}"/>
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:choose>
-          <xsl:when test="$master-page/style:header-left and $master-page/style:header">
-            <w:headerReference w:type="default" r:id="{generate-id($master-page/style:header)}"/>
-            <w:headerReference w:type="even" r:id="{generate-id($master-page/style:header-left)}"/>
-          </xsl:when>
-          <xsl:when test="$master-page/style:header">
-            <w:headerReference w:type="default" r:id="{generate-id($master-page/style:header)}"/>
-          </xsl:when>
-        </xsl:choose>
-        <xsl:choose>
-          <xsl:when test="$master-page/style:footer and $master-page/style:footer-left">
-            <w:footerReference w:type="default" r:id="{generate-id($master-page/style:footer)}"/>
-            <w:footerReference w:type="even" r:id="{generate-id($master-page/style:footer-left)}"/>
-          </xsl:when>
-          <xsl:when test="$master-page/style:footer">
-            <w:footerReference w:type="default" r:id="{generate-id($master-page/style:footer)}"/>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:otherwise>
+      <xsl:when test="$master-page/style:header">
+        <w:headerReference w:type="default" r:id="{generate-id($master-page/style:header)}"/>
+      </xsl:when>
     </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="$master-page/style:footer and $master-page/style:footer-left">
+        <w:footerReference w:type="default" r:id="{generate-id($master-page/style:footer)}"/>
+        <w:footerReference w:type="even" r:id="{generate-id($master-page/style:footer-left)}"/>
+      </xsl:when>
+      <xsl:when test="$master-page/style:footer">
+        <w:footerReference w:type="default" r:id="{generate-id($master-page/style:footer)}"/>
+      </xsl:when>
+    </xsl:choose>
+
   </xsl:template>
 
 
