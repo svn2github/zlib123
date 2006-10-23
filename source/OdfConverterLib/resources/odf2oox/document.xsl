@@ -29,6 +29,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -39,7 +40,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="office text table fo style draw xlink v svg number">
+  exclude-result-prefixes="office text table fo style draw xlink v svg number config">
 
   <xsl:import href="tables.xsl"/>
   <xsl:import href="indexes.xsl"/>
@@ -238,39 +239,74 @@
 
 
   <!-- Insert spacing in paragraph properties if table before/after w:p element has spacing after/before -->
+  <!-- Suppress spacing before/after in tables if corresponding setting enabled -->
   <xsl:template name="InsertParagraphSpacing">
-    <xsl:if
-      test="following-sibling::node()[1][name()='table:table'] or preceding-sibling::node()[1][name()='table:table']">
-      <!-- Compute space after -->
-      <xsl:variable name="spaceAfter">
-        <xsl:call-template name="CompareSpacingValues">
-          <xsl:with-param name="tableSide" select="'top'"/>
-          <xsl:with-param name="paraSide" select="'bottom'"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <!-- Compute space before -->
-      <xsl:variable name="spaceBefore">
-        <xsl:call-template name="CompareSpacingValues">
-          <xsl:with-param name="tableSide" select="'bottom'"/>
-          <xsl:with-param name="paraSide" select="'top'"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <!-- override if needed -->
-      <xsl:if test="$spaceBefore &gt; 0 or $spaceAfter &gt; 0">
-        <w:spacing>
-          <xsl:if test="$spaceBefore &gt; 0">
-            <xsl:attribute name="w:before">
-              <xsl:value-of select="$spaceBefore"/>
-            </xsl:attribute>
+    <xsl:choose>
+      <xsl:when test="ancestor::table:table">
+        <xsl:if
+          test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false'
+          or document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaSpacingToTableCells']/text()='false' ">
+          <w:spacing>
+            <xsl:if
+              test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false' ">
+              <xsl:if test="not(preceding-sibling::node())">
+                <xsl:attribute name="w:before">0</xsl:attribute>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if
+              test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaSpacingToTableCells']/text()='false' ">
+              <xsl:if test="not(following-sibling::node())">
+                <xsl:attribute name="w:after">0</xsl:attribute>
+              </xsl:if>
+            </xsl:if>
+          </w:spacing>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test="ancestor::draw:frame">
+        <xsl:if
+          test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false' ">
+          <w:spacing>
+            <xsl:if test="not(preceding-sibling::node())">
+              <xsl:attribute name="w:before">0</xsl:attribute>
+            </xsl:if>
+          </w:spacing>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if
+          test="following-sibling::node()[1][name()='table:table'] or preceding-sibling::node()[1][name()='table:table']">
+          <!-- Compute space after -->
+          <xsl:variable name="spaceAfter">
+            <xsl:call-template name="CompareSpacingValues">
+              <xsl:with-param name="tableSide" select="'top'"/>
+              <xsl:with-param name="paraSide" select="'bottom'"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <!-- Compute space before -->
+          <xsl:variable name="spaceBefore">
+            <xsl:call-template name="CompareSpacingValues">
+              <xsl:with-param name="tableSide" select="'bottom'"/>
+              <xsl:with-param name="paraSide" select="'top'"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <!-- override if needed -->
+          <xsl:if test="$spaceBefore &gt; 0 or $spaceAfter &gt; 0">
+            <w:spacing>
+              <xsl:if test="$spaceBefore &gt; 0">
+                <xsl:attribute name="w:before">
+                  <xsl:value-of select="$spaceBefore"/>
+                </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="$spaceAfter &gt; 0">
+                <xsl:attribute name="w:after">
+                  <xsl:value-of select="$spaceAfter"/>
+                </xsl:attribute>
+              </xsl:if>
+            </w:spacing>
           </xsl:if>
-          <xsl:if test="$spaceAfter &gt; 0">
-            <xsl:attribute name="w:after">
-              <xsl:value-of select="$spaceAfter"/>
-            </xsl:attribute>
-          </xsl:if>
-        </w:spacing>
-      </xsl:if>
-    </xsl:if>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 
