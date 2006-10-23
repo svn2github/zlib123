@@ -251,46 +251,10 @@
       </xsl:call-template>
     </xsl:if>
     
-    <!-- insert text from the beginning of index item-->
-    <w:r>
-      <w:rPr>
-        <w:noProof/>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:vanish/>
-        </xsl:if>
-      </w:rPr>
-      <w:t>
-        <xsl:choose>
-          <xsl:when test="child::node()[position() &lt; last()]">
-            <xsl:for-each select="child::node()[position() &lt; last()]">
-              <xsl:if test="not(name()='text:span')"><xsl:value-of select="."/></xsl:if>
-            </xsl:for-each>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="."/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </w:t>
-    </w:r>
-    
-    <!-- insert tab in between if there is any -->
-    <xsl:apply-templates select="text:tab|self::text:a/text:tab|text:span|parent::text:p/text:tab"
+    <!-- insert TOC -->
+    <xsl:apply-templates select="text:tab|self::text:a/text:tab|text:span|parent::text:p/text:tab|text()"
       mode="paragraph"/>
 
-    <!-- insert text at the end of index item -->
-    <w:r>
-      <w:rPr>
-        <w:noProof/>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:vanish/>
-        </xsl:if>
-        <w:webHidden/>
-      </w:rPr>
-       <xsl:if test="not(name(node()[position() = last()])='text:span')">
-        <xsl:apply-templates select="descendant::text()[last()]" mode="text"/>
-      </xsl:if>
-      </w:r>
-    
     <!-- alphabetical index doesn't support page reference link -->
     <xsl:if test="not(ancestor::text:alphabetical-index)">
       <xsl:call-template name="InsertIndexPageRefEnd"/>
