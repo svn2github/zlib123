@@ -1,4 +1,4 @@
-/* 
+	/* 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -578,10 +578,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 					}
 					
 					// titlePg
-					if (page.GetAttributeValue("name", CA_SECTIONS_NS).Equals("First_20_Page"))
-					{
-						this.titlePg.Write(nextWriter);
-					}
+//					if (page.GetAttributeValue("name", CA_SECTIONS_NS).Equals("First_20_Page"))
+//					{
+//						this.titlePg.Write(nextWriter);
+//					}
 					
 					nextWriter.WriteEndElement(); // end sectPr
 				}
