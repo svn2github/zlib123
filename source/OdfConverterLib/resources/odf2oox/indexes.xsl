@@ -235,13 +235,21 @@
     </w:instrText>
   </xsl:template>
 
-  
+
   
   <!--inserts index item content for all types of index-->
   <xsl:template name="InsertIndexItemContent">
     
     <!-- references to index bookmark id in text -->
     <xsl:param name="tocId" select="count(preceding-sibling::text:p)+1"/>
+    
+    <!-- alphabetical index doesn't support page reference link -->
+   
+    <xsl:if test="not(ancestor::text:alphabetical-index)">
+      <xsl:call-template name="InsertIndexPageRefStart">
+        <xsl:with-param name="tocId" select="$tocId"/>
+      </xsl:call-template>
+    </xsl:if>
     
     <!-- insert text from the beginning of index item-->
     <w:r>
@@ -255,7 +263,7 @@
         <xsl:choose>
           <xsl:when test="child::node()[position() &lt; last()]">
             <xsl:for-each select="child::node()[position() &lt; last()]">
-              <xsl:value-of select="."/>
+              <xsl:if test="not(name()='text:span')"><xsl:value-of select="."/></xsl:if>
             </xsl:for-each>
           </xsl:when>
           <xsl:otherwise>
@@ -268,14 +276,7 @@
     <!-- insert tab in between if there is any -->
     <xsl:apply-templates select="text:tab|self::text:a/text:tab|text:span|parent::text:p/text:tab"
       mode="paragraph"/>
-    
-    <!-- alphabetical index doesn't support page reference link -->
-    <xsl:if test="not(ancestor::text:alphabetical-index)">
-      <xsl:call-template name="InsertIndexPageRefStart">
-        <xsl:with-param name="tocId" select="$tocId"/>
-      </xsl:call-template>
-    </xsl:if>
-    
+
     <!-- insert text at the end of index item -->
     <w:r>
       <w:rPr>
@@ -285,8 +286,10 @@
         </xsl:if>
         <w:webHidden/>
       </w:rPr>
-      <xsl:apply-templates select="descendant::text()[last()]" mode="text"/>
-    </w:r>
+       <xsl:if test="not(name(node()[position() = last()])='text:span')">
+        <xsl:apply-templates select="descendant::text()[last()]" mode="text"/>
+      </xsl:if>
+      </w:r>
     
     <!-- alphabetical index doesn't support page reference link -->
     <xsl:if test="not(ancestor::text:alphabetical-index)">

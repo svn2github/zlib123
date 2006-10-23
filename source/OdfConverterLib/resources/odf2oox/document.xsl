@@ -625,7 +625,9 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-          <xsl:otherwise> </xsl:otherwise>
+          <xsl:otherwise>
+            <w:t><xsl:value-of select="."/></w:t>            
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
