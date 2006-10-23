@@ -917,6 +917,31 @@
         />
       </xsl:when>
 
+      <!-- if list is a continuing, get num from preceding list context -->
+      <xsl:when test="ancestor::text:list/@text:continue-numbering='true' and ancestor::text:list/preceding-sibling::text:list/text:list-item">
+        <xsl:choose>
+          <!-- try to find list of same style -->
+          <xsl:when test="ancestor::text:list[@text:continue-numbering='true']/@text:style-name">
+            <xsl:variable name="listStyle">
+              <xsl:value-of select="ancestor::text:list[@text:continue-numbering='true' and preceding-sibling::text:list/text:list-item]/@text:style-name"/>
+            </xsl:variable>
+            <xsl:for-each select="ancestor::text:list[preceding-sibling::text:list[@text:style-name=$listStyle]/text:list-item][1]/preceding-sibling::text:list[@text:style-name=$listStyle and text:list-item][1]/text:list-item[1]">
+              <xsl:call-template name="GetNumberingId">
+                <xsl:with-param name="styleName" select="parent::text:list/@text:style-name"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- use first preceding list -->
+            <xsl:for-each select="ancestor::text:list[preceding-sibling::text:list/text:list-item][1]/preceding-sibling::text:list[text:list-item][1]/text:list-item[1]">
+              <xsl:call-template name="GetNumberingId">
+                <xsl:with-param name="styleName" select="parent::text:list/@text:style-name"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
       <!-- look for this list style into content.xml -->
       <xsl:when
         test="key('list-style', $styleName) and not(ancestor::style:header) and not(ancestor::style:footer)">
