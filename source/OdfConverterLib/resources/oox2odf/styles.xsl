@@ -630,7 +630,14 @@
         </xsl:choose>
       </xsl:attribute>
     </xsl:if>
-
+    
+    <!-- page breaks and simple column breaks -->
+    <xsl:if test="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']">
+      <xsl:attribute name="fo:break-after">
+        <xsl:value-of select="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']/@w:type"/>
+      </xsl:attribute>
+    </xsl:if>
+    
     <!-- borders. -->
     <xsl:if test="w:pBdr">
       <xsl:call-template name="InsertParagraphBorder"/>

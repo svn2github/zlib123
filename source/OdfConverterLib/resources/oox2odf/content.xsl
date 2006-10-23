@@ -228,11 +228,11 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--paragraph with ouline level is a heading-->
+  <!--paragraph with outline level is a heading-->
   <xsl:template match="w:p" mode="heading">
     <xsl:param name="outlineLevel"/>
     <text:h>
-      <xsl:if test="w:pPr">
+      <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
         <xsl:attribute name="text:style-name">
           <xsl:value-of select="generate-id(self::node())"/>
         </xsl:attribute>
@@ -254,7 +254,7 @@
       <!--default scenario-->
       <xsl:otherwise>
         <text:p>
-          <xsl:if test="w:pPr">
+          <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="generate-id(self::node())"/>
             </xsl:attribute>
@@ -650,11 +650,24 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- line breaks  (page-break todo)-->
+  <!-- line breaks  -->
   <xsl:template match="w:br">
-    <text:line-break/>
+    <xsl:if test="@w:type!='page' and @w:type!='column' ">
+      <text:line-break/>
+    </xsl:if>
   </xsl:template>
 
+  <!-- page or column break must have style defined in paragraph -->
+  <xsl:template match="w:br[@w:type='page' or @w:type='column']" mode="automaticstyles">
+    <xsl:if test="not(ancestor::w:p/w:pPr)">
+      <style:style style:name="{generate-id(ancestor::w:p)}" style:family="paragraph">
+        <style:paragraph-properties>
+          <xsl:call-template name="InsertDefaultParagraphProperties"/>
+          <xsl:call-template name="InsertParagraphProperties"/>
+        </style:paragraph-properties>
+      </style:style>
+    </xsl:if>
+  </xsl:template>
   <!--ignore text in automatic styles mode-->
   <xsl:template match="text()" mode="automaticstyles"/>
 </xsl:stylesheet>

@@ -93,7 +93,7 @@ Runs;;;;;;;
 ;w (Expanded/Compressed Text) ;;;Completed;;style:text-properties/@style:text-scale;
 ;webHidden (Web Hidden Text) ;;;;;;
 Run Content;;;;;;;
-;br (Break) ;;;Completed;;text:line-break, style:paragraph-properties/@fo:break-before;
+;br (Break) ;;;Line and Page Breaks Completed, Column Breaks partial, TODO: investigate how to convert many column breaks in one paragraph;;text:line-break, style:paragraph-properties/@fo:break-after;
 ;cr (Carriage Return) ;;;;;;
 ;dayLong (Date Block - Long Day Format) ;;;;;;
 ;dayShort (Date Block - Short Day Format) ;;;;;;
