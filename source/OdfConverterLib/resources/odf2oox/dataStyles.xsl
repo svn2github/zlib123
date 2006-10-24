@@ -43,15 +43,6 @@
       <xsl:message terminate="no">feedback:Page number offset</xsl:message>
     </xsl:if>
     <w:fldSimple w:instr=" PAGE ">
-      <xsl:attribute name="w:instr">
-        <xsl:text>PAGE </xsl:text>
-        <xsl:choose>
-          <xsl:when test="not(@style:num-format)"> \* Roman</xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="GetNumberFormattingSwitch"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
