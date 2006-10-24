@@ -53,25 +53,17 @@
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
-  
+
   <xsl:template match="text:word-count|text:character-count|text:paragraph-count " mode="paragraph">
     <w:fldSimple>
       <xsl:attribute name="w:instr">
         <xsl:choose>
-          <xsl:when test="../text:word-count">
-            NUMWORDS
-          </xsl:when>
-          <xsl:when test="../text:character-count">
-            NUMCHARS
-          </xsl:when>
-          <xsl:when test="../text:paragraph-count ">
-            DOCPROPERTY  Paragraphs
-          </xsl:when>
+          <xsl:when test="../text:word-count"> NUMWORDS </xsl:when>
+          <xsl:when test="../text:character-count"> NUMCHARS </xsl:when>
+          <xsl:when test="../text:paragraph-count "> DOCPROPERTY Paragraphs </xsl:when>
         </xsl:choose>
-      <xsl:call-template name="GetNumberFormattingSwitch"/>
-        \* MERGEFORMAT
-      </xsl:attribute>
-      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>      
+        <xsl:call-template name="GetNumberFormattingSwitch"/> \* MERGEFORMAT </xsl:attribute>
+      <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
 
@@ -122,7 +114,7 @@
   </xsl:template>
 
   <xsl:template match="number:text" mode="dataStyle">
-    <xsl:value-of select="."/>
+    <xsl:value-of select="." xml:space="preserve"/>
   </xsl:template>
 
   <xsl:template match="number:day-of-week" mode="dataStyle">
@@ -245,7 +237,7 @@
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
-  
+
   <!-- User Fields -->
   <!-- TODO : comment csv file -->
   <xsl:template match="text:initial-creator[not(@text:fixed='true')]" mode="paragraph">
@@ -265,7 +257,7 @@
       <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
-  
+
   <xsl:template match="text:subject[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" SUBJECT ">
       <xsl:apply-templates mode="paragraph"/>
@@ -285,18 +277,20 @@
   </xsl:template>
 
   <!-- Sender Fields -->
-  <xsl:template match="text:sender-firstname[not(@text:fixed='true')]|text:sender-lastname[not(@text:fixed='true')]" mode="paragraph">    
-      <xsl:variable name="username">
-        <xsl:value-of select="."/>
-      </xsl:variable>
+  <xsl:template
+    match="text:sender-firstname[not(@text:fixed='true')]|text:sender-lastname[not(@text:fixed='true')]"
+    mode="paragraph">
+    <xsl:variable name="username">
+      <xsl:value-of select="."/>
+    </xsl:variable>
     <w:fldSimple>
       <xsl:attribute name="w:instr">
         <xsl:value-of select="concat('USERNAME ' ,$username,'\* MERGEFORMAT')"/>
       </xsl:attribute>
-      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>    
+      <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
-  
+
   <xsl:template match="text:sender-initials[not(@text:fixed='true')]" mode="paragraph">
     <xsl:variable name="userinitial">
       <xsl:value-of select="."/>
@@ -305,11 +299,13 @@
       <xsl:attribute name="w:instr">
         <xsl:value-of select="concat('USERINITIALS ' ,$userinitial,'\* MERGEFORMAT')"/>
       </xsl:attribute>
-      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>    
+      <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
-  
-  <xsl:template match="text:sender-street[not(@text:fixed='true')]|text:sender-country[not(@text:fixed='true')]|text:sender-postal-code[not(@text:fixed='true')]|text:sender-city[not(@text:fixed='true')]" mode="paragraph">
+
+  <xsl:template
+    match="text:sender-street[not(@text:fixed='true')]|text:sender-country[not(@text:fixed='true')]|text:sender-postal-code[not(@text:fixed='true')]|text:sender-city[not(@text:fixed='true')]"
+    mode="paragraph">
     <xsl:variable name="adress">
       <xsl:value-of select="."/>
     </xsl:variable>
@@ -317,10 +313,10 @@
       <xsl:attribute name="w:instr">
         <xsl:value-of select="concat('USERADDRESS ' ,$adress,'\* MERGEFORMAT')"/>
       </xsl:attribute>
-      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>      
+      <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
-  </xsl:template>  
-  
+  </xsl:template>
+
   <xsl:template match="text:sender-title" mode="paragraph">
     <xsl:variable name="title">
       <xsl:value-of select="."/>
@@ -328,24 +324,24 @@
     <w:fldSimple>
       <xsl:attribute name="w:instr">
         <xsl:value-of select="concat('TITLE ' ,$title,'\* MERGEFORMAT')"/>
-      </xsl:attribute>     
+      </xsl:attribute>
     </w:fldSimple>
-  </xsl:template> 
-  
+  </xsl:template>
+
   <xsl:template match="text:sender-company" mode="paragraph">
     <w:fldSimple w:instr=" DOCPROPERTY  Company  \* MERGEFORMAT ">
-      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>      
+      <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
-  
+
   <!-- Templates Fields -->
   <xsl:template match="text:template-name" mode="paragraph">
-  <w:fldSimple w:instr=" TEMPLATE   \* MERGEFORMAT ">
-    <xsl:apply-templates mode="paragraph"></xsl:apply-templates>
-   </w:fldSimple>
+    <w:fldSimple w:instr=" TEMPLATE   \* MERGEFORMAT ">
+      <xsl:apply-templates mode="paragraph"/>
+    </w:fldSimple>
   </xsl:template>
-  
-  
+
+
   <xsl:template match="text:editing-cycles[not(@text:fixed='true')]" mode="paragraph">
     <w:fldSimple w:instr=" REVNUM ">
       <xsl:apply-templates mode="paragraph"/>
@@ -358,10 +354,40 @@
     <xsl:if test="@text:display='name' and @text:outline-level">
       <xsl:variable name="outline-level" select="@text:outline-level"/>
       <!-- COMMENT : if the style changes name in the application, it may not be found and cause an error. -->
+      <xsl:message terminate="no">feedback:Chapter field</xsl:message>
+      <!-- find the style to match -->
       <xsl:variable name="style">
-        <xsl:value-of
-          select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:display-name"
-        />
+        <xsl:for-each select="document('styles.xml')">
+          <xsl:choose>
+            <xsl:when
+              test="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:display-name">
+              <xsl:value-of
+                select="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:display-name"
+              />
+            </xsl:when>
+            <xsl:when
+              test="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level and not(@style:display-name)]">
+              <xsl:value-of
+                select="office:document-styles/office:styles/style:style[@style:default-outline-level=$outline-level]/@style:name"
+              />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:variable name="styleName">
+                <xsl:value-of
+                  select="office:document-styles/office:styles/text:outline-style/text:outline-level-style[@text:level=$outline-level]/@text:style-name"
+                />
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when test="key('styles',$styleName)/@style:display-name">
+                  <xsl:value-of select="key('styles',$styleName)/@style:display-name"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$styleName"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
       </xsl:variable>
       <w:fldSimple>
         <xsl:attribute name="w:instr">
@@ -386,14 +412,14 @@
       <xsl:value-of select="concat('SEQ ', @text:name,' ', $numType)"/>
     </xsl:attribute>
   </xsl:template>
-  
+
   <!-- file name fields-->
   <xsl:template match="text:file-name" mode="paragraph">
-    <w:fldSimple w:instr="FILENAME   \* MERGEFORMAT">      
-      <xsl:apply-templates mode="paragraph"></xsl:apply-templates>
+    <w:fldSimple w:instr="FILENAME   \* MERGEFORMAT">
+      <xsl:apply-templates mode="paragraph"/>
     </w:fldSimple>
   </xsl:template>
-  
+
   <!-- report lost fields -->
   <xsl:template match="text:description" mode="paragraph">
     <xsl:message terminate="no">feedback:description field</xsl:message>
@@ -402,5 +428,5 @@
   <xsl:template match="text:printed-by" mode="paragraph">
     <xsl:message terminate="no">feedback:Printed-by field</xsl:message>
   </xsl:template>
-  
+
 </xsl:stylesheet>
