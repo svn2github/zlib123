@@ -68,6 +68,10 @@
       <xsl:for-each select="document('content.xml')">
         <xsl:for-each select="key('endnotes', '')">
           <w:endnote w:type="normal" w:id="{position() + 1}">
+            <!-- warn if list in note -->
+            <xsl:if test="text:note-body/descendant-or-self::text:list">
+              <xsl:message terminate="no">feedback:Note in list</xsl:message>
+            </xsl:if>
             <xsl:apply-templates select="text:note-body"/>
           </w:endnote>
         </xsl:for-each>
