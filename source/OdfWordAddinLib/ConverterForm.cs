@@ -179,14 +179,11 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
             // Launch convertion
             if (!converting) {
                 converting = true;
+                Application.DoEvents();
                 DoConvert();
                 converting = false;
             }
         }
 
-        private void progressBar1_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }
