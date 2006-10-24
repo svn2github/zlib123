@@ -37,63 +37,120 @@ using System.Windows.Forms;
 using System.Resources;
 using System.Collections;
 
+using System.Runtime.InteropServices;
 namespace CleverAge.OdfConverter.OdfWordAddinLib
 {
     public partial class InfoBox : Form
     {
         private ResourceManager manager;
+        /// <summary>
+        /// Are details shown
+        /// </summary>
         private bool showDetails;
+        /// <summary>
+        /// Client size of dialog box in "no details" mode
+        /// </summary>
+        private Size smallSize = new Size(387, 65);
+        /// <summary>
+        /// Client size of dialog box in "show details" mode
+        /// </summary>
+        private Size largeSize;
+
+
 
         public InfoBox(string label, ArrayList details, ResourceManager manager)
         {
             InitializeComponent();
             this.manager = manager;
-            this.showDetails = false;
             this.label.Text = manager.GetString(label);
+            StringBuilder bld = new StringBuilder();
             foreach (string detail in details)
             {
                 string text = manager.GetString(detail);
-                if (text != null && text.Length > 0)
-                {
-                    textBox1.Text += text + "\r\n";
-                }
-                else
-                {
-                    textBox1.Text += detail + "\r\n";
-                }
+                bld.Append(string.IsNullOrEmpty(text) ? detail : text);
+                bld.Append("\r\n");
             }
+            txtDetails.Text = bld.ToString();
         }
 
         public InfoBox(string label, string details, ResourceManager manager)
         {
             InitializeComponent();
             this.manager = manager;
-            this.showDetails = false;
             this.label.Text = manager.GetString(label);
             string text = manager.GetString(details);
-            if (text != null && text.Length > 0)
-            {
-                textBox1.Text += text;
-            }
-            else
-            {
-                textBox1.Text += details;
-            }
+            txtDetails.Text = (string.IsNullOrEmpty(text) ? details : text);
         }
 
         private void InfoBox_Load(object sender, EventArgs e)
         {
+
+            // Change the title
+            string newTitle = manager.GetString("OdfConverterTitle");
+            if (!string.IsNullOrEmpty(newTitle))
+            {
+                Text = newTitle;
+            }
+            // Store the offsets of buttons and groupbox
+            Size proposedSize = new Size(label.Width, 2000); // No vertical constraint
+            Size newSize = label.GetPreferredSize(proposedSize);
+            int newHeight = newSize.Height;
+            int offset = newHeight - label.Height;
+
+            // Redim/move windows and controls
+            label.Height = newHeight;
+            smallSize.Height += offset;
+            OK.Top += offset;
+            Details.Top += offset;
+            grpDetails.Top += offset;
+
+            // Now compute the size needed for details text box and form with details are shown
+            int marginBottom = ClientSize.Height - grpDetails.Bottom;
+
+            label1.Text = txtDetails.Text + "_";
+            proposedSize = new Size(label1.Width, 2000);
+            newSize = label1.GetPreferredSize(proposedSize);
+            newHeight = newSize.Height;
+            if (newHeight > txtDetails.Height) {
+                // Will add scrollbars
+                txtDetails.ScrollBars = ScrollBars.Vertical;
+            } else {
+                // No scrollbar needed
+                int offset2 = newHeight - txtDetails.Height;
+                txtDetails.Height = newHeight;
+                txtDetails.ScrollBars = ScrollBars.None;
+                grpDetails.Height += offset2;
+            }
+            largeSize = smallSize;
+            largeSize.Height = grpDetails.Bottom + marginBottom + offset;
+            // At loadtime : no details
+            this.showDetails = false;
+            this.ClientSize = smallSize;
+            txtDetails.Visible = showDetails;
+            grpDetails.Visible = showDetails;
+
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Details_Click(object sender, EventArgs e)
         {
             showDetails = !showDetails;
-            textBox1.Visible = showDetails;
+
+            txtDetails.Visible = showDetails;
+            grpDetails.Visible = showDetails;
+            if (showDetails)
+            {
+                this.ClientSize = largeSize;
+                Details.Text = Details.Text.Replace("> > >", "< < <");
+            }
+            else
+            {
+                this.ClientSize = smallSize;
+                Details.Text = Details.Text.Replace("< < <", "> > >");
+            }
         }
 
-        private void OK_Click(object sender, EventArgs e)
-        {
 
-        }
+
+
     }
 }
