@@ -312,6 +312,30 @@
   </xsl:template>
 
   <!--
+    Convert a radian angle to degrees
+    'select' param indicates that only a few values are allowed (90,180)
+  -->
+  <xsl:template name="DegreesAngle">
+    <xsl:param name="angle"/>
+    <xsl:param name="select" select="'false'"/>
+    <xsl:choose>
+      <xsl:when test="not($angle)">0</xsl:when>
+      <xsl:when test="not($select = 'true')">
+        <xsl:value-of select="round(number($angle) * 90 div 1.5707963267946)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$angle = 1.5707963267946">90</xsl:when>
+          <xsl:when test="$angle = -1.5707963267946">-90</xsl:when>
+          <xsl:when test="$angle = 3.1415926535892">180</xsl:when>
+          <xsl:when test="$angle = -3.1415926535892">180</xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>    
+  </xsl:template>
+    
+  <!--
 		Convert RGB code (#xxxxxx) to string-type color.
 	-->
   <xsl:template name="StringType-color">

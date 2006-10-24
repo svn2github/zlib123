@@ -43,8 +43,7 @@
   exclude-result-prefixes="xlink draw svg fo office style text">
 
   <xsl:key name="images"
-    match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]"
-    use="''"/>
+    match="draw:frame[not(./draw:object-ole or ./draw:object)]/draw:image[@xlink:href]" use="''"/>
   <xsl:key name="frames" match="draw:frame" use="''"/>
   <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
 
@@ -1742,6 +1741,21 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="InsertShapeRotation">
+    <xsl:if test="contains(parent::draw:frame/@draw:transform,'rotate')">
+      <xsl:text>rotation:</xsl:text>
+      <xsl:variable name="angle">
+        <xsl:call-template name="DegreesAngle">
+          <xsl:with-param name="angle">
+            <xsl:value-of select="substring-before(substring-after(substring-after(parent::draw:frame/@draw:transform,'rotate'),'('),')')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:value-of select="$angle"/>
+      <xsl:text>;</xsl:text>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template name="InsertShapeTransparency">
     <xsl:param name="shapeStyle"/>
 
@@ -1803,6 +1817,8 @@
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
       </xsl:call-template>
 
+      <xsl:call-template name="InsertShapeRotation"/>
+      
     </xsl:attribute>
 
     <xsl:call-template name="InsertShapeFill">
@@ -1887,9 +1903,31 @@
     <xsl:param name="shapeStyle"/>
 
     <v:textbox>
-      <xsl:if test="@fo:min-height">
+      <xsl:if
+        test="parent::draw:frame/@fo:min-width or @fo:min-height or contains(parent::draw:frame/@draw:transform,'rotate')">
         <xsl:attribute name="style">
-          <xsl:value-of select="'mso-fit-shape-to-text:t'"/>
+          <xsl:if test="parent::draw:frame/@fo:min-width or @fo:min-height">
+            <xsl:value-of select="'mso-fit-shape-to-text:t'"/>
+          </xsl:if>
+          <xsl:if test="contains(parent::draw:frame/@draw:transform,'rotate')">
+            <xsl:variable name="angle">
+              <xsl:call-template name="DegreesAngle">
+                <xsl:with-param name="angle">
+                  <xsl:value-of select="substring-before(substring-after(substring-after(parent::draw:frame/@draw:transform,'rotate'),'('),')')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="$angle = 90 or $angle = -90">
+                <xsl:text>layout-flow:vertical;mso-layout-flow-alt:bottom-to-top;</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>mso-rotate:</xsl:text>
+                <xsl:value-of select="$angle"/>
+                <xsl:text>;</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
         </xsl:attribute>
       </xsl:if>
 
