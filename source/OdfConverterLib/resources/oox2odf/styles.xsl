@@ -44,6 +44,9 @@
       </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
+        <!--   Default paragraph properties from settings -->
+        <xsl:call-template name="InsertSettingsStyleProperties"/>
+        <!-- document styles -->
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
       </office:styles>
       <!-- automatic styles -->
@@ -381,9 +384,11 @@
 
   <!-- document defaults -->
   <xsl:template match="w:rPrDefault | w:pPrDefault">
-    <style:default-style style:family="paragraph">
-      <xsl:call-template name="InsertDocDefaults"/>
-    </style:default-style>
+    <xsl:if test="w:pPr | w:rPr">
+      <style:default-style style:family="paragraph">
+        <xsl:call-template name="InsertDocDefaults"/>
+      </style:default-style>
+    </xsl:if>
   </xsl:template>
 
   <!-- create styles -->
@@ -425,33 +430,31 @@
   </xsl:template>
 
   <xsl:template name="InsertDocDefaults">
-     <style:paragraph-properties>
-        <xsl:call-template name="InsertDefaultParagraphProperties"/>
-        <xsl:if test="w:pPr">
-          <xsl:for-each select="w:pPr">
-            <xsl:call-template name="InsertParagraphProperties"/>
-          </xsl:for-each>
-        </xsl:if>
-      </style:paragraph-properties>
-   
+    <style:paragraph-properties>
+      <xsl:if test="w:pPr">
+        <xsl:for-each select="w:pPr">
+          <xsl:call-template name="InsertParagraphProperties"/>
+        </xsl:for-each>
+      </xsl:if>
+    </style:paragraph-properties>
+
     <style:text-properties>
-        <xsl:if test="w:rPr">
-          <xsl:for-each select="w:rPr">
-            <xsl:call-template name="InsertTextProperties"/>
-          </xsl:for-each>
-          <xsl:for-each select="w:pPr">
-            <xsl:call-template name="InsertpPrTextProperties"/>
-          </xsl:for-each>
-        </xsl:if>
-      </style:text-properties>
+      <xsl:if test="w:rPr">
+        <xsl:for-each select="w:rPr">
+          <xsl:call-template name="InsertTextProperties"/>
+        </xsl:for-each>
+        <xsl:for-each select="w:pPr">
+          <xsl:call-template name="InsertpPrTextProperties"/>
+        </xsl:for-each>
+      </xsl:if>
+    </style:text-properties>
   </xsl:template>
-  
+
   <!-- Compute style and text properties of context style. -->
   <xsl:template name="InsertStyleProperties">
 
     <xsl:if test="self::node()/@w:type = 'paragraph'">
       <style:paragraph-properties>
-        <xsl:call-template name="InsertDefaultParagraphProperties"/>
         <xsl:if test="w:pPr">
           <xsl:for-each select="w:pPr">
             <xsl:call-template name="InsertParagraphProperties"/>
@@ -475,103 +478,16 @@
 
   </xsl:template>
 
-  <!--   Default paragraph properties -->
+  <!--   Default paragraph properties from settings -->
   <xsl:template name="InsertDefaultParagraphProperties">
-
-    <!--    default widow and orphan  -->
-    <xsl:choose>
-      <xsl:when test="w:widowControl/@w:val='0'">
-        <!-- do nothing   -->
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="fo:widows">
-          <xsl:value-of select="1"/>
-        </xsl:attribute>
-        <xsl:attribute name="fo:orphans">
-          <xsl:value-of select="1"/>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
-
-    <!--    default align  -->
-    <xsl:choose>
-      <xsl:when test="w:jc">
-        <!--  do nothing      -->
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="fo:text-align">
-          <xsl:choose>
-            <xsl:when
-              test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='center'">
-              <xsl:value-of select="'center'"/>
-            </xsl:when>
-            <xsl:when
-              test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='left'">
-              <xsl:value-of select="'start'"/>
-            </xsl:when>
-            <xsl:when
-              test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='right'">
-              <xsl:value-of select="'end'"/>
-            </xsl:when>
-            <xsl:when
-              test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='both' or document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:jc/@w:val='distribute'">
-              <xsl:value-of select="'justify'"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="'start'"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
-
-    <!--    dafault spacing -->
-    <xsl:choose>
-      <xsl:when test="w:spacing/@w:line">
-        <!--     do nothing  -->
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:choose>
-          <xsl:when
-            test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:lineRule='atLeast'">
-            <xsl:attribute name="style:line-height-at-least">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of
-                    select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:line"
-                  />
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when
-            test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:lineRule='exact'">
-            <xsl:attribute name="fo:line-height">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of
-                    select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:line"
-                  />
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when
-            test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:lineRule='auto'">
-            <!-- value of lineRule is 'auto' -->
-            <xsl:attribute name="fo:line-height">
-              <!-- convert 240th of line to percent -->
-              <xsl:value-of
-                select="concat(document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:spacing/@w:line div 240 * 100,'%')"
-              />
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise> </xsl:otherwise>
-        </xsl:choose>
-      </xsl:otherwise>
-    </xsl:choose>
+    <!--default tab-stop-->
+    <xsl:variable name="tabStop" select="w:settings/w:defaultTabStop/@w:val"/>
+    <xsl:attribute name="style:tab-stop-distance">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length" select="$tabStop"/>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+    </xsl:attribute>
   </xsl:template>
 
   <!-- conversion of paragraph properties -->
@@ -630,14 +546,14 @@
         </xsl:choose>
       </xsl:attribute>
     </xsl:if>
-    
+
     <!-- page breaks and simple column breaks -->
     <xsl:if test="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']">
       <xsl:attribute name="fo:break-after">
         <xsl:value-of select="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']/@w:type"/>
       </xsl:attribute>
     </xsl:if>
-    
+
     <!-- borders. -->
     <xsl:if test="w:pBdr">
       <xsl:call-template name="InsertParagraphBorder"/>
@@ -888,13 +804,27 @@
       </xsl:attribute>
     </xsl:if>
 
+    <!-- widow and orphan  -->
+    <xsl:choose>
+      <xsl:when test="w:widowControl/@w:val='0'">
+        <!-- do nothing   -->
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:widows">
+          <xsl:value-of select="1"/>
+        </xsl:attribute>
+        <xsl:attribute name="fo:orphans">
+          <xsl:value-of select="1"/>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+
     <!-- tab stops -->
     <xsl:if test="w:tabs/w:tab">
       <style:tab-stops>
         <xsl:call-template name="InsertTabs"/>
       </style:tab-stops>
     </xsl:if>
-
   </xsl:template>
 
   <xsl:template name="InsertParagraphBorder">
@@ -1416,11 +1346,13 @@
     <!-- line through text -->
     <xsl:if test="w:dstrike or w:strike">
       <xsl:choose>
-        <xsl:when test="w:strike/@w:val='on' or w:strike/@w:val='true' or w:strike/@w:val=1 or w:strike/@w:val=1 or (w:strike and (not(w:strike/@w:val) or w:strike/@w:val = ''))">
+        <xsl:when
+          test="w:strike/@w:val='on' or w:strike/@w:val='true' or w:strike/@w:val=1 or w:strike/@w:val=1 or (w:strike and (not(w:strike/@w:val) or w:strike/@w:val = ''))">
           <xsl:attribute name="style:text-line-through-type">single</xsl:attribute>
           <xsl:attribute name="style:text-line-through-style">solid</xsl:attribute>
         </xsl:when>
-        <xsl:when test="w:dstrike/@w:val='on' or w:dstrike/@w:val='true' or w:dstrike/@w:val=1 or w:dstrike/@w:val=1 or (w:dstrike and (not(w:dstrike/@w:val) or w:dstrike/@w:val = ''))">
+        <xsl:when
+          test="w:dstrike/@w:val='on' or w:dstrike/@w:val='true' or w:dstrike/@w:val=1 or w:dstrike/@w:val=1 or (w:dstrike and (not(w:dstrike/@w:val) or w:dstrike/@w:val = ''))">
           <xsl:attribute name="style:text-line-through-type">double</xsl:attribute>
           <xsl:attribute name="style:text-line-through-style">solid</xsl:attribute>
         </xsl:when>
@@ -1538,7 +1470,7 @@
 
     <!-- fonts -->
     <xsl:if test="w:rFonts/@w:asciiTheme">
-        <xsl:attribute name="style:font-name">
+      <xsl:attribute name="style:font-name">
         <xsl:call-template name="ComputeThemeFontName">
           <xsl:with-param name="fontTheme" select="w:rFonts/@w:asciiTheme"/>
           <xsl:with-param name="fontType">a:latin</xsl:with-param>
@@ -1558,11 +1490,11 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-     <xsl:if test="w:rFonts/@w:cs">
+    <xsl:if test="w:rFonts/@w:cs">
       <xsl:attribute name="style:font-name-complex">
         <xsl:value-of select="w:rFonts/@w:cs"/>
-       </xsl:attribute>
-     </xsl:if>
+      </xsl:attribute>
+    </xsl:if>
     <xsl:if test="w:rFonts/@w:eastAsiaTheme">
       <xsl:attribute name="style:font-name-asian">
         <xsl:call-template name="ComputeThemeFontName">
@@ -1690,7 +1622,8 @@
     </xsl:if>
 
     <!-- script type -->
-    <xsl:if test="w:cs/@w:val='on' or w:cs/@w:val='true' or w:cs/@w:val=1 or (w:cs and (not(w:cs/@w:val) or w:cs/@w:val = ''))">
+    <xsl:if
+      test="w:cs/@w:val='on' or w:cs/@w:val='true' or w:cs/@w:val=1 or (w:cs and (not(w:cs/@w:val) or w:cs/@w:val = ''))">
       <xsl:attribute name="style:script-type">complex</xsl:attribute>
     </xsl:if>
 
@@ -1823,7 +1756,9 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:variable name="defaultFontSize">
-                <xsl:value-of select="document('word/styles.xml')/w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz/@w:val"/>
+                <xsl:value-of
+                  select="document('word/styles.xml')/w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz/@w:val"
+                />
               </xsl:variable>
               <xsl:value-of select="round(w:position/@w:val * 100 div number($defaultFontSize))"/>
             </xsl:otherwise>
@@ -1843,7 +1778,7 @@
       </xsl:when>
 
       <!-- positioning of subscript -->
-      <xsl:when test="w:vertAlign/@w:val = 'subscript'">     
+      <xsl:when test="w:vertAlign/@w:val = 'subscript'">
         <xsl:attribute name="style:text-position">
           <xsl:value-of select="concat('sub ',number(33 - $percentValue))"/>
         </xsl:attribute>
@@ -1860,7 +1795,7 @@
           <xsl:value-of select="concat(number($percentValue),' 100')"/>
         </xsl:attribute>
       </xsl:otherwise>
-      
+
     </xsl:choose>
   </xsl:template>
 
@@ -1868,21 +1803,23 @@
   <xsl:template name="ComputeThemeFontName"
     xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
     <xsl:param name="fontTheme"/>
-    <xsl:param name="fontType" />
+    <xsl:param name="fontType"/>
     <xsl:variable name="fontScheme"
       select="document('word/theme/theme1.xml')/a:theme/a:themeElements/a:fontScheme"/>
-    
+
     <xsl:variable name="fontName">
       <xsl:choose>
         <xsl:when test="contains($fontTheme,'minor')">
-          <xsl:value-of select="$fontScheme/a:minorFont/child::node()[name() = $fontType]/@typeface"/>
+          <xsl:value-of select="$fontScheme/a:minorFont/child::node()[name() = $fontType]/@typeface"
+          />
         </xsl:when>
         <xsl:when test="contains($fontTheme,'major')">
-          <xsl:value-of select="$fontScheme/a:majorFont/child::node()[name() = $fontType]/@typeface"/>
+          <xsl:value-of select="$fontScheme/a:majorFont/child::node()[name() = $fontType]/@typeface"
+          />
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="$fontName = ''">
         <xsl:text>none</xsl:text>
@@ -1893,4 +1830,14 @@
     </xsl:choose>
   </xsl:template>
 
+  <!--style properties from settings.xml -->
+  <xsl:template name="InsertSettingsStyleProperties">
+    <style:default-style style:family="paragraph">
+      <style:paragraph-properties>
+        <xsl:for-each select="document('word/settings.xml')">
+          <xsl:call-template name="InsertDefaultParagraphProperties"/>
+        </xsl:for-each>
+      </style:paragraph-properties>
+    </style:default-style>
+  </xsl:template>
 </xsl:stylesheet>

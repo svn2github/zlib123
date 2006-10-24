@@ -662,7 +662,6 @@
     <xsl:if test="not(ancestor::w:p/w:pPr)">
       <style:style style:name="{generate-id(ancestor::w:p)}" style:family="paragraph">
         <style:paragraph-properties>
-          <xsl:call-template name="InsertDefaultParagraphProperties"/>
           <xsl:call-template name="InsertParagraphProperties"/>
         </style:paragraph-properties>
       </style:style>
