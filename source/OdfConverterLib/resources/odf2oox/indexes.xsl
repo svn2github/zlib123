@@ -41,48 +41,48 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="office text table fo style draw xlink v svg number">
 
-  
+
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="text:p"/>
   <xsl:preserve-space elements="text:span"/>
 
-  
+
   <xsl:key name="toc" match="text:table-of-content" use="''"/>
   <xsl:key name="indexes" match="text:illustration-index | text:table-index" use="''"/>
-  
+
   <!-- Inserts item for all types of index  -->
   <xsl:template name="InsertIndexItem">
-    
+
     <xsl:variable name="indexElementPosition">
       <xsl:number/>
     </xsl:variable>
-    
+
     <!-- inserts field code of index to first index element -->
     <xsl:if test="$indexElementPosition = 1">
       <xsl:call-template name="InsertIndexFieldCodeStart"/>
     </xsl:if>
-    
+
     <xsl:choose>
-      
+
       <!-- when hyperlink option is on in TOC -->
       <xsl:when test="text:a">
         <xsl:apply-templates select="text:a" mode="paragraph"/>
       </xsl:when>
-      
+
       <!--default scenario-->
       <xsl:otherwise>
         <xsl:call-template name="InsertIndexItemContent"/>
       </xsl:otherwise>
-      
+
     </xsl:choose>
-    
+
     <!-- inserts field code end in last index element -->
     <xsl:if test="(count(following-sibling::text:p) = 0) and parent::text:index-body">
       <xsl:call-template name="InsertIndexFieldCodeEnd"/>
     </xsl:if>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertIndexFieldCodeEnd">
     <w:r>
       <xsl:if test="ancestor::text:section/@text:display='none'">
@@ -93,7 +93,7 @@
       <w:fldChar w:fldCharType="end"/>
     </w:r>
   </xsl:template>
-  
+
   <xsl:template name="InsertIndexFieldCodeStart">
     <w:r>
       <xsl:if test="ancestor::text:section/@text:display='none'">
@@ -133,7 +133,7 @@
       <w:fldChar w:fldCharType="separate"/>
     </w:r>
   </xsl:template>
-  
+
   <xsl:template name="InsertIndexFiguresPrefs">
     <w:instrText xml:space="preserve">
       <xsl:text>TOC  \t "</xsl:text>
@@ -141,7 +141,7 @@
       <xsl:text> " </xsl:text> 
     </w:instrText>
   </xsl:template>
-  
+
   <xsl:template name="insertAlphabeticalPrefs">
     <xsl:choose>
       <xsl:when
@@ -184,21 +184,21 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertIllustrationInPrefs">
     <w:instrText xml:space="preserve"> 
       <xsl:text> TOC  \t "</xsl:text>
       <xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" 
     </w:instrText>
   </xsl:template>
-  
+
   <xsl:template name="InsertTocPrefs">
     <xsl:variable name="tocSource"
       select="ancestor::text:table-of-content/text:table-of-content-source"/>
-    
+
     <w:instrText>
       <xsl:text>TOC \o "1-</xsl:text>
-      
+
       <!-- include elements with outline styles up to selected level  -->
       <xsl:choose>
         <xsl:when test="$tocSource/@text:outline-level=10">
@@ -209,17 +209,17 @@
           <xsl:text>"</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
-      
+
       <!--include index marks-->
       <xsl:if test="not($tocSource[@text:use-index-marks = 'false'])">
         <xsl:text>\u  </xsl:text>
       </xsl:if>
-      
+
       <!--use hyperlinks -->
       <xsl:if test="text:a">
         <xsl:text> \h </xsl:text>
       </xsl:if>
-      
+
       <!-- include elements with additional styles-->
       <xsl:if test="$tocSource/text:index-source-styles">
         <xsl:text> \t "</xsl:text>
@@ -236,32 +236,40 @@
   </xsl:template>
 
 
-  
+
   <!--inserts index item content for all types of index-->
   <xsl:template name="InsertIndexItemContent">
-    
+
     <!-- references to index bookmark id in text -->
     <xsl:param name="tocId" select="count(preceding-sibling::text:p)+1"/>
-    
+
     <!-- alphabetical index doesn't support page reference link -->
-   
+
     <xsl:if test="not(ancestor::text:alphabetical-index)">
       <xsl:call-template name="InsertIndexPageRefStart">
         <xsl:with-param name="tocId" select="$tocId"/>
       </xsl:call-template>
     </xsl:if>
-    
+
     <!-- insert TOC -->
-    <xsl:apply-templates select="text:tab|self::text:a/text:tab|text:span|parent::text:p/text:tab|text()"
-      mode="paragraph"/>
+    <xsl:choose>
+      <xsl:when test="self::text:a">
+        <xsl:apply-templates mode="paragraph"/>
+        <xsl:apply-templates select="parent::text:p/child::node()[not(self::text:a)]"
+          mode="paragraph"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates mode="paragraph"/>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <!-- alphabetical index doesn't support page reference link -->
     <xsl:if test="not(ancestor::text:alphabetical-index)">
       <xsl:call-template name="InsertIndexPageRefEnd"/>
     </xsl:if>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertIndexPageRefEnd">
     <w:r>
       <w:rPr>
@@ -274,10 +282,10 @@
       <w:fldChar w:fldCharType="end"/>
     </w:r>
   </xsl:template>
-  
+
   <xsl:template name="InsertIndexPageRefStart">
     <xsl:param name="tocId"/>
-    
+
     <w:r>
       <w:rPr>
         <w:noProof/>
@@ -311,8 +319,8 @@
       <w:fldChar w:fldCharType="separate"/>
     </w:r>
   </xsl:template>
-  
-  
+
+
   <!-- empty alphabetical indexes creating mark entry -->
   <xsl:template match="text:alphabetical-index-mark" mode="paragraph">
     <w:r>
@@ -358,7 +366,7 @@
       <w:fldChar w:fldCharType="end"/>
     </w:r>
   </xsl:template>
-  
+
   <!-- alphabetical indexes creating mark entry -->
   <xsl:template match="text:alphabetical-index-mark-end" mode="paragraph">
     <w:r>
@@ -418,8 +426,8 @@
     </w:r>
     <!-- <xsl:apply-templates select="text:s" mode="text"></xsl:apply-templates> -->
   </xsl:template>
-  
-  
-  
-  
+
+
+
+
 </xsl:stylesheet>

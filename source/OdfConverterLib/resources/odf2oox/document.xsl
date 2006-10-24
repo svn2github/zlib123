@@ -615,7 +615,7 @@
           </xsl:when>
           <xsl:when test="not(following-sibling::text:tab)">
             <xsl:choose>
-              <xsl:when test="not(ancestor::text:a)">
+              <xsl:when test="parent::text:a|parent::text:span">
                 <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
               </xsl:when>
               <xsl:otherwise>
