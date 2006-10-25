@@ -1444,6 +1444,8 @@
     <!-- report loss of header/footer properties -->
     <xsl:variable name="header-properties" select="parent::style:page-layout/style:header-style/style:header-footer-properties"/>
     <xsl:variable name="footer-properties" select="parent::style:page-layout/style:footer-style/style:header-footer-properties"/>
+    <!-- this attribute exists when the user choose to automatically adapt the header/footer height,
+          otherwise svg:height is used and it gives the exact header/footer height -->
     <xsl:if
       test="$header-properties/@fo:min-height">
       <xsl:message terminate="no">feedback:Header distance</xsl:message>
