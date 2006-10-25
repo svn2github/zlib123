@@ -30,6 +30,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -138,13 +139,14 @@
 
   <!-- Get outlineLvl if the paragraf is heading -->
   <xsl:template name="GetOutlineLevel">
+    <xsl:param name="node"/>
     <xsl:choose>
-      <xsl:when test="w:pPr/w:outlineLvl/@w:val">
-        <xsl:value-of select="w:pPr/w:outlineLvl/@w:val"/>
+      <xsl:when test="$node/w:pPr/w:outlineLvl/@w:val">
+        <xsl:value-of select="$node/w:pPr/w:outlineLvl/@w:val"/>
       </xsl:when>
-      <xsl:when test="w:pPr/w:pStyle/@w:val">
+      <xsl:when test="$node/w:pPr/w:pStyle/@w:val">
         <xsl:variable name="outline">
-          <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
+          <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
         </xsl:variable>
         <!--Search outlineLvl in styles.xml  -->
         <xsl:choose>
@@ -157,7 +159,7 @@
           <xsl:otherwise>
             <xsl:call-template name="CheckHeading">
               <xsl:with-param name="outline">
-                <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
+                <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:otherwise>
@@ -166,7 +168,7 @@
 
       <xsl:otherwise>
         <xsl:variable name="outline">
-          <xsl:value-of select="w:r/w:rPr/w:rStyle/@w:val"/>
+          <xsl:value-of select="$node/w:r/w:rPr/w:rStyle/@w:val"/>
         </xsl:variable>
         <xsl:variable name="linkedStyleOutline">
           <xsl:value-of
@@ -200,10 +202,20 @@
     <xsl:message terminate="no">progress:w:p</xsl:message>
 
     <xsl:variable name="outlineLevel">
-      <xsl:call-template name="GetOutlineLevel"/>
+      <xsl:call-template name="GetOutlineLevel">
+        <xsl:with-param name="node" select="."/>
+      </xsl:call-template>
     </xsl:variable>
 
     <xsl:choose>
+      
+      <!--  check if the paragraf is heading -->
+      <xsl:when test="$outlineLevel != '' ">
+        <xsl:apply-templates select="." mode="heading">
+          <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
+        </xsl:apply-templates>
+      </xsl:when>
+      
       <!-- check if list starts -->
       <xsl:when test="w:pPr/w:numPr">
         <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
@@ -212,13 +224,6 @@
           test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $NumberingId and  count(preceding-sibling::w:p)= $position -1])">
           <xsl:apply-templates select="." mode="list"/>
         </xsl:if>
-      </xsl:when>
-
-      <!--  check if the paragraf is heading -->
-      <xsl:when test="$outlineLevel != '' ">
-        <xsl:apply-templates select="." mode="heading">
-          <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
-        </xsl:apply-templates>
       </xsl:when>
 
       <!--  default scenario - paragraph-->
@@ -387,6 +392,13 @@
     </xsl:choose>
   </xsl:template>
 
+  
+  <xsl:template match="w:drawing">
+    <xsl:apply-templates select="wp:inline | wp:anchor">
+    </xsl:apply-templates>
+  </xsl:template>
+  
+  
   <!-- ignore text inside a field code -->
   <xsl:template match="w:instrText"/>
   <xsl:template match="w:instrText" mode="automaticstyles"/>

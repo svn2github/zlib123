@@ -35,6 +35,7 @@
   <xsl:import href="styles.xsl"/>
   <xsl:import href="meta.xsl"/>
   <xsl:import href="settings.xsl"/>
+  <xsl:import href="relationships.xsl"/>
   
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>

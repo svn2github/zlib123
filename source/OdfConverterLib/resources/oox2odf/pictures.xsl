@@ -43,36 +43,26 @@
   exclude-result-prefixes="w">
 
   <!-- Pictures conversion needs copy of image files in zipEnrty to work correctly (but id does't crash  -->
-
-  <xsl:template match="w:drawing">
-    <xsl:apply-templates select="wp:inline | wp:anchor"/>
-  </xsl:template>
-  
+ 
   <xsl:template match="wp:inline | wp:anchor">
+    <xsl:param name="document"/>
+    <xsl:value-of select="$document"/>
+<xsl:choose>
     
-    <xsl:variable name="pziptarget">
-      <xsl:value-of select="wp:docPr/@name"/>
-    </xsl:variable>
-    
-    <!--  Copy Pictures Files to the picture catalog -->
-    
-    <xsl:variable name="id">
-      <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
-    </xsl:variable>
-    
-    <xsl:for-each select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
+    <xsl:when test="not(name(/node()) = 'w:hdr') and not(name(/node()) = 'w:ftr') ">
+    <xsl:call-template name="CopyPictures">
+      <xsl:with-param name="document">document.xml</xsl:with-param>
+    </xsl:call-template>
       
-          <xsl:if test="./@Id=$id">
-        <xsl:variable name="pzipsource">
-          <xsl:value-of select="./@Target"/>
-        </xsl:variable>
-        <pzip:copy pzip:source="word/{$pzipsource}" pzip:target="pictures/{$pziptarget}"/>
-      </xsl:if>
-      
-    </xsl:for-each>
-
+    </xsl:when>
+  <xsl:otherwise>
+  </xsl:otherwise>
+  </xsl:choose>
+    
     <draw:frame text:anchor-type="paragraph">
       <!-- TODO: @draw:style-name @text:anchor-type -->
+      
+
       <xsl:attribute name="draw:name">
         <xsl:value-of select="wp:docPr/@name"/>
       </xsl:attribute>
@@ -81,9 +71,27 @@
         <xsl:call-template name="SetPosition"/>
       </xsl:if>
       <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-        <xsl:attribute name="xlink:href">
-          <xsl:value-of select="concat('pictures/', wp:docPr/@name)"/>
-        </xsl:attribute>
+        <xsl:variable name="id">
+          <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
+        </xsl:variable>
+        <xsl:if test="document('word/_rels/document.xml.rels')">
+          <xsl:for-each
+            select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
+            
+            <xsl:if test="./@Id=$id">
+              <xsl:variable name="pzipsource">
+                <xsl:value-of select="./@Target"/>
+              </xsl:variable>
+              <xsl:variable name="pziptarget">
+                <xsl:value-of select="substring-after($pzipsource,'/')"/>
+              </xsl:variable>
+              
+              <xsl:attribute name="xlink:href">
+                <xsl:value-of select="concat('pictures/', $pziptarget)"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:if>
       </draw:image>
     </draw:frame>
   </xsl:template>

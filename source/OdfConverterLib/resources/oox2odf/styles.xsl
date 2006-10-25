@@ -44,6 +44,11 @@
       </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
+        <xsl:for-each select="document('word/document.xml')">
+          <xsl:call-template name="HeadingList">
+            <xsl:with-param name="node" select="w:document/w:body/w:p"/>
+          </xsl:call-template>
+        </xsl:for-each>
         <!--   Default paragraph properties from settings -->
         <xsl:call-template name="InsertSettingsStyleProperties"/>
         <!-- document styles -->
@@ -70,20 +75,23 @@
   <xsl:template name="InsertDefaultMasterPage">
     <style:master-page style:name="Standard" style:page-layout-name="pm1">
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
-        <xsl:if test="w:headerReference">
+        <xsl:for-each select="w:headerReference">
+          <xsl:if test="./@w:type = 'default'">
           <style:header>
-            <xsl:variable name="headerId" select="w:headerReference/@r:id"/>
+            <xsl:variable name="headerId" select="./@r:id"/>
             <xsl:variable name="headerXmlDocument"
               select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-            <!-- change context to get header content -->
+            <!-- change context to get footer content -->
             <xsl:for-each select="document($headerXmlDocument)">
               <xsl:apply-templates/>
             </xsl:for-each>
           </style:header>
-        </xsl:if>
-        <xsl:if test="w:footerReference">
+            </xsl:if>
+        </xsl:for-each>
+        <xsl:for-each select="w:footerReference">
+          <xsl:if test="./@w:type = 'default'">
           <style:footer>
-            <xsl:variable name="footerId" select="w:footerReference/@r:id"/>
+            <xsl:variable name="footerId" select="./@r:id"/>
             <xsl:variable name="footerXmlDocument"
               select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
             <!-- change context to get header content -->
@@ -91,7 +99,8 @@
               <xsl:apply-templates/>
             </xsl:for-each>
           </style:footer>
-        </xsl:if>
+          </xsl:if>
+          </xsl:for-each>
       </xsl:for-each>
     </style:master-page>
   </xsl:template>
@@ -121,6 +130,97 @@
     </style:page-layout>
   </xsl:template>
 
+<!-- insert heading list style -->
+  <xsl:template name="HeadingList">
+    <xsl:param name="node"/>
+    <xsl:variable name="outlineLevel">
+      <xsl:call-template name="GetOutlineLevel">
+        <xsl:with-param name="node" select="$node"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$outlineLevel !=''">
+        <xsl:if test="$node/w:pPr/w:numPr">
+          <xsl:variable name="numid">
+            <xsl:value-of select="$node/w:pPr/w:numPr/w:numId/@w:val"/>
+          </xsl:variable>
+          <text:outline-style>
+            <xsl:variable name="abstractnumid">
+              <xsl:value-of select="document('word/numbering.xml')//w:numbering/w:num[@w:numId =$numid]/w:abstractNumId/@w:val"/>
+            </xsl:variable>
+            <xsl:for-each select="document('word/numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId = $abstractnumid]/w:lvl">
+              <text:outline-level-style>
+                <xsl:attribute name="text:level">
+                  <xsl:value-of select="./@w:ilvl +1"/>
+                </xsl:attribute>
+                <xsl:attribute name="style:num-format">
+                  <xsl:call-template name="NumFormat">
+                    <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
+                  </xsl:call-template>
+                </xsl:attribute>
+                <xsl:if test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
+                  <xsl:attribute name="style:num-suffix">
+                    <xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:variable name="display">
+                  <xsl:call-template name="Count">
+                    <xsl:with-param name="string">
+                      <xsl:value-of select="./w:lvlText/@w:val"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="count">0</xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:if test="$display &gt; 1">
+                  <xsl:attribute name="text:display-levels">
+                    <xsl:value-of select="$display"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <style:list-level-properties>
+                  <xsl:variable name="Ind" select="./w:pPr/w:ind"/> 
+                  <xsl:attribute name="text:space-before">
+                    <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:firstLine)"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="text:min-label-distance">
+                    <xsl:value-of select="number(./w:pPr/w:tabs/w:tab/@w:pos)"/>
+                  </xsl:attribute>
+                </style:list-level-properties>
+              </text:outline-level-style>
+            </xsl:for-each>
+          </text:outline-style>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="count($node/following::w:p) != 0">
+          <xsl:call-template name="HeadingList">
+            <xsl:with-param name="node" select="$node/following::w:p"/>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="Count">
+    <xsl:param name="string"/>
+    <xsl:param name="count"/>
+    <xsl:choose>
+      <xsl:when test="string-length(substring-after($string,'%')) &gt; 0">
+        <xsl:call-template name="Count">
+          <xsl:with-param name="string">
+            <xsl:value-of select="substring-after($string,'%')"/>
+          </xsl:with-param>
+          <xsl:with-param name="count">
+            <xsl:value-of select="$count +1"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$count"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
   <!-- conversion of page properties -->
   <!-- TODO : handle other properties -->
   <xsl:template name="InsertPageLayoutProperties">
@@ -401,7 +501,12 @@
             <xsl:call-template name="InsertStyleProperties"/>
           </style:default-style>
         </xsl:if>
-        <!--@TODO style:family: table, graphic, text etc-->
+        <xsl:if test="@w:type='table'">
+          <style:default-style style:family="table">
+            <xsl:call-template name="InsertTableProperties"/>
+          </style:default-style>
+        </xsl:if>
+        <!--@TODO style:family: graphic, text etc-->
       </xsl:when>
       <xsl:otherwise>
         <style:style style:name="{self::node()/@w:styleId}"
