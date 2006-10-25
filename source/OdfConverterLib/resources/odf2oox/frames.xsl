@@ -906,7 +906,7 @@
     </xsl:call-template>
     </w:p>
   </xsl:template>
-  
+
   <xsl:template match="draw:custom-shape" mode="shapes">
     <xsl:call-template name="InsertShapes">
       <xsl:with-param name="shapeType">
@@ -1082,8 +1082,8 @@
     </xsl:attribute>
   </xsl:template>
 
-  
-  <!-- shape position -->  
+
+  <!-- shape position -->
   <xsl:template name="InsertPosition">
     <xsl:variable name="x">
       <xsl:call-template name="point-measure">
@@ -1096,21 +1096,33 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="horizontal">
-      <xsl:if test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:horizontal-pos='from-left'">
+      <xsl:if
+       test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:horizontal-pos='from-left'">
         <xsl:text>mso-position-horizontal-relative:left-margin-area</xsl:text>
       </xsl:if>
     </xsl:variable>
     <xsl:variable name="Vertical">
-      <xsl:if test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:vertical-pos='from-top'">        
+      <xsl:if
+       test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:vertical-pos='from-top'">
         <xsl:text>mso-position-vertical-relative:top-margin-area</xsl:text>
       </xsl:if>
-    </xsl:variable>    
-    <xsl:value-of select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;',$horizontal,';',$Vertical,';')"/>
+    </xsl:variable>
+    <xsl:value-of
+     select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;',$horizontal,';',$Vertical,';')"
+    />
   </xsl:template>
-  
-  <!-- z-index -->
+
+  <!--insert shahpe z-index -->
   <xsl:template name="InsertDrawnShapeZindex">
-    <xsl:value-of select="concat('z-index:',@draw:z-index)"/>
+    <xsl:choose>
+      <xsl:when test="@draw:z-index=0">
+        <xsl:value-of select="concat('z-index:',2516572155-@draw:z-index,';')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat('z-index:',251659264+@draw:z-index,';')"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
   <!--  shape width and height-->
@@ -1781,7 +1793,9 @@
       <xsl:variable name="angle">
         <xsl:call-template name="DegreesAngle">
           <xsl:with-param name="angle">
-            <xsl:value-of select="substring-before(substring-after(substring-after(parent::draw:frame/@draw:transform,'rotate'),'('),')')"/>
+            <xsl:value-of
+              select="substring-before(substring-after(substring-after(parent::draw:frame/@draw:transform,'rotate'),'('),')')"
+            />
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
@@ -1789,7 +1803,7 @@
       <xsl:text>;</xsl:text>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertShapeTransparency">
     <xsl:param name="shapeStyle"/>
 
@@ -1852,7 +1866,7 @@
       </xsl:call-template>
 
       <xsl:call-template name="InsertShapeRotation"/>
-      
+
     </xsl:attribute>
 
     <xsl:call-template name="InsertShapeFill">
@@ -1947,7 +1961,9 @@
             <xsl:variable name="angle">
               <xsl:call-template name="DegreesAngle">
                 <xsl:with-param name="angle">
-                  <xsl:value-of select="substring-before(substring-after(substring-after(parent::draw:frame/@draw:transform,'rotate'),'('),')')"/>
+                  <xsl:value-of
+                    select="substring-before(substring-after(substring-after(parent::draw:frame/@draw:transform,'rotate'),'('),')')"
+                  />
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
