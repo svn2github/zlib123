@@ -252,11 +252,17 @@
     <!--    borders-->
     <xsl:choose>
       <xsl:when test="w:tcBorders">
+        <xsl:variable name="styleId">
+          <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
+        </xsl:variable>
+        <xsl:variable name="style1" select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:tblPr/w:tblBorders"/>
+        <xsl:variable name="style2" select="document('word/styles.xml')//w:styles/w:style[@w:default = 1 and @w:type = 'table']/w:tblPr/w:tblBorders"/>
+        <xsl:variable name="style" select="$style1|$style2"/>
         <xsl:call-template name="InsertCellBorder">
           <xsl:with-param name="tcBorder" select="w:tcBorders/w:bottom"/>
           <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:bottom"/>
           <xsl:with-param name="tblDefBorder"
-            select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblBorders/w:bottom"/>
+            select="$style/w:bottom"/>
           <xsl:with-param name="attribute">fo:border-bottom</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-bottom</xsl:with-param>
         </xsl:call-template>
@@ -264,7 +270,7 @@
           <xsl:with-param name="tcBorder" select="w:tcBorders/w:right"/>
           <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:right"/>
           <xsl:with-param name="tblDefBorder"
-            select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblBorders/w:right"/>
+            select="$style/w:right"/>
           <xsl:with-param name="attribute">fo:border-right</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-right</xsl:with-param>
         </xsl:call-template>
@@ -272,7 +278,7 @@
           <xsl:with-param name="tcBorder" select="w:tcBorders/w:left"/>
           <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:left"/>
           <xsl:with-param name="tblDefBorder"
-            select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblBorders/w:left"/>
+            select="$style/w:left"/>
           <xsl:with-param name="attribute">fo:border-left</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-left</xsl:with-param>
         </xsl:call-template>
@@ -280,7 +286,7 @@
           <xsl:with-param name="tcBorder" select="w:tcBorders/w:top"/>
           <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:top"/>
           <xsl:with-param name="tblDefBorder"
-            select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblBorders/w:top"/>
+            select="$style/w:top"/>
           <xsl:with-param name="attribute">fo:border-top</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
         </xsl:call-template>
@@ -289,9 +295,12 @@
         <xsl:variable name="styleId">
           <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
         </xsl:variable>
-        <xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
-          <xsl:variable name="style"
-            select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblBorders"/>
+        <!--<xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
+          <xsl:variable name="style" select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblBorders"/>-->
+
+        <xsl:variable name="style1" select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:tblPr/w:tblBorders"/>
+        <xsl:variable name="style2" select="document('word/styles.xml')//w:styles/w:style[@w:default = 1 and @w:type = 'table']/w:tblPr/w:tblBorders"/>
+        <xsl:variable name="style" select="$style1|$style2"/>
           <xsl:call-template name="InsertTableBorder">
             <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:bottom"/>
             <xsl:with-param name="tblDefBorder" select="$style/w:bottom"/>
@@ -316,7 +325,7 @@
             <xsl:with-param name="attribute">fo:border-top</xsl:with-param>
             <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
           </xsl:call-template>
-        </xsl:if>
+<!--        </xsl:if>-->
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -412,17 +421,20 @@
               <xsl:choose>
                 <xsl:when test="$tcBorder/@w:color = 'auto'">
                   <xsl:choose>
-                    <xsl:when test="not($tblBorder/@w:color = 'auto')">
-                      <xsl:value-of select="$tblBorder/@w:color"/>
-                    </xsl:when>
-                    <xsl:otherwise>
+                    <xsl:when test="$tblBorder/@w:color = 'auto' or not($tblBorder/@w:color)">
                       <xsl:variable name="styleId">
                         <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
                       </xsl:variable>
-                      <xsl:if
-                        test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
-                        <xsl:value-of select="$tblDefBorder/@w:color"/>
-                      </xsl:if>
+                      <xsl:choose>
+                        <xsl:when 
+                          test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
+                          <xsl:value-of select="$tblDefBorder/@w:color"/>
+                        </xsl:when>
+                        <xsl:otherwise>000000</xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$tblBorder/@w:color"/>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
@@ -490,16 +502,19 @@
         </xsl:if>
         <xsl:variable name="color">
           <xsl:choose>
-            <xsl:when test="not($tblBorder/@w:color = 'auto')">
-              <xsl:value-of select="$tblBorder/@w:color"/>
-            </xsl:when>
-            <xsl:otherwise>
+            <xsl:when test="$tblBorder/@w:color = 'auto' or not($tblBorder/@w:color)">
               <xsl:variable name="styleId">
                 <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
               </xsl:variable>
-              <xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
-                <xsl:value-of select="$tblDefBorder/@w:color"/>
-              </xsl:if>
+              <xsl:choose>
+                <xsl:when  test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
+                  <xsl:value-of select="$tblDefBorder/@w:color"/>
+                </xsl:when>
+                <xsl:otherwise>000000</xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$tblBorder/@w:color"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
