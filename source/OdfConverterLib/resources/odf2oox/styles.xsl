@@ -1442,25 +1442,48 @@
   <!-- Page margin properties -->
   <xsl:template name="ComputePageMargins">
     <!-- report loss of header/footer properties -->
+    <xsl:variable name="header-properties" select="parent::style:page-layout/style:header-style/style:header-footer-properties"/>
+    <xsl:variable name="footer-properties" select="parent::style:page-layout/style:footer-style/style:header-footer-properties"/>
     <xsl:if
-      test="following-sibling::*/style:header-footer-properties[@fo:min-height or @svg:height]">
-      <xsl:message terminate="no">feedback:Header/footer height</xsl:message>
-    </xsl:if>
-    <xsl:if
-      test="following-sibling::style:header-style/style:header-footer-properties/@fo:margin-bottom">
+      test="$header-properties/@fo:min-height">
       <xsl:message terminate="no">feedback:Header distance</xsl:message>
     </xsl:if>
     <xsl:if
-      test="following-sibling::style:footer-style/style:header-footer-properties/@fo:margin-top">
+      test="$footer-properties/@fo:min-height">
       <xsl:message terminate="no">feedback:Footer distance</xsl:message>
     </xsl:if>
     <w:pgMar>
       <xsl:if
         test="@fo:margin != 'none' or @fo:margin-top != 'none' or @fo:padding != 'none' or @fo:padding-top != 'none' ">
-        <xsl:attribute name="w:top">
-          <xsl:call-template name="GetPageMargin">
-            <xsl:with-param name="side">top</xsl:with-param>
-          </xsl:call-template>
+        <xsl:attribute name="w:top"> <!-- distance from top edge of the page to document body -->
+          <xsl:variable name="top">
+            <xsl:call-template name="GetPageMargin">
+              <xsl:with-param name="side">top</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <!-- additional header height -->
+            <xsl:when test="$header-properties">
+              <xsl:variable name="min-header-height">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length">
+                    <xsl:choose>
+                      <xsl:when test="$header-properties/@fo:min-height">
+                        <xsl:value-of select="$header-properties/@fo:min-height"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$header-properties/@svg:height"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="$top + $min-header-height"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$top"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
       </xsl:if>
       <xsl:if
@@ -1474,9 +1497,34 @@
       <xsl:if
         test="@fo:margin != 'none' or @fo:margin-bottom != 'none' or @fo:padding != 'none' or @fo:padding-bottom != 'none' ">
         <xsl:attribute name="w:bottom">
-          <xsl:call-template name="GetPageMargin">
-            <xsl:with-param name="side">bottom</xsl:with-param>
-          </xsl:call-template>
+          <xsl:variable name="bottom">
+            <xsl:call-template name="GetPageMargin">
+              <xsl:with-param name="side">bottom</xsl:with-param>
+            </xsl:call-template>
+            </xsl:variable>
+            <xsl:choose>
+              <!-- additional footer height -->
+              <xsl:when test="$footer-properties">
+                <xsl:variable name="min-footer-height">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length">
+                      <xsl:choose>
+                        <xsl:when test="$footer-properties/@fo:min-height">
+                          <xsl:value-of select="$footer-properties/@fo:min-height"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$footer-properties/@svg:height"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="$bottom + $min-footer-height"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$bottom"/>
+              </xsl:otherwise>
+            </xsl:choose>
         </xsl:attribute>
       </xsl:if>
       <xsl:if
@@ -1550,6 +1598,8 @@
     <xsl:value-of select="$padding + $margin"/>
   </xsl:template>
 
+  
+  
   <xsl:template match="style:columns" mode="columns">
     <w:cols>
       <!-- nb columns -->
