@@ -1527,7 +1527,9 @@
     <xsl:choose>
       <xsl:when test="$verticalRel = 'page' ">mso-position-vertical-relative: page;</xsl:when>
       <xsl:when test="$verticalRel = 'page-content' ">mso-position-vertical-relative:
-      margin;</xsl:when>
+        margin;</xsl:when>
+      <xsl:when test="$verticalRel = 'paragraph' ">mso-position-vertical-relative:
+        margin;</xsl:when>
     </xsl:choose>
   </xsl:template>
 
