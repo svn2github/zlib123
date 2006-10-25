@@ -478,23 +478,16 @@
     <xsl:call-template name="InsertHyperlink"/>
   </xsl:template>
 
-  <!--  text bookmark mark start -->
+  <!--  text bookmark mark -->
   <xsl:template match="w:bookmarkStart">
     <text:bookmark-start>
       <xsl:attribute name="text:name">
         <xsl:value-of select="@w:name"/>
       </xsl:attribute>
     </text:bookmark-start>
-  </xsl:template>
-
-  <!--  text bookmark mark end-->
-  <xsl:template match="w:bookmarkEnd">
     <text:bookmark-end>
-      <xsl:variable name="IdBookmark">
-        <xsl:value-of select="@w:id"/>
-      </xsl:variable>
       <xsl:attribute name="text:name">
-        <xsl:value-of select="ancestor::w:body/w:p/w:bookmarkStart[@w:id=$IdBookmark]/@w:name"/>
+        <xsl:value-of select="@w:name"/>
       </xsl:attribute>
     </text:bookmark-end>
   </xsl:template>
