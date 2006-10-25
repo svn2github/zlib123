@@ -897,6 +897,16 @@
 
   <!--custom shapes -->
 
+  <xsl:template match="draw:custom-shape">
+    <w:p>
+    <xsl:call-template name="InsertShapes">
+      <xsl:with-param name="shapeType">
+        <xsl:value-of select="draw:enhanced-geometry/@draw:type"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    </w:p>
+  </xsl:template>
+  
   <xsl:template match="draw:custom-shape" mode="shapes">
     <xsl:call-template name="InsertShapes">
       <xsl:with-param name="shapeType">
@@ -1060,9 +1070,7 @@
   <xsl:template name="InsertDrawnShapeProperties">
     <xsl:param name="shapeStyle"/>
     <xsl:attribute name="style">
-      <xsl:call-template name="InsertShapePosition">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-      </xsl:call-template>
+      <xsl:call-template name="InsertPosition"/>
 
       <xsl:call-template name="InsertDrawnShapeSize"/>
 
@@ -1074,6 +1082,32 @@
     </xsl:attribute>
   </xsl:template>
 
+  
+  <!-- shape position -->  
+  <xsl:template name="InsertPosition">
+    <xsl:variable name="x">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@svg:x"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="y">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length" select="@svg:y"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="horizontal">
+      <xsl:if test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:horizontal-pos='from-left'">
+        <xsl:text>mso-position-horizontal-relative:left-margin-area</xsl:text>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="Vertical">
+      <xsl:if test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:vertical-pos='from-top'">        
+        <xsl:text>mso-position-vertical-relative:top-margin-area</xsl:text>
+      </xsl:if>
+    </xsl:variable>    
+    <xsl:value-of select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;',$horizontal,';',$Vertical,';')"/>
+  </xsl:template>
+  
   <!-- z-index -->
   <xsl:template name="InsertDrawnShapeZindex">
     <xsl:value-of select="concat('z-index:',@draw:z-index)"/>
