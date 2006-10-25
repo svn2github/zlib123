@@ -473,6 +473,7 @@
     <xsl:choose>
       <xsl:when test="*[1][self::text:p or self::text:h]">
         <w:p>
+          <xsl:call-template name="MarkMasterPage"/>
           <w:pPr>
 
             <!-- insert style -->

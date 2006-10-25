@@ -72,11 +72,24 @@
   </xsl:template>
   
   <xsl:template name="MarkMasterPage">
-    <xsl:if test="key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name != '' ">
-      <xsl:attribute name="psect:master-page-name">
-        <xsl:value-of select="key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name"/>
-      </xsl:attribute>    
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="self::text:p or self::text:h or self::text:table">
+        <xsl:if test="key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name != '' ">
+          <xsl:attribute name="psect:master-page-name">
+            <xsl:value-of select="key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name"/>
+          </xsl:attribute>    
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test="self::text:list-item or self::text:list-header">
+        <xsl:variable name="elt" select="*[1][self::text:p or self::text:h]"/>
+        <xsl:if test="key('master-based-styles', $elt/@text:style-name)[1]/@style:master-page-name != '' ">
+          <xsl:attribute name="psect:master-page-name">
+            <xsl:value-of select="key('master-based-styles', $elt/@text:style-name)[1]/@style:master-page-name"/>
+          </xsl:attribute>  
+        </xsl:if>
+      </xsl:when>
+    </xsl:choose>
+    
   </xsl:template>
 
 
