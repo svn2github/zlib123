@@ -128,7 +128,7 @@
       <xsl:when test="contains($length, 'px')">
         <xsl:value-of select="round(number(substring-before($length, 'px')) * 1440 div 96.19)"/>
       </xsl:when>
-      <xsl:when test="not($length)">0</xsl:when>
+      <xsl:when test="not($length) or $length='' ">0</xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$length"/>
       </xsl:otherwise>
@@ -164,7 +164,7 @@
       <xsl:when test="contains($length, 'px')">
         <xsl:value-of select="number(substring-before($length, 'px')) * 0.264"/>
       </xsl:when>
-      <xsl:when test="not($length)">0</xsl:when>
+      <xsl:when test="not($length) or $length='' ">0</xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$length"/>
       </xsl:otherwise>
@@ -197,7 +197,7 @@
       <xsl:when test="contains($length, 'px')">
         <xsl:value-of select="round(number(substring-before($length, 'px')) * 576 div 96.19)"/>
       </xsl:when>
-      <xsl:when test="not($length)">0</xsl:when>
+      <xsl:when test="not($length) or $length='' ">0</xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$length"/>
       </xsl:otherwise>
@@ -233,7 +233,7 @@
         <xsl:when test="contains($length, 'px')">
           <xsl:value-of select="number(substring-before($length, 'px')) * 72 div 96.19"/>
         </xsl:when>
-        <xsl:when test="not($length)">0</xsl:when>
+        <xsl:when test="not($length) or $length='' ">0</xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$length"/>
         </xsl:otherwise>
@@ -272,6 +272,7 @@
       <xsl:when test="contains($length, 'px')">
         <xsl:value-of select="round(number(substring-before($length, 'px')) * 360000 div 37.87)"/>
       </xsl:when>
+      <xsl:when test="not($length) or $length='' ">0</xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$length"/>
       </xsl:otherwise>
