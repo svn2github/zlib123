@@ -140,10 +140,20 @@
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$outlineLevel !=''">
-        <xsl:if test="$node/w:pPr/w:numPr">
-          <xsl:variable name="numid">
-            <xsl:value-of select="$node/w:pPr/w:numPr/w:numId/@w:val"/>
-          </xsl:variable>
+        <xsl:variable name="numid">
+          <xsl:choose>
+            <xsl:when test="$node/w:pPr/w:numPr">
+              <xsl:value-of select="$node/w:pPr/w:numPr/w:numId/@w:val"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:variable name="styleId">
+                <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
+              </xsl:variable>
+              <xsl:value-of select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:pPr/w:numPr/w:numId/@w:val"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:if test="$numid">
           <text:outline-style>
             <xsl:variable name="abstractnumid">
               <xsl:value-of select="document('word/numbering.xml')//w:numbering/w:num[@w:numId =$numid]/w:abstractNumId/@w:val"/>
