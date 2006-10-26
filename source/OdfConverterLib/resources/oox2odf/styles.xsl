@@ -285,36 +285,15 @@
         <xsl:with-param name="length">
           <xsl:choose>
             <xsl:when test="w:pgMar/@w:top &lt; 0">
-              <xsl:choose>
-                <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
-                  <xsl:value-of select="w:pgMar/@w:top + w:pgMar/@w:gutter"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="w:pgMar/@w:top"/>
-                </xsl:otherwise>
-              </xsl:choose>
+              <xsl:value-of select="w:pgMar/@w:top"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
                 <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">
-                  <xsl:choose>
-                    <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
-                      <xsl:value-of select="w:pgMar/@w:header + w:pgMar/@w:gutter"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="w:pgMar/@w:header"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
+                  <xsl:value-of select="w:pgMar/@w:header"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:choose>
-                    <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
-                      <xsl:value-of select="w:pgMar/@w:top + w:pgMar/@w:gutter"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="w:pgMar/@w:top"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
+                  <xsl:value-of select="w:pgMar/@w:top"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
@@ -450,19 +429,43 @@
               <xsl:choose>
                 <xsl:when test="w:pgMar/@w:top &lt; 0">
                   <xsl:choose>
+                    <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
+                      <xsl:choose>
+                        <xsl:when test=" - w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header">0</xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select=" - w:pgMar/@w:top + w:pgMar/@w:gutter - w:pgMar/@w:header"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
+                  <xsl:choose>
                     <xsl:when test=" - w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select=" - w:pgMar/@w:top - w:pgMar/@w:header"/>
                     </xsl:otherwise>
                   </xsl:choose>
+                    </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
+                  <xsl:choose>
+                    <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
+                      <xsl:choose>
+                        <xsl:when test="w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header">0</xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="w:pgMar/@w:top + w:pgMar/@w:gutter - w:pgMar/@w:header"/>
+                        </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>
                   <xsl:choose>
                     <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="w:pgMar/@w:top - w:pgMar/@w:header"/>
                     </xsl:otherwise>
                   </xsl:choose>
+                    </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:when>
