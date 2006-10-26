@@ -136,7 +136,7 @@
         </xsl:call-template>
       </xsl:attribute>
       <xsl:attribute name="w:name">
-        <xsl:value-of select="concat(@text:name, generate-id())"/>
+        <xsl:value-of select="@text:name"/>
       </xsl:attribute>
     </w:bookmarkStart>
   </xsl:template>
@@ -168,20 +168,15 @@
           </xsl:when>
           <xsl:otherwise>REF </xsl:otherwise>
         </xsl:choose>
-        <xsl:choose>
-          <xsl:when test="../text:bookmark-ref[@text:ref-name=$TextName]">
-            <xsl:value-of
-              select="concat($TextName, generate-id(key('bookmark-reference-start', $TextName)))"/>
-          </xsl:when>
-          <xsl:when test="../text:reference-ref[@text:ref-name=$TextName]">
-            <xsl:value-of
-              select="concat($TextName, generate-id(key('bookmark-reference-start', $TextName)))"/>
-          </xsl:when>
+		<xsl:choose>
           <xsl:when test="../text:sequence-ref[@text:ref-name=$TextName]">
             <xsl:value-of
               select="concat('_Toc', number(count(key('bookmark-reference-start', $TextName)/preceding::text:sequence))+1)"
             />
           </xsl:when>
+			<xsl:otherwise>
+			<xsl:value-of select="$TextName"/>
+			</xsl:otherwise>	
         </xsl:choose>
         <xsl:if test="@text:reference-format='direction'">
           <xsl:text>\p</xsl:text>
