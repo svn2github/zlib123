@@ -672,6 +672,12 @@
       </xsl:attribute>
     </xsl:if>
 
+    <xsl:if test="w:r/w:br[@w:type='page' or @w:type='column']">
+      <xsl:attribute name="fo:break-after">
+        <xsl:value-of select="w:br[@w:type='page' or @w:type='column']/@w:type"/>
+      </xsl:attribute>
+    </xsl:if>
+    
     <!-- borders. -->
     <xsl:if test="w:pBdr">
       <xsl:call-template name="InsertParagraphBorder"/>

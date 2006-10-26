@@ -71,7 +71,7 @@
   </xsl:template>
 
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
-  <xsl:template match="w:pPr[parent::w:p]" mode="automaticstyles">
+  <xsl:template match="w:pPr[parent::w:p]|w:r[parent::w:p and child::w:br and not(parent::w:p[child::wpPr])]" mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
       <xsl:if test="w:pStyle">
