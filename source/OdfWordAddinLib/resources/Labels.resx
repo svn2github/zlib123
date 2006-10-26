@@ -148,9 +148,7 @@
     <value>Converting %1...</value>
   </data>
   <data name="FeedbackLabel" xml:space="preserve">
-    <value>Some elements may have been lost during the
-transformation.To see a list of potentially lost
-elements, click on "Details".</value>
+    <value>Some elements may have been lost during the transformation. To see a list of potentially lost elements, click on "Details".</value>
   </data>
   <data name="EncryptedDocumentDetail" xml:space="preserve">
     <value>This feature is not implemented by the current version of the add-in.</value>
@@ -162,8 +160,7 @@ elements, click on "Details".</value>
     <value>If you think it is a valid ODF document, you should fill a bug report on the project web site  (http://odf-converter.sourceforge.net) with your file attached.</value>
   </data>
   <data name="NotAnOdfDocumentLabel" xml:space="preserve">
-    <value>This document doesn't seem to be a valid
-ODF document.</value>
+    <value>This document doesn't seem to be a valid ODF document.</value>
   </data>
   <data name="OdfConverterNotInstalled" xml:space="preserve">
     <value>Office 2007 File converters are not installed : the ODF convertion cannot work without.</value>
