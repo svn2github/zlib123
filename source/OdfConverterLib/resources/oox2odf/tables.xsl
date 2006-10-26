@@ -82,7 +82,14 @@
       <xsl:attribute name="table:style-name">
         <xsl:value-of select="generate-id(self::w:tc)"/>
       </xsl:attribute>
-      <!--TODO: @table:style-name -->
+      
+      <!-- column-span -->
+      <xsl:if test="w:tcPr/w:gridSpan">
+        <xsl:attribute name="table:number-columns-spanned">
+          <xsl:value-of select="w:tcPr/w:gridSpan/@w:val"/>
+        </xsl:attribute>
+      </xsl:if>
+      
       <xsl:apply-templates/>
     </table:table-cell>
   </xsl:template>
@@ -571,7 +578,7 @@
 
   <!--  insert row properties: height-->
   <xsl:template name="InsertRowProperties">
-    <xsl:if test="w:trHeight">
+    <xsl:if test="w:trHeight/@w:hRule and w:trHeight/@w:hRule!='auto' ">
       <xsl:attribute name="style:min-row-height">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">
