@@ -542,8 +542,8 @@
       <xsl:if test="w:pPrDefault">
         <style:paragraph-properties>
           <xsl:call-template name="InsertDefaultParagraphProperties" />
-          <xsl:if test="w:pPr">
-            <xsl:for-each select="w:pPr">
+          <xsl:if test="w:pPrDefault/w:pPr">
+            <xsl:for-each select="w:pPrDefault/w:pPr">
               <xsl:call-template name="InsertParagraphProperties"/>
             </xsl:for-each>
           </xsl:if>
@@ -553,11 +553,11 @@
       <xsl:if test="w:rPrDefault">
         <style:text-properties>
           <xsl:call-template name="InsertDefaultTextProperties" />
-          <xsl:if test="w:rPr">
-            <xsl:for-each select="w:rPr">
+          <xsl:if test="w:rPrDefault/w:rPr">
+            <xsl:for-each select="w:rPrDefault/w:rPr">
               <xsl:call-template name="InsertTextProperties"/>
             </xsl:for-each>
-            <xsl:for-each select="w:pPr">
+            <xsl:for-each select="w:rPrDefault/w:pPr">
               <xsl:call-template name="InsertpPrTextProperties"/>
             </xsl:for-each>
           </xsl:if>
