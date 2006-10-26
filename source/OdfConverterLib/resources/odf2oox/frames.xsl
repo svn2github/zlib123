@@ -896,7 +896,6 @@
   </xsl:template>
 
   <!--custom shapes -->
-
   <xsl:template match="draw:custom-shape">
     <w:p>
       <xsl:call-template name="InsertShapes">
@@ -916,7 +915,6 @@
   </xsl:template>
 
   <!-- basic shapes - ellipse and rect -->
-
   <xsl:template match="draw:rect|draw:ellipse" mode="shapes">
     <xsl:call-template name="InsertShapes">
       <xsl:with-param name="shapeType" select="name()"/>
@@ -979,7 +977,8 @@
   <!-- TODO
   <xsl:template name="GenerateShapeId">
     <xsl:param name="shape"></xsl:param>
-    </xsl:template> -->
+  </xsl:template>
+  -->
 
   <!-- simple shape properties -->
   <xsl:template name="SimpleShape">
@@ -1095,21 +1094,15 @@
         <xsl:with-param name="length" select="@svg:y"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="horizontal">
-      <xsl:if
-        test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:horizontal-pos='from-left'">
-        <xsl:text>mso-position-horizontal-relative:left-margin-area</xsl:text>
-      </xsl:if>
-    </xsl:variable>
-    <xsl:variable name="Vertical">
-      <xsl:if
-        test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:vertical-pos='from-top'">
-        <xsl:text>mso-position-vertical-relative:top-margin-area</xsl:text>
-      </xsl:if>
-    </xsl:variable>
-    <xsl:value-of
-      select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;',$horizontal,';',$Vertical,';')"
-    />
+    <xsl:value-of select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;')"/>
+    <xsl:if
+      test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:horizontal-pos='from-left'">
+      <xsl:text>mso-position-horizontal-relative:margin;</xsl:text>
+    </xsl:if>
+    <xsl:if
+      test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:vertical-pos='from-top'">
+      <xsl:text>mso-position-vertical-relative:margin;</xsl:text>
+    </xsl:if>
   </xsl:template>
 
   <!--insert shape z-index -->
@@ -1125,7 +1118,6 @@
   </xsl:template>
 
   <!--  shape width and height-->
-
   <xsl:template name="InsertDrawnShapeSize">
     <xsl:variable name="frameW">
       <xsl:call-template name="point-measure">
@@ -1137,8 +1129,6 @@
         <xsl:with-param name="length" select="@fo:min-height|@svg:height"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="relWidth" select="substring-before(@style:rel-width,'%')"/>
-    <xsl:variable name="relHeight" select="substring-before(@style:rel-height,'%')"/>
     <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
     <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
   </xsl:template>
@@ -1359,7 +1349,6 @@
           <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
           <xsl:variable name="officeStyle"
             select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
-
           <xsl:variable name="shapeStyle" select="$automaticStyle | $officeStyle"/>
 
           <xsl:call-template name="InsertShapeProperties">
@@ -1400,9 +1389,6 @@
         <xsl:with-param name="length" select="parent::draw:frame/@svg:height"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="relWidth" select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
-    <xsl:variable name="relHeight"
-      select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
 
     <xsl:if test="not(parent::draw:frame/@fo:min-width)">
       <xsl:value-of select="concat('width:',$frameW,'pt;')"/>
@@ -1412,6 +1398,10 @@
     </xsl:if>
 
     <!--relative width and hight-->
+    <xsl:variable name="relWidth" select="substring-before(parent::draw:frame/@style:rel-width,'%')"/>
+    <xsl:variable name="relHeight"
+      select="substring-before(parent::draw:frame/@style:rel-height,'%')"/>
+
     <xsl:if test="$relWidth">
       <xsl:value-of select="concat('mso-width-percent:',$relWidth,'0;')"/>
     </xsl:if>
@@ -1483,78 +1473,82 @@
     <xsl:variable name="graphicProps" select="$shapeStyle/style:graphic-properties"/>
 
     <!-- text-box coordinates -->
-    <xsl:variable name="posL">
-      <xsl:if
-        test="parent::draw:frame/@svg:x or contains(parent::draw:frame/@draw:transform,'translate') or (($graphicProps/@style:horizontal-pos='left' or ($graphicProps/@style:horizontal-pos='right'  and not($graphicProps/@style:horizontal-rel='page-start-margin'))) and ($graphicProps/@fo:margin-left or $graphicProps/@fo:margin-right))">
-        <xsl:variable name="leftM">
-          <xsl:call-template name="ComputeMarginX">
-            <xsl:with-param name="parent" select="ancestor::draw:frame"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:value-of select="$leftM"/>
-      </xsl:if>
-    </xsl:variable>
-    <xsl:variable name="posT">
-      <xsl:if
-        test="parent::draw:frame/@svg:y or contains(parent::draw:frame/@draw:transform,'translate')">
-        <xsl:variable name="topM">
-          <xsl:call-template name="ComputeMarginY">
-            <xsl:with-param name="parent" select="ancestor::draw:frame"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:value-of select="$topM"/>
-      </xsl:if>
-    </xsl:variable>
-
+    <!-- left margin -->
     <xsl:if
-      test="parent::draw:frame/@svg:x or contains(parent::draw:frame/@draw:transform,'translate') or (($graphicProps/@style:horizontal-pos='left' or ($graphicProps/@style:horizontal-pos='right'  and not($graphicProps/@style:horizontal-rel='page-start-margin'))) and ($graphicProps/@fo:margin-left or $graphicProps/@fo:margin-right)) ">
-      <xsl:value-of select="concat('margin-left:',$posL,'pt;')"/>
+      test="parent::draw:frame/@svg:x or contains(parent::draw:frame/@draw:transform,'translate') or (($graphicProps/@style:horizontal-pos='left' or ($graphicProps/@style:horizontal-pos='right'  and not($graphicProps/@style:horizontal-rel='page-start-margin'))) and ($graphicProps/@fo:margin-left or $graphicProps/@fo:margin-right))">
+      <xsl:variable name="leftM">
+        <xsl:call-template name="ComputeMarginX">
+          <xsl:with-param name="parent" select="ancestor::draw:frame"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:value-of select="concat('margin-left:',$leftM,'pt;')"/>
     </xsl:if>
+    <!-- top margin -->
     <xsl:if
       test="parent::draw:frame/@svg:y or contains(parent::draw:frame/@draw:transform,'translate')">
-      <xsl:value-of select="concat('margin-top:',$posT,'pt;')"/>
+      <xsl:variable name="topM">
+        <xsl:call-template name="ComputeMarginY">
+          <xsl:with-param name="parent" select="ancestor::draw:frame"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:value-of select="concat('margin-top:',$topM,'pt;')"/>
     </xsl:if>
+
   </xsl:template>
 
   <xsl:template name="InsertShapePositionRelative">
     <xsl:param name="shapeStyle"/>
 
+    <!-- text-box horizontal relative position -->
     <xsl:variable name="horizontalRel">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:horizontal-rel</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$horizontalRel = 'page-end-margin' or $horizontalRel = 'page-start-margin' "
+        >mso-position-horizontal-relative:margin;</xsl:when>
+      <xsl:when test="$horizontalRel = 'page' ">mso-position-horizontal-relative:page;</xsl:when>
+      <xsl:when test="$horizontalRel = 'page-content' ">mso-position-horizontal-relative:text;</xsl:when>
+      <xsl:when test="$horizontalRel = 'char' ">mso-position-horizontal-relative:char;</xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="parent::draw:frame/@text:anchor-type = 'page' "
+            >mso-position-horizontal-relative:page;</xsl:when>
+          <xsl:when test="parent::draw:frame/@text:anchor-type = 'paragraph' "
+            >mso-position-horizontal-relative:text;</xsl:when>
+          <xsl:when
+            test="parent::draw:frame/@text:anchor-type = 'char' or parent::draw:frame/@text:anchor-type = 'as-char' "
+            >mso-position-horizontal-relative:char;</xsl:when>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
 
+    <!-- text-box vertical relative position -->
     <xsl:variable name="verticalRel">
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:vertical-rel</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
-    <!-- text-box relative position -->
     <xsl:choose>
-      <xsl:when test="$horizontalRel = 'page-end-margin' ">mso-position-horizontal-relative:
-        right-margin-area;</xsl:when>
-      <xsl:when test="$horizontalRel = 'page-start-margin' ">mso-position-horizontal-relative:
-        left-margin-area;</xsl:when>
-      <xsl:when test="$horizontalRel = 'page' ">mso-position-horizontal-relative: page;</xsl:when>
-      <xsl:when test="$horizontalRel = 'page-content' ">mso-position-horizontal-relative: column;</xsl:when>
+      <xsl:when test="$verticalRel = 'page' ">mso-position-vertical-relative:page;</xsl:when>
+      <xsl:when test="$verticalRel = 'text' or $verticalRel = 'page-content' "
+        >mso-position-vertical-relative:text;</xsl:when>
+      <xsl:when test="$verticalRel = 'char' or $verticalRel = 'line' or $verticalRel = 'baseline' "
+        >mso-position-vertical-relative:line;</xsl:when>
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="parent::draw:frame/@text:anchor-type = 'page' "
-            >mso-position-horizontal-relative: page;</xsl:when>
+            >mso-position-vertical-relative:page;</xsl:when>
           <xsl:when test="parent::draw:frame/@text:anchor-type = 'paragraph' "
-            >mso-position-horizontal-relative: column;</xsl:when>
+            >mso-position-vertical-relative:text;</xsl:when>
+          <xsl:when
+            test="parent::draw:frame/@text:anchor-type = 'char' or parent::draw:frame/@text:anchor-type = 'as-char' "
+            >mso-position-vertical-relative:char;</xsl:when>
         </xsl:choose>
       </xsl:otherwise>
-    </xsl:choose>
-
-    <xsl:choose>
-      <xsl:when test="$verticalRel = 'page' ">mso-position-vertical-relative: page;</xsl:when>
-      <xsl:when test="$verticalRel = 'page-content' ">mso-position-vertical-relative:
-      margin;</xsl:when>
     </xsl:choose>
   </xsl:template>
 
@@ -1606,7 +1600,7 @@
           test="($horizontalPos='right' and ($fo_margin_right='' or not($fo_margin_right != 0)) and not($graphicProps/@style:horizontal-rel='page-start-margin')) or ($graphicProps/@style:horizontal-pos='left' and ($graphicProps/@style:horizontal-rel='page-end-margin'))">
           <xsl:value-of select="concat('mso-position-horizontal:', 'right',';')"/>
         </xsl:when>
-        <!-- <xsl:otherwise><xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/></xsl:otherwise> -->
+        <xsl:otherwise/>
       </xsl:choose>
     </xsl:if>
 
@@ -1622,6 +1616,7 @@
         <xsl:when test="$verticalPos='bottom'">
           <xsl:value-of select="concat('mso-position-vertical:', 'bottom',';')"/>
         </xsl:when>
+        <xsl:otherwise/>
       </xsl:choose>
     </xsl:if>
   </xsl:template>
