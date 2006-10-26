@@ -42,6 +42,11 @@
 
   <!-- Tables -->
   <xsl:template match="table:table">
+    <!-- warn if consecutive tables -->
+    <xsl:if
+      test="preceding-sibling::table:table[not(@table:is-sub-table='true')] and not(@table:is-sub-table='true')">
+      <xsl:message terminate="no">feedback:Consecutive tables</xsl:message>
+    </xsl:if>
     <w:tbl>
       <xsl:call-template name="MarkMasterPage"/>
       <w:tblPr>
@@ -86,7 +91,7 @@
     <xsl:if test="$tableProp/@style:shadow">
       <xsl:message terminate="no">feedback:Table shadow</xsl:message>
     </xsl:if>
-    
+
     <w:tblW w:type="{$type}">
       <xsl:attribute name="w:w">
         <xsl:call-template name="twips-measure">
@@ -195,7 +200,7 @@
     <xsl:if test="$tableProp/@style:shadow">
       <xsl:message terminate="no">feedback:Table shadow</xsl:message>
     </xsl:if>
-    
+
     <w:tblW w:type="{$type}">
       <xsl:attribute name="w:w">
         <xsl:call-template name="twips-measure">
@@ -380,7 +385,7 @@
     <xsl:if test="$tableProp/@style:shadow">
       <xsl:message terminate="no">feedback:Cell shadow</xsl:message>
     </xsl:if>
-    
+
     <xsl:call-template name="InsertCellWidth"/>
     <xsl:call-template name="InsertCellSpan">
       <xsl:with-param name="vmerge"/>
@@ -952,7 +957,7 @@
   <xsl:template name="CompareSpacingValues">
     <xsl:param name="tableSide"/>
     <xsl:param name="paraSide"/>
-    
+
     <!-- get spacing value of table properties -->
     <xsl:variable name="tableSpace">
       <xsl:choose>
@@ -975,7 +980,7 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!-- if spacing value of table is 0, do not override. -->
     <xsl:choose>
       <xsl:when test="$tableSpace != 0">
