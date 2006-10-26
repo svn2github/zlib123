@@ -449,7 +449,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (basedOn != null)
                 {
                     string val = basedOn.GetAttributeValue("val", NAMESPACE);
-                    if (val.Length > 0)
+                    if (val.Length > 0 && !val.Equals(styleName))
                     {
                         AddParagraphStyleProperties(pPr, val);
                     }
@@ -683,7 +683,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (basedOn != null)
             {
                 string val = basedOn.GetAttributeValue("val", NAMESPACE);
-                if (val.Length > 0)
+                if (val.Length > 0 && !val.Equals(styleName))
                 {
                     AddRunStyleProperties(rPr, val, isCharacterStyle);
                 }
@@ -758,7 +758,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 if (basedOn != null)
                 {
                     string val = basedOn.GetAttributeValue("val", NAMESPACE);
-                    if (val.Length > 0)
+                    if (val.Length > 0 && !val.Equals(styleName))
                     {
                         AddStyleDeclaration(element, val, styleType);
                     }
