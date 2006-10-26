@@ -35,11 +35,46 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   exclude-result-prefixes="w">
   
+  <xsl:key name="numId" match="w:num" use="@w:numId"/>
+  <xsl:key name="abstractNumId" match="w:abstractNum" use="@w:abstractNumId"/>
+  
+  <!--insert num template for each text-list style -->
+  
+  <xsl:template match="w:num">
+    <xsl:variable name="id">
+      <xsl:value-of select="@w:numId"/>
+    </xsl:variable>
+    
+    <!-- apply abstractNum template with the same id -->
+    <xsl:apply-templates select="key('abstractNumId',w:abstractNumId/@w:val)">
+      <xsl:with-param name="id">
+        <xsl:value-of  select="$id"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+  </xsl:template>
+  
+  <!-- insert abstractNum template -->
+  
   <xsl:template match="w:abstractNum">
-    <text:list-style style:name="{concat('L',key('numId',@w:abstractNumId)/@w:numId)}">
-      <xsl:apply-templates select="w:lvl"/>
+    <xsl:param name="id"/>
+    <text:list-style style:name="{concat('L',$id)}">
+      <xsl:for-each select="w:lvl">
+        <xsl:variable name="level" select="@w:ilvl"/>
+        <xsl:choose>
+          
+          <!-- when numbering style is overriden, num template is used -->
+          <xsl:when test="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]">
+            <xsl:apply-templates select="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl[@w:ilvl = $level]"/>
+          </xsl:when>
+          
+          <xsl:otherwise>
+          <xsl:apply-templates select="."/>
+          </xsl:otherwise>
+        </xsl:choose>
+        </xsl:for-each>
     </text:list-style>
   </xsl:template>
+  
   <xsl:template match="w:lvl">
     <xsl:choose>
       
@@ -116,7 +151,7 @@
       <xsl:when test="w:lvlText[@w:val = 'o' ]">○</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">➔</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">✗</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '–' ]">–</xsl:when>
+      <xsl:when test="w:lvlText[@w:val = '-' ]">–</xsl:when>
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
   </xsl:template>

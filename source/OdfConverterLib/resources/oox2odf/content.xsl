@@ -47,7 +47,6 @@
   <xsl:preserve-space elements="w:p"/>
   <xsl:preserve-space elements="w:r"/>
 
-  <xsl:key name="numId" match="w:num" use="w:abstractNumId/@w:val"/>
 
   <!--main document-->
   <xsl:template name="content">
@@ -60,7 +59,7 @@
         <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
           mode="automaticstyles"/>
         <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr]">
-          <xsl:apply-templates select="document('word/numbering.xml')/w:numbering"/>
+          <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
         </xsl:if>
       </office:automatic-styles>
       <office:body>
@@ -217,6 +216,7 @@
       </xsl:when>
       
       <!-- check if list starts -->
+      
       <xsl:when test="w:pPr/w:numPr">
         <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
         <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
