@@ -68,11 +68,13 @@
   <xsl:template match="/odf:source">
     <xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction>
 
-    <!-- sections preformatting -->
-    <xsl:call-template name="sectionsPreProcessing"/>
-
+   
     <pzip:archive pzip:target="{$outputFile}">
 
+      <!-- sections preformatting -->
+      <xsl:call-template name="sectionsPreProcessing"/>
+      
+      
       <!-- Document core properties -->
       <pzip:entry pzip:target="docProps/core.xml">
         <xsl:call-template name="docprops-core"/>

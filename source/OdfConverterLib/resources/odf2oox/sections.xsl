@@ -73,7 +73,7 @@
   
   <xsl:template name="MarkMasterPage">
     <xsl:choose>
-      <xsl:when test="self::text:p or self::text:h or self::text:table">
+      <xsl:when test="self::text:p or self::text:h or self::table:table">
         <xsl:if test="key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name != '' ">
           <xsl:attribute name="psect:master-page-name">
             <xsl:value-of select="key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name"/>
