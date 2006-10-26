@@ -874,37 +874,59 @@
       <w:kern w:val="16"/>
     </xsl:if>
 
+    <!-- position : raise text with precise measurement -->
     <xsl:if test="@style:text-position">
       <xsl:if
         test="not(substring(@style:text-position, 1, 3) = 'sub') and not(substring(@style:text-position, 1, 5) = 'super') ">
+        <!-- first percentage value specifies distance to baseline -->
         <xsl:variable name="textPosition">
-          <xsl:value-of select="substring-before(substring-after(@style:text-position, ' '), '%')"/>
+          <xsl:value-of select="substring-before(@style:text-position, '%')"/>
         </xsl:variable>
         <xsl:if test="$textPosition != '' and $textPosition != 0">
-          <xsl:choose>
-            <xsl:when test="contains($textPosition, '-')">
-              <w:position
-                w:val="{concat('-', round(number(substring-after($textPosition, '-')) div 10 * 2))}"
-              />
-            </xsl:when>
-            <xsl:otherwise>
-              <w:position w:val="{round(number($textPosition) div 10)}"/>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:variable name="fontHeight">
+            <xsl:call-template name="computeSize"/>
+          </xsl:variable>
+          <xsl:if test="number($fontHeight)">
+            <w:position>
+              <xsl:attribute name="w:val">
+                <xsl:choose>
+                  <xsl:when test="contains($textPosition, '-')">
+                    <xsl:value-of
+                      select="concat('-', round(number(substring-after($textPosition, '-')) div 100 * $fontHeight))"
+                    />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="round(number($textPosition) div 100 * $fontHeight)"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </w:position>
+          </xsl:if>
         </xsl:if>
       </xsl:if>
     </xsl:if>
 
-    <xsl:if test="@fo:font-size">
-      <xsl:variable name="sz">
-        <xsl:call-template name="computeSize">
-          <xsl:with-param name="node" select="current()"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:if test="number($sz)">
-        <w:sz w:val="{$sz}"/>
-      </xsl:if>
-    </xsl:if>
+    <!-- font size -->
+    <xsl:choose>
+      <xsl:when test="@style:text-position">
+        <xsl:variable name="sz">
+          <xsl:call-template name="ComputePositionFontSize"/>
+        </xsl:variable>
+        <xsl:if test="number($sz)">
+          <w:sz w:val="{$sz}"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="@fo:font-size">
+          <xsl:variable name="sz">
+            <xsl:call-template name="computeSize"/>
+          </xsl:variable>
+          <xsl:if test="number($sz)">
+            <w:sz w:val="{$sz}"/>
+          </xsl:if>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <xsl:if test="@fo:font-size-complex">
       <w:szCs>
@@ -1013,6 +1035,7 @@
       </xsl:choose>
     </xsl:if>
 
+    <!-- vertAlign : raise text with as super or sub script -->
     <xsl:if test="@style:text-position">
       <xsl:choose>
         <xsl:when test="substring(@style:text-position, 1, 3) = 'sub' ">
@@ -1022,19 +1045,7 @@
           <w:vertAlign w:val="superscript"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:variable name="value">
-            <xsl:value-of select="substring-before(@style:text-position, '%')"/>
-          </xsl:variable>
-          <xsl:if test="$value != 0">
-            <xsl:choose>
-              <xsl:when test="contains($value,'-')">
-                <w:vertAlign w:val="subscript"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <w:vertAlign w:val="superscript"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
+          <!-- handled by position element -->
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
@@ -1142,40 +1153,105 @@
         Context must be document('styles.xml')
     -->
   <xsl:template name="computeSize">
-    <xsl:param name="node"/>
-    <xsl:if test="contains($node/@fo:font-size, 'pt')">
-      <xsl:value-of select="round(number(substring-before($node/@fo:font-size, 'pt')) * 2)"/>
-    </xsl:if>
-    <xsl:if test="contains($node/@fo:font-size, '%')">
-      <xsl:message terminate="no">feedback:Relative font size</xsl:message>
-      <xsl:variable name="parentStyleName" select="$node/../@style:parent-style-name"/>
-      <xsl:variable name="value">
-        <xsl:call-template name="computeSize">
-          <!-- should we look for @style:name in styles.xml, otherwise in content.xml ? -->
-          <xsl:with-param name="node"
-            select="key('styles', $parentStyleName)[1]/style:text-properties"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="number($value)">
-          <xsl:value-of
-            select="round(number(substring-before($node/@fo:font-size, '%')) div 100 * number($value))"
-          />
-        </xsl:when>
-        <xsl:otherwise>
-          <!-- fetch the default font size for this style family -->
-          <xsl:variable name="defaultProps"
-            select="/office:document-styles/office:styles/style:default-style[@style:family=$node/../@style:family]/style:text-properties"/>
-          <xsl:variable name="defaultValue"
-            select="number(substring-before($defaultProps/@fo:font-size, 'pt'))*2"/>
-          <xsl:value-of
-            select="round(number(substring-before($node/@fo:font-size, '%')) div 100 * number($defaultValue))"
-          />
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
+    <xsl:param name="node" select="."/>
+    <xsl:choose>
+      <xsl:when test="contains($node/@fo:font-size, 'pt')">
+        <xsl:value-of select="round(number(substring-before($node/@fo:font-size, 'pt')) * 2)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- look for font size in parent context -->
+        <xsl:variable name="parentStyleName" select="$node/../@style:parent-style-name"/>
+        <xsl:variable name="value">
+          <xsl:choose>
+            <xsl:when test="$parentStyleName != '' or count($parentStyleName) &gt; 0">
+              <xsl:for-each select="document('styles.xml')">
+                <xsl:call-template name="computeSize">
+                  <xsl:with-param name="node"
+                    select="key('styles', $parentStyleName)/style:text-properties"/>
+                </xsl:call-template>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>none</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="number($value)">
+            <xsl:choose>
+              <xsl:when test="contains($node/@fo:font-size, '%')">
+                <xsl:value-of
+                  select="round(number(substring-before($node/@fo:font-size, '%')) div 100 * number($value))"
+                />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$value"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- fetch the default font size for this style family -->
+            <xsl:variable name="defaultProps">
+              <xsl:variable name="family">
+                <xsl:value-of select="$node/../@style:family"/>
+              </xsl:variable>
+              <xsl:for-each select="document('styles.xml')">
+                <xsl:choose>
+                  <xsl:when
+                    test="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@fo:font-size">
+                    <xsl:value-of
+                      select="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@fo:font-size"
+                    />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <!-- when there is no other possibility -->
+                    <xsl:value-of
+                      select="office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties/@fo:font-size"
+                    />
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:variable>
+            <xsl:variable name="defaultValue"
+              select="number(substring-before($defaultProps, 'pt'))*2"/>
+            <xsl:choose>
+              <xsl:when test="contains($node/@fo:font-size, '%')">
+                <xsl:value-of
+                  select="round(number(substring-before($node/@fo:font-size, '%')) div 100 * number($defaultValue))"
+                />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$defaultValue"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
+
+  <!-- Compute font size when style has raised/lowered text -->
+  <xsl:template name="ComputePositionFontSize">
+    <!-- second percentage value specifies size -->
+    <xsl:variable name="percentValue">
+      <xsl:if
+        test="not(substring(@style:text-position, 1, 3) = 'sub') and not(substring(@style:text-position, 1, 5) = 'super') ">
+        <xsl:value-of select="substring-before(substring-after(@style:text-position, ' '), '%')"/>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$percentValue != '' ">
+        <xsl:variable name="fontHeight">
+          <xsl:call-template name="computeSize"/>
+        </xsl:variable>
+        <xsl:value-of select="round(number($percentValue) div 100 * $fontHeight)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="@fo:font-size">
+          <xsl:call-template name="computeSize"/>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
   <!-- Single tab-stop processing -->
   <xsl:template name="tabStop">
@@ -1442,22 +1518,23 @@
   <!-- Page margin properties -->
   <xsl:template name="ComputePageMargins">
     <!-- report loss of header/footer properties -->
-    <xsl:variable name="header-properties" select="parent::style:page-layout/style:header-style/style:header-footer-properties"/>
-    <xsl:variable name="footer-properties" select="parent::style:page-layout/style:footer-style/style:header-footer-properties"/>
+    <xsl:variable name="header-properties"
+      select="parent::style:page-layout/style:header-style/style:header-footer-properties"/>
+    <xsl:variable name="footer-properties"
+      select="parent::style:page-layout/style:footer-style/style:header-footer-properties"/>
     <!-- this attribute exists when the user choose to automatically adapt the header/footer height,
           otherwise svg:height is used and it gives the exact header/footer height -->
-    <xsl:if
-      test="$header-properties/@fo:min-height">
+    <xsl:if test="$header-properties/@fo:min-height">
       <xsl:message terminate="no">feedback:Header distance</xsl:message>
     </xsl:if>
-    <xsl:if
-      test="$footer-properties/@fo:min-height">
+    <xsl:if test="$footer-properties/@fo:min-height">
       <xsl:message terminate="no">feedback:Footer distance</xsl:message>
     </xsl:if>
     <w:pgMar>
       <xsl:if
         test="@fo:margin != 'none' or @fo:margin-top != 'none' or @fo:padding != 'none' or @fo:padding-top != 'none' ">
-        <xsl:attribute name="w:top"> <!-- distance from top edge of the page to document body -->
+        <xsl:attribute name="w:top">
+          <!-- distance from top edge of the page to document body -->
           <xsl:variable name="top">
             <xsl:call-template name="GetPageMargin">
               <xsl:with-param name="side">top</xsl:with-param>
@@ -1503,30 +1580,30 @@
             <xsl:call-template name="GetPageMargin">
               <xsl:with-param name="side">bottom</xsl:with-param>
             </xsl:call-template>
-            </xsl:variable>
-            <xsl:choose>
-              <!-- additional footer height -->
-              <xsl:when test="$footer-properties">
-                <xsl:variable name="min-footer-height">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length">
-                      <xsl:choose>
-                        <xsl:when test="$footer-properties/@fo:min-height">
-                          <xsl:value-of select="$footer-properties/@fo:min-height"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of select="$footer-properties/@svg:height"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:variable>
-                <xsl:value-of select="$bottom + $min-footer-height"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$bottom"/>
-              </xsl:otherwise>
-            </xsl:choose>
+          </xsl:variable>
+          <xsl:choose>
+            <!-- additional footer height -->
+            <xsl:when test="$footer-properties">
+              <xsl:variable name="min-footer-height">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length">
+                    <xsl:choose>
+                      <xsl:when test="$footer-properties/@fo:min-height">
+                        <xsl:value-of select="$footer-properties/@fo:min-height"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$footer-properties/@svg:height"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="$bottom + $min-footer-height"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$bottom"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
       </xsl:if>
       <xsl:if
@@ -1600,8 +1677,8 @@
     <xsl:value-of select="$padding + $margin"/>
   </xsl:template>
 
-  
-  
+
+
   <xsl:template match="style:columns" mode="columns">
     <w:cols>
       <!-- nb columns -->
