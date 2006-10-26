@@ -245,12 +245,6 @@
 
     <!-- alphabetical index doesn't support page reference link -->
 
-    <xsl:if test="not(ancestor::text:alphabetical-index)">
-      <xsl:call-template name="InsertIndexPageRefStart">
-        <xsl:with-param name="tocId" select="$tocId"/>
-      </xsl:call-template>
-    </xsl:if>
-
     <!-- insert TOC -->
     <xsl:choose>
       <xsl:when test="self::text:a">
@@ -262,12 +256,6 @@
         <xsl:apply-templates mode="paragraph"/>
       </xsl:otherwise>
     </xsl:choose>
-
-    <!-- alphabetical index doesn't support page reference link -->
-    <xsl:if test="not(ancestor::text:alphabetical-index)">
-      <xsl:call-template name="InsertIndexPageRefEnd"/>
-    </xsl:if>
-
   </xsl:template>
 
   <xsl:template name="InsertIndexPageRefEnd">
