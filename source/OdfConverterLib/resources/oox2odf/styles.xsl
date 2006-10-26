@@ -49,8 +49,6 @@
             <xsl:with-param name="node" select="w:document/w:body/w:p"/>
           </xsl:call-template>
         </xsl:for-each>
-        <!--   Default paragraph properties from settings -->
-        <xsl:call-template name="InsertSettingsStyleProperties"/>
         <!-- document styles -->
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
       </office:styles>
@@ -153,7 +151,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:if test="$numid">
+        <xsl:if test="$numid != '' ">
           <text:outline-style>
             <xsl:variable name="abstractnumid">
               <xsl:value-of select="document('word/numbering.xml')//w:numbering/w:num[@w:numId =$numid]/w:abstractNumId/@w:val"/>
@@ -495,15 +493,6 @@
     </xsl:attribute>
   </xsl:template>
 
-  <!-- document defaults -->
-  <xsl:template match="w:rPrDefault | w:pPrDefault">
-    <xsl:if test="w:pPr | w:rPr">
-      <style:default-style style:family="paragraph">
-        <xsl:call-template name="InsertDocDefaults"/>
-      </style:default-style>
-    </xsl:if>
-  </xsl:template>
-
   <!-- create styles -->
   <xsl:template match="w:style">
     <xsl:message terminate="no">progress:w:style</xsl:message>
@@ -547,27 +536,36 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template name="InsertDocDefaults">
-    <style:paragraph-properties>
-      <xsl:if test="w:pPr">
-        <xsl:for-each select="w:pPr">
-          <xsl:call-template name="InsertParagraphProperties"/>
-        </xsl:for-each>
+  <!-- document defaults -->
+  <xsl:template match="w:docDefaults">
+    <style:default-style style:family="paragraph">
+      <xsl:if test="w:pPrDefault">
+        <style:paragraph-properties>
+          <xsl:call-template name="InsertDefaultParagraphProperties" />
+          <xsl:if test="w:pPr">
+            <xsl:for-each select="w:pPr">
+              <xsl:call-template name="InsertParagraphProperties"/>
+            </xsl:for-each>
+          </xsl:if>
+        </style:paragraph-properties>
       </xsl:if>
-    </style:paragraph-properties>
-
-    <style:text-properties>
-      <xsl:if test="w:rPr">
-        <xsl:for-each select="w:rPr">
-          <xsl:call-template name="InsertTextProperties"/>
-        </xsl:for-each>
-        <xsl:for-each select="w:pPr">
-          <xsl:call-template name="InsertpPrTextProperties"/>
-        </xsl:for-each>
+      
+      <xsl:if test="w:rPrDefault">
+        <style:text-properties>
+          <xsl:call-template name="InsertDefaultTextProperties" />
+          <xsl:if test="w:rPr">
+            <xsl:for-each select="w:rPr">
+              <xsl:call-template name="InsertTextProperties"/>
+            </xsl:for-each>
+            <xsl:for-each select="w:pPr">
+              <xsl:call-template name="InsertpPrTextProperties"/>
+            </xsl:for-each>
+          </xsl:if>
+        </style:text-properties>
       </xsl:if>
-    </style:text-properties>
+    </style:default-style>
   </xsl:template>
-
+  
   <!-- Compute style and text properties of context style. -->
   <xsl:template name="InsertStyleProperties">
 
@@ -599,14 +597,14 @@
   <!--   Default paragraph properties from settings -->
   <xsl:template name="InsertDefaultParagraphProperties">
     <!--default tab-stop-->
-    <xsl:variable name="tabStop" select="w:settings/w:defaultTabStop/@w:val"/>
+    <xsl:variable name="tabStop" select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
     <xsl:attribute name="style:tab-stop-distance">
       <xsl:call-template name="ConvertTwips">
         <xsl:with-param name="length" select="$tabStop"/>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
-  </xsl:template>
+   </xsl:template>
 
   <!-- conversion of paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
@@ -928,10 +926,9 @@
       </xsl:attribute>
     </xsl:if>
 
-    <!-- widow and orphan  -->
+     <!-- widow and orphan-->
     <xsl:choose>
       <xsl:when test="w:widowControl/@w:val='0'">
-        <!-- do nothing   -->
       </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="fo:widows">
@@ -1955,15 +1952,11 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-  <!--style properties from settings.xml -->
-  <xsl:template name="InsertSettingsStyleProperties">
-    <style:default-style style:family="paragraph">
-      <style:paragraph-properties>
-        <xsl:for-each select="document('word/settings.xml')">
-          <xsl:call-template name="InsertDefaultParagraphProperties"/>
-        </xsl:for-each>
-      </style:paragraph-properties>
-    </style:default-style>
+ 
+  <xsl:template name="InsertDefaultTextProperties">
+    <!--default font size-->
+    <xsl:if test="not(w:sz)">
+      <xsl:attribute name="fo:font-size">10</xsl:attribute>
+    </xsl:if>
   </xsl:template>
 </xsl:stylesheet>
