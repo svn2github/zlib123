@@ -935,9 +935,11 @@
     </xsl:choose>
 
     <!-- tab stops -->
-    <xsl:if test="w:tabs/w:tab">
+    <xsl:if test="w:tabs">
       <style:tab-stops>
-        <xsl:call-template name="InsertTabs"/>
+        <xsl:for-each select="w:tabs/w:tab">
+          <xsl:call-template name="InsertTabs"/>
+        </xsl:for-each>
       </style:tab-stops>
     </xsl:if>
   </xsl:template>
@@ -1277,56 +1279,56 @@
   <!-- TODO : check how to deal with tab stops inside a list -->
   <xsl:template name="InsertTabs">
     <style:tab-stop>
-      <xsl:if test="w:tabs/w:tab/@w:val != 'num' and w:tabs/w:tab/@w:val != 'clear'">
+      <xsl:if test="./@w:val != 'num' and ./@w:val != 'clear'">
         <!--   type -->
         <xsl:attribute name="style:type">
           <xsl:choose>
-            <xsl:when test="w:tabs/w:tab/@w:val='center'">center</xsl:when>
-            <xsl:when test="w:tabs/w:tab/@w:val='right'">right</xsl:when>
-            <xsl:when test="w:tabs/w:tab/@w:val='left'">left</xsl:when>
-            <xsl:when test="w:tabs/w:tab/@w:val='decimal'">char</xsl:when>
+            <xsl:when test="./@w:val='center'">center</xsl:when>
+            <xsl:when test="./@w:val='right'">right</xsl:when>
+            <xsl:when test="./@w:val='left'">left</xsl:when>
+            <xsl:when test="./@w:val='decimal'">char</xsl:when>
             <xsl:otherwise>left</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
-        <xsl:if test="w:tabs/w:tab/@w:val='decimal'">
+        <xsl:if test="./@w:val='decimal'">
           <xsl:attribute name="style:char">
             <xsl:value-of select="','"/>
           </xsl:attribute>
         </xsl:if>
         <!-- position 
          TODO : what if @w:pos < 0 ? -->
-        <xsl:if test="w:tabs/w:tab/@w:pos >= 0">
+        <xsl:if test="./@w:pos >= 0">
           <xsl:attribute name="style:position">
             <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length" select="w:tabs/w:tab/@w:pos"/>
+              <xsl:with-param name="length" select="./@w:pos"/>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
         <!-- leader char -->
-        <xsl:if test="w:tabs/w:tab/@w:leader">
+        <xsl:if test="./@w:leader">
           <xsl:attribute name="style:leader-style">
             <xsl:choose>
-              <xsl:when test="w:tabs/w:tab/@w:leader='dot'">dotted</xsl:when>
-              <xsl:when test="w:tabs/w:tab/@w:leader='heavy'">solid</xsl:when>
-              <xsl:when test="w:tabs/w:tab/@w:leader='hyphen'">solid</xsl:when>
-              <xsl:when test="w:tabs/w:tab/@w:leader='middleDot'">dotted</xsl:when>
-              <xsl:when test="w:tabs/w:tab/@w:leader='none'">none</xsl:when>
-              <xsl:when test="w:tabs/w:tab/@w:leader='underscore'">solid</xsl:when>
+              <xsl:when test="./@w:leader='dot'">dotted</xsl:when>
+              <xsl:when test="./@w:leader='heavy'">solid</xsl:when>
+              <xsl:when test="./@w:leader='hyphen'">solid</xsl:when>
+              <xsl:when test="./@w:leader='middleDot'">dotted</xsl:when>
+              <xsl:when test="./@w:leader='none'">none</xsl:when>
+              <xsl:when test="./@w:leader='underscore'">solid</xsl:when>
               <xsl:otherwise>none</xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
         </xsl:if>
         <!--        leader text  -->
-        <xsl:if test="w:tabs/w:tab/@w:leader">
+        <xsl:if test="./@w:leader">
           <xsl:attribute name="style:leader-text">
             <xsl:choose>
-              <xsl:when test="w:tabs/w:tab/@w:leader='dot'">.</xsl:when>
-              <xsl:when test="w:tabs/w:tab/@w:leader='heavy'"/>
-              <xsl:when test="w:tabs/w:tab/@w:leader='hyphen'">-</xsl:when>
-              <xsl:when test="w:tabs/w:tab/@w:leader='middleDot'"/>
-              <xsl:when test="w:tabs/w:tab/@w:leader='none'"/>
-              <xsl:when test="w:tabs/w:tab/@w:leader='underscore'">_</xsl:when>
+              <xsl:when test="./@w:leader='dot'">.</xsl:when>
+              <xsl:when test="./@w:leader='heavy'"/>
+              <xsl:when test="./@w:leader='hyphen'">-</xsl:when>
+              <xsl:when test="./@w:leader='middleDot'"/>
+              <xsl:when test="./@w:leader='none'"/>
+              <xsl:when test="./@w:leader='underscore'">_</xsl:when>
               <xsl:otherwise>none</xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
