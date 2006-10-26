@@ -117,12 +117,7 @@
   <xsl:template name="GenerateBookmarkId">
     <xsl:param name="TextName"/>
     <xsl:value-of
-      select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"/>
-    <xsl:message>
-      <xsl:value-of
-        select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"
-      />
-    </xsl:message>
+      select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"/>  
   </xsl:template>
   
   <!-- Insert BookmarkStart or ReferenceMarkStart-->
