@@ -72,9 +72,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 StartStyle();
             }
-            else if (IsInRun() && IsRunProperties(localName, ns))
+            else if ((IsInRun() || IsInRPrChange()) && IsRunProperties(localName, ns))
             {
                 StartRunProperties();
+            }
+            else if (IsRPrChange(localName, ns))
+            {
+                StartRPrChange();
             }
             else if ((IsInParagraph() || IsInPPrChange()) && IsParagraphProperties(localName, ns))
             {
@@ -116,6 +120,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 EndElementInRunProperties();
             }
+            else if (IsInRPrChange())
+            {
+                EndElementInRPrChange();
+            }
             else if (IsInParagraphProperties())
             {
                 EndElementInParagraphProperties();
@@ -144,7 +152,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             this.currentNode.Push(new Attribute(prefix, localName, ns));
 
-            if (IsInRunProperties() || IsInParagraphProperties() || IsInPPrChange() || IsInStyle())
+            if (IsInRunProperties() || IsInRPrChange() || IsInParagraphProperties() || IsInPPrChange() || IsInStyle())
             {
                 // do nothing
             }
@@ -160,7 +168,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 EndAttributeInStyle();
             }
-            else if (IsInRunProperties())
+            else if (IsInRunProperties() || IsInRPrChange())
             {
                 EndAttributeInRunProperties();
             }
@@ -182,7 +190,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 StringInStyle(text);
             }
-            else if (IsInRunProperties())
+            else if (IsInRunProperties() || IsInRPrChange())
             {
                 StringInRunProperties(text);
             }
@@ -482,7 +490,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     if ("rPr".Equals(propName))
                     {
-                        DoWriteRunProperties(prop);
+                        WriteRunProperties(prop);
                     }
                     else
                     {
@@ -545,7 +553,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     Element rPr = new Element("w", "rPr", NAMESPACE);
                     AddRunStyleProperties(rPr, this.currentParagraphStyleName, false);
-                    DoWriteRunProperties(rPr);
+                    WriteRunProperties(rPr);
                     this.context.Pop();
                     this.context.Push("r-with-properties");
                 }
@@ -585,10 +593,20 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Element element = (Element)this.currentNode.Pop();
             if (IsRunProperties(element.Name, element.Ns))
             {
-                WriteRunProperties(element);
+                CompleteRunProperties(element);
                 this.context.Pop();
-                this.context.Pop();
-                this.context.Push("r-with-properties");
+                if (!IsInRPrChange())
+                {
+                    WriteRunProperties(element);
+                    this.context.Pop();
+                    this.context.Push("r-with-properties");
+                }
+                else
+                {
+                    // attach rPr to rPrChange
+                    Element parent = (Element)this.currentNode.Peek();
+                    parent.AddChild(GetOrderedRunProperties(element));
+                }
             }
             else
             {
@@ -621,7 +639,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void WriteRunProperties(Element rPr)
+        private void CompleteRunProperties(Element rPr)
         {
             Element rStyle = rPr.GetChild("rStyle", NAMESPACE);
             if (rStyle != null)
@@ -653,8 +671,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     AddStyleDeclaration(rPr, rStyleName, "rStyle");
                 }
             }
-            // write run properties
-            DoWriteRunProperties(rPr);
         }
 
         private void AddRunStyleProperties(Element rPr, string styleName, bool isCharacterStyle)
@@ -705,18 +721,23 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void DoWriteRunProperties(Element rPr)
+        private Element GetOrderedRunProperties(Element rPr)
         {
-            this.nextWriter.WriteStartElement(rPr.Prefix, rPr.Name, rPr.Ns);
+            Element ordered = new Element(rPr);
             foreach (string propName in RUN_PROPERTIES)
             {
                 Element prop = rPr.GetChild(propName, NAMESPACE);
                 if (prop != null)
                 {
-                    prop.Write(this.nextWriter);
+                    ordered.AddChild(prop);
                 }
             }
-            this.nextWriter.WriteEndElement();
+            return ordered;
+        }
+
+        private void WriteRunProperties(Element rPr)
+        {
+            GetOrderedRunProperties(rPr).Write(this.nextWriter);
         }
 
         private bool isToggle(Element prop)
@@ -772,6 +793,31 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 decl.AddAttribute(val);
                 element.AddFirstChild(decl);
             }
+        }
+        
+        /*
+         * Run changes
+         */
+
+        private bool IsRPrChange(string localName, string ns)
+        {
+            return NAMESPACE.Equals(ns) && "rPrChange".Equals(localName);
+        }
+
+        private bool IsInRPrChange()
+        {
+            return "rPrChange".Equals(this.context.Peek());
+        }
+
+        private void StartRPrChange()
+        {
+            this.context.Push("rPrChange");
+        }
+
+        private void EndElementInRPrChange()
+        {
+            this.context.Pop();
+            EndElementInRunProperties();
         }
 
 

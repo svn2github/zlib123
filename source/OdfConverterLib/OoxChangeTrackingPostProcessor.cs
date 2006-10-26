@@ -46,11 +46,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private Stack currentNode;
         private Stack context;
-        private Stack currentChangedRegion;
+        private Stack currentInsertionRegion;
+        private Stack currentFormatChangeRegion;
         private Stack currentDeletion;
         private int currentId = 0;
         private Stack previousParagraph;
-        private Element lastRegion;
+        private Element lastInsertionRegion;
+        private Element lastFormatChangeRegion;
         private Stack dontWrites;
 
         /// <summary>
@@ -62,10 +64,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.currentNode = new Stack();
             this.context = new Stack();
             this.context.Push("root");
-            this.currentChangedRegion = new Stack();
+            this.currentInsertionRegion = new Stack();
+            this.currentFormatChangeRegion = new Stack();
             this.currentDeletion = new Stack();
             this.previousParagraph = new Stack();
-            this.lastRegion = null;
+            this.lastInsertionRegion = null;
+            this.lastFormatChangeRegion = null;
             this.dontWrites = new Stack();
 
         }
@@ -89,7 +93,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 StartParagraph();
             }
-            else if (IsStartInsert() || IsEndInsert() || DontWrite())
+            else if (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite())
             {
                 // do nothing
             }
@@ -121,6 +125,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 EndEndInsert();
             }
+            else if (IsStartFormatChange())
+            {
+                EndStartFormatChange();
+            }
+            else if (IsEndFormatChange())
+            {
+                EndEndFormatChange();
+            }
             else if (DontWrite())
             {
                 AddChildToElement();
@@ -136,7 +148,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             this.currentNode.Push(new Attribute(prefix, localName, ns));
 
-            if (IsStartInsert() || IsEndInsert() || DontWrite())
+            if (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite())
             {
                 // do nothing
             }
@@ -148,7 +160,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteEndAttribute()
         {
-            if (IsStartInsert() || IsEndInsert() || DontWrite())
+            if (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite())
             {
                 AddAttributeToElement();
             }
@@ -162,7 +174,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteString(string text)
         {
-            if (IsStartInsert() || IsEndInsert() || DontWrite())
+            if (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite())
             {
                 AddStringToNode(text);
             }
@@ -395,10 +407,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         pPr = new Element("w", "pPr", W_NAMESPACE);
                         paragraph.AddChild(pPr);
                     }
-                    Element region = this.lastRegion;
-                    if (this.currentChangedRegion.Count > 0)
+                    Element region = this.lastInsertionRegion;
+                    if (this.currentInsertionRegion.Count > 0)
                     {
-                        region = (Element)this.currentChangedRegion.Peek();
+                        region = (Element)this.currentInsertionRegion.Peek();
                     }
                     pPr.AddChild(BuildPPrChange(previousParagraph.GetChild("pPr", W_NAMESPACE), region));
                 }
@@ -442,7 +454,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 rPr = new Element("w", "rPr", W_NAMESPACE);
                 pPr.AddChild(rPr);
             }
-            Element region = (Element)this.currentChangedRegion.Peek();
+            Element region = (Element)this.currentInsertionRegion.Peek();
             Element ins = new Element("w", "ins", W_NAMESPACE);
             ins.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
             ins.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
@@ -532,7 +544,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     // run start: we add a w:ins before
                     Element ins = new Element("w", "ins", W_NAMESPACE);
                     ins.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
-                    Element region = (Element)this.currentChangedRegion.Peek();
+                    Element region = (Element)this.currentInsertionRegion.Peek();
                     ins.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
                     ins.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
                     object current = this.currentNode.Pop();
@@ -553,7 +565,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     
                     this.nextWriter.WriteStartElement("w", "ins", W_NAMESPACE);
                     new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE).Write(this.nextWriter);
-                    Element region = (Element)this.currentChangedRegion.Peek();
+                    Element region = (Element)this.currentInsertionRegion.Peek();
                     new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE).Write(this.nextWriter);
                     new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE).Write(this.nextWriter);
                     this.context.Push("r-with-ins");
@@ -568,6 +580,25 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void EndRun()
         {
+            if (IsInFormatChange())
+            {
+                // format change: add rPrChange
+                Element run = (Element)this.currentNode.Peek();
+                Element rPr = run.GetChild("rPr", W_NAMESPACE);
+                if (rPr == null)
+                {
+                    rPr = new Element("w", "rPr", W_NAMESPACE);
+                    run.AddFirstChild(rPr);
+                }
+                Element newRPr = rPr.Clone();
+                Element rPrChange = new Element("w", "rPrChange", W_NAMESPACE);
+                rPrChange.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+                Element region = (Element)this.currentFormatChangeRegion.Peek();
+                rPrChange.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
+                rPrChange.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
+                rPrChange.AddChild(newRPr);
+                rPr.AddChild(rPrChange);
+            }
             if (DontWrite())
             {
                 AddChildToElement();
@@ -658,10 +689,15 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
+        private bool IsInInsert()
+        {
+            return this.currentInsertionRegion.Count > 0;
+        }
+
         private void EndStartInsert()
         {
             // add the region on the stack
-            this.currentChangedRegion.Push(this.currentNode.Peek());
+            this.currentInsertionRegion.Push(this.currentNode.Peek());
         }
 
         private void EndEndInsert()
@@ -670,28 +706,86 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Stack tmp = new Stack();
             Element element = (Element)this.currentNode.Peek();
             string id = element.GetAttributeValue("id", PCT_NAMESPACE);
-            Element region = (Element)this.currentChangedRegion.Pop();
+            Element region = (Element)this.currentInsertionRegion.Pop();
             while (!id.Equals(region.GetAttributeValue("id", PCT_NAMESPACE)))
             {
                 tmp.Push(region);
-                region = (Element)this.currentChangedRegion.Pop();
+                region = (Element)this.currentInsertionRegion.Pop();
             }
             while (tmp.Count > 0)
             {
-                this.currentChangedRegion.Push(tmp.Pop());
+                this.currentInsertionRegion.Push(tmp.Pop());
             }
             // save the last region in case we need it before closing a paragraph
-            this.lastRegion = region;
+            this.lastInsertionRegion = region;
         }
 
+
         /*
-         * Elements within an insert region
+         * StartFormatChange and EndFormatChange elements
          */
 
-        private bool IsInInsert()
+        private bool IsStartFormatChange()
         {
-            // the second condition has been added in case of a region ending before the run ends.
-            return this.currentChangedRegion.Count > 0;
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                return PCT_NAMESPACE.Equals(node.Ns) && "start-format-change".Equals(node.Name);
+            }
+            else
+            {
+                this.currentNode.Pop();
+                bool result = IsStartFormatChange();
+                this.currentNode.Push(node);
+                return result;
+            }
+        }
+
+        private bool IsEndFormatChange()
+        {
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                return PCT_NAMESPACE.Equals(node.Ns) && "end-format-change".Equals(node.Name);
+            }
+            else
+            {
+                this.currentNode.Pop();
+                bool result = IsEndFormatChange();
+                this.currentNode.Push(node);
+                return result;
+            }
+        }
+
+        private bool IsInFormatChange()
+        {
+            return this.currentFormatChangeRegion.Count > 0;
+        }
+
+        private void EndStartFormatChange()
+        {
+            // add the region on the stack
+            this.currentFormatChangeRegion.Push(this.currentNode.Peek());
+        }
+
+        private void EndEndFormatChange()
+        {
+            // remove the region from the regions stack
+            Stack tmp = new Stack();
+            Element element = (Element)this.currentNode.Peek();
+            string id = element.GetAttributeValue("id", PCT_NAMESPACE);
+            Element region = (Element)this.currentFormatChangeRegion.Pop();
+            while (!id.Equals(region.GetAttributeValue("id", PCT_NAMESPACE)))
+            {
+                tmp.Push(region);
+                region = (Element)this.currentFormatChangeRegion.Pop();
+            }
+            while (tmp.Count > 0)
+            {
+                this.currentFormatChangeRegion.Push(tmp.Pop());
+            }
+            // save the last region in case we need it before closing a paragraph
+            this.lastFormatChangeRegion = region;
         }
 
         /*

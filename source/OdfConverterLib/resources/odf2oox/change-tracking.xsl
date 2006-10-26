@@ -55,6 +55,11 @@
           <xsl:with-param name="changed-region" select="$changed-region"/>
         </xsl:call-template>
       </xsl:when>
+      <xsl:when test="$changed-region/text:format-change">
+        <xsl:call-template name="InsertStartFormatChange">
+          <xsl:with-param name="changed-region" select="$changed-region"/>
+        </xsl:call-template>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
   
@@ -74,6 +79,9 @@
     <xsl:choose>
       <xsl:when test="$changed-region/text:insertion">
         <xsl:call-template name="InsertEndInsertion"/>
+      </xsl:when>
+      <xsl:when test="$changed-region/text:format-change">
+        <xsl:call-template name="InsertEndFormatChange"/>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -123,6 +131,18 @@
     </pct:deletion>
   </xsl:template>
   
+  <!-- format changes -->
+
+  <!-- Insert start format change item -->
+  <xsl:template name="InsertStartFormatChange">
+    <xsl:param name="changed-region"/>
+    <pct:start-format-change pct:id="{@text:change-id}" pct:creator="{$changed-region/text:format-change/office:change-info/dc:creator}" pct:date="{$changed-region/text:format-change/office:change-info/dc:date}"/>
+  </xsl:template>
+
+  <!-- Insert end format change item -->
+  <xsl:template name="InsertEndFormatChange">
+    <pct:end-format-change pct:id="{@text:change-id}"/>
+  </xsl:template>
   
   
 </xsl:stylesheet>
