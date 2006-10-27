@@ -1295,36 +1295,44 @@
             <xsl:with-param name="length" select="@style:position"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:variable name="columnNumber">
-          <xsl:choose>
-            <!-- TODO : There can be many page-layouts in the document.
-                We need to know the master page in which our object is located. Then, we'll get the right page-layout.
-                pageLayoutName = key('master-pages', $masterPageName)[1]/@style:page-layout-name
-                key('page-layouts', $pageLayoutName)[1]/style:page-layout-properties/style:columns[@fo:column-count > 0]
-              -->
-            <xsl:when
-              test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns[@fo:column-count > 0]">
-              <xsl:value-of
-                select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-count"
-              />
-            </xsl:when>
-            <xsl:otherwise>1</xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="columnGap">
-          <xsl:choose>
-            <xsl:when
-              test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length"
-                  select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap"
-                />
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:value-of select="round(($margin + $position - $columnGap) div $columnNumber)"/>
+        <xsl:choose>
+          <xsl:when test="ancestor::office:styles or ancestor::office:automatic-styles">
+            <xsl:value-of select="$margin + $position"/>
+          </xsl:when>
+          <!-- paragraph may be embedded in columns -->
+          <xsl:otherwise>
+            <xsl:variable name="columnNumber">
+              <xsl:choose>
+                <!-- TODO : There can be many page-layouts in the document.
+                  We need to know the master page in which our object is located. Then, we'll get the right page-layout.
+                  pageLayoutName = key('master-pages', $masterPageName)[1]/@style:page-layout-name
+                  key('page-layouts', $pageLayoutName)[1]/style:page-layout-properties/style:columns[@fo:column-count > 0]
+                -->
+                <xsl:when
+                  test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns[@fo:column-count > 0]">
+                  <xsl:value-of
+                    select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-count"
+                  />
+                </xsl:when>
+                <xsl:otherwise>1</xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:variable name="columnGap">
+              <xsl:choose>
+                <xsl:when
+                  test="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length"
+                      select="document('styles.xml')/office:document-styles/office:automatic-styles/style:page-layout/style:page-layout-properties/style:columns/@fo:column-gap"
+                    />
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:value-of select="round(($margin + $position - $columnGap) div $columnNumber)"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
 
       <!-- tab stop type -->
