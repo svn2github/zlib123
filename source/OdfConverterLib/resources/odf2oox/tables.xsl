@@ -94,11 +94,43 @@
 
     <w:tblW w:type="{$type}">
       <xsl:attribute name="w:w">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="$tableProp/@style:width"/>
-        </xsl:call-template>
+        <xsl:choose>
+          <xsl:when test="$tableProp/@style:width">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="$tableProp/@style:width"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- TODO : find a better matching page width -->
+            <xsl:for-each select="document('styles.xml')">
+              <xsl:variable name="pageW">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length"
+                    select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:page-width"
+                  />
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="pageMarginL">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length"
+                    select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-left"
+                  />
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="pageMarginR">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length"
+                    select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-right"
+                  />
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="$pageW - $pageMarginR - $pageMarginL"/>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
     </w:tblW>
+
     <xsl:if test="$tableProp/@table:align">
       <xsl:choose>
         <xsl:when test="$tableProp/@table:align = 'margins'">
@@ -238,8 +270,9 @@
   <!-- match columns for gridCols -->
   <xsl:template match="table:table-column" mode="gridCol">
     <xsl:call-template name="InsertGridCol">
-      <xsl:with-param name="width"
-        select="key('automatic-styles',@table:style-name)/style:table-column-properties/@style:column-width"/>
+      <xsl:with-param name="width">
+        <xsl:call-template name="ComputeColumnWidth"/>
+      </xsl:with-param>
       <xsl:with-param name="number" select="@table:number-columns-repeated"/>
     </xsl:call-template>
   </xsl:template>
@@ -263,7 +296,98 @@
     </xsl:if>
   </xsl:template>
 
-
+  
+  <!-- in case of relative width. Context must be table:column -->
+  <xsl:template name="ComputeColumnWidth">
+    <xsl:choose>
+      <xsl:when
+        test="key('automatic-styles',@table:style-name)/style:table-column-properties/@style:column-width">
+        <xsl:value-of
+          select="key('automatic-styles',@table:style-name)/style:table-column-properties/@style:column-width"
+        />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="relWidth"
+          select="substring-before(key('automatic-styles',@table:style-name)/style:table-column-properties/@style:rel-column-width, '*')"/>
+        <xsl:variable name="totRelWidth">
+          <xsl:call-template name="ComputeTotalRelativeWidth">
+            <xsl:with-param name="columns" select="parent::node()/table:table-column"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="ancestor::table:table[1]/@style:width">
+            <xsl:value-of
+              select="round(ancestor::table:table[1]/@style:width * $relWidth div $totRelWidth)"
+            />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="pageWidth">
+              <!-- TODO : find a better matching page width -->
+              <xsl:for-each select="document('styles.xml')">
+                <xsl:variable name="pageW">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length"
+                      select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:page-width"
+                    />
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:variable name="pageMarginL">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length"
+                      select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-left"
+                    />
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:variable name="pageMarginR">
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length"
+                      select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-right"
+                    />
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="$pageW - $pageMarginR - $pageMarginL"/>
+              </xsl:for-each>
+            </xsl:variable>
+            <xsl:value-of select="round($pageWidth * $relWidth div $totRelWidth)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="ComputeTotalRelativeWidth">
+    <xsl:param name="totRelWidth" select="0"/>
+    <xsl:param name="columns"/>
+    <xsl:choose>
+      <xsl:when test="count($columns) &gt; 0">
+        <xsl:variable name="addedWidth">
+          <xsl:for-each select="$columns[1]">
+            <xsl:variable name="repeat">
+              <xsl:choose>
+                <xsl:when test="@table:number-columns-repeated">
+                  <xsl:value-of select="@table:number-columns-repeated"/>
+                </xsl:when>
+                <xsl:otherwise>1</xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:variable name="relWidth">
+              <xsl:value-of
+                select="substring-before(key('automatic-styles',@table:style-name)/style:table-column-properties/@style:rel-column-width,'*')"
+              />
+            </xsl:variable>
+            <xsl:value-of select="$repeat * $relWidth"/>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:call-template name="ComputeTotalRelativeWidth">
+          <xsl:with-param name="columns" select="$columns[position() &gt; 1]"/>
+          <xsl:with-param name="totRelWidth" select="$totRelWidth + $addedWidth"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$totRelWidth"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
   <!-- table rows -->
   <xsl:template match="table:table-row">
@@ -888,9 +1012,11 @@
       <xsl:when test="$colNumber &lt; ($currentColNumber + $rangeColNumber)">
         <xsl:variable name="currentColumnWidth">
           <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length"
-              select="key('automatic-styles',ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]/@table:style-name)/style:table-column-properties/@style:column-width"
-            />
+            <xsl:with-param name="length">
+              <xsl:for-each select="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]">
+                <xsl:call-template name="ComputeColumnWidth"/>
+              </xsl:for-each>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
         <xsl:choose>

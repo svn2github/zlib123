@@ -364,11 +364,6 @@
 
     <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id,generate-id($indexOfObjects))}"/>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:t>
         <xsl:value-of select="."/>
       </w:t>

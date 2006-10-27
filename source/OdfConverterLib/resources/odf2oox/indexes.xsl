@@ -85,30 +85,15 @@
 
   <xsl:template name="InsertIndexFieldCodeEnd">
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
   </xsl:template>
 
   <xsl:template name="InsertIndexFieldCodeStart">
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:fldChar w:fldCharType="begin"/>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <xsl:choose>
         <xsl:when test="ancestor::text:table-of-content">
           <xsl:call-template name="InsertTocPrefs"/>
@@ -125,11 +110,6 @@
       </xsl:choose>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:fldChar w:fldCharType="separate"/>
     </w:r>
   </xsl:template>
@@ -262,9 +242,6 @@
     <w:r>
       <w:rPr>
         <w:noProof/>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:vanish/>
-        </xsl:if>
         <w:webHidden/>
       </w:rPr>
       <w:fldChar w:fldCharType="end"/>
@@ -277,9 +254,6 @@
     <w:r>
       <w:rPr>
         <w:noProof/>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:vanish/>
-        </xsl:if>
         <w:webHidden/>
       </w:rPr>
       <w:fldChar w:fldCharType="begin">
@@ -289,9 +263,6 @@
     <w:r>
       <w:rPr>
         <w:noProof/>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:vanish/>
-        </xsl:if>
         <w:webHidden/>
       </w:rPr>
       <w:instrText xml:space="preserve"><xsl:value-of select="concat('PAGEREF _Toc', $tocId,generate-id(ancestor::node()[child::text:index-body]), ' \h')"/></w:instrText>
@@ -299,9 +270,6 @@
     <w:r>
       <w:rPr>
         <w:noProof/>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:vanish/>
-        </xsl:if>
         <w:webHidden/>
       </w:rPr>
       <w:fldChar w:fldCharType="separate"/>
@@ -312,45 +280,20 @@
   <!-- empty alphabetical indexes creating mark entry -->
   <xsl:template match="text:alphabetical-index-mark" mode="paragraph">
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:fldChar w:fldCharType="begin"/>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:instrText xml:space="preserve"> XE "</w:instrText>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:instrText>
         <xsl:value-of select="./@text:string-value"/>
       </w:instrText>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:instrText xml:space="preserve">" </w:instrText>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
   </xsl:template>
@@ -358,27 +301,12 @@
   <!-- alphabetical indexes creating mark entry -->
   <xsl:template match="text:alphabetical-index-mark-end" mode="paragraph">
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:fldChar w:fldCharType="begin"/>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:instrText xml:space="preserve"> XE "</w:instrText>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:instrText>
         <xsl:variable name="id" select="@text:id"/>
         <xsl:for-each select="preceding-sibling::node()">
@@ -400,25 +328,12 @@
       </w:instrText>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:instrText xml:space="preserve">" </w:instrText>
     </w:r>
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
     <!-- <xsl:apply-templates select="text:s" mode="text"></xsl:apply-templates> -->
   </xsl:template>
-
-
-
 
 </xsl:stylesheet>

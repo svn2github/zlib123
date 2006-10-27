@@ -139,7 +139,8 @@
         <!-- COMMENT , TODO , WARNING :
           this causes problem when paragraph contains element linked to another element
           (for example, text:change-start). Trick to replace : -->
-        <xsl:apply-templates select="child::node()[contains(name(), 'mark-') or contains(name(), 'change-')]"/>
+        <xsl:apply-templates
+          select="child::node()[contains(name(), 'mark-') or contains(name(), 'change-')]"/>
       </xsl:when>
 
       <!-- drawing shapes -->
@@ -167,11 +168,6 @@
     <xsl:if
       test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='page' ">
       <w:r>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:rPr>
-            <w:vanish/>
-          </w:rPr>
-        </xsl:if>
         <w:br w:type="page"/>
       </w:r>
     </xsl:if>
@@ -349,11 +345,6 @@
   <xsl:template name="InsertAnnotationReference">
     <xsl:if test="ancestor::office:annotation and position() = 1">
       <w:r>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:rPr>
-            <w:vanish/>
-          </w:rPr>
-        </xsl:if>
         <w:annotationRef/>
       </w:r>
     </xsl:if>
@@ -364,9 +355,6 @@
     <w:r>
       <w:rPr>
         <w:rStyle w:val="{concat(../@text:note-class, 'Reference')}"/>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:vanish/>
-        </xsl:if>
       </w:rPr>
       <xsl:choose>
         <xsl:when test="../text:note-citation/@text:label">
@@ -388,11 +376,6 @@
     </w:r>
     <!-- add an extra tab -->
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:tab/>
     </w:r>
   </xsl:template>
@@ -570,18 +553,9 @@
               <xsl:call-template name="GetStyleName"/>
             </xsl:with-param>
           </xsl:call-template>
-          <xsl:if test="ancestor::text:section/@text:display='none'">
-            <w:vanish/>
-          </xsl:if>
         </w:rPr>
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:rPr>
-            <w:vanish/>
-          </w:rPr>
-        </xsl:if>
-      </xsl:otherwise>
+      <xsl:otherwise> </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -631,7 +605,9 @@
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
-            <w:t><xsl:value-of select="."/></w:t>            
+            <w:t>
+              <xsl:value-of select="."/>
+            </w:t>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -644,9 +620,6 @@
   <!-- tab stops -->
   <xsl:template match="text:tab-stop" mode="paragraph">
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:vanish/>
-      </xsl:if>
       <w:tab/>
       <w:t/>
     </w:r>
@@ -657,9 +630,6 @@
     <w:r>
       <w:rPr>
         <w:noProof/>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:vanish/>
-        </xsl:if>
         <w:webHidden/>
       </w:rPr>
       <w:tab/>
@@ -669,11 +639,6 @@
   <!-- line breaks -->
   <xsl:template match="text:line-break" mode="paragraph">
     <w:r>
-      <xsl:if test="ancestor::text:section/@text:display='none'">
-        <w:rPr>
-          <w:vanish/>
-        </w:rPr>
-      </xsl:if>
       <w:br/>
       <w:t/>
     </w:r>
@@ -693,11 +658,6 @@
         <xsl:when
           test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-before='column' ">
           <w:r>
-            <xsl:if test="ancestor::text:section/@text:display='none'">
-              <w:rPr>
-                <w:vanish/>
-              </w:rPr>
-            </xsl:if>
             <w:br w:type="column"/>
           </w:r>
         </xsl:when>
@@ -705,11 +665,6 @@
         <xsl:when
           test="preceding-sibling::node()[1][self::text:list and descendant::node()[last()][(self::text:p or self::text:h) and key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='column' ]]">
           <w:r>
-            <xsl:if test="ancestor::text:section/@text:display='none'">
-              <w:rPr>
-                <w:vanish/>
-              </w:rPr>
-            </xsl:if>
             <w:br w:type="column"/>
           </w:r>
         </xsl:when>
@@ -717,11 +672,6 @@
         <xsl:when
           test="preceding-sibling::node()[1][self::table:table and key('automatic-styles',@table:name)/style:table-properties/@fo:break-after='column' ]">
           <w:r>
-            <xsl:if test="ancestor::text:section/@text:display='none'">
-              <w:rPr>
-                <w:vanish/>
-              </w:rPr>
-            </xsl:if>
             <w:br w:type="column"/>
           </w:r>
         </xsl:when>
@@ -729,11 +679,6 @@
         <xsl:when
           test="preceding-sibling::node()[1][(self::text:p or self::text:h) and key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='column' ]">
           <w:r>
-            <xsl:if test="ancestor::text:section/@text:display='none'">
-              <w:rPr>
-                <w:vanish/>
-              </w:rPr>
-            </xsl:if>
             <w:br w:type="column"/>
           </w:r>
         </xsl:when>
@@ -748,11 +693,6 @@
               <xsl:when
                 test="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:break-before='column' ">
                 <w:r>
-                  <xsl:if test="ancestor::text:section/@text:display='none'">
-                    <w:rPr>
-                      <w:vanish/>
-                    </w:rPr>
-                  </xsl:if>
                   <w:br w:type="column"/>
                 </w:r>
               </xsl:when>
@@ -760,11 +700,6 @@
                 <xsl:if
                   test="key('automatic-styles',$precStyleName)/style:paragraph-properties/@fo:break-after='column' ">
                   <w:r>
-                    <xsl:if test="ancestor::text:section/@text:display='none'">
-                      <w:rPr>
-                        <w:vanish/>
-                      </w:rPr>
-                    </xsl:if>
                     <w:br w:type="column"/>
                   </w:r>
                 </xsl:if>
@@ -784,11 +719,6 @@
       <xsl:when
         test="following-sibling::node()[1][self::text:list and descendant::node()[1][(self::text:p or self::text:h) and key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-before='column' ]]">
         <w:r>
-          <xsl:if test="ancestor::text:section/@text:display='none'">
-            <w:rPr>
-              <w:vanish/>
-            </w:rPr>
-          </xsl:if>
           <w:br w:type="column"/>
         </w:r>
       </xsl:when>
@@ -796,11 +726,6 @@
       <xsl:when
         test="following-sibling::node()[1][self::table:table and key('automatic-styles',@table:name)/style:table-properties/@fo:break-before='column' ]">
         <w:r>
-          <xsl:if test="ancestor::text:section/@text:display='none'">
-            <w:rPr>
-              <w:vanish/>
-            </w:rPr>
-          </xsl:if>
           <w:br w:type="column"/>
         </w:r>
       </xsl:when>
@@ -811,11 +736,6 @@
             <xsl:when
               test="key('automatic-styles',@text:style-name)/style:paragraph-properties/@fo:break-after='column' ">
               <w:r>
-                <xsl:if test="ancestor::text:section/@text:display='none'">
-                  <w:rPr>
-                    <w:vanish/>
-                  </w:rPr>
-                </xsl:if>
                 <w:br w:type="column"/>
               </w:r>
             </xsl:when>
@@ -825,11 +745,6 @@
                 <xsl:if
                   test="key('automatic-styles',$styleName)/style:paragraph-properties/@fo:break-after='column' ">
                   <w:r>
-                    <xsl:if test="ancestor::text:section/@text:display='none'">
-                      <w:rPr>
-                        <w:vanish/>
-                      </w:rPr>
-                    </xsl:if>
                     <w:br w:type="column"/>
                   </w:r>
                 </xsl:if>
@@ -851,9 +766,6 @@
           select="substring-after(key('automatic-styles', parent::text:span/@text:style-name)/style:text-properties/@fo:color,'#')"/>
         <xsl:if test="$fo:color">
           <w:color w:val="{$fo:color}"/>
-        </xsl:if>
-        <xsl:if test="ancestor::text:section/@text:display='none'">
-          <w:vanish/>
         </xsl:if>
       </w:rPr>
       <xsl:apply-templates select="." mode="text"/>
