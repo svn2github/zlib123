@@ -351,7 +351,7 @@
   <!-- chapter field. -->
   <xsl:template match="text:chapter" mode="paragraph">
     <!-- if field displays name, convert into a reference to default heading style. -->
-    <xsl:if test="@text:display='name' and @text:outline-level">
+    <xsl:if test="contains(@text:display, 'name') and @text:outline-level">
       <xsl:variable name="outline-level" select="@text:outline-level"/>
       <!-- COMMENT : if the style changes name in the application, it may not be found and cause an error. -->
       <xsl:message terminate="no">feedback:Chapter field</xsl:message>
