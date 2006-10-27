@@ -62,7 +62,9 @@
       <!-- track changes -->
       <xsl:if
         test="document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes">
-        <w:trackRevisions w:val="{document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes}"/>
+        <w:trackRevisions
+          w:val="{document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes}"
+        />
       </xsl:if>
 
       <xsl:if
@@ -85,6 +87,12 @@
 
       <!-- Header and Footer settings -->
       <xsl:call-template name="InsertHeaderFooterSettings"/>
+
+      <!-- Automatically update fields -->
+      <xsl:if
+        test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='FieldAutoUpdate']/text()='true' ">
+        <w:updateFields w:val="true"/>
+      </xsl:if>
 
       <!-- Footnotes document wide properties -->
       <xsl:apply-templates

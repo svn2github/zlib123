@@ -128,7 +128,7 @@
 
   <!-- object with xml representation are lost -->
   <xsl:template match="draw:frame[./draw:object]" mode="paragraph">
-    <xsl:message terminate="no">feedback:Object</xsl:message>
+    <xsl:message terminate="no">feedback:Embedded object</xsl:message>
   </xsl:template>
 
   <!-- conversion of external images -->
