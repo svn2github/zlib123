@@ -126,6 +126,11 @@
     </w:r>
   </xsl:template>
 
+  <!-- object with xml representation are lost -->
+  <xsl:template match="draw:frame[./draw:object]" mode="paragraph">
+    <xsl:message terminate="no">feedback:Object</xsl:message>
+  </xsl:template>
+
   <!-- conversion of external images -->
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[not(starts-with(@xlink:href, 'Pictures/'))]]"
