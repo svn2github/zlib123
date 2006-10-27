@@ -384,14 +384,17 @@
         <xsl:for-each select="preceding-sibling::node()">
           <xsl:if
             test="preceding-sibling::node()[name() = 'text:alphabetical-index-mark-start' and @text:id = $id]">
-            <xsl:choose>
-              <xsl:when test="self::text()">
-                <xsl:value-of select="."/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:apply-templates select="."/>
-              </xsl:otherwise>
-            </xsl:choose>
+            <!-- ignore all ...mark-start/end and track-changes -->
+            <xsl:if test="not(contains(name(), 'mark-') or contains(name(), 'change-'))">
+              <xsl:choose>
+                <xsl:when test="self::text()">
+                  <xsl:value-of select="."/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:apply-templates select="."/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:if>
           </xsl:if>
         </xsl:for-each>
       </w:instrText>

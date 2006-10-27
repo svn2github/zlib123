@@ -139,7 +139,7 @@
         <!-- COMMENT , TODO , WARNING :
           this causes problem when paragraph contains element linked to another element
           (for example, text:change-start). Trick to replace : -->
-        <xsl:apply-templates select="text:change-start|text:change-end"/>
+        <xsl:apply-templates select="child::node()[contains(name(), 'mark-') or contains(name(), 'change-')]"/>
       </xsl:when>
 
       <!-- drawing shapes -->
