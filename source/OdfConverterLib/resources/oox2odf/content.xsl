@@ -223,6 +223,8 @@
       
       <!-- check if list starts -->
      <xsl:when test="$numId != ''">
+       <xsl:choose>
+         <xsl:when test="document('word/numbering.xml')//w:numbering/w:num[@w:numId = $numId]">
         <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
         <xsl:if
           test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and  count(preceding-sibling::w:p)= $position -1])">
@@ -230,6 +232,11 @@
               <xsl:with-param name="numId" select="$numId" />
           </xsl:apply-templates>
         </xsl:if>
+           </xsl:when>
+         <xsl:otherwise>
+           <xsl:apply-templates select="." mode="paragraph"/>
+         </xsl:otherwise>
+    </xsl:choose>
       </xsl:when>
       
       <!--  default scenario - paragraph-->
