@@ -306,7 +306,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 						{ 	// defaults to the first style
 							this.name = masterPageName;
 						}
-						pages.Add(masterPageName, e);
+						// Hack when duplicate name encountered (jgoffinet)
+                        if (!pages.Contains(masterPageName))
+                        {
+                            pages.Add(masterPageName, e);
+                        }
 						inSectPr = false;
 					}
 				}
