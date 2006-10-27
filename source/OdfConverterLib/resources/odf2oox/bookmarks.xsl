@@ -31,9 +31,11 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  exclude-result-prefixes="text fo style">
+  exclude-result-prefixes="text fo style"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0">
 
-  
+
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="text:p"/>
   <xsl:preserve-space elements="text:span"/>
@@ -42,12 +44,12 @@
   <xsl:key name="bookmark-reference-start"
     match="text:bookmark-start|text:reference-mark-start|text:sequence"
     use="@text:name|@text:ref-name"/>
-  
+
   <!--checks if element has style used to generate table of contents in document  -->
   <xsl:template name="IsTOCBookmark">
     <xsl:param name="styleName"/>
     <xsl:param name="tableOfContentsNum" select="count(key('toc',''))"/>
-    
+
     <xsl:variable name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]"/>
     <xsl:variable name="tocStyle">
       <xsl:call-template name="IsTOCStyleOrElement">
@@ -57,33 +59,33 @@
         <xsl:with-param name="tableOfContent" select="$tableOfContent"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <!-- report loss of toc protection -->
     <xsl:if test="$tableOfContent/@text:protected = 'true' ">
       <xsl:message terminate="no">feedback:Table of content protection</xsl:message>
     </xsl:if>
-    
+
     <xsl:choose>
       <xsl:when test="$tocStyle = 'true'">true</xsl:when>
       <xsl:otherwise>false</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertTOCBookmark">
     <xsl:param name="tableOfContentsNum" select="count(key('toc',''))"/>
     <xsl:param name="bookmarkType"/>
     <xsl:param name="styleName" select="@text:style-name"/>
-    
+
     <xsl:choose>
       <xsl:when test="$tableOfContentsNum > 0">
-        
+
         <xsl:variable name="isBookmarked">
           <xsl:call-template name="IsTOCBookmark">
             <xsl:with-param name="styleName" select="$styleName"/>
             <xsl:with-param name="tableOfContentsNum" select="$tableOfContentsNum"/>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:if test="$isBookmarked = 'true' ">
           <xsl:variable name="bookmarkId">
             <xsl:call-template name="CalculateBookmarkId">
@@ -91,17 +93,17 @@
               <xsl:with-param name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]"/>
             </xsl:call-template>
           </xsl:variable>
-          
+
           <xsl:call-template name="InsertBookmarkStartTOC">
             <xsl:with-param name="tocId" select="$bookmarkId"/>
             <xsl:with-param name="tableOfContent" select="key('toc', '')[$tableOfContentsNum]"/>
           </xsl:call-template>
-          
+
           <xsl:call-template name="InsertBookmarkEndTOC">
             <xsl:with-param name="tocId" select="$bookmarkId"/>
           </xsl:call-template>
         </xsl:if>
-        
+
         <xsl:call-template name="InsertTOCBookmark">
           <xsl:with-param name="tableOfContentsNum" select="$tableOfContentsNum - 1"/>
           <xsl:with-param name="bookmarkType" select="$bookmarkType"/>
@@ -110,16 +112,17 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
-  
-  
+
+
+
   <!-- Insert BookmarkStart Id or BookmarkEnd Id -->
   <xsl:template name="GenerateBookmarkId">
     <xsl:param name="TextName"/>
     <xsl:value-of
-      select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"/>  
+      select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"
+    />
   </xsl:template>
-  
+
   <!-- Insert BookmarkStart or ReferenceMarkStart-->
   <xsl:template match="text:bookmark-start|text:reference-mark-start" mode="paragraph">
     <w:bookmarkStart>
@@ -135,7 +138,7 @@
       </xsl:attribute>
     </w:bookmarkStart>
   </xsl:template>
-  
+
   <!-- Insert BookmarkEnd-->
   <xsl:template match="text:bookmark-end|text:reference-mark-end" mode="paragraph">
     <w:bookmarkEnd>
@@ -148,13 +151,16 @@
       </xsl:attribute>
     </w:bookmarkEnd>
   </xsl:template>
-  
+
   <!-- Insert Cross References (Bookmark) -->
   <xsl:template match="text:bookmark-ref|text:reference-ref|text:sequence-ref" mode="paragraph">
     <xsl:variable name="TextName">
       <xsl:value-of select="@text:ref-name"/>
     </xsl:variable>
-    <xsl:if test="key('bookmark-reference-start', $TextName)">
+    <xsl:variable name="masterPage"
+      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:header/text:p"/>
+    <xsl:if
+     test="key('bookmark-reference-start', $TextName) or $masterPage/text:reference-mark-start[@text:name=$TextName] or $masterPage/text:bookmark-start[@text:name=$TextName]">
       <xsl:variable name="CrossReferences">
         <xsl:choose>
           <xsl:when
@@ -163,15 +169,22 @@
           </xsl:when>
           <xsl:otherwise>REF </xsl:otherwise>
         </xsl:choose>
-		<xsl:choose>
+        <xsl:choose>
           <xsl:when test="../text:sequence-ref[@text:ref-name=$TextName]">
             <xsl:value-of
               select="concat('_Toc', number(count(key('bookmark-reference-start', $TextName)/preceding::text:sequence))+1)"
             />
           </xsl:when>
-			<xsl:otherwise>
-			<xsl:value-of select="$TextName"/>
-			</xsl:otherwise>	
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="contains($TextName,' ' )">
+                <xsl:value-of select="translate($TextName,' ','_')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$TextName"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
         </xsl:choose>
         <xsl:if test="@text:reference-format='direction'">
           <xsl:text>\p</xsl:text>
@@ -209,37 +222,37 @@
       </w:r>
     </xsl:if>
   </xsl:template>
-  
-  
+
+
   <!-- bookmark start mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkStartTOC">
     <xsl:param name="tocId"/>
     <xsl:param name="tableOfContent"/>
-    
+
     <w:bookmarkStart w:id="{$tocId}" w:name="{concat('_Toc',$tocId,generate-id($tableOfContent))}"/>
   </xsl:template>
-  
+
   <!-- bookmark end mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkEndTOC">
     <xsl:param name="tocId"/>
-    
+
     <w:bookmarkEnd w:id="{$tocId}"/>
   </xsl:template>
-  
+
   <!-- checks if element has style or element used to generate TOC -->
   <xsl:template name="IsTOCStyleOrElement">
     <xsl:param name="sourceStyleNum"/>
     <xsl:param name="styleName"/>
     <xsl:param name="tableOfContent"/>
-    
+
     <xsl:choose>
-      
+
       <!-- empty elements are never bookmarked -->
       <xsl:when test="not(child::node())">false</xsl:when>
-      
+
       <!--content of index body is never bookmarked-->
       <xsl:when test="ancestor::text:index-body">false</xsl:when>
-      
+
       <!--checks if headings are used to generate TOC -->
       <xsl:when test="self::text:h">
         <xsl:choose>
@@ -259,7 +272,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- checks if entries are to be included in TOC-->
       <xsl:when test="self::text:toc-mark-start">
         <xsl:choose>
@@ -269,18 +282,18 @@
           <xsl:otherwise>true</xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!--  checks if style or parent style is used as a source style for TOC-->
       <xsl:when test="$sourceStyleNum > 0">
         <xsl:variable name="sourceStyleName"
           select="$tableOfContent/text:table-of-content-source/text:index-source-styles[$sourceStyleNum]/text:index-source-style/@text:style-name"/>
-        
+
         <xsl:choose>
           <xsl:when
             test="(key('automatic-styles',$styleName) and key('automatic-styles',$styleName)/@style:parent-style-name = $sourceStyleName) 
             or $styleName = $sourceStyleName"
             >true</xsl:when>
-          
+
           <!--  checks next source style-->
           <xsl:otherwise>
             <xsl:call-template name="IsTOCStyleOrElement">
@@ -294,16 +307,16 @@
       <xsl:otherwise>false</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!--calculate bookmark id for element contained in TOC -->
   <xsl:template name="CalculateBookmarkId">
     <xsl:param name="counter"/>
     <xsl:param name="tableOfContent"/>
     <xsl:param name="sourceStyleNum"
       select="count($tableOfContent/text:table-of-content-source/text:index-source-styles)"/>
-    
+
     <xsl:choose>
-      
+
       <!--after counting source styles elements add headings number up to proper level defined in TOC and entry marks -->
       <xsl:when test="$sourceStyleNum = 0">
         <xsl:value-of
@@ -313,7 +326,7 @@
           + count(preceding::text:toc-mark-start[$tableOfContent/text:table-of-content-source/@text:use-index-marks != 'false' ])"
         />
       </xsl:when>
-      
+
       <!--count element with source styles-->
       <xsl:when test="$sourceStyleNum > 0">
         <xsl:variable name="sourceStyleName"
@@ -324,7 +337,7 @@
             count(preceding::text:p[key('automatic-styles',@text:style-name)/@style:parent-style-name = $sourceStyleName and child::node() and not(ancestor::text:index-body)])"
           />
         </xsl:variable>
-        
+
         <xsl:call-template name="CalculateBookmarkId">
           <xsl:with-param name="sourceStyleNum" select="$sourceStyleNum - 1"/>
           <xsl:with-param name="counter" select="$elementSum"/>
@@ -336,19 +349,19 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
-  
+
+
+
   <!-- index bookmark-->
   <xsl:template name="InsertIndexOfFiguresBookmark">
-    
+
     <xsl:variable name="textName" select="@text:name"/>
     <xsl:variable name="id">
       <xsl:value-of select="number(count(preceding::text:sequence[@text:name = $textName]))+1"/>
     </xsl:variable>
     <xsl:variable name="indexOfObjects"
       select="key('indexes','')[child::*/@text:caption-sequence-name = $textName]"/>
-    
+
     <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id,generate-id($indexOfObjects))}"/>
     <w:r>
       <xsl:if test="ancestor::text:section/@text:display='none'">
@@ -362,7 +375,7 @@
     </w:r>
     <w:bookmarkEnd w:id="{$id}"/>
   </xsl:template>
-  
-  
+
+
 
 </xsl:stylesheet>
