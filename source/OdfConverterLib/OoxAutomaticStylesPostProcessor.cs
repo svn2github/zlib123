@@ -358,7 +358,20 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (IsParagraphProperties(element.Name, element.Ns))
             {
                 this.context.Pop();
-                WriteParagraphProperties(element);
+                CompleteParagraphProperties(element);
+                Element pPr = GetOrderedParagraphProperties(element);
+                if (IsInPPrChange())
+                {
+                    // attach properties to parent
+                    Element pPrChange = (Element)this.currentNode.Peek();
+                    pPrChange.AddChild(pPr);
+                }
+                else
+                {
+                    // write properties
+                    pPr.Write(this.nextWriter);
+                }
+
             }
             else
             {
@@ -391,7 +404,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void WriteParagraphProperties(Element pPr)
+        private void CompleteParagraphProperties(Element pPr)
         {
             Element rPr = pPr.GetChild("rPr", NAMESPACE);
             if (rPr == null)
@@ -425,17 +438,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (rPr.HasChild())
             {
                 pPr.AddChild(rPr);
-            }
-            if (IsInPPrChange())
-            {
-                // attach properties to parent
-                Element pPrChange = (Element)this.currentNode.Peek();
-                pPrChange.AddChild(pPr);
-            }
-            else
-            {
-                // write properties
-                DoWriteParagraphProperties(pPr);
             }
         }
 
@@ -480,9 +482,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void DoWriteParagraphProperties(Element pPr)
+        private Element GetOrderedParagraphProperties(Element pPr)
         {
-            this.nextWriter.WriteStartElement(pPr.Prefix, pPr.Name, pPr.Ns);
+            Element newPPr = new Element(pPr);
             foreach (string propName in PARAGRAPH_PROPERTIES)
             {
                 Element prop = pPr.GetChild(propName, NAMESPACE);
@@ -490,15 +492,15 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     if ("rPr".Equals(propName))
                     {
-                        WriteRunProperties(prop);
+                        newPPr.AddChild(GetOrderedRunProperties(prop));
                     }
                     else
                     {
-                        prop.Write(this.nextWriter);
+                        newPPr.AddChild(prop);
                     }
                 }
             }
-            this.nextWriter.WriteEndElement();
+            return newPPr;
         }
 
         /*

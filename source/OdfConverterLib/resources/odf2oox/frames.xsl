@@ -364,7 +364,12 @@
     </xsl:variable>
 
     <xsl:attribute name="relativeHeight">
-      <xsl:value-of select="2 + @draw:z-index"/>
+      <xsl:choose>
+        <xsl:when test="@draw:z-index">
+          <xsl:value-of select="2 + @draw:z-index"/>
+        </xsl:when>
+        <xsl:otherwise>2</xsl:otherwise>
+      </xsl:choose>      
     </xsl:attribute>
 
     <xsl:attribute name="behindDoc">

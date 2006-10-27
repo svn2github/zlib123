@@ -136,6 +136,10 @@
       <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
       <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
         <xsl:message terminate="no">feedback:Nested frames</xsl:message>
+        <!-- COMMENT , TODO , WARNING :
+          this causes problem when paragraph contains element linked to another element
+          (for example, text:change-start). Trick to replace : -->
+        <xsl:apply-templates select="text:change-start|text:change-end"/>
       </xsl:when>
 
       <!-- drawing shapes -->
