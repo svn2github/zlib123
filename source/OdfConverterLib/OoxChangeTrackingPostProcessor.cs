@@ -85,6 +85,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 StartTInDeletion();
             }
+            else if (IsInstrTextInDeletion())
+            {
+                StartInstrTextInDeletion();
+            }
             else if (IsDeletion())
             {
                 StartDeletion();
@@ -623,7 +627,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
         /*
-         * t in deletion
+         * t and others in deletion
          */
 
         private bool IsTInDeletion()
@@ -646,10 +650,36 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
+        private bool IsInstrTextInDeletion()
+        {
+            if (!IsInDeletion())
+            {
+                return false;
+            }
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                return W_NAMESPACE.Equals(node.Ns) && "instrText".Equals(node.Name);
+            }
+            else
+            {
+                this.currentNode.Pop();
+                bool result = IsTInDeletion();
+                this.currentNode.Push(node);
+                return result;
+            }
+        }
+
         private void StartTInDeletion()
         {
             Element t = (Element)this.currentNode.Peek();
             t.Name = "delText";
+        }
+
+        private void StartInstrTextInDeletion()
+        {
+            Element t = (Element)this.currentNode.Peek();
+            t.Name = "delInstrText";
         }
 
 
