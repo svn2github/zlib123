@@ -1358,7 +1358,7 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="$defaultOutlineLevel">
+      <xsl:when test="number($defaultOutlineLevel)">
         <w:numPr>
           <w:ilvl w:val="{$defaultOutlineLevel - 1}"/>
           <xsl:choose>
@@ -1410,12 +1410,12 @@
           </xsl:choose>
         </xsl:for-each>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="$context != 'styles.xml'">
         <xsl:call-template name="GetDefaultOutlineLevel">
           <xsl:with-param name="styleName" select="$styleName"/>
           <xsl:with-param name="context" select="'styles.xml'"/>
         </xsl:call-template>
-      </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
 
   </xsl:template>
