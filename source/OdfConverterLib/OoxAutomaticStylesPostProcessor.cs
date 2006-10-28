@@ -48,6 +48,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private Stack currentNode;
         private Stack context;
+        private Stack currentParagraphStyleName;
         private Hashtable cStyles;
         private Hashtable pStyles;
 
@@ -60,6 +61,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.currentNode = new Stack();
             this.context = new Stack();
             this.context.Push("root");
+            this.currentParagraphStyleName = new Stack();
             this.cStyles = new Hashtable();
             this.pStyles = new Hashtable();
         }
@@ -306,8 +308,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          * Paragraphs
          */
 
-        private string currentParagraphStyleName = null;
-
         private bool IsParagraph(string localName, string ns)
         {
             return NAMESPACE.Equals(ns) && "p".Equals(localName);
@@ -321,6 +321,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private void StartParagraph()
         {
             this.context.Push("p");
+            // no style name yet
+            this.currentParagraphStyleName.Push("");
         }
 
         private void EndElementInParagraph()
@@ -328,7 +330,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Element element = (Element)this.currentNode.Peek();
             if (IsParagraph(element.Name, element.Ns))
             {
-                this.currentParagraphStyleName = null;
+                this.currentParagraphStyleName.Pop();
                 this.context.Pop();
             }
         }
@@ -428,7 +430,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     if (!IsInPPrChange())
                     {
                         AddRunStyleProperties(rPr, pStyleName, false);
-                        this.currentParagraphStyleName = pStyleName;
+                        // update current paragraph style name
+                        this.currentParagraphStyleName.Pop();
+                        this.currentParagraphStyleName.Push(pStyleName);
                     }
                     // add style declaration
                     AddStyleDeclaration(pPr, pStyleName, "pStyle");
@@ -551,10 +555,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             if (!IsInRunProperties() && "r".Equals(this.context.Peek()))
             {
-                if (this.currentParagraphStyleName != null && IsAutomaticStyle((Element)pStyles[this.currentParagraphStyleName]))
+                string styleName = (string)this.currentParagraphStyleName.Peek();
+                if (!"".Equals(styleName) && IsAutomaticStyle((Element)pStyles[styleName]))
                 {
                     Element rPr = new Element("w", "rPr", NAMESPACE);
-                    AddRunStyleProperties(rPr, this.currentParagraphStyleName, false);
+                    AddRunStyleProperties(rPr, styleName, false);
                     WriteRunProperties(rPr);
                     this.context.Pop();
                     this.context.Push("r-with-properties");
@@ -656,9 +661,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
             }
             // add paragraph run properties (if automatic)
-            if (this.currentParagraphStyleName != null && IsAutomaticStyle((Element)pStyles[this.currentParagraphStyleName]))
+            string styleName = (string)this.currentParagraphStyleName.Peek();
+            if (!"".Equals(styleName) && IsAutomaticStyle((Element)pStyles[styleName]))
             {
-                Element style = (Element)pStyles[this.currentParagraphStyleName];
+                Element style = (Element)pStyles[styleName];
                 if (style != null)
                 {
                     AddRunProperties(rPr, style);
