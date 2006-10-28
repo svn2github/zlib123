@@ -489,14 +489,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private Element GetOrderedParagraphProperties(Element pPr)
         {
             Element newPPr = new Element(pPr);
+            bool hasNumbering = false;
             foreach (string propName in PARAGRAPH_PROPERTIES)
             {
                 Element prop = pPr.GetChild(propName, NAMESPACE);
                 if (prop != null)
                 {
+                    if ("numPr".Equals(propName))
+                    {
+                        hasNumbering = true;
+                    }
                     if ("rPr".Equals(propName))
                     {
                         newPPr.AddChild(GetOrderedRunProperties(prop));
+                    }
+                    // special case for not overriding indentation in lists
+                    else if (hasNumbering && "ind".Equals(propName))
+                    {
+                        // do nothing
                     }
                     else
                     {
