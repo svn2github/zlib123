@@ -1351,10 +1351,16 @@
       </xsl:choose>
     </xsl:variable>
 
+    <xsl:variable name="defaultOutlineLevel">
+      <xsl:call-template name="GetDefaultOutlineLevel">
+        <xsl:with-param name="styleName" select="$styleName"/>
+      </xsl:call-template>
+    </xsl:variable>
+
     <xsl:choose>
-      <xsl:when test="key('automatic-styles', $styleName)/@style:default-outline-level">
+      <xsl:when test="$defaultOutlineLevel">
         <w:numPr>
-          <w:ilvl w:val="{key('automatic-styles', $styleName)/@style:default-outline-level - 1}"/>
+          <w:ilvl w:val="{$defaultOutlineLevel - 1}"/>
           <xsl:choose>
             <xsl:when test="$listStyleName != '' ">
               <w:numId w:val="2"/>
@@ -1366,36 +1372,53 @@
         </w:numPr>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:for-each select="document('styles.xml')">
-          <xsl:choose>
-            <xsl:when test="key('styles', $styleName)/@style:default-outline-level">
-              <w:numPr>
-                <w:ilvl w:val="{key('styles', $styleName)/@style:default-outline-level - 1}"/>
-                <xsl:choose>
-                  <xsl:when test="$listStyleName != '' ">
-                    <w:numId w:val="2"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <w:numId w:val="1"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </w:numPr>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:if
-                test="@text:outline-level &lt;= 9 and office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !='' ">
-                <w:numPr>
-                  <w:ilvl w:val="{@text:outline-level - 1}"/>
-                  <w:numId w:val="1"/>
-                </w:numPr>
-              </xsl:if>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
+        <xsl:if
+          test="@text:outline-level &lt;= 9 and office:document-styles/office:styles/text:outline-style/text:outline-level-style/@style:num-format !='' ">
+          <w:numPr>
+            <w:ilvl w:val="{@text:outline-level - 1}"/>
+            <w:numId w:val="1"/>
+          </w:numPr>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
+  <!-- Climb the style hierarchy for a default outline level -->
+  <xsl:template name="GetDefaultOutlineLevel">
+    <xsl:param name="styleName"/>
+    <xsl:param name="context" select="'content.xml'"/>
+
+    <xsl:variable name="exists">
+      <xsl:for-each select="document($context)">
+        <xsl:value-of select="boolean(key('styles', $styleName))"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$exists = 'true' ">
+        <xsl:for-each select="document($context)">
+          <xsl:choose>
+            <xsl:when test="key('styles', $styleName)[1]/@style:default-outline-level">
+              <xsl:value-of select="key('styles', $styleName)[1]/@style:default-outline-level"/>
+            </xsl:when>
+            <xsl:when test="key('styles', $styleName)[1]/@style:parent-style-name">
+              <xsl:call-template name="GetDefaultOutlineLevel">
+                <xsl:with-param name="styleName"
+                  select="key('styles', $styleName)[1]/@style:parent-style-name"/>
+                <xsl:with-param name="context" select="$context"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="GetDefaultOutlineLevel">
+          <xsl:with-param name="styleName" select="$styleName"/>
+          <xsl:with-param name="context" select="'styles.xml'"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
 
 
   <!-- Inserts the outline level of a heading if needed -->

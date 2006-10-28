@@ -40,7 +40,7 @@
   <xsl:variable name="asianLayoutId">1</xsl:variable>
 
   <!-- keys definition -->
-  <xsl:key name="styles" match="office:styles/style:style" use="@style:name"/>
+  <xsl:key name="styles" match="style:style" use="@style:name"/>
 
 
   <xsl:template name="styles">
