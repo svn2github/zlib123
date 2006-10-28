@@ -335,5 +335,34 @@
     </w:r>
     <!-- <xsl:apply-templates select="text:s" mode="text"></xsl:apply-templates> -->
   </xsl:template>
+  
+  <xsl:template match="text()" mode="indexes">
+    <xsl:choose>
+      <xsl:when test="ancestor::text:index-title">
+        <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+      </xsl:when>
+      <xsl:when test="preceding-sibling::text:tab">
+        <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+      </xsl:when>
+      <xsl:when test="not(following-sibling::text:tab)">
+        <xsl:choose>
+          <xsl:when test="parent::text:a|parent::text:span">
+            <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:t>
+              <xsl:value-of select="ancestor::text:p/text()"/>
+            </w:t>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:t>
+          <xsl:value-of select="."/>
+        </w:t>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
 
 </xsl:stylesheet>
