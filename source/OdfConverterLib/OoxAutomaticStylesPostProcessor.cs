@@ -276,7 +276,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (node is Attribute)
             {
                 Attribute attribute = (Attribute)node;
-                attribute.Value = text;
+                attribute.Value += text;
             }
             else if (node is Element)
             {
@@ -397,7 +397,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (node is Attribute)
             {
                 Attribute attribute = (Attribute)node;
-                attribute.Value = text;
+                attribute.Value += text;
             }
             else if (node is Element)
             {
@@ -647,7 +647,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (node is Attribute)
             {
                 Attribute attribute = (Attribute)node;
-                attribute.Value = text;
+                attribute.Value += text;
             }
             else if (node is Element)
             {
