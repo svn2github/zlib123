@@ -123,8 +123,12 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
         public void OnConnection(object application, Extensibility.ext_ConnectMode connectMode, object addInInst, ref System.Array custom)
         {
             this.applicationObject = (MSword.Application)application;
+            // set culture to match current application culture
+            int officeUICulture = this.applicationObject.LanguageSettings.get_LanguageID(MsoAppLanguageID.msoLanguageIDUI);
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(officeUICulture);
+            
             FindWord12SaveFormat();
-            DialogBoxTitle = addinLib.GetString("OdfConverterTitle");
+            this.DialogBoxTitle = addinLib.GetString("OdfConverterTitle");
 
             if (connectMode != Extensibility.ext_ConnectMode.ext_cm_Startup)
             {
