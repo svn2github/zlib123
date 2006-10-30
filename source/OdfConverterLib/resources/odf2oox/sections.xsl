@@ -151,24 +151,36 @@
       <xsl:variable name="followings"
         select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
 
-      <xsl:variable name="master-page-starts"
-        select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
+      <xsl:variable name="next-master-page">
+        <xsl:choose>
+          <xsl:when test="$followings[1]/@text:style-name">
+            <xsl:call-template name="GetMasterPageNameFromHierarchy">
+              <xsl:with-param name="style-name" select="$followings[1]/@text:style-name"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$followings[1]/@table:style-name">
+            <xsl:call-template name="GetMasterPageNameFromHierarchy">
+              <xsl:with-param name="style-name" select="$followings[1]/@table:style-name"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
 
       <!-- 2 - Section starts. The following paragraph is contained in the following section -->
       <xsl:variable name="following-section" select="following::text:section[1]"/>
       <!-- the following section is the same as the following neighbour's ancestor section -->
-      <xsl:variable name="section-starts"
+      <xsl:variable name="next-new-section"
         select="$following-section and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id($following-section))"/>
 
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
       <xsl:variable name="ancestor-sections" select="ancestor::text:section"/>
       <xsl:variable name="previous-section" select="$ancestor-sections[1]"/>
       <!-- the following neighbour's ancestor section and the current section are different -->
-      <xsl:variable name="section-ends"
+      <xsl:variable name="next-end-section"
         select="$previous-section and not(generate-id($followings[1]/ancestor::text:section[1]) = generate-id($previous-section))"/>
 
-      <!-- 4 - Detect a page-break -->
-      <xsl:variable name="page-break">
+      <!-- 4 - Detect a next-page-break -->
+      <xsl:variable name="next-page-break">
         <xsl:call-template name="isPageBroken">
           <xsl:with-param name="following-elt" select="$followings[1]"/>
           <xsl:with-param name="self-style-name" select="@text:style-name"/>
@@ -177,23 +189,26 @@
 
 
       <!-- section creation 
-        A page-break or a master page start (not nested inside a text:section)
+        A next-page-break or a master page start (not nested inside a text:section)
         or a section start or end not nested inside another section
         And there mustn't exist a text:note-body or table:table ancestor
       -->
       <xsl:if
-        test="((($page-break='true' or $master-page-starts = 'true') ) 
-        or (($section-starts = 'true' or $section-ends = 'true') and count($ancestor-sections) &lt; 2)) 
+        test="((($next-page-break='true' or $next-master-page != '' ) ) 
+        or (($next-new-section = 'true' or $next-end-section = 'true') and count($ancestor-sections) &lt; 2)) 
         and not(ancestor::text:note-body or ancestor::table:table)">
         <w:sectPr>
-          <xsl:if test="$page-break = 'true' ">
-            <xsl:attribute name="psect:page-break">true</xsl:attribute>
+          <xsl:if test="$next-master-page != '' ">
+            <xsl:attribute name="psect:next-master-page">true</xsl:attribute>
           </xsl:if>
-          <xsl:if test="$section-starts = 'true' ">
-            <xsl:attribute name="psect:section-starts">true</xsl:attribute>
+          <xsl:if test="$next-page-break = 'true' ">
+            <xsl:attribute name="psect:next-page-break">true</xsl:attribute>
           </xsl:if>
-          <xsl:if test="$section-ends = 'true' ">
-            <xsl:attribute name="psect:section-ends">true</xsl:attribute>
+          <xsl:if test="$next-new-section = 'true' ">
+            <xsl:attribute name="psect:next-new-section">true</xsl:attribute>
+          </xsl:if>
+          <xsl:if test="$next-end-section = 'true' ">
+            <xsl:attribute name="psect:next-end-section">true</xsl:attribute>
             <xsl:apply-templates
               select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration"
               mode="note"/>
@@ -218,24 +233,36 @@
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
       <xsl:variable name="followings"
         select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
-      <xsl:variable name="master-page-name"
-        select="key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name"/>
-      <xsl:variable name="masterPageStarts" select="boolean($master-page-name != '')"/>
+      
+      <xsl:variable name="next-master-page">
+        <xsl:choose>
+          <xsl:when test="$followings[1]/@text:style-name">
+            <xsl:call-template name="GetMasterPageNameFromHierarchy">
+              <xsl:with-param name="style-name" select="$followings[1]/@text:style-name"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$followings[1]/@table:style-name">
+            <xsl:call-template name="GetMasterPageNameFromHierarchy">
+              <xsl:with-param name="style-name" select="$followings[1]/@table:style-name"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
 
       <!-- 2 - Section starts. The following paragraph is contained in the following section -->
       <xsl:variable name="followingSection" select="following::text:section[1]"/>
       <!-- the following section is the same as the following neighbour's ancestor section -->
-      <xsl:variable name="section-starts"
+      <xsl:variable name="next-new-section"
         select="$followingSection and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id($followingSection))"/>
 
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
       <xsl:variable name="ancestor-sections" select="ancestor::text:section"/>
       <xsl:variable name="previous-section" select="$ancestor-sections[1]"/>
       <!-- the following neighbour's ancestor section and the current section are different -->
-      <xsl:variable name="section-ends"
+      <xsl:variable name="next-end-section"
         select="$previous-section and not(generate-id($followings[1]/ancestor::text:section[1]) = generate-id($previous-section))"/>
 
-      <xsl:variable name="page-break">
+      <xsl:variable name="next-page-break">
         <xsl:call-template name="isPageBroken">
           <xsl:with-param name="following-elt" select="$followings[1]"/>
           <xsl:with-param name="self-style-name" select="@table:style-name"/>
@@ -244,20 +271,23 @@
 
 
       <xsl:if
-        test="(($masterPageStarts = 'true')
-        or (($section-starts = 'true' or $section-ends = 'true') and count($ancestor-sections) &lt; 2))
+        test="(($next-master-page != '' )
+        or (($next-new-section = 'true' or $next-end-section = 'true') and count($ancestor-sections) &lt; 2))
          and not(ancestor::text:note-body)">
         <w:p>
           <w:pPr>
             <w:sectPr>
-              <xsl:if test="$page-break = 'true' ">
-                <xsl:attribute name="psect:page-break">true</xsl:attribute>
+              <xsl:if test="$next-master-page != '' ">
+                <xsl:attribute name="psect:next-master-page">true</xsl:attribute>
               </xsl:if>
-              <xsl:if test="$section-starts = 'true' ">
-                <xsl:attribute name="psect:section-starts">true</xsl:attribute>
+              <xsl:if test="$next-page-break = 'true' ">
+                <xsl:attribute name="psect:next-page-break">true</xsl:attribute>
               </xsl:if>
-              <xsl:if test="$section-ends = 'true' ">
-                <xsl:attribute name="psect:section-ends">true</xsl:attribute>
+              <xsl:if test="$next-new-section = 'true' ">
+                <xsl:attribute name="psect:next-new-section">true</xsl:attribute>
+              </xsl:if>
+              <xsl:if test="$next-end-section = 'true' ">
+                <xsl:attribute name="psect:next-end-section">true</xsl:attribute>
                 <xsl:apply-templates
                   select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration"
                   mode="note"/>
