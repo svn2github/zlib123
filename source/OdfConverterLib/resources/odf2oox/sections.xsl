@@ -70,39 +70,87 @@
   <xsl:template name="InsertDocumentFinalSectionProperties">
     <w:sectPr/>
   </xsl:template>
-  
+
+  <!-- Mark the text element if its style is tied to a master-page -->
   <xsl:template name="MarkMasterPage">
     <xsl:choose>
       <xsl:when test="self::text:p or self::text:h or self::table:table">
-        <xsl:if test="key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name != '' ">
+        <xsl:variable name="master-page-name">
+          <xsl:call-template name="GetMasterPageNameFromHierarchy">
+            <xsl:with-param name="style-name" select="@text:style-name|@table:style-name"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$master-page-name != '' ">
           <xsl:attribute name="psect:master-page-name">
-            <xsl:value-of select="key('master-based-styles', @text:style-name|@table:style-name)[1]/@style:master-page-name"/>
-          </xsl:attribute>    
+            <xsl:value-of select="$master-page-name"/>
+          </xsl:attribute>
         </xsl:if>
       </xsl:when>
       <xsl:when test="self::text:list-item or self::text:list-header">
-        <xsl:variable name="elt" select="*[1][self::text:p or self::text:h]"/>
-        <xsl:if test="key('master-based-styles', $elt/@text:style-name)[1]/@style:master-page-name != '' ">
+        <xsl:variable name="master-page-name">
+          <xsl:call-template name="GetMasterPageNameFromHierarchy">
+            <xsl:with-param name="style-name" select="*[1][self::text:p or self::text:h]/@text:style-name"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if
+          test="$master-page-name != '' ">
           <xsl:attribute name="psect:master-page-name">
-            <xsl:value-of select="key('master-based-styles', $elt/@text:style-name)[1]/@style:master-page-name"/>
-          </xsl:attribute>  
+            <xsl:value-of select="$master-page-name"/>
+          </xsl:attribute>
         </xsl:if>
       </xsl:when>
     </xsl:choose>
-    
+  </xsl:template>
+
+  <!-- Look for a master-page-name into the style hierarchy 
+    starting from 'style-name' and 'context' 
+  -->
+  <xsl:template name="GetMasterPageNameFromHierarchy">
+    <xsl:param name="style-name"/>
+    <xsl:param name="context" select="'content.xml'"/>
+    <xsl:variable name="exists">
+      <xsl:for-each select="document($context)">
+        <xsl:value-of select="boolean(key('styles', $style-name))"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$exists = 'true' ">
+        <xsl:for-each select="document($context)">
+          <xsl:variable name="style" select="key('styles', $style-name)[1]"/>
+          <xsl:choose>
+            <xsl:when test="$style/@style:master-page-name">
+              <xsl:value-of select="$style/@style:master-page-name"/>
+            </xsl:when>
+            <xsl:when test="$style/@style:parent-style-name">
+              <xsl:call-template name="GetMasterPageNameFromHierarchy">
+                <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
+                <xsl:with-param name="context" select="$context"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- switch the context, let's look into styles.xml -->
+      <xsl:when test="$context != 'styles.xml'">
+        <xsl:call-template name="GetMasterPageNameFromHierarchy">
+          <xsl:with-param name="style-name" select="$style-name"/>
+          <xsl:with-param name="context" select="'styles.xml'"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
 
   <!-- section detection and insertion for paragraph-->
   <xsl:template name="InsertParagraphSectionProperties">
-    
+
     <xsl:if
       test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::draw:line) and not(ancestor::style:master-page)">
       <!-- Section detection  : 4 cases -->
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
       <xsl:variable name="followings"
         select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
-   
+
       <xsl:variable name="master-page-starts"
         select="boolean(key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name != '')"/>
 
@@ -146,24 +194,24 @@
           </xsl:if>
           <xsl:if test="$section-ends = 'true' ">
             <xsl:attribute name="psect:section-ends">true</xsl:attribute>
-            <xsl:apply-templates 
-              select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration" 
+            <xsl:apply-templates
+              select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration"
               mode="note"/>
             <xsl:apply-templates
               select="key('sections', $previous-section/@text:style-name)/style:section-properties"
               mode="section"/>
           </xsl:if>
-          </w:sectPr>
-        
+        </w:sectPr>
+
       </xsl:if>
     </xsl:if>
   </xsl:template>
 
- 
+
 
   <!-- Manages sections within TABLES -->
   <xsl:template name="ManageSectionsInTable">
-    
+
     <!-- Section detection  : 3 cases -->
     <xsl:if
       test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::draw:line) and not(ancestor::style:master-page)">
@@ -172,8 +220,7 @@
         select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
       <xsl:variable name="master-page-name"
         select="key('master-based-styles', $followings[1]/@text:style-name | $followings[1]/@table:style-name)[1]/@style:master-page-name"/>
-      <xsl:variable name="masterPageStarts"
-        select="boolean($master-page-name != '')"/>
+      <xsl:variable name="masterPageStarts" select="boolean($master-page-name != '')"/>
 
       <!-- 2 - Section starts. The following paragraph is contained in the following section -->
       <xsl:variable name="followingSection" select="following::text:section[1]"/>
@@ -195,12 +242,13 @@
         </xsl:call-template>
       </xsl:variable>
 
-      
+
       <xsl:if
         test="(($masterPageStarts = 'true')
         or (($section-starts = 'true' or $section-ends = 'true') and count($ancestor-sections) &lt; 2))
          and not(ancestor::text:note-body)">
-          <w:p><w:pPr>
+        <w:p>
+          <w:pPr>
             <w:sectPr>
               <xsl:if test="$page-break = 'true' ">
                 <xsl:attribute name="psect:page-break">true</xsl:attribute>
@@ -210,15 +258,16 @@
               </xsl:if>
               <xsl:if test="$section-ends = 'true' ">
                 <xsl:attribute name="psect:section-ends">true</xsl:attribute>
-                <xsl:apply-templates 
-                  select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration" 
+                <xsl:apply-templates
+                  select="key('sections', $previous-section/@text:style-name)[1]/style:section-properties/text:notes-configuration"
                   mode="note"/>
                 <xsl:apply-templates
                   select="key('sections', $previous-section/@text:style-name)/style:section-properties"
                   mode="section"/>
               </xsl:if>
             </w:sectPr>
-          </w:pPr></w:p>
+          </w:pPr>
+        </w:p>
       </xsl:if>
     </xsl:if>
   </xsl:template>
@@ -241,8 +290,7 @@
         <xsl:otherwise>
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
-              <xsl:when
-                test="key('styles', $self-style-name)[1]/child::*/@fo:break-after = 'page' "
+              <xsl:when test="key('styles', $self-style-name)[1]/child::*/@fo:break-after = 'page' "
                 >true</xsl:when>
               <xsl:when
                 test="$following-elt and key('styles', $following-elt/@text:style-name|$following-elt/@table:style-name)[1]/child::*/@fo:break-after = 'page'"
@@ -262,7 +310,7 @@
       <xsl:for-each
         select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page">
         <psect:master-page psect:name="{@style:name}">
-          <xsl:if  test="@style:next-style-name">  
+          <xsl:if test="@style:next-style-name">
             <xsl:attribute name="psect:next-style">
               <xsl:value-of select="@style:next-style-name"/>
             </xsl:attribute>
@@ -274,7 +322,8 @@
             select="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration"
             mode="note"/>
           <xsl:apply-templates
-            select="key('page-layouts', @style:page-layout-name)[1]/style:page-layout-properties" mode="master-page"/>
+            select="key('page-layouts', @style:page-layout-name)[1]/style:page-layout-properties"
+            mode="master-page"/>
         </psect:master-page>
       </xsl:for-each>
     </psect:master-pages>
