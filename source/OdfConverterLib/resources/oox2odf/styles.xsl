@@ -75,30 +75,30 @@
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
         <xsl:for-each select="w:headerReference">
           <xsl:if test="./@w:type = 'default'">
-          <style:header>
-            <xsl:variable name="headerId" select="./@r:id"/>
-            <xsl:variable name="headerXmlDocument"
-              select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-            <!-- change context to get footer content -->
-            <xsl:for-each select="document($headerXmlDocument)">
-              <xsl:apply-templates/>
-            </xsl:for-each>
-          </style:header>
-            </xsl:if>
+            <style:header>
+              <xsl:variable name="headerId" select="./@r:id"/>
+              <xsl:variable name="headerXmlDocument"
+                select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+              <!-- change context to get footer content -->
+              <xsl:for-each select="document($headerXmlDocument)">
+                <xsl:apply-templates/>
+              </xsl:for-each>
+            </style:header>
+          </xsl:if>
         </xsl:for-each>
         <xsl:for-each select="w:footerReference">
           <xsl:if test="./@w:type = 'default'">
-          <style:footer>
-            <xsl:variable name="footerId" select="./@r:id"/>
-            <xsl:variable name="footerXmlDocument"
-              select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-            <!-- change context to get header content -->
-            <xsl:for-each select="document($footerXmlDocument)">
-              <xsl:apply-templates/>
-            </xsl:for-each>
-          </style:footer>
+            <style:footer>
+              <xsl:variable name="footerId" select="./@r:id"/>
+              <xsl:variable name="footerXmlDocument"
+                select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+              <!-- change context to get header content -->
+              <xsl:for-each select="document($footerXmlDocument)">
+                <xsl:apply-templates/>
+              </xsl:for-each>
+            </style:footer>
           </xsl:if>
-          </xsl:for-each>
+        </xsl:for-each>
       </xsl:for-each>
     </style:master-page>
   </xsl:template>
@@ -128,7 +128,7 @@
     </style:page-layout>
   </xsl:template>
 
-<!-- insert heading list style -->
+  <!-- insert heading list style -->
   <xsl:template name="HeadingList">
     <xsl:param name="node"/>
     <xsl:for-each select="$node">
@@ -148,16 +148,21 @@
               <xsl:variable name="styleId">
                 <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
               </xsl:variable>
-              <xsl:value-of select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:pPr/w:numPr/w:numId/@w:val"/>
+              <xsl:value-of
+                select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:pPr/w:numPr/w:numId/@w:val"
+              />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
         <xsl:if test="$numid != '' ">
           <text:outline-style>
             <xsl:variable name="abstractnumid">
-              <xsl:value-of select="document('word/numbering.xml')//w:numbering/w:num[@w:numId =$numid]/w:abstractNumId/@w:val"/>
+              <xsl:value-of
+                select="document('word/numbering.xml')//w:numbering/w:num[@w:numId =$numid]/w:abstractNumId/@w:val"
+              />
             </xsl:variable>
-            <xsl:for-each select="document('word/numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId = $abstractnumid]/w:lvl">
+            <xsl:for-each
+              select="document('word/numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId = $abstractnumid]/w:lvl">
               <text:outline-level-style>
                 <xsl:attribute name="text:level">
                   <xsl:value-of select="./@w:ilvl +1"/>
@@ -169,9 +174,11 @@
                     </xsl:call-template>
                   </xsl:if>
                 </xsl:attribute>
-                <xsl:if test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
+                <xsl:if
+                  test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
                   <xsl:attribute name="style:num-suffix">
-                    <xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"/>
+                    <xsl:value-of
+                      select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"/>
                   </xsl:attribute>
                 </xsl:if>
                 <xsl:variable name="display">
@@ -188,7 +195,7 @@
                   </xsl:attribute>
                 </xsl:if>
                 <style:list-level-properties>
-                  <xsl:variable name="Ind" select="./w:pPr/w:ind"/> 
+                  <xsl:variable name="Ind" select="./w:pPr/w:ind"/>
                   <xsl:attribute name="text:space-before">
                     <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:firstLine)"/>
                   </xsl:attribute>
@@ -447,7 +454,7 @@
                     </xsl:otherwise>
                   </xsl:choose>
                     </xsl:otherwise>
-                    </xsl:choose>
+                  </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:choose>
@@ -460,14 +467,14 @@
                         </xsl:choose>
                     </xsl:when>
                     <xsl:otherwise>
-                  <xsl:choose>
-                    <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="w:pgMar/@w:top - w:pgMar/@w:header"/>
+                      <xsl:choose>
+                        <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="w:pgMar/@w:top - w:pgMar/@w:header"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:otherwise>
                   </xsl:choose>
-                    </xsl:otherwise>
-                    </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:when>
@@ -545,7 +552,7 @@
     <style:default-style style:family="paragraph">
       <xsl:if test="w:pPrDefault">
         <style:paragraph-properties>
-          <xsl:call-template name="InsertDefaultParagraphProperties" />
+          <xsl:call-template name="InsertDefaultParagraphProperties"/>
           <xsl:if test="w:pPrDefault/w:pPr">
             <xsl:for-each select="w:pPrDefault/w:pPr">
               <xsl:call-template name="InsertParagraphProperties"/>
@@ -556,7 +563,7 @@
       
       <xsl:if test="w:rPrDefault">
         <style:text-properties>
-          <xsl:call-template name="InsertDefaultTextProperties" />
+          <xsl:call-template name="InsertDefaultTextProperties"/>
           <xsl:if test="w:rPrDefault/w:rPr">
             <xsl:for-each select="w:rPrDefault/w:rPr">
               <xsl:call-template name="InsertTextProperties"/>
@@ -608,7 +615,7 @@
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
-   </xsl:template>
+  </xsl:template>
 
   <!-- conversion of paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
@@ -930,10 +937,9 @@
       </xsl:attribute>
     </xsl:if>
 
-     <!-- widow and orphan-->
+    <!-- widow and orphan-->
     <xsl:choose>
-      <xsl:when test="w:widowControl/@w:val='0'">
-      </xsl:when>
+      <xsl:when test="w:widowControl/@w:val='0'"> </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="fo:widows">
           <xsl:value-of select="1"/>

@@ -86,6 +86,11 @@
         <xsl:call-template name="InsertDefaultParagraphProperties"/>
         <xsl:call-template name="InsertParagraphProperties"/>
       </style:paragraph-properties>
+      
+      <!-- add text properties to paragraph -->
+      <xsl:if test="w:rPr and not(parent::w:p/w:r)">
+        <xsl:apply-templates select="w:rPr" mode="automaticstyles"/>
+      </xsl:if>
     </style:style>
   </xsl:template>
 
@@ -104,6 +109,13 @@
     </style:style>
   </xsl:template>
 
+  <!-- create text properties in paragraph (w:pPr/w:rPr) -->
+  <xsl:template match="w:rPr[parent::w:pPr]" mode="automaticstyles">
+    <style:text-properties>
+      <xsl:call-template name="InsertTextProperties"/>
+    </style:text-properties>
+  </xsl:template>
+  
   <!-- ignore text in automatic styles mode. -->
   <xsl:template match="w:t" mode="automaticstyles">
     <!-- do nothing. -->
