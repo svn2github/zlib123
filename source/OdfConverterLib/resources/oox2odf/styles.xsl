@@ -162,9 +162,11 @@
                   <xsl:value-of select="./@w:ilvl +1"/>
                 </xsl:attribute>
                 <xsl:attribute name="style:num-format">
-                  <xsl:call-template name="NumFormat">
-                    <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
-                  </xsl:call-template>
+                  <xsl:if test="./w:lvlText/@w:val != ''">
+                    <xsl:call-template name="NumFormat">
+                      <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
+                    </xsl:call-template>
+                  </xsl:if>
                 </xsl:attribute>
                 <xsl:if test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
                   <xsl:attribute name="style:num-suffix">
