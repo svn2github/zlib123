@@ -1,8 +1,8 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>CleverAge.OdfConverter.OdfConverterTest</RootNamespace>
-    <AssemblyName>OdfConverterTest</AssemblyName>
+    <RootNamespace>CleverAge.OdfConverter.CommandLineTool</RootNamespace>
+    <AssemblyName>OdfConverter</AssemblyName>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{289C4B72-B929-4E3D-808F-F622E275AC70}</ProjectGuid>
@@ -321,8 +321,6 @@
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="resources\tests\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
