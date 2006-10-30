@@ -89,10 +89,10 @@
       <xsl:call-template name="InsertHeaderFooterSettings"/>
 
       <!-- Automatically update fields -->
-      <xsl:if
+      <!--xsl:if
         test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='FieldAutoUpdate']/text()='true' ">
         <w:updateFields w:val="true"/>
-      </xsl:if>
+      </xsl:if-->
 
       <!-- Footnotes document wide properties -->
       <xsl:apply-templates
