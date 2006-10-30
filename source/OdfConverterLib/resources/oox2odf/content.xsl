@@ -36,8 +36,7 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-  exclude-result-prefixes="w">
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" exclude-result-prefixes="w">
 
   <xsl:import href="tables.xsl"/>
   <xsl:import href="lists.xsl"/>
@@ -59,10 +58,11 @@
         <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
           mode="automaticstyles"/>
         <xsl:if
-          test="document('word/document.xml')/w:document[descendant::w:numPr] or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr] ">
+          test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+          or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId] ">
           <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
-          </xsl:if>
-        </office:automatic-styles>
+        </xsl:if>
+      </office:automatic-styles>
       <office:body>
         <office:text>
           <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"/>
@@ -72,7 +72,9 @@
   </xsl:template>
 
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
-  <xsl:template match="w:pPr[parent::w:p]|w:r[parent::w:p and child::w:br and not(parent::w:p[child::wpPr])]" mode="automaticstyles">
+  <xsl:template
+    match="w:pPr[parent::w:p]|w:r[parent::w:p and child::w:br and not(parent::w:p[child::wpPr])]"
+    mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
       <xsl:if test="w:pStyle">
@@ -222,23 +224,23 @@
       </xsl:when>
       
       <!-- check if list starts -->
-     <xsl:when test="$numId != ''">
-       <xsl:choose>
-         <xsl:when test="document('word/numbering.xml')//w:numbering/w:num[@w:numId = $numId]">
-        <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
-        <xsl:if
-          test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and  count(preceding-sibling::w:p)= $position -1])">
-          <xsl:apply-templates select="." mode="list">
-              <xsl:with-param name="numId" select="$numId" />
-          </xsl:apply-templates>
-        </xsl:if>
-           </xsl:when>
-         <xsl:otherwise>
-           <xsl:apply-templates select="." mode="paragraph"/>
-         </xsl:otherwise>
-    </xsl:choose>
+      <xsl:when test="$numId != ''">
+        <xsl:choose>
+          <xsl:when test="document('word/numbering.xml')//w:numbering/w:num[@w:numId = $numId]">
+            <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
+            <xsl:if
+              test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and  count(preceding-sibling::w:p)= $position -1])">
+              <xsl:apply-templates select="." mode="list">
+                <xsl:with-param name="numId" select="$numId"/>
+              </xsl:apply-templates>
+            </xsl:if>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="." mode="paragraph"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
-      
+
       <!--  default scenario - paragraph-->
       <xsl:otherwise>
         <xsl:apply-templates select="." mode="paragraph"/>
@@ -248,43 +250,45 @@
 
   <!--gets numId if paragraph is a list-->
   <xsl:template name="GetNumId">
-    <xsl:param name="node" />
-    
+    <xsl:param name="node"/>
+
     <xsl:choose>
       <xsl:when test="$node/descendant::w:numPr">
         <xsl:value-of select="$node/descendant::w:numPr/w:numId/@w:val"/>
       </xsl:when>
-      
+
       <xsl:when test="$node/descendant::w:pStyle">
-        <xsl:variable name="pStyle" select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $node/descendant::w:pStyle/@w:val]" />
+        <xsl:variable name="pStyle"
+          select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $node/descendant::w:pStyle/@w:val]"/>
         <xsl:variable name="numId">
           <xsl:call-template name="CheckListStyle">
-            <xsl:with-param name="style" select="$pStyle" />
+            <xsl:with-param name="style" select="$pStyle"/>
           </xsl:call-template>
         </xsl:variable>
         <xsl:value-of select="$numId"/>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- checks for numId in styles hierarchy -->
-  <xsl:template name="CheckListStyle" >
-    <xsl:param name="style" />
+  <xsl:template name="CheckListStyle">
+    <xsl:param name="style"/>
     <xsl:choose>
       <xsl:when test="$style/descendant::w:numPr">
         <xsl:value-of select="$style/descendant::w:numPr/w:numId/@w:val"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:if test="$style/w:basedOn">
-          <xsl:variable name="parentStyle" select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $style/w:basedOn/@w:val]" />
+          <xsl:variable name="parentStyle"
+            select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $style/w:basedOn/@w:val]"/>
           <xsl:call-template name="CheckListStyle">
-            <xsl:with-param name="style" select="$parentStyle" />
+            <xsl:with-param name="style" select="$parentStyle"/>
           </xsl:call-template>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!--paragraph with outline level is a heading-->
   <xsl:template match="w:p" mode="heading">
     <xsl:param name="outlineLevel"/>
@@ -325,7 +329,7 @@
   <!-- paragraph which is the first element of a list-->
 
   <xsl:template match="w:p" mode="list">
-    <xsl:param name="numId" />
+    <xsl:param name="numId"/>
     <xsl:param name="nestedLevel" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
     <xsl:param name="level" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
     <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
@@ -403,8 +407,8 @@
         <xsl:if test="$nextListItem">
           <xsl:apply-templates select="$nextListItem" mode="list-item">
             <xsl:with-param name="nestedLevel">
-              <xsl:value-of
-                select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val - $level+$nestedLevel"/>
+              <xsl:value-of select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val - $level+$nestedLevel"
+              />
             </xsl:with-param>
             <xsl:with-param name="level">
               <xsl:value-of select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val"/>
@@ -709,10 +713,8 @@
   </xsl:template>
 
   <!-- line breaks  -->
-  <xsl:template match="w:br">
-    <xsl:if test="@w:type!='page' and @w:type!='column' ">
+  <xsl:template match="w:br[not(@w:type) or @w:type!='page' and @w:type!='column']">
       <text:line-break/>
-    </xsl:if>
   </xsl:template>
 
   <!-- page or column break must have style defined in paragraph -->
