@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfWord2007Addin", "OdfWord
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfWord2007AddinSetup", "OdfWord2007Addin\OdfWord2007AddinSetup\OdfWord2007AddinSetup.vdproj", "{05035DEA-21BC-490E-AEA7-A4C15F64ABFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfConverterTest", "OdfConverterTest\OdfConverterTest.csproj", "{289C4B72-B929-4E3D-808F-F622E275AC70}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineTool", "OdfConverterTest\CommandLineTool.csproj", "{289C4B72-B929-4E3D-808F-F622E275AC70}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfWordAddinLib", "OdfWordAddinLib\OdfWordAddinLib.csproj", "{0313EE78-AD27-47E0-9902-3149046E2F5D}"
 EndProject
