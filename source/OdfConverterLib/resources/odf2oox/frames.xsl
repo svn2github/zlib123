@@ -1868,9 +1868,15 @@
   <!--converts oo frame style properties to shape properties for text-box-->
   <xsl:template name="InsertShapeProperties">
     <xsl:param name="shapeStyle"/>
+    
+    <xsl:if test="ancestor::draw:a">
+      <xsl:attribute name="href">
+      <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
+      </xsl:attribute>
+    </xsl:if>    
 
     <xsl:attribute name="style">
-
+      
       <xsl:call-template name="InsertShapePositionProperties"/>
 
       <xsl:call-template name="InsertShapeSize"/>
