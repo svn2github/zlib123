@@ -349,11 +349,12 @@
     <!-- if first element of a list -->
     <xsl:if
       test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and count(preceding-sibling::w:p)= $position -1])">
+      <text:list text:style-name="{concat('L',$numId)}">
       <xsl:if
-        test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $numId and w:ilvl/@w:val = $level]]">
+        test="preceding-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $numId and w:ilvl/@w:val = $level]]">
         <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
       </xsl:if>
-      <text:list text:style-name="{concat('L',$numId)}">
+      
 
         <!-- convert element as list item -->
         <xsl:apply-templates select="." mode="list-item">
@@ -405,10 +406,6 @@
       </xsl:when>
 
       <xsl:otherwise>
-        <xsl:if
-          test="preceding-sibling::w:p[child::w:pPr/w:numP[w:numId/@w:val = $NumberingId and w:ilvl/@w:val = $level]]">
-          <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
-        </xsl:if>
         <text:list-item>
           <xsl:apply-templates select="." mode="paragraph"/>
         </text:list-item>
