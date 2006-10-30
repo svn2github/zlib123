@@ -29,7 +29,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace CleverAge.OdfConverter.OdfConverterTest
+namespace CleverAge.OdfConverter.CommandLineTool
 {
 
     /// <summary>Thrown whenever an error occurs during the build.</summary>

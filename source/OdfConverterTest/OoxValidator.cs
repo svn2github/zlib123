@@ -36,7 +36,7 @@ using System.Collections;
 using CleverAge.OdfConverter.OdfZipUtils;
 using CleverAge.OdfConverter.OdfConverterLib;
 
-namespace CleverAge.OdfConverter.OdfConverterTest
+namespace CleverAge.OdfConverter.CommandLineTool 
 {
 	/// <summary>Exception thrown when the file is not valid</summary>
 	public class OoxValidatorException : Exception

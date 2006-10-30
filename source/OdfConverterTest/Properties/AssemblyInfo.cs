@@ -38,7 +38,7 @@ using System.Resources;
 [assembly: AssemblyDescription("Converts files from the command line.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Clever Age")]
-[assembly: AssemblyProduct("CleverAge.OdfConverter.OdfConverterTest.Properties")]
+[assembly: AssemblyProduct("CleverAge.OdfConverter.CommandLineTool.Properties")]
 [assembly: AssemblyCopyright("Copyright © Clever Age 2006")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

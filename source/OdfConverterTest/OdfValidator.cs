@@ -39,7 +39,7 @@ using Tenuto.Reader;
 using Tenuto.Grammar;
 using Tenuto.Verifier;
 
-namespace CleverAge.OdfConverter.OdfConverterTest
+namespace CleverAge.OdfConverter.CommandLineTool
 {
 	/// <summary>Exception thrown when the file is not valid</summary>
 	public class OdfValidatorException : Exception
