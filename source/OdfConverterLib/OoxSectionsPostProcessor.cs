@@ -55,11 +55,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		private bool inNameAttr = false;
 		private bool inXmlnsPsectAttr = false;
 		
+		private Element evenAndOddHeaders;
+		
 		
 		public OoxSectionsPostProcessor(XmlWriter nextWriter):base(nextWriter)
 		{
 			this.stack = new Stack();
 			this.pageContext = new PageContext(stack, nextWriter);
+			this.evenAndOddHeaders = new Element("w", "evenAndOddHeaders", OOX_MAIN_NS);
 		}
 
 		public override void WriteString(string text)
@@ -93,11 +96,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			if (InGlobal())
 			{
 				this.inGlobal = true;
-			}
-			
-			if (InLocal())
+			} 
+			else if (InLocal())
 			{
 				this.inLocal = true;
+			}
+			else if (InEvenAndOddHeaders())
+			{
+				Console.WriteLine("page context = "+this.pageContext.EvenAndOddHeaders);
+				if (!this.pageContext.EvenAndOddHeaders) 
+				{
+					// do nothing
+				}
 			}
 			
 			if (this.inGlobal)
@@ -139,9 +149,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 				this.inGlobal = false;
 			}
 			
-			if (InLocal())
+			else if (InLocal())
 			{
 				this.inLocal = false;
+			}
+			
+			else if (InEvenAndOddHeaders())
+			{
+				if (!this.pageContext.EvenAndOddHeaders) 
+				{
+					// do nothing
+				}
 			}
 
 			stack.Pop();
@@ -228,6 +246,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			return n.Name.Equals("psect") && n.Prefix.Equals("xmlns");
 		}
 		
+		private bool InEvenAndOddHeaders() 
+		{
+			Node n = (Node) stack.Peek();
+			return n.Name.Equals("evenAndOddHeaders") && n.Ns.Equals(OOX_MAIN_NS);
+		}
+		
 		
 		/// <summary>
 		/// Keeps track of changes in page styles
@@ -236,10 +260,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		{
 			private string name;
 			private bool skip = false;
-			private bool continuous = false;
-			private bool pageBreak = false;
-			private bool sectionStarts = false;
-			private bool sectionEnds = false;
+			private bool nextIsContinuous = false;
+			private bool nextIsPageBreak = false;
+			private bool nextIsNewSection = false;
+			private bool nextIsEndSection = false;
+			private bool nextIsMasterPage = false;
 			private Element odfSectPr;
 			private Element cont;
 			private Element titlePg;
@@ -410,31 +435,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 						this.name = val;
 					}
 					
-					if (n.Name.Equals("page-break"))
+					if (n.Name.Equals("next-page-break"))
 					{
-						this.pageBreak = true;
-						this.skip = false;
-						// Determine the next master style name
-						if (pages.ContainsKey(this.name))
-						{
-							Page page = (Page) this.pages[this.name];
-							string nextStyle = page.GetAttributeValue("next-style", CA_SECTIONS_NS);
-							// a page break with no change in page style => no section needed
-							if (nextStyle.Length == 0)
-							{
-								this.skip = true;
-							}
-						}
+						this.nextIsPageBreak = true;
 					}
 					
-					if (n.Name.Equals("section-starts"))
+					if (n.Name.Equals("next-new-section"))
 					{
-						this.sectionStarts = true;
+						this.nextIsNewSection = true;
 					}
 
-					if (n.Name.Equals("section-ends"))
+					if (n.Name.Equals("next-end-section"))
 					{
-						this.sectionEnds = true;
+						this.nextIsEndSection = true;
+					}
+					
+					if (n.Name.Equals("next-master-page"))
+					{
+						this.nextIsMasterPage = true;
 					}
 				}
 			}
@@ -446,16 +464,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			/// </summary>
 			public void Update()
 			{
-				if (this.pageBreak && !this.skip)
+				if (this.nextIsPageBreak && !this.skip)
 				{
 					Page page = (Page) this.pages[this.name];
 					this.name = page.GetAttributeValue("next-style", CA_SECTIONS_NS);
 				}
 				
-				this.continuous = (this.sectionStarts || this.sectionEnds);
-				this.pageBreak = false;
-				this.sectionStarts = false;
-				this.sectionEnds = false;
+				this.nextIsContinuous = (this.nextIsNewSection || this.nextIsEndSection);
+				this.nextIsPageBreak = false;
+				this.nextIsNewSection = false;
+				this.nextIsEndSection = false;
+				this.nextIsMasterPage = false;
 				this.skip = false;
 				this.odfSectPr = null;
 			}
@@ -466,128 +485,165 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			/// </summary>
 			public void Write(XmlWriter nextWriter)
 			{
-				if (!this.skip && pages.ContainsKey(this.name))
+				if (pages.ContainsKey(this.name))
 				{
-					Page page = (Page) pages[this.name];
-					page.Use++;
+					Page page = (Page) this.pages[this.name];
 					
-					nextWriter.WriteStartElement("w", "sectPr", OOX_MAIN_NS);
-					
-					// header / footer reference
-					if (page.Use == 1)
+					// a page break with no change in page style => no section needed
+					if (this.nextIsPageBreak && !this.nextIsMasterPage)
 					{
-						ArrayList hdr = page.GetChildren("headerReference", OOX_MAIN_NS);
-						if (hdr.Count > 0) 
+						string nextStyle = page.GetAttributeValue("next-style", CA_SECTIONS_NS);
+						
+						if (nextStyle.Length == 0)
 						{
-							foreach (Element e in hdr)
+							this.skip = true;
+						}
+					}
+					
+					if (!this.skip)
+					{
+						page.Use++;
+						
+						nextWriter.WriteStartElement("w", "sectPr", OOX_MAIN_NS);
+						
+						// header / footer reference
+						if (page.Use == 1)
+						{
+							ArrayList hdr = page.GetChildren("headerReference", OOX_MAIN_NS);
+							if (hdr.Count > 0)
 							{
-								e.Write(nextWriter);
+								foreach (Element e in hdr)
+								{
+									if ("even".Equals(e.GetAttributeValue("type", OOX_MAIN_NS)))
+									{
+										page.EvenOdd = true;    	
+									}
+									e.Write(nextWriter);
+								}
+							}
+							
+							ArrayList ftr = page.GetChildren("footerReference", OOX_MAIN_NS);
+							if (ftr.Count > 0)
+							{
+								foreach (Element e in ftr)
+								{
+									if ("even".Equals(e.GetAttributeValue("type", OOX_MAIN_NS)))
+									{
+										page.EvenOdd = true;    	
+									}
+									e.Write(nextWriter);
+								}
 							}
 						}
 						
-						ArrayList ftr = page.GetChildren("footerReference", OOX_MAIN_NS);
-						if (ftr.Count > 0) 
-						{
-							foreach (Element e in ftr)
-							{
-								e.Write(nextWriter);
-							}
-						}
-					}
-					
-					// footnotes config
-					Element footnotePr = null;
-					if (this.sectionEnds &&
-					    (footnotePr = (Element) this.odfSectPr.GetChild("footnotePr", OOX_MAIN_NS)) != null)
-					{
-						footnotePr.Write(nextWriter);
-					}
-					else
-					{
-						if ((footnotePr = (Element) page.GetChild("footnotePr", OOX_MAIN_NS))!= null)
+						// footnotes config
+						Element footnotePr = null;
+						if (this.nextIsEndSection &&
+						    (footnotePr = (Element) this.odfSectPr.GetChild("footnotePr", OOX_MAIN_NS)) != null)
 						{
 							footnotePr.Write(nextWriter);
 						}
-					}
-					
-					// endnotes config
-					Element endnotePr = null;
-					if (this.sectionEnds &&
-					    (endnotePr = (Element) this.odfSectPr.GetChild("endnotePr", OOX_MAIN_NS)) != null)
-					{
-						endnotePr.Write(nextWriter);
-					}
-					else
-					{
-						if ((endnotePr = (Element) page.GetChild("endnotePr", OOX_MAIN_NS))!= null)
+						else
+						{
+							if ((footnotePr = (Element) page.GetChild("footnotePr", OOX_MAIN_NS))!= null)
+							{
+								footnotePr.Write(nextWriter);
+							}
+						}
+						
+						// endnotes config
+						Element endnotePr = null;
+						if (this.nextIsEndSection &&
+						    (endnotePr = (Element) this.odfSectPr.GetChild("endnotePr", OOX_MAIN_NS)) != null)
 						{
 							endnotePr.Write(nextWriter);
 						}
-					}
-					
-					// continuity
-					if (this.continuous)
-					{
-						cont.Write(nextWriter);
-					}
-					
-					// pgSz
-					Element pgSz = (Element) page.GetChild("pgSz", OOX_MAIN_NS);
-					if (pgSz != null)
-					{
-						pgSz.Write(nextWriter);
-					}
-					
-					// pgMar
-					Element pgMar = (Element) page.GetChild("pgMar", OOX_MAIN_NS);
-					if (pgMar != null)
-					{
-						pgMar.Write(nextWriter);
-					}
-					
-					// pgBorders
-					Element pgBorders = (Element) page.GetChild("pgBorders", OOX_MAIN_NS);
-					if (pgBorders != null)
-					{
-						pgBorders.Write(nextWriter);
-					}
+						else
+						{
+							if ((endnotePr = (Element) page.GetChild("endnotePr", OOX_MAIN_NS))!= null)
+							{
+								endnotePr.Write(nextWriter);
+							}
+						}
+						
+						// continuity
+						if (this.nextIsContinuous)
+						{
+							cont.Write(nextWriter);
+						}
+						
+						// pgSz
+						Element pgSz = (Element) page.GetChild("pgSz", OOX_MAIN_NS);
+						if (pgSz != null)
+						{
+							pgSz.Write(nextWriter);
+						}
+						
+						// pgMar
+						Element pgMar = (Element) page.GetChild("pgMar", OOX_MAIN_NS);
+						if (pgMar != null)
+						{
+							pgMar.Write(nextWriter);
+						}
+						
+						// pgBorders
+						Element pgBorders = (Element) page.GetChild("pgBorders", OOX_MAIN_NS);
+						if (pgBorders != null)
+						{
+							pgBorders.Write(nextWriter);
+						}
 
-                    // lnNumType
-                    Element lnNumType = (Element)page.GetChild("lnNumType", OOX_MAIN_NS);
-                    if (lnNumType != null)
-                    {
-                        lnNumType.Write(nextWriter);
-                    }
+						// lnNumType
+						Element lnNumType = (Element)page.GetChild("lnNumType", OOX_MAIN_NS);
+						if (lnNumType != null)
+						{
+							lnNumType.Write(nextWriter);
+						}
 
-                    // pgNumType
-                    Element pgNumType = (Element)page.GetChild("pgNumType", OOX_MAIN_NS);
-                    if (pgNumType != null)
-                    {
-                        pgNumType.Write(nextWriter);
-                    }
+						// pgNumType
+						Element pgNumType = (Element)page.GetChild("pgNumType", OOX_MAIN_NS);
+						if (pgNumType != null)
+						{
+							pgNumType.Write(nextWriter);
+						}
 
-					// columns
-					Element cols = (Element) page.GetChild("cols", OOX_MAIN_NS);
-					if (cols != null)
-					{
-						cols.Write(nextWriter);
-					}
-					else
-					{
-						if (this.sectionEnds &&
-						    (cols = (Element) this.odfSectPr.GetChild("cols", OOX_MAIN_NS)) != null)
+						// columns
+						Element cols = (Element) page.GetChild("cols", OOX_MAIN_NS);
+						if (cols != null)
 						{
 							cols.Write(nextWriter);
 						}
-					}
-					
-					// titlePg
+						else
+						{
+							if (this.nextIsEndSection &&
+							    (cols = (Element) this.odfSectPr.GetChild("cols", OOX_MAIN_NS)) != null)
+							{
+								cols.Write(nextWriter);
+							}
+						}
+						
+						// titlePg
 //					if (page.GetAttributeValue("name", CA_SECTIONS_NS).Equals("First_20_Page"))
 //					{
 //						this.titlePg.Write(nextWriter);
 //					}
-					
-					nextWriter.WriteEndElement(); // end sectPr
+						
+						nextWriter.WriteEndElement(); // end sectPr
+					}
+				}
+			}
+			
+			public bool EvenAndOddHeaders
+			{
+				get {
+					ICollection coll = pages.Values;
+					foreach (Page page in coll) 
+					{
+						if (page.EvenOdd) {
+							return true;
+						}
+					}
+					return false;
 				}
 			}
 		}
@@ -595,10 +651,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		protected class Page : Element
 		{
 			private int use;
+			private bool evenOdd;
 			
 			public int Use {
 				get { return use; }
 				set { use = value; }
+			}
+			
+			public bool EvenOdd {
+				get { return evenOdd; }
+				set { evenOdd = value; }
 			}
 			
 			public Page(string prefix, string name, string ns)
