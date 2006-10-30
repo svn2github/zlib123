@@ -131,21 +131,22 @@
 <!-- insert heading list style -->
   <xsl:template name="HeadingList">
     <xsl:param name="node"/>
+    <xsl:for-each select="$node">
     <xsl:variable name="outlineLevel">
       <xsl:call-template name="GetOutlineLevel">
-        <xsl:with-param name="node" select="$node"/>
+        <xsl:with-param name="node" select="."/>
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$outlineLevel !=''">
         <xsl:variable name="numid">
           <xsl:choose>
-            <xsl:when test="$node/w:pPr/w:numPr">
-              <xsl:value-of select="$node/w:pPr/w:numPr/w:numId/@w:val"/>
+            <xsl:when test="w:pPr/w:numPr">
+              <xsl:value-of select="w:pPr/w:numPr/w:numId/@w:val"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:variable name="styleId">
-                <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
+                <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
               </xsl:variable>
               <xsl:value-of select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:pPr/w:numPr/w:numId/@w:val"/>
             </xsl:otherwise>
@@ -201,13 +202,14 @@
         </xsl:if>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="count($node/following::w:p) != 0">
+        <xsl:if test="count(following::w:p) != 0">
           <xsl:call-template name="HeadingList">
-            <xsl:with-param name="node" select="$node/following::w:p"/>
+            <xsl:with-param name="node" select="following::w:p[1]"/>
           </xsl:call-template>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
   
   <xsl:template name="Count">
