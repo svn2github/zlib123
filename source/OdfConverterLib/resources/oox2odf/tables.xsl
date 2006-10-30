@@ -396,7 +396,12 @@
             <xsl:variable name="width">
               <xsl:call-template name="ConvertTwips">
                 <xsl:with-param name="length">
-                  <xsl:value-of select="$tcBorder/@w:sz"/>
+                  <xsl:choose>
+                    <xsl:when test="$tcBorder/@w:sz != 0">
+                      <xsl:value-of select="$tcBorder/@w:sz"/>
+                    </xsl:when>
+                    <xsl:otherwise>2</xsl:otherwise>
+                  </xsl:choose>
                 </xsl:with-param>
                 <xsl:with-param name="unit">cm</xsl:with-param>
               </xsl:call-template>
