@@ -939,13 +939,20 @@
 
     <!-- widow and orphan-->
     <xsl:choose>
-      <xsl:when test="w:widowControl/@w:val='0'"> </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="w:widowControl/@w:val='0'">
         <xsl:attribute name="fo:widows">
           <xsl:value-of select="1"/>
         </xsl:attribute>
         <xsl:attribute name="fo:orphans">
           <xsl:value-of select="1"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:widows">
+          <xsl:value-of select="2"/>
+        </xsl:attribute>
+        <xsl:attribute name="fo:orphans">
+          <xsl:value-of select="2"/>
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
