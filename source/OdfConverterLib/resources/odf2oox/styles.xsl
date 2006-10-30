@@ -610,14 +610,9 @@
         </xsl:call-template>
       </xsl:attribute>
       <!-- first line indent -->
-      <xsl:variable name="firstLine">
+      <xsl:variable name="firstLineIndent">
         <xsl:call-template name="GetFirstLineIndent">
           <xsl:with-param name="style" select="parent::style:style"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:variable name="firstLineIndent">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="concat($firstLine, 'pt')"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:choose>
@@ -2219,9 +2214,12 @@
           </xsl:when>
           <xsl:when
             test="$style/style:paragraph-properties/@style:auto-text-indent='true' and $style/style:text-properties/@fo:font-size">
-            <xsl:call-template name="computeSize">
-              <xsl:with-param name="node" select="$style/style:text-properties"/>
-            </xsl:call-template>   
+            <xsl:variable name="fontSize">
+              <xsl:call-template name="computeSize">
+                <xsl:with-param name="node" select="$style/style:text-properties"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat($fontSize div 2, 'pt')"/>
           </xsl:when>
           <xsl:when test="$style/ancestor::office:automatic-styles">
             <xsl:for-each select="document('styles.xml')">
@@ -2233,9 +2231,13 @@
                 </xsl:when>
                 <xsl:when
                   test="key('styles', $styleName)/style:paragraph-properties/@fo:auto-text-indent='true' and key('styles',$styleName)/style:text-properties/@fo:font-size">
-                  <xsl:call-template name="computeSize">
-                    <xsl:with-param name="node" select="key('styles', $styleName)[1]/style:text-properties"/>
-                  </xsl:call-template>   
+                  <xsl:variable name="fontSize">
+                    <xsl:call-template name="computeSize">
+                      <xsl:with-param name="node"
+                        select="key('styles', $styleName)[1]/style:text-properties"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:value-of select="concat($fontSize div 2, 'pt')"/>
                 </xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
