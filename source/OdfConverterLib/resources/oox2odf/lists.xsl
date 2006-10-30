@@ -128,12 +128,61 @@
   
   <xsl:template name="ListLevelProperties">
     <xsl:variable name="Ind" select="w:pPr/w:ind"/> 
-    <xsl:attribute name="text:space-before">
-      <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:hanging)"/>
-    </xsl:attribute>
-    <xsl:attribute name="text:min-label-width">
-      <xsl:value-of select="number($Ind/@w:hanging)"/>
-    </xsl:attribute>
+    <xsl:variable name="tab" select="w:pPr/w:tabs/w:tab"/>
+    <xsl:choose>
+      <xsl:when test="$Ind/@w:hanging">
+        <xsl:attribute name="text:space-before">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+                  <xsl:value-of select="$Ind/@w:left - $Ind/@w:hanging"/>    
+              </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:attribute name="text:min-label-width">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+                  <xsl:value-of select="number($Ind/@w:hanging)"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:attribute name="text:min-label-distance">
+              <xsl:choose>
+                <xsl:when test="number($Ind/@w:hanging) &lt; (number($tab/@pos) - number($Ind/@w:left)) ">
+                  <xsl:value-of select="number($tab/@pos) - number($Ind/@w:left)"/>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="text:space-before">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+                  <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:firstLine)"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:attribute name="text:min-label-width">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="number($Ind/@w:firstLine)"/>
+              </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:attribute name="text:min-label-distance">
+              <xsl:choose>
+                <xsl:when test="(3 * number($Ind/@w:firstLine)) &lt; (number($tab/@pos) - number($Ind/@w:left)) ">
+                  <xsl:value-of select="number($tab/@pos) - number($Ind/@w:left) - (2 * number($Ind/@w:firstLine))"/>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+         </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <!-- types of bullets -->
