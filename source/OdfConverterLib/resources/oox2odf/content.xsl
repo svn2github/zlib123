@@ -459,9 +459,7 @@
 
   
   <xsl:template match="w:drawing">
-    <xsl:if test="not(name(/node())= 'w:hdr') and not(name(/node())= 'w:ftr')">
-      <xsl:apply-templates select="wp:inline | wp:anchor"/>
-    </xsl:if>
+    <xsl:apply-templates select="wp:inline | wp:anchor"/>
   </xsl:template>
   
   

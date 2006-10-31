@@ -45,20 +45,32 @@
   <!-- Pictures conversion needs copy of image files in zipEnrty to work correctly (but id does't crash  -->
  
   <xsl:template match="wp:inline | wp:anchor">
-    <xsl:param name="document"/>
-    <xsl:value-of select="$document"/>
-<xsl:choose>
     
-    <xsl:when test="not(name(/node()) = 'w:hdr') and not(name(/node()) = 'w:ftr') ">
+    <xsl:variable name="document1">
+      <xsl:call-template name="GetDocumentName">
+        <xsl:with-param name="rootId">
+          <xsl:value-of select="generate-id(/node())"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="document">
+    <xsl:choose>
+      <xsl:when test="$document1 != ''">
+        <xsl:value-of select="$document1"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>document.xml</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+    </xsl:variable>
+    
     <xsl:call-template name="CopyPictures">
-      <xsl:with-param name="document">document.xml</xsl:with-param>
+      <xsl:with-param name="document">
+        <xsl:value-of select="$document"/>
+      </xsl:with-param>
     </xsl:call-template>
       
-    </xsl:when>
-  <xsl:otherwise>
-  </xsl:otherwise>
-  </xsl:choose>
-    
     <draw:frame text:anchor-type="paragraph">
       <!-- TODO: @draw:style-name @text:anchor-type -->
       
@@ -74,9 +86,9 @@
         <xsl:variable name="id">
           <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
         </xsl:variable>
-        <xsl:if test="document('word/_rels/document.xml.rels')">
+        <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
           <xsl:for-each
-            select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
+            select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
             
             <xsl:if test="./@Id=$id">
               <xsl:variable name="pzipsource">

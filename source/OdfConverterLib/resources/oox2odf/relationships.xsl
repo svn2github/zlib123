@@ -25,32 +25,7 @@
     
   <xsl:template name="CopyPictures">
     <xsl:param name="document"/>
-
-
-        <xsl:if test="name(document(concat('word/',$document))//node()) = 'w:hdr'">
-          <xsl:for-each
-            select="document(concat('word/',$document))//w:hdr/w:p/w:r/w:drawing/wp:inline|document(concat('word/',$document))//w:hdr/w:p/w:r/w:drawing/wp:anchor">
-            <xsl:variable name="pziptarget">
-              <xsl:value-of select="wp:docPr/@name"/>
-            </xsl:variable>
-            <xsl:variable name="id">
-              <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
-            </xsl:variable>
-            <xsl:for-each
-              select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
-              <xsl:if test="./@Id=$id">
-                <xsl:variable name="pzipsource">
-                  <xsl:value-of select="./@Target"/>
-                </xsl:variable>
-                <pzip:copy pzip:source="word/{$pzipsource}" pzip:target="pictures/{$pziptarget}"/>
-                
-              </xsl:if>
-            </xsl:for-each>
-          </xsl:for-each>
-        </xsl:if>
-    
-        <xsl:if test="name(document(concat('word/',$document))//node()) = 'w:document'">
-        
+          
         <!--  Copy Pictures Files to the picture catalog -->
 
         <xsl:variable name="id">
@@ -74,8 +49,18 @@
 
           </xsl:for-each>
         </xsl:if>
-          </xsl:if>
   </xsl:template>
 
+    <xsl:template name="GetDocumentName">
+      <xsl:param name="rootId"/>
+      <xsl:for-each select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-after(@Target,'.') = 'xml']">
+        <xsl:variable name="target">
+       <xsl:value-of select="./@Target"/>
+        </xsl:variable>
+        <xsl:if test="generate-id(document(concat('word/',$target))//node()) = $rootId">
+          <xsl:value-of select="$target"/>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:template>
 
 </xsl:stylesheet>
