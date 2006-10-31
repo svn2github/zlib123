@@ -24,7 +24,7 @@ To test the program, you need :
 OdfConverterTest Usage
 ----------------------
 
-OdfConverterTest.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level]
+OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level]
     Where options are:
        /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)
        /O PathOrFilename  Name of the output file (or output folder)
