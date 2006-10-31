@@ -103,7 +103,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			}
 			else if (InEvenAndOddHeaders())
 			{
-				Console.WriteLine("page context = "+this.pageContext.EvenAndOddHeaders);
 				if (!this.pageContext.EvenAndOddHeaders) 
 				{
 					// do nothing
