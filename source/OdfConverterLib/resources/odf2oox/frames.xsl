@@ -133,7 +133,7 @@
 
   <!-- conversion of external images -->
   <xsl:template
-    match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[not(starts-with(@xlink:href, 'Pictures/'))]]"
+    match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[@xlink:href and not(starts-with(@xlink:href, 'Pictures/'))]]"
     mode="paragraph">
     <xsl:variable name="supported">
       <xsl:call-template name="image-support">
