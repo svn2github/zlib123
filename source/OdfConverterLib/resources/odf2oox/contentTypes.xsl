@@ -37,6 +37,8 @@
       <Default Extension="png" ContentType="image/png"/>
       <Default Extension="wmf" ContentType="image/x-emf"/>
       <Default Extension="emf" ContentType="image/x-emf"/>
+      <Default Extension="tif" ContentType="image/tiff"/>
+      <Default Extension="tiff" ContentType="image/tiff"/>
       <Default Extension="bin" ContentType="application/vnd.openxmlformats-officedocument.oleObject"/>
       <Default Extension="rels"
         ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
