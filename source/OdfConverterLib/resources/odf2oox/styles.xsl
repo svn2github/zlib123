@@ -1336,9 +1336,9 @@
           <xsl:when test="$styleType">
             <xsl:value-of select="$styleType"/>
           </xsl:when>
-          <xsl:when test="@style:type">
-            <xsl:value-of select="@style:type"/>
-          </xsl:when>
+          <xsl:when test="@style:type = 'left' ">left</xsl:when>
+          <xsl:when test="@style:type = 'right' ">right</xsl:when>
+          <xsl:when test="@style:type = 'center' ">center</xsl:when>
           <xsl:otherwise>left</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
