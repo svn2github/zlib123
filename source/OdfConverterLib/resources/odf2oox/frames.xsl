@@ -1286,7 +1286,7 @@
       />
     </xsl:variable>
     <xsl:choose>
-      <!-- position Frame  "Bottom to Page Text:Area" -->            
+      <!-- Frame  position  "Bottom to Page Text:Area" -->            
       <xsl:when test="$style_vertical_pos='bottom' and $style_vertical_rel='page-content' and key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-bottom">              
         <xsl:variable name="y">
           <xsl:call-template name="point-measure">
@@ -1295,16 +1295,24 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:value-of select="-1*$y"/>
+        <xsl:variable name="svg-width">
+          <xsl:call-template name="point-measure">
+            <xsl:with-param name="length">
+              <xsl:value-of select="parent::draw:frame/draw:text-box/@fo:min-height"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>        
+        <xsl:value-of select="-1*($y+$svg-width)"/>
       </xsl:when>
       <!-- position Frame  "Top to Page Text:Area" -->
-      <xsl:when test="$style_vertical_pos='top' and $style_vertical_rel='page-content' and key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-top">        
+      <xsl:when test="$style_vertical_pos='top' and ($style_vertical_rel='page-content' or $style_vertical_rel='page')  and key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-top">
         <xsl:call-template name="point-measure">
           <xsl:with-param name="length">
             <xsl:value-of select="key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-top"/>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
+
       <xsl:when test="$parent">
         <xsl:variable name="recursive_result">
           <xsl:call-template name="ComputeMarginY">
@@ -1328,7 +1336,14 @@
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
-              <xsl:value-of select="$svg_y + $translation_top"/>
+              <xsl:choose>
+                <xsl:when test="$style_vertical_rel='char'">
+                  <xsl:value-of select="-1*($svg_y + $translation_top)"/>                  
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$svg_y + $translation_top"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:when>
             <xsl:when test="$parent[1]/@svg:y">
               <xsl:call-template name="point-measure">
@@ -1519,7 +1534,7 @@
     </xsl:if>
     <!-- top margin -->
     <xsl:if
-      test="parent::draw:frame/@svg:y or contains(parent::draw:frame/@draw:transform,'translate') or (($shapeStyle/style:graphic-properties/@style:vertical-pos='bottom' or $shapeStyle/style:graphic-properties/@style:vertical-pos='top') and $shapeStyle/style:graphic-properties/@style:vertical-rel='page-content') ">
+      test="parent::draw:frame/@svg:y or contains(parent::draw:frame/@draw:transform,'translate') or (($shapeStyle/style:graphic-properties/@style:vertical-pos='bottom' or $shapeStyle/style:graphic-properties/@style:vertical-pos='top') and ($shapeStyle/style:graphic-properties/@style:vertical-rel='page-content' or $shapeStyle/style:graphic-properties/@style:vertical-rel='page'))">
       <xsl:variable name="topM">
         <xsl:call-template name="ComputeMarginY">
           <xsl:with-param name="parent" select="ancestor::draw:frame"/>
@@ -1568,17 +1583,18 @@
     </xsl:variable>
     <xsl:choose>
       <!-- Frame position "Bottom to Page Text:Area" -->
-      <xsl:when test="$shapeStyle/style:graphic-properties/@style:vertical-pos='bottom' and $shapeStyle/style:graphic-properties/@style:vertical-rel='page-content'">
+      <xsl:when test="$shapeStyle/style:graphic-properties/@style:vertical-pos='bottom' and $shapeStyle/style:graphic-properties/@style:vertical-rel='page-content' and key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-bottom">
         <xsl:text>mso-position-vertical-relative:bottom-margin-area;</xsl:text>
       </xsl:when>
-      <!-- position Frame  "Top to Page Text:Area" -->
-      <xsl:when test="$shapeStyle/style:graphic-properties/@style:vertical-pos='top' and $shapeStyle/style:graphic-properties/@style:vertical-rel='page-content'">
+      <!-- Frame position  "Top to Page Text:Area" -->
+      <xsl:when test="$shapeStyle/style:graphic-properties/@style:vertical-pos='top' and $shapeStyle/style:graphic-properties/@style:vertical-rel='page-content' and  key('Index', parent::draw:frame/@draw:style-name)/style:graphic-properties/@fo:margin-top">
         <xsl:text>mso-position-vertical-relative:margin;</xsl:text>
       </xsl:when>
-      <!-- position Frame"Center to Page Text:Area" -->      
+      <!-- Frame position "Center to Page Text:Area" -->      
       <xsl:when test="$verticalRel = 'page'  or ( $verticalRel = 'page-content' and $shapeStyle/style:graphic-properties/@style:vertical-pos='middle' ) ">
 		mso-position-vertical-relative:page;
 	</xsl:when>
+
       <xsl:when test="$verticalRel = 'text' or $verticalRel = 'page-content' "
         >mso-position-vertical-relative:text;</xsl:when>
       <xsl:when test="$verticalRel = 'char' or $verticalRel = 'line' or $verticalRel = 'baseline' "
@@ -1612,6 +1628,13 @@
       <xsl:call-template name="GetGraphicProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
         <xsl:with-param name="attribName">style:vertical-pos</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="vertical-rel">
+      <xsl:call-template name="GetGraphicProperties">
+      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      <xsl:with-param name="attribName">style:vertical-rel</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
@@ -1650,8 +1673,18 @@
     </xsl:if>
 
     <!-- vertical position-->
-    <xsl:if test="$verticalPos and not(($shapeStyle/style:graphic-properties/@style:vertical-pos='bottom' or $shapeStyle/style:graphic-properties/@style:vertical-pos='top') and $shapeStyle/style:graphic-properties/@style:vertical-rel='page-content')">   
+    <xsl:if test="$verticalPos and not(($shapeStyle/style:graphic-properties/@style:vertical-pos='bottom' or $shapeStyle/style:graphic-properties/@style:vertical-pos='top') and $shapeStyle/style:graphic-properties/@style:vertical-rel='page-content') and not ($shapeStyle/style:graphic-properties/@style:vertical-pos='top' and $shapeStyle/style:graphic-properties/@style:vertical-rel='page')">   
       <xsl:choose>
+        
+        <!-- Frame Position Top to Line of the text (To character)-->
+        <xsl:when test="$verticalPos='top' and $vertical-rel='line'">
+          <xsl:value-of select="concat('mso-position-vertical:', 'bottom',';')"/>
+        </xsl:when>
+        <!-- Frame Position Bottom to Line of the text (To character)-->
+        <xsl:when test="$verticalPos='bottom' and $vertical-rel='line'">
+          <xsl:value-of select="concat('mso-position-vertical:', 'top',';')"/>
+        </xsl:when>
+        
         <xsl:when test="$verticalPos = 'middle'">
           <xsl:value-of select="concat('mso-position-vertical:', 'center',';')"/>
         </xsl:when>
