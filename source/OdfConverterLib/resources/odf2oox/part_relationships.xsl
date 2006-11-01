@@ -134,7 +134,7 @@
           <xsl:with-param name="name" select="@xlink:href"/>
         </xsl:call-template>
       </xsl:variable>
-      <xsl:if test="$supported = 'true' ">
+      <xsl:if test="@xlink:href and $supported = 'true' ">
         <xsl:choose>
           <!-- Internal image -->
           <xsl:when test="starts-with(@xlink:href, 'Pictures/')">

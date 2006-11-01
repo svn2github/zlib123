@@ -257,14 +257,16 @@
               <xsl:text>pt</xsl:text>
             </xsl:if>
           </xsl:attribute>
-          <v:imagedata>
-            <xsl:attribute name="r:id">
-              <xsl:value-of select="generate-id(.)"/>
-            </xsl:attribute>
-            <xsl:attribute name="o:title">
-              <xsl:value-of select="@xlink:href"/>
-            </xsl:attribute>
-          </v:imagedata>
+          <xsl:if test="@xlink:href">
+            <v:imagedata>
+              <xsl:attribute name="r:id">
+                <xsl:value-of select="generate-id(.)"/>
+              </xsl:attribute>
+              <xsl:attribute name="o:title">
+                <xsl:value-of select="@xlink:href"/>
+              </xsl:attribute>
+            </v:imagedata>
+          </xsl:if>
         </v:shape>
       </w:pict>
     </w:numPicBullet>
