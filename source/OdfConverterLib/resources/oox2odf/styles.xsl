@@ -1122,25 +1122,11 @@
     <xsl:variable name="firstVal">
       <xsl:choose>
         <xsl:when
-          test="w:pBdr/w:right/@w:shadow='true' or w:pBdr/w:right/@w:shadow=1 or w:pBdr/w:right/@w:shadow='on'">
-          <xsl:call-template name="ConvertPoints">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pBdr/w:right/@w:space"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
+          test="w:pBdr/w:right/@w:shadow='true' or w:pBdr/w:right/@w:shadow=1 or w:pBdr/w:right/@w:shadow='on'">0.0701in</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when
-              test="w:pBdr/w:left/@w:shadow='true' or w:pBdr/w:left/@w:shadow=1 or w:pBdr/w:left/@w:shadow='on'">
-              <xsl:call-template name="ConvertPoints">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pBdr/w:left/@w:space"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
+              test="w:pBdr/w:left/@w:shadow='true' or w:pBdr/w:left/@w:shadow=1 or w:pBdr/w:left/@w:shadow='on'">0.0701in</xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
@@ -1150,25 +1136,11 @@
     <xsl:variable name="secondVal">
       <xsl:choose>
         <xsl:when
-          test="w:pBdr/w:bottom/@w:shadow='true' or w:pBdr/w:bottom/@w:shadow=1 or w:pBdr/w:bottom/@w:shadow='on'">
-          <xsl:call-template name="ConvertPoints">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pBdr/w:bottom/@w:space"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
+          test="w:pBdr/w:bottom/@w:shadow='true' or w:pBdr/w:bottom/@w:shadow=1 or w:pBdr/w:bottom/@w:shadow='on'">0.0701in</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when
-              test="w:pBdr/w:top/@w:shadow='true' or w:pBdr/w:top/@w:shadow=1 or w:pBdr/w:top/@w:shadow='on'">
-              <xsl:call-template name="ConvertPoints">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:pBdr/w:top/@w:space"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
+              test="w:pBdr/w:top/@w:shadow='true' or w:pBdr/w:top/@w:shadow=1 or w:pBdr/w:top/@w:shadow='on'">0.0701in</xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
