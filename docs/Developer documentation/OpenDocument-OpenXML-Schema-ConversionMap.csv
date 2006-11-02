@@ -53,17 +53,17 @@ meta:document-statistic/@meta:character-count converted to CharactersWithSpaces"
 ;Custom Metadata;;;;;;;;
 Text Content;;;;;;;;;
 ;Headings, Paragraphs and Basic Text Structure;;;;;;;;
-;;Headings;0;0.2-M1;Partial;;"text:h is converted to a w:document/w:body/w:p paragraph.
+;;Headings;0;0.2-M1;Completed;;"text:h is converted to a w:document/w:body/w:p paragraph.
 text:h/@text:outline-level is translated to w:p/w:pPr/w:outLineLvi";;
 ;;Paragraphs;0;0.1;Completed;;text:p is converted to w:document/w:body/w:p;;
 ;;Common Paragraph Elements Attributes;0;0.2-Final;;;text:p/@text:style-name converted to w:styles/w:style;TODO : class-names, cond-style-name;
 ;Page Sequences;;;;;;;;
 ;;Page;;0.2-Final;;;;TODO : investigate;
 ;Lists;;;;;;;;
-;;List Block;;0.2-M1;Partial;;text:list/@text:style-name translated to w:p/w:pPr/w:pStyle/@w:val;TODO : @continue-numbering, @text:start-value;
-;;List Item;0;0.2-M1;Completed;jslaurent;text:list-item is translated to a paragraph with w:pPr/w:numPr descendant set a follow :  w:ilvi child is the item level starting at 0. w:numId identifier is based on the relative position of this element's style. If necessary, indent and tab added to override abstractNum (cf list-level-number).;TODO: check this formatted-number, @start-value;
+;;List Block;;0.2-M1;Completed;;text:list/@text:style-name translated to w:p/w:pPr/w:pStyle/@w:val;TODO : @continue-numbering, @text:start-value;
+;;List Item;;0.2-M1;Completed;jslaurent;text:list-item is translated to a paragraph with w:pPr/w:numPr descendant set a follow :  w:ilvi child is the item level starting at 0. w:numId identifier is based on the relative position of this element's style. If necessary, indent and tab added to override abstractNum (cf list-level-number).;TODO: check this formatted-number, @start-value;
 ;;List Header;;0.2-M1;Completed;jslaurent;text:list-header translated to w:p. No numPr property,indent  w:ind calculated based on the level in the list.;what is the equivalent feature in Word? Also no idea how to create such a List Header in OO.;
-;;Numbered Paragraphs;0;0.2-Final ?;;;;TODO : investigate;
+;;Numbered Paragraphs;;;;;;TODO : investigate;
 ;Text Sections;;;0.2-Final;;;;TODO : investigate;
 ;;Section Attributes;2;;;;;seems to be related to Word sections, but not one-to-one;
 ;;Section Source;;;;;;;
@@ -77,29 +77,29 @@ text:h/@text:outline-level is translated to w:p/w:pPr/w:outLineLvi";;
 ;;Format Change;2;;Completed;;format change elements are ignored;;
 ;;Change Info;2;;Completed;;change info is used within change marks;;
 ;;Change Marks;2;;Partial;;text:change-start is transformed into pct:start-insert, text:change-end is tranformed into pct:end-insert and text:change is transformed into pct:deletion. Those are then handled by a post processor. Format change is still to be handled.;;
-;Text Declarations;;;?;;;;;
+;Text Declarations;;;;;;;;
 Paragraph Elements Content;;;;;;;;;
 ;Basic Text Content;;;;;;;;
 ;;White-space Characters;0;0.1;Completed;;"Extra space characters text:c elements are injected into w:t elements by looking at the 
 text:p or text:span following siblings
 Tab character text:tab is translated to a run including a tabulation <w:r><w:tab/></w:r>
 Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";;
-;;Soft Hyphens, Hyphens, and Non-breaking Blanks;0;0.1;Completed? ;;;TODO : check this is really completed;
+;;Soft Hyphens, Hyphens, and Non-breaking Blanks;0;0.1;Completed;;Post processed;;
 ;;Attributed Text;0;0.2-Final;Partial;;text:span @style-name treated;TODO : class-names;
-;;Hyperlinks;0;0.2-M1;Partial;;text:a is converted to w:hyperlink where attribute r:id is the result of the generate-id() function;TODO : name: link-location, target-frames, text-styles;
-;Bookmarks and References;;;0.2-M1;;;;TODO : investigate;
-;;Bookmarks;2;;;;;;
-;;References;2;;;;;;
-;Notes;;;0.2-M1;;;;;
-;;Note Element;0;;Partial;;"Extra space characters text:c elements are injected into w:t elements by looking at the 
+;;Hyperlinks;0;0.3-M2;Partial;;text:a is converted to w:hyperlink where attribute r:id is the result of the generate-id() function;TODO : frames;
+;Bookmarks and References;;;;;;;;
+;;Bookmarks;;0.2-Final;Completed;mkaminski;;;
+;;References;;0.2-Final;Completed;mkaminski;;;
+;Notes;;;;;;;;
+;;Note Element;0;0.2-Final;Completed;;"Extra space characters text:c elements are injected into w:t elements by looking at the 
 text:p or text:span following siblings
 Tab character text:tab is translated to a run including a tabulation <w:r><w:tab/></w:r>
 Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>";;
 ;Ruby;;;0.2-Final;;;;;
-;Text Annotation;;;0.2-Final;;;;;
-;Index Marks;;3;0.2-Final;;;;;
-;Change Tracking and Change Marks;;2;0.2-Final;;;;;
-;Inline graphics and text-boxes;;1;;;;;;
+;Text Annotation;;;0.2-Final;Completed;;;;
+;Index Marks;;;;;;;;
+;Change Tracking and Change Marks;;;0.2-Final;Completed;;;;
+;Inline graphics and text-boxes;;;0.2-Final;Completed;;;;
 Text Fields;;;;;;;;in a first step, fixed text fields could be converted as text (does not work for dynamic fields such as page numbers!);
 ;Common Characteristics of Field Elements;;;;;;;;
 ;Document Fields;;1;;;;;;
@@ -395,16 +395,12 @@ Styles;;;;;;;;;
 ;Default Styles;;1;0.2-M1;Completed;;"office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties is translated to w:docDefaults/w:rPrDefault.
 office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:paragraph-properties translated to w:docDefaults/w:pPrDefault.
 ";;
-;Page Layout;;1;0.2-Final;;;;a page style concept does not exist in Word (roundtrip won't work);
-;;Header and Footer Styles;1;0.2-Final;Partial;;"For each office:document-styles/office:master-styles/style:master-page are created a file headerX.xml, footerX.xml, _rels/headerX.xml.rels, _rels/footerX.xml.rels.
-The content of headerX.xml and footerX.xml are generated like document.xml and _rels/headerX.xml.rels, _rels/footerX.xml.rels contains relations for images and hyperlinks.
-""Odd and even page"" are checked if there are a style with : $style1/@style:name =  $style2/@style:next-style-name and $style1/@style:next-style-name = $style2/@style:name. It's the tag w:settings/w:evenAndOddHeaders.
-If there are not odd and even page, the master style used is ""Standard"".
-""Different first page"" are checked if the style ""First page"" is used.  It's the tag w:document/w:body/w:sectPr/w:titlePg";"There are  a different first page in OOX only if the style ""first page"" is used in ODF.
-If there are many odd and even page, only one is kept and odd and even pages may be inverted.";
+;Page Layout;;1;0.2-Final;Completed;yves;style:page-layout-properties converted to w:sectPr properties;a page style concept does not exist in Word (roundtrip won't work);
+;;Header and Footer Styles;1;0.2-Final;Completed;yves;"converted to w:sectPr/w:headerReference and w:sectPr/w:footerReference. 
+The r:id attribute is based on generate-id(). This id must be used only once throughout the resulting w:document tree.";;
 ;Master Pages;;1;0.2-Final;;;;;
-;;Headers and Footers;1;0.2-Final;;;;header and footer belong to the page style!;
-;;Presentation Notes;1;0.2-Final;;;;;
+;;Headers and Footers;1;0.2-Final;Completed;yves;For each office:document-styles/office:master-styles/style:master-page  a file named headerX.xml, footerX.xml, _rels/headerX.xml.rels, _rels/footerX.xml.rels, where 'X' is the position of the node in the node set. ;header and footer belong to the page style!;
+;;Presentation Notes;1;0.2-Final;Completed;yves;footnotes and endnotes configurations are encapsulated into w:sectPr/w:footnotePR and w:sectPr/w:endnotePR;;
 ;Table Templates;;2;0.2-Final;;;;;
 ;;Row and Column Styles;2;0.2-Final;;;;;
 ;Font Face Declaration;;0;;;;;;
@@ -454,8 +450,8 @@ TODO : concerning footntes : handle master page, default note paragraph style, F
 footnotes positions 'section' and 'document' don't seem to have counterpart in OOX.";
 ;;Bibliography Configuration;3;0.2-Final;;;;;
 ;List Style;;;;;;;;
-;;Common List-Level Style Attributes;1;0.2-M1;Complete;;"text:level translated to <w:lvl w:ilvl=""{number(@text:level) - 1}"">";;
-;;Number Level Style;1;0.2-M1;Partial;jslaurent;"text:display-number is involved in the generation of w:lvlText/@w:val format string. When display-number is encountered, ""display-levels"" template is recursively called until text:display-number has been reached.
+;;Common List-Level Style Attributes;1;0.2-M1;Completed;;"text:level translated to <w:lvl w:ilvl=""{number(@text:level) - 1}"">";;
+;;Number Level Style;1;0.2-M1;Completed;jslaurent;"text:display-number is involved in the generation of w:lvlText/@w:val format string. When display-number is encountered, ""display-levels"" template is recursively called until text:display-number has been reached.
 style:num-format is translated to w:numFmt/@w:val as  :
 1 -> decimal
 i -> lowerRoman
@@ -465,13 +461,14 @@ A -> upperLetter
 otherwise decimal.
 style:num-format may also be empty. In this case, it is translated to lvlText/@w:val = '' if  no text:display-number has been specified. Otherwise, numbering is skipped when ""display-levels"" is called on an empty num-format.
 text:start-value is converted to w:start/@w:val";TODO : Name of style displayed.;
-;;Bullet Level Style;1;0.2-M1;Partial;;"w:lvl/w:numFmt/@w:val set to 'bullet'
+;;Bullet Level Style;1;0.2-M1;Completed;;"w:lvl/w:numFmt/@w:val set to 'bullet'
 w:lvl/w:lvlText/@w:val set to @text:bullet-char
 w:lvl/w:lvlJc/@w:val set to ""left""
 Same indentation properties as for text:list-level-style-number";"TODO : some bullet characters are not correctly converted 
 style:num-format-prefix, style:num-format-suffix
 bullet-relative-size";
-;;Image Level Style;3;0.2-Final;;;;;
+;;Image Level Style;3;0.2-Final;Completed;;"w:lvl/w:numFmt/@w:val set to 'bullet'
+w:lvl/w:lvlPicBulletId";;
 ;;List Level Style Example;;;;;;;
 ;Outline Style;;1;;;;;;
 ;;Outline Level Style;1;0.2-Final;Completed;;w:ilvi child is the item level starting at 0.;;
@@ -496,44 +493,59 @@ Formatting Properties;;;;;;;;;
 ;;Simple Formatting Properties;;;;;;;
 ;;Complex Formatting Properties;1;;;;;seems to be important, see example in ODF documentation on page 541;
 ;;Processing Rules for Formatting Properties;;;;;;;
-;Page Layout Formatting Properties;;1;0.2-Final;;;;;
-;;Page Size;1;0.2-Final;;;;;
-;;Page Number Format;1;0.2-Final;;;;;
-;;Paper Tray;2;0.2-Final;;;;;
-;;Print Orientation;0;0.2-Final;;;;;
-;;Margins;0;0.2-Final;;;;;
-;;Border;2;0.2-Final;;;;;
-;;Border Line Width;2;0.2-Final;;;;;
-;;Padding;1;0.2-Final;;;;;
-;;Shadow;2;0.2-Final;;;;;
+;Page Layout Formatting Properties;;;;;;Page layout properties are converted to OpenXml section properties;;
+;;Page Size;1;0.2-Final;Completed;gwen;"page-width converted to w:sectPr/w:pgSz/@w:w
+@fo:page-height converted to w:sectPr/w:pgSz/@w:h";;
+;;Page Number Format;1;0.2-Final;;jslaurent;"style:num-format converted to w:sectPr/w:pgNumType/w:fmt.
+'i' <-> 'lowerRoman'
+'I' <-> 'upperRoman'
+'a' <-> 'lowerLetter'
+'A' <-> 'upperLetter'";;
+;;Paper Tray;2;0.3-M2;;;;;
+;;Print Orientation;0;0.2-Final;Completed;gwen;"style:print-orientation = 'landscape' converted to w:pgSz/@w:orient='landscape"", otherwise ""portrait""";;
+;;Margins;0;0.2-Final;;gwen;"w:pgMar/w:top  determined by  style:page-layout-properties/(@fo:padding(-top) + @fo:margin(-top) + ../style:header-footer-properties/style:header-style/(@fo:min-height or @svg:height)) 
+w:pgMar/w:bottom determined by style:page-layout-properties/(@fo:padding(-bottom) + @fo:margin(-botttom) + ../style:header-footer-properties/style:footer-style/(@fo:min-height or @svg:height)) 
+w:pgMar/w:left determined by style:page-layout-properties/(@fo:padding(-left) + @fo:margin(-left))
+w:pgMar/w:right determined by style:page-layout-properties/(@fo:padding(-right) + @fo:margin(-right))
+
+";;
+;;Border;2;0.2-Final;Completed;jslaurent;"border(-side) converted to w:sectPr/pgBorders/w:(side)/@w:val, 
+where side in {top, left, bottom, right}";;
+;;Border Line Width;2;0.2-Final;Completed;jslaurent;cf  Paragraph Formatting Properties;;
+;;Padding;1;0.2-Final;;jslaurent;cf page Margins;;
+;;Shadow;2;0.2-Final;Completed;jslaurent;"style:shadow converted to w:pgBorder/w:top|w:left|w:bottom|w:right/@w:shadow=""true""";;
 ;;Background;2;0.2-Final;Partial;jslaurent;style:page-layout-properties/@fo:background color converted to w:document/w:background/@w:color, for the master-page referring to the page-layout style (cf test).;TODO : manage different  background color on different pages.;
-;;Columns;0;0.2-Final;;;;;
-;;Register-truth;3;0.2-Final;;;;;
-;;Print;;0.2-Final;;;;refers to spreadsheets, some of the remaining also;
-;;Print Page Order;;0.2-Final;;;;;
-;;First Page Number;;0.2-Final;;;;;
-;;Scale;;0.2-Final;;;;;
-;;Table Centering;;0.2-Final;;;;;
-;;Maximum Footnote Height;2;0.2-Final;;;;;
-;;Writing Mode;;0.2-Final;;;;;
-;;Footnote Separator;2;0.2-Final;;;;;
-;;Layout Grid;;0.2-Final;;;;refers to Asian layout grids;
-;;Layout Grid Base Height;;0.2-Final;;;;;
-;;Layout Grid Ruby Height;;0.2-Final;;;;;
-;;Layout Grid Lines;;0.2-Final;;;;;
-;;Layout Grid Color;;0.2-Final;;;;;
-;;Layout Grid Ruby Below;;0.2-Final;;;;;
-;;Layout Grid Print;;0.2-Final;;;;;
-;;Layout Grid Display;;0.2-Final;;;;;
-;Header Footer Formatting Properties;;0;0.2-M1;;;;;
-;;Fixed and Minimum heights;0;0.2-M1;;;;;
-;;Margins;0;0.2-M1;;;;;
-;;Border;2;0.2-M1;;;;;
-;;Border Line Width;2;0.2-M1;;;;;
-;;Padding;1;0.2-M1;;;;;
-;;Background;2;0.2-M1;;;;;
-;;Shadow;3;0.2-M1;;;;;
-;;Dynamic Spacing;3;0.2-M1;;;;;
+;;Columns;0;0.2-Final;;gwen;"style:columns converted to w:sectPr/w:cols
+@fo:column-count converted to w:cols/@w:num
+@fo:column-gap converted to w:cols/w:space otherwise w:cols/w:equalWidth=""0""
+
+";;
+;;Register-true;3;0.2-Final;-;yves;No equivalent in OpenXml;;
+;;Print;;0.3-M1;;;;refers to spreadsheets, some of the remaining also;
+;;Print Page Order;;0.3-M1;;;;;
+;;First Page Number;;0.3-M1;;;;;
+;;Scale;;0.3-M1;;;;;
+;;Table Centering;;0.3-M1;;;;;
+;;Maximum Footnote Height;;0.3-M1;;;;;
+;;Writing Mode;;0.3-M1;;;;;
+;;Footnote Separator;;0.3-M1;;;;;
+;;Layout Grid;;0.3-M1;;;;refers to Asian layout grids;
+;;Layout Grid Base Height;;0.3-M1;;;;;
+;;Layout Grid Ruby Height;;0.3-M1;;;;;
+;;Layout Grid Lines;;0.3-M1;;;;;
+;;Layout Grid Color;;0.3-M1;;;;;
+;;Layout Grid Ruby Below;;0.3-M1;;;;;
+;;Layout Grid Print;;0.3-M1;;;;;
+;;Layout Grid Display;;0.3-M1;;;;;
+;Header Footer Formatting Properties;;0;0.2-Final;;;;;
+;;Fixed and Minimum heights;0;0.2-Final;Completed;yves;style:master-page/style:header-style/style:header-footer-properties/@fo:min-height or @svg:height is converted to w:sectPr/w:pgMar/w:header. ;;
+;;Margins;0;0.2-Final;-;yves;No equivalent in OpenXml;;
+;;Border;2;0.2-Final;-;yves;No equivalent in OpenXml;;
+;;Border Line Width;2;0.2-Final;-;yves;No equivalent in OpenXml;;
+;;Padding;1;0.2-M1;-;yves;No equivalent in OpenXml;;
+;;Background;2;0.2-M1;-;yves;No equivalent in OpenXml;;
+;;Shadow;3;0.2-M1;-;yves;No equivalent in OpenXml;;
+;;Dynamic Spacing;3;0.2-M1;-;yves;No equivalent in OpenXml;;
 ;Text Formatting Properties;;0;0.2-M1;;;;;
 ;;Font Variant;1;0.2-M1;Completed;;style:text-properties/@fo:font-variant convert to w:styles/w:style/w:rPr/w:smallCaps;;
 ;;Text Transformations;1;0.2-M1;Completed;;style:text-properties/@fo:text-transform convert to w:styles/w:style/w:rPr/w:caps;;
@@ -548,7 +560,7 @@ Formatting Properties;;;;;;;;;
 ;;Line Through Text Style;3;0.2-M1;Completed;;;The translation is lost, because line through feature is richer in ODF than in OOX;
 ;;Text Position;1;0.2-M1;Completed;;style:text-properties/@style:text-position convert to w:styles/w:style/w:rPr/w:vertAlign;;
 ;;Font Name;1;0.1;Completed;Jslaurent;Find @svg:font-family that has sam font-face as style:text-properties/@style:font-name, and copy to /w:styles/w:style/w:rPr/w:rFonts/@w:ascii and @w:hAnsi attributes;;
-;;Font Family;0;0.1;Partial;;"style:style/@style:font-family converted to w:styles/w:style/@w:type
+;;Font Family;0;0.1;Completed;;"style:style/@style:font-family converted to w:styles/w:style/@w:type
 'text' family matches 'character' type.
 'graphic', 'section' and 'paragraph' families match 'paragraph' type. ";;
 ;;Font Family Generic;0;0.2-M1;Completed;;style:font-face/@style:font-family-generic convert to w:fonts/w:font/w:family;;
@@ -558,8 +570,8 @@ style:style[@fo:font-style-complex='italic'] converted to w:styles/w:style/w:rPr
 ;;Font Character Set;1?;0.2-M1;Completed;;style:font-face/@style:font-charset convert to w:fonts/w:font/w:charset;;
 ;;Font Size;0;0.1;Completed;;"style:text-properties/@fo:font-size converted to w:styles/w:style/w:rPr/@w:sz
 If fo:font-size is expressed in percentage of a parent font-size, we climb up the style ancestors until we find an absolute size (expressed in points). If none was found, the size of the default style (office:styles/style:default-style)  in the same family is used. ";;
-;;Relative Font Size;1;0.2-M1;Partial;;;not available in Open Office?;
-;;Script Type;2;0.2-M1;Partial;;w:pPr/w:spacing based on style:paragraph-properties/@fo:line-height;;
+;;Relative Font Size;1;0.2-M1;Completed;;The style hiereachy is climbed up until we find an absolute font-size. Otherwise, the default font-size for the same style family is used.;;
+;;Script Type;2;0.2-M1;Completed;;w:pPr/w:spacing based on style:paragraph-properties/@fo:line-height;;
 ;;Letter Spacing;2;0.2-M1;Completed;;style:text-properties/@fo:letter-spacing convert to w:styles/w:style/w:rPr/w:spacing;;
 ;;Language;0;0.2-M1;Completed;;style:text-properties/@fo:language convert to w:styles/w:style/w:rPr/w:lang concatenated with country;;
 ;;Country;2;0.2-M1;Completed;;style:text-properties/@fo:country convert to w:styles/w:style/w:rPr/w:lang concatenated with language;;
@@ -588,25 +600,25 @@ style:text-properties/@fo:font-complex-weight translated to w:styles/w:style/w:r
 ;;Letter Kerning;2;0.2-M1;Completed;;style:text-properties/@style:letter-kerning convert to w:styles/w:style/w:rPr/w:kern;;
 ;;Text Blinking;3;0.2-M1;Completed;;;The translation is lost, because line through feature is richer in ODF than in OOX;
 ;;Text Background Color;1;0.2-M1;Completed;Jslaurent;style:text-properties/@fo:background-color convert to w:styles/w:style/w:rPr/w:highlight. RGB color code converted to a string code.;;
-;;Text Combine;?;0.2-M1;Completed;;style:text-properties/@style:text-combine convert to w:styles/w:style/w:rPr/w:eastAsianLayout;Is for Asian languages, it's to combine characters so that they are displayed within two lines ;
-;;Text Combine Start and End Characters;?;0.2-M1;Completed;;style:text-properties/@style:text-combine-start-char and  style:text-properties/@style:text-combine-end-char convert to w:styles/w:style/w:rPr/w:eastAsianLayout/@w:combineBrackets;The translation might be lossy, because underline feature is richer in ODF than in OOX;
+;;Text Combine;;0.2-M1;Completed;;style:text-properties/@style:text-combine convert to w:styles/w:style/w:rPr/w:eastAsianLayout;Is for Asian languages, it's to combine characters so that they are displayed within two lines ;
+;;Text Combine Start and End Characters;;0.2-M1;Completed;;style:text-properties/@style:text-combine-start-char and  style:text-properties/@style:text-combine-end-char convert to w:styles/w:style/w:rPr/w:eastAsianLayout/@w:combineBrackets;The translation might be lossy, because underline feature is richer in ODF than in OOX;
 ;;Text Emphasis;;0.2-M1;Completed;;style:text-properties/@style:text-emphasize convert to w:styles/w:style/w:rPr/w:em;The translation might be lossy, because underline feature is richer in ODF than in OOX;
 ;;Text Scale;3;0.2-M1;Completed;;style:text-properties/@style:text-scale convert to w:styles/w:style/w:rPr/w:w;;
-;;Text Rotation Angle;3;0.2-M1;Partial;;;might not directly exist in Word! Simulated via text boxes?;
-;;Text Rotation Scale;3;0.2-M1;Partial;;;might not directly exist in Word! Simulated via text boxes?;
+;;Text Rotation Angle;;-;;;No equivalent in OpenXml;;
+;;Text Rotation Scale;;-;;;No equivalent in OpenXml;;
 ;;Hyphenation;3;0.2-M1;Completed;jslaurent;w:autoHyphenation added in settings.xml. fo:hyphenate converted to w:suppressAutoHyphenation=true or false.;;
 ;;Hyphenation Remain Char Count;3;0.2-M1;Completed;jslaurent;;Not available in Word.;
 ;;Hyphenation Push Char Count;3;0.2-M1;Completed;jslaurent;;Not available in Word.;
 ;;Hidden or Conditional Text;0;0.2-M1;Partial;;style:text-properties/@text:display convert to w:styles/w:style/w:rPr/w:vanish;There are a bug beetwen open office and ODF, conditional text don't existe in OOX;
 ;Paragraph Formatting Properties;;;0.2-M1;;;;;
-;;Fixed Line Height;1;0.2-M1;Partial;;"styles:paragraph-properties/@fo:line-height translated to w:styles/w:style/w:pPr/w:spacing
-@w:lineRule set to 'auto' if @w:line is expressed in percentage, otherwise, it is set to 'exact'. Attribute @w:line is the twip (twentieth of a point) measure of line-height";mapping to Word has to be defined;
-;;Minimum Line Height;1;0.2-M1;Partial;;"styles:paragraph-properties/@style:line-height-at-least translated to w:styles/w:style/w:pPr/w:spacing
+;;Fixed Line Height;1;0.2-M1;Completed;;"styles:paragraph-properties/@fo:line-height translated to w:styles/w:style/w:pPr/w:spacing
+@w:lineRule set to 'auto' if @w:line is expressed in percentage, otherwise, it is set to 'exact'. Attribute @w:line is the twip (twentieth of a point) measure of line-height";;
+;;Minimum Line Height;1;0.2-M1;Completed;;"styles:paragraph-properties/@style:line-height-at-least translated to w:styles/w:style/w:pPr/w:spacing
 @w:lineRule set to 'atLeast' and @w:line is the twip measure of line-height ";;
 ;;Line Distance;1;0.2-M1;Completed;Jslaurent;"style:paragraph-properties/@fo:keep-together='always' converted to w:styles/w:style/w:pPr/w:keepLines.
 style:paragraph-properties/@style:line-spacing converted to w:styles/w:style/w:pPr/w:spacing/@w:line, distance is added to normal spacing.";Bad result;
 ;;Font-Independent Line Spacing;1;0.2-M1;;;;;
-;;Text Align;0;0.2-M1;Partial;;"style:paragraph-properties/@fo:text-align converted to w:styles/w:style/w:pPr/w:jc.Translated values are :
+;;Text Align;0;0.2-M1;Completed;;"style:paragraph-properties/@fo:text-align converted to w:styles/w:style/w:pPr/w:jc.Translated values are :
 center -> center
 start -> left
 end -> right
@@ -626,8 +638,8 @@ Format .odt has more options for @style:leader-style for example: dot-dash, dot-
 ;;Tab Stop Distance;0;0.2-M1;;;;;
 ;;Hyphenation Keep;;0.2-M1;Completed;jslaurent;;Not available in Word.;
 ;;Maximum Hyphens;;0.2-M1;Completed;jslaurent;w:consecutiveHyphenLimit added to settings.xml. The value is 0, which means no-limit. It cannot be overwritten.;;
-;;Drop Caps;2;0.2-M1;;;;For Word in Text Formatting Properties;
-;;Register True;3;0.2-M1;;;;mapping to Word has to be defined;
+;;Drop Caps;2;0.3-M2;;;;For Word in Text Formatting Properties;
+;;Register True;3;0.2-M1;-;;No equivalent in OpenXml;;
 ;;Left and Right Margins;0;0.1;Completed;;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
 respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:style/w:pPr/w:ind/@w:right (Convertion to twip units is required).";;
 ;;Text Indent;0;0.1;Completed;;"style:paragraph-properties/@fo:left-margin and style:paragraph-properties/@fo:right-margin are 
@@ -637,10 +649,10 @@ respectively translated to w:styles/w:style/w:pPr/w:ind/@w:left and w:styles/w:s
 ;;Top and Bottom Margins;0;0.1;Completed;;"style:paragraph-properties/@fo:margin-top converted to w:styles/w:style/w:pPr/w:spacing/@w:before
 style:paragraph-properties/@fo:margin-right converted to w:styles/w:style/w:pPr/w:spacing/@w:after";;
 ;;Margins;0;0.2-M1;Completed;;style:paragraph-properties/@fo:margin-top and margin-bottom translated to w:styles/w:style/w:pPr/w:spacing/@fo:margin-top and margin-bottom;;
-;;Break Before and Break After;0;0.2-M1;Partial;;style:paragraph-properties/@fo:break-before='page' converted to w:styles/w:style/w:pPr/w:pageBreakBefore. fo:break-after='page' converted to <w:br w:style='page'/> at the end of every paragraph of the given style.;Break before doesn't exist in Word;
-;;Paragraph Background Color;1;0.1;Partial;;"style:paragraph-properties/@fo:background-color translated to w:styles/w:style/w:pPr/w:shd/@w:fill
+;;Break Before and Break After;0;0.2-M1;Completed;;style:paragraph-properties/@fo:break-before='page' converted to w:styles/w:style/w:pPr/w:pageBreakBefore. fo:break-after='page' converted to <w:br w:style='page'/> at the end of every paragraph of the given style.;Break before doesn't exist in Word;
+;;Paragraph Background Color;1;0.1;Completed;;"style:paragraph-properties/@fo:background-color translated to w:styles/w:style/w:pPr/w:shd/@w:fill
 Attribute @w:val is set to 'solid'";;
-;;Paragraph Background Image;3;0.2-M1;;;;not available in Word?;
+;;Paragraph Background Image;3;0.2-M1;-;;No equivalent in OpenXml;;
 ;;Border;1;0.2-M1;Completed;jslaurent;style:paragraph-properties/@fo:border translated to w:styles/w:style/w:pPr/w:pBdr/@w:color and @w:sz Attribute @w:val is not always converted precisely, best approaching solution chosen(template BorderStyle in common.xsl). @style:join-border converted w:pBdr/w:between.;;
 ;;Border Line Width;2;0.2-M1;Completed;jslaurent;Converted to w:pBdr/@w:val in case pragraph-properties/@fo:border='double'. Cf above.;not available in Word?;
 ;;Padding;2;0.2-M1;Partial;;style:paragraph-properties/@fo:padding translated to w:styles/w:style/w:pPr/w:pBdr/@w:space. Value limited to 31pt in oox. Padding generates indent : w:ind attribute added after w:pBdr. Same value as padding (in twips).;;
@@ -660,16 +672,24 @@ Attribute @w:val is set to 'solid'";;
 ;Ruby Text Formatting Properties;;;;;;;;
 ;;Ruby Position;;;;;;;
 ;;Ruby Alignment;;;;;;;
-;Section Formatting Properties;;;;;;;;
-;;Section Background;2;0.2-Final;;;;;
-;;Margins;0;0.2-Final;;;;;
-;;Columns;0;0.2-Final;;;;;
-;;Column Specification;1;;;;;;
-;;Column Separator;2;;;;;;
-;;Protect;2;;;;;;
-;;Don&#39;3;;;;;;
-;;Writing Mode;;;;;;;
-;;Notes Configuration;;;;;;not available in Word?;
+;Section Formatting Properties;;;;;yves;"A text:section element is translated to a continuous OpenXml section. 
+That is a w:sectPr with child property w:type/@w:val=""continuous"". The following w:sectPr must also be continuous.
+Text:section's style are indexed under <xsl:key name=""sections"" match=""style:style[@style:family='section']"" use=""@style:name""/>";;
+;;Section Background;2;0.2-Final;-;yves;-;;
+;;Margins;0;0.2-Final;Completed;yves;-;;
+;;Columns;0;0.2-Final;Completed;yves;"style:columns converted to w:cols
+@fo:column-count converted to w:cols/@w:num
+@fo:column-gap converted to w:cols/w:space otherwise w:cols/w:equalWidth=""0""
+
+";Columns separator attributes are lost;
+;;Column Specification;1;0.2-Final;;yves;style:columns/style:column converted to w:cols/w:col;;
+;;Column Separator;2;0.2-Final;;yves;"style:column-sep converted to w:cols/@w:sep=""1""";;
+;;Protect;2;0.3-M1;;;;;
+;;Dont Balance Text Columns;;;-;;No equivalent in OpenXml;;
+;;Writing Mode;;0.3-M1;;;;;
+;;Notes Configuration;;0.2-Final;Completed;yves;"Sections footnote configuration are encapsulated into w:sectPr/w:footnotePr
+, endnotes configuration are encapsulated into w:sectPr/w:endnotePr.
+See Enhanced Element Types - Notes Configuration Element for the details of the transformation.";;
 ;Table Formatting Properties;;1;;;;;to be analysed in more detail (some elements might not be required, e.g. Page Number element);
 ;;Table Width;1;0.1;Completed;;"The table style name table:table/@table:style-name is set to w:tbl/w:tblPr/w:tblStyle/@w:val.
 style:table-properties/@style:width for this table style name is converted to w:tbl/w:tblPr/w:tblW/@w:w";;
