@@ -1561,21 +1561,33 @@
         <xsl:with-param name="attribName">style:horizontal-rel</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:variable name="horizontalPos">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="fomarginright">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">fo:margin-right</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
     <xsl:choose>
       <!-- Frame Position Horizontal  ... to "Left page border"  -->
       <xsl:when test="$horizontalRel = 'page-start-margin' "
         >mso-position-horizontal-relative:left-margin-area;</xsl:when>
-      <!-- Frame Position Horizontal  ... to "Left page border"  -->
-      <xsl:when test="$horizontalRel = 'page-end-margin' ">
-        mso-position-horizontal-relative:right-margin-area; </xsl:when>
-      <xsl:when test="$horizontalRel = 'page' ">mso-position-horizontal-relative:page;</xsl:when>
+      <!-- Frame Position Horizontal  ".. to Right" or Horizontal Left (From Left) to Paragraph End Margin or Horizontal Right to Entrie page (without Spacing Right)-->
+      <xsl:when test="$horizontalRel = 'page-end-margin' or ($horizontalRel='paragraph-end-margin' and ($horizontalPos='left' or $horizontalPos='from-left')) or ($horizontalRel = 'page'  and $horizontalPos='right' and ($fomarginright='' or $fomarginright='0cm'))">mso-position-horizontal-relative:right-margin-area; </xsl:when>
+      <!-- Frame Position "Horizontal ... to EntriePage" without (Horizontal Right to Entrie Page  with Spacing Right>0)-->
+      <xsl:when test="$horizontalRel = 'page'  and not($horizontalPos='right' and ($fomarginright='' or $fomarginright='0cm'))">mso-position-horizontal-relative:page;</xsl:when>
       <xsl:when test="$horizontalRel = 'page-content' ">mso-position-horizontal-relative:text;</xsl:when>
       <xsl:when test="$horizontalRel = 'char' ">mso-position-horizontal-relative:char;</xsl:when>
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="parent::draw:frame/@text:anchor-type = 'page' "
             >mso-position-horizontal-relative:page;</xsl:when>
-          <xsl:when test="parent::draw:frame/@text:anchor-type = 'paragraph' "
+          <xsl:when test="parent::draw:frame/@text:anchor-type = 'paragraph' and not($horizontalRel = 'page-end-margin' and $horizontalPos='left' )"
             >mso-position-horizontal-relative:text;</xsl:when>
           <xsl:when
             test="parent::draw:frame/@text:anchor-type = 'char' or parent::draw:frame/@text:anchor-type = 'as-char' "
@@ -1635,6 +1647,13 @@
         <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    
+    <xsl:variable name="horizontalRel">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">style:horizontal-rel</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
 
     <xsl:variable name="verticalPos">
       <xsl:call-template name="GetGraphicProperties">
@@ -1673,14 +1692,14 @@
           <xsl:value-of select="concat('mso-position-horizontal:', 'center',';')"/>
         </xsl:when>
         <xsl:when
-          test="($horizontalPos='left' and ($fo_margin_left='' or not($fo_margin_left != 0))) ">
+          test="($horizontalPos='left' and ($fo_margin_left='' or not($fo_margin_left !='0cm')) and not($horizontalRel='page')) ">
           <xsl:value-of select="concat('mso-position-horizontal:', 'left',';')"/>
         </xsl:when>
         <xsl:when
-          test="($horizontalPos='right' and ($fo_margin_right='' or not($fo_margin_right != 0)))">
+          test="($horizontalPos='right' and (($fo_margin_right='' or not($fo_margin_right !='0cm')) or $horizontalRel='page-start-margin')) or ($horizontalPos='right' and $horizontalRel='char')">
           <xsl:value-of select="concat('mso-position-horizontal:', 'right',';')"/>
         </xsl:when>
-        <xsl:otherwise/>
+        <xsl:otherwise></xsl:otherwise>
       </xsl:choose>
     </xsl:if>
 
