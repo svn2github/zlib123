@@ -1579,17 +1579,7 @@
 
     <xsl:if test="w:vanish">
       <xsl:attribute name="text:display">
-        <xsl:choose>
-          <xsl:when test="w:vanish/@w:val='off' or w:vanish/@w:val='false' or w:vanish/@w:val=0">
-            <xsl:value-of select="'true'"/>
-          </xsl:when>
-          <xsl:when test="w:vanish/@w:val='on' or w:vanish/@w:val='true' or w:vanish/@w:val=1">
-            <xsl:value-of select="'none'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'true'"/>
-          </xsl:otherwise>
-        </xsl:choose>
+         <xsl:value-of select="'none'"/>
       </xsl:attribute>
     </xsl:if>
 
