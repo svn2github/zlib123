@@ -1565,19 +1565,15 @@
       </xsl:attribute>
     </xsl:if>
 
-    <xsl:if test="w:emboss or w:imprint">
+    <xsl:if test="w:imprint">
       <xsl:attribute name="style:font-relief">
-        <xsl:choose>
-          <xsl:when test="w:imprint/@w:val='on' or w:imprint/@w:val='true' or w:imprint/@w:val=1">
-            <xsl:value-of select="'engraved'"/>
-          </xsl:when>
-          <xsl:when test="w:emboss/@w:val='on' or w:emboss/@w:val='true' or w:emboss/@w:val=1">
-            <xsl:value-of select="'embossed'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'none'"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="'engraved'"/>
+      </xsl:attribute>
+    </xsl:if>
+    
+    <xsl:if test="w:emboss">
+      <xsl:attribute name="style:font-relief">
+        <xsl:value-of select="'embossed'"/>
       </xsl:attribute>
     </xsl:if>
 
