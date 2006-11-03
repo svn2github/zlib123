@@ -1180,14 +1180,39 @@
     </xsl:choose>
     
     <xsl:choose>
-      <xsl:when test="$verticalPos='from-top' and $verticalRel='page'">
+      <xsl:when test="$verticalPos='top' ">
+        <xsl:text>mso-position-vertical:top;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$verticalPos='bottom' ">
+        <xsl:text>mso-position-vertical:bottom;</xsl:text>
+      </xsl:when>  
+      <xsl:when test="$verticalPos='middle' ">
+        <xsl:text>mso-position-vertical:center;  </xsl:text>
+      </xsl:when> 
+      <xsl:when test="$verticalPos='from-top'">
         <xsl:text>mso-position-vertical-relative:top-margin-area;</xsl:text>
       </xsl:when>
-      <xsl:when test="$verticalPos='from-top'">
+    </xsl:choose>
+    
+    <xsl:choose>
+      <xsl:when test="$verticalRel='page'">        
+        <xsl:text>mso-position-vertical-relative:top-margin-area;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$verticalRel='page-content'">        
         <xsl:text>mso-position-vertical-relative:margin;</xsl:text>
       </xsl:when>
+      <xsl:when test="$verticalRel='paragraph'">        
+        <xsl:text>mso-position-vertical-relative:line;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$verticalRel='paragraph-content'">        
+        <xsl:text>mso-position-vertical-relative:line;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$verticalRel='char'">        
+        <xsl:text>mso-position-vertical-relative:line;</xsl:text>
+      </xsl:when>
     </xsl:choose>
-  
+    
+    
   </xsl:template>
 
   <!--insert shape z-index -->
