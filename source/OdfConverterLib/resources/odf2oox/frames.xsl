@@ -1104,15 +1104,41 @@
         <xsl:with-param name="length" select="@svg:y"/>
       </xsl:call-template>
     </xsl:variable>
+    
     <xsl:value-of select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;')"/>
-    <xsl:if
-      test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:horizontal-pos='from-left'">
-      <xsl:text>mso-position-horizontal-relative:margin;</xsl:text>
-    </xsl:if>
-    <xsl:if
-      test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:vertical-pos='from-top'">
-      <xsl:text>mso-position-vertical-relative:margin;</xsl:text>
-    </xsl:if>
+    
+    <xsl:variable name="horizontalRel">
+      <xsl:value-of select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:horizontal-rel"/>
+    </xsl:variable>
+    <xsl:variable name="horizontalPos">
+      <xsl:value-of select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:horizontal-pos"/>
+    </xsl:variable>
+    
+    <xsl:variable name="verticalPos">
+      <xsl:value-of select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:vertical-pos"/>
+    </xsl:variable>
+    <xsl:variable name="verticalRel">
+      <xsl:value-of select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:vertical-rel"/>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$horizontalPos='from-left' and $horizontalRel='paragraph'">
+        <xsl:text>mso-position-horizontal-relative:left-margin-area;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalPos='from-left'">
+        <xsl:text>mso-position-horizontal-relative:margin;</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+    
+    <xsl:choose>
+      <xsl:when test="$verticalPos='from-top' and $verticalRel='page'">
+        <xsl:text>mso-position-vertical-relative:top-margin-area;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$verticalPos='from-top'">
+        <xsl:text>mso-position-vertical-relative:margin;</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  
   </xsl:template>
 
   <!--insert shape z-index -->
