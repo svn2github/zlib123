@@ -925,6 +925,15 @@
   </xsl:template>
 
   <!-- basic shapes - ellipse and rect -->
+
+  <xsl:template match="draw:rect">
+    <w:p>
+    <xsl:call-template name="InsertShapes">
+      <xsl:with-param name="shapeType" select="name()"/>
+    </xsl:call-template>
+  </w:p>
+  </xsl:template>
+  
   <xsl:template match="draw:rect|draw:ellipse" mode="shapes">
     <xsl:call-template name="InsertShapes">
       <xsl:with-param name="shapeType" select="name()"/>
@@ -1122,11 +1131,51 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="$horizontalPos='from-left' and $horizontalRel='paragraph'">
+      <xsl:when test="$horizontalPos='from-left'">
         <xsl:text>mso-position-horizontal-relative:left-margin-area;</xsl:text>
       </xsl:when>
-      <xsl:when test="$horizontalPos='from-left'">
-        <xsl:text>mso-position-horizontal-relative:margin;</xsl:text>
+      <xsl:when test="$horizontalPos='left'">
+        <xsl:text>mso-position-horizontal:left;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalPos='center'">
+        <xsl:text>mso-position-horizontal:center;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalPos='right'">
+        <xsl:text>mso-position-horizontal:right;</xsl:text>
+      </xsl:when>    
+    </xsl:choose>
+    
+    <xsl:choose>
+      <xsl:when test="$horizontalRel='page-start-margin'">
+        <xsl:text>mso-position-horizontal-relative:left-margin-area;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalRel='page-end-margin'">
+        <xsl:text>mso-position-horizontal-relative:right-margin-area;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalRel='page'">
+        <xsl:message>Jestem</xsl:message>
+        <xsl:text>mso-position-horizontal-relative:page;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalRel='page-content'">
+        <xsl:text>mso-position-horizontal-relative:text;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalRel='paragraph-start-margin'">
+        <xsl:text>mso-position-horizontal-relative:char;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalRel='paragraph-end-margin'">
+        <xsl:text>mso-position-horizontal-relative:right-margin-area;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalRel='char'">
+        <xsl:text>mso-position-horizontal-relative:char;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalRel='paragraph' and not(@text:anchor-type='page')">
+        <xsl:text>mso-position-horizontal-relative:text;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalRel='paragraph' and @text:anchor-type='page'">
+        <xsl:text>mso-position-horizontal-relative:page;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$horizontalRel='paragraph-content'">
+        <xsl:text>mso-position-horizontal-relative:text;</xsl:text>
       </xsl:when>
     </xsl:choose>
     
