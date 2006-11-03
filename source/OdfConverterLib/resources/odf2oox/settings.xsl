@@ -33,7 +33,8 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
-  xmlns:ooo="http://openoffice.org/2004/office" exclude-result-prefixes="office fo style config ooo">
+  xmlns:ooo="http://openoffice.org/2004/office" 
+  exclude-result-prefixes="office fo style config ooo text">
 
   <xsl:template name="InsertSettings">
     <w:settings>
