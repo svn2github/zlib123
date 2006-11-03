@@ -51,6 +51,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private const string OOXToODF_XSL = "oox2odf.xsl";
         private const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
         private const string SOURCE_XML = "source.xml";
+        private const string ODF_MIME_TYPE = "application/vnd.oasis.opendocument.text";
 
         private string[] OOX_POST_PROCESSORS = 
         {
@@ -232,7 +233,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private void CheckOdfFile(string fileName)
         {
-
             // Test for encryption
             XmlDocument doc;
             try
@@ -249,11 +249,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 Debug.WriteLine(e.Message);
                 throw new NotAnOdfDocumentException(e.Message);
             }
+            
             XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
             if (nodes.Count > 0)
             {
                 throw new EncryptedDocumentException(fileName + " is an encrypted document");
             }
+            
+            // Check the document mime-type.
+      		XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
+      		nsmgr.AddNamespace("manifest", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
+           
+            XmlNode node = doc.SelectSingleNode("/manifest:manifest/manifest:file-entry[@manifest:media-type='"
+                                                + ODF_MIME_TYPE + "']", nsmgr);
+           	if (node == null) 
+            {
+            	throw new NotAnOdfDocumentException("Could not convert "+ fileName 
+           		                                    + ". Invalid OASIS OpenDocument file");
+            }        
         }
 
         private void CheckOoxFile(string fileName)
