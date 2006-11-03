@@ -222,6 +222,8 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
             exportButton.Enabled = true;
             exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
 
+            // Tell Word that the Normal.dot template should not be saved (unless the user later on makes it dirty)
+	        applicationObject.NormalTemplate.Saved = true;
         }
 
         /// <summary>
