@@ -26,7 +26,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  exclude-result-prefixes="w r office style">
 
   <!-- content types -->
   <xsl:template name="contentTypes">
@@ -68,25 +73,28 @@
       <Override PartName="/word/comments.xml"
         ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/>
 
-      <xsl:variable name="masterPage"
-        select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"
-        xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-        xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"/>
-
-      <xsl:for-each select="$masterPage">
-        <Override
-          ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml">
-          <xsl:attribute name="PartName">/word/header<xsl:value-of select="position()"
-          />.xml</xsl:attribute>
-        </Override>
-        <Override
-          ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml">
-          <xsl:attribute name="PartName">/word/footer<xsl:value-of select="position()"
-          />.xml</xsl:attribute>
-        </Override>
-      </xsl:for-each>
+     <xsl:call-template name="InsertHeaderFooterContentTypes"/>
 
     </Types>
+  </xsl:template>
+  
+  <!-- Headers / Footers content types -->
+  <xsl:template name="InsertHeaderFooterContentTypes">
+    <xsl:variable name="masterPages"
+      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"/>
+    
+    <xsl:for-each select="$masterPages/style:header | $masterPages/style:header-left">
+      <Override xmlns="http://schemas.openxmlformats.org/package/2006/content-types"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml">
+        <xsl:attribute name="PartName">/word/header<xsl:value-of select="position()"/>.xml</xsl:attribute>
+      </Override>
+    </xsl:for-each>
+    <xsl:for-each select="$masterPages/style:footer | $masterPages/style:footer-left">
+      <Override xmlns="http://schemas.openxmlformats.org/package/2006/content-types"
+        ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml">
+        <xsl:attribute name="PartName">/word/footer<xsl:value-of select="position()"/>.xml</xsl:attribute>
+      </Override>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>

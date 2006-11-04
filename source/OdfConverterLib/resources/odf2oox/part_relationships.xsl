@@ -250,5 +250,24 @@
   </xsl:template>
 
   
+  <!-- Headers / footers relationships -->
+  <xsl:template name="InsertHeaderFooterRelationships">
+    <xsl:variable name="masterPages"
+      select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page"/>
+    
+    <xsl:for-each select="$masterPages/style:header | $masterPages/style:header-left">
+      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+        Id="{generate-id()}"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header"
+        Target="header{position()}.xml"/>
+    </xsl:for-each>
+    <xsl:for-each select="$masterPages/style:footer | $masterPages/style:footer-left">
+      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+        Id="{generate-id()}"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer"
+        Target="footer{position()}.xml"/>
+    </xsl:for-each>
+  </xsl:template>
+  
 
 </xsl:stylesheet>
