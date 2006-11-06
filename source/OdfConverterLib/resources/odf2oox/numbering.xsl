@@ -318,10 +318,15 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="minLabelDistanceTwip">
-      <xsl:call-template name="twips-measure">
-        <xsl:with-param name="length" select="style:list-level-properties/@text:min-label-distance"
-        />
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="not(@style:num-format = '')">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="style:list-level-properties/@text:min-label-distance"
+            />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <!-- report lost min-label-distance -->
     <xsl:if test="$minLabelDistanceTwip != 0">
@@ -973,9 +978,11 @@
         <xsl:choose>
           <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
             <!--   text:outline-style -->
-            <xsl:value-of
-              select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
-            />
+            <xsl:if test="not(document('styles.xml')//text:outline-style/*[@text:level = $level+1]/@style:num-format = '')">
+              <xsl:value-of
+                select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
+              />
+            </xsl:if>
           </xsl:when>
           <!-- look into content.xml -->
           <xsl:when
