@@ -549,7 +549,7 @@
           </xsl:variable>
           <xsl:attribute name="w:lineRule">auto</xsl:attribute>
           <xsl:attribute name="w:line">
-            <xsl:value-of select="$spacing"/>
+            <xsl:value-of select="number(240 + $spacing)"/>  
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="contains(@fo:line-height, '%')">
