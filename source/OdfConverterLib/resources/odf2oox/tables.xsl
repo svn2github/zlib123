@@ -42,6 +42,10 @@
 
   <!-- Tables -->
   <xsl:template match="table:table">
+    <!-- warn if subtable -->
+    <xsl:if test="@table:is-sub-table='true' ">
+      <xsl:message terminate="no">feedback:Subtable borders and padding</xsl:message>
+    </xsl:if>
     <!-- warn if consecutive tables -->
     <xsl:if
       test="preceding-sibling::table:table[not(@table:is-sub-table='true')] and not(@table:is-sub-table='true')">
