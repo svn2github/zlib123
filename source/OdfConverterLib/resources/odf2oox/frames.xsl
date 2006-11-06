@@ -1114,7 +1114,7 @@
       </xsl:call-template>
     </xsl:variable>
     
-    <xsl:value-of select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;')"/>
+   
     
     <xsl:variable name="horizontalRel">
       <xsl:value-of select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:horizontal-rel"/>
@@ -1130,6 +1130,10 @@
       <xsl:value-of select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@style:vertical-rel"/>
     </xsl:variable>
 
+    <xsl:if test="$verticalRel!='baseline' and $verticalRel!='text' ">
+      <xsl:value-of select="concat('position:absolute;margin-left:',$x,'pt;margin-top:',$y,'pt;')"/>
+    </xsl:if>
+    
     <xsl:choose>
       <xsl:when test="$horizontalPos='from-left'">
         <xsl:text>mso-position-horizontal-relative:left-margin-area;</xsl:text>
@@ -1146,6 +1150,9 @@
     </xsl:choose>
     
     <xsl:choose>
+      <xsl:when test="$horizontalRel='char' or $verticalRel='baseline'">
+        <xsl:text>mso-position-horizontal-relative:char;</xsl:text>
+      </xsl:when>
       <xsl:when test="$horizontalRel='page-start-margin'">
         <xsl:text>mso-position-horizontal-relative:left-margin-area;</xsl:text>
       </xsl:when>
@@ -1165,9 +1172,6 @@
       <xsl:when test="$horizontalRel='paragraph-end-margin'">
         <xsl:text>mso-position-horizontal-relative:right-margin-area;</xsl:text>
       </xsl:when>
-      <xsl:when test="$horizontalRel='char'">
-        <xsl:text>mso-position-horizontal-relative:char;</xsl:text>
-      </xsl:when>
       <xsl:when test="$horizontalRel='paragraph' and not(@text:anchor-type='page')">
         <xsl:text>mso-position-horizontal-relative:text;</xsl:text>
       </xsl:when>
@@ -1180,6 +1184,12 @@
     </xsl:choose>
     
     <xsl:choose>
+      <xsl:when test="$verticalPos='top' and $verticalRel='line'">
+        <xsl:text>mso-position-vertical:bottom;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$verticalPos='bottom' and $verticalRel='line'">
+        <xsl:text>mso-position-vertical:top;</xsl:text>
+      </xsl:when>
       <xsl:when test="$verticalPos='top' ">
         <xsl:text>mso-position-vertical:top;</xsl:text>
       </xsl:when>
@@ -1209,6 +1219,15 @@
       </xsl:when>
       <xsl:when test="$verticalRel='char'">        
         <xsl:text>mso-position-vertical-relative:line;</xsl:text>
+      </xsl:when>
+      <xsl:when test="$verticalRel='line'">
+        mso-position-vertical-relative:line;
+      </xsl:when>
+      <xsl:when test="$verticalRel='baseline'">
+        mso-position-vertical-relative:line;
+      </xsl:when>
+      <xsl:when test="$verticalRel='text'">
+        mso-position-vertical-relative:line;
       </xsl:when>
     </xsl:choose>
     
@@ -2226,7 +2245,7 @@
 
           <xsl:choose>
             <!--   ignore embedded text-box becouse word doesn't support it-->
-            <xsl:when test="self::node()[name(draw:text-box)]">
+            <xsl:when test="self::node()[name(draw:text-box|draw:rect)]">
               <xsl:message terminate="no">feedback: Nested frames</xsl:message>
             </xsl:when>
 
