@@ -351,7 +351,7 @@
       test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and count(preceding-sibling::w:p)= $position -1])">
       <text:list text:style-name="{concat('L',$numId)}">
       <xsl:if
-        test="preceding-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $numId and w:ilvl/@w:val = $level]]">
+        test="preceding-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $numId and w:ilvl/@w:val = $level]] or document('word\numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId = document('word\numbering.xml')//w:numbering/w:num[@w:numId = $numId]/w:abstractNumId/@w:val]/w:lvl[@w:ilvl = $level]/w:start">
         <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
       </xsl:if>
       
@@ -382,6 +382,9 @@
       <xsl:when test="$nestedLevel &gt; 0">
         <text:list-item>
           <text:list text:style-name="{concat('L',$NumberingId)}">
+            <xsl:if test="document('word\numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId = document('word\numbering.xml')//w:numbering/w:num[@w:numId = $NumberingId]/w:abstractNumId/@w:val]/w:lvl[@w:ilvl = $level]/w:start">
+              <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
+            </xsl:if>
             <xsl:apply-templates select="." mode="list-item">
               <xsl:with-param name="nestedLevel" select="$nestedLevel -1"/>
               <xsl:with-param name="level" select="$level"/>

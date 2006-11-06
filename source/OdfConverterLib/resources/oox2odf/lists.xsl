@@ -102,6 +102,11 @@
               <xsl:with-param name="format" select="w:numFmt/@w:val"/>
             </xsl:call-template>
           </xsl:attribute>
+          <xsl:if test="w:start">
+            <xsl:attribute name="text:start-value">
+              <xsl:value-of select="w:start/@w:val"/>
+            </xsl:attribute>
+          </xsl:if>
           <style:list-level-properties>
             <xsl:call-template name="ListLevelProperties"/>
           </style:list-level-properties>
