@@ -484,7 +484,8 @@
         <xsl:call-template name="InsertCellProperties"/>
       </w:tcPr>
       <xsl:apply-templates/>
-      <xsl:if test="child::table:table/@table:is-sub-table = 'true'">
+      <!-- avoid crash -->
+      <xsl:if test="child::node()[last()][self::table:table]">
         <xsl:call-template name="InsertEmptyParagraph"/>
       </xsl:if>
     </w:tc>
