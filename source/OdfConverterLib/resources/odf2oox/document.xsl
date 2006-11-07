@@ -58,9 +58,8 @@
   <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value]" use="''"/>
 
 
-  <!-- key to find mailto hyperlinks. -->
-  <xsl:key name="mailto-hyperlinks" match="text:a[contains(@xlink:href,'mailto')]"
-    use="text:span/@text:style-name"/>
+  <!-- key to find hyperlinks with a particular style. -->
+  <xsl:key name="style-modified-hyperlinks" match="text:a" use="text:span/@text:style-name"/>
 
 
   <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
@@ -588,7 +587,7 @@
   <xsl:template match="text()" mode="text">
     <xsl:choose>
       <xsl:when test="ancestor::text:index-body">
-         <xsl:apply-templates select="." mode="indexes"/>
+        <xsl:apply-templates select="." mode="indexes"/>
       </xsl:when>
       <xsl:otherwise>
         <w:t xml:space="preserve"><xsl:value-of select="."/></w:t>
@@ -816,5 +815,5 @@
   <xsl:template match="text:tracked-changes"/>
   <xsl:template match="office:change-info"/>
 
-  
+
 </xsl:stylesheet>

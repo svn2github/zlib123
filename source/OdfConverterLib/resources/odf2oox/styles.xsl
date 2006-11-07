@@ -166,12 +166,12 @@
           <w:basedOn w:val="{@style:parent-style-name}"/>
         </xsl:when>
         <xsl:otherwise>
-          <!-- if a mailto-hyperlink has current style, set basedOn to Internet_20_link -->
+          <!-- if a hyperlink has current style and does not mention a particular parent style, set basedOn to 'Hyperlink' (built-in by converter, cf template 'styles') -->
           <xsl:if test="@style:family = 'text' ">
             <xsl:variable name="styleName" select="@style:name"/>
             <xsl:for-each select="document('content.xml')">
-              <xsl:if test="key('mailto-hyperlinks',$styleName)">
-                <w:basedOn w:val="Internet_20_link"/>
+              <xsl:if test="key('style-modified-hyperlinks',$styleName)">
+                <w:basedOn w:val="Hyperlink"/>
               </xsl:if>
             </xsl:for-each>
           </xsl:if>
@@ -549,7 +549,7 @@
           </xsl:variable>
           <xsl:attribute name="w:lineRule">auto</xsl:attribute>
           <xsl:attribute name="w:line">
-            <xsl:value-of select="number(240 + $spacing)"/>  
+            <xsl:value-of select="number(240 + $spacing)"/>
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="contains(@fo:line-height, '%')">
