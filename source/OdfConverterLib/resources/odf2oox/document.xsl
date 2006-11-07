@@ -617,6 +617,7 @@
   <!-- line breaks -->
   <xsl:template match="text:line-break" mode="paragraph">
     <w:r>
+      <xsl:call-template name="InsertRunProperties"/>
       <w:br/>
       <w:t/>
     </w:r>
