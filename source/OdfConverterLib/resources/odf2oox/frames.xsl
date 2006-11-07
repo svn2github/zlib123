@@ -2032,6 +2032,12 @@
   <xsl:template name="InsertShapeMargin">
     <xsl:param name="shapeStyle"/>
 
+    <!-- wrapping of text (horizontal adjustment) -->
+    <xsl:if
+      test="parent::draw:frame/@fo:min-width or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
+      <xsl:text>mso-wrap-style:none;</xsl:text>
+    </xsl:if>
+
     <!--text-box spacing/margins -->
     <xsl:variable name="marginL">
       <xsl:call-template name="GetGraphicProperties">
@@ -2381,9 +2387,9 @@
     <v:textbox>
       <xsl:attribute name="style">
         <xsl:if
-          test="parent::draw:frame/@fo:min-width or @fo:min-height
-          or $shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'true'
-          or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
+          test="@fo:min-height or parent::draw:frame/@fo:min-width
+          or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' 
+          or $shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'true' ">
           <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
         </xsl:if>
         <xsl:if test="contains(parent::draw:frame/@draw:transform,'rotate')">
