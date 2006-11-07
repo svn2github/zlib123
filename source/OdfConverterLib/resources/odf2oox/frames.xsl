@@ -1788,7 +1788,7 @@
       <!-- page-content -->
       <xsl:when test="$verticalRel = 'page-content' ">mso-position-vertical-relative:margin;</xsl:when>
       <!-- paragraph -->
-      <xsl:when test="$verticalRel = 'paragraph' ">mso-position-vertical-relative:margin;</xsl:when>
+      <xsl:when test="$verticalRel = 'paragraph' ">mso-position-vertical-relative:text;</xsl:when>
       <!-- paragraph-content -->
       <xsl:when test="$verticalRel = 'paragraph-content' ">mso-position-vertical-relative:text;</xsl:when>
       <!-- frame, frame-content -->
@@ -1883,7 +1883,7 @@
           <xsl:variable name="valX">
             <xsl:call-template name="ComputeMarginX">
               <xsl:with-param name="parent"
-                select="ancestor-or-self::node()[self::draw:frame|self::draw:custom-shape]"/>
+                select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
             </xsl:call-template>
           </xsl:variable>
           <xsl:value-of select="$valX"/>
@@ -1901,7 +1901,7 @@
           <xsl:variable name="valX">
             <xsl:call-template name="ComputeMarginX">
               <xsl:with-param name="parent"
-                select="ancestor-or-self::node()[self::draw:frame|self::draw:custom-shape]"/>
+                select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
             </xsl:call-template>
           </xsl:variable>
           <xsl:value-of select="$valX"/>
@@ -1922,7 +1922,7 @@
           <xsl:variable name="valY">
             <xsl:call-template name="ComputeMarginY">
               <xsl:with-param name="parent"
-                select="ancestor-or-self::node()[self::draw:frame|self::draw:custom-shape]"/>
+                select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
             </xsl:call-template>
           </xsl:variable>
           <xsl:value-of select="$valY"/>
@@ -1949,7 +1949,7 @@
           <xsl:variable name="valY">
             <xsl:call-template name="ComputeMarginY">
               <xsl:with-param name="parent"
-                select="ancestor-or-self::node()[self::draw:frame|self::draw:custom-shape]"/>
+                select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
             </xsl:call-template>
           </xsl:variable>
           <xsl:value-of select="$valY"/>
