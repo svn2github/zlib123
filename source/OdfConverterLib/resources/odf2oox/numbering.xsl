@@ -175,6 +175,7 @@
         <!--bullet style list-->
         <xsl:if test="name() = 'text:list-level-style-bullet' ">
           <w:numFmt w:val="bullet"/>
+          <w:suff w:val="tab"/>
           <w:lvlText w:val="{@text:bullet-char}">
             <xsl:attribute name="w:val">
               <xsl:call-template name="InsertBulletChar"/>
@@ -186,6 +187,31 @@
         <xsl:if test="name()='text:list-level-style-image' ">
           <w:start w:val="1"/>
           <w:numFmt w:val="bullet"/>
+          <!-- content between numbered item and text -->
+          <w:suff>
+            <xsl:attribute name="w:val">
+              <!-- to avoid problems when tab-stop cannot be evaluated precisely : if bullet too large, no spacing after bullet -->
+              <xsl:variable name="bulletWidth">
+                <xsl:call-template name="point-measure">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="style:list-level-properties/@fo:width"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="minLabelWidth">
+                <xsl:call-template name="point-measure">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="style:list-level-properties/@text:min-label-width"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when test="$bulletWidth &gt; $minLabelWidth">nothing</xsl:when>
+                <!-- default value -->
+                <xsl:otherwise>tab</xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </w:suff>
           <w:lvlText w:val=""/>
           <w:lvlPicBulletId>
             <xsl:attribute name="w:val">
@@ -238,23 +264,30 @@
       <w:pict>
         <v:shape id="_x0000_i1032" type="#_x0000_t75" o:bullet="t">
           <xsl:attribute name="style">
+            <!-- COMMENT : it seems that the value has to be divided by 2, but no reasonable explanation could be found -->
             <xsl:if test="style:list-level-properties/@fo:width">
               <xsl:text>width:</xsl:text>
-              <xsl:call-template name="point-measure">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="style:list-level-properties/@fo:width"/>
-                </xsl:with-param>
-              </xsl:call-template>
+              <xsl:variable name="val">
+                <xsl:call-template name="point-measure">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="style:list-level-properties/@fo:width"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="$val div 2"/>
               <xsl:text>pt;</xsl:text>
             </xsl:if>
             <xsl:if test="style:list-level-properties/@fo:height">
               <xsl:text>height:</xsl:text>
-              <xsl:call-template name="point-measure">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="style:list-level-properties/@fo:height"/>
-                </xsl:with-param>
-              </xsl:call-template>
-              <xsl:text>pt</xsl:text>
+              <xsl:variable name="val">
+                <xsl:call-template name="point-measure">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="style:list-level-properties/@fo:height"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="$val div 2"/>
+              <xsl:text>pt;</xsl:text>
             </xsl:if>
           </xsl:attribute>
           <xsl:if test="@xlink:href">
@@ -321,8 +354,8 @@
       <xsl:choose>
         <xsl:when test="not(@style:num-format = '')">
           <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="style:list-level-properties/@text:min-label-distance"
-            />
+            <xsl:with-param name="length"
+              select="style:list-level-properties/@text:min-label-distance"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
@@ -978,7 +1011,8 @@
         <xsl:choose>
           <xsl:when test="$listStyleName='' and $attribute='text:min-label-distance'">
             <!--   text:outline-style -->
-            <xsl:if test="not(document('styles.xml')//text:outline-style/*[@text:level = $level+1]/@style:num-format = '')">
+            <xsl:if
+              test="not(document('styles.xml')//text:outline-style/*[@text:level = $level+1]/@style:num-format = '')">
               <xsl:value-of
                 select="document('styles.xml')//text:outline-style/*[@text:level = $level+1]/style:list-level-properties/@text:min-label-distance"
               />
