@@ -40,12 +40,12 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   exclude-result-prefixes="w uri draw a pic">
 
   <!-- Pictures conversion needs copy of image files in zipEnrty to work correctly (but id does't crash  -->
 
   <xsl:template match="wp:inline | wp:anchor">
-
     <xsl:variable name="document">
       <xsl:call-template name="GetDocumentName">
         <xsl:with-param name="rootId">
@@ -60,24 +60,39 @@
       </xsl:with-param>
     </xsl:call-template>
 
-    <draw:frame text:anchor-type="paragraph">
-
+    <draw:frame>
       <!-- TODO:@text:anchor-type -->
+      <xsl:attribute name="text:anchor-type">
+        <xsl:variable name="verticalRelativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
+        <xsl:choose>
+          <xsl:when test="$verticalRelativeFrom = 'line'">
+            <xsl:text>char</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>paragraph</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
 
+      <!--style name-->
       <xsl:attribute name="draw:style-name">
         <xsl:value-of select="generate-id(ancestor::w:drawing)"/>
       </xsl:attribute>
 
+      <!--drawing name-->
       <xsl:attribute name="draw:name">
         <xsl:value-of select="wp:docPr/@name"/>
       </xsl:attribute>
 
+      <!--size-->
       <xsl:call-template name="SetSize"/>
 
+      <!--position-->
       <xsl:if test="self::wp:anchor">
         <xsl:call-template name="SetPosition"/>
       </xsl:if>
 
+      <!-- image href from relationships-->
       <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
         <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
           <xsl:call-template name="InsertImageHref">
@@ -148,6 +163,7 @@
       <!--in Word there are no parent style for image - make default Graphics in OO -->
       <xsl:attribute name="style:parent-style-name">
         <xsl:text>Graphics</xsl:text>
+        <xsl:value-of select="w:tblStyle/@w:val"/>
       </xsl:attribute>
 
       <style:graphic-properties>
@@ -157,9 +173,131 @@
   </xsl:template>
 
   <xsl:template name="InsertPictureProperties">
-    <xsl:for-each select="descendant::pic:pic">
-      <!--  picture flip (vertical, horizontal)-->
-      <xsl:if test="pic:spPr/a:xfrm/attribute::node()">
+    <xsl:call-template name="InsertImagePosH"/>
+    <xsl:call-template name="InsertImagePosV"/>
+    <xsl:call-template name="InsertImageFlip"/>
+    <xsl:call-template name="InsertImageCrop"/>
+  </xsl:template>
+
+  <xsl:template name="GetCropSize">
+    <xsl:param name="cropValue"/>
+    <xsl:param name="cropOppositeValue"/>
+    <xsl:param name="resultSize"/>
+
+    <xsl:choose>
+      <xsl:when test="not($cropValue)">
+        <xsl:text>0</xsl:text>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <xsl:variable name="cropPercent" select="$cropValue div (100000)"/>
+        <xsl:variable name="cropOppositePercent">
+          <xsl:choose>
+            <xsl:when test="$cropOppositeValue">
+              <xsl:value-of select="$cropOppositeValue div (100000)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:value-of
+          select="format-number(($resultSize div(1 - $cropPercent - $cropOppositePercent)) *  $cropPercent , '0.000' )"
+        />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertImagePosH">
+    <xsl:if test="descendant::wp:positionH">
+      <xsl:attribute name="style:horizontal-pos">
+        <xsl:value-of select="descendant::wp:positionH/wp:align"/>
+      </xsl:attribute>
+
+      <xsl:attribute name="style:horizontal-rel">
+        <xsl:variable name="relativeFrom" select="descendant::wp:positionH/@relativeFrom"/>
+        <xsl:choose>
+          <xsl:when test="$relativeFrom = 'margin' or $relativeFrom = 'column'">
+            <xsl:text>page-content</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom ='page'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'leftMargin' or $relativeFrom = 'outsideMargin'">
+            <xsl:text>page-start-margin</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'rightMargin' or $relativeFrom = 'insideMargin'">
+            <xsl:text>page-end-margin</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertImagePosV">
+    <xsl:if test="descendant::wp:positionV">
+      <xsl:attribute name="style:vertical-pos">
+        <xsl:variable name="align" select="descendant::wp:positionV/wp:align"/>
+        <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
+        <xsl:choose>
+          <!--special rules-->
+          <xsl:when
+            test="$relativeFrom = 'topMargin' or $relativeFrom = 'bottomMargin' or $relativeFrom = 'insideMargin' or $relativeFrom = 'outsideMargin'">
+            <xsl:text>top</xsl:text>
+          </xsl:when>
+          <!--default rules-->
+          <xsl:when test="$align = 'top' ">
+            <xsl:text>top</xsl:text>
+          </xsl:when>
+          <xsl:when test="$align = 'center' ">
+            <xsl:text>middle</xsl:text>
+          </xsl:when>
+          <xsl:when test="$align = 'bottom' ">
+            <xsl:text>bottom</xsl:text>
+          </xsl:when>
+          <xsl:when test="$align = 'inside' ">
+            <xsl:text>top</xsl:text>
+          </xsl:when>
+          <xsl:when test="$align = 'outside' ">
+            <xsl:text>bottom</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:attribute>
+
+      <xsl:attribute name="style:vertical-rel">
+        <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
+        <xsl:choose>
+          <xsl:when test="$relativeFrom = 'margin' ">
+            <xsl:text>page-content</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom ='page'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'topMargin'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'bottomMargin'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'insideMargin'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'outsideMargin'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'line'">
+            <xsl:text>line</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertImageFlip">
+    <!--  picture flip (vertical, horizontal)-->
+    <xsl:if test="descendant::pic:spPr/a:xfrm/attribute::node()">
+      <xsl:for-each select="descendant::pic:pic">
         <xsl:attribute name="style:mirror">
           <xsl:choose>
             <xsl:when test="pic:spPr/a:xfrm/@flipV = '1' and pic:spPr/a:xfrm/@flipH = '1'">
@@ -173,7 +311,72 @@
             </xsl:when>
           </xsl:choose>
         </xsl:attribute>
-      </xsl:if>
-    </xsl:for-each>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertImageCrop">
+    <!-- crop -->
+    <xsl:if test="pic:blipFill/a:srcRect/attribute::node()">
+      <xsl:for-each select="descendant::pic:pic">
+        <xsl:variable name="width">
+          <xsl:variable name="widthText">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="ancestor::w:drawing/descendant::wp:extent/@cx"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="substring-before($widthText,'cm')"/>
+        </xsl:variable>
+
+        <xsl:variable name="height">
+          <xsl:variable name="heightText">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="ancestor::w:drawing/descendant::wp:extent/@cy"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="substring-before($heightText,'cm')"/>
+        </xsl:variable>
+
+        <xsl:variable name="leftCrop">
+          <xsl:call-template name="GetCropSize">
+            <xsl:with-param name="cropValue" select="pic:blipFill/a:srcRect/@l"/>
+            <xsl:with-param name="cropOppositeValue" select="pic:blipFill/a:srcRect/@r"/>
+            <xsl:with-param name="resultSize" select="$width"/>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="rightCrop">
+          <xsl:call-template name="GetCropSize">
+            <xsl:with-param name="cropValue" select="pic:blipFill/a:srcRect/@r"/>
+            <xsl:with-param name="cropOppositeValue" select="pic:blipFill/a:srcRect/@l"/>
+            <xsl:with-param name="resultSize" select="$width"/>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="topCrop">
+          <xsl:call-template name="GetCropSize">
+            <xsl:with-param name="cropValue" select="pic:blipFill/a:srcRect/@t"/>
+            <xsl:with-param name="cropOppositeValue" select="pic:blipFill/a:srcRect/@b"/>
+            <xsl:with-param name="resultSize" select="$height"/>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="bottomCrop">
+          <xsl:call-template name="GetCropSize">
+            <xsl:with-param name="cropValue" select="pic:blipFill/a:srcRect/@b"/>
+            <xsl:with-param name="cropOppositeValue" select="pic:blipFill/a:srcRect/@t"/>
+            <xsl:with-param name="resultSize" select="$height"/>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:attribute name="fo:clip">
+          <xsl:value-of
+            select="concat('rect(',$topCrop,'cm ',$rightCrop,'cm ',$bottomCrop,'cm ',$leftCrop,'cm',')')"
+          />
+        </xsl:attribute>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 </xsl:stylesheet>

@@ -182,14 +182,14 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;;;Width;1;0.2-Final ;Completed;;;
 ;;;;;Lock aspect ratio;1;;;differently supported feature  see comment in Conversion issues;;
 ;;;;;Relative to orginal picture size;1;;;there is no equivalent in OO;;
-;;;;Crop from;Left/Right/Top/Bottom;3;;;;;
+;;;;Crop from;Left/Right/Top/Bottom;3;;Completed;crop is supported for 100% image scale - details are in Conversion issues;;
 ;;;Alt Text;;;;;;;;
 ;;;;;;;;;;;
-;;Advanced Layout;Picture position;Horizontal;Alignment;2;;;;;
+;;Advanced Layout;Picture position;Horizontal;Alignment;2;;Completed;;;
 ;;;;;Book layout;2;;;;;
 ;;;;;Absolute position;2;;;;;
 ;;;;;Relative position;2;;;;;
-;;;;Vertical;Alignment;2;;;;;
+;;;;Vertical;Alignment;2;;Partial;;;TODO: relative to line
 ;;;;;Absolute position;2;;;;;
 ;;;;;Relative position;2;;;;;
 ;;;;Options;Move object with text;2;;;;;
