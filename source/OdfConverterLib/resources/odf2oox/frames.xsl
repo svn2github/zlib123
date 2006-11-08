@@ -353,7 +353,7 @@
               <xsl:with-param name="length" select="$frame/@*[name()=concat('svg:',$side)]"/>
             </xsl:call-template>
           </xsl:when>
-          <xsl:otherwise>
+          <xsl:when test="$frame/*[contains(name(), 'draw:')]/@*[name()=concat('fo:min-',$side)]">
             <xsl:call-template name="ConvertMeasure">
               <xsl:with-param name="unit" select="$unit"/>
               <xsl:with-param name="length">
@@ -361,7 +361,16 @@
                   select="$frame/*[contains(name(), 'draw:')]/@*[name()=concat('fo:min-',$side)]"/>
               </xsl:with-param>
             </xsl:call-template>
-          </xsl:otherwise>
+          </xsl:when>
+          <xsl:when test="$frame/@*[name()=concat('fo:min-',$side)]">
+            <xsl:call-template name="ConvertMeasure">
+              <xsl:with-param name="unit" select="$unit"/>
+              <xsl:with-param name="length">
+                <xsl:value-of select="$frame/@*[name()=concat('fo:min-',$side)]"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
