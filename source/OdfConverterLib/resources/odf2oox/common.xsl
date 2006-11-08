@@ -97,6 +97,40 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Convert a measure with a given unit -->
+  <xsl:template name="ConvertMeasure">
+    <xsl:param name="length"/>
+    <xsl:param name="unit"/>
+    <xsl:choose>
+      <xsl:when test="$unit = 'twips' ">
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length" select="$length"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$unit = 'milimeter' ">
+        <xsl:call-template name="milimeter-measure">
+          <xsl:with-param name="length" select="$length"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$unit = 'eightspoint' ">
+        <xsl:call-template name="eightspoint-measure">
+          <xsl:with-param name="length" select="$length"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$unit = 'emu' ">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="$length"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$unit = 'point' ">
+        <xsl:call-template name="point-measure">
+          <xsl:with-param name="length" select="$length"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
 
   <!-- 
 		Convert various length units to twips (twentieths of a point)
@@ -290,7 +324,8 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$result > 31"><xsl:message terminate="no">feedback:Padding shortened</xsl:message>31</xsl:when>
+      <xsl:when test="$result > 31"><xsl:message terminate="no">feedback:Padding
+        shortened</xsl:message>31</xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$result"/>
       </xsl:otherwise>
@@ -305,7 +340,8 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$result > 620"><xsl:message terminate="no">feedback:Padding shortened</xsl:message>620</xsl:when>
+      <xsl:when test="$result > 620"><xsl:message terminate="no">feedback:Padding
+        shortened</xsl:message>620</xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$result"/>
       </xsl:otherwise>
@@ -333,9 +369,9 @@
           <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
-    </xsl:choose>    
+    </xsl:choose>
   </xsl:template>
-    
+
   <!--
 		Convert RGB code (#xxxxxx) to string-type color.
 	-->
@@ -370,7 +406,8 @@
       <xsl:when test="$code='FF0000'">red</xsl:when>
       <xsl:when test="$code='FFFFFF'">white</xsl:when>
       <xsl:when test="$code='FFFF00'">yellow</xsl:when>
-      <xsl:otherwise><xsl:message terminate="no">feedback:Text background color</xsl:message>yellow</xsl:otherwise>
+      <xsl:otherwise><xsl:message terminate="no">feedback:Text background
+      color</xsl:message>yellow</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -516,7 +553,7 @@
       <xsl:otherwise>\* arabic</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- 
 		Generate a decimal identifier based on the position of the current 
 		footenote/endnote among all the indexed footnotes/endnotes.
