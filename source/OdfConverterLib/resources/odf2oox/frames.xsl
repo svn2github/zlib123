@@ -1318,6 +1318,11 @@
                 <xsl:with-param name="length" select="$parent[1]/@svg:width"/>
               </xsl:call-template>
             </xsl:variable>
+            <xsl:variable name="frameHeight">
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length" select="$parent[1]/@svg:height"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:variable name="fromLeft">
               <xsl:choose>
                 <xsl:when test="$horizontalPos = 'from-left' or $horizontalPos = 'from-inside' ">
@@ -1337,10 +1342,32 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
+            <xsl:variable name="rotation">
+              <xsl:if test="contains($parent[1]/@draw:transform,'rotate')">
+                <xsl:call-template name="DegreesAngle">
+                  <xsl:with-param name="angle">
+                    <xsl:value-of
+                      select="substring-before(substring-after(substring-after($parent[1]/@draw:transform,'rotate'),'('),')')"
+                    />
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:variable>
             <xsl:variable name="svgx">
               <xsl:choose>
                 <xsl:when test="$horizontalPos = 'from-left' or $horizontalPos='from-inside' ">
                   <xsl:choose>
+                    <!-- special distance with rotation -->
+                    <xsl:when test="$rotation != '' ">
+                      <xsl:choose>
+                        <xsl:when test="$rotation &gt; 0">
+                          <xsl:value-of select="$translation"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$translation - $frameHeight"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
                     <!-- page, page-start-margin -->
                     <xsl:when
                       test="$horizontalRel = 'page' or $horizontalRel = 'page-start-margin' ">
@@ -1598,6 +1625,11 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
+            <xsl:variable name="frameWidth">
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length" select="$parent[1]/@svg:width"/>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:variable name="frameHeight">
               <xsl:call-template name="point-measure">
                 <xsl:with-param name="length" select="$parent[1]/@svg:height"/>
@@ -1622,10 +1654,32 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
+            <xsl:variable name="rotation">
+              <xsl:if test="contains($parent[1]/@draw:transform,'rotate')">
+                <xsl:call-template name="DegreesAngle">
+                  <xsl:with-param name="angle">
+                    <xsl:value-of
+                      select="substring-before(substring-after(substring-after($parent[1]/@draw:transform,'rotate'),'('),')')"
+                    />
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:variable>
             <xsl:variable name="svgy">
               <xsl:choose>
                 <xsl:when test="$verticalPos='from-top' ">
                   <xsl:choose>
+                    <!-- special distance with rotation -->
+                    <xsl:when test="$rotation != '' ">
+                      <xsl:choose>
+                        <xsl:when test="$rotation &lt; 0">
+                          <xsl:value-of select="$translation"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$translation - $frameWidth"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
                     <!-- page -->
                     <xsl:when test="$verticalRel = 'page' ">
                       <xsl:value-of select="$fromTop + $translation"/>
@@ -2051,6 +2105,19 @@
         </xsl:call-template>
       </xsl:variable>
 
+      <xsl:variable name="rotation">
+        <xsl:if
+          test="contains(ancestor-or-self::node()[contains(name(), 'draw:')]/@draw:transform,'rotate')">
+          <xsl:call-template name="DegreesAngle">
+            <xsl:with-param name="angle">
+              <xsl:value-of
+                select="substring-before(substring-after(substring-after(ancestor-or-self::node()[contains(name(), 'draw:')]/@draw:transform,'rotate'),'('),')')"
+              />
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:variable>
+
       <!-- declare an absolute positioning (case when margin is computed, cf below) -->
       <xsl:choose>
         <xsl:when test="$horizontalPos = 'from-left' or $horizontalPos='from-inside' ">
@@ -2099,10 +2166,21 @@
             <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
             <xsl:text>margin-left:</xsl:text>
             <xsl:variable name="valX">
-              <xsl:call-template name="ComputeMarginX">
-                <xsl:with-param name="parent"
-                  select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
-              </xsl:call-template>
+              <xsl:choose>
+                <!-- if rotation, revert X and Y -->
+                <xsl:when test="$rotation != '' ">
+                  <xsl:call-template name="ComputeMarginY">
+                    <xsl:with-param name="parent"
+                      select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="ComputeMarginX">
+                    <xsl:with-param name="parent"
+                      select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:variable>
             <xsl:value-of select="$valX"/>
             <xsl:if test="$valX != 0">pt</xsl:if>
@@ -2139,10 +2217,21 @@
             <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
             <xsl:text>margin-top:</xsl:text>
             <xsl:variable name="valY">
-              <xsl:call-template name="ComputeMarginY">
-                <xsl:with-param name="parent"
-                  select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
-              </xsl:call-template>
+              <xsl:choose>
+                <!-- if rotation, revert X and Y -->
+                <xsl:when test="$rotation != '' ">
+                  <xsl:call-template name="ComputeMarginX">
+                    <xsl:with-param name="parent"
+                      select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="ComputeMarginY">
+                    <xsl:with-param name="parent"
+                      select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:variable>
             <xsl:value-of select="$valY"/>
             <xsl:if test="$valY != 0">pt</xsl:if>
