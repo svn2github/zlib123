@@ -2018,7 +2018,9 @@
           <!-- frame, frame-content -->
           <xsl:when test="contains($verticalRel, 'frame')">mso-position-vertical-relative:text;</xsl:when>
           <!-- char, line, baseline, text -->
-          <xsl:otherwise>mso-position-vertical-relative:char;</xsl:otherwise>
+          <xsl:otherwise>
+            <xsl:if test="$verticalRel != '' ">mso-position-vertical-relative:char;</xsl:if>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
@@ -2150,14 +2152,14 @@
           <xsl:text>position:absolute;</xsl:text>
         </xsl:when>
         <xsl:when
-          test="not($horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'paragraph'  or $horizontalRel = 'paragraph-content'  or $horizontalRel = 'char' )">
+          test="$horizontalRel != '' and not($horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'paragraph'  or $horizontalRel = 'paragraph-content'  or $horizontalRel = 'char' )">
           <xsl:text>position:absolute;</xsl:text>
         </xsl:when>
         <xsl:when test="$verticalPos = 'from-top' ">
           <xsl:text>position:absolute;</xsl:text>
         </xsl:when>
         <xsl:when
-          test="not($verticalRel = 'page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph'  or $verticalRel = 'paragraph-content' 
+          test="$verticalRel != '' and not($verticalRel = 'page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph'  or $verticalRel = 'paragraph-content' 
         or $verticalRel = 'char' or $verticalRel = 'char' or $verticalRel = 'baseline' or $verticalRel = 'line' or $verticalRel = 'text' )">
           <xsl:text>position:absolute;</xsl:text>
         </xsl:when>

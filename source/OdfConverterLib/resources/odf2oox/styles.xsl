@@ -599,20 +599,20 @@
       <xsl:attribute name="w:left">
         <xsl:call-template name="ComputeAdditionalIndent">
           <xsl:with-param name="side" select="'left'"/>
-          <xsl:with-param name="style" select="parent::style:style"/>
+          <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"/>
         </xsl:call-template>
       </xsl:attribute>
       <!-- right indent -->
       <xsl:attribute name="w:right">
         <xsl:call-template name="ComputeAdditionalIndent">
           <xsl:with-param name="side" select="'right'"/>
-          <xsl:with-param name="style" select="parent::style:style"/>
+          <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"/>
         </xsl:call-template>
       </xsl:attribute>
       <!-- first line indent -->
       <xsl:variable name="firstLineIndent">
         <xsl:call-template name="GetFirstLineIndent">
-          <xsl:with-param name="style" select="parent::style:style"/>
+          <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:choose>
