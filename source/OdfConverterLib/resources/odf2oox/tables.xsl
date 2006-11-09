@@ -96,41 +96,26 @@
       <xsl:message terminate="no">feedback:Table shadow</xsl:message>
     </xsl:if>
 
-    <w:tblW w:type="{$type}">
+    <w:tblW>
+      <xsl:attribute name="w:type">
+        <xsl:choose>
+          <xsl:when test="$tableProp/@style:rel-width">pct</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$type"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
       <xsl:attribute name="w:w">
         <xsl:choose>
+          <xsl:when test="$tableProp/@style:rel-width">
+            <xsl:value-of select="50 * number(substring-before($tableProp/@style:rel-width, '%'))"/>
+          </xsl:when>
           <xsl:when test="$tableProp/@style:width">
             <xsl:call-template name="twips-measure">
               <xsl:with-param name="length" select="$tableProp/@style:width"/>
             </xsl:call-template>
           </xsl:when>
-          <xsl:otherwise>
-            <!-- TODO : find a better matching page width -->
-            <xsl:for-each select="document('styles.xml')">
-              <xsl:variable name="pageW">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length"
-                    select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:page-width"
-                  />
-                </xsl:call-template>
-              </xsl:variable>
-              <xsl:variable name="pageMarginL">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length"
-                    select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-left"
-                  />
-                </xsl:call-template>
-              </xsl:variable>
-              <xsl:variable name="pageMarginR">
-                <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length"
-                    select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-right"
-                  />
-                </xsl:call-template>
-              </xsl:variable>
-              <xsl:value-of select="$pageW - $pageMarginR - $pageMarginL"/>
-            </xsl:for-each>
-          </xsl:otherwise>
+          <xsl:otherwise>auto</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
     </w:tblW>
@@ -147,7 +132,75 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-    <xsl:call-template name="InsertTableIndent"/>
+    <xsl:if test="not($tableProp/@table:align ='center')">
+      <xsl:call-template name="InsertTableIndent"/>
+    </xsl:if>
+
+    <!--table background-->
+    <xsl:if test="$tableProp/@fo:background-color">
+      <xsl:choose>
+        <xsl:when test="$tableProp/@fo:background-color != 'transparent' ">
+          <w:shd w:val="clear" w:color="auto"
+            w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"
+          />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+
+    <!-- Default layout algorithm in ODF is "fixed". -->
+    <w:tblLayout w:type="fixed"/>
+
+    <!-- default margins -->
+    <w:tblCellMar>
+      <xsl:for-each select="descendant::table:table-cell[1]">
+        <xsl:call-template name="InsertCellMargins">
+          <xsl:with-param name="cellProp"
+            select="key('automatic-styles', @table:style-name)/style:table-cell-properties"/>
+          <xsl:with-param name="defaultMargin">true</xsl:with-param>
+        </xsl:call-template>
+      </xsl:for-each>
+    </w:tblCellMar>
+  </xsl:template>
+
+  <!-- In case the table is a subtable. Unherits a few properties of table it belongs to. -->
+  <xsl:template name="InsertSubTableProperties">
+    <xsl:variable name="tableStyleName">
+      <xsl:value-of
+        select="ancestor::table:table[1][not(@table:is-sub-table='true')]/@table:style-name"/>
+    </xsl:variable>
+    <w:tblStyle w:val="{$tableStyleName}"/>
+    <xsl:variable name="tableProp"
+      select="key('automatic-styles', $tableStyleName)/style:table-properties"/>
+
+    <!-- report lost attributes -->
+    <xsl:if test="$tableProp/@fo:keep-with-next">
+      <xsl:message terminate="no">feedback:Table together with next paragraph</xsl:message>
+    </xsl:if>
+    <xsl:if test="not($tableProp/@style:may-break-between-rows='true')">
+      <xsl:message terminate="no">feedback:Unsplitable table</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:background-image">
+      <xsl:message terminate="no">feedback:Table background image</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:shadow">
+      <xsl:message terminate="no">feedback:Table shadow</xsl:message>
+    </xsl:if>
+
+    <w:tblW>
+      <xsl:attribute name="w:type">
+        <xsl:choose>
+          <xsl:when test="$tableProp/@style:rel-width">pct</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$type"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="w:w">
+        <xsl:for-each select="ancestor::table:table-cell[1]">
+          <xsl:call-template name="GetCellWidth"/>
+        </xsl:for-each>
+      </xsl:attribute>
+    </w:tblW>
 
     <!--table background-->
     <xsl:if test="$tableProp/@fo:background-color">
@@ -213,57 +266,6 @@
     </w:tblInd>
   </xsl:template>
 
-  <!-- In case the table is a subtable. Unherits a few properties of table it belongs to. -->
-  <xsl:template name="InsertSubTableProperties">
-    <xsl:variable name="tableStyleName">
-      <xsl:value-of
-        select="ancestor::table:table[1][not(@table:is-sub-table='true')]/@table:style-name"/>
-    </xsl:variable>
-    <w:tblStyle w:val="{$tableStyleName}"/>
-    <xsl:variable name="tableProp"
-      select="key('automatic-styles', $tableStyleName)/style:table-properties"/>
-
-    <!-- report lost attributes -->
-    <xsl:if test="$tableProp/@fo:keep-with-next">
-      <xsl:message terminate="no">feedback:Table together with next paragraph</xsl:message>
-    </xsl:if>
-    <xsl:if test="not($tableProp/@style:may-break-between-rows='true')">
-      <xsl:message terminate="no">feedback:Unsplitable table</xsl:message>
-    </xsl:if>
-    <xsl:if test="$tableProp/@style:background-image">
-      <xsl:message terminate="no">feedback:Table background image</xsl:message>
-    </xsl:if>
-    <xsl:if test="$tableProp/@style:shadow">
-      <xsl:message terminate="no">feedback:Table shadow</xsl:message>
-    </xsl:if>
-
-    <w:tblW w:type="{$type}">
-      <xsl:attribute name="w:w">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length">
-            <xsl:for-each select="ancestor::table:table-cell[1]">
-              <xsl:call-template name="GetCellWidth"/>
-            </xsl:for-each>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </w:tblW>
-
-    <!--table background-->
-    <xsl:if test="$tableProp/@fo:background-color">
-      <xsl:choose>
-        <xsl:when test="$tableProp/@fo:background-color != 'transparent' ">
-          <w:shd w:val="clear" w:color="auto"
-            w:fill="{substring($tableProp/@fo:background-color, 2, string-length($tableProp/@fo:background-color) -1)}"
-          />
-        </xsl:when>
-      </xsl:choose>
-    </xsl:if>
-
-    <!-- Default layout algorithm in ODF is "fixed". -->
-    <w:tblLayout w:type="fixed"/>
-  </xsl:template>
-
   <!-- Inserts a table grid -->
   <xsl:template name="InsertTblGrid">
     <w:tblGrid>
@@ -300,17 +302,24 @@
     </xsl:if>
   </xsl:template>
 
-  
-  <!-- in case of relative width. Context must be table:column -->
+
+  <!-- returns a measured value, a twips value, or a percentage value. Context must be table:column -->
   <xsl:template name="ComputeColumnWidth">
+
+    <xsl:variable name="tablePercentVal">
+      <xsl:value-of
+        select="substring-before(key('automatic-styles',parent::table:table/@table:style-name)/style:table-properties/@style:rel-width,'%')"
+      />
+    </xsl:variable>
     <xsl:choose>
       <xsl:when
-        test="key('automatic-styles',@table:style-name)/style:table-column-properties/@style:column-width">
+        test="key('automatic-styles',@table:style-name)/style:table-column-properties/@style:column-width and $tablePercentVal = '' ">
         <xsl:value-of
           select="key('automatic-styles',@table:style-name)/style:table-column-properties/@style:column-width"
         />
       </xsl:when>
       <xsl:otherwise>
+        <!-- compute relatives width -->
         <xsl:variable name="relWidth"
           select="substring-before(key('automatic-styles',@table:style-name)/style:table-column-properties/@style:rel-column-width, '*')"/>
         <xsl:variable name="totRelWidth">
@@ -319,12 +328,17 @@
           </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
+          <!-- when table is expressed in percentage -->
+          <xsl:when test="$tablePercentVal != '' ">
+            <xsl:value-of select="round(50 * $relWidth * 100 div $totRelWidth)"/>
+          </xsl:when>
+          <!-- when a width is available for the column -->
           <xsl:when test="ancestor::table:table[1]/@style:width">
             <xsl:value-of
-              select="round(ancestor::table:table[1]/@style:width * $relWidth div $totRelWidth)"
-            />
+              select="round(ancestor::table:table[1]/@style:width * $relWidth div $totRelWidth)"/>
           </xsl:when>
           <xsl:otherwise>
+            <!-- try to find the good width -->
             <xsl:variable name="pageWidth">
               <!-- TODO : find a better matching page width -->
               <xsl:for-each select="document('styles.xml')">
@@ -358,7 +372,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="ComputeTotalRelativeWidth">
     <xsl:param name="totRelWidth" select="0"/>
     <xsl:param name="columns"/>
@@ -515,7 +529,9 @@
       <xsl:message terminate="no">feedback:Cell shadow</xsl:message>
     </xsl:if>
 
-    <xsl:call-template name="InsertCellWidth"/>
+    <xsl:call-template name="InsertCellWidth">
+      <xsl:with-param name="tableProp" select="$tableProp"/>
+    </xsl:call-template>
     <xsl:call-template name="InsertCellSpan">
       <xsl:with-param name="vmerge"/>
     </xsl:call-template>
@@ -527,9 +543,11 @@
       <xsl:with-param name="rowProp" select="$rowProp"/>
       <xsl:with-param name="tableProp" select="$tableProp"/>
     </xsl:call-template>
-    <xsl:call-template name="InsertCellMargins">
-      <xsl:with-param name="cellProp" select="$cellProp"/>
-    </xsl:call-template>
+    <w:tcMar>
+      <xsl:call-template name="InsertCellMargins">
+        <xsl:with-param name="cellProp" select="$cellProp"/>
+      </xsl:call-template>
+    </w:tcMar>
     <xsl:call-template name="InsertCellWritingMode">
       <xsl:with-param name="cellProp" select="$cellProp"/>
     </xsl:call-template>
@@ -540,7 +558,16 @@
 
   <!-- Inserts the cell width -->
   <xsl:template name="InsertCellWidth">
-    <w:tcW w:type="{$type}">
+    <xsl:param name="tableProp"/>
+    <w:tcW>
+      <xsl:attribute name="w:type">
+        <xsl:choose>
+          <xsl:when test="$tableProp/@style:rel-width">pct</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$type"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
       <xsl:attribute name="w:w">
         <xsl:call-template name="GetCellWidth"/>
       </xsl:attribute>
@@ -888,61 +915,58 @@
   <!-- Inserts the cell margins -->
   <xsl:template name="InsertCellMargins">
     <xsl:param name="cellProp"/>
+    <xsl:param name="defaultMargin" select="'false'"/>
     <xsl:choose>
-      <xsl:when test="table:table[@table:is-sub-table='true']">
-        <w:tcMar>
-          <w:top w:w="0" w:type="{$type}"/>
-          <w:left w:w="0" w:type="{$type}"/>
-          <w:bottom w:w="0" w:type="{$type}"/>
-          <w:right w:w="0" w:type="{$type}"/>
-        </w:tcMar>
+      <xsl:when test="$defaultMargin = 'false' and table:table[@table:is-sub-table='true']">
+        <w:top w:w="0" w:type="{$type}"/>
+        <w:left w:w="0" w:type="{$type}"/>
+        <w:bottom w:w="0" w:type="{$type}"/>
+        <w:right w:w="0" w:type="{$type}"/>
       </xsl:when>
       <xsl:otherwise>
-        <w:tcMar>
-          <xsl:choose>
-            <xsl:when test="$cellProp[@fo:padding and @fo:padding != 'none']">
-              <xsl:variable name="padding">
+        <xsl:choose>
+          <xsl:when test="$cellProp[@fo:padding and @fo:padding != 'none']">
+            <xsl:variable name="padding">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="$cellProp/@fo:padding"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <w:top w:w="{$padding}" w:type="{$type}"/>
+            <w:left w:w="{$padding}" w:type="{$type}"/>
+            <w:bottom w:w="{$padding}" w:type="{$type}"/>
+            <w:right w:w="{$padding}" w:type="{$type}"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:top w:type="{$type}">
+              <xsl:attribute name="w:w">
                 <xsl:call-template name="twips-measure">
-                  <xsl:with-param name="length" select="$cellProp/@fo:padding"/>
+                  <xsl:with-param name="length" select="$cellProp/@fo:padding-top"/>
                 </xsl:call-template>
-              </xsl:variable>
-              <w:top w:w="{$padding}" w:type="{$type}"/>
-              <w:left w:w="{$padding}" w:type="{$type}"/>
-              <w:bottom w:w="{$padding}" w:type="{$type}"/>
-              <w:right w:w="{$padding}" w:type="{$type}"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <w:top w:type="{$type}">
-                <xsl:attribute name="w:w">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length" select="$cellProp/@fo:padding-top"/>
-                  </xsl:call-template>
-                </xsl:attribute>
-              </w:top>
-              <w:left w:type="{$type}">
-                <xsl:attribute name="w:w">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length" select="$cellProp/@fo:padding-left"/>
-                  </xsl:call-template>
-                </xsl:attribute>
-              </w:left>
-              <w:bottom w:type="{$type}">
-                <xsl:attribute name="w:w">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length" select="$cellProp/@fo:padding-bottom"/>
-                  </xsl:call-template>
-                </xsl:attribute>
-              </w:bottom>
-              <w:right w:type="{$type}">
-                <xsl:attribute name="w:w">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length" select="$cellProp/@fo:padding-right"/>
-                  </xsl:call-template>
-                </xsl:attribute>
-              </w:right>
-            </xsl:otherwise>
-          </xsl:choose>
-        </w:tcMar>
+              </xsl:attribute>
+            </w:top>
+            <w:left w:type="{$type}">
+              <xsl:attribute name="w:w">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length" select="$cellProp/@fo:padding-left"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </w:left>
+            <w:bottom w:type="{$type}">
+              <xsl:attribute name="w:w">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length" select="$cellProp/@fo:padding-bottom"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </w:bottom>
+            <w:right w:type="{$type}">
+              <xsl:attribute name="w:w">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length" select="$cellProp/@fo:padding-right"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </w:right>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1018,7 +1042,8 @@
         <xsl:variable name="currentColumnWidth">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
-              <xsl:for-each select="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]">
+              <xsl:for-each
+                select="ancestor::table:table[1]/table:table-column[position() = $currentPosInColumns]">
                 <xsl:call-template name="ComputeColumnWidth"/>
               </xsl:for-each>
             </xsl:with-param>
