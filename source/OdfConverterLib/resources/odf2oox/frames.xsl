@@ -2714,12 +2714,16 @@
 
           <xsl:choose>
             <!--   ignore embedded text-box becouse word doesn't support it-->
-            <xsl:when test="self::node()[name(draw:text-box|draw:rect)]">
+            <xsl:when test="self::node()[name(draw:text-box)]">
               <xsl:message terminate="no">feedback: Nested frames</xsl:message>
             </xsl:when>
 
             <!--default scenario-->
             <xsl:otherwise>
+              <!-- warn loss of positioning for embedded drawn objects or pictures -->
+              <xsl:if test="contains(name(),'draw:')">
+                <xsl:message terminate="no">feedback: Position of object inside textbox</xsl:message>
+              </xsl:if>
               <xsl:apply-templates select="."/>
             </xsl:otherwise>
           </xsl:choose>

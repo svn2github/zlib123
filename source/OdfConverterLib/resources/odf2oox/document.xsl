@@ -145,6 +145,10 @@
       <!-- drawing shapes -->
       <xsl:when
         test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape|child::draw:frame">
+        <!-- warn loss of positioning for embedded drawn objects or pictures -->
+        <xsl:if test="ancestor::draw:text-box">
+          <xsl:message terminate="no">feedback: Position of object inside textbox</xsl:message>
+        </xsl:if>
         <xsl:if test="child::draw:frame">
           <xsl:apply-templates mode="paragraph"/>
         </xsl:if>
