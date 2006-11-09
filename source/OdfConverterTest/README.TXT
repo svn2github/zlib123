@@ -1,5 +1,5 @@
 ODF Command Line Translator
-================
+===========================
 
 Thank you for downloading ODF Command Line Translator(OdfConverterTest)
 
@@ -21,7 +21,7 @@ To test the program, you need :
 * .NET framework 2.0 (http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&displaylang=en)
 
 
-OdfConverterTest Usage
+Command line Usage
 ----------------------
 
 OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level]
@@ -42,4 +42,84 @@ OdfConverter.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] 
 Known Issues
 ------------
 
-	The OdfConverterTest command line tool only works on local drives.
+	The OdfConverter command line tool only works on local drives.
+
+
+
+The ODF to OpenXML conversion currently supports
+------------------------------------------------
+
+Characters formatting
+Paragraph formatting
+Page formatting
+Columns
+Tables
+Numbering
+Table of content
+Index of tables
+Alphanumerical index
+Pictures
+OLE Objects
+Headers and footers
+Footnotes and endnotes
+Bookmarks and cross-references
+Change tracking
+Line numbering
+Fields (common and documents fields)
+
+
+Features/options lost in the ODF to OpenXML translation
+-------------------------------------------------------
+
+Table of content protection
+Text background color outside the 16 basic colors
+Page number offset
+Fields (chapter, description, printed by)
+Nested frames
+Frame absolute position
+Annotations in text-boxes
+Annotations in headers or footers
+Hidden sections
+Page break before endnotes
+Notes in lists
+SVM images
+Cropped images
+Embedded objects
+Shape top and bottom wrapping
+Distance between numbering and text
+Spacing at top of a page/table
+Next page style if no page break
+Alignment of last line in paragraphs
+Paragraph's background image
+Automatic page breaks
+Widow and orphan user defined line numbers
+Text blinking
+Text font weight
+Basic text rotation
+Capitalized text
+Lowercase text
+Text scale greater than 600%
+Tab stop leader text
+Individual page background color
+Header or footer dynamic text adaptation
+Shadow borders style
+Subtables borders and padding
+Tables repeat header option
+Tables keep with next paragraph option
+Unsplittable table option
+Table background image
+Tables with more than 64 columns
+Table cell protection
+Table cell shadow
+
+
+OpenXML to ODF conversion currently supports
+--------------------------------------------
+
+Document structure
+Basic text and paragraph formatting
+Basic tables
+Basic document properties
+
+
+
