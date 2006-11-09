@@ -177,8 +177,99 @@
     <xsl:call-template name="InsertImagePosV"/>
     <xsl:call-template name="InsertImageFlip"/>
     <xsl:call-template name="InsertImageCrop"/>
+    <xsl:call-template name="InsertImageWrap"/>
+    <xsl:call-template name="InsertImageMargins"/>
   </xsl:template>
 
+  <xsl:template name="InsertImageWrap">
+    <xsl:if test="descendant::node()[contains(name(),'wp:wrap')]">
+      <xsl:attribute name="style:wrap">
+        
+        <xsl:if test="descendant::wp:wrapSquare">
+          <xsl:call-template name="InsertSquareWrap">
+            <xsl:with-param name="wrap" select="descendant::wp:wrapSquare/@wrapText"/>
+          </xsl:call-template>
+        </xsl:if>
+        
+        <xsl:if test="descendant::wp:wrapTight">
+          <xsl:call-template name="InsertSquareWrap">
+            <xsl:with-param name="wrap" select="descendant::wp:wrapTight/@wrapText"/>
+          </xsl:call-template>
+        </xsl:if>
+        
+        <xsl:if test="descendant::wp:wrapTopAndBottom">
+          <xsl:text>none</xsl:text>
+        </xsl:if>
+        
+        <xsl:if test="descendant::wp:wrapThrough">
+          <xsl:call-template name="InsertSquareWrap">
+            <xsl:with-param name="wrap" select="descendant::wp:wrapThrough/@wrapText"/>
+          </xsl:call-template>
+        </xsl:if>
+      
+        <xsl:if test="descendant::wp:wrapNone">
+          <xsl:text>run-through</xsl:text>
+        </xsl:if>
+      </xsl:attribute>
+      
+      <!--decide if in backround or in front of text-->
+      <xsl:if test="descendant::wp:anchor/@behindDoc = 1">
+        <xsl:attribute name="style:run-through">
+            <xsl:text>background</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+   </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="InsertImageMargins">
+    <xsl:if test="descendant::wp:anchor">
+
+        <xsl:attribute name="fo:margin-top">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length" select="descendant::wp:anchor/@distT"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      
+      <xsl:attribute name="fo:margin-bottom">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="descendant::wp:anchor/@distB"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+      
+      <xsl:attribute name="fo:margin-left">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="descendant::wp:anchor/@distL"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+      
+      <xsl:attribute name="fo:margin-right">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="descendant::wp:anchor/@distR"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="InsertSquareWrap">
+    <xsl:param name="wrap"/>
+    
+    <xsl:choose>
+      <xsl:when test="$wrap = 'bothSides' ">
+        <xsl:text>parallel</xsl:text>
+      </xsl:when>
+      <xsl:when test="$wrap = 'largest' ">
+        <xsl:text>dynamic</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$wrap"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <xsl:template name="GetCropSize">
     <xsl:param name="cropValue"/>
     <xsl:param name="cropOppositeValue"/>
@@ -211,86 +302,98 @@
 
   <xsl:template name="InsertImagePosH">
     <xsl:if test="descendant::wp:positionH">
-      <xsl:attribute name="style:horizontal-pos">
-        <xsl:value-of select="descendant::wp:positionH/wp:align"/>
-      </xsl:attribute>
-
-      <xsl:attribute name="style:horizontal-rel">
-        <xsl:variable name="relativeFrom" select="descendant::wp:positionH/@relativeFrom"/>
-        <xsl:choose>
-          <xsl:when test="$relativeFrom = 'margin' or $relativeFrom = 'column'">
-            <xsl:text>page-content</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom ='page'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'leftMargin' or $relativeFrom = 'outsideMargin'">
-            <xsl:text>page-start-margin</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'rightMargin' or $relativeFrom = 'insideMargin'">
-            <xsl:text>page-end-margin</xsl:text>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:attribute>
+      
+      <xsl:if test="descendant::wp:positionH/wp:align">
+        <xsl:attribute name="style:horizontal-pos">
+          <xsl:value-of select="descendant::wp:positionH/wp:align"/>
+        </xsl:attribute>
+      </xsl:if>
+      
+      <xsl:if test="descendant::wp:positionH/@relativeFrom">
+        <xsl:attribute name="style:horizontal-rel">
+          <xsl:variable name="relativeFrom" select="descendant::wp:positionH/@relativeFrom"/>
+          <xsl:choose>
+            <xsl:when test="$relativeFrom = 'margin' or $relativeFrom = 'column'">
+              <xsl:text>page-content</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom ='page'">
+              <xsl:text>page</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom = 'leftMargin' or $relativeFrom = 'outsideMargin'">
+              <xsl:text>page-start-margin</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom = 'rightMargin' or $relativeFrom = 'insideMargin'">
+              <xsl:text>page-end-margin</xsl:text>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertImagePosV">
     <xsl:if test="descendant::wp:positionV">
-      <xsl:attribute name="style:vertical-pos">
-        <xsl:variable name="align" select="descendant::wp:positionV/wp:align"/>
-        <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
-        <xsl:choose>
-          <!--special rules-->
-          <xsl:when
-            test="$relativeFrom = 'topMargin' or $relativeFrom = 'bottomMargin' or $relativeFrom = 'insideMargin' or $relativeFrom = 'outsideMargin'">
-            <xsl:text>top</xsl:text>
-          </xsl:when>
-          <!--default rules-->
-          <xsl:when test="$align = 'top' ">
-            <xsl:text>top</xsl:text>
-          </xsl:when>
-          <xsl:when test="$align = 'center' ">
-            <xsl:text>middle</xsl:text>
-          </xsl:when>
-          <xsl:when test="$align = 'bottom' ">
-            <xsl:text>bottom</xsl:text>
-          </xsl:when>
-          <xsl:when test="$align = 'inside' ">
-            <xsl:text>top</xsl:text>
-          </xsl:when>
-          <xsl:when test="$align = 'outside' ">
-            <xsl:text>bottom</xsl:text>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:attribute>
-
-      <xsl:attribute name="style:vertical-rel">
-        <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
-        <xsl:choose>
-          <xsl:when test="$relativeFrom = 'margin' ">
-            <xsl:text>page-content</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom ='page'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'topMargin'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'bottomMargin'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'insideMargin'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'outsideMargin'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'line'">
-            <xsl:text>line</xsl:text>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:attribute>
+      
+      <xsl:if test="descendant::wp:positionV/wp:align">
+        <xsl:attribute name="style:vertical-pos">
+          <xsl:variable name="align" select="descendant::wp:positionV/wp:align"/>
+          <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
+          <xsl:choose>
+            <!--special rules-->
+            <xsl:when
+              test="$relativeFrom = 'topMargin' or $relativeFrom = 'bottomMargin' or $relativeFrom = 'insideMargin' or $relativeFrom = 'outsideMargin'">
+              <xsl:text>top</xsl:text>
+            </xsl:when>
+            <!--default rules-->
+            <xsl:when test="$align = 'top' ">
+              <xsl:text>top</xsl:text>
+            </xsl:when>
+            <xsl:when test="$align = 'center' ">
+              <xsl:text>middle</xsl:text>
+            </xsl:when>
+            <xsl:when test="$align = 'bottom' ">
+              <xsl:text>bottom</xsl:text>
+            </xsl:when>
+            <xsl:when test="$align = 'inside' ">
+              <xsl:text>top</xsl:text>
+            </xsl:when>
+            <xsl:when test="$align = 'outside' ">
+              <xsl:text>bottom</xsl:text>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="descendant::wp:positionV/@relativeFrom">
+        <xsl:attribute name="style:vertical-rel">
+          <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
+          <xsl:choose>
+            <xsl:when test="$relativeFrom = 'margin' ">
+              <xsl:text>page-content</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom ='page'">
+              <xsl:text>page</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom = 'topMargin'">
+              <xsl:text>page</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom = 'bottomMargin'">
+              <xsl:text>page</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom = 'insideMargin'">
+              <xsl:text>page</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom = 'outsideMargin'">
+              <xsl:text>page</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom = 'line'">
+              <xsl:text>line</xsl:text>
+            </xsl:when>
+            <xsl:when test="$relativeFrom = 'paragraph'">
+              <xsl:text>paragraph-content</xsl:text>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
