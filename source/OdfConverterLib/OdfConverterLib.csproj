@@ -80,6 +80,7 @@
     <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
     <EmbeddedResource Include="resources\odf2oox\indexes.xsl" />
     <EmbeddedResource Include="resources\odf2oox\bookmarks.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\fields.xsl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
