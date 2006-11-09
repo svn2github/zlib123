@@ -1502,31 +1502,57 @@
                   <xsl:choose>
                     <!-- page-start-margin -->
                     <xsl:when test="$horizontalRel = 'page-start-margin' ">
-                      <xsl:value-of
-                        select="round(number(($pageLeftMargin - $frameWidth) div 2 + $translation))"
-                      />
+                      <xsl:choose>
+                        <xsl:when test="$frameWidth &lt; $pageLeftMargin">
+                          <xsl:value-of
+                            select="round(number(($pageLeftMargin - $frameWidth) div 2 + $translation))"
+                          />
+                        </xsl:when>
+                        <xsl:otherwise>0</xsl:otherwise>
+                      </xsl:choose>
                     </xsl:when>
                     <!-- page-end-margin -->
                     <xsl:when test="$horizontalRel = 'page-end-margin' ">
-                      <xsl:value-of
-                        select="round(number($pageWidth - ($pageRightMargin - $frameWidth) div 2 + $translation))"
-                      />
+                      <xsl:choose>
+                        <xsl:when test="$frameWidth &lt; $pageRightMargin">
+                          <xsl:value-of
+                            select="round(number($pageWidth - ($pageRightMargin - $frameWidth) div 2 + $translation))"
+                          />
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$pageWidth - $frameWidth + $translation"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:when>
                     <!-- paragraph-start-margin -->
                     <xsl:when test="$horizontalRel = 'paragraph-start-margin' ">
                       <!-- TODO : get indent property of current paragraph -->
                       <xsl:variable name="paragraphLeftIndent">0</xsl:variable>
-                      <xsl:value-of
-                        select="round(number(($paragraphLeftIndent - $frameWidth) div 2 + $translation))"
-                      />
+                      <xsl:choose>
+                        <xsl:when test="$frameWidth &lt; $paragraphLeftIndent">
+                          <xsl:value-of
+                            select="round(number(($paragraphLeftIndent - $frameWidth) div 2 + $translation))"
+                          />
+                        </xsl:when>
+                        <xsl:otherwise>0</xsl:otherwise>
+                      </xsl:choose>
                     </xsl:when>
                     <!-- paragraph-end-margin -->
                     <xsl:when test="$horizontalRel = 'paragraph-end-margin' ">
                       <!-- TODO : get indent property of current paragraph -->
                       <xsl:variable name="paragraphRightIndent">0</xsl:variable>
-                      <xsl:value-of
-                        select="round(number($pageWidth - $pageLeftMargin - $pageRightMargin - ($paragraphRightIndent - $frameWidth) div 2 + $translation))"
-                      />
+                      <xsl:choose>
+                        <xsl:when test="$frameWidth &lt; $paragraphRightIndent">
+                          <xsl:value-of
+                            select="round(number($pageWidth - $pageLeftMargin - $pageRightMargin - ($paragraphRightIndent - $frameWidth) div 2 + $translation))"
+                          />
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of
+                            select="$pageWidth - $pageLeftMargin - $pageRightMargin - $frameWidth + $translation"
+                          />
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:when>
                     <!-- frame, frame-content, frame-start-margin, frame-end-margin -->
                     <xsl:when test="contains($horizontalRel, 'frame')">
@@ -2160,7 +2186,12 @@
       <xsl:if
         test="$horizontalPos != '' or ($marginLeft != '' and $marginLeft != 0 ) or ($marginRight != '' and $marginRight != 0 ) or ($xCoordinate != '' and $xCoordinate != 0 ) ">
         <xsl:choose>
-          <!-- priority to measured position -->
+          <!-- centered position -->
+          <xsl:when
+            test="$horizontalPos = 'center' and not(contains($horizontalRel, '-start-margin') or contains($horizontalRel, '-end-margin'))">
+            <xsl:text>mso-position-horizontal:center;</xsl:text>
+          </xsl:when>
+          <!-- measured position -->
           <xsl:when
             test="$horizontalPos = 'from-left' or $horizontalPos='from-inside' or ($marginLeft != '' and $marginLeft != 0 ) or ($marginRight != '' and $marginRight != 0 ) ">
             <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
@@ -2211,7 +2242,11 @@
       <xsl:if
         test="$verticalPos != '' or ($marginTop != '' and $marginTop != 0 ) or ($marginBottom != '' and $marginBottom != 0 ) or ($yCoordinate != '' and $yCoordinate != 0 ) ">
         <xsl:choose>
-          <!-- priority to measured position -->
+          <!-- centered position -->
+          <xsl:when test="$verticalPos = 'middle' ">
+            <xsl:text>mso-position-vertical:center;</xsl:text>
+          </xsl:when>
+          <!-- measured position -->
           <xsl:when
             test="$verticalPos = 'from-top' or ($marginTop != '' and $marginTop != 0 ) or ($marginBottom != '' and $marginBottom != 0 ) ">
             <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
