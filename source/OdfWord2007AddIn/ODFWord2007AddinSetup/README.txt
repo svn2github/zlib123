@@ -36,3 +36,84 @@ If you don't see the ODF entry, it could be due to missing features in Word (see
 * Click "Word Options" in the File menu
 * In the "Add-ins" section, select "COM Add-ins" in the list box and press the "Go" button
 * Make sure to select the checkbox "ODF Word 2007 Add-in" and validate with the "OK" button.
+
+ODF to OpenXml conversion currently supports :
+----------------------------------------------	
+
+Characters formatting
+Paragraph formatting
+Page formatting
+Columns
+Tables
+Numbering
+Table of content
+Index of tables
+Alphanumerical index
+Pictures
+OLE Objects
+Headers and footers
+Footnotes and endnotes
+Bookmarks and cross-references
+Change tracking
+Line numbering
+Fields (common and documents fields)
+
+
+Features/options lost in the ODF to OpenXML translation
+-------------------------------------------------------
+
+Table of content protection
+Text background color outside the 16 basic colors
+Page number offset
+Fields (chapter, description, printed by)
+Nested frames
+Frame absolute position
+Annotations in text-boxes
+Annotations in headers or footers
+Hidden sections
+Page break before endnotes
+Notes in lists
+SVM images
+Cropped images
+Embedded objects
+Shape top and bottom wrapping
+Distance between numbering and text
+Spacing at top of a page/table
+Next page style if no page break
+Alignment of last line in paragraphs
+Paragraph's background image
+Automatic page breaks
+Widow and orphan user defined line numbers
+Text blinking
+Text font weight
+Basic text rotation
+Capitalized text
+Lowercase text
+Text scale greater than 600%
+Tab stop leader text
+Individual page background color
+Header or footer dynamic text adaptation
+Shadow borders style
+Subtables borders and padding
+Tables repeat header option
+Tables keep with next paragraph option
+Unsplittable table option
+Table background image
+Tables with more than 64 columns
+Table cell protection
+Table cell shadow
+
+
+OpenXML to ODF conversion currently supports :
+----------------------------------------------
+
+Document structure
+Basic text and paragraph formatting
+Basic tables
+Basic document properties
+
+
+
+
+
+
