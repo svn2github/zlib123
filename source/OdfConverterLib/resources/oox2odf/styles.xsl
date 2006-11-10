@@ -1932,14 +1932,14 @@
       <!-- positioning of superscript -->
       <xsl:when test="w:vertAlign/@w:val = 'superscript'">
         <xsl:attribute name="style:text-position">
-          <xsl:value-of select="concat('super ',number(33 + $percentValue))"/>
+          <xsl:value-of select="concat('super ',number(58 + $percentValue))"/>
         </xsl:attribute>
       </xsl:when>
 
       <!-- positioning of subscript -->
       <xsl:when test="w:vertAlign/@w:val = 'subscript'">
         <xsl:attribute name="style:text-position">
-          <xsl:value-of select="concat('sub ',number(33 - $percentValue))"/>
+          <xsl:value-of select="concat('sub ',number(58 - $percentValue))"/>
         </xsl:attribute>
       </xsl:when>
 
