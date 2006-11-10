@@ -2044,6 +2044,7 @@
       <!-- inline image -->
       <xsl:when test="$wrappedPara = 1">mso-position-horizontal-relative:char;</xsl:when>
       <!-- direct anchored frame -->
+      <xsl:when test="$anchor = 'as-char' ">mso-position-horizontal-relative:char;</xsl:when>
       <xsl:when test="$anchor = 'page' and ancestor::draw:frame[1]/@svg:x">
         <xsl:choose>
           <!-- page-content -->
@@ -2081,6 +2082,7 @@
       <!-- inline image -->
       <xsl:when test="$wrappedPara = 1">mso-position-vertical-relative:line;</xsl:when>
       <!-- direct anchored frame -->
+      <xsl:when test="$anchor = 'as-char' ">mso-position-horizontal-relative:line;</xsl:when>
       <xsl:when test="$anchor = 'page' and ancestor::draw:frame[1]/@svg:y">
         <xsl:choose>
           <!-- page-content -->
@@ -2114,6 +2116,10 @@
     <xsl:param name="shapeStyle"/>
     <xsl:variable name="graphicProps" select="$shapeStyle/style:graphic-properties"/>
 
+    <xsl:variable name="anchor">
+      <xsl:value-of select="ancestor::draw:frame[1]/@text:anchor-type"/>
+    </xsl:variable>
+    
     <xsl:variable name="wrappedPara">
       <xsl:variable name="wrapping">
         <xsl:call-template name="GetGraphicProperties">
@@ -2129,7 +2135,7 @@
       </xsl:if>
     </xsl:variable>
     <!-- if inline image, no positioning -->
-    <xsl:if test="not($wrappedPara = 1)">
+    <xsl:if test="not($wrappedPara = 1 or $anchor = 'as-char')">
       <!-- two cases : absolute (=>define margin-left and margin-top), or mso-position-horizontal / -vertical -->
       <xsl:variable name="horizontalPos">
         <xsl:call-template name="GetGraphicProperties">
