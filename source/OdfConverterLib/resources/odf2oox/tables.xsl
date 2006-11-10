@@ -114,9 +114,7 @@
           </xsl:attribute>
         </w:tblW>
       </xsl:when>
-      <xsl:otherwise>
-        <w:tblW w:type="auto"/>
-      </xsl:otherwise>
+      <xsl:otherwise/>
     </xsl:choose>
 
     <xsl:if test="$tableProp/@table:align">
