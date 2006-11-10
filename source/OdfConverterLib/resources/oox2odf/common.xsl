@@ -76,6 +76,9 @@
       <xsl:when test="$unit = 'px'">
         <xsl:value-of select="concat(format-number($length * 96.19 div 1440,'#.###'),'px')"/>
       </xsl:when>
+      <xsl:when test="$unit='pct'">        
+        <xsl:value-of select="concat(format-number($length div 50, '#.###'), '%')"/>
+      </xsl:when>
       <xsl:when test="not($length)">
         <xsl:value-of select="concat(0,'cm')"/>
       </xsl:when>
