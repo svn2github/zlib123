@@ -669,6 +669,7 @@
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="$horizontalRel='page'">page</xsl:when>
+          <xsl:when test="$horizontalRel='paragraph'">column</xsl:when>
           <xsl:otherwise>margin</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
@@ -765,12 +766,17 @@
             <xsl:with-param name="attribName">style:number-wrapped-paragraphs</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="not($wrappedPara = 1)">
-          <xsl:call-template name="InsertSquareWrap">
-            <xsl:with-param name="wrap" select="$wrap"/>
-            <xsl:with-param name="imageStyle" select="$imageStyle"/>
-          </xsl:call-template>
-        </xsl:if>
+        <xsl:choose>
+          <xsl:when test="$wrappedPara = 1">
+            <wp:wrapNone/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertSquareWrap">
+              <xsl:with-param name="wrap" select="$wrap"/>
+              <xsl:with-param name="imageStyle" select="$imageStyle"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
 
       <xsl:when test="$wrap ='left' or $wrap = 'right' or $wrap ='dynamic'">
@@ -2747,6 +2753,7 @@
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="$wrappedPara = 1">
+            <w10:wrap type="none"/>
             <w10:anchorlock/>
           </xsl:when>
           <xsl:otherwise>
