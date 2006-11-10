@@ -571,70 +571,6 @@
     </text:bookmark-end>
   </xsl:template>
 
-  <!-- footnotes -->
-  <xsl:template match="w:r[w:footnoteReference]">
-    <xsl:variable name="footnoteId" select="w:footnoteReference/@w:id"/>
-
-    <!-- change context to get the footnote content -->
-    <xsl:for-each select="document('word/footnotes.xml')/w:footnotes/w:footnote[@w:id=$footnoteId]">
-      <text:span>
-        <text:note text:id="{concat('ftn',count(preceding-sibling::w:footnote) - 1)}"
-          text:note-class="footnote">
-          <text:note-citation>
-            <xsl:choose>
-              <xsl:when
-                test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On' ">
-                <xsl:attribute name="text:label">
-                  <xsl:apply-templates select="w:t"/>
-                </xsl:attribute>
-                <xsl:apply-templates select="w:t"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="count(preceding-sibling::w:footnote) - 1"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </text:note-citation>
-          <text:note-body>
-            <!-- TODO : only take relevant content (ignore runs concerning footnoteproperties). -->
-            <xsl:apply-templates select="."/>
-          </text:note-body>
-        </text:note>
-      </text:span>
-    </xsl:for-each>
-  </xsl:template>
-
-  <!-- endnote -->
-  <xsl:template match="w:r[w:endnoteReference]">
-    <xsl:variable name="endnoteId" select="w:endnoteReference/@w:id"/>
-
-    <!-- change context to get the footnote content -->
-    <xsl:for-each select="document('word/endnotes.xml')/w:endnotes/w:endnote[@w:id=$endnoteId]">
-      <text:span>
-        <text:note text:id="{concat('edn',count(preceding-sibling::w:endnote) - 1)}"
-          text:note-class="endnote">
-          <text:note-citation>
-            <xsl:choose>
-              <xsl:when
-                test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On' ">
-                <xsl:attribute name="text:label">
-                  <xsl:apply-templates select="w:t"/>
-                </xsl:attribute>
-                <xsl:apply-templates select="w:t"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="count(preceding-sibling::w:endnote) - 1"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </text:note-citation>
-          <text:note-body>
-            <!-- TODO : only take relevant content (ignore runs concerning footnoteproperties). -->
-            <xsl:apply-templates select="."/>
-          </text:note-body>
-        </text:note>
-      </text:span>
-    </xsl:for-each>
-  </xsl:template>
-
   <!-- simple text  -->
   <xsl:template match="w:t">
     <xsl:message terminate="no">progress:w:t</xsl:message>
@@ -642,7 +578,9 @@
     <xsl:choose>
       <!--check whether string contains  whitespace sequence-->
       <xsl:when test="not(contains(.,'  '))">
+        <xsl:if test="not(ancestor::w:endnote and parent::w:r/w:rPr/w:rStyle) and not(ancestor::w:footnote and parent::w:r/w:rPr/w:rStyle)">
         <xsl:value-of select="."/>
+        </xsl:if>
       </xsl:when>
       <xsl:otherwise>
         <!--converts whitespaces sequence to text:s-->
@@ -752,4 +690,84 @@
   </xsl:template>
   <!--ignore text in automatic styles mode-->
   <xsl:template match="text()" mode="automaticstyles"/>
+  
+  <!-- footnotes -->
+  <xsl:template match="w:r[w:footnoteReference]">
+    <xsl:variable name="footnoteId" select="w:footnoteReference/@w:id"/>
+    <xsl:variable name="textFootnote" select="w:t"></xsl:variable>
+    <!-- change context to get the footnote content -->
+    <xsl:for-each select="document('word/footnotes.xml')/w:footnotes/w:footnote[@w:id=$footnoteId]">
+      
+      <text:span>
+        <text:note text:id="{concat('ftn',count(preceding-sibling::w:footnote) - 1)}"
+          text:note-class="footnote">
+          <text:note-citation>       
+            <xsl:choose>             
+              <xsl:when
+                test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On' or $textFootnote!=''">
+                <xsl:choose>
+                  <xsl:when test="$textFootnote!=''">
+                    <xsl:attribute name="text:label"><xsl:value-of select="concat($textFootnote, ' ')"/></xsl:attribute>
+                    <xsl:value-of select="concat('$textFootnote', ' ')"/>             
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name="text:label">                  
+                      <xsl:apply-templates select="w:t"/>
+                    </xsl:attribute>                
+                    <xsl:apply-templates select="w:t"/>                    
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>              
+              <xsl:otherwise>               
+                <xsl:value-of select="count(preceding-sibling::w:footnote) - 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </text:note-citation>
+          <text:note-body>            
+            <xsl:apply-templates select="."/>
+          </text:note-body>
+        </text:note>
+      </text:span>
+    </xsl:for-each>
+  </xsl:template>
+  
+  <!-- endnote -->
+  <xsl:template match="w:r[w:endnoteReference]">
+    <xsl:variable name="endnoteId" select="w:endnoteReference/@w:id"/>
+    <xsl:variable name="textEndnote" select="w:t"></xsl:variable>
+    <!-- change context to get the footnote content -->
+    <xsl:for-each select="document('word/endnotes.xml')/w:endnotes/w:endnote[@w:id=$endnoteId]">
+      <text:span>
+        <text:note text:id="{concat('edn',count(preceding-sibling::w:endnote) - 1)}"
+          text:note-class="endnote">
+          <text:note-citation>
+            <xsl:choose>
+              <xsl:when
+                test="@w:suppressRef = 1 or @w:suppressRef = 'true' or @w:suppressRef = 'On'  or $textEndnote!=''">
+                <xsl:choose>
+                  <xsl:when test="$textEndnote">
+                    <xsl:attribute name="text:label"><xsl:value-of select="concat($textEndnote, ' ')"/></xsl:attribute>
+                    <xsl:value-of select="concat($textEndnote, ' ')"/>    
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name="text:label">                  
+                      <xsl:apply-templates select="w:t"/>
+                    </xsl:attribute>                
+                    <xsl:apply-templates select="w:t"/>                    
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="count(preceding-sibling::w:endnote) - 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </text:note-citation>
+          <text:note-body>
+            <xsl:apply-templates select="."/>          
+          </text:note-body>
+        </text:note>
+      </text:span>
+    </xsl:for-each>
+  </xsl:template>
+  
 </xsl:stylesheet>
