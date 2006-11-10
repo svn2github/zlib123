@@ -96,29 +96,28 @@
       <xsl:message terminate="no">feedback:Table shadow</xsl:message>
     </xsl:if>
 
-    <w:tblW>
-      <xsl:attribute name="w:type">
-        <xsl:choose>
-          <xsl:when test="$tableProp/@style:rel-width">pct</xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$type"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      <xsl:attribute name="w:w">
-        <xsl:choose>
-          <xsl:when test="$tableProp/@style:rel-width">
+    <!-- table width -->
+    <xsl:choose>
+      <xsl:when test="$tableProp/@style:rel-width">
+        <w:tblW w:type="pct">
+          <xsl:attribute name="w:w">
             <xsl:value-of select="50 * number(substring-before($tableProp/@style:rel-width, '%'))"/>
-          </xsl:when>
-          <xsl:when test="$tableProp/@style:width">
+          </xsl:attribute>
+        </w:tblW>
+      </xsl:when>
+      <xsl:when test="$tableProp/@style:width">
+        <w:tblW w:type="{$type}">
+          <xsl:attribute name="w:w">
             <xsl:call-template name="twips-measure">
               <xsl:with-param name="length" select="$tableProp/@style:width"/>
             </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>auto</xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-    </w:tblW>
+          </xsl:attribute>
+        </w:tblW>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:tblW w:type="auto"/>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <xsl:if test="$tableProp/@table:align">
       <xsl:choose>
