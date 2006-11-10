@@ -44,11 +44,10 @@
       </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
-        <xsl:for-each select="document('word/document.xml')">
-          <xsl:call-template name="HeadingList">
-            <xsl:with-param name="node" select="w:document/w:body/w:p[1]"/>
-          </xsl:call-template>
-        </xsl:for-each>
+        <!--heading numbering style-->
+        <xsl:if test="document('word/document.xml')/descendant::w:outlineLvl or document('word/styles.xml')/descendant::w:outlineLvl">
+          <xsl:call-template name="InsertHeadingListStyle"/>
+        </xsl:if>
         <!-- document styles -->
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
       </office:styles>
@@ -154,90 +153,6 @@
     </style:page-layout>
   </xsl:template>
 
-<!-- insert heading list style -->
-  <xsl:template name="HeadingList">
-    <xsl:param name="node"/>
-    <xsl:for-each select="$node">
-    <xsl:variable name="outlineLevel">
-      <xsl:call-template name="GetOutlineLevel">
-        <xsl:with-param name="node" select="."/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:choose>
-      <xsl:when test="$outlineLevel !=''">
-        <xsl:variable name="numid">
-          <xsl:choose>
-            <xsl:when test="w:pPr/w:numPr">
-              <xsl:value-of select="w:pPr/w:numPr/w:numId/@w:val"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:variable name="styleId">
-                <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
-              </xsl:variable>
-              <xsl:value-of select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:pPr/w:numPr/w:numId/@w:val"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:if test="$numid != '' ">
-          <text:outline-style>
-            <xsl:variable name="abstractnumid">
-              <xsl:value-of select="document('word/numbering.xml')//w:numbering/w:num[@w:numId =$numid]/w:abstractNumId/@w:val"/>
-            </xsl:variable>
-            <xsl:for-each select="document('word/numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId = $abstractnumid]/w:lvl">
-              <text:outline-level-style>
-                <xsl:attribute name="text:level">
-                  <xsl:value-of select="./@w:ilvl +1"/>
-                </xsl:attribute>
-                <xsl:attribute name="style:num-format">
-                  <xsl:if test="./w:lvlText/@w:val != ''">
-                    <xsl:call-template name="NumFormat">
-                      <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
-                    </xsl:call-template>
-                  </xsl:if>
-                </xsl:attribute>
-                <xsl:if test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
-                  <xsl:attribute name="style:num-suffix">
-                    <xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:variable name="display">
-                  <xsl:call-template name="Count">
-                    <xsl:with-param name="string">
-                      <xsl:value-of select="./w:lvlText/@w:val"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="count">0</xsl:with-param>
-                  </xsl:call-template>
-                </xsl:variable>
-                <xsl:if test="$display &gt; 1">
-                  <xsl:attribute name="text:display-levels">
-                    <xsl:value-of select="$display"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <style:list-level-properties>
-                  <xsl:variable name="Ind" select="./w:pPr/w:ind"/> 
-                  <xsl:attribute name="text:space-before">
-                    <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:firstLine)"/>
-                  </xsl:attribute>
-                  <xsl:attribute name="text:min-label-distance">
-                    <xsl:value-of select="number(./w:pPr/w:tabs/w:tab/@w:pos)"/>
-                  </xsl:attribute>
-                </style:list-level-properties>
-              </text:outline-level-style>
-            </xsl:for-each>
-          </text:outline-style>
-        </xsl:if>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:if test="count(following::w:p[1]) != 0">
-          <xsl:call-template name="HeadingList">
-            <xsl:with-param name="node" select="following::w:p[1]"/>
-          </xsl:call-template>
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
-    </xsl:for-each>
-  </xsl:template>
-  
   <xsl:template name="Count">
     <xsl:param name="string"/>
     <xsl:param name="count"/>
@@ -257,8 +172,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
+    
   <!-- conversion of page properties -->
   <!-- TODO : handle other properties -->
   <xsl:template name="InsertPageLayoutProperties">
@@ -1995,4 +1909,16 @@
       <xsl:attribute name="fo:font-size">10</xsl:attribute>
     </xsl:if>
   </xsl:template>
-</xsl:stylesheet>
+  
+  <!-- generate text:outline-style for heading  numbering-->
+  <xsl:template name="InsertHeadingListStyle">
+    <xsl:variable name="numId">
+      <xsl:call-template name="GetOutlineListNumId"/>
+    </xsl:variable>
+    <xsl:if test="$numId != ''">
+        <xsl:call-template name="InsertOutlineListStyle">
+            <xsl:with-param name="numid" select="$numId"/>
+        </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+ </xsl:stylesheet>
