@@ -246,10 +246,26 @@
         select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = @draw:style-name]"/>
       <xsl:variable name="imageStyle" select="$automaticStyle | $officeStyle"/>
 
+      <!-- check if inline image. -->
+      <xsl:variable name="wrappedPara">
+        <xsl:variable name="wrapping">
+          <xsl:call-template name="GetGraphicProperties">
+            <xsl:with-param name="shapeStyle" select="$imageStyle"/>
+            <xsl:with-param name="attribName">style:wrap</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$wrapping = 'parallel' ">
+          <xsl:call-template name="GetGraphicProperties">
+            <xsl:with-param name="shapeStyle" select="$imageStyle"/>
+            <xsl:with-param name="attribName">style:number-wrapped-paragraphs</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:variable>
+
       <xsl:choose>
         <!-- image embedded in draw:frame/draw:text-box or in text:note element has to be inline with text -->
         <xsl:when
-          test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote'] or ($imageStyle/style:graphic-properties/@style:wrap='parallel' and $imageStyle/style:graphic-properties/@style:number-wrapped-paragraphs=1)">
+          test="ancestor::draw:text-box or @text:anchor-type='as-char' or ancestor::text:note[@ text:note-class='endnote'] or $wrappedPara = 1">
           <xsl:call-template name="InsertInlineImage">
             <xsl:with-param name="cx" select="$cx"/>
             <xsl:with-param name="cy" select="$cy"/>
@@ -1498,7 +1514,8 @@
                     </xsl:when>
                     <!-- page-content -->
                     <xsl:when test="$horizontalRel = 'page-content' ">
-                      <xsl:value-of select="$contextWidth - $frameWidth - $frameMarginRight + $translation"/>
+                      <xsl:value-of
+                        select="$contextWidth - $frameWidth - $frameMarginRight + $translation"/>
                     </xsl:when>
                     <!-- paragraph, paragraph-content, paragraph-end-margin -->
                     <xsl:when
@@ -1632,8 +1649,7 @@
             <xsl:when test="$horizontalPos='left' or $horizontalPos='inside' ">
               <xsl:value-of select="$pageWidth - $pageRightMargin"/>
             </xsl:when>
-            <xsl:when
-              test="$horizontalPos='right' or $horizontalPos='outside' ">
+            <xsl:when test="$horizontalPos='right' or $horizontalPos='outside' ">
               <xsl:value-of select="$pageWidth - $pageLeftMargin - $pageRightMargin"/>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
@@ -2125,7 +2141,7 @@
     <xsl:variable name="anchor">
       <xsl:value-of select="ancestor::draw:frame[1]/@text:anchor-type"/>
     </xsl:variable>
-    
+
     <xsl:variable name="wrappedPara">
       <xsl:variable name="wrapping">
         <xsl:call-template name="GetGraphicProperties">
