@@ -559,7 +559,16 @@
     <xsl:param name="imageStyle"/>
 
     <xsl:variable name="ox">
-      <xsl:choose>
+      <xsl:call-template name="emu-measure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ComputeMarginX">
+            <xsl:with-param name="parent"
+              select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+          </xsl:call-template>
+          <xsl:text>pt</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
+      <!--      <xsl:choose>
         <xsl:when test="@svg:x">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@svg:x"/>
@@ -568,11 +577,20 @@
         <xsl:otherwise>
           <xsl:value-of select="0"/>
         </xsl:otherwise>
-      </xsl:choose>
+      </xsl:choose>-->
     </xsl:variable>
 
     <xsl:variable name="oy">
-      <xsl:choose>
+      <xsl:call-template name="emu-measure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ComputeMarginY">
+            <xsl:with-param name="parent"
+              select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+          </xsl:call-template>
+          <xsl:text>pt</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
+      <!--      <xsl:choose>
         <xsl:when test="@svg:y">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@svg:y"/>
@@ -581,7 +599,7 @@
         <xsl:otherwise>
           <xsl:value-of select="0"/>
         </xsl:otherwise>
-      </xsl:choose>
+      </xsl:choose>-->
     </xsl:variable>
 
     <xsl:call-template name="InsertAnchorImagePosH">
@@ -1326,12 +1344,40 @@
             <!-- width to be added depending on were object is located : column or page -->
             <xsl:variable name="contextWidth">
               <xsl:call-template name="ComputeContextWidth">
+                <xsl:with-param name="frame" select="$parent[1]"/>
                 <xsl:with-param name="horizontalRel" select="$horizontalRel"/>
                 <xsl:with-param name="horizontalPos" select="$horizontalPos"/>
                 <xsl:with-param name="pageWidth" select="$pageWidth"/>
                 <xsl:with-param name="pageLeftMargin" select="$pageRightMargin"/>
                 <xsl:with-param name="pageRightMargin" select="$pageLeftMargin"/>
               </xsl:call-template>
+            </xsl:variable>
+            <!-- value to be substracted from the context width -->
+            <xsl:variable name="contextSubstractedValue">
+              <xsl:variable name="wrap">
+                <xsl:call-template name="GetGraphicProperties">
+                  <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                  <xsl:with-param name="attribName">style:wrap</xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when test="$wrap = 'none' or $wrap = 'run-through' or $wrap = '' ">
+                  <xsl:variable name="precedingFrames">
+                    <xsl:call-template name="ComputeContextSubstractedWidth">
+                      <xsl:with-param name="frames"
+                        select="$parent[1]/preceding-sibling::*[contains(name(),'draw:')]"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name="followingFrames">
+                    <xsl:call-template name="ComputeContextSubstractedWidth">
+                      <xsl:with-param name="frames"
+                        select="$parent[1]/following-sibling::*[contains(name(),'draw:')]"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:value-of select="$precedingFrames + $followingFrames"/>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
             </xsl:variable>
             <!-- values of frame : padding (margin width), width, heigth -->
             <xsl:variable name="frameMarginLeft">
@@ -1426,14 +1472,17 @@
                       test="$horizontalRel = 'paragraph' or $horizontalRel = 'paragraph-content'  or $horizontalRel = 'paragraph-start-margin' ">
                       <!-- TODO : get indent property of current paragraph -->
                       <xsl:variable name="paragraphLeftIndent">0</xsl:variable>
-                      <xsl:value-of select="$paragraphLeftIndent + $fromLeft + $translation"/>
+                      <xsl:value-of
+                        select="$paragraphLeftIndent - $contextSubstractedValue + $fromLeft + $translation"
+                      />
                     </xsl:when>
                     <!-- paragraph-end-margin -->
                     <xsl:when test="$horizontalRel = 'paragraph-end-margin' ">
                       <!-- TODO : get indent property of current paragraph -->
                       <xsl:variable name="paragraphRightIndent">0</xsl:variable>
                       <xsl:value-of
-                        select="$contextWidth - $paragraphRightIndent + $fromLeft + $translation"/>
+                        select="$contextWidth - $paragraphRightIndent - $contextSubstractedValue + $fromLeft + $translation"
+                      />
                     </xsl:when>
                     <!-- frame, frame-content, frame-start-margin, frame-end-margin -->
                     <xsl:when test="contains($horizontalRel, 'frame')">
@@ -1458,7 +1507,9 @@
                     <xsl:when test="$horizontalRel = 'page-end-margin' ">
                       <xsl:choose>
                         <xsl:when test="$frameWidth &lt; $pageRightMargin">
-                          <xsl:value-of select="$contextWidth + $frameMarginLeft + $translation"/>
+                          <xsl:value-of
+                            select="$contextWidth - $contextSubstractedValue + $frameMarginLeft + $translation"
+                          />
                         </xsl:when>
                         <xsl:otherwise>
                           <xsl:value-of
@@ -1471,7 +1522,8 @@
                       test="$horizontalRel = 'paragraph' or $horizontalRel = 'paragraph-content' or $horizontalRel = 'paragraph-start-margin' ">
                       <!-- TODO : get indent property of current paragraph -->
                       <xsl:variable name="paragraphLeftIndent">0</xsl:variable>
-                      <xsl:value-of select="$paragraphLeftIndent + $frameMarginLeft + $translation"
+                      <xsl:value-of
+                        select="$paragraphLeftIndent + $frameMarginLeft - $contextSubstractedValue + $translation"
                       />
                     </xsl:when>
                     <!-- paragraph-end-margin -->
@@ -1479,7 +1531,7 @@
                       <!-- TODO : get indent property of current paragraph -->
                       <xsl:variable name="paragraphRightIndent">0</xsl:variable>
                       <xsl:value-of
-                        select="$contextWidth - $paragraphRightIndent + $frameMarginLeft + $translation"
+                        select="$contextWidth - $paragraphRightIndent + $frameMarginLeft - $contextSubstractedValue + $translation"
                       />
                     </xsl:when>
                     <!-- frame, frame-content, frame-start-margin, frame-end-margin -->
@@ -1515,7 +1567,8 @@
                     <!-- page-content -->
                     <xsl:when test="$horizontalRel = 'page-content' ">
                       <xsl:value-of
-                        select="$contextWidth - $frameWidth - $frameMarginRight + $translation"/>
+                        select="$contextWidth - $frameWidth - $frameMarginRight - $contextSubstractedValue + $translation"
+                      />
                     </xsl:when>
                     <!-- paragraph, paragraph-content, paragraph-end-margin -->
                     <xsl:when
@@ -1523,14 +1576,15 @@
                       <!-- TODO : get indent property of current paragraph -->
                       <xsl:variable name="paragraphRightIndent">0</xsl:variable>
                       <xsl:value-of
-                        select="$contextWidth - $paragraphRightIndent -$frameWidth - $frameMarginRight + $translation"
+                        select="$contextWidth - $paragraphRightIndent -$frameWidth - $frameMarginRight - $contextSubstractedValue + $translation"
                       />
                     </xsl:when>
                     <!-- paragraph-start-margin -->
                     <xsl:when test="$horizontalRel = 'paragraph-start-margin' ">
                       <!-- TODO : get indent property of current paragraph -->
                       <xsl:variable name="paragraphLeftIndent">0</xsl:variable>
-                      <xsl:value-of select="$paragraphLeftIndent - $frameMarginRight + $translation"
+                      <xsl:value-of
+                        select="$paragraphLeftIndent - $frameMarginRight - $contextSubstractedValue + $translation"
                       />
                     </xsl:when>
                     <!-- frame, frame-content, frame-start-margin, frame-end-margin -->
@@ -1590,13 +1644,11 @@
                       <xsl:choose>
                         <xsl:when test="$frameWidth &lt; $paragraphRightIndent">
                           <xsl:value-of
-                            select="round(number($pageWidth - $pageLeftMargin - $pageRightMargin - ($paragraphRightIndent - $frameWidth) div 2 + $translation))"
+                            select="round(number($contextWidth - ($paragraphRightIndent - $frameWidth) div 2 + $translation))"
                           />
                         </xsl:when>
                         <xsl:otherwise>
-                          <xsl:value-of
-                            select="$pageWidth - $pageLeftMargin - $pageRightMargin - $frameWidth + $translation"
-                          />
+                          <xsl:value-of select="$contextWidth - $frameWidth + $translation"/>
                         </xsl:otherwise>
                       </xsl:choose>
                     </xsl:when>
@@ -1631,6 +1683,7 @@
   <!-- compute the width of page or paragraph margin. -->
   <!-- COMMENT : This is not correct if document has more than one page-master-style -->
   <xsl:template name="ComputeContextWidth">
+    <xsl:param name="frame"/>
     <xsl:param name="horizontalRel"/>
     <xsl:param name="horizontalPos"/>
     <xsl:param name="pageWidth"/>
@@ -1689,6 +1742,44 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
+  </xsl:template>
+
+  <!-- compute a value to be substracted to context width -->
+  <xsl:template name="ComputeContextSubstractedWidth">
+    <xsl:param name="frames"/>
+    <xsl:param name="side"/>
+    <xsl:choose>
+      <xsl:when test="$frames">
+        <xsl:variable name="otherValues">
+          <xsl:call-template name="ComputeContextSubstractedWidth">
+            <xsl:with-param name="frames" select="$frames[position() &gt; 1]"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="currentVal">
+          <xsl:choose>
+            <xsl:when
+              test="key('automatic-styles', $frames[1]/@draw:style-name)/style:graphic-properties/@style:wrap = 'right' ">
+              <xsl:call-template name="ComputeDrawingObjectSize">
+                <xsl:with-param name="side">width</xsl:with-param>
+                <xsl:with-param name="frame" select="$frames[1]"/>
+                <xsl:with-param name="unit">point</xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when
+              test="key('automatic-styles', $frames[1]/@draw:style-name)/style:graphic-properties/@style:wrap = 'left' ">
+              <xsl:call-template name="ComputeDrawingObjectSize">
+                <xsl:with-param name="side">width</xsl:with-param>
+                <xsl:with-param name="frame" select="$frames[1]"/>
+                <xsl:with-param name="unit">point</xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:value-of select="$currentVal + $otherValues"/>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- computes text-box margin. Returns a measure in Points -->
