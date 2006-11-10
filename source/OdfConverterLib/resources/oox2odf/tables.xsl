@@ -583,7 +583,7 @@
 
   <!--  insert row properties: height-->
   <xsl:template name="InsertRowProperties">
-    <xsl:if test="w:trHeight/@w:hRule and w:trHeight/@w:hRule!='auto' ">
+    <xsl:if test="(w:trHeight/@w:hRule and w:trHeight/@w:hRule!='auto' ) or not(w:trHeight/@w:hRule)">
       <xsl:attribute name="style:min-row-height">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">
