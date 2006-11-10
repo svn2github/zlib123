@@ -42,7 +42,16 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             this.handle = ZipLib.zipOpen(resolvedPath, 0);
             if (this.handle == IntPtr.Zero)
             {
-                throw new ZipException("Error while creating file: " + path);
+                // Small trick to get exact error message...
+                try {
+                    using (FileStream writer = File.Create(path)) {
+                        writer.WriteByte(0);
+                    }
+                    File.Delete(path);
+                    throw new ZipCreationException();
+                } catch (Exception ex) {
+                    throw new ZipCreationException(ex.Message);
+                }
             }
             this.entryOpened = false;
 		}

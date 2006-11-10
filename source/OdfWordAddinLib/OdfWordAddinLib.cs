@@ -104,6 +104,11 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                     InfoBox infoBox = new InfoBox("NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail", this.labelsResourceManager);
                     infoBox.ShowDialog();
                 }
+                catch (OdfZipUtils.ZipCreationException)
+                {
+                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "UnableToCreateOutputDetail", this.labelsResourceManager);
+                    infoBox.ShowDialog();
+                }
                 catch (Exception e)
                 {
                     InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.labelsResourceManager);
@@ -162,7 +167,10 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                             throw form.Exception;
                         }
                     }
-                }
+                } catch (OdfZipUtils.ZipCreationException zipEx) {
+                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", zipEx.Message ?? "UnableToCreateOutputDetail", this.labelsResourceManager);
+                    infoBox.ShowDialog();
+                } 
                 catch (Exception e)
                 {
                     InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.labelsResourceManager);

@@ -174,4 +174,10 @@
   <data name="OdfConverterTitle" xml:space="preserve">
     <value>ODF Converter</value>
   </data>
+  <data name="UnableToCreateOutputDetail" xml:space="preserve">
+    <value>Unable to create target file : check that the path is correct and that the file is not in use by another application.</value>
+  </data>
+  <data name="UnableToCreateOutputLabel" xml:space="preserve">
+    <value>Unable to create target file</value>
+  </data>
 </root>

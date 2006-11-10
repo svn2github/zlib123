@@ -174,4 +174,10 @@
   <data name="OdfConverterTitle" xml:space="preserve">
     <value>Convertisseur ODF</value>
   </data>
+  <data name="UnableToCreateOutputLabel" xml:space="preserve">
+    <value>Impossible de créer le fichier cible</value>
+  </data>
+  <data name="UnableToCreateOutputDetail" xml:space="preserve">
+    <value>Impossible de créer le fichier cible : vérifiez que le chemin est correct et que le fichier n'est pas en cours d'utilisation par une autre application.</value>
+  </data>
 </root>
