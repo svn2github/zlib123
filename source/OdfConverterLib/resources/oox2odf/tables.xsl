@@ -349,6 +349,14 @@
        <!--        </xsl:if>-->
       </xsl:otherwise>
     </xsl:choose>
+    
+<!-- Background color -->
+    <xsl:if test="w:shd">
+      <xsl:attribute name="fo:background-color">
+        <xsl:value-of select="concat('#', w:shd/@w:fill)"/>
+      </xsl:attribute>
+    </xsl:if>
+
   </xsl:template>
 
   <!--  insert cell margins-->
