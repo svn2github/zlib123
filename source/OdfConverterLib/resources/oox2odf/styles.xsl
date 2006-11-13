@@ -152,26 +152,6 @@
       </xsl:for-each>
     </style:page-layout>
   </xsl:template>
-
-  <xsl:template name="Count">
-    <xsl:param name="string"/>
-    <xsl:param name="count"/>
-    <xsl:choose>
-      <xsl:when test="string-length(substring-after($string,'%')) &gt; 0">
-        <xsl:call-template name="Count">
-          <xsl:with-param name="string">
-            <xsl:value-of select="substring-after($string,'%')"/>
-          </xsl:with-param>
-          <xsl:with-param name="count">
-            <xsl:value-of select="$count +1"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$count"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
     
   <!-- conversion of page properties -->
   <!-- TODO : handle other properties -->

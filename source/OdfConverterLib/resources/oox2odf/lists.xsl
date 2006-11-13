@@ -86,7 +86,7 @@
             <xsl:call-template name="TextChar"/>
           </xsl:attribute>
           <style:list-level-properties>
-            <xsl:call-template name="ListLevelProperties"/>
+            <xsl:call-template name="InsertListLevelProperties"/>
           </style:list-level-properties>
           <style:text-properties style:font-name="StarSymbol"/>
         </text:list-level-style-bullet>
@@ -109,7 +109,7 @@
             </xsl:attribute>
           </xsl:if>
           <style:list-level-properties>
-            <xsl:call-template name="ListLevelProperties"/>
+            <xsl:call-template name="InsertListLevelProperties"/>
           </style:list-level-properties>
         </text:list-level-style-number>
       </xsl:otherwise>
@@ -132,7 +132,7 @@
 
   <!-- properties for each list level -->
 
-  <xsl:template name="ListLevelProperties">
+  <xsl:template name="InsertListLevelProperties">
     <xsl:variable name="Ind" select="w:pPr/w:ind"/>
     <xsl:variable name="tab">
       <xsl:choose>
@@ -265,23 +265,34 @@
 
   <!-- heading numbering - gets heading num id which we need to generate text:outline-style-->
   <xsl:template name="GetOutlineListNumId">
-
+    <xsl:variable name="headingElement" select="document('word/document.xml')/descendant::w:p[descendant::w:outlineLvl]"/>
     <!-- take heading style which is used in the document (it can have a numId) -->
     <xsl:variable name="headingStyle"
       select="document('word/styles.xml')/w:styles/w:style[descendant::w:outlineLvl 
       and document('word/document.xml')/descendant::w:p/descendant::w:pStyle/@w:val = @w:styleId]"/>
 
     <xsl:choose>
-
+      <!-- when the outlineLvl is found in paragraph check for the numid in it and in it's style -->
+      <xsl:when test="$headingElement">
+        <xsl:variable name="headingNumId">
+          <xsl:call-template name="GetListProperty">
+            <xsl:with-param name="node" select="$headingElement"/>
+            <xsl:with-param name="property" >w:numId</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$headingNumId != ''">
+          <xsl:value-of select="$headingNumId"/>
+        </xsl:if>
+      </xsl:when>
+      
+      <!-- when the outlineLvl is found in style check for the numid in it and in paragraph with this style -->
       <xsl:when test="$headingStyle">
-
-        <xsl:variable name="styleNumId">
+         <xsl:variable name="styleNumId">
           <xsl:call-template name="GetListStyleProperty">
             <xsl:with-param name="style" select="$headingStyle"/>
             <xsl:with-param name="property">w:numId</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-
         <xsl:choose>
           <!--check for numId in style-->
           <xsl:when test="$styleNumId != '' ">
@@ -357,7 +368,7 @@
             </xsl:attribute>
           </xsl:if>
           <xsl:variable name="display">
-            <xsl:call-template name="Count">
+            <xsl:call-template name="CountDisplayListLevels">
               <xsl:with-param name="string">
                 <xsl:value-of select="./w:lvlText/@w:val"/>
               </xsl:with-param>
@@ -382,4 +393,146 @@
       </xsl:for-each>
     </text:outline-style>
   </xsl:template>
-</xsl:stylesheet>
+  
+  <!-- checks for list numPr properties (numid or level) for given element  -->
+  <xsl:template name="GetListProperty">
+    <xsl:param name="node"/>
+    <xsl:param name="property" />
+    
+    <xsl:choose>
+      <xsl:when test="$node/descendant::w:numPr">
+        <xsl:value-of select="$node/descendant::w:numPr/child::node()[name() = $property]/@w:val"/>
+      </xsl:when>
+      
+      <xsl:when test="$node/descendant::w:pStyle">
+        <xsl:variable name="styleId" select="$node/descendant::w:pStyle/@w:val"/>
+        
+        <xsl:variable name="pStyle"
+          select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $styleId]"/>
+        <xsl:variable name="propertyValue">
+          <xsl:call-template name="GetListStyleProperty">
+            <xsl:with-param name="style" select="$pStyle"/>
+            <xsl:with-param name="property" select="$property"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="$propertyValue"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- heading list display levels  -->
+    <xsl:template name="CountDisplayListLevels">
+    <xsl:param name="string"/>
+    <xsl:param name="count"/>
+    <xsl:choose>
+      <xsl:when test="string-length(substring-after($string,'%')) &gt; 0">
+        <xsl:call-template name="CountDisplayListLevels">
+          <xsl:with-param name="string">
+            <xsl:value-of select="substring-after($string,'%')"/>
+          </xsl:with-param>
+          <xsl:with-param name="count">
+            <xsl:value-of select="$count +1"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$count"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    </xsl:template>
+  
+  
+  <!-- paragraph which is the first element of a list-->
+  
+  <xsl:template match="w:p" mode="list">
+    <xsl:param name="numId"/>
+    <xsl:param name="nestedLevel" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
+    <xsl:param name="level" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
+    <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
+    
+    <!-- if first element of a list -->
+    <xsl:if
+      test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and count(preceding-sibling::w:p)= $position -1])">
+      <text:list text:style-name="{concat('L',$numId)}">
+        <xsl:if
+          test="preceding-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $numId and w:ilvl/@w:val = $level]] or document('word\numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId = document('word\numbering.xml')//w:numbering/w:num[@w:numId = $numId]/w:abstractNumId/@w:val]/w:lvl[@w:ilvl = $level]/w:start">
+          <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
+        </xsl:if>
+        
+        
+        <!-- convert element as list item -->
+        <xsl:apply-templates select="." mode="list-item">
+          <xsl:with-param name="nestedLevel" select="$nestedLevel"/>
+          <xsl:with-param name="level">
+            <xsl:value-of select="w:pPr/w:numPr/w:ilvl/@w:val"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </text:list>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- pargraph which is a list-item -->
+  
+  <xsl:template match="w:p" mode="list-item">
+    <xsl:param name="nestedLevel"/>
+    <xsl:param name="level"/>
+    <xsl:variable name="NumberingId" select="w:pPr/w:numPr/w:numId/@w:val"/>
+    <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
+    <xsl:variable name="notHigherLevelPosition"
+      select="count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level - $nestedLevel)])"/>
+    <xsl:choose>
+      
+      <!-- if there's a nested list we call the template recursively -->
+      <xsl:when test="$nestedLevel &gt; 0">
+        <text:list-item>
+          <text:list text:style-name="{concat('L',$NumberingId)}">
+            <xsl:if
+              test="document('word\numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId = document('word\numbering.xml')//w:numbering/w:num[@w:numId = $NumberingId]/w:abstractNumId/@w:val]/w:lvl[@w:ilvl = $level]/w:start">
+              <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates select="." mode="list-item">
+              <xsl:with-param name="nestedLevel" select="$nestedLevel -1"/>
+              <xsl:with-param name="level" select="$level"/>
+            </xsl:apply-templates>
+          </text:list>
+        </text:list-item>
+        
+        <!-- next paragraph on this level in same list -->
+        <xsl:variable name="nextElement"
+          select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId and w:ilvl/@w:val = $level - $nestedLevel] and count(preceding-sibling::w:p[not(w:pPr/w:numPr/w:ilvl/@w:val &gt; $level - $nestedLevel)])= $notHigherLevelPosition]"/>
+        <xsl:if test="$nextElement">
+          <xsl:apply-templates select="$nextElement" mode="list-item">
+            <xsl:with-param name="nestedLevel">
+              <xsl:value-of select="$nextElement/w:pPr/w:numPr/w:ilvl/@w:val - $level+$nestedLevel"
+              />
+            </xsl:with-param>
+            <xsl:with-param name="level">
+              <xsl:value-of select="$nextElement/w:pPr/w:numPr/w:ilvl/@w:val"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:if>
+      </xsl:when>
+      
+      <xsl:otherwise>
+        <text:list-item>
+          <xsl:apply-templates select="." mode="paragraph"/>
+        </text:list-item>
+        
+        <!-- next paragraph  in same list -->
+        <xsl:variable name="nextListItem"
+          select="following-sibling::w:p[child::w:pPr/w:numPr[w:numId/@w:val = $NumberingId and not(w:ilvl/@w:val &lt; $level - $nestedLevel)] and count(preceding-sibling::w:p)= $position +1]"/>
+        <xsl:if test="$nextListItem">
+          <xsl:apply-templates select="$nextListItem" mode="list-item">
+            <xsl:with-param name="nestedLevel">
+              <xsl:value-of select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val - $level+$nestedLevel"
+              />
+            </xsl:with-param>
+            <xsl:with-param name="level">
+              <xsl:value-of select="$nextListItem/w:pPr/w:numPr/w:ilvl/@w:val"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  </xsl:stylesheet>

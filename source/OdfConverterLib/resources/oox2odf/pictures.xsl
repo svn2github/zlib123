@@ -482,4 +482,8 @@
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
+  
+  <xsl:template match="w:drawing">
+    <xsl:apply-templates select="wp:inline | wp:anchor"/>
+  </xsl:template>
 </xsl:stylesheet>
