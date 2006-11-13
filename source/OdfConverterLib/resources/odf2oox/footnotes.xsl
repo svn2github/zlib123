@@ -32,8 +32,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   exclude-result-prefixes="text style office xlink draw pzip">
 
   <!-- Group footnotes under the same key -->
@@ -41,13 +40,11 @@
 
   <xsl:template name="footnotes">
     <w:footnotes>
-
       <!-- special footnotes -->
       <w:footnote w:type="separator" w:id="0">
         <w:p>
-          <!-- TODO :  extract properties from document('styles.xml')/office:automatic-styles/style:page-layout/style:footnote-sep -->
           <w:pPr>
-            <w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
+            <xsl:call-template name="InsertFootnoteSeparatorProperties"/>
           </w:pPr>
           <w:r>
             <w:separator/>
@@ -55,8 +52,13 @@
         </w:p>
       </w:footnote>
       <w:footnote w:type="continuationSeparator" w:id="1">
+        <!-- warn loss of text separator -->
+        <xsl:if
+          test="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']/text:footnote-continuation-notice-forward
+          or document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']/text:footnote-continuation-notice-backward">
+          <xsl:message terminate="no">feedback:Footnote continuation separator</xsl:message>
+        </xsl:if>
         <w:p>
-          <!-- TODO :  extract properties from document('styles.xml')/office:automatic-styles/style:page-layout/ -->
           <w:pPr>
             <w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
           </w:pPr>
@@ -86,6 +88,61 @@
   </xsl:template>
 
 
+  <!-- insert document-wide footnote separator properties using default page master-style-->
+  <xsl:template name="InsertFootnoteSeparatorProperties">
+
+    <xsl:for-each select="document('styles.xml')">
+      <!-- use default master-page style only. Other page styles lost. -->
+      <xsl:variable name="separatorProps"
+        select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/style:footnote-sep"/>
+
+      <!-- warn loss of footnote separator attibute -->
+      <xsl:if test="$separatorProps/@style:width">
+        <xsl:message terminate="no">feedback:Footnote separator width</xsl:message>
+      </xsl:if>
+      <xsl:if test="$separatorProps/@style:rel-width">
+        <xsl:message terminate="no">feedback:Footnote separator length</xsl:message>
+      </xsl:if>
+      <xsl:if test="$separatorProps/@style:color">
+        <xsl:message terminate="no">feedback:Footnote separator color</xsl:message>
+      </xsl:if>
+      <xsl:if test="$separatorProps/@style:line-style">
+        <xsl:message terminate="no">feedback:Footnote separator style</xsl:message>
+      </xsl:if>
+      <xsl:if test="$separatorProps/parent::style:page-layout-properties/@style:footnote-max-height">
+        <xsl:message terminate="no">feedback:Footnote maximum height</xsl:message>
+      </xsl:if>
+
+      <!-- spacing before/after -->
+      <w:spacing w:line="240" w:lineRule="auto">
+        <xsl:if test="$separatorProps/@style:distance-after-sep">
+          <xsl:attribute name="w:after">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="$separatorProps/@style:distance-after-sep"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="$separatorProps/@style:distance-before-sep">
+          <xsl:attribute name="w:before">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="$separatorProps/@style:distance-before-sep"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+      </w:spacing>
+      <!-- position of separator -->
+      <w:jc>
+        <xsl:attribute name="w:val">
+          <xsl:choose>
+            <xsl:when test="$separatorProps/@style:adjustment">
+              <xsl:value-of select="$separatorProps/@style:adjustment"/>
+            </xsl:when>
+            <xsl:otherwise>left</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </w:jc>
+    </xsl:for-each>
+  </xsl:template>
 
   <!-- footnotes configuration -->
   <xsl:template match="text:notes-configuration[@text:note-class='footnote']" mode="note">
@@ -149,7 +206,7 @@
     </w:footnotePr>
   </xsl:template>
 
-  
+
   <!-- Reference from the document -->
   <xsl:template match="text:note[@text:note-class='footnote']" mode="text">
     <w:footnoteReference>
@@ -169,8 +226,8 @@
       </w:t>
     </xsl:if>
   </xsl:template>
-  
-  
+
+
 
   <!-- Footnotes internal relationships -->
   <xsl:template name="InsertFootnotesInternalRelationships">
@@ -187,7 +244,7 @@
           <xsl:with-param name="images"
             select="key('images', '')[ancestor::text:note/@text:note-class = 'footnote' ]"/>
         </xsl:call-template>
-        
+
       </xsl:for-each>
     </Relationships>
   </xsl:template>
