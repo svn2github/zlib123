@@ -568,16 +568,6 @@
           <xsl:text>pt</xsl:text>
         </xsl:with-param>
       </xsl:call-template>
-      <!--      <xsl:choose>
-        <xsl:when test="@svg:x">
-          <xsl:call-template name="emu-measure">
-            <xsl:with-param name="length" select="@svg:x"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="0"/>
-        </xsl:otherwise>
-      </xsl:choose>-->
     </xsl:variable>
 
     <xsl:variable name="oy">
@@ -590,16 +580,6 @@
           <xsl:text>pt</xsl:text>
         </xsl:with-param>
       </xsl:call-template>
-      <!--      <xsl:choose>
-        <xsl:when test="@svg:y">
-          <xsl:call-template name="emu-measure">
-            <xsl:with-param name="length" select="@svg:y"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="0"/>
-        </xsl:otherwise>
-      </xsl:choose>-->
     </xsl:variable>
 
     <xsl:call-template name="InsertAnchorImagePosH">
@@ -2019,6 +1999,11 @@
         </v:shapetype>
 
         <v:shape type="#_x0000_t202">
+          <xsl:if test="parent::draw:frame/@draw:name">
+            <xsl:attribute name="id">
+              <xsl:value-of select="parent::draw:frame/@draw:name"/>
+            </xsl:attribute>
+          </xsl:if>
           <xsl:if test="ancestor::draw:a/@xlink:href">
             <xsl:attribute name="href">
               <xsl:choose>
@@ -2031,7 +2016,7 @@
               </xsl:choose>
             </xsl:attribute>
           </xsl:if>
-          <xsl:variable name="styleName" select=" parent::draw:frame/@draw:style-name"/>
+          <xsl:variable name="styleName" select="parent::draw:frame/@draw:style-name"/>
           <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
           <xsl:variable name="officeStyle"
             select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $styleName]"/>
@@ -2882,6 +2867,11 @@
 
     <v:textbox>
       <xsl:attribute name="style">
+        <xsl:if test="@draw:chain-next-name">
+          <xsl:text>mso-next-textbox:#</xsl:text>
+          <xsl:value-of select="@draw:chain-next-name"/>
+          <xsl:text>;</xsl:text>
+        </xsl:if>
         <xsl:if
           test="@fo:min-height or parent::draw:frame/@fo:min-width
           or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' 
