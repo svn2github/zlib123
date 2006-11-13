@@ -39,12 +39,32 @@
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
 
   <xsl:template match="text:page-number" mode="paragraph">
-    <xsl:if test="@text:page-adjust">
-      <xsl:message terminate="no">feedback:Page number offset</xsl:message>
-    </xsl:if>
-    <w:fldSimple w:instr=" PAGE ">
-      <xsl:apply-templates mode="paragraph"/>
-    </w:fldSimple>
+    <xsl:choose>
+      <xsl:when test="@text:page-adjust">
+        <w:r>
+          <w:fldChar w:fldCharType="begin"/>
+        </w:r>
+        <w:r>
+          <w:instrText xml:space="preserve"> =</w:instrText>
+        </w:r>
+        <w:fldSimple w:instr=" PAGE "/>
+        <w:r>
+          <w:instrText xml:space="preserve"> +<xsl:value-of select="@text:page-adjust"/> </w:instrText>
+        </w:r>
+        <w:r>
+          <w:fldChar w:fldCharType="separate"/>
+        </w:r>
+        <xsl:apply-templates mode="paragraph"/>
+        <w:r>
+          <w:fldChar w:fldCharType="end"/>
+        </w:r>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:fldSimple w:instr=" PAGE ">
+          <xsl:apply-templates mode="paragraph"/>
+        </w:fldSimple>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!--  STATISTICS FIELDS  -->
