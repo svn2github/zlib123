@@ -1031,9 +1031,11 @@
                   </xsl:call-template>
                 </xsl:variable>
 
-                <xsl:if test="$innerLineWidth = $outerLineWidth">thinThin</xsl:if>
-                <xsl:if test="$innerLineWidth > $outerLineWidth">thinThick</xsl:if>
-                <xsl:if test="$outerLineWidth > $innerLineWidth  ">thickThin</xsl:if>
+                <xsl:choose>
+                  <xsl:when test="$innerLineWidth &gt; $outerLineWidth">thinThick</xsl:when>
+                  <xsl:when test="$innerLineWidth &lt; $outerLineWidth">thickThin</xsl:when>
+                  <xsl:otherwise>dbl</xsl:otherwise>
+                </xsl:choose>
 
               </xsl:if>
             </xsl:when>
