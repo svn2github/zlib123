@@ -258,35 +258,53 @@
   <!-- Picture numbering symbol -->
   <xsl:template name="numPicBullet">
     <w:numPicBullet>
-      <xsl:attribute name="w:numPicBulletId">
+      <xsl:variable name="bulletId">
         <xsl:call-template name="GetBulletId"/>
+      </xsl:variable>
+      <xsl:attribute name="w:numPicBulletId">
+        <xsl:value-of select="$bulletId"/>
       </xsl:attribute>
       <w:pict>
-        <v:shape id="_x0000_i1032" type="#_x0000_t75" o:bullet="t">
+        <v:shapetype id="{concat('_x0000_t', $bulletId)}" coordsize="21600,21600" o:spt="75" o:preferrelative="t"
+          path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
+          <v:stroke joinstyle="miter"/>
+          <v:formulas>
+            <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+            <v:f eqn="sum @0 1 0"/>
+            <v:f eqn="sum 0 0 @1"/>
+            <v:f eqn="prod @2 1 2"/>
+            <v:f eqn="prod @3 21600 pixelWidth"/>
+            <v:f eqn="prod @3 21600 pixelHeight"/>
+            <v:f eqn="sum @0 0 1"/>
+            <v:f eqn="prod @6 1 2"/>
+            <v:f eqn="prod @7 21600 pixelWidth"/>
+            <v:f eqn="sum @8 21600 0"/>
+            <v:f eqn="prod @7 21600 pixelHeight"/>
+            <v:f eqn="sum @10 21600 0"/>
+          </v:formulas>
+          <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+          <o:lock v:ext="edit" aspectratio="t"/>
+        </v:shapetype>
+        <v:shape id="{concat('_x0000_i', $bulletId)}" type="{concat('#_x0000_t', $bulletId)}" o:bullet="t">
           <xsl:attribute name="style">
-            <!-- COMMENT : it seems that the value has to be divided by 2, but no reasonable explanation could be found -->
             <xsl:if test="style:list-level-properties/@fo:width">
               <xsl:text>width:</xsl:text>
-              <xsl:variable name="val">
                 <xsl:call-template name="point-measure">
+                  <xsl:with-param name="round">false</xsl:with-param>
                   <xsl:with-param name="length">
                     <xsl:value-of select="style:list-level-properties/@fo:width"/>
                   </xsl:with-param>
                 </xsl:call-template>
-              </xsl:variable>
-              <xsl:value-of select="$val div 2"/>
               <xsl:text>pt;</xsl:text>
             </xsl:if>
             <xsl:if test="style:list-level-properties/@fo:height">
               <xsl:text>height:</xsl:text>
-              <xsl:variable name="val">
                 <xsl:call-template name="point-measure">
+                  <xsl:with-param name="round">false</xsl:with-param>
                   <xsl:with-param name="length">
                     <xsl:value-of select="style:list-level-properties/@fo:height"/>
                   </xsl:with-param>
                 </xsl:call-template>
-              </xsl:variable>
-              <xsl:value-of select="$val div 2"/>
               <xsl:text>pt;</xsl:text>
             </xsl:if>
           </xsl:attribute>
