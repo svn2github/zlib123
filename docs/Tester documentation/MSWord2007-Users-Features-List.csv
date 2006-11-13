@@ -186,7 +186,7 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;Alt Text;;;;;;;;
 ;;;;;;;;;;;
 ;;Advanced Layout;Picture position;Horizontal;Alignment;2;;Completed;;;
-;;;;;Book layout;2;;;;;
+;;;;;Book layout;2;;Completed;;;
 ;;;;;Absolute position;2;;;;;
 ;;;;;Relative position;2;;;;;
 ;;;;Vertical;Alignment;2;;Partial;;;TODO: relative to line

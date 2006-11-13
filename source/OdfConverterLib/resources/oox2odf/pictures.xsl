@@ -333,18 +333,22 @@
 
   <xsl:template name="InsertImagePosV">
     <xsl:if test="descendant::wp:positionV">
+      <xsl:variable name="align" select="descendant::wp:positionV/wp:align"/>
+      <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
       
       <xsl:if test="descendant::wp:positionV/wp:align">
         <xsl:attribute name="style:vertical-pos">
-          <xsl:variable name="align" select="descendant::wp:positionV/wp:align"/>
-          <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
           <xsl:choose>
             <!--special rules-->
             <xsl:when
               test="$relativeFrom = 'topMargin' or $relativeFrom = 'bottomMargin' or $relativeFrom = 'insideMargin' or $relativeFrom = 'outsideMargin'">
               <xsl:text>top</xsl:text>
             </xsl:when>
-            <!--default rules-->
+            <xsl:when
+              test=" $relativeFrom = 'line'  and $align= 'bottom' ">
+              <xsl:text>top</xsl:text>
+            </xsl:when>
+             <!--default rules-->
             <xsl:when test="$align = 'top' ">
               <xsl:text>top</xsl:text>
             </xsl:when>
@@ -365,7 +369,6 @@
       </xsl:if>
       <xsl:if test="descendant::wp:positionV/@relativeFrom">
         <xsl:attribute name="style:vertical-rel">
-          <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
           <xsl:choose>
             <xsl:when test="$relativeFrom = 'margin' ">
               <xsl:text>page-content</xsl:text>
@@ -394,6 +397,12 @@
           </xsl:choose>
         </xsl:attribute>
       </xsl:if>
+      
+      <xsl:if test="$relativeFrom = 'line' and ($align = 'center'  or $align =  'outside' or $align = 'bottom' ) ">
+        <xsl:attribute name="draw:flow-with-text">
+            <xsl:text>false</xsl:text>
+        </xsl:attribute>
+          </xsl:if>
     </xsl:if>
   </xsl:template>
 
