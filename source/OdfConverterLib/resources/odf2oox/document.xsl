@@ -433,6 +433,10 @@
       <!--text body link-->
       <xsl:otherwise>
         <w:hyperlink r:id="{generate-id()}" w:history="1">
+          <!-- warn loss of visited style -->
+          <xsl:if test="@text:visited-style-name">
+            <xsl:message terminate="no">feedback:Style of visited link</xsl:message>
+          </xsl:if>
           <xsl:if test="@office:target-frame-name">
             <xsl:attribute name="w:tgtFrame">
               <xsl:value-of select="@office:target-frame-name"/>
