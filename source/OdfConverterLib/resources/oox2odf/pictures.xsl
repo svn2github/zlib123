@@ -151,7 +151,7 @@
           <xsl:value-of select="substring-after($pzipsource,'/')"/>
         </xsl:variable>
         <xsl:attribute name="xlink:href">
-          <xsl:value-of select="concat('pictures/', $pziptarget)"/>
+          <xsl:value-of select="concat('Pictures/', $pziptarget)"/>
         </xsl:attribute>
       </xsl:if>
     </xsl:for-each>
