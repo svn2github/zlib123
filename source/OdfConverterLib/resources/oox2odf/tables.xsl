@@ -311,7 +311,7 @@
         </xsl:call-template>
       </xsl:when>
 
-      <xsl:when test="not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:top) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:left) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:bottom) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:right)">
+      <xsl:when test="not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:top) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:left) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:bottom) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:right) and ancestor::w:tbl/w:tblPr/w:tblBorders/w:insideV/@w:val='none'">
         
         <xsl:variable name="styleId">
           <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>

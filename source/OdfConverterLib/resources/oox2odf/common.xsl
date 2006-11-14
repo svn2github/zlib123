@@ -53,7 +53,14 @@
     <xsl:param name="unit"/>
     <xsl:choose>
       <xsl:when test="$unit = 'cm'">
-        <xsl:value-of select="concat(format-number($length * 2.54 div 1440,'#.###'),'cm')"/>
+        <xsl:choose>
+          <xsl:when test="$length='0' or $length=''">
+            <xsl:value-of select="concat(0, 'cm')"/>    
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat(format-number($length * 2.54 div 1440,'#.###'),'cm')"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:when test="$unit = 'mm'">
         <xsl:value-of select="concat(format-number($length * 25.4 div 1440,'#.###'),'mm')"/>
