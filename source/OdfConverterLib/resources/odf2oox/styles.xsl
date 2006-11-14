@@ -69,13 +69,8 @@
         mode="styles"/>
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:automatic-styles" mode="styles"/>
-      <w:style w:type="character" w:styleId="Hyperlink">
-        <w:name w:val="Hyperlink"/>
-        <w:rPr>
-          <w:color w:val="000080"/>
-          <w:u w:val="single"/>
-        </w:rPr>
-      </w:style>
+      <!-- styles to ensure that hyperlinks will be matched and followed. -->
+      <xsl:call-template name="InsertHyperlinkStyles"/>
       <!-- warn if more than one master page style -->
       <xsl:if
         test="count(document('styles.xml')/office:document-styles/office:master-styles/style:master-page) &gt; 1">
@@ -1389,6 +1384,63 @@
       </xsl:attribute>
     </w:tab>
   </xsl:template>
+
+  <!-- insert Hyperlink and Followed Hyperink styles -->
+  <xsl:template name="InsertHyperlinkStyles">
+    <xsl:for-each select="document('styles.xml')">
+      <!-- hyperlink styles -->
+      <w:style w:styleId="Hyperlink" w:type="character">
+        <w:name w:val="Hyperlink"/>
+        <xsl:choose>
+          <xsl:when test="key('styles', 'Internet_20_link')">
+            <xsl:if test="key('styles', 'Internet_20_link')/@style:parent-style-name">
+              <w:basedOn w:val="{key('styles', 'Internet_20_link')/@style:parent-style-name}"/>
+            </xsl:if>
+            <!-- style's text properties -->
+            <xsl:if test="key('styles', 'Internet_20_link')/style:text-properties">
+              <w:rPr>
+                <xsl:apply-templates
+                  select="key('styles', 'Internet_20_link')/style:text-properties" mode="rPr"/>
+              </w:rPr>
+            </xsl:if>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:rPr>
+              <w:color w:val="000080"/>
+              <w:u w:val="single"/>
+            </w:rPr>
+          </xsl:otherwise>
+        </xsl:choose>
+      </w:style>
+      <!-- visited hyperlink styles -->
+      <w:style w:styleId="FollowedHyperlink" w:type="character">
+        <w:name w:val="FollowedHyperlink"/>
+        <xsl:choose>
+          <xsl:when test="key('styles', 'Visited_20_Internet_20_Link')">
+            <xsl:if test="key('styles', 'Visited_20_Internet_20_Link')/@style:parent-style-name">
+              <w:basedOn
+                w:val="{key('styles', 'Visited_20_Internet_20_Link')/@style:parent-style-name}"/>
+            </xsl:if>
+            <!-- style's text properties -->
+            <xsl:if test="key('styles', 'Visited_20_Internet_20_Link')/style:text-properties">
+              <w:rPr>
+                <xsl:apply-templates
+                  select="key('styles', 'Visited_20_Internet_20_Link')/style:text-properties"
+                  mode="rPr"/>
+              </w:rPr>
+            </xsl:if>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:rPr>
+              <w:color w:val="800080"/>
+              <w:u w:val="single"/>
+            </w:rPr>
+          </xsl:otherwise>
+        </xsl:choose>
+      </w:style>
+    </xsl:for-each>
+  </xsl:template>
+
 
   <!-- Page Layout Properties -->
   <xsl:template match="style:page-layout-properties" mode="master-page">
