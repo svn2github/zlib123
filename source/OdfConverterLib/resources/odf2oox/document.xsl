@@ -330,11 +330,8 @@
       <xsl:when test="parent::text:p|parent::text:h">
         <xsl:value-of select="parent::node()/@text:style-name"/>
       </xsl:when>
-      <xsl:when test="ancestor::text:a[1][@text:style-name]">
-        <xsl:value-of select="ancestor::text:a[1]/@text:style-name"/>
-      </xsl:when>
-      <xsl:when test="ancestor::text:span">
-        <xsl:value-of select="ancestor::text:span[1]/@text:style-name"/>
+      <xsl:when test="ancestor::node()[(self::text:a or self::text:span) and @text:style-name]">
+        <xsl:value-of select="ancestor::node()[(self::text:a or self::text:span) and @text:style-name][1]/@text:style-name"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="@text:style-name"/>
@@ -556,6 +553,14 @@
               <xsl:call-template name="GetStyleName"/>
             </xsl:with-param>
           </xsl:call-template>
+          <!-- override text properties of link -->
+          <xsl:if test="ancestor::text:a/@text:style-name">
+            <xsl:variable name="linkStyleName" select="parent::text:a/@text:style-name"/>
+            <xsl:for-each select="document('styles.xml')">
+              <xsl:apply-templates select="key('styles', $linkStyleName)/style:text-properties"
+                mode="rPr"/>
+            </xsl:for-each>
+          </xsl:if>
         </w:rPr>
       </xsl:when>
       <xsl:otherwise> </xsl:otherwise>
@@ -571,7 +576,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$prefixedStyleName!=''">
+      <xsl:when test="$prefixedStyleName!='' and not(parent::text:a/@text:style-name)">
         <w:rStyle w:val="{$prefixedStyleName}"/>
       </xsl:when>
       <xsl:otherwise>

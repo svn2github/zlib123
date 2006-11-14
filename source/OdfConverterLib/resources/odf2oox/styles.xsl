@@ -161,7 +161,7 @@
           <w:basedOn w:val="{@style:parent-style-name}"/>
         </xsl:when>
         <xsl:otherwise>
-          <!-- if a hyperlink has current style and does not mention a particular parent style, set basedOn to 'Hyperlink' (built-in by converter, cf template 'styles') -->
+          <!-- if a hyperlink has current style and does not mention a particular parent style, set basedOn to 'Hyperlink' (built-in by converter, cf template 'InsertHyperlinkStyles') -->
           <xsl:if test="@style:family = 'text' ">
             <xsl:variable name="styleName" select="@style:name"/>
             <xsl:for-each select="document('content.xml')">
