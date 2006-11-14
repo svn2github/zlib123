@@ -101,7 +101,7 @@
           <xsl:value-of select="w:tblStyle/@w:val"/>
         </xsl:attribute>
       </xsl:if>
-      <style:table-properties>
+      <style:table-properties table:border-model="collapsing">
         <xsl:call-template name="InsertTableProperties"/>
       </style:table-properties>
     </style:style>
@@ -152,7 +152,7 @@
         </xsl:attribute>
         <xsl:attribute name="table:align">
           <xsl:call-template name="InsertTableAlign"/>
-        </xsl:attribute>       
+        </xsl:attribute>
       </xsl:when>
       <xsl:when test="w:tblW/@w:type = 'dxa'">
         <xsl:attribute name="style:width">
@@ -181,7 +181,7 @@
         </xsl:attribute>
       </xsl:when>
     </xsl:choose>
-    
+
     <xsl:if test="w:tblInd">
       <xsl:attribute name="fo:margin-left">
         <xsl:call-template name="ConvertTwips">
@@ -310,6 +310,49 @@
           <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
         </xsl:call-template>
       </xsl:when>
+
+      <xsl:when test="not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:top) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:left) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:bottom) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:right)">
+        
+        <xsl:variable name="styleId">
+          <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
+        </xsl:variable>        
+        <xsl:variable name="style"
+          select="document('word/styles.xml')//w:styles/w:style[@w:type = 'table']/w:tblPr/w:tblBorders"/>       
+        
+        <xsl:if test="not(../../following-sibling::w:tr)">
+          <xsl:call-template name="InsertCellBorder">            
+            <xsl:with-param name="tblBorder" select="$style/w:bottom"/>            
+            <xsl:with-param name="attribute">fo:border-bottom</xsl:with-param>
+            <xsl:with-param name="attribute2">style:border-line-width-bottom</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        
+        <xsl:if test="not(../../preceding-sibling::w:tr)">
+          <xsl:call-template name="InsertCellBorder">            
+            <xsl:with-param name="tblBorder" select="$style/w:top"/>            
+            <xsl:with-param name="attribute">fo:border-top</xsl:with-param>
+            <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        
+        <xsl:if test="not(../preceding-sibling::w:tc)">
+          <xsl:call-template name="InsertCellBorder">            
+            <xsl:with-param name="tblBorder" select="$style/w:top"/>            
+            <xsl:with-param name="attribute">fo:border-left</xsl:with-param>
+            <xsl:with-param name="attribute2">style:border-line-width-left</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        
+        <xsl:if test="not(../following-sibling::w:tc)">
+          <xsl:call-template name="InsertCellBorder">            
+            <xsl:with-param name="tblBorder" select="$style/w:right"/>            
+            <xsl:with-param name="attribute">fo:border-right</xsl:with-param>
+            <xsl:with-param name="attribute2">style:border-line-width-right</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+
+      </xsl:when>
+
       <xsl:otherwise>
         <xsl:variable name="styleId">
           <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
@@ -349,7 +392,7 @@
        <!--        </xsl:if>-->
       </xsl:otherwise>
     </xsl:choose>
-    
+
 <!-- Background color -->
     <xsl:if test="w:shd">
       <xsl:attribute name="fo:background-color">
