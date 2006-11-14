@@ -53,6 +53,7 @@
       </office:styles>
       <!-- automatic styles -->
       <office:automatic-styles>
+        <xsl:call-template name="HeaderFooterAutomaticStyle"/>
         <!-- TODO : create other automatic styles. This one handles only the default (last w:sectPr of document.xml). -->
         <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr">
           <xsl:call-template name="InsertDefaultPageLayout"/>
@@ -68,6 +69,58 @@
     </office:document-styles>
   </xsl:template>
 
+
+  <xsl:template name="HeaderFooterAutomaticStyle">
+    <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
+      <xsl:for-each select="w:headerReference">
+        <xsl:if test="./@w:type = 'default'">
+          <xsl:variable name="headerId" select="./@r:id"/>
+          <xsl:variable name="headerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <!-- change context to get footer content -->
+          <xsl:for-each select="document($headerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+          </xsl:for-each>
+        </xsl:if>
+      </xsl:for-each>
+      <xsl:for-each select="w:headerReference">
+        <xsl:if test="./@w:type = 'even'">
+          <xsl:variable name="headerId" select="./@r:id"/>
+          <xsl:variable name="headerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <!-- change context to get footer content -->
+          <xsl:for-each select="document($headerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+          </xsl:for-each>
+        </xsl:if>
+      </xsl:for-each>
+      <xsl:for-each select="w:footerReference">
+        <xsl:if test="./@w:type = 'default'">
+          <xsl:variable name="footerId" select="./@r:id"/>
+          <xsl:variable name="footerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <!-- change context to get header content -->
+          <xsl:for-each select="document($footerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+          </xsl:for-each>
+        </xsl:if>
+      </xsl:for-each>
+      <xsl:for-each select="w:footerReference">
+        <xsl:if test="./@w:type = 'even'">
+          <xsl:variable name="footerId" select="./@r:id"/>
+          <xsl:variable name="footerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <!-- change context to get header content -->
+          <xsl:for-each select="document($footerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+          </xsl:for-each>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+  
+  
+  
   <!-- handle default master page style -->
   <xsl:template name="InsertDefaultMasterPage">
     <style:master-page style:name="Standard" style:page-layout-name="pm1">
