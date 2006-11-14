@@ -42,7 +42,7 @@
 
   <!-- key to find bookmarkt or reference-mark -->
   <xsl:key name="bookmark-reference-start"
-    match="text:bookmark-start|text:reference-mark-start|text:sequence"
+    match="text:bookmark|text:bookmark-start|text:reference-mark-start|text:sequence"
     use="@text:name|@text:ref-name"/>
 
   <!--checks if element has style used to generate table of contents in document  -->
@@ -118,13 +118,21 @@
   <!-- Insert BookmarkStart Id or BookmarkEnd Id -->
   <xsl:template name="GenerateBookmarkId">
     <xsl:param name="TextName"/>
+    <xsl:variable name="ReferenceMarkStart">
+      <xsl:value-of select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )"/>
+    </xsl:variable>
+    <xsl:variable name="BookmarkStart">
+      <xsl:value-of select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"/>
+    </xsl:variable>
+    <xsl:variable name="Bookmark">
+      <xsl:value-of select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark)"/>
+    </xsl:variable>
     <xsl:value-of
-      select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"
-    />
+      select="$ReferenceMarkStart+$BookmarkStart+$Bookmark"/>
   </xsl:template>
-
+  
   <!-- Insert BookmarkStart or ReferenceMarkStart-->
-  <xsl:template match="text:bookmark-start|text:reference-mark-start" mode="paragraph">
+  <xsl:template match="text:bookmark-start|text:reference-mark-start|text:bookmark" mode="paragraph">    
     <w:bookmarkStart>
       <xsl:attribute name="w:id">
         <xsl:call-template name="GenerateBookmarkId">
@@ -137,6 +145,17 @@
         <xsl:value-of select="@text:name"/>
       </xsl:attribute>
     </w:bookmarkStart>
+    <xsl:if test="name()='text:bookmark'">
+      <w:bookmarkEnd>
+        <xsl:attribute name="w:id">
+          <xsl:call-template name="GenerateBookmarkId">
+            <xsl:with-param name="TextName">
+              <xsl:value-of select="@text:name"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        </w:bookmarkEnd>
+    </xsl:if>
   </xsl:template>
 
   <!-- Insert BookmarkEnd-->
