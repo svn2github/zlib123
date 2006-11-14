@@ -80,6 +80,7 @@
           <!-- change context to get footer content -->
           <xsl:for-each select="document($headerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
@@ -91,6 +92,7 @@
           <!-- change context to get footer content -->
           <xsl:for-each select="document($headerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
@@ -102,6 +104,7 @@
           <!-- change context to get header content -->
           <xsl:for-each select="document($footerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
@@ -113,6 +116,7 @@
           <!-- change context to get header content -->
           <xsl:for-each select="document($footerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
