@@ -103,6 +103,9 @@
         <xsl:call-template name="InsertParagraphSectionProperties"/>
       </w:pPr>
 
+      <!-- insert drawing objects that are preceding-sibling of current. -->
+      <xsl:call-template name="InsertPrecedingDrawingObject"/>
+      
       <!--   insert bookmark for element which is contained in TOC-->
       <xsl:if test="$tocCount &gt; 0">
         <xsl:call-template name="InsertTOCBookmark"/>

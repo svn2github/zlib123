@@ -355,19 +355,31 @@
   <xsl:template name="DegreesAngle">
     <xsl:param name="angle"/>
     <xsl:param name="select" select="'false'"/>
+    <xsl:param name="revert" select="'false'"/>
+
+    <xsl:variable name="val">
+      <xsl:choose>
+        <xsl:when test="not($angle)">0</xsl:when>
+        <xsl:when test="not($select = 'true')">
+          <xsl:value-of select="round(number($angle) * 90 div 1.5707963267946)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$angle = 1.5707963267946">90</xsl:when>
+            <xsl:when test="$angle = -1.5707963267946">-90</xsl:when>
+            <xsl:when test="$angle = 3.1415926535892">180</xsl:when>
+            <xsl:when test="$angle = -3.1415926535892">180</xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
-      <xsl:when test="not($angle)">0</xsl:when>
-      <xsl:when test="not($select = 'true')">
-        <xsl:value-of select="round(number($angle) * 90 div 1.5707963267946)"/>
+      <xsl:when test="$revert = 'true' ">
+        <xsl:value-of select=" - number($val)"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:choose>
-          <xsl:when test="$angle = 1.5707963267946">90</xsl:when>
-          <xsl:when test="$angle = -1.5707963267946">-90</xsl:when>
-          <xsl:when test="$angle = 3.1415926535892">180</xsl:when>
-          <xsl:when test="$angle = -3.1415926535892">180</xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="$val"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

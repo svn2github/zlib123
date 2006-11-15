@@ -47,6 +47,83 @@
   <xsl:key name="frames" match="draw:frame" use="''"/>
   <xsl:key name="ole-objects" match="draw:frame[./draw:object-ole] " use="''"/>
 
+  <!-- 
+    embedd all consecutive frames that are not inserted into a paragraph in a single paragraph
+    (avoid paragraph not present in original document)
+  -->
+  <xsl:template match="node()[contains(name(), 'draw:') and parent::office:text]">
+    <!-- concerned elements : draw:custom-shape, draw:rect, draw:ellipse, draw:frame[ole-object|image|text-box] -->
+    <xsl:choose>
+      <xsl:when test="following-sibling::text:p">
+        <!-- do nothing : handled by the first paragraph -->
+      </xsl:when>
+      <xsl:otherwise>
+        <w:p>
+          <xsl:choose>
+            <xsl:when test="self::draw:frame">
+              <xsl:apply-templates select="." mode="paragraph"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="." mode="shapes"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:apply-templates select="following-sibling::node()[1][contains(name(), 'draw:')]"/>
+        </w:p>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- handle the frames that are ignored. context is text:p -->
+  <xsl:template name="InsertPrecedingDrawingObject">
+    <xsl:if test="parent::office:text and preceding-sibling::node()[1][contains(name(), 'draw:')]">
+      <xsl:choose>
+        <xsl:when test="preceding-sibling::node()[1][self::draw:frame]">
+          <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
+            mode="paragraph"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
+            mode="shapes"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:for-each select="preceding-sibling::node()[1]">
+        <xsl:call-template name="InsertPrecedingDrawingObject"/>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="draw:frame" mode="paragraph">
+    <xsl:call-template name="InsertEmbeddedTextboxes"/>
+  </xsl:template>
+  <!--
+  <xsl:template match="draw:frame">
+    <xsl:choose>
+      <xsl:when test=" preceding-sibling::node()[1][name() != 'draw:frame']">
+        <w:p>
+          <xsl:call-template name="InsertEmbeddedTextboxes"/>
+          <xsl:call-template name="InsertFollowingFrame"/>
+        </w:p>
+      </xsl:when>
+      <xsl:otherwise>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertFollowingFrame">
+    <xsl:for-each select="following-sibling::node()[1][name()='draw:frame']">
+      <xsl:call-template name="InsertEmbeddedTextboxes"/>
+      <xsl:call-template name="InsertFollowingFrame"/>
+    </xsl:for-each>
+  </xsl:template>
+-->
+  <!-- inserts textboxes which are embedded in odf as one after another in word -->
+  <xsl:template name="InsertEmbeddedTextboxes">
+    <xsl:for-each select="descendant::draw:text-box">
+      <xsl:apply-templates mode="paragraph" select="."/>
+    </xsl:for-each>
+  </xsl:template>
+
+
   <!-- check if image type is supported in word  -->
   <xsl:template name="image-support">
     <xsl:param name="name"/>
@@ -162,6 +239,7 @@
               <!-- shape properties: size, z-index, coordinates, position, margin etc -->
               <xsl:call-template name="InsertShapeProperties">
                 <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shapeProperties" select="parent::draw:frame"/>
               </xsl:call-template>
 
               <v:imagedata r:id="{generate-id(.)}" o:title=""/>
@@ -194,25 +272,6 @@
       </w:r>
     </xsl:if>
 
-  </xsl:template>
-
-  <!-- frame containing an image -->
-  <xsl:template
-    match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]">
-
-    <xsl:variable name="supported">
-      <xsl:call-template name="image-support">
-        <xsl:with-param name="name" select="./draw:image/@xlink:href"/>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:if test="$supported = 'true'">
-      <w:p>
-        <w:r>
-          <xsl:call-template name="InsertImage"/>
-        </w:r>
-      </w:p>
-    </xsl:if>
   </xsl:template>
 
   <!--   word has two types of images: inline (positioned with text) and anchor (can be aligned relative to page, margin etc); -->
@@ -1038,17 +1097,6 @@
     </xsl:if>
   </xsl:template>
 
-  <!--custom shapes -->
-  <xsl:template match="draw:custom-shape">
-    <w:p>
-      <xsl:call-template name="InsertShapes">
-        <xsl:with-param name="shapeType">
-          <xsl:value-of select="draw:enhanced-geometry/@draw:type"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </w:p>
-  </xsl:template>
-
   <xsl:template match="draw:custom-shape" mode="shapes">
     <xsl:call-template name="InsertShapes">
       <xsl:with-param name="shapeType">
@@ -1058,14 +1106,6 @@
   </xsl:template>
 
   <!-- basic shapes - ellipse and rect -->
-
-  <xsl:template match="draw:rect">
-    <w:p>
-      <xsl:call-template name="InsertShapes">
-        <xsl:with-param name="shapeType" select="name()"/>
-      </xsl:call-template>
-    </w:p>
-  </xsl:template>
 
   <xsl:template match="draw:rect|draw:ellipse" mode="shapes">
     <xsl:call-template name="InsertShapes">
@@ -1092,6 +1132,7 @@
             <v:rect>
               <xsl:call-template name="SimpleShape">
                 <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shapeProperties" select="."/>
               </xsl:call-template>
               <!--insert text-box-->
               <xsl:call-template name="InsertTextBox">
@@ -1105,6 +1146,7 @@
             <v:oval>
               <xsl:call-template name="SimpleShape">
                 <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shapeProperties" select="."/>
               </xsl:call-template>
             </v:oval>
           </xsl:when>
@@ -1115,6 +1157,7 @@
             <v:roundrect>
               <xsl:call-template name="SimpleShape">
                 <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="shapeProperties" select="."/>
               </xsl:call-template>
             </v:roundrect>
           </xsl:when>
@@ -1135,11 +1178,13 @@
   <!-- simple shape properties -->
   <xsl:template name="SimpleShape">
     <xsl:param name="shapeStyle"/>
+    <xsl:param name="shapeProperties"/>
 
     <xsl:if test="$shapeStyle != 0 or count($shapeStyle) &gt; 1">
       <!-- shape properties: size, z-index, color, position, stroke, etc -->
       <xsl:call-template name="InsertDrawnShapeProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>
 
       <xsl:call-template name="FillColor">
@@ -1147,6 +1192,10 @@
       </xsl:call-template>
 
       <xsl:call-template name="Stroke">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertShapeFillProperties">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
       </xsl:call-template>
     </xsl:if>
@@ -1220,6 +1269,7 @@
   <!-- shape properties -->
   <xsl:template name="InsertDrawnShapeProperties">
     <xsl:param name="shapeStyle"/>
+    <xsl:param name="shapeProperties"/>
     <xsl:attribute name="style">
 
       <xsl:call-template name="InsertDrawnShapeSize"/>
@@ -1228,10 +1278,12 @@
 
       <xsl:call-template name="InsertShapePositionRelative">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>
 
       <xsl:call-template name="InsertShapePosition">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>
 
     </xsl:attribute>
@@ -1403,7 +1455,7 @@
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            <!-- particular transformation : translation, rotation -->
+            <!-- particular transformation -->
             <xsl:variable name="translation">
               <xsl:call-template name="point-measure">
                 <xsl:with-param name="length">
@@ -1413,33 +1465,11 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
-            <xsl:variable name="rotation">
-              <xsl:if test="contains($parent[1]/@draw:transform,'rotate')">
-                <xsl:call-template name="DegreesAngle">
-                  <xsl:with-param name="angle">
-                    <xsl:value-of
-                      select="substring-before(substring-after(substring-after($parent[1]/@draw:transform,'rotate'),'('),')')"
-                    />
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:if>
-            </xsl:variable>
             <!-- find the value considering all cases -->
             <xsl:variable name="svgx">
               <xsl:choose>
                 <xsl:when test="$horizontalPos = 'from-left' or $horizontalPos='from-inside' ">
                   <xsl:choose>
-                    <!-- special distance with rotation -->
-                    <xsl:when test="$rotation != '' ">
-                      <xsl:choose>
-                        <xsl:when test="$rotation &gt; 0">
-                          <xsl:value-of select="$translation"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of select="$translation - $frameHeight"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:when>
                     <!-- page, page-content, page-start-margin -->
                     <xsl:when
                       test="$horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'page-start-margin' ">
@@ -1764,6 +1794,54 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- compute margin when rotation -->
+  <xsl:template name="ComputeMarginXWithRotation">
+    <xsl:param name="angle"/>
+    <xsl:param name="anchor"/>
+
+    <!-- particular transformation -->
+    <xsl:variable name="translationX">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length">
+          <xsl:value-of
+            select="substring-before(substring-after(substring-after(ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@draw:transform,'translate'),'('),' ')"
+          />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="translationY">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length">
+          <xsl:value-of
+            select="substring-before(substring-after(substring-after(substring-after(ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@draw:transform,'translate'),'('),' '),')')"
+          />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- frame properties -->
+    <xsl:variable name="frameWidth">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="frameHeight">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- special distance with rotation -->
+    <xsl:choose>
+      <xsl:when test="$angle &gt; 0">
+        <xsl:value-of select="$translationX"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$translationX - $frameHeight"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- computes text-box margin. Returns a measure in Points -->
   <xsl:template name="ComputeMarginY">
     <xsl:param name="parent"/>
@@ -1862,32 +1940,10 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
-            <xsl:variable name="rotation">
-              <xsl:if test="contains($parent[1]/@draw:transform,'rotate')">
-                <xsl:call-template name="DegreesAngle">
-                  <xsl:with-param name="angle">
-                    <xsl:value-of
-                      select="substring-before(substring-after(substring-after($parent[1]/@draw:transform,'rotate'),'('),')')"
-                    />
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:if>
-            </xsl:variable>
             <xsl:variable name="svgy">
               <xsl:choose>
                 <xsl:when test="$verticalPos='from-top' ">
                   <xsl:choose>
-                    <!-- special distance with rotation -->
-                    <xsl:when test="$rotation != '' ">
-                      <xsl:choose>
-                        <xsl:when test="$rotation &lt; 0">
-                          <xsl:value-of select="$translation"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of select="$translation - $frameWidth"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:when>
                     <!-- page -->
                     <xsl:when test="$verticalRel = 'page' ">
                       <xsl:value-of select="$fromTop + $translation"/>
@@ -1983,6 +2039,54 @@
 
   </xsl:template>
 
+  <!-- compute margin when rotation -->
+  <xsl:template name="ComputeMarginYWithRotation">
+    <xsl:param name="angle"/>
+    <xsl:param name="anchor"/>
+    
+    <!-- particular transformation -->
+    <xsl:variable name="translationX">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length">
+          <xsl:value-of
+            select="substring-before(substring-after(substring-after(ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@draw:transform,'translate'),'('),' ')"
+          />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="translationY">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length">
+          <xsl:value-of
+            select="substring-before(substring-after(substring-after(substring-after(ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@draw:transform,'translate'),'('),' '),')')"
+          />
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- frame properties -->
+    <xsl:variable name="frameWidth">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="frameHeight">
+      <xsl:call-template name="point-measure">
+        <xsl:with-param name="length"
+          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- special distance with rotation -->
+    <xsl:choose>
+      <xsl:when test="$angle &gt; 0">
+        <xsl:value-of select="$translationY"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$translationY - $frameWidth"/>
+        </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <!-- text boxes -->
   <xsl:template match="draw:text-box" mode="paragraph">
     <w:r>
@@ -2024,6 +2128,7 @@
 
           <xsl:call-template name="InsertShapeProperties">
             <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            <xsl:with-param name="shapeProperties" select="parent::draw:frame"/>
           </xsl:call-template>
 
           <!--insert text-box-->
@@ -2074,6 +2179,7 @@
 
   <xsl:template name="InsertShapeZindex">
     <xsl:param name="shapeStyle"/>
+    <xsl:param name="shapeProperties"/>
 
     <xsl:variable name="frameWrap">
       <xsl:call-template name="GetGraphicProperties">
@@ -2100,8 +2206,8 @@
           and not($runThrought)">251658240</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
-            <xsl:when test="parent::draw:frame/@draw:z-index">
-              <xsl:value-of select="2 + parent::draw:frame/@draw:z-index"/>
+            <xsl:when test="$shapeProperties/@draw:z-index">
+              <xsl:value-of select="2 + $shapeProperties/@draw:z-index"/>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
@@ -2114,9 +2220,10 @@
 
   <xsl:template name="InsertShapePositionRelative">
     <xsl:param name="shapeStyle"/>
+    <xsl:param name="shapeProperties"/>
 
     <xsl:variable name="anchor">
-      <xsl:value-of select="ancestor::draw:frame[1]/@text:anchor-type"/>
+      <xsl:value-of select="$shapeProperties/@text:anchor-type"/>
     </xsl:variable>
 
     <!-- text-box horizontal relative position -->
@@ -2145,7 +2252,7 @@
       <xsl:when test="$wrappedPara = 1">mso-position-horizontal-relative:char;</xsl:when>
       <!-- direct anchored frame -->
       <xsl:when test="$anchor = 'as-char' ">mso-position-horizontal-relative:char;</xsl:when>
-      <xsl:when test="$anchor = 'page' and ancestor::draw:frame[1]/@svg:x">
+      <xsl:when test="$anchor = 'page' and $shapeProperties/@svg:x">
         <xsl:choose>
           <!-- page-content -->
           <xsl:when test="$horizontalRel = 'page-content' ">mso-position-horizontal-relative:margin;</xsl:when>
@@ -2183,7 +2290,7 @@
       <xsl:when test="$wrappedPara = 1">mso-position-vertical-relative:line;</xsl:when>
       <!-- direct anchored frame -->
       <xsl:when test="$anchor = 'as-char' ">mso-position-horizontal-relative:line;</xsl:when>
-      <xsl:when test="$anchor = 'page' and ancestor::draw:frame[1]/@svg:y">
+      <xsl:when test="$anchor = 'page' and $shapeProperties/@svg:y">
         <xsl:choose>
           <!-- page-content -->
           <xsl:when test="$verticalRel = 'page-content' ">mso-position-vertical-relative:margin;</xsl:when>
@@ -2214,10 +2321,11 @@
 
   <xsl:template name="InsertShapePosition">
     <xsl:param name="shapeStyle"/>
+    <xsl:param name="shapeProperties"/>
     <xsl:variable name="graphicProps" select="$shapeStyle/style:graphic-properties"/>
 
     <xsl:variable name="anchor">
-      <xsl:value-of select="ancestor::draw:frame[1]/@text:anchor-type"/>
+      <xsl:value-of select="$shapeProperties/@text:anchor-type"/>
     </xsl:variable>
 
     <xsl:variable name="wrappedPara">
@@ -2324,14 +2432,14 @@
       </xsl:variable>
 
       <xsl:variable name="rotation">
-        <xsl:if
-          test="contains(ancestor-or-self::node()[contains(name(), 'draw:')]/@draw:transform,'rotate')">
+        <xsl:if test="contains($shapeProperties/@draw:transform,'rotate')">
           <xsl:call-template name="DegreesAngle">
             <xsl:with-param name="angle">
               <xsl:value-of
-                select="substring-before(substring-after(substring-after(ancestor-or-self::node()[contains(name(), 'draw:')]/@draw:transform,'rotate'),'('),')')"
+                select="substring-before(substring-after(substring-after($shapeProperties/@draw:transform,'rotate'),'('),')')"
               />
             </xsl:with-param>
+            <xsl:with-param name="revert">true</xsl:with-param>
           </xsl:call-template>
         </xsl:if>
       </xsl:variable>
@@ -2392,9 +2500,9 @@
               <xsl:choose>
                 <!-- if rotation, revert X and Y -->
                 <xsl:when test="$rotation != '' ">
-                  <xsl:call-template name="ComputeMarginY">
-                    <xsl:with-param name="parent"
-                      select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+                  <xsl:call-template name="ComputeMarginXWithRotation">
+                    <xsl:with-param name="anchor" select="$anchor"/>
+                    <xsl:with-param name="angle" select="$rotation"/>
                   </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>
@@ -2447,9 +2555,9 @@
               <xsl:choose>
                 <!-- if rotation, revert X and Y -->
                 <xsl:when test="$rotation != '' ">
-                  <xsl:call-template name="ComputeMarginX">
-                    <xsl:with-param name="parent"
-                      select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
+                  <xsl:call-template name="ComputeMarginYWithRotation">
+                    <xsl:with-param name="anchor" select="$anchor"/>
+                    <xsl:with-param name="angle" select="$rotation"/>
                   </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>
@@ -2498,10 +2606,11 @@
 
   <xsl:template name="InsertShapeMargin">
     <xsl:param name="shapeStyle"/>
+    <xsl:param name="shapeProperties"/>
 
     <!-- wrapping of text (horizontal adjustment) -->
     <xsl:if
-      test="parent::draw:frame/@fo:min-width or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
+      test="$shapeProperties/@fo:min-width or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
       <xsl:text>mso-wrap-style:none;</xsl:text>
     </xsl:if>
 
@@ -2691,19 +2800,54 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeRotation">
-    <xsl:if test="contains(parent::draw:frame/@draw:transform,'rotate')">
+    <xsl:param name="shapeProperties"/>
+
+    <xsl:if test="contains($shapeProperties/@draw:transform,'rotate')">
       <xsl:text>rotation:</xsl:text>
       <xsl:variable name="angle">
         <xsl:call-template name="DegreesAngle">
           <xsl:with-param name="angle">
             <xsl:value-of
-              select="substring-before(substring-after(substring-after(parent::draw:frame/@draw:transform,'rotate'),'('),')')"
+              select="substring-before(substring-after(substring-after($shapeProperties/@draw:transform,'rotate'),'('),')')"
             />
           </xsl:with-param>
+          <xsl:with-param name="revert">true</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:value-of select="$angle"/>
       <xsl:text>;</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- shape fill properties -->
+  <xsl:template name="InsertShapeFillProperties">
+    <xsl:param name="shapeStyle"/>
+
+    <xsl:if test="$shapeStyle/style:graphic-properties/@draw:fill-gradient-name">
+      <v:fill>
+        <xsl:variable name="gradientName"
+          select="$shapeStyle/style:graphic-properties/@draw:fill-gradient-name"/>
+        <xsl:for-each
+          select="document('styles.xml')/office:document-styles/office:styles/draw:gradient[@draw:name = $gradientName]">
+          <!-- radial gradients not handled yet -->
+          <xsl:attribute name="type">gradient</xsl:attribute>
+          <xsl:if test="@draw:angle">
+            <xsl:attribute name="angle">
+              <xsl:value-of select="round(number(@draw:angle) div 10)"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@draw:end-color">
+            <xsl:attribute name="color">
+              <xsl:value-of select="@draw:end-color"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:if test="@draw:start-color">
+            <xsl:attribute name="color2">
+              <xsl:value-of select="@draw:start-color"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:for-each>
+      </v:fill>
     </xsl:if>
   </xsl:template>
 
@@ -2739,6 +2883,7 @@
   <!--converts oo frame style properties to shape properties for text-box-->
   <xsl:template name="InsertShapeProperties">
     <xsl:param name="shapeStyle"/>
+    <xsl:param name="shapeProperties"/>
 
     <xsl:if test="ancestor::draw:a">
       <xsl:attribute name="href">
@@ -2752,21 +2897,27 @@
 
       <xsl:call-template name="InsertShapeZindex">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>
 
       <xsl:call-template name="InsertShapePositionRelative">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>
 
       <xsl:call-template name="InsertShapePosition">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>
 
       <xsl:call-template name="InsertShapeMargin">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>
 
-      <xsl:call-template name="InsertShapeRotation"/>
+      <xsl:call-template name="InsertShapeRotation">
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
+      </xsl:call-template>
 
     </xsl:attribute>
 
@@ -2824,7 +2975,7 @@
 
     <!--frame wrap-->
     <xsl:choose>
-      <xsl:when test="parent::draw:frame/@text:anchor-type = 'as-char' ">
+      <xsl:when test="parent::node()[contains(name(), 'draw:')]/@text:anchor-type = 'as-char' ">
         <w10:wrap type="none"/>
         <w10:anchorlock/>
       </xsl:when>
@@ -2889,13 +3040,17 @@
             </xsl:call-template>
           </xsl:variable>
           <xsl:choose>
-            <xsl:when test="$angle = 90 or $angle = -90">
+            <xsl:when test="$angle = 90">
               <xsl:text>layout-flow:vertical;mso-layout-flow-alt:bottom-to-top;</xsl:text>
             </xsl:when>
+            <xsl:when test="$angle = -90">
+              <xsl:text>layout-flow:vertical;</xsl:text>
+            </xsl:when>
+            <xsl:when test="$angle = 180">
+              <xsl:text>mso-rotate:180:</xsl:text>
+            </xsl:when>
             <xsl:otherwise>
-              <xsl:text>mso-rotate:</xsl:text>
-              <xsl:value-of select="$angle"/>
-              <xsl:text>;</xsl:text>
+              <xsl:message terminate="no">feedback:Text orientation in text box</xsl:message>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>
@@ -2988,7 +3143,6 @@
     </xsl:attribute>
   </xsl:template>
 
-
   <!--calculates textbox inset attribute  -->
   <xsl:template name="CalculateTextBoxPadding">
     <xsl:param name="padding"/>
@@ -3058,42 +3212,6 @@
       <w:rStyle w:val="{$prefixedStyleName}"/>
     </xsl:if>
   </xsl:template>
-
-  <xsl:template match="draw:frame" mode="paragraph">
-    <xsl:call-template name="InsertEmbeddedTextboxes"/>
-  </xsl:template>
-
-  <xsl:template match="draw:frame">
-    <xsl:choose>
-      <xsl:when test=" preceding-sibling::node()[1][name() != 'draw:frame']">
-        <w:p>
-          <xsl:call-template name="InsertEmbeddedTextboxes"/>
-          <!-- put all  consecutive frames in same paragraph -->
-          <xsl:call-template name="InsertFollowingFrame"/>
-        </w:p>
-      </xsl:when>
-      <xsl:otherwise>
-        <!-- already handled as a 'followinf frame' -->
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- Insert a frame in same paragraph as preceding frame -->
-  <xsl:template name="InsertFollowingFrame">
-    <xsl:for-each select="following-sibling::node()[1][name()='draw:frame']">
-      <xsl:call-template name="InsertEmbeddedTextboxes"/>
-      <!-- put all  consecutive frames in same paragraph -->
-      <xsl:call-template name="InsertFollowingFrame"/>
-    </xsl:for-each>
-  </xsl:template>
-
-  <!-- inserts textboxes which are embedded in odf as one after another in word -->
-  <xsl:template name="InsertEmbeddedTextboxes">
-    <xsl:for-each select="descendant::draw:text-box">
-      <xsl:apply-templates mode="paragraph" select="."/>
-    </xsl:for-each>
-  </xsl:template>
-
 
   <!-- Insert Picture's Properties in frame, if needed -->
   <xsl:template name="InsertPicturePropertiesInFrame">
