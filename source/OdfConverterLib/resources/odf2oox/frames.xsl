@@ -2909,8 +2909,8 @@
         <xsl:for-each select="child::node()">
 
           <xsl:choose>
-            <!--   ignore embedded text-box becouse word doesn't support it-->
-            <xsl:when test="self::node()[name(draw:text-box)]">
+            <!--   ignore embedded text-box and draw:rect becouse word doesn't support it-->
+            <xsl:when test="self::node()[name(draw:text-box|draw:rect)]">
               <xsl:message terminate="no">feedback: Nested frames</xsl:message>
             </xsl:when>
 
