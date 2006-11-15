@@ -234,15 +234,8 @@
 
     <xsl:choose>
       <!--  check if the paragraf is heading -->
-      <xsl:when test="$outlineLevel != '' ">
-        <xsl:apply-templates select="." mode="heading">
-          <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
-        </xsl:apply-templates>
-      </xsl:when>
-
-      <!-- check if list starts -->
-      <xsl:when test="$numId != ''">
-        <xsl:choose>
+      <xsl:when test="$outlineLevel != ''  or $numId != ''">
+          <xsl:choose>
           <xsl:when test="document('word/numbering.xml')//w:numbering/w:num[@w:numId = $numId]">
             <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
             <xsl:if

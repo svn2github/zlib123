@@ -108,6 +108,19 @@
               <xsl:value-of select="w:start/@w:val"/>
             </xsl:attribute>
           </xsl:if>
+          <xsl:variable name="display">
+            <xsl:call-template name="CountDisplayListLevels">
+              <xsl:with-param name="string">
+                <xsl:value-of select="./w:lvlText/@w:val"/>
+              </xsl:with-param>
+              <xsl:with-param name="count">0</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:if test="$display &gt; 1">
+            <xsl:attribute name="text:display-levels">
+              <xsl:value-of select="$display"/>
+            </xsl:attribute>
+          </xsl:if>
           <style:list-level-properties>
             <xsl:call-template name="InsertListLevelProperties"/>
           </style:list-level-properties>
@@ -449,7 +462,7 @@
     <xsl:param name="nestedLevel" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
     <xsl:param name="level" select="w:pPr/w:numPr/w:ilvl/@w:val"/>
     <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
-    
+ 
     <!-- if first element of a list -->
     <xsl:if
       test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and count(preceding-sibling::w:p)= $position -1])">
@@ -514,8 +527,20 @@
       </xsl:when>
       
       <xsl:otherwise>
+        <xsl:variable name="outlineLevel">
+          <xsl:call-template name="GetOutlineLevel">
+            <xsl:with-param name="node" select="."/>
+          </xsl:call-template>
+        </xsl:variable>
         <text:list-item>
-          <xsl:apply-templates select="." mode="paragraph"/>
+          <xsl:choose>
+            <xsl:when test="$outlineLevel != ''">
+                <xsl:apply-templates select="." mode="heading"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="." mode="paragraph"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </text:list-item>
         
         <!-- next paragraph  in same list -->
