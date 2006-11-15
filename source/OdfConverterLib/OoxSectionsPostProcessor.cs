@@ -54,6 +54,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		// test if a master page name has been encountered
 		private bool inNameAttr = false;
 		private bool inXmlnsPsectAttr = false;
+		// test if a page number has been encountered
+		private bool inPageNumAttr = false;
 		
 		private Element evenAndOddHeaders;
 		
@@ -67,7 +69,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
 		public override void WriteString(string text)
 		{
-			if (this.inLocal || this.inNameAttr)
+			if (this.inLocal || this.inNameAttr || this.inPageNumAttr)
 			{
 				this.pageContext.Set(text);
 				this.pageContext.InSectionWriteString(text);
@@ -174,13 +176,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			{
 				this.inNameAttr = true;
 			}
-			
+
+			if (InPageNumberAttribute())
+			{
+				this.inPageNumAttr = true;
+			}
+
 			if (InXmlnsPsectAttr())
 			{
 				this.inXmlnsPsectAttr = true;
 			}
-			
-			if (!this.inGlobal && !this.inLocal && !this.inNameAttr && !this.inXmlnsPsectAttr)
+
+			if (!this.inGlobal && !this.inLocal && !this.inNameAttr && !this.inPageNumAttr && !this.inXmlnsPsectAttr)
 			{
 				this.nextWriter.WriteStartAttribute(prefix, localName, ns);
 			}
@@ -195,7 +202,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		
 		public override void WriteEndAttribute()
 		{
-			if (!this.inGlobal && !this.inLocal && !this.inNameAttr && !this.inXmlnsPsectAttr)
+			if (!this.inGlobal && !this.inLocal && !this.inNameAttr && !this.inPageNumAttr && !this.inXmlnsPsectAttr)
 			{
 				this.nextWriter.WriteEndAttribute();
 			}
@@ -209,7 +216,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			{
 				this.inNameAttr = false;
 			}
-			
+
+			if (InPageNumberAttribute())
+			{
+				this.inPageNumAttr = false;
+			}
+
 			if (InXmlnsPsectAttr())
 			{
 				this.inXmlnsPsectAttr = false;
@@ -238,7 +250,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			Node n = (Node) stack.Peek();
 			return n.Name.Equals("master-page-name") && n.Ns.Equals(CA_SECTIONS_NS);
 		}
-		
+
+		private bool InPageNumberAttribute()
+		{
+			Node n = (Node)stack.Peek();
+			return n.Name.Equals("page-number") && n.Ns.Equals(CA_SECTIONS_NS);
+		}
+
 		private bool InXmlnsPsectAttr()
 		{
 			Node n = (Node) stack.Peek();
@@ -267,6 +285,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			private Element odfSectPr;
 			private Element cont;
 			private Element titlePg;
+			private string startPageNumber = null;
 			
 			private bool inSectPr = false;
 			private Stack sectPrStack;
@@ -453,6 +472,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 					{
 						this.nextIsMasterPage = true;
 					}
+
+					if (n.Name.Equals("page-number"))
+					{
+						this.startPageNumber = val;
+					}
 				}
 			}
 			
@@ -603,7 +627,21 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 						Element pgNumType = (Element)page.GetChild("pgNumType", OOX_MAIN_NS);
 						if (pgNumType != null)
 						{
-							pgNumType.Write(nextWriter);
+							if (this.startPageNumber != null)
+							{
+								pgNumType.AddAttribute(new Attribute("w", "start", startPageNumber, OOX_MAIN_NS));
+								pgNumType.Write(nextWriter);
+							}
+							else
+							{
+								pgNumType.Write(nextWriter);
+							}
+						}
+						else if (this.startPageNumber != null)
+						{
+							Element pgNumTypeStart = new Element("w", "pgNumType", OOX_MAIN_NS);
+							pgNumTypeStart.AddAttribute(new Attribute("w", "start", startPageNumber, OOX_MAIN_NS));
+							pgNumTypeStart.Write(nextWriter);
 						}
 
 						// columns

@@ -85,17 +85,37 @@
             <xsl:value-of select="$master-page-name"/>
           </xsl:attribute>
         </xsl:if>
+        <xsl:variable name="pageNumber">
+          <xsl:call-template name="GetPageStartNumber">
+            <xsl:with-param name="style-name" select="@text:style-name|@table:style-name"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$pageNumber != '' ">
+          <xsl:attribute name="psect:page-number">
+            <xsl:value-of select="$pageNumber"/>
+          </xsl:attribute>
+        </xsl:if>
       </xsl:when>
       <xsl:when test="self::text:list-item or self::text:list-header">
         <xsl:variable name="master-page-name">
           <xsl:call-template name="GetMasterPageNameFromHierarchy">
-            <xsl:with-param name="style-name" select="*[1][self::text:p or self::text:h]/@text:style-name"/>
+            <xsl:with-param name="style-name"
+              select="*[1][self::text:p or self::text:h]/@text:style-name"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:if
-          test="$master-page-name != '' ">
+        <xsl:if test="$master-page-name != '' ">
           <xsl:attribute name="psect:master-page-name">
             <xsl:value-of select="$master-page-name"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:variable name="pageNumber">
+          <xsl:call-template name="GetPageStartNumber">
+            <xsl:with-param name="style-name" select="@text:style-name|@table:style-name"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$pageNumber != '' ">
+          <xsl:attribute name="psect:page-number">
+            <xsl:value-of select="$pageNumber"/>
           </xsl:attribute>
         </xsl:if>
       </xsl:when>
@@ -140,6 +160,41 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- find the number if it is set to restart -->
+  <xsl:template name="GetPageStartNumber">
+    <xsl:param name="style-name"/>
+    <xsl:param name="context" select="'content.xml'"/>
+    <xsl:variable name="exists">
+      <xsl:for-each select="document($context)">
+        <xsl:value-of select="boolean(key('styles', $style-name))"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$exists = 'true' ">
+        <xsl:for-each select="document($context)">
+          <xsl:variable name="style" select="key('styles', $style-name)[1]"/>
+          <xsl:choose>
+            <xsl:when test="$style/style:paragraph-properties/@style:page-number">
+              <xsl:value-of select="$style/style:paragraph-properties/@style:page-number"/>
+            </xsl:when>
+            <xsl:when test="$style/@style:parent-style-name">
+              <xsl:call-template name="GetMasterPageNameFromHierarchy">
+                <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
+                <xsl:with-param name="context" select="$context"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- switch the context, let's look into styles.xml -->
+      <xsl:when test="$context != 'styles.xml'">
+        <xsl:call-template name="GetMasterPageNameFromHierarchy">
+          <xsl:with-param name="style-name" select="$style-name"/>
+          <xsl:with-param name="context" select="'styles.xml'"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 
   <!-- section detection and insertion for paragraph-->
   <xsl:template name="InsertParagraphSectionProperties">
@@ -233,7 +288,7 @@
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
       <xsl:variable name="followings"
         select="following::text:p[1] | following::text:h[1] | following::table:table[1]"/>
-      
+
       <xsl:variable name="next-master-page">
         <xsl:choose>
           <xsl:when test="$followings[1]/@text:style-name">
