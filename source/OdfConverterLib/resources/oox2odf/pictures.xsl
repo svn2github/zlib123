@@ -64,9 +64,14 @@
       <!-- TODO:@text:anchor-type -->
       <xsl:attribute name="text:anchor-type">
         <xsl:variable name="verticalRelativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
+        <xsl:variable name="layoutInCell" select="@layoutInCell"/>
+        
         <xsl:choose>
           <xsl:when test="$verticalRelativeFrom = 'line'">
             <xsl:text>char</xsl:text>
+          </xsl:when>
+          <xsl:when test="$layoutInCell = 0">
+            <xsl:text>page</xsl:text>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>paragraph</xsl:text>

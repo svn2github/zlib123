@@ -195,7 +195,7 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;;Options;Move object with text;2;0.3 M1;;;;
 ;;;;;Lock anchor;2;0.3 M1;;;;
 ;;;;;Allow overlap;2;0.3 M1;;;;
-;;;;;Layout in table cell;2;0.3 M1;;;;
+;;;;;Layout in table cell;2;0.3 M1;Completed;"corresponding feature in OO: anchor set ""to page"" (the behaviour is similar but not the same)";;
 ;;;;;;;;;;;
 ;;;Text Wrapping;Wrapping style;Square;2;0.3 M1;Completed;;;
 ;;;;;Tight;2;0.3 M1;Completed;;;
