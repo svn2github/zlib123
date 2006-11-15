@@ -90,7 +90,7 @@
             <xsl:with-param name="style-name" select="@text:style-name|@table:style-name"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="$pageNumber != '' ">
+        <xsl:if test="number($pageNumber)">
           <xsl:attribute name="psect:page-number">
             <xsl:value-of select="$pageNumber"/>
           </xsl:attribute>
@@ -103,17 +103,17 @@
               select="*[1][self::text:p or self::text:h]/@text:style-name"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="$master-page-name != '' ">
+        <xsl:if test="number($master-page-name)">
           <xsl:attribute name="psect:master-page-name">
             <xsl:value-of select="$master-page-name"/>
           </xsl:attribute>
         </xsl:if>
         <xsl:variable name="pageNumber">
           <xsl:call-template name="GetPageStartNumber">
-            <xsl:with-param name="style-name" select="@text:style-name|@table:style-name"/>
+            <xsl:with-param name="style-name" select="*[1][self::text:p or self::text:h]/@text:style-name"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="$pageNumber != '' ">
+        <xsl:if test="number($pageNumber)">
           <xsl:attribute name="psect:page-number">
             <xsl:value-of select="$pageNumber"/>
           </xsl:attribute>
@@ -178,7 +178,7 @@
               <xsl:value-of select="$style/style:paragraph-properties/@style:page-number"/>
             </xsl:when>
             <xsl:when test="$style/@style:parent-style-name">
-              <xsl:call-template name="GetMasterPageNameFromHierarchy">
+              <xsl:call-template name="GetPageStartNumber">
                 <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
                 <xsl:with-param name="context" select="$context"/>
               </xsl:call-template>
@@ -188,7 +188,7 @@
       </xsl:when>
       <!-- switch the context, let's look into styles.xml -->
       <xsl:when test="$context != 'styles.xml'">
-        <xsl:call-template name="GetMasterPageNameFromHierarchy">
+        <xsl:call-template name="GetPageStartNumber">
           <xsl:with-param name="style-name" select="$style-name"/>
           <xsl:with-param name="context" select="'styles.xml'"/>
         </xsl:call-template>
