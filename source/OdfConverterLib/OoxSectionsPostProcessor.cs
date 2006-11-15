@@ -392,7 +392,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 					Node n = (Node) sectPrStack.Peek();
 					if (n != null && n is Attribute)
 					{
-						((Attribute) n).Value = val;
+						((Attribute) n).Value += val;
 					}
 				}
 			}
@@ -475,6 +475,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
 					if (n.Name.Equals("page-number"))
 					{
+						Console.WriteLine("setting page number value to : "+val);
 						this.startPageNumber = val;
 					}
 				}
@@ -624,23 +625,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 						}
 
 						// pgNumType
-						Element pgNumType = (Element)page.GetChild("pgNumType", OOX_MAIN_NS);
+						Element pgNumType = (Element) page.GetChild("pgNumType", OOX_MAIN_NS);
 						if (pgNumType != null)
 						{
+							Element pgNumType0 = pgNumType.Clone();
 							if (this.startPageNumber != null)
 							{
-								pgNumType.AddAttribute(new Attribute("w", "start", startPageNumber, OOX_MAIN_NS));
-								pgNumType.Write(nextWriter);
+								pgNumType0.AddAttribute(new Attribute("w", "start", this.startPageNumber, OOX_MAIN_NS));
+								pgNumType0.Write(nextWriter);
 							}
 							else
 							{
-								pgNumType.Write(nextWriter);
+								pgNumType0.Write(nextWriter);
 							}
 						}
 						else if (this.startPageNumber != null)
 						{
 							Element pgNumTypeStart = new Element("w", "pgNumType", OOX_MAIN_NS);
-							pgNumTypeStart.AddAttribute(new Attribute("w", "start", startPageNumber, OOX_MAIN_NS));
+							pgNumTypeStart.AddAttribute(new Attribute("w", "start", this.startPageNumber, OOX_MAIN_NS));
 							pgNumTypeStart.Write(nextWriter);
 						}
 
