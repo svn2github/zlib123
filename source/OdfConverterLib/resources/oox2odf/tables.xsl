@@ -167,7 +167,7 @@
           <xsl:call-template name="InsertTableAlign"/>
         </xsl:attribute>
       </xsl:when>
-      <xsl:when test="w:tblW/@w:type = 'dxa'">
+      <xsl:when test="w:tblW/@w:type = 'auto'">
         <xsl:attribute name="style:width">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
@@ -477,23 +477,12 @@
                   <xsl:value-of select="'solid'"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="$tcBorder/@w:val"/>
+                  <!-- Styles of Table Border to do (Open Office Bug)-->                 
+                  <xsl:value-of select="'solid'"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            <xsl:if test="$tcBorder/@w:val = 'double'">
-              <xsl:variable name="width2">
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="$tcBorder/@w:sz div 3"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
-              </xsl:variable>
-              <xsl:attribute name="{$attribute2}">
-                <xsl:value-of select="concat($width2,' ',$width2,' ',$width2)"/>
-              </xsl:attribute>
-            </xsl:if>
+            
             <xsl:variable name="color">
               <xsl:choose>
                 <xsl:when test="$tcBorder/@w:color = 'auto'">
@@ -560,23 +549,12 @@
               <xsl:value-of select="'solid'"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="$tblBorder/@w:val"/>
+              <!-- Styles of Table Border to do (Open Office Bug)-->                            
+              <xsl:value-of select="'solid'"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:if test="$tblBorder/@w:val = 'double'">
-          <xsl:variable name="width2">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="$tblBorder/@w:sz div 3"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:attribute name="{$attribute2}">
-            <xsl:value-of select="concat($width2,' ',$width2,' ',$width2)"/>
-          </xsl:attribute>
-        </xsl:if>
+       
         <xsl:variable name="color">
           <xsl:choose>
             <xsl:when test="$tblBorder/@w:color = 'auto' or not($tblBorder/@w:color)">
@@ -617,24 +595,12 @@
               <xsl:when test="$tblDefBorder/@w:val = 'single'">
                 <xsl:value-of select="'solid'"/>
               </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$tblDefBorder/@w:val"/>
+              <xsl:otherwise>          
+                <!-- Styles of Table Border to do (Open Office Bug)-->
+                <xsl:value-of select="'solid'"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          <xsl:if test="$tblDefBorder/@w:val = 'double'">
-            <xsl:variable name="width2">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="$tblDefBorder/@w:sz div 3"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:attribute name="{$attribute2}">
-              <xsl:value-of select="concat($width2,' ',$width2,' ',$width2)"/>
-            </xsl:attribute>
-          </xsl:if>
           <xsl:variable name="color">
             <xsl:value-of select="$tblDefBorder/@w:color"/>
           </xsl:variable>
@@ -648,17 +614,38 @@
 
   <!--  insert row properties: height-->
   <xsl:template name="InsertRowProperties">
-    <xsl:if
-      test="(w:trHeight/@w:hRule and w:trHeight/@w:hRule!='auto' ) or not(w:trHeight/@w:hRule)">
-      <xsl:attribute name="style:min-row-height">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="w:trHeight/@w:val"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="w:trHeight/@w:hRule='exact'">
+        <xsl:attribute name="style:row-height">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:trHeight/@w:val"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="style:min-row-height">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:trHeight/@w:val"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:attribute name="style:keep-together">
+      <xsl:choose>
+        <xsl:when test="w:cantSplit">
+          <xsl:text>false</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>true</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
   </xsl:template>
 
 </xsl:stylesheet>
