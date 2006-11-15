@@ -521,11 +521,6 @@
     <xsl:message terminate="no">progress:w:style</xsl:message>
     <xsl:choose>
       <xsl:when test="self::node()/@w:default">
-        <xsl:if test="@w:type='paragraph'">
-          <style:default-style style:family="paragraph">
-            <xsl:call-template name="InsertStyleProperties"/>
-          </style:default-style>
-        </xsl:if>
         <xsl:if test="@w:type='table'">
           <style:default-style style:family="table">
             <xsl:call-template name="InsertTableProperties"/>
