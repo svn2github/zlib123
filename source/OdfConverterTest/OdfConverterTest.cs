@@ -121,9 +121,12 @@ namespace CleverAge.OdfConverter.CommandLineTool
         private OoxValidator ooxValidator = null;
         private OdfValidator odfValidator = null;
 
-
+		#if WINDOWS
         [DllImport("kernel32")]
         static extern bool SetConsoleCtrlHandler(ControlHandlerFonction handlerRoutine, bool add);
+        #else
+        static bool SetConsoleCtrlHandler(ControlHandlerFonction handlerRoutine, bool add) { return true; }
+		#endif
 
         int MyHandler(ControlType control)
         {
