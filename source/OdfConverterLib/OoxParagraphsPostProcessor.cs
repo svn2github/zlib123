@@ -425,19 +425,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          					else
          					{
          						int idx = s.IndexOf(' ');
-         						if (idx > 1)
+         						if (idx > -1)
          						{
          							dropCap += s.Substring(0, idx);
          							p.DropCapPr.IsWord = false;
          							if (idx+1 < s.Length)
          							{
-         								delayedReplace.Add(new Pair(s, s.Substring(idx+1, s.Length-(idx+1))));
+         								delayedReplace.Add(new Pair(s, s.Substring(idx, s.Length-idx)));
          							}
          							else
          							{
          								dropCap += s;
          								delayedRemove.Add(s);
          							}
+         						}
+         						else
+         						{
+         							dropCap += s;
+         							delayedRemove.Add(s);
          						}
          					}
          				}
@@ -457,10 +462,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          				run0.AddChild(rPr);
          			}
          			Element t0 = new Element("w", "t", W_NAMESPACE);
+         			t0.AddAttribute(new Attribute("xml", "space", "preserve", null));
          			t0.AddChild(dropCap);
-         			// TODO : add space="preserve" attribute
-         			//t0.AddAttribute("xml", "space", "preserve", );
-         			
          			run0.AddChild(t0);
          			p0.AddChild(run0);
          		}
