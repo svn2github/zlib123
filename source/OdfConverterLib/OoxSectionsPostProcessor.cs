@@ -500,6 +500,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 				this.nextIsMasterPage = false;
 				this.skip = false;
 				this.odfSectPr = null;
+				this.startPageNumber = null;
 			}
 			
 			

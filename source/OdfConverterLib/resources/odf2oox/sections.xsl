@@ -88,6 +88,12 @@
         <xsl:variable name="pageNumber">
           <xsl:call-template name="GetPageStartNumber">
             <xsl:with-param name="style-name" select="@text:style-name|@table:style-name"/>
+            <xsl:with-param name="context">
+              <xsl:choose>
+                <xsl:when test="ancestor::office:document-content">content.xml</xsl:when>
+                <xsl:otherwise>styles.xml</xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
         <xsl:if test="number($pageNumber)">
@@ -111,6 +117,12 @@
         <xsl:variable name="pageNumber">
           <xsl:call-template name="GetPageStartNumber">
             <xsl:with-param name="style-name" select="*[1][self::text:p or self::text:h]/@text:style-name"/>
+            <xsl:with-param name="context">
+              <xsl:choose>
+                <xsl:when test="ancestor::office:document-content">content.xml</xsl:when>
+                <xsl:otherwise>styles.xml</xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
         <xsl:if test="number($pageNumber)">
@@ -174,7 +186,7 @@
         <xsl:for-each select="document($context)">
           <xsl:variable name="style" select="key('styles', $style-name)[1]"/>
           <xsl:choose>
-            <xsl:when test="$style/style:paragraph-properties/@style:page-number">
+            <xsl:when test="$style/style:paragraph-properties/@style:page-number &gt; 0">
               <xsl:value-of select="$style/style:paragraph-properties/@style:page-number"/>
             </xsl:when>
             <xsl:when test="$style/@style:parent-style-name">
