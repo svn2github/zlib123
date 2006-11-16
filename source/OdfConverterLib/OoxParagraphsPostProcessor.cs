@@ -403,20 +403,23 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          				if (t is string)
          				{
          					string s = (string) t;
-         					if (!p.DropCapPr.IsWord && p.DropCapPr.Length > 0)
+         					if (!p.DropCapPr.IsWord)
          					{
-         						if (s.Length > p.DropCapPr.Length) 
+         						if (p.DropCapPr.Length > 0)
          						{
-         							dropCap += s.Substring(0, p.DropCapPr.Length);
-         							string newS = s.Substring(p.DropCapPr.Length, s.Length-p.DropCapPr.Length);
-         							p.DropCapPr.Length -= s.Length;
-         							delayedReplace.Add(new Pair(s, newS));
-         						}
-         						else
-         						{
-         							dropCap += s;
-         							p.DropCapPr.Length -= s.Length;
-         							delayedRemove.Add(s);
+         							if (s.Length > p.DropCapPr.Length)
+         							{
+         								dropCap += s.Substring(0, p.DropCapPr.Length);
+         								string newS = s.Substring(p.DropCapPr.Length, s.Length-p.DropCapPr.Length);
+         								p.DropCapPr.Length -= s.Length;
+         								delayedReplace.Add(new Pair(s, newS));
+         							}
+         							else
+         							{
+         								dropCap += s;
+         								p.DropCapPr.Length -= s.Length;
+         								delayedRemove.Add(s);
+         							}
          						}
          					}
          					else
