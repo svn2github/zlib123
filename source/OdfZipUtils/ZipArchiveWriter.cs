@@ -339,7 +339,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         public override void WriteFullEndElement()
         {
-            this.WriteFullEndElement();
+            this.WriteEndElement();
         }
 
         public override void WriteStartDocument()
@@ -452,10 +452,16 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
         public override WriteState WriteState
         {
-            // nothing smart to do here
             get
             {
-                return delegateWriter.WriteState;
+            	if (delegateWriter != null)
+            	{
+            		return delegateWriter.WriteState;
+            	}
+                else
+                {
+                	return WriteState.Closed;
+                }
             }
         }
 
