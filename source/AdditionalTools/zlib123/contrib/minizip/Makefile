@@ -1,25 +1,21 @@
+top_srcdir=../../../../..
+
+LD=ld
 CC=cc
-CFLAGS=-O -I../..
+DEBUG=-g -O0
+CFLAGS=-Wall
 
-UNZ_OBJS = miniunz.o unzip.o ioapi.o ../../libz.a
-ZIP_OBJS = minizip.o zip.o   ioapi.o ../../libz.a
+SOURCES = zip.c unzip.c ioapi.c
 
-.c.o:
-	$(CC) -c $(CFLAGS) $*.c
+include $(top_srcdir)/build/common.mk
 
-all: miniunz minizip
+all-local: libzlibwapi.so
 
-miniunz:  $(UNZ_OBJS)
-	$(CC) $(CFLAGS) -o $@ $(UNZ_OBJS)
+libzlibwapi.so : $(SOURCES)
+	$(CC) -lz -shared $(DEBUG) $(CFLAGS) \
+	    -o libzlibwapi.so $(SOURCES)
 
-minizip:  $(ZIP_OBJS)
-	$(CC) $(CFLAGS) -o $@ $(ZIP_OBJS)
+clean-local:
+	rm -f *.o libzlibwapi.so
 
-test:	miniunz minizip
-	./minizip test readme.txt
-	./miniunz -l test.zip
-	mv readme.txt readme.old
-	./miniunz test.zip
 
-clean:
-	/bin/rm -f *.o *~ minizip miniunz
