@@ -95,27 +95,7 @@
   <xsl:template match="draw:frame" mode="paragraph">
     <xsl:call-template name="InsertEmbeddedTextboxes"/>
   </xsl:template>
-  <!--
-  <xsl:template match="draw:frame">
-    <xsl:choose>
-      <xsl:when test=" preceding-sibling::node()[1][name() != 'draw:frame']">
-        <w:p>
-          <xsl:call-template name="InsertEmbeddedTextboxes"/>
-          <xsl:call-template name="InsertFollowingFrame"/>
-        </w:p>
-      </xsl:when>
-      <xsl:otherwise>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  
-  <xsl:template name="InsertFollowingFrame">
-    <xsl:for-each select="following-sibling::node()[1][name()='draw:frame']">
-      <xsl:call-template name="InsertEmbeddedTextboxes"/>
-      <xsl:call-template name="InsertFollowingFrame"/>
-    </xsl:for-each>
-  </xsl:template>
--->
+
   <!-- inserts textboxes which are embedded in odf as one after another in word -->
   <xsl:template name="InsertEmbeddedTextboxes">
     <xsl:for-each select="descendant::draw:text-box">
@@ -351,103 +331,30 @@
     <xsl:param name="unit"/>
 
     <xsl:choose>
-      <!-- if relative width is present and possible to calculate -->
-      <xsl:when
-        test="contains($frame/@*[name()=concat('style:rel-',$side)], '%') and $frame/ancestor::node()[contains(name(), 'draw:') and @*[name()=concat('svg:',$side)]]">
-        <xsl:variable name="parentSize">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="unit" select="$unit"/>
-            <xsl:with-param name="length">
-              <xsl:value-of
-                select="$frame/ancestor::node()[contains(name(), 'draw:') and @*[name()=concat('svg:',$side)]][1]/@*[name()=concat('svg:',$side)]"
-              />
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="padding">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="unit" select="$unit"/>
-            <xsl:with-param name="length">
-              <xsl:call-template name="GetGraphicProperties">
-                <xsl:with-param name="shapeStyle"
-                  select="key('automatic-styles', $frame/ancestor::node()[contains(name(), 'draw:') and @*[name()=concat('svg:',$side)]][1]/@draw:style-name)"/>
-                <xsl:with-param name="attribName">fo:padding</xsl:with-param>
-              </xsl:call-template>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="padding2">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="unit" select="$unit"/>
-            <xsl:with-param name="length">
-              <xsl:call-template name="GetGraphicProperties">
-                <xsl:with-param name="shapeStyle"
-                  select="key('automatic-styles', $frame/ancestor::node()[contains(name(), 'draw:') and @*[name()=concat('svg:',$side)]][1]/@draw:style-name)"/>
-                <xsl:with-param name="attribName">
-                  <xsl:choose>
-                    <xsl:when test="$side = 'width' ">fo:padding-left</xsl:when>
-                    <xsl:otherwise>fo:padding-top</xsl:otherwise>
-                  </xsl:choose>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="padding3">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="unit" select="$unit"/>
-            <xsl:with-param name="length">
-              <xsl:call-template name="GetGraphicProperties">
-                <xsl:with-param name="shapeStyle"
-                  select="key('automatic-styles', $frame/ancestor::node()[contains(name(), 'draw:') and @*[name()=concat('svg:',$side)]][1]/@draw:style-name)"/>
-                <xsl:with-param name="attribName">
-                  <xsl:choose>
-                    <xsl:when test="$side = 'width' ">fo:padding-right</xsl:when>
-                    <xsl:otherwise>fo:padding-bottom</xsl:otherwise>
-                  </xsl:choose>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="percentVal"
-          select="substring-before($frame/@*[name()=concat('style:rel-',$side)], '%')"/>
-        <xsl:value-of
-          select="round(($parentSize - $padding - $padding2 - $padding3) * number($percentVal) div 100)"
-        />
+      <xsl:when test="$frame/@*[name()=concat('svg:',$side)]">
+        <xsl:call-template name="ConvertMeasure">
+          <xsl:with-param name="unit" select="$unit"/>
+          <xsl:with-param name="length" select="$frame/@*[name()=concat('svg:',$side)]"/>
+        </xsl:call-template>
       </xsl:when>
-      <xsl:otherwise>
-        <!-- warn loss of scaled images (scale, scale-min) -->
-        <xsl:if test="contains($frame/@*[name()=concat('style:rel-',$side)], 'scale')">
-          <xsl:message terminate="no">feedback:Scaled image</xsl:message>
-        </xsl:if>
-        <xsl:choose>
-          <xsl:when test="$frame/@*[name()=concat('svg:',$side)]">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="unit" select="$unit"/>
-              <xsl:with-param name="length" select="$frame/@*[name()=concat('svg:',$side)]"/>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:when test="$frame/*[contains(name(), 'draw:')]/@*[name()=concat('fo:min-',$side)]">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="unit" select="$unit"/>
-              <xsl:with-param name="length">
-                <xsl:value-of
-                  select="$frame/*[contains(name(), 'draw:')]/@*[name()=concat('fo:min-',$side)]"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:when test="$frame/@*[name()=concat('fo:min-',$side)]">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="unit" select="$unit"/>
-              <xsl:with-param name="length">
-                <xsl:value-of select="$frame/@*[name()=concat('fo:min-',$side)]"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
-      </xsl:otherwise>
+      <xsl:when test="$frame/*[contains(name(), 'draw:')]/@*[name()=concat('fo:min-',$side)]">
+        <xsl:call-template name="ConvertMeasure">
+          <xsl:with-param name="unit" select="$unit"/>
+          <xsl:with-param name="length">
+            <xsl:value-of
+              select="$frame/*[contains(name(), 'draw:')]/@*[name()=concat('fo:min-',$side)]"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$frame/@*[name()=concat('fo:min-',$side)]">
+        <xsl:call-template name="ConvertMeasure">
+          <xsl:with-param name="unit" select="$unit"/>
+          <xsl:with-param name="length">
+            <xsl:value-of select="$frame/@*[name()=concat('fo:min-',$side)]"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -1289,7 +1196,6 @@
     </xsl:attribute>
   </xsl:template>
 
-
   <!--insert shape z-index -->
   <xsl:template name="InsertDrawnShapeZindex">
     <xsl:choose>
@@ -1822,13 +1728,15 @@
     <xsl:variable name="frameWidth">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length"
-          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width"/>
+          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width"
+        />
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="frameHeight">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length"
-          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height"/>
+          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height"
+        />
       </xsl:call-template>
     </xsl:variable>
     <!-- special distance with rotation -->
@@ -2043,7 +1951,7 @@
   <xsl:template name="ComputeMarginYWithRotation">
     <xsl:param name="angle"/>
     <xsl:param name="anchor"/>
-    
+
     <!-- particular transformation -->
     <xsl:variable name="translationX">
       <xsl:call-template name="point-measure">
@@ -2067,26 +1975,28 @@
     <xsl:variable name="frameWidth">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length"
-          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width"/>
+          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:width"
+        />
       </xsl:call-template>
     </xsl:variable>
     <xsl:variable name="frameHeight">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length"
-          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height"/>
+          select="ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@svg:height"
+        />
       </xsl:call-template>
     </xsl:variable>
     <!-- special distance with rotation -->
     <xsl:choose>
       <xsl:when test="$angle &gt; 0">
         <xsl:value-of select="$translationY"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$translationY - $frameWidth"/>
-        </xsl:otherwise>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$translationY - $frameWidth"/>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- text boxes -->
   <xsl:template match="draw:text-box" mode="paragraph">
     <w:r>
@@ -2148,12 +2058,13 @@
 
   <!-- shape properties attributes : size, position, z-index... -->
   <xsl:template name="InsertShapeSize">
+    <xsl:param name="shapeProperties"/>
 
     <!-- width -->
     <xsl:variable name="frameW">
       <xsl:call-template name="ComputeDrawingObjectSize">
         <xsl:with-param name="side">width</xsl:with-param>
-        <xsl:with-param name="frame" select="parent::draw:frame"/>
+        <xsl:with-param name="frame" select="$shapeProperties"/>
         <xsl:with-param name="unit">point</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -2166,13 +2077,75 @@
     <xsl:variable name="frameH">
       <xsl:call-template name="ComputeDrawingObjectSize">
         <xsl:with-param name="side">height</xsl:with-param>
-        <xsl:with-param name="frame" select="parent::draw:frame"/>
+        <xsl:with-param name="frame" select="$shapeProperties"/>
         <xsl:with-param name="unit">point</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 
     <xsl:if test="$frameH != '' ">
       <xsl:value-of select="concat('height:',$frameH,'pt;')"/>
+    </xsl:if>
+
+  </xsl:template>
+
+  <xsl:template name="InsertShapeRelativeSize">
+    <xsl:param name="shapeProperties"/>
+
+    <xsl:if test="$shapeProperties/@style:rel-width or $shapeProperties/@style:rel-height">
+
+      <!-- relative to -->
+      <xsl:variable name="relativeTo">
+        <xsl:choose>
+          <xsl:when test="$shapeProperties/@text:anchor-type = 'page'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$shapeProperties/@text:anchor-type = 'paragraph'">
+            <xsl:text>margin</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>margin</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- relative width -->
+      <xsl:choose>
+        <xsl:when test="contains($shapeProperties/@style:rel-width, 'scale')">
+          <!-- warn loss of scaled images (scale, scale-min) -->
+          <xsl:message terminate="no">feedback:Scaled image</xsl:message>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="relWidth"
+            select="substring-before($shapeProperties/@style:rel-width,'%')"/>
+          <xsl:if test="$relWidth != '' ">
+            <xsl:text>mso-width-percent:</xsl:text>
+            <xsl:value-of select="number($relWidth) * 10"/>
+            <xsl:text>;mso-width-relative:</xsl:text>
+            <xsl:value-of select="$relativeTo"/>
+            <xsl:text>;</xsl:text>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+
+      <!-- relative height -->
+      <xsl:choose>
+        <xsl:when test="contains($shapeProperties/@style:rel-height, 'scale')">
+          <!-- warn loss of scaled images (scale, scale-min) -->
+          <xsl:message terminate="no">feedback:Scaled image</xsl:message>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="relHeight"
+            select="substring-before($shapeProperties/@style:rel-height,'%')"/>
+          <xsl:if test="$relHeight != '' ">
+            <xsl:text>mso-height-percent:</xsl:text>
+            <xsl:value-of select="number($relHeight) * 10"/>
+            <xsl:text>;mso-height-relative:</xsl:text>
+            <xsl:value-of select="$relativeTo"/>
+            <xsl:text>;</xsl:text>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+
     </xsl:if>
 
   </xsl:template>
@@ -2893,7 +2866,13 @@
 
     <xsl:attribute name="style">
 
-      <xsl:call-template name="InsertShapeSize"/>
+      <xsl:call-template name="InsertShapeSize">
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertShapeRelativeSize">
+        <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
+      </xsl:call-template>
 
       <xsl:call-template name="InsertShapeZindex">
         <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
