@@ -228,7 +228,7 @@ Header and Footer Tools;Design;Position;Header from top;;;1;;;;;
 ;;;;Alignment relative to;Margin / Indent;1;;;;;
 ;;;;Leader;1/2/3/4/5;1;;;;;
 ;;Options;Different First Page;;;1;;;;;
-;;;Different Odd and Even Pages;;;1;;;;;
+;;;Different Odd and Even Pages;;;1;;Completed;;;
 ;;;;;;;;;;;
 Textbox Tools;Format;Text box styles;Size;Height;Absolute;2;;;;;
 ;;;;;Relative to Margin;2;;;;;
