@@ -176,7 +176,14 @@
       </xsl:if>
 
       <xsl:if test="@text:start-value">
-        <w:numStart w:val="{number(@text:start-value)+1}"/>
+        <xsl:choose>
+          <xsl:when test="ancestor::style:style[@style:family='section']">
+            <w:numStart w:val="{@text:start-value}"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:numStart w:val="{number(@text:start-value)+1}"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:if>
 
       <xsl:choose>
