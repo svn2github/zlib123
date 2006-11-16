@@ -103,7 +103,7 @@
               <xsl:with-param name="format" select="w:numFmt/@w:val"/>
             </xsl:call-template>
           </xsl:attribute>
-          <xsl:if test="w:start">
+          <xsl:if test="w:start and w:start/@w:val > 1">
             <xsl:attribute name="text:start-value">
               <xsl:value-of select="w:start/@w:val"/>
             </xsl:attribute>
