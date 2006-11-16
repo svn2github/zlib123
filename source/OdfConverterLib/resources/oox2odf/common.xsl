@@ -52,15 +52,11 @@
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
     <xsl:choose>
+      <xsl:when test="$length='0' or $length=''">
+        <xsl:value-of select="concat(0, $unit)"/>
+      </xsl:when>
       <xsl:when test="$unit = 'cm'">
-        <xsl:choose>
-          <xsl:when test="$length='0' or $length=''">
-            <xsl:value-of select="concat(0, 'cm')"/>    
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="concat(format-number($length * 2.54 div 1440,'#.###'),'cm')"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="concat(format-number($length * 2.54 div 1440,'#.###'),'cm')"/>
       </xsl:when>
       <xsl:when test="$unit = 'mm'">
         <xsl:value-of select="concat(format-number($length * 25.4 div 1440,'#.###'),'mm')"/>
@@ -100,6 +96,9 @@
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
     <xsl:choose>
+      <xsl:when test="$length='0' or $length=''">
+        <xsl:value-of select="concat(0, $unit)"/>
+      </xsl:when>
       <xsl:when test="$unit = 'cm'">
         <xsl:value-of select="concat(format-number($length * 2.54 div 72,'#.###'),'cm')"/>
       </xsl:when>
@@ -135,6 +134,9 @@
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
     <xsl:choose>
+      <xsl:when test="$length='0' or $length=''">
+        <xsl:value-of select="concat(0, $unit)"/>
+      </xsl:when>
       <xsl:when test="$unit = 'cm'">
         <xsl:value-of select="concat(format-number($length * 2.54 div 144,'#.###'),'cm')"/>
       </xsl:when>
@@ -170,6 +172,9 @@
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
     <xsl:choose>
+      <xsl:when test="$length='0' or $length=''">
+        <xsl:value-of select="concat(0, $unit)"/>
+      </xsl:when>
       <xsl:when test="$unit = 'cm'">
         <xsl:value-of select="concat(format-number($length * 2.54 div 576,'#.###'),'cm')"/>
       </xsl:when>
