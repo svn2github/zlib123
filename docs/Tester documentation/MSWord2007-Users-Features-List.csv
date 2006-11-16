@@ -187,11 +187,11 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;;;;;;;;;
 ;;Advanced Layout;Picture position;Horizontal;Alignment;2;0.3 M1;Completed;;;
 ;;;;;Book layout;2;0.3 M1;Completed;;;
-;;;;;Absolute position;2;0.3 M1;;;;
-;;;;;Relative position;2;;;;;
+;;;;;Absolute position;2;0.3 M1;Completed;;;
+;;;;;Relative position;2;;;;There is Word 2007 bug, see coment in Conversion Issues.;
 ;;;;Vertical;Alignment;2;0.3 M1;Partial;;;TODO: relative to line
-;;;;;Absolute position;2;0.3 M1;;;;
-;;;;;Relative position;2;;;;;
+;;;;;Absolute position;2;0.3 M1;Completed;;;
+;;;;;Relative position;2;;;;There is Word 2007 bug, see coment in Conversion Issues.;
 ;;;;Options;Move object with text;2;-;;not supported ;;property is not saved in xml - it's depends on application
 ;;;;;Lock anchor;2;-;;not supported ;;in OO only position can be locked
 ;;;;;Allow overlap;2;-;;not supported;;
