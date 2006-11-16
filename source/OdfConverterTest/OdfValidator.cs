@@ -35,9 +35,14 @@ using System.Collections;
 
 using CleverAge.OdfConverter.OdfZipUtils;
 using CleverAge.OdfConverter.OdfConverterLib;
+#if MONO
+// no Tenuto yet
+#else
 using Tenuto.Reader;
 using Tenuto.Grammar;
 using Tenuto.Verifier;
+#endif
+
 
 namespace CleverAge.OdfConverter.CommandLineTool
 {
@@ -46,6 +51,21 @@ namespace CleverAge.OdfConverter.CommandLineTool
 	{
 		public OdfValidatorException(String msg) : base (msg) {}
 	}
+	
+#if MONO
+	// Dummy validation class
+	public class OdfValidator
+	{
+		public OdfValidator(Report report)
+		{ 
+		}
+		public void validate(String fileName)
+		{
+			System.Console.WriteLine("Dummy validator");
+		}
+	}
+#else 
+	// Not Mono
 	
 	/// <summary>Check the validity of a odf file. Throw an OdfValidatorException if errors occurs</summary>
 	public class OdfValidator
@@ -162,6 +182,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 throw new OdfValidatorException("File is not valid");
             }
         }
+#endif
 
         private class ErrorReporter:Tenuto.Verifier.ErrorHandler
         {
