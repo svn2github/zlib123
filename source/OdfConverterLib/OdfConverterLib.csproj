@@ -82,15 +82,14 @@
     <EmbeddedResource Include="resources\odf2oox\bookmarks.xsl" />
     <EmbeddedResource Include="resources\oox2odf\fields.xsl" />
     <EmbeddedResource Include="resources\oox2odf\footnotes.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
+    <Compile Include="OoxParagraphsPostProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
       <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
       <Name>OdfZipUtils</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>

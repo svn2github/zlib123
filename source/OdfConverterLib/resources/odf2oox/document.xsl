@@ -95,6 +95,10 @@
     <xsl:param name="level" select="0"/>
     <xsl:message terminate="no">progress:text:p</xsl:message>
     <w:p>
+      <xsl:call-template name="InsertDropCap">
+        <xsl:with-param name="styleName" select="@text:style-name"/>
+      </xsl:call-template>
+      
       <xsl:call-template name="MarkMasterPage"/>
       <w:pPr>
         <xsl:call-template name="InsertParagraphProperties">
@@ -793,6 +797,93 @@
     <xsl:apply-templates/>
   </xsl:template>
 
+  
+  
+  <!-- Find potential drop cap properties into this element's style hierarchy  -->
+  <xsl:template name="InsertDropCap">
+    <xsl:param name="styleName"/>
+    <xsl:param name="context" select="'content.xml'"/>
+    
+    <xsl:if test="descendant::text()">
+      <xsl:variable name="exists">
+        <xsl:for-each select="document($context)">
+          <xsl:value-of select="boolean(key('styles', $styleName))"/>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$exists = 'true' ">
+          <xsl:for-each select="document($context)">
+            <xsl:choose>
+              <xsl:when
+                test="key('styles', $styleName)[1]/style:paragraph-properties/style:drop-cap">
+                <xsl:call-template name="InsertDropCapAttributes">
+                  <xsl:with-param name="dropcap"
+                    select="key('styles', $styleName)[1]/style:paragraph-properties/style:drop-cap"
+                  />
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="key('styles', $styleName)[1]/@style:parent-style-name">
+                <xsl:call-template name="InsertDropCap">
+                  <xsl:with-param name="styleName"
+                    select="key('styles', $styleName)[1]/@style:parent-style-name"/>
+                  <xsl:with-param name="context" select="$context"/>
+                </xsl:call-template>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="$context != 'styles.xml'">
+          <xsl:call-template name="InsertDropCap">
+            <xsl:with-param name="styleName" select="$styleName"/>
+            <xsl:with-param name="context" select="'styles.xml'"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  
+  
+  
+  <xsl:template name="InsertDropCapAttributes">
+    <xsl:param name="dropcap"/>
+    
+    <xsl:if test="$dropcap/@style:lines">
+      <xsl:attribute name="dropcap:lines" namespace="urn:cleverage:xmlns:post-processings:dropcap">
+        <xsl:value-of select="$dropcap/@style:lines"/>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="number($dropcap/@style:length)">
+        <xsl:attribute name="dropcap:length"
+          namespace="urn:cleverage:xmlns:post-processings:dropcap">
+          <xsl:value-of select="$dropcap/@style:length"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$dropcap/@style:length = 'word' ">
+        <xsl:attribute name="dropcap:word" namespace="urn:cleverage:xmlns:post-processings:dropcap"
+          >true</xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="dropcap:length" namespace="urn:cleverage:xmlns:post-processings:dropcap">1</xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:if test="$dropcap/@style:distance">
+      <xsl:attribute name="dropcap:distance"
+        namespace="urn:cleverage:xmlns:post-processings:dropcap">
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length" select="$dropcap/@style:distance"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="$dropcap/@style:style-name">
+      <xsl:attribute name="dropcap:style-name"
+        namespace="urn:cleverage:xmlns:post-processings:dropcap">
+        <xsl:value-of select="$dropcap/@style:style-name"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  
+  
   <!-- Extra spaces management, courtesy of J. David Eisenberg -->
   <xsl:variable name="spaces" xml:space="preserve">                                       </xsl:variable>
 
