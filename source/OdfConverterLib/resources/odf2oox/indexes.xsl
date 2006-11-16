@@ -284,6 +284,21 @@
     </w:r>
   </xsl:template>
 
+  <!-- insert the bg color in paragraph properties -->
+  <xsl:template name="InsertTOCBgColor">
+    <xsl:if
+      test="key('styles', ancestor::text:table-of-content/@text:style-name)/style:section-properties/@fo:background-color">
+      <xsl:variable name="bgColor">
+        <xsl:value-of
+          select="key('styles', ancestor::text:table-of-content/@text:style-name)/style:section-properties/@fo:background-color"
+        />
+      </xsl:variable>
+      <xsl:if test="$bgColor != 'transparent' ">
+        <w:shd w:val="clear" w:color="auto"
+          w:fill="{translate(translate(substring-after($bgColor, '#'),'f','F'),'c','C')}"/>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
 
   <!-- empty alphabetical indexes creating mark entry -->
   <xsl:template match="text:alphabetical-index-mark" mode="paragraph">

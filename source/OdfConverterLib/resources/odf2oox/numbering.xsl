@@ -265,8 +265,8 @@
         <xsl:value-of select="$bulletId"/>
       </xsl:attribute>
       <w:pict>
-        <v:shapetype id="{concat('_x0000_t', $bulletId)}" coordsize="21600,21600" o:spt="75" o:preferrelative="t"
-          path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
+        <v:shapetype id="{concat('_x0000_t', $bulletId)}" coordsize="21600,21600" o:spt="75"
+          o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
           <v:stroke joinstyle="miter"/>
           <v:formulas>
             <v:f eqn="if lineDrawn pixelLineWidth 0"/>
@@ -285,26 +285,27 @@
           <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
           <o:lock v:ext="edit" aspectratio="t"/>
         </v:shapetype>
-        <v:shape id="{concat('_x0000_i', $bulletId)}" type="{concat('#_x0000_t', $bulletId)}" o:bullet="t">
+        <v:shape id="{concat('_x0000_i', $bulletId)}" type="{concat('#_x0000_t', $bulletId)}"
+          o:bullet="t">
           <xsl:attribute name="style">
             <xsl:if test="style:list-level-properties/@fo:width">
               <xsl:text>width:</xsl:text>
-                <xsl:call-template name="point-measure">
-                  <xsl:with-param name="round">false</xsl:with-param>
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="style:list-level-properties/@fo:width"/>
-                  </xsl:with-param>
-                </xsl:call-template>
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="round">false</xsl:with-param>
+                <xsl:with-param name="length">
+                  <xsl:value-of select="style:list-level-properties/@fo:width"/>
+                </xsl:with-param>
+              </xsl:call-template>
               <xsl:text>pt;</xsl:text>
             </xsl:if>
             <xsl:if test="style:list-level-properties/@fo:height">
               <xsl:text>height:</xsl:text>
-                <xsl:call-template name="point-measure">
-                  <xsl:with-param name="round">false</xsl:with-param>
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="style:list-level-properties/@fo:height"/>
-                  </xsl:with-param>
-                </xsl:call-template>
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="round">false</xsl:with-param>
+                <xsl:with-param name="length">
+                  <xsl:value-of select="style:list-level-properties/@fo:height"/>
+                </xsl:with-param>
+              </xsl:call-template>
               <xsl:text>pt;</xsl:text>
             </xsl:if>
           </xsl:attribute>
@@ -1064,8 +1065,8 @@
   </xsl:template>
 
 
-  <!-- Inserts paragraph indentation -->
-  <xsl:template name="InsertIndent">
+  <!-- Inserts paragraph tabs -->
+  <xsl:template name="InsertTabStops">
     <xsl:param name="level" select="0"/>
 
     <!-- A text:note-body does not depend on its parent list indentation anymore -->
@@ -1085,12 +1086,6 @@
           <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
         </xsl:call-template>
       </xsl:variable>
-      <xsl:variable name="addRightIndent">
-        <xsl:call-template name="ComputeAdditionalIndent">
-          <xsl:with-param name="side" select="'right'"/>
-          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
-        </xsl:call-template>
-      </xsl:variable>
       <xsl:variable name="firstLineIndent">
         <xsl:call-template name="GetFirstLineIndent">
           <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
@@ -1099,30 +1094,10 @@
 
       <!-- numbered of levels displayed -->
       <xsl:variable name="displayedLevels">
-        <xsl:choose>
-          <!-- look into content.xml -->
-          <xsl:when
-            test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/@text:display-levels">
-            <xsl:value-of
-              select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/@text:display-levels"
-            />
-          </xsl:when>
-          <xsl:otherwise>
-            <!-- look into styles.xml -->
-            <xsl:for-each select="document('styles.xml')">
-              <xsl:choose>
-                <xsl:when
-                  test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/@text:display-levels">
-                  <xsl:value-of
-                    select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/@text:display-levels"
-                  />
-                </xsl:when>
-                <!-- default value -->
-                <xsl:otherwise>1</xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:call-template name="GetDisplayedLevelsNumber">
+          <xsl:with-param name="level" select="$level"/>
+          <xsl:with-param name="listStyleName" select="$listStyleName"/>
+        </xsl:call-template>
       </xsl:variable>
       <!-- report lost distance because of displayed levels -->
       <xsl:if test="$displayedLevels &gt; 1">
@@ -1167,80 +1142,23 @@
         <xsl:if test="not($displayedLevels &gt; 1) or $minLabelDistanceTwip &gt; 0">
           <w:tabs>
             <!-- clear tab calculated without additional value -->
-            <w:tab w:val="clear">
-              <xsl:attribute name="w:pos">
-                <xsl:choose>
-                  <xsl:when test="$spaceBeforeTwip &lt; 0">
-                    <xsl:choose>
-                      <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                        <xsl:value-of
-                          select="$minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$minLabelWidthTwip - $spaceBeforeTwip"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:choose>
-                      <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                        <xsl:value-of
-                          select="$spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="$spaceBeforeTwip + $minLabelWidthTwip"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:attribute>
-            </w:tab>
+            <xsl:call-template name="InsertNumberingTab">
+              <xsl:with-param name="tabVal">clear</xsl:with-param>
+              <xsl:with-param name="addLeftIndent" select="0"/>
+              <xsl:with-param name="firstLineIndent" select="0"/>
+              <xsl:with-param name="minLabelDistanceTwip" select="$minLabelDistanceTwip"/>
+              <xsl:with-param name="minLabelWidthTwip" select="$minLabelWidthTwip"/>
+              <xsl:with-param name="spaceBeforeTwip" select="$spaceBeforeTwip"/>
+            </xsl:call-template>
             <!-- replace with same distance + additional value -->
-            <w:tab>
-              <xsl:choose>
-                <xsl:when test="$firstLineIndent != 0">
-                  <xsl:attribute name="w:val">num</xsl:attribute>
-                  <xsl:attribute name="w:pos">
-                    <xsl:value-of
-                      select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent + $minLabelWidthTwip"
-                    />
-                  </xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:attribute name="w:val">num</xsl:attribute>
-                  <xsl:attribute name="w:pos">
-                    <xsl:choose>
-                      <xsl:when test="$spaceBeforeTwip &lt; 0">
-                        <xsl:choose>
-                          <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                            <xsl:value-of
-                              select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"
-                            />
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:value-of
-                              select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip"/>
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:choose>
-                          <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
-                            <xsl:value-of
-                              select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"
-                            />
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:value-of
-                              select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:attribute>
-                </xsl:otherwise>
-              </xsl:choose>
-            </w:tab>
+            <xsl:call-template name="InsertNumberingTab">
+              <xsl:with-param name="tabVal">num</xsl:with-param>
+              <xsl:with-param name="addLeftIndent" select="$addLeftIndent"/>
+              <xsl:with-param name="firstLineIndent" select="$firstLineIndent"/>
+              <xsl:with-param name="minLabelDistanceTwip" select="$minLabelDistanceTwip"/>
+              <xsl:with-param name="minLabelWidthTwip" select="$minLabelWidthTwip"/>
+              <xsl:with-param name="spaceBeforeTwip" select="$spaceBeforeTwip"/>
+            </xsl:call-template>
             <!-- add tabs of current paragraph so as not to lose them in post-processing -->
             <xsl:if test="key('automatic-styles',$styleName)//style:tab-stop">
               <xsl:for-each select="key('automatic-styles',$styleName)/style:paragraph-properties">
@@ -1254,6 +1172,151 @@
             </xsl:if>
           </w:tabs>
         </xsl:if>
+      </xsl:if>
+
+    </xsl:if>
+  </xsl:template>
+
+  <!-- insert a tab stop with regard to numbering dimensions. -->
+  <xsl:template name="InsertNumberingTab">
+    <xsl:param name="tabVal"/>
+    <xsl:param name="spaceBeforeTwip"/>
+    <xsl:param name="minLabelWidthTwip"/>
+    <xsl:param name="minLabelDistanceTwip"/>
+    <xsl:param name="firstLineIndent" select="0"/>
+    <xsl:param name="addLeftIndent" select="0"/>
+    <w:tab>
+      <xsl:attribute name="w:val">
+        <xsl:value-of select="$tabVal"/>
+      </xsl:attribute>
+      <xsl:attribute name="w:pos">
+        <xsl:choose>
+          <xsl:when test="$firstLineIndent != 0 and $tabVal = 'num' ">
+            <xsl:value-of
+              select="$minLabelDistanceTwip + $addLeftIndent + $firstLineIndent + $minLabelWidthTwip"
+            />
+          </xsl:when>
+          <xsl:when test="$spaceBeforeTwip &lt; 0">
+            <xsl:choose>
+              <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                <xsl:value-of
+                  select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip + $minLabelDistanceTwip"
+                />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$addLeftIndent + $minLabelWidthTwip - $spaceBeforeTwip"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="$minLabelWidthTwip &lt; $minLabelDistanceTwip">
+                <xsl:value-of
+                  select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip + $minLabelDistanceTwip"
+                />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </w:tab>
+  </xsl:template>
+
+  <!-- get the number of level displayed -->
+  <xsl:template name="GetDisplayedLevelsNumber">
+    <xsl:param name="level" select="0"/>
+    <xsl:param name="listStyleName"/>
+    <xsl:choose>
+      <!-- look into content.xml -->
+      <xsl:when
+        test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/@text:display-levels">
+        <xsl:value-of
+          select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/@text:display-levels"
+        />
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- look into styles.xml -->
+        <xsl:for-each select="document('styles.xml')">
+          <xsl:choose>
+            <xsl:when
+              test="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/@text:display-levels">
+              <xsl:value-of
+                select="key('list-style', $listStyleName)[1]/*[@text:level = $level+1]/@text:display-levels"
+              />
+            </xsl:when>
+            <!-- default value -->
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Inserts paragraph indentation -->
+  <xsl:template name="InsertIndent">
+    <xsl:param name="level" select="0"/>
+
+    <!-- A text:note-body does not depend on its parent list indentation anymore -->
+    <xsl:if test="not(parent::text:note-body) and ancestor-or-self::text:list">
+      <xsl:variable name="styleName">
+        <xsl:call-template name="GetStyleName"/>
+      </xsl:variable>
+      <xsl:variable name="parentStyleName"
+        select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
+      <xsl:variable name="listStyleName"
+        select="key('automatic-styles',$styleName)/@style:list-style-name"/>
+
+      <!-- Indent to add to numbering values. -->
+      <xsl:variable name="addLeftIndent">
+        <xsl:call-template name="ComputeAdditionalIndent">
+          <xsl:with-param name="side" select="'left'"/>
+          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="addRightIndent">
+        <xsl:call-template name="ComputeAdditionalIndent">
+          <xsl:with-param name="side" select="'right'"/>
+          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="firstLineIndent">
+        <xsl:call-template name="GetFirstLineIndent">
+          <xsl:with-param name="style" select="key('automatic-styles', $styleName)[1]"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <!-- Minimum width of a number -->
+      <xsl:variable name="minLabelWidthTwip">
+        <xsl:call-template name="ComputeNumberingIndent">
+          <xsl:with-param name="attribute" select="'text:min-label-width'"/>
+          <xsl:with-param name="level" select="$level"/>
+          <xsl:with-param name="listStyleName" select="$listStyleName"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <!-- Space before the number for all paragraphs at this level. -->
+      <xsl:variable name="spaceBeforeTwip">
+        <xsl:call-template name="ComputeNumberingIndent">
+          <xsl:with-param name="attribute" select="'text:space-before'"/>
+          <xsl:with-param name="level" select="$level"/>
+          <xsl:with-param name="listStyleName" select="$listStyleName"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <!-- Minimum distance between the number and the text -->
+      <xsl:variable name="minLabelDistanceTwip">
+        <xsl:call-template name="ComputeNumberingIndent">
+          <xsl:with-param name="attribute" select="'text:min-label-distance'"/>
+          <xsl:with-param name="level" select="$level"/>
+          <xsl:with-param name="listStyleName" select="$listStyleName"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <!-- report lost min-label-distance -->
+      <xsl:if test="$minLabelDistanceTwip != 0">
+        <xsl:message terminate="no">feedback:Distance between numbering and text</xsl:message>
       </xsl:if>
 
       <!-- insert indent with paragraph and numbering properties

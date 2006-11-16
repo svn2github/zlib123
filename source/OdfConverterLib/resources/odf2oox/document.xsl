@@ -98,7 +98,7 @@
       <xsl:call-template name="InsertDropCap">
         <xsl:with-param name="styleName" select="@text:style-name"/>
       </xsl:call-template>
-      
+
       <xsl:call-template name="MarkMasterPage"/>
       <w:pPr>
         <xsl:call-template name="InsertParagraphProperties">
@@ -109,7 +109,7 @@
 
       <!-- insert drawing objects that are preceding-sibling of current. -->
       <xsl:call-template name="InsertPrecedingDrawingObject"/>
-      
+
       <!--   insert bookmark for element which is contained in TOC-->
       <xsl:if test="$tocCount &gt; 0">
         <xsl:call-template name="InsertTOCBookmark"/>
@@ -210,6 +210,14 @@
 
     <!-- override spacing before/after when required -->
     <xsl:call-template name="InsertParagraphSpacing"/>
+
+    <!-- insert tab stops if paragraph is in a list -->
+    <xsl:call-template name="InsertTabStops">
+      <xsl:with-param name="level" select="$level"/>
+    </xsl:call-template>
+
+    <!-- insert bg color in case paragraph is in table-of-content -->
+    <xsl:call-template name="InsertTOCBgColor"/>
 
     <!-- insert indentation if paragraph is in a list -->
     <xsl:call-template name="InsertIndent">
@@ -338,7 +346,9 @@
         <xsl:value-of select="parent::node()/@text:style-name"/>
       </xsl:when>
       <xsl:when test="ancestor::node()[(self::text:a or self::text:span) and @text:style-name]">
-        <xsl:value-of select="ancestor::node()[(self::text:a or self::text:span) and @text:style-name][1]/@text:style-name"/>
+        <xsl:value-of
+          select="ancestor::node()[(self::text:a or self::text:span) and @text:style-name][1]/@text:style-name"
+        />
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="@text:style-name"/>
@@ -483,6 +493,14 @@
             <xsl:call-template name="InsertNumbering">
               <xsl:with-param name="level" select="$level"/>
             </xsl:call-template>
+
+            <!-- insert tab stops if paragraph is in a list -->
+            <xsl:call-template name="InsertTabStops">
+              <xsl:with-param name="level" select="$level"/>
+            </xsl:call-template>
+
+            <!-- insert bg color in case paragraph is in table-of-content -->
+            <xsl:call-template name="InsertTOCBgColor"/>
 
             <!-- override abstract num indent and tab if paragraph has margin defined -->
             <xsl:call-template name="InsertIndent">
@@ -797,13 +815,13 @@
     <xsl:apply-templates/>
   </xsl:template>
 
-  
-  
+
+
   <!-- Find potential drop cap properties into this element's style hierarchy  -->
   <xsl:template name="InsertDropCap">
     <xsl:param name="styleName"/>
     <xsl:param name="context" select="'content.xml'"/>
-    
+
     <xsl:if test="descendant::text()">
       <xsl:variable name="exists">
         <xsl:for-each select="document($context)">
@@ -841,12 +859,12 @@
       </xsl:choose>
     </xsl:if>
   </xsl:template>
-  
-  
-  
+
+
+
   <xsl:template name="InsertDropCapAttributes">
     <xsl:param name="dropcap"/>
-    
+
     <xsl:if test="$dropcap/@style:lines">
       <xsl:attribute name="dropcap:lines" namespace="urn:cleverage:xmlns:post-processings:dropcap">
         <xsl:value-of select="$dropcap/@style:lines"/>
@@ -864,7 +882,8 @@
           >true</xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:attribute name="dropcap:length" namespace="urn:cleverage:xmlns:post-processings:dropcap">1</xsl:attribute>
+        <xsl:attribute name="dropcap:length"
+          namespace="urn:cleverage:xmlns:post-processings:dropcap">1</xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:if test="$dropcap/@style:distance">
@@ -882,8 +901,8 @@
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
-  
-  
+
+
   <!-- Extra spaces management, courtesy of J. David Eisenberg -->
   <xsl:variable name="spaces" xml:space="preserve">                                       </xsl:variable>
 
