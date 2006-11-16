@@ -475,7 +475,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
 					if (n.Name.Equals("page-number"))
 					{
-						Console.WriteLine("setting page number value to : "+val);
 						this.startPageNumber = val;
 					}
 				}
