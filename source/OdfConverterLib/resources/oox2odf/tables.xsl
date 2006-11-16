@@ -602,7 +602,14 @@
             </xsl:choose>
           </xsl:variable>
           <xsl:variable name="color">
-            <xsl:value-of select="$tblDefBorder/@w:color"/>
+            <xsl:choose>
+              <xsl:when test="not($tblDefBorder/@w:color)">
+                <xsl:text>000000</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$tblDefBorder/@w:color"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:variable>
           <xsl:attribute name="{$attribute}">
             <xsl:value-of select="concat($width,' ',$style,' #',$color)"/>
