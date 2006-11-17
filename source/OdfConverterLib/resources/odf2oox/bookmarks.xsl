@@ -31,9 +31,9 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  exclude-result-prefixes="text fo style"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0">
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  exclude-result-prefixes="text fo style office draw">
 
 
   <xsl:strip-space elements="*"/>
