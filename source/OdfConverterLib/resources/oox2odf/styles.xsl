@@ -131,56 +131,58 @@
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
         <xsl:for-each select="w:headerReference">
           <xsl:if test="./@w:type = 'default'">
-          <style:header>
-            <xsl:variable name="headerId" select="./@r:id"/>
-            <xsl:variable name="headerXmlDocument"
-              select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-            <!-- change context to get footer content -->
-            <xsl:for-each select="document($headerXmlDocument)">
-              <xsl:apply-templates/>
-            </xsl:for-each>
-          </style:header>
+            <style:header>
+              <xsl:variable name="headerId" select="./@r:id"/>
+              <xsl:variable name="headerXmlDocument"
+                select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+              <!-- change context to get header content -->
+              <xsl:for-each select="document($headerXmlDocument)">
+                <xsl:apply-templates/>
+              </xsl:for-each>
+            </style:header>
           </xsl:if>
         </xsl:for-each>
-          <xsl:for-each select="w:headerReference">
+        <xsl:for-each select="w:headerReference">
           <xsl:if test="./@w:type = 'even'">
             <style:header-left>
               <xsl:variable name="headerId" select="./@r:id"/>
               <xsl:variable name="headerXmlDocument"
                 select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-              <!-- change context to get footer content -->
+              <!-- change context to get header content -->
               <xsl:for-each select="document($headerXmlDocument)">
                 <xsl:apply-templates/>
               </xsl:for-each>
             </style:header-left>
           </xsl:if>
+          <!-- ./@w:type='default' TODO -->
         </xsl:for-each>
         <xsl:for-each select="w:footerReference">
           <xsl:if test="./@w:type = 'default'">
-          <style:footer>
-            <xsl:variable name="footerId" select="./@r:id"/>
-            <xsl:variable name="footerXmlDocument"
-              select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-            <!-- change context to get header content -->
-            <xsl:for-each select="document($footerXmlDocument)">
-              <xsl:apply-templates/>
-            </xsl:for-each>
-          </style:footer>
+            <style:footer>
+              <xsl:variable name="footerId" select="./@r:id"/>
+              <xsl:variable name="footerXmlDocument"
+                select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+              <!-- change context to get footer content -->
+              <xsl:for-each select="document($footerXmlDocument)">
+                <xsl:apply-templates/>
+              </xsl:for-each>
+            </style:footer>
           </xsl:if>
         </xsl:for-each>
-          <xsl:for-each select="w:footerReference">
+        <xsl:for-each select="w:footerReference">
           <xsl:if test="./@w:type = 'even'">
             <style:footer-left>
               <xsl:variable name="footerId" select="./@r:id"/>
               <xsl:variable name="footerXmlDocument"
                 select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-              <!-- change context to get header content -->
+              <!-- change context to get footer content -->
               <xsl:for-each select="document($footerXmlDocument)">
                 <xsl:apply-templates/>
               </xsl:for-each>
             </style:footer-left>
           </xsl:if>
-          </xsl:for-each>
+          <!-- ./@w:type='default' TODO -->
+        </xsl:for-each>
       </xsl:for-each>
     </style:master-page>
   </xsl:template>
@@ -263,22 +265,15 @@
         <xsl:with-param name="unit">cm</xsl:with-param>
         <xsl:with-param name="length">
           <xsl:choose>
-            <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:headerReference">
-          <xsl:choose>
-            <xsl:when test="w:pgMar/@w:top &lt; 0">
-              <xsl:value-of select="w:pgMar/@w:top"/>
-            </xsl:when>
-            <xsl:otherwise>
+            <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:headerReference[@w:type='default' or @w:type='even']">
               <xsl:choose>
-                <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">
-                  <xsl:value-of select="w:pgMar/@w:header"/>
+                <xsl:when test="w:pgMar/@w:top &lt; 0">
+                  <xsl:value-of select="w:pgMar/@w:top"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="w:pgMar/@w:top"/>
+                  <xsl:value-of select="w:pgMar/@w:header"/>
                 </xsl:otherwise>
               </xsl:choose>
-            </xsl:otherwise>
-          </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
@@ -300,25 +295,25 @@
                   </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
-              <xsl:choose>
-                <xsl:when test="w:pgMar/@w:top &lt; 0">
-                  <xsl:value-of select="w:pgMar/@w:top"/>
-                </xsl:when>
-                <xsl:otherwise>
                   <xsl:choose>
-                    <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">
-                      <xsl:value-of select="w:pgMar/@w:header"/>
+                    <xsl:when test="w:pgMar/@w:top &lt; 0">
+                      <xsl:value-of select="w:pgMar/@w:top"/>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:value-of select="w:pgMar/@w:top"/>
+                      <xsl:choose>
+                        <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">
+                          <xsl:value-of select="w:pgMar/@w:header"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="w:pgMar/@w:top"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
-                </xsl:otherwise>
-                </xsl:choose>
             </xsl:otherwise>
-            </xsl:choose>
+          </xsl:choose>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
@@ -342,16 +337,30 @@
         <xsl:with-param name="unit">cm</xsl:with-param>
         <xsl:with-param name="length">
           <xsl:choose>
-            <xsl:when test="w:pgMar/@w:bottom &lt; 0">
-              <xsl:value-of select="w:pgMar/@w:bottom"/>
+            <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:footerReference[@w:type='default' or @w:type='even']">
+              <xsl:choose>
+                <xsl:when test="w:pgMar/@w:bottom &lt; 0">
+                  <xsl:value-of select="w:pgMar/@w:bottom"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="w:pgMar/@w:footer"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">
-                  <xsl:value-of select="w:pgMar/@w:footer"/>
+                <xsl:when test="w:pgMar/@w:bottom &lt; 0">
+                  <xsl:value-of select="w:pgMar/@w:bottom"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="w:pgMar/@w:bottom"/>
+                  <xsl:choose>
+                    <xsl:when test="w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">
+                      <xsl:value-of select="w:pgMar/@w:footer"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="w:pgMar/@w:bottom"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
@@ -448,66 +457,76 @@
           <xsl:choose>
             <xsl:when test="$object = 'header' ">
               <xsl:choose>
-                <xsl:when test="w:pgMar/@w:top &lt; 0">
+                <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:headerReference">
                   <xsl:choose>
-                    <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
+                    <xsl:when test="w:pgMar/@w:top &lt; 0">
                       <xsl:choose>
-                        <xsl:when test=" - w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header">0</xsl:when>
+                        <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
+                          <xsl:choose>
+                            <xsl:when test=" - w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header">0</xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select=" - w:pgMar/@w:top + w:pgMar/@w:gutter - w:pgMar/@w:header"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:when>
                         <xsl:otherwise>
-                          <xsl:value-of select=" - w:pgMar/@w:top + w:pgMar/@w:gutter - w:pgMar/@w:header"/>
+                          <xsl:choose>
+                            <xsl:when test=" - w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select=" - w:pgMar/@w:top - w:pgMar/@w:header"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
                         </xsl:otherwise>
                       </xsl:choose>
                     </xsl:when>
                     <xsl:otherwise>
-                  <xsl:choose>
-                    <xsl:when test=" - w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select=" - w:pgMar/@w:top - w:pgMar/@w:header"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                    </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:choose>
-                    <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
                       <xsl:choose>
-                        <xsl:when test="w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header">0</xsl:when>
+                        <xsl:when test="document('word/settings.xml')//w:settings/w:gutterAtTop">
+                          <xsl:choose>
+                            <xsl:when test="w:pgMar/@w:top + w:pgMar/@w:gutter &lt; w:pgMar/@w:header">0</xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="w:pgMar/@w:top + w:pgMar/@w:gutter - w:pgMar/@w:header"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:when>
                         <xsl:otherwise>
-                          <xsl:value-of select="w:pgMar/@w:top + w:pgMar/@w:gutter - w:pgMar/@w:header"/>
+                          <xsl:choose>
+                            <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="w:pgMar/@w:top - w:pgMar/@w:header"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
                         </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:when>
-                    <xsl:otherwise>
-                  <xsl:choose>
-                    <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">0</xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="w:pgMar/@w:top - w:pgMar/@w:header"/>
+                      </xsl:choose>
                     </xsl:otherwise>
                   </xsl:choose>
-                    </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:otherwise>
-              </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>          
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="w:pgMar/@w:bottom &lt; 0">
+                <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:footerReference">
                   <xsl:choose>
-                    <xsl:when test=" - w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">0</xsl:when>
+                    <xsl:when test="w:pgMar/@w:bottom &lt; 0">
+                      <xsl:choose>
+                        <xsl:when test=" - w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">0</xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select=" - w:pgMar/@w:bottom - w:pgMar/@w:footer"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
                     <xsl:otherwise>
-                      <xsl:value-of select=" - w:pgMar/@w:bottom - w:pgMar/@w:footer"/>
+                      <xsl:choose>
+                        <xsl:when test="w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">0</xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="w:pgMar/@w:bottom - w:pgMar/@w:footer"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
-                <xsl:otherwise>
-                  <xsl:choose>
-                    <xsl:when test="w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">0</xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="w:pgMar/@w:bottom - w:pgMar/@w:footer"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:otherwise>
+                <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
           </xsl:choose>
