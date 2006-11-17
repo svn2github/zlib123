@@ -233,24 +233,22 @@
     </xsl:variable>
 
     <xsl:choose>
-      <!--  check if the paragraf is heading -->
-      <xsl:when test="$outlineLevel != ''  or $numId != ''">
-          <xsl:choose>
-          <xsl:when test="document('word/numbering.xml')//w:numbering/w:num[@w:numId = $numId]">
-            <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
-            <xsl:if
-              test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and  count(preceding-sibling::w:p)= $position -1])">
-              <xsl:apply-templates select="." mode="list">
-                <xsl:with-param name="numId" select="$numId"/>
-              </xsl:apply-templates>
-            </xsl:if>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="." mode="paragraph"/>
-          </xsl:otherwise>
-        </xsl:choose>
+      <!--  check if the paragraf is list element (it can be a heading also) -->
+      <xsl:when test="$numId != ''">
+        <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
+        <xsl:if
+          test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and  count(preceding-sibling::w:p)= $position -1])">
+          <xsl:apply-templates select="." mode="list">
+            <xsl:with-param name="numId" select="$numId"/>
+          </xsl:apply-templates>
+        </xsl:if>
       </xsl:when>
       
+      <!--  check if the paragraf is heading -->
+      <xsl:when test="$outlineLevel != ''">
+        <xsl:apply-templates select="." mode="heading"/>
+      </xsl:when>
+       
       <!--  default scenario - paragraph-->
       <xsl:otherwise>
         <xsl:apply-templates select="." mode="paragraph"/>
@@ -382,11 +380,11 @@
   <!-- hyperlinks - w:hyperlink and fieldchar types-->
   <xsl:template name="InsertHyperlink">
     <text:a xlink:type="simple">
-      <!-- document hyperlink -->
+      <xsl:attribute name="xlink:href">
+    
+        <!-- document hyperlink -->
       <xsl:if test="@w:anchor">
-        <xsl:attribute name="xlink:href">
           <xsl:value-of select="concat('#',@w:anchor)"/>
-        </xsl:attribute>
       </xsl:if>
 
       <!-- file or web page hyperlink with relationship id -->
@@ -398,18 +396,15 @@
         <xsl:for-each
           select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
           <xsl:if test="./@Id=$relationshipId">
-            <xsl:attribute name="xlink:href">
               <xsl:call-template name="GetLinkPath">
                 <xsl:with-param name="linkHref" select="@Target"/>
               </xsl:call-template>
-            </xsl:attribute>
           </xsl:if>
         </xsl:for-each>
       </xsl:if>
 
       <!-- file or web page hyperlink -  fieldchar type (can contain several paragraphs in Word) -->
       <xsl:if test="self::w:r">
-        <xsl:attribute name="xlink:href">
           <xsl:call-template name="GetLinkPath">
             <xsl:with-param name="linkHref">
               <xsl:value-of
@@ -417,9 +412,9 @@
               />
             </xsl:with-param>
           </xsl:call-template>
-        </xsl:attribute>
-      </xsl:if>
-
+        </xsl:if>
+      </xsl:attribute>
+      
       <!-- attach automatic style-->
       <xsl:choose>
         <xsl:when test="w:rPr">
