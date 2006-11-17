@@ -88,12 +88,12 @@ Home;Font;Font;Font type;Selected font;;0;0.2-Final ;Completed;;;
 ;;;;;;;;;;;
 ;Styles;Styles;Selected style;;;1;0.2-Final ;Completed;;;
 ;;;;;;;;;;;
-Insert;Tables;Insert Table;Table Size;No of columns;;1;0.2-Final ;-;It's not convert because it's only supported  in Word.;;
-;;;;No of rows;;1;0.2-Final ;-;;;
-;;;Autofit behavior;Fixed column width;Auto;1;0.3 M1;-;;;
-;;;;;Selected value;1;0.3 M1;-;;;
-;;;;AutoFit to contents;;1;0.3 M1;-;;;
-;;;;AutoFit to window;;1;0.3 M1;-;;;
+Insert;Tables;Insert Table;Table Size;No of columns;;1;0.2-Final ;-;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;;No of rows;;1;0.2-Final ;-;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;Autofit behavior;Fixed column width;Auto;1;0.3 M1;-;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;;;Selected value;1;0.3 M1;-;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;;AutoFit to contents;;1;0.3 M1;-;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;;AutoFit to window;;1;0.3 M1;-;It's not converted because it's only supported  in Word. (feature depends on application);;
 ;;;;;;;;;;;
 ;Illustrations;Picture;;;;0;0.2-Final ;Completed;;;
 ;;Clip Art;;;;2;;;;;
@@ -124,7 +124,7 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;0.2-Final ;-;It's not con
 ;;;Include chapter number ;Chapter starts with style;;1;;;;;
 ;;;;Use separator;;1;;;;;
 ;;;Page numbering;Continue from previous section;;1;0.3 M1;Completed;;;
-;;;;Start at;;;0.3 M1;Partial;;;
+;;;;Start at;;;0.3 M1;Partial;;;TODO: ?
 ;;;;;;;;;;;
 ;Text;Text Box;;;;2;;;;;
 ;;Quick Parts;Document Property;Selected option;;2;;;;;
@@ -164,7 +164,7 @@ Table Tools;Layout;Table - Properties;Table;Size;;0;0.2-Final ;Completed;;;
 ;;;Cell;Size;Width;2;0.3 M1;Completed;;;
 ;;;;Vertical alignment;Top/Center/Bottom;2;0.2-Final ;Completed;;;
 ;;;;Options;Cell margins;2;0.2-Final ;Completed;;;
-;;;;;Wrap text;2;0.3 M1;????;;;
+;;;;;Wrap text;2;0.3 M1;;????;;TODO investigate this feature in Word
 ;;;;;Fit text;2;;;not supported;;
 ;;;;Text direction;;2;-;;not supported;;
 ;;;;;;;;;;;
@@ -188,10 +188,10 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;Advanced Layout;Picture position;Horizontal;Alignment;2;0.3 M1;Completed;;;
 ;;;;;Book layout;2;0.3 M1;Completed;;;
 ;;;;;Absolute position;2;0.3 M1;Completed;;;
-;;;;;Relative position;2;;;;There is Word 2007 bug, see coment in Conversion Issues.;
+;;;;;Relative position;2;-;;;There is Word 2007 bug, see coment in Conversion Issues.;
 ;;;;Vertical;Alignment;2;0.3 M1;Partial;;;TODO: relative to line
 ;;;;;Absolute position;2;0.3 M1;Completed;;;
-;;;;;Relative position;2;;;;There is Word 2007 bug, see coment in Conversion Issues.;
+;;;;;Relative position;2;-;;;There is Word 2007 bug, see coment in Conversion Issues.;
 ;;;;Options;Move object with text;2;-;;not supported ;;property is not saved in xml - it's depends on application
 ;;;;;Lock anchor;2;-;;not supported ;;in OO only position can be locked
 ;;;;;Allow overlap;2;-;;not supported;;
