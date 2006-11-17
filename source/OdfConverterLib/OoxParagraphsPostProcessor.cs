@@ -42,7 +42,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private const string W_NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         private const string DROPCAP_NAMESPACE = "urn:cleverage:xmlns:post-processings:dropcap";
  		private string[] PARAGRAPH_PROPERTIES = { "pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr", "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap", "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid", "spacing", "ind", "contextualSpacing", "mirrorIndents", "textboxTightWrap", "suppressOverlap", "jc", "textDirection", "textAlignment", "outlineLvl", "divId", "cnfStyle", "rPr", "sectPr", "pPrChange"};
-
+    	private string[] RUN_PROPERTIES = { "ins", "del", "moveFrom", "moveTo", "rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath", "rPrChange" };
+ 		
    		private Stack currentNode;
    		private Stack store;
       	private Element framePr;
@@ -456,11 +457,41 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          		if (dropCap.Length > 0)
          		{
          			run0 = new Element("w", "r", W_NAMESPACE);
+         			
          			Element rPr = run.GetChild("rPr", W_NAMESPACE);
          			if (rPr != null)
          			{
-         				run0.AddChild(rPr);
+         				Element rPr0 = rPr.Clone();
+         				if (p.DropCapPr.StyleName != null && p.DropCapPr.StyleName.Length > 0)
+         				{
+         					Element rStyle = rPr0.GetChild("rStyle", W_NAMESPACE);
+         					Element rStyle0 = new Element("w", "rStyle", W_NAMESPACE);
+         					rStyle0.AddAttribute(new Attribute("w", "val", p.DropCapPr.StyleName, W_NAMESPACE));
+         					
+         					if (rStyle != null)
+         					{
+         						rPr0.Replace(rStyle, rStyle0);
+         					}
+         					else
+         					{
+         						rPr0.AddChild(rStyle0);
+         						rPr0 = GetOrderedRunProperties(rPr0);
+         					}
+         				}
+         				run0.AddChild(rPr0);
          			}
+         			else 
+         			{
+         				if (p.DropCapPr.StyleName != null && p.DropCapPr.StyleName.Length > 0)
+         				{
+         					Element rPr0 = new Element("w", "rPr", W_NAMESPACE);
+         					Element rStyle0 = new Element("w", "rStyle", W_NAMESPACE);
+         					rStyle0.AddAttribute(new Attribute("w", "val", p.DropCapPr.StyleName, W_NAMESPACE));
+         					rPr0.AddChild(rStyle0);
+         					run0.AddChild(rPr0);
+         				}
+         			}
+         			
          			Element t0 = new Element("w", "t", W_NAMESPACE);
          			t0.AddAttribute(new Attribute("xml", "space", "preserve", null));
          			t0.AddChild(dropCap);
@@ -484,6 +515,21 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 }
             }
             return newPPr;
+        }
+        
+      
+        private Element GetOrderedRunProperties(Element rPr)
+        {
+            Element newRPr = new Element(rPr);
+            foreach (string propName in RUN_PROPERTIES)
+            {
+                Element prop = rPr.GetChild(propName, W_NAMESPACE);
+                if (prop != null)
+                {
+                    newRPr.AddChild(prop);
+                }
+            }
+            return newRPr;
         }
         
         
