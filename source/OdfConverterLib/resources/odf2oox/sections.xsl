@@ -109,7 +109,7 @@
               select="*[1][self::text:p or self::text:h]/@text:style-name"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:if test="number($master-page-name)">
+        <xsl:if test="$master-page-name != '' ">
           <xsl:attribute name="psect:master-page-name">
             <xsl:value-of select="$master-page-name"/>
           </xsl:attribute>
