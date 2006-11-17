@@ -171,7 +171,7 @@
         <xsl:attribute name="style:width">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="sum(ancestor::w:tbl/w:tblGrid/w:gridCol/@w:w)"/>
+              <xsl:value-of select="sum(ancestor::w:tbl[1]/w:tblGrid/w:gridCol/@w:w)"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -192,7 +192,7 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-  </xsl:template>
+	</xsl:template>
 
   <xsl:template name="InsertTableAlign">
     <xsl:choose>
@@ -239,32 +239,32 @@
 
     <!--    margins-->
     <xsl:variable name="mstyleId">
-      <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
+      <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     </xsl:variable>
     <xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $mstyleId">
       <xsl:variable name="mstyle"
         select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblCellMar"/>
       <xsl:call-template name="InsertCellMargins">
         <xsl:with-param name="tcMar" select="w:tcMar/w:bottom"/>
-        <xsl:with-param name="tblMar" select="ancestor::w:tbl/w:tblPr/w:tblCellMar/w:bottom"/>
+        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
         <xsl:with-param name="tblDefMar" select="$mstyle/w:bottom"/>
         <xsl:with-param name="attribute">fo:padding-bottom</xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="InsertCellMargins">
         <xsl:with-param name="tcMar" select="w:tcMar/w:left"/>
-        <xsl:with-param name="tblMar" select="ancestor::w:tbl/w:tblPr/w:tblCellMar/w:left"/>
+        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:left"/>
         <xsl:with-param name="tblDefMar" select="$mstyle/w:left"/>
         <xsl:with-param name="attribute">fo:padding-left</xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="InsertCellMargins">
         <xsl:with-param name="tcMar" select="w:tcMar/w:right"/>
-        <xsl:with-param name="tblMar" select="ancestor::w:tbl/w:tblPr/w:tblCellMar/w:right"/>
+        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:right"/>
         <xsl:with-param name="tblDefMar" select="$mstyle/w:right"/>
         <xsl:with-param name="attribute">fo:padding-right</xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="InsertCellMargins">
         <xsl:with-param name="tcMar" select="w:tcMar/w:top"/>
-        <xsl:with-param name="tblMar" select="ancestor::w:tbl/w:tblPr/w:tblCellMar/w:top"/>
+        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"></xsl:with-param> 
         <xsl:with-param name="tblDefMar" select="$mstyle/w:top"/>
         <xsl:with-param name="attribute">fo:padding-top</xsl:with-param>
       </xsl:call-template>
@@ -274,7 +274,7 @@
     <xsl:choose>
       <xsl:when test="w:tcBorders">
         <xsl:variable name="styleId">
-          <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
+          <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
         </xsl:variable>
         <xsl:variable name="style1"
           select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:tblPr/w:tblBorders"/>
@@ -283,38 +283,38 @@
         <xsl:variable name="style" select="$style1|$style2"/>
         <xsl:call-template name="InsertCellBorder">
           <xsl:with-param name="tcBorder" select="w:tcBorders/w:bottom"/>
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:bottom"/>
+          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:bottom"/>
           <xsl:with-param name="tblDefBorder" select="$style/w:bottom"/>
           <xsl:with-param name="attribute">fo:border-bottom</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-bottom</xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="InsertCellBorder">
           <xsl:with-param name="tcBorder" select="w:tcBorders/w:right"/>
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:right"/>
+          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:right"/>
           <xsl:with-param name="tblDefBorder" select="$style/w:right"/>
           <xsl:with-param name="attribute">fo:border-right</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-right</xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="InsertCellBorder">
           <xsl:with-param name="tcBorder" select="w:tcBorders/w:left"/>
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:left"/>
+          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:left"/>
           <xsl:with-param name="tblDefBorder" select="$style/w:left"/>
           <xsl:with-param name="attribute">fo:border-left</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-left</xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="InsertCellBorder">
           <xsl:with-param name="tcBorder" select="w:tcBorders/w:top"/>
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:top"/>
+          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:top"/>
           <xsl:with-param name="tblDefBorder" select="$style/w:top"/>
           <xsl:with-param name="attribute">fo:border-top</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
         </xsl:call-template>
       </xsl:when>
 
-      <xsl:when test="not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:top) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:left) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:bottom) and not(ancestor::w:tbl/w:tblPr/w:tblBorders/w:right) and ancestor::w:tbl/w:tblPr/w:tblBorders/w:insideV/@w:val='none'">
+      <xsl:when test="not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:top) and not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:left) and not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:bottom) and not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:right) and ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:insideV/@w:val='none'">
         
         <xsl:variable name="styleId">
-          <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
+          <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
         </xsl:variable>        
         <xsl:variable name="style"
           select="document('word/styles.xml')//w:styles/w:style[@w:type = 'table']/w:tblPr/w:tblBorders"/>       
@@ -355,7 +355,7 @@
 
       <xsl:otherwise>
         <xsl:variable name="styleId">
-          <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
+          <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
         </xsl:variable>
         <!--<xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
           <xsl:variable name="style" select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblBorders"/>-->
@@ -366,25 +366,25 @@
           select="document('word/styles.xml')//w:styles/w:style[@w:default = 1 and @w:type = 'table']/w:tblPr/w:tblBorders"/>
         <xsl:variable name="style" select="$style1|$style2"/>
         <xsl:call-template name="InsertTableBorder">
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:bottom"/>
+          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:bottom"/>
           <xsl:with-param name="tblDefBorder" select="$style/w:bottom"/>
           <xsl:with-param name="attribute">fo:border-bottom</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-bottom</xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="InsertTableBorder">
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:right"/>
+          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:right"/>
           <xsl:with-param name="tblDefBorder" select="$style/w:right"/>
           <xsl:with-param name="attribute">fo:border-right</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-right</xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="InsertTableBorder">
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:left"/>
+          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:left"/>
           <xsl:with-param name="tblDefBorder" select="$style/w:left"/>
           <xsl:with-param name="attribute">fo:border-left</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-left</xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="InsertTableBorder">
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl/w:tblPr/w:tblBorders/w:top"/>
+          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:top"/>
           <xsl:with-param name="tblDefBorder" select="$style/w:top"/>
           <xsl:with-param name="attribute">fo:border-top</xsl:with-param>
           <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
@@ -489,7 +489,7 @@
                   <xsl:choose>
                     <xsl:when test="$tblBorder/@w:color = 'auto' or not($tblBorder/@w:color)">
                       <xsl:variable name="styleId">
-                        <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
+                        <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
                       </xsl:variable>
                       <xsl:choose>
                         <xsl:when
@@ -534,7 +534,7 @@
     <xsl:param name="attribute"/>
     <xsl:param name="attribute2"/>
     <xsl:choose>
-      <xsl:when test="ancestor::w:tbl/w:tblPr/w:tblBorders">
+      <xsl:when test="ancestor::w:tbl[1]/w:tblPr/w:tblBorders">
         <xsl:variable name="width">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
@@ -559,7 +559,7 @@
           <xsl:choose>
             <xsl:when test="$tblBorder/@w:color = 'auto' or not($tblBorder/@w:color)">
               <xsl:variable name="styleId">
-                <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
+                <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
               </xsl:variable>
               <xsl:choose>
                 <xsl:when test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
@@ -579,7 +579,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="styleId">
-          <xsl:value-of select="ancestor::w:tbl/w:tblPr/w:tblStyle/@w:val"/>
+          <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
         </xsl:variable>
         <xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
           <xsl:variable name="width">
