@@ -219,7 +219,7 @@
     <xsl:variable name="marginLeft">
       <xsl:choose>
         <xsl:when
-          test="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left != '' ">
+          test="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left != ''  " >
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length"
               select="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left"
@@ -233,21 +233,21 @@
     <xsl:variable name="padding">
       <xsl:choose>
         <xsl:when
-          test="key('automatic-styles', descendant::table:table-cell[not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding and @fo:padding != 'none']">
+          test="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding and @fo:padding != 'none'] and not(ancestor::table:table)">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
               <xsl:value-of
-                select="key('automatic-styles', descendant::table:table-cell[not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding"
+                select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding"
               />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
         <xsl:when
-          test="key('automatic-styles', descendant::table:table-cell[not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding-left and @fo:padding-left != 'none']">
+          test="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties[@fo:padding-left and @fo:padding-left != 'none'] and not(ancestor::table:table)">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length">
               <xsl:value-of
-                select="key('automatic-styles', descendant::table:table-cell[not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding-left"
+                select="key('automatic-styles', descendant::table:table-cell[1][not(@table:is-sub-table = 'true')]/@table:style-name)/style:table-cell-properties/@fo:padding-left"
               />
             </xsl:with-param>
           </xsl:call-template>
