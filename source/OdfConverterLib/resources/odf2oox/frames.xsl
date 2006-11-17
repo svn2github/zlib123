@@ -1241,6 +1241,9 @@
             <xsl:value-of select="$recursive_result"/>
           </xsl:when>
           <xsl:otherwise>
+            <xsl:variable name="anchor">
+              <xsl:value-of select="$parent[1]/@text:anchor-type"/>
+            </xsl:variable>
             <xsl:variable name="horizontalPos">
               <xsl:value-of select="$shapeStyle/style:graphic-properties/@style:horizontal-pos"/>
             </xsl:variable>
@@ -1385,6 +1388,10 @@
                     <xsl:when test="$horizontalRel = 'page-end-margin' ">
                       <xsl:value-of select="$contextWidth + $fromLeft + $translation"/>
                     </xsl:when>
+                    <!-- avoid conflics -->
+                    <xsl:when test="$anchor = 'page' ">
+                      <xsl:value-of select="$fromLeft + $translation"/>
+                    </xsl:when>
                     <!-- paragraph, paragraph-content, paragraph-start-margin -->
                     <xsl:when
                       test="$horizontalRel = 'paragraph' or $horizontalRel = 'paragraph-content'  or $horizontalRel = 'paragraph-start-margin' ">
@@ -1435,6 +1442,10 @@
                         </xsl:otherwise>
                       </xsl:choose>
                     </xsl:when>
+                    <!-- avoid conflics -->
+                    <xsl:when test="$anchor = 'page' ">
+                      <xsl:value-of select="$frameMarginLeft + $translation"/>
+                    </xsl:when>
                     <!-- paragraph, paragraph-content, paragraph-start-margin -->
                     <xsl:when
                       test="$horizontalRel = 'paragraph' or $horizontalRel = 'paragraph-content' or $horizontalRel = 'paragraph-start-margin' ">
@@ -1481,6 +1492,11 @@
                         </xsl:when>
                         <xsl:otherwise>0</xsl:otherwise>
                       </xsl:choose>
+                    </xsl:when>
+                    <!-- avoid conflics -->
+                    <xsl:when test="$anchor = 'page' ">
+                      <xsl:value-of
+                        select="$pageWidth - $frameWidth - $frameMarginRight + $translation"/>
                     </xsl:when>
                     <!-- page-content -->
                     <xsl:when test="$horizontalRel = 'page-content' ">
@@ -2554,7 +2570,7 @@
               <xsl:when test="$verticalPos = 'middle' ">center</xsl:when>
               <xsl:when test="$verticalPos = 'below' ">bottom</xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="$horizontalPos"/>
+                <xsl:value-of select="$verticalPos"/>
               </xsl:otherwise>
             </xsl:choose>
             <xsl:text>;</xsl:text>
@@ -2792,14 +2808,51 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- shape fill properties -->
   <xsl:template name="InsertShapeFillProperties">
     <xsl:param name="shapeStyle"/>
 
-    <xsl:if test="$shapeStyle/style:graphic-properties/@draw:fill-gradient-name">
+    <!-- opacity -->
+    <xsl:variable name="bgTransparency">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">style:background-transparency</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="opacity">
+      <xsl:variable name="draw-opacity">
+        <xsl:call-template name="GetGraphicProperties">
+          <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+          <xsl:with-param name="attribName">draw:opacity</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$draw-opacity != '' ">
+          <xsl:value-of select="$draw-opacity"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="$bgTransparency != '' ">
+            <xsl:value-of select="(100 - number(substring-before($bgTransparency,'%'))) div 100"/>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- simple linear gradient -->
+    <xsl:variable name="gradientName">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">draw:fill-gradient-name</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:if test="$opacity != '' or $gradientName != '' ">
       <v:fill>
-        <xsl:variable name="gradientName"
-          select="$shapeStyle/style:graphic-properties/@draw:fill-gradient-name"/>
+        <xsl:if test="$opacity != '' ">
+          <xsl:attribute name="opacity">
+            <xsl:value-of select="concat($opacity,'%')"/>
+          </xsl:attribute>
+        </xsl:if>
+
         <xsl:for-each
           select="document('styles.xml')/office:document-styles/office:styles/draw:gradient[@draw:name = $gradientName]">
           <!-- radial gradients not handled yet -->
@@ -2822,35 +2875,7 @@
         </xsl:for-each>
       </v:fill>
     </xsl:if>
-  </xsl:template>
 
-  <xsl:template name="InsertShapeTransparency">
-    <xsl:param name="shapeStyle"/>
-
-    <xsl:variable name="backgroundColor">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="attribName">fo:background-color</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:variable name="backgroundTransparency">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="attribName">style:background-transparency</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <!--fill  transparency-->
-    <xsl:variable name="opacity" select="100 - substring-before($backgroundTransparency,'%')"/>
-
-    <xsl:if test="$backgroundTransparency != '' and $backgroundColor != 'transparent' ">
-      <v:fill>
-        <xsl:attribute name="opacity">
-          <xsl:value-of select="concat($opacity,'%')"/>
-        </xsl:attribute>
-      </v:fill>
-    </xsl:if>
   </xsl:template>
 
   <!--converts oo frame style properties to shape properties for text-box-->
@@ -2908,7 +2933,7 @@
       <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
     </xsl:call-template>
 
-    <xsl:call-template name="InsertShapeTransparency">
+    <xsl:call-template name="InsertShapeFillProperties">
       <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
     </xsl:call-template>
 
