@@ -80,7 +80,10 @@
           <!-- change context to get footer content -->
           <xsl:for-each select="document($headerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
@@ -92,7 +95,10 @@
           <!-- change context to get footer content -->
           <xsl:for-each select="document($headerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
@@ -104,7 +110,10 @@
           <!-- change context to get header content -->
           <xsl:for-each select="document($footerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
@@ -116,13 +125,15 @@
           <!-- change context to get header content -->
           <xsl:for-each select="document($footerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
-  
   
   
   <!-- handle default master page style -->
@@ -457,7 +468,7 @@
           <xsl:choose>
             <xsl:when test="$object = 'header' ">
               <xsl:choose>
-                <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:headerReference">
+                <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:headerReference[@w:type='default' or @w:type='even']">
                   <xsl:choose>
                     <xsl:when test="w:pgMar/@w:top &lt; 0">
                       <xsl:choose>
@@ -506,7 +517,7 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:footerReference">
+                <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:footerReference[@w:type='default' or @w:type='even']">
                   <xsl:choose>
                     <xsl:when test="w:pgMar/@w:bottom &lt; 0">
                       <xsl:choose>
