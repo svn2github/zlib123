@@ -68,6 +68,9 @@
         <xsl:variable name="layoutInCell" select="@layoutInCell"/>
         
         <xsl:choose>
+          <xsl:when test="name() = 'wp:inline' ">
+            <xsl:text>as-char</xsl:text>
+          </xsl:when>
           <xsl:when test="$verticalRelativeFrom = 'line' or $horizontalRelativeFrom = 'line'">
             <xsl:text>char</xsl:text>
           </xsl:when>
@@ -76,6 +79,9 @@
           </xsl:when>
           <xsl:when test="$verticalRelativeFrom = 'page'">
             <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$layoutInCell = 1">
+            <xsl:text>paragraph</xsl:text>
           </xsl:when>
           <xsl:when test="$layoutInCell = 0">
             <xsl:text>page</xsl:text>
