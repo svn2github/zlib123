@@ -2811,6 +2811,13 @@
   <xsl:template name="InsertShapeFillProperties">
     <xsl:param name="shapeStyle"/>
 
+    <xsl:variable name="fillProperty">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">draw:fill</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
     <!-- opacity -->
     <xsl:variable name="bgTransparency">
       <xsl:call-template name="GetGraphicProperties">
@@ -2838,6 +2845,27 @@
       </xsl:choose>
     </xsl:variable>
 
+    <xsl:if test="$fillProperty != 'none' ">
+      <v:fill>
+        <xsl:if test="$opacity != '' ">
+          <xsl:attribute name="opacity">
+            <xsl:value-of select="$opacity"/>
+          </xsl:attribute>
+        </xsl:if>
+        <!-- other fill properties -->
+        <xsl:if test="$fillProperty = 'gradient' ">
+          <xsl:call-template name="InsertGradientFill">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+          </xsl:call-template>
+        </xsl:if>
+      </v:fill>
+    </xsl:if>
+
+  </xsl:template>
+
+  <xsl:template name="InsertGradientFill">
+    <xsl:param name="shapeStyle"/>
+
     <!-- simple linear gradient -->
     <xsl:variable name="gradientName">
       <xsl:call-template name="GetGraphicProperties">
@@ -2846,37 +2874,26 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:if test="$opacity != '' or $gradientName != '' ">
-      <v:fill>
-        <xsl:if test="$opacity != '' ">
-          <xsl:attribute name="opacity">
-            <xsl:value-of select="$opacity"/>
-          </xsl:attribute>
-        </xsl:if>
-
-        <xsl:for-each
-          select="document('styles.xml')/office:document-styles/office:styles/draw:gradient[@draw:name = $gradientName]">
-          <!-- radial gradients not handled yet -->
-          <xsl:attribute name="type">gradient</xsl:attribute>
-          <xsl:if test="@draw:angle">
-            <xsl:attribute name="angle">
-              <xsl:value-of select="round(number(@draw:angle) div 10)"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@draw:end-color">
-            <xsl:attribute name="color">
-              <xsl:value-of select="@draw:end-color"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@draw:start-color">
-            <xsl:attribute name="color2">
-              <xsl:value-of select="@draw:start-color"/>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:for-each>
-      </v:fill>
-    </xsl:if>
-
+    <xsl:for-each
+      select="document('styles.xml')/office:document-styles/office:styles/draw:gradient[@draw:name = $gradientName]">
+      <!-- radial gradients not handled yet -->
+      <xsl:attribute name="type">gradient</xsl:attribute>
+      <xsl:if test="@draw:angle">
+        <xsl:attribute name="angle">
+          <xsl:value-of select="round(number(@draw:angle) div 10)"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@draw:end-color">
+        <xsl:attribute name="color">
+          <xsl:value-of select="@draw:end-color"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@draw:start-color">
+        <xsl:attribute name="color2">
+          <xsl:value-of select="@draw:start-color"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
 
   <!--converts oo frame style properties to shape properties for text-box-->
