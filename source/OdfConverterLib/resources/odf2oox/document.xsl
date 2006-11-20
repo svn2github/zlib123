@@ -823,7 +823,6 @@
     <xsl:param name="styleName"/>
     <xsl:param name="context" select="'content.xml'"/>
 
-    <xsl:if test="descendant::text()">
       <xsl:variable name="exists">
         <xsl:for-each select="document($context)">
           <xsl:value-of select="boolean(key('styles', $styleName))"/>
@@ -858,7 +857,7 @@
           </xsl:call-template>
         </xsl:when>
       </xsl:choose>
-    </xsl:if>
+    
   </xsl:template>
 
 

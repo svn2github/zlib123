@@ -204,6 +204,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
    				Element parent = (Element) this.store.Peek();
    				parent.AddChild(element);
    			}
+   			
    			this.store.Push(element);	
         }
         
@@ -319,8 +320,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          private object GetBottom(Stack stack) 
          {
          	object res = null;
-         	int count = stack.Count;
-         	for (int i=0; i<count; i++)
+         	for (int i=0; i<stack.Count; i++)
          	{
          		res = stack.Peek();
          	}
@@ -349,7 +349,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          }
          
          // TODO : test no framePr exist
-         // TODO : test this is not an empty text paragraph
          // Split the paragraph in two : 
          // one with the dropcap text in a framePr, the other with the dropcap removed.
          // param p paragraph to be splitten. Will get its dropcap removed
@@ -537,11 +536,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
         	private DropCapProperties dropCapProperties;
         	
-        	public bool IsDroppedCap {
-        		get { return dropCapProperties != null; }
+        	public bool IsDroppedCap 
+        	{
+        		get 
+        		{
+        			return dropCapProperties != null && this.HasText; 
+        		}
         	}
         	
-        	public DropCapProperties DropCapPr {
+        	public DropCapProperties DropCapPr 
+        	{
         		get { return dropCapProperties; }
         		set { dropCapProperties = value; }
         	}
@@ -551,6 +555,42 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         	
         	public Paragraph (string prefix, string localName, string ns) :
         		base (prefix, localName, ns) {}
+        	
+        	
+        	public bool HasText 
+        	{
+        		get 
+        		{
+        			return HasTextNode(this);
+        		}
+        	}
+			
+        	
+        	private static bool HasTextNode(Element e) 
+        	{
+        		bool b = false;
+        		if ("t".Equals(e.Name) && W_NAMESPACE.Equals(e.Ns))
+        		{
+        			b = true;
+        		}
+        		else {
+        			
+        			foreach (object node in e.Children)
+        			{
+        				if (node is Element)
+        				{
+        					b = b || HasTextNode((Element) node);
+        				}
+        				else
+        				{
+        					b = true;
+        				}
+        			}
+        		}
+        		return b;
+        	}
+        	
+       
         }
       
         
