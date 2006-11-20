@@ -573,27 +573,28 @@
   <!-- Inserts the Run properties -->
   <xsl:template name="InsertRunProperties">
     <!-- apply text properties if needed -->
-    <xsl:choose>
-      <xsl:when
-        test="ancestor::text:span|ancestor::text:a|self::text:list-level-style-number|self::text:outline-level-style">
-        <w:rPr>
-          <xsl:call-template name="InsertRunStyle">
-            <xsl:with-param name="styleName">
-              <xsl:call-template name="GetStyleName"/>
-            </xsl:with-param>
-          </xsl:call-template>
-          <!-- override text properties of link -->
-          <xsl:if test="ancestor::text:a/@text:style-name">
-            <xsl:variable name="linkStyleName" select="parent::text:a/@text:style-name"/>
-            <xsl:for-each select="document('styles.xml')">
-              <xsl:apply-templates select="key('styles', $linkStyleName)/style:text-properties"
-                mode="rPr"/>
-            </xsl:for-each>
-          </xsl:if>
-        </w:rPr>
-      </xsl:when>
-      <xsl:otherwise> </xsl:otherwise>
-    </xsl:choose>
+    <!-- test description : if there is an ancestor text:span or text:a,
+      and that the first ancestor to come is not a text:p or text:h
+    or if we are in a list-->
+    <xsl:if
+      test="ancestor-or-self::*[self::text:span or self::text:a or self::text:p or self::text:h][1][self::text:span or self::text:a]
+      or self::text:list-level-style-number|self::text:outline-level-style">
+      <w:rPr>
+        <xsl:call-template name="InsertRunStyle">
+          <xsl:with-param name="styleName">
+            <xsl:call-template name="GetStyleName"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        <!-- override text properties of link -->
+        <xsl:if test="ancestor::text:a/@text:style-name">
+          <xsl:variable name="linkStyleName" select="parent::text:a/@text:style-name"/>
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:apply-templates select="key('styles', $linkStyleName)/style:text-properties"
+              mode="rPr"/>
+          </xsl:for-each>
+        </xsl:if>
+      </w:rPr>
+    </xsl:if>
   </xsl:template>
 
   <!-- Inserts the style of a run -->
