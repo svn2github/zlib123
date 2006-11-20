@@ -37,6 +37,9 @@
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   exclude-result-prefixes="w r draw number">
+  
+  <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
+  
   <xsl:template name="styles">
     <office:document-styles>
       <office:font-face-decls>
@@ -1968,7 +1971,19 @@
   <xsl:template name="InsertDefaultTextProperties">
     <!--default font size-->
     <xsl:if test="not(w:sz)">
+      <xsl:choose>
+        <xsl:when test="key('StyleId', 'Normal')/w:rPr/w:sz">
+          <xsl:attribute name="fo:font-size">
+            <xsl:call-template name="ConvertHalfPoints">
+              <xsl:with-param name="length" select="key('StyleId', 'Normal')/w:rPr/w:sz/@w:val"/>
+              <xsl:with-param name="unit">pt</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
       <xsl:attribute name="fo:font-size">10</xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>      
     </xsl:if>
   </xsl:template>
   
