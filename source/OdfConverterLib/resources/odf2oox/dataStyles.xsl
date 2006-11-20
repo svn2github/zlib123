@@ -370,6 +370,10 @@
 
   <!-- chapter field. -->
   <xsl:template match="text:chapter" mode="paragraph">
+    <!-- warn loss of field -->
+    <xsl:if test="contains(@text:display, 'number')">
+      <xsl:message terminate="no">feedback:Chapter number field</xsl:message>
+    </xsl:if>
     <!-- if field displays name, convert into a reference to default heading style. -->
     <xsl:if test="contains(@text:display, 'name') and @text:outline-level">
       <xsl:variable name="outline-level" select="@text:outline-level"/>
