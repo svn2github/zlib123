@@ -84,6 +84,7 @@
     <EmbeddedResource Include="resources\oox2odf\footnotes.xsl" />
     <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
     <Compile Include="OoxParagraphsPostProcessor.cs" />
+    <Compile Include="OdfParagraphPostProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">

@@ -62,7 +62,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         	"OoxCharactersPostProcessor" 
         };
 
-        private string[] ODF_POST_PROCESSORS = { };
+        private string[] ODF_POST_PROCESSORS = {
+			"OdfParagraphPostProcessor"
+ 		};
 
         private bool isDirectTransform = true;
         private ArrayList skipedPostProcessors = null;

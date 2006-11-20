@@ -38,7 +38,7 @@
           <xsl:variable name="pziptarget">
             <xsl:value-of select="substring-after($pzipsource,'/')"/>
           </xsl:variable>
-          <pzip:copy pzip:source="word/{$pzipsource}" pzip:target="Pictures/{$pziptarget}"/>
+          <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{concat('Pictures/',$pziptarget)}"/>
         </xsl:if>
       </xsl:for-each>
     </xsl:if>

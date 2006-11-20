@@ -1,6 +1,5 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+﻿Microsoft Visual Studio Solution File, Format Version 9.00
+# SharpDevelop 2.0.0.1462
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfConverterLib", "OdfConverterLib\OdfConverterLib.csproj", "{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfZipUtils", "OdfZipUtils\OdfZipUtils.csproj", "{E51CB999-A720-4165-9DF2-A3E49547A40B}"
