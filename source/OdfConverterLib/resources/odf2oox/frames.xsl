@@ -2831,7 +2831,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="$bgTransparency != '' ">
-            <xsl:value-of select="(100 - number(substring-before($bgTransparency,'%'))) div 100"/>
+            <xsl:value-of select="concat((100 - number(substring-before($bgTransparency,'%'))), '%')"/>
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
@@ -2849,7 +2849,7 @@
       <v:fill>
         <xsl:if test="$opacity != '' ">
           <xsl:attribute name="opacity">
-            <xsl:value-of select="concat($opacity,'%')"/>
+            <xsl:value-of select="$opacity"/>
           </xsl:attribute>
         </xsl:if>
 
