@@ -1558,7 +1558,7 @@
 
     <xsl:if test="w:vanish">
       <xsl:attribute name="text:display">
-         <xsl:value-of select="'none'"/>
+         <xsl:value-of select="'true'"/>
       </xsl:attribute>
     </xsl:if>
 
