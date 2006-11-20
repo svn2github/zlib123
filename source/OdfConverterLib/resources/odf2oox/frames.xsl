@@ -2831,7 +2831,8 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="$bgTransparency != '' ">
-            <xsl:value-of select="concat((100 - number(substring-before($bgTransparency,'%'))), '%')"/>
+            <xsl:value-of
+              select="concat((100 - number(substring-before($bgTransparency,'%'))), '%')"/>
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
@@ -3094,114 +3095,80 @@
   <xsl:template name="InsertTextBoxInset">
     <xsl:param name="shapeStyle"/>
 
-    <xsl:variable name="padding">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="attribName">fo:padding</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:variable name="paddingTop">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="attribName">fo:padding-top</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:variable name="paddingRight">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="attribName">fo:padding-right</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:variable name="paddingLeft">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="attribName">fo:padding-left</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:variable name="paddingBottom">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="attribName">fo:padding-bottom</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
     <xsl:attribute name="inset">
-      <xsl:choose>
-        <xsl:when test="$padding != '' or $paddingTop != '' ">
-          <xsl:call-template name="CalculateTextBoxPadding">
-            <xsl:with-param name="padding" select="$padding"/>
-            <xsl:with-param name="paddingTop" select="$paddingTop"/>
-            <xsl:with-param name="paddingLeft" select="$paddingLeft"/>
-            <xsl:with-param name="paddingRight" select="$paddingRight"/>
-            <xsl:with-param name="paddingBottom" select="$paddingBottom"/>
+      <!-- left padding -->
+      <xsl:call-template name="milimeter-measure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="GetFramePadding">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            <xsl:with-param name="side">left</xsl:with-param>
           </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="CalculateTextBoxPadding"/>
-        </xsl:otherwise>
-      </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="round">false</xsl:with-param>
+      </xsl:call-template>
+      <xsl:text>mm,</xsl:text>
+      <!-- top padding -->
+      <xsl:call-template name="milimeter-measure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="GetFramePadding">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            <xsl:with-param name="side">top</xsl:with-param>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="round">false</xsl:with-param>
+      </xsl:call-template>
+      <xsl:text>mm,</xsl:text>
+      <!-- right padding -->
+      <xsl:call-template name="milimeter-measure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="GetFramePadding">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            <xsl:with-param name="side">right</xsl:with-param>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="round">false</xsl:with-param>
+      </xsl:call-template>
+      <xsl:text>mm,</xsl:text>
+      <!-- bottom padding -->
+      <xsl:call-template name="milimeter-measure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="GetFramePadding">
+            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            <xsl:with-param name="side">bottom</xsl:with-param>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="round">false</xsl:with-param>
+      </xsl:call-template>
+      <xsl:text>mm</xsl:text>
     </xsl:attribute>
   </xsl:template>
 
-  <!--calculates textbox inset attribute  -->
-  <xsl:template name="CalculateTextBoxPadding">
-    <xsl:param name="padding"/>
-    <xsl:param name="paddingBottom"/>
-    <xsl:param name="paddingLeft"/>
-    <xsl:param name="paddingRight"/>
-    <xsl:param name="paddingTop"/>
-
+  <!-- compute the padding of a border -->
+  <xsl:template name="GetFramePadding">
+    <xsl:param name="shapeStyle"/>
+    <xsl:param name="side"/>
 
     <xsl:choose>
-      <xsl:when test="not($padding)">0mm,0mm,0mm,0mm</xsl:when>
-      <xsl:when test="$padding">
-        <xsl:variable name="paddingVal">
-          <xsl:call-template name="milimeter-measure">
-            <xsl:with-param name="length" select="$padding"/>
-          </xsl:call-template>
-        </xsl:variable>
+      <!-- priority to border padding -->
+      <xsl:when
+        test="$shapeStyle/style:graphic-properties/@*[name() = concat('fo:padding-', $side)]">
         <xsl:value-of
-          select="concat($paddingVal,'mm,',$paddingVal,'mm,',$paddingVal,'mm,',$paddingVal,'mm')"/>
+          select="$shapeStyle/style:graphic-properties/@*[name() = concat('fo:padding-', $side)]"/>
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:variable name="padding-top">
-          <xsl:if test="$paddingTop">
-            <xsl:call-template name="milimeter-measure">
-              <xsl:with-param name="length" select="$paddingTop"/>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="padding-right">
-          <xsl:if test="$paddingRight">
-            <xsl:call-template name="milimeter-measure">
-              <xsl:with-param name="length" select="$paddingRight"/>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="padding-bottom">
-          <xsl:if test="$paddingBottom">
-            <xsl:call-template name="milimeter-measure">
-              <xsl:with-param name="length" select="$paddingBottom"/>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="padding-left">
-          <xsl:if test="$paddingLeft">
-            <xsl:call-template name="milimeter-measure">
-              <xsl:with-param name="length" select="$paddingLeft"/>
-            </xsl:call-template>
-          </xsl:if>
-        </xsl:variable>
-        <xsl:if test="$paddingTop">
-          <xsl:value-of
-            select="concat($padding-left,'mm,',$padding-top,'mm,',$padding-right,'mm,',$padding-bottom,'mm')"
-          />
-        </xsl:if>
-      </xsl:otherwise>
+      <!-- otherwise if padding attribute -->
+      <xsl:when test="$shapeStyle/style:graphic-properties/@fo:padding">
+        <xsl:value-of select="$shapeStyle/style:graphic-properties/@fo:padding"/>
+      </xsl:when>
+      <!-- otherwise look parent style -->
+      <xsl:when test="$shapeStyle/@style:parent-style-name">
+        <xsl:variable name="parentStyle"
+          select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $shapeStyle/@style:parent-style-name]"/>
+        <xsl:call-template name="GetFramePadding">
+          <xsl:with-param name="shapeStyle" select="$parentStyle"/>
+          <xsl:with-param name="side" select="$side"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
