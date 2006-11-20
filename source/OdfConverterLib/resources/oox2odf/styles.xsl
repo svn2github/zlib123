@@ -553,7 +553,7 @@
   <xsl:template match="w:style">
     <xsl:message terminate="no">progress:w:style</xsl:message>
     <xsl:choose>
-      <xsl:when test="self::node()/@w:default">
+      <xsl:when test="self::node()/@w:default and not(@w:styleId='Normal')">
         <xsl:if test="@w:type='table'">
           <style:default-style style:family="table">
             <xsl:call-template name="InsertTableProperties"/>
@@ -1971,19 +1971,7 @@
   <xsl:template name="InsertDefaultTextProperties">
     <!--default font size-->
     <xsl:if test="not(w:sz)">
-      <xsl:choose>
-        <xsl:when test="key('StyleId', 'Normal')/w:rPr/w:sz">
-          <xsl:attribute name="fo:font-size">
-            <xsl:call-template name="ConvertHalfPoints">
-              <xsl:with-param name="length" select="key('StyleId', 'Normal')/w:rPr/w:sz/@w:val"/>
-              <xsl:with-param name="unit">pt</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
       <xsl:attribute name="fo:font-size">10</xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>      
     </xsl:if>
   </xsl:template>
   

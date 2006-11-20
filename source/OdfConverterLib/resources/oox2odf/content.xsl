@@ -80,12 +80,20 @@
     match="w:pPr[parent::w:p]|w:r[parent::w:p and child::w:br and not(parent::w:p[child::wpPr])]"
     mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
-    <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
-      <xsl:if test="w:pStyle">
-        <xsl:attribute name="style:parent-style-name">
-          <xsl:value-of select="w:pStyle/@w:val"/>
-        </xsl:attribute>
-      </xsl:if>
+    <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">      
+      <xsl:choose>
+        <xsl:when test="w:pStyle">
+          <xsl:attribute name="style:parent-style-name">
+            <xsl:value-of select="w:pStyle/@w:val"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="style:parent-style-name">
+            <xsl:text>Normal</xsl:text>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+      
       <style:paragraph-properties>
         <xsl:call-template name="InsertDefaultParagraphProperties"/>
         <xsl:call-template name="InsertParagraphProperties"/>
@@ -101,12 +109,20 @@
   <!-- create a style for each run. Do not take w:pPr/w:rPr into consideration. -->
   <xsl:template match="w:rPr[parent::w:r]" mode="automaticstyles">
     <xsl:message terminate="no">progress:w:rPr</xsl:message>
-    <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
-      <xsl:if test="w:rStyle">
-        <xsl:attribute name="style:parent-style-name">
-          <xsl:value-of select="w:rStyle/@w:val"/>
-        </xsl:attribute>
-      </xsl:if>
+    <style:style style:name="{generate-id(parent::w:r)}" style:family="text">      
+      <xsl:choose>
+        <xsl:when test="w:rStyle">
+          <xsl:attribute name="style:parent-style-name">
+            <xsl:value-of select="w:rStyle/@w:val"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="style:parent-style-name">
+            <xsl:text>Normal</xsl:text>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+      
       <style:text-properties>
         <xsl:call-template name="InsertTextProperties"/>
       </style:text-properties>
