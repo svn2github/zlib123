@@ -590,17 +590,6 @@
   <!-- document defaults -->
   <xsl:template match="w:docDefaults">
     <style:default-style style:family="paragraph">
-      <xsl:if test="w:pPrDefault">
-        <style:paragraph-properties>
-          <xsl:call-template name="InsertDefaultParagraphProperties" />
-          <xsl:if test="w:pPrDefault/w:pPr">
-            <xsl:for-each select="w:pPrDefault/w:pPr">
-              <xsl:call-template name="InsertParagraphProperties"/>
-            </xsl:for-each>
-          </xsl:if>
-        </style:paragraph-properties>
-      </xsl:if>
-      
       <xsl:if test="w:rPrDefault">
         <style:text-properties>
           <xsl:call-template name="InsertDefaultTextProperties" />
@@ -619,7 +608,7 @@
   
   <!-- Compute style and text properties of context style. -->
   <xsl:template name="InsertStyleProperties">
-
+      
     <xsl:if test="self::node()/@w:type = 'paragraph'">
       <style:paragraph-properties>
         <xsl:if test="w:pPr">
@@ -627,10 +616,21 @@
             <xsl:call-template name="InsertParagraphProperties"/>
           </xsl:for-each>
         </xsl:if>
+        
+       <!-- add default paragraph propeties to Normal or Default style (it can't be in style:default-style becouse of OO bug ? (see #1593148 image partly lost))-->
+        <xsl:if test="self::node()/@w:styleId = 'Normal' or self::node()/@w:styleId = 'Default'">
+            <xsl:for-each select="ancestor::w:styles/w:docDefaults">
+              <xsl:if test="w:pPrDefault/w:pPr">
+                <xsl:for-each select="w:pPrDefault/w:pPr">
+                  <xsl:call-template name="InsertParagraphProperties"/>
+                </xsl:for-each>
+              </xsl:if>
+            </xsl:for-each>
+        </xsl:if>
       </style:paragraph-properties>
     </xsl:if>
 
-    <xsl:if test="self::node()/@w:type = 'paragraph' or self::node()/@w:type = 'character'">
+        <xsl:if test="self::node()/@w:type = 'paragraph' or self::node()/@w:type = 'character'">
       <style:text-properties>
         <xsl:if test="w:rPr">
           <xsl:for-each select="w:rPr">
@@ -768,6 +768,7 @@
     </xsl:if>
 
     <!-- space before/after -->
+
     <xsl:if test="w:ind">
       <xsl:if test="w:ind/@w:left">
         <xsl:attribute name="fo:margin-left">
@@ -811,8 +812,10 @@
       </xsl:if>
     </xsl:if>
 
+
     <!-- w:afterAutospacing and w:beforeAutospacing attributes are lost -->
     <!-- w:afterLines and w:beforeLines attributes are lost -->
+
     <xsl:if test="w:spacing/@w:before">
       <xsl:attribute name="fo:margin-top">
         <xsl:call-template name="ConvertTwips">
@@ -834,6 +837,7 @@
       </xsl:attribute>
     </xsl:if>
 
+    
     <!-- line spacing -->
     <xsl:if test="w:spacing/@w:line">
       <xsl:choose>
