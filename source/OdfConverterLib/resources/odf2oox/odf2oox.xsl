@@ -28,9 +28,10 @@
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odf="urn:odf"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" exclude-result-prefixes="odf style">
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  exclude-result-prefixes="odf style text">
 
- 
   <xsl:import href="common.xsl"/>
   <xsl:import href="docprops.xsl"/>
   <xsl:import href="document.xsl"/>
@@ -50,7 +51,9 @@
   <xsl:import href="comments.xsl"/>
   <xsl:import href="change-tracking.xsl"/>
  
-
+  <xsl:strip-space elements="*"/>
+  <xsl:preserve-space elements="text:p text:span"/>
+  
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
 

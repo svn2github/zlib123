@@ -46,9 +46,6 @@
   <xsl:import href="indexes.xsl"/>
   <xsl:import href="bookmarks.xsl"/>
 
-  <xsl:strip-space elements="*"/>
-  <xsl:preserve-space elements="text:p"/>
-  <xsl:preserve-space elements="text:span"/>
 
   <xsl:key name="annotations" match="office:annotation" use="''"/>
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
