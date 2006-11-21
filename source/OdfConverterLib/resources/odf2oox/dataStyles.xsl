@@ -61,6 +61,17 @@
       </xsl:when>
       <xsl:otherwise>
         <w:fldSimple w:instr=" PAGE ">
+          <xsl:attribute name="w:instr">
+            <xsl:choose>
+              <xsl:when test="@style:num-format">
+                <xsl:variable name="num-format">
+                  <xsl:call-template name="GetNumberFormattingSwitch"/>
+                </xsl:variable>
+                <xsl:value-of select="concat(' PAGE ', $num-format)"/>
+              </xsl:when>
+              <xsl:otherwise> PAGE </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
           <xsl:apply-templates mode="paragraph"/>
         </w:fldSimple>
       </xsl:otherwise>
