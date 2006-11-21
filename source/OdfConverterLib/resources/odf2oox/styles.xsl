@@ -197,7 +197,16 @@
 
       <!-- style's text properties -->
       <w:rPr>
-        <xsl:apply-templates mode="rPr"/>
+        <xsl:choose>
+          <xsl:when test="style:text-properties">
+            <xsl:apply-templates mode="rPr"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="$default-language">
+              <w:lang w:val="{$default-language}"/>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
       </w:rPr>
 
     </w:style>
