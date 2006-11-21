@@ -864,7 +864,8 @@
 
   <xsl:template name="InsertDropCapAttributes">
     <xsl:param name="dropcap"/>
-
+    
+    <xsl:message terminate="no">feedback:Dropcap size</xsl:message>
     <xsl:if test="$dropcap/@style:lines">
       <xsl:attribute name="dropcap:lines" namespace="urn:cleverage:xmlns:post-processings:dropcap">
         <xsl:value-of select="$dropcap/@style:lines"/>
