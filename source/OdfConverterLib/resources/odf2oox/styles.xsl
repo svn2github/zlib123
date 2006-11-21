@@ -35,9 +35,12 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  exclude-result-prefixes="office style fo text draw number svg">
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  exclude-result-prefixes="office style fo text draw number svg dc">
 
   <xsl:variable name="asianLayoutId">1</xsl:variable>
+  <!-- default language of the document -->
+  <xsl:variable name="default-language" select="document('meta.xml')/office:document-meta/office:meta/dc:language"/>
 
   <!-- keys definition -->
   <xsl:key name="styles" match="style:style" use="@style:name"/>
@@ -1060,13 +1063,20 @@
     </xsl:if>
 
     <xsl:if
-      test="(@fo:language and @fo:country) or (@style:language-asian and @style:country-asian) or (@style:language-complex and @style:country-complex)">
+      test="$default-language or (@fo:language and @fo:country) or (@style:language-asian and @style:country-asian) or (@style:language-complex and @style:country-complex)">
       <w:lang>
-        <xsl:if test="(@fo:language and @fo:country)">
+        <xsl:choose>
+        <xsl:when test="(@fo:language and @fo:country)">
           <xsl:attribute name="w:val">
             <xsl:value-of select="@fo:language"/>-<xsl:value-of select="@fo:country"/>
           </xsl:attribute>
-        </xsl:if>
+        </xsl:when>
+          <xsl:when test="$default-language">
+            <xsl:attribute name="w:val">
+              <xsl:value-of select="$default-language"/>
+            </xsl:attribute>
+          </xsl:when>
+        </xsl:choose>
         <xsl:if test="(@style:language-asian and @style:country-asian)">
           <xsl:attribute name="w:eastAsia">
             <xsl:value-of select="@style:language-asian"/>-<xsl:value-of
