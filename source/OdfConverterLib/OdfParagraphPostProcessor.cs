@@ -173,7 +173,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         	   }
         	   return false;
         	}
-        	catch(Exception e){
+        	catch(Exception){
         		return false;
         	}
         }
@@ -192,7 +192,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         			return false;
         		}
         	}
-        	catch(Exception e)
+        	catch(Exception)
         	{
         		return false;
         	}

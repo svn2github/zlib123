@@ -3,11 +3,18 @@ top_srcdir=../..
 include $(top_srcdir)/build/common.mk
 
 SOURCE = $(wildcard *.cs)
+DISTFILES = $(SOURCE)
 
-all-local: OdfZipUtils.dll
-
+all-local: OdfZipUtils.dll OdfZipUtilsStatic.dll
+dist-local: dist-common
 
 OdfZipUtils.dll : $(SOURCE)
-	$(CSC) $(CSC_DEBUG) -debug+ -target:library \
+	$(CSC) $(CSC_DEBUG) -target:library \
 	     -out:OdfZipUtils.dll $(SOURCE)
+
+OdfZipUtilsStatic.dll : $(SOURCE)
+	$(CSC) $(CSC_DEBUG) -d:STATIC -target:library \
+	     -out:OdfZipUtilsStatic.dll $(SOURCE)
+
+.PHONY: clean-local
 

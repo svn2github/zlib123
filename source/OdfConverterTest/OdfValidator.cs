@@ -182,7 +182,6 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 throw new OdfValidatorException("File is not valid");
             }
         }
-#endif
 
         private class ErrorReporter:Tenuto.Verifier.ErrorHandler
         {
@@ -223,4 +222,5 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         }
 	}
+#endif
 }

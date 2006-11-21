@@ -23,6 +23,7 @@ ID_SUFFIX2=$(ID_SUFFIX).odf2oox
 RESOURCE_FLAGS+=${foreach file, $(ODF2OOX_XML), $(PREFIX2)/$(file),$(ID_SUFFIX2).$(file)}
 
 SOURCE=${wildcard *.cs}
+DISTFILES=$(SOURCE) $(ODF2OOX_RES) $(OOX2ODF_RES)
 
 all-local: OdfConverterLib.dll
 OdfConverterLib.dll: $(SOURCE) Makefile
@@ -31,3 +32,5 @@ OdfConverterLib.dll: $(SOURCE) Makefile
 
 clean-local:
 	rm -f *.dll
+
+dist-local: dist-common

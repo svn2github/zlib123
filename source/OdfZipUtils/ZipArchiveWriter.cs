@@ -460,7 +460,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             	}
                 else
                 {
-                	return WriteState.Closed;
+                	return WriteState.Start;
                 }
             }
         }

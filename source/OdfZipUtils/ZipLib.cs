@@ -56,7 +56,6 @@ using System.Collections;
 
 namespace CleverAge.OdfConverter.OdfZipUtils
 {
-
     /// <summary>Support methods for uncompressing zip files.</summary>
     /// <remarks>
     ///   <para>This unzip package allow extract file from .ZIP file, compatible with PKZip 2.04g WinZip, InfoZip tools and compatible.</para>
@@ -66,6 +65,11 @@ namespace CleverAge.OdfConverter.OdfZipUtils
     /// </remarks>
     internal sealed class ZipLib
     {
+#if STATIC
+	const string zlibwapi = "__Internal";
+#else
+	const string zlibwapi = "zlibwapi.dll";
+#endif
 
         // prevent instances of this class from being constructed
         private ZipLib() { }
@@ -78,7 +82,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             Else, the return value is a zipFile Handle, usable with other function of this zip package.
         */
         /// <summary>Create a zip file.</summary>
-        [DllImport("zlibwapi.dll", ExactSpelling = true, CharSet = CharSet.Ansi)]
+        [DllImport(zlibwapi, ExactSpelling = true, CharSet = CharSet.Ansi)]
         public static extern IntPtr zipOpen(string fileName, int append);
 
         /*
@@ -92,7 +96,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             level contain the level of compression (can be Z_DEFAULT_COMPRESSION)
         */
         /// <summary>Open a new zip entry for writing.</summary>
-        [DllImport("zlibwapi.dll", ExactSpelling = true, CharSet = CharSet.Ansi)]
+        [DllImport(zlibwapi, ExactSpelling = true, CharSet = CharSet.Ansi)]
         public static extern int zipOpenNewFileInZip(IntPtr handle,
             string entryName,
             out ZipFileEntryInfo entryInfoPtr,
@@ -106,15 +110,15 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 
 
         /// <summary>Write data to the zip file.</summary>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int zipWriteInFileInZip(IntPtr handle, byte[] buffer, uint count);
 
         /// <summary>Close the current entry in the zip file.</summary>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int zipCloseFileInZip(IntPtr handle);
 
         /// <summary>Close the zip file.</summary>
-        [DllImport("zlibwapi.dll", ExactSpelling = true, CharSet = CharSet.Ansi)]
+        [DllImport(zlibwapi, ExactSpelling = true, CharSet = CharSet.Ansi)]
         public static extern int zipClose(IntPtr handle, string comment);
 
 
@@ -124,7 +128,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>A handle usable with other functions of the ZipLib class.</para>
         ///   <para>Otherwise IntPtr.Zero if the zip file could not e opened (file doen not exist or is not valid).</para>
         /// </returns>
-        [DllImport("zlibwapi.dll", ExactSpelling = true, CharSet = CharSet.Ansi)]
+        [DllImport(zlibwapi, ExactSpelling = true, CharSet = CharSet.Ansi)]
         public static extern IntPtr unzOpen(string fileName);
 
         /// <summary>Closes a zip file opened with unzipOpen.</summary>
@@ -134,7 +138,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>Zero if there was no error.</para>
         ///   <para>Otherwise a value less than zero.  See <see cref="ErrorCode"/> for the specific reason.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int unzClose(IntPtr handle);
 
         /// <summary>Get global information about the zip file.</summary>
@@ -144,7 +148,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>Zero if there was no error.</para>
         ///   <para>Otherwise a value less than zero.  See <see cref="ErrorCode"/> for the specific reason.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int unzGetGlobalInfo(IntPtr handle, out ZipFileInfo globalInfoPtr);
 
         /// <summary>Get the comment associated with the entire zip file.</summary>
@@ -155,7 +159,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>The number of characters in the comment if there was no error.</para>
         ///   <para>Otherwise a value less than zero.  See <see cref="ErrorCode"/> for the specific reason.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int unzGetGlobalComment(IntPtr handle, sbyte[] commentBuffer, uint commentBufferLength);
 
         /// <summary>Set the current file of the zip file to the first file.</summary>
@@ -164,7 +168,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>Zero if there was no error.</para>
         ///   <para>Otherwise a value less than zero.  See <see cref="ErrorCode"/> for the specific reason.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int unzGoToFirstFile(IntPtr handle);
 
         /// <summary>Set the current file of the zip file to the next file.</summary>
@@ -173,7 +177,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>Zero if there was no error.</para>
         ///   <para>Otherwise <see cref="ErrorCode.EndOfListOfFile"/> if there are no more entries.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int unzGoToNextFile(IntPtr handle);
 
         /// <summary>Try locate the entry in the zip file.</summary>
@@ -184,7 +188,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>Zero if there was no error.</para>
         ///   <para>Otherwise <see cref="ErrorCode.EndOfListOfFile"/> if there are no more entries.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll", ExactSpelling = true, CharSet = CharSet.Ansi)]
+        [DllImport(zlibwapi, ExactSpelling = true, CharSet = CharSet.Ansi)]
         public static extern int unzLocateFile(IntPtr handle, string entryName, int caseSensitivity);
 
         /// <summary>Get information about the current entry in the zip file.</summary>
@@ -206,7 +210,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>Zero if there was no error.</para>
         ///   <para>Otherwise a value less than zero.  See <see cref="ErrorCode"/> for the specific reason.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll", ExactSpelling = true, CharSet = CharSet.Ansi)]
+        [DllImport(zlibwapi, ExactSpelling = true, CharSet = CharSet.Ansi)]
         public static extern int unzGetCurrentFileInfo(IntPtr handle, out ZipEntryInfo entryInfoPtr,
             sbyte[] entryNameBuffer, uint entryNameBufferLength,
             byte[] extraField, uint extraFieldLength,
@@ -218,7 +222,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>Zero if there was no error.</para>
         ///   <para>Otherwise a value from <see cref="ErrorCode"/>.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int unzOpenCurrentFile(IntPtr handle);
 
         /// <summary>Close the file entry opened by <see cref="unzOpenCurrentFile"/>.</summary>
@@ -228,7 +232,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>CrcError if the file was read but the Crc does not match.</para>
         ///   <para>Otherwise a value from <see cref="ErrorCode"/>.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int unzCloseCurrentFile(IntPtr handle);
 
         /// <summary>Read bytes from the current zip file entry.</summary>
@@ -240,13 +244,13 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>Zero if the end of file was reached.</para>
         ///   <para>Less than zero with error code if there is an error.  See <see cref="ErrorCode"/> for a list of possible error codes.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int unzReadCurrentFile(IntPtr handle, byte[] buffer, uint count);
 
         /// <summary>Give the current position in uncompressed data of the zip file entry currently opened.</summary>
         /// <param name="handle">The zip file handle opened by <see cref="unzOpenCurrentFile"/>.</param>
         /// <returns>The number of bytes into the uncompressed data read so far.</returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern long unztell(IntPtr handle);
 
         /// <summary>Determine if the end of the zip file entry has been reached.</summary>
@@ -255,7 +259,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>One if the end of file was reached.</para>
         ///   <para>Zero if elsewhere.</para>
         /// </returns>
-        [DllImport("zlibwapi.dll")]
+        [DllImport(zlibwapi)]
         public static extern int unzeof(IntPtr handle);
 
         /// <summary>Converts a CLR string to a 8 bit ANSI array of characters.</summary>
