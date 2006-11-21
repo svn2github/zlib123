@@ -1076,8 +1076,16 @@
       </xsl:variable>
       <xsl:variable name="parentStyleName"
         select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
-      <xsl:variable name="listStyleName"
-        select="key('automatic-styles',$styleName)/@style:list-style-name"/>
+      <xsl:variable name="listStyleName">
+        <xsl:choose>
+          <xsl:when test="key('automatic-styles',$styleName)/@style:list-style-name">
+            <xsl:value-of select="key('automatic-styles',$styleName)/@style:list-style-name"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="ancestor::text:list[@text:style-name][1]/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
 
       <!-- Indent to add to numbering values. -->
       <xsl:variable name="addLeftIndent">
@@ -1266,9 +1274,17 @@
       </xsl:variable>
       <xsl:variable name="parentStyleName"
         select="key('automatic-styles',$styleName)/@style:parent-style-name"/>
-      <xsl:variable name="listStyleName"
-        select="key('automatic-styles',$styleName)/@style:list-style-name"/>
-
+      <xsl:variable name="listStyleName">
+        <xsl:choose>
+          <xsl:when test="key('automatic-styles',$styleName)/@style:list-style-name">
+            <xsl:value-of select="key('automatic-styles',$styleName)/@style:list-style-name"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="ancestor::text:list[@text:style-name][1]/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
       <!-- Indent to add to numbering values. -->
       <xsl:variable name="addLeftIndent">
         <xsl:call-template name="ComputeAdditionalIndent">
