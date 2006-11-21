@@ -1235,7 +1235,7 @@
             <xsl:with-param name="parent" select="$parent[position()>1]"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:variable name="shapeStyle" select="key('Index', $parent[1]/@draw:style-name)"/>
+        <xsl:variable name="shapeStyle" select="key('styles', $parent[1]/@draw:style-name)"/>
         <xsl:choose>
           <xsl:when test="count($shapeStyle) = 0">
             <xsl:value-of select="$recursive_result"/>
@@ -1776,7 +1776,7 @@
             <xsl:with-param name="parent" select="$parent[position()>1]"/>
           </xsl:call-template>
         </xsl:variable>
-        <xsl:variable name="shapeStyle" select="key('Index', $parent[1]/@draw:style-name)"/>
+        <xsl:variable name="shapeStyle" select="key('styles', $parent[1]/@draw:style-name)"/>
         <xsl:choose>
           <xsl:when test="count($shapeStyle) = 0">
             <xsl:value-of select="$recursive_result"/>

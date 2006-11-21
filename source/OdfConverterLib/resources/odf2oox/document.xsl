@@ -51,7 +51,6 @@
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
   <xsl:key name="hyperlinks" match="text:a" use="''"/>
   <xsl:key name="headers" match="text:h" use="''"/>
-  <xsl:key name="Index" match="style:style" use="@style:name"/>
   <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value]" use="''"/>
 
 
