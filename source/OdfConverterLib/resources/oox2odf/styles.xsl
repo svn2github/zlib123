@@ -1024,9 +1024,11 @@
         <xsl:otherwise>
           <xsl:for-each
             select="child::node()[name() = 'w:top' or name() = 'w:left' or name() = 'w:bottom' or name() = 'w:right']">
+            <xsl:if test="./@w:val != 'none'">
             <xsl:call-template name="InsertBorderAttributes">
               <xsl:with-param name="side" select="substring-after(name(),'w:')"/>
             </xsl:call-template>
+            </xsl:if>
           </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
@@ -1067,7 +1069,10 @@
           </xsl:variable>
           <xsl:choose>
             <xsl:when test="@w:color='auto'">
-              <xsl:value-of select="concat($size,' ',$style)"/>
+              <xsl:value-of select="concat($size,' ',$style,' #000000')"/>
+            </xsl:when>
+            <xsl:when test="@w:color=''">
+              <xsl:value-of select="concat($size,' ',$style,' #000000')"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:variable name="color">
@@ -1980,10 +1985,5 @@
     <xsl:variable name="numId">
       <xsl:call-template name="GetOutlineListNumId"/>
     </xsl:variable>
-    <xsl:if test="$numId != ''">
-        <xsl:call-template name="InsertOutlineListStyle">
-            <xsl:with-param name="numid" select="$numId"/>
-        </xsl:call-template>
-    </xsl:if>
   </xsl:template>
  </xsl:stylesheet>

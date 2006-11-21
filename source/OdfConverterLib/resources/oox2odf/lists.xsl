@@ -349,63 +349,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-  <!--  heading numbering style -->
-  <xsl:template name="InsertOutlineListStyle">
-    <xsl:param name="numid"/>
-
-    <text:outline-style>
-      <xsl:variable name="abstractnumid">
-        <xsl:value-of
-          select="document('word/numbering.xml')//w:numbering/w:num[@w:numId =$numid]/w:abstractNumId/@w:val"
-        />
-      </xsl:variable>
-      <xsl:for-each
-        select="document('word/numbering.xml')//w:numbering/w:abstractNum[@w:abstractNumId = $abstractnumid]/w:lvl">
-        <text:outline-level-style>
-          <xsl:attribute name="text:level">
-            <xsl:value-of select="./@w:ilvl +1"/>
-          </xsl:attribute>
-          <xsl:attribute name="style:num-format">
-            <xsl:if test="./w:lvlText/@w:val != ''">
-              <xsl:call-template name="NumFormat">
-                <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
-              </xsl:call-template>
-            </xsl:if>
-          </xsl:attribute>
-          <xsl:if
-            test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
-            <xsl:attribute name="style:num-suffix">
-              <xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"
-              />
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:variable name="display">
-            <xsl:call-template name="CountDisplayListLevels">
-              <xsl:with-param name="string">
-                <xsl:value-of select="./w:lvlText/@w:val"/>
-              </xsl:with-param>
-              <xsl:with-param name="count">0</xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:if test="$display &gt; 1">
-            <xsl:attribute name="text:display-levels">
-              <xsl:value-of select="$display"/>
-            </xsl:attribute>
-          </xsl:if>
-          <style:list-level-properties>
-            <xsl:variable name="Ind" select="./w:pPr/w:ind"/>
-            <xsl:attribute name="text:space-before">
-              <xsl:value-of select="number($Ind/@w:left)-number($Ind/@w:firstLine)"/>
-            </xsl:attribute>
-            <xsl:attribute name="text:min-label-distance">
-              <xsl:value-of select="number(./w:pPr/w:tabs/w:tab/@w:pos)"/>
-            </xsl:attribute>
-          </style:list-level-properties>
-        </text:outline-level-style>
-      </xsl:for-each>
-    </text:outline-style>
-  </xsl:template>
   
   <!-- checks for list numPr properties (numid or level) for given element  -->
   <xsl:template name="GetListProperty">
