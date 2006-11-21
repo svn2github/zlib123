@@ -1168,11 +1168,6 @@
               <xsl:with-param name="spaceBeforeTwip" select="$spaceBeforeTwip"/>
             </xsl:call-template>
             <!-- add tabs of current paragraph so as not to lose them in post-processing -->
-            <xsl:if test="key('automatic-styles',$styleName)//style:tab-stop">
-              <xsl:for-each select="key('automatic-styles',$styleName)/style:paragraph-properties">
-                <xsl:call-template name="ComputeParagraphTabs"/>
-              </xsl:for-each>
-            </xsl:if>
             <xsl:if test="key('styles',$styleName)//style:tab-stop">
               <xsl:for-each select="key('styles',$styleName)/style:paragraph-properties">
                 <xsl:call-template name="ComputeParagraphTabs"/>
