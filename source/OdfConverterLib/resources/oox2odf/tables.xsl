@@ -554,7 +554,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-       
+
         <xsl:variable name="color">
           <xsl:choose>
             <xsl:when test="$tblBorder/@w:color = 'auto' or not($tblBorder/@w:color)">
@@ -603,7 +603,7 @@
           </xsl:variable>
           <xsl:variable name="color">
             <xsl:choose>
-              <xsl:when test="not($tblDefBorder/@w:color)">
+              <xsl:when test="not($tblDefBorder/@w:color) or $tblDefBorder/@w:color">
                 <xsl:text>000000</xsl:text>
               </xsl:when>
               <xsl:otherwise>
