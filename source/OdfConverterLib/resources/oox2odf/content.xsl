@@ -248,6 +248,13 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <xsl:variable name="level">
+      <xsl:call-template name="GetListProperty">
+        <xsl:with-param name="node" select="."/>
+        <xsl:with-param name="property">w:ilvl</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
     <xsl:choose>
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != ''">
@@ -256,6 +263,7 @@
           test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and  count(preceding-sibling::w:p)= $position -1])">
           <xsl:apply-templates select="." mode="list">
             <xsl:with-param name="numId" select="$numId"/>
+            <xsl:with-param name="level" select="$level"/>
           </xsl:apply-templates>
         </xsl:if>
       </xsl:when>

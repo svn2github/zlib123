@@ -47,10 +47,6 @@
       </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
-        <!--heading numbering style-->
-        <xsl:if test="document('word/document.xml')/descendant::w:outlineLvl or document('word/styles.xml')/descendant::w:outlineLvl">
-          <xsl:call-template name="InsertHeadingListStyle"/>
-        </xsl:if>
         <!-- document styles -->
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
       </office:styles>
@@ -1974,12 +1970,5 @@
         <xsl:value-of select="$fontName"/>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
-  
-  <!-- generate text:outline-style for heading  numbering-->
-  <xsl:template name="InsertHeadingListStyle">
-    <xsl:variable name="numId">
-      <xsl:call-template name="GetOutlineListNumId"/>
-    </xsl:variable>
   </xsl:template>
  </xsl:stylesheet>
