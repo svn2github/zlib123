@@ -32,7 +32,7 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  exclude-result-prefixes="style text office">
+  exclude-result-prefixes="style text office number">
   
 
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
