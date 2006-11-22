@@ -592,7 +592,6 @@
     <style:default-style style:family="paragraph">
       <xsl:if test="w:rPrDefault">
         <style:text-properties>
-          <xsl:call-template name="InsertDefaultTextProperties" />
           <xsl:if test="w:rPrDefault/w:rPr">
             <xsl:for-each select="w:rPrDefault/w:rPr">
               <xsl:call-template name="InsertTextProperties"/>
@@ -1975,13 +1974,6 @@
         <xsl:value-of select="$fontName"/>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
- 
-  <xsl:template name="InsertDefaultTextProperties">
-    <!--default font size-->
-    <xsl:if test="not(w:sz)">
-      <xsl:attribute name="fo:font-size">10</xsl:attribute>
-    </xsl:if>
   </xsl:template>
   
   <!-- generate text:outline-style for heading  numbering-->
