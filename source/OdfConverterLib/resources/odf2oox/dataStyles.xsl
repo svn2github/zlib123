@@ -33,8 +33,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   exclude-result-prefixes="style text office">
-
-  <xsl:preserve-space elements="number:text"/>
+  
 
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
 
@@ -133,7 +132,7 @@
           </xsl:attribute>
           <w:r>
             <w:rPr>
-              <w:noProof/>
+              <xsl:call-template name="InsertLanguage"/>
             </w:rPr>
             <w:t>
               <xsl:value-of select="text()"/>
@@ -464,4 +463,17 @@
     <xsl:message terminate="no">feedback:Printed-by field</xsl:message>
   </xsl:template>
 
+  
+  <xsl:template name="InsertLanguage">
+    <xsl:choose>
+      <xsl:when test="$default-language">
+        <w:lang w:val="{$default-language}"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:noProof/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
 </xsl:stylesheet>

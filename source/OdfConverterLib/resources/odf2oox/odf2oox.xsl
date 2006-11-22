@@ -30,7 +30,8 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  exclude-result-prefixes="odf style text">
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  exclude-result-prefixes="odf style text number">
 
   <xsl:import href="common.xsl"/>
   <xsl:import href="docprops.xsl"/>
@@ -52,7 +53,7 @@
   <xsl:import href="change-tracking.xsl"/>
  
   <xsl:strip-space elements="*"/>
-  <xsl:preserve-space elements="text:p text:span"/>
+  <xsl:preserve-space elements="text:p text:span number:text"/>
   
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
