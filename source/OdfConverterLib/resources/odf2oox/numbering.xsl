@@ -590,15 +590,9 @@
       </xsl:attribute>
     </w:numFmt>
     <!-- level style -->
-    <xsl:choose>
-      <xsl:when test="$style != 'none' ">
-        <w:pStyle w:val="{$style}"/>
-      </xsl:when>
-      <xsl:when test="@text:style-name">
-        <w:pStyle w:val="{@text:style-name}"/>
-      </xsl:when>
-      <xsl:otherwise/>
-    </xsl:choose>
+    <xsl:if test="$style != 'none' ">
+      <w:pStyle w:val="{$style}"/>
+    </xsl:if>
     <!-- content between numbered item and text -->
     <w:suff>
       <xsl:attribute name="w:val">
@@ -1279,7 +1273,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <!-- Indent to add to numbering values. -->
       <xsl:variable name="addLeftIndent">
         <xsl:call-template name="ComputeAdditionalIndent">
@@ -1494,17 +1488,12 @@
 
     <xsl:choose>
       <xsl:when test="number($defaultOutlineLevel)">
-        <w:numPr>
-          <w:ilvl w:val="{$defaultOutlineLevel - 1}"/>
-          <xsl:choose>
-            <xsl:when test="$listStyleName != '' ">
-              <w:numId w:val="2"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <w:numId w:val="1"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </w:numPr>
+        <xsl:if test="$listStyleName != '' ">
+          <w:numPr>
+            <w:ilvl w:val="{$defaultOutlineLevel - 1}"/>
+            <w:numId w:val="2"/>
+          </w:numPr>
+        </xsl:if>
       </xsl:when>
       <xsl:otherwise>
         <xsl:if
