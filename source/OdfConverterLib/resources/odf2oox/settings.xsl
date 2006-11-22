@@ -33,7 +33,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
-  xmlns:ooo="http://openoffice.org/2004/office" 
+  xmlns:ooo="http://openoffice.org/2004/office"
   exclude-result-prefixes="office fo style config ooo text">
 
   <xsl:template name="InsertSettings">
@@ -126,7 +126,19 @@
             </xsl:choose>
           </xsl:attribute>
         </w:suppressTopSpacing>
-        <w:doNotUseHTMLParagraphAutoSpacing/>
+        <w:doNotUseHTMLParagraphAutoSpacing>
+          <xsl:attribute name="w:val">
+            <xsl:choose>
+              <xsl:when
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacing']/text()='false'">
+                <xsl:value-of select="'false'"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="'true'"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </w:doNotUseHTMLParagraphAutoSpacing>
       </w:compat>
     </w:settings>
   </xsl:template>
