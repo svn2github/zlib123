@@ -82,7 +82,7 @@ Home;Font;Font;Font type;Selected font;;0;0.2-Final ;Completed;;;
 ;;Multi level list;;;;1;;;;;
 ;;;;;;;;;;;
 ;;List indents;Number position;;;1;0.3 M1;Completed;;;
-;;;Text indent;;;1;0.3 M1;;;;
+;;;Text indent;;;1;0.3 M2;;;;
 ;;;Follow number with;;;1;0.3 M1;Completed;;;
 ;;;Add tab stop at;;;1;0.3 M1;Completed;;;
 ;;;;;;;;;;;
@@ -124,11 +124,11 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;0.2-Final ;-;It's not con
 ;;;Include chapter number ;Chapter starts with style;;1;;;;;
 ;;;;Use separator;;1;;;;;
 ;;;Page numbering;Continue from previous section;;1;0.3 M1;Completed;;;
-;;;;Start at;;;0.3 M1;Partial;;;TODO: ?
+;;;;Start at;;;0.3 M1;-;;;This feature is unsupported in OO 
 ;;;;;;;;;;;
 ;Text;Text Box;;;;2;;;;;
 ;;Quick Parts;Document Property;Selected option;;2;;;;;
-;;;Field;Selected field;;2;0.3 M1;Partial;completed are date, time, page number ;;
+;;;Field;Selected field;;2;0.3 M2;Partial;completed are date, time, page number ;;
 ;;Drop cap;Position;None / Dropped/ In margin;;3;;;;;
 ;;;Options;Font;;3;;;;;
 ;;;;Lines to drop;;3;;;;;
@@ -164,7 +164,7 @@ Table Tools;Layout;Table - Properties;Table;Size;;0;0.2-Final ;Completed;;;
 ;;;Cell;Size;Width;2;0.3 M1;Completed;;;
 ;;;;Vertical alignment;Top/Center/Bottom;2;0.2-Final ;Completed;;;
 ;;;;Options;Cell margins;2;0.2-Final ;Completed;;;
-;;;;;Wrap text;2;0.3 M1;;????;;TODO investigate this feature in Word
+;;;;;Wrap text;2;0.3 M2;;;;TODO investigate this feature in Word
 ;;;;;Fit text;2;;;not supported;;
 ;;;;Text direction;;2;-;;not supported;;
 ;;;;;;;;;;;
@@ -189,7 +189,7 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;;;Book layout;2;0.3 M1;Completed;;;
 ;;;;;Absolute position;2;0.3 M1;Completed;;;
 ;;;;;Relative position;2;-;;;There is Word 2007 bug, see coment in Conversion Issues.;
-;;;;Vertical;Alignment;2;0.3 M1;Partial;;;TODO: relative to line
+;;;;Vertical;Alignment;2;0.3 M1;Completed;;;
 ;;;;;Absolute position;2;0.3 M1;Completed;;;
 ;;;;;Relative position;2;-;;;There is Word 2007 bug, see coment in Conversion Issues.;
 ;;;;Options;Move object with text;2;-;;not supported ;;property is not saved in xml - it's depends on application
