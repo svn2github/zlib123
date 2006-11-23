@@ -59,11 +59,20 @@
         <xsl:apply-templates select="document('word/fontTable.xml')/w:fonts"/>
       </office:font-face-decls>
       <office:automatic-styles>
+       <!--automatic styles for document body-->
         <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
           mode="automaticstyles"/>
+  
+        <!-- document with lists-->
         <xsl:if
           test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
           or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId] ">
+          <!-- automatic list styles with empty num format for elements which has non-existent w:num attached -->
+          <xsl:apply-templates 
+            select="document('word/document.xml')/w:document/w:body/descendant::w:numId
+            [not(document('word/numbering.xml')/w:numbering/w:num/@w:numId = @w:val)][1]"
+            mode="automaticstyles"/>
+          <!-- automatic list styles-->
           <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
         </xsl:if>
       </office:automatic-styles>
@@ -258,14 +267,10 @@
     <xsl:choose>
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != ''">
-        <xsl:variable name="position" select="count(preceding-sibling::w:p)"/>
-        <xsl:if
-          test="not(preceding-sibling::node()[child::w:pPr/w:numPr/w:numId/@w:val = $numId and  count(preceding-sibling::w:p)= $position -1])">
           <xsl:apply-templates select="." mode="list">
             <xsl:with-param name="numId" select="$numId"/>
             <xsl:with-param name="level" select="$level"/>
           </xsl:apply-templates>
-        </xsl:if>
       </xsl:when>
       
       <!--  check if the paragraf is heading -->
@@ -589,8 +594,7 @@
       </style:style>
     </xsl:if>
   </xsl:template>
+  
   <!--ignore text in automatic styles mode-->
   <xsl:template match="text()" mode="automaticstyles"/>
- 
-  
-</xsl:stylesheet>
+ </xsl:stylesheet>
