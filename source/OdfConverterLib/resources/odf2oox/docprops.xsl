@@ -50,39 +50,77 @@
       xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/"
       xmlns:dcmitype="http://purl.org/dc/dcmitype/"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <dc:title>
-        <xsl:value-of select="dc:title"/>
-      </dc:title>
-      <dc:subject>
-        <xsl:value-of select="dc:subject"/>
-      </dc:subject>
-      <dc:creator>
-        <xsl:value-of select="meta:initial-creator"/>
-      </dc:creator>
-      <cp:keywords>
-        <xsl:apply-templates select="meta:keyword"/>
-      </cp:keywords>
-      <dc:description>
-        <xsl:value-of select="dc:description"/>
-      </dc:description>
-      <dc:language>
-        <xsl:value-of select="dc:language"/>
-      </dc:language>
-      <cp:lastModifiedBy>
-        <xsl:value-of select="dc:creator"/>
-      </cp:lastModifiedBy>
-      <cp:revision>
-        <xsl:value-of select="meta:editing-cycles"/>
-      </cp:revision>
+      <!-- creation date -->
       <xsl:if test="meta:creation-date">
         <dcterms:created xsi:type="dcterms:W3CDTF">
           <xsl:value-of select="meta:creation-date"/>
         </dcterms:created>
       </xsl:if>
+      <!-- creator -->
+      <xsl:if test="meta:initial-creator">
+        <dc:creator>
+          <xsl:value-of select="meta:initial-creator"/>
+        </dc:creator>
+      </xsl:if>
+      <!-- description -->
+      <xsl:if test="dc:description">
+        <dc:description>
+          <xsl:value-of select="dc:description"/>
+        </dc:description>
+      </xsl:if>
+      <!-- identifier -->
+      <xsl:if test="dc:identifier">
+        <dc:identifier>
+          <xsl:value-of select="dc:identifier"/>
+        </dc:identifier>
+      </xsl:if>
+      <!-- keywords -->
+      <xsl:if test="meta:keyword">
+        <cp:keywords>
+          <xsl:apply-templates select="meta:keyword"/>
+        </cp:keywords>
+      </xsl:if>
+      <!-- language -->
+      <xsl:if test="dc:language">
+        <dc:language>
+          <xsl:value-of select="dc:language"/>
+        </dc:language>
+      </xsl:if>
+      <!-- last modification author -->
+      <xsl:if test="dc:creator">
+        <cp:lastModifiedBy>
+          <xsl:value-of select="dc:creator"/>
+        </cp:lastModifiedBy>
+      </xsl:if>
+      <!-- last printing -->
+      <xsl:if test="meta:printed-date">
+        <cp:lastPrinted>
+          <xsl:value-of select="meta:printed-date"/>
+        </cp:lastPrinted>
+      </xsl:if>
+      <!-- last modification date -->
       <xsl:if test="dc:date">
         <dcterms:modified xsi:type="dcterms:W3CDTF">
           <xsl:value-of select="dc:date"/>
         </dcterms:modified>
+      </xsl:if>
+      <!-- number of times it was saved -->
+      <xsl:if test="meta:editing-cycles">
+        <cp:revision>
+          <xsl:value-of select="meta:editing-cycles"/>
+        </cp:revision>
+      </xsl:if>
+      <!-- topic -->
+      <xsl:if test="dc:subject">
+        <dc:subject>
+          <xsl:value-of select="dc:subject"/>
+        </dc:subject>
+      </xsl:if>
+      <!-- title -->
+      <xsl:if test="dc:title">
+        <dc:title>
+          <xsl:value-of select="dc:title"/>
+        </dc:title>
       </xsl:if>
     </cp:coreProperties>
   </xsl:template>
