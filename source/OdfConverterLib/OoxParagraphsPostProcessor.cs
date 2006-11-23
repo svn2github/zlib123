@@ -284,7 +284,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          
          private void SetDropCapProperties(string text)
          {
-         	Paragraph p = (Paragraph) GetBottom(this.store);
+         	Paragraph p = (Paragraph) GetFirstParagraph(this.store);
          	if (p.DropCapPr == null)
          	{
          		p.DropCapPr = new DropCapProperties();
@@ -318,13 +318,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          	}
          }
          
-         private object GetBottom(Stack stack) 
+         private object GetFirstParagraph(Stack stack) 
          {
          	object res = null;
          	IEnumerator objEnum = stack.GetEnumerator();
          	while (objEnum.MoveNext())
          	{
          		res = objEnum.Current;
+         		if (res is Paragraph)
+         		{
+         			return res;
+         		}
          	}
          	return res;
          }
@@ -379,11 +383,31 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          	if (pPr != null)
          	{
          		pPr0 = pPr.Clone();	
+         		Element pBdr = pPr0.GetChild("pBdr", W_NAMESPACE);
+         		if (pBdr != null)
+         		{   // remove bottom and right border if needed
+         			Element bottom = pBdr.GetChild("bottom", W_NAMESPACE);
+         			if (bottom != null)
+         			{
+         				pBdr.RemoveChild(bottom);
+         			}
+         			Element right = pBdr.GetChild("right", W_NAMESPACE);
+         			if (right != null)
+         			{
+         				pBdr.RemoveChild(right);
+         			}
+         		}
+         		Element sectPr = pPr0.GetChild("sectPr", W_NAMESPACE);
+         		if (sectPr != null)
+         		{   // sectPr free
+         			pPr0.RemoveChild(sectPr);
+         		}
          	}
          	else
          	{
          		pPr0 = new Element("w", "pPr", W_NAMESPACE);
          	}
+         	
          	p0.AddChild(pPr0);
          	
          	pPr0.AddChildIfNotExist(new Element("w", "keepNext", W_NAMESPACE));
