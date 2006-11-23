@@ -40,6 +40,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     {
 
         private const string W_NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        private const string V_NAMESPACE = "urn:schemas-microsoft-com:vml";
         private const string DROPCAP_NAMESPACE = "urn:cleverage:xmlns:post-processings:dropcap";
  		private string[] PARAGRAPH_PROPERTIES = { "pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr", "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap", "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid", "spacing", "ind", "contextualSpacing", "mirrorIndents", "textboxTightWrap", "suppressOverlap", "jc", "textDirection", "textAlignment", "outlineLvl", "divId", "cnfStyle", "rPr", "sectPr", "pPrChange"};
     	private string[] RUN_PROPERTIES = { "ins", "del", "moveFrom", "moveTo", "rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath", "rPrChange" };
@@ -160,7 +161,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         	{
         		Paragraph p = (Paragraph) e;
         		
-        		if (p.IsDroppedCap)
+        		if (p.IsDroppedCap && !HasAncestor("textbox", V_NAMESPACE))
         		{
         			Element p0 = SplitParagraph(p);
       
@@ -320,9 +321,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          private object GetBottom(Stack stack) 
          {
          	object res = null;
-         	for (int i=0; i<stack.Count; i++)
+         	IEnumerator objEnum = stack.GetEnumerator();
+         	while (objEnum.MoveNext())
          	{
-         		res = stack.Peek();
+         		res = objEnum.Current;
          	}
          	return res;
          }
@@ -330,9 +332,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          
          private Element GetParent(Element e, Stack stack)
          {
-         	for (int i=0; i<stack.Count; i++)
+         	IEnumerator objEnum = stack.GetEnumerator();
+         	while (objEnum.MoveNext())
          	{
-         		Node node = (Node) stack.Peek();
+         		Node node = (Node) objEnum.Current;
          		if (node is Element)
          		{
          			Element parent = (Element) node;
@@ -348,7 +351,21 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          	return null;
          }
          
-         // TODO : test no framePr exist
+         
+        public bool HasAncestor(string localName, string nameSpace)
+        {
+        	IEnumerator objEnum = this.currentNode.GetEnumerator();
+        	while (objEnum.MoveNext()) {
+        		Node node = (Node) objEnum.Current;
+        		if (localName.Equals(node.Name) && nameSpace.Equals(node.Ns))
+            	{
+            		return true;
+            	}
+        	}
+        	return false;
+        }
+         
+        
          // Split the paragraph in two : 
          // one with the dropcap text in a framePr, the other with the dropcap removed.
          // param p paragraph to be splitten. Will get its dropcap removed
