@@ -1611,6 +1611,14 @@
     </xsl:if>
 
     <!-- fonts -->
+    <xsl:choose>
+      <xsl:when test="ancestor::node()/w:style[@w:type='paragraph' and @w:default='1']">
+        <xsl:attribute name="style:font-name">
+           <xsl:value-of select="ancestor::node()/w:style[@w:type='paragraph' and @w:default='1']/w:rPr/w:rFonts/@w:ascii"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+    
     <xsl:if test="w:rFonts/@w:asciiTheme">
       <xsl:attribute name="style:font-name">
         <xsl:call-template name="ComputeThemeFontName">
@@ -1619,6 +1627,8 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:if test="w:rFonts/@w:ascii">
       <xsl:attribute name="style:font-name">
         <xsl:value-of select="w:rFonts/@w:ascii"/>
