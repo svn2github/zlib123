@@ -27,6 +27,7 @@
  */
 
 using System.Xml;
+using System.Collections;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -35,55 +36,636 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     /// An <c>XmlWriter</c> implementation for characters post processings
     public class OoxCharactersPostProcessor : AbstractPostProcessor
     {
-        public OoxCharactersPostProcessor(XmlWriter nextWriter):base(nextWriter)
+
+        private const string NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        private string[] RUN_PROPERTIES = { "ins", "del", "moveFrom", "moveTo", "rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath", "rPrChange" };
+
+        // series of symbol that do not use reverse direction
+        private static char[] HEBREW_DIRECT_SYMBOLS = 
+            { '\u05B0', '\u05B1', '\u05B2', '\u05B3', '\u05B4', '\u05B5', '\u05B6', '\u05B7', '\u05B8' };
+
+        private static char[] HEBREW_SYMBOLS = 
+            { '\u05B9', '\u05BA', '\u05BB', '\u05BC', '\u05BD', '\u05BE', '\u05BF',
+			'\u05C0', '\u05C1', '\u05C2', '\u05C3',
+			'\u05D0', '\u05D1', '\u05D2', '\u05D3', '\u05D4', '\u05D5', '\u05D6', '\u05D7', '\u05D8', '\u05D9', '\u05DA', '\u05DB', '\u05DC', '\u05DD', '\u05DE', '\u05DF',
+			'\u05E0', '\u05E1', '\u05E2', '\u05E3', '\u05E4', '\u05E5', '\u05E6', '\u05E7', '\u05E8', '\u05E9', '\u05EA',
+			'\u05F0', '\u05F1', '\u05F2', '\u05F3', '\u05F4' };
+
+        private static char[] ARABIC_BASIC_SYMBOLS = 
+            { '\u060C', '\u061B', '\u061F',
+			'\u0621', '\u0622', '\u0623', '\u0624', '\u0625', '\u0626', '\u0627', '\u0628', '\u0629', '\u062A', '\u062B', '\u062C', '\u062D', '\u062E', '\u062F',
+			'\u0630', '\u0631', '\u0632', '\u0633', '\u0634', '\u0635', '\u0636', '\u0637', '\u0638', '\u0639', '\u063A',
+			'\u0640', '\u0641', '\u0642', '\u0643', '\u0644', '\u0645', '\u0646', '\u0647', '\u0648', '\u0649', '\u064A', '\u064B', '\u064C', '\u064D', '\u064E', '\u064F',
+			'\u0650', '\u0651', '\u0652', '\u0653', '\u0654', '\u0655' };
+
+        private static char[] ARABIC_EXTENDED_SYMBOLS = 
+            { '\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0625', '\u0666', '\u0667', '\u0668', '\u0669', '\u066A', '\u066B', '\u066C', '\u066D', '\u066E', '\u066F',
+			'\u0670', '\u0641', '\u0672', '\u0673', '\u0674', '\u0675', '\u0676', '\u0677', '\u0678', '\u0679', '\u067A', '\u067B', '\u067C', '\u067D', '\u067E', '\u067F',
+			'\u0680', '\u0681', '\u0682', '\u0683', '\u0684', '\u0685', '\u0686', '\u0687', '\u0688', '\u0689', '\u068A', '\u068B', '\u068C', '\u068D', '\u068E', '\u068F',
+			'\u0690', '\u0691', '\u0692', '\u0693', '\u0694', '\u0695', '\u0696', '\u0697', '\u0698', '\u0699', '\u069A', '\u069B', '\u069C', '\u069D', '\u069E', '\u069F',
+			'\u06A0', '\u06A1', '\u06A2', '\u06A3', '\u06A4', '\u06A5', '\u06A6', '\u06A7', '\u06A8', '\u06A9', '\u06AA', '\u06AB', '\u06AC', '\u06AD', '\u06AE', '\u06AF',
+			'\u06B0', '\u06B1', '\u06B2', '\u06B3', '\u06B4', '\u06B5', '\u06B6', '\u06B7', '\u06B8', '\u06B9', '\u06BA', '\u06BB', '\u06BC', '\u06BD', '\u06BE', '\u06BF',
+			'\u06C0', '\u06C1', '\u06C2', '\u06C3', '\u06C4', '\u06C5', '\u06C6', '\u06C7', '\u06C8', '\u06C9', '\u06CA', '\u06CB', '\u06CC', '\u06CD', '\u06CE', '\u06CF',
+			'\u06D0', '\u06D1', '\u06D2', '\u06D3', '\u06D4', '\u06D5', '\u06D6', '\u06D7', '\u06D8', '\u06D9', '\u06DA', '\u06DB', '\u06DC', '\u06DD', '\u06DE', '\u06DF',
+			'\u06E0', '\u06E1', '\u06E2', '\u06E3', '\u06E4', '\u06E5', '\u06E6', '\u06E7', '\u06E8', '\u06E9', '\u06EA', '\u06EB', '\u06EC', '\u06ED',
+			'\u06F0', '\u06F1', '\u06F2', '\u06F3', '\u06F4', '\u06F5', '\u06F6', '\u06F7', '\u06F8', '\u06F9', '\u06FA', '\u06FB', '\u06FC', '\u06FD', '\u06FE' };
+
+        private Stack currentNode;
+        private Stack store;
+
+        public OoxCharactersPostProcessor(XmlWriter nextWriter)
+            : base(nextWriter)
         {
+            this.currentNode = new Stack();
+            this.store = new Stack();
         }
+
+        public override void WriteStartElement(string prefix, string localName, string ns)
+        {
+            Element e = null;
+            if (NAMESPACE.Equals(ns) && "r".Equals(localName))
+            {
+                e = new Run(prefix, localName, ns);
+            }
+            else
+            {
+                e = new Element(prefix, localName, ns);
+            }
+
+            this.currentNode.Push(e);
+
+            if (InRun())
+            {
+                StartStoreElement();
+            }
+            else
+            {
+                this.nextWriter.WriteStartElement(prefix, localName, ns);
+            }
+        }
+
+
+        public override void WriteEndElement()
+        {
+
+            if (IsRun())
+            {
+                WriteStoredRun();
+            }
+            if (InRun())
+            {
+                EndStoreElement();
+            }
+            else
+            {
+                this.nextWriter.WriteEndElement();
+            }
+            this.currentNode.Pop();
+        }
+
+
+        public override void WriteStartAttribute(string prefix, string localName, string ns)
+        {
+            this.currentNode.Push(new Attribute(prefix, localName, ns));
+
+            if (InRun())
+            {
+                StartStoreAttribute();
+            }
+            else
+            {
+                this.nextWriter.WriteStartAttribute(prefix, localName, ns);
+            }
+        }
+
+
+        public override void WriteEndAttribute()
+        {
+            if (InRun())
+            {
+                EndStoreAttribute();
+            }
+            else
+            {
+                this.nextWriter.WriteEndAttribute();
+            }
+            this.currentNode.Pop();
+        }
+
 
         public override void WriteString(string text)
         {
-            this.ReplaceSoftHyphens(text);
+            if (InRun())
+            {
+                StoreString(text);
+            }
+            else
+            {
+                this.nextWriter.WriteString(text);
+            }
         }
 
-        private void ReplaceSoftHyphens(string text)
+
+        /*
+         * General methods
+         */
+
+        public void WriteStoredRun()
         {
+            Element e = (Element)this.store.Peek();
+
+            if (e is Run)
+            {
+                Run r = (Run)e;
+
+                if (r.HasReversedText)
+                {
+                    SplitRun(r);
+                }
+                else
+                {
+                    if (this.store.Count < 2)
+                    {
+                        if (r.HasText)
+                        {
+                            if (r.GetChild("t", NAMESPACE) != null)
+                                r.ReplaceFirstTextChild(this.ReplaceSoftHyphens(r.GetChild("t", NAMESPACE).GetTextChild(), r));
+                        }
+                        r.Write(nextWriter);
+                    }
+                }
+            }
+            else
+            {
+                if (this.store.Count < 2)
+                {
+                    e.Write(nextWriter);
+                }
+            }
+        }
+
+        private void StartStoreElement()
+        {
+            Element element = (Element)this.currentNode.Peek();
+
+            if (this.store.Count > 0)
+            {
+                Element parent = (Element)this.store.Peek();
+                parent.AddChild(element);
+            }
+
+            this.store.Push(element);
+        }
+
+
+        private void EndStoreElement()
+        {
+            Element e = (Element)this.store.Pop();
+        }
+
+
+        private void StartStoreAttribute()
+        {
+            Element parent = (Element)store.Peek();
+            Attribute attr = (Attribute)this.currentNode.Peek();
+            parent.AddAttribute(attr);
+            this.store.Push(attr);
+        }
+
+
+        private void StoreString(string text)
+        {
+            Node node = (Node)this.currentNode.Peek();
+
+            if (node is Element)
+            {
+                Element element = (Element)this.store.Peek();
+                element.AddChild(text);
+            }
+            else
+            {
+                Attribute attr = (Attribute)store.Peek();
+                attr.Value += text;
+            }
+        }
+
+
+        private void EndStoreAttribute()
+        {
+            this.store.Pop();
+        }
+
+
+        private void SplitRun(Run r)
+        {
+            Run extractedRun = new Run("w", "r", NAMESPACE);
+            Element rPr = r.GetChild("rPr", NAMESPACE);
+            Element rPr0 = null;
+
+            if (rPr != null)
+            {
+                rPr0 = rPr.Clone();
+            }
+            else
+            {
+                rPr0 = new Element("w", "rPr", NAMESPACE);
+            }
+
+            // get first substring of run of a unique type, and retrieve it from run
+            TextProperties extractedText = ExtractText(r);
+            if (extractedText.IsReverse)
+            {
+                rPr0.AddChild(new Element("w", "rtl", NAMESPACE));
+                if (rPr0.GetChild("b", NAMESPACE) != null && rPr0.GetChild("b", NAMESPACE).GetAttribute("val", NAMESPACE).Value.Equals("on"))
+                {
+                    Element elt = new Element("w", "bCs", NAMESPACE);
+                    elt.AddAttribute(new Attribute("w", "val", "on", NAMESPACE));
+                    rPr0.AddChild(elt);
+                }
+                if (rPr0.GetChild("i", NAMESPACE) != null && rPr0.GetChild("i", NAMESPACE).GetAttribute("val", NAMESPACE).Value.Equals("on"))
+                {
+                    Element elt = new Element("w", "iCs", NAMESPACE);
+                    elt.AddAttribute(new Attribute("w", "val", "on", NAMESPACE));
+                    rPr0.AddChild(elt);
+                }
+                string fontSize = null;
+                if (rPr0.GetChild("sz", NAMESPACE) != null)
+                    fontSize = rPr0.GetChild("sz", NAMESPACE).GetAttribute("val", NAMESPACE).Value;
+                if (fontSize != null)
+                {
+                    Element elt = new Element("w", "szCs", NAMESPACE);
+                    elt.AddAttribute(new Attribute("w", "val", fontSize, NAMESPACE));
+                    rPr0.AddChild(elt);
+                }
+                rPr0 = this.GetOrderedRunProperties(rPr0);
+            }
+
+            extractedRun.AddChild(rPr0);
+            Element t = new Element("w", "t", NAMESPACE);
+            t.AddAttribute(new Attribute("xml", "space", "preserve", null));
+            t.AddChild(extractedText.Content);
+            extractedRun.AddChild(t);
+
+            if (this.store.Count < 2)
+            {
+                extractedRun.Write(nextWriter);
+            }
+            else
+            {
+                Element parent = GetParent(r, this.store);
+                if (parent != null)
+                {
+                    parent.AddChild(extractedRun);
+                }
+            }
+
+            if (r.HasReversedText)
+            {
+                SplitRun(r);
+            }
+            else
+            {
+                if (this.store.Count < 2)
+                {
+                    if (r.HasNotEmptyText)
+                    {
+                        r.Write(nextWriter);
+                    }
+                    else
+                    {
+                        bool hasRelevantChild = false;
+                        //try to avoid empty runs
+                        foreach (Element runChild in r.GetChildElements())
+                        {
+                            if ("t".Equals(runChild.Name) && NAMESPACE.Equals(runChild.Ns)) { }
+                            else if ("rPr".Equals(runChild.Name) && NAMESPACE.Equals(runChild.Ns)) { }
+                            else
+                            {
+                                hasRelevantChild = true;
+                                break;
+                            }
+                        }
+                        if (hasRelevantChild)
+                            //do not write run, just pop it.
+                            this.currentNode.Pop();
+                    }
+                }
+            }
+
+        }
+
+        // Extract the first part of run text that is of one particular type
+        private TextProperties ExtractText(Run r)
+        {
+            TextProperties extractedText = new TextProperties();
+            // teake the very first string of run.
+            string text = r.GetChild("t", NAMESPACE).GetTextChild();
+            int startChar = -1;
+            int endChar = -1;
+            int startHebrew = -1;
+            int startArabic = -1;
+            int startExtendedArabic = -1;
+            char[] charTable = null;
+
+            // get start of special symbol substring
+            if ((startHebrew = text.IndexOfAny(HEBREW_SYMBOLS)) >= 0)
+            {
+                startChar = startHebrew;
+                charTable = HEBREW_SYMBOLS;
+            }
+            if ((startArabic = text.IndexOfAny(ARABIC_BASIC_SYMBOLS)) >= 0)
+            {
+                if (startChar >= 0)
+                    startChar = System.Math.Min(startChar, startArabic);
+                else startChar = startArabic;
+                if (startChar.Equals(startArabic))
+                    charTable = ARABIC_BASIC_SYMBOLS;
+            }
+            if ((startExtendedArabic = text.IndexOfAny(ARABIC_EXTENDED_SYMBOLS)) >= 0)
+            {
+                if (startChar >= 0)
+                    startChar = System.Math.Min(startChar, startExtendedArabic);
+                else startChar = startExtendedArabic;
+                if (startChar.Equals(startExtendedArabic))
+                    charTable = ARABIC_EXTENDED_SYMBOLS;
+            }
+
+            if (startChar.Equals(0))
+            {
+                // get end of special symbol substring
+                endChar = text.LastIndexOfAny(charTable);
+                // retrieve substring from run
+                r.ReplaceFirstTextChild(text.Substring(endChar + 1, text.Length - endChar - 1));
+                // return substring. Do not apply character processing to special characters.
+                extractedText.Content = text.Substring(0, endChar + 1);
+                extractedText.IsReverse = true;
+            }
+            else if (startChar > 0)
+            {
+                // retrieve substring from run
+                r.ReplaceFirstTextChild(text.Substring(startChar, text.Length - startChar));
+                // return first substring
+                extractedText.Content = this.ReplaceSoftHyphens(text.Substring(0, startChar), r);
+                extractedText.IsReverse = false;
+            }
+            else
+            {
+                extractedText.Content = this.ReplaceSoftHyphens(text, r);
+                extractedText.IsReverse = false;
+            }
+            return extractedText;
+        }
+
+
+        private string ReplaceSoftHyphens(string text, Run r)
+        {
+            string substring = "";
             int i = 0;
             if ((i = text.IndexOf('\u00AD')) >= 0)
             {
-                this.ReplaceNonBreakingHyphens(text.Substring(0, i));
-                nextWriter.WriteEndElement();
-                nextWriter.WriteStartElement("w", "softHyphen", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
+                substring = this.ReplaceNonBreakingHyphens(text.Substring(0, i), r);
+                r.AddChild(new Element("w", "softHyphen", NAMESPACE));
                 if (i < text.Length - 1)
                 {
-                    nextWriter.WriteEndElement();
-                    nextWriter.WriteStartElement("w", "t", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
-                    this.ReplaceSoftHyphens(text.Substring(i + 1, text.Length - i - 1));
+                    Element newT = new Element("w", "t", NAMESPACE);
+                    newT.AddChild(this.ReplaceSoftHyphens(text.Substring(i + 1, text.Length - i - 1), r));
+                    r.AddChild(newT);
                 }
             }
             else
             {
-                this.ReplaceNonBreakingHyphens(text);
+                substring = this.ReplaceNonBreakingHyphens(text, r);
             }
+            return substring;
         }
 
-        private void ReplaceNonBreakingHyphens(string text)
+
+        private string ReplaceNonBreakingHyphens(string text, Run r)
         {
+            string substring = "";
             int i = 0;
             if ((i = text.IndexOf('\u2011')) >= 0)
             {
-                nextWriter.WriteString(text.Substring(0, i));
-                nextWriter.WriteEndElement();
-                nextWriter.WriteStartElement("w", "noBreakHyphen", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
+                substring = text.Substring(0, i);
+                r.AddChild(new Element("w", "noBreakHyphen", NAMESPACE));
                 if (i < text.Length - 1)
                 {
-                    nextWriter.WriteEndElement();
-                    nextWriter.WriteStartElement("w", "t", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
-                    this.ReplaceNonBreakingHyphens(text.Substring(i + 1, text.Length - i - 1));
+                    Element newT = new Element("w", "t", NAMESPACE);
+                    newT.AddChild(this.ReplaceNonBreakingHyphens(text.Substring(i + 1, text.Length - i - 1), r));
+                    r.AddChild(newT);
                 }
             }
             else
             {
-                nextWriter.WriteString(text);
+                substring = text;
+            }
+            return substring;
+        }
+
+
+        private bool IsRun()
+        {
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                Element element = (Element)node;
+                if ("r".Equals(element.Name) && NAMESPACE.Equals(element.Ns))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        private bool InRun()
+        {
+            return IsRun() || this.store.Count > 0;
+        }
+
+        private Element GetParent(Element e, Stack stack)
+        {
+            IEnumerator objEnum = stack.GetEnumerator();
+            while (objEnum.MoveNext())
+            {
+                Node node = (Node)objEnum.Current;
+                if (node is Element)
+                {
+                    Element parent = (Element)node;
+                    foreach (object child in parent.Children)
+                    {
+                        if (child == e) // object identity
+                        {
+                            return parent;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        protected class Run : Element
+        {
+            private TextProperties TextProperties;
+
+            public TextProperties TextPr
+            {
+                get { return TextProperties; }
+                set { TextProperties = value; }
+            }
+
+            public Run(Element e)
+                :
+                base(e.Prefix, e.Name, e.Ns) { }
+
+            public Run(string prefix, string localName, string ns)
+                :
+                base(prefix, localName, ns) { }
+
+            public bool HasReversedText
+            {
+                get
+                {
+                    return HasReversedTextNode(this);
+                }
+            }
+
+            private bool HasReversedTextNode(Element e)
+            {
+                bool b = false;
+                foreach (object node in e.Children)
+                {
+                    if (node is Element)
+                    {
+                        Element element = (Element)node;
+                        if (element.GetTextChild() != null)
+                        {
+                            b = b || isReversed(element.GetTextChild());
+                        }
+                    }
+                }
+                return b;
+            }
+
+            private bool isReversed(string text)
+            {
+                if (text.IndexOfAny(HEBREW_SYMBOLS) >= 0)
+                    return true;
+                else if (text.IndexOfAny(ARABIC_BASIC_SYMBOLS) >= 0)
+                    return true;
+                else if (text.IndexOfAny(ARABIC_EXTENDED_SYMBOLS) >= 0)
+                    return true;
+                else return false;
+            }
+
+            public void ReplaceFirstTextChild(string newText)
+            {
+                if (this.GetChild("t", NAMESPACE) != null)
+                {
+                    if (this.GetChild("t", NAMESPACE).GetTextChild() != newText)
+                    {
+                        Element oldT = this.GetChild("t", NAMESPACE);
+                        Element newT = new Element("w", "t", NAMESPACE);
+                        newT.AddChild(newText);
+                        this.Replace(oldT, newT);
+                    }
+                }
+            }
+
+            public bool HasNotEmptyText
+            {
+                get
+                {
+                    return HasNotEmptyTextNode(this);
+                }
+            }
+
+
+            private static bool HasNotEmptyTextNode(Element e)
+            {
+                bool b = false;
+                foreach (object node in e.Children)
+                {
+                    if (node is Element)
+                    {
+                        Element element = (Element)node;
+                        if (element.GetTextChild() != null && element.GetTextChild().Length > 0)
+                        {
+                            b = true;
+                        }
+                    }
+                }
+                return b;
+            }
+
+            public bool HasText
+            {
+                get
+                {
+                    return HasTextNode(this);
+                }
+            }
+
+
+            private static bool HasTextNode(Element e)
+            {
+                bool b = false;
+                if ("t".Equals(e.Name) && NAMESPACE.Equals(e.Ns))
+                {
+                    b = true;
+                }
+                else
+                {
+
+                    foreach (object node in e.Children)
+                    {
+                        if (node is Element)
+                        {
+                            b = b || HasTextNode((Element)node);
+                        }
+                        else
+                        {
+                            b = true;
+                        }
+                    }
+                }
+                return b;
+            }
+
+        }
+
+        protected class TextProperties
+        {
+            private bool isReverse;
+            private string content;
+
+            public bool IsReverse
+            {
+                get { return isReverse; }
+                set { isReverse = value; }
+            }
+
+            public string Content
+            {
+                get { return content; }
+                set { content = value; }
             }
         }
+
+        private Element GetOrderedRunProperties(Element rPr)
+        {
+            Element newRPr = new Element(rPr);
+            foreach (string propName in RUN_PROPERTIES)
+            {
+                Element prop = rPr.GetChild(propName, NAMESPACE);
+                if (prop != null)
+                {
+                    newRPr.AddChild(prop);
+                }
+            }
+            return newRPr;
+        }
+
+
     }
 }

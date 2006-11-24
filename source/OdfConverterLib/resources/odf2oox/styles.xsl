@@ -659,7 +659,7 @@
     </xsl:if>
 
     <!-- fonts -->
-    <xsl:if test="@style:font-name">
+    <xsl:if test="@style:font-name or @style:font-name-complex or @style:font-name-asian">
       <w:rFonts>
         <xsl:if test="@style:font-name">
           <xsl:variable name="fontName">
