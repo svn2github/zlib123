@@ -63,7 +63,7 @@
         <xsl:choose>
 
           <!-- when numbering style is overriden, num template is used -->
-          <xsl:when test="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]">
+          <xsl:when test="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl">
             <xsl:apply-templates
               select="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl[@w:ilvl = $level]"/>
           </xsl:when>
