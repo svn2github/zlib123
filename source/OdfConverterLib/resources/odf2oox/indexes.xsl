@@ -115,11 +115,13 @@
   </xsl:template>
 
   <xsl:template name="InsertIndexFiguresPrefs">
-    <w:instrText xml:space="preserve">
-      <xsl:text>TOC  \t "</xsl:text>
-      <xsl:value-of select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"/>
-      <xsl:text> " </xsl:text> 
+    <w:instrText xml:space="preserve"> TOC \c "</w:instrText>
+    <w:instrText>
+      <xsl:value-of
+        select="parent::text:index-body/preceding-sibling::text:table-index-source/@text:caption-sequence-name"
+      />
     </w:instrText>
+    <w:instrText xml:space="preserve">" </w:instrText>
   </xsl:template>
 
   <xsl:template name="insertAlphabeticalPrefs">
@@ -174,10 +176,11 @@
   </xsl:template>
 
   <xsl:template name="InsertIllustrationInPrefs">
-    <w:instrText xml:space="preserve"> 
-      <xsl:text> TOC  \t "</xsl:text>
-      <xsl:value-of select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"/>" 
-    </w:instrText>
+    <w:instrText xml:space="preserve"> TOC  \c "</w:instrText>
+    <w:instrText>
+      <xsl:value-of
+        select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"
+      />" </w:instrText>
   </xsl:template>
 
   <xsl:template name="InsertTocPrefs">
