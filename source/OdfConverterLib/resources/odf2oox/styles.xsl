@@ -40,7 +40,8 @@
 
   <xsl:variable name="asianLayoutId">1</xsl:variable>
   <!-- default language of the document -->
-  <xsl:variable name="default-language" select="document('meta.xml')/office:document-meta/office:meta/dc:language"/>
+  <xsl:variable name="default-language"
+    select="document('meta.xml')/office:document-meta/office:meta/dc:language"/>
 
   <!-- keys definition -->
   <xsl:key name="styles" match="style:style" use="@style:name"/>
@@ -1075,11 +1076,11 @@
       test="$default-language or (@fo:language and @fo:country) or (@style:language-asian and @style:country-asian) or (@style:language-complex and @style:country-complex)">
       <w:lang>
         <xsl:choose>
-        <xsl:when test="(@fo:language and @fo:country)">
-          <xsl:attribute name="w:val">
-            <xsl:value-of select="@fo:language"/>-<xsl:value-of select="@fo:country"/>
-          </xsl:attribute>
-        </xsl:when>
+          <xsl:when test="(@fo:language and @fo:country)">
+            <xsl:attribute name="w:val">
+              <xsl:value-of select="@fo:language"/>-<xsl:value-of select="@fo:country"/>
+            </xsl:attribute>
+          </xsl:when>
           <xsl:when test="$default-language">
             <xsl:attribute name="w:val">
               <xsl:value-of select="$default-language"/>
@@ -1492,7 +1493,23 @@
         <xsl:call-template name="ComputePageMargins"/>
       </xsl:otherwise>
     </xsl:choose>
-
+    <!-- paper source : must be a decimal number in OOX. Cannot convert codes -->
+    <xsl:choose>
+      <xsl:when test="@style:paper-tray-name = 'default' ">
+        <w:paperSrc w:first="1" w:other="1"/>
+      </xsl:when>
+      <xsl:when test="@style:paper-tray-name = '' ">
+        <w:paperSrc w:first="1" w:other="1"/>
+      </xsl:when>
+      <xsl:when test="number(@style:paper-tray-name)">
+        <w:paperSrc w:first="{@style:paper-tray-name}" w:other="{@style:paper-tray-name}"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="@style:paper-tray-name != '' ">
+          <xsl:message terminate="no">feedback:Paper Tray</xsl:message>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
     <!-- page borders -->
     <xsl:choose>
       <xsl:when test="@fo:border and @fo:border != 'none' ">
