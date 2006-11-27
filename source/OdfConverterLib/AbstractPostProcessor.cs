@@ -86,7 +86,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteFullEndElement()
         {
-            this.nextWriter.WriteFullEndElement();
+            this.WriteEndElement();
         }
 
         public override void WriteStartDocument()
