@@ -90,31 +90,31 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 
 ;Hyperlink;Hyperlink Type;Web /FTP /Telnet;;0;0.1;Completed;;82
 ;;;URL;;;0.1;Completed;;
-;;;Further settings;Frame;3;;;;
-;;;;Form;1;0.1;Completed;Button form is not applicable in OpenXml;82
+;;;Further settings;Frame;3;;Completed;;
+;;;;Form;1;-;;Button form is not applicable in OpenXml;82
 ;;;;Text;0;0.1;Completed;;82
-;;;;Name;;;;;
+;;;;Name;;-;;No equivalent in OpenXML;
 
-;;Mails & News;Mails & News;Email/ News;1;0.2-Final;Completed;
-;;;;Receiver;1;0.2-Final;Completed;
-;;;;Subject;1;0.2-Final;Completed;
-;;;Further settings;Frame;1;0.3-Final;;
-;;;;Form;1;-;;Button form is not applicable in OpenXml
-;;;;Text;1;0.2-Final;Completed;
-;;;;Name;1;0.2-Final;Completed;
-;;Document;Document;Path;3;0.3-M2;;
-;;;Target in Document;Target URL;3;0.3-M2;;
-;;;Further settings;Frame;3;0.3-M2;;
-;;;;Form;3;0.3-M2;;
-;;;;Text;3;0.3-M2;;
-;;;;Name;3;0.3-M2;;
-;;New Document;New Document;Edit Now/Edit later;3;0.3-M2;;
-;;;;File;3;0.3-M2;;
-;;;;Filetype;3;0.3-M2;;;;
-;;;Further settings;Frame;3;0.3-M2;;;;
-;;;;Form;3;0.3-M2;;;;
-;;;;Text;3;0.3-M2;;;;
-;;;;Name;3;0.3-M2;;;;
+;;Mails & News;Mails & News;Email/ News;1;0.2-Final;Completed;;82
+;;;;Receiver;1;0.2-Final;Completed;;
+;;;;Subject;1;0.2-Final;Completed;;
+;;;Further settings;Frame;1;0.3-Final;Completed;;
+;;;;Form;1;-;;Button form is not applicable in OpenXml;
+;;;;Text;1;0.2-Final;Completed;;
+;;;;Name;1;-;;No equivalent in OpenXML;
+;;Document;Document;Path;3;0.3-M2;Completed;;82
+;;;Target in Document;Target URL;3;0.3-M2;Completed;;
+;;;Further settings;Frame;3;0.3-M2;Completed;;
+;;;;Form;3;-;;Button form is not applicable in OpenXml;
+;;;;Text;3;0.3-M2;Completed;;
+;;;;Name;3;-;;No equivalent in OpenXML;
+;;New Document;New Document;Edit Now/Edit later;3;0.3-M2;Completed;;82
+;;;;File;3;0.3-M2;Completed;;
+;;;;Filetype;3;0.3-M2;Completed;;;
+;;;Further settings;Frame;3;0.3-M2;Completed;;;
+;;;;Form;3;-;;Button form is not applicable in OpenXml;;
+;;;;Text;3;0.3-M2;Completed;;;
+;;;;Name;3;-;;No equivalent in OpenXML;;
 ;Header;;;;1;0.2-M1;Completed;;369;Detailed out in Format-->Page (header and footer tabs)
 
 ;Footer;;;;1;0.2-M1;Completed;;369;

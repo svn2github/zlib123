@@ -86,7 +86,7 @@ Tab character text:tab is translated to a run including a tabulation <w:r><w:tab
 Line break text:line-break is translated to <w:r><w:br/><w:t/></w:r>"
 ;;Soft Hyphens, Hyphens, and Non-breaking Blanks;0;0.1;Completed;;Post processed
 ;;Attributed Text;0;0.2-Final;Partial;;text:span @style-name treated;TODO : class-names
-;;Hyperlinks;0;0.3-M2;Partial;;text:a is converted to w:hyperlink where attribute r:id is the result of the generate-id() function;TODO : frames
+;;Hyperlinks;0;0.3-M2;Completed;;text:a is converted to w:hyperlink where attribute r:id is the result of the generate-id() function;
 ;Bookmarks and References;;;;;;;
 ;;Bookmarks;;0.2-Final;Completed;mkaminski;;
 ;;References;;0.2-Final;Completed;mkaminski;;
