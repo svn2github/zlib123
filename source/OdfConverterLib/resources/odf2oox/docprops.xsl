@@ -135,8 +135,6 @@
   <xsl:template match="/office:document-meta/office:meta" mode="app">
     <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
       xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
-      <!-- todo: conversion from duration data type into seconds -->
-      <!--TotalTime>0</TotalTime-->
       <xsl:if test="meta:document-statistic/@meta:page-count">
         <Pages>
           <xsl:value-of select="meta:document-statistic/@meta:page-count"/>
@@ -153,6 +151,56 @@
         <Paragraphs>
           <xsl:value-of select="meta:document-statistic/@meta:paragraph-count"/>
         </Paragraphs>
+      </xsl:if>
+      <!-- editing duration -->
+      <xsl:if test="meta:editing-duration">
+        <xsl:variable name="hours">
+          <xsl:choose>
+            <xsl:when test="contains(meta:editing-duration, 'H')">
+              <xsl:value-of
+                select="substring-before(substring-after(meta:editing-duration, 'T'), 'H')"/>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="minutes">
+          <xsl:choose>
+            <xsl:when test="contains(meta:editing-duration, 'H')">
+              <xsl:value-of
+                select="substring-before(substring-after(meta:editing-duration, 'H'), 'M')"/>
+            </xsl:when>
+            <xsl:when test="contains(meta:editing-duration, 'M')">
+              <xsl:value-of
+                select="substring-before(substring-after(meta:editing-duration, 'T'), 'M')"/>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="seconds">
+          <xsl:choose>
+            <xsl:when test="contains(meta:editing-duration, 'M')">
+              <xsl:value-of
+                select="substring-before(substring-after(meta:editing-duration, 'M'), 'S')"/>
+            </xsl:when>
+            <xsl:when test="contains(meta:editing-duration, 'S')">
+              <xsl:value-of
+                select="substring-before(substring-after(meta:editing-duration, 'T'), 'S')"/>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:if test="number($hours) and number($minutes) and number($seconds)">
+          <TotalTime>
+            <xsl:choose>
+              <xsl:when test="number($seconds) &gt; 30">
+                <xsl:value-of select="60 * number($hours) + number($minutes) + 1"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="60 * number($hours) + number($minutes)"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </TotalTime>
+        </xsl:if>
       </xsl:if>
       <ScaleCrop>false</ScaleCrop>
       <LinksUpToDate>false</LinksUpToDate>
