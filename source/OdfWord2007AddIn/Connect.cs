@@ -153,6 +153,11 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 		{
 		}
 
+        /// <summary>
+        /// Get custom UI
+        /// </summary>
+        /// <param name="RibbonID">the ribbon identifier</param>
+        /// <returns>string ui</returns>
 		string IRibbonExtensibility.GetCustomUI(string RibbonID)
 		{
             using (System.IO.TextReader tr = new System.IO.StreamReader(GetCustomUI())) {
@@ -160,6 +165,10 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
             }
 		}
 
+        /// <summary>
+        /// Read an ODF file
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
         public void ImportODF(IRibbonControl control)
         {
 
@@ -201,6 +210,10 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
             }
 		}
 
+        /// <summary>
+        /// Save as ODF.
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
 		public void ExportODF(IRibbonControl control)
 		{
             
@@ -270,16 +283,31 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
             }
 		}
 
+        /// <summary>
+        /// Get an image
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
+        /// <returns>IPictureDisp object</returns>
 		public stdole.IPictureDisp GetImage(IRibbonControl control)
 		{
             return this.addinLib.GetLogo();
 		}
 
+        /// <summary>
+        /// Get a label
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
+        /// <returns>label as a string</returns>
 		public string getLabel(IRibbonControl control)
 		{
             return this.addinLib.GetString(control.Id + "Label");
 		}
 
+        /// <summary>
+        /// Get description
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
+        /// <returns>Description as a string</returns>
 		public string getDescription(IRibbonControl control)
 		{
             return this.addinLib.GetString(control.Id + "Description");
