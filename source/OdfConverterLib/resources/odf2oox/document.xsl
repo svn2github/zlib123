@@ -446,7 +446,10 @@
       <!--text body link-->
       <xsl:otherwise>
         <w:hyperlink r:id="{generate-id()}" w:history="1">
-          <!-- warn loss of visited style -->
+          <!-- warn loss of hyperlink properties -->
+          <xsl:if test="@office:name">
+            <xsl:message terminate="no">feedback:Name of hyperlink</xsl:message>
+          </xsl:if>
           <xsl:if test="@text:visited-style-name">
             <xsl:message terminate="no">feedback:Style of visited link</xsl:message>
           </xsl:if>

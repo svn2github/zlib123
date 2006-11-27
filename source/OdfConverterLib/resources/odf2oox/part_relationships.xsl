@@ -239,7 +239,10 @@
         <xsl:attribute name="Target">
           <!-- having Target empty makes Word Beta 2007 crash -->
           <xsl:choose>
-            <xsl:when test="string-length(@xlink:href) &gt; 0">
+              <xsl:when test="contains(@xlink:href, './')">
+                <xsl:value-of select="substring-after(@xlink:href, '../')"/>
+              </xsl:when>
+              <xsl:when test="string-length(@xlink:href) &gt; 0">
               <xsl:value-of select="@xlink:href"/>
             </xsl:when>
             <xsl:otherwise>/</xsl:otherwise>
