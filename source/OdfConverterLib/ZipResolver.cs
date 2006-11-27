@@ -29,6 +29,8 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Reflection;
+using System.Text;
 using System.Xml;
 using CleverAge.OdfConverter.OdfZipUtils;
 
@@ -95,20 +97,31 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		
 		public override object GetEntity(Uri absoluteUri, string role, Type ofObjectToReturn)
 		{
-			Stream stream = null;
+			try {
+				
+				Stream stream = null;
+				
+				if (entries.Contains(absoluteUri.AbsoluteUri))
+				{
+					stream = archive.GetEntry((string) entries[absoluteUri.AbsoluteUri]);
+				}
+				
+				if (stream == null)
+				{
+					stream = new MemoryStream();
+				}
+				return stream;
+				
+			} 
 			
-			if (entries.Contains(absoluteUri.AbsoluteUri))
-			{
-			    stream = archive.GetEntry((string) entries[absoluteUri.AbsoluteUri]);
+			catch (Exception) {
+				return new ResourceResolver(Assembly.GetExecutingAssembly(), 
+				                            this.GetType().Namespace +
+				                            ".resources.odf2oox").GetInnerStream("source.xml");
 			}
-			
-			if (stream == null)
-			{
-                stream = new MemoryStream();
-			}
-			return stream;
 		}
 		
+		private const string PROLOG = "<?xml version='1.0' encoding='UTF-8'?><dummy/>";
 		
 		
 	}
