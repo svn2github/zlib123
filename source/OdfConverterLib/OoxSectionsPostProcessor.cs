@@ -493,6 +493,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 					this.name = page.GetAttributeValue("next-style", CA_SECTIONS_NS);
 				}
 				
+				if (!this.nextIsPageBreak || !this.skip)
+				{
+					this.startPageNumber = null;
+				}
+				
 				this.nextIsContinuous = (this.nextIsNewSection || this.nextIsEndSection);
 				this.nextIsPageBreak = false;
 				this.nextIsNewSection = false;
@@ -500,7 +505,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 				this.nextIsMasterPage = false;
 				this.skip = false;
 				this.odfSectPr = null;
-				this.startPageNumber = null;
 			}
 			
 			
