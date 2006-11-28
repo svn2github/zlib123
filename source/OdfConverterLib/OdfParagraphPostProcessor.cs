@@ -48,29 +48,27 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.context.Push("root");    
 		}
 
-        
-
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
         	Element currentElement = new Element(prefix,localName,ns);
-        	//if element is not paragraph
-        	if(!localName.Equals("p"))
+        	//if element is in paragraph, than we push it into context stack
+        	
+        	if(IsInParagraph())
         	{
-        		//if element is in paragraph we push it into context stack
-        		if(IsInParagraph())
+				this.context.Push(currentElement);
+        	}
+        	else
+        	{
+        		//if it's a paragraph element, than we start pushing nodes into context stack instead of writing them
+        		if(localName.Equals("p"))
         		{
+					this.currentParagraphNode.Push(currentElement);
         			this.context.Push(currentElement);
         		}
         		else
         		{
-        			this.nextWriter.WriteStartElement(prefix,localName,ns);
+					this.nextWriter.WriteStartElement(prefix,localName,ns);
         		}
-        	}
-        	//if element is paragraph we push it into both stacks: context and currentParagraphNode
-        	else
-        	{
-        	this.currentParagraphNode.Push(currentElement);
-        	this.context.Push(currentElement);
         	}
         }
         public override void WriteStartAttribute(string prefix, string localName, string ns)
@@ -133,8 +131,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         	if(IsInParagraph())
         	{
         		Element element = (Element)this.context.Peek();
-        		//if it's the end of paragraph,
-        		if(element.Name.Equals("p"))
+        		this.context.Pop();
+        		object rootElement = this.context.Peek();
+        		this.context.Push(element);
+        		//if it's the end of a main paragraph we write elements from context stack using WriteParagraph method
+        		if(element.Name.Equals("p") && IsRoot(rootElement))
         		{
         			// a new child element, which contains all the text in paragraph is created
         			Element paragraphTextElement = new Element("text","paragraph",element.Ns);
@@ -197,6 +198,21 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         		return false;
         	}
         }
+        //method tocheck if element is root(if yes then we are ending paragraph)
+        private bool IsRoot(object element)
+        {
+        	if(element is string)
+        	{
+        		string text = (string)element;
+        		if("root".Equals(text))
+        		{
+        		   	return true;
+        		}
+        		return false;
+        	}
+        	return false;
+        }
+        
         private void WriteParagraph(Element element)
         {
         	Element textParagraphElement = element.GetChild("paragraph",element.Ns);
