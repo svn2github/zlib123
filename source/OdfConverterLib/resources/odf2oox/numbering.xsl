@@ -43,30 +43,14 @@
   <xsl:key name="list-style" match="text:list-style" use="@style:name"/>
   <xsl:key name="list-content" match="text:list" use="@text:style-name"/>
   <xsl:key name="bullets" match="text:list-level-style-image" use="''"/>
-  <xsl:key name="outlined-styles"
-    match="style:style[@style:default-outline-level and @style:list-style-name]" use="''"/>
+  <xsl:key name="outlined-styles" match="style:style[@style:default-outline-level]" use="''"/>
+  <xsl:key name="list-styles" match="office:styles/style:style[@style:list-style-name]"
+    use="@style:name"/>
 
   <xsl:variable name="automaticListStylesCount"
     select="count(document('content.xml')/office:document-content/office:automatic-styles/text:list-style)"/>
   <xsl:variable name="stylesListStyleCount"
     select="count(document('styles.xml')/office:document-styles/office:styles/text:list-style|document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style)"/>
-  <xsl:variable name="chapterListCount">
-    <!-- if there is a list for chapter defined, 1. Else 0 -->
-    <!-- look in content.xml or styles.xml -->
-    <xsl:for-each select="document('content.xml')">
-      <xsl:choose>
-        <xsl:when test="key('outlined-styles','')">1</xsl:when>
-        <xsl:otherwise>
-          <xsl:for-each select="document('styles.xml')">
-            <xsl:choose>
-              <xsl:when test="key('outlined-styles','')">1</xsl:when>
-              <xsl:otherwise>0</xsl:otherwise>
-            </xsl:choose>
-          </xsl:for-each>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:for-each>
-  </xsl:variable>
 
   <!--generate numbering definitions: abstract numbering w:abstractNumbering and numbering instances w:num -->
   <xsl:template name="numbering">
@@ -93,10 +77,6 @@
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:outline-style"
         mode="numbering"/>
-      <!-- list for chapter numbering -->
-      <xsl:if test="$chapterListCount = 1">
-        <xsl:call-template name="BuildChapterList"/>
-      </xsl:if>
       <!-- other lists -->
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style"
@@ -104,43 +84,40 @@
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:list-style"
         mode="numbering">
-        <xsl:with-param name="offset" select="$automaticListStylesCount + $chapterListCount"/>
+        <xsl:with-param name="offset" select="$automaticListStylesCount "/>
       </xsl:apply-templates>
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style"
         mode="numbering">
-        <xsl:with-param name="offset" select="$automaticListStylesCount + $chapterListCount"/>
+        <xsl:with-param name="offset" select="$automaticListStylesCount "/>
       </xsl:apply-templates>
       <xsl:for-each select="document('content.xml')">
         <xsl:apply-templates select="key('restarting-lists','')" mode="numbering">
-          <xsl:with-param name="offset"
-            select="$automaticListStylesCount + $stylesListStyleCount + $chapterListCount"/>
+          <xsl:with-param name="offset" select="$automaticListStylesCount + $stylesListStyleCount "
+          />
         </xsl:apply-templates>
       </xsl:for-each>
 
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:outline-style"
         mode="num"/>
-      <xsl:if test="$chapterListCount = 1">
-        <xsl:call-template name="BuildChapterListNum"/>
-      </xsl:if>
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles/text:list-style"
         mode="num"/>
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/text:list-style"
         mode="num">
-        <xsl:with-param name="offset" select="$automaticListStylesCount + $chapterListCount"/>
+        <xsl:with-param name="offset" select="$automaticListStylesCount "/>
       </xsl:apply-templates>
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:automatic-styles/text:list-style"
         mode="num">
-        <xsl:with-param name="offset" select="$automaticListStylesCount + $chapterListCount"/>
+        <xsl:with-param name="offset" select="$automaticListStylesCount "/>
       </xsl:apply-templates>
       <xsl:for-each select="document('content.xml')">
         <xsl:apply-templates select="key('restarting-lists','')" mode="num">
-          <xsl:with-param name="offset"
-            select="$automaticListStylesCount + $stylesListStyleCount + $chapterListCount"/>
+          <xsl:with-param name="offset" select="$automaticListStylesCount + $stylesListStyleCount "
+          />
         </xsl:apply-templates>
       </xsl:for-each>
     </w:numbering>
@@ -716,24 +693,25 @@
   <!-- insert ten levels of list, even those not defined in original doc, in order to change default parameters -->
   <xsl:template name="InsertLevels">
     <xsl:param name="level" select="0"/>
-    <xsl:param name="buildOutline" select="'true'"/>
 
     <xsl:if test="$level &lt; 9">
       <xsl:choose>
         <xsl:when test="text:outline-level-style/@text:level = $level+1">
-          <xsl:for-each select="text:outline-level-style[@text:level = $level+1]">
-            <w:lvl w:ilvl="{number(@text:level)-1}">
-              <!--numbered list properties: num start, level, num type-->
-              <xsl:call-template name="InsertNumberedListProperties"/>
-              <!--justification-->
-              <w:lvlJc w:val="left"/>
-              <!--  list paragraph properties: indent -->
-              <w:pPr>
-                <xsl:call-template name="InsertListParagraphProperties"/>
-              </w:pPr>
-              <xsl:call-template name="InsertRunProperties"/>
-            </w:lvl>
-          </xsl:for-each>
+          <xsl:variable name="levelStyleName">
+            <xsl:call-template name="GetLevelStyleName">
+              <xsl:with-param name="level" select="$level"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="listStyleName">
+            <xsl:call-template name="GetListStyleName">
+              <xsl:with-param name="level" select="$level"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:call-template name="InsertOutlineListLevel">
+            <xsl:with-param name="level" select="$level"/>
+            <xsl:with-param name="levelStyleName" select="$levelStyleName"/>
+            <xsl:with-param name="listStyleName" select="$listStyleName"/>
+          </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
           <!-- insert level with no numbering defined -->
@@ -747,85 +725,66 @@
           </w:lvl>
         </xsl:otherwise>
       </xsl:choose>
-      <xsl:if test="$buildOutline = 'true'">
-        <xsl:call-template name="InsertLevels">
-          <xsl:with-param name="level" select="$level+1"/>
-        </xsl:call-template>
-      </xsl:if>
-    </xsl:if>
-  </xsl:template>
-
-  <!-- build a list for chapter numbering, called when ther is default outline level in a style -->
-  <xsl:template name="BuildChapterList">
-    <w:abstractNum w:abstractNumId="2">
-      <xsl:call-template name="InsertChapterListElements"/>
-    </w:abstractNum>
-  </xsl:template>
-
-  <xsl:template name="InsertChapterListElements">
-    <xsl:param name="level" select="0"/>
-    <xsl:if test="$level &lt; 9">
-      <!-- find list name associated to level -->
-      <xsl:variable name="listStyleName">
-        <xsl:call-template name="GetListStyleName">
-          <xsl:with-param name="level" select="$level"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <!-- insert element of given level -->
-      <xsl:choose>
-        <xsl:when test="$listStyleName != 'none'">
-          <xsl:for-each select="document('content.xml')">
-            <xsl:choose>
-              <xsl:when
-                test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]">
-                <xsl:apply-templates
-                  select="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]"
-                  mode="numbering">
-                  <xsl:with-param name="style">
-                    <xsl:call-template name="GetLevelStyleName">
-                      <xsl:with-param name="level" select="$level"/>
-                    </xsl:call-template>
-                  </xsl:with-param>
-                </xsl:apply-templates>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:for-each select="document('styles.xml')">
-                  <xsl:if
-                    test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]">
-                    <xsl:apply-templates
-                      select="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]"
-                      mode="numbering">
-                      <xsl:with-param name="style">
-                        <xsl:call-template name="GetLevelStyleName">
-                          <xsl:with-param name="level" select="$level"/>
-                        </xsl:call-template>
-                      </xsl:with-param>
-                    </xsl:apply-templates>
-                  </xsl:if>
-                </xsl:for-each>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:otherwise>
-          <!-- insert level with outline numbering (default) -->
-          <xsl:for-each
-            select="document('styles.xml')/office:document-styles/office:styles/text:outline-style">
-            <xsl:call-template name="InsertLevels">
-              <xsl:with-param name="level" select="$level"/>
-              <xsl:with-param name="buildOutline" select="'false'"/>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:otherwise>
-      </xsl:choose>
-      <!-- insert next level -->
-      <xsl:call-template name="InsertChapterListElements">
-        <xsl:with-param name="level" select="$level + 1"/>
+      <xsl:call-template name="InsertLevels">
+        <xsl:with-param name="level" select="$level+1"/>
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
 
-  <!-- find the style name associated to a chapter level -->
+  <xsl:template name="InsertOutlineListLevel">
+    <xsl:param name="level" select="0"/>
+    <xsl:param name="levelStyleName" select="'none'"/>
+    <xsl:param name="listStyleName" select="'none'"/>
+    <xsl:choose>
+      <xsl:when test="$listStyleName != 'none'">
+        <!-- insert level with list numbering -->
+        <xsl:for-each select="document('content.xml')">
+          <xsl:choose>
+            <xsl:when
+              test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]">
+              <xsl:apply-templates
+                select="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]"
+                mode="numbering">
+                <xsl:with-param name="style" select="$levelStyleName"/>
+              </xsl:apply-templates>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:for-each select="document('styles.xml')">
+                <xsl:if
+                  test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]">
+                  <xsl:apply-templates
+                    select="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]"
+                    mode="numbering">
+                    <xsl:with-param name="style" select="$levelStyleName"/>
+                  </xsl:apply-templates>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- insert level with outline numbering (default) -->
+        <xsl:for-each select="text:outline-level-style[@text:level = $level+1]">
+          <w:lvl w:ilvl="{number(@text:level)-1}">
+            <!--numbered list properties: num start, level, num type-->
+            <xsl:call-template name="InsertNumberedListProperties">
+              <xsl:with-param name="style" select="$levelStyleName"/>
+            </xsl:call-template>
+            <!--justification-->
+            <xsl:call-template name="InsertListJustification"/>
+            <!--  list paragraph properties: indent -->
+            <w:pPr>
+              <xsl:call-template name="InsertListParagraphProperties"/>
+            </w:pPr>
+            <xsl:call-template name="InsertRunProperties"/>
+          </w:lvl>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- find the style name associated to an outline level. Returns 'none' if no style corresponds to level. -->
   <xsl:template name="GetLevelStyleName">
     <xsl:param name="level"/>
     <xsl:for-each select="document('content.xml')">
@@ -853,7 +812,7 @@
     </xsl:for-each>
   </xsl:template>
 
-  <!-- find the list associated to a chapter level -->
+  <!-- find the list associated to a chapter level. Returns none if no list defined for current level. -->
   <xsl:template name="GetListStyleName">
     <xsl:param name="level"/>
     <xsl:for-each select="document('content.xml')">
@@ -879,12 +838,6 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
-  </xsl:template>
-
-  <xsl:template name="BuildChapterListNum">
-    <w:num w:numId="2">
-      <w:abstractNumId w:val="2"/>
-    </w:num>
   </xsl:template>
 
   <!-- Generate the format string for multiple levels -->
@@ -960,7 +913,6 @@
     </w:abstractNum>
   </xsl:template>
 
-
   <!-- numbering definition which references particular abstractNum and can be applied to a list paragraph -->
   <xsl:template match="text:list" mode="num">
     <xsl:param name="offset" select="0"/>
@@ -979,7 +931,7 @@
       <!-- first, if list is a restarting special overriding num-->
       <xsl:when test="parent::text:list/text:list-item/@text:start-value">
         <xsl:value-of
-          select="count(parent::text:list/preceding-sibling::text:list[text:list-item/@text:start-value])+2+$chapterListCount+$stylesListStyleCount + $automaticListStylesCount"
+          select="count(parent::text:list/preceding-sibling::text:list[text:list-item/@text:start-value])+2+$stylesListStyleCount + $automaticListStylesCount"
         />
       </xsl:when>
 
@@ -998,15 +950,14 @@
       <xsl:when
         test="key('list-style', $styleName) and not(ancestor::style:header) and not(ancestor::style:footer)">
         <xsl:value-of
-          select="count(key('list-style', $styleName)/preceding-sibling::text:list-style)+2+$chapterListCount"
-        />
+          select="count(key('list-style', $styleName)/preceding-sibling::text:list-style)+2"/>
       </xsl:when>
 
       <!-- otherwise, look into styles.xml (add the offset) -->
       <xsl:otherwise>
         <xsl:for-each select="document('styles.xml')">
           <xsl:value-of
-            select="count(key('list-style', $styleName)/preceding-sibling::text:list-style)+2+$chapterListCount+$automaticListStylesCount"
+            select="count(key('list-style', $styleName)/preceding-sibling::text:list-style)+2+$automaticListStylesCount"
           />
         </xsl:for-each>
       </xsl:otherwise>
@@ -1488,12 +1439,12 @@
 
     <xsl:choose>
       <xsl:when test="number($defaultOutlineLevel)">
-        <xsl:if test="$listStyleName != '' ">
-          <w:numPr>
-            <w:ilvl w:val="{$defaultOutlineLevel - 1}"/>
-            <w:numId w:val="2"/>
-          </w:numPr>
-        </xsl:if>
+        <!-- WARNING : this is not supposed to exist. It is due to a Word bug (cf bug #1604472) -->
+        <w:numPr>
+          <w:ilvl w:val="{number($defaultOutlineLevel) - 1}"/>
+          <w:numId w:val="1"/>
+        </w:numPr>
+        <!-- /WARNING -->
       </xsl:when>
       <xsl:otherwise>
         <xsl:if

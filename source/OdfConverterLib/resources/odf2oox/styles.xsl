@@ -431,20 +431,11 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- insert a reference to list 1 -->
   <xsl:template name="InsertOutlineNumPr">
     <!-- numbering properties -->
     <w:numPr>
-      <w:ilvl w:val="{number(@style:default-outline-level) - 1}"/>
-      <xsl:choose>
-        <xsl:when test="@style:list-style-name">
-          <!-- chapter numbering defined -->
-          <w:numId w:val="2"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <!-- default numbering -->
-          <w:numId w:val="1"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <w:numId w:val="1"/>
     </w:numPr>
   </xsl:template>
 
