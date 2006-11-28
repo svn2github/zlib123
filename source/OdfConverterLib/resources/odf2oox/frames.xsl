@@ -1719,7 +1719,6 @@
   <!-- compute margin when rotation -->
   <xsl:template name="ComputeMarginXWithRotation">
     <xsl:param name="angle"/>
-    <xsl:param name="anchor"/>
 
     <!-- particular transformation -->
     <xsl:variable name="translationX">
@@ -1727,15 +1726,6 @@
         <xsl:with-param name="length">
           <xsl:value-of
             select="substring-before(substring-after(substring-after(ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@draw:transform,'translate'),'('),' ')"
-          />
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="translationY">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length">
-          <xsl:value-of
-            select="substring-before(substring-after(substring-after(substring-after(ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@draw:transform,'translate'),'('),' '),')')"
           />
         </xsl:with-param>
       </xsl:call-template>
@@ -1755,13 +1745,23 @@
         />
       </xsl:call-template>
     </xsl:variable>
+    <!-- value used by Word to calculate frame position -->
+    <xsl:variable name="frameOffset">
+      <xsl:value-of select="round(($frameWidth - $frameHeight) div 2)"/>
+    </xsl:variable>
     <!-- special distance with rotation -->
     <xsl:choose>
+      <xsl:when test="$angle = 90">
+        <xsl:value-of select="$translationX - $frameHeight - $frameOffset"/>
+      </xsl:when>
+      <xsl:when test="$angle = -90">
+        <xsl:value-of select="$translationX - $frameOffset"/>
+      </xsl:when>
       <xsl:when test="$angle &gt; 0">
-        <xsl:value-of select="$translationX"/>
+        <xsl:value-of select="$translationX - $frameHeight - $frameOffset"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$translationX - $frameHeight"/>
+        <xsl:value-of select="$translationX - $frameOffset"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1966,18 +1966,8 @@
   <!-- compute margin when rotation -->
   <xsl:template name="ComputeMarginYWithRotation">
     <xsl:param name="angle"/>
-    <xsl:param name="anchor"/>
 
     <!-- particular transformation -->
-    <xsl:variable name="translationX">
-      <xsl:call-template name="point-measure">
-        <xsl:with-param name="length">
-          <xsl:value-of
-            select="substring-before(substring-after(substring-after(ancestor-or-self::node()[contains(name(), 'draw:') and @draw:transform][1]/@draw:transform,'translate'),'('),' ')"
-          />
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
     <xsl:variable name="translationY">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length">
@@ -2002,13 +1992,23 @@
         />
       </xsl:call-template>
     </xsl:variable>
+    <!-- value used by Word to calculate frame position -->
+    <xsl:variable name="frameOffset">
+      <xsl:value-of select="round(($frameWidth - $frameHeight) div 2)"/>
+    </xsl:variable>
     <!-- special distance with rotation -->
     <xsl:choose>
+      <xsl:when test="$angle = 90">
+        <xsl:value-of select="$translationY + $frameOffset"/>
+      </xsl:when>
+      <xsl:when test="$angle = -90">
+        <xsl:value-of select="$translationY - $frameWidth + $frameOffset"/>
+      </xsl:when>
       <xsl:when test="$angle &gt; 0">
-        <xsl:value-of select="$translationY"/>
+        <xsl:value-of select="$translationY + $frameOffset"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$translationY - $frameWidth"/>
+        <xsl:value-of select="$translationY - $frameWidth + $frameOffset"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -2490,7 +2490,6 @@
                 <!-- if rotation, revert X and Y -->
                 <xsl:when test="$rotation != '' ">
                   <xsl:call-template name="ComputeMarginXWithRotation">
-                    <xsl:with-param name="anchor" select="$anchor"/>
                     <xsl:with-param name="angle" select="$rotation"/>
                   </xsl:call-template>
                 </xsl:when>
@@ -2545,7 +2544,6 @@
                 <!-- if rotation, revert X and Y -->
                 <xsl:when test="$rotation != '' ">
                   <xsl:call-template name="ComputeMarginYWithRotation">
-                    <xsl:with-param name="anchor" select="$anchor"/>
                     <xsl:with-param name="angle" select="$rotation"/>
                   </xsl:call-template>
                 </xsl:when>
