@@ -38,6 +38,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   exclude-result-prefixes="w r draw number">
   
+  <xsl:import href="footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
   
   <xsl:template name="styles">
@@ -49,6 +50,7 @@
       <office:styles>
         <!-- document styles -->
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
+        <xsl:call-template name="InsertNotesConfiguration"/>
       </office:styles>
       <!-- automatic styles -->
       <office:automatic-styles>
@@ -573,8 +575,11 @@
   <!-- create styles -->
   <xsl:template match="w:style">
     <xsl:message terminate="no">progress:w:style</xsl:message>
+    <xsl:variable name="currentStyleId">
+      <xsl:value-of select="self::node()/@w:styleId"/>
+    </xsl:variable>
     <xsl:choose>
-      <xsl:when test="self::node()/@w:default and not(@w:styleId='Normal')">
+      <xsl:when test="self::node()/@w:default and not($currentStyleId='Normal')">
         <xsl:if test="@w:type='table'">
           <style:default-style style:family="table">
             <xsl:call-template name="InsertTableProperties"/>
@@ -582,10 +587,31 @@
         </xsl:if>
         <!--@TODO style:family: graphic, text etc-->
       </xsl:when>
+      
+      <!-- do not add anchor and symbol styles if there are there allready-->
+      <xsl:when test="(($currentStyleId='FootnoteReference' or $currentStyleId='EndnoteReference') and document('word/styles.xml')/descendant::w:style[@w:styleId = concat(substring-before($currentStyleId,'Reference'),'_20_anchor')]) or (($currentStyleId='FootnoteText' or $currentStyleId='EndnoteText') and document('word/styles.xml')/descendant::w:style[@w:styleId = concat(substring-before($currentStyleId,'Text'),'_20_Symbol')])"></xsl:when>
+      
       <xsl:otherwise>
-        <style:style style:name="{self::node()/@w:styleId}"
-          style:display-name="{self::node()/w:name/@w:val}">
-
+        <style:style>
+          <xsl:attribute name="style:name">
+            <xsl:choose>
+              <!-- change reference style to anchor style -->
+            <xsl:when test="$currentStyleId='FootnoteReference' or $currentStyleId='EndnoteReference'">
+              <xsl:value-of select="concat(substring-before($currentStyleId,'Reference'),'_20_anchor')"/>
+            </xsl:when>
+              <!--change Text style to Symbol style -->
+              <xsl:when test="$currentStyleId='FootnoteText' or $currentStyleId='EndnoteText'">
+                <xsl:value-of select="concat(substring-before($currentStyleId,'Text'),'_20_Symbol')"/>
+              </xsl:when>
+  
+              <xsl:otherwise>
+                <xsl:value-of select="$currentStyleId"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <xsl:attribute name="style:display-name">
+            <xsl:value-of select="self::node()/w:name/@w:val"/>
+          </xsl:attribute>
           <xsl:attribute name="style:family">
             <xsl:choose>
               <xsl:when test="self::node()/@w:type = 'character' ">

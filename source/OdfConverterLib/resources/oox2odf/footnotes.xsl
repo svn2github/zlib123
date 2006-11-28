@@ -29,7 +29,7 @@
                 <xsl:choose>
                   <xsl:when test="$textFootnote!=''">
                     <xsl:attribute name="text:label"><xsl:value-of select="concat($textFootnote, ' ')"/></xsl:attribute>
-                    <xsl:value-of select="concat('$textFootnote', ' ')"/>             
+                    <xsl:value-of select="concat($textFootnote, ' ')"/>             
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:attribute name="text:label">                  
@@ -89,6 +89,40 @@
         </text:note>
       </text:span>
     </xsl:for-each>
+  </xsl:template>
+  
+  <!-- Insert text:notes-configuration element -->
+  
+  <xsl:template name="InsertNotesConfiguration">
+    <xsl:if test="document('word/document.xml')/descendant::w:footnoteReference">
+      <xsl:call-template name="InsertNotesConfigurationContent">
+        <xsl:with-param name="noteType">footnote</xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    <xsl:if test="document('word/document.xml')/descendant::w:endnoteReference">
+      <xsl:call-template name="InsertNotesConfigurationContent">
+        <xsl:with-param name="noteType">endnote</xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- Insert text-notes-configuration element content -->
+  
+  <xsl:template name="InsertNotesConfigurationContent">
+    <xsl:param name="noteType"/>
+    <text:notes-configuration text:note-class="{$noteType}">
+      <xsl:choose>
+        <xsl:when test="$noteType='footnote' ">
+      <xsl:attribute name="text:citation-style-name">Footnote_20_Symbol</xsl:attribute>
+      <xsl:attribute name="text:citation-body-style-name">Footnote_20_anchor</xsl:attribute>
+          <xsl:attribute name="text:start-numbering-at">document</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$noteType='endnote' ">
+          <xsl:attribute name="text:citation-style-name">Endnote_20_Symbol</xsl:attribute>
+          <xsl:attribute name="text:citation-body-style-name">Endnote_20_anchor</xsl:attribute>  
+        </xsl:when>
+      </xsl:choose>
+    </text:notes-configuration>
   </xsl:template>
   
 </xsl:stylesheet>
