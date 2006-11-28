@@ -83,6 +83,7 @@
     <EmbeddedResource Include="resources\oox2odf\fields.xsl" />
     <EmbeddedResource Include="resources\oox2odf\footnotes.xsl" />
     <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\frames.xsl" />
     <Compile Include="OoxParagraphsPostProcessor.cs" />
     <Compile Include="OdfParagraphPostProcessor.cs" />
   </ItemGroup>

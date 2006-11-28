@@ -218,4 +218,36 @@
      </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="GetValue">
+    <xsl:param name="length"/>
+    <xsl:choose>
+      <xsl:when test="contains($length, 'cm')">
+        <xsl:value-of select="substring-before($length,'cm')"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'mm')">
+        <xsl:value-of select="substring-before($length,'mm')"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'in')">
+        <xsl:value-of select="substring-before($length,'in')"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'pt')">
+        <xsl:value-of select="substring-before($length,'pt')"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'twip')">
+        <xsl:value-of select="substring-before($length,'twip')"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'pica')">
+        <xsl:value-of select="substring-before($length,'pica')"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'dpt')">
+        <xsl:value-of select="substring-before($length,'dpt')"/>
+      </xsl:when>
+      <xsl:when test="contains($length, 'px')">
+        <xsl:value-of select="substring-before($length,'px')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$length"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>

@@ -44,6 +44,7 @@
   <xsl:import href="fonts.xsl"/>
   <xsl:import href="fields.xsl"/>
   <xsl:import href="footnotes.xsl"/>
+  <xsl:import href="frames.xsl"/>
 
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="w:p"/>
@@ -427,7 +428,7 @@
   <xsl:template match="w:p" mode="paragraph">
     <xsl:choose>
       <!--avoid nested paragaraphs-->
-      <xsl:when test="ancestor::w:p">
+      <xsl:when test="parent::w:p">
         <xsl:apply-templates select="child::node()"/>
       </xsl:when>
       <!--default scenario-->
