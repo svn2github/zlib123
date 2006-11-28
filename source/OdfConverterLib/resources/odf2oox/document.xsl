@@ -241,14 +241,45 @@
   <!-- Inserts the style of a paragraph -->
   <xsl:template name="InsertParagraphStyle">
     <xsl:param name="styleName"/>
-    <xsl:variable name="prefixedStyleName">
-      <xsl:call-template name="GetPrefixedStyleName">
-        <xsl:with-param name="styleName" select="$styleName"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:if test="$prefixedStyleName != ''">
-      <w:pStyle w:val="{$prefixedStyleName}"/>
-    </xsl:if>
+
+    <xsl:choose>
+      <xsl:when test="ancestor::text:table-of-content and not (ancestor::text:index-title)">
+        <xsl:choose>
+          <xsl:when test="key('automatic-styles', $styleName)/@style:parent-style-name">
+            <xsl:variable name="level">
+              <xsl:value-of
+                select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = key('automatic-styles', $styleName)/@style:parent-style-name]/@text:outline-level "
+              />
+            </xsl:variable>
+            <xsl:if test="number($level)">
+              <w:pStyle w:val="{concat('TOC', $level)}"/>
+            </xsl:if>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="key('styles', $styleName)">
+              <xsl:variable name="level">
+                <xsl:value-of
+                  select="ancestor::text:table-of-content/*/text:table-of-content-entry-template[@text:style-name = $styleName]/@text:outline-level "
+                />
+              </xsl:variable>
+              <xsl:if test="number($level)">
+                <w:pStyle w:val="{concat('TOC', $level)}"/>
+              </xsl:if>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="prefixedStyleName">
+          <xsl:call-template name="GetPrefixedStyleName">
+            <xsl:with-param name="styleName" select="$styleName"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$prefixedStyleName != ''">
+          <w:pStyle w:val="{$prefixedStyleName}"/>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 
@@ -822,48 +853,46 @@
     <xsl:param name="styleName"/>
     <xsl:param name="context" select="'content.xml'"/>
 
-      <xsl:variable name="exists">
+    <xsl:variable name="exists">
+      <xsl:for-each select="document($context)">
+        <xsl:value-of select="boolean(key('styles', $styleName))"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$exists = 'true' ">
         <xsl:for-each select="document($context)">
-          <xsl:value-of select="boolean(key('styles', $styleName))"/>
+          <xsl:choose>
+            <xsl:when test="key('styles', $styleName)[1]/style:paragraph-properties/style:drop-cap">
+              <xsl:call-template name="InsertDropCapAttributes">
+                <xsl:with-param name="dropcap"
+                  select="key('styles', $styleName)[1]/style:paragraph-properties/style:drop-cap"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="key('styles', $styleName)[1]/@style:parent-style-name">
+              <xsl:call-template name="InsertDropCap">
+                <xsl:with-param name="styleName"
+                  select="key('styles', $styleName)[1]/@style:parent-style-name"/>
+                <xsl:with-param name="context" select="$context"/>
+              </xsl:call-template>
+            </xsl:when>
+          </xsl:choose>
         </xsl:for-each>
-      </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="$exists = 'true' ">
-          <xsl:for-each select="document($context)">
-            <xsl:choose>
-              <xsl:when
-                test="key('styles', $styleName)[1]/style:paragraph-properties/style:drop-cap">
-                <xsl:call-template name="InsertDropCapAttributes">
-                  <xsl:with-param name="dropcap"
-                    select="key('styles', $styleName)[1]/style:paragraph-properties/style:drop-cap"
-                  />
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:when test="key('styles', $styleName)[1]/@style:parent-style-name">
-                <xsl:call-template name="InsertDropCap">
-                  <xsl:with-param name="styleName"
-                    select="key('styles', $styleName)[1]/@style:parent-style-name"/>
-                  <xsl:with-param name="context" select="$context"/>
-                </xsl:call-template>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:when test="$context != 'styles.xml'">
-          <xsl:call-template name="InsertDropCap">
-            <xsl:with-param name="styleName" select="$styleName"/>
-            <xsl:with-param name="context" select="'styles.xml'"/>
-          </xsl:call-template>
-        </xsl:when>
-      </xsl:choose>
-    
+      </xsl:when>
+      <xsl:when test="$context != 'styles.xml'">
+        <xsl:call-template name="InsertDropCap">
+          <xsl:with-param name="styleName" select="$styleName"/>
+          <xsl:with-param name="context" select="'styles.xml'"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+
   </xsl:template>
 
 
 
   <xsl:template name="InsertDropCapAttributes">
     <xsl:param name="dropcap"/>
-    
+
     <xsl:message terminate="no">feedback:Dropcap size</xsl:message>
     <xsl:if test="$dropcap/@style:lines">
       <xsl:attribute name="dropcap:lines" namespace="urn:cleverage:xmlns:post-processings:dropcap">

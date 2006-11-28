@@ -279,6 +279,9 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                 object missing = Type.Missing;
                 Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing);
 
+                // update document fields
+                doc.Fields.Update();
+
                 // and activate it
                 doc.Activate();
 

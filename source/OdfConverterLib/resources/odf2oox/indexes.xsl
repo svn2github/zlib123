@@ -49,6 +49,7 @@
 
   <xsl:key name="toc" match="text:table-of-content" use="''"/>
   <xsl:key name="indexes" match="text:illustration-index | text:table-index" use="''"/>
+  <xsl:key name="index-styles" match="text:table-of-content-source/*" use="@text:style-name"/>
 
   <!-- Inserts item for all types of index  -->
   <xsl:template name="InsertIndexItem">
@@ -203,7 +204,7 @@
 
       <!--include index marks-->
       <xsl:if test="not($tocSource[@text:use-index-marks = 'false'])">
-        <xsl:text>\u  </xsl:text>
+        <xsl:text> \u </xsl:text>
       </xsl:if>
 
       <!--use hyperlinks -->
@@ -212,18 +213,67 @@
       </xsl:if>
 
       <!-- include elements with additional styles-->
-      <xsl:if test="$tocSource/text:index-source-styles">
+      <xsl:if
+        test="$tocSource/text:index-source-styles or $tocSource/text:table-of-content-entry-template">
         <xsl:text> \t "</xsl:text>
-        <xsl:for-each select="$tocSource/text:index-source-styles">
-          <xsl:variable name="additionalStyleName"
-            select="./text:index-source-style/@text:style-name"/>
-          <xsl:value-of select="$additionalStyleName"/>
-          <xsl:text>; </xsl:text>
-          <xsl:value-of select="@text:outline-level"/>
-          <xsl:text>"</xsl:text>
-        </xsl:for-each>
+        <xsl:call-template name="InsertTOCLevelStyle">
+          <xsl:with-param name="tocSource" select="$tocSource"/>
+        </xsl:call-template>
+        <xsl:text>"</xsl:text>
       </xsl:if>
     </w:instrText>
+  </xsl:template>
+
+
+  <xsl:template name="InsertTOCLevelStyle">
+    <xsl:param name="level" select="1"/>
+    <xsl:param name="tocSource"/>
+
+    <xsl:if test="$level &lt; 10">
+      <xsl:variable name="levelStyleName">
+        <xsl:choose>
+          <xsl:when
+            test="$tocSource/text:index-source-styles[@text:outline-level = $level]/@text:style-name">
+            <xsl:value-of
+              select="$tocSource/text:index-source-styles[@text:outline-level = $level]/@text:style-name"
+            />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if
+              test="$tocSource/text:table-of-content-entry-template[@text:outline-level = $level]/@text:style-name">
+              <xsl:value-of
+                select="$tocSource/text:table-of-content-entry-template[@text:outline-level = $level]/@text:style-name"
+              />
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:for-each select="key('styles', $levelStyleName)">
+          <xsl:choose>
+            <xsl:when test="@style:display-name">
+              <xsl:value-of select="@style:display-name"/>
+              <xsl:text>;</xsl:text>
+              <xsl:value-of select="$level"/>
+              <xsl:text>;</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="@style:name">
+                <xsl:value-of select="@style:name"/>
+                <xsl:text>;</xsl:text>
+                <xsl:value-of select="$level"/>
+                <xsl:text>;</xsl:text>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:for-each>
+      <!-- insert next level -->
+      <xsl:call-template name="InsertTOCLevelStyle">
+        <xsl:with-param name="level" select="$level + 1"/>
+        <xsl:with-param name="tocSource" select="$tocSource"/>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
 
 
@@ -388,6 +438,43 @@
         </w:t>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+
+  <!-- styles for indexes. They require a particular syntax -->
+  <xsl:template name="InsertIndexStyles">
+    <xsl:for-each select="document('content.xml')">
+      <xsl:for-each select="key('toc', '')">
+        <xsl:call-template name="InsertIndexLevelStyle"/>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+
+  <!-- there can be only one style for the whole document (all TOCs) -->
+  <xsl:template name="InsertIndexLevelStyle">
+    <xsl:param name="level" select="1"/>
+
+    <xsl:if test="$level &lt; 10">
+      <xsl:variable name="levelStyleName">
+        <xsl:value-of
+          select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]/@text:style-name"
+        />
+      </xsl:variable>
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:for-each select="key('styles', $levelStyleName)">
+          <w:style w:styleId="{concat('TOC', $level)}" w:type="paragraph">
+            <w:name w:val="{concat('toc ', $level)}"/>
+            <w:basedOn w:val="{$levelStyleName}"/>
+            <w:autoRedefine/>
+            <w:semiHidden/>
+          </w:style>
+        </xsl:for-each>
+      </xsl:for-each>
+      <!-- insert next level -->
+      <xsl:call-template name="InsertIndexLevelStyle">
+        <xsl:with-param name="level" select="$level + 1"/>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
 
 

@@ -75,6 +75,8 @@
         select="document('styles.xml')/office:document-styles/office:automatic-styles" mode="styles"/>
       <!-- styles to ensure that hyperlinks will be matched and followed. -->
       <xsl:call-template name="InsertHyperlinkStyles"/>
+      <!-- styles to ensure that indexes keep the same style when updated -->
+      <xsl:call-template name="InsertIndexStyles"/>
       <!-- warn if more than one master page style -->
       <xsl:if
         test="count(document('styles.xml')/office:document-styles/office:master-styles/style:master-page) &gt; 1">
