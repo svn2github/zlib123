@@ -51,7 +51,8 @@
   <xsl:key name="automatic-styles" match="office:automatic-styles/style:style" use="@style:name"/>
   <xsl:key name="hyperlinks" match="text:a" use="''"/>
   <xsl:key name="headers" match="text:h" use="''"/>
-  <xsl:key name="restarting-lists" match="text:list[text:list-item/@text:start-value and @text:style-name]" use="''"/>
+  <xsl:key name="restarting-lists"
+    match="text:list[text:list-item/@text:start-value and @text:style-name]" use="''"/>
 
 
   <!-- key to find hyperlinks with a particular style. -->
@@ -888,7 +889,35 @@
 
   </xsl:template>
 
-
+  <!-- warn loss of index-scope = 'chapter' -->
+  <xsl:template
+    match="text:table-of-content|text:illustration-index|text:table-index|text:object-index|text:user-index|text:alphabetical-index|text:bibliography">
+    <xsl:variable name="indexName">
+      <xsl:choose>
+        <xsl:when test="contains(name(), '-index')">
+          <xsl:value-of select="substring-after(substring-before(name(), '-index'), 'text:')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-after(name(), 'text:')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="*/@text:index-scope = 'chapter' ">
+      <xsl:message terminate="no">
+        <xsl:text>feedback:Index '</xsl:text>
+        <xsl:value-of select="$indexName"/>
+        <xsl:text>' chapter scope</xsl:text>
+      </xsl:message>
+    </xsl:if>
+    <!-- report loss of toc protection -->
+    <xsl:if test="@text:protected = 'true' ">
+      <xsl:message terminate="no">
+        <xsl:text>feedback:Index '</xsl:text>
+        <xsl:value-of select="$indexName"/>
+        <xsl:text>' protection</xsl:text>
+      </xsl:message>
+    </xsl:if>
+  </xsl:template>
 
   <xsl:template name="InsertDropCapAttributes">
     <xsl:param name="dropcap"/>

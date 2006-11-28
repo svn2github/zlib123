@@ -60,11 +60,6 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <!-- report loss of toc protection -->
-    <xsl:if test="$tableOfContent/@text:protected = 'true' ">
-      <xsl:message terminate="no">feedback:Table of content protection</xsl:message>
-    </xsl:if>
-
     <xsl:choose>
       <xsl:when test="$tocStyle = 'true'">true</xsl:when>
       <xsl:otherwise>false</xsl:otherwise>
