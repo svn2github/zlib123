@@ -195,6 +195,19 @@
         </xsl:for-each>
       </xsl:for-each>
     </style:master-page>
+    <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
+      <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+      <style:master-page>
+        <xsl:attribute name="style:name">
+          <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
+        </xsl:attribute>
+        <xsl:attribute name="style:page-layout-name">
+          <xsl:value-of select="concat('PAGE',generate-id(.))"/>
+        </xsl:attribute>
+      </style:master-page>
+        </xsl:if>
+    </xsl:for-each>
+    
   </xsl:template>
 
   <!-- handle default page layout -->
@@ -220,6 +233,18 @@
         </style:footer-style>
       </xsl:for-each>
     </style:page-layout>
+    <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
+      <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+      <style:page-layout>
+        <xsl:attribute name="style:name">
+          <xsl:value-of select="concat('PAGE',generate-id(.))"/>
+        </xsl:attribute>
+        <style:page-layout-properties>
+          <xsl:call-template name="InsertPageLayoutProperties"/>
+        </style:page-layout-properties>
+      </style:page-layout>
+        </xsl:if>
+    </xsl:for-each>
   </xsl:template>
     
   <!-- conversion of page properties -->

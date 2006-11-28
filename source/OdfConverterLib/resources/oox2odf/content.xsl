@@ -75,15 +75,81 @@
           <!-- automatic list styles-->
           <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
         </xsl:if>
+        <xsl:call-template name="ParagraphFromSectionsStyles"/>
       </office:automatic-styles>
       <office:body>
         <office:text>
-          <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"/>
+          <xsl:choose>
+            <xsl:when test="document('word/document.xml')//w:document/w:body/w:p/w:pPr/w:sectPr">
+              <xsl:apply-templates select="document('word/document.xml')//w:document/w:body" mode="sections"/>
+              <text:p>
+                <xsl:attribute name="text:style-name">
+                  <xsl:text>P_Standard</xsl:text>
+                </xsl:attribute>
+              </text:p>
+            </xsl:when>
+          </xsl:choose>
+            <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr)]"/>
         </office:text>
       </office:body>
     </office:document-content>
   </xsl:template>
 
+  <xsl:template name="ParagraphFromSectionsStyles">
+    <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
+      <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+        <style:style>
+          <xsl:attribute name="style:name">
+            <xsl:value-of select="concat('P_',generate-id(.))"/>
+          </xsl:attribute>
+          <xsl:attribute name="style:family">
+            <xsl:text>paragraph</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="style:master-page-name">
+            <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
+          </xsl:attribute>
+        </style:style>
+      </xsl:if>
+    </xsl:for-each>
+    <style:style>
+      <xsl:attribute name="style:name">
+        <xsl:text>P_Standard</xsl:text>
+      </xsl:attribute>
+      <xsl:attribute name="style:family">
+        <xsl:text>paragraph</xsl:text>
+      </xsl:attribute>
+      <xsl:attribute name="style:master-page-name">
+        <xsl:text>Standard</xsl:text>
+      </xsl:attribute>
+    </style:style>
+  </xsl:template>
+  
+  <xsl:template match="w:sectPr[parent::w:pPr]" mode="sections">
+        <xsl:variable name="id">
+          <xsl:value-of select="generate-id(following::w:sectPr)"/>
+        </xsl:variable>
+        <xsl:variable name="id2">
+          <xsl:value-of select="generate-id(.)"/>
+        </xsl:variable>
+        <text:section>
+          <xsl:attribute name="text:style-name">
+            <xsl:value-of select="$id2"/>
+          </xsl:attribute>
+          <xsl:attribute name="text:name">
+            <xsl:value-of select="$id"/>
+          </xsl:attribute>
+          <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+            <text:p>
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of select="concat('P_',$id2)"/>
+              </xsl:attribute>
+            </text:p>
+          </xsl:if>
+          <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2]"/>
+        </text:section>
+    
+  </xsl:template>
+  
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
   <xsl:template
     match="w:pPr[parent::w:p]|w:r[parent::w:p and child::w:br[@w:type='page' or @w:type='column'] and not(parent::w:p[child::wpPr])]"
@@ -113,6 +179,9 @@
         <xsl:apply-templates select="w:rPr" mode="automaticstyles"/>
       </xsl:if>
     </style:style>
+    <xsl:if test="w:sectPr">
+      <xsl:apply-templates select="w:sectPr" mode="automaticstyles"/>
+    </xsl:if>
   </xsl:template>
 
   <!-- create a style for each run. Do not take w:pPr/w:rPr into consideration. -->
@@ -135,6 +204,28 @@
       <style:text-properties>
         <xsl:call-template name="InsertTextProperties"/>
       </style:text-properties>
+    </style:style>
+  </xsl:template>
+  
+  <xsl:template match="w:sectPr" mode="automaticstyles">
+    <style:style style:name="{generate-id(.)}" style:family="section">
+      <style:section-properties>
+        <xsl:if test="w:cols/@w:num">
+          <style:columns>
+            <xsl:attribute name="fo:column-count">
+              <xsl:value-of select="w:cols/@w:num"/>
+            </xsl:attribute>
+            <xsl:attribute name="fo:column-gap">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:cols/@w:space"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </style:columns>
+        </xsl:if>
+      </style:section-properties>      
     </style:style>
   </xsl:template>
 
@@ -597,4 +688,5 @@
   
   <!--ignore text in automatic styles mode-->
   <xsl:template match="text()" mode="automaticstyles"/>
+  <xsl:template match="text()" mode="sections"/>
  </xsl:stylesheet>
