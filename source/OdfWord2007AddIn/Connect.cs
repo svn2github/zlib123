@@ -60,6 +60,14 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
     [ClassInterface(ClassInterfaceType.AutoDispatch)]
     public class Connect : Object, Extensibility.IDTExtensibility2, IRibbonExtensibility, IOdfConverter
 	{
+    	private const string ODF_FILE_TYPE = "OdfFileType";
+		private const string ALL_FILE_TYPE = "AllFileType";
+		private const string IMPORT_ODF_FILE_FILTER = "*.odt";
+		private const string IMPORT_ALL_FILE_FILTER = "*.*";
+		private const string IMPORT_LABEL = "OdfImportLabel";
+		private const string EXPORT_ODF_FILE_FILTER = " (*.odt)|*.odt|";
+		private const string EXPORT_ALL_FILE_FILTER = " (*.*)|*.*";
+		private const string EXPORT_LABEL = "OdfExportLabel";
 
         [DllImport("kernel32.dll")]
         private static extern void OutputDebugString(string chaine);
@@ -165,6 +173,9 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
             }
 		}
 
+		
+
+		
         /// <summary>
         /// Read an ODF file
         /// </summary>
@@ -177,10 +188,10 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 			fd.AllowMultiSelect = true;
             // add filter for ODT files
             fd.Filters.Clear();
-            fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.odt", Type.Missing);
-            fd.Filters.Add(this.addinLib.GetString("AllFileType"), "*.*", Type.Missing);
+            fd.Filters.Add(this.addinLib.GetString(ODF_FILE_TYPE), IMPORT_ODF_FILE_FILTER, Type.Missing);
+            fd.Filters.Add(this.addinLib.GetString(ALL_FILE_TYPE), IMPORT_ALL_FILE_FILTER, Type.Missing);
             // set title
-            fd.Title = this.addinLib.GetString("OdfImportLabel");
+            fd.Title = this.addinLib.GetString(IMPORT_LABEL);
             // display the dialog
             fd.Show();
 
@@ -212,7 +223,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 
             }
 		}
-
+        
         /// <summary>
         /// Save as ODF.
         /// </summary>
@@ -231,11 +242,11 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
                 sfd.AddExtension = true;
                 sfd.DefaultExt = "odt";
-                sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.odt)|*.odt|"
-                             + this.addinLib.GetString("AllFileType") + " (*.*)|*.*";
+                sfd.Filter = this.addinLib.GetString(ODF_FILE_TYPE) + EXPORT_ODF_FILE_FILTER
+                             + this.addinLib.GetString(ALL_FILE_TYPE) + EXPORT_ALL_FILE_FILTER;
                 sfd.InitialDirectory = doc.Path;
                 sfd.OverwritePrompt = true;
-                sfd.Title = this.addinLib.GetString("OdfExportLabel");
+                sfd.Title = this.addinLib.GetString(EXPORT_LABEL);
 
                 // process the chosen documents	
                 if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
