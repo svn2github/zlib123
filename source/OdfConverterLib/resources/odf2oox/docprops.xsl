@@ -56,10 +56,24 @@
   <xsl:template match="/office:document-meta/office:meta" mode="core">
     <!-- creation date -->
     <xsl:if test="meta:creation-date">
-      <dcterms:created xmlns:dcterms="http://purl.org/dc/terms/"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
-        <xsl:value-of select="meta:creation-date"/>
-      </dcterms:created>
+      <xsl:variable name="dateIsValid">
+        <xsl:call-template name="validateDate">
+          <xsl:with-param name="date">
+            <xsl:value-of select="meta:creation-date"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$dateIsValid = 'true' ">
+          <dcterms:created xmlns:dcterms="http://purl.org/dc/terms/"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
+            <xsl:value-of select="meta:creation-date"/>
+          </dcterms:created>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:message terminate="no">feedback:Document creation date</xsl:message>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
     <!-- creator -->
     <xsl:if test="meta:initial-creator">
@@ -108,10 +122,24 @@
     </xsl:if>
     <!-- last modification date -->
     <xsl:if test="dc:date">
-      <dcterms:modified xmlns:dcterms="http://purl.org/dc/terms/"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
-        <xsl:value-of select="dc:date"/>
-      </dcterms:modified>
+      <xsl:variable name="dateIsValid">
+        <xsl:call-template name="validateDate">
+          <xsl:with-param name="date">
+            <xsl:value-of select="dc:date"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$dateIsValid = 'true' ">
+          <dcterms:modified xmlns:dcterms="http://purl.org/dc/terms/"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dcterms:W3CDTF">
+            <xsl:value-of select="dc:date"/>
+          </dcterms:modified>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:message terminate="no">feedback:Document last modification date</xsl:message>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
     <!-- number of times it was saved -->
     <xsl:if test="meta:editing-cycles">
@@ -152,7 +180,8 @@
         <xsl:value-of select="meta:document-statistic/@meta:word-count"/>
       </Words>
     </xsl:if>
-    <Application xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">ODF Converter</Application>
+    <Application xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
+      >ODF Converter</Application>
     <DocSecurity xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">0</DocSecurity>
     <xsl:if test="meta:document-statistic/@meta:paragraph-count">
       <Paragraphs xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
@@ -209,15 +238,20 @@
         </TotalTime>
       </xsl:if>
     </xsl:if>
-    <ScaleCrop xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">false</ScaleCrop>
-    <LinksUpToDate xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">false</LinksUpToDate>
+    <ScaleCrop xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
+      >false</ScaleCrop>
+    <LinksUpToDate xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
+      >false</LinksUpToDate>
     <xsl:if test="meta:document-statistic/@meta:character-count">
-      <CharactersWithSpaces xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
+      <CharactersWithSpaces
+        xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
         <xsl:value-of select="meta:document-statistic/@meta:character-count"/>
       </CharactersWithSpaces>
     </xsl:if>
-    <SharedDoc xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">false</SharedDoc>
-    <HyperlinksChanged xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">false</HyperlinksChanged>
+    <SharedDoc xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
+      >false</SharedDoc>
+    <HyperlinksChanged
+      xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">false</HyperlinksChanged>
     <AppVersion xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
       <xsl:value-of select="$app-version"/>
     </AppVersion>
@@ -244,6 +278,104 @@
         <xsl:value-of select="text()"/>
       </vt:lpwstr>
     </property>
+  </xsl:template>
+
+
+  <!-- check if a date is valid regarding W3C format -->
+  <xsl:template name="validateDate">
+    <xsl:param name="date"/>
+    <!-- year -->
+    <xsl:variable name="Y">
+      <xsl:choose>
+        <xsl:when test="contains($date, '-')">
+          <xsl:value-of select="substring-before($date, '-')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$date"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- month -->
+    <xsl:variable name="M">
+      <xsl:variable name="date_Y" select="substring-after($date, concat($Y, '-'))"/>
+      <xsl:choose>
+        <xsl:when test="contains($date_Y, '-')">
+          <xsl:value-of select="substring-before($date_Y, '-')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$date_Y"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- day -->
+    <xsl:variable name="D">
+      <xsl:variable name="date_Y_m" select="substring-after($date, concat($Y, '-', $M, '-'))"/>
+      <xsl:choose>
+        <xsl:when test="contains($date_Y_m, 'T')">
+          <xsl:value-of select="substring-before($date_Y_m, 'T')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$date_Y_m"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- hour -->
+    <xsl:variable name="h">
+      <xsl:if test="contains($date, 'T')">
+        <xsl:value-of select="substring-before(substring-after($date, 'T'), ':')"/>
+      </xsl:if>
+    </xsl:variable>
+    <!-- minutes -->
+    <xsl:variable name="m">
+      <xsl:if test="contains($date, 'T')">
+        <xsl:variable name="time_h" select="substring-after(substring-after($date, 'T'), ':')"/>
+        <xsl:choose>
+          <xsl:when test="contains($time_h, ':')">
+            <xsl:value-of select="substring-before($time_h, ':')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$time_h"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:variable>
+    <!-- seconds (with our without decimal) -->
+    <xsl:variable name="s">
+      <xsl:if test="contains($date, 'T')">
+        <xsl:variable name="time_h_m"
+          select="substring-after(substring-after($date, 'T'), concat($h, ':', $m, ':'))"/>
+        <xsl:choose>
+          <xsl:when test="contains($time_h_m, 'TZD')">
+            <xsl:value-of select="substring-before($time_h_m, 'TZD')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$time_h_m"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:variable>
+
+    <!-- validate format -->
+    <xsl:choose>
+      <xsl:when test="string-length($Y) != 4">false</xsl:when>
+      <xsl:when test="string-length($M) != 2">false</xsl:when>
+      <xsl:when test="string-length($D) != 2">false</xsl:when>
+      <xsl:when test="string-length($h) != 2">false</xsl:when>
+      <xsl:when test="string-length($m) != 2">false</xsl:when>
+      <xsl:when test="string-length($s) &gt; 4">false</xsl:when>
+      <xsl:when test="string-length(substring-after($date, 'TZD')) &gt; 0">false</xsl:when>
+      <xsl:when test="number($M) &gt; 12">false</xsl:when>
+      <xsl:when test="number($M) &lt; 1">false</xsl:when>
+      <xsl:when test="number($M) &gt; 31">false</xsl:when>
+      <xsl:when test="number($M) &lt; 1">false</xsl:when>
+      <xsl:when test="number($h) &gt; 24">false</xsl:when>
+      <xsl:when test="number($h) &lt; 1">false</xsl:when>
+      <xsl:when test="number($m) &gt; 60">false</xsl:when>
+      <xsl:when test="number($m) &lt; 1">false</xsl:when>
+      <xsl:when test="number($s) &gt; 61">false</xsl:when>
+      <xsl:when test="number($s) &lt; 1">false</xsl:when>
+      <xsl:otherwise>true</xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
