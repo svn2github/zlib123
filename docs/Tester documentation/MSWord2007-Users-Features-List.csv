@@ -245,16 +245,16 @@ Textbox Tools;Format;Text box styles;Size;Height;Absolute;2;0.3 M2;Completed;;;
 ;;;;;Relative to Inside margin;2;0.3 M2;;;;
 ;;;;;Relative to Outside margin;2;0.3 M2;;;;
 ;;;;Rotate;;2;0.3 M2;;;;
-;;;;Scale;Height;2;0.3 M2;;;;
-;;;;;Width;2;0.3 M2;;;;
-;;;;;Lock aspect ratio;2;0.3 M2;;;;
-;;;;;Relative to orginal picture size;2;0.3 M2;;;;
+;;;;Scale;Height;2;0.3 M2;-;not supported;;property is not saved in xml - is is used to calculate absolute size
+;;;;;Width;2;0.3 M2;-;not supported;;property is not saved in xml - is is used to calculate absolute size
+;;;;;Lock aspect ratio;2;0.3 M2;-;not supported;;in OO only position can be locked
+;;;;;Relative to orginal picture size;2;0.3 M2;-;there is no equivalent in OO;;
 ;;;;;;;;;;;
 ;;;Layout;Wrapping style;In line with text;2;0.3 M2;Completed;;;
 ;;;;;Square;2;0.3 M2;Completed;;;
-;;;;;Tight;2;0.3 M2;;;;
-;;;;;Behind text;2;0.3 M2;;;;
-;;;;;In front of text;2;0.3 M2;;;;
+;;;;;Tight;2;0.3 M2;Completed;;;
+;;;;;Behind text;2;0.3 M2;Completed;;;
+;;;;;In front of text;2;0.3 M2;Completed;;;
 ;;;;Horizontal alignment;Left  / Center / Right / Other;2;0.3 M2;;;;
 ;;;Advanced Layout;Picture position;Horizontal;2;0.3 M2;;;;
 ;;;;;Vertical;2;0.3 M2;;;;

@@ -106,7 +106,16 @@
   <xsl:template name="GetShapeProperty">
     <xsl:param name="shape"/>
     <xsl:param name="propertyName"/>
-     <xsl:variable name="propertyValue" select="substring-before(substring-after($shape/@style,concat($propertyName,':')),';')"/>
+     <xsl:variable name="propertyValue">
+         <xsl:choose>
+           <xsl:when test="contains(substring-after($shape/@style,concat($propertyName,':')),';')">
+             <xsl:value-of select="substring-before(substring-after($shape/@style,concat($propertyName,':')),';')"/>
+           </xsl:when>
+           <xsl:otherwise>
+             <xsl:value-of select="substring-after($shape/@style,concat($propertyName,':'))"/>
+           </xsl:otherwise>
+         </xsl:choose>
+     </xsl:variable> 
     <xsl:value-of select="$propertyValue"/>
   </xsl:template>
   
@@ -147,18 +156,124 @@
   <xsl:template name="InsertShapeProperties">
     <!--TODO automatic style content-->
     <xsl:call-template name="InsertShapeWrap"/>
+    <xsl:call-template name="InsertShapeFromTextDistance"/>
   </xsl:template>
   
   <xsl:template name="InsertShapeWrap">
     <xsl:if test="descendant::node()[contains(name(),'wrap')]">
-      <xsl:variable name="wrap" select="descendant::w10:wrap/@type"/>
-        <xsl:attribute name="style:wrap">
-          <xsl:choose>
-            <xsl:when test="$wrap= 'square' ">
-              <xsl:text>parallel</xsl:text>
-            </xsl:when>
-          </xsl:choose>
+      <xsl:variable name="wrap" select="descendant::w10:wrap"/>
+      <xsl:variable name="zindex">
+        <xsl:call-template name="GetShapeProperty">
+          <xsl:with-param name="propertyName" select="'z-index'"/>
+          <xsl:with-param name="shape" select="v:shape"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:if test="$zindex &lt; 0 and not($wrap/@type)">
+        <xsl:attribute name="style:run-through">
+          <xsl:text>background</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+      
+      <xsl:attribute name="style:wrap">
+        <xsl:choose>
+          <xsl:when test="not($wrap/@type)">
+            <xsl:text>run-through</xsl:text>
+          </xsl:when>
+          <xsl:when test="($wrap/@type = 'square' or $wrap/@type = 'tight' or $wrap/@type = 'through') and not($wrap/@side)">
+            <xsl:text>parallel</xsl:text>
+          </xsl:when>
+          <xsl:when test="($wrap/@type = 'square' or $wrap/@type = 'tight' or $wrap/@type = 'through') and $wrap/@side = 'left' ">
+            <xsl:text>left</xsl:text>
+          </xsl:when>
+          <xsl:when test="($wrap/@type = 'square' or $wrap/@type = 'tight' or $wrap/@type = 'through') and $wrap/@side = 'right' ">
+            <xsl:text>right</xsl:text>
+          </xsl:when>
+          <xsl:when test="($wrap/@type = 'square' or $wrap/@type = 'tight' or $wrap/@type = 'through') and $wrap/@side = 'largest' ">
+            <xsl:text>dynamic</xsl:text>
+          </xsl:when>
+          <xsl:when test="$wrap/@type = 'topAndBottom' ">
+            <xsl:text>none</xsl:text>
+          </xsl:when>
+        </xsl:choose>
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
+  
+  <xsl:template name="InsertShapeFromTextDistance">
+    <xsl:param name="shape" select="v:shape"/>
+    
+    <xsl:variable name="margin-top">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-wrap-distance-top'"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
+    </xsl:variable>
+      
+    <xsl:if test="$margin-top !=''">
+      <xsl:call-template name="InsertShapeMargin">
+        <xsl:with-param name="attributeName" select=" 'fo:margin-top' "/>
+          <xsl:with-param name="margin" select="$margin-top"/>
+      </xsl:call-template>
+    </xsl:if>
+    
+    <xsl:variable name="margin-bottom">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-wrap-distance-bottom'"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$margin-bottom !=''">
+      <xsl:call-template name="InsertShapeMargin">
+        <xsl:with-param name="attributeName" select=" 'fo:margin-bottom' "/>
+        <xsl:with-param name="margin" select="$margin-bottom"/>
+      </xsl:call-template>
+    </xsl:if>
+    
+    <xsl:variable name="margin-left">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-wrap-distance-left'"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$margin-left !=''">
+      <xsl:call-template name="InsertShapeMargin">
+        <xsl:with-param name="attributeName" select=" 'fo:margin-left' "/>
+        <xsl:with-param name="margin" select="$margin-left"/>
+      </xsl:call-template>
+    </xsl:if>
+    
+    <xsl:variable name="margin-right">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-wrap-distance-right'"/>
+        <xsl:with-param name="shape" select="$shape"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$margin-right !=''">
+      <xsl:call-template name="InsertShapeMargin">
+        <xsl:with-param name="attributeName" select=" 'fo:margin-right' "/>
+        <xsl:with-param name="margin" select="$margin-right"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="InsertShapeMargin">
+    <xsl:param name="margin"/>
+    <xsl:param name="attributeName"/>
+    
+    <xsl:attribute name="{$attributeName}">
+    <xsl:call-template name="ConvertPoints">
+      <xsl:with-param name="length" >
+        <xsl:call-template name="GetValue">
+          <xsl:with-param name="length" select="$margin"/>
+        </xsl:call-template>
+      </xsl:with-param>
+      <xsl:with-param name="unit" select="'cm'"/>
+    </xsl:call-template>
+  </xsl:attribute>
+  </xsl:template>
+  
 </xsl:stylesheet>
