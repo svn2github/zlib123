@@ -380,15 +380,11 @@
 
   <!-- chapter field. -->
   <xsl:template match="text:chapter" mode="paragraph">
-    <!-- warn loss of field -->
-    <xsl:if test="contains(@text:display, 'number')">
-      <xsl:message terminate="no">feedback:Chapter number field</xsl:message>
-    </xsl:if>
-    <!-- if field displays name, convert into a reference to default heading style. -->
-    <xsl:if test="contains(@text:display, 'name') and @text:outline-level">
-      <xsl:variable name="outline-level" select="@text:outline-level"/>
+    <xsl:if test="@text:outline-level">
       <!-- COMMENT : if the style changes name in the application, it may not be found and cause an error. -->
-      <xsl:message terminate="no">feedback:Chapter field</xsl:message>
+      <xsl:message terminate="no">feedback:Chapter field (if style not defined)</xsl:message>
+      
+      <xsl:variable name="outline-level" select="@text:outline-level"/>
       <!-- find the style to match -->
       <xsl:variable name="style">
         <xsl:for-each select="document('styles.xml')">
@@ -423,9 +419,19 @@
           </xsl:choose>
         </xsl:for-each>
       </xsl:variable>
+    
+      <!-- if field displays number, find number associated to style. -->
+    <xsl:if test="contains(@text:display, 'number')">
       <w:fldSimple>
         <xsl:attribute name="w:instr">
-          <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \*MERGEFORMAT')"/>
+          <xsl:choose>
+            <xsl:when test="@text:display = 'plain-number' ">
+              <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \n \t ')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \n ')"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
         <w:r>
           <w:rPr>
@@ -434,6 +440,22 @@
           <xsl:apply-templates mode="text"/>
         </w:r>
       </w:fldSimple>
+    </xsl:if>
+      
+    <!-- if field displays name, convert into a reference to default heading style. -->
+    <xsl:if test="contains(@text:display, 'name')">
+      <w:fldSimple>
+        <xsl:attribute name="w:instr">
+          <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \* MERGEFORMAT')"/>
+        </xsl:attribute>
+        <w:r>
+          <w:rPr>
+            <w:noProof/>
+          </w:rPr>
+          <xsl:apply-templates mode="text"/>
+        </w:r>
+      </w:fldSimple>
+    </xsl:if>
     </xsl:if>
   </xsl:template>
 
