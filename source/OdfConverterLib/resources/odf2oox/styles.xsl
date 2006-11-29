@@ -594,49 +594,66 @@
 
   <!-- Paragraph indent property -->
   <xsl:template name="ComputeParagraphIndent">
-    <w:ind>
-      <xsl:variable name="parentStyleName" select="parent::style:style/@style:parent-style-name"/>
-      <!-- left indent -->
-      <xsl:attribute name="w:left">
-        <xsl:call-template name="ComputeAdditionalIndent">
-          <xsl:with-param name="side" select="'left'"/>
-          <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"/>
+    <xsl:variable name="defaultOutlineLevel">
+      <xsl:call-template name="GetDefaultOutlineLevel">
+        <xsl:with-param name="styleName" select="parent::style:style/@style:name"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="number($defaultOutlineLevel)">
+        <xsl:call-template name="OverrideNumberingProperty">
+          <xsl:with-param name="level" select="$defaultOutlineLevel"/>
+          <xsl:with-param name="property">indent</xsl:with-param>
         </xsl:call-template>
-      </xsl:attribute>
-      <!-- right indent -->
-      <xsl:attribute name="w:right">
-        <xsl:call-template name="ComputeAdditionalIndent">
-          <xsl:with-param name="side" select="'right'"/>
-          <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"/>
-        </xsl:call-template>
-      </xsl:attribute>
-      <!-- first line indent -->
-      <xsl:variable name="firstLineIndent">
-        <xsl:call-template name="GetFirstLineIndent">
-          <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"/>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="$firstLineIndent != 0">
+      </xsl:when>
+      <xsl:otherwise>
+        <w:ind>
+          <!-- left indent -->
+          <xsl:attribute name="w:left">
+            <xsl:call-template name="ComputeAdditionalIndent">
+              <xsl:with-param name="side" select="'left'"/>
+              <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"
+              />
+            </xsl:call-template>
+          </xsl:attribute>
+          <!-- right indent -->
+          <xsl:attribute name="w:right">
+            <xsl:call-template name="ComputeAdditionalIndent">
+              <xsl:with-param name="side" select="'right'"/>
+              <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"
+              />
+            </xsl:call-template>
+          </xsl:attribute>
+          <!-- first line indent -->
+          <xsl:variable name="firstLineIndent">
+            <xsl:call-template name="GetFirstLineIndent">
+              <xsl:with-param name="style" select="parent::style:style|parent::style:default-style"
+              />
+            </xsl:call-template>
+          </xsl:variable>
           <xsl:choose>
-            <xsl:when test="$firstLineIndent &lt; 0">
-              <xsl:attribute name="w:hanging">
-                <xsl:value-of select="-$firstLineIndent"/>
-              </xsl:attribute>
+            <xsl:when test="$firstLineIndent != 0">
+              <xsl:choose>
+                <xsl:when test="$firstLineIndent &lt; 0">
+                  <xsl:attribute name="w:hanging">
+                    <xsl:value-of select="-$firstLineIndent"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:attribute name="w:firstLine">
+                    <xsl:value-of select="$firstLineIndent"/>
+                  </xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:attribute name="w:firstLine">
-                <xsl:value-of select="$firstLineIndent"/>
-              </xsl:attribute>
+              <!-- default value is hanging=0 if nothing is specified -->
+              <xsl:attribute name="w:hanging">0</xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <!-- default value is hanging=0 if nothing is specified -->
-          <xsl:attribute name="w:hanging">0</xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
-    </w:ind>
+        </w:ind>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 

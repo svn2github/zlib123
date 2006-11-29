@@ -209,16 +209,18 @@
     <xsl:call-template name="InsertParagraphSpacing"/>
 
     <!-- insert tab stops if paragraph is in a list -->
-    <xsl:call-template name="InsertTabStops">
+    <xsl:call-template name="OverrideNumberingProperty">
       <xsl:with-param name="level" select="$level"/>
+      <xsl:with-param name="property">tab</xsl:with-param>
     </xsl:call-template>
 
     <!-- insert bg color in case paragraph is in table-of-content -->
     <xsl:call-template name="InsertTOCBgColor"/>
 
     <!-- insert indentation if paragraph is in a list -->
-    <xsl:call-template name="InsertIndent">
+    <xsl:call-template name="OverrideNumberingProperty">
       <xsl:with-param name="level" select="$level"/>
+      <xsl:with-param name="property">indent</xsl:with-param>
     </xsl:call-template>
 
     <!-- insert heading outline level -->
@@ -363,6 +365,9 @@
   <!-- Computes the style name to be used be InsertIndent template -->
   <xsl:template name="GetStyleName">
     <xsl:choose>
+      <xsl:when test="parent::style:style/@style:name">
+        <xsl:value-of select="parent::style:style/@style:name"/>
+      </xsl:when>
       <xsl:when test="self::text:list-item|self::text:list-header">
         <xsl:value-of select="*[1][self::text:p]/@text:style-name"/>
       </xsl:when>
@@ -526,16 +531,18 @@
             </xsl:call-template>
 
             <!-- insert tab stops if paragraph is in a list -->
-            <xsl:call-template name="InsertTabStops">
+            <xsl:call-template name="OverrideNumberingProperty">
               <xsl:with-param name="level" select="$level"/>
+              <xsl:with-param name="property">tab</xsl:with-param>
             </xsl:call-template>
 
             <!-- insert bg color in case paragraph is in table-of-content -->
             <xsl:call-template name="InsertTOCBgColor"/>
 
             <!-- override abstract num indent and tab if paragraph has margin defined -->
-            <xsl:call-template name="InsertIndent">
+            <xsl:call-template name="OverrideNumberingProperty">
               <xsl:with-param name="level" select="$level"/>
+              <xsl:with-param name="property">indent</xsl:with-param>
             </xsl:call-template>
 
             <!-- insert heading outline level -->
@@ -917,7 +924,6 @@
         <xsl:text>' protection</xsl:text>
       </xsl:message>
     </xsl:if>
-    <xsl:apply-templates/>
   </xsl:template>
 
   <xsl:template name="InsertDropCapAttributes">
