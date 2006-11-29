@@ -146,7 +146,9 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 		/// </param>
 		/// <seealso class='IDTExtensibility2' />
 		public void OnStartupComplete(ref System.Array custom)
-		{
+        {
+            // Tell Word that the Normal.dot template should not be saved (unless the user later on makes it dirty)
+            this.applicationObject.NormalTemplate.Saved = true;
 		}
 
 		/// <summary>
