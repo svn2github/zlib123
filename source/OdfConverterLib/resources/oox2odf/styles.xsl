@@ -141,70 +141,80 @@
   <xsl:template name="InsertDefaultMasterPage">
     <style:master-page style:name="Standard" style:page-layout-name="pm1">
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
-        <xsl:for-each select="w:headerReference">
-          <xsl:if test="./@w:type = 'default'">
-            <style:header>
-              <xsl:variable name="headerId" select="./@r:id"/>
-              <xsl:variable name="headerXmlDocument"
-                select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-              <!-- change context to get header content -->
-              <xsl:for-each select="document($headerXmlDocument)">
-                <xsl:apply-templates/>
-              </xsl:for-each>
-            </style:header>
-          </xsl:if>
-        </xsl:for-each>
-        <xsl:for-each select="w:headerReference">
-          <xsl:if test="./@w:type = 'even'">
-            <style:header-left>
-              <xsl:variable name="headerId" select="./@r:id"/>
-              <xsl:variable name="headerXmlDocument"
-                select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-              <!-- change context to get header content -->
-              <xsl:for-each select="document($headerXmlDocument)">
-                <xsl:apply-templates/>
-              </xsl:for-each>
-            </style:header-left>
-          </xsl:if>
-          <!-- ./@w:type='default' TODO -->
-        </xsl:for-each>
-        <xsl:for-each select="w:footerReference">
-          <xsl:if test="./@w:type = 'default'">
-            <style:footer>
-              <xsl:variable name="footerId" select="./@r:id"/>
-              <xsl:variable name="footerXmlDocument"
-                select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-              <!-- change context to get footer content -->
-              <xsl:for-each select="document($footerXmlDocument)">
-                <xsl:apply-templates/>
-              </xsl:for-each>
-            </style:footer>
-          </xsl:if>
-        </xsl:for-each>
-        <xsl:for-each select="w:footerReference">
-          <xsl:if test="./@w:type = 'even'">
-            <style:footer-left>
-              <xsl:variable name="footerId" select="./@r:id"/>
-              <xsl:variable name="footerXmlDocument"
-                select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-              <!-- change context to get footer content -->
-              <xsl:for-each select="document($footerXmlDocument)">
-                <xsl:apply-templates/>
-              </xsl:for-each>
-            </style:footer-left>
-          </xsl:if>
-          <!-- ./@w:type='default' TODO -->
-        </xsl:for-each>
+        <xsl:call-template name="HeaderFooter"/>
       </xsl:for-each>
     </style:master-page>
+      <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
+        <xsl:if test="w:headerReference/@w:type = 'default' or w:headerReference/@w:type = 'even' or w:footerReference/@w:type = 'default' or w:footerReference/@w:type = 'even'">
+          <xsl:choose>
+            <xsl:when test="w:headerReference/@w:type = 'first' or w:footerReference/@w:type = 'first'">
+              <style:master-page>
+                <xsl:attribute name="style:name">
+                  <xsl:value-of select="concat('First_H_',generate-id(.))"/>
+                </xsl:attribute>
+                <xsl:attribute name="style:next-style-name">
+                  <xsl:value-of select="concat('H_',generate-id(.))"/>
+                </xsl:attribute>
+                <xsl:attribute name="style:page-layout-name">
+                  <xsl:text>pm1</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="style:display-name">
+                  <xsl:value-of select="concat('H_',generate-id(.))"/>
+                </xsl:attribute>
+                <xsl:call-template name="HeaderFooterFirst"/>
+              </style:master-page>
+            </xsl:when>
+            <xsl:when test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
+              <style:master-page>
+                <xsl:attribute name="style:name">
+                  <xsl:value-of select="concat('First_H_',generate-id(.))"/>
+                </xsl:attribute>
+                <xsl:attribute name="style:next-style-name">
+                  <xsl:value-of select="concat('H_',generate-id(.))"/>
+                </xsl:attribute>
+                <xsl:attribute name="style:page-layout-name">
+                  <xsl:text>pm1</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="style:display-name">
+                  <xsl:value-of select="concat('First_H_',generate-id(.))"/>
+                </xsl:attribute>
+                <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
+                  <xsl:call-template name="HeaderFooterFirst"/>
+                </xsl:for-each>
+              </style:master-page>
+              
+            </xsl:when>
+          </xsl:choose>
+          
+          <style:master-page>
+            <xsl:attribute name="style:name">
+              <xsl:value-of select="concat('H_',generate-id(.))"/>
+            </xsl:attribute>
+            <xsl:attribute name="style:page-layout-name">
+              <xsl:text>pm1</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="style:display-name">
+              <xsl:value-of select="concat('H_',generate-id(.))"/>
+            </xsl:attribute>
+            <xsl:call-template name="HeaderFooter"/>
+          </style:master-page>
+        </xsl:if>
+      </xsl:for-each>
+    <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
+    <style:master-page style:name="First_Page" style:page-layout-name="pm1" style:next-style-name="Standard" style:display-name="First Page">
+      <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
+        <xsl:call-template name="HeaderFooterFirst"/>
+      </xsl:for-each>
+    </style:master-page>
+    </xsl:if>
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
       <style:master-page>
         <xsl:attribute name="style:name">
           <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
         </xsl:attribute>
-        <xsl:attribute name="style:page-layout-name">
-          <xsl:value-of select="concat('PAGE',generate-id(.))"/>
+        <xsl:attribute name="style:master-page-name">
+          <xsl:value-of select="First_Page"/>
         </xsl:attribute>
       </style:master-page>
         </xsl:if>
@@ -212,12 +222,115 @@
     
   </xsl:template>
 
+  
+  <xsl:template name="HeaderFooter">
+    <xsl:for-each select="w:headerReference">
+      <xsl:if test="./@w:type = 'default'">
+        <style:header>
+          <xsl:variable name="headerId" select="./@r:id"/>
+          <xsl:variable name="headerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <!-- change context to get header content -->
+          <xsl:for-each select="document($headerXmlDocument)">
+            <xsl:apply-templates/>
+          </xsl:for-each>
+        </style:header>
+      </xsl:if>
+    </xsl:for-each>
+    <xsl:for-each select="w:headerReference">
+      <xsl:if test="./@w:type = 'even'">
+        <style:header-left>
+          <xsl:variable name="headerId" select="./@r:id"/>
+          <xsl:variable name="headerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <!-- change context to get header content -->
+          <xsl:for-each select="document($headerXmlDocument)">
+            <xsl:apply-templates/>
+          </xsl:for-each>
+        </style:header-left>
+      </xsl:if>
+      <!-- ./@w:type='default' TODO -->
+    </xsl:for-each>
+    <xsl:for-each select="w:footerReference">
+      <xsl:if test="./@w:type = 'default'">
+        <style:footer>
+          <xsl:variable name="footerId" select="./@r:id"/>
+          <xsl:variable name="footerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <!-- change context to get footer content -->
+          <xsl:for-each select="document($footerXmlDocument)">
+            <xsl:apply-templates/>
+          </xsl:for-each>
+        </style:footer>
+      </xsl:if>
+    </xsl:for-each>
+    <xsl:for-each select="w:footerReference">
+      <xsl:if test="./@w:type = 'even'">
+        <style:footer-left>
+          <xsl:variable name="footerId" select="./@r:id"/>
+          <xsl:variable name="footerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <!-- change context to get footer content -->
+          <xsl:for-each select="document($footerXmlDocument)">
+            <xsl:apply-templates/>
+          </xsl:for-each>
+        </style:footer-left>
+      </xsl:if>
+      <!-- ./@w:type='default' TODO -->
+    </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template name="HeaderFooterFirst">
+    <xsl:for-each select="w:headerReference">
+      <xsl:if test="./@w:type = 'first'">
+        <style:header>
+          <xsl:variable name="headerId" select="./@r:id"/>
+          <xsl:variable name="headerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <!-- change context to get header content -->
+          <xsl:for-each select="document($headerXmlDocument)">
+            <xsl:apply-templates/>
+          </xsl:for-each>
+        </style:header>
+      </xsl:if>
+    </xsl:for-each>
+    <xsl:for-each select="w:footerReference">
+      <xsl:if test="./@w:type = 'first'">
+        <style:footer>
+          <xsl:variable name="footerId" select="./@r:id"/>
+          <xsl:variable name="footerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <!-- change context to get footer content -->
+          <xsl:for-each select="document($footerXmlDocument)">
+            <xsl:apply-templates/>
+          </xsl:for-each>
+        </style:footer>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  
+  
   <!-- handle default page layout -->
   <xsl:template name="InsertDefaultPageLayout">
     <style:page-layout style:name="pm1">
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
         <style:page-layout-properties>
           <xsl:call-template name="InsertPageLayoutProperties"/>
+          <xsl:if test="w:cols/@w:num">
+            <style:columns>
+              <xsl:attribute name="fo:column-count">
+                <xsl:value-of select="w:cols/@w:num"/>
+              </xsl:attribute>
+              <xsl:attribute name="fo:column-gap">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="w:cols/@w:space"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+            </style:columns>
+          </xsl:if>
         </style:page-layout-properties>
         <style:header-style>
           <style:header-footer-properties>
@@ -293,6 +406,8 @@
       <xsl:call-template name="InsertPageNumbering"/>
     </xsl:if>
 
+    
+    
   </xsl:template>
 
   <!-- page margins -->

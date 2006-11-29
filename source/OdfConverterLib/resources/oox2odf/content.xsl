@@ -80,17 +80,21 @@
       </office:automatic-styles>
       <office:body>
         <office:text>
+          <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
+            </xsl:if>
           <xsl:choose>
             <xsl:when test="document('word/document.xml')//w:document/w:body/w:p/w:pPr/w:sectPr">
               <xsl:apply-templates select="document('word/document.xml')//w:document/w:body" mode="sections"/>
-              <text:p>
-                <xsl:attribute name="text:style-name">
-                  <xsl:text>P_Standard</xsl:text>
-                </xsl:attribute>
-              </text:p>
             </xsl:when>
           </xsl:choose>
+          <text:p>
+            <xsl:attribute name="text:style-name">
+              <xsl:text>P_F</xsl:text>
+            </xsl:attribute>
+          </text:p>
+          
             <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr)]"/>
+          
         </office:text>
       </office:body>
     </office:document-content>
@@ -110,8 +114,37 @@
             <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
           </xsl:attribute>
         </style:style>
+   
       </xsl:if>
+      <style:style>
+        <xsl:attribute name="style:name">
+          <xsl:value-of select="concat('F_P_',generate-id(.))"/>
+        </xsl:attribute>
+        <xsl:attribute name="style:family">
+          <xsl:text>paragraph</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="style:master-page-name">
+          <xsl:value-of select="concat('First_H_',generate-id(.))"/>
+        </xsl:attribute>
+      </style:style>
     </xsl:for-each>
+    
+    <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
+      <style:style>
+        <xsl:attribute name="style:name">
+          <xsl:text>P_F</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="style:family">
+          <xsl:text>paragraph</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="style:parent-style-name">
+          <xsl:text>Standard</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="style:master-page-name">
+          <xsl:text>First_Page</xsl:text>
+        </xsl:attribute>
+      </style:style>
+      </xsl:if>
     <style:style>
       <xsl:attribute name="style:name">
         <xsl:text>P_Standard</xsl:text>
@@ -132,6 +165,7 @@
         <xsl:variable name="id2">
           <xsl:value-of select="generate-id(.)"/>
         </xsl:variable>
+    
         <text:section>
           <xsl:attribute name="text:style-name">
             <xsl:value-of select="$id2"/>
@@ -139,6 +173,11 @@
           <xsl:attribute name="text:name">
             <xsl:value-of select="$id"/>
           </xsl:attribute>
+          <text:p>
+            <xsl:attribute name="text:style-name">
+              <xsl:value-of select="concat('F_P_',$id2)"/>
+            </xsl:attribute>
+          </text:p>
           <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
             <text:p>
               <xsl:attribute name="text:style-name">
@@ -147,6 +186,13 @@
             </text:p>
           </xsl:if>
           <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2]"/>
+          <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+          <text:p>
+            <xsl:attribute name="text:style-name">
+              <xsl:text>P_Standard</xsl:text>
+            </xsl:attribute>
+          </text:p>
+          </xsl:if>
         </text:section>
     
   </xsl:template>
