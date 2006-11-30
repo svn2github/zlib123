@@ -173,11 +173,13 @@
           <xsl:attribute name="text:name">
             <xsl:value-of select="$id"/>
           </xsl:attribute>
+          <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr/w:footerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr/w:headerReference/@w:type = 'first'">
           <text:p>
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="concat('F_P_',$id2)"/>
             </xsl:attribute>
           </text:p>
+            </xsl:if>
           <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or preceding::w:sectPr/w:pgMar/@w:top != ./w:pgMar/@w:top or preceding::w:sectPr/w:pgMar/@w:left != ./w:pgMar/@w:left or preceding::w:sectPr/w:pgMar/@w:right != ./w:pgMar/@w:right or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer">
 
             <text:p>
