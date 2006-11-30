@@ -238,16 +238,18 @@
     </xsl:when>
     <xsl:otherwise>0</xsl:otherwise>
  </xsl:choose>
-  
+</xsl:variable>
+    
 <xsl:variable name="WFirstLine">
     <xsl:choose>
       <xsl:when test="$Ind/@w:firstLine"></xsl:when>
       <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
-  </xsl:variable>
-</xsl:variable>
-    
+ </xsl:variable>
 
+
+   
+    
     <xsl:choose>
       
       <xsl:when test="$Ind/@w:hanging">
@@ -304,25 +306,32 @@
         <xsl:attribute name="text:space-before">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="number($Ind/@w:left) + number($Ind/@w:firstLine) - $paragraphIndent"/>
+              <xsl:value-of select="number($WLeft) + number($WFirstLine) - $paragraphIndent"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name="text:min-label-width">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="number($Ind/@w:firstLine)"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:choose>
+                  <xsl:when test="../w:multiLevelType/@w:val='multilevel' and number($tab) > (number($WLeft) - number($WFirstLine))">                
+                    <xsl:value-of select="$tab - number($WLeft) - number($WFirstLine)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="number($WFirstLine)"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name="text:min-label-distance">
           <xsl:choose>
             <xsl:when
-              test="(3 * number($Ind/@w:firstLine)) &lt; (number($tab) - number($Ind/@w:left)) ">
+              test="(3 * number($WFirstLine)) &lt; (number($tab) - number($WLeft)) ">
               <xsl:value-of
-                select="number($tab) - number($Ind/@w:left) - (2 * number($Ind/@w:firstLine))"/>
+                select="number($tab) - number($WLeft) - (2 * number($WFirstLine))"/>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
