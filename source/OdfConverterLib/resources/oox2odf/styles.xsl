@@ -316,7 +316,8 @@
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
         <style:page-layout-properties>
           <xsl:call-template name="InsertPageLayoutProperties"/>
-          <xsl:if test="w:cols/@w:num">
+          <xsl:choose>
+            <xsl:when test="w:cols/@w:num">
             <style:columns>
               <xsl:attribute name="fo:column-count">
                 <xsl:value-of select="w:cols/@w:num"/>
@@ -330,7 +331,16 @@
                 </xsl:call-template>
               </xsl:attribute>
             </style:columns>
-          </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+              <style:columns>
+                <xsl:attribute name="fo:column-count">
+                  <xsl:text>1</xsl:text>
+                </xsl:attribute>
+              </style:columns>
+            </xsl:otherwise>
+            </xsl:choose>
+          
         </style:page-layout-properties>
         <style:header-style>
           <style:header-footer-properties>

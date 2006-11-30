@@ -80,19 +80,19 @@
       </office:automatic-styles>
       <office:body>
         <office:text>
-          <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
-            </xsl:if>
           <xsl:choose>
             <xsl:when test="document('word/document.xml')//w:document/w:body/w:p/w:pPr/w:sectPr">
               <xsl:apply-templates select="document('word/document.xml')//w:document/w:body" mode="sections"/>
             </xsl:when>
           </xsl:choose>
-          <text:p>
-            <xsl:attribute name="text:style-name">
-              <xsl:text>P_F</xsl:text>
-            </xsl:attribute>
-          </text:p>
-          
+          <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
+            <text:p>
+              <xsl:attribute name="text:style-name">
+                <xsl:text>P_F</xsl:text>
+              </xsl:attribute>
+            </text:p>
+            
+          </xsl:if>
             <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr)]"/>
           
         </office:text>
@@ -178,7 +178,8 @@
               <xsl:value-of select="concat('F_P_',$id2)"/>
             </xsl:attribute>
           </text:p>
-          <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+          <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or preceding::w:sectPr/w:pgMar/@w:top != ./w:pgMar/@w:top or preceding::w:sectPr/w:pgMar/@w:left != ./w:pgMar/@w:left or preceding::w:sectPr/w:pgMar/@w:right != ./w:pgMar/@w:right or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer">
+
             <text:p>
               <xsl:attribute name="text:style-name">
                 <xsl:value-of select="concat('P_',$id2)"/>
@@ -186,7 +187,7 @@
             </text:p>
           </xsl:if>
           <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2]"/>
-          <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+          <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or preceding::w:sectPr/w:pgMar/@w:top != ./w:pgMar/@w:top or preceding::w:sectPr/w:pgMar/@w:left != ./w:pgMar/@w:left or preceding::w:sectPr/w:pgMar/@w:right != ./w:pgMar/@w:right or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer ">
           <text:p>
             <xsl:attribute name="text:style-name">
               <xsl:text>P_Standard</xsl:text>
@@ -254,24 +255,33 @@
     </style:style>
   </xsl:template>
   
-  <xsl:template match="w:sectPr" mode="automaticstyles">
+  <xsl:template match="w:sectPr[parent::w:pPr]" mode="automaticstyles">
     <style:style style:name="{generate-id(.)}" style:family="section">
       <style:section-properties>
-        <xsl:if test="w:cols/@w:num">
-          <style:columns>
-            <xsl:attribute name="fo:column-count">
-              <xsl:value-of select="w:cols/@w:num"/>
-            </xsl:attribute>
-            <xsl:attribute name="fo:column-gap">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:cols/@w:space"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </style:columns>
-        </xsl:if>
+        <xsl:choose>
+          <xsl:when test="w:cols/@w:num">
+            <style:columns>
+              <xsl:attribute name="fo:column-count">
+                <xsl:value-of select="w:cols/@w:num"/>
+              </xsl:attribute>
+              <xsl:attribute name="fo:column-gap">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="w:cols/@w:space"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+            </style:columns>
+          </xsl:when>
+          <xsl:otherwise>
+            <style:columns>
+              <xsl:attribute name="fo:column-count">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+            </style:columns>
+          </xsl:otherwise>
+        </xsl:choose>
       </style:section-properties>      
     </style:style>
   </xsl:template>
