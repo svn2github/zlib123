@@ -924,6 +924,7 @@
         <xsl:text>' protection</xsl:text>
       </xsl:message>
     </xsl:if>
+    <xsl:apply-templates/>
   </xsl:template>
 
   <xsl:template name="InsertDropCapAttributes">
