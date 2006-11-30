@@ -153,34 +153,148 @@
         <xsl:when test="w:pPr/w:tabs/w:tab">
           <xsl:value-of select="w:pPr/w:tabs/w:tab/@w:pos"/>
         </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="document('word/settings.xml')//w:settings/w:defaultTabStop/@w:val"/>
-        </xsl:otherwise>
+        <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 
+   	<xsl:variable name="abstractNumId">
+      <xsl:value-of select="parent::w:abstractNum/@w:abstractNumId"/>
+    </xsl:variable>
+
+    <xsl:variable name="numId">
+      <xsl:value-of select="w:num[w:abstractNumId/@w:val=$abstractNumId]/@w:numId"/>
+    </xsl:variable>
+
+    <xsl:variable name="paragraph" select="document('word/document.xml')//descendant::w:p[w:pPr/w:numPr/w:numId=$numId]"/>
+
+    <xsl:variable name="paragraphStyleProperties" select="document('word/styles.xml')//descendant::w:style[@w:styleId = $paragraph/w:pPr/w:pStyle/@w:val]/w:pPr"/>
+
+    <xsl:variable name="paragraphBorder">
+      
+      <xsl:choose>
+        
+        <xsl:when test="$paragraph/w:pPr/w:pBdr/w:left/@w:sz">
+          <xsl:value-of select="$paragraph/w:pPr/w:pBdr/w:left/@w:sz"/>
+        </xsl:when>
+        
+        <xsl:when test="$paragraphStyleProperties/w:pBdr/w:left/@w:sz">
+          <xsl:value-of select="$paragraphStyleProperties/w:pBdr/w:left/@w:sz"/>
+        </xsl:when>
+        
+        <xsl:otherwise>0</xsl:otherwise>
+        
+      </xsl:choose>
+      
+    </xsl:variable> 
+    
+    <xsl:variable name="paragraphPadding">
+      
+      <xsl:choose>
+        
+        <xsl:when test="$paragraph/w:pPr/w:pBdr/w:left/@w:space">
+          <xsl:value-of select="$paragraph/w:pPr/w:pBdr/w:left/@w:space"/>
+        </xsl:when>
+        
+        <xsl:when test="$paragraphStyleProperties/w:pBdr/w:left/@w:space">
+          <xsl:value-of select="$paragraphStyleProperties/w:pBdr/w:left/@w:space"/>
+        </xsl:when>
+        
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    
+    </xsl:variable>
+    
+    <xsl:variable name="paragraphMargin">
+      <xsl:choose>
+        
+        <xsl:when test="$paragraph/w:pPr/w:pBdr/w:ind/@w:left">
+          <xsl:value-of select="$paragraph/w:pPr/w:pBdr/w:ind/@w:left"/>
+        </xsl:when>
+        
+        <xsl:when test="$paragraphStyleProperties/w:ind/@w:left">
+          <xsl:value-of select="$paragraphStyleProperties/w:ind/@w:left"/>
+        </xsl:when>
+        
+        <xsl:otherwise>0</xsl:otherwise>
+        
+      </xsl:choose>
+    </xsl:variable>
+    
+<xsl:variable name="paragraphIndent" select="$paragraphBorder+$paragraphPadding+$paragraphMargin"/>
+    
+<xsl:variable name="WLeft">
+  <xsl:choose>    
+    <xsl:when test="$Ind/@w:left">
+    <xsl:value-of select="$Ind/@w:left"/>
+    </xsl:when>
+    <xsl:otherwise>0</xsl:otherwise>
+</xsl:choose>
+</xsl:variable>
+    
+<xsl:variable name="WHanging">
+  <xsl:choose>
+    <xsl:when test="$Ind/@w:hanging">
+      <xsl:value-of select="$Ind/@w:hanging"/>
+    </xsl:when>
+    <xsl:otherwise>0</xsl:otherwise>
+ </xsl:choose>
+  
+<xsl:variable name="WFirstLine">
     <xsl:choose>
+      <xsl:when test="$Ind/@w:firstLine"></xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+</xsl:variable>
+    
+
+    <xsl:choose>
+      
       <xsl:when test="$Ind/@w:hanging">
         <xsl:attribute name="text:space-before">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="$Ind/@w:left - $Ind/@w:hanging"/>
+              <xsl:choose>
+                <xsl:when test="number($WLeft) - number($WHanging) = 0">0</xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$WLeft - $WHanging - $paragraphIndent" />    
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
+          </xsl:call-template>          
         </xsl:attribute>
         <xsl:attribute name="text:min-label-width">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="number($Ind/@w:hanging)"/>
+              <xsl:choose>
+                <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
+                <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
+                <xsl:when test="number($tab)>(number($WLeft) - ($WHanging)) and (number($WHanging) > (number($tab) - number($WLeft) + number($WHanging)))">
+                  <xsl:value-of select="$tab - $WLeft + $WHanging"/>
+                </xsl:when>
+                <xsl:when test="$paragraph/w:pPr/w:ind/@w:hanging">
+                  <xsl:value-of select="$paragraph/w:pPr/w:ind/@w:hanging"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$Ind/@w:hanging"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name="text:min-label-distance">
           <xsl:choose>
-            <xsl:when test="number($Ind/@w:hanging) &lt; (number($tab) - number($Ind/@w:left)) ">
-              <xsl:value-of select="number($tab) - number($Ind/@w:left)"/>
+            <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
+            <xsl:when test="w:suff/@w:val='space'">350</xsl:when>            
+            <xsl:when test="$paragraph/w:pPr/w:ind/@w:hanging">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="$paragraph/w:pPr/w:ind/@w:hanging"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>         
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
@@ -190,7 +304,7 @@
         <xsl:attribute name="text:space-before">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="number($Ind/@w:left) + number($Ind/@w:firstLine)"/>
+              <xsl:value-of select="number($Ind/@w:left) + number($Ind/@w:firstLine) - $paragraphIndent"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
