@@ -7,7 +7,7 @@
 
   <xsl:template match="w:sectPr[parent::w:pPr]" mode="sections">
     <xsl:variable name="id">
-      <xsl:value-of select="generate-id(following::w:sectPr)"/>
+      <xsl:value-of select="generate-id(preceding::w:sectPr/ancestor::w:p)"/>
     </xsl:variable>
     <xsl:variable name="id2">
       <xsl:value-of select="generate-id(.)"/>
@@ -17,7 +17,7 @@
         <xsl:value-of select="$id2"/>
       </xsl:attribute>
       <xsl:attribute name="text:name">
-        <xsl:value-of select="$id"/>
+        <xsl:value-of select="concat('S_',$id2)"/>
       </xsl:attribute>
       <xsl:if
         test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr/w:footerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr/w:headerReference/@w:type = 'first'">
@@ -36,7 +36,7 @@
         </text:p>
       </xsl:if>
       <xsl:apply-templates
-        select="document('word/document.xml')/w:document/w:body/child::node()[generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2]"/>
+        select="document('word/document.xml')/w:document/w:body/child::node()[generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)]"/>
       <xsl:if
         test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or preceding::w:sectPr/w:pgMar/@w:top != ./w:pgMar/@w:top or preceding::w:sectPr/w:pgMar/@w:left != ./w:pgMar/@w:left or preceding::w:sectPr/w:pgMar/@w:right != ./w:pgMar/@w:right or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer ">
         <text:p>
@@ -62,6 +62,7 @@
           <xsl:attribute name="style:master-page-name">
             <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
           </xsl:attribute>
+          <style:text-properties fo:language="en" fo:country="US" text:display="true"/>
         </style:style>
       </xsl:if>
       <style:style>
@@ -74,6 +75,7 @@
         <xsl:attribute name="style:master-page-name">
           <xsl:value-of select="concat('First_H_',generate-id(.))"/>
         </xsl:attribute>
+        <style:text-properties fo:language="en" fo:country="US" text:display="true"/>
       </style:style>
     </xsl:for-each>
     <xsl:if
@@ -91,6 +93,7 @@
         <xsl:attribute name="style:master-page-name">
           <xsl:text>First_Page</xsl:text>
         </xsl:attribute>
+        <style:text-properties fo:language="en" fo:country="US" text:display="true"/>
       </style:style>
     </xsl:if>
     <style:style>
@@ -103,6 +106,7 @@
       <xsl:attribute name="style:master-page-name">
         <xsl:text>Standard</xsl:text>
       </xsl:attribute>
+      <style:text-properties fo:language="en" fo:country="US" text:display="true"/>
     </style:style>
   </xsl:template>
   
