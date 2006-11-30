@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  * Copyright (c) 2006, Clever Age
+  * All rights reserved.
+  * 
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions are met:
+  *
+  *     * Redistributions of source code must retain the above copyright
+  *       notice, this list of conditions and the following disclaimer.
+  *     * Redistributions in binary form must reproduce the above copyright
+  *       notice, this list of conditions and the following disclaimer in the
+  *       documentation and/or other materials provided with the distribution.
+  *     * Neither the name of Clever Age nor the names of its contributors 
+  *       may be used to endorse or promote products derived from this software
+  *       without specific prior written permission.
+  *
+  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
+  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  * DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
+  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  exclude-result-prefixes="w text style">
+  
+  <!-- table-of content paragraph -->
+  <xsl:template match="w:p" mode="index">
+    <text:p text:style-name="{generate-id(self::node())}">
+      <xsl:apply-templates mode="index"/>
+    </text:p>
+    <xsl:if test="following-sibling::w:p[1]/descendant::w:r[contains(w:instrText,'PAGEREF')]">
+      <xsl:apply-templates select="following-sibling::w:p[1]" mode="index"/>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- insert table-of content properties -->
+  <xsl:template name="InsertIndexProperties">
+    <xsl:variable name="maxLevel">
+      <xsl:value-of select="substring-before(substring-after(descendant::w:r/w:instrText,'-'),'&quot;')"/>
+    </xsl:variable>
+    <text:table-of-content-source text:outline-level="{$maxLevel}">
+      <text:index-title-template text:style-name="Contents_20_Heading"/>
+      <xsl:call-template name="InsertTableOfContentEntryProperties">
+        <xsl:with-param name="level">
+          <xsl:value-of select="substring-after(substring-before(descendant::w:r/w:instrText,'-'),'&quot;')"/>
+        </xsl:with-param>
+        <xsl:with-param name="maxLevel" select="$maxLevel"/>
+      </xsl:call-template>
+    </text:table-of-content-source>
+  </xsl:template>
+  
+  <!-- insert entry properties -->
+  <xsl:template name="InsertTableOfContentEntryProperties">
+    <xsl:param name="level"/>
+    <xsl:param name="maxLevel"/>
+    <xsl:choose>
+      <xsl:when test="not(number($level) &gt; number($maxLevel))">
+        <text:table-of-content-entry-template text:outline-level="{$level}" text:style-name="{concat('Contents_20_',$level)}">
+          <xsl:if test="descendant::w:pStyle[@w:val = concat('TOC',$level)]">
+            <xsl:apply-templates mode="entry"/>
+          </xsl:if>
+          <xsl:for-each select="following-sibling::w:p[descendant::w:pStyle/@w:val=concat('TOC',$level) and not(preceding::w:p/descendant::w:pStyle/@w:val=concat('TOC',$level))]">
+            <xsl:apply-templates mode="entry"/>
+          </xsl:for-each>
+        </text:table-of-content-entry-template>
+        <xsl:call-template name="InsertTableOfContentEntryProperties">
+          <xsl:with-param name="level" select="number($level)+1"/>
+          <xsl:with-param name="maxLevel" select="$maxLevel"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- insert entry properties for text and numbers -->
+  <xsl:template match="w:t" mode="entry">
+    <xsl:choose>
+      <xsl:when test="number(child::text)">
+        <text:index-entry-page-number/>
+      </xsl:when>
+      <xsl:otherwise>
+        <text:index-entry-text/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- insert entry properties for tabs -->
+  <xsl:template match="w:tab[not(parent::w:tabs)]" mode="entry">
+    <text:index-entry-tab-stop style:type="{preceding::w:tabs[1]/w:tab/@w:val}">
+      <xsl:call-template name="InsertStyleLeaderChar">
+        <xsl:with-param name="leaderChar">
+          <xsl:value-of select="preceding::w:tabs[1]/w:tab/@w:leader"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </text:index-entry-tab-stop>
+  </xsl:template>
+  
+  <!-- insert tab-leader char -->
+  <xsl:template name="InsertStyleLeaderChar">
+    <xsl:param name="leaderChar"/>
+      <xsl:choose>
+        <xsl:when test="$leaderChar='dot' ">
+          <xsl:attribute name="style:leader-char">.</xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+  </xsl:template>
+  
+  <!-- handle text in table-of content -->
+  <xsl:template match="text()" mode="entry"/>
+  
+  <!-- handle runs in order to avoid unnecessary text:spans -->
+  <xsl:template match="w:r" mode="index">
+    <xsl:choose>
+      <xsl:when test="w:fldChar or w:instrText"></xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="."/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+</xsl:stylesheet>

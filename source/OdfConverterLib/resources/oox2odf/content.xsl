@@ -44,6 +44,8 @@
   <xsl:import href="fonts.xsl"/>
   <xsl:import href="fields.xsl"/>
   <xsl:import href="footnotes.xsl"/>
+  <xsl:import href="indexes.xsl"/>
+
   <xsl:import href="frames.xsl"/>
   <xsl:import href="sections.xsl"/>
 
@@ -283,6 +285,19 @@
     </xsl:variable>
     
     <xsl:choose>
+      
+      <!--check if the paragraph is in table-of content -->
+      <xsl:when test="descendant::w:r[contains(w:instrText,'TOC')]">
+        <text:table-of-content text:style-name="Sect1" text:protected="true" text:name="Table of Contents1">
+          <xsl:call-template name="InsertIndexProperties"/>
+          <text:index-body>
+            <xsl:apply-templates select="." mode="index"/>
+          </text:index-body>
+        </text:table-of-content>
+      </xsl:when>
+      
+      <xsl:when test="descendant::w:r[contains(w:instrText,'PAGEREF')]"/>
+        
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != ''">
           <xsl:apply-templates select="." mode="list">

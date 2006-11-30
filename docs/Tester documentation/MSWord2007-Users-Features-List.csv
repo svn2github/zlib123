@@ -422,13 +422,13 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;Fonts;;;;2;0.3-M2;;;;
 ;;Effects;;;;2;0.3-M2;;;;
 ;;;;;;;;;;;
-References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;;;;
+References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Completed;;;
 ;;;Right align page numbers;;;1;0.3-M2;;;;
 ;;;Use hyperlinks instead of page numbers;;;1;0.3-M2;;;;
 ;;;Tab leader;;;1;0.3-M2;;;;
 ;;;Show levels;;;1;0.3-M2;;;;
 ;;;Options;Build TOC from;Styles;1;0.3-M2;;;;
-;;;;;Ouline levels;1;0.3-M2;;;;
+;;;;;Outline levels;1;0.3-M2;Completed;;;
 ;;;;;Table entry fields;1;0.3-M2;;;;
 ;;;;;;;;;;;
 ;Foot notes;Footnote and Endnote;Footnotes;;;2;0.3-M1;Completed;;;
