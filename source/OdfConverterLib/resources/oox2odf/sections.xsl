@@ -7,7 +7,7 @@
 
   <xsl:template match="w:sectPr[parent::w:pPr]" mode="sections">
     <xsl:variable name="id">
-      <xsl:value-of select="generate-id(preceding::w:sectPr/ancestor::w:p)"/>
+      <xsl:value-of select="generate-id(preceding::w:p/w:pPr/w:sectPr)"/>
     </xsl:variable>
     <xsl:variable name="id2">
       <xsl:value-of select="generate-id(.)"/>
@@ -36,7 +36,7 @@
         </text:p>
       </xsl:if>
       <xsl:apply-templates
-        select="document('word/document.xml')/w:document/w:body/child::node()[generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)]"/>
+        select="document('word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"/>
       <xsl:if
         test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or preceding::w:sectPr/w:pgMar/@w:top != ./w:pgMar/@w:top or preceding::w:sectPr/w:pgMar/@w:left != ./w:pgMar/@w:left or preceding::w:sectPr/w:pgMar/@w:right != ./w:pgMar/@w:right or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer ">
         <text:p>

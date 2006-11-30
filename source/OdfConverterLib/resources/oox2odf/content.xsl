@@ -95,7 +95,7 @@
               </xsl:attribute>
             </text:p>
           </xsl:if>
-            <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr)]"/>
+            <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr) and not(descendant::w:sectPr)]"/>
         </office:text>
       </office:body>
     </office:document-content>
