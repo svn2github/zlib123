@@ -43,7 +43,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private string[] PPRCHANGE_CHILDREN = { "pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr", "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap", "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid", "spacing", "ind", "contextualSpacing", "mirrorIndents", "textboxTightWrap", "suppressOverlap", "jc", "textDirection", "textAlignment", "outlineLvl" };
         private string[] DEL_CHILDREN = { "bookmarkEnd", "bookmarkStart", "commentRangeEnd", "commentRangeStart", "customXml", "customXmlDelRangeEnd", "customXmlDelRangeStart", "customXmlInsRangeEnd", "customXmlInsRangeStart", "customXmlMoveFromRangeEnd", "customXmlMoveFromRangeStart", "customXmlMoveToRangeEnd", "customXmlMoveToRangeStart", "del", "ins", "moveFrom", "moveFromRangeEnd", "moveFromRangeStart", "moveTo", "moveToRangeEnd", "moveToRangeStart", "permEnd", "permStart", "proofErr", "r", "sdt", "smartTag"};
-
+        private string[] TR_CHILDREN = { "tblPrEx", "trPr", "tc", "customXml", "sdt", "proofErr", "permStart", "permEnd", "bookmarkStart", "bookmarkEnd", "moveFromRangeStart", "moveFromRangeEnd", "moveToRangeStart", "moveToRangeEnd", "commentRangeStart", "commentRangeEnd", "customXmlInsRangeStart", "customXmlInsRangeEnd", "customXmlDelRangeStart", "customXmlDelRangeEnd", "customXmlMoveFromRangeStart", "customXmlMoveFromRangeEnd", "customXmlMoveToRangeStart", "customXmlMoveToRangeEnd", "ins", "del", "moveFrom", "moveTo"};
+        private string[] TRPR_CHILDREN = { "cnfStyle", "divid", "gridBefore", "gridAfter", "wBefore", "wAfter", "canSplit", "trHeight", "trHeader", "tblCellSpacing", "jc", "hidden", "ins", "del", "trPrChange" };
+        
         private Stack currentNode;
         private Stack context;
         private Stack currentInsertionRegion;
@@ -71,7 +73,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.lastInsertionRegion = null;
             this.lastFormatChangeRegion = null;
             this.dontWrites = new Stack();
-
         }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
@@ -97,6 +98,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 StartParagraph();
             }
+            else if (IsTableRow())
+            {
+            	StartTableRow();
+            }
             else if (IsStartInsert() || IsEndInsert() || IsStartFormatChange() || IsEndFormatChange() || DontWrite())
             {
                 // do nothing
@@ -120,6 +125,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             else if (IsRun())
             {
                 EndRun();
+            }
+            else if (IsTableRow())
+            {
+            	EndTableRow();
             }
             else if (IsStartInsert())
             {
@@ -266,6 +275,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.dontWrites.Push("p");
         }
 
+        
+     
+        
         private void EndParagraph()
         {
             string context = (string)this.context.Pop();
@@ -941,6 +953,94 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return false;
         }
 
+        /*
+         * Table rows
+         */
+        private bool IsTableRow()
+        {
+            Node node = (Node)this.currentNode.Peek();
+            if (node is Element)
+            {
+                return W_NAMESPACE.Equals(node.Ns) && "tr".Equals(node.Name);
+            }
+            else
+            {
+                this.currentNode.Pop();
+                bool result = IsTableRow();
+                this.currentNode.Push(node);
+                return result;
+            }
+        }
+        
+        private bool IsInTableRow()
+        {
+        	 return this.context.Contains("tr") || this.context.Contains("tr-with-ins");
+        }
+        
+       	private bool IsTableRowInsert()
+        {
+            return "tr-with-ins".Equals(this.context.Peek());
+        }
+        
+        private void StartTableRow() 
+        {
+        	if (IsInInsert())
+        	{
+        		this.context.Push("tr-with-ins");
+        	}
+        	else
+        	{
+        		this.context.Push("tr");
+        	}
+        	this.dontWrites.Push("tr");
+        }
+        
+        private void EndTableRow()
+        {
+        	Element tr = (Element) currentNode.Peek();
+        		
+        	if (IsTableRowInsert()) // only on insertion
+        	{
+        		Element trPr = tr.GetChild("trPr", W_NAMESPACE);
+        		Element region = (Element)this.currentInsertionRegion.Peek();
+        		Element ins = new Element("w", "ins", W_NAMESPACE);
+        		ins.AddAttribute(new Attribute("w", "id", "" + this.currentId++, W_NAMESPACE));
+        		ins.AddAttribute(new Attribute("w", "author", region.GetAttributeValue("creator", PCT_NAMESPACE), W_NAMESPACE));
+        		ins.AddAttribute(new Attribute("w", "date", region.GetAttributeValue("date", PCT_NAMESPACE), W_NAMESPACE));
+        		if (trPr == null)
+        		{
+        			trPr = new Element("w", "trPr", W_NAMESPACE);
+        			tr.AddChild(trPr);
+        			tr.Children = GetOrderedChildren(tr, TR_CHILDREN);
+        		}
+        		trPr.AddChild(ins);
+        		trPr.Children = GetOrderedChildren(trPr, TRPR_CHILDREN);
+        		this.context.Pop();
+        	}
+        	this.dontWrites.Pop();
+        	if (DontWrite())
+        	{
+        		AddChildToElement();
+        	}
+        	else
+        	{
+        		tr.Write(nextWriter);
+        	}
+        }
+       
+        private ArrayList GetOrderedChildren(Element parent, string [] childrenNames)
+        {
+        	ArrayList ordered = new ArrayList();
+            foreach (string childName in childrenNames)
+            {
+                Element child = parent.GetChild(childName, W_NAMESPACE);
+                if (child != null)
+                {
+                	ordered.Add(child);
+                }
+            }
+            return ordered;
+        }
 
     }
 }
