@@ -460,6 +460,12 @@
           select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]/@text:style-name"
         />
       </xsl:variable>
+      <!-- if hyperlink -->
+      <xsl:variable name="levelTextStyleName">
+        <xsl:value-of
+          select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]/*[self::text:index-entry-link-start or self::text:index-entry-link-end]/@text:style-name"
+        />
+      </xsl:variable>
       <xsl:for-each select="document('styles.xml')">
         <xsl:for-each select="key('styles', $levelStyleName)">
           <w:style w:styleId="{concat('TOC', $level)}" w:type="paragraph">
@@ -467,6 +473,14 @@
             <w:basedOn w:val="{$levelStyleName}"/>
             <w:autoRedefine/>
             <w:semiHidden/>
+            <xsl:if test="$levelTextStyleName != '' ">
+              <w:rPr>
+                <w:rStyle w:val="{$levelTextStyleName}"/>
+                <xsl:for-each select="document('styles.xml')">
+                  <xsl:apply-templates select="key('styles', $levelTextStyleName)" mode="rPr"/>
+                </xsl:for-each>
+              </w:rPr>
+            </xsl:if>
           </w:style>
         </xsl:for-each>
       </xsl:for-each>
