@@ -213,8 +213,11 @@
         <xsl:attribute name="style:name">
           <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
         </xsl:attribute>
-        <xsl:attribute name="style:master-page-name">
-          <xsl:value-of select="First_Page"/>
+        <xsl:attribute name="style:page-layout-name">
+          <xsl:value-of select="concat('PAGE',generate-id(.))"/>
+        </xsl:attribute>
+        <xsl:attribute name="style:display-name">
+          <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
         </xsl:attribute>
       </style:master-page>
         </xsl:if>
