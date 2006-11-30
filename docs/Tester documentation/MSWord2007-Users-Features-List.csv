@@ -393,10 +393,10 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;Paper;Paper Size;Paper size;;0;0.2-Final ;Completed;;;
 ;;;;Width;;0;0.2-Final ;Completed;;;
 ;;;;Height;;0;0.2-Final ;Completed;;;
-;;Layout;Section;Section start;New page;1;0.3-M2;;;;
-;;;;;Even page;1;0.3-M2;;;;
-;;;;;Odd page;1;0.3-M2;;;;
-;;;;;Continuous;1;0.3-M2;;;;
+;;Layout;Section;Section start;New page;1;Delayed;;;;
+;;;;;Even page;1;-;;;;There is Word 2007 bug, see coment in Conversion Issues.
+;;;;;Odd page;1;-;;;;There is Word 2007 bug, see coment in Conversion Issues.
+;;;;;Continuous;1;0.3-M2;Completed;;;
 ;;;;;New column;1;0.3-M2;;;;
 ;;;Header and Footer;Different odd and even;;1;0.3-M2;Completed;;;
 ;;;;Different first page;;1;0.3-M2;Completed;;;
