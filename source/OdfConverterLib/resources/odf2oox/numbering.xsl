@@ -1205,8 +1205,8 @@
               <xsl:with-param name="spaceBeforeTwip" select="$spaceBeforeTwip"/>
             </xsl:call-template>
             <!-- add tabs of current paragraph so as not to lose them in post-processing -->
-            <xsl:if test="key('styles',$styleName)//style:tab-stop">
-              <xsl:for-each select="key('styles',$styleName)/style:paragraph-properties">
+            <xsl:if test="key('styles', $styleName)//style:tab-stop">
+              <xsl:for-each select="key('styles', $styleName)/style:paragraph-properties">
                 <xsl:call-template name="ComputeParagraphTabs"/>
               </xsl:for-each>
             </xsl:if>
@@ -1536,23 +1536,25 @@
   <xsl:template name="InsertOutlineLevel">
     <xsl:param name="node"/>
     <!-- List item are first considered if exist than heading style-->
-    <xsl:variable name="stylename" select="./@text:style-name"/>
-    <xsl:variable name="list"
-      select="//office:document-content/office:automatic-styles/style:style[@style:name = $stylename]"/>
-    <xsl:if
-      test="$node[self::text:h and not($list/@style:list-style-name) and (not(parent::text:list-item) or position() > 1) ]">
-      <xsl:choose>
-        <xsl:when test="not($node/@text:outline-level)">
-          <w:outlineLvl w:val="0"/>
-        </xsl:when>
-        <xsl:when test="$node/@text:outline-level &lt;= 9">
-          <w:outlineLvl w:val="{$node/@text:outline-level}"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <w:outlineLvl w:val="9"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
+    <xsl:variable name="stylename" select="@text:style-name"/>
+    <xsl:for-each select="document('content.xml')">
+      <xsl:variable name="list" select="key('styles', $stylename)[1]"/>
+     
+      <xsl:if
+        test="$node[self::text:h and not($list/@style:list-style-name) and (not(parent::text:list-item) or position() > 1) ]">
+        <xsl:choose>
+          <xsl:when test="not($node/@text:outline-level)">
+            <w:outlineLvl w:val="0"/>
+          </xsl:when>
+          <xsl:when test="$node/@text:outline-level &lt;= 9">
+            <w:outlineLvl w:val="{$node/@text:outline-level}"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:outlineLvl w:val="9"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:for-each>
     <xsl:if test="$node[child::text:toc-mark-start]">
       <w:outlineLvl w:val="{$node/text:toc-mark-start/@text:outline-level}"/>
     </xsl:if>
