@@ -165,6 +165,10 @@
       <xsl:value-of select="w:num[w:abstractNumId/@w:val=$abstractNumId]/@w:numId"/>
     </xsl:variable>
 
+    <xsl:variable name="StyleId">      
+        <xsl:value-of select="w:pStyle/@w:val"/>
+    </xsl:variable>
+    
     <xsl:variable name="paragraph" select="document('word/document.xml')//descendant::w:p[w:pPr/w:numPr/w:numId=$numId]"/>
 
     <xsl:variable name="paragraphStyleProperties" select="document('word/styles.xml')//descendant::w:style[@w:styleId = $paragraph/w:pPr/w:pStyle/@w:val]/w:pPr"/>
@@ -242,13 +246,12 @@
     
 <xsl:variable name="WFirstLine">
     <xsl:choose>
-      <xsl:when test="$Ind/@w:firstLine"></xsl:when>
+      <xsl:when test="$Ind/@w:firstLine">
+        <xsl:value-of select="$Ind/@w:firstLine"/>
+      </xsl:when>
       <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
  </xsl:variable>
-
-
-   
     
     <xsl:choose>
       
@@ -257,6 +260,9 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
+                <xsl:when test="w:pPr/w:outlineLvl/@w:val or document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:outlineLvl/@w:val">
+                  <xsl:value-of select="$WLeft - $WHanging" />    
+                </xsl:when>
                 <xsl:when test="number($WLeft) - number($WHanging) = 0">0</xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of select="$WLeft - $WHanging - $paragraphIndent" />    
@@ -306,11 +312,20 @@
         <xsl:attribute name="text:space-before">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="number($WLeft) + number($WFirstLine) - $paragraphIndent"/>
+              <xsl:choose>
+                <xsl:when test="w:pPr/w:outlineLvl/@w:val or document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:outlineLvl/@w:val">
+                  <xsl:value-of select="number($WLeft) + number($WFirstLine)"/>    
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="number($WLeft) + number($WFirstLine) - $paragraphIndent"/>    
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
+          
         </xsl:attribute>
+       
         <xsl:attribute name="text:min-label-width">
             <xsl:call-template name="ConvertTwips">
               <xsl:with-param name="length">
@@ -321,7 +336,7 @@
                   <xsl:otherwise>
                     <xsl:value-of select="number($WFirstLine)"/>
                   </xsl:otherwise>
-                </xsl:choose>
+                  </xsl:choose>
               </xsl:with-param>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
