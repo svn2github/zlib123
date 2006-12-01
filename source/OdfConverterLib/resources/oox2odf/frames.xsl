@@ -13,16 +13,17 @@
   <xsl:template match="w:pict" >
     <draw:frame>
       <xsl:call-template name="InsertShapeStyleName"/>
+      <xsl:call-template name="InsertShapeAnchor"/>
       <xsl:call-template name="InsertShapeWidth"/>
       <xsl:call-template name="InsertShapeHeight"/>
-      <xsl:call-template name="InsertShapeAnchor"/>
       <xsl:call-template name="InsertShapeZindex"/>
       <xsl:apply-templates select="v:shape/child::node()"/>
     </draw:frame>
   </xsl:template>
   
   <xsl:template match="v:textbox">
-    <draw:text-box >
+    <draw:text-box>
+      <xsl:call-template name="InsertTextBoxAutomaticHeight"/>
       <xsl:apply-templates select="w:txbxContent/child::node()"/>
     </draw:text-box>
   </xsl:template>
@@ -71,6 +72,7 @@
         <xsl:with-param name="propertyName" select="'height'"/>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:if test="not($shape/v:textbox/@style)">
     <xsl:attribute name="svg:height">
       <xsl:call-template name="ConvertPoints">
         <xsl:with-param name="length" >
@@ -81,26 +83,37 @@
         <xsl:with-param name="unit" select="'cm'"/>
       </xsl:call-template>
     </xsl:attribute>
+    </xsl:if>
   </xsl:template>
   
   <xsl:template name="InsertShapeWidth">
     <xsl:param name="shape" select="v:shape"/>
-    <xsl:variable name="width">
+    <xsl:variable name="wrapStyle">
       <xsl:call-template name="GetShapeProperty">
         <xsl:with-param name="shape" select="$shape"/>
-        <xsl:with-param name="propertyName" select="'width'"/>
+        <xsl:with-param name="propertyName" select="'mso-wrap-style'"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:attribute name="svg:width">
-      <xsl:call-template name="ConvertPoints">
-        <xsl:with-param name="length" >
-          <xsl:call-template name="GetValue">
-            <xsl:with-param name="length" select="$width"/>
+    <xsl:choose>
+      <xsl:when test="$wrapStyle = '' or $wrapStyle != 'none' ">
+        <xsl:variable name="width">
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="shape" select="$shape"/>
+            <xsl:with-param name="propertyName" select="'width'"/>
           </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="unit" select="'cm'"/>
-      </xsl:call-template>
-    </xsl:attribute>
+        </xsl:variable>
+        <xsl:attribute name="svg:width">
+          <xsl:call-template name="ConvertPoints">
+            <xsl:with-param name="length" >
+              <xsl:call-template name="GetValue">
+                <xsl:with-param name="length" select="$width"/>
+              </xsl:call-template>
+            </xsl:with-param>
+            <xsl:with-param name="unit" select="'cm'"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template name="GetShapeProperty">
@@ -157,6 +170,9 @@
     <!--TODO automatic style content-->
     <xsl:call-template name="InsertShapeWrap"/>
     <xsl:call-template name="InsertShapeFromTextDistance"/>
+    <xsl:call-template name="InsertTextBoxPadding"/>
+    <xsl:call-template name="InsertShapeBorders"/>
+    <xsl:call-template name="InsertShapeAutomaticWidth"/>
   </xsl:template>
   
   <xsl:template name="InsertShapeWrap">
@@ -276,4 +292,179 @@
   </xsl:attribute>
   </xsl:template>
   
+  <xsl:template name="InsertTextBoxPadding">
+    <xsl:param name="shape" select="v:shape"/>
+    
+    <xsl:variable name="textBoxInset" select="$shape/v:textbox/@inset"/>
+  
+    <xsl:variable name="paddingLeft">
+      <xsl:call-template name="ConvertMilimeters">
+        <xsl:with-param name="length">
+            <xsl:call-template name="ExplodeValues">
+              <xsl:with-param name="elementNum" select="'1'"/>
+              <xsl:with-param name="text" select="$textBoxInset"/>
+            </xsl:call-template>
+          </xsl:with-param>
+        <xsl:with-param name="unit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+      <xsl:attribute name="fo:padding-left">
+        <xsl:value-of select="$paddingLeft"/>
+    </xsl:attribute>
+    
+    <xsl:variable name="paddingTop">
+      <xsl:call-template name="ConvertMilimeters">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ExplodeValues">
+            <xsl:with-param name="elementNum" select="'2'"/>
+            <xsl:with-param name="text" select="$textBoxInset"/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="unit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:attribute name="fo:padding-top">
+      <xsl:value-of select="$paddingTop"/>
+    </xsl:attribute>
+    
+    <xsl:variable name="paddingRight">
+      <xsl:call-template name="ConvertMilimeters">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ExplodeValues">
+            <xsl:with-param name="elementNum" select="'3'"/>
+            <xsl:with-param name="text" select="$textBoxInset"/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="unit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:attribute name="fo:padding-right">
+      <xsl:value-of select="$paddingRight"/>
+    </xsl:attribute>
+    
+    <xsl:variable name="paddingBottom">
+      <xsl:call-template name="ConvertMilimeters">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ExplodeValues">
+            <xsl:with-param name="elementNum" select="'4'"/>
+            <xsl:with-param name="text" select="$textBoxInset"/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="unit" select="'cm'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:attribute name="fo:padding-bottom">
+      <xsl:value-of select="$paddingBottom"/>
+    </xsl:attribute>
+  </xsl:template>
+  
+  <xsl:template name="ExplodeValues">
+    <xsl:param name="elementNum"/>
+    <xsl:param name="text"/>
+    <xsl:param name="counter" select="'1'"/>
+        <xsl:choose>
+      <xsl:when test="$elementNum = $counter">
+        <xsl:choose>
+          <xsl:when test="contains($text,',')">
+            <xsl:value-of select="substring-before($text,',')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$text"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="ExplodeValues">
+          <xsl:with-param name="elementNum" select="$elementNum"/>
+          <xsl:with-param name="text" select="substring-after($text,',')"/>
+          <xsl:with-param name="counter" select="$counter+1"></xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertShapeBorders">
+    <xsl:param name="shape" select="v:shape"/>
+
+    <xsl:if test="$shape/@strokeweight">
+    <xsl:variable name="borderWeight">
+      <xsl:call-template name="ConvertPoints">
+        <xsl:with-param name="length" select="$shape/@strokeweight"/>
+        <xsl:with-param name="unit" select="'cm'"/>
+        </xsl:call-template>
+    </xsl:variable> 
+      <xsl:variable name="borderColor">
+          <xsl:choose>
+            <xsl:when test="not($shape/@strokecolor)">
+              <xsl:text>#000000</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$shape/@strokecolor"/>
+            </xsl:otherwise>
+          </xsl:choose>
+      </xsl:variable> 
+      
+      <xsl:variable name="borderStyle">
+        <xsl:choose>
+          <xsl:when test="not($shape/v:stroke)">
+              <xsl:text>solid</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+              <xsl:text>double</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+      <xsl:attribute name="fo:border">
+          <xsl:value-of select="concat($borderWeight,' ',$borderStyle,' ',$borderColor)"/>
+      </xsl:attribute>
+      
+      <xsl:if test="$borderStyle= 'double' ">
+        <xsl:variable name="strokeStyle" select="$shape/v:stroke/@linestyle"/>
+        
+        <xsl:attribute name="style:border-line-width">
+          <xsl:choose>
+            <xsl:when test="$strokeStyle = 'thinThin' or $strokeStyle = 'thickBetweenThin'">
+              <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.45 ,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.45,'cm')"/>
+            </xsl:when>
+            <xsl:when test="$strokeStyle = 'thinThick' ">
+              <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.7,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.2,'cm')"/>
+            </xsl:when>
+            <xsl:when test="$strokeStyle = 'thickThin' ">
+              <xsl:value-of select="concat(substring-before($borderWeight,'cm')*0.2,'cm',' ',substring-before($borderWeight,'cm')*0.1,'cm ', substring-before($borderWeight,'cm')*0.7,'cm')"/>
+            </xsl:when>
+          </xsl:choose>
+         </xsl:attribute>
+      </xsl:if>
+   </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="InsertTextBoxAutomaticHeight">
+    <xsl:if test="@style ='mso-fit-shape-to-text:t'">
+      <xsl:attribute name="fo:min-height">
+        <xsl:text>0cm</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="InsertShapeAutomaticWidth">
+    <xsl:param name="shape" select="v:shape"/>
+    <xsl:variable name="wrapStyle">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-wrap-style'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$wrapStyle != '' and $wrapStyle = 'none' ">
+        <xsl:attribute name="fo:min-width">
+          <xsl:text>0cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>

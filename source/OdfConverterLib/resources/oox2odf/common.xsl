@@ -95,36 +95,46 @@
   <xsl:template name="ConvertPoints">
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
+    <xsl:variable name="lengthVal">
+      <xsl:choose>
+        <xsl:when test="contains($length,'pt')">
+          <xsl:value-of select="substring-before($length,'pt')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$length"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$length='0' or $length=''">
+      <xsl:when test="$lengthVal='0' or $lengthVal=''">
         <xsl:value-of select="concat(0, $unit)"/>
       </xsl:when>
       <xsl:when test="$unit = 'cm'">
-        <xsl:value-of select="concat(format-number($length * 2.54 div 72,'#.###'),'cm')"/>
+        <xsl:value-of select="concat(format-number($lengthVal * 2.54 div 72,'#.###'),'cm')"/>
       </xsl:when>
       <xsl:when test="$unit = 'mm'">
-        <xsl:value-of select="concat(format-number($length * 25.4 div 72,'#.###'),'mm')"/>
+        <xsl:value-of select="concat(format-number($lengthVal * 25.4 div 72,'#.###'),'mm')"/>
       </xsl:when>
       <xsl:when test="$unit = 'in'">
-        <xsl:value-of select="concat(format-number($length div 72,'#.###'),'in')"/>
+        <xsl:value-of select="concat(format-number($lengthVal div 72,'#.###'),'in')"/>
       </xsl:when>
       <xsl:when test="$unit = 'pt'">
-        <xsl:value-of select="concat($length,'pt')"/>
+        <xsl:value-of select="concat($lengthVal,'pt')"/>
       </xsl:when>
       <xsl:when test="$unit = 'pica'">
-        <xsl:value-of select="concat(format-number($length div 12,'#.###'),'pica')"/>
+        <xsl:value-of select="concat(format-number($lengthVal div 12,'#.###'),'pica')"/>
       </xsl:when>
       <xsl:when test="$unit = 'dpt'">
-        <xsl:value-of select="concat($length,'dpt')"/>
+        <xsl:value-of select="concat($lengthVal,'dpt')"/>
       </xsl:when>
       <xsl:when test="$unit = 'px'">
-        <xsl:value-of select="concat(format-number($length * 96.19 div 72,'#.###'),'px')"/>
+        <xsl:value-of select="concat(format-number($lengthVal * 96.19 div 72,'#.###'),'px')"/>
       </xsl:when>
-      <xsl:when test="not($length)">
+      <xsl:when test="not($lengthVal)">
         <xsl:value-of select="concat(0,'cm')"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$length"/>
+        <xsl:value-of select="$lengthVal"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -247,6 +257,38 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$length"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="ConvertMilimeters">
+    <xsl:param name="length"/>
+    <xsl:param name="unit"/>
+    <xsl:variable name="lengthVal">
+      <xsl:choose>
+        <xsl:when test="contains($length,'mm')">
+          <xsl:value-of select="substring-before($length,'mm')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$length"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$lengthVal='0' or $lengthVal=''">
+        <xsl:value-of select="concat(0, $unit)"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'cm'">
+        <xsl:value-of select="concat(format-number($lengthVal div 10,'#.###'),'cm')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'mm'">
+        <xsl:value-of select="concat($lengthVal,'mm')"/>
+      </xsl:when>
+       <xsl:when test="not($lengthVal)">
+        <xsl:value-of select="concat(0,'cm')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$lengthVal"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

@@ -64,61 +64,71 @@
       </office:font-face-decls>
       <office:automatic-styles>
        <!--automatic styles for document body-->
-        <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
-          mode="automaticstyles"/>
-  
-        <!-- document with lists-->
-        <xsl:if
-          test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
-          or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId] ">
-          <!-- automatic list styles with empty num format for elements which has non-existent w:num attached -->
-          <xsl:apply-templates 
-            select="document('word/document.xml')/w:document/w:body/descendant::w:numId
-            [not(document('word/numbering.xml')/w:numbering/w:num/@w:numId = @w:val)][1]"
-            mode="automaticstyles"/>
-          <!-- automatic list styles-->
-          <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
-        </xsl:if>
+        <xsl:call-template name="InsertBodyStyles"/>
+        <xsl:call-template name="InsertListStyles"/>
         <xsl:call-template name="ParagraphFromSectionsStyles"/>
+        <xsl:call-template name="InsertSectionsStyles"/>
       </office:automatic-styles>
       <office:body>
         <office:text>
-          <xsl:choose>
-            <xsl:when test="document('word/document.xml')//w:document/w:body/w:p/w:pPr/w:sectPr">
-              <xsl:apply-templates select="document('word/document.xml')//w:document/w:body" mode="sections"/>
-            </xsl:when>
-          </xsl:choose>
-          <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
-            <text:p>
-              <xsl:attribute name="text:style-name">
-                <xsl:text>P_F</xsl:text>
-              </xsl:attribute>
-            </text:p>
-          </xsl:if>
-            <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr) and not(descendant::w:sectPr)]"/>
+          <xsl:call-template name="InsertDocumentBody"/>
         </office:text>
       </office:body>
     </office:document-content>
   </xsl:template>
 
+<!--  generates automatic styles for sections-->
+  <xsl:template name="InsertSectionsStyles">
+    <xsl:if test="w:sectPr">
+      <xsl:apply-templates select="w:sectPr" mode="automaticstyles"/>
+    </xsl:if>
+  </xsl:template>
+  
+  <!--  generates automatic styles for paragraphs  ho w does it exactly work ?? -->
+  <xsl:template name="InsertBodyStyles">
+    <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
+      mode="automaticstyles"/>
+  </xsl:template>
+  
+  <xsl:template name="InsertListStyles">
+    <!-- document with lists-->
+    <xsl:if
+      test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+      or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId] ">
+      <!-- automatic list styles with empty num format for elements which has non-existent w:num attached -->
+      <xsl:apply-templates
+        select="document('word/document.xml')/w:document/w:body/descendant::w:numId
+        [not(document('word/numbering.xml')/w:numbering/w:num/@w:numId = @w:val)][1]"
+        mode="automaticstyles"/>
+      <!-- automatic list styles-->
+      <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+    </xsl:if>
+  </xsl:template>
+  
+<!--  inserts document elements-->
+  <xsl:template name="InsertDocumentBody">
+    <xsl:choose>
+      <xsl:when test="document('word/document.xml')//w:document/w:body/w:p/w:pPr/w:sectPr">
+        <xsl:apply-templates select="document('word/document.xml')//w:document/w:body" mode="sections"/>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
+      <text:p>
+        <xsl:attribute name="text:style-name">
+          <xsl:text>P_F</xsl:text>
+        </xsl:attribute>
+      </text:p>
+    </xsl:if>
+    <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr) and not(descendant::w:sectPr)]"/>
+    </xsl:template>
+  
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
   <xsl:template
     match="w:pPr[parent::w:p]|w:r[parent::w:p and child::w:br[@w:type='page' or @w:type='column'] and not(parent::w:p[child::wpPr])]"
     mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">      
-      <xsl:choose>
-        <xsl:when test="w:pStyle">
-          <xsl:attribute name="style:parent-style-name">
-            <xsl:value-of select="w:pStyle/@w:val"/>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="style:parent-style-name">
-            <xsl:text>Normal</xsl:text>
-          </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="InsertParagraphParentStyle"/>
       
       <style:paragraph-properties>
         <xsl:call-template name="InsertDefaultParagraphProperties"/>
@@ -130,11 +140,24 @@
         <xsl:apply-templates select="w:rPr" mode="automaticstyles"/>
       </xsl:if>
     </style:style>
-    <xsl:if test="w:sectPr">
-      <xsl:apply-templates select="w:sectPr" mode="automaticstyles"/>
-    </xsl:if>
-  </xsl:template>
+   </xsl:template>
 
+<!--  when paragraph has no parent style it should be set to Normal style which contains all default paragraph properties -->
+  <xsl:template name="InsertParagraphParentStyle">
+    <xsl:choose>
+      <xsl:when test="w:pStyle">
+        <xsl:attribute name="style:parent-style-name">
+          <xsl:value-of select="w:pStyle/@w:val"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="style:parent-style-name">
+          <xsl:text>Normal</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <!-- create a style for each run. Do not take w:pPr/w:rPr into consideration. -->
   <xsl:template match="w:rPr[parent::w:r]" mode="automaticstyles">
     <xsl:message terminate="no">progress:w:rPr</xsl:message>
@@ -151,7 +174,6 @@
           </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
-      
       <style:text-properties>
         <xsl:call-template name="InsertTextProperties"/>
       </style:text-properties>
@@ -170,7 +192,7 @@
     <!-- do nothing. -->
   </xsl:template>
 
-  <!--  get outline level from styles hierarchy -->
+  <!--  get outline level from styles hierarchy for headings -->
   <xsl:template name="GetStyleOutlineLevel">
     <xsl:param name="outline"/>
     <xsl:variable name="basedOn">
@@ -178,7 +200,6 @@
         select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"
       />
     </xsl:variable>
-
     <!--  Search outlineLvl in style based on style -->
     <xsl:choose>
       <xsl:when
@@ -228,7 +249,6 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
       <xsl:otherwise>
         <xsl:variable name="outline">
           <xsl:value-of select="$node/w:r/w:rPr/w:rStyle/@w:val"/>
@@ -310,7 +330,6 @@
       <xsl:when test="$outlineLevel != ''">
         <xsl:apply-templates select="." mode="heading"/>
       </xsl:when>
-       
       <!--  default scenario - paragraph-->
       <xsl:otherwise>
         <xsl:apply-templates select="." mode="paragraph"/>
@@ -328,43 +347,50 @@
           <xsl:value-of select="generate-id(self::node())"/>
         </xsl:attribute>
       </xsl:if>
-      
       <!--header outline level -->
-      <xsl:attribute name="text:outline-level">
-        <xsl:variable name="headingLvl">
-          <xsl:call-template name="GetListProperty">
-            <xsl:with-param name="node" select="."/>
-            <xsl:with-param name="property" >w:ilvl</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:choose>
-          <xsl:when test="$headingLvl != ''">
-            <xsl:value-of select="$headingLvl+1"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$outlineLevel+1"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      
+      <xsl:call-template name="InsertHeadingOutlineLvl">
+          <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
+      </xsl:call-template>
       <!-- unnumbered heading is list header  -->
-      <xsl:variable name="numId">
-        <xsl:call-template name="GetListProperty">
-          <xsl:with-param name="node" select="."/>
-          <xsl:with-param name="property" >w:numId</xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-      
-      <xsl:if test="$numId = ''">
-        <xsl:attribute name="text:is-list-header">
-            <xsl:text>true</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
-
+      <xsl:call-template name="InsertHeadingAsListHeader"/>
       <xsl:apply-templates/>
     </text:h>
   </xsl:template>
 
+  <xsl:template name="InsertHeadingAsListHeader">
+    <xsl:variable name="numId">
+      <xsl:call-template name="GetListProperty">
+        <xsl:with-param name="node" select="."/>
+        <xsl:with-param name="property" >w:numId</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+        <xsl:if test="$numId = ''">
+      <xsl:attribute name="text:is-list-header">
+        <xsl:text>true</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="InsertHeadingOutlineLvl">
+    <xsl:param name="outlineLevel"/>
+    <xsl:attribute name="text:outline-level">
+      <xsl:variable name="headingLvl">
+        <xsl:call-template name="GetListProperty">
+          <xsl:with-param name="node" select="."/>
+          <xsl:with-param name="property" >w:ilvl</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$headingLvl != ''">
+          <xsl:value-of select="$headingLvl+1"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$outlineLevel+1"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+  
   <!--  paragraphs-->
   <xsl:template match="w:p" mode="paragraph">
     <xsl:choose>
@@ -405,7 +431,7 @@
       <xsl:when
         test="((contains(w:instrText,'TIME') or contains(preceding::w:instrText[1]  ,'TIME')) or(contains(w:instrText,'DATE') or contains(preceding::w:instrText[1]  ,'DATE'))) and 
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end'])">
-        <xsl:call-template name="wInstrText"></xsl:call-template>
+        <xsl:call-template name="wInstrText"/>
       </xsl:when>
       <!-- Fields -->
       <xsl:when test="parent::w:fldSimple">        
@@ -417,7 +443,6 @@
           <xsl:apply-templates/>
         </text:span>
       </xsl:when>
-
       <!--default scenario-->
       <xsl:otherwise>
         <xsl:apply-templates/>
@@ -443,18 +468,15 @@
   <xsl:template name="InsertHyperlink">
     <text:a xlink:type="simple">
       <xsl:attribute name="xlink:href">
-    
-        <!-- document hyperlink -->
+            <!-- document hyperlink -->
       <xsl:if test="@w:anchor">
           <xsl:value-of select="concat('#',@w:anchor)"/>
       </xsl:if>
-
       <!-- file or web page hyperlink with relationship id -->
       <xsl:if test="@r:id">
         <xsl:variable name="relationshipId">
           <xsl:value-of select="@r:id"/>
         </xsl:variable>
-
         <xsl:for-each
           select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
           <xsl:if test="./@Id=$relationshipId">
@@ -464,7 +486,6 @@
           </xsl:if>
         </xsl:for-each>
       </xsl:if>
-
       <!-- file or web page hyperlink -  fieldchar type (can contain several paragraphs in Word) -->
       <xsl:if test="self::w:r">
           <xsl:call-template name="GetLinkPath">
@@ -476,8 +497,7 @@
           </xsl:call-template>
         </xsl:if>
       </xsl:attribute>
-      
-      <!-- attach automatic style-->
+            <!-- attach automatic style-->
       <xsl:choose>
         <xsl:when test="w:rPr">
           <text:span text:style-name="{generate-id(self::node())}">
@@ -495,7 +515,6 @@
   <xsl:template match="w:hyperlink">
     <xsl:call-template name="InsertHyperlink"/>
   </xsl:template>
-
   <!--  text bookmark mark -->
   <xsl:template match="w:bookmarkStart">
     <text:bookmark-start>
@@ -513,7 +532,6 @@
   <!-- simple text  -->
   <xsl:template match="w:t">
     <xsl:message terminate="no">progress:w:t</xsl:message>
-
     <xsl:choose>
       <!--check whether string contains  whitespace sequence-->
       <xsl:when test="not(contains(.,'  '))">
@@ -532,19 +550,16 @@
   <xsl:template name="InsertWhiteSpaces">
     <xsl:param name="string" select="."/>
     <xsl:param name="length" select="string-length(.)"/>
-
     <!-- string which doesn't contain whitespaces-->
     <xsl:choose>
       <xsl:when test="not(contains($string,' '))">
         <xsl:value-of select="$string"/>
       </xsl:when>
-
       <!-- convert white spaces  -->
       <xsl:otherwise>
         <xsl:variable name="before">
           <xsl:value-of select="substring-before($string,' ')"/>
         </xsl:variable>
-
         <xsl:variable name="after">
           <xsl:call-template name="CutStartSpaces">
             <xsl:with-param name="cuted">
@@ -552,11 +567,9 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-
         <xsl:if test="$before != '' ">
           <xsl:value-of select="concat($before,' ')"/>
         </xsl:if>
-
         <!--add remaining whitespaces as text:s if there are any-->
         <xsl:if test="string-length(concat($before,' ', $after)) &lt; $length ">
           <xsl:choose>
@@ -579,7 +592,6 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>
-
         <!--repeat it for substring which has whitespaces-->
         <xsl:if test="contains($string,' ') and $length &gt; 0">
           <xsl:call-template name="InsertWhiteSpaces">
@@ -594,7 +606,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
   <!--  cut start spaces -->
   <xsl:template name="CutStartSpaces">
     <xsl:param name="cuted"/>
