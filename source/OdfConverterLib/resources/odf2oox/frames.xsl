@@ -188,6 +188,21 @@
     <xsl:message terminate="no">feedback:Embedded object</xsl:message>
   </xsl:template>
 
+  <!-- plugin (for instance audio and video content) -->
+  <xsl:template match="draw:plugin" mode="paragraph">
+    <xsl:message terminate="no">feedback:Embedded file with plug-in</xsl:message>
+  </xsl:template>
+
+  <!-- plugin (for instance audio and video content) -->
+  <xsl:template match="draw:applet" mode="paragraph">
+    <xsl:message terminate="no">feedback:Applet</xsl:message>
+  </xsl:template>
+
+  <!-- plugin (for instance audio and video content) -->
+  <xsl:template match="draw:floating-frame" mode="paragraph">
+    <xsl:message terminate="no">feedback:Floating frame</xsl:message>
+  </xsl:template>
+
   <!-- conversion of external images -->
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[@xlink:href and not(starts-with(@xlink:href, 'Pictures/'))]]"

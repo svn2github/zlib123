@@ -54,6 +54,13 @@
   </xsl:template>
 
   <xsl:template match="/office:document-meta/office:meta" mode="core">
+    <!-- report lost properties -->
+    <xsl:if test="meta:auto-reload">
+      <xsl:message terminate="no">feedback:Internet properties</xsl:message>
+    </xsl:if>
+    <xsl:if test="meta:hyperlink-behaviour">
+      <xsl:message terminate="no">feedback:Internet properties</xsl:message>
+    </xsl:if>
     <!-- creation date -->
     <xsl:if test="meta:creation-date">
       <xsl:variable name="dateIsValid">

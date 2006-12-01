@@ -145,6 +145,12 @@
     mode="numbering">
     <xsl:param name="style" select="'none'"/>
 
+    <!-- report lost features -->
+    <xsl:if
+      test="style:list-level-properties/@style:vertical-pos|style:list-level-properties/@style:horizontal-pos">
+      <xsl:message terminate="no">feedback:List bullet alignment</xsl:message>
+    </xsl:if>
+
     <!-- odf supports list level up to 10-->
     <xsl:if test="number(@text:level) &lt; 10">
       <w:lvl w:ilvl="{number(@text:level) - 1}">
@@ -1539,7 +1545,7 @@
     <xsl:variable name="stylename" select="@text:style-name"/>
     <xsl:for-each select="document('content.xml')">
       <xsl:variable name="list" select="key('styles', $stylename)[1]"/>
-     
+
       <xsl:if
         test="$node[self::text:h and not($list/@style:list-style-name) and (not(parent::text:list-item) or position() > 1) ]">
         <xsl:choose>
