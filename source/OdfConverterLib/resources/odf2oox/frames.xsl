@@ -3098,12 +3098,16 @@
               <xsl:message terminate="no">feedback: Nested frames</xsl:message>
             </xsl:when>
 
+            <!-- warn loss of positioning for embedded drawn objects or pictures -->
+            <xsl:when test="contains(name(), 'draw:')">
+              <xsl:message terminate="no">feedback:Position of object inside textbox</xsl:message>
+              <w:p>
+                <xsl:apply-templates select="." mode="paragraph"/>
+              </w:p>
+            </xsl:when>
+
             <!--default scenario-->
             <xsl:otherwise>
-              <!-- warn loss of positioning for embedded drawn objects or pictures -->
-              <xsl:if test="contains(name(),'draw:')">
-                <xsl:message terminate="no">feedback:Position of object inside textbox</xsl:message>
-              </xsl:if>
               <xsl:apply-templates select="."/>
             </xsl:otherwise>
           </xsl:choose>
