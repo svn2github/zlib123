@@ -1177,6 +1177,11 @@
   <xsl:template name="InsertDrawnShapeProperties">
     <xsl:param name="shapeStyle"/>
     <xsl:param name="shapeProperties"/>
+    <!-- report lost properties -->
+    <xsl:if test="$shapeStyle/style:graphic-properties/@draw:textarea-vertical-align != 'top' ">
+      <xsl:message terminate="no">feedback:Vertical alignment of text inside text-box</xsl:message>
+    </xsl:if>
+
     <xsl:attribute name="style">
 
       <xsl:call-template name="InsertDrawnShapeSize"/>
@@ -2898,6 +2903,10 @@
   <xsl:template name="InsertShapeProperties">
     <xsl:param name="shapeStyle"/>
     <xsl:param name="shapeProperties"/>
+    <!-- report lost properties -->
+    <xsl:if test="$shapeStyle/style:graphic-properties/@draw:textarea-vertical-align != 'top' ">
+      <xsl:message terminate="no">feedback:Vertical alignment of text inside text-box</xsl:message>
+    </xsl:if>
 
     <xsl:if test="ancestor::draw:a">
       <xsl:attribute name="href">
@@ -3093,8 +3102,7 @@
             <xsl:otherwise>
               <!-- warn loss of positioning for embedded drawn objects or pictures -->
               <xsl:if test="contains(name(),'draw:')">
-                <xsl:message terminate="no">feedback: Position of object inside
-                textbox</xsl:message>
+                <xsl:message terminate="no">feedback:Position of object inside textbox</xsl:message>
               </xsl:if>
               <xsl:apply-templates select="."/>
             </xsl:otherwise>
