@@ -683,32 +683,32 @@
       <xsl:variable name="fourthVal"
         select="substring-before(substring-after($clip,concat('(',$firstVal,' ',$secondVal,' ',$thirdVal,' ')),')')"/>
       <xsl:variable name="t">
-        <xsl:call-template name="GetValue">
+        <xsl:call-template name="twips-measure">
           <xsl:with-param name="length" select="$firstVal"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="b">
-        <xsl:call-template name="GetValue">
+        <xsl:call-template name="twips-measure">
           <xsl:with-param name="length" select="$thirdVal"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="r">
-        <xsl:call-template name="GetValue">
+        <xsl:call-template name="twips-measure">
           <xsl:with-param name="length" select="$secondVal"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="l">
-        <xsl:call-template name="GetValue">
+        <xsl:call-template name="twips-measure">
           <xsl:with-param name="length" select="$fourthVal"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="height">
-        <xsl:call-template name="GetValue">
+        <xsl:call-template name="twips-measure">
           <xsl:with-param name="length" select="@svg:height"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="width">
-        <xsl:call-template name="GetValue">
+        <xsl:call-template name="twips-measure">
           <xsl:with-param name="length" select="@svg:width"/>
         </xsl:call-template>
       </xsl:variable>
