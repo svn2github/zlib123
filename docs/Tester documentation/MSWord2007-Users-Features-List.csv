@@ -139,9 +139,9 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted bec
 ;;;Language;;;0;0.3-M2;Completed;;;
 ;;;;;;;;;;;
 ;;Object;;;;1;0.3-M2;;;;
-;;;Object type;;;1;0.3-M2;;;;
-;;;Display as icon;;;1;0.3-M2;;;;
-;;;Create from file;Selected file;;1;0.3-M2;;;;
+;;;Object type;;;1;0.3-M2;Completed;;Object of Open Office are not supported correctly.;
+;;;Display as icon;;;1;0.3-M2;;not supported;;
+;;;Create from file;Selected file;;1;0.3-M2;Completed;;;
 ;;;;Link to file;;1;0.3-M2;;;;
 ;;;;;;;;;;;
 ;;Signature Line;;;;2;1.0;;;;
