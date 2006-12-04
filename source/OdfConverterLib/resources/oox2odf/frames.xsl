@@ -118,24 +118,57 @@
 
   <xsl:template name="InsertShapeHeight">
     <xsl:param name="shape" select="v:shape"/>
+
     <xsl:variable name="height">
       <xsl:call-template name="GetShapeProperty">
         <xsl:with-param name="shape" select="$shape"/>
         <xsl:with-param name="propertyName" select="'height'"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:if test="not($shape/v:textbox/@style)">
-      <xsl:attribute name="svg:height">
-        <xsl:call-template name="ConvertPoints">
-          <xsl:with-param name="length">
-            <xsl:call-template name="GetValue">
-              <xsl:with-param name="length" select="$height"/>
-            </xsl:call-template>
-          </xsl:with-param>
-          <xsl:with-param name="unit" select="'cm'"/>
+
+    <xsl:variable name="relativeHeight">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-height-percent'"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$relativeHeight != ''">
+        <xsl:call-template name="InsertShapeRelativeHeight">
+          <xsl:with-param name="shape" select="$shape"/>
         </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="not($shape/v:textbox/@style)">
+          <xsl:attribute name="svg:height">
+            <xsl:call-template name="ConvertPoints">
+              <xsl:with-param name="length">
+                <xsl:call-template name="GetValue">
+                  <xsl:with-param name="length" select="$height"/>
+                </xsl:call-template>
+              </xsl:with-param>
+              <xsl:with-param name="unit" select="'cm'"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertShapeRelativeHeight">
+    <xsl:param name="shape" select="v:shape"/>
+
+    <xsl:variable name="relativeHeight">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-height-percent'"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:attribute name="style:rel-height">
+      <xsl:value-of select="$relativeHeight div 10"/>
+    </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="InsertShapeWidth">
@@ -146,7 +179,20 @@
         <xsl:with-param name="propertyName" select="'mso-wrap-style'"/>
       </xsl:call-template>
     </xsl:variable>
+
+    <xsl:variable name="relativeWidth">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-width-percent'"/>
+      </xsl:call-template>
+    </xsl:variable>
+
     <xsl:choose>
+      <xsl:when test="$relativeWidth != ''">
+        <xsl:call-template name="InsertShapeRelativeWidth">
+          <xsl:with-param name="shape" select="$shape"/>
+        </xsl:call-template>
+      </xsl:when>
       <xsl:when test="$wrapStyle = '' or $wrapStyle != 'none' ">
         <xsl:variable name="width">
           <xsl:call-template name="GetShapeProperty">
@@ -166,6 +212,21 @@
         </xsl:attribute>
       </xsl:when>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertShapeRelativeWidth">
+    <xsl:param name="shape" select="v:shape"/>
+
+    <xsl:variable name="relativeWidth">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-width-percent'"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:attribute name="style:rel-width">
+      <xsl:value-of select="$relativeWidth div 10"/>
+    </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="GetShapeProperty">
@@ -227,6 +288,63 @@
     <xsl:call-template name="InsertTextBoxPadding"/>
     <xsl:call-template name="InsertShapeBorders"/>
     <xsl:call-template name="InsertShapeAutomaticWidth"/>
+    <xsl:call-template name="InsertShapeHorizontalPos"/>
+    <xsl:call-template name="InsertShapeVerticalPos"/>
+  </xsl:template>
+
+  <xsl:template name="InsertShapeHorizontalPos">
+    <xsl:param name="shape" select="v:shape"/>
+
+    <xsl:variable name="horizontalPos">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-position-horizontal'"/>
+        <xsl:with-param name="shape" select="v:shape"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:call-template name="InsertGraphicPosH">
+      <xsl:with-param name="align" select="$horizontalPos"/>
+    </xsl:call-template>
+
+    <xsl:variable name="horizontalRelative">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
+        <xsl:with-param name="shape" select="v:shape"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:call-template name="InsertGraphicPosRelativeH">
+      <xsl:with-param name="relativeFrom" select="$horizontalRelative"/>
+    </xsl:call-template>
+  </xsl:template>
+
+
+  <xsl:template name="InsertShapeVerticalPos">
+    <xsl:param name="shape" select="v:shape"/>
+
+    <xsl:variable name="verticalPos">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-position-vertical'"/>
+        <xsl:with-param name="shape" select="v:shape"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="verticalRelative">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
+        <xsl:with-param name="shape" select="v:shape"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:call-template name="InsertGraphicPosV">
+      <xsl:with-param name="align" select="$verticalPos"/>
+      <xsl:with-param name="relativeFrom" select="$verticalRelative"/>
+    </xsl:call-template>
+
+    <xsl:call-template name="InsertGraphicPosRelativeV">
+      <xsl:with-param name="relativeFrom" select="$verticalRelative"/>
+      <xsl:with-param name="align" select="$verticalPos"/>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="InsertShapeWrap">

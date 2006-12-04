@@ -66,7 +66,7 @@
         <xsl:variable name="verticalRelativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
         <xsl:variable name="horizontalRelativeFrom" select="descendant::wp:positionH/@relativeFrom"/>
         <xsl:variable name="layoutInCell" select="@layoutInCell"/>
-        
+
         <xsl:choose>
           <xsl:when test="name() = 'wp:inline' ">
             <xsl:text>as-char</xsl:text>
@@ -74,7 +74,8 @@
           <xsl:when test="$verticalRelativeFrom = 'line' or $horizontalRelativeFrom = 'line'">
             <xsl:text>char</xsl:text>
           </xsl:when>
-          <xsl:when test="$verticalRelativeFrom = 'character' or $horizontalRelativeFrom = 'character'">
+          <xsl:when
+            test="$verticalRelativeFrom = 'character' or $horizontalRelativeFrom = 'character'">
             <xsl:text>char</xsl:text>
           </xsl:when>
           <xsl:when test="$verticalRelativeFrom = 'page'">
@@ -92,7 +93,7 @@
         </xsl:choose>
       </xsl:attribute>
 
-      
+
       <!--style name-->
       <xsl:attribute name="draw:style-name">
         <xsl:value-of select="generate-id(ancestor::w:drawing)"/>
@@ -107,10 +108,10 @@
       <xsl:if test="self::wp:anchor">
         <xsl:call-template name="SetPosition"/>
       </xsl:if>
-      
+
       <!--size-->
       <xsl:call-template name="SetSize"/>
-      
+
       <!-- image href from relationships-->
       <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
         <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
@@ -152,7 +153,7 @@
               <xsl:value-of select="-wp:positionV/wp:posOffset"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>    
+          </xsl:call-template>
         </xsl:when>
         <xsl:when test="wp:positionV/@relativeFrom = 'bottomMargin'">
           <xsl:variable name="pgH">
@@ -161,7 +162,7 @@
                 <xsl:value-of select="//w:document/w:body/w:sectPr/w:pgSz/@w:h"/>
               </xsl:with-param>
               <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>  
+            </xsl:call-template>
           </xsl:variable>
           <xsl:variable name="botMar">
             <xsl:call-template name="ConvertTwips">
@@ -179,13 +180,15 @@
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
-          <xsl:value-of select="substring-before($pgH,'cm') -substring-before($botMar,'cm') + substring-before($Pos,'cm')"/><xsl:text>cm</xsl:text>
+          <xsl:value-of
+            select="substring-before($pgH,'cm') -substring-before($botMar,'cm') + substring-before($Pos,'cm')"/>
+          <xsl:text>cm</xsl:text>
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="wp:positionV/wp:posOffset"/>
             <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>    
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
@@ -242,67 +245,67 @@
   <xsl:template name="InsertImageWrap">
     <xsl:if test="descendant::node()[contains(name(),'wp:wrap')]">
       <xsl:attribute name="style:wrap">
-        
+
         <xsl:if test="descendant::wp:wrapSquare">
           <xsl:call-template name="InsertSquareWrap">
             <xsl:with-param name="wrap" select="descendant::wp:wrapSquare/@wrapText"/>
           </xsl:call-template>
         </xsl:if>
-        
+
         <xsl:if test="descendant::wp:wrapTight">
           <xsl:call-template name="InsertSquareWrap">
             <xsl:with-param name="wrap" select="descendant::wp:wrapTight/@wrapText"/>
           </xsl:call-template>
         </xsl:if>
-        
+
         <xsl:if test="descendant::wp:wrapTopAndBottom">
           <xsl:text>none</xsl:text>
         </xsl:if>
-        
+
         <xsl:if test="descendant::wp:wrapThrough">
           <xsl:call-template name="InsertSquareWrap">
             <xsl:with-param name="wrap" select="descendant::wp:wrapThrough/@wrapText"/>
           </xsl:call-template>
         </xsl:if>
-      
+
         <xsl:if test="descendant::wp:wrapNone">
           <xsl:text>run-through</xsl:text>
         </xsl:if>
       </xsl:attribute>
-      
+
       <!--decide if in backround or in front of text-->
       <xsl:if test="descendant::wp:anchor/@behindDoc = 1">
         <xsl:attribute name="style:run-through">
-            <xsl:text>background</xsl:text>
+          <xsl:text>background</xsl:text>
         </xsl:attribute>
       </xsl:if>
-   </xsl:if>
+    </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertImageMargins">
     <xsl:if test="descendant::wp:anchor">
 
-        <xsl:attribute name="fo:margin-top">
-          <xsl:call-template name="emu-measure">
-            <xsl:with-param name="length" select="descendant::wp:anchor/@distT"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:attribute>
-      
+      <xsl:attribute name="fo:margin-top">
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="descendant::wp:anchor/@distT"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+
       <xsl:attribute name="fo:margin-bottom">
         <xsl:call-template name="emu-measure">
           <xsl:with-param name="length" select="descendant::wp:anchor/@distB"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
-      
+
       <xsl:attribute name="fo:margin-left">
         <xsl:call-template name="emu-measure">
           <xsl:with-param name="length" select="descendant::wp:anchor/@distL"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
-      
+
       <xsl:attribute name="fo:margin-right">
         <xsl:call-template name="emu-measure">
           <xsl:with-param name="length" select="descendant::wp:anchor/@distR"/>
@@ -311,10 +314,10 @@
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertSquareWrap">
     <xsl:param name="wrap"/>
-    
+
     <xsl:choose>
       <xsl:when test="$wrap = 'bothSides' ">
         <xsl:text>parallel</xsl:text>
@@ -327,7 +330,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="GetCropSize">
     <xsl:param name="cropValue"/>
     <xsl:param name="cropOppositeValue"/>
@@ -360,54 +363,64 @@
 
   <xsl:template name="InsertImagePosH">
     <xsl:if test="descendant::wp:positionH">
-      
-      <xsl:choose>
-        <xsl:when test="descendant::wp:positionH/wp:align">
-        <xsl:attribute name="style:horizontal-pos">
-          <xsl:value-of select="descendant::wp:positionH/wp:align"/>
-        </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-            <xsl:attribute name="style:horizontal-pos">
-              <xsl:text>from-left</xsl:text>
-            </xsl:attribute>
-        </xsl:otherwise>
-        </xsl:choose>
-      
-      <xsl:if test="descendant::wp:positionH/@relativeFrom">
-        <xsl:attribute name="style:horizontal-rel">
-          <xsl:variable name="relativeFrom">
-            <xsl:value-of select="descendant::wp:positionH/@relativeFrom"/>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="$relativeFrom = 'margin' or $relativeFrom = 'column'">
-              <xsl:text>page-content</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom ='page'">
-              <xsl:text>page</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom = 'leftMargin' or $relativeFrom = 'outsideMargin'">
-              <xsl:text>page-start-margin</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom = 'rightMargin' or $relativeFrom = 'insideMargin'">
-              <xsl:text>page-end-margin</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom = 'character'">
-              <xsl:text>char</xsl:text>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:attribute>
-      </xsl:if>
+
+      <xsl:call-template name="InsertGraphicPosH">
+        <xsl:with-param name="align" select="descendant::wp:positionH/wp:align"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertGraphicPosRelativeH">
+        <xsl:with-param name="relativeFrom" select="descendant::wp:positionH/@relativeFrom"/>
+      </xsl:call-template>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template name="InsertImagePosV">
-    <xsl:if test="descendant::wp:positionV">
-      <xsl:variable name="align" select="descendant::wp:positionV/wp:align"/>
-      <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
-      
+  <xsl:template name="InsertGraphicPosH">
+    <xsl:param name="align"/>
+
+    <xsl:choose>
+      <xsl:when test="$align and $align != ''">
+        <xsl:attribute name="style:horizontal-pos">
+          <xsl:value-of select="$align"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="style:horizontal-pos">
+          <xsl:text>from-left</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertGraphicPosRelativeH">
+    <xsl:param name="relativeFrom"/>
+
+    <xsl:attribute name="style:horizontal-rel">
       <xsl:choose>
-        <xsl:when test="descendant::wp:positionV/wp:align">
+        <xsl:when test="$relativeFrom = 'margin' or $relativeFrom = 'column'">
+          <xsl:text>page-content</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom ='page'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'leftMargin' or $relativeFrom = 'outsideMargin'">
+          <xsl:text>page-start-margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'rightMargin' or $relativeFrom = 'insideMargin'">
+          <xsl:text>page-end-margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'character'">
+          <xsl:text>char</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+
+  <xsl:template name="InsertGraphicPosV">
+    <xsl:param name="align"/>
+    <xsl:param name="relativeFrom"/>
+
+    <xsl:choose>
+      <xsl:when test="$align and $align != ''">
         <xsl:attribute name="style:vertical-pos">
           <xsl:choose>
             <!--special rules-->
@@ -415,11 +428,10 @@
               test="$relativeFrom = 'topMargin' or $relativeFrom = 'bottomMargin' or $relativeFrom = 'insideMargin' or $relativeFrom = 'outsideMargin'">
               <xsl:text>top</xsl:text>
             </xsl:when>
-            <xsl:when
-              test=" $relativeFrom = 'line'  and $align= 'bottom' ">
+            <xsl:when test=" $relativeFrom = 'line'  and $align= 'bottom' ">
               <xsl:text>top</xsl:text>
             </xsl:when>
-             <!--default rules-->
+            <!--default rules-->
             <xsl:when test="$align = 'top' ">
               <xsl:text>top</xsl:text>
             </xsl:when>
@@ -437,50 +449,72 @@
             </xsl:when>
           </xsl:choose>
         </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-            <xsl:attribute name="style:vertical-pos">
-                  <xsl:text>from-top</xsl:text>
-            </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
-      
-      <xsl:if test="descendant::wp:positionV/@relativeFrom">
-        <xsl:attribute name="style:vertical-rel">
-          <xsl:choose>
-            <xsl:when test="$relativeFrom = 'margin' ">
-              <xsl:text>page-content</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom ='page'">
-              <xsl:text>page</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom = 'topMargin'">
-              <xsl:text>page</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom = 'bottomMargin'">
-              <xsl:text>page</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom = 'insideMargin'">
-              <xsl:text>page</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom = 'outsideMargin'">
-              <xsl:text>page</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom = 'line'">
-              <xsl:text>line</xsl:text>
-            </xsl:when>
-            <xsl:when test="$relativeFrom = 'paragraph'">
-              <xsl:text>paragraph-content</xsl:text>
-            </xsl:when>
-          </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="style:vertical-pos">
+          <xsl:text>from-top</xsl:text>
         </xsl:attribute>
-      </xsl:if>
-      
-      <xsl:if test="$relativeFrom = 'line' and ($align = 'center'  or $align =  'outside' or $align = 'bottom' ) ">
-        <xsl:attribute name="draw:flow-with-text">
-            <xsl:text>false</xsl:text>
-        </xsl:attribute>
-          </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertGraphicPosRelativeV">
+    <xsl:param name="relativeFrom"/>
+    <xsl:param name="align"/>
+
+    <xsl:if test="$relativeFrom and $relativeFrom != ''">
+      <xsl:attribute name="style:vertical-rel">
+        <xsl:choose>
+          <xsl:when test="$relativeFrom = 'margin' ">
+            <xsl:text>page-content</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom ='page'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'topMargin'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'bottomMargin'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'insideMargin'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'outsideMargin'">
+            <xsl:text>page</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'line'">
+            <xsl:text>line</xsl:text>
+          </xsl:when>
+          <xsl:when test="$relativeFrom = 'paragraph'">
+            <xsl:text>paragraph-content</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
+
+    <xsl:if
+      test="$relativeFrom = 'line' and ($align = 'center'  or $align =  'outside' or $align = 'bottom' ) ">
+      <xsl:attribute name="draw:flow-with-text">
+        <xsl:text>false</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertImagePosV">
+    <xsl:if test="descendant::wp:positionV">
+      <xsl:variable name="align" select="descendant::wp:positionV/wp:align"/>
+      <xsl:variable name="relativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
+
+      <xsl:call-template name="InsertGraphicPosV">
+        <xsl:with-param name="align" select="$align"/>
+        <xsl:with-param name="relativeFrom" select="$relativeFrom"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertGraphicPosRelativeV">
+        <xsl:with-param name="relativeFrom" select="$relativeFrom"/>
+        <xsl:with-param name="align" select="$align"/>
+      </xsl:call-template>
     </xsl:if>
   </xsl:template>
 
@@ -569,7 +603,7 @@
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="w:drawing">
     <xsl:apply-templates select="wp:inline | wp:anchor"/>
   </xsl:template>
