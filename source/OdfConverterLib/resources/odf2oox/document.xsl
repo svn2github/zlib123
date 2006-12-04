@@ -848,10 +848,14 @@
   <!-- sections -->
   <xsl:template match="text:section">
     <xsl:message terminate="no">progress:text:section</xsl:message>
-    <xsl:if test="@text:display='none'">
-      <xsl:message terminate="no">feedback:Hidden section</xsl:message>
-    </xsl:if>
-    <xsl:apply-templates/>
+    <xsl:choose>
+      <xsl:when test="@text:display='none'">
+        <xsl:message terminate="no">feedback:Hidden section</xsl:message>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 
