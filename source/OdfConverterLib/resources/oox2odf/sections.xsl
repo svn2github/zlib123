@@ -28,7 +28,7 @@
         </text:p>
       </xsl:if>
       <xsl:if
-        test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or preceding::w:sectPr/w:pgMar/@w:top != ./w:pgMar/@w:top or preceding::w:sectPr/w:pgMar/@w:left != ./w:pgMar/@w:left or preceding::w:sectPr/w:pgMar/@w:right != ./w:pgMar/@w:right or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer">
+        test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or preceding::w:sectPr/w:pgMar/@w:top != ./w:pgMar/@w:top or preceding::w:sectPr/w:pgMar/@w:left != ./w:pgMar/@w:left or preceding::w:sectPr/w:pgMar/@w:right != ./w:pgMar/@w:right or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer or ./w:headerReference or ./w:footerReference or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
         <text:p>
           <xsl:attribute name="text:style-name">
             <xsl:value-of select="concat('P_',$id2)"/>
@@ -38,7 +38,7 @@
       <xsl:apply-templates
         select="document('word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"/>
       <xsl:if
-        test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or preceding::w:sectPr/w:pgMar/@w:top != ./w:pgMar/@w:top or preceding::w:sectPr/w:pgMar/@w:left != ./w:pgMar/@w:left or preceding::w:sectPr/w:pgMar/@w:right != ./w:pgMar/@w:right or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer ">
+        test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or preceding::w:sectPr/w:pgMar/@w:top != ./w:pgMar/@w:top or preceding::w:sectPr/w:pgMar/@w:left != ./w:pgMar/@w:left or preceding::w:sectPr/w:pgMar/@w:right != ./w:pgMar/@w:right or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient  ">
         <text:p>
           <xsl:attribute name="text:style-name">
             <xsl:text>P_Standard</xsl:text>
@@ -50,8 +50,7 @@
 
   <xsl:template name="ParagraphFromSectionsStyles">
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-      <xsl:if
-        test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+      <xsl:if test="(preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient) and not(./w:headerReference) and not(./w:footerReference)">
         <style:style>
           <xsl:attribute name="style:name">
             <xsl:value-of select="concat('P_',generate-id(.))"/>
@@ -74,6 +73,18 @@
         </xsl:attribute>
         <xsl:attribute name="style:master-page-name">
           <xsl:value-of select="concat('First_H_',generate-id(.))"/>
+        </xsl:attribute>
+        <style:text-properties fo:language="en" fo:country="US" text:display="true"/>
+      </style:style>
+      <style:style>
+        <xsl:attribute name="style:name">
+          <xsl:value-of select="concat('P_',generate-id(.))"/>
+        </xsl:attribute>
+        <xsl:attribute name="style:family">
+          <xsl:text>paragraph</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="style:master-page-name">
+          <xsl:value-of select="concat('H_',generate-id(.))"/>
         </xsl:attribute>
         <style:text-properties fo:language="en" fo:country="US" text:display="true"/>
       </style:style>

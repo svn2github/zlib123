@@ -156,7 +156,14 @@
                   <xsl:value-of select="concat('H_',generate-id(.))"/>
                 </xsl:attribute>
                 <xsl:attribute name="style:page-layout-name">
-                  <xsl:text>pm1</xsl:text>
+                  <xsl:choose>
+                    <xsl:when test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+                      <xsl:value-of select="concat('PAGE',generate-id(.))"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>pm1</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:attribute>
                 <xsl:attribute name="style:display-name">
                   <xsl:value-of select="concat('H_',generate-id(.))"/>
@@ -173,7 +180,14 @@
                   <xsl:value-of select="concat('H_',generate-id(.))"/>
                 </xsl:attribute>
                 <xsl:attribute name="style:page-layout-name">
-                  <xsl:text>pm1</xsl:text>
+                  <xsl:choose>
+                    <xsl:when test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+                      <xsl:value-of select="concat('PAGE',generate-id(.))"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>pm1</xsl:text>
+                    </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:attribute>
                 <xsl:attribute name="style:display-name">
                   <xsl:value-of select="concat('First_H_',generate-id(.))"/>
@@ -191,7 +205,14 @@
               <xsl:value-of select="concat('H_',generate-id(.))"/>
             </xsl:attribute>
             <xsl:attribute name="style:page-layout-name">
-              <xsl:text>pm1</xsl:text>
+              <xsl:choose>
+                <xsl:when test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+                  <xsl:value-of select="concat('PAGE',generate-id(.))"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>pm1</xsl:text>
+                </xsl:otherwise>
+                </xsl:choose>
             </xsl:attribute>
             <xsl:attribute name="style:display-name">
               <xsl:value-of select="concat('H_',generate-id(.))"/>
@@ -208,7 +229,7 @@
     </style:master-page>
     </xsl:if>
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-      <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+      <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
       <style:master-page>
         <xsl:attribute name="style:name">
           <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
@@ -338,7 +359,7 @@
       </xsl:for-each>
     </style:page-layout>
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-      <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+      <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
       <style:page-layout>
         <xsl:attribute name="style:name">
           <xsl:value-of select="concat('PAGE',generate-id(.))"/>
@@ -376,6 +397,12 @@
       </xsl:if>
     </xsl:if>
 
+    
+    <xsl:if test="w:pgBorders">
+      <xsl:call-template name="InsertPageBorders"/>
+      <xsl:call-template name="InsertPagePadding"/>
+    </xsl:if>
+
     <!-- page margins -->
     <xsl:if test="w:pgMar">
       <xsl:call-template name="ComputePageMargins"/>
@@ -395,13 +422,292 @@
       <xsl:call-template name="InsertPageNumbering"/>
     </xsl:if>
 
-    
+
     
   </xsl:template>
 
+  
+  <xsl:template name="InsertPageBorders">
+    <xsl:choose>
+      <xsl:when test="w:pgBorders/w:top">
+        <xsl:variable name="type">
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/w:top/@w:val = 'single'">
+              <xsl:text>solid</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>solid</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="sz">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:pgBorders/w:top/@w:sz"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="color">
+          <!--   temporary  -->
+          <xsl:text>#000000</xsl:text>
+        </xsl:variable>
+        <xsl:attribute name="fo:border-top">
+          <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:border-top">
+          <xsl:text>none</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="w:pgBorders/w:left">
+        <xsl:variable name="type">
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/w:left/@w:val = 'single'">
+              <xsl:text>solid</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>solid</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="sz">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:pgBorders/w:left/@w:sz"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="color">
+          <!--   temporary  -->
+          <xsl:text>#000000</xsl:text>
+        </xsl:variable>
+        <xsl:attribute name="fo:border-left">
+          <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:border-left">
+          <xsl:text>none</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="w:pgBorders/w:right">
+        <xsl:variable name="type">
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/w:right/@w:val = 'single'">
+              <xsl:text>solid</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>solid</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="sz">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:pgBorders/w:right/@w:sz"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="color">
+          <!--   temporary  -->
+          <xsl:text>#000000</xsl:text>
+        </xsl:variable>
+        <xsl:attribute name="fo:border-right">
+          <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:border-right">
+          <xsl:text>none</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="w:pgBorders/w:bottom">
+        <xsl:variable name="type">
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/w:bottom/@w:val = 'single'">
+              <xsl:text>solid</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>solid</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="sz">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:value-of select="w:pgBorders/w:bottom/@w:sz"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="color">
+          <!--   temporary  -->
+          <xsl:text>#000000</xsl:text>
+        </xsl:variable>
+        <xsl:attribute name="fo:border-bottom">
+          <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fo:border-bottom">
+          <xsl:text>none</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
+  <xsl:template name="InsertPagePadding">
+    <xsl:if test="w:pgBorders/w:top">
+        <xsl:attribute name="fo:padding-top">
+        <xsl:choose>
+          <xsl:when test="w:pgBorders/@w:offsetFrom = 'page'">
+            <xsl:variable name="marg">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pgMar/@w:top"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="space">
+              <xsl:call-template name="ConvertPoints">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pgBorders/w:top/@w:space"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="ConvertPoints">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:pgBorders/w:top/@w:space"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+        </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="w:pgBorders/w:left">
+        <xsl:attribute name="fo:padding-left">
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/@w:offsetFrom = 'page'">
+              <xsl:variable name="marg">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="w:pgMar/@w:left"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="space">
+                <xsl:call-template name="ConvertPoints">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="w:pgBorders/w:left/@w:space"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="ConvertPoints">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pgBorders/w:left/@w:space"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="w:pgBorders/w:right">
+        <xsl:attribute name="fo:padding-right">
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/@w:offsetFrom = 'page'">
+              <xsl:variable name="marg">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="w:pgMar/@w:right"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="space">
+                <xsl:call-template name="ConvertPoints">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="w:pgBorders/w:right/@w:space"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="ConvertPoints">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pgBorders/w:right/@w:space"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="w:pgBorders/w:bottom">
+        <xsl:attribute name="fo:padding-bottom">
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/@w:offsetFrom = 'page'">
+              <xsl:variable name="marg">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="w:pgMar/@w:bottom"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name="space">
+                <xsl:call-template name="ConvertPoints">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="w:pgBorders/w:bottom/@w:space"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="ConvertPoints">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pgBorders/w:bottom/@w:space"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:if>
+  </xsl:template>
+  
+  
+  
   <!-- page margins -->
   <xsl:template name="ComputePageMargins">
     <xsl:attribute name="fo:margin-top">
+      <xsl:variable name="marg">
       <xsl:call-template name="ConvertTwips">
         <xsl:with-param name="unit">cm</xsl:with-param>
         <xsl:with-param name="length">
@@ -457,8 +763,34 @@
           </xsl:choose>
         </xsl:with-param>
       </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="w:pgBorders/w:top">
+          <xsl:variable name="space">
+            <xsl:call-template name="ConvertPoints">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:pgBorders/w:top/@w:space"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/@w:offsetFrom='page'">
+              <xsl:value-of select="$space"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$marg"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
+    
     <xsl:attribute name="fo:margin-left">
+      <xsl:variable name="marg">
       <xsl:call-template name="ConvertTwips">
         <xsl:with-param name="length">
           <xsl:choose>
@@ -472,8 +804,34 @@
         </xsl:with-param>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="w:pgBorders/w:left">
+          <xsl:variable name="space">
+            <xsl:call-template name="ConvertPoints">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:pgBorders/w:left/@w:space"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/@w:offsetFrom='page'">
+              <xsl:value-of select="$space"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$marg"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
+    
     <xsl:attribute name="fo:margin-bottom">
+      <xsl:variable name="marg">
       <xsl:call-template name="ConvertTwips">
         <xsl:with-param name="unit">cm</xsl:with-param>
         <xsl:with-param name="length">
@@ -508,12 +866,62 @@
           </xsl:choose>
         </xsl:with-param>
       </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="w:pgBorders/w:bottom">
+          <xsl:variable name="space">
+            <xsl:call-template name="ConvertPoints">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:pgBorders/w:bottom/@w:space"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/@w:offsetFrom='page'">
+              <xsl:value-of select="$space"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$marg"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
+    
     <xsl:attribute name="fo:margin-right">
+      <xsl:variable name="marg">
       <xsl:call-template name="ConvertTwips">
         <xsl:with-param name="length" select="w:pgMar/@w:right"/>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="w:pgBorders/w:right">
+          <xsl:variable name="space">
+            <xsl:call-template name="ConvertPoints">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:pgBorders/w:right/@w:space"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="w:pgBorders/@w:offsetFrom='page'">
+              <xsl:value-of select="$space"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat(substring-before($marg,'cm') - substring-before($space,'cm'),'cm')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$marg"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
   </xsl:template>
 
