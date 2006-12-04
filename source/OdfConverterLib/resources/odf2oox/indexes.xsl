@@ -125,55 +125,51 @@
     <w:instrText xml:space="preserve">" </w:instrText>
   </xsl:template>
 
+  <!-- alphabetical index -->
   <xsl:template name="insertAlphabeticalPrefs">
+    <w:instrText xml:space="preserve">INDEX </w:instrText>
+
+    <!--Right Align Page Number-->
+    <xsl:if
+      test="key('styles', @text:style-name)/style:paragraph-properties/style:tab-stops/style:tab-stop/@style:type='right' ">
+      <w:instrText xml:space="preserve">\e "</w:instrText>
+      <w:tab/>
+      <w:instrText xml:space="preserve">" </w:instrText>
+    </xsl:if>
+
+    <!-- column number -->
     <xsl:choose>
       <xsl:when
-        test="key('styles', @text:style-name)/style:paragraph-properties/style:tab-stops/style:tab-stop/@style:type='right'">
-        <w:instrText xml:space="preserve">INDEX \e "</w:instrText>
-        <w:tab/>
-        <!--Right Align Page Number-->
-        <xsl:choose>
-          <xsl:when
-            test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count>4">
-            <w:instrText xml:space="preserve">" \c "4" \z "1045" </w:instrText>
-          </xsl:when>
-          <xsl:when
-            test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count>1">
-            <w:instrText xml:space="preserve">" \c "</w:instrText>
-            <w:instrText>
-              <xsl:value-of
-                select="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"
-              />
-            </w:instrText>
-            <w:instrText xml:space="preserve">" \z "1045" </w:instrText>
-          </xsl:when>
-          <xsl:otherwise>
-            <w:instrText xml:space="preserve">" \c "1" \z "1045" </w:instrText>
-          </xsl:otherwise>
-        </xsl:choose>
+        test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count >4">
+        <xsl:message terminate="no">feedback:Column number of alphabetical index (no more than 4)</xsl:message>
+        <w:instrText xml:space="preserve">\c "4" </w:instrText>
+      </xsl:when>
+      <xsl:when
+        test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count >1">
+        <w:instrText xml:space="preserve">\c "</w:instrText>
+        <w:instrText>
+          <xsl:value-of
+            select="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"
+          />
+        </w:instrText>
+        <w:instrText xml:space="preserve">" </w:instrText>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:choose>
-          <xsl:when
-            test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count>4">
-            <w:instrText xml:space="preserve">INDEX \c "4" \z "1045" </w:instrText>
-          </xsl:when>
-          <xsl:when
-            test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count>1">
-            <w:instrText xml:space="preserve">INDEX \c "</w:instrText>
-            <w:instrText>
-              <xsl:value-of
-                select="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count"
-              />
-            </w:instrText>
-            <w:instrText xml:space="preserve">" \z "1045" </w:instrText>
-          </xsl:when>
-          <xsl:otherwise>
-            <w:instrText xml:space="preserve">INDEX \c "1" \z "1045" </w:instrText>
-          </xsl:otherwise>
-        </xsl:choose>
+        <w:instrText xml:space="preserve">\c "1" </w:instrText>
       </xsl:otherwise>
     </xsl:choose>
+
+    <!-- language -->
+    <xsl:if
+      test="ancestor-or-self::text:alphabetical-index/text:alphabetical-index-source/@fo:language">
+      <w:instrText xml:space="preserve">\z "</w:instrText>
+      <w:instrText>
+        <xsl:value-of
+          select="ancestor-or-self::text:alphabetical-index/text:alphabetical-index-source/@fo:language"
+        />
+      </w:instrText>
+      <w:instrText xml:space="preserve">"</w:instrText>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertIllustrationInPrefs">
@@ -181,47 +177,53 @@
     <w:instrText>
       <xsl:value-of
         select="parent::text:index-body/preceding-sibling::text:illustration-index-source/@text:caption-sequence-name"
-      />" </w:instrText>
+      />
+    </w:instrText>
+    <w:instrText xml:space="preserve">" </w:instrText>
   </xsl:template>
 
+  <!-- table of content -->
   <xsl:template name="InsertTocPrefs">
     <xsl:variable name="tocSource"
       select="ancestor::text:table-of-content/text:table-of-content-source"/>
 
-    <w:instrText>
-      <xsl:text>TOC \o "1-</xsl:text>
+    <w:instrText xml:space="preserve"> TOC </w:instrText>
+    <!-- outline level -->
+    <xsl:if test="$tocSource/@text:outline-level">
+      <w:instrText xml:space="preserve">\o "1-</w:instrText>
+      <w:instrText>
+        <!-- include elements with outline styles up to selected level  -->
+        <xsl:choose>
+          <xsl:when test="$tocSource/@text:outline-level=10">9</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$tocSource/@text:outline-level"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </w:instrText>
+      <w:instrText xml:space="preserve">" </w:instrText>
+    </xsl:if>
 
-      <!-- include elements with outline styles up to selected level  -->
-      <xsl:choose>
-        <xsl:when test="$tocSource/@text:outline-level=10">
-          <xsl:text>9"</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$tocSource/@text:outline-level"/>
-          <xsl:text>"</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
+    <!--include index marks-->
+    <xsl:if test="not($tocSource[@text:use-index-marks = 'false'])">
+      <w:instrText xml:space="preserve">\u </w:instrText>
+    </xsl:if>
 
-      <!--include index marks-->
-      <xsl:if test="not($tocSource[@text:use-index-marks = 'false'])">
-        <xsl:text> \u </xsl:text>
-      </xsl:if>
+    <!--use hyperlinks -->
+    <xsl:if test="text:a">
+      <w:instrText xml:space="preserve">\h </w:instrText>
+    </xsl:if>
 
-      <!--use hyperlinks -->
-      <xsl:if test="text:a">
-        <xsl:text> \h </xsl:text>
-      </xsl:if>
-
-      <!-- include elements with additional styles-->
-      <xsl:if
-        test="$tocSource/text:index-source-styles or $tocSource/text:table-of-content-entry-template">
-        <xsl:text> \t "</xsl:text>
+    <!-- include elements with additional styles-->
+    <xsl:if
+      test="$tocSource/text:index-source-styles or $tocSource/text:table-of-content-entry-template">
+      <w:instrText xml:space="preserve">\t "</w:instrText>
+      <w:instrText>
         <xsl:call-template name="InsertTOCLevelStyle">
           <xsl:with-param name="tocSource" select="$tocSource"/>
         </xsl:call-template>
-        <xsl:text>"</xsl:text>
-      </xsl:if>
-    </w:instrText>
+      </w:instrText>
+      <w:instrText xml:space="preserve">" </w:instrText>
+    </xsl:if>
   </xsl:template>
 
 

@@ -994,6 +994,13 @@
         <xsl:text>' indent property</xsl:text>
       </xsl:message>
     </xsl:if>
+    <xsl:if test="*/@text:sort-algorithm">
+      <xsl:message terminate="no">
+        <xsl:text>feedback:Index '</xsl:text>
+        <xsl:value-of select="$indexName"/>
+        <xsl:text>' sort algorithm</xsl:text>
+      </xsl:message>
+    </xsl:if>
     <!-- report loss of toc protection -->
     <xsl:if test="@text:protected = 'true' ">
       <xsl:message terminate="no">
@@ -1003,6 +1010,11 @@
       </xsl:message>
     </xsl:if>
     <xsl:apply-templates/>
+  </xsl:template>
+
+  <!-- loss of concordance file -->
+  <xsl:template match="text:alphabetical-index-auto-mark-file">
+    <xsl:message terminate="no">feedback:Alphabetical index concordance file</xsl:message>
   </xsl:template>
 
   <xsl:template name="InsertDropCapAttributes">

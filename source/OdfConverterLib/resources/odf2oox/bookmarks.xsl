@@ -114,20 +114,25 @@
   <xsl:template name="GenerateBookmarkId">
     <xsl:param name="TextName"/>
     <xsl:variable name="ReferenceMarkStart">
-      <xsl:value-of select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )"/>
+      <xsl:value-of
+        select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:reference-mark-start )+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:reference-mark-start )"
+      />
     </xsl:variable>
     <xsl:variable name="BookmarkStart">
-      <xsl:value-of select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"/>
+      <xsl:value-of
+        select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark-start)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark-start)"
+      />
     </xsl:variable>
     <xsl:variable name="Bookmark">
-      <xsl:value-of select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark)"/>
+      <xsl:value-of
+        select="count(key('bookmark-reference-start', $TextName)/preceding-sibling::text:bookmark)+count(key('bookmark-reference-start', $TextName)/parent::text:p/preceding-sibling::node()/text:bookmark)"
+      />
     </xsl:variable>
-    <xsl:value-of
-      select="$ReferenceMarkStart+$BookmarkStart+$Bookmark"/>
+    <xsl:value-of select="$ReferenceMarkStart+$BookmarkStart+$Bookmark"/>
   </xsl:template>
-  
+
   <!-- Insert BookmarkStart or ReferenceMarkStart-->
-  <xsl:template match="text:bookmark-start|text:reference-mark-start|text:bookmark" mode="paragraph">    
+  <xsl:template match="text:bookmark-start|text:reference-mark-start|text:bookmark" mode="paragraph">
     <w:bookmarkStart>
       <xsl:attribute name="w:id">
         <xsl:call-template name="GenerateBookmarkId">
@@ -149,7 +154,7 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
-        </w:bookmarkEnd>
+      </w:bookmarkEnd>
     </xsl:if>
   </xsl:template>
 
@@ -174,37 +179,7 @@
     <xsl:variable name="masterPage"
       select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:header/text:p"/>
     <xsl:if
-     test="key('bookmark-reference-start', $TextName) or $masterPage/text:reference-mark-start[@text:name=$TextName] or $masterPage/text:bookmark-start[@text:name=$TextName]">
-      <xsl:variable name="CrossReferences">
-        <xsl:choose>
-          <xsl:when
-            test="@text:reference-format='page' or ../text:sequence-ref[@text:ref-name=$TextName]">
-            <xsl:text>PAGEREF </xsl:text>
-          </xsl:when>
-          <xsl:otherwise>REF </xsl:otherwise>
-        </xsl:choose>
-        <xsl:choose>
-          <xsl:when test="../text:sequence-ref[@text:ref-name=$TextName]">
-            <xsl:value-of
-              select="concat('_Toc', number(count(key('bookmark-reference-start', $TextName)/preceding::text:sequence))+1)"
-            />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:choose>
-              <xsl:when test="contains($TextName,' ' )">
-                <xsl:value-of select="translate($TextName,' ','_')"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$TextName"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:otherwise>
-        </xsl:choose>
-        <xsl:if test="@text:reference-format='direction'">
-          <xsl:text>\p</xsl:text>
-        </xsl:if>
-        <xsl:text> \h</xsl:text>
-      </xsl:variable>
+      test="key('bookmark-reference-start', $TextName) or $masterPage/text:reference-mark-start[@text:name=$TextName] or $masterPage/text:bookmark-start[@text:name=$TextName]">
       <w:r>
         <w:fldChar w:fldCharType="begin"/>
       </w:r>
@@ -212,9 +187,9 @@
         <w:rPr>
           <w:lang/>
         </w:rPr>
-        <w:instrText xml:space="preserve">
-          <xsl:value-of select="$CrossReferences"/>
-        </w:instrText>
+        <xsl:call-template name="InsertCrossReferences">
+          <xsl:with-param name="TextName" select="$TextName"/>
+        </xsl:call-template>
       </w:r>
       <w:r>
         <w:rPr>
@@ -237,6 +212,45 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- insert reference field -->
+  <xsl:template name="InsertCrossReferences">
+    <xsl:param name="TextName"/>
+    <!-- field type -->
+    <xsl:choose>
+      <xsl:when
+        test="@text:reference-format='page' or ../text:sequence-ref[@text:ref-name=$TextName]">
+        <w:instrText xml:space="preserve">PAGEREF </w:instrText>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:instrText xml:space="preserve">REF </w:instrText>
+      </xsl:otherwise>
+    </xsl:choose>
+    <w:instrText>
+      <xsl:choose>
+        <xsl:when test="../text:sequence-ref[@text:ref-name=$TextName]">
+          <xsl:value-of
+            select="concat('_Toc', number(count(key('bookmark-reference-start', $TextName)/preceding::text:sequence))+1)"
+          />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="contains($TextName,' ' )">
+              <xsl:value-of select="translate($TextName,' ','_')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$TextName"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </w:instrText>
+
+    <xsl:if test="@text:reference-format='direction' ">
+      <w:instrText xml:space="preserve"> \p</w:instrText>
+    </xsl:if>
+
+    <w:instrText xml:space="preserve"> \h </w:instrText>
+  </xsl:template>
 
   <!-- bookmark start mark for elements contained in TOC -->
   <xsl:template name="InsertBookmarkStartTOC">
