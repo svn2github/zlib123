@@ -78,8 +78,13 @@
     <xsl:if test="parent::office:text and preceding-sibling::node()[1][contains(name(), 'draw:')]">
       <xsl:choose>
         <xsl:when test="preceding-sibling::node()[1][self::draw:frame]">
-          <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
-            mode="paragraph"/>
+          <!--xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
+            mode="paragraph"/-->
+          <xsl:if
+            test="preceding-sibling::node()[1][not(descendant::*[(self::text:p or self::text:h) and (@text:style-name='Sender' or @text:style-name='Addressee')])]">
+            <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"
+              mode="paragraph"/>
+          </xsl:if>
         </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="preceding-sibling::node()[1][contains(name(), 'draw:')]"

@@ -91,6 +91,8 @@
   <xsl:template match="text:p | text:h">
     <xsl:param name="level" select="0"/>
     <xsl:message terminate="no">progress:text:p</xsl:message>
+    <!-- insert frames for first paragraph of document if we are in an envelope  -->
+    <xsl:call-template name="InsertEnvelopeFrames"/>
     <w:p>
       <xsl:call-template name="InsertDropCap">
         <xsl:with-param name="styleName" select="@text:style-name"/>
@@ -197,6 +199,9 @@
     <!-- insert page break before table when required -->
     <xsl:call-template name="InsertPageBreakBefore"/>
 
+    <!-- insert frame properties -->
+    <xsl:call-template name="InsertFrameProperties"/>
+
     <!-- insert numbering properties -->
     <xsl:call-template name="InsertNumbering">
       <xsl:with-param name="level" select="$level"/>
@@ -285,6 +290,68 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- insert frame properties if paragraph is in a particular fame (eg envelope) -->
+  <xsl:template name="InsertFrameProperties">
+    <xsl:if
+      test="(@text:style-name='Addressee' or @text:style-name='Sender') and ancestor::draw:frame">
+      <xsl:variable name="framePr" select="ancestor::draw:frame[last()]"/>
+      <w:framePr>
+        <!-- width -->
+        <xsl:if test="$framePr/@svg:width">
+          <xsl:attribute name="w:w">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="$framePr/@svg:width"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <!-- height -->
+        <xsl:choose>
+          <xsl:when test="ancestor::draw:text-box[last()]/@fo:min-height">
+            <xsl:attribute name="w:h">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length"
+                  select="ancestor::draw:text-box[last()]/@fo:min-height"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="$framePr/@svg:height">
+              <xsl:attribute name="w:h">
+                <xsl:call-template name="twips-measure">
+                  <xsl:with-param name="length" select="$framePr/@svg:height"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+        <!-- height rule -->
+        <xsl:attribute name="w:hRule">
+          <xsl:choose>
+            <xsl:when test="$framePr/@fo:min-height">atLeast</xsl:when>
+            <xsl:when test="$framePr/@svg:height">exact</xsl:when>
+            <xsl:otherwise>auto</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <!-- position -->
+        <xsl:if test="$framePr/@svg:x">
+          <xsl:attribute name="w:x">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="$framePr/@svg:x"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="$framePr/@svg:y">
+          <xsl:attribute name="w:y">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="$framePr/@svg:y"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:attribute name="w:hAnchor">page</xsl:attribute>
+        <xsl:attribute name="w:wrap">auto</xsl:attribute>
+      </w:framePr>
+    </xsl:if>
+  </xsl:template>
 
   <!-- Insert spacing in paragraph properties if table before/after w:p element has spacing after/before -->
   <!-- Suppress spacing before/after in tables if corresponding setting enabled -->

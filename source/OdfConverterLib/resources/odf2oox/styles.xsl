@@ -89,6 +89,8 @@
   <xsl:template name="GetPrefixedStyleName">
     <xsl:param name="styleName"/>
     <xsl:choose>
+      <xsl:when test="$styleName='Sender' ">EnvelopeReturn</xsl:when>
+      <xsl:when test="$styleName='Addressee' ">EnvelopeAddress</xsl:when>
       <xsl:when test="key('automatic-styles',$styleName)">
         <xsl:choose>
           <xsl:when test="ancestor::office:document-styles/office:automatic-styles">
@@ -151,6 +153,12 @@
 
       <!-- Display name-->
       <xsl:choose>
+        <xsl:when test="@style:name='Sender' ">
+          <w:name w:val="envelope return"/>
+        </xsl:when>
+        <xsl:when test="@style:name='Addressee' ">
+          <w:name w:val="envelope address"/>
+        </xsl:when>
         <xsl:when test="@style:display-name">
           <w:name w:val="{@style:display-name}"/>
         </xsl:when>

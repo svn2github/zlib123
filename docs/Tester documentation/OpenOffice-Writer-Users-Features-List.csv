@@ -190,21 +190,21 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 ;;;Structure;;;0.2-M2;Completed;;;
 ;;;Entry text;;2;0.2-M2;Completed;;;
 ;;;Tab stop;;2;0.2-M2;Completed;;;
-;;;Page no;;2;0.2-M2;Completed
-;;;Character style;;2;0.2-M2;Completed
-;;;Format;Character style for main entries;2;0.3-M2;
-;;;;Alphabetical delimited;;0.2-M2;Completed
-;;;;Key seperated byt commas;;0.2-M2;Completed
-;;;;Tab position relative to Paragraph Style indent;;0.2-M2;Completed
+;;;Page no;;2;0.2-M2;Completed;;
+;;;Character style;;2;0.2-M2;Completed;;
+;;;Format;Character style for main entries;2;0.3-M2;;;
+;;;;Alphabetical delimited;;0.2-M2;Completed;;
+;;;;Key seperated byt commas;;0.2-M2;Completed;;
+;;;;Tab position relative to Paragraph Style indent;;0.2-M2;Completed;;
 
-;Indexes and Tables - Bibliography entry;Entry;From;;0;0.3-M2;
-;;Short name;;;;-;
+;Indexes and Tables - Bibliography entry;Entry;From;;0;0.3-M2;;;
+;;Short name;;;;-;;;
 
-;Envelope;Address;Database;;;0.3-M2;
-;;;Table;;;0.3-M2;
-;;;Database field;;;-;
+;Envelope;Address;Database;;;-;Completed;Convert manually entered adress (no database adress).;
+;;;Table;;;-;;;
+;;;Database field;;;-;;;
 
-;;Sender;;;;0.3-M2;
+;;Sender;;;;0.3-M2;Completed;;Only one envelope per document allowed
 
 ;Frame;Type;Width;Relative;;0.2-M2;Completed;"There is a difference between openoffice and word in handling relative sizes: in openoffice the size can be set relative according to frame anchor (page, paragraph, character) but in word you can set size relativly to: page, margin, left margin and so on. So we can map only ""size relative to page"" property becouse the rest of properties  are incompatible. ";729;
 ;;;;Automatic;;0.2-M2;Completed;min-width is lost;729;

@@ -116,7 +116,8 @@
         </xsl:if>
         <xsl:variable name="pageNumber">
           <xsl:call-template name="GetPageStartNumber">
-            <xsl:with-param name="style-name" select="*[1][self::text:p or self::text:h]/@text:style-name"/>
+            <xsl:with-param name="style-name"
+              select="*[1][self::text:p or self::text:h]/@text:style-name"/>
             <xsl:with-param name="context">
               <xsl:choose>
                 <xsl:when test="ancestor::office:document-content">content.xml</xsl:when>
@@ -215,7 +216,8 @@
       test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::draw:line) and not(ancestor::draw:rect) and not(ancestor::style:master-page)">
       <!-- Section detection  : 4 cases -->
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) with non-empty reference to a master page  -->
-      <xsl:variable name="followings" select="following::*[name()='text:p' or name()='text:h' or name()='table:table'][1]"/>
+      <xsl:variable name="followings"
+        select="following::*[name()='text:p' or name()='text:h' or name()='table:table'][1]"/>
 
       <xsl:variable name="next-master-page">
         <xsl:choose>
@@ -297,7 +299,8 @@
     <xsl:if
       test="not(ancestor::table:table) and not(ancestor::draw:frame) and not(ancestor::draw:line) and not (ancestor::draw:rect) and not(ancestor::style:master-page)">
       <!-- 1 - Following neighbour's (ie paragraph, heading or table) master style  -->
-      <xsl:variable name="followings" select="following::*[name()='text:p' or name()='text:h' or name()='table:table'][1]"/>
+      <xsl:variable name="followings"
+        select="following::*[name()='text:p' or name()='text:h' or name()='table:table'][1]"/>
 
       <xsl:variable name="next-master-page">
         <xsl:choose>
@@ -424,5 +427,71 @@
     </psect:master-pages>
   </xsl:template>
 
+
+
+  <!-- manage envelope -->
+  <xsl:template name="InsertEnvelopeFrames">
+    <xsl:if test="parent::office:text and not(preceding-sibling::*[self::text:p or self::text:h])">
+      <xsl:variable name="master-page-name">
+        <xsl:call-template name="GetMasterPageNameFromHierarchy">
+          <xsl:with-param name="style-name" select="@text:style-name"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="$master-page-name = 'Envelope' ">
+        <xsl:for-each
+          select="parent::office:text/draw:frame[not(@text:anchor-page-number) or @text:anchor-page-number='1']">
+          <xsl:choose>
+            <!-- sender field -->
+            <xsl:when test="descendant::*[self::text:p or self::text:h]/@text:style-name='Sender' ">
+              <xsl:for-each select="draw:text-box/child::node()">
+                <xsl:choose>
+                  <!--   ignore embedded text-box and draw:rect becouse word doesn't support it-->
+                  <xsl:when test="self::node()[name(draw:text-box|draw:rect)]">
+                    <xsl:message terminate="no">feedback: Nested frames</xsl:message>
+                  </xsl:when>
+                  <!-- warn loss of positioning for embedded drawn objects or pictures -->
+                  <xsl:when test="contains(name(), 'draw:')">
+                    <xsl:message terminate="no">feedback:Position of object inside textbox</xsl:message>
+                    <w:p>
+                      <xsl:apply-templates select="." mode="paragraph"/>
+                    </w:p>
+                  </xsl:when>
+                  <!--default scenario-->
+                  <xsl:otherwise>
+                    <xsl:apply-templates select="."/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- adress field -->
+              <xsl:if
+                test="descendant::*[self::text:p or self::text:h]/@text:style-name='Addressee' ">
+                <xsl:for-each select="draw:text-box/child::node()">
+                  <xsl:choose>
+                    <!--   ignore embedded text-box and draw:rect becouse word doesn't support it-->
+                    <xsl:when test="self::node()[name(draw:text-box|draw:rect)]">
+                      <xsl:message terminate="no">feedback: Nested frames</xsl:message>
+                    </xsl:when>
+                    <!-- warn loss of positioning for embedded drawn objects or pictures -->
+                    <xsl:when test="contains(name(), 'draw:')">
+                      <xsl:message terminate="no">feedback:Position of object inside textbox</xsl:message>
+                      <w:p>
+                        <xsl:apply-templates select="." mode="paragraph"/>
+                      </w:p>
+                    </xsl:when>
+                    <!--default scenario-->
+                    <xsl:otherwise>
+                      <xsl:apply-templates select="."/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
 
 </xsl:stylesheet>
