@@ -1,5 +1,5 @@
 Top level Menu Item;Sub Menu Item;Section / Tab;Feature;Sub Feature;Priority;Delivery Milestone;Completion Status;Lost during conversion;Schema Conversion Map reference;Comments
-
+;;;;;;;;;;
 File;Properties;General;Digital Signature;;;0.3-Final;;;;It is impossible to sign the DOCX file. We should see if we may verify the signed document when opening it, and which feedback we may give to the user
 ;;Description;Title;;;0.1;Completed;;32;
 ;;;Subject;;;0.1;Completed;;34;
@@ -13,24 +13,24 @@ File;Properties;General;Digital Signature;;;0.3-Final;;;;It is impossible to sig
 ;;;Info 3;;;0.1;Completed;;49;
 ;;;Info Field 4 Name;;;0.1;Completed;;49;
 ;;;Info 4;;;0.1;Completed;;49;
-;;Internet;Auto refresh proprty;;;;;;;
-;Encryption;;;;;0.3-Final;;;
-
-Edit;Changes;;Record;;;0.2-Final;Completed;;
-;;;Show;;;0.2-Final;Completed;;
-
-View;;;Layout Print;;;0.2-Final;Completed;;
-;;;Layout Web;;;0.2-Final;Completed;;
-;;;Tool Bars;;;-;;;
-;;;Marks;;;-;;;
-;;;Field names;;;-;;;
-;;;Non printable characters;;;-;;;
-;;;Hidden paragraphs;;;-;;;
-;;;Zoom;;;-;;;
-
-Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
-;;;Column Break;;0;0.2-Final;Completed;;540
-
+;;Internet;Auto refresh proprty;;;-;;;;This is an OpenOffice internal functionality.
+;Encryption;;;;;0.3-Final;;;;
+;;;;;;;;;;
+Edit;Changes;;Record;;;0.2-Final;Completed;;;
+;;;Show;;;0.2-Final;Completed;;;
+;;;;;;;;;;
+View;;;Layout Print;;;0.2-Final;Completed;;;
+;;;Layout Web;;;0.2-Final;Completed;;;
+;;;Tool Bars;;;-;;;;
+;;;Marks;;;-;;;;
+;;;Field names;;;-;;;;
+;;;Non printable characters;;;-;;;;
+;;;Hidden paragraphs;;;-;;;;
+;;;Zoom;;;-;;;;
+;;;;;;;;;;
+Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540;
+;;;Column Break;;0;0.2-Final;Completed;;540;
+;;;;;;;;;;
 ;Fields;;Date;;1;0.2-M1;Completed;;97;
 ;;;Time;;1;0.2-M1;Completed;;98;
 ;;;Page Number;;1;0.2-M1;Completed;;99;
@@ -43,475 +43,475 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 ;;;;Functions;;-;;;;
 ;;;;Doc Information;Printed by (author);0.2-Final;Completed;;118-135;TODO : 
 ;;;;Variables;;0.3-Final;;;;
-
+;;;;;;;;;;
 ;Special Characters;;;;0;0.1;Completed;;;
-
-;Formatting Mark;;Non-breaking space;;0;0.2-Final;Completed;;80
-;;;Non-Breaking hyphen;;0;0.2-Final;Completed;;80
-;;;Optional Hyphen;;0;0.2-Final;Completed;;80
-
-;Section;Section;Section Name;;;-;;;
-;;;Link;;;-;;;
-;;;Write Protect;;3;0.3-M2;;;
-;;;Hide;;3;0.3-M2;;;
-;;;Editable in read-only doc;;3;0.3-M2;;;
-
-;;Columns;No of columns;;1;0.2-M2;Completed;;
-;;;Column style;;1;0.2-M2;Completed;;
-;;;Evenly distribute to columns;;1;0.2-M2;Completed;;
-;;;Autowidth;;1;0.2-M2;Completed;;
-;;;Width for each column;;1;0.2-M2;Completed;;
-;;;Spacing;;1;0.2-M2;Completed;;
-;;;Separator Line;selected line;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties
-;;;;Height;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties
-;;;;Position;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties
-
-;;Indents;Before Section;;;-;;No equivalent in OpenXML
-;;;After Section;;;-;;No equivalent in OpenXML
-
-;;Background;As color;selected color;;-;;No equivalent in OpenXML
-;;;As graphics;File;;-;;No equivalent in OpenXML
-;;;;Link;;-;;No equivalent in OpenXML
-;;;;Type (Position/ Area/ Tile);;-;;No equivalent in OpenXML
-
-;;Foot notes;Collect at end of text;;3;0.2-M2;Completed;
-;;;Restart numbering;;3;0.2-M2;Completed;
-;;;Start at;;3;0.2-M2;Completed;
-;;;Custom Format;;3;0.2-M2;Completed;
-;;;Before;;3;-;;No equivalent in OpenXML;
-;;;After;;3;-;;No equivalent in OpenXML;
-
-;;End notes;Collect at end of text;;3;0.2-M2;Completed;;
-;;;Restart numbering;;3;0.2-M2;Completed;;
-;;;Start at;;3;0.2-M2;Completed;;
-;;;Custom Format;;3;0.2-M2;Completed;;
-;;;Before;;;-;;No equivalent in OpenXML;
-;;;After;;;-;;No equivalent in OpenXML;
-
-;Hyperlink;Hyperlink Type;Web /FTP /Telnet;;0;0.1;Completed;;82
-;;;URL;;;0.1;Completed;;
-;;;Further settings;Frame;3;;Completed;;
-;;;;Form;1;-;;Button form is not applicable in OpenXml;82
-;;;;Text;0;0.1;Completed;;82
-;;;;Name;;-;;No equivalent in OpenXML;
-
-;;Mails & News;Mails & News;Email/ News;1;0.2-Final;Completed;;82
-;;;;Receiver;1;0.2-Final;Completed;;
-;;;;Subject;1;0.2-Final;Completed;;
-;;;Further settings;Frame;1;0.3-Final;Completed;;
-;;;;Form;1;-;;Button form is not applicable in OpenXml;
-;;;;Text;1;0.2-Final;Completed;;
-;;;;Name;1;-;;No equivalent in OpenXML;
-;;Document;Document;Path;3;0.3-M2;Completed;;82
-;;;Target in Document;Target URL;3;0.3-M2;Completed;;
-;;;Further settings;Frame;3;0.3-M2;Completed;;
-;;;;Form;3;-;;Button form is not applicable in OpenXml;
-;;;;Text;3;0.3-M2;Completed;;
-;;;;Name;3;-;;No equivalent in OpenXML;
-;;New Document;New Document;Edit Now/Edit later;3;0.3-M2;Completed;;82
-;;;;File;3;0.3-M2;Completed;;
-;;;;Filetype;3;0.3-M2;Completed;;;
-;;;Further settings;Frame;3;0.3-M2;Completed;;;
-;;;;Form;3;-;;Button form is not applicable in OpenXml;;
-;;;;Text;3;0.3-M2;Completed;;;
-;;;;Name;3;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;Formatting Mark;;Non-breaking space;;0;0.2-Final;Completed;;80;
+;;;Non-Breaking hyphen;;0;0.2-Final;Completed;;80;
+;;;Optional Hyphen;;0;0.2-Final;Completed;;80;
+;;;;;;;;;;
+;Section;Section;Section Name;;;-;;;;
+;;;Link;;;-;;;;
+;;;Write Protect;;3;0.3-M2;;;;
+;;;Hide;;3;-;;Hidden content;;
+;;;Editable in read-only doc;;3;0.3-M2;;;;
+;;;;;;;;;;
+;;Columns;No of columns;;1;0.2-M2;Completed;;;
+;;;Column style;;1;0.2-M2;Completed;;;
+;;;Evenly distribute to columns;;1;0.2-M2;Completed;;;
+;;;Autowidth;;1;0.2-M2;Completed;;;
+;;;Width for each column;;1;0.2-M2;Completed;;;
+;;;Spacing;;1;0.2-M2;Completed;;;
+;;;Separator Line;selected line;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties;;
+;;;;Height;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties;;
+;;;;Position;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties;;
+;;;;;;;;;;
+;;Indents;Before Section;;;-;;No equivalent in OpenXML;;
+;;;After Section;;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;;Background;As color;selected color;;-;;No equivalent in OpenXML;;
+;;;As graphics;File;;-;;No equivalent in OpenXML;;
+;;;;Link;;-;;No equivalent in OpenXML;;
+;;;;Type (Position/ Area/ Tile);;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;;Foot notes;Collect at end of text;;3;0.2-M2;Completed;;;
+;;;Restart numbering;;3;0.2-M2;Completed;;;
+;;;Start at;;3;0.2-M2;Completed;;;
+;;;Custom Format;;3;0.2-M2;Completed;;;
+;;;Before;;3;-;;No equivalent in OpenXML;;
+;;;After;;3;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;;End notes;Collect at end of text;;3;0.2-M2;Completed;;;
+;;;Restart numbering;;3;0.2-M2;Completed;;;
+;;;Start at;;3;0.2-M2;Completed;;;
+;;;Custom Format;;3;0.2-M2;Completed;;;
+;;;Before;;;-;;No equivalent in OpenXML;;
+;;;After;;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;Hyperlink;Hyperlink Type;Web /FTP /Telnet;;0;0.1;Completed;;82;
+;;;URL;;;0.1;Completed;;;
+;;;Further settings;Frame;3;0.3-M1;Completed;;;
+;;;;Form;1;-;;Button form is not applicable in OpenXml;82;
+;;;;Text;0;0.1;Completed;;82;
+;;;;Name;;-;;;;Property not available in OpenXML
+;;;;;;;;;;
+;;Mails & News;Mails & News;Email/ News;1;0.2-Final;Completed;;;
+;;;;Receiver;1;0.2-Final;Completed;;;
+;;;;Subject;1;0.2-Final;Completed;;;
+;;;Further settings;Frame;1;0.3-M2;Completed;;;
+;;;;Form;1;-;;Button form is not applicable in OpenXml;;
+;;;;Text;1;0.2-Final;Completed;;;
+;;;;Name;1;0.2-Final;Completed;;;
+;;Document;Document;Path;3;0.3-M2;Completed;;82;
+;;;Target in Document;Target URL;3;0.3-M2;Completed;;82;Does not seem available in OpenXML
+;;;Further settings;Frame;3;0.3-M2;Completed;;82;
+;;;;Form;;-;;Button form is not applicable in OpenXml;;
+;;;;Text;3;0.3-M2;Completed;;82;
+;;;;Name;3;-;;;;Property not available in OpenXML
+;;New Document;New Document;Edit Now/Edit later;3;0.3-M2;Completed;;82;
+;;;;File;3;0.3-M2;Completed;;82;
+;;;;Filetype;3;0.3-M2;Completed;;82;
+;;;Further settings;Frame;3;0.3-M2;Completed;;82;
+;;;;Form;;-;;Button form is not applicable in OpenXml;;
+;;;;Text;3;0.3-M2;Completed;;82;
+;;;;Name;3;-;;;;Property not available in OpenXML
 ;Header;;;;1;0.2-M1;Completed;;369;Detailed out in Format-->Page (header and footer tabs)
-
+;;;;;;;;;;
 ;Footer;;;;1;0.2-M1;Completed;;369;
-
+;;;;;;;;;;
 ;Foot Note ;Numbering;Automatic / Character;;1;0.2-M1;Completed;;401;
 ;;Type;Footnote / Endnote;;1;0.2-M1;Completed;;401;
-
+;;;;;;;;;;
 ;Bookmarks;;;;1;0.2-Final;Completed;;84;
-
+;;;;;;;;;;
 ;Cross Reference;;Cf. Insert->Field->Others->Reference;;3;0.2-Final;Completed;;85;
-
-;Note;;;;2;0.2-M2;Completed;;86;;
-
-;Indexes and Tables - Entry;;Index;;;0.3-M2;Partial;;;TODO : enduser entry;
-;;;Entry;;2;0.2-Final;Completed;;;;
-;;;1st Key;;;0.3-M2;;;;;TODO : check this
-;;;Main Entry;;;0.3-M2;;;;;TODO : check this
-;;;Apply to all similar texts;Match case;;0.3-M2;;;;;TODO : check this
-;;;;Whole word only;;0.3-M2;;;;;TODO : check this
-
-;Indexes and Tables - Indexes and Tables;Index / Table - Table of Contents;Title;;1;0.2-M1;Completed;;174-176;;
-;;;Type;;2;0.2-M2;Completed;;174-176;;
-;;;Protected against manual changes;;;-;;No equivalent in OpenXML;;;
-
-;;;for;;1;0.3-M2;Partial;;174-176;Whole document only;TODO : chapter
-;;;Evaluate upto level;;1;0.2-M1;Completed;;174-176;;
-;;;Create from;Outline;1;0.2-M2;Completed;;;;
-;;;;Additional Styles;1;0.2-M2;Completed;This feature doesn't have equivalent in Word - see Conversion Issues on Wiki page;
-;;;;Index marks;1;0.2-M2;Completed;;
-
-;;Entries;Level;;;0.2-Final;Completed;;174-176
-;;;Structure;;;0.2-Final;Completed;Stucture is converted properly but in Word structure cannot be changed - after TOC update it restores default settings;
-;;;Chapter no;;2;0.2-M2;Completed;;
-;;;Entry text;;2;0.2-M2;Completed;;174-176
-;;;Tab stop;;2;0.2-M2;Completed;;174-176
-;;;Page no;;2;0.2-M2;Completed;;174-176
-;;;Character style;;2;0.2-M2;Completed;;
-;;;Format;Tab position relative to Paragraph style indent;2;0.3-M1;Completed;Stucture is converted properly but in Word structure cannot be changed - after TOC update it restores default settings;
-
-;;Styles;Levels;;2;0.2-M2;Completed;;174-176
-;;;Paragraph Styles;;2;0.2-M2;Completed;;
-
-;;Columns;No of columns;;2;0.2-Final;Completed;;
-;;;Column style;;2;0.2-Final;Completed;
-;;;Evenly distribute to columns;;2;0.2-Final;Completed;
-;;;Autowidth;;2;0.2-Final;Completed;
-;;;Width for each column;;2;0.2-Final;Completed;
-;;;Spacing;;2;0.2-Final;Completed;
-;;;Seperator Line;selected line;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties
-;;;;Height;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties
-;;;;Position;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties
-
-;;Background;As color;selected color;;-;;No equivalent in OpenXML
-;;;As graphics;File;;-;;No equivalent in OpenXML
-;;;;Link;;-;;No equivalent in OpenXML
-;;;;Type (Position/ Area/ Tile);;-;;No equivalent in OpenXML
-
-;Indexes and Tables - Indexes and Tables;Index / Table - Alphabetical Index;Title;;1;0.2-M1;Completed;
-;;;Type;;2;0.2-M2;Completed;
+;;;;;;;;;;
+;Note;;;;2;0.2-M2;Completed;;86;
+;;;;;;;;;;
+;Indexes and Tables - Entry;;Index;;;0.3-Final;Partial;;;TODO : enduser entry
+;;;Entry;;2;0.2-Final;Completed;;;
+;;;1st Key;;;0.3-Final;;;;
+;;;Main Entry;;;0.3-Final;;;;
+;;;Apply to all similar texts;Match case;;0.3-Final;;;;
+;;;;Whole word only;;0.3-Final;;;;
+;;;;;;;;;;
+;Indexes and Tables - Indexes and Tables;Index / Table - Table of Contents;Title;;1;0.2-M1;Completed;;174-176;
+;;;Type;;2;0.2-M2;Completed;;174-176;
 ;;;Protected against manual changes;;;-;;No equivalent in OpenXML;;
-
-;;;for;;1;0.3-M2;;;;TODO : chapter
+;;;;;;;;;;
+;;;for;;1;0.2-M1;Completed;Chapter;174-176;Whole document only, chapter has no equivalent - TODO: User feedback
+;;;Evaluate upto level;;1;0.2-M1;Completed;;174-176;
+;;;Create from;Outline;1;0.2-M2;Completed;;;
+;;;;Additional Styles;1;0.2-M2;Completed;This feature doesn't have equivalent in Word - see Conversion Issues on Wiki page;;
+;;;;Index marks;1;0.2-M2;Completed;;;
+;;;;;;;;;;
+;;Entries;Level;;;0.2-Final;Completed;;174-176;
+;;;Structure;;;0.2-Final;Completed;;;Stucture is converted properly but in Word structure cannot be changed - after TOC update it restores default settings
+;;;Chapter no;;2;0.2-M2;Completed;;;
+;;;Entry text;;2;0.2-M2;Completed;;174-176;
+;;;Tab stop;;2;0.2-M2;Completed;;174-176;
+;;;Page no;;2;0.2-M2;Completed;;174-176;
+;;;Character style;;2;0.2-M2;Completed;;;
+;;;Format;Tab position relative to Paragraph style indent;2;0.3-M1;Completed;;;Stucture is converted properly but in Word structure cannot be changed - after TOC update it restores default settings
+;;;;;;;;;;
+;;Styles;Levels;;2;0.2-M2;Completed;;174-176;
+;;;Paragraph Styles;;2;0.2-M2;Completed;;;
+;;;;;;;;;;
+;;Columns;No of columns;;2;0.2-Final;Completed;;;
+;;;Column style;;2;0.2-Final;Completed;;;
+;;;Evenly distribute to columns;;2;0.2-Final;Completed;;;
+;;;Autowidth;;2;0.2-Final;Completed;;;
+;;;Width for each column;;2;0.2-Final;Completed;;;
+;;;Spacing;;2;0.2-Final;Completed;;;
+;;;Seperator Line;selected line;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties;;
+;;;;Height;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties;;
+;;;;Position;3;0.2-Final;Completed;Sperator line is a boolean in OOX. It has no properties;;
+;;;;;;;;;;
+;;Background;As color;selected color;;-;;No equivalent in OpenXML;;
+;;;As graphics;File;;-;;No equivalent in OpenXML;;
+;;;;Link;;-;;No equivalent in OpenXML;;
+;;;;Type (Position/ Area/ Tile);;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;Indexes and Tables - Indexes and Tables;Index / Table - Alphabetical Index;Title;;1;0.2-M1;Completed;;;
+;;;Type;;2;0.2-M2;Completed;;;
+;;;Protected against manual changes;;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;;;for;;1;0.2-M2;Completed;Chapter;;Whole document only, chapter has no equivalent - TODO: User feedback
 ;;;Options;Combine identical entries;1;0.2-M2;Completed;;;
 ;;;;Combine with;1;0.2-M2;Completed;;;
 ;;;;Case sensitive;1;0.2-M2;Completed;;;
 ;;;;AutoCapitalize Entries;;0.2-M2;Completed;;;
 ;;;;Keys as seperate entries;;0.2-M2;Completed;;;
-;;;;Concordance file;;0.3-M2;;;;
+;;;;Concordance file;;0.3-Final;;;;
 ;;;Sort;;;;;;;
-;;;;Language;;0.3-M2;;;;
-;;;;Key type;;0.3-M2;;;;
+;;;;Language;;0.3-Final;;;;
+;;;;Key type;;0.3-Final;;;;
 ;;Entries;Level;;;0.2-M2;Completed;;;
 ;;;Structure;;;0.2-M2;Completed;;;
 ;;;Entry text;;2;0.2-M2;Completed;;;
 ;;;Tab stop;;2;0.2-M2;Completed;;;
-;;;Page no;;2;0.2-M2;Completed;;
-;;;Character style;;2;0.2-M2;Completed;;
-;;;Format;Character style for main entries;2;0.3-M2;;;
-;;;;Alphabetical delimited;;0.2-M2;Completed;;
-;;;;Key seperated byt commas;;0.2-M2;Completed;;
-;;;;Tab position relative to Paragraph Style indent;;0.2-M2;Completed;;
-
-;Indexes and Tables - Bibliography entry;Entry;From;;0;0.3-M2;;;
-;;Short name;;;;-;;;
-
-;Envelope;Address;Database;;;-;Completed;Convert manually entered adress (no database adress).;
-;;;Table;;;-;;;
-;;;Database field;;;-;;;
-
-;;Sender;;;;0.3-M2;Completed;;Only one envelope per document allowed
-
+;;;Page no;;2;0.2-M2;Completed;;;
+;;;Character style;;2;0.2-M2;Completed;;;
+;;;Format;Character style for main entries;2;0.3-Final;;;;
+;;;;Alphabetical delimited;;0.2-M2;Completed;;;
+;;;;Key seperated byt commas;;0.2-M2;Completed;;;
+;;;;Tab position relative to Paragraph Style indent;;0.2-M2;Completed;;;
+;;;;;;;;;;
+;Indexes and Tables - Bibliography entry;Entry;From;;0;0.3-Final;;;;
+;;Short name;;;;-;;;;
+;;;;;;;;;;
+;Envelope;Address;Database;;;-;Completed;Convert manually entered adress (no database adress).;;
+;;;Table;;;-;;;;
+;;;Database field;;;-;;;;
+;;;;;;;;;;
+;;Sender;;;;0.3-M2;Completed;;Only one envelope per document allowed;
+;;;;;;;;;;
 ;Frame;Type;Width;Relative;;0.2-M2;Completed;"There is a difference between openoffice and word in handling relative sizes: in openoffice the size can be set relative according to frame anchor (page, paragraph, character) but in word you can set size relativly to: page, margin, left margin and so on. So we can map only ""size relative to page"" property becouse the rest of properties  are incompatible. ";729;
 ;;;;Automatic;;0.2-M2;Completed;min-width is lost;729;
-
+;;;;;;;;;;
 ;;;Height;Relative;;0.2-M2;Completed;"There is a difference between openoffice and word in handling relative sizes: in openoffice the size can be set relative according to frame anchor (page, paragraph, character) but in word you can set size relativly to: page, margin, left margin and so on. So we can map only ""size relative to page"" property becouse the rest of properties  are incompatible. ";730;
 ;;;;Autosize;;0.2-M2;Completed;min-height is lost;730;
-
+;;;;;;;;;;
 ;;;Keep ratio;;;0.2-M2;Completed;;;"This feature doesn't have a equivalent in Word (Word has different feature called ""lock acpect ratio"" but it works differently then ""keep ratio"" in OO. Openoffice ""keep ratio"" feature  doesn't block ratio - it justs calculates width and height)"
-
+;;;;;;;;;;
 ;;;Anchor;To (page/ para/ char) / as char;1;0.2-M2;Completed;;741;"There is no seperate property like anchor for frame/text-box in Word - it depends on value of ""alignement relative to"" property. In OpenOffice ""anchor"" and ""alignment relative to"" property are two different things. "
-
+;;;;;;;;;;
 ;;;Position;Horizontal;;0.2-M2;Completed;No equivalent in OpenXML;737;relative to Left page border, right page border, entire page, page text area,paragraph text-area are converted
 ;;;;Vertical;;0.2-M2;Completed; Relative to margin, relative to Paragraph text area are interpreted differently in Word and in OO;739;
-
+;;;;;;;;;;
 ;;Options;Name;;;-;;No equivalent in OpenXML;;
-;;;Previous Link;;;0.3-M2;;;;
-;;;Next Link;;;0.3-M2;;;;
-
-;;;Protect;Content;;-;;No equivalent in OpenXML;
-;;;;Position ;;-;;No equivalent in OpenXML;
-;;;;Size;;-;;No equivalent in OpenXML;
-
-;;;Properties;Editable in read-only doc;;-;;No equivalent in OpenXML;
-;;;;Print;;-;;No equivalent in OpenXML;
-;;;;Text direction;;-;;No equivalent in OpenXML;
-
-;;Wrap;Settings;None/ Beforte/ After/ Parallel/ Through/ Optimal;;0.2-M2;Completed;;
-
-;;;Spacing;Left;;0.2-M2;Completed;;732
-;;;;Right;;0.2-M2;Completed;;732
-;;;;Top;;0.2-M2;Completed;;733
-;;;;Bottom;;0.2-M2;Completed;;733
-
-;;Hyperlink;URL;;;0.2-Final;Completed;;
-;;;Name;;;0.2-Final;Completed;;
-;;;Frame;;;0.3-Final;;;
-
-;;;Image Map;Server side;;Delayed;;;
-;;;;Client side;;Delayed;;;
-
-;;Borders;Line arrangement;;;0.2-Final;Completed;Word support only borders for all edges of frame/text-box;
-;;;Line;;;0.2-Final;Completed;;
-;;;Spacing of contents;Sync;;0.2-M2;Completed;;744
-
-;;;Shadow style;Position;;0.2-Final;Completed;shadowing borders is a boolean in OOX. So no style properties;
-;;;;Distance;;0.2-Final;Completed;shadowing borders is a boolean in OOX. So no style properties;
-;;;;Color;;0.2-Final;Completed;shadowing borders is a boolean in OOX. So no style properties;
-
-;;Background;As color;selected color;;0.2-M2;Completed;;746
-;;;As graphics;File;;-;;No support for background pictures;
-;;;;Link;;-;;No support for background pictures;
-;;;;Type (Position/ Area/ Tile);;-;;No support for background pictures;
-
-;;Columns;No of columns;;;-;;Columns are not supported for frames/text-boxes in Word;
-;;;Column style;;;-;;Columns are not supported for frames/text-boxes in Word;
-;;;Evenly distribute to columns;;;-;;Columns are not supported for frames/text-boxes in Word;
-;;;Autowidth;;;-;;Columns are not supported for frames/text-boxes in Word;
-;;;Width for each column;;;-;;Columns are not supported for frames/text-boxes in Word;
-;;;Spacing;;;-;;Columns are not supported for frames/text-boxes in Word;
-;;;Seperator Line;selected line;;-;;Columns are not supported for frames/text-boxes in Word;
-;;;;Height;;-;;Columns are not supported for frames/text-boxes in Word;
-;;;;Position;;-;;Columns are not supported for frames/text-boxes in Word;
-
-;Table;;Name;;0;0.2-M1;Completed;;210
-;;;Columns;;0;0.2-M1;Completed;;212
-;;;Rows;;0;0.2-M1;Completed;;211
-
-;;;Heading;;0;0.2-M1;Completed;;217
-;;;Repeat heading;;1;0.2-M1;Completed;;217
-;;;First (x) rows (to repeat);;2;0.2-M1;Completed;;217
-;;;Don't split table;;;-;;Not available in OOX.;583
-;;;Border;;1;0.2-M1;Completed;;584
-
-;;;Autoformat;selected format;;-;;;
-
-;Horizontal Ruler;;selected style;;3;0.3-M2;Completed;;
-
-;Picture;;X position;;0;0.2-M1;Completed;;19,244
-;;;Y position;;0;0.2-M1;Completed;;19,244
-;;;Length;;0;0.2-M1;Completed;;19,244
-;;;Width;;0;0.2-M1;Completed;;19,244
-
-;Audio / Video;;;;;;;;
-
-;Object;;Ole object;;1;0.2-M2;Completed;;245
-;;;Plugin;;;Delayed;;;
-;;;Applet;;;Delayed;;;
-;;;Formula;;;Delayed;;;
-;;;Chart;;;Delayed;;;
-
-
-;Floating frame;;Name;;;Delayed;;;
-;;;Contents;;;Delayed;;;
-
-;;;Scroll Bar;;;Delayed;;;
-;;;Border;;;Delayed;;;
-
+;;;Previous Link;;;0.3-M2;Completed;;;
+;;;Next Link;;;0.3-M2;Completed;;;
+;;;;;;;;;;
+;;;Protect;Content;;-;;No equivalent in OpenXML;;
+;;;;Position ;;-;;No equivalent in OpenXML;;
+;;;;Size;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;;;Properties;Editable in read-only doc;;-;;No equivalent in OpenXML;;
+;;;;Print;;-;;No equivalent in OpenXML;;
+;;;;Text direction;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;;Wrap;Settings;None/ Beforte/ After/ Parallel/ Through/ Optimal;;0.2-M2;Completed;;;
+;;;;;;;;;;
+;;;Spacing;Left;;0.2-M2;Completed;;732;
+;;;;Right;;0.2-M2;Completed;;732;
+;;;;Top;;0.2-M2;Completed;;733;
+;;;;Bottom;;0.2-M2;Completed;;733;
+;;;;;;;;;;
+;;Hyperlink;URL;;;0.2-Final;Completed;;;
+;;;Name;;;0.2-Final;Completed;;;
+;;;Frame;;;0.3-Final;;;;
+;;;;;;;;;;
+;;;Image Map;Server side;;Delayed;;;;
+;;;;Client side;;Delayed;;;;
+;;;;;;;;;;
+;;Borders;Line arrangement;;;0.2-Final;Completed;Word support only borders for all edges of frame/text-box;;
+;;;Line;;;0.2-Final;Completed;;;
+;;;Spacing of contents;Sync;;0.2-M2;Completed;;744;
+;;;;;;;;;;
+;;;Shadow style;Position;;0.2-Final;Completed;shadowing borders is a boolean in OOX. So no style properties;;
+;;;;Distance;;0.2-Final;Completed;shadowing borders is a boolean in OOX. So no style properties;;
+;;;;Color;;0.2-Final;Completed;shadowing borders is a boolean in OOX. So no style properties;;
+;;;;;;;;;;
+;;Background;As color;selected color;;0.2-M2;Completed;;746;
+;;;As graphics;File;;-;;No support for background pictures;;
+;;;;Link;;-;;No support for background pictures;;
+;;;;Type (Position/ Area/ Tile);;-;;No support for background pictures;;
+;;;;;;;;;;
+;;Columns;No of columns;;;-;;Columns are not supported for frames/text-boxes in Word;;
+;;;Column style;;;-;;Columns are not supported for frames/text-boxes in Word;;
+;;;Evenly distribute to columns;;;-;;Columns are not supported for frames/text-boxes in Word;;
+;;;Autowidth;;;-;;Columns are not supported for frames/text-boxes in Word;;
+;;;Width for each column;;;-;;Columns are not supported for frames/text-boxes in Word;;
+;;;Spacing;;;-;;Columns are not supported for frames/text-boxes in Word;;
+;;;Seperator Line;selected line;;-;;Columns are not supported for frames/text-boxes in Word;;
+;;;;Height;;-;;Columns are not supported for frames/text-boxes in Word;;
+;;;;Position;;-;;Columns are not supported for frames/text-boxes in Word;;
+;;;;;;;;;;
+;Table;;Name;;0;0.2-M1;Completed;;210;
+;;;Columns;;0;0.2-M1;Completed;;212;
+;;;Rows;;0;0.2-M1;Completed;;211;
+;;;;;;;;;;
+;;;Heading;;0;0.2-M1;Completed;;217;
+;;;Repeat heading;;1;0.2-M1;Completed;;217;
+;;;First (x) rows (to repeat);;2;0.2-M1;Completed;;217;
+;;;Don't split table;;;-;;Not available in OOX.;583;
+;;;Border;;1;0.2-M1;Completed;;584;
+;;;;;;;;;;
+;;;Autoformat;selected format;;-;;;;
+;;;;;;;;;;
+;Horizontal Ruler;;selected style;;3;0.3-M2;Completed;;;
+;;;;;;;;;;
+;Picture;;X position;;0;0.2-M1;Completed;;19,244;
+;;;Y position;;0;0.2-M1;Completed;;19,244;
+;;;Length;;0;0.2-M1;Completed;;19,244;
+;;;Width;;0;0.2-M1;Completed;;19,244;
+;;;;;;;;;;
+;Audio / Video;;;;;0.3-Final;;;;"Via ""insert object"""
+;;;;;;;;;;
+;Object;;Ole object;;1;0.2-M2;Completed;;245;
+;;;Plugin;;;Delayed;;;;
+;;;Applet;;;Delayed;;;;
+;;;Formula;;;Delayed;;;;
+;;;Chart;;;Delayed;;;;
+;;;;;;;;;;
+;;;;;;;;;;
+;Floating frame;;Name;;;Delayed;;;;
+;;;Contents;;;Delayed;;;;
+;;;;;;;;;;
+;;;Scroll Bar;;;Delayed;;;;
+;;;Border;;;Delayed;;;;
+;;;;;;;;;;
 ;;;Spacing to contents;Width;;Delayed;;;;
 ;;;;Height;;Delayed;;;;
 ;;;;Default;;Delayed;;;;
-
+;;;;;;;;;;
 Format;Character;Font;Font Face;selected font face out of 112 available;0;0.1;Completed;;483,486;
 ;;;Typeface ;Regular/Italic/Bold/Bold Italic;0;0.1;Completed;;;
 ;;;Size;Selected size out of (about) 30 available;0;0.1;Completed;;489;
 ;;;Language;selected language;;0.2-Final;Completed;;;language for proofing 
-
+;;;;;;;;;;
 ;;Font effects;Underline;can be of one of 16 available styles;1;0.2-M1;Completed;The conversion is lossy;498-501;
 ;;;strike through;can be of one of 5 available styles;1;0.2-M1;Completed;The conversion is lossy;476-481;
 ;;;Font color;one of 91 available;1;0.2-M1;Completed;;473;
 ;;;Effects;Capitals / Lower case/ Small capitals/ Title;2;0.2-M1;Completed;lower case is lost;;
 ;;;Relief;Embosed / Engraved;2;0.2-M1;Completed;;496;
-
+;;;;;;;;;;
 ;;;Outline;;2;0.2-M1;Completed;The conversion is lossy;475;
-;;;Shadow;;2;0.2-M1;Completed;;497
-;;;Blinking;;2;0.2-M1;Completed;The conversion is lossy;506
-;;;Hidden;;0;0.2-M1;Completed;Conditional text doesn't exist in OOX;517
-
-;;Position;Position;Normal/ Subscript/ Superscript;2;0.2-M1;Completed;;401
-;;;Rotation / Scaling;0 deg/ 90 deg/ 270 deg;3;0.2-M1;Completed;Basic text rotation does not exist in OOX;512-513
-;;;;Scale width (%);;0.2-M2;Completed;;
-;;;Spacing;Default/ Expanded (by point)/ Condensed (by point);1;0.2-M1;Completed;;492
-
-;;Hyperlink;URL;;;0.2-M1;Completed;;
-;;;Text;;;0.2-M1;Completed;;
-;;;Name;;;0.2-M1;Completed;;
-;;;Target Frame;;;0.2-Final;Completed;;
-
-;;;Character style - Visited Links;;2;0.2-Final;Completed;;
-;;;Character style - Unvisited Links;;2;0.2-Final;Completed;;
-
-;;Background;selected color;;2;0.2-M1;Completed;;
-
-;Paragraph;Indents & Spacing;Indents;Before Text;0;0.2-M1;Completed;;535
-;;;;After Text;0;0.2-M1;Completed;;535
-;;;;First Line;0;0.2-M1;Completed;;536
-;;;;Automatic;1;0.2-M1;Completed;;537
-
-;;;Spacing;Above paragraph;0;0.2-M1;Completed;;538
-;;;;Below paragraph;0;0.2-M1;Completed;;538
-
-;;;Line spacing;"Single / 1.5 lines / Double / Proportional (%) / At least ("") /  Leading ("") / Fixed ("")";1;0.2-M1;Completed;;519
-
-;;;Register True;Activate;;-;;No equivalent in OpenXML;534
-
-;;Alignment;Options;Left / Right / Center / Justified ;1;0.2-M1;Completed;;523
-
-;;;Text to text alignment;Automatic / Base line / Top / Middle / Bottom;0;0.2-M1;Completed;;523
-
-;;Text flow;Hyphenation;Chars at line end;;-;;Not available;515
-;;;;chars at line begin;;-;;Not available;516
-;;;;max number of consecutive hyphens;;0.2-M2;Completed;Default value in OOX, set to no-limit.;531
-
-;;;Breaks;Type;0;0.2-Final;Completed;;540
-;;;;Position;0;0.2-M1;Completed;;540
-;;;;With page style;1;0.2-M1;Completed;;
-;;;;Page number;;0.3-M2;;;
-
-;;;Options;Do not split paragraph;1;0.2-M1;Completed;;526
-;;;;Keep with next paragraph;1;0.2-M1;Completed;;547
-;;;;Orphan control - no of lines;1;0.2-M1;Completed;In Open XML no of lines is static and equals 2;528
-;;;;Widow control - no of lines;1;0.2-M1;Completed;In Open XML no of lines is static and equals 2;527
-
+;;;Shadow;;2;0.2-M1;Completed;;497;
+;;;Blinking;;2;0.2-M1;Completed;The conversion is lossy;506;
+;;;Hidden;;0;0.2-M1;Completed;Conditional text doesn't exist in OOX;517;
+;;;;;;;;;;
+;;Position;Position;Normal/ Subscript/ Superscript;2;0.2-M1;Completed;;401;
+;;;Rotation / Scaling;0 deg/ 90 deg/ 270 deg;3;0.2-M1;Completed;Basic text rotation does not exist in OOX;512-513;
+;;;;Scale width (%);;0.2-M2;Completed;;;
+;;;Spacing;Default/ Expanded (by point)/ Condensed (by point);1;0.2-M1;Completed;;492;
+;;;;;;;;;;
+;;Hyperlink;URL;;;0.2-M1;Completed;;;
+;;;Text;;;0.2-M1;Completed;;;
+;;;Name;;;0.2-M1;Completed;;;
+;;;Target Frame;;;0.2-Final;Completed;;;
+;;;;;;;;;;
+;;;Character style - Visited Links;;2;0.2-Final;Completed;;;
+;;;Character style - Unvisited Links;;2;0.2-Final;Completed;;;
+;;;;;;;;;;
+;;Background;selected color;;2;0.2-M1;Completed;;;
+;;;;;;;;;;
+;Paragraph;Indents & Spacing;Indents;Before Text;0;0.2-M1;Completed;;535;
+;;;;After Text;0;0.2-M1;Completed;;535;
+;;;;First Line;0;0.2-M1;Completed;;536;
+;;;;Automatic;1;0.2-M1;Completed;;537;
+;;;;;;;;;;
+;;;Spacing;Above paragraph;0;0.2-M1;Completed;;538;
+;;;;Below paragraph;0;0.2-M1;Completed;;538;
+;;;;;;;;;;
+;;;Line spacing;"Single / 1.5 lines / Double / Proportional (%) / At least ("") /  Leading ("") / Fixed ("")";1;0.2-M1;Completed;;519;
+;;;;;;;;;;
+;;;Register True;Activate;;-;;No equivalent in OpenXML;534;
+;;;;;;;;;;
+;;Alignment;Options;Left / Right / Center / Justified ;1;0.2-M1;Completed;;523;
+;;;;;;;;;;
+;;;Text to text alignment;Automatic / Base line / Top / Middle / Bottom;0;0.2-M1;Completed;;523;
+;;;;;;;;;;
+;;Text flow;Hyphenation;Chars at line end;;-;;Not available;515;
+;;;;chars at line begin;;-;;Not available;516;
+;;;;max number of consecutive hyphens;;0.2-M2;Completed;Default value in OOX, set to no-limit.;531;
+;;;;;;;;;;
+;;;Breaks;Type;0;0.2-Final;Completed;;540;
+;;;;Position;0;0.2-M1;Completed;;540;
+;;;;With page style;1;0.2-M1;Completed;;;
+;;;;Page number;;0.3-M2;;;;
+;;;;;;;;;;
+;;;Options;Do not split paragraph;1;0.2-M1;Completed;;526;
+;;;;Keep with next paragraph;1;0.2-M1;Completed;;547;
+;;;;Orphan control - no of lines;1;0.2-M1;Completed;In Open XML no of lines is static and equals 2;528;
+;;;;Widow control - no of lines;1;0.2-M1;Completed;In Open XML no of lines is static and equals 2;527;
+;;;;;;;;;;
 ;;Numbering;Style;;;0.2-Final;Completed;;;
-
+;;;;;;;;;;
 ;;;Numbering;Restart at this para;;0.2-Final;Completed;;59;
 ;;;;Start with;;0.2-Final;Completed;;;
-
+;;;;;;;;;;
 ;;;Line numbering;Include this para in line numbering;2;0.2-Final;Completed;;548;
 ;;;;Restart at this para;;-;;No equivalent in OpenXML;549;
 ;;;;start with;;-;;No equivalent in OpenXML;549;
-
+;;;;;;;;;;
 ;;Tabs;Position;;0;0.2-M1;Completed;;;
 ;;;Type;Left / Right / Center / Decimal;0;0.2-M1;Completed;;529;
 ;;;Fill Character;one of the 5 styles (define character if character style selcted);0;0.2-M1;Completed;Character fill has no equivalent in OpenXML. Format .odt has more options for @style:leader-style for example: dot-dash, dot-dot-dash, long-dash or wave which have no equivalent in OpenXML.;529;
-
+;;;;;;;;;;
 ;;Drop Caps;Settings;display drop caps;2;0.3-M1;Completed;font-size and position of the drap cap is lost;533;Text formatting props in OpenXML
 ;;;;Whole word;2;0.3-M1;Completed;;533;
-;;;;Number of characters;2;0.3-M1;Completed;;533
-;;;;Lines;2;0.3-M1;Completed;;533
-;;;;Space to text;2;0.3-M1;Completed;;533
-
-;;;Contents;Text;2;0.3-M1;Completed;;533
-;;;;Character style;2;0.3-M1;Completed;;533
-
-;;Borders;Line Arrangement;Selected default;1;0.2-M1;Completed;;543
-;;;;User defined;;0.2-M1;Completed;;
-
-;;;Line;selected style;2;0.2-M1;Completed;Double lines with different thickness don't seem to be possible in Open XML;544
-
-;;;Color;selected color;2;0.2-M1;Completed;;543
-
-;;;Spacing to contents;Left ;2;0.2-M1;Completed;;545
-;;;;Right;;0.2-Final;Completed;;
-;;;;Top;;0.2-Final;Completed;;
-;;;;Bottom;;0.2-Final;Completed;;
-;;;;Synchronize;;0.2-Final;Completed;;
-
-;;;Shadow style;Position;;-;;No equivalent in OpenXML;546
-;;;;Distance;;-;;No equivalent in OpenXML;546
-;;;;Color;;-;;No equivalent in OpenXML;546
-
-;;;Properties;Merge with next paragraph;2;0.2-M2;Completed;;543
-
-;;Background;selected color;;;-;;No equivalent in OpenXML;541,542
-
-;Bullets and Numbering;Bullets;selected style;;1;0.2-M1;Completed;;406
-
-;;Numbering style;selected style;;1;0.2-M1;Completed;Vertical numbering is not converted.;405
-
+;;;;Number of characters;2;0.3-M1;Completed;;533;
+;;;;Lines;2;0.3-M1;Completed;;533;
+;;;;Space to text;2;0.3-M1;Completed;;533;
+;;;;;;;;;;
+;;;Contents;Text;2;0.3-M1;Completed;;533;
+;;;;Character style;2;0.3-M1;Completed;;533;
+;;;;;;;;;;
+;;Borders;Line Arrangement;Selected default;1;0.2-M1;Completed;;543;
+;;;;User defined;;0.2-M1;Completed;;;
+;;;;;;;;;;
+;;;Line;selected style;2;0.2-M1;Completed;Double lines with different thickness don't seem to be possible in Open XML;544;
+;;;;;;;;;;
+;;;Color;selected color;2;0.2-M1;Completed;;543;
+;;;;;;;;;;
+;;;Spacing to contents;Left ;2;0.2-M1;Completed;;545;
+;;;;Right;;0.2-Final;Completed;;;
+;;;;Top;;0.2-Final;Completed;;;
+;;;;Bottom;;0.2-Final;Completed;;;
+;;;;Synchronize;;0.2-Final;Completed;;;
+;;;;;;;;;;
+;;;Shadow style;Position;;-;;No equivalent in OpenXML;546;
+;;;;Distance;;-;;No equivalent in OpenXML;546;
+;;;;Color;;-;;No equivalent in OpenXML;546;
+;;;;;;;;;;
+;;;Properties;Merge with next paragraph;2;0.2-M2;Completed;;543;
+;;;;;;;;;;
+;;Background;selected color;;;-;;No equivalent in OpenXML;541,542;
+;;;;;;;;;;
+;Bullets and Numbering;Bullets;selected style;;1;0.2-M1;Completed;;406;
+;;;;;;;;;;
+;;Numbering style;selected style;;1;0.2-M1;Completed;Vertical numbering is not converted.;405;
+;;;;;;;;;;
 ;;Outline;selected style;;1;0.2-M1;Completed;;405-406;
-
+;;;;;;;;;;
 ;;Graphics;selected style;;3;0.2-Final;Completed;;407;
-
-;;Position;Level;selected level;;;;;;
+;;;;;;;;;;
+;;Position;Level;selected level;;0.2-M1;Completed;;;
 ;;;Indent;relative or not and value;1;0.2-M2;Completed;;616;
 ;;;Spacing to left;;1;0.2-M1;Completed;;616;
 ;;;Minimum space numbering <-> text;;1;-;;No equivalent in OpenXML;;
 ;;;Numbering Alignment;;1;0.2-M1;Completed;;616;
-
-;;Options;Level;;;;;;;
-;;;Numbering ;;1;0.2-Final;Completed;;404-405;TODO : graphical bullets
+;;;;;;;;;;
+;;Options;Level;;;0.2-Final;Completed;;;
+;;;Numbering ;;1;0.2-Final;Completed;;404-405;
 ;;;Graphics ;selected graphics;;0.2-Final;Completed;;406;
-;;;Width;;;0.3-M2;;;406;
-;;;Height;;;0.3-M2;;;406;
-;;;Keep ratio;;;0.3-M2;;;406;
-;;;Alignment;;;0.3-M2;;;406
-
-;;;All levels;consecutive numbering;;-;;No equivalent in OpenXML;
-
-;Page style;Organizer;Name;;;-;;;370
-;;;Next style;;1;0.2-Final;Completed;;370
-;;;Linked with;;;-;;;
-;;;Category;;;-;;;
-
-;;Page;Paper format;Format;0;0.2-M2;Completed;;
-;;;;Width;0;0.2-M2;Completed;;433
-;;;;Height;0;0.2-M2;Completed;;433
-;;;;Orientation;0;0.2-M2;Completed;;436
-;;;;Paper tray;;0.3-M2;Completed;;435
-
-;;;Margins;Left;0;0.2-M2;Completed;;437
-;;;;Right;0;0.2-M2;Completed;;437
-;;;;Top;0;0.2-M2;Completed;;437
-;;;;Bottom;0;0.2-M2;Completed;;437
-
-;;;Layout settings;Page layout;;0.3-M2;;;
-;;;;Format (number formatting);;0.2-Final;Completed;;
-;;;;Register True;;-;;No equivalent in OpenXML;
-
-;;Background;selected color;;;-;;No equivalent in OpenXML;442
-
-;;Header;Header on;;;0.2-Final;Completed;;
-;;;Same content left /right;;1;0.2-Final;Completed;;
-;;;Left margin;;;-;;No equivalent in OpenXML;
-;;;Right margin;;;-;;No equivalent in OpenXML;
-;;;Spacing;Value;2;0.2-Final;Completed;;
-;;;;Use dynamic spacing;;-;;No equivalent in OpenXML;
-;;;Height;Value;2;0.2-Final;Completed;;
-;;;;Autofit height;;-;;No equivalent in OpenXML;
-
-;;Footer;Footer on;;;0.2-Final;Completed;;
-;;;Same content left /right;;1;0.2-Final;Completed;;
-;;;Left margin;;;-;;No equivalent in OpenXML;
-;;;Right margin;;;-;;No equivalent in OpenXML;
-;;;Spacing;Value;2;0.2-Final;Completed;;
-;;;;Use dynamic spacing;;-;;No equivalent in OpenXML;
-;;;Height;Value;2;0.2-Final;Completed;;
-;;;;Autofit height;;-;;No equivalent in OpenXML;
-
-;;Borders;Line Arrangement;Selected default;0;0.2-M2;Completed;;439
-;;;;User defined;;0.2-M2;Completed;;439
-
-;;;Line;selected style;0;0.2-M2;Completed;;439
-
+;;;Width;;;0.3-M1;Completed;;406;
+;;;Height;;;0.3-M1;Completed;;406;
+;;;Keep ratio;;;0.3-M1;Completed;;406;
+;;;Alignment;;;0.3-M1;Completed;;406;
+;;;;;;;;;;
+;;;All levels;consecutive numbering;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;Page style;Organizer;Name;;;-;;;370;
+;;;Next style;;1;0.2-Final;Completed;;370;
+;;;Linked with;;;-;;;;
+;;;Category;;;-;;;;
+;;;;;;;;;;
+;;Page;Paper format;Format;0;0.2-M2;Completed;;;
+;;;;Width;0;0.2-M2;Completed;;433;
+;;;;Height;0;0.2-M2;Completed;;433;
+;;;;Orientation;0;0.2-M2;Completed;;436;
+;;;;Paper tray;;0.3-M2;Completed;;435;
+;;;;;;;;;;
+;;;Margins;Left;0;0.2-M2;Completed;;437;
+;;;;Right;0;0.2-M2;Completed;;437;
+;;;;Top;0;0.2-M2;Completed;;437;
+;;;;Bottom;0;0.2-M2;Completed;;437;
+;;;;;;;;;;
+;;;Layout settings;Page layout;;0.3-Final;;;;
+;;;;Format (number formatting);;0.2-Final;Completed;;;
+;;;;Register True;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;;Background;selected color;;;-;;No equivalent in OpenXML;442;
+;;;;;;;;;;
+;;Header;Header on;;;0.2-Final;Completed;;;
+;;;Same content left /right;;1;0.2-Final;Completed;;;
+;;;Left margin;;;-;;No equivalent in OpenXML;;
+;;;Right margin;;;-;;No equivalent in OpenXML;;
+;;;Spacing;Value;2;0.2-Final;Completed;;;
+;;;;Use dynamic spacing;;-;;No equivalent in OpenXML;;
+;;;Height;Value;2;0.2-Final;Completed;;;
+;;;;Autofit height;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;;Footer;Footer on;;;0.2-Final;Completed;;;
+;;;Same content left /right;;1;0.2-Final;Completed;;;
+;;;Left margin;;;-;;No equivalent in OpenXML;;
+;;;Right margin;;;-;;No equivalent in OpenXML;;
+;;;Spacing;Value;2;0.2-Final;Completed;;;
+;;;;Use dynamic spacing;;-;;No equivalent in OpenXML;;
+;;;Height;Value;2;0.2-Final;Completed;;;
+;;;;Autofit height;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;;Borders;Line Arrangement;Selected default;0;0.2-M2;Completed;;439;
+;;;;User defined;;0.2-M2;Completed;;439;
+;;;;;;;;;;
+;;;Line;selected style;0;0.2-M2;Completed;;439;
+;;;;;;;;;;
 ;;;Color;selected color;2;0.2-M2;Completed;;439;
-
+;;;;;;;;;;
 ;;;Spacing to contents;Left ;0;0.2-M2;Completed;;439;
 ;;;;Right;0;0.2-M2;Completed;;439;
 ;;;;Top;0;0.2-M2;Completed;;439;
 ;;;;Bottom;0;0.2-M2;Completed;;439;
 ;;;;Synchronize;0;0.2-M2;Completed;;439;
-
+;;;;;;;;;;
 ;;;Shadow style;Position;;-;;No equivalent in OpenXML;;
 ;;;;Distance;;-;;No equivalent in OpenXML;;
 ;;;;Color;;-;;No equivalent in OpenXML;;
-
-
+;;;;;;;;;;
+;;;;;;;;;;
 ;;Columns;No of columns;;;0.2-M2;Completed;;443;These would be same as from Inset-->Section-->Columns
 ;;;Column style;;;0.2-Final;Completed;;443;
-;;;Evenly distribute to columns;;;0.2-M2;Completed;;443
-;;;Autowidth;;;0.2-M2;Completed;;443
-;;;Width for each column;;;0.2-M2;Completed;;443
-;;;Spacing;;;0.2-M2;Completed;;443
-;;;Seperator Line;selected line;;0.3-M2;;;443
-;;;;Height;;0.3-M2;;;443
-;;;;Position;;0.3-M2;;;443
-
-;;Footnote;footnote area;;1;0.3-M2;;;
-;;;Space to text;;1;0.3-M2;;;
-
-;;;Seperator Line;Position;2;0.3-M2;;;
-;;;;Width;2;0.3-M2;;;
-;;;;Length;2;0.3-M2;;;
-;;;;Spacing to footnote contents;2;0.3-M2;;;
-
+;;;Evenly distribute to columns;;;0.2-M2;Completed;;443;
+;;;Autowidth;;;0.2-M2;Completed;;443;
+;;;Width for each column;;;0.2-M2;Completed;;443;
+;;;Spacing;;;0.2-M2;Completed;;443;
+;;;Seperator Line;selected line;;-;;Columns separator line properties;443;Property not available in OpenXML
+;;;;Height;;-;;;443;Property not available in OpenXML
+;;;;Position;;-;;;443;Property not available in OpenXML
+;;;;;;;;;;
+;;Footnote;footnote area;;1;-;;?;;Property not available in OpenXML. OpenXML only allows maximum page height.
+;;;Space to text;;1;-;;;;Property not available in OpenXML
+;;;;;;;;;;
+;;;Seperator Line;Position;2;-;;Footnote separator line properties;;Property not available in OpenXML
+;;;;Width;2;-;;;;Property not available in OpenXML
+;;;;Length;2;-;;;;Property not available in OpenXML
+;;;;Spacing to footnote contents;2;-;;;;Property not available in OpenXML
+;;;;;;;;;;
 ;Columns;;;;;;;;;Already covered.
-
+;;;;;;;;;;
 ;Styles and Formatting;Text styles;;;;0.2-M1;Completed;;;When a particular style has been assigned to some text, when cnverted, the text needs to show up in the same fomratting - plus the style - that is if its Arial 16 and Heading 1, when converted, in Word it should show up as Arial 16 AND heading 1
 ;;Chapter styles;Title / Subtitle;;;0.2-M1;Completed;;;
 ;;List styles;;;;0.2-M1;Completed;;;
@@ -519,64 +519,79 @@ Format;Character;Font;Font Face;selected font face out of 112 available;0;0.1;Co
 ;;Special styles;;;;0.2-Final;Completed;;;
 ;;HTML styles;;;;0.2-Final;Completed;Processed, even if the conversion of .oht files is off topic;;
 ;;Conditional styles;;;;-;;No equivalent in OpenXML;;
-
-
+;;;;;;;;;;
+;;;;;;;;;;
 ;Alignment;Horizontal alignment;left / center / right / justified;;0;0.2-M1;Completed;;;
 ;;Vertical alignment;top / center / bottom;;;0.2-Final;Completed;;;
-
-Table;Number Format;Category;;;;;;;;
-;;Format;;;;;;;;
-;;Language;;;;;;;;
-;;Format code;;;;;;;;
+;;;;;;;;;;
+Table;Number Format;Category;;;;-;;Number format in tables;;Limited workaround through table formulas. Won't implement it. 
+;;Format;;;;-;;;;Limited workaround through table formulas. Won't implement it. 
+;;Language;;;;-;;;;Limited workaround through table formulas. Won't implement it. 
+;;Format code;;;;-;;;;Limited workaround through table formulas. Won't implement it. 
 ;Table Properties;Table;Properties;Name;;0.2-M1;Completed;;573;
 ;;;;Width;;0.2-M1;Completed;;575,576;
 ;;;Spacing;;;0.2-Final;Completed;;574;
 ;;;Alignment;;;0.2-Final;Completed;;579;
 ;;Text Flow;Break;;;0.2-M1;Completed;;583;
-;;;Allow row to break across pages and columns;;;0.3-M2;;;;
+;;;Allow row to break across pages and columns;;;0.3-Final;;;;
 ;;;Keep with next paragraph;;;0.2-M1;Completed;;582;
 ;;;Repeat Heading;;;0.2-M1;Completed;;598;
 ;;;Vertical alignment;;;0.2-Final;Completed;;588;
 ;;Columns;;;;0.2-M1;Completed;;584;
 ;;Borders;;;;0.2-M1;Completed;picture background;580;
 ;;Background;;;;0.2-M1;Completed;picture background;580;
-
+;;;;;;;;;;
 Tools;Word Count;;;;;0.3-Final;;;;Does the converted doc have same number of words?
-
-;Outline numbering;Numbering;Number;;;0.2-Final;Completed;;410
-;;;Character style;;;0.2-Final;Completed;;410
-;;;Complete levels;;;0.2-Final;Completed;;410
-;;Seperator;Before;;;0.2-Final;Completed;;410
-;;;After;;;0.2-Final;Completed;;410
-;;;Start At;;;0.2-Final;Completed;;410
-;;Position;Indent;;;0.2-Final;Completed;;410
-;;;Space to text;;;0.2-Final;Completed;;410
-;;;Minimum space numbering;;;0.2-Final;Completed;;410
-;;;Numbering alignment;;;0.2-Final;Completed;;410
-
-;Line Numbering;View;Character Style;;;-;;No equivalent in OpenXML;
-;;;Format;;;-;;No equivalent in OpenXML;
-;;;Position;;;-;;No equivalent in OpenXML;
-;;;Spacing;;3;0.2-Final;Completed;;400
-;;;Interval;;3;0.2-Final;Completed;;400
-;;Seperator;Text;;;-;;No equivalent in OpenXML;
-;;;Every <number> Lines;;;-;;No equivalent in OpenXML;
-;;Count;Blank lines;;3;0.2-Final;Completed;;400
-;;;Lines in text frames;;;-;;No equivalent in OpenXML;
-;;;Restart every new page;;;-;;No equivalent in OpenXML;
-
-;Foot Notes;Footnotes;Auto Numbering;Numbering /Start At;;0.2-M2;Completed;;401
-;;;;Counting;;0.2-M2;Completed;;401
-;;;;Before/After;;-;;No equivalent in OpenXML;
-;;;;Position;;0.2-M2;Completed;;401
-;;;Styles/Character styles;Paragraph;;0.2-Final;Completed;;401
-;;;;Text Area;;0.2-Final;Completed;;401
-;;;;Footnote Area;;0.2-Final;Completed;;401
-;;;Continuation notice;End of footnote;;0.3-M2;;;401
-;;;;Start of nextpage;;0.3-M2;;;401
-;;Endnotes;Auto Numbering;Numbering/Start At;;0.2-M2;Completed;;401
-;;;;Before/After;;-;;No equivalent in OpenXML;
-;;;Styles/Character styles;Paragraph;;0.2-Final;Completed;;401
-;;;;Text Area;;0.2-Final;Completed;;401
-;;;;Endnote Area;;0.2-Final;Completed;;401
-;;;;Page;;-;;No control over the endnotes' section properties in OpenXML;401
+;;;;;;;;;;
+;Outline numbering;Numbering;Number;;;0.2-Final;Completed;;410;
+;;;Character style;;;0.2-Final;Completed;;410;
+;;;Complete levels;;;0.2-Final;Completed;;410;
+;;Seperator;Before;;;0.2-Final;Completed;;410;
+;;;After;;;0.2-Final;Completed;;410;
+;;;Start At;;;0.2-Final;Completed;;410;
+;;Position;Indent;;;0.2-Final;Completed;;410;
+;;;Space to text;;;0.2-Final;Completed;;410;
+;;;Minimum space numbering;;;0.2-Final;Completed;;410;
+;;;Numbering alignment;;;0.2-Final;Completed;;410;
+;;;;;;;;;;
+;Line Numbering;View;Character Style;;;-;;No equivalent in OpenXML;;
+;;;Format;;;-;;No equivalent in OpenXML;;
+;;;Position;;;-;;No equivalent in OpenXML;;
+;;;Spacing;;3;0.2-Final;Completed;;400;
+;;;Interval;;3;0.2-Final;Completed;;400;
+;;Seperator;Text;;;-;;No equivalent in OpenXML;;
+;;;Every <number> Lines;;;-;;No equivalent in OpenXML;;
+;;Count;Blank lines;;3;0.2-Final;Completed;;400;
+;;;Lines in text frames;;;-;;No equivalent in OpenXML;;
+;;;Restart every new page;;;-;;No equivalent in OpenXML;;
+;;;;;;;;;;
+;Foot Notes;Footnotes;Auto Numbering;Numbering /Start At;;0.2-M2;Completed;;401;
+;;;;Counting;;0.2-M2;Completed;;401;
+;;;;Before/After;;-;;No equivalent in OpenXML;;
+;;;;Position;;0.2-M2;Completed;;401;
+;;;Styles/Character styles;Paragraph;;0.2-Final;Completed;;401;
+;;;;Text Area;;0.2-Final;Completed;;401;
+;;;;Footnote Area;;0.2-Final;Completed;;401;
+;;;Continuation notice;End of footnote;;-;;;401;Property not available in OpenXML
+;;;;Start of nextpage;;-;;;401;Property not available in OpenXML
+;;Endnotes;Auto Numbering;Numbering/Start At;;0.2-M2;Completed;;401;
+;;;;Before/After;;-;;No equivalent in OpenXML;;
+;;;Styles/Character styles;Paragraph;;0.2-Final;Completed;;401;
+;;;;Text Area;;0.2-Final;Completed;;401;
+;;;;Endnote Area;;0.2-Final;Completed;;401;
+;;;;Page;;-;;No control over the endnotes' section properties in OpenXML;401;
+;;;;;;;;;;
+1537339 Coding conventions not followed -( connect.cs file);;;;;;1.0;;;;
+1534346 Unable to convert doc that Open Office Writer can open;;;;;;0.3-Final;;;;
+1533811 Perf/Load issue: Crash while converting a BIG .odt file;;;;;;0.3-Final;;;;
+1524483 The gridlines of the table are not displayed after import;;;;;;0.3-M2;;;;
+1542566 Special symbols are printed in reverse after import.;;;;;;0.3-M2;;;;
+1536829 Document version information is lost on import;;;;;;0.3-M2;;;;
+1547805 ODF option still exists after unistallation of Plug-in;;;;;;1.0;;;;
+1549293 Multi columned A.I is converted as single columned A.I.;;;;;;0.3-M2;;;;
+1556149 Spacing-Above b/w the section and paragraph text is wrongly imported;;;;;;-;;;;
+1559078 Parallel installation not throwing error message;;;;;;1.0;;;;
+1585789 Textbox is going out of page when rotated.;;;;;;0.3-M2;;;;
+1599716 Drop Cap is not properly retained after import.;;;;;;0.3-M2;Completed;;;
+1587812 TrackChanges: empty table in original;;;;;;0.3-M2;;;;
+1584253 Wrong positioned frame covers content;;;;;;0.3-M2;;;;
