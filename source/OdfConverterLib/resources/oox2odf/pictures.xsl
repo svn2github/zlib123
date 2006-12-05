@@ -81,6 +81,9 @@
           <xsl:when test="$verticalRelativeFrom = 'page'">
             <xsl:text>page</xsl:text>
           </xsl:when>
+          <xsl:when test="$verticalRelativeFrom = 'paragraph'">
+            <xsl:text>char</xsl:text>
+          </xsl:when>
           <xsl:when test="$layoutInCell = 1">
             <xsl:text>paragraph</xsl:text>
           </xsl:when>
@@ -240,6 +243,9 @@
     <xsl:call-template name="InsertImageCrop"/>
     <xsl:call-template name="InsertImageWrap"/>
     <xsl:call-template name="InsertImageMargins"/>
+    <xsl:attribute name="draw:flow-with-text">
+      <xsl:text>false</xsl:text>
+    </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="InsertImageWrap">
