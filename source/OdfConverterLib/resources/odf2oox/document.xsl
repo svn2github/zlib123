@@ -81,7 +81,13 @@
   <!-- document body -->
   <xsl:template match="office:body">
     <w:body>
+      <xsl:if test="$protected-sections[1]">
+        <w:permStart w:edGrp="everyone"/>
+      </xsl:if>
       <xsl:apply-templates/>
+      <xsl:if test="$protected-sections[1]">
+        <w:permEnd/>
+      </xsl:if>
       <xsl:call-template name="InsertDocumentFinalSectionProperties"/>
     </w:body>
   </xsl:template>
@@ -916,8 +922,13 @@
   <xsl:template match="text:section">
     <xsl:message terminate="no">progress:text:section</xsl:message>
     <xsl:choose>
-      <xsl:when test="@text:display='none'">
+      <xsl:when test="@text:display= 'none' ">
         <xsl:message terminate="no">feedback:Hidden section</xsl:message>
+      </xsl:when>
+      <xsl:when test="@text:protected = 'true' ">
+        <w:permEnd/>
+        <xsl:apply-templates/>
+        <w:permStart w:edGrp="everyone"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates/>

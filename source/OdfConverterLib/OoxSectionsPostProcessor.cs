@@ -56,6 +56,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private bool inXmlnsPsectAttr = false;
         // test if a page number has been encountered
         private bool inPageNumAttr = false;
+        private int currentPermId = -1;
 
         private Element evenAndOddHeaders;
 
@@ -131,6 +132,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteEndElement()
         {
+        	if (IsPerm())
+        	{
+        		EndPerm();
+        	} 
+        	
             if (!this.inGlobal && !this.inLocal)
             {
                 this.nextWriter.WriteEndElement();
@@ -232,7 +238,29 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
 
-
+        private bool IsPerm()
+        {
+        	Element e = (Element) stack.Peek();
+        	return ("permStart".Equals(e.Name) || "permEnd".Equals(e.Name)) 
+        		&& OOX_MAIN_NS.Equals(e.Ns);
+        }
+        
+        private void EndPerm()
+        {
+        	Element e = (Element) stack.Peek();
+        	if ("permStart".Equals(e.Name))
+        	{
+        		this.currentPermId++;
+        	}
+        	WritePermId();
+        }
+        
+        private void WritePermId()
+        {
+        	this.nextWriter.WriteStartAttribute("w", "id", OOX_MAIN_NS);
+        	this.nextWriter.WriteString(this.currentPermId.ToString());
+        	this.nextWriter.WriteEndAttribute();
+        }
 
         private bool InLocal()
         {
@@ -513,6 +541,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.odfSectPr = null;
             }
 
+            
 
             /// <summary>
             /// Creates the w:sectPr node

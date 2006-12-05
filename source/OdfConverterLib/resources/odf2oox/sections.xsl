@@ -62,6 +62,8 @@
     select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[1]"/>
   <!-- The very first text element -->
   <xsl:variable name="first-elt" select="$elts[1]"/>
+  <xsl:variable name="protected-sections" 
+    select="document('content.xml')/office:document-content/office:body//text:section[@text:protected='true']"/>
 
 
 
@@ -318,10 +320,10 @@
       </xsl:variable>
 
       <!-- 2 - Section starts. The following paragraph is contained in the following section -->
-      <xsl:variable name="followingSection" select="following::text:section[1]"/>
+      <xsl:variable name="following-section" select="following::text:section[1]"/>
       <!-- the following section is the same as the following neighbour's ancestor section -->
       <xsl:variable name="next-new-section"
-        select="$followingSection and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id($followingSection))"/>
+        select="$following-section and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id($following-section))"/>
 
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
       <xsl:variable name="ancestor-sections" select="ancestor::text:section"/>

@@ -47,7 +47,6 @@
             <xsl:when
               test="$view-settings/config:config-item[@config:name='InBrowseMode' and @config:type='boolean'] = 'true' "
               >web</xsl:when>
-
             <xsl:otherwise>print</xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
@@ -66,6 +65,11 @@
         <w:trackRevisions
           w:val="{document('content.xml')/office:document-content/office:body/office:text/text:tracked-changes/@text:track-changes}"
         />
+      </xsl:if>
+      
+      <!-- document protection -->
+      <xsl:if test="$protected-sections[1]">
+        <w:documentProtection w:edit="readOnly" w:enforcement="1"/>
       </xsl:if>
 
       <xsl:if
