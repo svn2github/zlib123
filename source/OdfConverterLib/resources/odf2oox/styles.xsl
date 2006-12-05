@@ -177,12 +177,21 @@
         <xsl:otherwise>
           <!-- if a hyperlink has current style and does not mention a particular parent style, set basedOn to 'Hyperlink' (built-in by converter, cf template 'InsertHyperlinkStyles') -->
           <xsl:if test="@style:family = 'text' ">
-            <xsl:variable name="styleName" select="@style:name"/>
-            <xsl:for-each select="document('content.xml')">
-              <xsl:if test="key('style-modified-hyperlinks',$styleName)">
-                <w:basedOn w:val="Hyperlink"/>
-              </xsl:if>
-            </xsl:for-each>
+            <xsl:choose>
+              <xsl:when test="ancestor::office:automatic-styles">
+                <xsl:if test="key('style-modified-hyperlinks',@style:name)">
+                  <w:basedOn w:val="Hyperlink"/>
+                </xsl:if>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:variable name="styleName" select="@style:name"/>
+                <xsl:for-each select="document('content.xml')">
+                  <xsl:if test="key('style-modified-hyperlinks',$styleName)">
+                    <w:basedOn w:val="Hyperlink"/>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
