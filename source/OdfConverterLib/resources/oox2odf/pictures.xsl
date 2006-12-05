@@ -222,6 +222,7 @@
   </xsl:template>
 
   <xsl:template match="w:drawing" mode="automaticstyles">
+    
     <style:style style:name="{generate-id(.)}" style:family="graphic">
 
       <!--in Word there are no parent style for image - make default Graphics in OO -->
@@ -368,8 +369,10 @@
   </xsl:template>
 
   <xsl:template name="InsertImagePosH">
+
     <xsl:if test="descendant::wp:positionH">
 
+      
       <xsl:call-template name="InsertGraphicPosH">
         <xsl:with-param name="align" select="descendant::wp:positionH/wp:align"/>
       </xsl:call-template>
@@ -382,11 +385,11 @@
 
   <xsl:template name="InsertGraphicPosH">
     <xsl:param name="align"/>
-
+   
     <xsl:choose>
       <xsl:when test="$align and $align != ''">
         <xsl:attribute name="style:horizontal-pos">
-          <xsl:value-of select="$align"/>
+         <xsl:value-of select="$align"/>
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
@@ -416,6 +419,18 @@
         </xsl:when>
         <xsl:when test="$relativeFrom = 'character'">
           <xsl:text>char</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'left-margin-area' ">
+          <xsl:text>page-start-margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'right-margin-area' ">
+          <xsl:text>page-end-margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'inner-margin-area'">
+          <xsl:text>paragraph-end-margin</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'outer-margin-area'">
+          <xsl:text>paragraph-start-margin</xsl:text>
         </xsl:when>
       </xsl:choose>
     </xsl:attribute>

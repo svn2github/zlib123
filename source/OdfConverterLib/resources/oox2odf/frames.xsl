@@ -20,6 +20,7 @@
       <xsl:call-template name="InsertShapeWidth"/>
       <xsl:call-template name="InsertShapeHeight"/>
       <xsl:call-template name="InsertShapeZindex"/>
+      <xsl:call-template name="InsertshapeAbsolutePos"/>
       <xsl:apply-templates select="o:OLEObject"/>
       <xsl:apply-templates select="v:shape/child::node()"/>
     </draw:frame>
@@ -33,19 +34,15 @@
   </xsl:template>
 
   <xsl:template match="o:OLEObject">
-
     <xsl:variable name="IdFile">
       <xsl:value-of select="@r:id"/>
     </xsl:variable>
-
     <xsl:variable name="IdImage">
       <xsl:value-of select="parent::w:object/v:shape/v:imagedata/@r:id"/>
     </xsl:variable>
-
     <xsl:variable name="pziptarget">
       <xsl:value-of select="generate-id()"/>
     </xsl:variable>
-
     <draw:object-ole>
       <xsl:attribute name="xlink:href">
         <xsl:value-of select="concat('./',$pziptarget)"/>
@@ -77,9 +74,60 @@
         <xsl:value-of select="concat('./ObjectReplacements/',$pziptarget)"/>
       </xsl:attribute>
     </draw:image>
+</xsl:template>
 
+  <xsl:template name="InsertshapeAbsolutePos">
+    <xsl:param name="shape" select="v:shape"/>
+    
+    <!--svg:x="12cm" svg:y="12cm"-->
+    <!--    position:absolute;margin-left:340.2pt;margin-top:340.2pt;-->
+    
+    <xsl:variable name="position">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'position'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$position = 'absolute' ">
+        <xsl:variable name="svgx">
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="shape" select="$shape"/>
+            <xsl:with-param name="propertyName" select="'margin-left'"/>
+          </xsl:call-template>
+        </xsl:variable>
+      
+      <xsl:attribute name="svg:x">
+        <xsl:call-template name="ConvertPoints">
+          <xsl:with-param name="length">
+            <xsl:call-template name="GetValue">
+              <xsl:with-param name="length" select="$svgx"/>
+            </xsl:call-template>
+          </xsl:with-param>
+          <xsl:with-param name="unit" select="'cm'"/>
+        </xsl:call-template>
+      </xsl:attribute>
+      
+      <xsl:variable name="svgy">
+        <xsl:call-template name="GetShapeProperty">
+          <xsl:with-param name="shape" select="$shape"/>
+          <xsl:with-param name="propertyName" select="'margin-top'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:attribute name="svg:y">
+        <xsl:call-template name="ConvertPoints">
+          <xsl:with-param name="length">
+            <xsl:call-template name="GetValue">
+              <xsl:with-param name="length" select="$svgy"/>
+            </xsl:call-template>
+          </xsl:with-param>
+          <xsl:with-param name="unit" select="'cm'"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
-
+  
   <xsl:template name="InsertShapeAnchor">
     <xsl:param name="shape" select="v:shape"/>
     <!--TODO page anchor -->
@@ -290,8 +338,16 @@
     <xsl:call-template name="InsertShapeAutomaticWidth"/>
     <xsl:call-template name="InsertShapeHorizontalPos"/>
     <xsl:call-template name="InsertShapeVerticalPos"/>
+    <xsl:call-template name="InsertShapeFlowWithText"/>
   </xsl:template>
 
+  <xsl:template name="InsertShapeFlowWithText">
+  <!--    TODO  investigate when this need to be set to true -->
+    <xsl:attribute name="draw:flow-with-text">
+        <xsl:text>false</xsl:text>
+    </xsl:attribute>
+  </xsl:template>
+  
   <xsl:template name="InsertShapeHorizontalPos">
     <xsl:param name="shape" select="v:shape"/>
 

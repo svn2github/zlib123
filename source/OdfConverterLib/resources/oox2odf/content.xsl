@@ -67,7 +67,6 @@
         <xsl:call-template name="InsertBodyStyles"/>
         <xsl:call-template name="InsertListStyles"/>
         <xsl:call-template name="ParagraphFromSectionsStyles"/>
-        <xsl:call-template name="InsertSectionsStyles"/>
       </office:automatic-styles>
       <office:body>
         <office:text>
@@ -77,16 +76,9 @@
     </office:document-content>
   </xsl:template>
 
-<!--  generates automatic styles for sections-->
-  <xsl:template name="InsertSectionsStyles">
-    <xsl:if test="w:sectPr">
-      <xsl:apply-templates select="w:sectPr" mode="automaticstyles"/>
-    </xsl:if>
-  </xsl:template>
-  
   <!--  generates automatic styles for paragraphs  ho w does it exactly work ?? -->
   <xsl:template name="InsertBodyStyles">
-    <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
+    <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/descendant::node()"
       mode="automaticstyles"/>
   </xsl:template>
   
@@ -95,12 +87,6 @@
     <xsl:if
       test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
       or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId] ">
-      <!-- automatic list styles with empty num format for elements which has non-existent w:num attached -->
-      <xsl:apply-templates
-        select="document('word/document.xml')/w:document/w:body/descendant::w:numId
-        [not(document('word/numbering.xml')/w:numbering/w:num/@w:numId = @w:val)][1]"
-        mode="automaticstyles"/>
-      <!-- automatic list styles-->
       <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
     </xsl:if>
   </xsl:template>
@@ -137,7 +123,10 @@
 
       <!-- add text properties to paragraph -->
       <xsl:if test="w:rPr and not(parent::w:p/w:r)">
-        <xsl:apply-templates select="w:rPr" mode="automaticstyles"/>
+        <style:text-properties>
+          <xsl:call-template name="InsertTextProperties"/>
+        </style:text-properties>
+ <!--       <xsl:apply-templates select="w:rPr" mode="automaticstyles"/>  -->
       </xsl:if>
     </style:style>
    </xsl:template>
@@ -178,13 +167,6 @@
         <xsl:call-template name="InsertTextProperties"/>
       </style:text-properties>
     </style:style>
-  </xsl:template>
-
-  <!-- create text properties in paragraph (w:pPr/w:rPr) -->
-  <xsl:template match="w:rPr[parent::w:pPr]" mode="automaticstyles">
-    <style:text-properties>
-      <xsl:call-template name="InsertTextProperties"/>
-    </style:text-properties>
   </xsl:template>
 
   <!-- ignore text in automatic styles mode. -->
