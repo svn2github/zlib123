@@ -192,6 +192,12 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
+    
+    <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore">
+      <xsl:attribute name="fo:break-before">
+        <xsl:text>page</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
 	</xsl:template>
 
   <xsl:template name="InsertTableAlign">
