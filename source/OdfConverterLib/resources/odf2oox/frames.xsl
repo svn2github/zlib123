@@ -1197,10 +1197,6 @@
   <xsl:template name="InsertDrawnShapeProperties">
     <xsl:param name="shapeStyle"/>
     <xsl:param name="shapeProperties"/>
-    <!-- report lost properties -->
-    <xsl:if test="$shapeStyle/style:graphic-properties/@draw:textarea-vertical-align != 'top' ">
-      <xsl:message terminate="no">feedback:Vertical alignment of text inside text-box</xsl:message>
-    </xsl:if>
 
     <xsl:attribute name="style">
 
@@ -1218,6 +1214,9 @@
         <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>
 
+      <xsl:call-template name="InsertTextAnchor">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
     </xsl:attribute>
   </xsl:template>
 
@@ -2886,6 +2885,29 @@
 
   </xsl:template>
 
+
+  <!-- text vertical anchor -->
+  <xsl:template name="InsertTextAnchor">
+    <xsl:param name="shapeStyle"/>
+
+    <xsl:variable name="verticalAlign">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">draw:textarea-vertical-align</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:text>v-text-anchor:</xsl:text>
+    <xsl:choose>
+      <xsl:when test="$verticalAlign = '' or $verticalAlign = 'top' ">top</xsl:when>
+      <xsl:when test="$verticalAlign = 'middle' or $verticalAlign = 'justify' ">middle</xsl:when>
+      <xsl:when test="$verticalAlign = 'bottom' ">bottom</xsl:when>
+      <xsl:otherwise>top</xsl:otherwise>
+    </xsl:choose>
+    <xsl:text>;</xsl:text>
+  </xsl:template>
+
+
   <xsl:template name="InsertGradientFill">
     <xsl:param name="shapeStyle"/>
 
@@ -2968,6 +2990,9 @@
         <xsl:with-param name="shapeProperties" select="$shapeProperties"/>
       </xsl:call-template>
 
+      <xsl:call-template name="InsertTextAnchor">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+      </xsl:call-template>
     </xsl:attribute>
 
     <xsl:call-template name="InsertShapeFill">
