@@ -21,7 +21,7 @@
       </xsl:attribute>
       <xsl:choose>
         <xsl:when 
-        test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr/w:footerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr/w:headerReference/@w:type = 'first'">
+          test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg or document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr/w:titlePg">
         <text:p>
           <xsl:attribute name="text:style-name">
             <xsl:value-of select="concat('F_P_',$id2)"/>
@@ -62,12 +62,12 @@
         or preceding::w:sectPr/w:pgMar/@w:bottom != ./w:pgMar/@w:bottom
         or preceding::w:sectPr/w:pgMar/@w:header != ./w:pgMar/@w:header
         or preceding::w:sectPr/w:pgMar/@w:footer != ./w:pgMar/@w:footer
-        or ./w:headerReference
-        or ./w:footerReference
         or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
         or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
-        or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient)  
-        and not(following::w:p/w:pPr//w:sectPr)">
+        or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient)
+        or ./w:headerReference
+        or ./w:footerReference
+        and not(following::w:p/w:pPr/w:sectPr) and not(document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg)">
         <text:p>
           <xsl:attribute name="text:style-name">
             <xsl:text>P_Standard</xsl:text>
@@ -119,7 +119,7 @@
       </style:style>
     </xsl:for-each>
     <xsl:if
-      test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
+      test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
       <style:style>
         <xsl:attribute name="style:name">
           <xsl:text>P_F</xsl:text>
