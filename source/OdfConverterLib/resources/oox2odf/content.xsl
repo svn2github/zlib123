@@ -48,7 +48,8 @@
 
   <xsl:import href="frames.xsl"/>
   <xsl:import href="sections.xsl"/>
-
+  <xsl:import href="comments.xsl"/>
+  
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="w:p"/>
   <xsl:preserve-space elements="w:r"/>
@@ -423,6 +424,16 @@
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end'])">
         <xsl:call-template name="wInstrText"/>
       </xsl:when>
+      
+      <!-- Comments -->
+      <xsl:when test="w:commentReference/@w:id">        
+        <xsl:call-template name="comments">
+          <xsl:with-param name="Id">
+            <xsl:value-of select="w:commentReference/@w:id"/>
+          </xsl:with-param>
+        </xsl:call-template>       
+      </xsl:when>
+      
       <!-- Fields -->
       <xsl:when test="parent::w:fldSimple">        
         <xsl:call-template name="wfldSimple"/>
@@ -433,6 +444,7 @@
           <xsl:apply-templates/>
         </text:span>
       </xsl:when>
+   
       <!--default scenario-->
       <xsl:otherwise>
         <xsl:apply-templates/>

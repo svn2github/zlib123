@@ -38,6 +38,7 @@
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="footnotes.xsl"/>
   <xsl:import href="sections.xsl"/>
+  <xsl:import href="comments.xsl"/>
   
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
