@@ -327,6 +327,8 @@
         <xsl:call-template name="InsertShapeProperties"/>
       </style:graphic-properties>
     </style:style>
+    
+    <xsl:apply-templates mode="automaticstyles"/>
   </xsl:template>
 
   <xsl:template name="InsertShapeProperties">
