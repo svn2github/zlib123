@@ -136,7 +136,14 @@
     <xsl:choose>
       <xsl:when test="w:pStyle">
         <xsl:attribute name="style:parent-style-name">
-          <xsl:value-of select="w:pStyle/@w:val"/>
+          <xsl:choose>
+            <xsl:when test="contains(w:pStyle/@w:val,'TOC')">
+              <xsl:value-of select="concat('Contents_20_',substring-after(w:pStyle/@w:val,'TOC'))"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="w:pStyle/@w:val"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
@@ -288,7 +295,7 @@
     
     <xsl:choose>
       
-      <!--check if the paragraph is in table-of content -->
+      <!--check if the paragraph starts a table-of content -->
       <xsl:when test="descendant::w:r[contains(w:instrText,'TOC')]">
         <text:table-of-content text:style-name="Sect1" text:protected="true" text:name="Table of Contents1">
           <xsl:call-template name="InsertIndexProperties"/>
@@ -298,7 +305,8 @@
         </text:table-of-content>
       </xsl:when>
       
-      <xsl:when test="descendant::w:r[contains(w:instrText,'PAGEREF')]"/>
+      <!--check if paragraph is in table-of -content -->
+      <xsl:when test="not(descendant::w:r[contains(w:instrText,'TOC')]) and descendant::w:pStyle[contains(@w:val,'TOC')]"/>
         
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != ''">

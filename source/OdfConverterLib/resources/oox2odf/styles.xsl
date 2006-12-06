@@ -1107,40 +1107,44 @@
       </xsl:when>
       
       <!-- do not add anchor and symbol styles if there are there allready-->
-      <xsl:when test="(($currentStyleId='FootnoteReference' or $currentStyleId='EndnoteReference') and document('word/styles.xml')/descendant::w:style[@w:styleId = concat(substring-before($currentStyleId,'Reference'),'_20_anchor')]) or (($currentStyleId='FootnoteText' or $currentStyleId='EndnoteText') and document('word/styles.xml')/descendant::w:style[@w:styleId = concat(substring-before($currentStyleId,'Text'),'_20_Symbol')])"></xsl:when>
-      
+      <xsl:when
+        test="(($currentStyleId='FootnoteReference' or $currentStyleId='EndnoteReference') and document('word/styles.xml')/descendant::w:style[@w:styleId = concat(substring-before($currentStyleId,'Reference'),'_20_anchor')]) or (($currentStyleId='FootnoteText' or $currentStyleId='EndnoteText') and document('word/styles.xml')/descendant::w:style[@w:styleId = concat(substring-before($currentStyleId,'Text'),'_20_Symbol')])"/>
+      <xsl:when test="$currentStyleId='FootnoteReference' or $currentStyleId='EndnoteReference'">
+        <style:style style:name="{concat(substring-before($currentStyleId,'Reference'),'_20_anchor')}" style:display-name="{concat(substring-before(self::node()/w:name/@w:val,'reference'),'anchor')}">
+          <xsl:call-template name="InsertStyleFamily"/>
+          <xsl:if test="w:basedOn">
+            <xsl:attribute name="style:parent-style-name">
+              <xsl:value-of select="w:basedOn/@w:val"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:call-template name="InsertStyleProperties"/>
+        </style:style>
+      </xsl:when>
+      <xsl:when test="$currentStyleId='FootnoteText' or $currentStyleId='EndnoteText'">
+        <style:style style:name="{concat(substring-before($currentStyleId,'Text'),'_20_Symbol')}" style:display-name="{concat(substring-before(self::node()/w:name/@w:val,'text'),'symbol')}">
+          <xsl:call-template name="InsertStyleFamily"/>
+          <xsl:if test="w:basedOn">
+            <xsl:attribute name="style:parent-style-name">
+              <xsl:value-of select="w:basedOn/@w:val"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:call-template name="InsertStyleProperties"/>
+        </style:style>
+      </xsl:when>
+      <xsl:when test="contains($currentStyleId,'TOC')">
+        <style:style style:name="{concat('Contents_20_',substring-after($currentStyleId,'TOC'))}" style:display-name="{concat('Contents',substring-after(self::node()/w:name/@w:val,'toc'))}">
+          <xsl:call-template name="InsertStyleFamily"/>
+          <xsl:if test="w:basedOn">
+            <xsl:attribute name="style:parent-style-name">
+              <xsl:value-of select="w:basedOn/@w:val"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:call-template name="InsertStyleProperties"/>
+        </style:style>
+      </xsl:when>
       <xsl:otherwise>
-        <style:style>
-          <xsl:attribute name="style:name">
-            <xsl:choose>
-              <!-- change reference style to anchor style -->
-            <xsl:when test="$currentStyleId='FootnoteReference' or $currentStyleId='EndnoteReference'">
-              <xsl:value-of select="concat(substring-before($currentStyleId,'Reference'),'_20_anchor')"/>
-            </xsl:when>
-              <!--change Text style to Symbol style -->
-              <xsl:when test="$currentStyleId='FootnoteText' or $currentStyleId='EndnoteText'">
-                <xsl:value-of select="concat(substring-before($currentStyleId,'Text'),'_20_Symbol')"/>
-              </xsl:when>
-  
-              <xsl:otherwise>
-                <xsl:value-of select="$currentStyleId"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-          <xsl:attribute name="style:display-name">
-            <xsl:value-of select="self::node()/w:name/@w:val"/>
-          </xsl:attribute>
-          <xsl:attribute name="style:family">
-            <xsl:choose>
-              <xsl:when test="self::node()/@w:type = 'character' ">
-                <xsl:text>text</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="self::node()/@w:type"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-
+        <style:style style:name="{$currentStyleId}" style:display-name="{self::node()/w:name/@w:val}">
+          <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn">
             <xsl:attribute name="style:parent-style-name">
               <xsl:value-of select="w:basedOn/@w:val"/>
@@ -1152,6 +1156,27 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="InsertStyleFamily">
+    <xsl:attribute name="style:family">
+      <xsl:choose>
+        <xsl:when test="self::node()/@w:type = 'character' ">
+          <xsl:text>text</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="self::node()/@w:type"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+  
+  <xsl:template name="InsertExtraTabs">
+    <xsl:param name="currentStyleId"/>
+      <style:tab-stops>
+        <xsl:for-each select="document('word/document.xml')/descendant::w:pPr[w:pStyle/@w:val = $currentStyleId][1]/w:tabs/w:tab">
+          <xsl:call-template name="InsertTabs"/>
+        </xsl:for-each>
+      </style:tab-stops>
+  </xsl:template>
   <!-- document defaults -->
   <xsl:template match="w:docDefaults">
     <style:default-style style:family="paragraph">
@@ -1183,18 +1208,26 @@
         
        <!-- add default paragraph propeties to Normal or Default style (it can't be in style:default-style becouse of OO bug ? (see #1593148 image partly lost))-->
         <xsl:if test="self::node()/@w:styleId = 'Normal' or self::node()/@w:styleId = 'Default'">
-            <xsl:for-each select="ancestor::w:styles/w:docDefaults">
-              <xsl:if test="w:pPrDefault/w:pPr">
-                <xsl:for-each select="w:pPrDefault/w:pPr">
-                  <xsl:call-template name="InsertParagraphProperties"/>
-                </xsl:for-each>
-              </xsl:if>
-            </xsl:for-each>
+          <xsl:for-each select="ancestor::w:styles/w:docDefaults">
+            <xsl:if test="w:pPrDefault/w:pPr">
+              <xsl:for-each select="w:pPrDefault/w:pPr">
+                <xsl:call-template name="InsertParagraphProperties"/>
+              </xsl:for-each>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:if>
+        
+        <xsl:if test="contains(self::node()/@w:styleId,'TOC')">
+          <xsl:call-template name="InsertExtraTabs">
+            <xsl:with-param name="currentStyleId">
+              <xsl:value-of select="self::node()/@w:styleId"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:if>
       </style:paragraph-properties>
     </xsl:if>
 
-        <xsl:if test="self::node()/@w:type = 'paragraph' or self::node()/@w:type = 'character'">
+    <xsl:if test="(self::node()/@w:type = 'paragraph' and w:rPr) or self::node()/@w:type = 'character'">
       <style:text-properties>
         <xsl:if test="w:rPr">
           <xsl:for-each select="w:rPr">
@@ -1699,6 +1732,7 @@
     </xsl:choose>
 
     <!-- tab stops -->
+    
     <xsl:if test="w:tabs">
       <style:tab-stops>
         <xsl:for-each select="w:tabs/w:tab">
@@ -1706,6 +1740,29 @@
         </xsl:for-each>
       </style:tab-stops>
     </xsl:if>
+    
+    <xsl:if test="not(w:tabs)">
+      <xsl:for-each select="document('word/styles.xml')/descendant::w:style[@w:styleId = $StyleId]">
+        <xsl:call-template name="GetTabStopsFromStyles"/>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="GetTabStopsFromStyles">
+    <xsl:choose>
+      <xsl:when test="w:pPr/w:tabs">
+        <style:tab-stops>
+          <xsl:for-each select="w:pPr/w:tabs/w:tab">
+            <xsl:call-template name="InsertTabs"/>
+          </xsl:for-each>
+        </style:tab-stops>
+      </xsl:when>
+      <xsl:when test="w:basedOn">
+        <xsl:for-each select="key('StyleId',w:basedOn/@w:val)">
+          <xsl:call-template name="GetTabStopsFromStyles"/>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertParagraphBorder">

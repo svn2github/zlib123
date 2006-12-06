@@ -37,7 +37,7 @@
     <text:p text:style-name="{generate-id(self::node())}">
       <xsl:apply-templates mode="index"/>
     </text:p>
-    <xsl:if test="following-sibling::w:p[1]/descendant::w:r[contains(w:instrText,'PAGEREF')]">
+    <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
       <xsl:apply-templates select="following-sibling::w:p[1]" mode="index"/>
     </xsl:if>
   </xsl:template>
@@ -83,8 +83,11 @@
   
   <!-- insert entry properties for text and numbers -->
   <xsl:template match="w:t" mode="entry">
+    <xsl:variable name="text">
+      <xsl:value-of select="child::text()"/>
+    </xsl:variable>
     <xsl:choose>
-      <xsl:when test="number(child::text)">
+      <xsl:when test="number($text)">
         <text:index-entry-page-number/>
       </xsl:when>
       <xsl:otherwise>
@@ -95,25 +98,81 @@
   
   <!-- insert entry properties for tabs -->
   <xsl:template match="w:tab[not(parent::w:tabs)]" mode="entry">
-    <text:index-entry-tab-stop style:type="{preceding::w:tabs[1]/w:tab/@w:val}">
-      <xsl:call-template name="InsertStyleLeaderChar">
-        <xsl:with-param name="leaderChar">
-          <xsl:value-of select="preceding::w:tabs[1]/w:tab/@w:leader"/>
-        </xsl:with-param>
+    <xsl:variable name="styleType">
+      <xsl:call-template name="GetTabParams">
+        <xsl:with-param name="param">w:val</xsl:with-param>
       </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="leaderChar">
+      <xsl:call-template name="GetTabParams">
+        <xsl:with-param name="param">w:leader</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <text:index-entry-tab-stop style:type="{$styleType}">
+      <xsl:if test="$leaderChar!=''">
+        <xsl:call-template name="InsertStyleLeaderChar">
+          <xsl:with-param name="leaderChar">
+            <xsl:value-of select="$leaderChar"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
     </text:index-entry-tab-stop>
   </xsl:template>
   
   <!-- insert tab-leader char -->
   <xsl:template name="InsertStyleLeaderChar">
     <xsl:param name="leaderChar"/>
+    <xsl:attribute name="style:leader-char">
       <xsl:choose>
-        <xsl:when test="$leaderChar='dot' ">
-          <xsl:attribute name="style:leader-char">.</xsl:attribute>
-        </xsl:when>
+        <xsl:when test="$leaderChar='dot'">.</xsl:when>
+        <xsl:when test="$leaderChar='heavy'"/>
+        <xsl:when test="$leaderChar='hyphen'">-</xsl:when>
+        <xsl:when test="$leaderChar='middleDot'"/>
+        <xsl:when test="$leaderChar='none'"/>
+        <xsl:when test="$leaderChar='underscore'">_</xsl:when>
+        <xsl:otherwise>none</xsl:otherwise>
       </xsl:choose>
+    </xsl:attribute>
   </xsl:template>
   
+  <!-- get properties of tabs -->
+  <xsl:template name="GetTabParams">
+    <xsl:param name="param"/>
+    <xsl:choose>
+      <xsl:when test="preceding::w:tabs[1]/w:tab/@w:val">
+        <xsl:value-of select="preceding::w:tabs[1]/w:tab/attribute::node()[name()=$param]"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="GetTabParamsFromStyles">
+          <xsl:with-param name="tabStyle">
+            <xsl:value-of select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
+          </xsl:with-param>
+          <xsl:with-param name="attribute" select="$param"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!--get properties of tabs from styles.xml -->
+  <xsl:template name="GetTabParamsFromStyles">
+    <xsl:param name="tabStyle"/>
+    <xsl:param name="attribute"/>
+    <xsl:choose>
+      <xsl:when test="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:pPr/w:tabs">
+        <xsl:value-of select="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:pPr/w:tabs/w:tab/attribute::node()[name()=$attribute]"/>
+      </xsl:when>
+      <xsl:when test="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:basedOn/@w:val">
+        <xsl:call-template name="GetTabParamsFromStyles">
+          <xsl:with-param name="tabStyle">
+            <xsl:value-of select="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:basedOn/@w:val"/>
+          </xsl:with-param>
+          <xsl:with-param name="attribute" select="$attribute"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
+  </xsl:template>
+ 
   <!-- handle text in table-of content -->
   <xsl:template match="text()" mode="entry"/>
   

@@ -423,9 +423,9 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;Effects;;;;2;0.3-M2;;;;
 ;;;;;;;;;;;
 References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Completed;;;
-;;;Right align page numbers;;;1;0.3-M2;;;;
+;;;Right align page numbers;;;1;0.3-M2;Partial;Only first level is alligned properly;;
 ;;;Use hyperlinks instead of page numbers;;;1;0.3-M2;;;;
-;;;Tab leader;;;1;0.3-M2;;;;
+;;;Tab leader;;;1;0.3-M2;Completed;;;
 ;;;Show levels;;;1;0.3-M2;;;;
 ;;;Options;Build TOC from;Styles;1;0.3-M2;;;;
 ;;;;;Outline levels;1;0.3-M2;Completed;;;
