@@ -1293,7 +1293,20 @@
     </xsl:if>
 
     <!-- break before paragraph -->
-    <xsl:if test="w:pageBreakBefore or descendant::w:lastRenderedPageBreak">
+    <xsl:if
+      test="(preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:w = following::w:sectPr/w:pgSz/@w:w
+      and preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:h = following::w:sectPr/w:pgSz/@w:h
+      and preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:orient = following::w:sectPr/w:pgSz/@w:orient
+      and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:top = following::w:sectPr/w:pgMar/@w:top
+      and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:left = following::w:sectPr/w:pgMar/@w:left
+      and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:right = following::w:sectPr/w:pgMar/@w:right
+      and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:bottom = following::w:sectPr/w:pgMar/@w:bottom
+      and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:header = following::w:sectPr/w:pgMar/@w:header
+      and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:footer = following::w:sectPr/w:pgMar/@w:footer
+      and not(preceding::w:p[1]/w:pPr/w:sectPr/w:headerReference)
+      and not(preceding::w:p[1]/w:pPr/w:sectPr/w:footerReference))
+      or not(preceding::w:p[1]/w:pPr/w:sectPr)">
+    <xsl:if test="w:pageBreakBefore">
       <xsl:attribute name="fo:break-before">
         <xsl:choose>
           <xsl:when
@@ -1310,6 +1323,7 @@
         </xsl:choose>
       </xsl:attribute>
     </xsl:if>
+      </xsl:if>
 
     <!-- page breaks and simple column breaks -->
     <xsl:if test="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']">
@@ -2371,7 +2385,7 @@
 
     <!-- fonts -->
     <xsl:choose>
-      <xsl:when test="ancestor::node()/w:style[@w:type='paragraph' and @w:default='1']">
+      <xsl:when test="ancestor::node()/w:style[@w:type='paragraph' and @w:default='1']/w:rPr/w:rFonts/@w:ascii">
         <xsl:attribute name="style:font-name">
            <xsl:value-of select="ancestor::node()/w:style[@w:type='paragraph' and @w:default='1']/w:rPr/w:rFonts/@w:ascii"/>
         </xsl:attribute>
