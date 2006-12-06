@@ -84,8 +84,9 @@
     <EmbeddedResource Include="resources\oox2odf\footnotes.xsl" />
     <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
     <EmbeddedResource Include="resources\oox2odf\frames.xsl" />
-  	<EmbeddedResource Include="resources\oox2odf\indexes.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\indexes.xsl" />
     <EmbeddedResource Include="resources\oox2odf\sections.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\comments.xsl" />
     <Compile Include="OoxParagraphsPostProcessor.cs" />
     <Compile Include="OdfParagraphPostProcessor.cs" />
   </ItemGroup>
