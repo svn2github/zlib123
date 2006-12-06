@@ -831,7 +831,7 @@
   <xsl:template match="w:numId" mode="automaticstyles">
     <xsl:variable name="numId" select="@w:val"/>
     <xsl:for-each select="document('word/numbering.xml')">
-      <xsl:if test="not(key('numId',@w:val))">
+      <xsl:if test="key('numId',@w:val) = ''">
         <xsl:call-template name="InsertDefaultListStyle">
           <xsl:with-param name="numId" select="$numId"/>
         </xsl:call-template>
