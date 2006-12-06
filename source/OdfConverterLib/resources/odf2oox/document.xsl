@@ -925,6 +925,9 @@
       <xsl:when test="@text:display= 'none' ">
         <xsl:message terminate="no">feedback:Hidden section</xsl:message>
       </xsl:when>
+      <xsl:when test="@text:is-hidden = 'true' ">
+        <xsl:message terminate="no">feedback: Conditional hidden text</xsl:message>
+      </xsl:when>
       <xsl:when test="@text:protected = 'true' ">
         <w:permEnd/>
         <xsl:apply-templates/>
