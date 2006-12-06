@@ -313,6 +313,7 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                 sfd.InitialDirectory = doc.Path;
                 sfd.OverwritePrompt = true;
                 sfd.Title = this.addinLib.GetString("OdfExportLabel");
+                sfd.FileName = doc.FullName.Substring(0, doc.FullName.LastIndexOf('.')) + ".odt";
 
                 // process the chosen documents	
                 if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
