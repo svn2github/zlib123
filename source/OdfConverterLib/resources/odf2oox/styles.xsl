@@ -280,11 +280,7 @@
     </xsl:choose>
 
     <!-- numbering properties -->
-    <xsl:if test="parent::style:style/@style:default-outline-level">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InsertOutlineNumPr"/>
-      </xsl:for-each>
-    </xsl:if>
+    <xsl:call-template name="InsertOutlineNumPr"/>
 
     <!-- line numbers -->
     <xsl:if
@@ -439,32 +435,42 @@
 
   <!--  Paragraph properties from attributes -->
   <xsl:template name="InsertOutlineLevel">
-    <xsl:if test="not(style:paragraph-properties) and @style:default-outline-level">
+    <xsl:if test="not(style:paragraph-properties)">
       <xsl:if test="not(style:text-properties)">
         <xsl:call-template name="InsertOutlineNumPr"/>
       </xsl:if>
       <!-- outline level for numbering -->
-      <w:outlineLvl w:val="{number(@style:default-outline-level) - 1}"/>
+      <xsl:if test="@style:default-outline-level">
+        <w:outlineLvl w:val="{number(@style:default-outline-level) - 1}"/>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
-  <!-- insert a reference to list 1 -->
+  <!-- insert a reference to list 1, or override this reference -->
   <xsl:template name="InsertOutlineNumPr">
-    <!-- numbering properties -->
-    <w:numPr>
-      <w:numId w:val="1"/>
-    </w:numPr>
+    <!-- context can be style:style, style:para-props or style:text-props -->
+    <xsl:choose>
+      <xsl:when test="ancestor-or-self::style:style/@style:default-outline-level">
+        <w:numPr>
+          <w:numId w:val="1"/>
+        </w:numPr>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if
+          test="ancestor::office:styles and key('styles', ancestor-or-self::style:style/@style:parent-style-name)/@style:default-outline-level">
+          <w:numPr>
+            <w:numId w:val="0"/>
+          </w:numPr>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 
   <!-- Paragraph properties from text-properties -->
   <xsl:template match="style:text-properties" mode="pPr">
     <xsl:if test="not(parent::node()/style:paragraph-properties)">
-      <xsl:if test="parent::node()/@style:default-outline-level">
-        <xsl:for-each select="parent::node()">
-          <xsl:call-template name="InsertOutlineNumPr"/>
-        </xsl:for-each>
-      </xsl:if>
+      <xsl:call-template name="InsertOutlineNumPr"/>
       <xsl:choose>
         <xsl:when test="@fo:hyphenate='true'">
           <w:suppressAutoHyphens w:val="false"/>

@@ -1517,13 +1517,16 @@
             <xsl:when test="key('styles', $styleName)[1]/@style:default-outline-level">
               <xsl:value-of select="key('styles', $styleName)[1]/@style:default-outline-level"/>
             </xsl:when>
-            <xsl:when test="key('styles', $styleName)[1]/@style:parent-style-name">
-              <xsl:call-template name="GetDefaultOutlineLevel">
-                <xsl:with-param name="styleName"
-                  select="key('styles', $styleName)[1]/@style:parent-style-name"/>
-                <xsl:with-param name="context" select="$context"/>
-              </xsl:call-template>
-            </xsl:when>
+            <xsl:otherwise>
+              <!-- do not climb more than one non-automatic-style -->
+              <xsl:if test="$context != 'styles.xml' ">
+                <xsl:call-template name="GetDefaultOutlineLevel">
+                  <xsl:with-param name="styleName"
+                    select="key('styles', $styleName)[1]/@style:parent-style-name"/>
+                  <xsl:with-param name="context" select="$context"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:otherwise>
           </xsl:choose>
         </xsl:for-each>
       </xsl:when>
@@ -1534,7 +1537,6 @@
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
-
   </xsl:template>
 
 
