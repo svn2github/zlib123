@@ -193,7 +193,7 @@
       </xsl:attribute>
     </xsl:if>
     
-    <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and not(parent::w:tbl[1])">
+    <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1]))">
       <xsl:attribute name="fo:break-before">
         <xsl:text>page</xsl:text>
       </xsl:attribute>
