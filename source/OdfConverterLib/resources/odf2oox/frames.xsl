@@ -489,7 +489,13 @@
       <!--drawing element onclick hyperlink-->
       <xsl:if test="ancestor::draw:a">
         <a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-          r:id="{generate-id(ancestor::draw:a)}"/>
+          r:id="{generate-id(ancestor::draw:a)}">
+          <xsl:if test="ancestor::draw:a/@office:target-frame-name">
+            <xsl:attribute name="tgtFrame">
+              <xsl:value-of select="ancestor::draw:a/@office:target-frame-name"/>
+            </xsl:attribute>
+          </xsl:if>
+        </a:hlinkClick>
       </xsl:if>
     </wp:docPr>
 
@@ -2053,23 +2059,6 @@
         </v:shapetype>
 
         <v:shape type="#_x0000_t202">
-          <xsl:if test="parent::draw:frame/@draw:name">
-            <xsl:attribute name="id">
-              <xsl:value-of select="parent::draw:frame/@draw:name"/>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="ancestor::draw:a/@xlink:href">
-            <xsl:attribute name="href">
-              <xsl:choose>
-                <xsl:when test="substring-before(ancestor::draw:a/@xlink:href,'/')='..'">
-                  <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'/')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:if>
           <xsl:variable name="styleName" select="parent::draw:frame/@draw:style-name"/>
           <xsl:variable name="automaticStyle" select="key('automatic-styles', $styleName)"/>
           <xsl:variable name="officeStyle"
@@ -2950,9 +2939,28 @@
       <xsl:message terminate="no">feedback:Vertical alignment of text inside text-box</xsl:message>
     </xsl:if>
 
-    <xsl:if test="ancestor::draw:a">
+    <xsl:if test="$shapeProperties/@draw:name">
+      <xsl:attribute name="id">
+        <xsl:value-of select="$shapeProperties/@draw:name"/>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="ancestor::draw:a/@xlink:href">
       <xsl:attribute name="href">
-        <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
+        <!-- avoid empty target -->
+        <xsl:choose>
+          <xsl:when test="contains(ancestor::draw:a/@xlink:href, './')">
+            <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href, '../')"/>
+          </xsl:when>
+          <xsl:when test="string-length(ancestor::draw:a/@xlink:href) &gt; 0">
+            <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
+          </xsl:when>
+          <xsl:otherwise>/</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="ancestor::draw:a/@office:target-frame-name">
+      <xsl:attribute name="target">
+        <xsl:value-of select="ancestor::draw:a/@office:target-frame-name"/>
       </xsl:attribute>
     </xsl:if>
 
