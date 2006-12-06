@@ -82,6 +82,7 @@
   <xsl:template match="office:body">
     <w:body>
       <xsl:if test="$protected-sections[1]">
+        <!-- permission range id's added in a post processing step -->
         <w:permStart w:edGrp="everyone"/>
       </xsl:if>
       <xsl:apply-templates/>
@@ -929,6 +930,7 @@
         <xsl:message terminate="no">feedback: Conditional hidden text</xsl:message>
       </xsl:when>
       <xsl:when test="@text:protected = 'true' ">
+        <!-- permission range id's added in a post processing step -->
         <w:permEnd/>
         <xsl:apply-templates/>
         <w:permStart w:edGrp="everyone"/>
