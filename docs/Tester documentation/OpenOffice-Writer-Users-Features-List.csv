@@ -240,7 +240,7 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 
 ;;Hyperlink;URL;;;0.2-Final;Completed;;
 ;;;Name;;;0.2-Final;Completed;;
-;;;Frame;;;0.3-Final;;;
+;;;Frame;;;0.3-Final;Completed;;
 
 ;;;Image Map;Server side;;Delayed;;;
 ;;;;Client side;;Delayed;;;
@@ -541,7 +541,7 @@ Table;Number Format;Category;;;;-;;Number format in tables;;Limited workaround t
 ;;Borders;;;;0.2-M1;Completed;picture background;580;
 ;;Background;;;;0.2-M1;Completed;picture background;580;
 
-Tools;Word Count;;;;;0.3-Final;;;;Does the converted doc have same number of words?
+Tools;Word Count;;;;;0.3-Final;Completed;;;Word a,d OO do not count the same way (for instance, numbering is counted in Word, but not in OO)
 
 ;Outline numbering;Numbering;Number;;;0.2-Final;Completed;;410
 ;;;Character style;;;0.2-Final;Completed;;410
