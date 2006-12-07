@@ -255,6 +255,7 @@
         <xsl:call-template name="InsertColumns"/>
       </style:section-properties>      
     </style:style>
+    <xsl:call-template name="HeaderFooterStyles"/>
   </xsl:template>
   
 </xsl:stylesheet>

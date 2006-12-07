@@ -73,103 +73,102 @@
 
   <xsl:template name="HeaderFooterAutomaticStyle">
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
-     <xsl:call-template name="HeaderFooterStyles"/>
-    </xsl:for-each>
-    <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <xsl:call-template name="HeaderFooterStyles"/>
     </xsl:for-each>
   </xsl:template>
   
   <xsl:template name="HeaderFooterStyles">
     <xsl:for-each select="w:headerReference">
-      <xsl:if test="./@w:type = 'default'">
-        <xsl:variable name="headerId" select="./@r:id"/>
-        <xsl:variable name="headerXmlDocument"
-          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-        <!-- change context to get footer content -->
-        <xsl:for-each select="document($headerXmlDocument)">
-          <xsl:apply-templates mode="automaticstyles"/>
-          <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
-            or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
-    </xsl:for-each>
-    <xsl:for-each select="w:headerReference">
-      <xsl:if test="./@w:type = 'even'">
-        <xsl:variable name="headerId" select="./@r:id"/>
-        <xsl:variable name="headerXmlDocument"
-          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-        <!-- change context to get footer content -->
-        <xsl:for-each select="document($headerXmlDocument)">
-          <xsl:apply-templates mode="automaticstyles"/>
-          <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
-            or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
-    </xsl:for-each>
-    <xsl:for-each select="w:footerReference">
-      <xsl:if test="./@w:type = 'default'">
-        <xsl:variable name="footerId" select="./@r:id"/>
-        <xsl:variable name="footerXmlDocument"
-          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-        <!-- change context to get header content -->
-        <xsl:for-each select="document($footerXmlDocument)">
-          <xsl:apply-templates mode="automaticstyles"/>
-          <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
-            or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
-    </xsl:for-each>
-    <xsl:for-each select="w:footerReference">
-      <xsl:if test="./@w:type = 'even'">
-        <xsl:variable name="footerId" select="./@r:id"/>
-        <xsl:variable name="footerXmlDocument"
-          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-        <!-- change context to get header content -->
-        <xsl:for-each select="document($footerXmlDocument)">
-          <xsl:apply-templates mode="automaticstyles"/>
-          <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
-            or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
-    </xsl:for-each>
-    <xsl:for-each select="w:headerReference">
-      <xsl:if test="./@w:type = 'first'">
-        <xsl:variable name="headerId" select="./@r:id"/>
-        <xsl:variable name="headerXmlDocument"
-          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-        <!-- change context to get footer content -->
-        <xsl:for-each select="document($headerXmlDocument)">
-          <xsl:apply-templates mode="automaticstyles"/>
-          <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
-            or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="./@w:type = 'default'">
+          <xsl:variable name="headerId" select="./@r:id"/>
+          <xsl:variable name="headerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <!-- change context to get footer content -->
+          <xsl:for-each select="document($headerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if
+              test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="./@w:type = 'even'">
+          <xsl:variable name="headerId" select="./@r:id"/>
+          <xsl:variable name="headerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <!-- change context to get footer content -->
+          <xsl:for-each select="document($headerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if
+              test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="./@w:type = 'first'">
+          <xsl:variable name="headerId" select="./@r:id"/>
+          <xsl:variable name="headerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+          <!-- change context to get footer content -->
+          <xsl:for-each select="document($headerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if
+              test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
     </xsl:for-each>
     <xsl:for-each select="w:footerReference">
-      <xsl:if test="./@w:type = 'first'">
-        <xsl:variable name="footerId" select="./@r:id"/>
-        <xsl:variable name="footerXmlDocument"
-          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-        <!-- change context to get header content -->
-        <xsl:for-each select="document($footerXmlDocument)">
-          <xsl:apply-templates mode="automaticstyles"/>
-          <xsl:if test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
-            or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
-            <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="./@w:type = 'default'">
+          <xsl:variable name="footerId" select="./@r:id"/>
+          <xsl:variable name="footerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <!-- change context to get header content -->
+          <xsl:for-each select="document($footerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if
+              test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="./@w:type = 'even'">
+          <xsl:variable name="footerId" select="./@r:id"/>
+          <xsl:variable name="footerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <!-- change context to get header content -->
+          <xsl:for-each select="document($footerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if
+              test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="./@w:type = 'first'">
+          <xsl:variable name="footerId" select="./@r:id"/>
+          <xsl:variable name="footerXmlDocument"
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+          <!-- change context to get header content -->
+          <xsl:for-each select="document($footerXmlDocument)">
+            <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if
+              test="document('word/document.xml')/w:document[descendant::w:numPr/w:numId] 
+              or document('word/styles.xml')/w:styles/w:style[descendant::w:numPr/w:numId]">
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
     </xsl:for-each>
   </xsl:template>
   
