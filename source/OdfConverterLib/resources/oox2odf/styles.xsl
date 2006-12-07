@@ -382,6 +382,11 @@
   <!-- handle default page layout -->
   <xsl:template name="InsertDefaultPageLayout">
     <style:page-layout style:name="pm1">
+      <xsl:if test="document('word/settings.xml')/w:settings/w:mirrorMargins">
+        <xsl:attribute name="style:page-usage">
+          <xsl:text>mirrored</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
         <style:page-layout-properties>
           <xsl:call-template name="InsertPageLayoutProperties"/>
@@ -406,6 +411,11 @@
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
       <style:page-layout>
+        <xsl:if test="document('word/settings.xml')/w:settings/w:mirrorMargins">
+          <xsl:attribute name="style:page-usage">
+            <xsl:text>mirrored</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
         <xsl:attribute name="style:name">
           <xsl:value-of select="concat('PAGE',generate-id(.))"/>
         </xsl:attribute>
