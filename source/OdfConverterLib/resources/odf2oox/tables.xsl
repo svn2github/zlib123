@@ -219,7 +219,7 @@
     <xsl:variable name="marginLeft">
       <xsl:choose>
         <xsl:when
-          test="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left != ''  " >
+          test="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left != ''  ">
           <xsl:call-template name="twips-measure">
             <xsl:with-param name="length"
               select="key('automatic-styles', @table:style-name)/style:table-properties/@fo:margin-left"
@@ -284,11 +284,21 @@
   <xsl:template name="InsertGridCol">
     <xsl:param name="width"/>
     <xsl:param name="number"/>
+    <xsl:variable name="widthVal">
+      <xsl:call-template name="GetValue">
+        <xsl:with-param name="length" select="$width"/>
+      </xsl:call-template>
+    </xsl:variable>
     <w:gridCol>
       <xsl:attribute name="w:w">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="$width"/>
-        </xsl:call-template>
+        <xsl:choose>
+          <xsl:when test="number($widthVal)">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="$width"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
     </w:gridCol>
     <xsl:if test="$number > 1">
@@ -406,6 +416,14 @@
 
   <!-- table rows -->
   <xsl:template match="table:table-row">
+    <xsl:call-template name="InsertRow">
+      <xsl:with-param name="number" select="@table:number-rows-repeated"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- Inserts a row -->
+  <xsl:template name="InsertRow">
+    <xsl:param name="number"/>
     <w:tr>
       <xsl:if
         test="key('automatic-styles',child::table:table-cell/@table:style-name)/style:table-cell-properties/@fo:wrap-option='no-wrap'">
@@ -422,7 +440,13 @@
         <xsl:message terminate="no">feedback: table with more than 64 columns</xsl:message>
       </xsl:if>
     </w:tr>
+    <xsl:if test="$number > 1">
+      <xsl:call-template name="InsertRow">
+        <xsl:with-param name="number" select="$number - 1"/>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
+
 
   <!-- Inserts row properties -->
   <xsl:template name="InsertRowProperties">
@@ -507,11 +531,23 @@
   </xsl:template>
 
   <xsl:template name="InsertCellProperties">
+    <xsl:variable name="cellStyleName">
+      <xsl:choose>
+        <xsl:when test="@table:style-name">
+          <xsl:value-of select="@table:style-name"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="parent::table:table-row/@table:default-cell-style-name">
+            <xsl:value-of select="parent::table:table-row/@table:default-cell-style-name"/>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <!-- pointers on the cell style properties -->
     <xsl:variable name="cellProp"
-      select="key('automatic-styles', @table:style-name)/style:table-cell-properties"/>
+      select="key('automatic-styles', $cellStyleName)/style:table-cell-properties"/>
     <xsl:variable name="rowProp"
-      select="key('automatic-styles', ../@table:style-name)/style:table-row-properties"/>
+      select="key('automatic-styles', parent::table:table-row/@table:style-name)/style:table-row-properties"/>
     <xsl:variable name="tableProp"
       select="key('automatic-styles', ancestor::table:table[@table:style-name][1]/@table:style-name)/style:table-properties"/>
 
@@ -556,19 +592,24 @@
   <!-- Inserts the cell width -->
   <xsl:template name="InsertCellWidth">
     <xsl:param name="tableProp"/>
-    <w:tcW>
-      <xsl:attribute name="w:type">
-        <xsl:choose>
-          <xsl:when test="$tableProp/@style:rel-width">pct</xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$type"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-      <xsl:attribute name="w:w">
-        <xsl:call-template name="GetCellWidth"/>
-      </xsl:attribute>
-    </w:tcW>
+    <xsl:variable name="cellWidth">
+      <xsl:call-template name="GetCellWidth"/>
+    </xsl:variable>
+    <xsl:if test="number($cellWidth)">
+      <w:tcW>
+        <xsl:attribute name="w:type">
+          <xsl:choose>
+            <xsl:when test="$tableProp/@style:rel-width">pct</xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$type"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:attribute name="w:w">
+          <xsl:value-of select="$cellWidth"/>
+        </xsl:attribute>
+      </w:tcW>
+    </xsl:if>
   </xsl:template>
 
   <!-- Inserts the cell span -->
