@@ -38,713 +38,763 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     /// An <c>XmlWriter</c> implementation for OOX sections post processing
     public class OoxSectionsPostProcessor : AbstractPostProcessor
     {
-        private const string OOX_MAIN_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-        private const string OOX_RELS_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
-        private const string CA_SECTIONS_NS = "urn:cleverage:xmlns:post-processings:sections";
+        private const string W_NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        private const string R_NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+        private const string PSECT_NAMESPACE = "urn:cleverage:xmlns:post-processings:sections";
 
-        private Stack stack;
-        private PageContext pageContext;
-
-        // test if global page properties have been encountered
-        // (ie, properties defined in master styles)
-        private bool inGlobal = false;
-        // test if local page properties have been encountered
-        // (ie, an odf section's columns/notes configuration)
-        private bool inLocal = false;
-        // test if a master page name has been encountered
-        private bool inNameAttr = false;
-        private bool inXmlnsPsectAttr = false;
-        // test if a page number has been encountered
-        private bool inPageNumAttr = false;
-        private int currentPermId = -1;
-
+        private Stack currentNode;
+        private Stack context;
+        private Stack store;
+        
         private Element evenAndOddHeaders;
+		private int currentPermId = -1;
+        private string name;
+        private bool skip = false;
+        private bool nextIsContinuous = false;
+        private bool nextIsPageBreak = false;
+        private bool nextIsNewSection = false;
+        private bool nextIsEndSection = false;
+        private bool nextIsMasterPage = false;
+        private Element odfSectPr;
+        private Element cont;
+        private Element titlePg;
+        private Hashtable pages;
+        private string startPageNumber = null;
 
+       
 
         public OoxSectionsPostProcessor(XmlWriter nextWriter)
             : base(nextWriter)
         {
-            this.stack = new Stack();
-            this.pageContext = new PageContext(stack, nextWriter);
-            this.evenAndOddHeaders = new Element("w", "evenAndOddHeaders", OOX_MAIN_NS);
+        	this.currentNode = new Stack();
+        	this.context = new Stack();
+            this.evenAndOddHeaders = new Element("w", "evenAndOddHeaders", W_NAMESPACE);
+            this.pages = new Hashtable();
+            this.cont = new Element("w", "type", W_NAMESPACE);
+            this.cont.AddAttribute(new Attribute("w", "val", "continuous", W_NAMESPACE));
+            this.titlePg = new Element("w", "titlePg", W_NAMESPACE);
+        }
+        
+        private Element OdfSectPr
+        {
+        	get { return odfSectPr; }
+           	set { odfSectPr = value; }
         }
 
+        private bool EvenAndOddHeaders
+        {
+        	get
+        	{
+        		ICollection coll = pages.Values;
+        		foreach (Page page in coll)
+        		{
+        			if (page.EvenOdd)
+        			{
+        				return true;
+        			}
+        		}
+        		return false;
+        	}
+        }
+        
+        /**
+         * Overriden callbacks
+         */
         public override void WriteString(string text)
         {
-            if (this.inLocal || this.inNameAttr || this.inPageNumAttr)
-            {
-                this.pageContext.Set(text);
-                this.pageContext.InSectionWriteString(text);
-            }
-            else
-            {
-                if (this.inGlobal)
-                {
-                    this.pageContext.InSectionWriteString(text);
-                }
-                else
-                {
-                    if (!this.inXmlnsPsectAttr)
-                    {
-                        nextWriter.WriteString(text);
-                    }
-                }
-            }
+        	if (InMasterStyles())
+        	{
+        		WriteMasterStyles(text);
+        	}
+        	else if (InSectPr())
+        	{
+        		WriteSectPrAttributes(text);
+        	}
+        	else if (InParagraphOrTable())
+        	{
+        		WriteParagraphOrTableAttribute(text);
+        	}
+        	else if (InEvenAndOddHeaders())
+        	{
+        		// nothing to do
+        	}
+        	else
+        	{
+        		nextWriter.WriteString(text);
+        	}
         }
 
-
+       
         public override void WriteStartElement(string prefix, string localName, string ns)
         {
-            stack.Push(new Element(prefix, localName, ns));
+            this.currentNode.Push(new Element(prefix, localName, ns));
 
-            if (InGlobal())
+            if (IsMasterStyles())
             {
-                this.inGlobal = true;
+            	StartMasterStyles();
             }
-            else if (InLocal())
+            else if (IsSectPr())
             {
-                this.inLocal = true;
+            	StartSectPr();
+            } 
+            else if (IsParagraphOrTable())
+            {
+            	StartParagraphOrTable();
             }
-            else if (InEvenAndOddHeaders())
+            else if (IsEvenAndOddHeaders())
             {
-                if (!this.pageContext.EvenAndOddHeaders)
-                {
-                    // do nothing
-                }
+            	StartEvenAndOddHeaders();
             }
-
-            if (this.inGlobal)
+            else 
             {
-                this.pageContext.InPageStartElement(prefix, localName, ns);
-            }
-
-            if (this.inLocal)
-            {
-                this.pageContext.InSectionStartElement(prefix, localName, ns);
-            }
-
-            if (!this.inGlobal && !this.inLocal)
-            {
-                this.nextWriter.WriteStartElement(prefix, localName, ns);
+            	this.nextWriter.WriteStartElement(prefix, localName, ns);
             }
         }
-
 
         public override void WriteEndElement()
         {
-            if (IsPerm())
+        	if (IsPerm())
+        	{
+        		EndPerm();
+        	} 
+        	else if (IsMasterStyles())
+        	{
+        		EndMasterStyles();
+        	}
+        	else if (IsSectPr()) 
+        	{
+        		EndSectPr();
+        	}
+        	else if (IsParagraphOrTable())
+        	{
+        		EndParagraphOrTable();
+        	}
+            else if (IsEvenAndOddHeaders())
             {
-                EndPerm();
+            	EndEvenAndOddHeaders();
+            }
+            else 
+            {
+            	this.nextWriter.WriteEndElement();
             }
 
-            if (!this.inGlobal && !this.inLocal)
-            {
-                this.nextWriter.WriteEndElement();
-            }
-
-            if (this.inGlobal)
-            {
-                this.pageContext.InPageEndElement();
-            }
-
-            if (this.inLocal)
-            {
-                this.pageContext.InSectionEndElement();
-            }
-
-            if (InGlobal())
-            {
-                this.inGlobal = false;
-            }
-
-            else if (InLocal())
-            {
-                this.inLocal = false;
-            }
-
-            else if (InEvenAndOddHeaders())
-            {
-                if (!this.pageContext.EvenAndOddHeaders)
-                {
-                    // do nothing
-                }
-            }
-
-            stack.Pop();
+            this.currentNode.Pop();
         }
-
-
-
+        
         public override void WriteStartAttribute(string prefix, string localName, string ns)
         {
-            stack.Push(new Attribute(prefix, localName, ns));
-
-            if (InNameAttribute())
+            this.currentNode.Push(new Attribute(prefix, localName, ns));
+			
+            if (InMasterStyles())
             {
-                this.inNameAttr = true;
+            	StartMasterStylesAttribute();
             }
-
-            if (InPageNumberAttribute())
+            else if (InSectPr())
             {
-                this.inPageNumAttr = true;
+            	StartSectPrAttribute();
             }
-
-            if (InXmlnsPsectAttr())
+            else if (InParagraphOrTable())
             {
-                this.inXmlnsPsectAttr = true;
+            	StartParagraphOrTableAttribute();
             }
-
-            if (!this.inGlobal && !this.inLocal && !this.inNameAttr && !this.inPageNumAttr && !this.inXmlnsPsectAttr)
+            else if (InEvenAndOddHeaders())
             {
-                this.nextWriter.WriteStartAttribute(prefix, localName, ns);
+            	// nothing to do
             }
-
-            if (this.inGlobal || this.inLocal)
-            {
-                this.pageContext.InSectionStartAttribute(prefix, localName, ns);
+           	else
+           	{
+            	this.nextWriter.WriteStartAttribute(prefix, localName, ns);
             }
         }
-
-
 
         public override void WriteEndAttribute()
         {
-            if (!this.inGlobal && !this.inLocal && !this.inNameAttr && !this.inPageNumAttr && !this.inXmlnsPsectAttr)
-            {
+        	if (InMasterStyles())
+        	{
+        		EndMasterStylesAttribute();
+        	}
+        	else if (InSectPr())
+        	{
+        		EndSectPrAttribute();
+        	}
+        	else if (InParagraphOrTable())
+        	{
+        		EndParagraphOrTableAttribute();
+        	}
+        	else if (InEvenAndOddHeaders())
+        	{
+        		// nothing to do
+        	}
+        	else
+        	{
                 this.nextWriter.WriteEndAttribute();
             }
-
-            if (this.inGlobal || this.inLocal)
-            {
-                this.pageContext.InSectionEndAttribute();
-            }
-
-            if (InNameAttribute())
-            {
-                this.inNameAttr = false;
-            }
-
-            if (InPageNumberAttribute())
-            {
-                this.inPageNumAttr = false;
-            }
-
-            if (InXmlnsPsectAttr())
-            {
-                this.inXmlnsPsectAttr = false;
-            }
-
-            stack.Pop();
+            this.currentNode.Pop();
         }
 
-
+		/**
+		 * Permission range elements
+		 */
         private bool IsPerm()
         {
-            Element e = (Element)stack.Peek();
-            return ("permStart".Equals(e.Name) || "permEnd".Equals(e.Name))
-                && OOX_MAIN_NS.Equals(e.Ns);
+        	Element e = (Element) this.currentNode.Peek();
+        	return ("permStart".Equals(e.Name) || "permEnd".Equals(e.Name)) 
+        		&& W_NAMESPACE.Equals(e.Ns);
         }
-
+        
         private void EndPerm()
         {
-            Element e = (Element)stack.Peek();
-            if ("permStart".Equals(e.Name))
-            {
-                this.currentPermId++;
-            }
-            WritePermId();
+        	Element e = (Element) this.currentNode.Peek();
+        	if ("permStart".Equals(e.Name))
+        	{
+        		this.currentPermId++;
+        	}
+        	WritePermId();
+        	this.nextWriter.WriteEndElement();
         }
-
+        
         private void WritePermId()
         {
-            this.nextWriter.WriteStartAttribute("w", "id", OOX_MAIN_NS);
-            this.nextWriter.WriteString(this.currentPermId.ToString());
-            this.nextWriter.WriteEndAttribute();
+        	this.nextWriter.WriteStartAttribute("w", "id", W_NAMESPACE);
+        	this.nextWriter.WriteString(this.currentPermId.ToString());
+        	this.nextWriter.WriteEndAttribute();
         }
 
-        private bool InLocal()
+        /**
+         * sectPr elements get skipped or filled with properties 
+         * depending on the page context.
+         */
+        private bool IsSectPr()
         {
-            Node n = (Node)stack.Peek();
-            return n.Name.Equals("sectPr") && n.Ns.Equals(OOX_MAIN_NS);
+        	Element e = (Element) this.currentNode.Peek();
+        	return this.context.Contains("sectPr") || 
+        	    ("sectPr".Equals(e.Name) && W_NAMESPACE.Equals(e.Ns));
         }
-
-        private bool InGlobal()
+        
+        private bool InSectPr()
         {
-            Node n = (Node)stack.Peek();
-            return n.Name.Equals("master-pages") && n.Ns.Equals(CA_SECTIONS_NS);
+        	return this.context.Contains("sectPr");
         }
-
-        private bool InNameAttribute()
+        
+        private void StartSectPr()
         {
-            Node n = (Node)stack.Peek();
-            return n.Name.Equals("master-page-name") && n.Ns.Equals(CA_SECTIONS_NS);
+        	Element e = (Element) this.currentNode.Peek();
+        	
+        	if ("sectPr".Equals(e.Name) && W_NAMESPACE.Equals(e.Ns))
+        	{
+        		this.context.Push("sectPr");
+        		this.store = new Stack();
+        		this.odfSectPr = e;
+        		this.store.Push(this.OdfSectPr);
+        	}
+        	else
+        	{
+        		Element parent = (Element) this.store.Peek();
+        		if (parent != null)
+        		{
+        			parent.AddChild(e);
+        		}
+        		this.store.Push(e);
+        	}
         }
-
-        private bool InPageNumberAttribute()
+        
+        private void EndSectPr()
         {
-            Node n = (Node)stack.Peek();
-            return n.Name.Equals("page-number") && n.Ns.Equals(CA_SECTIONS_NS);
+        	Element e = (Element) this.store.Pop();
+        	if ("sectPr".Equals(e.Name) && W_NAMESPACE.Equals(e.Ns))
+        	{
+        		this.WriteSectPr();
+        		this.Update();
+        		this.context.Pop();
+        	}
         }
-
-        private bool InXmlnsPsectAttr()
+        
+        private void StartSectPrAttribute()
         {
-            Node n = (Node)stack.Peek();
-            return n.Name.Equals("psect") && n.Prefix.Equals("xmlns");
+        	Attribute a = (Attribute) this.currentNode.Peek();
+        	if (!"psect".Equals(a.Name) && !PSECT_NAMESPACE.Equals(a.Ns))
+        	{
+        		Element e = (Element) this.store.Peek();
+        		e.AddAttribute(a);
+        		this.store.Push(a);
+        	}
+        }
+        
+        private void EndSectPrAttribute()
+        {
+        	Attribute a = (Attribute) this.currentNode.Peek();
+        	if (!"psect".Equals(a.Name) && !PSECT_NAMESPACE.Equals(a.Ns))
+        	{
+        		this.store.Pop();
+        	}
+        }
+        
+       private void WriteSectPrAttributes(string text)
+        {
+        	Node node = (Node) this.currentNode.Peek();
+
+        	if (PSECT_NAMESPACE.Equals(node.Ns))
+        	{
+        		switch (node.Name)
+        		{
+        			case "next-page-break":
+        				this.nextIsPageBreak = true;
+        				break;
+        			case "next-new-section":
+        				this.nextIsNewSection = true;
+        				break;
+        			case "next-end-section":
+        				this.nextIsEndSection = true;
+        				break;
+        			case "next-master-page":
+        				this.nextIsMasterPage = true;
+        				break;
+        		}
+        	}
+        	else
+        	{
+        		if (node is Attribute && !"psect".Equals(node.Name))
+        		{
+        			Attribute a = (Attribute) this.store.Peek();
+        			a.Value += text;
+        		}
+        	}
+        }
+        
+       	/**
+       	 * Master style definitions get stored in a hashtable
+       	 */
+        private bool IsMasterStyles() 
+        {
+        	Element e = (Element) this.currentNode.Peek();
+        	return this.context.Contains("master-pages") || 
+        		("master-pages".Equals(e.Name) && PSECT_NAMESPACE.Equals(e.Ns));
+        }
+        
+        private bool InMasterStyles()
+        {
+        	return this.context.Contains("master-pages");
+        }
+        
+        private void StartMasterStyles()
+        {
+        	Element e = (Element) this.currentNode.Peek();
+        	if ("master-pages".Equals(e.Name) && PSECT_NAMESPACE.Equals(e.Ns))
+        	{
+        		this.context.Push("master-pages");
+        	} 
+        	else 
+        	{
+        		Element elt = null;
+                if ("master-page".Equals(e.Name) && PSECT_NAMESPACE.Equals(e.Ns))
+                {
+                	this.context.Push("master-page");
+                    this.store = new Stack();
+                    elt = new Page(e.Prefix, e.Name, e.Ns);
+                    this.store.Push(elt);
+                }
+                else
+                {
+                	if (this.context.Contains("master-page"))
+                    {
+                        elt = new Element(e);
+                        Element parent = (Element) this.store.Peek();
+                        if (parent != null)
+                        {
+                            parent.AddChild(elt);
+                        }
+                        this.store.Push(elt);
+                    }
+                }
+        	}
+        }
+        
+        private void EndMasterStyles()
+        {
+        	if (this.context.Contains("master-page"))
+        	{
+        		Element e = (Element) this.store.Pop();
+        		
+        		if ("master-page".Equals(e.Name) && PSECT_NAMESPACE.Equals(e.Ns))
+        		{
+        			string masterPageName = e.GetAttributeValue("name", PSECT_NAMESPACE);
+        			if (this.pages.Count == 0)
+        			{ 	// defaults to the first style
+        				this.name = masterPageName;
+        			}
+        			// Hack when duplicate name encountered (jgoffinet)
+        			if (!this.pages.Contains(masterPageName))
+        			{
+        				this.pages.Add(masterPageName, e);
+        			}	
+        		}
+         	}
+        	Element c = (Element) this.currentNode.Peek();
+        	if (("master-pages".Equals(c.Name) || "master-page".Equals(c.Name)) && 
+        	    PSECT_NAMESPACE.Equals(c.Ns))
+        	{
+        		// pop "master-styles"
+        		this.context.Pop();
+        	}
+        }
+        
+        private void StartMasterStylesAttribute()
+        {
+        	if (this.context.Contains("master-page"))
+        	{
+        		Attribute a = (Attribute) this.currentNode.Peek();
+        		Element parent = (Element) this.store.Peek();
+        		parent.AddAttribute(a);
+        		this.store.Push(a);
+        		
+        	}
+        }
+        
+        private void EndMasterStylesAttribute()
+        {
+        	if (this.context.Contains("master-page"))
+        	{
+        		this.store.Pop();
+        	}
+        }
+        
+        private void WriteMasterStyles(string val)
+        {
+        	if (this.context.Contains("master-page"))
+        	{
+        		Node node = (Node) this.store.Peek();
+        		if (node is Element)
+        		{
+        			Element parent = (Element) node;
+        			parent.AddChild(val);
+        		}
+        		else
+        		{
+        			Attribute attr = (Attribute) node;
+        			attr.Value += val;
+        		}
+        	}
         }
 
+        /**
+         * Pick up master page names from the text flow.
+         */
+        private bool IsParagraphOrTable()
+        {
+        	Element e = (Element) this.currentNode.Peek();
+        	return ("p".Equals(e.Name) || "tbl".Equals(e.Name)) &&  
+        			W_NAMESPACE.Equals(e.Ns);
+        }
+        
+        private bool InParagraphOrTable()
+        {
+        	return this.context.Contains("p-or-tbl");
+        }
+        
+        private void StartParagraphOrTable()
+        {
+        	Element e = (Element) this.currentNode.Peek();
+        	this.nextWriter.WriteStartElement(e.Prefix, e.Name, e.Ns);
+        	this.context.Push("p-or-tbl");
+        }
+        
+        private void EndParagraphOrTable()
+        {
+        	this.nextWriter.WriteEndElement();
+        	this.context.Pop();
+        }
+        
+        private void StartParagraphOrTableAttribute()
+        {
+        	Attribute a = (Attribute) this.currentNode.Peek();
+        	if (!("psect".Equals(a.Name) && "xmlns".Equals(a.Prefix)) && !PSECT_NAMESPACE.Equals(a.Ns))
+        	{
+        		this.nextWriter.WriteStartAttribute(a.Prefix, a.Name, a.Ns);
+        	}
+        }
+        
+        private void EndParagraphOrTableAttribute()
+        {
+        	Attribute a = (Attribute) this.currentNode.Peek();
+        	if (!("psect".Equals(a.Name) && "xmlns".Equals(a.Prefix)) && !PSECT_NAMESPACE.Equals(a.Ns))
+        	{
+        		this.nextWriter.WriteEndAttribute();
+        	}
+        }
+        
+        private void WriteParagraphOrTableAttribute(string text)
+        {
+        	Node node = (Node) this.currentNode.Peek();
+
+        	if (PSECT_NAMESPACE.Equals(node.Ns))
+        	{
+        		switch (node.Name)
+        		{
+        			case "master-page-name":
+        				this.name = text;
+        				break;
+        			case "page-number":
+        				this.startPageNumber = text;
+        				break;
+        		}
+        	}
+        	else
+        	{
+        		if (!("psect".Equals(node.Name) && "xmlns".Equals(node.Prefix)) && !PSECT_NAMESPACE.Equals(node.Ns))
+        		{
+        			this.nextWriter.WriteString(text);
+        		}
+        	}
+        }
+        
+       
+        
+      
+       
+		/**
+		 * Change the document settings if we have even and odd headers.
+		 */
+        private bool IsEvenAndOddHeaders()
+        {
+            Element e = (Element) this.currentNode.Peek();
+            return "evenAndOddHeaders".Equals(e.Name) && W_NAMESPACE.Equals(e.Ns);
+        }
+        
         private bool InEvenAndOddHeaders()
         {
-            Node n = (Node)stack.Peek();
-            return n.Name.Equals("evenAndOddHeaders") && n.Ns.Equals(OOX_MAIN_NS);
+        	return this.context.Contains("evenAndOddHeaders");
+        }
+        
+        private void StartEvenAndOddHeaders()
+        {
+        	this.context.Push("evenAndOddHeaders");
+        }
+        
+        private void EndEvenAndOddHeaders()
+        {
+        	if (this.EvenAndOddHeaders)
+        	{
+        		evenAndOddHeaders.Write(this.nextWriter);
+        	}
+        	this.context.Pop();
+        }
+        
+        
+        /// <summary>
+        /// Update page context.
+        /// It may change if a page-break has been encountered and the
+        /// current master page name defines a next master style.
+        /// </summary>
+        public void Update()
+        {
+        	if (this.nextIsPageBreak && !this.skip)
+        	{
+        		Page page = (Page) this.pages[this.name];
+        		this.name = page.GetAttributeValue("next-style", PSECT_NAMESPACE);
+        	}
+
+        	if (!this.nextIsPageBreak || !this.skip)
+        	{
+        		this.startPageNumber = null;
+        	}
+
+        	this.nextIsContinuous = (this.nextIsNewSection || this.nextIsEndSection);
+        	this.nextIsPageBreak = false;
+        	this.nextIsNewSection = false;
+        	this.nextIsEndSection = false;
+        	this.nextIsMasterPage = false;
+        	this.skip = false;
+        	this.odfSectPr = null;
         }
 
+            
 
         /// <summary>
-        /// Keeps track of changes in page styles
+        /// Creates the w:sectPr node
         /// </summary>
-        protected class PageContext
+        private void WriteSectPr()
         {
-            private string name;
-            private bool skip = false;
-            private bool nextIsContinuous = false;
-            private bool nextIsPageBreak = false;
-            private bool nextIsNewSection = false;
-            private bool nextIsEndSection = false;
-            private bool nextIsMasterPage = false;
-            private Element odfSectPr;
-            private Element cont;
-            private Element titlePg;
-            private string startPageNumber = null;
+        	if (this.name != null && this.pages.ContainsKey(this.name))
+        	{
+        		Page page = (Page) this.pages[this.name];
 
-            private bool inSectPr = false;
-            private Stack sectPrStack;
-            private XmlWriter nextWriter;
+        		// a page break with no change in page style => no section needed
+        		if (this.nextIsPageBreak && !this.nextIsMasterPage)
+        		{
+        			string nextStyle = page.GetAttributeValue("next-style", PSECT_NAMESPACE);
 
+        			if (nextStyle.Length == 0)
+        			{
+        				this.skip = true;
+        			}
+        		}
 
-            private Stack stack;
-            private Hashtable pages;
+        		if (!this.skip)
+        		{
+        			page.Use++;
 
-            public PageContext(Stack stack, XmlWriter nextWriter)
-            {
-                this.stack = stack;
-                this.nextWriter = nextWriter;
-                this.pages = new Hashtable();
-                this.cont = new Element("w", "type", OOX_MAIN_NS);
-                this.cont.AddAttribute(new Attribute("w", "val", "continuous", OOX_MAIN_NS));
-                this.titlePg = new Element("w", "titlePg", OOX_MAIN_NS);
-            }
+        			nextWriter.WriteStartElement("w", "sectPr", W_NAMESPACE);
 
-            public Element OdfSectPr
-            {
-                get { return odfSectPr; }
-                set { odfSectPr = value; }
-            }
+        			// header / footer reference
+        			if (page.Use == 1)
+        			{
+        				WriteHeaderFooter(page, "headerReference");
+        				WriteHeaderFooter(page, "footerReference");
+        			}
 
-            // Create a page style representation based on pre formatted section properties
-            public void InPageStartElement(string prefix, string localName, string ns)
-            {
-                Element e = null;
-                if ("master-page".Equals(localName) && CA_SECTIONS_NS.Equals(ns))
-                {
-                    inSectPr = true;
-                    this.sectPrStack = new Stack();
-                    e = new Page(prefix, localName, ns);
-                    sectPrStack.Push(e);
-                }
-                else
-                {
-                    if (inSectPr)
-                    {
-                        e = new Element(prefix, localName, ns);
-                        Element parent = (Element)sectPrStack.Peek();
-                        if (parent != null)
-                        {
-                            parent.AddChild(e);
-                        }
-                        sectPrStack.Push(e);
-                    }
-                }
-            }
+        			// footnotes config
+        			WriteNotesProperties(page, "footnotePr");
+        			WriteNotesProperties(page, "endnotePr");
 
-            // Store pre formatted section properties
-            public void InPageEndElement()
-            {
-                if (inSectPr)
-                {
-                    Element e = (Element)sectPrStack.Pop();
-                    if ("master-page".Equals(e.Name) && CA_SECTIONS_NS.Equals(e.Ns))
-                    {
-                        string masterPageName = e.GetAttributeValue("name", CA_SECTIONS_NS);
-                        if (pages.Count == 0)
-                        { 	// defaults to the first style
-                            this.name = masterPageName;
-                        }
-                        // Hack when duplicate name encountered (jgoffinet)
-                        if (!pages.Contains(masterPageName))
-                        {
-                            pages.Add(masterPageName, e);
-                        }
-                        inSectPr = false;
-                    }
-                }
-            }
+        			// continuous or even or odd
+        			WriteSectionType(page);
+        			
+        			// page geometry properties
+        			WritePageLayout(page);
 
-            // Store pre formatted section properties
-            public void InSectionStartAttribute(string prefix, string localName, string ns)
-            {
-                if (inSectPr)
-                {
-                    sectPrStack.Push(new Attribute(prefix, localName, ns));
-                }
-            }
+        			// titlePg
+        			//	if (page.GetAttributeValue("name", PSECT_NAMESPACE).Equals("First_20_Page"))
+        			//	{
+        			//		this.titlePg.Write(nextWriter);
+        			//	}
 
-            // Store pre formatted section properties
-            public void InSectionEndAttribute()
-            {
-                if (inSectPr)
-                {
-                    Attribute attr = (Attribute)sectPrStack.Pop();
-                    if (!attr.Prefix.Equals("xmlns"))
-                    {
-                        Node n = (Node)sectPrStack.Peek();
-                        if (n != null && n is Element)
-                        {
-                            Element parent = (Element)n;
-                            parent.AddAttribute(attr);
-                        }
-                    }
-                }
-            }
-
-            // Store pre formatted section properties
-            public void InSectionWriteString(string val)
-            {
-                if (inSectPr)
-                {
-                    Node n = (Node)sectPrStack.Peek();
-                    if (n != null && n is Attribute)
-                    {
-                        ((Attribute)n).Value += val;
-                    }
-                }
-            }
-
-            // Store preformatted section properties
-            public void InSectionStartElement(string prefix, string localName, string ns)
-            {
-                if ("sectPr".Equals(localName) && OOX_MAIN_NS.Equals(ns))
-                {
-                    inSectPr = true;
-                    this.sectPrStack = new Stack();
-                    this.odfSectPr = new Element(prefix, localName, ns);
-                    sectPrStack.Push(this.OdfSectPr);
-                }
-                else
-                {
-                    if (inSectPr)
-                    {
-                        Element e = new Element(prefix, localName, ns);
-                        Element parent = (Element)sectPrStack.Peek();
-                        if (parent != null)
-                        {
-                            parent.AddChild(e);
-                        }
-                        sectPrStack.Push(e);
-                    }
-                }
-            }
-
-            // Produce the oox section and update the page context.
-            public void InSectionEndElement()
-            {
-                if (inSectPr)
-                {
-                    Element e = (Element)sectPrStack.Pop();
-                    if ("sectPr".Equals(e.Name) && OOX_MAIN_NS.Equals(e.Ns))
-                    {
-                        this.Write(nextWriter);
-                        this.Update();
-                        inSectPr = false;
-                    }
-                }
-            }
-
-
-
-            /// <summary>
-            /// Gather page context information.
-            /// </summary>
-            /// <param name="val"></param>
-            public void Set(string val)
-            {
-
-                Node n = (Node)stack.Peek();
-
-                if (n.Ns.Equals(CA_SECTIONS_NS))
-                {
-                    if (n.Name.Equals("master-page-name"))
-                    {
-                        this.name = val;
-                    }
-
-                    if (n.Name.Equals("next-page-break"))
-                    {
-                        this.nextIsPageBreak = true;
-                    }
-
-                    if (n.Name.Equals("next-new-section"))
-                    {
-                        this.nextIsNewSection = true;
-                    }
-
-                    if (n.Name.Equals("next-end-section"))
-                    {
-                        this.nextIsEndSection = true;
-                    }
-
-                    if (n.Name.Equals("next-master-page"))
-                    {
-                        this.nextIsMasterPage = true;
-                    }
-
-                    if (n.Name.Equals("page-number"))
-                    {
-                        this.startPageNumber = val;
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Update page context.
-            /// It may change if a page-break has been encountered and the
-            /// current master page name defines a next master style.
-            /// </summary>
-            public void Update()
-            {
-                if (this.nextIsPageBreak && !this.skip)
-                {
-                    Page page = (Page)this.pages[this.name];
-                    this.name = page.GetAttributeValue("next-style", CA_SECTIONS_NS);
-                }
-
-                if (!this.nextIsPageBreak || !this.skip)
-                {
-                    this.startPageNumber = null;
-                }
-
-                this.nextIsContinuous = (this.nextIsNewSection || this.nextIsEndSection);
-                this.nextIsPageBreak = false;
-                this.nextIsNewSection = false;
-                this.nextIsEndSection = false;
-                this.nextIsMasterPage = false;
-                this.skip = false;
-                this.odfSectPr = null;
-            }
-
-
-
-            /// <summary>
-            /// Creates the w:sectPr node
-            /// </summary>
-            public void Write(XmlWriter nextWriter)
-            {
-                if (this.name != null && pages.ContainsKey(this.name))
-                {
-                    Page page = (Page)this.pages[this.name];
-
-                    // a page break with no change in page style => no section needed
-                    if (this.nextIsPageBreak && !this.nextIsMasterPage)
-                    {
-                        string nextStyle = page.GetAttributeValue("next-style", CA_SECTIONS_NS);
-
-                        if (nextStyle.Length == 0)
-                        {
-                            this.skip = true;
-                        }
-                    }
-
-                    if (!this.skip)
-                    {
-                        page.Use++;
-
-                        nextWriter.WriteStartElement("w", "sectPr", OOX_MAIN_NS);
-
-                        // header / footer reference
-                        if (page.Use == 1)
-                        {
-                            ArrayList hdr = page.GetChildren("headerReference", OOX_MAIN_NS);
-                            if (hdr.Count > 0)
-                            {
-                                foreach (Element e in hdr)
-                                {
-                                    if ("even".Equals(e.GetAttributeValue("type", OOX_MAIN_NS)))
-                                    {
-                                        page.EvenOdd = true;
-                                    }
-                                    e.Write(nextWriter);
-                                }
-                            }
-
-                            ArrayList ftr = page.GetChildren("footerReference", OOX_MAIN_NS);
-                            if (ftr.Count > 0)
-                            {
-                                foreach (Element e in ftr)
-                                {
-                                    if ("even".Equals(e.GetAttributeValue("type", OOX_MAIN_NS)))
-                                    {
-                                        page.EvenOdd = true;
-                                    }
-                                    e.Write(nextWriter);
-                                }
-                            }
-                        }
-
-                        // footnotes config
-                        Element footnotePr = null;
-                        if (this.nextIsEndSection &&
-                            (footnotePr = (Element)this.odfSectPr.GetChild("footnotePr", OOX_MAIN_NS)) != null)
-                        {
-                            footnotePr.Write(nextWriter);
-                        }
-                        else
-                        {
-                            if ((footnotePr = (Element)page.GetChild("footnotePr", OOX_MAIN_NS)) != null)
-                            {
-                                footnotePr.Write(nextWriter);
-                            }
-                        }
-
-                        // endnotes config
-                        Element endnotePr = null;
-                        if (this.nextIsEndSection &&
-                            (endnotePr = (Element)this.odfSectPr.GetChild("endnotePr", OOX_MAIN_NS)) != null)
-                        {
-                            endnotePr.Write(nextWriter);
-                        }
-                        else
-                        {
-                            if ((endnotePr = (Element)page.GetChild("endnotePr", OOX_MAIN_NS)) != null)
-                            {
-                                endnotePr.Write(nextWriter);
-                            }
-                        }
-
-                        // type
-                        Element type = (Element)page.GetChild("type", OOX_MAIN_NS);
-                        if (type != null)
-                        {
-                            type.Write(nextWriter);
-                        }
-                        else if (this.nextIsContinuous)
-                        {
-                            // continuity
-                            cont.Write(nextWriter);
-                        }
-
-                        // pgSz
-                        Element pgSz = (Element)page.GetChild("pgSz", OOX_MAIN_NS);
-                        if (pgSz != null)
-                        {
-                            pgSz.Write(nextWriter);
-                        }
-
-                        // pgMar
-                        Element pgMar = (Element)page.GetChild("pgMar", OOX_MAIN_NS);
-                        if (pgMar != null)
-                        {
-                            pgMar.Write(nextWriter);
-                        }
-
-                        // pgBorders
-                        Element pgBorders = (Element)page.GetChild("pgBorders", OOX_MAIN_NS);
-                        if (pgBorders != null)
-                        {
-                            pgBorders.Write(nextWriter);
-                        }
-
-                        // lnNumType
-                        Element lnNumType = (Element)page.GetChild("lnNumType", OOX_MAIN_NS);
-                        if (lnNumType != null)
-                        {
-                            lnNumType.Write(nextWriter);
-                        }
-
-                        // pgNumType
-                        Element pgNumType = (Element)page.GetChild("pgNumType", OOX_MAIN_NS);
-                        if (pgNumType != null)
-                        {
-                            Element pgNumType0 = pgNumType.Clone();
-                            if (this.startPageNumber != null)
-                            {
-                                pgNumType0.AddAttribute(new Attribute("w", "start", this.startPageNumber, OOX_MAIN_NS));
-                                pgNumType0.Write(nextWriter);
-                            }
-                            else if (this.name.Equals("Envelope"))
-                            {
-                                pgNumType0.AddAttribute(new Attribute("w", "start", "0", OOX_MAIN_NS));
-                                pgNumType0.Write(nextWriter);
-                            }
-                            else
-                            {
-                                pgNumType0.Write(nextWriter);
-                            }
-                        }
-                        else if (this.name.Equals("Envelope"))
-                        {
-                            Element pgNumTypeStart = new Element("w", "pgNumType", OOX_MAIN_NS);
-                            pgNumTypeStart.AddAttribute(new Attribute("w", "start", "0", OOX_MAIN_NS));
-                            pgNumTypeStart.Write(nextWriter);
-                        }
-                        else if (this.startPageNumber != null)
-                        {
-                            Element pgNumTypeStart = new Element("w", "pgNumType", OOX_MAIN_NS);
-                            pgNumTypeStart.AddAttribute(new Attribute("w", "start", this.startPageNumber, OOX_MAIN_NS));
-                            pgNumTypeStart.Write(nextWriter);
-                        }
-
-                        // columns
-                        Element cols = (Element)page.GetChild("cols", OOX_MAIN_NS);
-                        if (cols != null)
-                        {
-                            cols.Write(nextWriter);
-                        }
-                        else
-                        {
-                            if (this.nextIsEndSection &&
-                                (cols = (Element)this.odfSectPr.GetChild("cols", OOX_MAIN_NS)) != null)
-                            {
-                                cols.Write(nextWriter);
-                            }
-                        }
-
-                        // titlePg
-                        //					if (page.GetAttributeValue("name", CA_SECTIONS_NS).Equals("First_20_Page"))
-                        //					{
-                        //						this.titlePg.Write(nextWriter);
-                        //					}
-
-                        nextWriter.WriteEndElement(); // end sectPr
-                    }
-                }
-            }
-
-            public bool EvenAndOddHeaders
-            {
-                get
-                {
-                    ICollection coll = pages.Values;
-                    foreach (Page page in coll)
-                    {
-                        if (page.EvenOdd)
-                        {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            }
+        			nextWriter.WriteEndElement(); // end sectPr
+        		}
+        	}
+        }
+        
+        // Header and footer references
+        private void WriteHeaderFooter(Page page, string localName)
+        {
+        	ArrayList hdr = page.GetChildren(localName, W_NAMESPACE);
+        	if (hdr.Count > 0)
+        	{
+        		foreach (Element e in hdr)
+        		{
+        			if ("even".Equals(e.GetAttributeValue("type", W_NAMESPACE)))
+        			{
+        				page.EvenOdd = true;
+        			}
+        			e.Write(nextWriter);
+        		}
+        	}
+        }
+        
+        // Footnotes and endnotes local (section) properties 
+        private void WriteNotesProperties(Page page, string localName)
+        {
+        	Element notePr = null;
+        	if (this.nextIsEndSection &&
+        	    (notePr = (Element) this.odfSectPr.GetChild(localName, W_NAMESPACE)) != null)
+        	{
+        		notePr.Write(nextWriter);
+        	}
+        	else
+        	{
+        		if ((notePr = (Element) page.GetChild(localName, W_NAMESPACE)) != null)
+        		{
+        			notePr.Write(nextWriter);
+        		}
+        	}
         }
 
+        // Section type
+        private void WriteSectionType(Page page)
+        {
+        	// type
+        	Element type = (Element)page.GetChild("type", W_NAMESPACE);
+        	if (type != null)
+        	{
+        		type.Write(nextWriter);
+        	}
+        	// continuity
+        	if (this.nextIsContinuous)
+        	{
+        		cont.Write(nextWriter);
+        	}
+        }
+        
+        // Page geometry properties
+        private void WritePageLayout(Page page)
+        {
+        	// pgSz
+        	Element pgSz = (Element)page.GetChild("pgSz", W_NAMESPACE);
+        	if (pgSz != null)
+        	{
+        		pgSz.Write(nextWriter);
+        	}
+
+        	// pgMar
+        	Element pgMar = (Element)page.GetChild("pgMar", W_NAMESPACE);
+        	if (pgMar != null)
+        	{
+        		pgMar.Write(nextWriter);
+        	}
+
+        	// pgBorders
+        	Element pgBorders = (Element)page.GetChild("pgBorders", W_NAMESPACE);
+        	if (pgBorders != null)
+        	{
+        		pgBorders.Write(nextWriter);
+        	}
+
+        	// lnNumType
+        	Element lnNumType = (Element)page.GetChild("lnNumType", W_NAMESPACE);
+        	if (lnNumType != null)
+        	{
+        		lnNumType.Write(nextWriter);
+        	}
+
+        	// pgNumType
+        	Element pgNumType = (Element)page.GetChild("pgNumType", W_NAMESPACE);
+        	if (pgNumType != null)
+        	{
+        		Element pgNumType0 = pgNumType.Clone();
+        		if (this.startPageNumber != null)
+        		{
+        			pgNumType0.AddAttribute(new Attribute("w", "start", this.startPageNumber, W_NAMESPACE));
+        			pgNumType0.Write(nextWriter);
+        		}
+        		else if (this.name.Equals("Envelope"))
+        		{
+        			pgNumType0.AddAttribute(new Attribute("w", "start", "0", W_NAMESPACE));
+        			pgNumType0.Write(nextWriter);
+        		}
+        		else
+        		{
+        			pgNumType0.Write(nextWriter);
+        		}
+        	}
+        	else if (this.name.Equals("Envelope"))
+        	{
+        		Element pgNumTypeStart = new Element("w", "pgNumType", W_NAMESPACE);
+        		pgNumTypeStart.AddAttribute(new Attribute("w", "start", "0", W_NAMESPACE));
+        		pgNumTypeStart.Write(nextWriter);
+        	}
+        	else if (this.startPageNumber != null)
+        	{
+        		Element pgNumTypeStart = new Element("w", "pgNumType", W_NAMESPACE);
+        		pgNumTypeStart.AddAttribute(new Attribute("w", "start", this.startPageNumber, W_NAMESPACE));
+        		pgNumTypeStart.Write(nextWriter);
+        	}
+
+        	// columns
+        	Element cols = (Element)page.GetChild("cols", W_NAMESPACE);
+        	if (cols != null)
+        	{
+        		cols.Write(nextWriter);
+        	}
+        	else
+        	{
+        		if (this.nextIsEndSection &&
+        		    (cols = (Element)this.odfSectPr.GetChild("cols", W_NAMESPACE)) != null)
+        		{
+        			cols.Write(nextWriter);
+        		}
+        	}
+        }
+        
+       
         protected class Page : Element
         {
             private int use;
@@ -765,7 +815,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             public Page(string prefix, string name, string ns)
                 : base(prefix, name, ns) { }
         }
-
 
     }
 
