@@ -1147,7 +1147,7 @@
             <xsl:attribute name="w:id">
               <xsl:number count="style:style"/>
             </xsl:attribute>
-            <xsl:attribute name="w:combine">On</xsl:attribute>
+            <xsl:attribute name="w:combine">true</xsl:attribute>
             <xsl:choose>
               <xsl:when
                 test="@style:text-combine-start-char = '&lt;' and @style:text-combine-end-char = '&gt;' ">
