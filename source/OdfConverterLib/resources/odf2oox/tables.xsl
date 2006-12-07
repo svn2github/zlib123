@@ -647,71 +647,24 @@
             <xsl:with-param name="colsNumber" select="$colsNumber"/>
           </xsl:call-template>
         </xsl:when>
+        <!-- other cases : compute borders -->
         <xsl:when test="$cellProp[@fo:border and @fo:border!='none' ]">
-          <xsl:variable name="border" select="$cellProp/@fo:border"/>
-          <!-- fo:border = "0.002cm solid #000000" -->
-          <xsl:variable name="border-color" select="substring-after($border, '#')"/>
-          <xsl:variable name="border-size">
-            <xsl:call-template name="eightspoint-measure">
-              <xsl:with-param name="length" select="substring-before($border,' ')"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <w:top w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-          <w:left w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-          <w:bottom w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-          <w:right w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+          <xsl:call-template name="InsertBorders">
+            <xsl:with-param name="allSides">true</xsl:with-param>
+            <xsl:with-param name="node" select="$cellProp"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when
+          test="$cellProp[@fo:border-top or @fo:border-left or @fo:border-bottom or @fo:border-right]">
+          <xsl:call-template name="InsertBorders">
+            <xsl:with-param name="allSides">false</xsl:with-param>
+            <xsl:with-param name="node" select="$cellProp"/>
+          </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:if test="$cellProp[@fo:border-top and @fo:border-top != 'none']">
-            <xsl:variable name="border" select="$cellProp/@fo:border-top"/>
-            <w:top w:val="single" w:color="{substring-after($border, '#')}">
-              <xsl:attribute name="w:sz">
-                <xsl:call-template name="eightspoint-measure">
-                  <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </w:top>
-          </xsl:if>
-          <xsl:if test="$cellProp[@fo:border-left and @fo:border-left != 'none']">
-            <xsl:variable name="border" select="$cellProp/@fo:border-left"/>
-            <w:left w:val="single" w:color="{substring-after($border, '#')}">
-              <xsl:attribute name="w:sz">
-                <xsl:call-template name="eightspoint-measure">
-                  <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </w:left>
-          </xsl:if>
-          <xsl:if test="$cellProp[@fo:border-bottom and @fo:border-bottom != 'none']">
-            <xsl:variable name="border" select="$cellProp/@fo:border-bottom"/>
-            <w:bottom w:val="single" w:color="{substring-after($border, '#')}">
-              <xsl:attribute name="w:sz">
-                <xsl:call-template name="eightspoint-measure">
-                  <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </w:bottom>
-          </xsl:if>
-          <xsl:if
-            test="$cellProp[(@fo:border-right and @fo:border-right != 'none')] or (position() &lt; $colsNumber and position() = 63)">
-            <xsl:variable name="border">
-              <xsl:choose>
-                <xsl:when test="position() &lt; $colsNumber and position() = 63">
-                  <xsl:value-of select="$cellProp/@fo:border-left"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$cellProp/@fo:border-right"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
-            <w:right w:val="single" w:color="{substring-after($border, '#')}">
-              <xsl:attribute name="w:sz">
-                <xsl:call-template name="eightspoint-measure">
-                  <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-                </xsl:call-template>
-              </xsl:attribute>
-            </w:right>
-          </xsl:if>
+          <xsl:call-template name="InsertEmptyBorders">
+            <xsl:with-param name="node" select="$cellProp"/>
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </w:tcBorders>
@@ -728,21 +681,12 @@
 
     <xsl:choose>
       <xsl:when test="$subCellsProps[@fo:border and @fo:border!='none' ]">
-        <xsl:variable name="border">
-          <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
-          <xsl:value-of select="$subCellsProps[@fo:border and @fo:border != 'none']/@fo:border"/>
-        </xsl:variable>
-        <!-- fo:border = "0.002cm solid #000000" -->
-        <xsl:variable name="border-color" select="substring-after($border, '#')"/>
-        <xsl:variable name="border-size">
-          <xsl:call-template name="eightspoint-measure">
-            <xsl:with-param name="length" select="substring-before($border,' ')"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <w:top w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-        <w:left w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-        <w:bottom w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-        <w:right w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
+        <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
+        <xsl:call-template name="InsertBorders">
+          <xsl:with-param name="allSides">true</xsl:with-param>
+          <xsl:with-param name="node" select="$subCellsProps[@fo:border and @fo:border!='none' ][1]"
+          />
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="topCellsProps"
@@ -755,71 +699,54 @@
           select="key('automatic-styles', descendant::table:table-row[last()]/table:table-cell/@table:style-name)/style:table-cell-properties"/>
 
         <xsl:if test="$topCellsProps[@fo:border-top and @fo:border-top != 'none']">
-          <xsl:variable name="border">
-            <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
-            <xsl:value-of
-              select="$topCellsProps[@fo:border-top and @fo:border-top != 'none']/@fo:border-top"/>
-          </xsl:variable>
-          <w:top w:val="single" w:color="{substring-after($border, '#')}">
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
+          <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
+          <w:top>
+            <xsl:call-template name="border">
+              <xsl:with-param name="side" select="'top'"/>
+              <xsl:with-param name="node"
+                select="$topCellsProps[@fo:border-top and @fo:border-top != 'none'][1]"/>
+            </xsl:call-template>
           </w:top>
         </xsl:if>
         <xsl:if test="$leftCellsProps[@fo:border-left and @fo:border-left != 'none']">
-          <xsl:variable name="border">
-            <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
-            <xsl:value-of
-              select="$leftCellsProps[@fo:border-left and @fo:border-left != 'none']/@fo:border-left"
-            />
-          </xsl:variable>
-          <w:left w:val="single" w:color="{substring-after($border, '#')}">
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
+          <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
+          <w:left>
+            <xsl:call-template name="border">
+              <xsl:with-param name="side" select="'left'"/>
+              <xsl:with-param name="node"
+                select="$leftCellsProps[@fo:border-left and @fo:border-left != 'none'][1]"/>
+            </xsl:call-template>
           </w:left>
         </xsl:if>
         <xsl:if test="$bottomCellsProps[@fo:border-bottom and @fo:border-bottom != 'none']">
-          <xsl:variable name="border">
-            <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
-            <xsl:value-of
-              select="$leftCellsProps[@fo:border-bottom and @fo:border-bottom != 'none']/@fo:border-bottom"
-            />
-          </xsl:variable>
-          <w:bottom w:val="single" w:color="{substring-after($border, '#')}">
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
+          <!-- NB : value-of takes the first subCell properties only (not the whole node set) -->
+          <w:bottom>
+            <xsl:call-template name="border">
+              <xsl:with-param name="side" select="'bottom'"/>
+              <xsl:with-param name="node"
+                select="$bottomCellsProps[@fo:border-bottom and @fo:border-bottom != 'none'][1]"/>
+            </xsl:call-template>
           </w:bottom>
         </xsl:if>
         <xsl:if
           test="$rightCellsProps[(@fo:border-right and @fo:border-right != 'none')] or (position() &lt; $colsNumber and position() = 63)">
-          <xsl:variable name="border">
+          <w:right>
             <xsl:choose>
               <xsl:when test="position() &lt; $colsNumber and position() = 63">
-                <xsl:value-of
-                  select="$subCellsProps[(@fo:border-left and @fo:border-left != 'none')]/@fo:border-left"
-                />
+                <xsl:call-template name="border">
+                  <xsl:with-param name="side" select="'right'"/>
+                  <xsl:with-param name="node"
+                    select="$subCellsProps[@fo:border-right and @fo:border-right != 'none'][1]"/>
+                </xsl:call-template>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of
-                  select="$rightCellsProps[(@fo:border-right and @fo:border-right != 'none')]/@fo:border-right"
-                />
+                <xsl:call-template name="border">
+                  <xsl:with-param name="side" select="'right'"/>
+                  <xsl:with-param name="node"
+                    select="$rightCellsProps[@fo:border-right and @fo:border-right != 'none'][1]"/>
+                </xsl:call-template>
               </xsl:otherwise>
             </xsl:choose>
-          </xsl:variable>
-          <w:right w:val="single" w:color="{substring-after($border, '#')}">
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
           </w:right>
         </xsl:if>
       </xsl:otherwise>
@@ -838,80 +765,41 @@
           <xsl:with-param name="colsNumber" select="$colsNumber"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$cellProp[@fo:border and @fo:border!='none' ]">
-        <xsl:variable name="border" select="$cellProp/@fo:border"/>
-        <!-- fo:border = "0.002cm solid #000000" -->
-        <xsl:variable name="border-color" select="substring-after($border, '#')"/>
-        <xsl:variable name="border-size">
-          <xsl:call-template name="eightspoint-measure">
-            <xsl:with-param name="length" select="substring-before($border,' ')"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:if test="parent::table:table-row/preceding-sibling::table:table-row">
-          <w:top w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-        </xsl:if>
-        <xsl:if test="not(position()=1)">
-          <w:left w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-        </xsl:if>
-        <xsl:if test="parent::table:table-row/following-sibling::table:table-row">
-          <w:bottom w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-        </xsl:if>
-        <xsl:if test="not(position()=last())">
-          <w:right w:val="single" w:color="{$border-color}" w:sz="{$border-size}"/>
-        </xsl:if>
-      </xsl:when>
       <xsl:otherwise>
         <xsl:if
-          test="$cellProp[@fo:border-top and @fo:border-top != 'none'] and parent::table:table-row/preceding-sibling::table:table-row">
-          <xsl:variable name="border" select="$cellProp/@fo:border-top"/>
-          <w:top w:val="single" w:color="{substring-after($border, '#')}">
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
+          test="$cellProp[(@fo:border and @fo:border!='none') or (@fo:border-top and @fo:border-top != 'none')] and parent::table:table-row/preceding-sibling::table:table-row">
+          <w:top>
+            <xsl:call-template name="border">
+              <xsl:with-param name="side" select="'top'"/>
+              <xsl:with-param name="node" select="$cellProp"/>
+            </xsl:call-template>
           </w:top>
         </xsl:if>
         <xsl:if
-          test="$cellProp[@fo:border-left and @fo:border-left != 'none'] and not(position()=1)">
-          <xsl:variable name="border" select="$cellProp/@fo:border-left"/>
-          <w:left w:val="single" w:color="{substring-after($border, '#')}">
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
+          test="$cellProp[(@fo:border and @fo:border!='none') or (@fo:border-left and @fo:border-left != 'none')] and not(position()=1)">
+          <w:left>
+            <xsl:call-template name="border">
+              <xsl:with-param name="side" select="'left'"/>
+              <xsl:with-param name="node" select="$cellProp"/>
+            </xsl:call-template>
           </w:left>
         </xsl:if>
         <xsl:if
-          test="$cellProp[@fo:border-bottom and @fo:border-bottom != 'none'] and parent::table:table-row/following-sibling::table:table-row">
-          <xsl:variable name="border" select="$cellProp/@fo:border-bottom"/>
-          <w:bottom w:val="single" w:color="{substring-after($border, '#')}">
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
+          test="$cellProp[(@fo:border and @fo:border!='none') or (@fo:border-bottom and @fo:border-bottom != 'none')] and parent::table:table-row/following-sibling::table:table-row">
+          <w:bottom>
+            <xsl:call-template name="border">
+              <xsl:with-param name="side" select="'bottom'"/>
+              <xsl:with-param name="node" select="$cellProp"/>
+            </xsl:call-template>
           </w:bottom>
         </xsl:if>
         <xsl:if
-          test="($cellProp[(@fo:border-right and @fo:border-right != 'none')] or (position() &lt; $colsNumber and position() = 63)) and not(position()=last())">
-          <xsl:variable name="border">
-            <xsl:choose>
-              <xsl:when test="position() &lt; $colsNumber and position() = 63">
-                <xsl:value-of select="$cellProp/@fo:border-left"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$cellProp/@fo:border-right"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:variable>
-          <w:right w:val="single" w:color="{substring-after($border, '#')}">
-            <xsl:attribute name="w:sz">
-              <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before($border, ' ')"/>
-              </xsl:call-template>
-            </xsl:attribute>
+          test="($cellProp[(@fo:border and @fo:border!='none') or (@fo:border-right and @fo:border-right != 'none')] or (position() &lt; $colsNumber and position() = 63)) and not(position()=last())">
+          <w:right>
+            <xsl:call-template name="border">
+              <xsl:with-param name="side" select="'right'"/>
+              <xsl:with-param name="node" select="$cellProp"/>
+            </xsl:call-template>
           </w:right>
         </xsl:if>
       </xsl:otherwise>

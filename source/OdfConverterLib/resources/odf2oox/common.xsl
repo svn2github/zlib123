@@ -440,20 +440,21 @@
 
   <xsl:template name="GetBorderStyle">
     <xsl:param name="side"/>
+    <xsl:param name="node" select="."/>
     <xsl:param name="borderStr"/>
 
     <xsl:variable name="borderLineWidth">
       <xsl:choose>
-        <xsl:when test="@style:border-line-width">
-          <xsl:value-of select="@style:border-line-width"/>
+        <xsl:when test="$node/@style:border-line-width">
+          <xsl:value-of select="$node/@style:border-line-width"/>
         </xsl:when>
         <xsl:when test="$side='middle'">
           <xsl:choose>
-            <xsl:when test="@style:border-line-width-top">
-              <xsl:value-of select="@style:border-line-width-top"/>
+            <xsl:when test="$node/@style:border-line-width-top">
+              <xsl:value-of select="$node/@style:border-line-width-top"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="@fo:border-line-width-bottom"/>
+              <xsl:value-of select="$node/@fo:border-line-width-bottom"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
