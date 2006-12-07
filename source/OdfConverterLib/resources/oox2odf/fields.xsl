@@ -674,7 +674,16 @@
     </text:page-number>
   </xsl:template>
 
-
+<xsl:template name="PageInstr">
+  <text:page-number>
+    <xsl:attribute name="text:select-page">
+      <xsl:text>current</xsl:text>
+    </xsl:attribute>
+    <xsl:attribute name="style:num-format">
+      <xsl:text>Arabic</xsl:text>
+    </xsl:attribute>      
+  </text:page-number>
+</xsl:template>
 
 
 </xsl:stylesheet>

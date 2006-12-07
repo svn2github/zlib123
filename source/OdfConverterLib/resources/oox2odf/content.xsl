@@ -440,6 +440,12 @@
         <xsl:call-template name="wInstrText"/>
       </xsl:when>
       
+      <xsl:when
+        test="((contains(w:instrText,'PAGE') or contains(preceding::w:instrText[1]  ,'PAGE'))) and 
+        count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and descendant::w:t">
+        <xsl:call-template name="PageInstr"/>
+      </xsl:when>
+      
       <!-- Comments -->
       <xsl:when test="w:commentReference/@w:id">        
         <xsl:call-template name="comments">
