@@ -708,7 +708,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         		type.Write(nextWriter);
         	}
         	// continuity
-        	if (this.nextIsContinuous)
+        	else if (this.nextIsContinuous)
         	{
         		cont.Write(nextWriter);
         	}
