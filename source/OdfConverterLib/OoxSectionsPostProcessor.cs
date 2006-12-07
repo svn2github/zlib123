@@ -548,7 +548,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             /// </summary>
             public void Write(XmlWriter nextWriter)
             {
-                if (pages.ContainsKey(this.name))
+                if (this.name != null && pages.ContainsKey(this.name))
                 {
                     Page page = (Page)this.pages[this.name];
 
