@@ -445,6 +445,9 @@
 
     <xsl:variable name="borderLineWidth">
       <xsl:choose>
+        <xsl:when test="$side = 'tl-br' or $side = 'bl-tr' ">
+          <xsl:value-of select="$node/@*[name()=concat('style:diagonal-', $side, '-widths')]"/>
+        </xsl:when>
         <xsl:when test="$node/@style:border-line-width">
           <xsl:value-of select="$node/@style:border-line-width"/>
         </xsl:when>

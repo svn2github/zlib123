@@ -2087,6 +2087,9 @@
 
     <xsl:variable name="borderStr">
       <xsl:choose>
+        <xsl:when test="$side = 'tl-br' or $side = 'bl-tr' ">
+          <xsl:value-of select="$node/@*[name()=concat('style:diagonal-', $side)]"/>
+        </xsl:when>
         <xsl:when test="$node/@fo:border">
           <xsl:value-of select="$node/@fo:border"/>
         </xsl:when>

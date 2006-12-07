@@ -429,7 +429,7 @@
         test="key('automatic-styles',child::table:table-cell/@table:style-name)/style:table-cell-properties/@fo:wrap-option='no-wrap'">
         <!-- Override layout algorithm -->
         <w:tblPrEx>
-          <w:tblLayout w:type="auto"/>
+          <w:tblLayout w:type="autofit"/>
         </w:tblPrEx>
       </xsl:if>
       <w:trPr>
@@ -561,6 +561,18 @@
     <xsl:if test="$tableProp/@style:shadow">
       <xsl:message terminate="no">feedback:Cell shadow</xsl:message>
     </xsl:if>
+    <xsl:if test="$tableProp/@style:print-content = 'false' ">
+      <xsl:message terminate="no">feedback:Cell content not printed</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:repeat-content = 'true' ">
+      <xsl:message terminate="no">feedback:Cell content repeated</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:rotation-angle">
+      <xsl:message terminate="no">feedback:Cell rotation angle</xsl:message>
+    </xsl:if>
+    <xsl:if test="$tableProp/@style:rotation-align">
+      <xsl:message terminate="no">feedback:Cell rotation alignment</xsl:message>
+    </xsl:if>
 
     <xsl:call-template name="InsertCellWidth">
       <xsl:with-param name="tableProp" select="$tableProp"/>
@@ -583,6 +595,7 @@
     </w:tcMar>
     <xsl:call-template name="InsertCellWritingMode">
       <xsl:with-param name="cellProp" select="$cellProp"/>
+      <xsl:with-param name="tableProp" select="$tableProp"/>
     </xsl:call-template>
     <xsl:call-template name="InsertCellValign">
       <xsl:with-param name="cellProp" select="$cellProp"/>
@@ -667,7 +680,32 @@
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
+      <xsl:call-template name="InsertCellDiagonals">
+        <xsl:with-param name="cellProp" select="$cellProp"/>
+      </xsl:call-template>
     </w:tcBorders>
+  </xsl:template>
+
+  <!-- insert cell diagonals inside tcBorders element -->
+  <xsl:template name="InsertCellDiagonals">
+    <xsl:param name="cellProp"/>
+
+    <xsl:if test="$cellProp[@style:diagonal-tl-br and @style:diagonal-tl-br != 'none']">
+      <w:tl2br>
+        <xsl:call-template name="border">
+          <xsl:with-param name="side" select="'tl-br'"/>
+          <xsl:with-param name="node" select="$cellProp"/>
+        </xsl:call-template>
+      </w:tl2br>
+    </xsl:if>
+    <xsl:if test="$cellProp[@style:diagonal-bl-tr and @style:diagonal-bl-tr != 'none']">
+      <w:tr2bl>
+        <xsl:call-template name="border">
+          <xsl:with-param name="side" select="'bl-tr'"/>
+          <xsl:with-param name="node" select="$cellProp"/>
+        </xsl:call-template>
+      </w:tr2bl>
+    </xsl:if>
   </xsl:template>
 
   <!-- Write borders attribute by extracting them from subcells -->
@@ -900,22 +938,28 @@
   <!-- Inserts the cell writing mode -->
   <xsl:template name="InsertCellWritingMode">
     <xsl:param name="cellProp"/>
-    <xsl:if test="$cellProp/@style:writing-mode">
-      <xsl:choose>
-        <xsl:when test="$cellProp[@style:writing-mode = 'tb-rl']">
-          <w:textDirection w:val="tbRl"/>
-        </xsl:when>
-        <xsl:when test="$cellProp[@style:writing-mode = 'lr-tb']">
-          <w:textDirection w:val="lrTb"/>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:if>
+    <xsl:param name="tableProp"/>
+    <xsl:choose>
+      <xsl:when test="$cellProp/@style:direction = 'ltr' ">
+        <w:textDirection w:val="lrTb"/>
+      </xsl:when>
+      <xsl:when test="$cellProp/@style:direction = 'ttb' ">
+        <w:textDirection w:val="tbRl"/>
+      </xsl:when>
+      <xsl:when test="$tableProp/@style:writing-mode = 'tb-rl' ">
+        <w:textDirection w:val="tbRl"/>
+      </xsl:when>
+      <xsl:when test="$tableProp/@style:writing-mode = 'lr-tb' ">
+        <w:textDirection w:val="lrTb"/>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <!-- Inserts the cell vertical alignment -->
   <xsl:template name="InsertCellValign">
     <xsl:param name="cellProp"/>
-    <xsl:if test="$cellProp[@style:vertical-align and @style:vertical-align!='']">
+    <xsl:if
+      test="$cellProp[@style:vertical-align and @style:vertical-align!='' and @style:vertical-align!='automatic']">
       <xsl:choose>
         <xsl:when test="$cellProp/@style:vertical-align = 'middle'">
           <w:vAlign w:val="center"/>
