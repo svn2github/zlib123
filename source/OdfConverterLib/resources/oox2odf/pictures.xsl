@@ -128,13 +128,13 @@
 
   <xsl:template name="SetSize">
     <xsl:attribute name="svg:height">
-      <xsl:call-template name="emu-measure">
+      <xsl:call-template name="ConvertEmu">
         <xsl:with-param name="length" select="wp:extent/@cy"/>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
     <xsl:attribute name="svg:width">
-      <xsl:call-template name="emu-measure">
+      <xsl:call-template name="ConvertEmu">
         <xsl:with-param name="length" select="wp:extent/@cx"/>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
@@ -143,7 +143,7 @@
 
   <xsl:template name="SetPosition">
     <xsl:attribute name="svg:x">
-      <xsl:call-template name="emu-measure">
+      <xsl:call-template name="ConvertEmu">
         <xsl:with-param name="length" select="wp:positionH/wp:posOffset"/>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
@@ -151,7 +151,7 @@
     <xsl:attribute name="svg:y">
       <xsl:choose>
         <xsl:when test="wp:positionV/@relativeFrom = 'line'">
-          <xsl:call-template name="emu-measure">
+          <xsl:call-template name="ConvertEmu">
             <xsl:with-param name="length">
               <xsl:value-of select="-wp:positionV/wp:posOffset"/>
             </xsl:with-param>
@@ -176,7 +176,7 @@
             </xsl:call-template>
           </xsl:variable>
           <xsl:variable name="Pos">
-            <xsl:call-template name="emu-measure">
+            <xsl:call-template name="ConvertEmu">
               <xsl:with-param name="length">
                 <xsl:value-of select="wp:positionV/wp:posOffset"/>
               </xsl:with-param>
@@ -188,7 +188,7 @@
           <xsl:text>cm</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="emu-measure">
+          <xsl:call-template name="ConvertEmu">
             <xsl:with-param name="length" select="wp:positionV/wp:posOffset"/>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -293,28 +293,28 @@
     <xsl:if test="descendant::wp:anchor">
 
       <xsl:attribute name="fo:margin-top">
-        <xsl:call-template name="emu-measure">
+        <xsl:call-template name="ConvertEmu">
           <xsl:with-param name="length" select="descendant::wp:anchor/@distT"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
 
       <xsl:attribute name="fo:margin-bottom">
-        <xsl:call-template name="emu-measure">
+        <xsl:call-template name="ConvertEmu">
           <xsl:with-param name="length" select="descendant::wp:anchor/@distB"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
 
       <xsl:attribute name="fo:margin-left">
-        <xsl:call-template name="emu-measure">
+        <xsl:call-template name="ConvertEmu">
           <xsl:with-param name="length" select="descendant::wp:anchor/@distL"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
 
       <xsl:attribute name="fo:margin-right">
-        <xsl:call-template name="emu-measure">
+        <xsl:call-template name="ConvertEmu">
           <xsl:with-param name="length" select="descendant::wp:anchor/@distR"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
@@ -566,7 +566,7 @@
       <xsl:for-each select="descendant::pic:pic">
         <xsl:variable name="width">
           <xsl:variable name="widthText">
-            <xsl:call-template name="emu-measure">
+            <xsl:call-template name="ConvertEmu">
               <xsl:with-param name="length" select="ancestor::w:drawing/descendant::wp:extent/@cx"/>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
@@ -576,7 +576,7 @@
 
         <xsl:variable name="height">
           <xsl:variable name="heightText">
-            <xsl:call-template name="emu-measure">
+            <xsl:call-template name="ConvertEmu">
               <xsl:with-param name="length" select="ancestor::w:drawing/descendant::wp:extent/@cy"/>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>

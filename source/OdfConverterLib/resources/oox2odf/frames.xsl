@@ -91,9 +91,6 @@
   <xsl:template name="InsertshapeAbsolutePos">
     <xsl:param name="shape" select="v:shape"/>
     
-    <!--svg:x="12cm" svg:y="12cm"-->
-    <!--    position:absolute;margin-left:340.2pt;margin-top:340.2pt;-->
-    
     <xsl:variable name="position">
       <xsl:call-template name="GetShapeProperty">
         <xsl:with-param name="shape" select="$shape"/>
@@ -110,13 +107,9 @@
         </xsl:variable>
       
       <xsl:attribute name="svg:x">
-        <xsl:call-template name="ConvertPoints">
-          <xsl:with-param name="length">
-            <xsl:call-template name="GetValue">
-              <xsl:with-param name="length" select="$svgx"/>
-            </xsl:call-template>
-          </xsl:with-param>
-          <xsl:with-param name="unit" select="'cm'"/>
+        <xsl:call-template name="ConvertMeasure">
+          <xsl:with-param name="length" select="$svgx"/>
+          <xsl:with-param name="destUnit" select="'cm'"/>
         </xsl:call-template>
       </xsl:attribute>
       
@@ -128,13 +121,9 @@
       </xsl:variable>
       
       <xsl:attribute name="svg:y">
-        <xsl:call-template name="ConvertPoints">
-          <xsl:with-param name="length">
-            <xsl:call-template name="GetValue">
-              <xsl:with-param name="length" select="$svgy"/>
-            </xsl:call-template>
-          </xsl:with-param>
-          <xsl:with-param name="unit" select="'cm'"/>
+        <xsl:call-template name="ConvertMeasure">
+          <xsl:with-param name="length" select="$svgy"/>
+          <xsl:with-param name="destUnit" select="'cm'"/>
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
@@ -202,13 +191,9 @@
       <xsl:otherwise>
         <xsl:if test="not($shape/v:textbox/@style)">
           <xsl:attribute name="svg:height">
-            <xsl:call-template name="ConvertPoints">
-              <xsl:with-param name="length">
-                <xsl:call-template name="GetValue">
-                  <xsl:with-param name="length" select="$height"/>
-                </xsl:call-template>
-              </xsl:with-param>
-              <xsl:with-param name="unit" select="'cm'"/>
+            <xsl:call-template name="ConvertMeasure">
+              <xsl:with-param name="length" select="$height"/>
+              <xsl:with-param name="destUnit" select="'cm'"/>
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
@@ -261,13 +246,9 @@
           </xsl:call-template>
         </xsl:variable>
         <xsl:attribute name="svg:width">
-          <xsl:call-template name="ConvertPoints">
-            <xsl:with-param name="length">
-              <xsl:call-template name="GetValue">
-                <xsl:with-param name="length" select="$width"/>
-              </xsl:call-template>
-            </xsl:with-param>
-            <xsl:with-param name="unit" select="'cm'"/>
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length" select="$width"/>
+            <xsl:with-param name="destUnit" select="'cm'"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
@@ -353,8 +334,22 @@
     <xsl:call-template name="InsertShapeHorizontalPos"/>
     <xsl:call-template name="InsertShapeVerticalPos"/>
     <xsl:call-template name="InsertShapeFlowWithText"/>
+    <xsl:call-template name="InsertShapeBackgroundColor"/>
   </xsl:template>
-
+  
+  <xsl:template name="InsertShapeBackgroundColor">
+    <xsl:param name="shape" select="v:shape"/>
+    <xsl:variable name="bgColor" select="$shape/@fillcolor"/>
+     <xsl:variable name="isFilled" select="$shape/@filled"/>
+      <xsl:if test="(not($isFilled) or $isFilled != 'f') and $bgColor != ''">
+      <xsl:attribute name="fo:background-color">
+        <xsl:call-template name="InsertColor">
+            <xsl:with-param name="color" select="$bgColor"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template name="InsertShapeFlowWithText">
   <!--    TODO  investigate when this need to be set to true -->
     <xsl:attribute name="draw:flow-with-text">
@@ -527,13 +522,9 @@
     <xsl:param name="attributeName"/>
 
     <xsl:attribute name="{$attributeName}">
-      <xsl:call-template name="ConvertPoints">
-        <xsl:with-param name="length">
-          <xsl:call-template name="GetValue">
-            <xsl:with-param name="length" select="$margin"/>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="unit" select="'cm'"/>
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length" select="$margin"/>
+        <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:attribute>
   </xsl:template>
@@ -544,14 +535,14 @@
     <xsl:variable name="textBoxInset" select="$shape/v:textbox/@inset"/>
 
     <xsl:variable name="paddingLeft">
-      <xsl:call-template name="ConvertMilimeters">
+      <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
           <xsl:call-template name="ExplodeValues">
             <xsl:with-param name="elementNum" select="'1'"/>
             <xsl:with-param name="text" select="$textBoxInset"/>
           </xsl:call-template>
         </xsl:with-param>
-        <xsl:with-param name="unit" select="'cm'"/>
+        <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -560,14 +551,14 @@
     </xsl:attribute>
 
     <xsl:variable name="paddingTop">
-      <xsl:call-template name="ConvertMilimeters">
+      <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
           <xsl:call-template name="ExplodeValues">
             <xsl:with-param name="elementNum" select="'2'"/>
             <xsl:with-param name="text" select="$textBoxInset"/>
           </xsl:call-template>
         </xsl:with-param>
-        <xsl:with-param name="unit" select="'cm'"/>
+        <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -576,14 +567,14 @@
     </xsl:attribute>
 
     <xsl:variable name="paddingRight">
-      <xsl:call-template name="ConvertMilimeters">
+      <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
           <xsl:call-template name="ExplodeValues">
             <xsl:with-param name="elementNum" select="'3'"/>
             <xsl:with-param name="text" select="$textBoxInset"/>
           </xsl:call-template>
         </xsl:with-param>
-        <xsl:with-param name="unit" select="'cm'"/>
+        <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -592,14 +583,14 @@
     </xsl:attribute>
 
     <xsl:variable name="paddingBottom">
-      <xsl:call-template name="ConvertMilimeters">
+      <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
           <xsl:call-template name="ExplodeValues">
             <xsl:with-param name="elementNum" select="'4'"/>
             <xsl:with-param name="text" select="$textBoxInset"/>
           </xsl:call-template>
         </xsl:with-param>
-        <xsl:with-param name="unit" select="'cm'"/>
+        <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -638,23 +629,17 @@
 
     <xsl:if test="$shape/@strokeweight">
       <xsl:variable name="borderWeight">
-        <xsl:call-template name="ConvertPoints">
+        <xsl:call-template name="ConvertMeasure">
           <xsl:with-param name="length" select="$shape/@strokeweight"/>
-          <xsl:with-param name="unit" select="'cm'"/>
+          <xsl:with-param name="destUnit" select="'cm'"/>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="borderColor">
-        <xsl:choose>
-          <xsl:when test="not($shape/@strokecolor)">
-            <xsl:text>#000000</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$shape/@strokecolor"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-
-      <xsl:variable name="borderStyle">
+        <xsl:call-template name="InsertColor">
+          <xsl:with-param name="color" select="$shape/@strokecolor"/>
+        </xsl:call-template>
+     </xsl:variable>
+    <xsl:variable name="borderStyle">
         <xsl:choose>
           <xsl:when test="not($shape/v:stroke)">
             <xsl:text>solid</xsl:text>
