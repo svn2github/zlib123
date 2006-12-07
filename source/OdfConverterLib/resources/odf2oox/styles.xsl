@@ -588,9 +588,14 @@
           <xsl:if test="@fo:line-height">
             <xsl:attribute name="w:lineRule">exact</xsl:attribute>
             <xsl:attribute name="w:line">
-              <xsl:call-template name="twips-measure">
-                <xsl:with-param name="length" select="@fo:line-height"/>
-              </xsl:call-template>
+              <xsl:choose>
+                <xsl:when test="@fo:line-height = 'normal' ">240</xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="twips-measure">
+                    <xsl:with-param name="length" select="@fo:line-height"/>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
           </xsl:if>
         </xsl:otherwise>
