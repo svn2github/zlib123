@@ -43,13 +43,6 @@
     <xsl:variable name="pziptarget">
       <xsl:value-of select="generate-id()"/>
     </xsl:variable>
-    <draw:object-ole>
-      <xsl:attribute name="xlink:href">
-        <xsl:value-of select="concat('./',$pziptarget)"/>
-      </xsl:attribute>
-      <xsl:attribute name="xlink:show">
-        <xsl:if test="@Type='Embed'">embed</xsl:if>
-      </xsl:attribute>
       <xsl:if test="document('word/_rels/document.xml.rels')">
         <xsl:for-each
           select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
@@ -68,6 +61,25 @@
           </xsl:if>
         </xsl:for-each>
       </xsl:if>
+    <draw:object-ole>
+      <xsl:if test="document('word/_rels/document.xml.rels')">
+        <xsl:for-each
+          select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
+          <xsl:if test="./@Id=$IdFile">
+            <xsl:attribute name="xlink:href">
+              <xsl:choose>
+                <xsl:when test="starts-with(./@Target, 'file:///')">
+                  <xsl:value-of select="translate(substring-after(./@Target, 'file://'), '\', '/')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="concat('./',$pziptarget)"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:if>
+      <xsl:attribute name="xlink:show">embed</xsl:attribute>
     </draw:object-ole>
     <draw:image>
       <xsl:attribute name="xlink:href">
