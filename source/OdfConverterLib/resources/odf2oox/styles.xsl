@@ -1502,6 +1502,17 @@
       test="@fo:background-color != 'transparent' and parent::style:page-layout/@style:name != $default-master-style/@style:page-layout-name">
       <xsl:message terminate="no">feedback:Page background color</xsl:message>
     </xsl:if>
+    <!-- page type -->
+    <xsl:if test="parent::style:page-layout/@style:page-usage">
+      <xsl:choose>
+        <xsl:when test="parent::style:page-layout/@style:page-usage = 'left' ">
+          <w:type w:val="evenPage"/>
+        </xsl:when>
+        <xsl:when test="parent::style:page-layout/@style:page-usage = 'right' ">
+          <w:type w:val="oddPage"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
     <!-- page size -->
     <xsl:choose>
       <xsl:when

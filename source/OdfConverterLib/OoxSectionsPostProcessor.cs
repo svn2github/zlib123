@@ -132,11 +132,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public override void WriteEndElement()
         {
-        	if (IsPerm())
-        	{
-        		EndPerm();
-        	} 
-        	
+            if (IsPerm())
+            {
+                EndPerm();
+            }
+
             if (!this.inGlobal && !this.inLocal)
             {
                 this.nextWriter.WriteEndElement();
@@ -240,26 +240,26 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private bool IsPerm()
         {
-        	Element e = (Element) stack.Peek();
-        	return ("permStart".Equals(e.Name) || "permEnd".Equals(e.Name)) 
-        		&& OOX_MAIN_NS.Equals(e.Ns);
+            Element e = (Element)stack.Peek();
+            return ("permStart".Equals(e.Name) || "permEnd".Equals(e.Name))
+                && OOX_MAIN_NS.Equals(e.Ns);
         }
-        
+
         private void EndPerm()
         {
-        	Element e = (Element) stack.Peek();
-        	if ("permStart".Equals(e.Name))
-        	{
-        		this.currentPermId++;
-        	}
-        	WritePermId();
+            Element e = (Element)stack.Peek();
+            if ("permStart".Equals(e.Name))
+            {
+                this.currentPermId++;
+            }
+            WritePermId();
         }
-        
+
         private void WritePermId()
         {
-        	this.nextWriter.WriteStartAttribute("w", "id", OOX_MAIN_NS);
-        	this.nextWriter.WriteString(this.currentPermId.ToString());
-        	this.nextWriter.WriteEndAttribute();
+            this.nextWriter.WriteStartAttribute("w", "id", OOX_MAIN_NS);
+            this.nextWriter.WriteString(this.currentPermId.ToString());
+            this.nextWriter.WriteEndAttribute();
         }
 
         private bool InLocal()
@@ -541,7 +541,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 this.odfSectPr = null;
             }
 
-            
+
 
             /// <summary>
             /// Creates the w:sectPr node
@@ -629,9 +629,15 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                             }
                         }
 
-                        // continuity
-                        if (this.nextIsContinuous)
+                        // type
+                        Element type = (Element)page.GetChild("type", OOX_MAIN_NS);
+                        if (type != null)
                         {
+                            type.Write(nextWriter);
+                        }
+                        else if (this.nextIsContinuous)
+                        {
+                            // continuity
                             cont.Write(nextWriter);
                         }
 
