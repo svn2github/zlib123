@@ -254,6 +254,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
             else
             {
                 System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+                // sfd.SupportMultiDottedExtensions = true;
                 sfd.AddExtension = true;
                 sfd.DefaultExt = "odt";
                 sfd.Filter = this.addinLib.GetString(ODF_FILE_TYPE) + EXPORT_ODF_FILE_FILTER
@@ -261,14 +262,18 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 sfd.InitialDirectory = doc.Path;
                 sfd.OverwritePrompt = true;
                 sfd.Title = this.addinLib.GetString(EXPORT_LABEL);
-                sfd.FileName = doc.FullName.Substring(0, doc.FullName.LastIndexOf('.')) + ".odt";
+                string ext = '.' + sfd.DefaultExt;
+                sfd.FileName = doc.FullName.Substring(0, doc.FullName.LastIndexOf('.')) + ext;
 
                 // process the chosen documents	
                 if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
                 {
                     // retrieve file name
-                    string odfFile = sfd.FileName; ;
-
+                    string odfFile = sfd.FileName;
+                    if (!odfFile.EndsWith(ext)) 
+                    { // multi dotted extension support
+                        odfFile += ext;
+                    }
                     object initialName = doc.FullName;
                     object tmpFileName = null;
                     string docxFile = (string)initialName;

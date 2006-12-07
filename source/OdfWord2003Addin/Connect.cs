@@ -317,6 +317,7 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
             else
             {
                 System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+                // sfd.SupportMultiDottedExtensions = true;
                 sfd.AddExtension = true;
                 sfd.DefaultExt = "odt";
                 sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.odt)|*.odt|"
@@ -324,13 +325,19 @@ namespace CleverAge.OdfConverter.OdfWord2003Addin
                 sfd.InitialDirectory = doc.Path;
                 sfd.OverwritePrompt = true;
                 sfd.Title = this.addinLib.GetString("OdfExportLabel");
-                sfd.FileName = doc.FullName.Substring(0, doc.FullName.LastIndexOf('.')) + ".odt";
+                string ext = '.' + sfd.DefaultExt;
+                sfd.FileName = doc.FullName.Substring(0, doc.FullName.LastIndexOf('.')) + ext;
 
                 // process the chosen documents	
                 if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
                 {
                     // name of the file to create
                     string odfFileName = sfd.FileName;
+                    // support multi dotted extensions
+                    if (!odfFileName.EndsWith(ext))
+                    {
+                    	odfFileName += ext;
+                    }
                     // name of the document to convert
                     object sourceFileName = doc.FullName;
                     // name of the temporary Word12 file created if current file is not already a Word12 document
