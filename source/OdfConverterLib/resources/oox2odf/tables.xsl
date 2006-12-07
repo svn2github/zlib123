@@ -193,12 +193,14 @@
       </xsl:attribute>
     </xsl:if>
     
-    <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1]))">
+    <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and 
+      not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1])) 
+      and not(parent::w:tbl/preceding::w:p[1]/w:pPr/w:sectPr)">
       <xsl:attribute name="fo:break-before">
         <xsl:text>page</xsl:text>
       </xsl:attribute>
     </xsl:if>
-	</xsl:template>
+  </xsl:template>
 
   <xsl:template name="InsertTableAlign">
     <xsl:choose>
