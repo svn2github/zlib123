@@ -598,7 +598,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         		this.startPageNumber = null;
         	}
 
-        	this.nextIsContinuous = (this.nextIsNewSection || this.nextIsEndSection);
+        	this.nextIsContinuous = (this.nextIsNewSection || this.nextIsEndSection)
+        		|| (this.nextIsContinuous && this.skip);
         	this.nextIsPageBreak = false;
         	this.nextIsNewSection = false;
         	this.nextIsEndSection = false;
