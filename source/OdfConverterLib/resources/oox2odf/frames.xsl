@@ -14,16 +14,23 @@
   exclude-result-prefixes="w draw">
 
   <xsl:template match="w:pict|w:object">
-    <draw:frame>
-      <xsl:call-template name="InsertShapeStyleName"/>
-      <xsl:call-template name="InsertShapeAnchor"/>
-      <xsl:call-template name="InsertShapeWidth"/>
-      <xsl:call-template name="InsertShapeHeight"/>
-      <xsl:call-template name="InsertShapeZindex"/>
-      <xsl:call-template name="InsertshapeAbsolutePos"/>
-      <xsl:apply-templates select="o:OLEObject"/>
-      <xsl:apply-templates select="v:shape/child::node()"/>
-    </draw:frame>
+      <xsl:choose>
+        <xsl:when test="v:rect">
+          <xsl:call-template name="v:rect"></xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <draw:frame>
+          <xsl:call-template name="InsertShapeStyleName"/>
+          <xsl:call-template name="InsertShapeAnchor"/>
+          <xsl:call-template name="InsertShapeWidth"/>
+          <xsl:call-template name="InsertShapeHeight"/>
+          <xsl:call-template name="InsertShapeZindex"/>
+          <xsl:call-template name="InsertshapeAbsolutePos"/>
+          <xsl:apply-templates select="o:OLEObject"/>
+          <xsl:apply-templates select="v:shape/child::node()"/>
+          </draw:frame>
+        </xsl:otherwise>
+      </xsl:choose>
   </xsl:template>
 
   <xsl:template match="v:textbox">
@@ -98,7 +105,7 @@
       </xsl:call-template>
     </xsl:variable>
     
-    <xsl:if test="$position = 'absolute' ">
+    <xsl:if test="$position = 'absolute'  or v:rect">
         <xsl:variable name="svgx">
           <xsl:call-template name="GetShapeProperty">
             <xsl:with-param name="shape" select="$shape"/>
@@ -303,10 +310,19 @@
   <xsl:template match="w:pict" mode="automaticstyles">
     <style:style>
       <xsl:attribute name="style:name">
+        <xsl:choose>
+          <xsl:when test="v:rect">
+            <xsl:call-template name="GenerateStyleName">          
+              <xsl:with-param name="node" select="v:rect"/>
+            </xsl:call-template>
+       </xsl:when>
+      <xsl:otherwise>
         <xsl:call-template name="GenerateStyleName">
           <xsl:with-param name="node" select="v:shape"/>
         </xsl:call-template>
-      </xsl:attribute>
+      </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>        
       <!--in Word there are no parent style for image - make default Graphics in OO -->
       <xsl:attribute name="style:parent-style-name">
         <xsl:text>Graphics</xsl:text>
@@ -326,14 +342,39 @@
 
   <xsl:template name="InsertShapeProperties">
     <!--TODO automatic style content-->
-    <xsl:call-template name="InsertShapeWrap"/>
-    <xsl:call-template name="InsertShapeFromTextDistance"/>
-    <xsl:call-template name="InsertTextBoxPadding"/>
-    <xsl:call-template name="InsertShapeBorders"/>
-    <xsl:call-template name="InsertShapeAutomaticWidth"/>
-    <xsl:call-template name="InsertShapeHorizontalPos"/>
-    <xsl:call-template name="InsertShapeVerticalPos"/>
-    <xsl:call-template name="InsertShapeFlowWithText"/>
+    <xsl:choose>
+      <xsl:when test="v:rect">
+        <xsl:call-template name="InsertShapeWrap"/>
+        <xsl:call-template name="InsertShapeFromTextDistance">
+          <xsl:with-param name="shape" select="v:rect"></xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertShapeBorders">
+          <xsl:with-param name="shape" select="v:rect"></xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertShapeAutomaticWidth">
+          <xsl:with-param name="shape" select="v:rect"></xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertShapeHorizontalPos">
+          <xsl:with-param name="shape" select="v:rect"></xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertShapeVerticalPos">
+          <xsl:with-param name="shape" select="v:rect"></xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertShapeFlowWithText">
+          <xsl:with-param name="shape" select="v:rect"></xsl:with-param>
+        </xsl:call-template>        
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="InsertShapeWrap"/>
+        <xsl:call-template name="InsertShapeFromTextDistance"/>
+        <xsl:call-template name="InsertTextBoxPadding"/>
+        <xsl:call-template name="InsertShapeBorders"/>
+        <xsl:call-template name="InsertShapeAutomaticWidth"/>
+        <xsl:call-template name="InsertShapeHorizontalPos"/>
+        <xsl:call-template name="InsertShapeVerticalPos"/>
+        <xsl:call-template name="InsertShapeFlowWithText"/>
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:call-template name="InsertShapeBackgroundColor"/>
   </xsl:template>
   
@@ -704,4 +745,35 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+  
+  <xsl:template name="v:rect">
+    <draw:rect>     
+      <xsl:call-template name="InsertShapeAnchor">
+        <xsl:with-param name="shape" select="v:rect"/>
+      </xsl:call-template>  
+      <xsl:call-template name="InsertShapeZindex">
+        <xsl:with-param name="shape" select="v:rect"/>
+      </xsl:call-template>
+      <xsl:call-template name="InsertShapeStyleName">
+        <xsl:with-param name="shape" select="v:rect"/>
+      </xsl:call-template>
+      <xsl:call-template name="InsertShapeWidth">
+        <xsl:with-param name="shape" select="v:rect"/>
+      </xsl:call-template>
+      <xsl:call-template name="InsertShapeHeight">
+        <xsl:with-param name="shape" select="v:rect"/>
+      </xsl:call-template>
+      <xsl:call-template name="InsertshapeAbsolutePos">
+        <xsl:with-param name="shape" select="v:rect"/>
+      </xsl:call-template>      
+      <text:p/>
+    </draw:rect>
+    <!--draw:rect text:anchor-type="paragraph" draw:z-index="0" draw:style-name="gr1"
+      svg:width="10.408cm" svg:height="5.469cm" svg:x="2.438cm"
+      svg:y="1.288cm">
+      <text:p/>
+    </draw:rect-->
+  </xsl:template>
+
+  
 </xsl:stylesheet>
