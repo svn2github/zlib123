@@ -921,15 +921,17 @@
 
   <!-- sections -->
   <xsl:template match="text:section">
-    <xsl:message terminate="no">progress:text:section</xsl:message>
     <xsl:choose>
       <xsl:when test="@text:display= 'none' ">
         <xsl:message terminate="no">feedback:Hidden section</xsl:message>
       </xsl:when>
       <xsl:when test="@text:is-hidden = 'true' ">
-        <xsl:message terminate="no">feedback: Conditional hidden text</xsl:message>
+        <xsl:message terminate="no">feedback:Conditional hidden section</xsl:message>
       </xsl:when>
       <xsl:when test="@text:protected = 'true' ">
+        <xsl:if test="@text:protection-key">
+          <xsl:message terminate="no">feedback:Protection key for<xsl:value-of select="@text:name"/></xsl:message>
+        </xsl:if>
         <!-- permission range id's added in a post processing step -->
         <w:permEnd/>
         <xsl:apply-templates/>
