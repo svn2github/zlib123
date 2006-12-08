@@ -203,6 +203,11 @@
       <w:instrText xml:space="preserve">" </w:instrText>
     </xsl:if>
 
+    <!-- separator before page numbering. default is right align, null if no tab-stop defined -->
+    <xsl:if test="not($tocSource/text:table-of-content-entry-template/@text:index-entry-tab-stop)">
+      <w:instrText xml:space="preserve">\p " " </w:instrText>
+    </xsl:if>
+
     <!--include index marks-->
     <xsl:if test="not($tocSource[@text:use-index-marks = 'false'])">
       <w:instrText xml:space="preserve">\u </w:instrText>
