@@ -386,22 +386,22 @@ Smart Art Tools;Format;Shape Styles;Fill;;;3;Delayed;;;;
 Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;Completed;;;
 ;;;;Gutter/ Gutter position;;0;0.2-Final ;Completed;;;
 ;;;Orientation;Portrait/Landscape;;0;0.2-Final ;Completed;;;
-;;;Pages;Multiple pages;Normal;1;0.3-M2;;;;
-;;;;;Mirror margins;1;0.3-M2;;;;
-;;;;;2 pages per sheet;1;0.3-M2;;;;
-;;;;;Book fold;1;0.3-M2;;;;
+;;;Pages;Multiple pages;Normal;1;0.3-M2;Completed;;;
+;;;;;Mirror margins;1;0.3-M2;Completed;;;
+;;;;;2 pages per sheet;1;0.3-M2;-;not supported;;
+;;;;;Book fold;1;0.3-M2;-;not supported;;
 ;;Paper;Paper Size;Paper size;;0;0.2-Final ;Completed;;;
 ;;;;Width;;0;0.2-Final ;Completed;;;
 ;;;;Height;;0;0.2-Final ;Completed;;;
-;;Layout;Section;Section start;New page;1;Delayed;;;;
+;;Layout;Section;Section start;New page;1;Delayed;Completed;;;
 ;;;;;Even page;1;-;;;;There is Word 2007 bug, see coment in Conversion Issues.
 ;;;;;Odd page;1;-;;;;There is Word 2007 bug, see coment in Conversion Issues.
 ;;;;;Continuous;1;0.3-M2;Completed;;;
 ;;;;;New column;1;0.3-M2;;;;
 ;;;Header and Footer;Different odd and even;;1;0.3-M2;Completed;;;
 ;;;;Different first page;;1;0.3-M2;Completed;;;
-;;;;From edge;Header;1;0.3-M2;;;;
-;;;;;Footer;1;0.3-M2;;;;
+;;;;From edge;Header;1;0.3-M2;Completed;;;
+;;;;;Footer;1;0.3-M2;Completed;;;
 ;;;Page;Vertical alignment to;Top;0;-;;not supported;;
 ;;;;;Center;0;-;;not supported;;
 ;;;;;Justified;0;-;;not supported;;
@@ -413,14 +413,14 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;;Equal column width;;;1;0.3-M2;Completed;;;
 ;;;;;;;;;;;
 ;Page background;Page color;Selected color;;;2;0.2-Final ;Completed;In ODF page background color is set excluding the margin area;;
-;;Page Borders;Settings;None/Box/Shadow/3D/custom;;2;0.3-M2;;;;
+;;Page Borders;Settings;None/Box/Shadow/3D/custom;;2;0.3-M2;Completed;;;
 ;;;Style;Selected style;;2;0.3-M2;;;;
 ;;;Color;Selected color;;2;0.3-M2;;;;
 ;;;Width;Selected width;;2;0.3-M2;;;;
 ;;;;;;;;;;;
-;Themes;Colors;;;;2;0.3-M2;;;;
-;;Fonts;;;;2;0.3-M2;;;;
-;;Effects;;;;2;0.3-M2;;;;
+;Themes;Colors;;;;2;0.3-M2;Delayed;;;Level 2
+;;Fonts;;;;2;0.3-M2;Delayed;;;Level 2
+;;Effects;;;;2;0.3-M2;Delayed;;;Level 2
 ;;;;;;;;;;;
 References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Completed;;;
 ;;;Right align page numbers;;;1;0.3-M2;Partial;Only first level is alligned properly;;
