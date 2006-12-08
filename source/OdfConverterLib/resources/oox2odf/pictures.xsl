@@ -244,11 +244,23 @@
     <xsl:call-template name="InsertImageCrop"/>
     <xsl:call-template name="InsertImageWrap"/>
     <xsl:call-template name="InsertImageMargins"/>
-    <xsl:attribute name="draw:flow-with-text">
-      <xsl:text>false</xsl:text>
-    </xsl:attribute>
+    <xsl:call-template name="InsertImageFlowWithtText"/>
   </xsl:template>
 
+  <xsl:template name="InsertImageFlowWithtText">
+    <xsl:variable name="layoutInCell" select="wp:inline/@layoutInCell | wp:anchor/@layoutInCell"/>
+    <xsl:attribute name="draw:flow-with-text">
+      <xsl:choose>
+        <xsl:when test="$layoutInCell = 1">
+            <xsl:text>true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+  
   <xsl:template name="InsertImageWrap">
     <xsl:if test="descendant::node()[contains(name(),'wp:wrap')]">
       <xsl:attribute name="style:wrap">

@@ -433,13 +433,11 @@
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end'])">
         <xsl:call-template name="InsertHyperlink"/>
       </xsl:when>
-	<!-- Data and Time Fiellds -->
+	<!-- ignore text when we are in date or time field -->
       <xsl:when
         test="((contains(w:instrText,'TIME') or contains(preceding::w:instrText[1]  ,'TIME')) or(contains(w:instrText,'DATE') or contains(preceding::w:instrText[1]  ,'DATE'))) and 
-        count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end'])">
-        <xsl:call-template name="wInstrText"/>
-      </xsl:when>
-      
+        count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and not(w:instrText)"/>
+  
       <xsl:when
         test="((contains(w:instrText,'PAGE') or contains(preceding::w:instrText[1]  ,'PAGE'))) and 
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and descendant::w:t">
@@ -455,10 +453,6 @@
         </xsl:call-template>       
       </xsl:when>
       
-      <!-- Fields -->
-      <xsl:when test="parent::w:fldSimple">        
-        <xsl:call-template name="wfldSimple"/>
-      </xsl:when>     
       <!-- attach automatic style-->
       <xsl:when test="w:rPr">
         <text:span text:style-name="{generate-id(self::node())}">

@@ -13,151 +13,113 @@
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" exclude-result-prefixes="w">
 
-  
-  <xsl:template name="wInstrText">
-    <xsl:if test="contains(w:instrText,'DATE')">
-      <text:span text:style-name="{generate-id(self::node())}">
-        <xsl:call-template name="InsertDataField"/>
-      </text:span>
-    </xsl:if>
-    <xsl:if test="contains(w:instrText,'TIME') ">
-      <text:span text:style-name="{generate-id(self::node())}">
-        <xsl:call-template name="InsertTimeField"/>
-      </text:span>
-    </xsl:if>
-  </xsl:template>
-  
   <!-- Date and Time Fields -->
-  
-  <xsl:template name="InsertDataField">
+  <xsl:template name="InsertDateField">
+    <xsl:param name="dateText"/>
     <text:date>
       <xsl:attribute name="style:data-style-name">
-        <xsl:choose>
-          <xsl:when test="parent::w:fldSimple">
-            <xsl:value-of select="generate-id(parent::w:fldSimple)"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="generate-id(w:instrText)"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
+        <xsl:value-of select="generate-id(.)"/>
+         </xsl:attribute>
       <xsl:attribute name="text:date-value">
-        <xsl:value-of select="."/>
+        <xsl:value-of select="$dateText"/>
       </xsl:attribute>
+      <xsl:value-of select="$dateText"/>
     </text:date>
-
   </xsl:template>
 
   <xsl:template name="InsertTimeField">
-
+    <xsl:param name="timeText"/>
     <text:time>
       <xsl:attribute name="style:data-style-name">
-        <xsl:choose>
-          <xsl:when test="parent::w:fldSimple">
-            <xsl:value-of select="generate-id(parent::w:fldSimple)"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="generate-id(w:instrText)"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="generate-id(.)"/>
       </xsl:attribute>
       <xsl:attribute name="text:time-value">
-        <xsl:value-of select="."/>
+        <xsl:value-of select="$timeText"/>
       </xsl:attribute>
     </text:time>
-
   </xsl:template>
   
   <!-- ignore text inside a field code -->
   <xsl:template match="w:instrText"/>
 
-  <xsl:template match="w:instrText" mode="automaticstyles">
-
-    <xsl:choose>
-      <xsl:when test="contains(., 'DATE')">
-        <xsl:variable name="FormatDate">
-          <xsl:value-of select="substring-before(substring-after(., '&quot;'), '&quot;')"/>
-        </xsl:variable>
-        <xsl:call-template name="InsertDate">
-          <xsl:with-param name="FormatDate">
-            <xsl:value-of select="$FormatDate"/>
-          </xsl:with-param>
-          <xsl:with-param name="ParamField">
-            <xsl:text>DATE</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-
-      <xsl:when test="contains(., 'TIME')">
-        <xsl:variable name="FormatDate">
-          <xsl:value-of select="substring-before(substring-after(., '&quot;'), '&quot;')"/>
-        </xsl:variable>
-        <xsl:call-template name="InsertDate">
-          <xsl:with-param name="FormatDate">
-            <xsl:value-of select="$FormatDate"/>
-          </xsl:with-param>
-          <xsl:with-param name="ParamField">
-            <xsl:text>TIME</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-    </xsl:choose>
-
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE')]">
+    <text:span text:style-name="{generate-id(w:r)}">
+      <text:title>
+          <xsl:apply-templates select="w:r/child::node()"/>
+      </text:title>
+    </text:span>
   </xsl:template>
 
-  <!--  Insert Fields  -->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'SUBJECT')]">
+    <text:span text:style-name="{generate-id(w:r)}">
+      <text:subject>
+        <xsl:apply-templates select="w:r/child::node()"/>
+      </text:subject>
+    </text:span>
+  </xsl:template>
   
-  <xsl:template name="wfldSimple">
-    <xsl:choose>
-      <xsl:when test="contains(parent::w:fldSimple/@w:instr, 'DATE')">
-        <text:span text:style-name="{generate-id(self::node())}">
-          <xsl:call-template name="InsertDataField"/>
-        </text:span>
-      </xsl:when>
-      <xsl:when test="contains(parent::w:fldSimple/@w:instr, 'TIME')">
-        <text:span text:style-name="{generate-id(self::node())}">
-          <xsl:call-template name="InsertTimeField"/>
-        </text:span>
-      </xsl:when>
-      <xsl:when
-        test="contains(parent::w:fldSimple/@w:instr, 'NUMPAGES') or contains(parent::w:fldSimple/@w:instr, 'PAGE')">
-        <xsl:call-template name="PageNumberField"/>
-      </xsl:when>
-    </xsl:choose>
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')] | w:instrText[contains(self::node(),'DATE')]">
+    <xsl:call-template name="InsertDateField">
+        <xsl:with-param name="dateText" select="@w:instr | text()"/>
+      </xsl:call-template>
   </xsl:template>
-
-
+  
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')] | w:instrText[contains(self::node(),'TIME')]">
+      <xsl:call-template name="InsertTimeField">
+        <xsl:with-param name="timeText" select="@w:instr | text()"/>
+      </xsl:call-template>
+  </xsl:template>
+  
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGES') or contains(@w:instr,'PAGE')]">
+      <xsl:call-template name="InsertPageNumberField"/>
+  </xsl:template>
+  
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')] | w:instrText[contains(., 'DATE')]" mode="automaticstyles">
+    <xsl:call-template name="InsertDateStyle">
+      <xsl:with-param name="dateText" select="@w:instr | text()"/>
+    </xsl:call-template>
+  </xsl:template>
+  
+  <xsl:template name="InsertDateStyle">
+    <xsl:param name="dateText"/>
+    <xsl:variable name="FormatDate">
+      <xsl:value-of
+        select="substring-before(substring-after($dateText, '&quot;'), '&quot;')"/>
+    </xsl:variable>
+    <xsl:call-template name="InsertDate">
+      <xsl:with-param name="FormatDate">
+        <xsl:value-of select="$FormatDate"/>
+      </xsl:with-param>
+      <xsl:with-param name="ParamField">
+        <xsl:text>DATE</xsl:text>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+  
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')] | w:instrText[contains(., 'TIME')]" mode="automaticstyles">
+      <xsl:call-template name="InsertTimeStyle">
+        <xsl:with-param name="timeText" select="@w:instr | text()"/>
+      </xsl:call-template>
+  </xsl:template>
+  
+  <xsl:template name="InsertTimeStyle">
+    <xsl:param name="timeText"/>
+    <xsl:variable name="FormatDate">
+      <xsl:value-of
+        select="substring-before(substring-after($timeText, '&quot;'), '&quot;')"/>
+    </xsl:variable>
+    <xsl:call-template name="InsertDate">
+      <xsl:with-param name="FormatDate">
+        <xsl:value-of select="$FormatDate"/>
+      </xsl:with-param>
+      <xsl:with-param name="ParamField">
+        <xsl:text>TIME</xsl:text>
+      </xsl:with-param>
+    </xsl:call-template>  
+  </xsl:template>
+  
   <xsl:template match="w:fldSimple" mode="automaticstyles">
-    
-    <xsl:if test="contains(@w:instr,'DATE')">
-      <xsl:variable name="FormatDate">
-        <xsl:value-of
-          select="substring-before(substring-after(@w:instr, '&quot;'), '&quot;')"/>
-      </xsl:variable>
-      <xsl:call-template name="InsertDate">
-        <xsl:with-param name="FormatDate">
-          <xsl:value-of select="$FormatDate"/>
-        </xsl:with-param>
-        <xsl:with-param name="ParamField">
-          <xsl:text>DATE</xsl:text>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-
-    <xsl:if test="contains(@w:instr,'TIME')">
-      <xsl:variable name="FormatDate">
-        <xsl:value-of
-          select="substring-before(substring-after(@w:instr, '&quot;'), '&quot;')"/>
-      </xsl:variable>
-      <xsl:call-template name="InsertDate">
-        <xsl:with-param name="FormatDate">
-          <xsl:value-of select="$FormatDate"/>
-        </xsl:with-param>
-        <xsl:with-param name="ParamField">
-          <xsl:text>TIME</xsl:text>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
+    <xsl:apply-templates select="w:r/w:rPr" mode="automaticstyles"/>
   </xsl:template>
 
   <xsl:template name="InsertDate">
@@ -602,14 +564,12 @@
       </xsl:when>
 
       <xsl:otherwise>
-
-        <xsl:variable name="Apostrof">
+      <xsl:variable name="Apostrof">
           <xsl:text>&apos;</xsl:text>
         </xsl:variable>
 
         <xsl:choose>
-
-          <xsl:when test="contains(substring($FormatDate, 1, 1), $Apostrof)">
+       <xsl:when test="contains(substring($FormatDate, 1, 1), $Apostrof)">
             <xsl:call-template name="InsertFormatDate">
               <xsl:with-param name="FormatDate">
                 <xsl:value-of
@@ -641,22 +601,17 @@
               </number:text>
             </xsl:if>
           </xsl:otherwise>
-
-        </xsl:choose>
-
-      </xsl:otherwise>
-
-    </xsl:choose>
-
+       </xsl:choose>
+    </xsl:otherwise>
+  </xsl:choose>
   </xsl:template>
-
-  <!-- Page Number Field -->
 
   <xsl:template match="w:sdt/w:sdtContent/w:fldSimple">
     <xsl:apply-templates/>
   </xsl:template>
-
-  <xsl:template name="PageNumberField">
+  
+  <!-- Page Number Field -->
+  <xsl:template name="InsertPageNumberField">
     <xsl:variable name="WInstr">
       <xsl:value-of select="parent::w:fldSimple/@w:instr"/>
     </xsl:variable>
@@ -684,6 +639,4 @@
     </xsl:attribute>      
   </text:page-number>
 </xsl:template>
-
-
 </xsl:stylesheet>
