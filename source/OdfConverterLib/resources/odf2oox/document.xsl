@@ -436,14 +436,14 @@
 
 
 
-  <!-- Computes the style name to be used be InsertIndent template -->
+  <!-- Computes the style name in a given situation -->
   <xsl:template name="GetStyleName">
     <xsl:choose>
       <xsl:when test="parent::style:style/@style:name">
         <xsl:value-of select="parent::style:style/@style:name"/>
       </xsl:when>
       <xsl:when test="self::text:list-item|self::text:list-header">
-        <xsl:value-of select="*[1][self::text:p]/@text:style-name"/>
+        <xsl:value-of select="*[1][self::text:p or self::text:h]/@text:style-name"/>
       </xsl:when>
       <xsl:when
         test="parent::text:list-header|self::text:p|self::text:h|self::text:list-level-style-number|self::text:outline-level-style">

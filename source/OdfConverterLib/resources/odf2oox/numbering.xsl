@@ -709,7 +709,7 @@
             </xsl:call-template>
           </xsl:variable>
           <xsl:variable name="listStyleName">
-            <xsl:call-template name="GetListStyleName">
+            <xsl:call-template name="GetLevelListStyleName">
               <xsl:with-param name="level" select="$level"/>
             </xsl:call-template>
           </xsl:variable>
@@ -819,7 +819,7 @@
   </xsl:template>
 
   <!-- find the list associated to a chapter level. Returns none if no list defined for current level. -->
-  <xsl:template name="GetListStyleName">
+  <xsl:template name="GetLevelListStyleName">
     <xsl:param name="level"/>
     <xsl:for-each select="document('content.xml')">
       <xsl:choose>
@@ -988,26 +988,12 @@
         </xsl:call-template>
       </xsl:variable>
       <!-- two cases for overriding numbering properties : we are in a list, or an outlined heading -->
-      <xsl:if test="ancestor-or-self::text:list or number($defaultOutlineLevel)">
+      <xsl:if test="ancestor-or-self::text:list or number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
         <xsl:variable name="listStyleName">
-          <xsl:choose>
-            <xsl:when test="key('styles',$styleName)/@style:list-style-name">
-              <xsl:value-of select="key('styles',$styleName)/@style:list-style-name"/>
-            </xsl:when>
-            <xsl:when test="number($defaultOutlineLevel)">
-              <xsl:for-each select="document('styles.xml')">
-                <xsl:choose>
-                  <xsl:when test="key('styles', $parentStyleName)/@style:list-style-name">
-                    <xsl:value-of select="key('styles',$parentStyleName)/@style:list-style-name"/>
-                  </xsl:when>
-                  <xsl:otherwise>outline-style</xsl:otherwise>
-                </xsl:choose>
-              </xsl:for-each>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="ancestor::text:list[@text:style-name][1]/@text:style-name"/>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:call-template name="GetListStyleName">
+            <xsl:with-param name="styleName" select="$styleName"/>
+            <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
+          </xsl:call-template>
         </xsl:variable>
 
         <!-- Indent to add to numbering values. -->
@@ -1033,12 +1019,44 @@
 
         <xsl:variable name="newLevel">
           <xsl:choose>
-            <xsl:when test="number($defaultOutlineLevel)">
-              <xsl:value-of select="$defaultOutlineLevel"/>
+            <xsl:when test="number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
+              <xsl:variable name="levelListSyle">
+                <xsl:call-template name="GetLevelListStyleName">
+                  <xsl:with-param name="level" select="$defaultOutlineLevel"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when
+                  test="$listStyleName != 'outline-style' and $levelListSyle != $listStyleName">
+                  <xsl:value-of select="$level"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$defaultOutlineLevel"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$level"/>
             </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="enforceOverride">
+          <xsl:choose>
+            <xsl:when test="number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
+              <!-- see if numbering style is overriden -->
+              <xsl:variable name="levelListSyle">
+                <xsl:call-template name="GetLevelListStyleName">
+                  <xsl:with-param name="level" select="$defaultOutlineLevel"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when
+                  test="$listStyleName != 'outline-style' and $levelListSyle != $listStyleName">true</xsl:when>
+                <xsl:otherwise>false</xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>false</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
 
@@ -1093,6 +1111,7 @@
             <xsl:call-template name="InsertTabStops">
               <xsl:with-param name="styleName" select="$styleName"/>
               <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
+              <xsl:with-param name="enforceOverride" select="$enforceOverride"/>
               <xsl:with-param name="addLeftIndent" select="$addLeftIndent"/>
               <xsl:with-param name="firstLineIndent" select="$firstLineIndent"/>
               <xsl:with-param name="displayedLevels" select="$displayedLevels"/>
@@ -1105,6 +1124,7 @@
             <xsl:if test="$property = 'indent' ">
               <xsl:call-template name="InsertIndent">
                 <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
+                <xsl:with-param name="enforceOverride" select="$enforceOverride"/>
                 <xsl:with-param name="addLeftIndent" select="$addLeftIndent"/>
                 <xsl:with-param name="addRightIndent" select="$addRightIndent"/>
                 <xsl:with-param name="firstLineIndent" select="$firstLineIndent"/>
@@ -1118,6 +1138,53 @@
 
       </xsl:if>
     </xsl:if>
+  </xsl:template>
+
+  <!-- Climb content and style hierarchy for a list style -->
+  <xsl:template name="GetListStyleName">
+    <xsl:param name="styleName"/>
+    <xsl:param name="defaultOutlineLevel"/>
+    <xsl:param name="context" select="'content.xml'"/>
+
+    <xsl:variable name="exists">
+      <xsl:for-each select="document($context)">
+        <xsl:value-of select="boolean(key('styles', $styleName))"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$exists = 'true' ">
+        <xsl:for-each select="document($context)">
+          <xsl:choose>
+            <xsl:when test="key('styles',$styleName)/@style:list-style-name">
+              <xsl:value-of select="key('styles',$styleName)/@style:list-style-name"/>
+            </xsl:when>
+            <xsl:when test="$context ='content.xml' and ancestor::text:list/@text:style-name">
+              <xsl:value-of select="ancestor::text:list[@text:style-name][1]/@text:style-name"/>
+            </xsl:when>
+            <!-- if no style to climb and outline is defined, use outline-style -->
+            <xsl:when
+              test="not(key('styles', $styleName)[1]/@style:parent-style-name) and (number($defaultOutlineLevel) or $defaultOutlineLevel = 0)"
+              >outline-style</xsl:when>
+            <xsl:otherwise>
+              <!-- climb style hierarchy -->
+              <xsl:call-template name="GetListStyleName">
+                <xsl:with-param name="styleName"
+                  select="key('styles', $styleName)[1]/@style:parent-style-name"/>
+                <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
+                <xsl:with-param name="context" select="$context"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="$context != 'styles.xml'">
+        <xsl:call-template name="GetListStyleName">
+          <xsl:with-param name="styleName" select="$styleName"/>
+          <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
+          <xsl:with-param name="context" select="'styles.xml'"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <!-- computes numbering indent which is applied in list paragraph properties -->
@@ -1178,6 +1245,7 @@
   <xsl:template name="InsertTabStops">
     <xsl:param name="styleName"/>
     <xsl:param name="defaultOutlineLevel"/>
+    <xsl:param name="enforceOverride">false</xsl:param>
     <xsl:param name="addLeftIndent"/>
     <xsl:param name="firstLineIndent"/>
     <xsl:param name="displayedLevels"/>
@@ -1187,8 +1255,8 @@
 
     <!-- Override tabs of numbered elements ('num' tabs) if additional value (left margin or first line indent) defined. -->
     <xsl:if
-      test="(number($defaultOutlineLevel)) or (not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())))">
-      <xsl:if test="$addLeftIndent != 0 or $firstLineIndent != 0">
+      test="(number($defaultOutlineLevel) or $defaultOutlineLevel = 0) or (not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())))">
+      <xsl:if test="$addLeftIndent != 0 or $firstLineIndent != 0 or $enforceOverride = 'true' ">
         <!--If @text:display-levels is defined and greater than 1, the tabs may not be well converted.-->
         <xsl:if test="not($displayedLevels &gt; 1) or $minLabelDistanceTwip &gt; 0">
           <w:tabs>
@@ -1312,6 +1380,7 @@
   <!-- Inserts paragraph indentation -->
   <xsl:template name="InsertIndent">
     <xsl:param name="defaultOutlineLevel"/>
+    <xsl:param name="enforceOverride">false</xsl:param>
     <xsl:param name="addLeftIndent"/>
     <xsl:param name="addRightIndent"/>
     <xsl:param name="firstLineIndent"/>
@@ -1324,8 +1393,9 @@
     <xsl:choose>
       <!-- List element with numbering, or outlined heading -->
       <xsl:when
-        test="(number($defaultOutlineLevel)) or (not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())))">
-        <xsl:if test="$addLeftIndent != 0 or $addRightIndent !=  0 or $firstLineIndent != 0">
+        test="(number($defaultOutlineLevel) or $defaultOutlineLevel = 0) or (not(ancestor-or-self::text:list-header) and (self::text:list-item or not(preceding-sibling::node())))">
+        <xsl:if
+          test="$addLeftIndent != 0 or $addRightIndent !=  0 or $firstLineIndent != 0 or $enforceOverride = 'true' ">
           <w:ind w:left="{$addLeftIndent + $spaceBeforeTwip + $minLabelWidthTwip}"
             w:right="{$addRightIndent}">
             <!-- first line and hanging indent -->
@@ -1480,10 +1550,10 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="number($defaultOutlineLevel)">
+      <xsl:when test="number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
         <!-- WARNING : this is not supposed to exist. It is due to a Word bug (cf bug #1604472) -->
         <w:numPr>
-          <w:ilvl w:val="{number($defaultOutlineLevel) - 1}"/>
+          <w:ilvl w:val="{$defaultOutlineLevel}"/>
           <w:numId w:val="1"/>
         </w:numPr>
         <!-- /WARNING -->
@@ -1515,7 +1585,10 @@
         <xsl:for-each select="document($context)">
           <xsl:choose>
             <xsl:when test="key('styles', $styleName)[1]/@style:default-outline-level">
-              <xsl:value-of select="key('styles', $styleName)[1]/@style:default-outline-level"/>
+              <xsl:variable name="lvl">
+                <xsl:value-of select="key('styles', $styleName)[1]/@style:default-outline-level"/>
+              </xsl:variable>
+              <xsl:value-of select="number($lvl) - 1"/>
             </xsl:when>
             <xsl:otherwise>
               <!-- do not climb more than one non-automatic-style -->

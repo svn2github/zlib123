@@ -628,7 +628,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="number($defaultOutlineLevel)">
+      <xsl:when test="number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
         <xsl:call-template name="OverrideNumberingProperty">
           <xsl:with-param name="level" select="$defaultOutlineLevel"/>
           <xsl:with-param name="property">indent</xsl:with-param>
