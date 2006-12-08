@@ -452,141 +452,152 @@
   
   <xsl:template name="InsertPageBorders">
     <xsl:choose>
-      <xsl:when test="w:pgBorders/w:top">
-        <xsl:variable name="type">
-          <xsl:choose>
-            <xsl:when test="w:pgBorders/w:top/@w:val = 'single'">
-              <xsl:text>solid</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>solid</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="sz">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pgBorders/w:top/@w:sz"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="color">
-          <!--   temporary  -->
-          <xsl:text>#000000</xsl:text>
-        </xsl:variable>
-        <xsl:attribute name="fo:border-top">
-          <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+      <xsl:when test="w:pgBorders/w:top/@w:shadow or w:pgBorders/w:left/@w:shadow or w:pgBorders/w:right/@w:shadow or w:pgBorders/w:bottom/@w:shadow">
+        <xsl:attribute name="style:shadow">
+          <xsl:text>#000000 0.049cm 0.049cm</xsl:text>
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:attribute name="fo:border-top">
-          <xsl:text>none</xsl:text>
-        </xsl:attribute>
+        <xsl:choose>
+          <xsl:when test="w:pgBorders/w:top">
+            <xsl:variable name="type">
+              <xsl:choose>
+                <xsl:when test="w:pgBorders/w:top/@w:val = 'single'">
+                  <xsl:text>solid</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>solid</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:variable name="sz">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pgBorders/w:top/@w:sz"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="color">
+              <!--   temporary  -->
+              <xsl:text>#000000</xsl:text>
+            </xsl:variable>
+            <xsl:attribute name="fo:border-top">
+              <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:border-top">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="w:pgBorders/w:left">
+            <xsl:variable name="type">
+              <xsl:choose>
+                <xsl:when test="w:pgBorders/w:left/@w:val = 'single'">
+                  <xsl:text>solid</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>solid</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:variable name="sz">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pgBorders/w:left/@w:sz"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="color">
+              <!--   temporary  -->
+              <xsl:text>#000000</xsl:text>
+            </xsl:variable>
+            <xsl:attribute name="fo:border-left">
+              <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:border-left">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="w:pgBorders/w:right">
+            <xsl:variable name="type">
+              <xsl:choose>
+                <xsl:when test="w:pgBorders/w:right/@w:val = 'single'">
+                  <xsl:text>solid</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>solid</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:variable name="sz">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pgBorders/w:right/@w:sz"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="color">
+              <!--   temporary  -->
+              <xsl:text>#000000</xsl:text>
+            </xsl:variable>
+            <xsl:attribute name="fo:border-right">
+              <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:border-right">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="w:pgBorders/w:bottom">
+            <xsl:variable name="type">
+              <xsl:choose>
+                <xsl:when test="w:pgBorders/w:bottom/@w:val = 'single'">
+                  <xsl:text>solid</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>solid</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:variable name="sz">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="w:pgBorders/w:bottom/@w:sz"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="color">
+              <!--   temporary  -->
+              <xsl:text>#000000</xsl:text>
+            </xsl:variable>
+            <xsl:attribute name="fo:border-bottom">
+              <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:border-bottom">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:choose>
-      <xsl:when test="w:pgBorders/w:left">
-        <xsl:variable name="type">
-          <xsl:choose>
-            <xsl:when test="w:pgBorders/w:left/@w:val = 'single'">
-              <xsl:text>solid</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>solid</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="sz">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pgBorders/w:left/@w:sz"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="color">
-          <!--   temporary  -->
-          <xsl:text>#000000</xsl:text>
-        </xsl:variable>
-        <xsl:attribute name="fo:border-left">
-          <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="fo:border-left">
-          <xsl:text>none</xsl:text>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:choose>
-      <xsl:when test="w:pgBorders/w:right">
-        <xsl:variable name="type">
-          <xsl:choose>
-            <xsl:when test="w:pgBorders/w:right/@w:val = 'single'">
-              <xsl:text>solid</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>solid</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="sz">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pgBorders/w:right/@w:sz"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="color">
-          <!--   temporary  -->
-          <xsl:text>#000000</xsl:text>
-        </xsl:variable>
-        <xsl:attribute name="fo:border-right">
-          <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="fo:border-right">
-          <xsl:text>none</xsl:text>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:choose>
-      <xsl:when test="w:pgBorders/w:bottom">
-        <xsl:variable name="type">
-          <xsl:choose>
-            <xsl:when test="w:pgBorders/w:bottom/@w:val = 'single'">
-              <xsl:text>solid</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>solid</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="sz">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="w:pgBorders/w:bottom/@w:sz"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="color">
-          <!--   temporary  -->
-          <xsl:text>#000000</xsl:text>
-        </xsl:variable>
-        <xsl:attribute name="fo:border-bottom">
-          <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="fo:border-bottom">
-          <xsl:text>none</xsl:text>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
+    
+    
   </xsl:template>
   
   
