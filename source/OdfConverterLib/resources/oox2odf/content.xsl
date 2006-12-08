@@ -80,8 +80,8 @@
   
   <!--  generates automatic styles for sections-->
   <xsl:template name="InsertSectionsStyles">
-    <xsl:if test="w:sectPr">
-      <xsl:apply-templates select="w:sectPr" mode="automaticstyles"/>
+    <xsl:if test="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
+      <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr" mode="automaticstyles"/>
     </xsl:if>
   </xsl:template>
   

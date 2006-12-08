@@ -452,6 +452,9 @@
             <xsl:when test=" $relativeFrom = 'line'  and $align= 'bottom' ">
               <xsl:text>top</xsl:text>
             </xsl:when>
+            <xsl:when test=" $relativeFrom = 'line'  and $align= 'top' ">
+              <xsl:text>bottom</xsl:text>
+            </xsl:when>
             <!--default rules-->
             <xsl:when test="$align = 'top' ">
               <xsl:text>top</xsl:text>
