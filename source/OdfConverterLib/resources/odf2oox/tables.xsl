@@ -473,7 +473,7 @@
     <xsl:if test="@table:style-name">
       <xsl:variable name="rowProp"
         select="key('automatic-styles',@table:style-name)/style:table-row-properties"/>
-      <xsl:variable name="widthRow">
+      <xsl:variable name="rowHeight">
         <xsl:choose>
           <xsl:when test="$rowProp[@style:row-height]">
             <xsl:value-of select="$rowProp/@style:row-height"/>
@@ -485,10 +485,21 @@
         </xsl:choose>
       </xsl:variable>
       <w:trHeight>
-        <xsl:attribute name="w:val">
-          <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="$widthRow"/>
+        <!-- get number value of height to check if row height is not negative. -->
+        <xsl:variable name="checkRowHeight">
+          <xsl:call-template name="GetValue">
+            <xsl:with-param name="length" select="$rowHeight"/>
           </xsl:call-template>
+        </xsl:variable>
+        <xsl:attribute name="w:val">
+          <xsl:choose>
+            <xsl:when test="number($checkRowHeight) &lt; 0">0</xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="$rowHeight"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
         <xsl:attribute name="w:hRule">
           <xsl:choose>

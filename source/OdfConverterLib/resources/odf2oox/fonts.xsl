@@ -46,67 +46,71 @@
 
   <!-- Make sure we manage all cases -->
   <xsl:template match="style:font-face" mode="fonts">
-    <w:font>
-      <!-- Make sur the 'x-symbol' charset is always '02' and the asian and complex charset are not control -->
-      <xsl:choose>
-        <!-- particular case -->
-        <xsl:when test="@svg:font-family = 'StarSymbol' ">
-          <xsl:attribute name="w:name">Symbol</xsl:attribute>
-        </xsl:when>
-        <!-- take value of font-family if it exists -->
-        <xsl:when test="@svg:font-family">
-          <xsl:variable name="fontFamily">
-            <xsl:value-of
-              select="translate(@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
-            />
-          </xsl:variable>
-          <xsl:choose>
-            <!-- take only first font of list (svg:font-family="font1, font2, font3 ...") -->
-            <xsl:when test="contains($fontFamily, ',')">
-              <xsl:attribute name="w:name">
-                <xsl:value-of select="substring-before($fontFamily, ',')"/>
-              </xsl:attribute>
-              <w:altName w:val="{substring-after($fontFamily, ',')}"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:attribute name="w:name">
-                <xsl:value-of select="$fontFamily"/>
-              </xsl:attribute>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <!-- if no other possibility -->
-        <xsl:otherwise>
-          <xsl:attribute name="w:name">
-            <xsl:value-of select="@style:name"/>
-          </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
+    <!-- check if style has a consistent name -->
+    <xsl:if test="not(@style:name = '' and @svg:font-family = '')">
+      <w:font>
+        <!-- Make sur the 'x-symbol' charset is always '02' and the asian and complex charset are not control -->
+        <xsl:choose>
+          <!-- particular case -->
+          <xsl:when test="@svg:font-family = 'StarSymbol' ">
+            <xsl:attribute name="w:name">Symbol</xsl:attribute>
+          </xsl:when>
+          <!-- take value of font-family if it exists -->
+          <xsl:when
+            test="@svg:font-family and not(translate(@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)) = '' ">
+            <xsl:variable name="fontFamily">
+              <xsl:value-of
+                select="translate(@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
+              />
+            </xsl:variable>
+            <xsl:choose>
+              <!-- take only first font of list (svg:font-family="font1, font2, font3 ...") -->
+              <xsl:when test="contains($fontFamily, ',')">
+                <xsl:attribute name="w:name">
+                  <xsl:value-of select="substring-before($fontFamily, ',')"/>
+                </xsl:attribute>
+                <w:altName w:val="{substring-after($fontFamily, ',')}"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="w:name">
+                  <xsl:value-of select="$fontFamily"/>
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <!-- if no other possibility -->
+          <xsl:otherwise>
+            <xsl:attribute name="w:name">
+              <xsl:value-of select="@style:name"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
 
-      <xsl:choose>
-        <xsl:when test="@style:font-charset = 'x-symbol'">
-          <w:charset w:val="02"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <w:charset w:val="00"/>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:choose>
+        <xsl:choose>
+          <xsl:when test="@style:font-charset = 'x-symbol'">
+            <w:charset w:val="02"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <w:charset w:val="00"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
 
-        <!-- open xml don't know the attribute filed system : replace with auto -->
-        <xsl:when test="@style:font-family-generic='system'">
-          <w:family w:val="auto"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:if test="@style:font-family-generic">
-            <w:family w:val="{@style:font-family-generic}"/>
-          </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:if test="@style:font-pitch">
-        <w:pitch w:val="{@style:font-pitch}"/>
-      </xsl:if>
-    </w:font>
+          <!-- open xml don't know the attribute filed system : replace with auto -->
+          <xsl:when test="@style:font-family-generic='system'">
+            <w:family w:val="auto"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="@style:font-family-generic">
+              <w:family w:val="{@style:font-family-generic}"/>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:if test="@style:font-pitch">
+          <w:pitch w:val="{@style:font-pitch}"/>
+        </xsl:if>
+      </w:font>
+    </xsl:if>
   </xsl:template>
 
   <!-- Map font types -->
