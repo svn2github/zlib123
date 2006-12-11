@@ -930,18 +930,15 @@
   <!-- Hidden sections -->
   <xsl:template match="text:section[@text:display = 'none' ]" priority="3">
     <xsl:message terminate="no">feedback:Hidden section</xsl:message>
-    <!--PRIORITY>3 (text:display='none')</PRIORITY-->
   </xsl:template>
 
   <!-- Conditional hidden sections -->
   <xsl:template match="text:section[@text:is-hidden = 'true' ]" priority="3">
     <xsl:message terminate="no">feedback:Conditional hidden section</xsl:message>
-    <!--PRIORITY>3 (text:is-hidden='true')</PRIORITY-->
   </xsl:template>
 
   <!-- Protected sections -->
   <xsl:template match="text:section[@text:protected = 'true' ]" priority="2">
-    <!--PRIORITY>2 (text:protected='true')</PRIORITY-->
     <xsl:if test="@text:protection-key">
       <xsl:message terminate="no">feedback:Protection key for<xsl:value-of select="@text:name"
       /></xsl:message>
@@ -965,7 +962,6 @@
   <xsl:template
     match="text:section[key('automatic-styles', @text:style-name)[1]/style:section-properties/@style:editable = 'true']"
     priority="1">
-    <!--PRIORITY>1 (style:editable='true')</PRIORITY-->
     <!--  in a read-only document : grant permission -->
     <xsl:choose>
       <xsl:when test="boolean($load-readonly)">
@@ -982,7 +978,6 @@
 
   <!-- Basic sections -->
   <xsl:template match="text:section">
-    <!-- PRIORITY>0</PRIORITY-->
     <xsl:choose>
       <xsl:when test="$protected-sections[1] and not(boolean($load-readonly))">
         <w:permStart w:edGrp="everyone"/>
