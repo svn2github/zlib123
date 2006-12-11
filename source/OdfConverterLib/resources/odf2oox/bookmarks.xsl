@@ -142,7 +142,9 @@
         </xsl:call-template>
       </xsl:attribute>
       <xsl:attribute name="w:name">
-        <xsl:value-of select="@text:name"/>
+        <xsl:call-template name="SuppressForbiddenChars">
+          <xsl:with-param name="string" select="@text:name"/>
+        </xsl:call-template>
       </xsl:attribute>
     </w:bookmarkStart>
     <xsl:if test="name()='text:bookmark'">
@@ -233,14 +235,9 @@
           />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when test="contains($TextName,' ' )">
-              <xsl:value-of select="translate($TextName,' ','_')"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$TextName"/>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:call-template name="SuppressForbiddenChars">
+            <xsl:with-param name="string" select="$TextName"/>
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </w:instrText>
@@ -399,6 +396,56 @@
     <w:bookmarkEnd w:id="{$id}"/>
   </xsl:template>
 
+
+  <!-- compute a string to get an acceptable sting in OOX -->
+  <xsl:template name="SuppressForbiddenChars">
+    <xsl:param name="string"/>
+
+    <xsl:variable name="newString">
+      <xsl:choose>
+        <xsl:when test="contains($string, ' ')">
+          <xsl:value-of select="translate($string, ' ', '_')"/>
+        </xsl:when>
+        <xsl:when test="contains($string, ',')">
+          <xsl:value-of select="translate($string, ',', '')"/>
+        </xsl:when>
+        <xsl:when test="contains($string, '?')">
+          <xsl:value-of select="translate($string, '?', '')"/>
+        </xsl:when>
+        <xsl:when test="contains($string, ';')">
+          <xsl:value-of select="translate($string, ';', '')"/>
+        </xsl:when>
+        <xsl:when test="contains($string, '.')">
+          <xsl:value-of select="translate($string, '.', '')"/>
+        </xsl:when>
+        <xsl:when test="contains($string, ':')">
+          <xsl:value-of select="translate($string, ':', '')"/>
+        </xsl:when>
+        <xsl:when test="contains($string, '/')">
+          <xsl:value-of select="translate($string, '/', '')"/>
+        </xsl:when>
+        <xsl:when test="contains($string, '!')">
+          <xsl:value-of select="translate($string, '!', '')"/>
+        </xsl:when>
+        <xsl:when test="contains($string, '§')">
+          <xsl:value-of select="translate($string, '§', '')"/>
+        </xsl:when>
+        <xsl:otherwise>clean</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$newString = 'clean' ">
+        <xsl:value-of select="$string"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="SuppressForbiddenChars">
+          <xsl:with-param name="string" select="$newString"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
 
 
 </xsl:stylesheet>

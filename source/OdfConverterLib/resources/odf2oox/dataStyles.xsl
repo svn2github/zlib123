@@ -33,7 +33,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   exclude-result-prefixes="style text office number">
-  
+
 
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
 
@@ -383,7 +383,7 @@
     <xsl:if test="@text:outline-level">
       <!-- COMMENT : if the style changes name in the application, it may not be found and cause an error. -->
       <xsl:message terminate="no">feedback:Chapter field (if style not defined)</xsl:message>
-      
+
       <xsl:variable name="outline-level" select="@text:outline-level"/>
       <!-- find the style to match -->
       <xsl:variable name="style">
@@ -419,43 +419,44 @@
           </xsl:choose>
         </xsl:for-each>
       </xsl:variable>
-    
+
       <!-- if field displays number, find number associated to style. -->
-    <xsl:if test="contains(@text:display, 'number')">
-      <w:fldSimple>
-        <xsl:attribute name="w:instr">
-          <xsl:choose>
-            <xsl:when test="@text:display = 'plain-number' ">
-              <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \n \t ')"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \n ')"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <w:r>
-          <w:rPr>
-            <w:noProof/>
-          </w:rPr>
-          <xsl:apply-templates mode="text"/>
-        </w:r>
-      </w:fldSimple>
-    </xsl:if>
-      
-    <!-- if field displays name, convert into a reference to default heading style. -->
-    <xsl:if test="contains(@text:display, 'name')">
-      <w:fldSimple>
-        <xsl:attribute name="w:instr">
-          <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \* MERGEFORMAT')"/>
-        </xsl:attribute>
-        <w:r>
-          <w:rPr>
-            <w:noProof/>
-          </w:rPr>
-          <xsl:apply-templates mode="text"/>
-        </w:r>
-      </w:fldSimple>
-    </xsl:if>
+      <xsl:if test="contains(@text:display, 'number')">
+        <w:fldSimple>
+          <xsl:attribute name="w:instr">
+            <xsl:choose>
+              <xsl:when test="@text:display = 'plain-number' ">
+                <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \n \t ')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \n ')"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <w:r>
+            <w:rPr>
+              <w:noProof/>
+            </w:rPr>
+            <xsl:apply-templates mode="text"/>
+          </w:r>
+        </w:fldSimple>
+      </xsl:if>
+
+      <!-- if field displays name, convert into a reference to default heading style. -->
+      <xsl:if test="contains(@text:display, 'name')">
+        <w:fldSimple>
+          <xsl:attribute name="w:instr">
+            <xsl:value-of select="concat('STYLEREF &quot;',$style,'&quot; \* MERGEFORMAT')"
+            />
+          </xsl:attribute>
+          <w:r>
+            <w:rPr>
+              <w:noProof/>
+            </w:rPr>
+            <xsl:apply-templates mode="text"/>
+          </w:r>
+        </w:fldSimple>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
@@ -476,6 +477,81 @@
     </w:fldSimple>
   </xsl:template>
 
+  <!-- variable : set value -->
+  <xsl:template match="text:variable-set" mode="paragraph">
+    <xsl:variable name="varName">
+      <xsl:call-template name="SuppressForbiddenChars">
+        <xsl:with-param name="string" select="@text:name"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <w:r>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r>
+      <w:instrText xml:space="preserve"> SET </w:instrText>
+      <w:instrText>
+        <xsl:value-of select="$varName"/>
+      </w:instrText>
+      <w:instrText xml:space="preserve"> "</w:instrText>
+      <w:instrText>
+        <xsl:choose>
+          <xsl:when
+            test="(@office:value-type = 'float' or @office:value-type = 'percentage') and @office:value">
+            <xsl:value-of select="@office:value"/>
+          </xsl:when>
+          <xsl:when test="@office:value-type = 'currency' and (@office:value and @office:currency)">
+            <xsl:value-of select="concat(@office:value, @office:currency)"/>
+          </xsl:when>
+          <xsl:when test="@office:value-type = 'date' and @office:date-value">
+            <xsl:value-of select="@office:date-value"/>
+          </xsl:when>
+          <xsl:when test="@office:value-type = 'time' and @office:time-value">
+            <xsl:value-of select="@office:time-value"/>
+          </xsl:when>
+          <xsl:when test="@office:value-type = 'boolean' and @office:boolean-value">
+            <xsl:value-of select="@office:boolean-value"/>
+          </xsl:when>
+          <xsl:when test="@office:value-type = 'string' and @office:string-value">
+            <xsl:value-of select="@office:string-value"/>
+          </xsl:when>
+          <xsl:when test="@office:value-type = 'string' and @office:string-value">
+            <xsl:value-of select="@office:string-value"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="child::text()"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </w:instrText>
+      <w:instrText xml:space="preserve">" \* MERGEFORMAT </w:instrText>
+    </w:r>
+    <w:r>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
+    <xsl:if test="not(@text:display='none')">
+      <w:fldSimple w:instr="{concat(' REF &quot;', $varName, '&quot; ')}">
+        <w:r>
+          <xsl:apply-templates mode="text"/>
+        </w:r>
+      </w:fldSimple>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- variable : get value -->
+  <xsl:template match="text:variable-get" mode="paragraph">
+    <xsl:variable name="varName">
+      <xsl:call-template name="SuppressForbiddenChars">
+        <xsl:with-param name="string" select="@text:name"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:if test="not(@text:display='none')">
+      <w:fldSimple w:instr="{concat(' REF &quot;', $varName, '&quot; ')}">
+        <w:r>
+          <xsl:apply-templates mode="text"/>
+        </w:r>
+      </w:fldSimple>
+    </xsl:if>
+  </xsl:template>
+
   <!-- report lost fields -->
   <xsl:template match="text:description" mode="paragraph">
     <xsl:message terminate="no">feedback:description field</xsl:message>
@@ -485,7 +561,7 @@
     <xsl:message terminate="no">feedback:Printed-by field</xsl:message>
   </xsl:template>
 
-  
+
   <xsl:template name="InsertLanguage">
     <xsl:choose>
       <xsl:when test="$default-language">
@@ -496,6 +572,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
+
+
 </xsl:stylesheet>
