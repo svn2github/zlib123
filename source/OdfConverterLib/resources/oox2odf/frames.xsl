@@ -283,10 +283,20 @@
           </xsl:call-template>
         </xsl:variable>
         <xsl:attribute name="svg:width">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="length" select="$width"/>
-            <xsl:with-param name="destUnit" select="'cm'"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="$width = 0 and $shape//@o:hr='t'">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length" select="following::w:pgSz[1]/@w:w - following::w:pgMar/@w:right[1] - following::w:pgMar/@w:left[1]"/>
+                  <xsl:with-param name="unit" select="'cm'"/>                
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="$width"/>
+                <xsl:with-param name="destUnit" select="'cm'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
       </xsl:when>
     </xsl:choose>
