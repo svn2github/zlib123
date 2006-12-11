@@ -68,8 +68,8 @@ Home;Font;Font;Font type;Selected font;;0;0.2-Final ;Completed;;;
 ;;;Shading;Fill;Selected fill color;2;-;;not supported in ODF;;
 ;;;;Patterns;Selected style;2;-;;not supported in ODF;;
 ;;;;;;;;;;;
-;;Horizontal Line;Selected Line;;;1;0.3-M2;;;;
-;;;Imported line;;;1;0.3-M2;;;;
+;;Horizontal Line;Selected Line;;;1;0.3-M2;Completed;;;
+;;;Imported line;;;1;0.3-M2;Completed;;;
 ;;;;;;;;;;;
 ;;Bullets;Bullets;Bullets library;;1;0.2-Final ;Partial;;;TODO only few types of bullets are converted
 ;;;;Define new bullet;Symbol;1;1.0;;;;
