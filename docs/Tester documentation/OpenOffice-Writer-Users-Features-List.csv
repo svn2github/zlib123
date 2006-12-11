@@ -287,7 +287,7 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 ;;;Length;;0;0.2-M1;Completed;;19,244
 ;;;Width;;0;0.2-M1;Completed;;19,244
 
-;Audio / Video;;;;;0.3-Final;;;;"Via ""insert object"""
+;Audio / Video;;;;;Delayed;;;;Objects are not embedded in OO. In Word, objects have to be embedded in binary format (*.bin)
 
 ;Object;;Ole object;;1;0.2-M2;Completed;;245;
 ;;;Plugin;;;Delayed;;;;
@@ -585,13 +585,13 @@ Tools;Word Count;;;;;0.3-Final;Completed;;;Word a,d OO do not count the same way
 1534346 Unable to convert doc that Open Office Writer can open;;;;;;0.3-Final;;;
 1533811 Perf/Load issue: Crash while converting a BIG .odt file;;;;;;0.3-Final;;;
 1524483 The gridlines of the table are not displayed after import;;;;;;0.3-M2;;;
-1542566 Special symbols are printed in reverse after import.;;;;;;0.3-M2;;;
+1542566 Special symbols are printed in reverse after import.;;;;;;0.3-M2;Completed;;
 1536829 Document version information is lost on import;;;;;;0.3-M2;;;
 1547805 ODF option still exists after unistallation of Plug-in;;;;;;1.0;;;
-1549293 Multi columned A.I is converted as single columned A.I.;;;;;;0.3-M2;;;
+1549293 Multi columned A.I is converted as single columned A.I.;;;;;;0.3-M2;Completed;;
 1556149 Spacing-Above b/w the section and paragraph text is wrongly imported;;;;;;-;;;
 1559078 Parallel installation not throwing error message;;;;;;1.0;
-1585789 Textbox is going out of page when rotated.;;;;;;0.3-M2;
+1585789 Textbox is going out of page when rotated.;;;;;;0.3-M2;Completed
 1599716 Drop Cap is not properly retained after import.;;;;;;0.3-M2;Completed
 1587812 TrackChanges: empty table in original;;;;;;0.3-M2;
-1584253 Wrong positioned frame covers content;;;;;;0.3-M2;
+1584253 Wrong positioned frame covers content;;;;;;0.3-M2;Completed
