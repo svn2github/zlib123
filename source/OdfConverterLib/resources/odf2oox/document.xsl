@@ -368,8 +368,7 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- Insert spacing in paragraph properties if table before/after w:p element has spacing after/before -->
-  <!-- Suppress spacing before/after in tables if corresponding setting enabled -->
+  <!-- override spacing properties -->
   <xsl:template name="InsertParagraphSpacing">
     <xsl:choose>
       <xsl:when test="ancestor::table:table">
@@ -377,6 +376,7 @@
           test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false'
           or document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaSpacingToTableCells']/text()='false' ">
           <w:spacing>
+            <!-- Suppress spacing before/after in tables if corresponding setting enabled -->
             <xsl:if
               test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false' ">
               <xsl:if test="not(preceding-sibling::node())">
@@ -403,8 +403,23 @@
         </xsl:if>
       </xsl:when>
       <xsl:otherwise>
+        <!-- check if para is first of page -->
+        <xsl:variable name="isFirstOfPage">
+          <xsl:call-template name="GetBreakBeforeProperty">
+            <xsl:with-param name="style-name" select="@text:style-name"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <!-- override space before to 0 if required -->
+        <xsl:variable name="OverrideSpaceBefore">
+          <xsl:if
+            test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false' ">
+            <xsl:if test="$isFirstOfPage = 'true' ">0</xsl:if>
+          </xsl:if>
+        </xsl:variable>
+        <!-- Insert spacing in paragraph properties if table before/after w:p element has spacing after/before -->
         <xsl:if
-          test="following-sibling::node()[1][name()='table:table'] or preceding-sibling::node()[1][name()='table:table']">
+          test="($isFirstOfPage and document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false' )
+          or following-sibling::node()[1][name()='table:table'] or preceding-sibling::node()[1][name()='table:table']">
           <!-- Compute space after -->
           <xsl:variable name="spaceAfter">
             <xsl:call-template name="CompareSpacingValues">
@@ -420,13 +435,21 @@
             </xsl:call-template>
           </xsl:variable>
           <!-- override if needed -->
-          <xsl:if test="$spaceBefore &gt; 0 or $spaceAfter &gt; 0">
+          <xsl:if
+            test="$OverrideSpaceBefore = 0 or $spaceBefore &gt; 0 or $spaceAfter &gt; 0">
             <w:spacing>
-              <xsl:if test="$spaceBefore &gt; 0">
-                <xsl:attribute name="w:before">
-                  <xsl:value-of select="$spaceBefore"/>
-                </xsl:attribute>
-              </xsl:if>
+              <xsl:choose>
+                <xsl:when test="$OverrideSpaceBefore = 0">
+                  <xsl:attribute name="w:before">0</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:if test="$spaceBefore &gt; 0">
+                    <xsl:attribute name="w:before">
+                      <xsl:value-of select="$spaceBefore"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                </xsl:otherwise>
+              </xsl:choose>
               <xsl:if test="$spaceAfter &gt; 0">
                 <xsl:attribute name="w:after">
                   <xsl:value-of select="$spaceAfter"/>
@@ -440,7 +463,42 @@
   </xsl:template>
 
 
+  <!-- Climb style hierarchy for a property -->
+  <xsl:template name="GetBreakBeforeProperty">
+    <xsl:param name="style-name"/>
+    <xsl:param name="context">content.xml</xsl:param>
 
+    <xsl:variable name="exists">
+      <xsl:for-each select="document($context)">
+        <xsl:value-of select="boolean(key('styles', $style-name))"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$exists = 'true' ">
+        <xsl:for-each select="document($context)">
+          <xsl:variable name="style" select="key('styles', $style-name)[1]"/>
+          <xsl:choose>
+            <xsl:when test="$style/style:paragraph-properties/@fo:break-before = 'page' ">true</xsl:when>
+            <xsl:when test="$style/@style:master-page-name != '' ">true</xsl:when>
+            <xsl:when test="$style/@style:parent-style-name">
+              <xsl:call-template name="GetBreakBeforeProperty">
+                <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
+                <xsl:with-param name="context" select="$context"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>false</xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- switch the context, let's look into styles.xml -->
+      <xsl:when test="$context != 'styles.xml'">
+        <xsl:call-template name="GetBreakBeforeProperty">
+          <xsl:with-param name="style-name" select="$style-name"/>
+          <xsl:with-param name="context" select="'styles.xml'"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 
 
 
