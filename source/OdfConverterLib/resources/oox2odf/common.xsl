@@ -403,8 +403,11 @@
           <xsl:when test="$color = 'red'">
             <xsl:text>#ff0000</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'black'">
+          <xsl:when test="$color = 'black' or contains($color,'black')">
             <xsl:text>#000000</xsl:text>
+          </xsl:when>
+          <xsl:when test="$color='yellow'">
+            <xsl:text>#ffff00</xsl:text>
           </xsl:when>
           <xsl:when test="$color = 'navy'">
             <xsl:text>#000080</xsl:text>
