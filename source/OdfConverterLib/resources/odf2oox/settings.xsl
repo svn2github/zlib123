@@ -36,6 +36,14 @@
   xmlns:ooo="http://openoffice.org/2004/office"
   exclude-result-prefixes="office fo style config ooo text">
 
+  
+  <xsl:variable name="configuration-settings"
+    select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']"/>
+  <!-- read only configuration setting -->
+  <xsl:variable name="load-readonly"
+    select="$configuration-settings/config:config-item[@config:name='LoadReadonly' and @config:type='boolean'] = 'true'"/>
+  
+  
   <xsl:template name="InsertSettings">
     <w:settings>
       <!-- view layout -->
@@ -68,7 +76,7 @@
       </xsl:if>
       
       <!-- document protection -->
-      <xsl:if test="$protected-sections[1]">
+      <xsl:if test="$protected-sections[1] or boolean($load-readonly)">
         <w:documentProtection w:edit="readOnly" w:enforcement="1"/>
       </xsl:if>
 
@@ -120,7 +128,7 @@
           <xsl:attribute name="w:val">
             <xsl:choose>
               <xsl:when
-                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false'">
+                test="$configuration-settings/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false'">
                 <xsl:message terminate="no">feedback:Spacing at top of page/table</xsl:message>
                 <xsl:value-of select="'true'"/>
               </xsl:when>
@@ -134,7 +142,7 @@
           <xsl:attribute name="w:val">
             <xsl:choose>
               <xsl:when
-                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name='ooo:configuration-settings']/config:config-item[@config:name='AddParaTableSpacing']/text()='false'">
+                test="$configuration-settings/config:config-item[@config:name='AddParaTableSpacing']/text()='false'">
                 <xsl:value-of select="'false'"/>
               </xsl:when>
               <xsl:otherwise>

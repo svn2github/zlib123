@@ -55,11 +55,14 @@
     match="text:list[text:list-item/@text:start-value and @text:style-name]" use="''"/>
 
 
+  <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
   <!-- key to find hyperlinks with a particular style. -->
   <xsl:key name="style-modified-hyperlinks" match="text:a" use="text:span/@text:style-name"/>
+  <!-- protected sections -->
+  <xsl:variable name="protected-sections"
+    select="document('content.xml')/office:document-content/office:body//text:section[@text:protected='true']"/>
 
 
-  <xsl:variable name="body" select="document('content.xml')/office:document-content/office:body"/>
   <!-- table of content count -->
   <xsl:variable name="tocCount" select="count($body//text:table-of-content)"/>
 
@@ -81,12 +84,17 @@
   <!-- document body -->
   <xsl:template match="office:body">
     <w:body>
-      <xsl:if test="$protected-sections[1]">
+      <!-- read-write odf document with protected sections : 
+        the whole openxml document is made readonly and permissions are granted everywhere,
+        but on protected section -->
+      <!-- read-only odf document : 
+        the whole openxml document is made readonly and permissions are granted on editable sections -->
+      <xsl:if test="not(boolean($load-readonly)) and $protected-sections[1]">
         <!-- permission range id's added in a post processing step -->
         <w:permStart w:edGrp="everyone"/>
       </xsl:if>
       <xsl:apply-templates/>
-      <xsl:if test="$protected-sections[1]">
+      <xsl:if test="not(boolean($load-readonly)) and $protected-sections[1]">
         <w:permEnd/>
       </xsl:if>
       <xsl:call-template name="InsertDocumentFinalSectionProperties"/>
@@ -918,24 +926,68 @@
     </w:fldSimple>
   </xsl:template>
 
+  <!-- Sections -->
+  <!-- Hidden sections -->
+  <xsl:template match="text:section[@text:display = 'none' ]" priority="3">
+    <xsl:message terminate="no">feedback:Hidden section</xsl:message>
+    <!--PRIORITY>3 (text:display='none')</PRIORITY-->
+  </xsl:template>
 
-  <!-- sections -->
-  <xsl:template match="text:section">
+  <!-- Conditional hidden sections -->
+  <xsl:template match="text:section[@text:is-hidden = 'true' ]" priority="3">
+    <xsl:message terminate="no">feedback:Conditional hidden section</xsl:message>
+    <!--PRIORITY>3 (text:is-hidden='true')</PRIORITY-->
+  </xsl:template>
+
+  <!-- Protected sections -->
+  <xsl:template match="text:section[@text:protected = 'true' ]" priority="2">
+    <!--PRIORITY>2 (text:protected='true')</PRIORITY-->
+    <xsl:if test="@text:protection-key">
+      <xsl:message terminate="no">feedback:Protection key for<xsl:value-of select="@text:name"
+      /></xsl:message>
+    </xsl:if>
     <xsl:choose>
-      <xsl:when test="@text:display= 'none' ">
-        <xsl:message terminate="no">feedback:Hidden section</xsl:message>
+      <!-- in a read-only odf document : grant permission not needed -->
+      <xsl:when test="boolean($load-readonly)">
+        <xsl:apply-templates/>
       </xsl:when>
-      <xsl:when test="@text:is-hidden = 'true' ">
-        <xsl:message terminate="no">feedback:Conditional hidden section</xsl:message>
-      </xsl:when>
-      <xsl:when test="@text:protected = 'true' ">
-        <xsl:if test="@text:protection-key">
-          <xsl:message terminate="no">feedback:Protection key for<xsl:value-of select="@text:name"/></xsl:message>
-        </xsl:if>
+      <!-- in a read-write odf document -->
+      <xsl:otherwise>
         <!-- permission range id's added in a post processing step -->
         <w:permEnd/>
         <xsl:apply-templates/>
         <w:permStart w:edGrp="everyone"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Editable sections -->
+  <xsl:template
+    match="text:section[key('automatic-styles', @text:style-name)[1]/style:section-properties/@style:editable = 'true']"
+    priority="1">
+    <!--PRIORITY>1 (style:editable='true')</PRIORITY-->
+    <!--  in a read-only document : grant permission -->
+    <xsl:choose>
+      <xsl:when test="boolean($load-readonly)">
+        <!-- permission range id's added in a post processing step -->
+        <w:permStart w:edGrp="everyone"/>
+        <xsl:apply-templates/>
+        <w:permEnd/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- Basic sections -->
+  <xsl:template match="text:section">
+    <!-- PRIORITY>0</PRIORITY-->
+    <xsl:choose>
+      <xsl:when test="$protected-sections[1] and not(boolean($load-readonly))">
+        <w:permStart w:edGrp="everyone"/>
+        <xsl:apply-templates/>
+        <w:permEnd/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates/>

@@ -62,8 +62,6 @@
     select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[1]"/>
   <!-- The very first text element -->
   <xsl:variable name="first-elt" select="$elts[1]"/>
-  <xsl:variable name="protected-sections" 
-    select="document('content.xml')/office:document-content/office:body//text:section[@text:protected='true']"/>
 
 
 
