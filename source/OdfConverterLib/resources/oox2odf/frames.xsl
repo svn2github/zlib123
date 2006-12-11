@@ -226,7 +226,7 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="not($shape/v:textbox/@style)">
+        <xsl:if test="not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t')) ">
           <xsl:attribute name="svg:height">
             <xsl:call-template name="ConvertMeasure">
               <xsl:with-param name="length" select="$height"/>
@@ -381,7 +381,7 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeProperties">
-    <!--TODO automatic style content-->
+    <!--XXX TODO automatic style content-->
     <xsl:choose>
       <xsl:when test="v:rect">
         <xsl:call-template name="InsertShapeWrap"/>
@@ -410,15 +410,25 @@
       <xsl:otherwise>
         <xsl:call-template name="InsertShapeWrap"/>
         <xsl:call-template name="InsertShapeFromTextDistance"/>
-        <xsl:call-template name="InsertTextBoxPadding"/>
         <xsl:call-template name="InsertShapeBorders"/>
         <xsl:call-template name="InsertShapeAutomaticWidth"/>
         <xsl:call-template name="InsertShapeHorizontalPos"/>
         <xsl:call-template name="InsertShapeVerticalPos"/>
         <xsl:call-template name="InsertShapeFlowWithText"/>
         <xsl:call-template name="InsertShapeBackgroundColor"/>
+        <xsl:call-template name="InsertTexboxTextDirection"/>
+        <xsl:call-template name="InsertTextBoxPadding"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertTexboxTextDirection">
+    <xsl:param name="shape" select="v:shape"/>
+    <xsl:if test="$shape/v:textbox/@style = 'layout-flow:vertical' ">
+      <xsl:attribute name="style:writing-mode">
+        <xsl:text>tb-rl</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
   
   <xsl:template name="InsertShapeBackgroundColor">
@@ -442,9 +452,17 @@
   </xsl:template>
   
   <xsl:template name="InsertShapeFlowWithText">
-  <!--    TODO  investigate when this need to be set to true -->
+    <xsl:param name="shape" select="v:shape"/>
+    <xsl:variable name="layouitInCell" select="$shape/@o:allowincell"/>
     <xsl:attribute name="draw:flow-with-text">
-        <xsl:text>false</xsl:text>
+      <xsl:choose>
+        <xsl:when test="$layouitInCell = 'f' ">
+          <xsl:text>false</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>true</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
   </xsl:template>
   
@@ -733,11 +751,18 @@
     <xsl:param name="shape" select="v:shape"/>
 
     <xsl:choose>
-      <xsl:when test="v:rect/@o:hr='t'">
+      <xsl:when test="$shape/@o:hr='t' or $shape/@stroked = 'f' ">
         <xsl:attribute name="draw:stroke">
           <xsl:text>none</xsl:text>
         </xsl:attribute>
-      </xsl:when>      
+      </xsl:when> 
+    <!--  Word sets default values for borders  when no strokeweight and strokecolor is set and @stroked is not set to f-->
+      <xsl:when test="not($shape/@strokeweight) and not($shape/@strokecolor)">
+         <xsl:attribute name="fo:border">
+           <xsl:text>0.0176cm solid #000000</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    <!--  default scenario -->
       <xsl:otherwise>
         <xsl:if test="$shape/@strokeweight">
           <xsl:variable name="borderWeight">
@@ -792,7 +817,6 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>    
-   
   </xsl:template>
 
   <xsl:template name="InsertTextBoxAutomaticHeight">
