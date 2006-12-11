@@ -437,12 +437,10 @@
       <xsl:when
         test="((contains(w:instrText,'TIME') or contains(preceding::w:instrText[1]  ,'TIME')) or(contains(w:instrText,'DATE') or contains(preceding::w:instrText[1]  ,'DATE'))) and 
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and not(w:instrText)"/>
-  
+      <!-- ignore text when we are in pagebreak field -->
       <xsl:when
         test="((contains(w:instrText,'PAGE') or contains(preceding::w:instrText[1]  ,'PAGE'))) and 
-        count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and descendant::w:t">
-        <xsl:call-template name="PageInstr"/>
-      </xsl:when>
+        count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and descendant::w:t"/>
       
       <!-- Comments -->
       <xsl:when test="w:commentReference/@w:id">        

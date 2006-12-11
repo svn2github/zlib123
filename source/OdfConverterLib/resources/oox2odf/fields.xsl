@@ -70,7 +70,7 @@
       </xsl:call-template>
   </xsl:template>
   
-  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGES') or contains(@w:instr,'PAGE')]">
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGES') or contains(@w:instr,'PAGE')] | w:instrText[contains(self::node(),'NUMPAGES') or contains(self::node(),'PAGE')] ">
       <xsl:call-template name="InsertPageNumberField"/>
   </xsl:template>
   
@@ -616,6 +616,9 @@
       <xsl:value-of select="parent::w:fldSimple/@w:instr"/>
     </xsl:variable>
     <text:page-number>
+      <xsl:attribute name="text:select-page">
+        <xsl:text>current</xsl:text>
+      </xsl:attribute>
       <xsl:attribute name="style:num-format">
         <xsl:choose>
           <xsl:when test="contains($WInstr, 'Arabic')">Arabic</xsl:when>
@@ -628,15 +631,4 @@
       </xsl:attribute>      
     </text:page-number>
   </xsl:template>
-
-<xsl:template name="PageInstr">
-  <text:page-number>
-    <xsl:attribute name="text:select-page">
-      <xsl:text>current</xsl:text>
-    </xsl:attribute>
-    <xsl:attribute name="style:num-format">
-      <xsl:text>Arabic</xsl:text>
-    </xsl:attribute>      
-  </text:page-number>
-</xsl:template>
 </xsl:stylesheet>
