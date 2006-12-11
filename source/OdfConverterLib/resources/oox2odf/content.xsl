@@ -114,7 +114,7 @@
         <xsl:apply-templates select="document('word/document.xml')//w:document/w:body" mode="sections"/>
       </xsl:when>
     </xsl:choose>
-    <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:headerReference/@w:type = 'first' or document('word/document.xml')/w:document/w:body/w:sectPr/w:footerReference/@w:type = 'first'">
+    <xsl:if test="document('word/document.xml')//w:document/w:body/w:sectPr/w:titlePg">
       <text:p>
         <xsl:attribute name="text:style-name">
           <xsl:text>P_F</xsl:text>

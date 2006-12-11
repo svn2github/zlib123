@@ -148,7 +148,7 @@
       </xsl:for-each>
     </style:master-page>
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-        <xsl:if test="w:headerReference/@w:type = 'default' or w:headerReference/@w:type = 'even' or w:footerReference/@w:type = 'default' or w:footerReference/@w:type = 'even'">
+        <!--<xsl:if test="w:headerReference/@w:type = 'default' or w:headerReference/@w:type = 'even' or w:footerReference/@w:type = 'default' or w:footerReference/@w:type = 'even'">-->
           <xsl:choose>
             <xsl:when test="w:titlePg">
               <style:master-page>
@@ -232,7 +232,7 @@
             </xsl:attribute>
             <xsl:call-template name="HeaderFooter"/>
           </style:master-page>
-        </xsl:if>
+        <!--</xsl:if>-->
       </xsl:for-each>
     <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
     <style:master-page style:name="First_Page" style:page-layout-name="pm1" style:next-style-name="Standard" style:display-name="First Page">
@@ -261,89 +261,137 @@
 
   
   <xsl:template name="HeaderFooter">
-    <xsl:for-each select="w:headerReference">
-      <xsl:if test="./@w:type = 'default'">
-        <style:header>
-          <xsl:variable name="headerId" select="./@r:id"/>
-          <xsl:variable name="headerXmlDocument"
-            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-          <!-- change context to get header content -->
-          <xsl:for-each select="document($headerXmlDocument)">
-            <xsl:apply-templates/>
-          </xsl:for-each>
-        </style:header>
-      </xsl:if>
-    </xsl:for-each>
-    <xsl:for-each select="w:headerReference">
-      <xsl:if test="./@w:type = 'even'">
+    <xsl:variable name="headerId">
+      <xsl:choose>
+        <xsl:when test="w:headerReference/@w:type = 'default'">
+          <xsl:value-of select="w:headerReference[./@w:type = 'default']/@r:id"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="preceding::w:sectPr/w:headerReference[./@w:type = 'default'][1]/@r:id"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="$headerId != ''">
+      <style:header>
+        <xsl:variable name="headerXmlDocument"
+          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+        <!-- change context to get header content -->
+        <xsl:for-each select="document($headerXmlDocument)">
+          <xsl:apply-templates/>
+        </xsl:for-each>
+      </style:header>
+    </xsl:if>
+    
+    <xsl:if test="document('word/settings.xml')//w:settings/w:evenAndOddHeaders">
+     <xsl:variable name="headerIdEven">
+      <xsl:choose>
+        <xsl:when test="w:headerReference/@w:type = 'even'">
+          <xsl:value-of select="w:headerReference[./@w:type = 'even']/@r:id"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="preceding::w:sectPr/w:headerReference[./@w:type = 'even'][1]/@r:id"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      </xsl:variable>
+      <xsl:if test="$headerId != ''">
         <style:header-left>
-          <xsl:variable name="headerId" select="./@r:id"/>
           <xsl:variable name="headerXmlDocument"
-            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerIdEven]/@Target)"/>
           <!-- change context to get header content -->
           <xsl:for-each select="document($headerXmlDocument)">
             <xsl:apply-templates/>
           </xsl:for-each>
         </style:header-left>
       </xsl:if>
-      <!-- ./@w:type='default' TODO -->
-    </xsl:for-each>
-    <xsl:for-each select="w:footerReference">
-      <xsl:if test="./@w:type = 'default'">
-        <style:footer>
-          <xsl:variable name="footerId" select="./@r:id"/>
-          <xsl:variable name="footerXmlDocument"
-            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-          <!-- change context to get footer content -->
-          <xsl:for-each select="document($footerXmlDocument)">
-            <xsl:apply-templates/>
-          </xsl:for-each>
-        </style:footer>
-      </xsl:if>
-    </xsl:for-each>
-    <xsl:for-each select="w:footerReference">
-      <xsl:if test="./@w:type = 'even'">
+    </xsl:if>
+        
+    <xsl:variable name="footerId">
+      <xsl:choose>
+        <xsl:when test="w:footerReference/@w:type = 'default'">
+          <xsl:value-of select="w:footerReference[./@w:type = 'default']/@r:id"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="preceding::w:sectPr/w:footerReference[./@w:type = 'default'][1]/@r:id"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="$footerId != ''">
+      <style:footer>
+        <xsl:variable name="footerXmlDocument"
+          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+        <!-- change context to get footer content -->
+        <xsl:for-each select="document($footerXmlDocument)">
+          <xsl:apply-templates/>
+        </xsl:for-each>
+      </style:footer>
+    </xsl:if>
+    
+    <xsl:if test="document('word/settings.xml')//w:settings/w:evenAndOddFooters">
+      <xsl:variable name="footerIdEven">
+        <xsl:choose>
+          <xsl:when test="w:footerReference/@w:type = 'even'">
+            <xsl:value-of select="w:footerReference[./@w:type = 'even']/@r:id"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="preceding::w:sectPr/w:footerReference[./@w:type = 'even'][1]/@r:id"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:if test="$footerId != ''">
         <style:footer-left>
-          <xsl:variable name="footerId" select="./@r:id"/>
           <xsl:variable name="footerXmlDocument"
-            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerIdEven]/@Target)"/>
           <!-- change context to get footer content -->
           <xsl:for-each select="document($footerXmlDocument)">
             <xsl:apply-templates/>
           </xsl:for-each>
         </style:footer-left>
       </xsl:if>
-      <!-- ./@w:type='default' TODO -->
-    </xsl:for-each>
+     </xsl:if>
   </xsl:template>
   
   <xsl:template name="HeaderFooterFirst">
-    <xsl:for-each select="w:headerReference">
-      <xsl:if test="./@w:type = 'first'">
-        <style:header>
-          <xsl:variable name="headerId" select="./@r:id"/>
-          <xsl:variable name="headerXmlDocument"
-            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
-          <!-- change context to get header content -->
-          <xsl:for-each select="document($headerXmlDocument)">
-            <xsl:apply-templates/>
-          </xsl:for-each>
-        </style:header>
-      </xsl:if>
-    </xsl:for-each>
-    <xsl:for-each select="w:footerReference">
-      <xsl:if test="./@w:type = 'first'">
-        <style:footer>
-          <xsl:variable name="footerId" select="./@r:id"/>
-          <xsl:variable name="footerXmlDocument"
-            select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
-          <!-- change context to get footer content -->
-          <xsl:for-each select="document($footerXmlDocument)">
-            <xsl:apply-templates/>
-          </xsl:for-each>
-        </style:footer>
-      </xsl:if>
-    </xsl:for-each>
+    <xsl:variable name="headerId">
+      <xsl:choose>
+        <xsl:when test="w:headerReference/@w:type = 'first'">
+          <xsl:value-of select="w:headerReference[./@w:type = 'first']/@r:id"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="preceding::w:sectPr/w:headerReference[./@w:type = 'first'][1]/@r:id"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="$headerId != ''">
+      <style:header>
+        <xsl:variable name="headerXmlDocument"
+          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
+        <!-- change context to get header content -->
+        <xsl:for-each select="document($headerXmlDocument)">
+          <xsl:apply-templates/>
+        </xsl:for-each>
+      </style:header>
+    </xsl:if>
+    
+    <xsl:variable name="footerId">
+      <xsl:choose>
+        <xsl:when test="w:footerReference/@w:type = 'first'">
+          <xsl:value-of select="w:footerReference[./@w:type = 'first']/@r:id"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="preceding::w:sectPr/w:footerReference[./@w:type = 'first'][1]/@r:id"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="$footerId != ''">
+      <style:footer>
+        <xsl:variable name="footerXmlDocument"
+          select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
+        <!-- change context to get footer content -->
+        <xsl:for-each select="document($footerXmlDocument)">
+          <xsl:apply-templates/>
+        </xsl:for-each>
+      </style:footer>
+    </xsl:if>
   </xsl:template>
   
   

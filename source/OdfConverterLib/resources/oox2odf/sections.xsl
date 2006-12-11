@@ -21,7 +21,7 @@
       </xsl:attribute>
       <xsl:choose>
         <xsl:when 
-          test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg or document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr/w:titlePg">
+          test="./w:titlePg">
         <text:p>
           <xsl:attribute name="text:style-name">
             <xsl:value-of select="concat('F_P_',$id2)"/>
@@ -65,8 +65,8 @@
         or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
         or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
         or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient
-        or ./w:headerReference
-        or ./w:footerReference)
+        or following::w:sectPr[1]/w:headerReference
+        or following::w:sectPr[1]/w:footerReference)
         and (not(following::w:p/w:pPr/w:sectPr) and not(document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg))">
         <text:p>
           <xsl:attribute name="text:style-name">
