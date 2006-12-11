@@ -79,7 +79,7 @@ Home;Font;Font;Font type;Selected font;;0;0.2-Final ;Completed;;;
 ;;Numbering;Number formats;;;1;0.2-Final ;Completed;;;
 ;;;Numbering value;Start at;;1;0.3-M2;Completed;;;
 ;;;;;;;;;;;
-;;Multi level list;;;;1;0.3-M2;;;;
+;;Multi level list;;;;1;0.3-M2;Completed;;;
 ;;;;;;;;;;;
 ;;List indents;Number position;;;1;0.3-M1;Completed;;;
 ;;;Text indent;;;1;0.3-M2;;;;
@@ -121,8 +121,8 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted bec
 ;Header & Footer;Header;;;;1;0.3-M1;Completed;;;
 ;;Footer;;;;1;0.3-M1;Completed;;;
 ;;Page Number;Number format;;;1;0.3-M1;Completed;;;
-;;;Include chapter number ;Chapter starts with style;;1;0.3-M2;;;;
-;;;;Use separator;;1;0.3-M2;;;;
+;;;Include chapter number ;Chapter starts with style;;1;0.3-M2;;;;It's Word Bug because this function is not supported in new version of Word.
+;;;;Use separator;;1;0.3-M2;;;;It's Word Bug because this function is not supported in new version of Word.
 ;;;Page numbering;Continue from previous section;;1;0.3-M1;Completed;;;
 ;;;;Start at;;;-;;;;This feature is unsupported in OO 
 ;;;;;;;;;;;
