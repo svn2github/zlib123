@@ -217,7 +217,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 	object readOnly = true;
                 	object addToRecentFiles = false;
                 	object isVisible = true;
-                	object openAndRepair = true;
+                	object openAndRepair = false;
                 	object missing = Type.Missing;
                 	Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref openAndRepair, ref missing, ref missing, ref missing);
 
