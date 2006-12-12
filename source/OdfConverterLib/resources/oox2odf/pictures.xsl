@@ -245,6 +245,7 @@
     <xsl:call-template name="InsertImageWrap"/>
     <xsl:call-template name="InsertImageMargins"/>
     <xsl:call-template name="InsertImageFlowWithtText"/>
+    <xsl:call-template name="InsertImageBorder"/>
   </xsl:template>
 
   <xsl:template name="InsertImageFlowWithtText">
@@ -259,6 +260,42 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
+  </xsl:template>
+  
+  <xsl:template name="InsertImageBorder">
+    <xsl:if test="descendant::a:ln">
+      <xsl:variable name="width">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length">
+            <xsl:value-of select="descendant::a:ln/@w"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="type">
+        <xsl:choose>
+          <xsl:when test="descendant::a:ln/a:prstDash/@val = 'solid'">
+            <xsl:text>solid</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>solid</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="color">
+        <xsl:choose>
+          <xsl:when test="descendant::a:ln/a:solidFill/a:srgbClr">
+            <xsl:value-of select="descendant::a:ln/a:solidFill/a:srgbClr/@val"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>000000</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:attribute name="fo:border">
+        <xsl:value-of select="concat($width,' ',$type,' #',$color)"/>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
   
   <xsl:template name="InsertImageWrap">

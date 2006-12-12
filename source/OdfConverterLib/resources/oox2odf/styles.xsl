@@ -142,15 +142,17 @@
   
   <!-- handle default master page style -->
   <xsl:template name="InsertDefaultMasterPage">
+    
     <style:master-page style:name="Standard" style:page-layout-name="pm1">
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
         <xsl:call-template name="HeaderFooter"/>
       </xsl:for-each>
     </style:master-page>
+    
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-        <!--<xsl:if test="w:headerReference/@w:type = 'default' or w:headerReference/@w:type = 'even' or w:footerReference/@w:type = 'default' or w:footerReference/@w:type = 'even'">-->
           <xsl:choose>
             <xsl:when test="w:titlePg">
+              
               <style:master-page>
                 <xsl:attribute name="style:name">
                   <xsl:value-of select="concat('First_H_',generate-id(.))"/>
@@ -181,10 +183,11 @@
                     </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
-                
               </style:master-page>
+              
             </xsl:when>
             <xsl:when test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
+              
               <style:master-page>
                 <xsl:attribute name="style:name">
                   <xsl:value-of select="concat('First_H_',generate-id(.))"/>
@@ -213,7 +216,7 @@
             </xsl:when>
           </xsl:choose>
           
-          <style:master-page>
+        <style:master-page>
             <xsl:attribute name="style:name">
               <xsl:value-of select="concat('H_',generate-id(.))"/>
             </xsl:attribute>
@@ -232,18 +235,21 @@
             </xsl:attribute>
             <xsl:call-template name="HeaderFooter"/>
           </style:master-page>
-        <!--</xsl:if>-->
+
       </xsl:for-each>
     <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
-    <style:master-page style:name="First_Page" style:page-layout-name="pm1" style:next-style-name="Standard" style:display-name="First Page">
+    
+      <style:master-page style:name="First_Page" style:page-layout-name="pm1" style:next-style-name="Standard" style:display-name="First Page">
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
         <xsl:call-template name="HeaderFooterFirst"/>
       </xsl:for-each>
-    </style:master-page>
+      </style:master-page>
+      
     </xsl:if>
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <xsl:if test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
-      <style:master-page>
+      
+        <style:master-page>
         <xsl:attribute name="style:name">
           <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
         </xsl:attribute>
@@ -253,10 +259,10 @@
         <xsl:attribute name="style:display-name">
           <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
         </xsl:attribute>
-      </style:master-page>
+        </style:master-page>
+        
         </xsl:if>
     </xsl:for-each>
-    
   </xsl:template>
 
   
