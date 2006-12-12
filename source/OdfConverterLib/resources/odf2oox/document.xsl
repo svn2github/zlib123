@@ -121,6 +121,9 @@
         <xsl:call-template name="InsertParagraphSectionProperties"/>
       </w:pPr>
 
+      <!-- if paragraph is the very first of page, declare user variables -->
+      <xsl:call-template name="InsertUserFieldDeclaration"/>
+
       <!-- insert drawing objects that are preceding-sibling of current. -->
       <xsl:call-template name="InsertPrecedingDrawingObject"/>
 

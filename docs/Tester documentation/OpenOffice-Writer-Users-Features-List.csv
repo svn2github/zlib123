@@ -42,7 +42,7 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 ;;;;Reference;3;0.3-Final;Completed;;85;
 ;;;;Functions;;-;;;;
 ;;;;Doc Information;Printed by (author);0.2-Final;Completed;;118-135;TODO : 
-;;;;Variables;;0.3-Final;Partial;;;TODO : user field, dde, page, sequence.
+;;;;Variables;;0.3-Final;Partial;DDE field is lost;;TODO : formula, sequence.
 
 ;Special Characters;;;;0;0.1;Completed;;;
 

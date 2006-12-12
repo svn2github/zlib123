@@ -477,8 +477,25 @@
     </w:fldSimple>
   </xsl:template>
 
-  <!-- variable : set value -->
+
+  <!-- simple variables and user variables-->
   <xsl:template match="text:variable-set" mode="paragraph">
+    <xsl:call-template name="InsertVariableField"/>
+  </xsl:template>
+
+  <!-- insert field declarations only in the first paragraph -->
+  <xsl:template name="InsertUserFieldDeclaration">
+    <xsl:if test="parent::office:text">
+      <xsl:if test="not(preceding-sibling::*[self::text:p or self::text:h])">
+        <xsl:for-each select="preceding-sibling::text:user-field-decls/text:user-field-decl">
+          <xsl:call-template name="InsertVariableField"/>
+        </xsl:for-each>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- insert declaration of variable, and potentially a reference to display it. -->
+  <xsl:template name="InsertVariableField">
     <xsl:variable name="varName">
       <xsl:call-template name="SuppressForbiddenChars">
         <xsl:with-param name="string" select="@text:name"/>
@@ -527,7 +544,7 @@
     <w:r>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
-    <xsl:if test="not(@text:display='none')">
+    <xsl:if test="not(@text:display='none' or self::text:user-field-decl)">
       <w:fldSimple w:instr="{concat(' REF &quot;', $varName, '&quot; ')}">
         <w:r>
           <xsl:apply-templates mode="text"/>
@@ -536,8 +553,7 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- variable : get value -->
-  <xsl:template match="text:variable-get" mode="paragraph">
+  <xsl:template match="text:variable-get | text:user-field-get" mode="paragraph">
     <xsl:variable name="varName">
       <xsl:call-template name="SuppressForbiddenChars">
         <xsl:with-param name="string" select="@text:name"/>
@@ -552,14 +568,42 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="text:variable-input | text:user-field-input" mode="paragraph">
+    <xsl:variable name="varName">
+      <xsl:call-template name="SuppressForbiddenChars">
+        <xsl:with-param name="string" select="@text:name"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <w:fldSimple
+      w:instr="{concat(' ASK ', $varName, ' &quot;', @text:description, '&quot; ')}"/>
+    <xsl:if test="not(@text:display='none')">
+      <w:fldSimple w:instr="{concat(' REF &quot;', $varName, '&quot; ')}">
+        <w:r>
+          <xsl:apply-templates mode="text"/>
+        </w:r>
+      </w:fldSimple>
+    </xsl:if>
+  </xsl:template>
+
   <!-- report lost fields -->
   <xsl:template match="text:description" mode="paragraph">
-    <xsl:message terminate="no">feedback:description field</xsl:message>
+    <xsl:message terminate="no">feedback:Description field</xsl:message>
   </xsl:template>
 
   <xsl:template match="text:printed-by" mode="paragraph">
     <xsl:message terminate="no">feedback:Printed-by field</xsl:message>
   </xsl:template>
+
+  <xsl:template match="text:page-variable-set | text:page-variable-get" mode="paragraph">
+    <xsl:message terminate="no">feedback:Page variable field</xsl:message>
+    <xsl:apply-templates mode="paragraph"/>
+  </xsl:template>
+
+  <xsl:template match="text:dde-connection-decls[text:dde-connection-decl/@text:name]">
+    <!-- lost because not in the spec, although DDE and DDEAUTO are available in Word -->
+    <xsl:message terminate="no">feedback:DDE Connection</xsl:message>
+  </xsl:template>
+
 
 
   <xsl:template name="InsertLanguage">
