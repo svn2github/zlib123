@@ -274,19 +274,24 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
 
                 try
                 {
-                // open the document
-                object readOnly = true;
-                object addToRecentFiles = false;
-                object isVisible = true;
-                object openAndRepair = false;
-                object missing = Type.Missing;
-                Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref openAndRepair, ref missing, ref missing);
+                    // open the document
+                    object readOnly = true;
+                    object addToRecentFiles = false;
+                    object isVisible = true;
+                    object openAndRepair = false;
+                    object missing = Type.Missing;
 
-                // update document fields
-                doc.Fields.Update();
+                    // conversion may have been cancelled and file deleted.
+                    if (File.Exists((string)fileName))
+                    {
+                        Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref openAndRepair, ref missing, ref missing);
 
-                // and activate it
-                doc.Activate();
+                        // update document fields
+                        doc.Fields.Update();
+
+                        // and activate it
+                        doc.Activate();
+                    }
                 } 
                 catch (Exception ex)
                 {

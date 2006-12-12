@@ -219,18 +219,23 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 	object isVisible = true;
                 	object openAndRepair = false;
                 	object missing = Type.Missing;
-                	Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref openAndRepair, ref missing, ref missing, ref missing);
 
-                	// update document fields
-                	doc.Fields.Update();
+                    // conversion may have been cancelled and file deleted.
+                    if (File.Exists((string) fileName))
+                    {
+                        Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref openAndRepair, ref missing, ref missing, ref missing);
 
-                	// and activate it
-                	doc.Activate();
+                        // update document fields
+                        doc.Fields.Update();
+
+                        // and activate it
+                        doc.Activate();
+                    }
                 } 
                 catch (Exception ex) 
                 {
                 	this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorNormal;
-                   	System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
+                    System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
                    	System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
                   	return;
                 }
