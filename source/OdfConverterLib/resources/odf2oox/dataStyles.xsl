@@ -585,6 +585,7 @@
     </xsl:if>
   </xsl:template>
 
+
   <!-- report lost fields -->
   <xsl:template match="text:description" mode="paragraph">
     <xsl:message terminate="no">feedback:Description field</xsl:message>
@@ -602,6 +603,16 @@
   <xsl:template match="text:dde-connection-decls[text:dde-connection-decl/@text:name]">
     <!-- lost because not in the spec, although DDE and DDEAUTO are available in Word -->
     <xsl:message terminate="no">feedback:DDE Connection</xsl:message>
+  </xsl:template>
+
+  <xsl:template match="text:expression" mode="paragraph">
+    <xsl:message terminate="no">feedback:Formula field</xsl:message>
+    <xsl:apply-templates mode="paragraph"/>
+  </xsl:template>
+
+  <xsl:template match="text:sequence" mode="paragraph">
+    <xsl:message terminate="no">feedback:Sequence field</xsl:message>
+    <xsl:apply-templates mode="paragraph"/>
   </xsl:template>
 
 
