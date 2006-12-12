@@ -49,6 +49,7 @@
 
   <xsl:key name="toc" match="text:table-of-content" use="''"/>
   <xsl:key name="indexes" match="text:illustration-index | text:table-index" use="''"/>
+  <xsl:key name="user-indexes" match="text:user-index" use="''"/>
   <xsl:key name="alphabetical-indexes" match="text:alphabetical-index" use="''"/>
   <xsl:key name="index-styles" match="text:table-of-content-source/*" use="@text:style-name"/>
 
@@ -99,6 +100,9 @@
       <xsl:choose>
         <xsl:when test="ancestor::text:table-of-content">
           <xsl:call-template name="InsertTocPrefs"/>
+        </xsl:when>
+        <xsl:when test="ancestor::text:user-index">
+          <xsl:call-template name="InsertUserIndexPrefs"/>
         </xsl:when>
         <xsl:when test="ancestor::text:illustration-index">
           <xsl:call-template name="InsertIllustrationInPrefs"/>
@@ -232,6 +236,34 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- user defined index -->
+  <xsl:template name="InsertUserIndexPrefs">
+    <xsl:variable name="tocSource" select="ancestor::text:user-index/text:user-index-source"/>
+
+    <w:instrText xml:space="preserve"> TOC </w:instrText>
+
+    <!-- add an id so as not to mix TOCs -->
+    <xsl:if test="$tocSource/@text:index-name">
+      <w:instrText xml:space="preserve">\f "</w:instrText>
+      <w:instrText>
+        <xsl:call-template name="GetTOCId">
+          <xsl:with-param name="indexName" select="$tocSource/@text:index-name"/>
+        </xsl:call-template>
+      </w:instrText>
+      <w:instrText xml:space="preserve">" </w:instrText>
+    </xsl:if>
+
+  </xsl:template>
+
+  <!-- return the id of a user index using its position, so as not to mix all sorts of TOCs -->
+  <xsl:template name="GetTOCId">
+    <xsl:param name="indexName"/>
+    <xsl:for-each select="key('user-indexes', '')">
+      <xsl:if test="text:user-index-source/@text:index-name = $indexName">
+        <xsl:value-of select="position()"/>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
 
   <xsl:template name="InsertTOCLevelStyle">
     <xsl:param name="level" select="1"/>
@@ -408,7 +440,6 @@
     <w:r>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
-    <!-- <xsl:apply-templates select="text:s" mode="text"></xsl:apply-templates> -->
   </xsl:template>
 
   <!-- insert field instruction for XE index entry -->
@@ -477,6 +508,78 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- empty user indexes creating mark entry -->
+  <xsl:template match="text:user-index-mark" mode="paragraph">
+    <w:r>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r>
+      <xsl:call-template name="InsertUserFieldInstructions">
+        <xsl:with-param name="entryText" select="@text:string-value"/>
+      </xsl:call-template>
+    </w:r>
+    <w:r>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
+  </xsl:template>
+
+  <!-- alphabetical indexes creating mark entry -->
+  <xsl:template match="text:user-index-mark-end" mode="paragraph">
+    <w:r>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r>
+      <xsl:variable name="id" select="@text:id"/>
+      <xsl:variable name="entryText">
+        <xsl:for-each
+          select="preceding-sibling::node()[preceding-sibling::text:user-index-mark-start[@text:id = $id]]">
+          <!-- ignore all ...mark-start/end and track-changes -->
+          <xsl:if test="not(contains(name(), 'mark-') or contains(name(), 'change-'))">
+            <xsl:choose>
+              <xsl:when test="self::text()">
+                <xsl:value-of select="."/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="."/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:for-each select="preceding-sibling::text:user-index-mark-start[@text:id = $id]">
+        <xsl:call-template name="InsertUserFieldInstructions">
+          <xsl:with-param name="entryText" select="$entryText"/>
+        </xsl:call-template>
+      </xsl:for-each>
+    </w:r>
+    <w:r>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
+  </xsl:template>
+
+  <!-- insert field instruction for user index entry -->
+  <xsl:template name="InsertUserFieldInstructions">
+    <xsl:param name="entryText"/>
+    <w:instrText xml:space="preserve"> TC "</w:instrText>
+    <w:instrText>
+      <xsl:value-of select="$entryText"/>
+    </w:instrText>
+    <w:instrText xml:space="preserve">" </w:instrText>
+    <!-- index id -->
+    <w:instrText xml:space="preserve">\f "</w:instrText>
+    <w:instrText>
+      <xsl:call-template name="GetTOCId">
+        <xsl:with-param name="indexName" select="@text:index-name"/>
+      </xsl:call-template>
+    </w:instrText>
+    <w:instrText xml:space="preserve">" </w:instrText>
+    <!-- outline level -->
+    <w:instrText xml:space="preserve">\l "</w:instrText>
+    <w:instrText>
+      <xsl:value-of select="@text:outline-level"/>
+    </w:instrText>
+    <w:instrText xml:space="preserve">" </w:instrText>
+  </xsl:template>
 
   <!-- styles for indexes. They require a particular syntax -->
   <xsl:template name="InsertIndexStyles">

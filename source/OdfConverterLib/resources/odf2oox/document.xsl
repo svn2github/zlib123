@@ -64,7 +64,11 @@
 
 
   <!-- table of content count -->
-  <xsl:variable name="tocCount" select="count($body//text:table-of-content)"/>
+  <xsl:variable name="tocCount">
+    <xsl:for-each select="document('content.xml')">
+      <xsl:value-of select="count(key('toc', ''))"/>
+    </xsl:for-each>
+  </xsl:variable>
 
   <!-- main document -->
   <xsl:template name="document">

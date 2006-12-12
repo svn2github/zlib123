@@ -42,7 +42,7 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 ;;;;Reference;3;0.3-Final;Completed;;85;
 ;;;;Functions;;-;;;;
 ;;;;Doc Information;Printed by (author);0.2-Final;Completed;;118-135;TODO : 
-;;;;Variables;;0.3-Final;Completed;Lost fields : DDE, formula, sequence;;
+;;;;Variables;;0.3-Final;Completed;Lost fields : DDE, formula;;
 
 ;Special Characters;;;;0;0.1;Completed;;;
 
@@ -128,7 +128,7 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 
 ;Note;;;;2;0.2-M2;Completed;;86;
 
-;Indexes and Tables - Entry;;Index;;;0.3-Final;Partial;;;TODO : enduser entry
+;Indexes and Tables - Entry;;Index;;;0.3-Final;Completed;;;
 ;;;Entry;;2;0.2-Final;Completed;;;
 ;;;1st Key;;;0.3-Final;Completed;;;
 ;;;Main Entry;;;0.3-Final;Completed;;;

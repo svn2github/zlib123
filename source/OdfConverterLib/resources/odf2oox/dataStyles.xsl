@@ -610,11 +610,6 @@
     <xsl:apply-templates mode="paragraph"/>
   </xsl:template>
 
-  <xsl:template match="text:sequence" mode="paragraph">
-    <xsl:message terminate="no">feedback:Sequence field</xsl:message>
-    <xsl:apply-templates mode="paragraph"/>
-  </xsl:template>
-
 
 
   <xsl:template name="InsertLanguage">
