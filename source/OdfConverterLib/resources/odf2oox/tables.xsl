@@ -114,7 +114,10 @@
           </xsl:attribute>
         </w:tblW>
       </xsl:when>
-      <xsl:otherwise/>
+      <xsl:otherwise>
+        <!-- default value if no width specified : 100% of width -->
+        <w:tblW w:w="5000" w:type="pct"/>
+      </xsl:otherwise>
     </xsl:choose>
 
     <xsl:if test="$tableProp/@table:align">
