@@ -533,11 +533,17 @@
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="color">
-              <!--   temporary  -->
-              <xsl:text>#000000</xsl:text>
+              <xsl:choose>
+                <xsl:when test="w:pgBorders/w:top/@w:color != 'auto'">
+                  <xsl:value-of select="w:pgBorders/w:top/@w:color"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>000000</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:variable>
             <xsl:attribute name="fo:border-top">
-              <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+              <xsl:value-of select="concat($type,' ',$sz,' #',$color)"/>
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
@@ -567,11 +573,17 @@
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="color">
-              <!--   temporary  -->
-              <xsl:text>#000000</xsl:text>
+              <xsl:choose>
+                <xsl:when test="w:pgBorders/w:left/@w:color != 'auto'">
+                  <xsl:value-of select="w:pgBorders/w:left/@w:color"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>000000</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:variable>
             <xsl:attribute name="fo:border-left">
-              <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+              <xsl:value-of select="concat($type,' ',$sz,' #',$color)"/>
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
@@ -601,11 +613,17 @@
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="color">
-              <!--   temporary  -->
-              <xsl:text>#000000</xsl:text>
+              <xsl:choose>
+                <xsl:when test="w:pgBorders/w:right/@w:color != 'auto'">
+                  <xsl:value-of select="w:pgBorders/w:right/@w:color"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>000000</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:variable>
             <xsl:attribute name="fo:border-right">
-              <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+              <xsl:value-of select="concat($type,' ',$sz,' #',$color)"/>
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
@@ -635,11 +653,17 @@
               </xsl:call-template>
             </xsl:variable>
             <xsl:variable name="color">
-              <!--   temporary  -->
-              <xsl:text>#000000</xsl:text>
+              <xsl:choose>
+                <xsl:when test="w:pgBorders/w:bottom/@w:color != 'auto'">
+                  <xsl:value-of select="w:pgBorders/w:bottom/@w:color"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>000000</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:variable>
             <xsl:attribute name="fo:border-bottom">
-              <xsl:value-of select="concat($type,' ',$sz,' ',$color)"/>
+              <xsl:value-of select="concat($type,' ',$sz,' #',$color)"/>
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
