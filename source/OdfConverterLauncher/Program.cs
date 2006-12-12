@@ -29,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using CleverAge.OdfConverter.OdfWordAddinLib;
-using CleverAge.OdfConverter.OdfConverterLib;
 using System.Runtime.InteropServices;
 using System.Reflection;
 
@@ -92,10 +91,10 @@ namespace OdfConverterLauncher
                 string input = args[0];
                 try
                 {
-                    string output = new OdfWordAddinLib().GetTempFileName(input);
-                    Converter converter = new CleverAge.OdfConverter.OdfConverterLib.Converter();
-                    converter.DirectTransform = true;
-                    converter.Transform(input, output);
+                    bool showUserInterface = true;
+                    OdfWordAddinLib lib = new OdfWordAddinLib();
+                    string output = lib.GetTempFileName(input);
+                    lib.OdfToOox(input, output, showUserInterface);
                     Word word = new Word();
                     word.Visible = true;
                     word.Open(output);
