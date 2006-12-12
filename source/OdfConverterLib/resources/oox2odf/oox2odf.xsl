@@ -26,8 +26,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oox="urn:oox"
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" exclude-result-prefixes="oox">
+<xsl:stylesheet version="1.0" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+  xmlns:oox="urn:oox"
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
+  exclude-result-prefixes="oox rels">
 
   <xsl:import href="common.xsl"/>
   <xsl:import href="content.xsl"/>
@@ -39,9 +43,46 @@
   <xsl:import href="footnotes.xsl"/>
   <xsl:import href="sections.xsl"/>
   <xsl:import href="comments.xsl"/>
-  
+
   <xsl:param name="outputFile"/>
-  <xsl:output method="xml" encoding="UTF-8"/>
+  <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+
+  
+  <!-- packages relationships -->
+  <!--
+  <xsl:variable name="package-rels" select="document('_rels/.rels')"/>
+  <xsl:variable name="officeDocument"
+    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument']/@Target)"/>
+  <xsl:variable name="core-properties"
+    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties']/@Target)"/>
+  <xsl:variable name="extended-properties"
+    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties']/@Target)"/>
+  <xsl:variable name="custom-properties"
+    select="string($package-rels/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties']/@Target)"/>
+  
+  <xsl:variable name="document-path" select="concat(substring-before($officeDocument, '/'), '/')"/>
+    -->
+  <!-- part relationships -->
+  <!-- TODO multilevel /.../.../ -->
+  <!--
+  <xsl:variable name="part-relationships"
+    select="concat(concat($document-path, '_rels/'), concat(substring-after($officeDocument, '/'), '.rels'))"/>
+  <xsl:variable name="numbering"
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering']/@Target)"/>
+  <xsl:variable name="styles"
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles']/@Target)"/>
+  <xsl:variable name="fontTable"
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable']/@Target)"/>
+  <xsl:variable name="settings"
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@rType='http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings']/@Target)"/>
+  <xsl:variable name="footnotes"
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes']/@Target)"/>
+  <xsl:variable name="endnotes"
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes']/@Target)"/>
+  <xsl:variable name="comments"
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments']/@Target)"/>
+  -->
+
 
   <!-- App version number -->
   <!-- WARNING: it has to be of type xx.yy -->
@@ -71,17 +112,17 @@
       <pzip:entry pzip:target="styles.xml">
         <xsl:call-template name="styles"/>
       </pzip:entry>
-      
+
       <!-- meta -->
       <pzip:entry pzip:target="meta.xml">
         <xsl:call-template name="meta"/>
       </pzip:entry>
-      
+
       <!-- settings -->
       <pzip:entry pzip:target="settings.xml">
         <xsl:call-template name="settings"/>
       </pzip:entry>
-      
+
     </pzip:archive>
   </xsl:template>
 
