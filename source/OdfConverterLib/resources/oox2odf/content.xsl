@@ -138,15 +138,19 @@
       </style:paragraph-properties>
 
       <!-- add text properties to paragraph -->
-      <xsl:if test="w:rPr and not(parent::w:p/w:r)">
-        <style:text-properties>
-          <xsl:call-template name="InsertTextProperties"/>
-        </style:text-properties>
- <!--       <xsl:apply-templates select="w:rPr" mode="automaticstyles"/>  -->
-      </xsl:if>
+      <xsl:apply-templates select="w:rPr[not(parent::w:r)]" mode="automaticstyles"/>
+      
     </style:style>
    </xsl:template>
 
+  <!-- add text properties to paragraph -->
+  <xsl:template match="w:rPr[parent::w:pPr]" mode="automaticstyles">
+   <style:text-properties>
+      <xsl:call-template name="InsertTextProperties"/>
+    </style:text-properties>
+  </xsl:template>
+  
+  
 <!--  when paragraph has no parent style it should be set to Normal style which contains all default paragraph properties -->
   <xsl:template name="InsertParagraphParentStyle">
     <xsl:choose>
@@ -334,7 +338,11 @@
       
       <!--  check if the paragraf is heading -->
       <xsl:when test="$outlineLevel != ''">
-        <xsl:apply-templates select="." mode="heading"/>
+        <xsl:apply-templates select="." mode="heading">
+          <xsl:with-param name="outlineLevel">
+            <xsl:value-of select="$outlineLevel"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
       </xsl:when>
       <!--  default scenario - paragraph-->
       <xsl:otherwise>
