@@ -130,10 +130,10 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 
 ;Indexes and Tables - Entry;;Index;;;0.3-Final;Partial;;;TODO : enduser entry
 ;;;Entry;;2;0.2-Final;Completed;;;
-;;;1st Key;;;0.3-Final;;;;
-;;;Main Entry;;;0.3-Final;;;;
-;;;Apply to all similar texts;Match case;;0.3-Final;;;;
-;;;;Whole word only;;0.3-Final;;;;
+;;;1st Key;;;0.3-Final;Completed;;;
+;;;Main Entry;;;0.3-Final;Completed;;;
+;;;Apply to all similar texts;Match case;;0.3-Final;Completed;;;
+;;;;Whole word only;;0.3-Final;Completed;;;
 
 ;Indexes and Tables - Indexes and Tables;Index / Table - Table of Contents;Title;;1;0.2-M1;Completed;;174-176;
 ;;;Type;;2;0.2-M2;Completed;;174-176;
@@ -192,7 +192,7 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 ;;;Tab stop;;2;0.2-M2;Completed;;;
 ;;;Page no;;2;0.2-M2;Completed;;
 ;;;Character style;;2;0.2-M2;Completed;;
-;;;Format;Character style for main entries;2;0.3-Final;;;
+;;;Format;Character style for main entries;2;0.3-Final;Completed;Only bold and italic are saved.;
 ;;;;Alphabetical delimited;;0.2-M2;Completed;;
 ;;;;Key seperated byt commas;;0.2-M2;Completed;;
 ;;;;Tab position relative to Paragraph Style indent;;0.2-M2;Completed;;
@@ -200,7 +200,7 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 ;Indexes and Tables - Bibliography entry;Entry;From;;0;0.3-Final;;;
 ;;Short name;;;;-;;;
 
-;Envelope;Address;Database;;;-;Completed;Convert manually entered adress (no database adress).;
+;Envelope;Address;Database;;;0.3-Final;Completed;Convert manually entered adress (no database adress).;
 ;;;Table;;;-;;;
 ;;;Database field;;;-;;;
 

@@ -49,6 +49,7 @@
 
   <xsl:key name="toc" match="text:table-of-content" use="''"/>
   <xsl:key name="indexes" match="text:illustration-index | text:table-index" use="''"/>
+  <xsl:key name="alphabetical-indexes" match="text:alphabetical-index" use="''"/>
   <xsl:key name="index-styles" match="text:table-of-content-source/*" use="@text:style-name"/>
 
   <!-- Inserts item for all types of index  -->
@@ -366,15 +367,9 @@
       <w:fldChar w:fldCharType="begin"/>
     </w:r>
     <w:r>
-      <w:instrText xml:space="preserve"> XE "</w:instrText>
-    </w:r>
-    <w:r>
-      <w:instrText>
-        <xsl:value-of select="./@text:string-value"/>
-      </w:instrText>
-    </w:r>
-    <w:r>
-      <w:instrText xml:space="preserve">" </w:instrText>
+      <xsl:call-template name="InsertXEFieldInstructions">
+        <xsl:with-param name="entryText" select="@text:string-value"/>
+      </xsl:call-template>
     </w:r>
     <w:r>
       <w:fldChar w:fldCharType="end"/>
@@ -387,36 +382,71 @@
       <w:fldChar w:fldCharType="begin"/>
     </w:r>
     <w:r>
-      <w:instrText xml:space="preserve"> XE "</w:instrText>
-    </w:r>
-    <w:r>
-      <w:instrText>
-        <xsl:variable name="id" select="@text:id"/>
-        <xsl:for-each select="preceding-sibling::node()">
-          <xsl:if
-            test="preceding-sibling::node()[name() = 'text:alphabetical-index-mark-start' and @text:id = $id]">
-            <!-- ignore all ...mark-start/end and track-changes -->
-            <xsl:if test="not(contains(name(), 'mark-') or contains(name(), 'change-'))">
-              <xsl:choose>
-                <xsl:when test="self::text()">
-                  <xsl:value-of select="."/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:apply-templates select="."/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:if>
+      <xsl:variable name="id" select="@text:id"/>
+      <xsl:variable name="entryText">
+        <xsl:for-each
+          select="preceding-sibling::node()[preceding-sibling::text:alphabetical-index-mark-start[@text:id = $id]]">
+          <!-- ignore all ...mark-start/end and track-changes -->
+          <xsl:if test="not(contains(name(), 'mark-') or contains(name(), 'change-'))">
+            <xsl:choose>
+              <xsl:when test="self::text()">
+                <xsl:value-of select="."/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="."/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:if>
         </xsl:for-each>
-      </w:instrText>
-    </w:r>
-    <w:r>
-      <w:instrText xml:space="preserve">" </w:instrText>
+      </xsl:variable>
+      <xsl:for-each select="preceding-sibling::text:alphabetical-index-mark-start[@text:id = $id]">
+        <xsl:call-template name="InsertXEFieldInstructions">
+          <xsl:with-param name="entryText" select="$entryText"/>
+        </xsl:call-template>
+      </xsl:for-each>
     </w:r>
     <w:r>
       <w:fldChar w:fldCharType="end"/>
     </w:r>
     <!-- <xsl:apply-templates select="text:s" mode="text"></xsl:apply-templates> -->
+  </xsl:template>
+
+  <!-- insert field instruction for XE index entry -->
+  <xsl:template name="InsertXEFieldInstructions">
+    <xsl:param name="entryText"/>
+    <w:instrText xml:space="preserve"> XE "</w:instrText>
+    <w:instrText>
+      <xsl:variable name="key1">
+        <xsl:if test="@text:key1">
+          <xsl:value-of select="concat(@text:key1, ':')"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name="key2">
+        <xsl:if test="@text:key2">
+          <xsl:value-of select="concat(@text:key2, ':')"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:value-of select="concat($key1, $key2, $entryText)"/>
+    </w:instrText>
+    <w:instrText xml:space="preserve">" </w:instrText>
+    <!-- find style associated to main entries. If more than one index, use style of first only. -->
+    <xsl:if test="@text:main-entry='true' ">
+      <xsl:variable name="MainStyleName">
+        <xsl:value-of
+          select="key('alphabetical-indexes', '')/text:alphabetical-index-source/@text:main-entry-style-name"
+        />
+      </xsl:variable>
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:for-each select="key('styles', $MainStyleName)/style:text-properties">
+          <xsl:if test="@fo:font-weight = 'bold' ">
+            <w:instrText xml:space="preserve">\b </w:instrText>
+          </xsl:if>
+          <xsl:if test="@fo:font-style = 'italic' ">
+            <w:instrText xml:space="preserve">\i </w:instrText>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="text()" mode="indexes">
