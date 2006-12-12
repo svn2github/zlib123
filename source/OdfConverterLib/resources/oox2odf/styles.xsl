@@ -505,13 +505,13 @@
 
   
   <xsl:template name="InsertPageBorders">
-    <xsl:choose>
-      <xsl:when test="w:pgBorders/w:top/@w:shadow or w:pgBorders/w:left/@w:shadow or w:pgBorders/w:right/@w:shadow or w:pgBorders/w:bottom/@w:shadow">
+   
+      <xsl:if test="w:pgBorders/w:top/@w:shadow or w:pgBorders/w:left/@w:shadow or w:pgBorders/w:right/@w:shadow or w:pgBorders/w:bottom/@w:shadow">
         <xsl:attribute name="style:shadow">
           <xsl:text>#000000 0.049cm 0.049cm</xsl:text>
         </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
+      </xsl:if>
+      
         <xsl:choose>
           <xsl:when test="w:pgBorders/w:top">
             <xsl:variable name="type">
@@ -672,10 +672,7 @@
             </xsl:attribute>
           </xsl:otherwise>
         </xsl:choose>
-      </xsl:otherwise>
-    </xsl:choose>
-    
-    
+         
   </xsl:template>
   
   
