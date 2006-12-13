@@ -209,19 +209,7 @@
     </xsl:variable>
     
     <xsl:variable name="paragraphMargin">
-      <xsl:choose>
-        
-        <xsl:when test="$paragraph/w:pPr/w:pBdr/w:ind/@w:left">
-          <xsl:value-of select="$paragraph/w:pPr/w:pBdr/w:ind/@w:left"/>
-        </xsl:when>
-        
-        <xsl:when test="$paragraphStyleProperties/w:ind/@w:left">
-          <xsl:value-of select="$paragraphStyleProperties/w:ind/@w:left"/>
-        </xsl:when>
-        
-        <xsl:otherwise>0</xsl:otherwise>
-        
-      </xsl:choose>
+      <xsl:call-template name="GetParagraphIndent"/>
     </xsl:variable>
     
 <xsl:variable name="paragraphIndent" select="$paragraphBorder+$paragraphPadding+$paragraphMargin"/>

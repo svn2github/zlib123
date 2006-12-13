@@ -1551,13 +1551,7 @@
     </xsl:variable>
         
    <xsl:variable name="paragraphIndent">
-      <xsl:choose>
-        <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left">
-          <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left"/>
-        </xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
-      </xsl:choose>
-      
+      <xsl:call-template name="GetParagraphIndent"/> 
    </xsl:variable>  
     <xsl:choose>
       <xsl:when test="w:ind">        
@@ -2211,7 +2205,7 @@
           </xsl:attribute>
         </xsl:if>
         <!-- position 
-         TODO : what if @w:pos < 0 ? -->
+          TODO : what if @w:pos < 0 ? -->
         <xsl:if test="./@w:pos >= 0">
           <xsl:attribute name="style:position">
             <xsl:call-template name="ConvertTwips">
@@ -2252,6 +2246,36 @@
     </style:tab-stop>
   </xsl:template>
 
+  <xsl:template name="GetParagraphIndent">
+    <xsl:choose>
+      <xsl:when test="w:ind/@w:left">
+        <xsl:value-of select="w:ind/@w:left"/>
+      </xsl:when>
+      <xsl:when test="w:pStyle/@w:val">
+        <xsl:variable name="pStyle">
+          <xsl:value-of select="w:pStyle/@w:val"/>
+        </xsl:variable>
+        <xsl:for-each select="document('word/styles.xml')/descendant::w:style[@w:styleId=$pStyle]/w:pPr">
+          <xsl:call-template name="GetParagraphIndent"/>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="ancestor::w:style/w:basedOn/@w:val">
+        <xsl:variable name="basedOn">
+          <xsl:value-of select="ancestor::w:style/w:basedOn/@w:val"/>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="key('StyleId',$basedOn)/w:pPr">
+            <xsl:for-each select="key('StyleId',$basedOn)/w:pPr">
+              <xsl:call-template name="GetParagraphIndent"/>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <!-- ODF Text properties contained in OOX pPr element -->
   <xsl:template name="InsertpPrTextProperties">
     <!-- hyphenation -->

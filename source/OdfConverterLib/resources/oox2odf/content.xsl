@@ -317,17 +317,12 @@
       
       <!--check if the paragraph starts a table-of content -->
       <xsl:when test="descendant::w:r[contains(w:instrText,'TOC')]">
-        <text:table-of-content text:style-name="Sect1" text:protected="true" text:name="Table of Contents1">
-          <xsl:call-template name="InsertIndexProperties"/>
-          <text:index-body>
-            <xsl:apply-templates select="." mode="index"/>
-          </text:index-body>
-        </text:table-of-content>
+        <xsl:apply-templates select="." mode="tocstart"/>
       </xsl:when>
       
-      <!--check if paragraph is in table-of -content -->
-      <xsl:when test="not(descendant::w:r[contains(w:instrText,'TOC')]) and descendant::w:pStyle[contains(@w:val,'TOC')]"/>
-        
+      <!-- if paragraph is in toc, it has been converted already -->
+      <xsl:when test="not(descendant::w:r[contains(w:instrText,'TOC')]) and contains(descendant::w:pStyle/@w:val,'TOC')"/>
+      
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != ''">
           <xsl:apply-templates select="." mode="list">
@@ -447,7 +442,7 @@
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and not(w:instrText)"/>
       <!-- ignore text when we are in pagebreak field -->
       <xsl:when
-        test="((contains(w:instrText,'PAGE') or contains(preceding::w:instrText[1]  ,'PAGE'))) and 
+        test="(((contains(w:instrText,'PAGE') and not(contains(w:instrText,'PAGEREF')))or (contains(preceding::w:instrText[1]  ,'PAGE') and not(contains(preceding::w:instrText[1],'PAGEREF'))))) and 
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and descendant::w:t"/>
       
       <!-- Comments -->
