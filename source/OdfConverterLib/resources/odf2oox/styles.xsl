@@ -2138,18 +2138,37 @@
       </xsl:choose>
     </xsl:variable>
 
+    <!-- border line width -->
+    <xsl:variable name="borderLineWidth">
+      <xsl:call-template name="GetBorderLineWidth">
+        <xsl:with-param name="side" select="$side"/>
+        <xsl:with-param name="node" select="$node"/>
+      </xsl:call-template>
+    </xsl:variable>
+
 
     <xsl:attribute name="w:val">
       <xsl:call-template name="GetBorderStyle">
         <xsl:with-param name="side" select="$side"/>
         <xsl:with-param name="borderStr" select="$borderStr"/>
+        <xsl:with-param name="borderLineWidth" select="$borderLineWidth"/>
       </xsl:call-template>
     </xsl:attribute>
 
     <xsl:attribute name="w:sz">
-      <xsl:call-template name="eightspoint-measure">
-        <xsl:with-param name="length" select="substring-before($borderStr,  ' ')"/>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="$borderLineWidth != '' ">
+          <xsl:call-template name="ComputeBorderLineWidth">
+            <xsl:with-param name="borderLineWidth" select="$borderLineWidth"/>
+            <xsl:with-param name="unit">eightspoint</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="eightspoint-measure">
+            <xsl:with-param name="length" select="substring-before($borderStr,  ' ')"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
 
     <xsl:if test="$padding != '' ">
@@ -2194,6 +2213,61 @@
   </xsl:template>
 
 
+  <!-- compute the width of a border using border-line-width attribute -->
+  <xsl:template name="ComputeBorderLineWidth">
+    <xsl:param name="borderLineWidth"/>
+    <xsl:param name="unit"/>
+
+    <xsl:variable name="inner">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length" select="substring-before($borderLineWidth,' ')"/>
+        <xsl:with-param name="unit" select="$unit"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="between">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length"
+          select="substring-before(substring-after($borderLineWidth,' '),' ')"/>
+        <xsl:with-param name="unit" select="$unit"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="outer">
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length"
+          select="substring-after(substring-after($borderLineWidth,' '),' ')"/>
+        <xsl:with-param name="unit" select="$unit"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="$inner + $outer + $between"/>
+  </xsl:template>
+
+  <!-- get border line width attribute -->
+  <xsl:template name="GetBorderLineWidth">
+    <xsl:param name="side"/>
+    <xsl:param name="node"/>
+    <xsl:choose>
+      <xsl:when test="$side = 'tl-br' or $side = 'bl-tr' ">
+        <xsl:value-of select="$node/@*[name()=concat('style:diagonal-', $side, '-widths')]"/>
+      </xsl:when>
+      <xsl:when test="$node/@style:border-line-width">
+        <xsl:value-of select="$node/@style:border-line-width"/>
+      </xsl:when>
+      <xsl:when test="$side='middle'">
+        <xsl:choose>
+          <xsl:when test="$node/@style:border-line-width-top">
+            <xsl:value-of select="$node/@style:border-line-width-top"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$node/@fo:border-line-width-bottom"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="attribute::node()[name()=concat('style:border-line-width-',$side)]"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- Compute values to be added for indent value. -->
   <xsl:template name="ComputeAdditionalIndent">
     <xsl:param name="side"/>
@@ -2201,6 +2275,7 @@
     <!-- If there is a border, the indent will have to take it into consideration. -->
     <xsl:variable name="BorderWidth">
       <xsl:call-template name="GetBorderWidth">
+        <xsl:with-param name="side" select="$side"/>
         <xsl:with-param name="style" select="$style"/>
       </xsl:call-template>
     </xsl:variable>
@@ -2226,34 +2301,50 @@
   <xsl:template name="GetBorderWidth">
     <xsl:param name="side"/>
     <xsl:param name="style"/>
+
     <xsl:variable name="styleName" select="$style/@style:parent-style-name"/>
     <xsl:variable name="borderWidth">
       <xsl:choose>
         <xsl:when
           test="$style/style:paragraph-properties/@fo:border and $style/style:paragraph-properties/@fo:border!='none'">
-          <xsl:value-of select="substring-before($style/style:paragraph-properties/@fo:border,' ')"
-          />
+          <xsl:call-template name="GetConsistentBorderValue">
+            <xsl:with-param name="side" select="$side"/>
+            <xsl:with-param name="borderAttibute"
+              select="$style/style:paragraph-properties/@fo:border"/>
+            <xsl:with-param name="node" select="$style/style:paragraph-properties"/>
+          </xsl:call-template>
         </xsl:when>
         <xsl:when
           test="$style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)] and $style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)] != 'none' ">
-          <xsl:value-of
-            select="substring-before($style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)],' ')"
-          />
+          <xsl:call-template name="GetConsistentBorderValue">
+            <xsl:with-param name="side" select="$side"/>
+            <xsl:with-param name="borderAttibute"
+              select="$style/style:paragraph-properties/@*[name()=concat('fo:border-', $side)]"/>
+            <xsl:with-param name="node" select="$style/style:paragraph-properties"/>
+          </xsl:call-template>
         </xsl:when>
         <xsl:when test="$style/ancestor::office:automatic-styles">
           <xsl:for-each select="document('styles.xml')">
             <xsl:choose>
               <xsl:when
                 test="key('styles',$styleName)[1]/style:paragraph-properties/@fo:border and key('styles',$styleName)[1]/style:paragraph-properties/@fo:border != 'none' ">
-                <xsl:value-of
-                  select="substring-before(key('styles', $styleName)/style:paragraph-properties/@fo:border,' ')"
-                />
+                <xsl:call-template name="GetConsistentBorderValue">
+                  <xsl:with-param name="side" select="$side"/>
+                  <xsl:with-param name="borderAttibute"
+                    select="key('styles', $styleName)/style:paragraph-properties/@fo:border"/>
+                  <xsl:with-param name="node"
+                    select="key('styles', $styleName)/style:paragraph-properties"/>
+                </xsl:call-template>
               </xsl:when>
               <xsl:when
                 test="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:border-',$side)] and key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:border-',$side)] != 'none'">
-                <xsl:value-of
-                  select="substring-before(key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:border-',$side)],' ')"
-                />
+                <xsl:call-template name="GetConsistentBorderValue">
+                  <xsl:with-param name="side" select="$side"/>
+                  <xsl:with-param name="borderAttibute"
+                    select="key('styles', $styleName)/style:paragraph-properties/@*[name()=concat('fo:border-', $side)]"/>
+                  <xsl:with-param name="node"
+                    select="key('styles', $styleName)/style:paragraph-properties"/>
+                </xsl:call-template>
               </xsl:when>
               <xsl:otherwise>0</xsl:otherwise>
             </xsl:choose>
@@ -2262,13 +2353,43 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:call-template name="twips-measure">
-      <xsl:with-param name="length">
-        <xsl:value-of select="$borderWidth"/>
-      </xsl:with-param>
-    </xsl:call-template>
+    <!-- if double border (should then contain ' '), compute width -->
+    <xsl:choose>
+      <xsl:when test="contains($borderWidth, ' ')">
+        <xsl:call-template name="ComputeBorderLineWidth">
+          <xsl:with-param name="unit">twips</xsl:with-param>
+          <xsl:with-param name="borderLineWidth" select="$borderWidth">
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="twips-measure">
+          <xsl:with-param name="length">
+            <xsl:value-of select="$borderWidth"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
+  <!-- get the consistent value of border width using context -->
+  <xsl:template name="GetConsistentBorderValue">
+    <xsl:param name="side"/>
+    <xsl:param name="node"/>
+    <xsl:param name="borderAttibute"/>
+
+    <xsl:choose>
+      <xsl:when test="contains($borderAttibute, 'double')">
+        <xsl:call-template name="GetBorderLineWidth">
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="node" select="$node"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="substring-before($borderAttibute,' ')"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
   <!-- Compute the value of padding -->
   <xsl:template name="ComputePaddingValue">
