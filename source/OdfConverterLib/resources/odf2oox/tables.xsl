@@ -1075,22 +1075,40 @@
 
   <!-- Inserts a page break before if needed -->
   <xsl:template name="InsertPageBreakBefore">
-    <!-- in the first paragraph of a table -->
-    <xsl:if test="not(preceding-sibling::text:p) and ancestor-or-self::table:table">
-      <!-- if first cell -->
-      <xsl:if test="parent::table:table-cell[not(preceding-sibling::node())]">
-        <!-- if first row -->
-        <xsl:if
-          test="ancestor::table:table-row[preceding-sibling::node()[1][name()='table:table-column' or name()='table:table-columns'] or not(preceding-sibling::node())]">
-          <!-- if associated style has a pgBreakBefore property -->
-          <xsl:if
-            test="key('automatic-styles', ancestor::table:table[1]/@table:style-name)/style:table-properties/@fo:break-before = 'page'
+    <xsl:variable name="isFirstParagraphOfTable">
+      <xsl:call-template name="IsFirstParagraphOfTable"/>
+    </xsl:variable>
+    <xsl:if test="$isFirstParagraphOfTable = 'true' ">
+      <!-- if associated style has a pgBreakBefore property -->
+      <xsl:if
+        test="key('automatic-styles', ancestor::table:table[1]/@table:style-name)/style:table-properties/@fo:break-before = 'page'
         or key('automatic-styles', ancestor::table:table[1]/@table:style-name)/@style:master-page-name != ''">
-            <w:pageBreakBefore/>
-          </xsl:if>
-        </xsl:if>
+        <w:pageBreakBefore/>
       </xsl:if>
     </xsl:if>
+  </xsl:template>
+
+  <!-- template to know if context paragraph is first of table. returns 'true' or 'false' -->
+  <xsl:template name="IsFirstParagraphOfTable">
+    <xsl:choose>
+      <!-- in the first paragraph of a table -->
+      <xsl:when test="not(preceding-sibling::text:p) and ancestor-or-self::table:table">
+        <xsl:choose>
+          <!-- if first cell -->
+          <xsl:when test="parent::table:table-cell[not(preceding-sibling::node())]">
+            <xsl:choose>
+              <!-- if first row -->
+              <xsl:when
+                test="ancestor::table:table-row[preceding-sibling::node()[1][name()='table:table-column' or name()='table:table-columns'] or not(preceding-sibling::node())]"
+                >true</xsl:when>
+              <xsl:otherwise>false</xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>false</xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>false</xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- compare values of spacing before/after and return 0 or the spacing value to override -->

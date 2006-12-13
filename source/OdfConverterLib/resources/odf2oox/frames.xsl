@@ -98,6 +98,8 @@
   </xsl:template>
 
   <xsl:template match="draw:frame" mode="paragraph">
+    <!-- insert link to TOC field when required (user indexes) -->
+    <xsl:call-template name="InsertTCField"/>
     <xsl:call-template name="InsertEmbeddedTextboxes"/>
   </xsl:template>
 
@@ -158,6 +160,9 @@
 
   <!--draw:object-ole element represents objects that only have a binary representation -->
   <xsl:template match="draw:frame[./draw:object-ole]" mode="paragraph">
+    <!-- insert link to TOC field when required (user indexes) -->
+    <xsl:call-template name="InsertTCField"/>
+
     <xsl:variable name="imageId">
       <xsl:call-template name="GetPosition"/>
     </xsl:variable>
@@ -190,6 +195,8 @@
 
   <!-- object with xml representation are lost -->
   <xsl:template match="draw:frame[./draw:object]" mode="paragraph">
+    <!-- insert link to TOC field when required (user indexes) -->
+    <!--sl:call-template name="InsertTCField"/-->
     <xsl:message terminate="no">feedback:Embedded object</xsl:message>
   </xsl:template>
 
@@ -205,6 +212,8 @@
 
   <!-- plugin (for instance audio and video content) -->
   <xsl:template match="draw:floating-frame" mode="paragraph">
+    <!-- insert link to TOC field when required (user indexes) -->
+    <!--sl:call-template name="InsertTCField"/-->
     <xsl:message terminate="no">feedback:Floating frame</xsl:message>
   </xsl:template>
 
@@ -212,6 +221,9 @@
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and ./draw:image[@xlink:href and not(starts-with(@xlink:href, 'Pictures/'))]]"
     mode="paragraph">
+    <!-- insert link to TOC field when required (user indexes) -->
+    <xsl:call-template name="InsertTCField"/>
+
     <xsl:variable name="supported">
       <xsl:call-template name="image-support">
         <xsl:with-param name="name" select="./draw:image/@xlink:href"/>
@@ -260,6 +272,9 @@
   <xsl:template
     match="draw:frame[not(./draw:object-ole or ./draw:object) and starts-with(./draw:image/@xlink:href, 'Pictures/')]"
     mode="paragraph">
+    <!-- insert link to TOC field when required (user indexes) -->
+    <xsl:call-template name="InsertTCField"/>
+
     <xsl:variable name="supported">
       <xsl:call-template name="image-support">
         <xsl:with-param name="name" select="./draw:image/@xlink:href"/>

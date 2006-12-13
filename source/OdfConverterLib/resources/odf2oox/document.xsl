@@ -144,6 +144,9 @@
       <!-- paragraph content-->
       <xsl:call-template name="InsertParagraphContent"/>
 
+      <!-- reference to user-defined-TOC if we are in first paragraph of a table -->
+      <xsl:call-template name="InsertTCField"/>
+
       <!-- If there is a page-break-after in the paragraph style -->
       <xsl:call-template name="InsertPageBreakAfter"/>
     </w:p>
