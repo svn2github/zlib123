@@ -378,7 +378,9 @@
 
     <!-- indent -->
     <xsl:if
-      test="@fo:margin-left or @fo:margin-right or @fo:text-indent or @text:space-before or @fo:padding or @fo:padding-left or @fo:padding-right">
+      test="@fo:margin-left or @fo:margin-right or @fo:text-indent or @text:space-before
+      or @fo:padding or @fo:padding-left or @fo:padding-right
+      or @fo:border or @fo:border-left or @fo:border-right">
       <xsl:call-template name="ComputeParagraphIndent"/>
     </xsl:if>
 
