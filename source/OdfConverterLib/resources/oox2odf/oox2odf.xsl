@@ -74,7 +74,7 @@
   <xsl:variable name="fontTable"
     select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable']/@Target)"/>
   <xsl:variable name="settings"
-    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@rType='http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings']/@Target)"/>
+    select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings']/@Target)"/>
   <xsl:variable name="footnotes"
     select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes']/@Target)"/>
   <xsl:variable name="endnotes"
