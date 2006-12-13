@@ -414,9 +414,9 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;;;;;;;;;;
 ;Page background;Page color;Selected color;;;2;0.2-Final ;Completed;In ODF page background color is set excluding the margin area;;
 ;;Page Borders;Settings;None/Box/Shadow/3D/custom;;2;0.3-M2;Completed;;;
-;;;Style;Selected style;;2;0.3-M2;;;;
-;;;Color;Selected color;;2;0.3-M2;;;;
-;;;Width;Selected width;;2;0.3-M2;;;;
+;;;Style;Selected style;;2;0.3-M2;Completed;;;
+;;;Color;Selected color;;2;0.3-M2;Completed;;;
+;;;Width;Selected width;;2;0.3-M2;Completed;;;
 ;;;;;;;;;;;
 ;Themes;Colors;;;;2;0.3-M2;Delayed;;;Level 2
 ;;Fonts;;;;2;0.3-M2;Delayed;;;Level 2
