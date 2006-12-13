@@ -121,8 +121,8 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted bec
 ;Header & Footer;Header;;;;1;0.3-M1;Completed;;;
 ;;Footer;;;;1;0.3-M1;Completed;;;
 ;;Page Number;Number format;;;1;0.3-M1;Completed;;;
-;;;Include chapter number ;Chapter starts with style;;1;0.3-M2;;;;It's Word Bug because this function is not supported in new version of Word.
-;;;;Use separator;;1;0.3-M2;;;;It's Word Bug because this function is not supported in new version of Word.
+;;;Include chapter number ;Chapter starts with style;;1;0.3-M2;Completed;;;
+;;;;Use separator;;1;0.3-M2;Completed;;;
 ;;;Page numbering;Continue from previous section;;1;0.3-M1;Completed;;;
 ;;;;Start at;;;-;;;;This feature is unsupported in OO 
 ;;;;;;;;;;;
