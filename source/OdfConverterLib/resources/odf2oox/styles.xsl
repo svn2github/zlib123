@@ -2156,19 +2156,24 @@
     </xsl:attribute>
 
     <xsl:attribute name="w:sz">
-      <xsl:choose>
-        <xsl:when test="$borderLineWidth != '' ">
-          <xsl:call-template name="ComputeBorderLineWidth">
-            <xsl:with-param name="borderLineWidth" select="$borderLineWidth"/>
-            <xsl:with-param name="unit">eightspoint</xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="eightspoint-measure">
-            <xsl:with-param name="length" select="substring-before($borderStr,  ' ')"/>
-          </xsl:call-template>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="CheckBorder">
+        <xsl:with-param name="unit">eightspoint</xsl:with-param>
+        <xsl:with-param name="length">
+          <xsl:choose>
+            <xsl:when test="$borderLineWidth != '' ">
+              <xsl:call-template name="ComputeBorderLineWidth">
+                <xsl:with-param name="borderLineWidth" select="$borderLineWidth"/>
+                <xsl:with-param name="unit">eightspoint</xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="eightspoint-measure">
+                <xsl:with-param name="length" select="substring-before($borderStr,  ' ')"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
     </xsl:attribute>
 
     <xsl:if test="$padding != '' ">
@@ -2354,22 +2359,26 @@
       </xsl:choose>
     </xsl:variable>
     <!-- if double border (should then contain ' '), compute width -->
-    <xsl:choose>
-      <xsl:when test="contains($borderWidth, ' ')">
-        <xsl:call-template name="ComputeBorderLineWidth">
-          <xsl:with-param name="unit">twips</xsl:with-param>
-          <xsl:with-param name="borderLineWidth" select="$borderWidth">
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length">
-            <xsl:value-of select="$borderWidth"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:call-template name="CheckBorder">
+      <xsl:with-param name="unit">twips</xsl:with-param>
+      <xsl:with-param name="length">
+        <xsl:choose>
+          <xsl:when test="contains($borderWidth, ' ')">
+            <xsl:call-template name="ComputeBorderLineWidth">
+              <xsl:with-param name="unit">twips</xsl:with-param>
+              <xsl:with-param name="borderLineWidth" select="$borderWidth"> </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="$borderWidth"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
   <!-- get the consistent value of border width using context -->

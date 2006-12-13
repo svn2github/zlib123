@@ -359,6 +359,26 @@
     </xsl:choose>
   </xsl:template>
 
+
+  <!-- check if border is not too large -->
+  <xsl:template name="CheckBorder">
+    <xsl:param name="length"/>
+    <xsl:param name="unit"/>
+    <xsl:choose>
+      <xsl:when test="$unit = 'twips' and $length &gt; 240">
+        <xsl:message terminate="no">feedback:Border shortened</xsl:message>
+        <xsl:text>240</xsl:text>
+      </xsl:when>
+      <xsl:when test="$unit = 'eightspoint' and $length &gt; 96">
+        <xsl:message terminate="no">feedback:Border shortened</xsl:message>
+        <xsl:text>96</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$length"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!--
     Convert a radian angle to degrees
     'select' param indicates that only a few values are allowed (90,180)
