@@ -612,6 +612,64 @@
   
   <!-- Page Number Field -->
   <xsl:template name="InsertPageNumberField">
+    <xsl:variable name="docName">
+    <xsl:call-template name="GetDocumentName">
+      <xsl:with-param name="rootId">
+        <xsl:value-of select="generate-id(/node())"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$docName = 'document.xml'">
+        <xsl:if test="following::w:sectPr[1]/w:pgNumType/@w:chapStyle">
+          <text:chapter>
+            <xsl:attribute name="text:display">
+              <xsl:text>number</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="text:outline-level">
+              <xsl:value-of select="following::w:sectPr[1]/w:pgNumType/@w:chapStyle"/>
+            </xsl:attribute>
+          </text:chapter>
+          <xsl:choose>
+            <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:chapSep = 'period'">
+              <xsl:text>.</xsl:text>
+            </xsl:when>
+            <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:chapSep = 'colon'">
+              <xsl:text>:</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>-</xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        
+        <xsl:variable name="rId">
+          <xsl:value-of select="document('word/_rels/document.xml.rels')/descendant::node()[@Target = $docName]/@Id"/>
+        </xsl:variable>
+        <xsl:for-each select="document('word/document.xml')/descendant::w:sectPr[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]">
+          <xsl:if test="w:pgNumType/@w:chapStyle">
+            <text:chapter>
+              <xsl:attribute name="text:display">
+                <xsl:text>number</xsl:text>
+              </xsl:attribute>
+              <xsl:attribute name="text:outline-level">
+                <xsl:value-of select="w:pgNumType/@w:chapStyle"/>
+              </xsl:attribute>
+            </text:chapter>
+            <xsl:choose>
+              <xsl:when test="w:pgNumType/@w:chapSep = 'period'">
+                <xsl:text>.</xsl:text>
+              </xsl:when>
+              <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:chapSep = 'colon'">
+                <xsl:text>:</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>-</xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+    
     <xsl:variable name="WInstr">
       <xsl:value-of select="parent::w:fldSimple/@w:instr"/>
     </xsl:variable>
