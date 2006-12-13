@@ -202,7 +202,7 @@
     <xsl:param name="document"/>
 
     <xsl:variable name="id">
-      <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
+      <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed | @r:id"/>
     </xsl:variable>
 
     <xsl:for-each

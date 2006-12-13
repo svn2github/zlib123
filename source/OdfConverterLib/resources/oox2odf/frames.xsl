@@ -19,15 +19,17 @@
   
   <xsl:template match="v:shape">
     <draw:frame>
-      <xsl:call-template name="InsertShapeProperties"/>
+      <xsl:call-template name="InsertCommonShapeProperties"/>
+      <xsl:call-template name="InsertShapeZindex"/>
       <xsl:apply-templates/>
-      <xsl:apply-templates select="self::node()/following-sibling::node()"  mode="shape"/>
+    <!--  some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
+      <xsl:apply-templates select="self::node()/following-sibling::node()"  mode="draw:frame"/>
     </draw:frame>
   </xsl:template>
   
   <xsl:template match="v:rect">
     <draw:rect>   
-      <xsl:call-template name="InsertShapeProperties"/>
+      <xsl:call-template name="InsertCommonShapeProperties"/>
       <xsl:call-template name="InsertVRectAbsolutePos"/>
     </draw:rect>
   </xsl:template>
@@ -43,12 +45,11 @@
     </xsl:attribute>
   </xsl:template>
   
-  <xsl:template name="InsertShapeProperties">
+  <xsl:template name="InsertCommonShapeProperties">
     <xsl:call-template name="InsertShapeStyleName"/>
     <xsl:call-template name="InsertShapeAnchor"/>
     <xsl:call-template name="InsertShapeWidth"/>
     <xsl:call-template name="InsertShapeHeight"/>
-    <xsl:call-template name="InsertShapeZindex"/>
     <xsl:call-template name="InsertshapeAbsolutePos"/>
   </xsl:template>
   
@@ -65,7 +66,7 @@
     </draw:text-box>
   </xsl:template>
 
-  <xsl:template match="o:OLEObject" mode="shape">
+  <xsl:template match="o:OLEObject" mode="draw:frame">
     <xsl:variable name="IdFile">
       <xsl:value-of select="@r:id"/>
     </xsl:variable>
@@ -121,33 +122,25 @@
   </xsl:template>
   
   <xsl:template match="v:imagedata">
-    
-    <xsl:variable name="rId">
-      <xsl:value-of select="./@r:id"/>
+    <xsl:variable name="document">
+      <xsl:call-template name="GetDocumentName">
+        <xsl:with-param name="rootId">
+          <xsl:value-of select="generate-id(/node())"/>
+        </xsl:with-param>
+      </xsl:call-template>
     </xsl:variable>
-    
-    <xsl:variable name="FileName">
-      <xsl:value-of select="generate-id()"/>
-    </xsl:variable>
-    
-    <xsl:if test="document('word/_rels/document.xml.rels')">
-      <xsl:for-each
-        select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
-        <xsl:if test="./@Id=$rId">
-          <xsl:variable name="pzipsource">
-            <xsl:value-of select="./@Target"/>
-          </xsl:variable>
-          <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{concat('Pictures/',$FileName,'.jpg')}"/>
-        </xsl:if>       
-      </xsl:for-each>
-    </xsl:if>
-    
-    <draw:image>
-      <xsl:attribute name="xlink:href">
-        <xsl:value-of select="concat('Pictures/',$FileName, '.jpg')"/>
-      </xsl:attribute>
+    <xsl:call-template name="CopyPictures">
+      <xsl:with-param name="document">
+        <xsl:value-of select="$document"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+      <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
+        <xsl:call-template name="InsertImageHref">
+          <xsl:with-param name="document" select="$document"/>
+        </xsl:call-template>
+      </xsl:if>
     </draw:image>
-    
   </xsl:template>
 
   <xsl:template name="InsertshapeAbsolutePos">

@@ -26,8 +26,9 @@
 
     <!--  Copy Pictures Files to the picture catalog -->
     <xsl:variable name="id">
-      <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
+      <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed |  @r:id"/>
     </xsl:variable>
+    
     <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
       <xsl:for-each
         select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
