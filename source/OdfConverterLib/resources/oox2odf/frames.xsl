@@ -11,7 +11,9 @@
   xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  exclude-result-prefixes="w draw v w10 o">
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  exclude-result-prefixes="w r draw number wp xlink v w10 o">
 
   <xsl:template match="w:pict | w:object">
       <xsl:apply-templates/>
@@ -66,60 +68,34 @@
     </draw:text-box>
   </xsl:template>
 
+  
   <xsl:template match="o:OLEObject" mode="draw:frame">
-    <xsl:variable name="IdFile">
-      <xsl:value-of select="@r:id"/>
+    <xsl:variable name="document">
+      <xsl:call-template name="GetDocumentName">
+        <xsl:with-param name="rootId">
+          <xsl:value-of select="generate-id(/node())"/>
+        </xsl:with-param>
+      </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="IdImage">
-      <xsl:value-of select="parent::w:object/v:shape/v:imagedata/@r:id"/>
-    </xsl:variable>
-    <xsl:variable name="pziptarget">
-      <xsl:value-of select="generate-id()"/>
-    </xsl:variable>
-      <xsl:if test="document('word/_rels/document.xml.rels')">
-        <xsl:for-each
-          select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
-          <xsl:if test="./@Id=$IdFile">
-            <xsl:variable name="pzipsource">
-              <xsl:value-of select="./@Target"/>
-            </xsl:variable>
-            <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{$pziptarget}"/>
-          </xsl:if>
-          <xsl:if test="./@Id=$IdImage">
-            <xsl:variable name="pzipsource">
-              <xsl:value-of select="./@Target"/>
-            </xsl:variable>
-            <pzip:copy pzip:source="{concat('word/',$pzipsource)}"
-              pzip:target="{concat('ObjectReplacements/',$pziptarget)}"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
+    <xsl:call-template name="CopyPictures">
+      <xsl:with-param name="document">
+        <xsl:value-of select="$document"/>
+      </xsl:with-param>
+      <xsl:with-param name="rId" select="@r:id"/>
+      <xsl:with-param name="destFolder" select="'ObjectReplacements'"/>
+    </xsl:call-template>
     <draw:object-ole>
-      <xsl:if test="document('word/_rels/document.xml.rels')">
-        <xsl:for-each
-          select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
-          <xsl:if test="./@Id=$IdFile">
-            <xsl:attribute name="xlink:href">
-              <xsl:choose>
-                <xsl:when test="starts-with(./@Target, 'file:///')">
-                  <xsl:value-of select="translate(substring-after(./@Target, 'file://'), '\', '/')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat('./',$pziptarget)"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:for-each>
+      <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
+        <xsl:call-template name="InsertImageHref">
+          <xsl:with-param name="document" select="$document"/>
+          <xsl:with-param name="rId" select="@r:id"/>
+          <xsl:with-param name="destFolder" select="'ObjectReplacements'"/>
+        </xsl:call-template>
       </xsl:if>
       <xsl:attribute name="xlink:show">embed</xsl:attribute>
     </draw:object-ole>
-    <draw:image>
-      <xsl:attribute name="xlink:href">
-        <xsl:value-of select="concat('./ObjectReplacements/',$pziptarget)"/>
-      </xsl:attribute>
-    </draw:image>
   </xsl:template>
+  
   
   <xsl:template match="v:imagedata">
     <xsl:variable name="document">
@@ -133,11 +109,13 @@
       <xsl:with-param name="document">
         <xsl:value-of select="$document"/>
       </xsl:with-param>
+      <xsl:with-param name="rId" select="@r:id"/>
     </xsl:call-template>
     <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
       <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
         <xsl:call-template name="InsertImageHref">
           <xsl:with-param name="document" select="$document"/>
+          <xsl:with-param name="rId" select="@r:id"/>
         </xsl:call-template>
       </xsl:if>
     </draw:image>
@@ -191,6 +169,9 @@
         <xsl:when test="descendant::w10:wrap/@type = 'none' ">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
+        <xsl:when test="ancestor::w:hdr or ancestor::w:ftr ">
+          <xsl:text>char</xsl:text>
+        </xsl:when>
         <xsl:otherwise>
           <xsl:text>paragraph</xsl:text>
         </xsl:otherwise>
@@ -206,13 +187,15 @@
         <xsl:with-param name="propertyName" select="'z-index'"/>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:if test="$zindex != ''">
     <xsl:attribute name="draw:z-index">
       <xsl:value-of select="$zindex"/> 
     </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertShapeStyleName">
-    <xsl:param name="shape" select="ancestor::w:pict"/>
+    <xsl:param name="shape" select="ancestor::w:pict | ancestor::w:object"/>
     <xsl:attribute name="draw:style-name">
       <xsl:call-template name="GenerateStyleName">
         <xsl:with-param name="node" select="$shape"/>
@@ -369,7 +352,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:pict" mode="automaticstyles">
+  <xsl:template match="w:pict | w:object" mode="automaticstyles">
     <style:style>
       <xsl:attribute name="style:name">
         <xsl:call-template name="GenerateStyleName">
@@ -738,8 +721,8 @@
           <xsl:text>none</xsl:text>
         </xsl:attribute>
       </xsl:when> 
-    <!--  Word sets default values for borders  when no strokeweight and strokecolor is set and @stroked is not set to f-->
-      <xsl:when test="not($shape/@strokeweight) and not($shape/@strokecolor)">
+    <!--  Word sets default values for borders  when no strokeweight and strokecolor is set and @stroked is not set to f (this does not work for ole-objects (v:imagedata))-->
+      <xsl:when test="not($shape/@strokeweight) and not($shape/@strokecolor) and not(descendant::v:imagedata)">
          <xsl:attribute name="fo:border">
            <xsl:text>0.0176cm solid #000000</xsl:text>
         </xsl:attribute>

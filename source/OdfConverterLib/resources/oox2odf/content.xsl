@@ -37,7 +37,8 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" exclude-result-prefixes="w">
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" 
+  exclude-result-prefixes="w r xlink number wp ">
 
   <xsl:import href="tables.xsl"/>
   <xsl:import href="lists.xsl"/>

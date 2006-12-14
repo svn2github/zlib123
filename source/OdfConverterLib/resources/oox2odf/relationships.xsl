@@ -23,11 +23,20 @@
 
   <xsl:template name="CopyPictures">
      <xsl:param name="document"/>
-
+    <xsl:param name="rId"/>
+    <xsl:param name="destFolder" select="'Pictures'"/>
+    
     <!--  Copy Pictures Files to the picture catalog -->
     <xsl:variable name="id">
-      <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed |  @r:id"/>
-    </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$rId != ''">  
+            <xsl:value-of select="$rId"/>
+        </xsl:when>
+        <xsl:otherwise>
+         <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
+        </xsl:otherwise>
+      </xsl:choose>
+  </xsl:variable>
     
     <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
       <xsl:for-each
@@ -39,7 +48,7 @@
           <xsl:variable name="pziptarget">
             <xsl:value-of select="substring-after($pzipsource,'/')"/>
           </xsl:variable>
-          <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{concat('Pictures/',$pziptarget)}"/>
+          <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{concat($destFolder,'/',$pziptarget)}"/>
         </xsl:if>
       </xsl:for-each>
     </xsl:if>

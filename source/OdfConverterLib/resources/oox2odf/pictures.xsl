@@ -61,42 +61,9 @@
     </xsl:call-template>
 
     <draw:frame>
-      <!-- TODO:@text:anchor-type -->
-      <xsl:attribute name="text:anchor-type">
-        <xsl:variable name="verticalRelativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
-        <xsl:variable name="horizontalRelativeFrom" select="descendant::wp:positionH/@relativeFrom"/>
-        <xsl:variable name="layoutInCell" select="@layoutInCell"/>
-
-        <xsl:choose>
-          <xsl:when test="name() = 'wp:inline' ">
-            <xsl:text>as-char</xsl:text>
-          </xsl:when>
-          <xsl:when test="$verticalRelativeFrom = 'line' or $horizontalRelativeFrom = 'line'">
-            <xsl:text>char</xsl:text>
-          </xsl:when>
-          <xsl:when
-            test="$verticalRelativeFrom = 'character' or $horizontalRelativeFrom = 'character'">
-            <xsl:text>char</xsl:text>
-          </xsl:when>
-          <xsl:when test="$verticalRelativeFrom = 'page'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$verticalRelativeFrom = 'paragraph'">
-            <xsl:text>char</xsl:text>
-          </xsl:when>
-          <xsl:when test="$layoutInCell = 1">
-            <xsl:text>paragraph</xsl:text>
-          </xsl:when>
-          <xsl:when test="$layoutInCell = 0">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>page</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-
-
+     <!-- anchor type-->
+      <xsl:call-template name="InsertImageAnchorType"/>
+      
       <!--style name-->
       <xsl:attribute name="draw:style-name">
         <xsl:value-of select="generate-id(ancestor::w:drawing)"/>
@@ -126,6 +93,42 @@
     </draw:frame>
   </xsl:template>
 
+  <xsl:template name="InsertImageAnchorType">
+    <xsl:attribute name="text:anchor-type">
+      <xsl:variable name="verticalRelativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
+      <xsl:variable name="horizontalRelativeFrom" select="descendant::wp:positionH/@relativeFrom"/>
+      <xsl:variable name="layoutInCell" select="@layoutInCell"/>
+      
+      <xsl:choose>
+        <xsl:when test="name() = 'wp:inline' ">
+          <xsl:text>as-char</xsl:text>
+        </xsl:when>
+        <xsl:when test="$verticalRelativeFrom = 'line' or $horizontalRelativeFrom = 'line'">
+          <xsl:text>char</xsl:text>
+        </xsl:when>
+        <xsl:when
+          test="$verticalRelativeFrom = 'character' or $horizontalRelativeFrom = 'character'">
+          <xsl:text>char</xsl:text>
+        </xsl:when>
+        <xsl:when test="$verticalRelativeFrom = 'page'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$verticalRelativeFrom = 'paragraph'">
+          <xsl:text>char</xsl:text>
+        </xsl:when>
+        <xsl:when test="$layoutInCell = 1">
+          <xsl:text>paragraph</xsl:text>
+        </xsl:when>
+        <xsl:when test="$layoutInCell = 0">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>page</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+  
   <xsl:template name="SetSize">
     <xsl:choose>
       <xsl:when test="descendant::a:ln">
@@ -232,11 +235,20 @@
   <!-- inserts image href from relationships -->
   <xsl:template name="InsertImageHref">
     <xsl:param name="document"/>
-
+    <xsl:param name="rId"/>
+    <xsl:param name="srcFolder" select="'Pictures'"/>
+    
     <xsl:variable name="id">
-      <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed | @r:id"/>
+      <xsl:choose>
+        <xsl:when test="$rId != ''">  
+          <xsl:value-of select="$rId"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip/@r:embed"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-
+    
     <xsl:for-each
       select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
       <xsl:if test="./@Id=$id">
@@ -247,7 +259,7 @@
           <xsl:value-of select="substring-after($pzipsource,'/')"/>
         </xsl:variable>
         <xsl:attribute name="xlink:href">
-          <xsl:value-of select="concat('Pictures/', $pziptarget)"/>
+          <xsl:value-of select="concat($srcFolder,'/', $pziptarget)"/>
         </xsl:attribute>
       </xsl:if>
     </xsl:for-each>

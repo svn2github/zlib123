@@ -36,7 +36,9 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  exclude-result-prefixes="w r draw number">
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  exclude-result-prefixes="w r draw number wp xlink">
   
   <xsl:import href="footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
