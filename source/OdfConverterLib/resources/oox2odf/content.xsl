@@ -444,6 +444,9 @@
       <xsl:when
         test="(((contains(w:instrText,'PAGE') and not(contains(w:instrText,'PAGEREF')))or (contains(preceding::w:instrText[1]  ,'PAGE') and not(contains(preceding::w:instrText[1],'PAGEREF'))))) and 
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and descendant::w:t"/>
+      <!-- ignore text when we are in reference field -->
+      <xsl:when
+        test="contains(preceding::w:instrText[1],'REF') and count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and not(w:instrText)"/>
       
       <!-- Comments -->
       <xsl:when test="w:commentReference/@w:id">        
