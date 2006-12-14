@@ -112,10 +112,10 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted bec
 ;;;;;;;;;;;
 ;;Bookmark;;;;2;1.0;;;;
 ;;;;;;;;;;;
-;;Cross Reference;Reference type;;;2;1.0;;;;
-;;;Insert reference to;Selected destination;;2;1.0;;;;
-;;;;Include above/below;;2;1.0;;;;
-;;;Insert as hyperlink;;;2;1.0;;;;
+;;Cross Reference;Reference type;;;2;1.0;Completed;;;
+;;;Insert reference to;Selected destination;;2;1.0;Completed;;;
+;;;;Include above/below;;2;1.0;Completed;;;
+;;;Insert as hyperlink;;;2;1.0;Completed;;;
 ;;;Seperate numbers with;;;3;1.0;;;;
 ;;;;;;;;;;;
 ;Header & Footer;Header;;;;1;0.3-M1;Completed;;;
