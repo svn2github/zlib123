@@ -313,53 +313,16 @@
       </xsl:call-template>
     </xsl:variable>
     
-    <xsl:variable name="IfToc">    
-      <xsl:call-template name="CheckifTOC"/>
-      </xsl:variable>
-  
     <xsl:choose>
       
       <!--check if the paragraph starts a table-of content -->
       <xsl:when test="descendant::w:r[contains(w:instrText,'TOC')]">
-        <text:table-of-content text:style-name="Sect1" text:protected="true" text:name="Table of Contents1">
-          <xsl:call-template name="InsertIndexProperties"/>
-          <text:index-body>
-            <xsl:apply-templates select="." mode="index"/>
-          </text:index-body>
-        </text:table-of-content>
+        <xsl:apply-templates select="." mode="tocstart"/>
       </xsl:when>
       
-      <!-- check if the paragraph is Bibliography -->
+      <!-- if paragraph is in toc, it has been converted already -->
+      <xsl:when test="not(descendant::w:r[contains(w:instrText,'TOC')]) and contains(descendant::w:pStyle/@w:val,'TOC')"/>
       
-      <xsl:when test="descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')]">
-        <text:bibliography>
-          <xsl:attribute name="text:name">
-            <xsl:value-of select="generate-id(descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')])"/>
-          </xsl:attribute>
-            <text:bibliography-source>
-            </text:bibliography-source>
-          <text:index-body>       
-              <xsl:apply-templates select="." mode="index"/>
-          </text:index-body>
-        </text:bibliography>       
-      </xsl:when>
-      
-      <!-- check if the pargraph is Citations -->
-      
-      <xsl:when test="descendant::w:r[contains(w:instrText,'CITATION')]">
-        <xsl:variable name="InstrText">
-          <xsl:value-of select="descendant::w:r/w:instrText"/>
-        </xsl:variable>
-        <text:p>
-          <xsl:call-template name="TextBibliographyMark">
-            <xsl:with-param name="TextIdentifier">
-              <xsl:value-of select="substring-before(substring-after($InstrText, 'CITATION '), ' \')"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </text:p>
-      </xsl:when>
-      
-
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != ''">
           <xsl:apply-templates select="." mode="list">
@@ -376,10 +339,6 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
-      
-      <!--check if paragraph is in table-of -content -->
-      <xsl:when test="$IfToc = 'true'"/>
-      
       <!--  default scenario - paragraph-->
       <xsl:otherwise>
         <xsl:apply-templates select="." mode="paragraph"/>
@@ -483,8 +442,11 @@
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and not(w:instrText)"/>
       <!-- ignore text when we are in pagebreak field -->
       <xsl:when
-        test="((contains(w:instrText,'PAGE') or contains(preceding::w:instrText[1]  ,'PAGE'))) and 
+        test="(((contains(w:instrText,'PAGE') and not(contains(w:instrText,'PAGEREF')))or (contains(preceding::w:instrText[1]  ,'PAGE') and not(contains(preceding::w:instrText[1],'PAGEREF'))))) and 
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and descendant::w:t"/>
+      <!-- ignore text when we are in reference field -->
+      <xsl:when
+        test="contains(preceding::w:instrText[1],'REF') and count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and not(w:instrText)"/>
       
       <!-- Comments -->
       <xsl:when test="w:commentReference/@w:id">        
