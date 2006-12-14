@@ -2113,29 +2113,31 @@
 
     <!-- padding = 0 if side border not defined ! -->
     <xsl:variable name="padding">
-      <xsl:choose>
-        <xsl:when test="$node/@fo:border and $node/@fo:padding">
-          <xsl:value-of select="$node/@fo:padding"/>
-        </xsl:when>
-        <xsl:when
-          test="$node/@*[name()=concat('fo:border-', $side)] != 'none' and $node/@fo:padding">
-          <xsl:value-of select="$node/@fo:padding"/>
-        </xsl:when>
-        <xsl:when test="$side = 'middle' ">
-          <xsl:choose>
-            <xsl:when test="$node/@fo:padding-top != 'none'">
-              <xsl:value-of select="$node/@fo:padding-top"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$node/@fo:padding-bottom"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:when test="$node/@*[name()=concat('fo:padding-', $side)]">
-          <xsl:value-of select="$node/@*[name()=concat('fo:padding-', $side)]"/>
-        </xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
-      </xsl:choose>
+      <xsl:if test="not($node/self::style:table-cell-properties)">
+        <xsl:choose>
+          <xsl:when test="$node/@fo:border and $node/@fo:padding">
+            <xsl:value-of select="$node/@fo:padding"/>
+          </xsl:when>
+          <xsl:when
+            test="$node/@*[name()=concat('fo:border-', $side)] != 'none' and $node/@fo:padding">
+            <xsl:value-of select="$node/@fo:padding"/>
+          </xsl:when>
+          <xsl:when test="$side = 'middle' ">
+            <xsl:choose>
+              <xsl:when test="$node/@fo:padding-top != 'none'">
+                <xsl:value-of select="$node/@fo:padding-top"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$node/@fo:padding-bottom"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:when test="$node/@*[name()=concat('fo:padding-', $side)]">
+            <xsl:value-of select="$node/@*[name()=concat('fo:padding-', $side)]"/>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
     </xsl:variable>
 
     <!-- border line width -->
