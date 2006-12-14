@@ -426,7 +426,12 @@
     <xsl:param name="imageId"/>
     <xsl:param name="imageStyle"/>
 
-    <wp:anchor simplePos="0" locked="0" layoutInCell="1" allowOverlap="1">
+    <wp:anchor simplePos="0" locked="0" layoutInCell="1">
+
+      <!-- overlap property -->
+      <xsl:call-template name="InsertOverlapProperty">
+        <xsl:with-param name="imageStyle" select="$imageStyle"/>
+      </xsl:call-template>
 
       <!-- image z-index-->
       <xsl:call-template name="InsertZindex">
@@ -440,7 +445,6 @@
 
       <!--height and width -->
       <wp:extent cx="{$cx}" cy="{$cy}"/>
-      <wp:effectExtent l="0" t="0" r="0" b="0"/>
 
       <!--image wrapping-->
       <xsl:call-template name="InsertAnchorImageWrapping">
@@ -456,6 +460,26 @@
       </xsl:call-template>
     </wp:anchor>
 
+  </xsl:template>
+
+  <xsl:template name="InsertOverlapProperty">
+    <xsl:param name="imageStyle"/>
+
+    <xsl:variable name="contour">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$imageStyle"/>
+        <xsl:with-param name="attribName">style:wrap-contour</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$contour = 'true' ">
+        <xsl:attribute name="allowOverlap">1</xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$contour = 'false' ">
+        <xsl:attribute name="allowOverlap">0</xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertZindex">
@@ -779,6 +803,13 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <xsl:if test="$wrap != 'parallel' ">
+      <xsl:call-template name="InsertWrapExtent">
+        <xsl:with-param name="wrap" select="$wrap"/>
+        <xsl:with-param name="imageStyle" select="$imageStyle"/>
+      </xsl:call-template>
+    </xsl:if>
+
     <xsl:choose>
       <xsl:when test="$wrap = 'parallel' ">
         <xsl:variable name="wrappedPara">
@@ -789,9 +820,14 @@
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="$wrappedPara = 1">
+            <wp:effectExtent l="0" t="0" r="0" b="0"/>
             <wp:wrapNone/>
           </xsl:when>
           <xsl:otherwise>
+            <xsl:call-template name="InsertWrapExtent">
+              <xsl:with-param name="wrap" select="$wrap"/>
+              <xsl:with-param name="imageStyle" select="$imageStyle"/>
+            </xsl:call-template>
             <xsl:call-template name="InsertSquareWrap">
               <xsl:with-param name="wrap" select="$wrap"/>
               <xsl:with-param name="imageStyle" select="$imageStyle"/>
@@ -822,6 +858,80 @@
         <wp:wrapNone/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <!-- insert wrapping extent if wrap is  -->
+  <xsl:template name="InsertWrapExtent">
+    <xsl:param name="wrap"/>
+    <xsl:param name="imageStyle"/>
+
+    <xsl:choose>
+      <xsl:when
+        test="$wrap = 'parallel' or $wrap ='left' or $wrap = 'right' or $wrap ='dynamic' or $wrap = 'none' ">
+        <wp:effectExtent>
+          <xsl:attribute name="l">
+            <xsl:call-template name="ComputeImageBorderWidth">
+              <xsl:with-param name="imageStyle" select="$imageStyle"/>
+              <xsl:with-param name="side">left</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name="t">
+            <xsl:call-template name="ComputeImageBorderWidth">
+              <xsl:with-param name="imageStyle" select="$imageStyle"/>
+              <xsl:with-param name="side">top</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name="r">
+            <xsl:call-template name="ComputeImageBorderWidth">
+              <xsl:with-param name="imageStyle" select="$imageStyle"/>
+              <xsl:with-param name="side">right</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name="b">
+            <xsl:call-template name="ComputeImageBorderWidth">
+              <xsl:with-param name="imageStyle" select="$imageStyle"/>
+              <xsl:with-param name="side">bottom</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </wp:effectExtent>
+      </xsl:when>
+      <xsl:otherwise>
+        <wp:effectExtent l="0" t="0" r="0" b="0"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="ComputeImageBorderWidth">
+    <xsl:param name="side"/>
+    <xsl:param name="imageStyle"/>
+
+    <xsl:variable name="borderWidth">
+      <xsl:call-template name="GetFrameBorder">
+        <xsl:with-param name="shapeStyle" select="$imageStyle"/>
+        <xsl:with-param name="side" select="$side"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- if double border (should then contain ' '), compute width -->
+    <xsl:call-template name="CheckBorder">
+      <xsl:with-param name="unit">emu</xsl:with-param>
+      <xsl:with-param name="length">
+        <xsl:choose>
+          <xsl:when test="contains($borderWidth, ' ')">
+            <xsl:call-template name="ComputeBorderLineWidth">
+              <xsl:with-param name="unit">emu</xsl:with-param>
+              <xsl:with-param name="borderLineWidth" select="$borderWidth"> </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="$borderWidth"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
   <!-- square wrap type for anchor image -->
@@ -986,8 +1096,13 @@
       <xsl:variable name="strokeColor" select="substring-after($border,'#')"/>
 
       <xsl:variable name="strokeWeight">
-        <xsl:call-template name="emu-measure">
-          <xsl:with-param name="length" select="substring-before($border,' ')"/>
+        <xsl:call-template name="CheckBorder">
+          <xsl:with-param name="length">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length" select="substring-before($border,' ')"/>
+            </xsl:call-template>
+          </xsl:with-param>
+          <xsl:with-param name="unit">emu</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
 
@@ -2693,6 +2808,26 @@
 
   </xsl:template>
 
+  <xsl:template name="InsertShapeOverlapProperty">
+    <xsl:param name="shapeStyle"/>
+
+    <xsl:variable name="shapeContour">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">style:wrap-contour</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$shapeContour = 'true' ">
+        <xsl:attribute name="o:allowoverlap">t</xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$shapeContour = 'false' ">
+        <xsl:attribute name="o:allowoverlap">f</xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template name="InsertShapeFill">
     <xsl:param name="shapeStyle"/>
 
@@ -3018,6 +3153,10 @@
       </xsl:call-template>
     </xsl:attribute>
 
+    <xsl:call-template name="InsertShapeOverlapProperty">
+      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+    </xsl:call-template>
+
     <xsl:call-template name="InsertShapeFill">
       <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
     </xsl:call-template>
@@ -3253,6 +3392,43 @@
       <!-- otherwise if padding attribute -->
       <xsl:when test="$shapeStyle/style:graphic-properties/@fo:padding">
         <xsl:value-of select="$shapeStyle/style:graphic-properties/@fo:padding"/>
+      </xsl:when>
+      <!-- otherwise look parent style -->
+      <xsl:when test="$shapeStyle/@style:parent-style-name">
+        <xsl:variable name="parentStyle"
+          select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $shapeStyle/@style:parent-style-name]"/>
+        <xsl:call-template name="GetFramePadding">
+          <xsl:with-param name="shapeStyle" select="$parentStyle"/>
+          <xsl:with-param name="side" select="$side"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- compute the border of a frame -->
+  <xsl:template name="GetFrameBorder">
+    <xsl:param name="shapeStyle"/>
+    <xsl:param name="side"/>
+
+    <xsl:choose>
+      <!-- priority to side border -->
+      <xsl:when test="$shapeStyle/style:graphic-properties/@*[name() = concat('fo:border-', $side)]">
+        <xsl:call-template name="GetConsistentBorderValue">
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="borderAttibute"
+            select="$shapeStyle/style:graphic-properties/@*[name() = concat('fo:border-', $side)]"/>
+          <xsl:with-param name="node" select="$shapeStyle/style:graphic-properties"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!-- otherwise if border attribute -->
+      <xsl:when test="$shapeStyle/style:graphic-properties/@fo:border">
+        <xsl:call-template name="GetConsistentBorderValue">
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="borderAttibute"
+            select="$shapeStyle/style:graphic-properties/@fo:border"/>
+          <xsl:with-param name="node" select="$shapeStyle/style:graphic-properties"/>
+        </xsl:call-template>
       </xsl:when>
       <!-- otherwise look parent style -->
       <xsl:when test="$shapeStyle/@style:parent-style-name">

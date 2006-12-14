@@ -373,6 +373,10 @@
         <xsl:message terminate="no">feedback:Border shortened</xsl:message>
         <xsl:text>96</xsl:text>
       </xsl:when>
+      <xsl:when test="$unit = 'emu' and $length &gt; 152400">
+        <xsl:message terminate="no">feedback:Border shortened</xsl:message>
+        <xsl:text>152400</xsl:text>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$length"/>
       </xsl:otherwise>
