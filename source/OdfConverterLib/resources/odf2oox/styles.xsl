@@ -700,14 +700,27 @@
     </xsl:if>
 
     <!-- fonts -->
-    <xsl:if test="@style:font-name or @style:font-name-complex or @style:font-name-asian">
+    <xsl:if
+      test="@style:font-name or @style:font-name-complex or @style:font-name-asian
+      or @fo:font-family or @style:font-family-asian or @style:font-family-complex">
       <w:rFonts>
-        <xsl:if test="@style:font-name">
-          <xsl:variable name="fontName">
-            <xsl:call-template name="ComputeFontName">
-              <xsl:with-param name="fontName" select="@style:font-name"/>
-            </xsl:call-template>
-          </xsl:variable>
+        <xsl:variable name="fontName">
+          <xsl:call-template name="ComputeFontName">
+            <xsl:with-param name="fontName">
+              <xsl:choose>
+                <xsl:when test="@style:font-name">
+                  <xsl:value-of select="@style:font-name"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:if test="@fo:font-family">
+                    <xsl:value-of select="@fo:font-family"/>
+                  </xsl:if>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$fontName != '' ">
           <xsl:attribute name="w:ascii">
             <xsl:value-of select="$fontName"/>
           </xsl:attribute>
@@ -715,20 +728,42 @@
             <xsl:value-of select="$fontName"/>
           </xsl:attribute>
         </xsl:if>
-        <xsl:if test="@style:font-name-complex">
-          <xsl:attribute name="w:cs">
-            <xsl:call-template name="ComputeFontName">
-              <xsl:with-param name="fontName" select="@style:font-name-complex"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="@style:font-name-asian">
-          <xsl:attribute name="w:eastAsia">
-            <xsl:call-template name="ComputeFontName">
-              <xsl:with-param name="fontName" select="@style:font-name-asian"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
+        <xsl:choose>
+          <xsl:when test="@style:font-name-complex">
+            <xsl:attribute name="w:cs">
+              <xsl:call-template name="ComputeFontName">
+                <xsl:with-param name="fontName" select="@style:font-name-complex"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="@fo:font-family-complex">
+              <xsl:attribute name="w:cs">
+                <xsl:call-template name="ComputeFontName">
+                  <xsl:with-param name="fontName" select="@style:font-family-complex"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="@style:font-name-asian">
+            <xsl:attribute name="w:eastAsia">
+              <xsl:call-template name="ComputeFontName">
+                <xsl:with-param name="fontName" select="@style:font-name-asian"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="@fo:font-family-asian">
+              <xsl:attribute name="w:eastAsia">
+                <xsl:call-template name="ComputeFontName">
+                  <xsl:with-param name="fontName" select="@style:font-family-asian"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
       </w:rFonts>
     </xsl:if>
 
