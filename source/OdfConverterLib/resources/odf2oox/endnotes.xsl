@@ -68,7 +68,7 @@
       <xsl:for-each select="document('content.xml')">
         <!-- warn loss of page break before endnotes -->
         <xsl:if test="key('endnotes', '')">
-          <xsl:message terminate="no">feedback:Page break before endnotes.</xsl:message>
+          <xsl:message terminate="no">feedback:Page break before endnotes</xsl:message>
         </xsl:if>
         <xsl:for-each select="key('endnotes', '')">
           <w:endnote w:type="normal" w:id="{position() + 1}">

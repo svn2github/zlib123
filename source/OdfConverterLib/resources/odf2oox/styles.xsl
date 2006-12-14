@@ -270,7 +270,7 @@
     <xsl:choose>
       <xsl:when test="@fo:widows != '0' or @fo:orphans != '0'">
         <xsl:if test="@fo:widows &gt; 2 or @fo:orphans &gt; 2">
-          <xsl:message terminate="no">feedback:Widows and Orphans number</xsl:message>
+          <xsl:message terminate="no">feedback:Widows and orphans number</xsl:message>
         </xsl:if>
         <w:widowControl w:val="on"/>
       </xsl:when>
@@ -693,7 +693,7 @@
 
     <!-- report lost attributes -->
     <xsl:if test="@style:text-blinking">
-      <xsl:message terminate="no">feedback:Text blinking</xsl:message>
+      <xsl:message terminate="no">feedback:Blinking text</xsl:message>
     </xsl:if>
     <xsl:if test="@style:text-rotation-angle or @style:text-rotation-scale">
       <xsl:message terminate="no">feedback:Rotated text</xsl:message>
@@ -1557,7 +1557,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:if test="@style:paper-tray-name != '' ">
-          <xsl:message terminate="no">feedback:Paper Tray</xsl:message>
+          <xsl:message terminate="no">feedback:Paper tray</xsl:message>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>

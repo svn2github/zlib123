@@ -300,7 +300,9 @@
               <xsl:with-param name="length" select="$width"/>
             </xsl:call-template>
           </xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
+          <!-- WARNING : 0 should be the default value, but Word 2007 cannot compute layout properly.
+          Another solution would be to return an empty string, but  an empty tblGrid does not pass validation (although it is permitted by OOX spec) -->
+          <xsl:otherwise>1</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
     </w:gridCol>
@@ -440,7 +442,7 @@
       </w:trPr>
       <xsl:apply-templates select="*[position() &lt; 64]"/>
       <xsl:if test="*[position() &gt;= 64]">
-        <xsl:message terminate="no">feedback: table with more than 64 columns</xsl:message>
+        <xsl:message terminate="no">feedback:Table with more than 64 columns</xsl:message>
       </xsl:if>
     </w:tr>
     <xsl:if test="$number > 1">

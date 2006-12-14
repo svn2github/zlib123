@@ -155,7 +155,7 @@
     <xsl:choose>
       <xsl:when
         test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count >4">
-        <xsl:message terminate="no">feedback:Column number of alphabetical index (no more than 4)</xsl:message>
+        <xsl:message terminate="no">feedback:Alphabetical index column number</xsl:message>
         <w:instrText xml:space="preserve">\c "4" </w:instrText>
       </xsl:when>
       <xsl:when
