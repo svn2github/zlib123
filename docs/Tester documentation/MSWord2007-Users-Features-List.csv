@@ -397,7 +397,7 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;;;;Even page;1;-;;;;There is Word 2007 bug, see coment in Conversion Issues.
 ;;;;;Odd page;1;-;;;;There is Word 2007 bug, see coment in Conversion Issues.
 ;;;;;Continuous;1;0.3-M2;Completed;;;
-;;;;;New column;1;0.3-M2;;;;
+;;;;;New column;1;0.3-M2;Completed;;;
 ;;;Header and Footer;Different odd and even;;1;0.3-M2;Completed;;;
 ;;;;Different first page;;1;0.3-M2;Completed;;;
 ;;;;From edge;Header;1;0.3-M2;Completed;;;
