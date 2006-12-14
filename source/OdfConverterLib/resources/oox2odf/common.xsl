@@ -228,6 +228,19 @@
       </xsl:when>
      </xsl:choose>
   </xsl:template>
+  
+  <xsl:template name="ConvertEmu3">
+    <xsl:param name="length"/>
+    <xsl:param name="unit"/>
+    <xsl:choose>
+      <xsl:when test="not($length) or $length = 0 or format-number($length div 360000, '#.###') = ''">
+        <xsl:value-of select="concat(0,'cm')"/>
+      </xsl:when>
+      <xsl:when test="$unit = 'cm'">
+        <xsl:value-of select="concat(format-number($length div 360000, '#.###'), 'cm')"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 
   <xsl:template name="GetValue">
     <xsl:param name="length"/>

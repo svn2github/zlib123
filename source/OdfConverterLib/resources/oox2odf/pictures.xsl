@@ -127,6 +127,36 @@
   </xsl:template>
 
   <xsl:template name="SetSize">
+    <xsl:choose>
+      <xsl:when test="descendant::a:ln">
+      <xsl:variable name="border">
+        <xsl:call-template name="ConvertEmu3">
+          <xsl:with-param name="length">
+            <xsl:value-of select="descendant::a:ln/@w"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+        <xsl:variable name="height">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="wp:extent/@cy"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="width">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="wp:extent/@cx"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:attribute name="svg:height">
+          <xsl:value-of select="concat(substring-before($height,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"/>
+        </xsl:attribute>
+        <xsl:attribute name="svg:width">
+          <xsl:value-of select="concat(substring-before($width,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
     <xsl:attribute name="svg:height">
       <xsl:call-template name="ConvertEmu">
         <xsl:with-param name="length" select="wp:extent/@cy"/>
@@ -139,6 +169,8 @@
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
+      </xsl:otherwise>
+      </xsl:choose>
   </xsl:template>
 
   <xsl:template name="SetPosition">
@@ -265,7 +297,7 @@
   <xsl:template name="InsertImageBorder">
     <xsl:if test="descendant::a:ln">
       <xsl:variable name="width">
-        <xsl:call-template name="ConvertEmu">
+        <xsl:call-template name="ConvertEmu3">
           <xsl:with-param name="length">
             <xsl:value-of select="descendant::a:ln/@w"/>
           </xsl:with-param>
