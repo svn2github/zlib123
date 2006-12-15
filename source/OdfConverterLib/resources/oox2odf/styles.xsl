@@ -2210,10 +2210,25 @@
           TODO : what if @w:pos < 0 ? -->
         <xsl:if test="./@w:pos >= 0">
           <xsl:attribute name="style:position">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length" select="./@w:pos"/>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
+            <xsl:choose>
+              <xsl:when test="./@w:val = 'right' ">
+                <xsl:variable name="indent">
+                  <xsl:for-each select="ancestor::w:pPr[1]">
+                    <xsl:call-template name="GetParagraphIndent"/>
+                  </xsl:for-each>
+                </xsl:variable>
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length" select="./@w:pos - number($indent)"/>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length" select="./@w:pos"/>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
         </xsl:if>
         <!-- leader char -->
@@ -2248,6 +2263,7 @@
     </style:tab-stop>
   </xsl:template>
 
+  <!-- paragraph indent -->
   <xsl:template name="GetParagraphIndent">
     <xsl:choose>
       <xsl:when test="w:ind/@w:left">
@@ -2257,9 +2273,26 @@
         <xsl:variable name="pStyle">
           <xsl:value-of select="w:pStyle/@w:val"/>
         </xsl:variable>
-        <xsl:for-each select="document('word/styles.xml')/descendant::w:style[@w:styleId=$pStyle]/w:pPr">
-          <xsl:call-template name="GetParagraphIndent"/>
-        </xsl:for-each>
+        <xsl:choose>
+          <xsl:when test="document('word/styles.xml')/descendant::w:style[@w:styleId=$pStyle]/w:pPr">
+            <xsl:for-each select="document('word/styles.xml')/descendant::w:style[@w:styleId=$pStyle]/w:pPr">
+              <xsl:call-template name="GetParagraphIndent"/>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="basedOn">
+              <xsl:value-of select="document('word/styles.xml')/descendant::w:style[@w:styleId=$pStyle]/w:basedOn/@w:val"/>
+            </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="document('word/styles.xml')/descendant::w:style[@w:styleId=$basedOn]/w:pPr">
+                <xsl:for-each select="document('word/styles.xml')/descendant::w:style[@w:styleId=$basedOn]/w:pPr">
+                  <xsl:call-template name="GetParagraphIndent"/>
+                </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>0</xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:when test="ancestor::w:style/w:basedOn/@w:val">
         <xsl:variable name="basedOn">

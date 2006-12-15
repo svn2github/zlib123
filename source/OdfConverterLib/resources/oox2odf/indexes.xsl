@@ -32,7 +32,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   exclude-result-prefixes="w text style">
   
-  <!-- paragraph which starts atble of content -->
+  <!-- paragraph which starts table of content -->
   <xsl:template match="w:p" mode="tocstart">
     <text:table-of-content text:style-name="Sect1" text:protected="true" text:name="Table of Contents1">
       <xsl:call-template name="InsertIndexProperties"/>
@@ -88,6 +88,9 @@
       </xsl:choose>
     </xsl:variable>
     <text:table-of-content-source text:outline-level="{$maxLevel}">
+      <xsl:if test="$maxLevel = 0">
+        <xsl:attribute name="text:outline-level">1</xsl:attribute>
+      </xsl:if>
       <text:index-title-template text:style-name="Contents_20_Heading"/>
       <xsl:variable name="level">
         <xsl:choose>
@@ -112,6 +115,10 @@
     <xsl:choose>
       <xsl:when test="not(number($level) &gt; number($maxLevel))">
         <text:table-of-content-entry-template text:outline-level="{$level}" text:style-name="{concat('Contents_20_',$level)}">
+          <xsl:if test="$level = 0">
+            <xsl:attribute name="text:outline-level">1</xsl:attribute>
+            <xsl:attribute name="text:style-name">Contents_20_1</xsl:attribute>
+          </xsl:if>
           <xsl:call-template name="EntryIterator">
             <xsl:with-param name="fieldCharCount">0</xsl:with-param>
             <xsl:with-param name="level" select="$level"/>
@@ -147,7 +154,7 @@
     </xsl:variable>
     <xsl:if test="$count &gt; 0">
       <xsl:choose>
-      <xsl:when test="(contains(descendant::w:pStyle/@w:val,$level) and not(contains(preceding::w:p[(preceding::node()=$node or self::node()=$node)]/descendant::w:pStyle/@w:val,$level))) or $level = 0">
+      <xsl:when test="(contains(descendant::w:pStyle/@w:val,$level) and not(contains(preceding-sibling::w:p[(preceding::node()=$node or self::node()=$node)]/descendant::w:pStyle/@w:val,$level))) or $level = 0">
         <xsl:apply-templates mode="entry"/>
       </xsl:when>
       <xsl:otherwise>
@@ -295,6 +302,22 @@
       </xsl:call-template>
     </xsl:variable>
     <text:index-entry-tab-stop style:type="{$styleType}">
+      <!--if style type is left, there must be style:position attribute -->
+      
+      <xsl:if test="$styleType = 'left' ">
+        <xsl:attribute name="style:position">
+          <xsl:variable name="position">
+            <xsl:call-template name="GetTabParams">
+              <xsl:with-param name="param">w:pos</xsl:with-param>
+              <xsl:with-param name="tabCount" select="$tabCount"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length" select="$position"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:if test="$leaderChar!=''">
         <xsl:call-template name="InsertStyleLeaderChar">
           <xsl:with-param name="leaderChar">
@@ -326,8 +349,8 @@
     <xsl:param name="param"/>
     <xsl:param name="tabCount"/>
     <xsl:choose>
-      <xsl:when test="preceding::w:tabs[1]/w:tab[$tabCount]/@w:val">
-        <xsl:value-of select="preceding::w:tabs[1]/w:tab[$tabCount]/attribute::node()[name()=$param]"/>
+      <xsl:when test="preceding::w:tabs[1]/w:tab[number($tabCount)]/attribute::node()[name()=$param]">
+        <xsl:value-of select="preceding::w:tabs[1]/w:tab[number($tabCount)]/attribute::node()[name()=$param]"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="GetTabParamsFromStyles">
@@ -335,6 +358,7 @@
             <xsl:value-of select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
           </xsl:with-param>
           <xsl:with-param name="attribute" select="$param"/>
+          <xsl:with-param name="tabCount" select="$tabCount"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -344,9 +368,10 @@
   <xsl:template name="GetTabParamsFromStyles">
     <xsl:param name="tabStyle"/>
     <xsl:param name="attribute"/>
+    <xsl:param name="tabCount"/>
     <xsl:choose>
-      <xsl:when test="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:pPr/w:tabs">
-        <xsl:value-of select="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:pPr/w:tabs/w:tab/attribute::node()[name()=$attribute]"/>
+      <xsl:when test="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:pPr/w:tabs/w:tab[number($tabCount)]/attribute::node()[name()=$attribute]">
+        <xsl:value-of select="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:pPr/w:tabs/w:tab[number($tabCount)]/attribute::node()[name()=$attribute]"/>
       </xsl:when>
       <xsl:when test="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:basedOn/@w:val">
         <xsl:call-template name="GetTabParamsFromStyles">
@@ -354,6 +379,7 @@
             <xsl:value-of select="document('word/styles.xml')/descendant::w:style[@w:styleId = $tabStyle]/w:basedOn/@w:val"/>
           </xsl:with-param>
           <xsl:with-param name="attribute" select="$attribute"/>
+          <xsl:with-param name="tabCount" select="$tabCount"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise/>
