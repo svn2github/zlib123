@@ -187,7 +187,7 @@
             <xsl:value-of select="number($CountFldCharTypeBegin) + count(preceding-sibling::w:p[number($CountParagraph)][preceding-sibling::w:p/w:r[contains(w:instrText,'BIBLIOGRAPHY')  or contains(w:instrText,'TOC')][1]]/descendant::w:r/w:fldChar[@w:fldCharType = 'begin'])"/>  
           </xsl:variable>   
           <xsl:choose>
-            <xsl:when test="number($CountFldCharTypeBegin) + 1 - number($FldCharTypeEnd) = 0">
+            <xsl:when test="number($FldCharTypeBegin) + 1 - number($FldCharTypeEnd) = 0">
                 <xsl:text>0</xsl:text>
             </xsl:when>
             <xsl:otherwise>

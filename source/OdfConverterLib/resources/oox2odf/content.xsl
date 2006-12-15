@@ -325,7 +325,7 @@
     </xsl:otherwise>
   </xsl:choose>
 </xsl:variable>
-    
+
     
     <xsl:choose>
       
@@ -363,9 +363,6 @@
           </xsl:call-template>
         </text:p>
       </xsl:when>
-
-      <!-- if paragraph is in toc, it has been converted already -->
-      <xsl:when test="not(descendant::w:r[contains(w:instrText,'TOC')]) and contains(descendant::w:pStyle/@w:val,'TOC')"/>
       
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != ''">
@@ -383,7 +380,8 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
-      
+
+ <!-- if paragraph is in toc, it has been converted already -->
       <xsl:when test="$IfToc = 'true'"/>
       
       <!--  default scenario - paragraph-->
