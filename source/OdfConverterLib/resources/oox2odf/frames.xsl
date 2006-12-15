@@ -25,7 +25,7 @@
       <xsl:call-template name="InsertShapeZindex"/>
       <xsl:apply-templates/>
     <!--  some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
-      <xsl:apply-templates select="self::node()/following-sibling::node()"  mode="draw:frame"/>
+      <xsl:apply-templates select="self::node()/following-sibling::node()[1]"  mode="draw:frame"/>
     </draw:frame>
   </xsl:template>
   
@@ -77,27 +77,47 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    
+    <xsl:call-template name="CopyPictures">
+      <xsl:with-param name="document">
+        <xsl:value-of select="$document"/>
+       </xsl:with-param>
+      <xsl:with-param name="rId" select="@r:id"/>
+      <xsl:with-param name="destFolder" select="'.'"/>
+      <xsl:with-param name="targetName" select="generate-id(.)"/>
+    </xsl:call-template>
+    
     <xsl:call-template name="CopyPictures">
       <xsl:with-param name="document">
         <xsl:value-of select="$document"/>
       </xsl:with-param>
-      <xsl:with-param name="rId" select="@r:id"/>
+      <xsl:with-param name="rId" select="parent::w:object/v:shape/v:imagedata/@r:id"/>
       <xsl:with-param name="destFolder" select="'ObjectReplacements'"/>
-    </xsl:call-template>
+      <xsl:with-param name="targetName" select="generate-id(.)"/>
+      </xsl:call-template>
+   
     <draw:object-ole>
       <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
         <xsl:call-template name="InsertImageHref">
           <xsl:with-param name="document" select="$document"/>
           <xsl:with-param name="rId" select="@r:id"/>
-          <xsl:with-param name="destFolder" select="'ObjectReplacements'"/>
+          <xsl:with-param name="srcFolder" select="'.'"/>
+          <xsl:with-param name="targetName" select="generate-id(.)"/>
         </xsl:call-template>
       </xsl:if>
       <xsl:attribute name="xlink:show">embed</xsl:attribute>
     </draw:object-ole>
+    <draw:image>
+       <xsl:call-template name="InsertImageHref">
+          <xsl:with-param name="document" select="$document"/>
+         <xsl:with-param name="rId" select="parent::w:object/v:shape/v:imagedata/@r:id"/>
+         <xsl:with-param name="srcFolder" select="'./ObjectReplacements'"/>
+         <xsl:with-param name="targetName" select="generate-id(.)"/>
+        </xsl:call-template>
+    </draw:image>
   </xsl:template>
   
-  
-  <xsl:template match="v:imagedata">
+  <xsl:template match="v:imagedata[not(ancestor::w:object)]">
     <xsl:variable name="document">
       <xsl:call-template name="GetDocumentName">
         <xsl:with-param name="rootId">
@@ -120,8 +140,8 @@
       </xsl:if>
     </draw:image>
   </xsl:template>
-
-  <xsl:template name="InsertshapeAbsolutePos">
+  
+    <xsl:template name="InsertshapeAbsolutePos">
     <xsl:param name="shape" select="."/>
     
     <xsl:variable name="position">
@@ -169,8 +189,10 @@
         <xsl:when test="descendant::w10:wrap/@type = 'none' ">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
+     <!--frames must be anchored as character in header of footer because otherwise they lost their size
+       and horizontal and vertical position (when anchored as character horizontal position is lost)-->
         <xsl:when test="ancestor::w:hdr or ancestor::w:ftr ">
-          <xsl:text>char</xsl:text>
+          <xsl:text>as-char</xsl:text>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>paragraph</xsl:text>

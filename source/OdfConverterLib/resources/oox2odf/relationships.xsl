@@ -24,6 +24,7 @@
   <xsl:template name="CopyPictures">
      <xsl:param name="document"/>
     <xsl:param name="rId"/>
+    <xsl:param name="targetName"/>
     <xsl:param name="destFolder" select="'Pictures'"/>
     
     <!--  Copy Pictures Files to the picture catalog -->
@@ -46,10 +47,24 @@
             <xsl:value-of select="./@Target"/>
           </xsl:variable>
           <xsl:variable name="pziptarget">
-            <xsl:value-of select="substring-after($pzipsource,'/')"/>
+            <xsl:choose>
+              <xsl:when test="$targetName != ''">
+                  <xsl:value-of select="$targetName"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-after($pzipsource,'/')"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:variable>
-          <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{concat($destFolder,'/',$pziptarget)}"/>
-        </xsl:if>
+          <xsl:choose>
+            <xsl:when test="$destFolder = '.' ">
+              <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{$pziptarget}"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{concat($destFolder,'/',$pziptarget)}"/>
+            </xsl:otherwise>
+          </xsl:choose>
+         </xsl:if>
       </xsl:for-each>
     </xsl:if>
   </xsl:template>

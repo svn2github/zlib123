@@ -236,6 +236,7 @@
   <xsl:template name="InsertImageHref">
     <xsl:param name="document"/>
     <xsl:param name="rId"/>
+    <xsl:param name="targetName"/>
     <xsl:param name="srcFolder" select="'Pictures'"/>
     
     <xsl:variable name="id">
@@ -256,7 +257,14 @@
           <xsl:value-of select="./@Target"/>
         </xsl:variable>
         <xsl:variable name="pziptarget">
-          <xsl:value-of select="substring-after($pzipsource,'/')"/>
+          <xsl:choose>
+            <xsl:when test="$targetName != ''">
+              <xsl:value-of select="$targetName"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after($pzipsource,'/')"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
         <xsl:attribute name="xlink:href">
           <xsl:value-of select="concat($srcFolder,'/', $pziptarget)"/>
