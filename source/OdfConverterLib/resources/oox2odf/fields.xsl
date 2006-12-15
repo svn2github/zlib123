@@ -851,39 +851,6 @@
     </text:bibliography-mark>
   </xsl:template>  
     
-  <!-- template which counts difference before number of fldChar 'begin' and number of fldChar 'end' -->
-  <xsl:template name="CountFldChar">
-    <xsl:param name="node"/>
-    <xsl:param name="count"/>
-    <xsl:variable name="counting">
-      
-      <!-- when begin add 1, when end deduct 1 -->
-      <xsl:choose>
-        <xsl:when test="descendant::w:r/w:fldChar/@w:fldCharType='begin'">
-          <xsl:value-of select="number($count)+1"/>
-        </xsl:when>
-        <xsl:when test="descendant::w:r/w:fldChar/@w:fldCharType='end'">
-          <xsl:value-of select="number($count)-1"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="number($count)"/>
-        </xsl:otherwise>
-      </xsl:choose>
-      
-    </xsl:variable>
-    <xsl:choose>
-      <xsl:when test="self::node()=$node or $counting = 0">
-        <xsl:value-of select="$counting"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each select="following-sibling::w:p[1]">
-          <xsl:call-template name="CountFldChar">
-            <xsl:with-param name="node" select="$node"/>
-            <xsl:with-param name="count" select="$counting"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
+  
   
 </xsl:stylesheet>
