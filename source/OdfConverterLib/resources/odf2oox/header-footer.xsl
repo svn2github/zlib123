@@ -47,39 +47,6 @@
     <xsl:param name="footerNode"/>
     <w:ftr>
       <xsl:apply-templates select="$footerNode"/>
-      <!--
-      <xsl:for-each select="child::node()">
-        <xsl:choose>
-          <xsl:when test="./descendant::text:page-number">
-            <w:sdt>
-              <w:sdtContent>
-                <w:p>
-                  <w:pPr>
-                    <w:jc>
-                      <xsl:attribute name="w:val">
-                        <xsl:variable name="style" select="descendant::draw:frame/@draw:style-name"/>
-                        <xsl:variable name="alignment" select="//office:document-styles/office:automatic-styles/style:style[@style:name= $style]/style:graphic-properties/@style:horizontal-pos"/>
-                       
-                        <xsl:choose>
-                          <xsl:when test="($alignment = 'center') or ($alignment = 'right') or ($alignment = 'left')">
-                            <xsl:value-of select="$alignment"/>
-                          </xsl:when>
-                          <xsl:otherwise>center</xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:attribute>
-                    </w:jc>
-                  </w:pPr>
-                  <w:fldSimple w:instr=" PAGE   \* MERGEFORMAT "/>
-                </w:p>
-              </w:sdtContent>
-            </w:sdt>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="."/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
-      -->
     </w:ftr>
   </xsl:template>
 
