@@ -1958,53 +1958,57 @@
             </xsl:call-template>
           </xsl:attribute>
         </xsl:when>
+        <xsl:when test="style:column">
+          <xsl:attribute name="w:equalWidth">0</xsl:attribute>
+        </xsl:when>
         <xsl:otherwise>
-          <xsl:attribute name="w:equalWidth">
-            <xsl:value-of select="0"/>
-          </xsl:attribute>
+          <xsl:attribute name="w:equalWidth">1</xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
-      <!-- for each column -->
-      <xsl:for-each select="style:column">
-        <w:col>
-          <!-- the left and right spaces -->
-          <xsl:variable name="start">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@fo:start-indent"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="end">
-            <xsl:call-template name="twips-measure">
-              <xsl:with-param name="length" select="@fo:end-indent"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="width">
-            <xsl:value-of select="number($start + $end)"/>
-          </xsl:variable>
-          <!-- space -->
-          <xsl:attribute name="w:space">
-            <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent ) -->
-            <xsl:choose>
-              <xsl:when test="following-sibling::style:column/@fo:start-indent">
-                <xsl:variable name="followingStart">
-                  <xsl:call-template name="twips-measure">
-                    <xsl:with-param name="length"
-                      select="following-sibling::style:column/@fo:start-indent"/>
-                  </xsl:call-template>
-                </xsl:variable>
-                <xsl:value-of select="number($followingStart + $end)"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$end"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-          <!-- width -->
-          <xsl:attribute name="w:w">
-            <xsl:value-of select="substring-before(@style:rel-width,'*') - $width"/>
-          </xsl:attribute>
-        </w:col>
-      </xsl:for-each>
+
+      <xsl:if test="style:column">
+        <!-- for each column -->
+        <xsl:for-each select="style:column">
+          <w:col>
+            <!-- the left and right spaces -->
+            <xsl:variable name="start">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:start-indent"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="end">
+              <xsl:call-template name="twips-measure">
+                <xsl:with-param name="length" select="@fo:end-indent"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="width">
+              <xsl:value-of select="number($start + $end)"/>
+            </xsl:variable>
+            <!-- space -->
+            <xsl:attribute name="w:space">
+              <!-- odt separate space between two columns ( col 1 : fo:end-indent and col 2 : fo:start-indent ) -->
+              <xsl:choose>
+                <xsl:when test="following-sibling::style:column/@fo:start-indent">
+                  <xsl:variable name="followingStart">
+                    <xsl:call-template name="twips-measure">
+                      <xsl:with-param name="length"
+                        select="following-sibling::style:column/@fo:start-indent"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:value-of select="number($followingStart + $end)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$end"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+            <!-- width -->
+            <xsl:attribute name="w:w">
+              <xsl:value-of select="substring-before(@style:rel-width,'*') - $width"/>
+            </xsl:attribute>
+          </w:col>
+        </xsl:for-each>
+      </xsl:if>
     </w:cols>
   </xsl:template>
 
