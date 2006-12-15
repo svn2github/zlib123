@@ -113,9 +113,11 @@
     <!-- insert frames for first paragraph of document if we are in an envelope  -->
     <xsl:call-template name="InsertEnvelopeFrames"/>
     <w:p>
-      <xsl:call-template name="InsertDropCap">
-        <xsl:with-param name="styleName" select="@text:style-name"/>
-      </xsl:call-template>
+      <xsl:if test="not(parent::table:table-cell)">
+        <xsl:call-template name="InsertDropCap">
+          <xsl:with-param name="styleName" select="@text:style-name"/>
+        </xsl:call-template>
+      </xsl:if>
 
       <xsl:call-template name="MarkMasterPage"/>
       <w:pPr>
@@ -1104,45 +1106,47 @@
     </xsl:choose>
   </xsl:template>
 
-  
-  
+
+
   <xsl:template name="InsertDropCapAttributes">
     <xsl:param name="dropcap"/>
     <xsl:message terminate="no">feedback:Dropcap size</xsl:message>
-    <xsl:if test="$dropcap/@style:lines">
+
+    <!-- if @style:lines is 0 or 1 dropcap is disabled -->
+    <xsl:if test="$dropcap[@style:lines &gt; 1]">
       <xsl:attribute name="dropcap:lines" namespace="urn:cleverage:xmlns:post-processings:dropcap">
         <xsl:value-of select="$dropcap/@style:lines"/>
       </xsl:attribute>
-    </xsl:if>
-    <xsl:choose>
-      <xsl:when test="number($dropcap/@style:length)">
-        <xsl:attribute name="dropcap:length"
+      <xsl:choose>
+        <xsl:when test="number($dropcap/@style:length)">
+          <xsl:attribute name="dropcap:length"
+            namespace="urn:cleverage:xmlns:post-processings:dropcap">
+            <xsl:value-of select="$dropcap/@style:length"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$dropcap/@style:length = 'word' ">
+          <xsl:attribute name="dropcap:word"
+            namespace="urn:cleverage:xmlns:post-processings:dropcap">true</xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="dropcap:length"
+            namespace="urn:cleverage:xmlns:post-processings:dropcap">1</xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:if test="$dropcap/@style:distance">
+        <xsl:attribute name="dropcap:distance"
           namespace="urn:cleverage:xmlns:post-processings:dropcap">
-          <xsl:value-of select="$dropcap/@style:length"/>
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="$dropcap/@style:distance"/>
+          </xsl:call-template>
         </xsl:attribute>
-      </xsl:when>
-      <xsl:when test="$dropcap/@style:length = 'word' ">
-        <xsl:attribute name="dropcap:word" namespace="urn:cleverage:xmlns:post-processings:dropcap"
-          >true</xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="dropcap:length"
-          namespace="urn:cleverage:xmlns:post-processings:dropcap">1</xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:if test="$dropcap/@style:distance">
-      <xsl:attribute name="dropcap:distance"
-        namespace="urn:cleverage:xmlns:post-processings:dropcap">
-        <xsl:call-template name="twips-measure">
-          <xsl:with-param name="length" select="$dropcap/@style:distance"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if test="$dropcap/@style:style-name">
-      <xsl:attribute name="dropcap:style-name"
-        namespace="urn:cleverage:xmlns:post-processings:dropcap">
-        <xsl:value-of select="$dropcap/@style:style-name"/>
-      </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$dropcap/@style:style-name">
+        <xsl:attribute name="dropcap:style-name"
+          namespace="urn:cleverage:xmlns:post-processings:dropcap">
+          <xsl:value-of select="$dropcap/@style:style-name"/>
+        </xsl:attribute>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
