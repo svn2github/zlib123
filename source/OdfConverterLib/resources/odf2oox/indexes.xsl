@@ -68,17 +68,17 @@
     </xsl:if>
 
     <xsl:choose>
-
       <!-- when hyperlink option is on in TOC -->
       <xsl:when test="text:a">
-        <xsl:apply-templates select="text:a" mode="paragraph"/>
+        <!-- apply templates to nodes except tabs who do not have preceding sibling other than tabs (converted into indent) -->
+        <xsl:apply-templates
+          select="child::node()[not(self::text:tab[not(preceding-sibling::node()[not(self::text:tab)])])]"
+          mode="paragraph"/>
       </xsl:when>
-
-      <!--default scenario-->
+      <!-- default scenario -->
       <xsl:otherwise>
-        <xsl:call-template name="InsertIndexItemContent"/>
+        <xsl:apply-templates mode="paragraph"/>
       </xsl:otherwise>
-
     </xsl:choose>
 
     <!-- inserts field code end in last index element -->
@@ -315,27 +315,6 @@
   </xsl:template>
 
 
-
-  <!--inserts index item content for all types of index-->
-  <xsl:template name="InsertIndexItemContent">
-
-    <!-- references to index bookmark id in text -->
-    <xsl:param name="tocId" select="count(preceding-sibling::text:p)+1"/>
-
-    <!-- alphabetical index doesn't support page reference link -->
-
-    <!-- insert TOC -->
-    <xsl:choose>
-      <xsl:when test="self::text:a">
-        <xsl:apply-templates mode="paragraph"/>
-        <xsl:apply-templates select="parent::text:p/child::node()[not(self::text:a)]"
-          mode="paragraph"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates mode="paragraph"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
 
   <xsl:template name="InsertIndexPageRefEnd">
     <w:r>
@@ -641,7 +620,7 @@
   <!-- styles for indexes. They require a particular syntax -->
   <xsl:template name="InsertIndexStyles">
     <xsl:for-each select="document('content.xml')">
-      <xsl:for-each select="key('toc', '')">
+      <xsl:for-each select="key('toc', '')[1]">
         <xsl:call-template name="InsertIndexLevelStyle"/>
       </xsl:for-each>
     </xsl:for-each>
@@ -663,24 +642,34 @@
           select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]/*[self::text:index-entry-link-start or self::text:index-entry-link-end]/@text:style-name"
         />
       </xsl:variable>
-      <xsl:for-each select="document('styles.xml')">
-        <xsl:for-each select="key('styles', $levelStyleName)">
-          <w:style w:styleId="{concat('TOC', $level)}" w:type="paragraph">
-            <w:name w:val="{concat('toc ', $level)}"/>
-            <w:basedOn w:val="{$levelStyleName}"/>
-            <w:autoRedefine/>
-            <w:semiHidden/>
-            <xsl:if test="$levelTextStyleName != '' ">
+      <w:style w:styleId="{concat('TOC', $level)}" w:type="paragraph">
+        <w:name w:val="{concat('toc ', $level)}"/>
+        <w:basedOn w:val="{$levelStyleName}"/>
+        <w:autoRedefine/>
+        <w:semiHidden/>
+        <w:pPr>
+          <xsl:for-each
+            select="text:table-of-content-source/text:table-of-content-entry-template[@text:outline-level = $level]">
+            <xsl:call-template name="OverrideIndexParagraphTabs">
+              <xsl:with-param name="levelStyleName" select="$levelStyleName"/>
+              <xsl:with-param name="level" select="$level"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </w:pPr>
+        <xsl:if test="$levelTextStyleName != '' ">
+          <!-- change context -->
+          <xsl:for-each select="document('styles.xml')">
+            <xsl:for-each select="key('styles', $levelStyleName)">
               <w:rPr>
                 <w:rStyle w:val="{$levelTextStyleName}"/>
                 <xsl:for-each select="document('styles.xml')">
                   <xsl:apply-templates select="key('styles', $levelTextStyleName)" mode="rPr"/>
                 </xsl:for-each>
               </w:rPr>
-            </xsl:if>
-          </w:style>
-        </xsl:for-each>
-      </xsl:for-each>
+            </xsl:for-each>
+          </xsl:for-each>
+        </xsl:if>
+      </w:style>
       <!-- insert next level -->
       <xsl:call-template name="InsertIndexLevelStyle">
         <xsl:with-param name="level" select="$level + 1"/>
@@ -688,8 +677,133 @@
     </xsl:if>
   </xsl:template>
 
-  
-  
+  <!-- override tabs for index -->
+  <xsl:template name="OverrideIndexParagraphTabs">
+    <xsl:param name="levelStyleName"/>
+    <xsl:param name="level"/>
+
+    <xsl:variable name="leftTabStop">
+      <xsl:if
+        test="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
+        <xsl:call-template name="GetLargestTabStop">
+          <xsl:with-param name="tabStops"
+            select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]"
+          />
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="numberingFormat">
+      <xsl:call-template name="GetLevelNumberingFormat">
+        <xsl:with-param name="level" select="$level - 1"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:if
+      test="($leftTabStop != '' and $numberingFormat != '' ) or text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]
+      or document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$levelStyleName]">
+      <w:tabs>
+        <!-- clear all parent tabs -->
+        <xsl:call-template name="ClearParentStyleTabs">
+          <xsl:with-param name="parentstyleName" select="$levelStyleName"/>
+        </xsl:call-template>
+
+        <!-- declare tabs after text -->
+        <xsl:if
+          test="($leftTabStop != '' and $numberingFormat != '' ) or text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
+          <!-- do not write tabs after text except right tab-stop -->
+          <xsl:for-each
+            select="text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type = 'right']">
+            <xsl:call-template name="tabStop"/>
+          </xsl:for-each>
+        </xsl:if>
+
+        <!-- declare 1 tab before text -->
+        <xsl:if test="$leftTabStop != '' and $numberingFormat != '' ">
+          <w:tab w:pos="{$leftTabStop}">
+            <xsl:attribute name="w:val">
+              <xsl:variable name="styleType">
+                <xsl:value-of
+                  select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]/@style:type"
+                />
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when test="$styleType">
+                  <xsl:value-of select="$styleType"/>
+                </xsl:when>
+                <xsl:otherwise>left</xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+            <xsl:attribute name="w:leader">
+              <xsl:call-template name="ComputeTabStopLeader">
+                <xsl:with-param name="tabStop"
+                  select="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position][1]"
+                />
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:tab>
+        </xsl:if>
+      </w:tabs>
+    </xsl:if>
+
+    <!-- tabs before text are retained as indent if no numbering is defined -->
+    <xsl:if
+      test="text:index-entry-text[1]/preceding-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
+      <xsl:if test="$numberingFormat = '' ">
+        <w:ind>
+          <xsl:attribute name="w:left">
+            <xsl:value-of select="$leftTabStop"/>
+          </xsl:attribute>
+        </w:ind>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- transform a tab stop position into indent -->
+  <xsl:template name="GetLargestTabStop">
+    <xsl:param name="tabStops"/>
+    <xsl:param name="result" select="0"/>
+    <!-- get value of first tab-stop -->
+    <xsl:variable name="toCompare">
+      <xsl:choose>
+        <xsl:when test="$tabStops[1]/@style:position != '' ">
+          <xsl:call-template name="twips-measure">
+            <xsl:with-param name="length" select="$tabStops[1]/@style:position"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- add to other tab-stops -->
+    <xsl:choose>
+      <xsl:when test="count($tabStops) &gt; 1">
+        <xsl:call-template name="GetLargestTabStop">
+          <xsl:with-param name="tabStops" select="$tabStops[position() &gt; 1]"/>
+          <xsl:with-param name="result">
+            <xsl:choose>
+              <xsl:when test="$result &gt; $toCompare">
+                <xsl:value-of select="$result"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$toCompare"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$result &gt; $toCompare">
+            <xsl:value-of select="$result"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$toCompare"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
   <!-- warn loss of index properties -->
   <xsl:template
     match="text:table-of-content|text:illustration-index|text:table-index|text:object-index|text:user-index|text:alphabetical-index|text:bibliography">
@@ -734,13 +848,10 @@
     </xsl:if>
     <xsl:apply-templates/>
   </xsl:template>
-  
+
   <!-- loss of concordance file -->
   <xsl:template match="text:alphabetical-index-auto-mark-file">
     <xsl:message terminate="no">feedback:Alphabetical index concordance file</xsl:message>
   </xsl:template>
-  
-  
-  
 
 </xsl:stylesheet>

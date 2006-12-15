@@ -626,9 +626,7 @@
             <xsl:value-of
               select="concat('_Toc',$tocId,generate-id(ancestor::text:table-of-content))"/>
           </xsl:attribute>
-          <xsl:call-template name="InsertIndexItemContent">
-            <xsl:with-param name="tocId" select="$tocId"/>
-          </xsl:call-template>
+          <xsl:apply-templates mode="paragraph"/>
         </w:hyperlink>
       </xsl:when>
 
@@ -842,13 +840,20 @@
 
   <!-- tabs -->
   <xsl:template match="text:tab" mode="paragraph">
-    <w:r>
-      <w:rPr>
-        <w:noProof/>
-        <w:webHidden/>
-      </w:rPr>
-      <w:tab/>
-    </w:r>
+    <xsl:choose>
+      <xsl:when test="ancestor::text:index-body and ((preceding-sibling::text:a or parent::text:a) and preceding-sibling::text:tab)">
+        <!-- do nothing : only one tab-stop converted in indexes -->
+      </xsl:when>
+      <xsl:otherwise>
+        <w:r>
+          <w:rPr>
+            <w:noProof/>
+            <w:webHidden/>
+          </w:rPr>
+          <w:tab/>
+        </w:r>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- line breaks -->

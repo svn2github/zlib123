@@ -511,6 +511,19 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
+
+    <xsl:call-template name="ClearParentStyleTabs">
+      <xsl:with-param name="parentstyleName" select="$parentstyleName"/>
+      <xsl:with-param name="styleContext" select="$styleContext"/>
+      <xsl:with-param name="styleName" select="$styleName"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- clear tabs of parent style -->
+  <xsl:template name="ClearParentStyleTabs">
+    <xsl:param name="parentstyleName"/>
+    <xsl:param name="styleContext"/>
+    <xsl:param name="styleName"/>
     <!-- change context to see if it is necessary to clear parent tabs -->
     <xsl:for-each select="document('styles.xml')">
       <xsl:for-each select="key('styles', $parentstyleName)[1]//style:tab-stop">
@@ -532,14 +545,13 @@
                 <xsl:value-of select="'true'"/>
               </xsl:if>
             </xsl:when>
-            <xsl:otherwise>
-              <xsl:if test="$styleContext='styles' ">
-                <xsl:if
-                  test="not($parentPosition = key('styles', $styleName)[1]//style:tab-stop/@style:position)">
-                  <xsl:value-of select="'true'"/>
-                </xsl:if>
+            <xsl:when test="$styleContext='styles' ">
+              <xsl:if
+                test="not($parentPosition = key('styles', $styleName)[1]//style:tab-stop/@style:position)">
+                <xsl:value-of select="'true'"/>
               </xsl:if>
-            </xsl:otherwise>
+            </xsl:when>
+            <xsl:otherwise>true</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
         <!-- clear the tab, from the parent style context. -->
@@ -551,8 +563,6 @@
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
-
-
 
   <!-- Paragraph spacing property -->
   <xsl:template name="ComputeParagraphSpacing">
@@ -1377,12 +1387,50 @@
         </xsl:variable>
         <xsl:variable name="position">
           <xsl:call-template name="twips-measure">
-            <xsl:with-param name="length" select="@style:position"/>
+            <xsl:with-param name="length">
+              <xsl:choose>
+                <!-- particular case : right tab in indexes -->
+                <xsl:when
+                  test="self::text:index-entry-tab-stop[@style:type = 'right' and not(@style:position)]">
+                  <xsl:for-each select="document('styles.xml')">
+                    <xsl:variable name="pageW">
+                      <xsl:call-template name="twips-measure">
+                        <xsl:with-param name="length"
+                          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:page-width"
+                        />
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:variable name="pageMarginL">
+                      <xsl:call-template name="twips-measure">
+                        <xsl:with-param name="length"
+                          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-left"
+                        />
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:variable name="pageMarginR">
+                      <xsl:call-template name="twips-measure">
+                        <xsl:with-param name="length"
+                          select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/@fo:margin-right"
+                        />
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:value-of select="$pageW - $pageMarginR - $pageMarginL"/>
+                  </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@style:position"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="ancestor::office:styles or ancestor::office:automatic-styles">
             <xsl:value-of select="$margin + $position"/>
+          </xsl:when>
+          <!-- particular case : indexes -->
+          <xsl:when test="self::text:index-entry-tab-stop">
+            <xsl:value-of select="$position"/>
           </xsl:when>
           <!-- paragraph may be embedded in columns -->
           <xsl:otherwise>
@@ -1435,49 +1483,73 @@
 
       <!-- tab leader character -->
       <xsl:attribute name="w:leader">
+        <xsl:call-template name="ComputeTabStopLeader"/>
+      </xsl:attribute>
+    </w:tab>
+  </xsl:template>
+
+  <!-- compute the value of leader character for tab-stop -->
+  <xsl:template name="ComputeTabStopLeader">
+    <xsl:param name="tabStop" select="."/>
+
+    <xsl:choose>
+      <xsl:when test="$tabStop/@style:leader-text">
         <xsl:choose>
-          <xsl:when test="@style:leader-text">
-            <xsl:choose>
-              <xsl:when test="@style:leader-text = '.' ">
-                <xsl:value-of select="'dot'"/>
-              </xsl:when>
-              <xsl:when test="@style:leader-text = '-' ">
-                <xsl:value-of select="'hyphen'"/>
-              </xsl:when>
-              <xsl:when test="@style:leader-text = '_' ">
-                <xsl:value-of select="'heavy'"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:message terminate="no">feedback:Leader text</xsl:message>
-                <xsl:value-of select="'none'"/>
-              </xsl:otherwise>
-            </xsl:choose>
+          <xsl:when test="$tabStop/@style:leader-text = '.' ">
+            <xsl:value-of select="'dot'"/>
           </xsl:when>
-          <xsl:when test="@style:leader-style and not(@style:leader-text)">
-            <xsl:choose>
-              <xsl:when test="@style:leader-style = 'dotted' ">
-                <xsl:value-of select="'dot'"/>
-              </xsl:when>
-              <xsl:when test="@style:leader-style = 'solid' ">
-                <xsl:value-of select="'heavy'"/>
-              </xsl:when>
-              <xsl:when test="@style:leader-style = 'dash' ">
-                <xsl:value-of select="'hyphen'"/>
-              </xsl:when>
-              <xsl:when test="@style:leader-style = 'dotted' ">
-                <xsl:value-of select="'dot'"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="'none'"/>
-              </xsl:otherwise>
-            </xsl:choose>
+          <xsl:when test="$tabStop/@style:leader-text = '-' ">
+            <xsl:value-of select="'hyphen'"/>
+          </xsl:when>
+          <xsl:when test="$tabStop/@style:leader-text = '_' ">
+            <xsl:value-of select="'heavy'"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:message terminate="no">feedback:Leader text</xsl:message>
+            <xsl:value-of select="'none'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="$tabStop/@style:leader-style and not($tabStop/@style:leader-text)">
+        <xsl:choose>
+          <xsl:when test="$tabStop/@style:leader-style = 'dotted' ">
+            <xsl:value-of select="'dot'"/>
+          </xsl:when>
+          <xsl:when test="$tabStop/@style:leader-style = 'solid' ">
+            <xsl:value-of select="'heavy'"/>
+          </xsl:when>
+          <xsl:when test="$tabStop/@style:leader-style = 'dash' ">
+            <xsl:value-of select="'hyphen'"/>
+          </xsl:when>
+          <xsl:when test="$tabStop/@style:leader-style = 'dotted' ">
+            <xsl:value-of select="'dot'"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="'none'"/>
           </xsl:otherwise>
         </xsl:choose>
-      </xsl:attribute>
-    </w:tab>
+      </xsl:when>
+      <xsl:when test="$tabStop/@style:leader-char">
+        <xsl:choose>
+          <xsl:when test="$tabStop/@style:leader-char = '.' ">
+            <xsl:value-of select="'dot'"/>
+          </xsl:when>
+          <xsl:when test="$tabStop/@style:leader-char = '-' ">
+            <xsl:value-of select="'hyphen'"/>
+          </xsl:when>
+          <xsl:when test="$tabStop/@style:leader-char = '_' ">
+            <xsl:value-of select="'heavy'"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:message terminate="no">feedback:Leader char</xsl:message>
+            <xsl:value-of select="'none'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="'none'"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- insert Hyperlink and Followed Hyperink styles -->

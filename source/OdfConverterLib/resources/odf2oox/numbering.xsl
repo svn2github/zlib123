@@ -846,6 +846,57 @@
     </xsl:for-each>
   </xsl:template>
 
+  <!-- find the numbering format associated to a leve -->
+  <xsl:template name="GetLevelNumberingFormat">
+    <xsl:param name="level"/>
+
+    <xsl:variable name="levelStyleName">
+      <xsl:call-template name="GetLevelStyleName">
+        <xsl:with-param name="level" select="$level"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="listStyleName">
+      <xsl:call-template name="GetLevelListStyleName">
+        <xsl:with-param name="level" select="$level"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$listStyleName != 'none'">
+        <!-- get list numbering -->
+        <xsl:for-each select="document('content.xml')">
+          <xsl:choose>
+            <xsl:when
+              test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]/@style:num-format">
+              <xsl:value-of
+                select="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]/@style:num-format"
+              />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:for-each select="document('styles.xml')">
+                <xsl:if
+                  test="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]/@style:num-format">
+                  <xsl:value-of
+                    select="key('list-style', $listStyleName)/text:list-level-style-number[@text:level = $level+1]/@style:num-format"
+                  />
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- get outline numbering (default) -->
+        <xsl:if
+          test="document('styles.xml')/office:document-styles/office:styles/text:outline-style/text:outline-level-style[@text:level = $level+1]/@style:num-format">
+          <xsl:value-of
+            select="document('styles.xml')/office:document-styles/office:styles/text:outline-style/text:outline-level-style[@text:level = $level+1]/@style:num-format"
+          />
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- Generate the format string for multiple levels -->
   <!--  level : current level -->
   <!-- displayLevels : number of preceding levels displayed at this level -->
@@ -988,7 +1039,8 @@
         </xsl:call-template>
       </xsl:variable>
       <!-- two cases for overriding numbering properties : we are in a list, or an outlined heading -->
-      <xsl:if test="ancestor-or-self::text:list or number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
+      <xsl:if
+        test="ancestor-or-self::text:list or number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
         <xsl:variable name="listStyleName">
           <xsl:call-template name="GetListStyleName">
             <xsl:with-param name="styleName" select="$styleName"/>
