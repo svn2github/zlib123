@@ -472,14 +472,13 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:choose>
-      <xsl:when test="$contour = 'true' ">
-        <xsl:attribute name="allowOverlap">1</xsl:attribute>
-      </xsl:when>
-      <xsl:when test="$contour = 'false' ">
-        <xsl:attribute name="allowOverlap">0</xsl:attribute>
-      </xsl:when>
-    </xsl:choose>
+    <xsl:attribute name="allowOverlap">
+      <xsl:choose>
+        <xsl:when test="$contour = 'true' ">1</xsl:when>
+        <xsl:when test="$contour = 'false' ">0</xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="InsertZindex">
