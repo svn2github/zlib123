@@ -89,6 +89,7 @@
     <EmbeddedResource Include="resources\oox2odf\comments.xsl" />
     <Compile Include="OoxParagraphsPostProcessor.cs" />
     <Compile Include="OdfParagraphPostProcessor.cs" />
+    <Compile Include="OoxSpacesPostProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">

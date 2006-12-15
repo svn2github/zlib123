@@ -809,7 +809,15 @@
 
   <!-- spaces (within a text flow) -->
   <xsl:template match="text:s" mode="text">
-    <w:t xml:space="preserve"><xsl:call-template name="extra-spaces"><xsl:with-param name="spaces" select="@text:c"/></xsl:call-template></w:t>
+    <w:t>
+      <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
+        <xsl:if test="@text:c">
+          <xsl:attribute name="pxs:c">
+            <xsl:value-of select="@text:c"/>
+          </xsl:attribute>
+        </xsl:if>
+      </pxs:s>
+    </w:t>
   </xsl:template>
 
   <!-- simple text (within a text flow) -->
@@ -982,11 +990,11 @@
 
 
   <!-- spaces -->
-  <xsl:template match="text:s">
+  <!--xsl:template match="text:s">
     <xsl:call-template name="extra-spaces">
       <xsl:with-param name="spaces" select="@text:c"/>
     </xsl:call-template>
-  </xsl:template>
+  </xsl:template-->
 
   <!-- sequences used for index of tables, index of illustrations -->
   <xsl:template match="text:sequence" mode="paragraph">
