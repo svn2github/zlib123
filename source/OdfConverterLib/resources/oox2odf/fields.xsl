@@ -11,6 +11,7 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+  xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" exclude-result-prefixes="w">
 
   <!-- Date and Time Fields -->
@@ -700,4 +701,189 @@
       </xsl:attribute>      
     </text:page-number>
   </xsl:template>
+
+  <!-- Insert Citations & Bibliography -->
+  <xsl:template name="TextBibliographyMark">
+    <xsl:param name="TextIdentifier"></xsl:param>
+
+    <xsl:variable name="Path" select="document('customXml/item1.xml')/b:Sources/b:Source[b:Tag = $TextIdentifier]"/>  
+    
+    <xsl:variable name="BibliographyType" select="$Path/b:SourceType"/>
+    
+    <xsl:variable name="LastName">
+      <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Last"/>
+    </xsl:variable>
+    
+    <xsl:variable name="FirstName">
+      <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:First"/>
+    </xsl:variable>
+    
+    <xsl:variable name="Middle">
+      <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Middle"/>      
+    </xsl:variable>
+    
+    <xsl:variable name="Author">
+      <xsl:choose>
+        <xsl:when test="$LastName and $FirstName and $Middle">
+          <xsl:value-of select="concat($LastName, ' ', $FirstName,' ', $Middle)"/>
+        </xsl:when>
+        <xsl:when test="$LastName and $FirstName">
+          <xsl:value-of select="concat($LastName, ' ', $FirstName)"/>
+        </xsl:when>
+        <xsl:when test="$LastName and $Middle">
+          <xsl:value-of select="concat($LastName, ' ', $Middle)"/>
+        </xsl:when>
+        <xsl:when test="$FirstName and $Middle">
+          <xsl:value-of select="concat($FirstName,' ', $Middle)"/>
+        </xsl:when>
+        <xsl:when test="$LastName">
+          <xsl:value-of select="$LastName"/>
+        </xsl:when>
+        <xsl:when test="$FirstName">
+          <xsl:value-of select="$FirstName"/>
+        </xsl:when>
+        <xsl:when test="$Middle">
+          <xsl:value-of select="$Middle"/>
+        </xsl:when>
+      </xsl:choose> 
+    </xsl:variable>
+    
+    <xsl:variable name="City">
+      <xsl:value-of select="$Path/b:City"/>
+    </xsl:variable>
+   
+      <xsl:variable name="StateProvince">
+        <xsl:value-of select="$Path/b:StateProvince"/>
+      </xsl:variable>
+      
+      <xsl:variable name="CountryRegion">
+        <xsl:value-of select="$Path/b:CountryRegion"/>
+      </xsl:variable>
+    
+    <xsl:variable name="Address">
+      <xsl:choose>
+        <xsl:when test="$City and $StateProvince and $CountryRegion">
+          <xsl:value-of select="concat($City,' ',$StateProvince,' ',$CountryRegion)"/>
+        </xsl:when>
+        <xsl:when test="$City and $StateProvince">
+          <xsl:value-of select="concat($City,' ',$StateProvince)"/>
+        </xsl:when>
+        <xsl:when test="$City and $CountryRegion">
+          <xsl:value-of select="concat($City,' ',$CountryRegion)"/>          
+        </xsl:when>
+        <xsl:when test="$StateProvince and $CountryRegion">
+          <xsl:value-of select="concat($StateProvince,' ',$CountryRegion)"/>          
+        </xsl:when>
+        <xsl:when test="$City">
+          <xsl:value-of select="$City"/>
+        </xsl:when>
+        <xsl:when test="$StateProvince">
+          <xsl:value-of select="$StateProvince"/>
+        </xsl:when>
+        <xsl:when test="$CountryRegion">
+          <xsl:value-of select="$CountryRegion"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <text:bibliography-mark>
+      <xsl:attribute name="text:identifier">
+        <xsl:value-of select="$TextIdentifier"/>
+      </xsl:attribute>      
+      <xsl:attribute name="text:bibliography-type">
+        <xsl:choose>
+          <xsl:when test="$BibliographyType = 'Book'">
+            <xsl:text>book</xsl:text>
+          </xsl:when>
+          <xsl:when test="$BibliographyType = 'JournalArticle'">
+            <xsl:text>article</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>book</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>        
+      </xsl:attribute>
+      <xsl:if test="$Author">
+      <xsl:attribute name="text:author">
+        <xsl:value-of select="$Author"/>
+      </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$Path/b:Title">
+      <xsl:attribute name="text:title">
+        <xsl:value-of select="$Path/b:Title"/>
+      </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$Path/b:Year">
+      <xsl:attribute name="text:year">
+        <xsl:value-of select="$Path/b:Year"/>
+      </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$Path/b:Publisher">
+      <xsl:attribute name="text:publisher">        
+        <xsl:value-of select="$Path/b:Publisher"/>
+      </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$Address">
+      <xsl:attribute name="text:address">
+        <xsl:value-of select="$Address"/>
+      </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$Path/b:Volume">
+        <xsl:attribute name="text:volume">
+          <xsl:value-of select="$Path/b:Volume"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$Path/b:StandardNumber">
+        <xsl:attribute name="text:number">
+          <xsl:value-of select="$Path/b:StandardNumber"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$Path/b:Pages">
+        <xsl:attribute name="text:pages">
+          <xsl:value-of select="$Path/b:Pages"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="$Path/b:Edition">
+        <xsl:attribute name="text:edition">
+          <xsl:value-of select="$Path/b:Edition"/>
+        </xsl:attribute>
+      </xsl:if>
+    </text:bibliography-mark>
+  </xsl:template>  
+    
+  <!-- template which counts difference before number of fldChar 'begin' and number of fldChar 'end' -->
+  <xsl:template name="CountFldChar">
+    <xsl:param name="node"/>
+    <xsl:param name="count"/>
+    <xsl:variable name="counting">
+      
+      <!-- when begin add 1, when end deduct 1 -->
+      <xsl:choose>
+        <xsl:when test="descendant::w:r/w:fldChar/@w:fldCharType='begin'">
+          <xsl:value-of select="number($count)+1"/>
+        </xsl:when>
+        <xsl:when test="descendant::w:r/w:fldChar/@w:fldCharType='end'">
+          <xsl:value-of select="number($count)-1"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="number($count)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="self::node()=$node or $counting = 0">
+        <xsl:value-of select="$counting"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each select="following-sibling::w:p[1]">
+          <xsl:call-template name="CountFldChar">
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="count" select="$counting"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>

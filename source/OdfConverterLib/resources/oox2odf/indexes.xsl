@@ -163,6 +163,98 @@
     </xsl:if>
   </xsl:template> 
   
+<!-- template which counts difference before number of fldChar 'begin' and number of fldChar 'end' -->
+  <xsl:template name="CountFldChar">
+    <xsl:param name="CountParagraph"/>
+    <xsl:param name="CountFldCharTypeEnd"/>
+    <xsl:param name="CountFldCharTypeBegin"/>
+    <xsl:choose>
+        <xsl:when test="$CountParagraph = 0">          
+          <xsl:value-of select="number($CountFldCharTypeBegin) + 1 - number($CountFldCharTypeEnd)"/>
+        </xsl:when>
+        <xsl:otherwise>       
+          <xsl:variable name="FldCharTypeEnd">
+            <xsl:value-of select="number($CountFldCharTypeEnd) + count(preceding-sibling::w:p[number($CountParagraph)][preceding-sibling::w:p/w:r[contains(w:instrText,'BIBLIOGRAPHY')  or contains(w:instrText,'TOC')][1]]/descendant::w:r/w:fldChar[@w:fldCharType = 'end'])"/>  
+          </xsl:variable>
+          <xsl:variable name="FldCharTypeBegin">
+            <xsl:value-of select="number($CountFldCharTypeBegin) + count(preceding-sibling::w:p[number($CountParagraph)][preceding-sibling::w:p/w:r[contains(w:instrText,'BIBLIOGRAPHY')  or contains(w:instrText,'TOC')][1]]/descendant::w:r/w:fldChar[@w:fldCharType = 'begin'])"/>  
+          </xsl:variable>   
+          <xsl:choose>
+            <xsl:when test="number($CountFldCharTypeBegin) + 1 - number($FldCharTypeEnd) = 0">
+                <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="CountFldChar">
+                <xsl:with-param name="CountParagraph">
+                  <xsl:value-of select="number($CountParagraph) - 1"/>
+                </xsl:with-param>
+                <xsl:with-param name="CountFldCharTypeEnd">
+                  <xsl:value-of select="$FldCharTypeEnd"/>
+                </xsl:with-param>
+                <xsl:with-param name="CountFldCharTypeBegin">
+                  <xsl:value-of select="$FldCharTypeBegin"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>          
+        </xsl:otherwise>
+      </xsl:choose>
+  </xsl:template>
+  
+  <!-- We check if paragraph is TOC or BIBLIOGRAPHY -->
+  
+  <xsl:template name="CheckifTOC">
+    
+ <xsl:choose>
+   <xsl:when test="not(preceding-sibling::w:p[descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText,'TOC')]])">
+     <xsl:text>false</xsl:text>
+   </xsl:when>
+   <xsl:otherwise>
+     <xsl:variable name="CountParagraph">
+       <xsl:value-of select="count(preceding-sibling::w:p[preceding-sibling::w:p[descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText,'TOC')]][1]])"/>
+     </xsl:variable>
+     
+     <xsl:choose>
+       
+       <xsl:when test="$CountParagraph = 0 and not(preceding-sibling::w:p[descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText,'TOC')]])">
+         <xsl:text>false</xsl:text>
+       </xsl:when>
+       <xsl:otherwise>
+         <xsl:variable name="Result">
+           <xsl:call-template name="CountFldChar">
+             <xsl:with-param name="CountParagraph">
+               <xsl:value-of select="$CountParagraph"/>
+             </xsl:with-param>
+             <xsl:with-param name="CountFldCharTypeEnd">
+               <xsl:text>0</xsl:text>
+             </xsl:with-param>
+             <xsl:with-param name="CountFldCharTypeBegin">
+               <xsl:text>0</xsl:text>
+             </xsl:with-param>
+           </xsl:call-template>         
+         </xsl:variable> 
+         <xsl:choose>
+           <xsl:when test="$Result = 0">
+             <xsl:text>false</xsl:text>
+           </xsl:when>
+           <xsl:otherwise>
+             <xsl:text>true</xsl:text>
+           </xsl:otherwise>
+         </xsl:choose>        
+       </xsl:otherwise>
+     </xsl:choose>
+   </xsl:otherwise>
+ </xsl:choose>       
+  </xsl:template>
+  
+  <!--TO DO insert Bibliography properties -->
+  
+  <!--xsl:template name="InsertBibliographyProperties">
+
+  </xsl:template-->
+  
+
+
   <!-- insert entry properties for text and numbers -->
   <xsl:template match="w:t" mode="entry">
     <xsl:variable name="text">

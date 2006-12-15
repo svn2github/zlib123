@@ -314,6 +314,19 @@
       </xsl:call-template>
     </xsl:variable>
     
+    
+<xsl:variable name="IfToc">
+  <xsl:choose>
+    <xsl:when test="preceding::w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY')]">
+      <xsl:call-template name="CheckifTOC"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:text>false</xsl:text>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:variable>
+    
+    
     <xsl:choose>
       
       <!--check if the paragraph starts a table-of content -->
@@ -321,6 +334,36 @@
         <xsl:apply-templates select="." mode="tocstart"/>
       </xsl:when>
       
+  <!-- check if the paragraph is Bibliography -->
+      
+      <xsl:when test="descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')]">
+        <text:bibliography>
+          <xsl:attribute name="text:name">
+            <xsl:value-of select="generate-id(descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')])"/>
+          </xsl:attribute>
+            <text:bibliography-source>
+            </text:bibliography-source>
+          <text:index-body>       
+              <xsl:apply-templates select="." mode="index"/>
+          </text:index-body>
+        </text:bibliography>       
+      </xsl:when>
+
+ <!-- check if the pargraph is Citations -->
+      
+      <xsl:when test="descendant::w:r[contains(w:instrText,'CITATION')]">
+        <xsl:variable name="InstrText">
+          <xsl:value-of select="descendant::w:r/w:instrText"/>
+        </xsl:variable>
+        <text:p>
+          <xsl:call-template name="TextBibliographyMark">
+            <xsl:with-param name="TextIdentifier">
+              <xsl:value-of select="substring-before(substring-after($InstrText, 'CITATION '), ' \')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </text:p>
+      </xsl:when>
+
       <!-- if paragraph is in toc, it has been converted already -->
       <xsl:when test="not(descendant::w:r[contains(w:instrText,'TOC')]) and contains(descendant::w:pStyle/@w:val,'TOC')"/>
       
@@ -340,6 +383,9 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
+      
+      <xsl:when test="$IfToc = 'true'"/>
+      
       <!--  default scenario - paragraph-->
       <xsl:otherwise>
         <xsl:apply-templates select="." mode="paragraph"/>
