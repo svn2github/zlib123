@@ -1545,7 +1545,8 @@
       <xsl:message terminate="no">feedback:Page background color</xsl:message>
     </xsl:if>
     <!-- page type -->
-    <xsl:if test="parent::style:page-layout/@style:page-usage">
+    <!-- TODO : review. This entails a page jump on an even or odd page with a potential unwanted blank page in between... -->
+    <!--xsl:if test="parent::style:page-layout/@style:page-usage">
       <xsl:choose>
         <xsl:when test="parent::style:page-layout/@style:page-usage = 'left' ">
           <w:type w:val="evenPage"/>
@@ -1554,7 +1555,7 @@
           <w:type w:val="oddPage"/>
         </xsl:when>
       </xsl:choose>
-    </xsl:if>
+    </xsl:if-->
     <!-- page size -->
     <xsl:choose>
       <xsl:when
