@@ -3312,6 +3312,26 @@
               </w:p>
             </xsl:when>
 
+            <!-- frames with top-and-bottom wrapping inside text-boxes -->
+            <xsl:when test="draw:frame">
+              <xsl:variable name="wrapping">
+                <xsl:call-template name="GetGraphicProperties">
+                  <xsl:with-param name="shapeStyle"
+                    select="key('styles', draw:frame/@draw:style-name)"/>
+                  <xsl:with-param name="attribName">style:wrap</xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:if test="$wrapping = 'none' and not(draw:frame/@text:anchor-type='as-char')">
+                <w:p>
+                  <w:pPr>
+                    <xsl:call-template name="InsertPicturePropertiesInFrame"/>
+                  </w:pPr>
+                  <xsl:apply-templates select="draw:frame" mode="paragraph"/>
+                </w:p>
+              </xsl:if>
+              <xsl:apply-templates select="."/>
+            </xsl:when>
+
             <!--default scenario-->
             <xsl:otherwise>
               <xsl:apply-templates select="."/>
@@ -3456,26 +3476,28 @@
 
   <!-- Insert Picture's Properties in frame, if needed -->
   <xsl:template name="InsertPicturePropertiesInFrame">
-    <xsl:if test="ancestor::draw:text-box and descendant::draw:image">
-      <xsl:choose>
-        <xsl:when
-          test="key('automatic-styles', draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='center'">
-          <w:jc>
-            <xsl:attribute name="w:val">
-              <xsl:text>center</xsl:text>
-            </xsl:attribute>
-          </w:jc>
-        </xsl:when>
-        <xsl:when
-          test="key('automatic-styles', draw:frame/@draw:style-name)/style:graphic-properties/@style:horizontal-pos='right'">
-          <w:jc>
-            <xsl:attribute name="w:val">
-              <xsl:text>right</xsl:text>
-            </xsl:attribute>
-          </w:jc>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:if>
+    <xsl:variable name="hPos">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="key('styles', draw:frame/@draw:style-name)"/>
+        <xsl:with-param name="attribName">style:horizontal-pos</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$hPos = 'center' ">
+        <w:jc>
+          <xsl:attribute name="w:val">
+            <xsl:text>center</xsl:text>
+          </xsl:attribute>
+        </w:jc>
+      </xsl:when>
+      <xsl:when test="$hPos = 'right' ">
+        <w:jc>
+          <xsl:attribute name="w:val">
+            <xsl:text>right</xsl:text>
+          </xsl:attribute>
+        </w:jc>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -175,19 +175,40 @@
           select="child::node()[contains(name(), 'mark-') or contains(name(), 'change-')]"/>
       </xsl:when>
 
+      <!-- frames -->
+      <xsl:when test="child::draw:frame">
+        <xsl:choose>
+          <xsl:when test="ancestor::draw:text-box">
+            <xsl:message terminate="no">feedback:Position of object inside text-box</xsl:message>
+            <xsl:variable name="wrapping">
+              <xsl:call-template name="GetGraphicProperties">
+                <xsl:with-param name="shapeStyle"
+                  select="key('styles', draw:frame/@draw:style-name)"/>
+                <xsl:with-param name="attribName">style:wrap</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="$wrapping = 'none' and not(draw:frame/@text:anchor-type='as-char')">
+                <xsl:apply-templates select="node()[not(self::draw:frame)]" mode="paragraph"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates mode="paragraph"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates mode="paragraph"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+
       <!-- drawing shapes -->
-      <xsl:when
-        test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape|child::draw:frame">
+      <xsl:when test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape">
         <!-- warn loss of positioning for embedded drawn objects or pictures -->
         <xsl:if test="ancestor::draw:text-box">
           <xsl:message terminate="no">feedback:Position of object inside text-box</xsl:message>
         </xsl:if>
-        <xsl:if test="child::draw:frame">
-          <xsl:apply-templates mode="paragraph"/>
-        </xsl:if>
-        <xsl:if test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape">
-          <xsl:apply-templates mode="shapes"/>
-        </xsl:if>
+        <xsl:apply-templates mode="shapes"/>
       </xsl:when>
 
       <xsl:otherwise>
@@ -266,10 +287,6 @@
 
     <!-- insert run properties -->
     <xsl:call-template name="InsertRunProperties"/>
-
-    <!-- picture in a frame -->
-    <xsl:call-template name="InsertPicturePropertiesInFrame"/>
-
 
   </xsl:template>
 
@@ -841,7 +858,8 @@
   <!-- tabs -->
   <xsl:template match="text:tab" mode="paragraph">
     <xsl:choose>
-      <xsl:when test="ancestor::text:index-body and ((preceding-sibling::text:a or parent::text:a) and preceding-sibling::text:tab)">
+      <xsl:when
+        test="ancestor::text:index-body and ((preceding-sibling::text:a or parent::text:a) and preceding-sibling::text:tab)">
         <!-- do nothing : only one tab-stop converted in indexes -->
       </xsl:when>
       <xsl:otherwise>
