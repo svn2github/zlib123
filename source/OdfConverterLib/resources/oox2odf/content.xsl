@@ -707,5 +707,4 @@
   
   <!--ignore text in automatic styles mode-->
   <xsl:template match="text()" mode="automaticstyles"/>
-  <xsl:template match="text()" mode="sections"/>
  </xsl:stylesheet>

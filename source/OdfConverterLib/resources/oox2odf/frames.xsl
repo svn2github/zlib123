@@ -15,6 +15,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   exclude-result-prefixes="w r draw number wp xlink v w10 o">
 
+  <!-- shape or ole-object-->
   <xsl:template match="w:pict | w:object">
       <xsl:apply-templates/>
   </xsl:template>
@@ -29,6 +30,7 @@
     </draw:frame>
   </xsl:template>
   
+  <!--horizontal line-->
   <xsl:template match="v:rect">
     <draw:rect>   
       <xsl:call-template name="InsertCommonShapeProperties"/>
@@ -55,6 +57,7 @@
     <xsl:call-template name="InsertshapeAbsolutePos"/>
   </xsl:template>
   
+  <!--hyperlink shape-->
   <xsl:template match="w:pict[v:shape/@href]">
     <draw:a xlink:type="simple" xlink:href="{v:shape/@href}">
       <xsl:apply-templates/>
@@ -117,6 +120,7 @@
     </draw:image>
   </xsl:template>
   
+  <!-- inserts horizontal ruler as image -->
   <xsl:template match="v:imagedata[not(ancestor::w:object)]">
     <xsl:variable name="document">
       <xsl:call-template name="GetDocumentName">
@@ -410,7 +414,7 @@
       <xsl:call-template name="InsertShapeBackgroundColor"/>
       <xsl:call-template name="InsertShapeZindex"/>
     </xsl:for-each>
-    <xsl:for-each select="v:textbox">
+    <xsl:for-each select="v:shape/v:textbox">
       <xsl:call-template name="InsertTexboxTextDirection"/>
       <xsl:call-template name="InsertTextBoxPadding"/>
     </xsl:for-each>

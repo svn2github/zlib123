@@ -257,4 +257,5 @@
     </style:style>
   </xsl:template>
   
+  <xsl:template match="text()" mode="sections"/>
 </xsl:stylesheet>
