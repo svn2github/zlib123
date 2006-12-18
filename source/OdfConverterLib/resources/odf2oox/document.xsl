@@ -594,9 +594,31 @@
       </xsl:choose>
     </w:r>
     <!-- add an extra tab -->
-    <w:r>
-      <w:tab/>
-    </w:r>
+    <xsl:variable name="textIndent">
+      <xsl:if test=" following-sibling::text:note-body/text:p[1]/@text:style-name">
+        <xsl:choose>
+          <xsl:when test="key('styles', following-sibling::text:note-body/text:p[1]/@text:style-name)">
+            <xsl:call-template name="GetFirstLineIndent">
+              <xsl:with-param name="style"
+                select="key('styles', following-sibling::text:note-body/text:p[1]/@text:style-name)"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="noteStyle" select="following-sibling::text:note-body/text:p[1]/@text:style-name"/>
+            <xsl:for-each select="document('styles.xml')">
+              <xsl:call-template name="GetFirstLineIndent">
+                <xsl:with-param name="style" select="key('styles', $noteStyle)"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:if test="not($textIndent = 0)">
+      <w:r>
+        <w:tab/>
+      </w:r>
+    </xsl:if>
   </xsl:template>
 
   <!-- annotations -->
