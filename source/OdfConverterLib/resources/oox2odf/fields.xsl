@@ -89,8 +89,14 @@
       </xsl:call-template>
   </xsl:template>
   
-  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGES') or contains(@w:instr,'PAGE')] | w:instrText[contains(self::node(),'NUMPAGES') or contains(self::node(),'PAGE')] ">
+  <xsl:template match="w:fldSimple[contains(@w:instr,'PAGE') and not(contains(@w:instr,'NUMPAGE'))] | w:instrText[contains(self::node(),'PAGE') and not(contains(self::node(),'NUMPAGE'))] ">
       <xsl:call-template name="InsertPageNumberField"/>
+  </xsl:template>
+  
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGE')] | w:instrText[contains(self::node(),'NUMPAGE')] ">
+    <text:page-count>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:page-count>
   </xsl:template>
   
   <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')] | w:instrText[contains(., 'DATE')]" mode="automaticstyles">
