@@ -52,6 +52,13 @@
         </xsl:for-each>
       </text:bookmark-ref>
     </xsl:if>
+    <xsl:if test="contains(preceding::w:instrText[1],'XE')">
+      <text:alphabetical-index-mark>
+        <xsl:attribute name="text:string-value">
+          <xsl:value-of select="."/>
+        </xsl:attribute>
+      </text:alphabetical-index-mark>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE')]">
@@ -683,7 +690,7 @@
     </xsl:choose>
     
     <xsl:variable name="WInstr">
-      <xsl:value-of select="parent::w:fldSimple/@w:instr"/>
+      <xsl:value-of select="./@w:instr"/>
     </xsl:variable>
     <text:page-number>
       <xsl:attribute name="text:select-page">
@@ -691,14 +698,15 @@
       </xsl:attribute>
       <xsl:attribute name="style:num-format">
         <xsl:choose>
-          <xsl:when test="contains($WInstr, 'Arabic')">Arabic</xsl:when>
+          <xsl:when test="contains($WInstr, 'Arabic')">1</xsl:when>
           <xsl:when test="contains($WInstr, 'alphabetic')">a</xsl:when>
           <xsl:when test="contains($WInstr, 'ALPHABETIC')">A</xsl:when>
           <xsl:when test="contains($WInstr, 'roman')">i</xsl:when>
           <xsl:when test="contains($WInstr, 'ROMAN')">I</xsl:when>
-          <xsl:otherwise>Arabic</xsl:otherwise>
+          <xsl:otherwise>1</xsl:otherwise>
         </xsl:choose>
-      </xsl:attribute>      
+      </xsl:attribute>
+      <xsl:value-of select="$WInstr"/>
     </text:page-number>
   </xsl:template>
 
