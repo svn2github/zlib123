@@ -440,7 +440,17 @@
       <w:trPr>
         <xsl:call-template name="InsertRowProperties"/>
       </w:trPr>
-      <xsl:apply-templates select="*[position() &lt; 64]"/>
+      <xsl:apply-templates select="*[position() &lt; 64]">
+        <xsl:with-param name="isFirstRow">
+          <xsl:if
+            test="key('automatic-styles', ancestor::table:table[1]/@table:style-name)/style:table-properties/@fo:break-before = 'page'
+            or key('automatic-styles', ancestor::table:table[1]/@table:style-name)/@style:master-page-name != ''">
+            <xsl:value-of
+              select="boolean((@table:number-rows-repeated = $number) and (preceding-sibling::*[1][self::table:table-column or self::table:table-columns] or not(preceding-sibling::node())))"
+            />
+          </xsl:if>
+        </xsl:with-param>
+      </xsl:apply-templates>
       <xsl:if test="*[position() &gt;= 64]">
         <xsl:message terminate="no">feedback:Table with more than 64 columns</xsl:message>
       </xsl:if>
@@ -534,11 +544,14 @@
 
   <!-- table cells -->
   <xsl:template match="table:table-cell">
+    <xsl:param name="isFirstRow"/>
     <w:tc>
       <w:tcPr>
         <xsl:call-template name="InsertCellProperties"/>
       </w:tcPr>
-      <xsl:apply-templates/>
+      <xsl:apply-templates>
+        <xsl:with-param name="isFirstRow" select="$isFirstRow"/>
+      </xsl:apply-templates>
       <!-- avoid crash -->
       <xsl:if test="child::node()[last()][self::table:table]">
         <xsl:call-template name="InsertEmptyParagraph"/>
@@ -1101,7 +1114,7 @@
             <xsl:choose>
               <!-- if first row -->
               <xsl:when
-                test="ancestor::table:table-row[preceding-sibling::node()[1][name()='table:table-column' or name()='table:table-columns'] or not(preceding-sibling::node())]"
+                test="ancestor::table:table-row[not(@table:number-rows-repeated &gt; 1) and (preceding-sibling::*[1][self::table:table-column or self::table:table-columns] or not(preceding-sibling::node()))]"
                 >true</xsl:when>
               <xsl:otherwise>false</xsl:otherwise>
             </xsl:choose>

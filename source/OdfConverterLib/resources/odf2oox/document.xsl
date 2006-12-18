@@ -109,6 +109,7 @@
   <!-- paragraphs and headings -->
   <xsl:template match="text:p | text:h">
     <xsl:param name="level" select="0"/>
+    <xsl:param name="isFirstRow" select="'false'"/>
     <xsl:message terminate="no">progress:text:p</xsl:message>
     <!-- insert frames for first paragraph of document if we are in an envelope  -->
     <xsl:call-template name="InsertEnvelopeFrames"/>
@@ -123,6 +124,7 @@
       <w:pPr>
         <xsl:call-template name="InsertParagraphProperties">
           <xsl:with-param name="level" select="$level"/>
+          <xsl:with-param name="isFirstRow" select="$isFirstRow"/>
         </xsl:call-template>
         <xsl:call-template name="InsertParagraphSectionProperties"/>
       </w:pPr>
@@ -137,6 +139,9 @@
       <xsl:if test="$tocCount &gt; 0">
         <xsl:call-template name="InsertTOCBookmark"/>
       </xsl:if>
+
+      <!-- insert a page break if a table with break after is preceding -->
+      <xsl:call-template name="InsertPageBreakAfterTable"/>
 
       <!-- footnotes or endnotes: insert the mark in the first paragraph -->
       <xsl:if test="parent::text:note-body and position() = 1">
@@ -230,12 +235,25 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- inserts page-break-before if defined in preceding table -->
+  <xsl:template name="InsertPageBreakAfterTable">
+    <xsl:if test="preceding-sibling::node()[1][self::table:table]">
+      <xsl:if
+        test="key('automatic-styles', preceding-sibling::node()[1][self::table:table]/@table:style-name)/style:table-properties/@fo:break-after='page' ">
+        <w:r>
+          <w:br w:type="page"/>
+        </w:r>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+
 
 
 
   <!-- Inserts the paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
     <xsl:param name="level"/>
+    <xsl:param name="isFirstRow"/>
 
     <!-- insert paragraph style -->
     <xsl:call-template name="InsertParagraphStyle">
@@ -245,7 +263,14 @@
     </xsl:call-template>
 
     <!-- insert page break before table when required -->
-    <xsl:call-template name="InsertPageBreakBefore"/>
+    <xsl:choose>
+      <xsl:when test="$isFirstRow = 'true' ">
+        <w:pageBreakBefore/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="InsertPageBreakBefore"/>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <!-- insert frame properties -->
     <xsl:call-template name="InsertFrameProperties"/>
@@ -597,14 +622,17 @@
     <xsl:variable name="textIndent">
       <xsl:if test=" following-sibling::text:note-body/text:p[1]/@text:style-name">
         <xsl:choose>
-          <xsl:when test="key('styles', following-sibling::text:note-body/text:p[1]/@text:style-name)">
+          <xsl:when
+            test="key('styles', following-sibling::text:note-body/text:p[1]/@text:style-name)">
             <xsl:call-template name="GetFirstLineIndent">
               <xsl:with-param name="style"
-                select="key('styles', following-sibling::text:note-body/text:p[1]/@text:style-name)"/>
+                select="key('styles', following-sibling::text:note-body/text:p[1]/@text:style-name)"
+              />
             </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:variable name="noteStyle" select="following-sibling::text:note-body/text:p[1]/@text:style-name"/>
+            <xsl:variable name="noteStyle"
+              select="following-sibling::text:note-body/text:p[1]/@text:style-name"/>
             <xsl:for-each select="document('styles.xml')">
               <xsl:call-template name="GetFirstLineIndent">
                 <xsl:with-param name="style" select="key('styles', $noteStyle)"/>
