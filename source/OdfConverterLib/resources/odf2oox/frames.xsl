@@ -578,6 +578,9 @@
             <xsl:call-template name="InsertImageBorders">
               <xsl:with-param name="imageStyle" select="$imageStyle"/>
             </xsl:call-template>
+            <xsl:call-template name="InsertImageEffects">
+              <xsl:with-param name="imageStyle" select="$imageStyle"/>
+            </xsl:call-template>
           </pic:spPr>
         </pic:pic>
       </a:graphicData>
@@ -1156,6 +1159,89 @@
         </a:solidFill>
         <a:prstDash val="solid"/>
       </a:ln>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- image effects -->
+  <xsl:template name="InsertImageEffects">
+    <xsl:param name="imageStyle"/>
+
+    <!-- shadow -->
+    <xsl:variable name="shadow">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$imageStyle"/>
+        <xsl:with-param name="attribName">style:shadow</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:if test="$shadow != ''  and $shadow != 'none' ">
+      <a:effectLst>
+        <a:outerShdw>
+          <xsl:attribute name="rotWithShape">0</xsl:attribute>
+          <xsl:variable name="firstShadow">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select=" substring-before(substring-after($shadow, ' '), ' ')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="secondShadow">
+            <xsl:call-template name="emu-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select=" substring-after(substring-after($shadow, ' '), ' ')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <!-- Handles only simple cases.
+            distance calculation is wrong anyway (should be square average, but no sqroot funcion in xsl)
+            More complex issues require post-processing (angle calculation) -->
+          <xsl:choose>
+            <xsl:when test="contains($firstShadow, '-') and contains($secondShadow, '-')">
+              <xsl:attribute name="algn">tl</xsl:attribute>
+              <xsl:attribute name="dir">
+                <xsl:value-of select="225*60000"/>
+              </xsl:attribute>
+              <xsl:attribute name="dist">
+                <xsl:value-of
+                  select="(number(substring-after($firstShadow, '-'))+number(substring-after($secondShadow, '-'))) div 2"
+                />
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="contains($firstShadow, '-') and number($secondShadow)">
+              <xsl:attribute name="algn">bl</xsl:attribute>
+              <xsl:attribute name="dir">
+                <xsl:value-of select="135*60000"/>
+              </xsl:attribute>
+              <xsl:attribute name="dist">
+                <xsl:value-of
+                  select="(number(substring-after($firstShadow, '-'))+number($secondShadow)) div 2"
+                />
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="contains($secondShadow, '-') and number($firstShadow)">
+              <xsl:attribute name="algn">tr</xsl:attribute>
+              <xsl:attribute name="dir">
+                <xsl:value-of select="315*60000"/>
+              </xsl:attribute>
+              <xsl:attribute name="dist">
+                <xsl:value-of
+                  select="(number(substring-after($secondShadow, '-'))+number($firstShadow)) div 2"
+                />
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="number($firstShadow) and number($secondShadow)">
+              <xsl:attribute name="algn">br</xsl:attribute>
+              <xsl:attribute name="dir">
+                <xsl:value-of select="45*60000"/>
+              </xsl:attribute>
+              <xsl:attribute name="dist">
+                <xsl:value-of select="(number($firstShadow)+number($secondShadow)) div 2"/>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+          <!-- color : converter uses the most direct way of converting a color -->
+          <a:srgbClr val="{substring-after(substring-before($shadow, ' '), '#')}"/>
+        </a:outerShdw>
+      </a:effectLst>
     </xsl:if>
   </xsl:template>
 
@@ -2863,6 +2949,46 @@
 
   </xsl:template>
 
+  <xsl:template name="InsertShapeShadow">
+    <xsl:param name="shapeStyle"/>
+
+    <xsl:variable name="shadow">
+      <xsl:call-template name="GetGraphicProperties">
+        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+        <xsl:with-param name="attribName">style:shadow</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:if test="$shadow != ''  and $shadow != 'none' ">
+      <v:shadow on="t">
+        <xsl:if test="substring-before($shadow, ' ') != 'none' ">
+          <xsl:attribute name="color">
+            <xsl:value-of select="substring-before($shadow, ' ')"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:variable name="firstShadow">
+          <xsl:value-of select=" substring-before(substring-after($shadow, ' '), ' ')"/>
+        </xsl:variable>
+        <xsl:variable name="secondShadow">
+          <xsl:value-of select=" substring-after(substring-after($shadow, ' '), ' ')"/>
+        </xsl:variable>
+        <xsl:if test="$firstShadow != '' and $secondShadow != '' ">
+          <xsl:attribute name="offset">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="$firstShadow"/>
+            </xsl:call-template>
+            <xsl:text>pt,</xsl:text>
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length" select="$secondShadow"/>
+            </xsl:call-template>
+            <xsl:text>pt</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      </v:shadow>
+    </xsl:if>
+
+  </xsl:template>
+
   <xsl:template name="InsertShapeBorders">
     <xsl:param name="shapeStyle"/>
 
@@ -3168,6 +3294,9 @@
       <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
     </xsl:call-template>
 
+    <xsl:call-template name="InsertShapeShadow">
+      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+    </xsl:call-template>
   </xsl:template>
 
   <!-- finds shape graphic property recursively in style or parent style -->
