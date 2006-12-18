@@ -144,6 +144,19 @@
     </style:style>
    </xsl:template>
 
+  <xsl:template match="w:p[not (./w:pPr)]" mode="automaticstyles">
+    <xsl:if test="document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr">
+      <style:style style:name="{generate-id(.)}" style:family="paragraph">
+        <style:paragraph-properties>
+          <xsl:for-each select="document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr">
+            <xsl:call-template name="InsertParagraphProperties"/>
+          </xsl:for-each>
+        </style:paragraph-properties>
+      </style:style>
+    </xsl:if>
+    <xsl:apply-templates mode="automaticstyles"/>
+  </xsl:template>
+  
   <!-- add text properties to paragraph -->
   <xsl:template match="w:rPr[parent::w:pPr]" mode="automaticstyles">
    <style:text-properties>
@@ -455,7 +468,7 @@
       <!--default scenario-->
       <xsl:otherwise>
         <text:p>
-          <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
+          <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column' or document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr]">
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="generate-id(self::node())"/>
             </xsl:attribute>
