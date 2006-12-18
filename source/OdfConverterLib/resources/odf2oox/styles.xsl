@@ -89,8 +89,7 @@
   <xsl:template name="GetPrefixedStyleName">
     <xsl:param name="styleName"/>
     <xsl:choose>
-      <xsl:when test="$styleName='Sender' ">EnvelopeReturn</xsl:when>
-      <xsl:when test="$styleName='Addressee' ">EnvelopeAddress</xsl:when>
+    
       <xsl:when test="key('automatic-styles',$styleName)">
         <xsl:choose>
           <xsl:when test="ancestor::office:document-styles/office:automatic-styles">
@@ -102,7 +101,11 @@
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$styleName"/>
+        <xsl:choose>
+          <xsl:when test="$styleName='Sender' ">EnvelopeReturn</xsl:when>
+          <xsl:when test="$styleName='Addressee' ">EnvelopeAddress</xsl:when>
+          <xsl:otherwise><xsl:value-of select="$styleName"/></xsl:otherwise>
+        </xsl:choose> 
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1261,6 +1264,10 @@
   <xsl:template name="computeSize">
     <xsl:param name="node" select="."/>
     <xsl:choose>
+      <!-- when there's no unit -->
+      <xsl:when test="number($node/@fo:font-size)">
+        <xsl:value-of select="number($node/@fo:font-size) * 2"/>
+      </xsl:when>
       <xsl:when test="contains($node/@fo:font-size, 'pt')">
         <xsl:value-of select="round(number(substring-before($node/@fo:font-size, 'pt')) * 2)"/>
       </xsl:when>
