@@ -409,7 +409,14 @@
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
+        <xsl:variable name="precedingText">
+          <xsl:for-each select="parent::w:r/preceding-sibling::w:r[1]/w:t">
+            <xsl:value-of select="child::text()"/>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:if test="not($precedingText) or $precedingText = '' or number($precedingText)">
         <text:index-entry-text/>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
