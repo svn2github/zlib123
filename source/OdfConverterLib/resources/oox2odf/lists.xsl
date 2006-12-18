@@ -100,9 +100,11 @@
             </xsl:attribute>
           </xsl:if>
           <xsl:attribute name="style:num-format">
+            <xsl:if test="w:lvlText/@w:val != ''">
             <xsl:call-template name="NumFormat">
               <xsl:with-param name="format" select="w:numFmt/@w:val"/>
             </xsl:call-template>
+            </xsl:if>
           </xsl:attribute>
           <xsl:if test="w:start and w:start/@w:val > 1">
             <xsl:attribute name="text:start-value">
