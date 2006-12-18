@@ -338,28 +338,12 @@
     </xsl:otherwise>
   </xsl:choose>
 </xsl:variable>
-
     
     <xsl:choose>
       
-      <!--check if the paragraph starts a table-of content -->
-      <xsl:when test="descendant::w:r[contains(w:instrText,'TOC')]">
+      <!--check if the paragraph starts a table-of content or Bibliography-->
+      <xsl:when test="descendant::w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY')]">
         <xsl:apply-templates select="." mode="tocstart"/>
-      </xsl:when>
-      
-  <!-- check if the paragraph is Bibliography -->
-      
-      <xsl:when test="descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')]">
-        <text:bibliography>
-          <xsl:attribute name="text:name">
-            <xsl:value-of select="generate-id(descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')])"/>
-          </xsl:attribute>
-            <text:bibliography-source>
-            </text:bibliography-source>
-          <text:index-body>       
-              <xsl:apply-templates select="." mode="index"/>
-          </text:index-body>
-        </text:bibliography>       
       </xsl:when>
 
  <!-- check if the pargraph is Citations -->

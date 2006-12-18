@@ -725,38 +725,53 @@
     <xsl:variable name="BibliographyType" select="$Path/b:SourceType"/>
     
     <xsl:variable name="LastName">
-      <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Last"/>
+      <xsl:choose>
+        <xsl:when test="$Path/b:Author/b:Author/b:NameList/b:Person/b:Last">
+          <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Last"/>    
+        </xsl:when>
+        <xsl:otherwise></xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     
     <xsl:variable name="FirstName">
-      <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:First"/>
+      <xsl:choose>
+        <xsl:when test="$Path/b:Author/b:Author/b:NameList/b:Person/b:First">
+          <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:First"/>
+        </xsl:when>
+        <xsl:otherwise></xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     
     <xsl:variable name="Middle">
-      <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Middle"/>      
+      <xsl:choose>
+        <xsl:when test="$Path/b:Author/b:Author/b:NameList/b:Person/b:Middle">
+          <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Middle"/>      
+        </xsl:when>
+        <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
     </xsl:variable>
     
     <xsl:variable name="Author">
       <xsl:choose>
-        <xsl:when test="$LastName and $FirstName and $Middle">
+        <xsl:when test="$LastName != '' and $FirstName != '' and $Middle != ''">
           <xsl:value-of select="concat($LastName, ' ', $FirstName,' ', $Middle)"/>
         </xsl:when>
-        <xsl:when test="$LastName and $FirstName">
+        <xsl:when test="$LastName != '' and $FirstName != ''">
           <xsl:value-of select="concat($LastName, ' ', $FirstName)"/>
         </xsl:when>
-        <xsl:when test="$LastName and $Middle">
+        <xsl:when test="$LastName != '' and $Middle != ''">
           <xsl:value-of select="concat($LastName, ' ', $Middle)"/>
         </xsl:when>
-        <xsl:when test="$FirstName and $Middle">
+        <xsl:when test="$FirstName != '' and $Middle != ''">
           <xsl:value-of select="concat($FirstName,' ', $Middle)"/>
         </xsl:when>
-        <xsl:when test="$LastName">
+        <xsl:when test="$LastName != ''">
           <xsl:value-of select="$LastName"/>
         </xsl:when>
-        <xsl:when test="$FirstName">
+        <xsl:when test="$FirstName != ''">
           <xsl:value-of select="$FirstName"/>
         </xsl:when>
-        <xsl:when test="$Middle">
+        <xsl:when test="$Middle != ''">
           <xsl:value-of select="$Middle"/>
         </xsl:when>
       </xsl:choose> 
@@ -776,25 +791,25 @@
     
     <xsl:variable name="Address">
       <xsl:choose>
-        <xsl:when test="$City and $StateProvince and $CountryRegion">
+        <xsl:when test="$City != '' and $StateProvince != '' and $CountryRegion != ''">
           <xsl:value-of select="concat($City,' ',$StateProvince,' ',$CountryRegion)"/>
         </xsl:when>
-        <xsl:when test="$City and $StateProvince">
+        <xsl:when test="$City != '' and $StateProvince != ''">
           <xsl:value-of select="concat($City,' ',$StateProvince)"/>
         </xsl:when>
-        <xsl:when test="$City and $CountryRegion">
+        <xsl:when test="$City != '' and $CountryRegion != ''">
           <xsl:value-of select="concat($City,' ',$CountryRegion)"/>          
         </xsl:when>
-        <xsl:when test="$StateProvince and $CountryRegion">
+        <xsl:when test="$StateProvince != '' and $CountryRegion != ''">
           <xsl:value-of select="concat($StateProvince,' ',$CountryRegion)"/>          
         </xsl:when>
-        <xsl:when test="$City">
+        <xsl:when test="$City != ''">
           <xsl:value-of select="$City"/>
         </xsl:when>
-        <xsl:when test="$StateProvince">
+        <xsl:when test="$StateProvince != ''">
           <xsl:value-of select="$StateProvince"/>
         </xsl:when>
-        <xsl:when test="$CountryRegion">
+        <xsl:when test="$CountryRegion != ''">
           <xsl:value-of select="$CountryRegion"/>
         </xsl:when>
       </xsl:choose>
@@ -802,7 +817,7 @@
     
     <text:bibliography-mark>
       <xsl:attribute name="text:identifier">
-        <xsl:value-of select="$TextIdentifier"/>
+        <xsl:value-of select="substring-before(substring-after(descendant::w:t, '('), ')')"/>
       </xsl:attribute>      
       <xsl:attribute name="text:bibliography-type">
         <xsl:choose>
@@ -862,6 +877,7 @@
           <xsl:value-of select="$Path/b:Edition"/>
         </xsl:attribute>
       </xsl:if>
+      <xsl:value-of select="substring-before(substring-after(descendant::w:t, '('), ')')"/>
     </text:bibliography-mark>
   </xsl:template>  
     

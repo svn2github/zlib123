@@ -30,16 +30,35 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
   exclude-result-prefixes="w text style">
   
   <!-- paragraph which starts table of content -->
   <xsl:template match="w:p" mode="tocstart">
-    <text:table-of-content text:style-name="Sect1" text:protected="true" text:name="Table of Contents1">
-      <xsl:call-template name="InsertIndexProperties"/>
-      <text:index-body>
-        <xsl:apply-templates select="." mode="index"/>
-      </text:index-body>
-    </text:table-of-content>
+    <xsl:choose>
+      <xsl:when test="descendant::w:r[contains(w:instrText,'TOC')]">
+        <text:table-of-content text:style-name="Sect1" text:protected="true" text:name="Table of Contents1">
+          <xsl:call-template name="InsertIndexProperties"/>
+          <text:index-body>
+            <xsl:apply-templates select="." mode="index"/>
+          </text:index-body>
+        </text:table-of-content>
+      </xsl:when>
+      <xsl:when test="descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')]">
+        <text:bibliography>
+          <xsl:attribute name="text:name">
+            <xsl:value-of select="generate-id(descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')])"/>
+          </xsl:attribute>
+          <text:bibliography-source>
+            <text:index-title-template/>
+            <xsl:call-template name="InsertBibliographyProperties"/>
+          </text:bibliography-source>
+          <text:index-body>            
+            <xsl:apply-templates select="." mode="index"/>
+          </text:index-body>
+        </text:bibliography>        
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   
   <!-- paragraph in index-->
@@ -220,10 +239,9 @@
      <xsl:variable name="CountParagraph">
        <xsl:value-of select="count(preceding-sibling::w:p[preceding-sibling::w:p[descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText,'TOC')]][1]])"/>
      </xsl:variable>
-     
      <xsl:choose>
        
-       <xsl:when test="$CountParagraph = 0 and not(preceding-sibling::w:p[descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText,'TOC')]])">
+       <xsl:when test="$CountParagraph = 0 and not(preceding-sibling::w:p[descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText,'TOC')]][1])">
          <xsl:text>false</xsl:text>
        </xsl:when>
        <xsl:otherwise>
@@ -254,11 +272,123 @@
  </xsl:choose>       
   </xsl:template>
   
-  <!--TO DO insert Bibliography properties -->
+  <!--insert Bibliography properties -->
   
-  <!--xsl:template name="InsertBibliographyProperties">
-
-  </xsl:template-->
+  <xsl:template name="InsertBibliographyProperties">
+    
+    <xsl:variable name="Style">
+      <xsl:value-of select="document('customXml/item1.xml')/b:Sources/@StyleName"/>
+    </xsl:variable> 
+    
+    <text:bibliography-entry-template text:bibliography-type="book">
+      <xsl:attribute name="text:style-name">
+        <xsl:value-of select="generate-id()"/>
+      </xsl:attribute>
+    <xsl:choose>
+      <xsl:when test="$Style = 'APA'">
+        <text:index-entry-bibliography text:bibliography-data-field="author"/><text:index-entry-span>.(</text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="year"/><text:index-entry-span>). </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="title"/><text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="address"/><text:index-entry-span>: </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="publisher"/>
+      </xsl:when>
+      <xsl:when test="$Style = 'Chicago' or $Style = 'ISO 690 - Numerical Reference' or $Style = 'MLA' or $Style = 'Turabian'">        
+        <text:index-entry-bibliography text:bibliography-data-field="author"/>        
+        <text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="title"/>
+        <text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="address"/>
+        <text:index-entry-span> : </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="publisher"/>
+        <text:index-entry-span>, </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="year"/> 
+        <text:index-entry-span>. </text:index-entry-span>
+      </xsl:when>
+      <xsl:when test="$Style = 'GB7714'">
+        <text:index-entry-bibliography text:bibliography-data-field="author"/>
+        <text:index-entry-span>.</text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="year"/>
+        <text:index-entry-span>.</text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="title"/>
+        <text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="address"/>
+        <text:index-entry-span>: </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="publisher"/>
+        <text:index-entry-span>, </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="year"/>
+        <text:index-entry-span>. </text:index-entry-span>
+      </xsl:when>
+      <xsl:when test="$Style = 'GOST - Name Sort'">
+        <text:index-entry-bibliography text:bibliography-data-field="author"/>
+        <text:index-entry-span> </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="title"/>
+        <text:index-entry-span>[</text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="bibliography-type"/>
+        <text:index-entry-span>].-</text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="address"/>
+        <text:index-entry-span> : </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="publisher"/>        
+        <text:index-entry-span>, </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="year"/>
+        <text:index-entry-span>. </text:index-entry-span>
+      </xsl:when>
+      <xsl:when test="$Style = 'GOST - Title Sort'">
+        <text:index-entry-bibliography text:bibliography-data-field="title"/>
+        <text:index-entry-span> </text:index-entry-span>
+        <text:index-entry-span>[</text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="bibliography-type"/>
+        <text:index-entry-span>]/ AUT. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="author"/>
+        <text:index-entry-span>. - </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="address"/>
+        <text:index-entry-span> : </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="publisher"/>        
+        <text:index-entry-span>, </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="year"/>
+        <text:index-entry-span>. </text:index-entry-span>
+      </xsl:when>
+      <xsl:when test="$Style = 'ISO 690 - First Element and Date'">
+       
+        <text:index-entry-bibliography text:bibliography-data-field="author"/>
+        <text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="year"/>
+        <text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="title"/>
+        <text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="address"/>
+        <text:index-entry-span> : </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="publisher"/>
+        <text:index-entry-span>, </text:index-entry-span>        
+        <text:index-entry-bibliography text:bibliography-data-field="year"/>
+        <text:index-entry-span>. </text:index-entry-span>
+      </xsl:when>
+      <xsl:when test="$Style = 'SIST02'">        
+        <text:index-entry-bibliography text:bibliography-data-field="author"/>        
+        <text:index-entry-span> </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="title"/>
+        <text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="address"/>
+        <text:index-entry-span>, </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="publisher"/>
+        <text:index-entry-span>, </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="year"/> 
+        <text:index-entry-span>. </text:index-entry-span>
+      </xsl:when>
+      <xsl:otherwise>
+        <text:index-entry-bibliography text:bibliography-data-field="author"/>        
+        <text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="title"/>
+        <text:index-entry-span>. </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="address"/>
+        <text:index-entry-span> : </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="publisher"/>
+        <text:index-entry-span>, </text:index-entry-span>
+        <text:index-entry-bibliography text:bibliography-data-field="year"/> 
+        <text:index-entry-span>. </text:index-entry-span>
+      </xsl:otherwise>
+    </xsl:choose>
+      </text:bibliography-entry-template>
+ </xsl:template>
   
 
 

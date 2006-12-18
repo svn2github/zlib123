@@ -52,7 +52,10 @@
       <office:styles>
         <!-- document styles -->
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
-        <xsl:call-template name="InsertNotesConfiguration"/>
+        <xsl:call-template name="InsertNotesConfiguration"/>        
+        <xsl:if test="document('word/document.xml')//w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
+          <xsl:call-template name="BibliographyConfiguration"/>
+        </xsl:if>        
       </office:styles>
       <!-- automatic styles -->
       <office:automatic-styles>
@@ -2915,5 +2918,17 @@
         <xsl:value-of select="$fontName"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template> 
+  
+  <xsl:template name="BibliographyConfiguration">
+    <text:bibliography-configuration text:prefix="(" text:suffix=")">
+      <xsl:attribute name="text:sort-by-position">false</xsl:attribute>
+      <xsl:attribute name="text:sort-algorithm">
+        <xsl:text>alphanumeric</xsl:text>
+      </xsl:attribute>
+      <text:sort-key text:key="author" text:sort-ascending="true"/>
+    </text:bibliography-configuration>
   </xsl:template>
+  
+  
  </xsl:stylesheet>
