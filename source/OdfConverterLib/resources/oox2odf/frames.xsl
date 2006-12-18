@@ -113,7 +113,7 @@
     <draw:image>
        <xsl:call-template name="InsertImageHref">
           <xsl:with-param name="document" select="$document"/>
-         <xsl:with-param name="rId" select="parent::w:object/v:shape/v:imagedata/@r:id"/>
+         <xsl:with-param name="rId" select="parent::w:object/v:shape/v:imagedata/@r:id | parent::w:pict/v:shape/v:imagedata/@r:id"/>
          <xsl:with-param name="srcFolder" select="'./ObjectReplacements'"/>
          <xsl:with-param name="targetName" select="generate-id(.)"/>
         </xsl:call-template>
