@@ -89,7 +89,7 @@
   <xsl:template name="GetPrefixedStyleName">
     <xsl:param name="styleName"/>
     <xsl:choose>
-    
+
       <xsl:when test="key('automatic-styles',$styleName)">
         <xsl:choose>
           <xsl:when test="ancestor::office:document-styles/office:automatic-styles">
@@ -104,8 +104,10 @@
         <xsl:choose>
           <xsl:when test="$styleName='Sender' ">EnvelopeReturn</xsl:when>
           <xsl:when test="$styleName='Addressee' ">EnvelopeAddress</xsl:when>
-          <xsl:otherwise><xsl:value-of select="$styleName"/></xsl:otherwise>
-        </xsl:choose> 
+          <xsl:otherwise>
+            <xsl:value-of select="$styleName"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -868,7 +870,8 @@
       </xsl:choose>
     </xsl:if>
 
-    <xsl:if test="@style:text-line-through-style != 'none'">
+    <xsl:if
+      test="@style:text-line-through-style != 'none' or @style:text-line-through-type != 'none' ">
       <xsl:choose>
         <xsl:when test="@style:text-line-through-type = 'double'">
           <w:dstrike w:val="on"/>
@@ -880,6 +883,16 @@
           <w:strike w:val="on"/>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:if>
+
+    <xsl:if test="@style:text-line-through-width != 'none'">
+      <!-- TODO : localize this -->
+      <xsl:message terminate="no">feedback:Line through width</xsl:message>
+    </xsl:if>
+
+    <xsl:if test="@style:text-line-through-color != 'none'">
+      <!-- TODO : localize this -->
+      <xsl:message terminate="no">feedback:Line through color</xsl:message>
     </xsl:if>
 
     <xsl:if test="@style:text-outline">
