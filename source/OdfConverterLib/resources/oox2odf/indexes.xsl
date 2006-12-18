@@ -301,6 +301,7 @@
         <xsl:with-param name="tabCount" select="$tabCount"/>
       </xsl:call-template>
     </xsl:variable>
+    <xsl:if test="$styleType != ''">
     <text:index-entry-tab-stop style:type="{$styleType}">
       <!--if style type is left, there must be style:position attribute -->
       
@@ -326,6 +327,7 @@
         </xsl:call-template>
       </xsl:if>
     </text:index-entry-tab-stop>
+    </xsl:if>
   </xsl:template>
   
   <!-- insert tab-leader char -->
