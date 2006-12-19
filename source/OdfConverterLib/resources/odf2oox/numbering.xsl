@@ -1602,6 +1602,12 @@
     </xsl:variable>
 
     <xsl:choose>
+      <xsl:when test="(self::text:p or self::text:h) and @text:is-list-header='true' ">
+        <!-- Override num property if specified -->
+        <w:numPr>
+          <w:numId w:val="0"/>
+        </w:numPr>
+      </xsl:when>
       <xsl:when test="number($defaultOutlineLevel) or $defaultOutlineLevel = 0">
         <!-- WARNING : this is not supposed to exist. It is due to a Word bug (cf bug #1604472) -->
         <w:numPr>
