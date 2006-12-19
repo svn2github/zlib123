@@ -42,16 +42,6 @@
   
   <!-- ignore text inside a field code -->
   <xsl:template match="w:instrText">
-    <xsl:if test="contains(.,'REF')">
-      <text:bookmark-ref text:reference-format="text">
-        <xsl:attribute name="text:ref-name">
-          <xsl:value-of select="substring-before(substring-after(.,'REF '),' \')"/>
-        </xsl:attribute>
-        <xsl:for-each select="ancestor::w:p/descendant::w:t">
-          <xsl:value-of select="."/>
-        </xsl:for-each>
-      </text:bookmark-ref>
-    </xsl:if>
     <xsl:if test="contains(preceding::w:instrText[1],'XE')">
       <text:alphabetical-index-mark>
         <xsl:attribute name="text:string-value">
@@ -61,6 +51,35 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- cross references -->
+  <xsl:template match="w:instrText[contains(self::node(),'REF')]">
+    <text:bookmark-ref text:reference-format="text">
+      <xsl:attribute name="text:ref-name">
+        <xsl:value-of select="substring-before(substring-after(.,'REF '),' \')"/>
+      </xsl:attribute>
+     
+      <xsl:call-template name="InsertFieldCharFieldContent"/>
+    </text:bookmark-ref>
+  </xsl:template>
+  
+  <xsl:template name="InsertFieldCharFieldContent">
+    <xsl:variable name="fieldCharId" select="generate-id(.)"/>
+   <!-- element that starts field-->
+    <xsl:variable name="fieldBegin" select="preceding::w:fldChar[@w:fldCharType='begin' and not(following::w:fldChar
+      [@w:fldCharType='end' and generate-id(following::w:instrText[contains(self::node(),'REF')][1]) = $fieldCharId ]) ][1] "/>
+    <!-- element that ends field-->
+    <xsl:variable name="fieldEnd" select="following::w:fldChar[@w:fldCharType='end' and not(preceding::w:fldChar
+      [@w:fldCharType='begin' and generate-id(preceding::w:instrText[contains(self::node(),'REF')][1]) = fieldCharId ]) ][1] "/>
+      <!--paragraph that contains field-->
+    <xsl:variable name="fieldParagraph" select="generate-id(ancestor::w:p)"/>
+    
+    <!--  inserts field  text contents from beginning to ending  element -->
+    <xsl:for-each select="$fieldBegin/following::w:t[generate-id(ancestor::w:p) = $fieldParagraph
+      and generate-id(preceding::w:fldChar[1]) != generate-id($fieldEnd) ]  ">
+      <xsl:apply-templates />
+    </xsl:for-each>
+  </xsl:template>
+  
   <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE')]">
     <text:span text:style-name="{generate-id(w:r)}">
       <text:title>
@@ -89,7 +108,7 @@
       </xsl:call-template>
   </xsl:template>
   
-  <xsl:template match="w:fldSimple[contains(@w:instr,'PAGE') and not(contains(@w:instr,'NUMPAGE'))] | w:instrText[contains(self::node(),'PAGE') and not(contains(self::node(),'NUMPAGE'))] ">
+  <xsl:template match="w:fldSimple[contains(@w:instr,'PAGE ') and not(contains(@w:instr,'NUMPAGE'))] | w:instrText[contains(self::node(),'PAGE ') and not(contains(self::node(),'NUMPAGE'))] ">
       <xsl:call-template name="InsertPageNumberField"/>
   </xsl:template>
   
@@ -882,5 +901,8 @@
   </xsl:template>  
     
   
+<!--  <xsl:template match="w:instrText[contains(self::node(),'HYPERLINK')]">
+    
+    </xsl:template>-->
   
 </xsl:stylesheet>

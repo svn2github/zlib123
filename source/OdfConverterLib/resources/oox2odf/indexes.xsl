@@ -533,7 +533,7 @@
     <xsl:choose>
       <xsl:when test="w:fldChar or w:instrText"></xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates select="."/>
+        <xsl:apply-templates />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

@@ -472,23 +472,16 @@
   <xsl:template match="w:r">
     <xsl:message terminate="no">progress:w:r</xsl:message>
     <xsl:choose>
-      <!--  fieldchar hyperlink -->
+      <!--  fieldchar hyperlink TODO: move hyperlink to fields  -->
       <xsl:when
         test="contains(preceding::w:instrText[1],'HYPERLINK') and 
         count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end'])">
         <xsl:call-template name="InsertHyperlink"/>
       </xsl:when>
-	<!-- ignore text when we are in date or time field -->
-      <xsl:when
-        test="((contains(w:instrText,'TIME') or contains(preceding::w:instrText[1]  ,'TIME')) or(contains(w:instrText,'DATE') or contains(preceding::w:instrText[1]  ,'DATE'))) and 
-        count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and not(w:instrText)"/>
-      <!-- ignore text when we are in pagebreak field -->
-      <xsl:when
-        test="(((contains(w:instrText,'PAGE') and not(contains(w:instrText,'PAGEREF')))or (contains(preceding::w:instrText[1]  ,'PAGE') and not(contains(preceding::w:instrText[1],'PAGEREF'))))) and 
-        count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and descendant::w:t"/>
-      <!-- ignore text when we are in reference field -->
-      <xsl:when
-        test="contains(preceding::w:instrText[1],'REF') and not(contains(preceding::w:instrText[1],'PAGEREF')) and count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end']) and not(w:instrText)"/>
+      <!-- ignore text when we are in field-->
+      <xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin'] or preceding::w:fldChar[1][@w:fldCharType='separate'] ">
+        <xsl:apply-templates select="w:instrText"/>
+      </xsl:when>
       
       <!-- Comments -->
       <xsl:when test="w:commentReference/@w:id">        
