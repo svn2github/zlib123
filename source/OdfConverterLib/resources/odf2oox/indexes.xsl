@@ -698,24 +698,16 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <!-- insert tabs if right tab defined or if a tab exist after/before entry-text or if parent style has tabs (to be overriden) -->
     <xsl:if
-      test="($leftTabStop != '' and $numberingFormat != '' ) or text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]
+      test="($leftTabStop != '' and $numberingFormat != '' )
+      or text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type='right' or @style:position]
       or document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$levelStyleName]//style:tab-stop">
       <w:tabs>
         <!-- clear all parent tabs -->
         <xsl:call-template name="ClearParentStyleTabs">
           <xsl:with-param name="parentstyleName" select="$levelStyleName"/>
         </xsl:call-template>
-
-        <!-- declare tabs after text -->
-        <xsl:if
-          test="($leftTabStop != '' and $numberingFormat != '' ) or text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]">
-          <!-- do not write tabs after text except right tab-stop -->
-          <xsl:for-each
-            select="text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type = 'right']">
-            <xsl:call-template name="tabStop"/>
-          </xsl:for-each>
-        </xsl:if>
 
         <!-- declare 1 tab before text -->
         <xsl:if test="$leftTabStop != '' and $numberingFormat != '' ">
@@ -741,6 +733,16 @@
               </xsl:call-template>
             </xsl:attribute>
           </w:tab>
+        </xsl:if>
+
+        <!-- declare tabs after text -->
+        <xsl:if
+          test="($leftTabStop != '' and $numberingFormat != '' ) or text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type='right' or @style:position]">
+          <!-- do not write tabs after text except right tab-stop -->
+          <xsl:for-each
+            select="text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type = 'right'][1]">
+            <xsl:call-template name="tabStop"/>
+          </xsl:for-each>
         </xsl:if>
       </w:tabs>
     </xsl:if>
