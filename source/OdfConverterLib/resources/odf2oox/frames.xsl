@@ -3139,11 +3139,21 @@
           </xsl:attribute>
         </xsl:if>
         <!-- other fill properties -->
-        <xsl:if test="$fillProperty = 'gradient' ">
-          <xsl:call-template name="InsertGradientFill">
-            <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-          </xsl:call-template>
-        </xsl:if>
+        <xsl:choose>
+          <xsl:when test="$fillProperty = 'solid' ">
+            <xsl:attribute name="color">
+              <xsl:call-template name="GetGraphicProperties">
+                <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+                <xsl:with-param name="attribName">draw:fill-color</xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="$fillProperty = 'gradient' ">
+            <xsl:call-template name="InsertGradientFill">
+              <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
       </v:fill>
     </xsl:if>
 
