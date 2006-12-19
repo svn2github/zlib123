@@ -264,6 +264,7 @@
         <xsl:attribute name="style:display-name">
           <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
         </xsl:attribute>
+          <xsl:call-template name="HeaderFooter"/>
         </style:master-page>
         
         </xsl:if>
@@ -278,7 +279,7 @@
           <xsl:value-of select="w:headerReference[./@w:type = 'default']/@r:id"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="preceding::w:sectPr/w:headerReference[./@w:type = 'default'][1]/@r:id"/>
+          <xsl:value-of select="preceding::w:sectPr[w:headerReference/@w:type = 'default'][1]/w:headerReference[./@w:type = 'default']/@r:id"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -300,7 +301,7 @@
           <xsl:value-of select="w:headerReference[./@w:type = 'even']/@r:id"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="preceding::w:sectPr/w:headerReference[./@w:type = 'even'][1]/@r:id"/>
+          <xsl:value-of select="preceding::w:sectPr[w:headerReference/@w:type = 'even'][1]/w:headerReference[./@w:type = 'even']/@r:id"/>
         </xsl:otherwise>
       </xsl:choose>
       </xsl:variable>
@@ -322,7 +323,7 @@
           <xsl:value-of select="w:footerReference[./@w:type = 'default']/@r:id"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="preceding::w:sectPr/w:footerReference[./@w:type = 'default'][1]/@r:id"/>
+          <xsl:value-of select="preceding::w:sectPr[w:footerReference/@w:type = 'default'][1]/w:footerReference[./@w:type = 'default']/@r:id"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -344,7 +345,7 @@
             <xsl:value-of select="w:footerReference[./@w:type = 'even']/@r:id"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="preceding::w:sectPr/w:footerReference[./@w:type = 'even'][1]/@r:id"/>
+            <xsl:value-of select="preceding::w:sectPr[w:footerReference/@w:type = 'even'][1]/w:footerReference[./@w:type = 'even']/@r:id"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
