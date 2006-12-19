@@ -560,17 +560,8 @@
           </xsl:call-template>
         </xsl:if>
       </xsl:attribute>
-            <!-- attach automatic style-->
-      <xsl:choose>
-        <xsl:when test="w:rPr">
-          <text:span text:style-name="{generate-id(self::node())}">
-            <xsl:apply-templates/>
-          </text:span>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <!--hyperlink text-->
+      <xsl:apply-templates/>
     </text:a>
   </xsl:template>
 
@@ -598,9 +589,7 @@
     <xsl:choose>
       <!--check whether string contains  whitespace sequence-->
       <xsl:when test="not(contains(.,'  '))">
-        <xsl:if test="not(ancestor::w:endnote and parent::w:r/w:rPr/w:rStyle) and not(ancestor::w:footnote and parent::w:r/w:rPr/w:rStyle)">
         <xsl:value-of select="."/>
-        </xsl:if>
       </xsl:when>
       <xsl:otherwise>
         <!--converts whitespaces sequence to text:s-->
