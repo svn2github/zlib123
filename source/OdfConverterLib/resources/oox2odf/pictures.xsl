@@ -304,10 +304,13 @@
     <xsl:variable name="layoutInCell" select="wp:inline/@layoutInCell | wp:anchor/@layoutInCell"/>
     <xsl:attribute name="draw:flow-with-text">
       <xsl:choose>
+        <xsl:when test="ancestor::w:hdr or ancestor::w:ftr">
+          <xsl:text>false</xsl:text>
+        </xsl:when>
         <xsl:when test="$layoutInCell = 1">
             <xsl:text>true</xsl:text>
         </xsl:when>
-        <xsl:otherwise>
+       <xsl:otherwise>
             <xsl:text>false</xsl:text>
         </xsl:otherwise>
       </xsl:choose>

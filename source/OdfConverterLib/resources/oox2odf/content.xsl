@@ -533,8 +533,15 @@
         <xsl:variable name="relationshipId">
           <xsl:value-of select="@r:id"/>
         </xsl:variable>
+        <xsl:variable name="document">
+          <xsl:call-template name="GetDocumentName">
+            <xsl:with-param name="rootId">
+              <xsl:value-of select="generate-id(/node())"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
         <xsl:for-each
-          select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship']">
+          select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
           <xsl:if test="./@Id=$relationshipId">
               <xsl:call-template name="GetLinkPath">
                 <xsl:with-param name="linkHref" select="@Target"/>
