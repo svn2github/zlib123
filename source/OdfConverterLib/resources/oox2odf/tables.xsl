@@ -84,7 +84,7 @@
       </xsl:attribute>
 
       <!-- column-span -->
-      <xsl:if test="w:tcPr/w:gridSpan">
+      <xsl:if test="w:tcPr/w:gridSpan and w:tcPr/w:gridSpan/@w:val != '0'">
         <xsl:attribute name="table:number-columns-spanned">
           <xsl:value-of select="w:tcPr/w:gridSpan/@w:val"/>
         </xsl:attribute>
