@@ -428,11 +428,6 @@
 
     <wp:anchor simplePos="0" locked="0" layoutInCell="1">
 
-      <!-- overlap property -->
-      <xsl:call-template name="InsertOverlapProperty">
-        <xsl:with-param name="imageStyle" select="$imageStyle"/>
-      </xsl:call-template>
-
       <!-- image z-index-->
       <xsl:call-template name="InsertZindex">
         <xsl:with-param name="imageStyle" select="$imageStyle"/>
@@ -460,25 +455,6 @@
       </xsl:call-template>
     </wp:anchor>
 
-  </xsl:template>
-
-  <xsl:template name="InsertOverlapProperty">
-    <xsl:param name="imageStyle"/>
-
-    <xsl:variable name="contour">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$imageStyle"/>
-        <xsl:with-param name="attribName">style:wrap-contour</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:attribute name="allowOverlap">
-      <xsl:choose>
-        <xsl:when test="$contour = 'true' ">1</xsl:when>
-        <xsl:when test="$contour = 'false' ">0</xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
-      </xsl:choose>
-    </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="InsertZindex">
@@ -2893,26 +2869,6 @@
 
   </xsl:template>
 
-  <xsl:template name="InsertShapeOverlapProperty">
-    <xsl:param name="shapeStyle"/>
-
-    <xsl:variable name="shapeContour">
-      <xsl:call-template name="GetGraphicProperties">
-        <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-        <xsl:with-param name="attribName">style:wrap-contour</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-    <xsl:choose>
-      <xsl:when test="$shapeContour = 'true' ">
-        <xsl:attribute name="o:allowoverlap">t</xsl:attribute>
-      </xsl:when>
-      <xsl:when test="$shapeContour = 'false' ">
-        <xsl:attribute name="o:allowoverlap">f</xsl:attribute>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-
   <xsl:template name="InsertShapeFill">
     <xsl:param name="shapeStyle"/>
 
@@ -3288,10 +3244,6 @@
       </xsl:call-template>
     </xsl:attribute>
 
-    <xsl:call-template name="InsertShapeOverlapProperty">
-      <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
-    </xsl:call-template>
-
     <xsl:call-template name="InsertShapeFill">
       <xsl:with-param name="shapeStyle" select="$shapeStyle"/>
     </xsl:call-template>
@@ -3400,7 +3352,7 @@
         <xsl:if
           test="@fo:min-height or parent::draw:frame/@fo:min-width
           or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' 
-          or $shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'true' ">
+          or not($shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'false')">
           <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
         </xsl:if>
         <xsl:if test="contains(parent::draw:frame/@draw:transform,'rotate')">
