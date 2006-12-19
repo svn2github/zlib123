@@ -2041,6 +2041,26 @@
 
   <!-- Section properties -->
   <xsl:template match="style:section-properties" mode="section">
+    <!-- margins -->
+    <xsl:if test="@fo:margin-left != '' or @fo:margin-right != '' ">
+      <w:pgMar>
+        <xsl:if test="@fo:margin-left != '' or @fo:margin-left != 'none' ">
+          <xsl:attribute name="w:left">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="@fo:margin-left"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="@fo:margin-right != '' or @fo:margin-right != 'none' ">
+          <xsl:attribute name="w:right">
+            <xsl:call-template name="twips-measure">
+              <xsl:with-param name="length" select="@fo:margin-right"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+      </w:pgMar>
+    </xsl:if>
+    <!-- columns -->
     <xsl:apply-templates select="style:columns" mode="columns"/>
   </xsl:template>
 

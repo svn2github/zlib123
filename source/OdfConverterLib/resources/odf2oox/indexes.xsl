@@ -700,7 +700,7 @@
 
     <xsl:if
       test="($leftTabStop != '' and $numberingFormat != '' ) or text:index-entry-text[1]/following-sibling::text:index-entry-tab-stop[@style:type!='right' and @style:position]
-      or document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$levelStyleName]">
+      or document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$levelStyleName]//style:tab-stop">
       <w:tabs>
         <!-- clear all parent tabs -->
         <xsl:call-template name="ClearParentStyleTabs">

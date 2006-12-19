@@ -426,7 +426,7 @@
     <xsl:param name="imageId"/>
     <xsl:param name="imageStyle"/>
 
-    <wp:anchor simplePos="0" locked="0" layoutInCell="1">
+    <wp:anchor simplePos="0" locked="0" layoutInCell="1" allowOverlap="1">
 
       <!-- image z-index-->
       <xsl:call-template name="InsertZindex">
