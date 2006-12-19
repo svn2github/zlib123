@@ -2227,8 +2227,22 @@
                 </xsl:call-template>
               </xsl:when>
               <xsl:otherwise>
+                <xsl:variable name="indent">
+                  <xsl:for-each select="ancestor::w:pPr[1]">
+                    <xsl:call-template name="GetParagraphIndent"/>
+                  </xsl:for-each>
+                </xsl:variable>
                 <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length" select="./@w:pos"/>
+                  <xsl:with-param name="length">
+                    <xsl:choose>
+                      <xsl:when test="./@w:pos = '0'">
+                        <xsl:text>0</xsl:text>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="./@w:pos - number($indent)"/>
+                      </xsl:otherwise>
+                    </xsl:choose>                    
+                  </xsl:with-param>
                   <xsl:with-param name="unit">cm</xsl:with-param>
                 </xsl:call-template>
               </xsl:otherwise>
