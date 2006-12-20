@@ -2635,161 +2635,106 @@
         </xsl:if>
       </xsl:variable>
 
-      <!-- declare an absolute positioning (case when margin is computed, cf below) -->
-      <xsl:choose>
-        <xsl:when test="$horizontalPos = 'from-left' or $horizontalPos='from-inside' ">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:when
-          test="$horizontalRel != '' and not($horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'paragraph'  or $horizontalRel = 'paragraph-content'  or $horizontalRel = 'char' )">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:when test="$verticalPos = 'from-top' ">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:when
-          test="$verticalRel != '' and not($verticalRel = 'page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph'  or $verticalRel = 'paragraph-content' 
-        or $verticalRel = 'char' or $verticalRel = 'char' or $verticalRel = 'baseline' or $verticalRel = 'line' or $verticalRel = 'text' )">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:when test="$marginLeft != '' and $marginLeft != 0 ">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:when test="$marginRight != '' and $marginRight != 0 ">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:when test="$marginTop != '' and $marginTop != 0 ">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:when test="$marginBottom != '' and $marginBottom != 0 ">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:when test="$xCoordinate != '' and $xCoordinate != 0 ">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:when test="$yCoordinate != '' and $yCoordinate != 0 ">
-          <xsl:text>position:absolute;</xsl:text>
-        </xsl:when>
-        <xsl:otherwise/>
-      </xsl:choose>
+      <!-- declare an absolute positioning (ignored if margin-left/rigt=0)
+        NB : it should not be compulsory to declare absolute positioning, but it causes troubles for images embedded in text-boxes in Word if not declared.
+      -->
+      <xsl:text>position:absolute;</xsl:text>
 
-      <!-- horizontal position -->
-      <xsl:if
-        test="$horizontalPos != '' or ($marginLeft != '' and $marginLeft != 0 ) or ($marginRight != '' and $marginRight != 0 ) or ($xCoordinate != '' and $xCoordinate != 0 ) ">
-        <xsl:choose>
-          <!-- centered position -->
-          <xsl:when
-            test="$horizontalPos = 'center' and not(contains($horizontalRel, '-start-margin') or contains($horizontalRel, '-end-margin'))">
-            <xsl:text>mso-position-horizontal:center;</xsl:text>
-          </xsl:when>
-          <!-- measured position -->
-          <xsl:when
-            test="$horizontalPos = 'from-left' or $horizontalPos='from-inside' or ($marginLeft != '' and $marginLeft != 0 ) or ($marginRight != '' and $marginRight != 0 ) ">
-            <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
-            <xsl:text>margin-left:</xsl:text>
-            <xsl:variable name="valX">
-              <xsl:choose>
-                <!-- if rotation, revert X and Y -->
-                <xsl:when test="$rotation != '' ">
-                  <xsl:call-template name="ComputeMarginXWithRotation">
-                    <xsl:with-param name="angle" select="$rotation"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:call-template name="ComputeMarginX">
-                    <xsl:with-param name="parent"
-                      select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
-                  </xsl:call-template>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
-            <xsl:value-of select="$valX"/>
-            <xsl:if test="$valX != 0">pt</xsl:if>
-            <xsl:text>;</xsl:text>
-          </xsl:when>
-          <!-- relative to page, page-content, paragraph, paragraph-content, char -->
-          <xsl:when
-            test="$horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'paragraph'  or $horizontalRel = 'paragraph-content'  or $horizontalRel = 'char' ">
-            <xsl:value-of select="concat('mso-position-horizontal:', $horizontalPos, ';')"/>
-          </xsl:when>
-          <!-- any other case -->
-          <xsl:otherwise>
-            <xsl:text>margin-left:</xsl:text>
-            <xsl:variable name="valX">
+      <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
+      <xsl:text>margin-left:</xsl:text>
+      <xsl:variable name="valX">
+        <xsl:if
+          test="$horizontalPos = 'from-left' or $horizontalPos='from-inside' or ($marginLeft != '' and $marginLeft != 0 ) or ($marginRight != '' and $marginRight != 0 ) ">
+          <xsl:choose>
+            <!-- if rotation, revert X and Y -->
+            <xsl:when test="$rotation != '' ">
+              <xsl:call-template name="ComputeMarginXWithRotation">
+                <xsl:with-param name="angle" select="$rotation"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
               <xsl:call-template name="ComputeMarginX">
                 <xsl:with-param name="parent"
                   select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
               </xsl:call-template>
-            </xsl:variable>
-            <xsl:value-of select="$valX"/>
-            <xsl:if test="$valX != 0">pt</xsl:if>
-            <xsl:text>;</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="number($valX) and $valX != 0">
+          <xsl:value-of select="$valX"/>
+          <xsl:text>pt</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+      <xsl:text>;</xsl:text>
 
-      <!-- vertical position-->
-      <xsl:if
-        test="$verticalPos != '' or ($marginTop != '' and $marginTop != 0 ) or ($marginBottom != '' and $marginBottom != 0 ) or ($yCoordinate != '' and $yCoordinate != 0 ) ">
-        <xsl:choose>
-          <!-- centered position -->
-          <xsl:when test="$verticalPos = 'middle' ">
-            <xsl:text>mso-position-vertical:center;</xsl:text>
-          </xsl:when>
-          <!-- measured position -->
-          <xsl:when
-            test="$verticalPos = 'from-top' or ($marginTop != '' and $marginTop != 0 ) or ($marginBottom != '' and $marginBottom != 0 ) ">
-            <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
-            <xsl:text>margin-top:</xsl:text>
-            <xsl:variable name="valY">
-              <xsl:choose>
-                <!-- if rotation, revert X and Y -->
-                <xsl:when test="$rotation != '' ">
-                  <xsl:call-template name="ComputeMarginYWithRotation">
-                    <xsl:with-param name="angle" select="$rotation"/>
-                  </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:call-template name="ComputeMarginY">
-                    <xsl:with-param name="parent"
-                      select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
-                  </xsl:call-template>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
-            <xsl:value-of select="$valY"/>
-            <xsl:if test="$valY != 0">pt</xsl:if>
-            <xsl:text>;</xsl:text>
-          </xsl:when>
-          <!-- relative to page, page-content, paragraph, paragraph-content, char -->
-          <xsl:when
-            test="$verticalRel = 'page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph'  or $verticalRel = 'paragraph-content'  or $verticalRel = 'char' 
-          or $verticalRel = 'char' or $verticalRel = 'baseline' or $verticalRel = 'line' or $verticalRel = 'text' ">
-            <xsl:text>mso-position-vertical:</xsl:text>
-            <xsl:choose>
-              <xsl:when test="$verticalPos = 'middle' ">center</xsl:when>
-              <xsl:when test="$verticalPos = 'below' ">bottom</xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$verticalPos"/>
-              </xsl:otherwise>
-            </xsl:choose>
-            <xsl:text>;</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <!-- any other case -->
-            <xsl:text>margin-top:</xsl:text>
-            <xsl:variable name="valY">
+      <!-- compute margin with respect to frame spacing to content, paragraph/page margins... -->
+      <xsl:text>margin-top:</xsl:text>
+      <xsl:variable name="valY">
+        <xsl:if
+          test="$verticalPos = 'from-top' or ($marginTop != '' and $marginTop != 0 ) or ($marginBottom != '' and $marginBottom != 0 ) ">
+          <xsl:choose>
+            <!-- if rotation, revert X and Y -->
+            <xsl:when test="$rotation != '' ">
+              <xsl:call-template name="ComputeMarginYWithRotation">
+                <xsl:with-param name="angle" select="$rotation"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
               <xsl:call-template name="ComputeMarginY">
                 <xsl:with-param name="parent"
                   select="ancestor-or-self::node()[contains(name(), 'draw:')]"/>
               </xsl:call-template>
-            </xsl:variable>
-            <xsl:value-of select="$valY"/>
-            <xsl:if test="$valY != 0">pt</xsl:if>
-            <xsl:text>;</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="number($valY) and $valY != 0">
+          <xsl:value-of select="$valY"/>
+          <xsl:text>pt</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+      <xsl:text>;</xsl:text>
+
+      <!-- horizontal position (overrides margin-left) -->
+      <xsl:choose>
+        <!-- centered position -->
+        <xsl:when
+          test="$horizontalPos = 'center' and not(contains($horizontalRel, '-start-margin') or contains($horizontalRel, '-end-margin'))">
+          <xsl:text>mso-position-horizontal:center;</xsl:text>
+        </xsl:when>
+        <!-- relative to page, page-content, paragraph, paragraph-content, char -->
+        <xsl:when
+          test="$horizontalRel = 'page' or $horizontalRel = 'page-content' or $horizontalRel = 'paragraph'  or $horizontalRel = 'paragraph-content'  or $horizontalRel = 'char' ">
+          <xsl:value-of select="concat('mso-position-horizontal:', $horizontalPos, ';')"/>
+        </xsl:when>
+      </xsl:choose>
+
+      <!-- vertical position (overrides margin-top) -->
+      <xsl:choose>
+        <!-- centered position -->
+        <xsl:when test="$verticalPos = 'middle' ">
+          <xsl:text>mso-position-vertical:center;</xsl:text>
+        </xsl:when>
+        <!-- relative to page, page-content, paragraph, paragraph-content, char -->
+        <xsl:when
+          test="$verticalRel = 'page' or $verticalRel = 'page-content' or $verticalRel = 'paragraph'  or $verticalRel = 'paragraph-content'  or $verticalRel = 'char' 
+          or $verticalRel = 'char' or $verticalRel = 'baseline' or $verticalRel = 'line' or $verticalRel = 'text' ">
+          <xsl:text>mso-position-vertical:</xsl:text>
+          <xsl:choose>
+            <xsl:when test="$verticalPos = 'middle' ">center</xsl:when>
+            <xsl:when test="$verticalPos = 'below' ">bottom</xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$verticalPos"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:text>;</xsl:text>
+        </xsl:when>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 
