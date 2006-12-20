@@ -1524,20 +1524,17 @@
               </xsl:otherwise>
             </xsl:choose>
             <w:numId>
-              <xsl:attribute name="w:val">
+              <xsl:attribute name="w:val">  
                 <xsl:choose>
                   <xsl:when test="self::text:list-item">
                     <xsl:call-template name="GetNumberingId">
-                      <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"
-                      />
+                      <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
                     </xsl:call-template>
                   </xsl:when>
                   <xsl:otherwise>
-
                     <xsl:call-template name="GetNumberingId">
                       <xsl:with-param name="styleName" select="$listStyleName"/>
                     </xsl:call-template>
-
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:attribute>
@@ -1556,6 +1553,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  
+  
 
   <!-- insert numbering properties of header element -->
   <xsl:template name="InsertHeaderNumbering">
@@ -1602,6 +1602,18 @@
     </xsl:variable>
 
     <xsl:choose>
+      <!-- Headings in lists are treated as basic list items -->
+      <xsl:when test="self::text:list-item">
+        <w:numPr>
+          <w:numId>
+            <xsl:attribute name="w:val">  
+              <xsl:call-template name="GetNumberingId">
+                <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
+              </xsl:call-template>
+            </xsl:attribute>
+          </w:numId>
+        </w:numPr>
+      </xsl:when>
       <xsl:when test="(self::text:p or self::text:h) and @text:is-list-header='true' ">
         <!-- Override num property if specified -->
         <w:numPr>
