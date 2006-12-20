@@ -2659,7 +2659,7 @@
       <xsl:with-param name="length">
         <xsl:choose>
           <xsl:when
-            test="$style/style:paragraph-properties/@fo:text-indent and ($style/style:paragraph-properties/@style:auto-text-indent!='true')">
+            test="$style/style:paragraph-properties/@fo:text-indent and not($style/style:paragraph-properties/@style:auto-text-indent='true')">
             <xsl:value-of select="$style/style:paragraph-properties/@fo:text-indent"/>
           </xsl:when>
           <xsl:when
@@ -2675,7 +2675,7 @@
             <xsl:for-each select="document('styles.xml')">
               <xsl:choose>
                 <xsl:when
-                  test="key('styles', $styleName)/style:paragraph-properties/@fo:text-indent and (key('styles', $styleName)/style:paragraph-properties/@style:auto-text-indent!='true')">
+                  test="key('styles', $styleName)/style:paragraph-properties/@fo:text-indent and not(key('styles', $styleName)/style:paragraph-properties/@style:auto-text-indent='true')">
                   <xsl:value-of
                     select="key('styles', $styleName)/style:paragraph-properties/@fo:text-indent"/>
                 </xsl:when>
