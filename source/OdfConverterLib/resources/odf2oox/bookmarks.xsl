@@ -175,9 +175,7 @@
 
   <!-- Insert Cross References (Bookmark) -->
   <xsl:template match="text:bookmark-ref|text:reference-ref|text:sequence-ref" mode="paragraph">
-    <xsl:variable name="TextName">
-      <xsl:value-of select="@text:ref-name"/>
-    </xsl:variable>
+    <xsl:variable name="TextName" select="@text:ref-name"/>
     <xsl:variable name="masterPage"
       select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page/style:header/text:p"/>
     <xsl:if
@@ -220,7 +218,7 @@
     <!-- field type -->
     <xsl:choose>
       <xsl:when
-        test="@text:reference-format='page' or ../text:sequence-ref[@text:ref-name=$TextName]">
+        test="@text:reference-format='page' ">
         <w:instrText xml:space="preserve">PAGEREF </w:instrText>
       </xsl:when>
       <xsl:otherwise>
@@ -230,8 +228,10 @@
     <w:instrText>
       <xsl:choose>
         <xsl:when test="../text:sequence-ref[@text:ref-name=$TextName]">
+          <xsl:variable name="indexOfObjects"
+            select="generate-id(key('indexes','')[child::*/@text:caption-sequence-name = key('bookmark-reference-start', $TextName)/@text:name])"/>
           <xsl:value-of
-            select="concat('_Toc', number(count(key('bookmark-reference-start', $TextName)/preceding::text:sequence))+1)"
+            select="concat('_Toc', number(count(key('bookmark-reference-start', $TextName)/preceding::text:sequence))+1, $indexOfObjects)"
           />
         </xsl:when>
         <xsl:otherwise>
@@ -385,9 +385,9 @@
       <xsl:value-of select="number(count(preceding::text:sequence[@text:name = $textName]))+1"/>
     </xsl:variable>
     <xsl:variable name="indexOfObjects"
-      select="key('indexes','')[child::*/@text:caption-sequence-name = $textName]"/>
+      select="generate-id(key('indexes','')[child::*/@text:caption-sequence-name = $textName])"/>
 
-    <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id,generate-id($indexOfObjects))}"/>
+    <w:bookmarkStart w:id="{$id}" w:name="{concat('_Toc',$id,$indexOfObjects)}"/>
     <w:r>
       <w:t>
         <xsl:value-of select="."/>
