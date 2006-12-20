@@ -318,7 +318,7 @@
   </xsl:template>
   
   <xsl:template name="InsertImageBorder">
-    <xsl:if test="descendant::a:ln">
+    <xsl:if test="descendant::a:ln[not(a:noFill)]">
       <xsl:variable name="width">
         <xsl:call-template name="ConvertEmu3">
           <xsl:with-param name="length">
