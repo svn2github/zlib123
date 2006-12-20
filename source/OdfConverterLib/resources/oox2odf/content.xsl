@@ -127,7 +127,7 @@
   
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
   <xsl:template
-    match="w:pPr[parent::w:p]|w:r[parent::w:p and child::w:br[@w:type='page' or @w:type='column'] and not(parent::w:p[child::wpPr])]"
+    match="w:pPr[parent::w:p]|w:r[parent::w:p and child::w:br[@w:type='page' or @w:type='column'] and not(parent::w:p[child::w:pPr])]"
     mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">      
