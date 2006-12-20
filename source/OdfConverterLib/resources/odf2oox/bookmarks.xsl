@@ -184,29 +184,19 @@
         <w:fldChar w:fldCharType="begin"/>
       </w:r>
       <w:r>
-        <w:rPr>
-          <w:lang/>
-        </w:rPr>
+        <xsl:call-template name="InsertRunProperties"/>
         <xsl:call-template name="InsertCrossReferences">
           <xsl:with-param name="TextName" select="$TextName"/>
         </xsl:call-template>
       </w:r>
       <w:r>
-        <w:rPr>
-          <w:lang/>
-        </w:rPr>
         <w:fldChar w:fldCharType="separate"/>
       </w:r>
       <w:r>
-        <!--xsl:call-template name="InsertRunProperties"/-->
-        <w:t>
-          <xsl:value-of select="."/>
-        </w:t>
+        <xsl:call-template name="InsertRunProperties"/>
+        <xsl:apply-templates mode="text"/>
       </w:r>
       <w:r>
-        <w:rPr>
-          <w:lang/>
-        </w:rPr>
         <w:fldChar w:fldCharType="end"/>
       </w:r>
     </xsl:if>
@@ -217,12 +207,11 @@
     <xsl:param name="TextName"/>
     <!-- field type -->
     <xsl:choose>
-      <xsl:when
-        test="@text:reference-format='page' ">
-        <w:instrText xml:space="preserve">PAGEREF </w:instrText>
+      <xsl:when test="@text:reference-format='page' ">
+        <w:instrText xml:space="preserve">PAGEREF \*MERGEFORMAT </w:instrText>
       </xsl:when>
       <xsl:otherwise>
-        <w:instrText xml:space="preserve">REF </w:instrText>
+        <w:instrText xml:space="preserve">REF \*MERGEFORMAT </w:instrText>
       </xsl:otherwise>
     </xsl:choose>
     <w:instrText>
@@ -242,9 +231,14 @@
       </xsl:choose>
     </w:instrText>
 
-    <xsl:if test="@text:reference-format='direction' ">
-      <w:instrText xml:space="preserve"> \p</w:instrText>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="@text:reference-format='direction' ">
+        <w:instrText xml:space="preserve"> \p</w:instrText>
+      </xsl:when>
+      <xsl:when test="@text:reference-format='chapter' ">
+        <w:instrText xml:space="preserve"> \n</w:instrText>
+      </xsl:when>
+    </xsl:choose>
 
     <w:instrText xml:space="preserve"> \h </w:instrText>
   </xsl:template>
