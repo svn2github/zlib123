@@ -105,9 +105,7 @@
 
   <!-- inserts textboxes which are embedded in odf as one after another in word -->
   <xsl:template name="InsertEmbeddedTextboxes">
-    <xsl:for-each select="descendant::draw:text-box">
-      <xsl:apply-templates mode="paragraph" select="."/>
-    </xsl:for-each>
+    <xsl:apply-templates select="draw:text-box" mode="paragraph"/>
   </xsl:template>
 
 
@@ -3412,7 +3410,8 @@
                   <xsl:with-param name="attribName">style:wrap</xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
-              <xsl:if test="$wrapping = 'none' and not(draw:frame/@text:anchor-type='as-char')">
+              <xsl:if
+                test="$wrapping = 'none' and not(draw:frame/@text:anchor-type='as-char') and not(draw:frame/descendant::draw:text-box)">
                 <w:p>
                   <w:pPr>
                     <xsl:call-template name="InsertPicturePropertiesInFrame"/>
