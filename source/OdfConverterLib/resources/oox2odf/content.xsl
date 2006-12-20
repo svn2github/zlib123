@@ -452,7 +452,7 @@
       <!--default scenario-->
       <xsl:otherwise>
         <text:p>
-          <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column' or document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr]">
+          <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr">
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="generate-id(self::node())"/>
             </xsl:attribute>
