@@ -392,7 +392,7 @@
         <xsl:value-of select="concat(round($newlength),'cm')"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="concat((round($newlength * 100)) div 100,'cm')"/>
+        <xsl:value-of select="concat((round($newlength * 1000)) div 1000,'cm')"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -426,7 +426,7 @@
             <xsl:text>#000080</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:text>#ffffff</xsl:text>
+            <xsl:text>#000000</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>

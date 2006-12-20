@@ -198,6 +198,9 @@
         <xsl:when test="ancestor::w:hdr or ancestor::w:ftr ">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
+        <xsl:when test="descendant::w10:wrap/@anchorx = 'page' and descendant::w10:wrap/@anchory = 'page'  ">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
         <xsl:otherwise>
           <xsl:text>paragraph</xsl:text>
         </xsl:otherwise>
@@ -413,11 +416,21 @@
       <xsl:call-template name="InsertShapeFlowWithText"/>
       <xsl:call-template name="InsertShapeBackgroundColor"/>
       <xsl:call-template name="InsertShapeZindex"/>
+      <xsl:call-template name="InsertShapeWrappedParagraph"/>
+
+      
     </xsl:for-each>
     <xsl:for-each select="v:shape/v:textbox">
       <xsl:call-template name="InsertTexboxTextDirection"/>
       <xsl:call-template name="InsertTextBoxPadding"/>
     </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template name="InsertShapeWrappedParagraph">
+ <!-- TODO inverstigate when this should not be set-->
+    <xsl:attribute name="style:number-wrapped-paragraphs">
+      <xsl:text>1</xsl:text>
+    </xsl:attribute>
   </xsl:template>
   
   <xsl:template name="InsertTexboxTextDirection">
@@ -762,6 +775,9 @@
               <xsl:with-param name="destUnit" select="'cm'"/>
             </xsl:call-template>
           </xsl:variable>
+          
+ 
+          
           <xsl:variable name="borderColor">
             <xsl:call-template name="InsertColor">
               <xsl:with-param name="color" select="$shape/@strokecolor"/>
