@@ -127,7 +127,7 @@
           </xsl:variable>
           <xsl:variable name="dataStyle">
             <xsl:apply-templates
-              select="/*/office:automatic-styles/number:date-style[@style:name=$curStyle]"
+              select="/*/office:automatic-styles/*[(self::number:date-style or self::number:time-style) and @style:name=$curStyle]"
               mode="dataStyle"/>
           </xsl:variable>
           <xsl:attribute name="w:instr">
@@ -205,7 +205,7 @@
           </xsl:variable>
           <xsl:variable name="dataStyle">
             <xsl:apply-templates
-              select="/*/office:automatic-styles/number:time-style[@style:name=$curStyle]"
+              select="/*/office:automatic-styles/*[(self::number:time-style or self::number:date-style) and @style:name=$curStyle]"
               mode="dataStyle"/>
           </xsl:variable>
           <xsl:attribute name="w:instr">
