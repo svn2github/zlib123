@@ -38,11 +38,11 @@
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
 
   <xsl:template match="text:page-number" mode="paragraph">
+    <w:r>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
     <xsl:choose>
       <xsl:when test="@text:page-adjust">
-        <w:r>
-          <w:fldChar w:fldCharType="begin"/>
-        </w:r>
         <w:r>
           <w:instrText xml:space="preserve"> =</w:instrText>
         </w:r>
@@ -53,35 +53,38 @@
         <w:r>
           <w:fldChar w:fldCharType="separate"/>
         </w:r>
-        <xsl:apply-templates mode="paragraph"/>
-        <w:r>
-          <w:fldChar w:fldCharType="end"/>
-        </w:r>
       </xsl:when>
       <xsl:otherwise>
-        <w:fldSimple w:instr=" PAGE ">
-          <xsl:attribute name="w:instr">
-            <xsl:choose>
-              <xsl:when test="@style:num-format">
-                <xsl:variable name="num-format">
-                  <xsl:call-template name="GetNumberFormattingSwitch"/>
-                </xsl:variable>
-                <xsl:value-of select="concat(' PAGE ', $num-format)"/>
-              </xsl:when>
-              <xsl:otherwise> PAGE </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-          <xsl:apply-templates mode="paragraph"/>
-        </w:fldSimple>
+        <w:r>
+          <xsl:call-template name="InsertRunProperties"/>
+          <w:instrText xml:space="preserve">PAGE </w:instrText>
+          <xsl:if test="@style:num-format">
+            <w:instrText>
+              <xsl:call-template name="GetNumberFormattingSwitch"/>
+            </w:instrText>
+          </xsl:if>
+        </w:r>
       </xsl:otherwise>
     </xsl:choose>
+    <xsl:apply-templates mode="paragraph"/>
+    <w:r>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
   </xsl:template>
 
   <!--  STATISTICS FIELDS  -->
   <xsl:template match="text:page-count" mode="paragraph">
-    <w:fldSimple w:instr=" NUMPAGES ">
-      <xsl:apply-templates mode="paragraph"/>
-    </w:fldSimple>
+    <w:r>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r>
+      <xsl:call-template name="InsertRunProperties"/>
+      <w:instrText xml:space="preserve">NUMPAGES </w:instrText>
+      <xsl:apply-templates mode="text"/>
+    </w:r>
+    <w:r>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
   </xsl:template>
 
   <xsl:template match="text:word-count|text:character-count|text:paragraph-count " mode="paragraph">
