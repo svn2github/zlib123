@@ -249,9 +249,9 @@
     <xsl:variable name="mstyleId">
       <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     </xsl:variable>
-    <xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $mstyleId">
+    <xsl:if test="document('word/styles.xml')//w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]">
       <xsl:variable name="mstyle"
-        select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblCellMar"/>
+        select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
       <xsl:call-template name="InsertCellMargins">
         <xsl:with-param name="tcMar" select="w:tcMar/w:bottom"/>
         <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
