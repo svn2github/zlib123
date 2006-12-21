@@ -3292,11 +3292,13 @@
           <xsl:value-of select="@draw:chain-next-name"/>
           <xsl:text>;</xsl:text>
         </xsl:if>
-        <xsl:if
-          test="@fo:min-height or parent::draw:frame/@fo:min-width
-          or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' 
-          or not($shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'false')">
-          <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
+        <xsl:if test="self::draw:text-box">
+          <xsl:if
+            test="@fo:min-height or parent::draw:frame/@fo:min-width
+            or not($shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
+            or not($shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'false')">
+            <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
+          </xsl:if>
         </xsl:if>
         <xsl:if test="contains(parent::draw:frame/@draw:transform,'rotate')">
           <xsl:variable name="angle">
