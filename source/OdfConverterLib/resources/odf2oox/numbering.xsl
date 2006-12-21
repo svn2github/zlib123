@@ -1605,6 +1605,7 @@
       <!-- Headings in lists are treated as basic list items -->
       <xsl:when test="self::text:list-item">
         <w:numPr>
+          <w:ilvl w:val="{number(text:h/@text:outline-level) - 1}"/>
           <w:numId>
             <xsl:attribute name="w:val">  
               <xsl:call-template name="GetNumberingId">
