@@ -116,6 +116,9 @@
       <xsl:choose>
         <xsl:when test="contains($name, '.svm')">
           <xsl:message terminate="no">feedback:SVM image</xsl:message> false </xsl:when>
+        <!-- WMF images inside text-box are properly displayed in Word 2007, but cause an opening crash in prior Word versions -->
+        <!--xsl:when test="contains($name, '.wmf') and ancestor::draw:text-box">
+          <xsl:message terminate="no">feedback:WMF image inside text-box</xsl:message> false </xsl:when-->
         <xsl:otherwise>true</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
