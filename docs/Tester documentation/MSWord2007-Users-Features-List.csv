@@ -82,7 +82,7 @@ Home;Font;Font;Font type;Selected font;;0;0.2-Final ;Completed;;;
 ;;Multi level list;;;;1;0.3-M2;Completed;;;
 ;;;;;;;;;;;
 ;;List indents;Number position;;;1;0.3-M1;Completed;;;
-;;;Text indent;;;1;0.3-M2;;;;
+;;;Text indent;;;1;1.0;;;;
 ;;;Follow number with;;;1;0.3-M1;Completed;;;
 ;;;Add tab stop at;;;1;0.3-M1;Completed;;;
 ;;;;;;;;;;;
@@ -128,7 +128,7 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted bec
 ;;;;;;;;;;;
 ;Text;Text Box;;;;2;0.3-M2;Completed;;;
 ;;Quick Parts;Document Property;Selected option;;2;;;;;
-;;;Field;Selected field;;2;0.3-M2;Partial;completed are date, time, page number ;;
+;;;Field;Selected field;;2;1.0;Partial;completed are date, time, page number ;;
 ;;Drop cap;Position;None / Dropped/ In margin;;3;1.0;;;;
 ;;;Options;Font;;3;1.0;;;;
 ;;;;Lines to drop;;3;1.0;;;;
@@ -140,7 +140,7 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted bec
 ;;;;;;;;;;;
 ;;Object;;;;1;0.3-M2;Completed;;;
 ;;;Object type;;;1;0.3-M2;Completed;;Object of Open Office are not supported correctly.;
-;;;Display as icon;;;1;0.3-M2;-;not supported;;
+;;;Display as icon;;;1;-;-;not supported;;
 ;;;Create from file;Selected file;;1;0.3-M2;Completed;;;
 ;;;;Link to file;;1;0.3-M2;Completed;;;
 ;;;;;;;;;;;
@@ -164,7 +164,7 @@ Table Tools;Layout;Table - Properties;Table;Size;;0;0.2-Final ;Completed;;;
 ;;;Cell;Size;Width;2;0.3-M1;Completed;;;
 ;;;;Vertical alignment;Top/Center/Bottom;2;0.2-Final ;Completed;;;
 ;;;;Options;Cell margins;2;0.2-Final ;Completed;;;
-;;;;;Wrap text;2;0.3-M2;-;not supported;;
+;;;;;Wrap text;2;-;-;not supported;;
 ;;;;;Fit text;2;-;;not supported;;
 ;;;;Text direction;;2;-;;not supported;;
 ;;;;;;;;;;;
@@ -224,38 +224,38 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;;;;;;;;;
 Header and Footer Tools;Design;Position;Header from top;;;1;0.3-M2;Completed;;;
 ;;;Footer from bottom;;;1;0.3-M2;Completed;;;
-;;;Insert alignment tab;Alignment;Left /center / Right;1;0.3-M2;-;not supported;;
+;;;Insert alignment tab;Alignment;Left /center / Right;1;-;-;not supported;;
 ;;;;Alignment relative to;Margin / Indent;1;-;;not supported;;
-;;;;Leader;1/2/3/4/5;1;0.3-M2;-;not supported;;
+;;;;Leader;1/2/3/4/5;1;-;-;not supported;;
 ;;Options;Different First Page;;;1;0.3-M2;Completed;;;
 ;;;Different Odd and Even Pages;;;1;0.3-M2;Completed;;;
 ;;;;;;;;;;;
 Textbox Tools;Format;Text box styles;Size;Height;Absolute;2;0.3-M2;Completed;;;
 ;;;;;Relative to Margin;2;0.3-M2;Completed;;;
-;;;;;Relative to Page;2;0.3-M2;-;not supported;;
-;;;;;Relative to Top margin;2;0.3-M2;-;not supported;;
-;;;;;Relative to Bottom margin;2;0.3-M2;-;not supported;;
-;;;;;Relative to Inside margin;2;0.3-M2;-;not supported;;
-;;;;;Relative to Outside margin;2;0.3-M2;-;not supported;;
+;;;;;Relative to Page;2;-;-;not supported;;
+;;;;;Relative to Top margin;2;-;-;not supported;;
+;;;;;Relative to Bottom margin;2;-;-;not supported;;
+;;;;;Relative to Inside margin;2;-;-;not supported;;
+;;;;;Relative to Outside margin;2;-;-;not supported;;
 ;;;;Width;Absolute;2;0.3-M2;Completed;;;
 ;;;;;Relative to Margin;2;0.3-M2;Completed;;;
-;;;;;Relative to Page;2;0.3-M2;-;not supported;;
-;;;;;Relative to Top margin;2;0.3-M2;-;not supported;;
-;;;;;Relative to Bottom margin;2;0.3-M2;-;not supported;;
-;;;;;Relative to Inside margin;2;0.3-M2;-;not supported;;
-;;;;;Relative to Outside margin;2;0.3-M2;-;not supported;;
-;;;;Rotate;;2;0.3-M2;;;;
-;;;;Scale;Height;2;0.3-M2;-;;;property is not saved in xml - is is used to calculate absolute size
-;;;;;Width;2;0.3-M2;-;;;property is not saved in xml - is is used to calculate absolute size
-;;;;;Lock aspect ratio;2;0.3-M2;-;;;in OO only position can be locked
-;;;;;Relative to orginal picture size;2;0.3-M2;-;there is no equivalent in OO;;
+;;;;;Relative to Page;2;-;-;not supported;;
+;;;;;Relative to Top margin;2;-;-;not supported;;
+;;;;;Relative to Bottom margin;2;-;-;not supported;;
+;;;;;Relative to Inside margin;2;-;-;not supported;;
+;;;;;Relative to Outside margin;2;-;-;not supported;;
+;;;;Rotate;;2;1.0;;;;
+;;;;Scale;Height;2;-;-;;;property is not saved in xml - is is used to calculate absolute size
+;;;;;Width;2;-;-;;;property is not saved in xml - is is used to calculate absolute size
+;;;;;Lock aspect ratio;2;-;-;;;in OO only position can be locked
+;;;;;Relative to orginal picture size;2;-;-;there is no equivalent in OO;;
 ;;;;;;;;;;;
 ;;;Layout;Wrapping style;In line with text;2;0.3-M2;Completed;;;
 ;;;;;Square;2;0.3-M2;Completed;;;
 ;;;;;Tight;2;0.3-M2;Completed;;;
 ;;;;;Behind text;2;0.3-M2;Completed;;;
 ;;;;;In front of text;2;0.3-M2;Completed;;;
-;;;;Horizontal alignment;Left  / Center / Right / Other;2;0.3-M2;-;not supported;;
+;;;;Horizontal alignment;Left  / Center / Right / Other;2;-;-;not supported;;
 ;;;Advanced Layout;Picture position;Horizontal;2;0.3-M2;Completed;;;
 ;;;;;Vertical;2;0.3-M2;Completed;;;
 ;;;;;Options;2;0.3-M2;Completed;allow overlap - no equivalent in OO, lock anchor not supported (in OO only position can be locked);;
@@ -263,7 +263,7 @@ Textbox Tools;Format;Text box styles;Size;Height;Absolute;2;0.3-M2;Completed;;;
 ;;;;;Wrap text;2;0.3-M2;Completed;;;
 ;;;;;Distance from text;2;0.3-M2;Completed;;;
 ;;;Text Box;Internal margin;Left/ Top / Right / Bottom;2;0.3-M2;Completed;;;
-;;;;Vertical alignment;Top/ Center / Bottom;2;0.3-M2;-;not supported;;
+;;;;Vertical alignment;Top/ Center / Bottom;2;-;-;not supported;;
 ;;;;Options;Word wrap text in Autoshape;2;0.3-M2;Completed;;;
 ;;;;;Resize autoshape to fit text;2;0.3-M2;Completed;;;
 ;;;Colors and Lines;Fill;Color;3;1.0;;;;
@@ -388,8 +388,8 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;;Orientation;Portrait/Landscape;;0;0.2-Final ;Completed;;;
 ;;;Pages;Multiple pages;Normal;1;0.3-M2;Completed;;;
 ;;;;;Mirror margins;1;0.3-M2;Completed;;;
-;;;;;2 pages per sheet;1;0.3-M2;-;not supported;;
-;;;;;Book fold;1;0.3-M2;-;not supported;;
+;;;;;2 pages per sheet;1;-;-;not supported;;
+;;;;;Book fold;1;-;-;not supported;;
 ;;Paper;Paper Size;Paper size;;0;0.2-Final ;Completed;;;
 ;;;;Width;;0;0.2-Final ;Completed;;;
 ;;;;Height;;0;0.2-Final ;Completed;;;
@@ -418,18 +418,18 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;;Color;Selected color;;2;0.3-M2;Completed;;;
 ;;;Width;Selected width;;2;0.3-M2;Completed;;;
 ;;;;;;;;;;;
-;Themes;Colors;;;;2;0.3-M2;Delayed;;;Level 2
-;;Fonts;;;;2;0.3-M2;Delayed;;;Level 2
-;;Effects;;;;2;0.3-M2;Delayed;;;Level 2
+;Themes;Colors;;;;2;Delayed;;;;Level 2
+;;Fonts;;;;2;Delayed;;;;Level 2
+;;Effects;;;;2;Delayed;;;;Level 2
 ;;;;;;;;;;;
 References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Completed;;;
 ;;;Right align page numbers;;;1;0.3-M2;Completed;;;
-;;;Use hyperlinks instead of page numbers;;;1;0.3-M2;;;;
+;;;Use hyperlinks instead of page numbers;;;1;1.0;;;;
 ;;;Tab leader;;;1;0.3-M2;Completed;;;
 ;;;Show levels;;;1;0.3-M2;Completed;;;
-;;;Options;Build TOC from;Styles;1;0.3-M2;;;;
+;;;Options;Build TOC from;Styles;1;1.0;;;;
 ;;;;;Outline levels;1;0.3-M2;Completed;;;
-;;;;;Table entry fields;1;0.3-M2;;;;
+;;;;;Table entry fields;1;1.0;;;;
 ;;;;;;;;;;;
 ;Foot notes;Footnote and Endnote;Footnotes;;;2;0.3-M1;Completed;;;
 ;;;Endnotes;;;2;0.3-M1;Completed;;;
