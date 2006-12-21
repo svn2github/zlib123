@@ -20,7 +20,7 @@
     <text:date>
       <xsl:attribute name="style:data-style-name">
         <xsl:value-of select="generate-id(.)"/>
-         </xsl:attribute>
+      </xsl:attribute>
       <xsl:attribute name="text:date-value">
         <xsl:value-of select="$dateText"/>
       </xsl:attribute>
@@ -39,16 +39,198 @@
       </xsl:attribute>
     </text:time>
   </xsl:template>
-  
-  <!-- ignore text inside a field code -->
+
+  <!-- process a field code -->
   <xsl:template match="w:instrText">
-    <xsl:if test="contains(preceding::w:instrText[1],'XE')">
-      <text:alphabetical-index-mark>
-        <xsl:attribute name="text:string-value">
-          <xsl:value-of select="."/>
-        </xsl:attribute>
-      </text:alphabetical-index-mark>
-    </xsl:if>
+    <!-- rebuild the field code using a series of instrText, in current run or followings -->
+    <xsl:variable name="fieldCode">
+      <xsl:call-template name="BuildFieldCode"/>
+    </xsl:variable>
+    <!-- first field instruction. Should contains field type. If not, switch to next instruction -->
+    <xsl:variable name="fieldType">
+      <xsl:call-template name="GetFieldTypeFromCode">
+        <xsl:with-param name="fieldCode" select="$fieldCode"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$fieldType = 'XE' ">
+        <xsl:call-template name="InsertIndexMark">
+          <xsl:with-param name="instrText" select="following-sibling::instrText[1]"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$fieldType = 'SET' ">
+        <xsl:call-template name="InsertUserVariable">
+          <xsl:with-param name="fieldCode" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- build a field code using current instrText and recursively forward (go to next instrText) -->
+  <xsl:template name="BuildFieldCode">
+    <xsl:param name="instrText" select="."/>
+    <xsl:param name="fieldCode"/>
+    <!-- context must be w:instrText -->
+    <xsl:choose>
+      <xsl:when test="$instrText/following-sibling::w:instrText">
+        <xsl:call-template name="BuildFieldCode">
+          <xsl:with-param name="instrText" select="$instrText/following-sibling::w:instrText[1]"/>
+          <xsl:with-param name="fieldCode" select="concat($fieldCode, $instrText/text())"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$instrText/parent::w:r/following-sibling::node()[1][self::w:r and w:instrText]">
+        <xsl:call-template name="BuildFieldCode">
+          <xsl:with-param name="instrText"
+            select="$instrText/parent::w:r/following-sibling::node()[1][self::w:r]/w:instrText[1]"/>
+          <xsl:with-param name="fieldCode" select="concat($fieldCode, $instrText/text())"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat($fieldCode, $instrText/text())"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- return a field type if it is contained in param string -->
+  <xsl:template name="GetFieldTypeFromCode">
+    <xsl:param name="fieldCode"/>
+    <!-- field can start with space, but first none-space text is field code -->
+    <xsl:variable name="newFieldCode">
+      <xsl:call-template name="suppressFieldCodeFirstSpaceChar">
+        <xsl:with-param name="string" select="$fieldCode"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="contains($newFieldCode, ' ')">
+        <xsl:value-of select="substring-before($newFieldCode, ' ')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$newFieldCode"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- suppress first space char in a given string (used for field codes -->
+  <xsl:template name="suppressFieldCodeFirstSpaceChar">
+    <xsl:param name="string"/>
+    <xsl:choose>
+      <xsl:when test="substring($string, 1, 1) = ' ' ">
+        <xsl:call-template name="suppressFieldCodeFirstSpaceChar">
+          <xsl:with-param name="string" select="substring($string, 2, string-length($string) - 1)"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$string"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- user field declaration -->
+  <xsl:template name="InsertUserVariable">
+    <xsl:param name="fieldCode"/>
+    <!-- troncate field to find arguments -->
+    <xsl:variable name="fieldName">
+      <xsl:variable name="newFieldCode">
+        <xsl:call-template name="suppressFieldCodeFirstSpaceChar">
+          <xsl:with-param name="string" select="substring-after($fieldCode, 'SET')"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="contains($newFieldCode, ' ')">
+          <xsl:value-of select="substring-before($newFieldCode, ' ')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$newFieldCode"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="fieldValue">
+      <xsl:variable name="newFieldCode">
+        <xsl:call-template name="suppressFieldCodeFirstSpaceChar">
+          <xsl:with-param name="string"
+            select="substring-after(substring-after($fieldCode, 'SET'), $fieldName)"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="substring($newFieldCode, 1,1) = &apos;&quot;&apos;">
+          <xsl:value-of
+            select="substring-before(substring-after($newFieldCode, &apos;&quot;&apos;), &apos;&quot;&apos;)"
+          />
+        </xsl:when>
+        <xsl:when test="contains($newFieldCode, ' ')">
+          <xsl:value-of select="substring-before($newFieldCode, ' ')"/>
+        </xsl:when>
+        <!--xsl:when test="$newFieldCode = '' ">
+          < at least a blank space >
+          <xsl:text xml:space="preserve"> </xsl:text>
+          </xsl:when-->
+        <xsl:otherwise>
+          <xsl:value-of select="$newFieldCode"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <text:variable-set>
+      <xsl:attribute name="text:name">
+        <xsl:value-of select="$fieldName"/>
+      </xsl:attribute>
+      <xsl:variable name="valueType">
+        <xsl:choose>
+          <xsl:when test="number($fieldValue)">float</xsl:when>
+          <xsl:otherwise>string</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:attribute name="office:value-type">
+        <xsl:value-of select="$valueType"/>
+      </xsl:attribute>
+      <!-- TODO : find the best matching type for the value -->
+      <xsl:choose>
+        <xsl:when test="$valueType = 'float' or $valueType = 'percentage' ">
+          <xsl:attribute name="office:value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$valueType = 'currency' ">
+          <xsl:attribute name="office:value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+          <xsl:attribute name="office:currency"/>
+        </xsl:when>
+        <xsl:when test="$valueType = 'date' ">
+          <xsl:attribute name="office:date-value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$valueType = 'time' ">
+          <xsl:attribute name="office:time-value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$valueType = 'boolean' ">
+          <xsl:attribute name="office:boolean-value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="$valueType = 'string' ">
+          <xsl:attribute name="office:string-value">
+            <xsl:value-of select="$fieldValue"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
+      <xsl:attribute name="text:display">none</xsl:attribute>
+    </text:variable-set>
+  </xsl:template>
+
+  <!-- alphabetical index mark -->
+  <xsl:template name="InsertIndexMark">
+    <xsl:param name="instrText"/>
+    <text:alphabetical-index-mark>
+      <xsl:attribute name="text:string-value">
+        <xsl:value-of select="$instrText/text()"/>
+      </xsl:attribute>
+    </text:alphabetical-index-mark>
   </xsl:template>
 
   <!-- cross references -->
@@ -57,33 +239,36 @@
       <xsl:attribute name="text:ref-name">
         <xsl:value-of select="substring-before(substring-after(.,'REF '),' \')"/>
       </xsl:attribute>
-     
+
       <xsl:call-template name="InsertFieldCharFieldContent"/>
     </text:bookmark-ref>
   </xsl:template>
-  
+
   <xsl:template name="InsertFieldCharFieldContent">
     <xsl:variable name="fieldCharId" select="generate-id(.)"/>
-   <!-- element that starts field-->
-    <xsl:variable name="fieldBegin" select="preceding::w:fldChar[@w:fldCharType='begin' and not(following::w:fldChar
+    <!-- element that starts field-->
+    <xsl:variable name="fieldBegin"
+      select="preceding::w:fldChar[@w:fldCharType='begin' and not(following::w:fldChar
       [@w:fldCharType='end' and generate-id(following::w:instrText[contains(self::node(),'REF')][1]) = $fieldCharId ]) ][1] "/>
     <!-- element that ends field-->
-    <xsl:variable name="fieldEnd" select="following::w:fldChar[@w:fldCharType='end' and not(preceding::w:fldChar
+    <xsl:variable name="fieldEnd"
+      select="following::w:fldChar[@w:fldCharType='end' and not(preceding::w:fldChar
       [@w:fldCharType='begin' and generate-id(preceding::w:instrText[contains(self::node(),'REF')][1]) = fieldCharId ]) ][1] "/>
-      <!--paragraph that contains field-->
+    <!--paragraph that contains field-->
     <xsl:variable name="fieldParagraph" select="generate-id(ancestor::w:p)"/>
-    
+
     <!--  inserts field  text contents from beginning to ending  element -->
-    <xsl:for-each select="$fieldBegin/following::w:t[generate-id(ancestor::w:p) = $fieldParagraph
+    <xsl:for-each
+      select="$fieldBegin/following::w:t[generate-id(ancestor::w:p) = $fieldParagraph
       and generate-id(preceding::w:fldChar[1]) != generate-id($fieldEnd) ]  ">
-      <xsl:apply-templates />
+      <xsl:apply-templates/>
     </xsl:for-each>
   </xsl:template>
-  
+
   <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE')]">
     <text:span text:style-name="{generate-id(w:r)}">
       <text:title>
-          <xsl:apply-templates select="w:r/child::node()"/>
+        <xsl:apply-templates select="w:r/child::node()"/>
       </text:title>
     </text:span>
   </xsl:template>
@@ -95,35 +280,40 @@
       </text:subject>
     </text:span>
   </xsl:template>
-  
-  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')] | w:instrText[contains(self::node(),'DATE')]">
+
+  <xsl:template
+    match="w:fldSimple[contains(@w:instr,'DATE')] | w:instrText[contains(self::node(),'DATE')]">
     <xsl:call-template name="InsertDateField">
-        <xsl:with-param name="dateText" select="@w:instr | text()"/>
-      </xsl:call-template>
+      <xsl:with-param name="dateText" select="@w:instr | text()"/>
+    </xsl:call-template>
   </xsl:template>
-  
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')] | w:instrText[contains(self::node(),'TIME')]">
-      <xsl:call-template name="InsertTimeField">
-        <xsl:with-param name="timeText" select="@w:instr | text()"/>
-      </xsl:call-template>
+
+  <xsl:template
+    match="w:fldSimple[contains(@w:instr,'TIME')] | w:instrText[contains(self::node(),'TIME')]">
+    <xsl:call-template name="InsertTimeField">
+      <xsl:with-param name="timeText" select="@w:instr | text()"/>
+    </xsl:call-template>
   </xsl:template>
-  
-  <xsl:template match="w:fldSimple[contains(@w:instr,'PAGE ') and not(contains(@w:instr,'NUMPAGE'))] | w:instrText[contains(self::node(),'PAGE ') and not(contains(self::node(),'NUMPAGE'))] ">
-      <xsl:call-template name="InsertPageNumberField"/>
+
+  <xsl:template
+    match="w:fldSimple[contains(@w:instr,'PAGE ') and not(contains(@w:instr,'NUMPAGE'))] | w:instrText[contains(self::node(),'PAGE ') and not(contains(self::node(),'NUMPAGE'))] ">
+    <xsl:call-template name="InsertPageNumberField"/>
   </xsl:template>
-  
-  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGE')] | w:instrText[contains(self::node(),'NUMPAGE')] ">
+
+  <xsl:template
+    match="w:fldSimple[contains(@w:instr,'NUMPAGE')] | w:instrText[contains(self::node(),'NUMPAGE')] ">
     <text:page-count>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:page-count>
   </xsl:template>
-  
-  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')] | w:instrText[contains(., 'DATE')]" mode="automaticstyles">
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')] | w:instrText[contains(., 'DATE')]"
+    mode="automaticstyles">
     <xsl:call-template name="InsertDateStyle">
       <xsl:with-param name="dateText" select="@w:instr | text()"/>
     </xsl:call-template>
   </xsl:template>
-  
+
   <xsl:template name="InsertDateStyle">
     <xsl:param name="dateText"/>
     <xsl:variable name="FormatDate">
@@ -139,13 +329,14 @@
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
-  
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')] | w:instrText[contains(., 'TIME')]" mode="automaticstyles">
-      <xsl:call-template name="InsertTimeStyle">
-        <xsl:with-param name="timeText" select="@w:instr | text()"/>
-      </xsl:call-template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')] | w:instrText[contains(., 'TIME')]"
+    mode="automaticstyles">
+    <xsl:call-template name="InsertTimeStyle">
+      <xsl:with-param name="timeText" select="@w:instr | text()"/>
+    </xsl:call-template>
   </xsl:template>
-  
+
   <xsl:template name="InsertTimeStyle">
     <xsl:param name="timeText"/>
     <xsl:variable name="FormatDate">
@@ -159,9 +350,9 @@
       <xsl:with-param name="ParamField">
         <xsl:text>TIME</xsl:text>
       </xsl:with-param>
-    </xsl:call-template>  
+    </xsl:call-template>
   </xsl:template>
-  
+
   <xsl:template match="w:fldSimple" mode="automaticstyles">
     <xsl:apply-templates select="w:r/w:rPr" mode="automaticstyles"/>
   </xsl:template>
@@ -608,12 +799,12 @@
       </xsl:when>
 
       <xsl:otherwise>
-      <xsl:variable name="Apostrof">
+        <xsl:variable name="Apostrof">
           <xsl:text>&apos;</xsl:text>
         </xsl:variable>
 
         <xsl:choose>
-       <xsl:when test="contains(substring($FormatDate, 1, 1), $Apostrof)">
+          <xsl:when test="contains(substring($FormatDate, 1, 1), $Apostrof)">
             <xsl:call-template name="InsertFormatDate">
               <xsl:with-param name="FormatDate">
                 <xsl:value-of
@@ -645,23 +836,23 @@
               </number:text>
             </xsl:if>
           </xsl:otherwise>
-       </xsl:choose>
-    </xsl:otherwise>
-  </xsl:choose>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="w:sdt/w:sdtContent/w:fldSimple">
     <xsl:apply-templates/>
   </xsl:template>
-  
+
   <!-- Page Number Field -->
   <xsl:template name="InsertPageNumberField">
     <xsl:variable name="docName">
-    <xsl:call-template name="GetDocumentName">
-      <xsl:with-param name="rootId">
-        <xsl:value-of select="generate-id(/node())"/>
-      </xsl:with-param>
-    </xsl:call-template>
+      <xsl:call-template name="GetDocumentName">
+        <xsl:with-param name="rootId">
+          <xsl:value-of select="generate-id(/node())"/>
+        </xsl:with-param>
+      </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$docName = 'document.xml'">
@@ -686,11 +877,14 @@
         </xsl:if>
       </xsl:when>
       <xsl:otherwise>
-        
+
         <xsl:variable name="rId">
-          <xsl:value-of select="document('word/_rels/document.xml.rels')/descendant::node()[@Target = $docName]/@Id"/>
+          <xsl:value-of
+            select="document('word/_rels/document.xml.rels')/descendant::node()[@Target = $docName]/@Id"
+          />
         </xsl:variable>
-        <xsl:for-each select="document('word/document.xml')/descendant::w:sectPr[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]">
+        <xsl:for-each
+          select="document('word/document.xml')/descendant::w:sectPr[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]">
           <xsl:if test="w:pgNumType/@w:chapStyle">
             <text:chapter>
               <xsl:attribute name="text:display">
@@ -713,7 +907,7 @@
         </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
-    
+
     <xsl:variable name="WInstr">
       <xsl:value-of select="./@w:instr"/>
     </xsl:variable>
@@ -737,39 +931,40 @@
 
   <!-- Insert Citations & Bibliography -->
   <xsl:template name="TextBibliographyMark">
-    <xsl:param name="TextIdentifier"></xsl:param>
+    <xsl:param name="TextIdentifier"/>
 
-    <xsl:variable name="Path" select="document('customXml/item1.xml')/b:Sources/b:Source[b:Tag = $TextIdentifier]"/>  
-    
+    <xsl:variable name="Path"
+      select="document('customXml/item1.xml')/b:Sources/b:Source[b:Tag = $TextIdentifier]"/>
+
     <xsl:variable name="BibliographyType" select="$Path/b:SourceType"/>
-    
+
     <xsl:variable name="LastName">
       <xsl:choose>
         <xsl:when test="$Path/b:Author/b:Author/b:NameList/b:Person/b:Last">
-          <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Last"/>    
+          <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Last"/>
         </xsl:when>
-        <xsl:otherwise></xsl:otherwise>
+        <xsl:otherwise/>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="FirstName">
       <xsl:choose>
         <xsl:when test="$Path/b:Author/b:Author/b:NameList/b:Person/b:First">
           <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:First"/>
         </xsl:when>
-        <xsl:otherwise></xsl:otherwise>
+        <xsl:otherwise/>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="Middle">
       <xsl:choose>
         <xsl:when test="$Path/b:Author/b:Author/b:NameList/b:Person/b:Middle">
-          <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Middle"/>      
+          <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Middle"/>
         </xsl:when>
-        <xsl:otherwise></xsl:otherwise>
-        </xsl:choose>
+        <xsl:otherwise/>
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="Author">
       <xsl:choose>
         <xsl:when test="$LastName != '' and $FirstName != '' and $Middle != ''">
@@ -793,21 +988,21 @@
         <xsl:when test="$Middle != ''">
           <xsl:value-of select="$Middle"/>
         </xsl:when>
-      </xsl:choose> 
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="City">
       <xsl:value-of select="$Path/b:City"/>
     </xsl:variable>
-   
-      <xsl:variable name="StateProvince">
-        <xsl:value-of select="$Path/b:StateProvince"/>
-      </xsl:variable>
-      
-      <xsl:variable name="CountryRegion">
-        <xsl:value-of select="$Path/b:CountryRegion"/>
-      </xsl:variable>
-    
+
+    <xsl:variable name="StateProvince">
+      <xsl:value-of select="$Path/b:StateProvince"/>
+    </xsl:variable>
+
+    <xsl:variable name="CountryRegion">
+      <xsl:value-of select="$Path/b:CountryRegion"/>
+    </xsl:variable>
+
     <xsl:variable name="Address">
       <xsl:choose>
         <xsl:when test="$City != '' and $StateProvince != '' and $CountryRegion != ''">
@@ -817,10 +1012,10 @@
           <xsl:value-of select="concat($City,' ',$StateProvince)"/>
         </xsl:when>
         <xsl:when test="$City != '' and $CountryRegion != ''">
-          <xsl:value-of select="concat($City,' ',$CountryRegion)"/>          
+          <xsl:value-of select="concat($City,' ',$CountryRegion)"/>
         </xsl:when>
         <xsl:when test="$StateProvince != '' and $CountryRegion != ''">
-          <xsl:value-of select="concat($StateProvince,' ',$CountryRegion)"/>          
+          <xsl:value-of select="concat($StateProvince,' ',$CountryRegion)"/>
         </xsl:when>
         <xsl:when test="$City != ''">
           <xsl:value-of select="$City"/>
@@ -833,11 +1028,11 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-    
+
     <text:bibliography-mark>
       <xsl:attribute name="text:identifier">
         <xsl:value-of select="substring-before(substring-after(descendant::w:t, '('), ')')"/>
-      </xsl:attribute>      
+      </xsl:attribute>
       <xsl:attribute name="text:bibliography-type">
         <xsl:choose>
           <xsl:when test="$BibliographyType = 'Book'">
@@ -849,32 +1044,32 @@
           <xsl:otherwise>
             <xsl:text>book</xsl:text>
           </xsl:otherwise>
-        </xsl:choose>        
+        </xsl:choose>
       </xsl:attribute>
       <xsl:if test="$Author">
-      <xsl:attribute name="text:author">
-        <xsl:value-of select="$Author"/>
-      </xsl:attribute>
+        <xsl:attribute name="text:author">
+          <xsl:value-of select="$Author"/>
+        </xsl:attribute>
       </xsl:if>
       <xsl:if test="$Path/b:Title">
-      <xsl:attribute name="text:title">
-        <xsl:value-of select="$Path/b:Title"/>
-      </xsl:attribute>
+        <xsl:attribute name="text:title">
+          <xsl:value-of select="$Path/b:Title"/>
+        </xsl:attribute>
       </xsl:if>
       <xsl:if test="$Path/b:Year">
-      <xsl:attribute name="text:year">
-        <xsl:value-of select="$Path/b:Year"/>
-      </xsl:attribute>
+        <xsl:attribute name="text:year">
+          <xsl:value-of select="$Path/b:Year"/>
+        </xsl:attribute>
       </xsl:if>
       <xsl:if test="$Path/b:Publisher">
-      <xsl:attribute name="text:publisher">        
-        <xsl:value-of select="$Path/b:Publisher"/>
-      </xsl:attribute>
+        <xsl:attribute name="text:publisher">
+          <xsl:value-of select="$Path/b:Publisher"/>
+        </xsl:attribute>
       </xsl:if>
       <xsl:if test="$Address">
-      <xsl:attribute name="text:address">
-        <xsl:value-of select="$Address"/>
-      </xsl:attribute>
+        <xsl:attribute name="text:address">
+          <xsl:value-of select="$Address"/>
+        </xsl:attribute>
       </xsl:if>
       <xsl:if test="$Path/b:Volume">
         <xsl:attribute name="text:volume">
@@ -898,11 +1093,11 @@
       </xsl:if>
       <xsl:value-of select="substring-before(substring-after(descendant::w:t, '('), ')')"/>
     </text:bibliography-mark>
-  </xsl:template>  
-    
-  
-<!--  <xsl:template match="w:instrText[contains(self::node(),'HYPERLINK')]">
+  </xsl:template>
+
+
+  <!--  <xsl:template match="w:instrText[contains(self::node(),'HYPERLINK')]">
     
     </xsl:template>-->
-  
+
 </xsl:stylesheet>

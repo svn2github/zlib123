@@ -534,9 +534,6 @@
           <xsl:when test="@office:value-type = 'string' and @office:string-value">
             <xsl:value-of select="@office:string-value"/>
           </xsl:when>
-          <xsl:when test="@office:value-type = 'string' and @office:string-value">
-            <xsl:value-of select="@office:string-value"/>
-          </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="child::text()"/>
           </xsl:otherwise>
