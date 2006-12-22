@@ -163,7 +163,16 @@
                         </xsl:with-param>
                       </xsl:call-template>
                     </xsl:when>
-
+                    
+                    <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '/')">
+                      <xsl:call-template name="HandlingSpaces">
+                        <xsl:with-param name="path">
+                          <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'/')"
+                          />
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:when>
+                    
                     <xsl:otherwise>
                       <xsl:call-template name="HandlingSpaces">
                         <xsl:with-param name="path">
@@ -186,6 +195,9 @@
                 <xsl:choose>
                   <xsl:when test="contains(@xlink:href, './')">
                     <xsl:value-of select="concat('../../', @xlink:href)"/>
+                  </xsl:when>
+                  <xsl:when test="starts-with(@xlink:href, '/')">
+                    <xsl:value-of select="substring-after(@xlink:href, '/')"/>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="@xlink:href"/>
