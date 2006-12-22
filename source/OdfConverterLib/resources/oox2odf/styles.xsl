@@ -1289,6 +1289,9 @@
   <!-- document defaults -->
   <xsl:template match="w:docDefaults">
     <style:default-style style:family="paragraph">
+<style:paragraph-properties>
+        <xsl:call-template name="InsertDefaultParagraphProperties"/>        
+ </style:paragraph-properties>
       <xsl:if test="w:rPrDefault">
         <style:text-properties>
           <xsl:if test="w:rPrDefault/w:rPr">
@@ -1354,10 +1357,10 @@
   <!--   Default paragraph properties from settings -->
   <xsl:template name="InsertDefaultParagraphProperties">
     <!--default tab-stop-->
-    <xsl:variable name="tabStop" select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+    <xsl:variable name="tabStop" select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>    
     <xsl:attribute name="style:tab-stop-distance">
       <xsl:call-template name="ConvertTwips">
-        <xsl:with-param name="length" select="$tabStop"/>
+        <xsl:with-param name="length" select="number($tabStop)"/>
         <xsl:with-param name="unit">cm</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
@@ -1555,110 +1558,84 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-        
-   <xsl:variable name="paragraphIndent">
-      <xsl:call-template name="GetParagraphIndent"/> 
-   </xsl:variable>  
+     
+   <xsl:variable name="MarginLeft">
     <xsl:choose>
-      <xsl:when test="w:ind">        
-        <xsl:if test="w:ind">
-          <xsl:if test="w:ind/@w:left">
-            <xsl:attribute name="fo:margin-left">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:choose>
-                    <xsl:when test="w:ind/@w:left and w:numPr/w:numId/@w:val">
-                      <xsl:value-of select="w:ind/@w:left  - $LeftNumber + $HangingNumber + $paragraphIndent"/>                  
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="w:ind/@w:left"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="w:ind/@w:right">
-            <xsl:attribute name="fo:margin-right">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:ind/@w:right"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="w:ind/@w:firstLine">
-            <xsl:attribute name="fo:text-indent">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="w:ind/@w:firstLine"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:choose>
-            <xsl:when test="w:ind/@w:hanging">
-              <xsl:attribute name="fo:text-indent">
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="-w:ind/@w:hanging"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:when test="not(w:ind/@w:hanging) and w:numPr/w:numId/@w:val">
-              <xsl:attribute name="fo:text-indent">
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length">
-                    <xsl:value-of select="-$HangingNumber"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:otherwise>
-              
-            </xsl:otherwise>        
-          </xsl:choose>
-          
-          <xsl:if test="w:ind/@w:hanging">
-            <xsl:attribute name="fo:text-indent">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
-                  <xsl:value-of select="-w:ind/@w:hanging"/>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:if>
-        </xsl:if>
-        
+      <xsl:when test="w:ind/@w:left and w:ind/@w:hanging and w:numPr">                         
+        <xsl:value-of select="number(w:ind/@w:left) - number(w:ind/@w:hanging)"/>
       </xsl:when>      
-      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">         
-        <xsl:attribute name="fo:margin-left">
-          <xsl:call-template name="ConvertTwips">
-            <xsl:with-param name="length">
-              <xsl:value-of select="number($LeftNumber) - number($HangingNumber)"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>          
-        </xsl:attribute>
-        
-          <xsl:attribute name="fo:text-indent">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="number($HangingNumber) - number($LeftNumber)"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>        
+      
+      <xsl:when test="w:ind/@w:left">
+        <xsl:value-of select="number(w:ind/@w:left)"/>
       </xsl:when>
+      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+        <xsl:value-of select="number($LeftNumber) - number($HangingNumber)"/>
+      </xsl:when>
+      <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left">
+        <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
+      </xsl:otherwise>
     </xsl:choose>
-
+ </xsl:variable>
+    
+  <xsl:if test="$MarginLeft != ''">
+    <xsl:attribute name="fo:margin-left">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length">
+    <xsl:value-of select="$MarginLeft"/>
+        </xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+     </xsl:attribute>
+ </xsl:if>
+  
+    <xsl:variable name="TextIndent">
+      <xsl:choose>
+        <xsl:when test="w:ind/@w:hanging">
+              <xsl:value-of select="-w:ind/@w:hanging"/>
+        </xsl:when>
+        <xsl:when test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+          <xsl:value-of select="number($HangingNumber) - number($LeftNumber)"/>
+        </xsl:when>     
+        <xsl:when test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:hanging">
+          <xsl:value-of select="-document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:hanging"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:if test="w:ind/@w:right">
+      <xsl:attribute name="fo:margin-right">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length">
+            <xsl:value-of select="w:ind/@w:right"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="w:ind/@w:firstLine">
+      <xsl:attribute name="fo:text-indent">
+        <xsl:call-template name="ConvertTwips">
+          <xsl:with-param name="length">
+            <xsl:value-of select="w:ind/@w:firstLine"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    
+    <xsl:if test="$TextIndent != '' and not(w:numPr)">
+    <xsl:attribute name="fo:text-indent">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length">
+            <xsl:value-of select="$TextIndent"/>
+        </xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+    </xsl:attribute>
+    </xsl:if>
 
     <!-- w:afterAutospacing and w:beforeAutospacing attributes are lost -->
     <!-- w:afterLines and w:beforeLines attributes are lost -->
@@ -1853,30 +1830,47 @@
     <xsl:if test="w:tabs">
       <style:tab-stops>
         <xsl:for-each select="w:tabs/w:tab">
-          <xsl:call-template name="InsertTabs"/>
+          <xsl:call-template name="InsertTabs">
+            <xsl:with-param name="MarginLeft">
+              <xsl:value-of select="$MarginLeft"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:for-each>
       </style:tab-stops>
     </xsl:if>
     
     <xsl:if test="not(w:tabs)">
       <xsl:for-each select="document('word/styles.xml')/descendant::w:style[@w:styleId = $StyleId]">
-        <xsl:call-template name="GetTabStopsFromStyles"/>
+        <xsl:call-template name="GetTabStopsFromStyles">
+          <xsl:with-param name="MarginLeft">
+            <xsl:value-of select="$MarginLeft"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
 
   <xsl:template name="GetTabStopsFromStyles">
+    <xsl:param name="MarginLeft"/>
     <xsl:choose>
       <xsl:when test="w:pPr/w:tabs">
         <style:tab-stops>
           <xsl:for-each select="w:pPr/w:tabs/w:tab">
-            <xsl:call-template name="InsertTabs"/>
+            <xsl:call-template name="InsertTabs">
+              <xsl:with-param name="MarginLeft">
+                <xsl:value-of select="$MarginLeft"/>
+              </xsl:with-param>
+            </xsl:call-template>
           </xsl:for-each>
         </style:tab-stops>
       </xsl:when>
       <xsl:when test="w:basedOn">
         <xsl:for-each select="key('StyleId',w:basedOn/@w:val)">
-          <xsl:call-template name="GetTabStopsFromStyles"/>
+          <xsl:call-template name="GetTabStopsFromStyles">
+            <xsl:with-param name="MarginLeft">
+              <xsl:value-of select="$MarginLeft"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:when>
     </xsl:choose>
@@ -2193,8 +2187,9 @@
   <!-- Handle tab stops -->
   <!-- TODO : check how to deal with tab stops inside a list -->
   <xsl:template name="InsertTabs">
+    <xsl:param name="MarginLeft"/>
     <style:tab-stop>
-      <xsl:if test="./@w:val != 'num' and ./@w:val != 'clear'">
+      <xsl:if test="./@w:val != 'clear'">
         <!--   type -->
         <xsl:attribute name="style:type">
           <xsl:choose>
@@ -2214,39 +2209,19 @@
           TODO : what if @w:pos < 0 ? -->
         <xsl:if test="./@w:pos >= 0">
           <xsl:attribute name="style:position">
-            <xsl:choose>
-              <xsl:when test="./@w:val = 'right' ">
-                <xsl:variable name="indent">
-                  <xsl:for-each select="ancestor::w:pPr[1]">
-                    <xsl:call-template name="GetParagraphIndent"/>
-                  </xsl:for-each>
-                </xsl:variable>
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length" select="./@w:pos - number($indent)"/>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:variable name="indent">
-                  <xsl:for-each select="ancestor::w:pPr[1]">
-                    <xsl:call-template name="GetParagraphIndent"/>
-                  </xsl:for-each>
-                </xsl:variable>
-                <xsl:call-template name="ConvertTwips">
-                  <xsl:with-param name="length">
-                    <xsl:choose>
-                      <xsl:when test="./@w:pos = '0'">
-                        <xsl:text>0</xsl:text>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="./@w:pos - number($indent)"/>
-                      </xsl:otherwise>
-                    </xsl:choose>                    
-                  </xsl:with-param>
-                  <xsl:with-param name="unit">cm</xsl:with-param>
-                </xsl:call-template>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:choose>
+                  <xsl:when test="$MarginLeft != ''">
+                    <xsl:value-of select="./@w:pos - number($MarginLeft)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="./@w:pos"/>                        
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>           
           </xsl:attribute>
         </xsl:if>
         <!-- leader char -->
@@ -2279,54 +2254,6 @@
         </xsl:if>
       </xsl:if>
     </style:tab-stop>
-  </xsl:template>
-
-  <!-- paragraph indent -->
-  <xsl:template name="GetParagraphIndent">
-    <xsl:choose>
-      <xsl:when test="w:ind/@w:left">
-        <xsl:value-of select="w:ind/@w:left"/>
-      </xsl:when>
-      <xsl:when test="w:pStyle/@w:val">
-        <xsl:variable name="pStyle">
-          <xsl:value-of select="w:pStyle/@w:val"/>
-        </xsl:variable>
-        <xsl:choose>
-          <xsl:when test="document('word/styles.xml')/descendant::w:style[@w:styleId=$pStyle]/w:pPr">
-            <xsl:for-each select="document('word/styles.xml')/descendant::w:style[@w:styleId=$pStyle]/w:pPr">
-              <xsl:call-template name="GetParagraphIndent"/>
-            </xsl:for-each>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:variable name="basedOn">
-              <xsl:value-of select="document('word/styles.xml')/descendant::w:style[@w:styleId=$pStyle]/w:basedOn/@w:val"/>
-            </xsl:variable>
-            <xsl:choose>
-              <xsl:when test="document('word/styles.xml')/descendant::w:style[@w:styleId=$basedOn]/w:pPr">
-                <xsl:for-each select="document('word/styles.xml')/descendant::w:style[@w:styleId=$basedOn]/w:pPr">
-                  <xsl:call-template name="GetParagraphIndent"/>
-                </xsl:for-each>
-              </xsl:when>
-              <xsl:otherwise>0</xsl:otherwise>
-            </xsl:choose>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:when test="ancestor::w:style/w:basedOn/@w:val">
-        <xsl:variable name="basedOn">
-          <xsl:value-of select="ancestor::w:style/w:basedOn/@w:val"/>
-        </xsl:variable>
-        <xsl:choose>
-          <xsl:when test="key('StyleId',$basedOn)/w:pPr">
-            <xsl:for-each select="key('StyleId',$basedOn)/w:pPr">
-              <xsl:call-template name="GetParagraphIndent"/>
-            </xsl:for-each>
-          </xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>0</xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
   
   <!-- ODF Text properties contained in OOX pPr element -->

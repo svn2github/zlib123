@@ -211,7 +211,9 @@
     </xsl:variable>
     
     <xsl:variable name="paragraphMargin">
-      <xsl:call-template name="GetParagraphIndent"/>
+     <!--xsl:call-template name="GetParagraphIndent">
+        <xsl:with-param name="Path" select="."></xsl:with-param>
+        </xsl:call-template-->
     </xsl:variable>
     
 <xsl:variable name="paragraphIndent" select="$paragraphBorder+$paragraphPadding+$paragraphMargin"/>
@@ -282,7 +284,7 @@
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
-        <xsl:attribute name="text:min-label-distance">
+        <!--xsl:attribute name="text:min-label-distance">
           <xsl:choose>
             <xsl:when test="w:suff/@w:val='nothing'">0</xsl:when>
             <xsl:when test="w:suff/@w:val='space'">350</xsl:when>            
@@ -296,7 +298,7 @@
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
-        </xsl:attribute>
+        </xsl:attribute-->
       </xsl:when>
       <xsl:otherwise>
      <!--   <xsl:attribute name="text:space-before">
