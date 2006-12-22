@@ -3296,12 +3296,24 @@
           <xsl:text>;</xsl:text>
         </xsl:if>
         <xsl:if test="self::draw:text-box">
-          <xsl:if
-            test="@fo:min-height or parent::draw:frame/@fo:min-width
-            or not($shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
-            or not($shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'false')">
-            <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
-          </xsl:if>
+          <!-- comment : OpenOffice will rather use fo:min-width when parent style defined, and draw:auto-grow-width if not -->
+          <xsl:choose>
+            <xsl:when test="$shapeStyle/@style:parent-style-name">
+              <xsl:if
+                test="@fo:min-height or parent::draw:frame/@fo:min-width
+                or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true'
+                or $shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'true'">
+                <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
+              </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if
+                test="not($shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'false') 
+                or not($shapeStyle/style:graphic-properties/@draw:auto-grow-height = 'false')">
+                <xsl:text>mso-fit-shape-to-text:t;</xsl:text>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:if>
         <xsl:if test="contains(parent::draw:frame/@draw:transform,'rotate')">
           <xsl:variable name="angle">
