@@ -11,7 +11,7 @@ Software Requirements
 To test the add-in, you will need the following:
 * Word XP with SP3 on Windows XP with SP2 or Windows Server 2003 with SP1
 * .NET Framework 2.0
-* Compatibility Pack (Beta 2 Technical Refresh) for Word, Excel, and PowerPoint 2007 File Formats.
+* Compatibility Pack for Word, Excel, and PowerPoint 2007 File Formats.
 
 Download and install the add-in
 -------------------------------
