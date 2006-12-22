@@ -43,6 +43,9 @@
       <xsl:for-each
         select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
         <xsl:if test="./@Id=$id">
+          <xsl:variable name="targetmode">
+            <xsl:value-of select="./@TargetMode"/>
+          </xsl:variable>
           <xsl:variable name="pzipsource">
             <xsl:value-of select="./@Target"/>
           </xsl:variable>
@@ -57,7 +60,8 @@
             </xsl:choose>
           </xsl:variable>
           <xsl:choose>
-            <xsl:when test="$destFolder = '.' ">
+            <xsl:when test="$targetmode='External'"/>
+            <xsl:when test="$destFolder = '.'">
               <pzip:copy pzip:source="{concat('word/',$pzipsource)}" pzip:target="{$pziptarget}"/>
             </xsl:when>
             <xsl:otherwise>

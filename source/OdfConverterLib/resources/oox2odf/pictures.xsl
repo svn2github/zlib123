@@ -249,10 +249,12 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
     <xsl:for-each
       select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
       <xsl:if test="./@Id=$id">
+        <xsl:variable name="targetmode">
+          <xsl:value-of select="./@TargetMode"/>
+        </xsl:variable>
         <xsl:variable name="pzipsource">
           <xsl:value-of select="./@Target"/>
         </xsl:variable>
@@ -267,7 +269,14 @@
           </xsl:choose>
         </xsl:variable>
         <xsl:attribute name="xlink:href">
-          <xsl:value-of select="concat($srcFolder,'/', $pziptarget)"/>
+          <xsl:choose>
+            <xsl:when test="$targetmode='External'">
+              <xsl:value-of select="$pziptarget"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat($srcFolder,'/', $pziptarget)"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
       </xsl:if>
     </xsl:for-each>
