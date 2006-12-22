@@ -68,7 +68,6 @@
         <!--automatic styles for document body-->
         <xsl:call-template name="InsertBodyStyles"/>
         <xsl:call-template name="InsertListStyles"/>
-        <xsl:call-template name="ParagraphFromSectionsStyles"/>
         <xsl:call-template name="InsertSectionsStyles"/>
       </office:automatic-styles>
       <office:body>
@@ -118,13 +117,6 @@
           mode="sections"/>
       </xsl:when>
     </xsl:choose>
-    <xsl:if test="document('word/document.xml')//w:document/w:body/w:sectPr/w:titlePg">
-      <text:p>
-        <xsl:attribute name="text:style-name">
-          <xsl:text>P_F</xsl:text>
-        </xsl:attribute>
-      </text:p>
-    </xsl:if>
     <xsl:apply-templates
       select="document('word/document.xml')/w:document/w:body/child::node()[not(following::w:p/w:pPr/w:sectPr) and not(descendant::w:sectPr)]"
     />
@@ -136,6 +128,7 @@
     mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
+      <xsl:call-template name="MasterPageName"/>
       <xsl:call-template name="InsertParagraphParentStyle"/>
 
       <style:paragraph-properties>
@@ -152,6 +145,7 @@
   <xsl:template match="w:p[not (./w:pPr)]" mode="automaticstyles">
     <xsl:if test="document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr">
       <style:style style:name="{generate-id(.)}" style:family="paragraph">
+        <xsl:call-template name="MasterPageName"/>
         <style:paragraph-properties>
           <xsl:for-each
             select="document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr">
@@ -698,6 +692,7 @@
   <xsl:template match="w:br[@w:type='page' or @w:type='column']" mode="automaticstyles">
     <xsl:if test="not(ancestor::w:p/w:pPr)">
       <style:style style:name="{generate-id(ancestor::w:p)}" style:family="paragraph">
+        <xsl:call-template name="MasterPageName"/>
         <style:paragraph-properties>
           <xsl:call-template name="InsertParagraphProperties"/>
         </style:paragraph-properties>
@@ -707,4 +702,82 @@
 
   <!--ignore text in automatic styles mode-->
   <xsl:template match="text()" mode="automaticstyles"/>
+  
+  <xsl:template name="MasterPageName">
+    <xsl:if test="not(preceding::w:p)">
+      <xsl:choose>
+        <xsl:when test="following::w:p/descendant::w:sectPr">
+          <xsl:choose>
+            <xsl:when test="following::w:p/descendant::w:sectPr/w:titlePg">
+              <xsl:attribute name="style:master-page-name">
+                <xsl:value-of select="concat('First_H_',generate-id(following::w:p/descendant::w:sectPr))"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="style:master-page-name">
+                <xsl:value-of select="concat('H_',generate-id(following::w:p/descendant::w:sectPr))"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
+              <xsl:attribute name="style:master-page-name">
+                <xsl:text>First_Page</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="style:parent-style-name">
+                <xsl:text>Standard</xsl:text>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+    <xsl:if test="preceding::w:p[1]/descendant::w:sectPr">
+      <xsl:if test="(preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w or preceding::w:sectPr[1]/w:pgSz/@w:h != following::w:sectPr[1]/w:pgSz/@w:h or preceding::w:sectPr[1]/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient) and not(following::w:sectPr[1]/w:headerReference) and not(following::w:sectPr[1]/w:footerReference)">
+        <xsl:attribute name="style:master-page-name">
+          <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="following::w:p/descendant::w:sectPr">
+          <xsl:choose>
+            <xsl:when test="following::w:p/descendant::w:sectPr/w:titlePg">
+              <xsl:attribute name="style:master-page-name">
+                <xsl:value-of select="concat('First_H_',generate-id(following::w:sectPr))"/>
+              </xsl:attribute>        
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="style:master-page-name">
+                <xsl:value-of select="concat('H_',generate-id(following::w:sectPr))"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="following::w:sectPr/w:titlePg">
+              <xsl:attribute name="style:master-page-name">
+                <xsl:text>First_Page</xsl:text>
+              </xsl:attribute>        
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w 
+                or preceding::w:sectPr[1]/w:pgSz/@w:h != following::w:sectPr[1]/w:pgSz/@w:h 
+                or preceding::w:sectPr[1]/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient 
+                or following::w:sectPr[1]/w:headerReference 
+                or following::w:sectPr[1]/w:footerReference">
+              <xsl:attribute name="style:master-page-name">
+                <xsl:text>Standard</xsl:text>
+              </xsl:attribute>
+                </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
 </xsl:stylesheet>
