@@ -51,6 +51,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private Stack currentParagraphStyleName;
         private Hashtable cStyles;
         private Hashtable pStyles;
+        // keep track of lower case styles to avoid conflicts
+        private ArrayList cStylesLowerCaseList;
+        private ArrayList pStylesLowerCaseList;
 
         /// <summary>
         /// Constructor
@@ -64,6 +67,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             this.currentParagraphStyleName = new Stack();
             this.cStyles = new Hashtable();
             this.pStyles = new Hashtable();
+            this.cStylesLowerCaseList = new ArrayList();
+            this.pStylesLowerCaseList = new ArrayList();
         }
 
         public override void WriteStartElement(string prefix, string localName, string ns)
@@ -230,12 +235,26 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Element element = (Element)this.currentNode.Pop();
             if (IsStyle(element.Name, element.Ns))
             {
-                // style element : write it if not hidden or not paragraph or character style
+                // style element : write it if not hidden or not paragraph or character style.
                 if (IsCharacterStyle(element))
                 {
                     string key = element.GetAttributeValue("styleId", NAMESPACE);
                     if (!cStyles.Contains(key))
                     {
+                        // if a style exists having same lower-case name, replace with new name.
+                        string name = element.GetChild("name", NAMESPACE).GetAttributeValue("val", NAMESPACE);
+                        if (this.cStylesLowerCaseList.Contains(name.ToLower()))
+                        {
+                            string newStyleName = this.GetUniqueLowerCaseStyleName(name, cStylesLowerCaseList);
+                            Element newName = new Element("w", "name", NAMESPACE);
+                            newName.AddAttribute(new Attribute("w", "val", newStyleName, NAMESPACE));
+                            element.Replace(element.GetChild("name", NAMESPACE), newName);
+                            this.cStylesLowerCaseList.Add(newStyleName);
+                        }
+                        else
+                        {
+                            this.cStylesLowerCaseList.Add(name.ToLower());
+                        }
                         this.cStyles.Add(key, element);
                     }
                 }
@@ -244,6 +263,20 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     string key = element.GetAttributeValue("styleId", NAMESPACE);
                     if (!pStyles.Contains(key))
                     {
+                        // if a style exists having same lower-case name, replace with new name.
+                        string name = element.GetChild("name", NAMESPACE).GetAttributeValue("val", NAMESPACE);
+                        if (this.pStylesLowerCaseList.Contains(name.ToLower()))
+                        {
+                            string newStyleName = this.GetUniqueLowerCaseStyleName(name, pStylesLowerCaseList);
+                            Element newName = new Element("w", "name", NAMESPACE);
+                            newName.AddAttribute(new Attribute("w", "val", newStyleName, NAMESPACE));
+                            element.Replace(element.GetChild("name", NAMESPACE), newName);
+                            this.pStylesLowerCaseList.Add(newStyleName);
+                        }
+                        else
+                        {
+                            this.pStylesLowerCaseList.Add(name.ToLower());
+                        }
                         this.pStyles.Add(key, element);
                     }
                 }
@@ -838,6 +871,20 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             EndElementInRunProperties();
         }
 
+        /*
+         *  Get a unique lower case name for a style in a list of lowered-case names.
+         */
+
+        private string GetUniqueLowerCaseStyleName(string key, ArrayList styleList)
+        {
+            string baseName = key.ToLower();
+            int num = 0;
+            while (styleList.Contains(key.ToLower()))
+            {
+                key = baseName + "_" + ++num ;
+            }
+            return key.ToLower();
+        }
 
     }
 }
