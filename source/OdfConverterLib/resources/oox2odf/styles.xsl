@@ -827,7 +827,7 @@
         <xsl:with-param name="unit">cm</xsl:with-param>
         <xsl:with-param name="length">
           <xsl:choose>
-            <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:headerReference[@w:type='default' or @w:type='even']">
+            <xsl:when test="./w:headerReference[@w:type='default' or @w:type='even']">
               <xsl:choose>
                 <xsl:when test="w:pgMar/@w:top &lt; 0">
                   <xsl:value-of select="w:pgMar/@w:top"/>
@@ -951,7 +951,7 @@
         <xsl:with-param name="unit">cm</xsl:with-param>
         <xsl:with-param name="length">
           <xsl:choose>
-            <xsl:when test="document('word/document.xml')//w:document/w:body/w:sectPr/w:footerReference[@w:type='default' or @w:type='even']">
+            <xsl:when test="./w:footerReference[@w:type='default' or @w:type='even']">
               <xsl:choose>
                 <xsl:when test="w:pgMar/@w:bottom &lt; 0">
                   <xsl:value-of select="w:pgMar/@w:bottom"/>
