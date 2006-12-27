@@ -1259,6 +1259,24 @@
               <xsl:value-of select="w:basedOn/@w:val"/>
             </xsl:attribute>
           </xsl:if>
+          <xsl:attribute name="style:next-style-name">
+          <xsl:choose>
+            <xsl:when test="w:next">
+              <xsl:value-of select="w:next/@w:val"/>
+            </xsl:when>
+            <xsl:when test="w:basedOn">
+              <xsl:variable name="based">
+                <xsl:value-of select="w:basedOn/@w:val"/>
+              </xsl:variable>
+              <xsl:if test="ancestor::w:styles/w:style[@w:styleId = $based]/w:next">
+                <xsl:value-of select="ancestor::w:styles/w:style[@w:styleId = $based]/w:next/@w:val"/>
+              </xsl:if>  
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>Normal</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+          </xsl:attribute>
           <xsl:call-template name="InsertStyleProperties"/>
         </style:style>
       </xsl:otherwise>
