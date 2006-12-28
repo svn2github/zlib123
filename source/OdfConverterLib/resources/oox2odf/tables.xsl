@@ -194,11 +194,27 @@
     </xsl:if>
     
     <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and 
-      not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1])) 
-      and not(parent::w:tbl/preceding::w:p[1]/w:pPr/w:sectPr)">
-      <xsl:attribute name="fo:break-before">
-        <xsl:text>page</xsl:text>
-      </xsl:attribute>
+      not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1]))">
+      <xsl:choose>
+        <xsl:when test="not(parent::w:tbl/preceding::w:p[1]/w:pPr/w:sectPr)">
+          <xsl:attribute name="fo:break-before">
+            <xsl:text>page</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="(preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:w = following::w:sectPr/w:pgSz/@w:w
+          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:h = following::w:sectPr/w:pgSz/@w:h
+          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:orient = following::w:sectPr/w:pgSz/@w:orient
+          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:top = following::w:sectPr/w:pgMar/@w:top
+          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:left = following::w:sectPr/w:pgMar/@w:left
+          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:right = following::w:sectPr/w:pgMar/@w:right
+          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:bottom = following::w:sectPr/w:pgMar/@w:bottom
+          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:header = following::w:sectPr/w:pgMar/@w:header
+          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:footer = following::w:sectPr/w:pgMar/@w:footer)">
+          <xsl:attribute name="fo:break-before">
+            <xsl:text>page</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 
