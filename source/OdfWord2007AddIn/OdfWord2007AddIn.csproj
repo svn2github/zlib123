@@ -53,9 +53,9 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Connect.cs">
-    </Compile>
+    <Compile Include="Connect.cs" />
     <Compile Include="ConverterInterface.cs" />
+    <EmbeddedResource Include="resources\customUI.xml" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
@@ -66,8 +66,6 @@
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\OdfConverterLib\OdfConverterLib.csproj">
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
@@ -76,9 +74,6 @@
       <Project>{0313EE78-AD27-47E0-9902-3149046E2F5D}</Project>
       <Name>OdfWordAddinLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\customUI.xml" />
   </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>

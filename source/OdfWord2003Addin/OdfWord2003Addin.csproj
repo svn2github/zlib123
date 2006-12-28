@@ -85,6 +85,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="FrmPrerequisites.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>FrmPrerequisites.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Error.PNG" />
+    <None Include="ImageInstaller.PNG" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfConverterLib\OdfConverterLib.csproj">
@@ -95,23 +106,6 @@
       <Project>{0313EE78-AD27-47E0-9902-3149046E2F5D}</Project>
       <Name>OdfWordAddinLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="FrmPrerequisites.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>FrmPrerequisites.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Error.PNG" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ImageInstaller.PNG" />
   </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>

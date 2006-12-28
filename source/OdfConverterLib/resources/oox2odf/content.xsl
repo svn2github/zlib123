@@ -327,19 +327,6 @@
       </xsl:call-template>
     </xsl:variable>
 
-
-    <xsl:variable name="IfToc">
-      <xsl:choose>
-        <xsl:when
-          test="preceding::w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY')]">
-          <xsl:call-template name="CheckifTOC"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>false</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
     <xsl:choose>
 
       <!--check if the paragraph starts a table-of content or Bibliography-->
@@ -380,9 +367,6 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
-
-      <!-- if paragraph is in toc, it has been converted already -->
-      <xsl:when test="$IfToc = 'true'"/>
 
       <!--  default scenario - paragraph-->
       <xsl:otherwise>

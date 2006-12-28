@@ -64,7 +64,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         };
 
         private string[] ODF_POST_PROCESSORS = {
-			"OdfParagraphPostProcessor"
+			"OdfParagraphPostProcessor",
+			"OdfCheckIfIndexPostProcessor"
  		};
 
         private bool isDirectTransform = true;

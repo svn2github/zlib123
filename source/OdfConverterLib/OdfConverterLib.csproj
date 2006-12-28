@@ -7,6 +7,9 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</ProjectGuid>
     <SignAssembly>false</SignAssembly>
+    <StartAction>Program</StartAction>
+    <StartProgram>..\OdfConverterTest\bin\Debug\OdfConverter.exe</StartProgram>
+    <StartArguments>/I C:\Tom\Work\work\testing\spistresci.docx /O C:\Tom\Work\work\testing\spistresci.odt /V /LEVEL 1 /XSLT C:\Tom\Work\work\odfconverter\source\OdfConverterLib\resources\source\OdfConverterLib\resources\oox2odf</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>bin\Debug\</OutputPath>
@@ -90,6 +93,7 @@
     <Compile Include="OoxParagraphsPostProcessor.cs" />
     <Compile Include="OdfParagraphPostProcessor.cs" />
     <Compile Include="OoxSpacesPostProcessor.cs" />
+    <Compile Include="OdfCheckIfIndexPostProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OdfZipUtils\OdfZipUtils.csproj">
