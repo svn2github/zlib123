@@ -492,11 +492,11 @@
         <xsl:with-param name="tabCount" select="$tabCount"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:if test="$styleType != ''">
+    <xsl:if test="$styleType != '' and $styleType != 'clear'">
     <text:index-entry-tab-stop style:type="{$styleType}">
       <!--if style type is left, there must be style:position attribute -->
       
-      <xsl:if test="$styleType = 'left' ">
+      <xsl:if test="$styleType = 'left'">
         <xsl:attribute name="style:position">
           <xsl:variable name="position">
             <xsl:call-template name="GetTabParams">
@@ -510,11 +510,9 @@
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="$leaderChar!=''">
+      <xsl:if test="$leaderChar!='' and $leaderChar!='heavy' and $leaderChar!='middleDot' and $leaderChar!='none'">
         <xsl:call-template name="InsertStyleLeaderChar">
-          <xsl:with-param name="leaderChar">
-            <xsl:value-of select="$leaderChar"/>
-          </xsl:with-param>
+          <xsl:with-param name="leaderChar" select="$leaderChar"/>
         </xsl:call-template>
       </xsl:if>
     </text:index-entry-tab-stop>
@@ -527,10 +525,7 @@
     <xsl:attribute name="style:leader-char">
       <xsl:choose>
         <xsl:when test="$leaderChar='dot'">.</xsl:when>
-        <xsl:when test="$leaderChar='heavy'"/>
         <xsl:when test="$leaderChar='hyphen'">-</xsl:when>
-        <xsl:when test="$leaderChar='middleDot'"/>
-        <xsl:when test="$leaderChar='none'"/>
         <xsl:when test="$leaderChar='underscore'">_</xsl:when>
         <xsl:otherwise>none</xsl:otherwise>
       </xsl:choose>

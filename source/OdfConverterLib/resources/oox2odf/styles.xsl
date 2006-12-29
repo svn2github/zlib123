@@ -1389,7 +1389,7 @@
           </xsl:for-each>
         </xsl:if>
 
-        <xsl:if test="contains(self::node()/@w:styleId,'TOC')">
+        <xsl:if test="contains(self::node()/@w:styleId,'TOC') and not(w:pPr/w:tabs)">
           <xsl:call-template name="InsertExtraTabs">
             <xsl:with-param name="currentStyleId">
               <xsl:value-of select="self::node()/@w:styleId"/>
@@ -2423,14 +2423,11 @@
           </xsl:attribute>
         </xsl:if>
         <!--        leader text  -->
-        <xsl:if test="./@w:leader">
+        <xsl:if test="./@w:leader and ./@w:leader!='' and ./@w:leader!='heavy' and ./@w:leader!='middleDot' and ./@w:leader!='none'">
           <xsl:attribute name="style:leader-text">
             <xsl:choose>
               <xsl:when test="./@w:leader='dot'">.</xsl:when>
-              <xsl:when test="./@w:leader='heavy'"/>
               <xsl:when test="./@w:leader='hyphen'">-</xsl:when>
-              <xsl:when test="./@w:leader='middleDot'"/>
-              <xsl:when test="./@w:leader='none'"/>
               <xsl:when test="./@w:leader='underscore'">_</xsl:when>
               <xsl:otherwise>none</xsl:otherwise>
             </xsl:choose>
