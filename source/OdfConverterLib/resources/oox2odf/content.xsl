@@ -720,7 +720,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-    <xsl:if test="preceding::w:p[1]/descendant::w:sectPr">
+    <xsl:if test="preceding::w:p[parent::w:body][1]/descendant::w:sectPr">
       <xsl:if test="(preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w or preceding::w:sectPr[1]/w:pgSz/@w:h != following::w:sectPr[1]/w:pgSz/@w:h or preceding::w:sectPr[1]/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient) and not(following::w:sectPr[1]/w:headerReference) and not(following::w:sectPr[1]/w:footerReference)">
         <xsl:attribute name="style:master-page-name">
           <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
@@ -735,9 +735,18 @@
               </xsl:attribute>        
             </xsl:when>
             <xsl:otherwise>
+              <xsl:if test="(preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w
+                or preceding::w:sectPr[1]/w:pgSz/@w:h != following::w:sectPr[1]/w:pgSz/@w:h
+                or preceding::w:sectPr[1]/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient 
+                or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w
+                or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
+                or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient) 
+                or following::w:sectPr[1]/w:headerReference 
+                or following::w:sectPr[1]/w:footerReference">
               <xsl:attribute name="style:master-page-name">
                 <xsl:value-of select="concat('H_',generate-id(following::w:sectPr))"/>
               </xsl:attribute>
+                </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>

@@ -1650,13 +1650,13 @@
 
     <!-- page breaks and simple column breaks -->
     <xsl:if test="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']">
-      <xsl:attribute name="fo:break-after">
+      <xsl:attribute name="fo:break-before">
         <xsl:value-of select="parent::w:p/w:r/w:br[@w:type='page' or @w:type='column']/@w:type"/>
       </xsl:attribute>
     </xsl:if>
 
     <xsl:if test="w:r/w:br[@w:type='page' or @w:type='column']">
-      <xsl:attribute name="fo:break-after">
+      <xsl:attribute name="fo:break-before">
         <xsl:value-of select="w:br[@w:type='page' or @w:type='column']/@w:type"/>
       </xsl:attribute>
     </xsl:if>

@@ -101,6 +101,7 @@
           <xsl:value-of select="w:tblStyle/@w:val"/>
         </xsl:attribute>
       </xsl:if>
+      <xsl:call-template name="MasterPageName"/>
       <style:table-properties table:border-model="collapsing">
         <xsl:call-template name="InsertTableProperties"/>
       </style:table-properties>
