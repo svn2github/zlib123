@@ -239,8 +239,7 @@
       <xsl:attribute name="text:ref-name">
         <xsl:value-of select="substring-before(substring-after(.,'REF '),' \')"/>
       </xsl:attribute>
-
-      <xsl:call-template name="InsertFieldCharFieldContent"/>
+      <xsl:apply-templates select="following::w:t[1]/ancestor::w:r/child::node()"/>
     </text:bookmark-ref>
   </xsl:template>
 
