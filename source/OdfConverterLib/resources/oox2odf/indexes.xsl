@@ -93,6 +93,7 @@
   
   <xsl:template name="GetMaxLevelFromStyles">
     <xsl:param name="stylesWithLevels"/>
+    <xsl:param name="defaultLevel"/>
     <xsl:choose>
       <xsl:when test="$stylesWithLevels!=''">
         <xsl:variable name="firstNum">
@@ -110,14 +111,25 @@
             <xsl:with-param name="stylesWithLevels">
               <xsl:value-of select="substring-after(substring-after($stylesWithLevels,';'),';')"/>
             </xsl:with-param>
+            <xsl:with-param name="defaultLevel" select="$defaultLevel"/>
           </xsl:call-template>
         </xsl:variable>
+        <xsl:variable name="num">
         <xsl:choose>
           <xsl:when test="number($firstNum) &gt; number($otherNum)">
             <xsl:value-of select ="$firstNum"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$otherNum"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="number($num) &gt; number($defaultLevel)">
+            <xsl:value-of select="$num"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$defaultLevel"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -127,6 +139,7 @@
   
   <xsl:template name="GetMinLevelFromStyles">
     <xsl:param name="stylesWithLevels"/>
+    <xsl:param name="defaultLevel"/>
     <xsl:choose>
       <xsl:when test="$stylesWithLevels!=''">
         <xsl:variable name="firstNum">
@@ -144,14 +157,25 @@
             <xsl:with-param name="stylesWithLevels">
               <xsl:value-of select="substring-after(substring-after($stylesWithLevels,';'),';')"/>
             </xsl:with-param>
+            <xsl:with-param name="defaultLevel" select="$defaultLevel"/>
           </xsl:call-template>
         </xsl:variable>
+        <xsl:variable name="num">
         <xsl:choose>
           <xsl:when test="number($firstNum) &lt; number($otherNum)">
             <xsl:value-of select ="$firstNum"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$otherNum"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="number($num) &lt; number($defaultLevel)">
+            <xsl:value-of select="$num"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$defaultLevel"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -205,6 +229,14 @@
             <xsl:with-param name="stylesWithLevels">
               <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')"/>
             </xsl:with-param>
+            <xsl:with-param name="defaultLevel">
+              <xsl:choose>
+                <xsl:when test="contains($instrTextContent,'-')">
+                  <xsl:value-of select="substring-before(substring-after($instrTextContent,'-'),'&quot;')"/>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
         <xsl:when test="contains($instrTextContent,'-')">
@@ -224,6 +256,14 @@
             <xsl:call-template name="GetMinLevelFromStyles">
               <xsl:with-param name="stylesWithLevels">
                 <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')"/>
+              </xsl:with-param>
+              <xsl:with-param name="defaultLevel">
+                <xsl:choose>
+                  <xsl:when test="contains($instrTextContent,'-')">
+                    <xsl:value-of select="substring-after(substring-before($instrTextContent,'-'),'&quot;')"/>
+                  </xsl:when>
+                  <xsl:otherwise>0</xsl:otherwise>
+                </xsl:choose>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:when>
@@ -247,8 +287,16 @@
     <xsl:param name="maxLevel"/>
     <xsl:param name="instrTextContent"/>
     <xsl:variable name="node" select="self::node()"/>
+    <xsl:variable name="levelForStyle">
+      <xsl:call-template name="GetStyleForLevel">
+        <xsl:with-param name="stylesWithLevels">
+          <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')"/>
+        </xsl:with-param>
+        <xsl:with-param name="level" select="$level"/>
+      </xsl:call-template>
+    </xsl:variable>
     <xsl:choose>
-      <xsl:when test="not(number($level) &gt; number($maxLevel))">
+      <xsl:when test="not(number($level) &gt; number($maxLevel)) and $levelForStyle!='NaN'">
         <text:table-of-content-entry-template text:outline-level="{$level}"> 
           <xsl:if test="$level = 0">
             <xsl:attribute name="text:outline-level">1</xsl:attribute>
@@ -256,17 +304,13 @@
           <xsl:attribute name="text:style-name">
             <xsl:choose>
               <xsl:when test="$level=0">
-                <xsl:value-of select="descendant::w:pStyle/@w:val"/>
+                <xsl:call-template name="TocToContent">
+                  <xsl:with-param name="styleValue">
+                    <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
+                  </xsl:with-param>
+                </xsl:call-template>
               </xsl:when>
               <xsl:when test="contains($instrTextContent,'\t')">
-                <xsl:variable name="levelForStyle">
-                  <xsl:call-template name="GetStyleForLevel">
-                    <xsl:with-param name="stylesWithLevels">
-                      <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="level" select="$level"/>
-                  </xsl:call-template>
-                </xsl:variable>
                 <xsl:value-of select="concat('Contents_20_',$levelForStyle)"/>
               </xsl:when>
               <xsl:otherwise>
@@ -287,6 +331,19 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!--template which changes style 'TOC' to style 'Contents_20'-->
+  <xsl:template name="TocToContent">
+    <xsl:param name="styleValue"/>
+    <xsl:choose>
+      <xsl:when test="contains($styleValue,'TOC')">
+        <xsl:value-of select="concat('Contents_20_',substring-after($styleValue,'TOC'))"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$styleValue"/>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   
@@ -510,7 +567,7 @@
           </xsl:call-template>
         </xsl:attribute>
       </xsl:if>
-      <xsl:if test="$leaderChar!='' and $leaderChar!='heavy' and $leaderChar!='middleDot' and $leaderChar!='none'">
+      <xsl:if test="$leaderChar and $leaderChar!='' and $leaderChar!='heavy' and $leaderChar!='middleDot' and $leaderChar!='none'">
         <xsl:call-template name="InsertStyleLeaderChar">
           <xsl:with-param name="leaderChar" select="$leaderChar"/>
         </xsl:call-template>
@@ -582,7 +639,7 @@
     <xsl:choose>
       <xsl:when test="w:fldChar or w:instrText"></xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates />
+        <xsl:apply-templates select="."/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

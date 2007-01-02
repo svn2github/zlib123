@@ -467,7 +467,7 @@
         <xsl:call-template name="InsertHyperlink"/>
       </xsl:when>
       <!-- ignore text when we are in field-->
-      <xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin' or @w:fldCharType='separate'] ">
+      <xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin' or @w:fldCharType='separate'] and w:instrText">
         <!-- catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
         <xsl:if
           test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin' or @w:fldCharType='separate']] ">
