@@ -99,13 +99,10 @@
               <xsl:value-of select="substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))"/>
             </xsl:attribute>
           </xsl:if>
-          <xsl:attribute name="style:num-format">
-            <xsl:if test="w:lvlText and w:lvlText/@w:val != ''">
               <xsl:call-template name="NumFormat">
                 <xsl:with-param name="format" select="w:numFmt/@w:val"/>
+                <xsl:with-param name="BeforeAfterNum"><xsl:value-of select="w:lvlText/@w:val"/></xsl:with-param>
               </xsl:call-template>
-            </xsl:if>
-          </xsl:attribute>
           <xsl:if test="w:start and w:start/@w:val > 1">
             <xsl:attribute name="text:start-value">
               <xsl:value-of select="w:start/@w:val"/>
@@ -136,13 +133,64 @@
 
   <xsl:template name="NumFormat">
     <xsl:param name="format"/>
+    <xsl:param name="BeforeAfterNum"/>    
+    <xsl:attribute name="style:num-format">
+      <xsl:if test="$BeforeAfterNum != ''">
+        <xsl:choose>
+          <xsl:when test="$format= 'decimal' ">1</xsl:when>
+          <xsl:when test="$format= 'lowerRoman' ">i</xsl:when>
+          <xsl:when test="$format= 'upperRoman' ">I</xsl:when>
+          <xsl:when test="$format= 'lowerLetter' ">a</xsl:when>
+          <xsl:when test="$format= 'upperLetter' ">A</xsl:when>
+          <xsl:otherwise>1</xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:attribute>
+    
+    <xsl:if test="$BeforeAfterNum != ''">
+              <xsl:variable name="NumPrefix">
+                <xsl:value-of select="substring-before($BeforeAfterNum, '%')"/>
+              </xsl:variable>
+              <xsl:if test="$NumPrefix != ''">
+                <xsl:attribute name="style:num-prefix">
+                  <xsl:value-of select="$NumPrefix"/>
+                </xsl:attribute>
+              </xsl:if>
+            <xsl:variable name="NumSuffix">
+              <xsl:call-template name="AfterTextNumber">
+                <xsl:with-param name="string">
+                  <xsl:value-of select="$BeforeAfterNum"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+             <xsl:if test="$NumSuffix != ''">
+               <xsl:attribute name="style:num-suffix">
+                 <xsl:value-of select="$NumSuffix"/>
+               </xsl:attribute>
+            </xsl:if>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- text after numbering in list -->
+  
+  <xsl:template name="AfterTextNumber">
+    <xsl:param name="BeforeAfterNum"/>    
     <xsl:choose>
-      <xsl:when test="$format= 'decimal' ">1</xsl:when>
-      <xsl:when test="$format= 'lowerRoman' ">i</xsl:when>
-      <xsl:when test="$format= 'upperRoman' ">I</xsl:when>
-      <xsl:when test="$format= 'lowerLetter' ">a</xsl:when>
-      <xsl:when test="$format= 'upperLetter' ">A</xsl:when>
-      <xsl:otherwise>1</xsl:otherwise>
+      <xsl:when test="contains(substring-after($BeforeAfterNum,'%'), '%')">
+        <xsl:call-template name="AfterTextNumber">
+          <xsl:with-param name="BeforeAfterNum">
+            <xsl:value-of select="substring-after($BeforeAfterNum,'%')"/>
+          </xsl:with-param>         
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="substring(substring-after($BeforeAfterNum, '%'), 2) != ''">
+            <xsl:value-of select="substring(substring-after($BeforeAfterNum, '%'), 2)"/>  
+          </xsl:when>
+          <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 

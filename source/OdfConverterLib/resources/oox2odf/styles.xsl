@@ -1511,6 +1511,9 @@
                 select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left"
               />
             </xsl:when>
+            <xsl:when test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
+              <xsl:value-of select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left"/>  
+            </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
@@ -1522,6 +1525,9 @@
               <xsl:value-of
                 select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging"
               />
+            </xsl:when>
+            <xsl:when test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging">
+              <xsl:value-of select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging"/>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
@@ -1543,7 +1549,7 @@
             <xsl:choose>
               <xsl:when test="$IndLeft = $IndHanging">0</xsl:when>
               <xsl:when test="$IndLeft != $IndHanging">
-                <xsl:value-of select="$IndLeft - $LeftNumber"/>
+                <xsl:value-of select="$IndLeft -  $LeftNumber + $HangingNumber"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$IndLeft"/>
@@ -1551,7 +1557,7 @@
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
+          </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
@@ -1579,7 +1585,7 @@
 
   <!-- conversion of paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
-
+           
     <xsl:if test="w:keepNext">
       <xsl:attribute name="fo:keep-with-next">
         <xsl:choose>
@@ -1772,9 +1778,15 @@
 
     <xsl:variable name="TextIndent">
       <xsl:choose>
+        <xsl:when test="w:ind/@w:firstLine">
+          <xsl:value-of select="w:ind/@w:firstLine"/>
+        </xsl:when>
         <xsl:when test="$CheckIfList = 'true' and $IndHanging = $IndLeft">0</xsl:when>
+        <xsl:when test="$CheckIfList = 'true' and $IndHanging != ''">
+          <xsl:value-of select="-$IndHanging"/>
+        </xsl:when>
         <xsl:when test="$CheckIfList = 'true'">0</xsl:when>
-        <xsl:when test="$IndHanging">
+        <xsl:when test="$IndHanging != ''">
           <xsl:value-of select="-$IndHanging"/>
         </xsl:when>
       </xsl:choose>
@@ -1790,18 +1802,6 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-
-    <xsl:if test="w:ind/@w:firstLine">
-      <xsl:attribute name="fo:text-indent">
-        <xsl:call-template name="ConvertTwips">
-          <xsl:with-param name="length">
-            <xsl:value-of select="w:ind/@w:firstLine"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-
     <xsl:if test="$TextIndent != ''">
       <xsl:attribute name="fo:text-indent">
         <xsl:call-template name="ConvertTwips">
