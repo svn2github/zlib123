@@ -115,7 +115,9 @@ namespace CleverAge.OdfConverter.CommandLineTool
         private ArrayList skipedPostProcessors = null;   // Post processors to skip (identified by their names)
         private bool packaging = true;                   // Build the zip archive after conversion
 
-        private bool isDirectTransform = true; // conversion from ODT to DOCX (default)
+        private enum Direction { OdtToDocx, DocxToOdt };
+	   	private Direction transformDirection = Direction.OdtToDocx; // direction of conversion
+		private bool transformDirectionOverride = false; // whether conversion direction has been specified
         private Report report = null;
         private Word word = null;
         private OoxValidator ooxValidator = null;
@@ -198,14 +200,14 @@ namespace CleverAge.OdfConverter.CommandLineTool
             {
 
                 // instanciate word if needed
-                if (this.isDirectTransform && this.open)
+               	if (this.transformDirection == Direction.OdtToDocx && this.open)
                 {
                     word = new Word();
                     word.Visible = false;
                 }
 
-                this.ProceedSingleFile(this.input, this.output, this.isDirectTransform);
-
+ 				this.ProceedSingleFile(this.input, this.output, this.transformDirection);
+                
                 // close word if needed
                 if (this.open)
                 {
@@ -248,7 +250,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             foreach (string input in files)
             {
                 string output = this.GenerateOutputName(this.output, input, ".docx", true);
-                int result = this.ProceedSingleFile(input, output, true);
+                int result = this.ProceedSingleFile(input, output, Direction.OdtToDocx);
                 switch (result)
                 {
                     case NOT_CONVERTED:
@@ -303,24 +305,24 @@ namespace CleverAge.OdfConverter.CommandLineTool
             foreach (string input in files)
             {
                 string output = this.GenerateOutputName(this.output, input, ".odt", true);
-                this.ProceedSingleFile(input, output, false);
+                this.ProceedSingleFile(input, output, Direction.DocxToOdt);
             }
         }
 
-        private int ProceedSingleFile(string input, string output, bool isDirectTransform)
+        private int ProceedSingleFile(string input, string output, Direction transformDirection)
         {
             bool converted = false;
             bool validated = false;
             bool opened = false;
             report.AddLog(input, "Converting file: " + input + " into " + output, Report.INFO_LEVEL);
-            converted = ConvertFile(input, output, isDirectTransform);
+            converted = ConvertFile(input, output, transformDirection);
             if (converted && this.validate)
             {
-                validated = ValidateFile(input, output, isDirectTransform);
+                validated = ValidateFile(input, output, transformDirection);
             }
             if (converted && this.open)
             {
-                opened = TryToOpen(input, output, isDirectTransform);
+                opened = TryToOpen(input, output, transformDirection);
             }
             if (!converted) 
             {
@@ -333,7 +335,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             else return NOT_VALIDATED_AND_NOT_OPENED;
         }
 
-        private bool ConvertFile(string input, string output, bool isDirectTransform)
+        private bool ConvertFile(string input, string output, Direction transformDirection)
         {
             try
             {
@@ -341,7 +343,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 Converter converter = new Converter();
                 converter.ExternalResources = this.xslPath;
                 converter.SkipedPostProcessors = this.skipedPostProcessors;
-                converter.DirectTransform = isDirectTransform;
+                converter.DirectTransform = transformDirection == Direction.OdtToDocx;
                 converter.Packaging = this.packaging;
                 converter.Transform(input, output);
                 TimeSpan duration = DateTime.Now - start;
@@ -380,9 +382,9 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
         }
 
-        private bool ValidateFile(string input, string output, bool isDirectTransform)
+        private bool ValidateFile(string input, string output, Direction transformDirection)
         {
-            if (isDirectTransform)
+            if (transformDirection == Direction.OdtToDocx)
             {
                 try
                 {
@@ -438,9 +440,9 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
         }
 
-        private bool TryToOpen(string input, string output, bool isDirectTransform)
+        private bool TryToOpen(string input, string output, Direction transformDirection)
         {
-            if (isDirectTransform)
+            if (transformDirection == Direction.OdtToDocx)
             {
                 //  Microsoft.Office.Interop.Word.Application msWord = (Microsoft.Office.Interop.Word.Application)wordApp;
                 try
@@ -475,6 +477,8 @@ namespace CleverAge.OdfConverter.CommandLineTool
             Console.WriteLine("     /SKIP name         Skip a post-processing (provide the post-processor's name)");
             Console.WriteLine("     /REPORT Filename   Name of the report file that must be generated (existing files will be replaced)");
             Console.WriteLine("     /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR");
+          	Console.WriteLine("     /ODT2DOCX          Force conversion to DOCX regardless of input file extension");
+			Console.WriteLine("     /DOCX2ODT          Force conversion to ODT regardless of input file extension");
         }
 
         private void ParseCommandLine(string[] args)
@@ -563,6 +567,16 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     case "/CV":
                         OoxValidator.test();
                         break;
+                   	case "/DOCX2ODT":
+						this.transformDirection = Direction.DocxToOdt;
+						this.transformDirectionOverride = true;
+						// System.Console.WriteLine("Override to odt\n");
+						break;
+					case "/ODT2DOCX":
+						this.transformDirection = Direction.OdtToDocx;
+						this.transformDirectionOverride = true;
+						// System.Console.WriteLine("Override to docx\n");
+						break;
                     default:
                         break;
                 }
@@ -620,11 +634,19 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 throw new OdfCommandLineException("Input file does not exist");
             }
 
-            string extension = ".docx";
-            if (extension.Equals(Path.GetExtension(this.input).ToLowerInvariant()))
+            string extension = null;
+            if (transformDirectionOverride)
             {
-                this.isDirectTransform = false;
-                extension = ".odt";
+            	extension = transformDirection == Direction.OdtToDocx ? ".odt" : ".docx";
+            }
+            else
+            {
+                extension = ".docx";
+                if (extension.Equals(Path.GetExtension(this.input).ToLowerInvariant()))
+                {
+                	this.transformDirection = Direction.DocxToOdt;
+                	extension = ".odt";
+                }
             }
             if (!this.packaging)
             {
