@@ -160,7 +160,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         ///   <para>Otherwise a value less than zero.  See <see cref="ErrorCode"/> for the specific reason.</para>
         /// </returns>
         [DllImport(zlibwapi)]
-        public static extern int unzGetGlobalComment(IntPtr handle, sbyte[] commentBuffer, uint commentBufferLength);
+        public static extern int unzGetGlobalComment(IntPtr handle, sbyte[] commentBuffer, UIntPtr commentBufferLength);
 
         /// <summary>Set the current file of the zip file to the first file.</summary>
         /// <param name="handle">The zip file handle opened by <see cref="unzOpenCurrentFile"/>.</param>
@@ -212,9 +212,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// </returns>
         [DllImport(zlibwapi, ExactSpelling = true, CharSet = CharSet.Ansi)]
         public static extern int unzGetCurrentFileInfo(IntPtr handle, out ZipEntryInfo entryInfoPtr,
-            sbyte[] entryNameBuffer, uint entryNameBufferLength,
-            byte[] extraField, uint extraFieldLength,
-            sbyte[] commentBuffer, uint commentBufferLength);
+            sbyte[] entryNameBuffer, UIntPtr entryNameBufferLength,
+            byte[] extraField, UIntPtr extraFieldLength,
+            sbyte[] commentBuffer, UIntPtr commentBufferLength);
 
         /// <summary>Open the zip file entry for reading.</summary>
         /// <param name="handle">The zip file handle opened by <see cref="unzOpenCurrentFile"/>.</param>
@@ -366,19 +366,19 @@ namespace CleverAge.OdfConverter.OdfZipUtils
     internal struct ZipFileInfo
     {
         /// <summary>The number of entries in the directory.</summary>
-        public UInt32 EntryCount;
+        public UIntPtr EntryCount;
 
         /// <summary>Length of zip file comment in bytes (8 bit characters).</summary>
-        public UInt32 CommentLength;
+        public UIntPtr CommentLength;
     }
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct ZipFileEntryInfo
     {
         public ZipDateTimeInfo DateTime;
-        public UInt32 DosDate;
-        public UInt32 InternalFileAttributes; // 2 bytes
-        public UInt32 ExternalFileAttributes; // 4 bytes
+        public UIntPtr DosDate;
+        public UIntPtr InternalFileAttributes; // 2 bytes
+        public UIntPtr ExternalFileAttributes; // 4 bytes
     }
 
     /// <summary>Custom ZipLib date time structure.</summary>
@@ -422,46 +422,46 @@ namespace CleverAge.OdfConverter.OdfZipUtils
     internal struct ZipEntryInfo
     {
         // <summary>Version made by (2 bytes).</summary>
-        public UInt32 Version;
+        public UIntPtr Version;
 
         /// <summary>Version needed to extract (2 bytes).</summary>
-        public UInt32 VersionNeeded;
+        public UIntPtr VersionNeeded;
 
         /// <summary>General purpose bit flag (2 bytes).</summary>
-        public UInt32 Flag;
+        public UIntPtr Flag;
 
         /// <summary>Compression method (2 bytes).</summary>
-        public UInt32 CompressionMethod;
+        public UIntPtr CompressionMethod;
 
         /// <summary>Last mod file date in Dos fmt (4 bytes).</summary>
-        public UInt32 DosDate;
+        public UIntPtr DosDate;
 
         /// <summary>Crc-32 (4 bytes).</summary>
-        public UInt32 Crc;
+        public UIntPtr Crc;
 
         /// <summary>Compressed size (4 bytes).</summary>
-        public UInt32 CompressedSize;
+        public UIntPtr CompressedSize;
 
         /// <summary>Uncompressed size (4 bytes).</summary>
-        public UInt32 UncompressedSize;
+        public UIntPtr UncompressedSize;
 
         /// <summary>Filename length (2 bytes).</summary>
-        public UInt32 FileNameLength;
+        public UIntPtr FileNameLength;
 
         /// <summary>Extra field length (2 bytes).</summary>
-        public UInt32 ExtraFieldLength;
+        public UIntPtr ExtraFieldLength;
 
         /// <summary>File comment length (2 bytes).</summary>
-        public UInt32 CommentLength;
+        public UIntPtr CommentLength;
 
         /// <summary>Disk number start (2 bytes).</summary>
-        public UInt32 DiskStartNumber;
+        public UIntPtr DiskStartNumber;
 
         /// <summary>Internal file attributes (2 bytes).</summary>
-        public UInt32 InternalFileAttributes;
+        public UIntPtr InternalFileAttributes;
 
         /// <summary>External file attributes (4 bytes).</summary>
-        public UInt32 ExternalFileAttributes;
+        public UIntPtr ExternalFileAttributes;
 
         /// <summary>File modification date of entry.</summary>
         public ZipDateTimeInfo DateTime;

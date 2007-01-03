@@ -89,7 +89,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
             }
 
             ZipEntryInfo entryInfo = new ZipEntryInfo();
-            int result = ZipLib.unzGetCurrentFileInfo(this.handle, out entryInfo, null, 0, null, 0, null, 0);
+            int result = ZipLib.unzGetCurrentFileInfo(this.handle, out entryInfo, null, UIntPtr.Zero, null, UIntPtr.Zero, null, UIntPtr.Zero);
             if (result != 0)
             {
                 throw new ZipException("Error while reading entry info: " + relativePath + " - Errorcode: " + result);
@@ -101,7 +101,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                 throw new ZipException("Error while opening entry: " + relativePath + " - Errorcode: " + result);
             }
 
-            byte[] buffer = new byte[entryInfo.UncompressedSize];
+            byte[] buffer = new byte[entryInfo.UncompressedSize.ToUInt64 ()];
             int bytesRead = 0;
             if ((bytesRead = ZipLib.unzReadCurrentFile(this.handle, buffer, (uint)entryInfo.UncompressedSize)) < 0)
             {
