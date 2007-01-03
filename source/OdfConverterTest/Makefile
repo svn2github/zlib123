@@ -1,36 +1,79 @@
 top_srcdir=../..
 include $(top_srcdir)/build/common.mk
 
+ifeq ($(OS),Cygwin)
+CC=gcc -mno-cygwin
+EXEEXT=.exe
+PATHSEP=;
+KILLAT=-Wl,--kill-at
+ZLIB=libzlib.dll.a
+ZLIBDEP=$(ZLIB)
+ZIPOPEN=_zipOpen@8
+UNZOPEN=_unzOpen@4
+OTHERLIBS=-lole32 -loleaut32 -lws2_32 -lpsapi -luser32 -lkernel32
+else
+EXEEXT=
+PATHSEP=:
+EXPORTDYNAMIC=-Wl,--export-dynamic
+ZLIB=-lz
+ZIPOPEN=zipOpen
+UNZOPEN=unzOpen
+endif
+
 SOURCE = \
     OdfCommandLineException.cs \
     OdfConverterTest.cs \
     OoxValidator.cs \
     OdfValidator.cs
-DISTFILES=$(SOURCE)
+DISTFILES=$(SOURCE) zlib.def
 
-all-local: OdfConverterTest.exe OdfConverter
-OdfConverterTest.exe : $(SOURCE) ../OdfZipUtils/OdfZipUtils.dll ../OdfConverterLib/OdfConverterLib.dll
+all-local: OdfConverterTest.exe OdfConverter$(EXEEXT)
+
+OdfConverterTest.exe : Makefile $(SOURCE) ../OdfZipUtils/OdfZipUtils.dll ../OdfConverterLib/OdfConverterLib.dll
 	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:OdfConverterTest.exe \
 		-reference:../OdfZipUtils/OdfZipUtils.dll \
 		-reference:../OdfConverterLib/OdfConverterLib.dll \
 		$(SOURCE)
 
-OdfConverterTestStatic.exe : $(SOURCE) ../OdfZipUtils/OdfZipUtilsStatic.dll ../OdfConverterLib/OdfConverterLib.dll
+OdfConverterTestStatic.exe : $(SOURCE) ../OdfZipUtils/OdfZipUtilsStatic.dll ../OdfConverterLib/OdfConverterLibStatic.dll
 	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:OdfConverterTestStatic.exe \
 		-reference:../OdfZipUtils/OdfZipUtilsStatic.dll \
-		-reference:../OdfConverterLib/OdfConverterLib.dll \
+		-reference:../OdfConverterLib/OdfConverterLibStatic.dll \
 		$(SOURCE)
 
-main.c bundle.o : OdfConverterTestStatic.exe
-	MONO_PATH='../OdfZipUtils:../OdfConverterLib' mkbundle2 -c -o main.c -oo bundle.o --deps OdfConverterTestStatic.exe
+main.c bundle.o : OdfConverterTestStatic.exe Makefile
+	MONO_PATH='../OdfZipUtils$(PATHSEP)../OdfConverterLib' mkbundle2 -c -o main.c -oo bundle.o --deps OdfConverterTestStatic.exe
 
-OdfConverter : main.c bundle.o Makefile
-	rm -f OdfConverter
+OdfConverter$(EXEEXT) : main.c bundle.o $(ZLIBDEP) Makefile
+	rm -f $@
+ifeq ($(OS),Darwin)
+# Don't even try static linking to mono as we need to bundle glib and all of
+# its dependencies which are not included in a standard Mac OS X installation
 	$(CC) -o OdfConverter -Wall `pkg-config --cflags mono` main.c \
+		`pkg-config --libs-only-L mono` -bind_at_load \
+	    ../AdditionalTools/zlib123/contrib/minizip/libzlibwapi.a \
+		`pkg-config --libs-only-l mono` bundle.o
+else
+	$(CC) -o OdfConverter$(EXEEXT) -Wall `pkg-config --cflags mono` main.c \
+	    $(KILLAT) \
+	    bundle.o \
+	    $(EXPORTDYNAMIC) \
+	    -Wl,--undefined=$(ZIPOPEN) -Wl,--undefined=$(UNZOPEN) \
 	    `pkg-config --libs-only-L mono` -L../AdditionalTools/zlib123/contrib/minizip \
-	    -Wl,--export-dynamic -lz -Wl,--undefined=zipOpen -Wl,--undefined=unzOpen \
 	    -Wl,-Bstatic -lmono -lzlibwapi -Wl,-Bdynamic  \
-	    `pkg-config --libs-only-l mono | sed -e "s/\-lmono //"` bundle.o
+	    `pkg-config --libs-only-l mono | sed -e "s/\-lmono //"` \
+	    $(ZLIB) $(OTHERLIBS)
+endif
+ifeq ($(OS),Cygwin)
+	    strip --strip-unneeded $@
+endif
+
+# Construct the import library manually from the def file so that we
+# don't have to bother with creating a patch to bundle it (a binary
+# file), and can bundle just the def file.
+libzlib.dll.a: zlib.def
+	dlltool -D zlib1.dll -d zlib.def -l libzlib.dll.a
+
 
 check-local: all
 	rm -f /tmp/foo.odt
@@ -38,7 +81,7 @@ check-local: all
 	MONO_TRACE_LISTENER=Console.Error ./OdfConverter /LEVEL 1 /I /tmp/foo.odt /O /tmp/baa.docx 
 
 clean-local:
-	rm -f OdfConverterTest.exe OdfConverterTest *.mdb
+	rm -f *.exe OdfConverterTest$(EXEEXT) *.mdb main.c bundle.o
 
 install-local: OdfConverter
 	install -D OdfConverter $(DESTDIR)/usr/lib/ooo-2.0/program/OdfConverter

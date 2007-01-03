@@ -16,5 +16,6 @@ OdfZipUtilsStatic.dll : $(SOURCE)
 	$(CSC) $(CSC_DEBUG) -d:STATIC -target:library \
 	     -out:OdfZipUtilsStatic.dll $(SOURCE)
 
-.PHONY: clean-local
+clean-local:
+	rm -f *.dll *.mdb
 

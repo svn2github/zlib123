@@ -54,6 +54,12 @@ extern "C" {
 #include "zlib.h"
 #endif
 
+#ifdef _WIN32
+#undef ZEXPORT
+#include <windows.h>
+#define ZEXPORT WINAPI __declspec(dllexport)
+#endif
+
 #ifndef _ZLIBIOAPI_H
 #include "ioapi.h"
 #endif

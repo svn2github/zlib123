@@ -1,5 +1,7 @@
 all: do-all
 
+OS:=$(shell uname -o)
+
 CC=gcc
 LD=ld
 CSC=gmcs
@@ -23,7 +25,7 @@ dist-recursive: dist-local
 	done
 
 dist-common:
-	-mkdir -p $(distdir)
+	-mkdir -p $(top_srcdir)/$(distdir)
 	for file in Makefile $(DISTFILES) ; do \
 	    install -D $$file $(top_srcdir)/$(distdir)/$$file || exit 1 ; \
 	done
