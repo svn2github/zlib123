@@ -886,14 +886,7 @@
                         <xsl:value-of select="w:pgMar/@w:top"/>
                       </xsl:when>
                       <xsl:otherwise>
-                        <xsl:choose>
-                          <xsl:when test="w:pgMar/@w:top &lt; w:pgMar/@w:header">
-                            <xsl:value-of select="w:pgMar/@w:header"/>
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:value-of select="w:pgMar/@w:top"/>
-                          </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:value-of select="w:pgMar/@w:top"/>
                       </xsl:otherwise>
                     </xsl:choose>
                   </xsl:otherwise>
@@ -993,14 +986,7 @@
                     <xsl:value-of select="w:pgMar/@w:bottom"/>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:choose>
-                      <xsl:when test="w:pgMar/@w:bottom &lt; w:pgMar/@w:footer">
-                        <xsl:value-of select="w:pgMar/@w:footer"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="w:pgMar/@w:bottom"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:value-of select="w:pgMar/@w:bottom"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:otherwise>
