@@ -271,6 +271,27 @@
       </text:title>
     </text:span>
   </xsl:template>
+  
+  <xsl:template match="w:fldSimple[contains(@w:instr,'STYLEREF')]">
+    <text:span text:style-name="{generate-id(w:r)}">
+      <text:chapter>
+        <xsl:choose>
+          <xsl:when test="self::node()[contains(@w:instr,'\n')]">
+          <xsl:attribute name="text:display">number</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="self::node()[contains(@w:instr,'\*')]">
+          <xsl:attribute name="text:display">name</xsl:attribute>
+        </xsl:when>
+        </xsl:choose>
+        <xsl:if test="self::node()[contains(@w:instr,'Heading')]">
+          <xsl:attribute name="text:outline-level">
+            <xsl:value-of select="substring-before(substring-after(./@w:instr,'Heading '),'&quot;')"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:apply-templates select="w:r/child::node()"/>
+      </text:chapter>
+    </text:span>
+  </xsl:template>
 
   <xsl:template match="w:fldSimple[contains(@w:instr,'SUBJECT')]">
     <text:span text:style-name="{generate-id(w:r)}">
