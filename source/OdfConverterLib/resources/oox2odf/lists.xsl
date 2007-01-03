@@ -199,12 +199,7 @@
   <xsl:template name="InsertListLevelProperties">
     <xsl:variable name="Ind" select="w:pPr/w:ind"/>
     <xsl:variable name="tab">
-      <xsl:choose>
-        <xsl:when test="w:pPr/w:tabs/w:tab">
           <xsl:value-of select="w:pPr/w:tabs/w:tab/@w:pos"/>
-        </xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
-      </xsl:choose>
     </xsl:variable>
 
     <xsl:variable name="abstractNumId">
@@ -263,10 +258,9 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
-                <xsl:when test="w:suff/@w:val='nothing' or $paragraph/w:pPr/w:ind/@w:left = 0">0</xsl:when>
+                <xsl:when test="w:suff/@w:val='nothing' or ($paragraph/w:pPr/w:ind/@w:left = 0 and $tab = '')">0</xsl:when>
                 <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
-                <xsl:when
-                  test="number($tab)>(number($WLeft) - ($WHanging)) and (number($WHanging) > (number($tab) - number($WLeft) + number($WHanging)))">
+                <xsl:when test="$tab != '' and (number($WLeft) - number($tab) >= 0)">
                   <xsl:value-of select="$tab - $WLeft + $WHanging"/>
                 </xsl:when>
                 <xsl:when test="$paragraph/w:pPr/w:ind/@w:hanging">
@@ -281,7 +275,7 @@
           </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name="text:min-label-distance">
-          <xsl:if test="$paragraph/w:pPr/w:ind/@w:left = 0">
+          <xsl:if test="$paragraph/w:pPr/w:ind/@w:left = 0 and $tab = ''">
             <xsl:call-template name="ConvertTwips">
               <xsl:with-param name="length">
             <xsl:value-of select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
