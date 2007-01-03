@@ -634,14 +634,21 @@
   <!-- handle text in table-of content -->
   <xsl:template match="text()" mode="entry"/>
   
-  <!-- handle runs in order to avoid unnecessary text:spans -->
+  <!-- handle runs -->
   <xsl:template match="w:r" mode="index">
     <xsl:choose>
-      <xsl:when test="w:fldChar or w:instrText"></xsl:when>
+      <!--  ignore text when we are in field-->
+      <xsl:when test="w:fldChar or w:instrText"/>
+      <!--attach style-->
+      <xsl:when test="w:rPr">
+        <text:span text:style-name="{generate-id(self::node())}">
+          <xsl:apply-templates/>
+        </text:span>
+      </xsl:when>
+      <!--default scenario-->
       <xsl:otherwise>
-        <xsl:apply-templates select="."/>
+        <xsl:apply-templates />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
 </xsl:stylesheet>
