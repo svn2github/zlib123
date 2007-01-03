@@ -161,6 +161,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (Exception e)
             {
+            	Environment.ExitCode = 1;
                 Console.WriteLine("Error when parsing command line: " + e.Message);
                 usage();
                 return;
@@ -321,7 +322,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
             {
                 opened = TryToOpen(input, output, isDirectTransform);
             }
-            if (!converted) return NOT_CONVERTED;
+            if (!converted) 
+            {
+            	Environment.ExitCode = 1;
+            	return NOT_CONVERTED;
+            }
             else if (validated && opened) return VALIDATED_AND_OPENED;
             else if (validated && !opened) return VALIDATED_AND_NOT_OPENED;
             else if (!validated && opened) return NOT_VALIDATED_AND_OPENED;
