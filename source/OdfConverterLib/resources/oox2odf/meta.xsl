@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
+    xmlns:cust-p="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
     xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:dcmitype="http://purl.org/dc/dcmitype/"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -104,6 +105,17 @@
                         </xsl:choose>
                     </meta:editing-duration>
                 </xsl:if>
+                <!-- custom properties-->        
+               <xsl:if test="document('docProps/custom.xml')/cust-p:Properties/cust-p:property">
+                   <xsl:for-each select="document('docProps/custom.xml')/cust-p:Properties/cust-p:property">
+                       <xsl:variable name="numer"><xsl:number/></xsl:variable>
+                       <xsl:if test="$numer &lt; 5">
+                           <meta:user-defined meta:name="Info {$numer}">
+                               <xsl:value-of select="@name"/><xsl:text>: </xsl:text><xsl:value-of select="vt:lpwstr/text()"/>
+                           </meta:user-defined>
+                       </xsl:if>
+                   </xsl:for-each>
+               </xsl:if>        
                 <!-- keywords -->
                 <xsl:if test="document('docProps/core.xml')/cp:coreProperties/cp:keywords">
                     <meta:keyword>
