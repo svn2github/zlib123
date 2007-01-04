@@ -57,6 +57,7 @@
           test="document('word/document.xml')//w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
           <xsl:call-template name="BibliographyConfiguration"/>
         </xsl:if>
+        <xsl:call-template name="LineNumbering"/>
       </office:styles>
       <!-- automatic styles -->
       <office:automatic-styles>
@@ -3043,5 +3044,30 @@
     </text:bibliography-configuration>
   </xsl:template>
 
+  <xsl:template name="LineNumbering">
+    <xsl:if test="not(document('word/document.xml')/w:document/w:body/w:p/descendant::w:sectPr)">
+      <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr/w:lnNumType">
+        <style:style style:name="Line_20_numbering" style:display-name="Line numbering"
+          style:family="text"/>
+        <text:linenumbering-configuration  text:style-name="Line_20_numbering" style:num-format="1" text:number-position="left">
+          <xsl:if test="not(./@w:restart)">
+            <xsl:attribute name="text:restart-on-page">true</xsl:attribute>
+          </xsl:if>
+          <xsl:attribute name="text:increment">
+            <xsl:value-of select="./@w:countBy"/>
+          </xsl:attribute>
+          <xsl:attribute name="text:offset">
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:value-of select="./@w:distance"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          
+        </text:linenumbering-configuration>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
 
 </xsl:stylesheet>
