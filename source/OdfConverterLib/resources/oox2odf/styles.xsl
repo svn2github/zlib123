@@ -97,6 +97,10 @@
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
           <xsl:for-each select="document($headerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if test="document($headerXmlDocument)/w:hdr[descendant::w:numPr/w:numId]">
+              <!-- automatic list styles-->
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="./@w:type = 'even'">
@@ -105,6 +109,10 @@
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
           <xsl:for-each select="document($headerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if test="document($headerXmlDocument)/w:hdr[descendant::w:numPr/w:numId]">
+              <!-- automatic list styles-->
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="./@w:type = 'first'">
@@ -113,6 +121,10 @@
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$headerId]/@Target)"/>
           <xsl:for-each select="document($headerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if test="document($headerXmlDocument)/w:hdr[descendant::w:numPr/w:numId]">
+              <!-- automatic list styles-->
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:when>
       </xsl:choose>
@@ -125,6 +137,10 @@
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
           <xsl:for-each select="document($footerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if test="document($footerXmlDocument)/w:ftr[descendant::w:numPr/w:numId]">
+              <!-- automatic list styles-->
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="./@w:type = 'even'">
@@ -133,6 +149,10 @@
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
           <xsl:for-each select="document($footerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if test="document($footerXmlDocument)/w:ftr[descendant::w:numPr/w:numId]">
+              <!-- automatic list styles-->
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:when>
         <xsl:when test="./@w:type = 'first'">
@@ -141,6 +161,10 @@
             select="concat('word/',document('word/_rels/document.xml.rels')/descendant::node()[@Id=$footerId]/@Target)"/>
           <xsl:for-each select="document($footerXmlDocument)">
             <xsl:apply-templates mode="automaticstyles"/>
+            <xsl:if test="document($footerXmlDocument)/w:ftr[descendant::w:numPr/w:numId]">
+              <!-- automatic list styles-->
+              <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+            </xsl:if>
           </xsl:for-each>
         </xsl:when>
       </xsl:choose>
@@ -1462,7 +1486,6 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-
         <xsl:variable name="Ivl">
           <xsl:choose>
             <xsl:when test="w:numPr/w:ilvl/@w:val">
@@ -1498,8 +1521,11 @@
                 select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:left"
               />
             </xsl:when>
-            <xsl:when test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
-              <xsl:value-of select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left"/>  
+            <xsl:when
+              test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
+              <xsl:value-of
+                select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left"
+              />
             </xsl:when>
           </xsl:choose>
         </xsl:variable>
@@ -1512,8 +1538,11 @@
                 select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:hanging"
               />
             </xsl:when>
-            <xsl:when test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging">
-              <xsl:value-of select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging"/>
+            <xsl:when
+              test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging">
+              <xsl:value-of
+                select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:hanging"
+              />
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
@@ -1548,7 +1577,7 @@
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>0</xsl:otherwise>
-          </xsl:choose>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
@@ -1576,7 +1605,7 @@
 
   <!-- conversion of paragraph properties -->
   <xsl:template name="InsertParagraphProperties">
-           
+
     <xsl:if test="w:keepNext">
       <xsl:attribute name="fo:keep-with-next">
         <xsl:choose>
@@ -1712,7 +1741,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="IndLeft">
       <xsl:choose>
         <xsl:when test="w:ind/@w:left != ''">
@@ -1740,7 +1769,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="MarginLeft">
       <xsl:call-template name="MarginLeft">
         <xsl:with-param name="StyleId">
@@ -2416,7 +2445,8 @@
           </xsl:attribute>
         </xsl:if>
         <!--        leader text  -->
-        <xsl:if test="./@w:leader and ./@w:leader!='' and ./@w:leader!='heavy' and ./@w:leader!='middleDot' and ./@w:leader!='none'">
+        <xsl:if
+          test="./@w:leader and ./@w:leader!='' and ./@w:leader!='heavy' and ./@w:leader!='middleDot' and ./@w:leader!='none'">
           <xsl:attribute name="style:leader-text">
             <xsl:choose>
               <xsl:when test="./@w:leader='dot'">.</xsl:when>
@@ -3054,7 +3084,8 @@
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr/w:lnNumType">
         <style:style style:name="Line_20_numbering" style:display-name="Line numbering"
           style:family="text"/>
-        <text:linenumbering-configuration  text:style-name="Line_20_numbering" style:num-format="1" text:number-position="left">
+        <text:linenumbering-configuration text:style-name="Line_20_numbering" style:num-format="1"
+          text:number-position="left">
           <xsl:if test="not(./@w:restart)">
             <xsl:attribute name="text:restart-on-page">true</xsl:attribute>
           </xsl:if>
@@ -3069,7 +3100,7 @@
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
-          
+
         </text:linenumbering-configuration>
       </xsl:for-each>
     </xsl:if>
