@@ -113,7 +113,7 @@
     <text:notes-configuration text:note-class="{$noteType}">
       <xsl:choose>
         <xsl:when test="$noteType='footnote' ">
-      <xsl:attribute name="text:citation-style-name">Footnote_20_Symbol</xsl:attribute>
+      <xsl:attribute name="text:citation-style-name">Footnote_20_anchor</xsl:attribute>
       <xsl:attribute name="text:citation-body-style-name">Footnote_20_anchor</xsl:attribute>
           <xsl:attribute name="text:start-numbering-at">document</xsl:attribute>
         </xsl:when>

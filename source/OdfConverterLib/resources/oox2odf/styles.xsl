@@ -3012,7 +3012,7 @@
       <!-- positioning of superscript -->
       <xsl:when test="w:vertAlign/@w:val = 'superscript'">
         <xsl:attribute name="style:text-position">
-          <xsl:value-of select="concat('super ',number(58 + $percentValue))"/>
+          <xsl:value-of select="concat('super ',number(58 + $percentValue),'%')"/>
         </xsl:attribute>
       </xsl:when>
 
