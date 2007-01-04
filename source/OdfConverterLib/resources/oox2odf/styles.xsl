@@ -1501,7 +1501,6 @@
             <xsl:when test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left">
               <xsl:value-of select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:lvlOverride/w:lvl/w:pPr/w:ind/@w:left"/>  
             </xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
 
@@ -1532,12 +1531,17 @@
           </xsl:choose>
         </xsl:variable>
         <xsl:choose>
+          <xsl:when test=" $LeftNumber = '' and $IndLeft = ''">
+            <xsl:value-of
+              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left - document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:hanging"
+            />
+          </xsl:when>
           <xsl:when test="$IndLeft != ''">
             <xsl:choose>
-              <xsl:when test="$IndLeft = $IndHanging">0</xsl:when>
-              <xsl:when test="$IndLeft != $IndHanging">
-                <xsl:value-of select="$IndLeft -  $LeftNumber + $HangingNumber"/>
+              <xsl:when test="$IndLeft != $IndHanging or ($IndHanging = 0 and $IndLeft= 0)">
+                <xsl:value-of select="$IndLeft - $LeftNumber + $HangingNumber"/>
               </xsl:when>
+              <xsl:when test="$IndLeft = $IndHanging">0</xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$IndLeft"/>
               </xsl:otherwise>
@@ -1700,6 +1704,29 @@
     <xsl:variable name="StyleId">
       <xsl:value-of select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
     </xsl:variable>
+
+    <xsl:variable name="CheckIfList">
+      <xsl:call-template name="CheckIfList">
+        <xsl:with-param name="StyleId">
+          <xsl:value-of select="$StyleId"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="IndLeft">
+      <xsl:choose>
+        <xsl:when test="w:ind/@w:left != ''">
+          <xsl:value-of select="number(w:ind/@w:left)"/>
+        </xsl:when>
+        <xsl:when
+          test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left != '' and $CheckIfList != 'true'">
+          <xsl:value-of
+            select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left"
+          />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:variable name="IndHanging">
       <xsl:choose>
         <xsl:when test="w:ind/@w:hanging != ''">
@@ -1713,29 +1740,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-
-    <xsl:variable name="IndLeft">
-      <xsl:choose>
-        <xsl:when test="w:ind/@w:left != ''">
-          <xsl:value-of select="number(w:ind/@w:left)"/>
-        </xsl:when>
-        <xsl:when
-          test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left != ''">
-          <xsl:value-of
-            select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left"
-          />
-        </xsl:when>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:variable name="CheckIfList">
-      <xsl:call-template name="CheckIfList">
-        <xsl:with-param name="StyleId">
-          <xsl:value-of select="$StyleId"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
+    
     <xsl:variable name="MarginLeft">
       <xsl:call-template name="MarginLeft">
         <xsl:with-param name="StyleId">
@@ -1769,8 +1774,8 @@
         <xsl:when test="w:ind/@w:firstLine">
           <xsl:value-of select="w:ind/@w:firstLine"/>
         </xsl:when>
-        <xsl:when test="$CheckIfList = 'true' and $IndHanging = $IndLeft">0</xsl:when>
-        <xsl:when test="$CheckIfList = 'true' and $IndHanging != ''">
+        <xsl:when test="$CheckIfList = 'true' and $IndHanging = $IndLeft and $IndLeft != ''">0</xsl:when>
+        <xsl:when test="$CheckIfList = 'true' and $IndHanging != '' and $IndLeft !=''">
           <xsl:value-of select="-$IndHanging"/>
         </xsl:when>
         <xsl:when test="$CheckIfList = 'true'">0</xsl:when>
