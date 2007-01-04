@@ -352,7 +352,7 @@
       </xsl:when>
 
       <!--  check if the paragraf is list element (it can be a heading also) -->
-      <xsl:when test="$numId != ''">
+      <xsl:when test="$numId != '' and $level &lt; 10">
         <xsl:apply-templates select="." mode="list">
           <xsl:with-param name="numId" select="$numId"/>
           <xsl:with-param name="level" select="$level"/>
