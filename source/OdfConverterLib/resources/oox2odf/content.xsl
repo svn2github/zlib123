@@ -218,30 +218,24 @@
   <!--  get outline level from styles hierarchy for headings -->
   <xsl:template name="GetStyleOutlineLevel">
     <xsl:param name="outline"/>
-    <xsl:variable name="basedOn">
-      <xsl:value-of
-        select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"
-      />
-    </xsl:variable>
-    <!--  Search outlineLvl in style based on style -->
-    <xsl:choose>
-      <xsl:when
-        test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$basedOn]/w:pPr/w:outlineLvl/@w:val">
-        <xsl:value-of
-          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$basedOn]/w:pPr/w:outlineLvl/@w:val"
-        />
-      </xsl:when>
-      <xsl:when
-        test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val">
-        <xsl:call-template name="GetStyleOutlineLevel">
-          <xsl:with-param name="outline">
-            <xsl:value-of
-              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:basedOn/@w:val"
-            />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-    </xsl:choose>
+    <xsl:for-each select="document('word/styles.xml')">
+      <xsl:variable name="basedOn">
+        <xsl:value-of select="key('StyleId', $outline)[1]/w:basedOn/@w:val"/>
+      </xsl:variable>
+      <!--  Search outlineLvl in style based on style -->
+      <xsl:choose>
+        <xsl:when test="key('StyleId', $basedOn)[1]/w:pPr/w:outlineLvl/@w:val">
+          <xsl:value-of select="key('StyleId', $basedOn)[1]/w:pPr/w:outlineLvl/@w:val"/>
+        </xsl:when>
+        <xsl:when test="key('StyleId', $outline)[1]/w:basedOn/@w:val">
+          <xsl:call-template name="GetStyleOutlineLevel">
+            <xsl:with-param name="outline">
+              <xsl:value-of select="key('StyleId', $outline)[1]/w:basedOn/@w:val"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
   <!-- Get outlineLvl if the paragraf is heading -->
