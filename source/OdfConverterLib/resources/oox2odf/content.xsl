@@ -161,10 +161,6 @@
         <xsl:call-template name="InsertDefaultParagraphProperties"/>
         <xsl:call-template name="InsertParagraphProperties"/>
       </style:paragraph-properties>
-
-      <!-- add text properties to paragraph -->
-      <xsl:apply-templates select="w:rPr[not(parent::w:r)]" mode="automaticstyles"/>
-
     </style:style>
   </xsl:template>
 
@@ -182,14 +178,6 @@
     </xsl:if>
     <xsl:apply-templates mode="automaticstyles"/>
   </xsl:template>
-
-  <!-- add text properties to paragraph -->
-  <xsl:template match="w:rPr[parent::w:pPr]" mode="automaticstyles">
-    <style:text-properties>
-      <xsl:call-template name="InsertTextProperties"/>
-    </style:text-properties>
-  </xsl:template>
-
 
   <!--  when paragraph has no parent style it should be set to Normal style which contains all default paragraph properties -->
   <xsl:template name="InsertParagraphParentStyle">

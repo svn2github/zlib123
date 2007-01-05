@@ -1370,7 +1370,9 @@
               <xsl:call-template name="InsertpPrTextProperties"/>
             </xsl:for-each>
           </xsl:if>
-        </style:text-properties>
+          <!--default text properties-->
+           <xsl:call-template name="InsertDefaultTextProperties"/>
+       </style:text-properties>
       </xsl:if>
     </style:default-style>
   </xsl:template>
@@ -1436,6 +1438,11 @@
     </xsl:attribute>
   </xsl:template>
 
+  <xsl:template name="InsertDefaultTextProperties">
+      <!--auto text color-->
+    <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
+  </xsl:template>
+  
   <xsl:template name="CheckIfList">
     <xsl:param name="StyleId"/>
     <xsl:choose>
@@ -2750,6 +2757,10 @@
       <xsl:attribute name="fo:color">
         <xsl:value-of select="concat('#',w:color/@w:val)"/>
       </xsl:attribute>
+    </xsl:if>
+    <!--auto text color-->
+     <xsl:if test="w:color/@w:val = 'auto'">
+      <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
     </xsl:if>
 
     <!-- letter spacing -->
