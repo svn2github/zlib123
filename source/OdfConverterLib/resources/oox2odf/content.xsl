@@ -247,60 +247,53 @@
   <!-- Get outlineLvl if the paragraf is heading -->
   <xsl:template name="GetOutlineLevel">
     <xsl:param name="node"/>
-    <xsl:choose>
-      <xsl:when test="$node/w:pPr/w:outlineLvl/@w:val">
-        <xsl:value-of select="$node/w:pPr/w:outlineLvl/@w:val"/>
-      </xsl:when>
-      <xsl:when test="$node/w:pPr/w:pStyle/@w:val">
-        <xsl:variable name="outline">
-          <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
-        </xsl:variable>
-        <!--Search outlineLvl in styles.xml  -->
-        <xsl:choose>
-          <xsl:when
-            test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val">
-            <xsl:value-of
-              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:pPr/w:outlineLvl/@w:val"
-            />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="GetStyleOutlineLevel">
-              <xsl:with-param name="outline">
-                <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:variable name="outline">
-          <xsl:value-of select="$node/w:r/w:rPr/w:rStyle/@w:val"/>
-        </xsl:variable>
-        <xsl:variable name="linkedStyleOutline">
-          <xsl:value-of
-            select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:link/@w:val"
-          />
-        </xsl:variable>
-        <!--if outlineLvl is not defined search in parent style by w:link-->
-        <xsl:choose>
-          <xsl:when
-            test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val">
-            <xsl:value-of
-              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$linkedStyleOutline]/w:pPr/w:outlineLvl/@w:val"
-            />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="GetStyleOutlineLevel">
-              <xsl:with-param name="outline">
-                <xsl:value-of
-                  select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$outline]/w:link/@w:val"
-                />
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:for-each select="document('word/styles.xml')">
+      <xsl:choose>
+        <xsl:when test="$node/w:pPr/w:outlineLvl/@w:val">
+          <xsl:value-of select="$node/w:pPr/w:outlineLvl/@w:val"/>
+        </xsl:when>
+        <xsl:when test="$node/w:pPr/w:pStyle/@w:val">
+          <xsl:variable name="outline">
+            <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
+          </xsl:variable>
+          <!--Search outlineLvl in styles.xml  -->
+          <xsl:choose>
+            <xsl:when test="key('StyleId', $outline)[1]/w:pPr/w:outlineLvl/@w:val">
+              <xsl:value-of select="key('StyleId', $outline)[1]/w:pPr/w:outlineLvl/@w:val"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetStyleOutlineLevel">
+                <xsl:with-param name="outline">
+                  <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="outline">
+            <xsl:value-of select="$node/w:r/w:rPr/w:rStyle/@w:val"/>
+          </xsl:variable>
+          <xsl:variable name="linkedStyleOutline">
+            <xsl:value-of select="key('StyleId', $outline)[1]/w:link/@w:val"/>
+          </xsl:variable>
+          <!--if outlineLvl is not defined search in parent style by w:link-->
+          <xsl:choose>
+            <xsl:when test="key('StyleId', $linkedStyleOutline)[1]/w:pPr/w:outlineLvl/@w:val">
+              <xsl:value-of
+                select="key('StyleId', $linkedStyleOutline)[1]/w:pPr/w:outlineLvl/@w:val"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetStyleOutlineLevel">
+                <xsl:with-param name="outline">
+                  <xsl:value-of select="key('StyleId', $outline)[1]/w:link/@w:val"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
   <!--  paragraphs, lists, headings-->
@@ -686,7 +679,7 @@
 
   <!--ignore text in automatic styles mode-->
   <xsl:template match="text()" mode="automaticstyles"/>
-  
+
   <xsl:template name="MasterPageName">
     <xsl:if test="not(preceding::w:p)">
       <xsl:choose>
@@ -694,12 +687,14 @@
           <xsl:choose>
             <xsl:when test="following::w:p/descendant::w:sectPr/w:titlePg">
               <xsl:attribute name="style:master-page-name">
-                <xsl:value-of select="concat('First_H_',generate-id(following::w:p/descendant::w:sectPr))"/>
+                <xsl:value-of
+                  select="concat('First_H_',generate-id(following::w:p/descendant::w:sectPr))"/>
               </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
               <xsl:attribute name="style:master-page-name">
-                <xsl:value-of select="concat('H_',generate-id(following::w:p/descendant::w:sectPr))"/>
+                <xsl:value-of select="concat('H_',generate-id(following::w:p/descendant::w:sectPr))"
+                />
               </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
@@ -721,7 +716,8 @@
       </xsl:choose>
     </xsl:if>
     <xsl:if test="preceding::w:p[parent::w:body][1]/descendant::w:sectPr">
-      <xsl:if test="(preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w or preceding::w:sectPr[1]/w:pgSz/@w:h != following::w:sectPr[1]/w:pgSz/@w:h or preceding::w:sectPr[1]/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient) and not(following::w:sectPr[1]/w:headerReference) and not(following::w:sectPr[1]/w:footerReference)">
+      <xsl:if
+        test="(preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w or preceding::w:sectPr[1]/w:pgSz/@w:h != following::w:sectPr[1]/w:pgSz/@w:h or preceding::w:sectPr[1]/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient) and not(following::w:sectPr[1]/w:headerReference) and not(following::w:sectPr[1]/w:footerReference)">
         <xsl:attribute name="style:master-page-name">
           <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
         </xsl:attribute>
@@ -732,10 +728,11 @@
             <xsl:when test="following::w:p/descendant::w:sectPr/w:titlePg">
               <xsl:attribute name="style:master-page-name">
                 <xsl:value-of select="concat('First_H_',generate-id(following::w:sectPr))"/>
-              </xsl:attribute>        
+              </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:if test="(preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w
+              <xsl:if
+                test="(preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w
                 or preceding::w:sectPr[1]/w:pgSz/@w:h != following::w:sectPr[1]/w:pgSz/@w:h
                 or preceding::w:sectPr[1]/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient 
                 or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w
@@ -743,10 +740,10 @@
                 or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient) 
                 or following::w:sectPr[1]/w:headerReference 
                 or following::w:sectPr[1]/w:footerReference">
-              <xsl:attribute name="style:master-page-name">
-                <xsl:value-of select="concat('H_',generate-id(following::w:sectPr))"/>
-              </xsl:attribute>
-                </xsl:if>
+                <xsl:attribute name="style:master-page-name">
+                  <xsl:value-of select="concat('H_',generate-id(following::w:sectPr))"/>
+                </xsl:attribute>
+              </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
@@ -755,18 +752,19 @@
             <xsl:when test="following::w:sectPr/w:titlePg">
               <xsl:attribute name="style:master-page-name">
                 <xsl:text>First_Page</xsl:text>
-              </xsl:attribute>        
+              </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:if test="preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w 
+              <xsl:if
+                test="preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w 
                 or preceding::w:sectPr[1]/w:pgSz/@w:h != following::w:sectPr[1]/w:pgSz/@w:h 
                 or preceding::w:sectPr[1]/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient 
                 or following::w:sectPr[1]/w:headerReference 
                 or following::w:sectPr[1]/w:footerReference">
-              <xsl:attribute name="style:master-page-name">
-                <xsl:text>Standard</xsl:text>
-              </xsl:attribute>
-                </xsl:if>
+                <xsl:attribute name="style:master-page-name">
+                  <xsl:text>Standard</xsl:text>
+                </xsl:attribute>
+              </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
