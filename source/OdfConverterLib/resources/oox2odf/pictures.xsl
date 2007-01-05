@@ -590,6 +590,11 @@
           </xsl:choose>
         </xsl:attribute>
       </xsl:when>
+      <xsl:when test="not(contains(@style,'mso-position-vertical')) and name()='v:shape'">
+        <xsl:attribute name="style:vertical-pos">
+          <xsl:text>top</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="style:vertical-pos">
           <xsl:text>from-top</xsl:text>

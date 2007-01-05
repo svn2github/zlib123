@@ -198,6 +198,9 @@
         <xsl:when test="ancestor::w:hdr or ancestor::w:ftr ">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
+        <xsl:when test="ancestor::w:p/w:r/w:t">
+          <xsl:text>as-char</xsl:text>          
+        </xsl:when>        
         <xsl:when test="descendant::w10:wrap/@anchorx = 'page' and descendant::w10:wrap/@anchory = 'page'  ">
           <xsl:text>page</xsl:text>
         </xsl:when>
@@ -490,6 +493,13 @@
         <xsl:call-template name="InsertGraphicPosH">      
           <xsl:with-param name="align" select="$shape/@o:hralign"/>
         </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$horizontalPos = '' and ancestor::w:p/w:pPr/w:jc/@w:val ">
+        <xsl:if test="ancestor::w:p/w:pPr/w:jc/@w:val">
+          <xsl:call-template name="InsertGraphicPosH">          
+            <xsl:with-param name="align" select="ancestor::w:p/w:pPr/w:jc/@w:val"/>
+          </xsl:call-template>  
+        </xsl:if>        
       </xsl:when>
       <xsl:otherwise>
           <xsl:call-template name="InsertGraphicPosH">
