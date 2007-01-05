@@ -2,6 +2,7 @@ top_srcdir=../..
 include $(top_srcdir)/build/common.mk
 
 ifeq ($(OS),Cygwin)
+MACHINE_CONFIG_FILE=--machine-config $(shell cygpath -m $(shell pkg-config --variable=prefix mono))etc/mono/2.0/machine.config
 CC=gcc -mno-cygwin
 EXEEXT=.exe
 PATHSEP=;
@@ -12,6 +13,7 @@ ZIPOPEN=_zipOpen@8
 UNZOPEN=_unzOpen@4
 OTHERLIBS=-lole32 -loleaut32 -lws2_32 -lpsapi -luser32 -lkernel32
 else
+MACHINE_CONFIG_FILE=--machine-config "`pkg-config --variable=prefix mono`/etc/mono/2.0/machine.config"
 EXEEXT=
 PATHSEP=:
 EXPORTDYNAMIC=-Wl,--export-dynamic
@@ -42,7 +44,7 @@ OdfConverterTestStatic.exe : $(SOURCE) ../OdfZipUtils/OdfZipUtilsStatic.dll ../O
 		$(SOURCE)
 
 main.c bundle.o : OdfConverterTestStatic.exe Makefile
-	MONO_PATH='../OdfZipUtils$(PATHSEP)../OdfConverterLib' mkbundle2 -c -o main.c -oo bundle.o --deps OdfConverterTestStatic.exe
+	MONO_PATH='../OdfZipUtils$(PATHSEP)../OdfConverterLib' mkbundle2 -c -o main.c -oo bundle.o --deps $(MACHINE_CONFIG_FILE) OdfConverterTestStatic.exe
 
 OdfConverter$(EXEEXT) : main.c bundle.o $(ZLIBDEP) Makefile
 	rm -f $@
