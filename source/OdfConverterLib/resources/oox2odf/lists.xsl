@@ -32,10 +32,13 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" exclude-result-prefixes="w">
 
   <xsl:key name="numId" match="w:num" use="@w:numId"/>
   <xsl:key name="abstractNumId" match="w:abstractNum" use="@w:abstractNumId"/>
+  <xsl:key name="numPicBullet" match="w:numPicBullet " use="@w:numPicBulletId"/>
 
   <!--insert num template for each text-list style -->
 
@@ -79,7 +82,55 @@
   <xsl:template match="w:lvl">
     <xsl:choose>
 
-      <!--check if it's numbering or bullet -->
+      <!--check if it's numbering, bullet or picture bullet -->
+      <xsl:when test="w:numFmt[@w:val = 'bullet'] and w:lvlPicBulletId/@w:val != ''">
+
+        <xsl:variable name="document">
+          <xsl:call-template name="GetDocumentName">
+            <xsl:with-param name="rootId">
+              <xsl:value-of select="generate-id(/node())"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="lvlPicBulletId">
+          <xsl:value-of select="w:lvlPicBulletId/@w:val"/>
+        </xsl:variable>
+
+        <xsl:variable name="rId">
+          <xsl:value-of
+            select="key('numPicBullet', $lvlPicBulletId)/w:pict/v:shape/v:imagedata/@r:id"/>
+        </xsl:variable>
+
+        <xsl:variable name="XlinkHref">
+          <xsl:variable name="pzipsource">
+            <xsl:value-of
+              select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship'][@Id=$rId]/@Target"
+            />
+          </xsl:variable>
+          <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'/'))"/>
+        </xsl:variable>
+
+        <xsl:call-template name="CopyPictures">
+          <xsl:with-param name="document">
+            <xsl:value-of select="$document"/>
+          </xsl:with-param>
+          <xsl:with-param name="rId">
+            <xsl:value-of select="$rId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+
+        <text:list-level-style-image text:level="{number(@w:ilvl)+1}">
+          <xsl:attribute name="xlink:href">
+            <xsl:value-of select="$XlinkHref"/>
+          </xsl:attribute>
+          <style:list-level-properties>
+            <xsl:call-template name="InsertListLevelProperties"/>
+            <style:text-properties fo:font-size="96"/>
+          </style:list-level-properties>
+        </text:list-level-style-image>
+      </xsl:when>
+
       <xsl:when test="w:numFmt[@w:val = 'bullet']">
         <text:list-level-style-bullet text:level="{number(@w:ilvl)+1}"
           text:style-name="Bullet_20_Symbols">
@@ -99,10 +150,12 @@
               <xsl:value-of select="substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))"/>
             </xsl:attribute>
           </xsl:if>
-              <xsl:call-template name="NumFormat">
-                <xsl:with-param name="format" select="w:numFmt/@w:val"/>
-                <xsl:with-param name="BeforeAfterNum"><xsl:value-of select="w:lvlText/@w:val"/></xsl:with-param>
-              </xsl:call-template>
+          <xsl:call-template name="NumFormat">
+            <xsl:with-param name="format" select="w:numFmt/@w:val"/>
+            <xsl:with-param name="BeforeAfterNum">
+              <xsl:value-of select="w:lvlText/@w:val"/>
+            </xsl:with-param>
+          </xsl:call-template>
           <xsl:if test="w:start and w:start/@w:val > 1">
             <xsl:attribute name="text:start-value">
               <xsl:value-of select="w:start/@w:val"/>
@@ -133,7 +186,7 @@
 
   <xsl:template name="NumFormat">
     <xsl:param name="format"/>
-    <xsl:param name="BeforeAfterNum"/>    
+    <xsl:param name="BeforeAfterNum"/>
     <xsl:attribute name="style:num-format">
       <xsl:if test="$BeforeAfterNum != ''">
         <xsl:choose>
@@ -146,49 +199,49 @@
         </xsl:choose>
       </xsl:if>
     </xsl:attribute>
-    
+
     <xsl:if test="$BeforeAfterNum != ''">
-              <xsl:variable name="NumPrefix">
-                <xsl:value-of select="substring-before($BeforeAfterNum, '%')"/>
-              </xsl:variable>
-              <xsl:if test="$NumPrefix != ''">
-                <xsl:attribute name="style:num-prefix">
-                  <xsl:value-of select="$NumPrefix"/>
-                </xsl:attribute>
-              </xsl:if>
-            <xsl:variable name="NumSuffix">
-              <xsl:call-template name="AfterTextNumber">
-                <xsl:with-param name="string">
-                  <xsl:value-of select="$BeforeAfterNum"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
-             <xsl:if test="$NumSuffix != ''">
-               <xsl:attribute name="style:num-suffix">
-                 <xsl:value-of select="$NumSuffix"/>
-               </xsl:attribute>
-            </xsl:if>
+      <xsl:variable name="NumPrefix">
+        <xsl:value-of select="substring-before($BeforeAfterNum, '%')"/>
+      </xsl:variable>
+      <xsl:if test="$NumPrefix != ''">
+        <xsl:attribute name="style:num-prefix">
+          <xsl:value-of select="$NumPrefix"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:variable name="NumSuffix">
+        <xsl:call-template name="AfterTextNumber">
+          <xsl:with-param name="string">
+            <xsl:value-of select="$BeforeAfterNum"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="$NumSuffix != ''">
+        <xsl:attribute name="style:num-suffix">
+          <xsl:value-of select="$NumSuffix"/>
+        </xsl:attribute>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
-  
+
   <!-- text after numbering in list -->
-  
+
   <xsl:template name="AfterTextNumber">
-    <xsl:param name="BeforeAfterNum"/>    
+    <xsl:param name="BeforeAfterNum"/>
     <xsl:choose>
       <xsl:when test="contains(substring-after($BeforeAfterNum,'%'), '%')">
         <xsl:call-template name="AfterTextNumber">
           <xsl:with-param name="BeforeAfterNum">
             <xsl:value-of select="substring-after($BeforeAfterNum,'%')"/>
-          </xsl:with-param>         
+          </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="substring(substring-after($BeforeAfterNum, '%'), 2) != ''">
-            <xsl:value-of select="substring(substring-after($BeforeAfterNum, '%'), 2)"/>  
+            <xsl:value-of select="substring(substring-after($BeforeAfterNum, '%'), 2)"/>
           </xsl:when>
-          <xsl:otherwise></xsl:otherwise>
+          <xsl:otherwise/>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
@@ -199,7 +252,7 @@
   <xsl:template name="InsertListLevelProperties">
     <xsl:variable name="Ind" select="w:pPr/w:ind"/>
     <xsl:variable name="tab">
-          <xsl:value-of select="w:pPr/w:tabs/w:tab/@w:pos"/>
+      <xsl:value-of select="w:pPr/w:tabs/w:tab/@w:pos"/>
     </xsl:variable>
 
     <xsl:variable name="abstractNumId">
@@ -216,7 +269,7 @@
 
     <xsl:variable name="paragraph"
       select="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId=$numId]"/>
-    
+
     <xsl:variable name="WLeft">
       <xsl:choose>
         <xsl:when test="$Ind/@w:left">
@@ -258,7 +311,9 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
-                <xsl:when test="w:suff/@w:val='nothing' or ($paragraph/w:pPr/w:ind/@w:left = 0 and $tab = '')">0</xsl:when>
+                <xsl:when
+                  test="w:suff/@w:val='nothing' or ($paragraph/w:pPr/w:ind/@w:left = 0 and $tab = '')"
+                  >0</xsl:when>
                 <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
                 <xsl:when test="$tab != '' and (number($WLeft) - number($tab) >= 0)">
                   <xsl:value-of select="$tab - $WLeft + $WHanging"/>
@@ -269,7 +324,7 @@
                 <xsl:otherwise>
                   <xsl:value-of select="$Ind/@w:hanging"/>
                 </xsl:otherwise>
-                </xsl:choose>
+              </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -278,11 +333,12 @@
           <xsl:if test="$paragraph/w:pPr/w:ind/@w:left = 0 and $tab = ''">
             <xsl:call-template name="ConvertTwips">
               <xsl:with-param name="length">
-            <xsl:value-of select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+                <xsl:value-of
+                  select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
               </xsl:with-param>
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
-          </xsl:if>          
+          </xsl:if>
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
@@ -328,8 +384,50 @@
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
+    
+    <!-- Picture Bullet Size -->
+    <xsl:if test="w:lvlPicBulletId/@w:val != ''">
+      <xsl:attribute name="fo:width">
+        <xsl:call-template name="ConvertPoints">
+          <xsl:with-param name="length">
+            <xsl:choose>
+              <xsl:when test="w:rPr/w:sz/@w:val">
+                <xsl:value-of select="w:rPr/w:sz/@w:val div 2"/>
+              </xsl:when>
+              <xsl:otherwise>12</xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:attribute name="fo:height">
+        <xsl:call-template name="ConvertPoints">
+          <xsl:with-param name="length">
+            <xsl:choose>
+              <xsl:when test="w:rPr/w:sz/@w:val">
+                <xsl:value-of select="w:rPr/w:sz/@w:val div 2"/>
+              </xsl:when>
+              <xsl:otherwise>12</xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+  
+    <!-- Bullet Align -->    
+    <xsl:attribute name="fo:text-align">
+      <xsl:choose>
+        <xsl:when test="w:lvlJc/@w:val='center'">
+          <xsl:text>center</xsl:text>
+        </xsl:when>        
+        <xsl:otherwise>
+          <xsl:text>left</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>    
+    </xsl:attribute>
   </xsl:template>
-
+  
   <!-- types of bullets -->
 
   <xsl:template name="TextChar">
@@ -348,6 +446,8 @@
       <xsl:when test="w:lvlText[@w:val = '-' ]">–</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '–' ]">–</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '' ]">–</xsl:when>
+      <xsl:when test="w:lvlText[@w:val = '']">ρ</xsl:when>
+      <xsl:when test="w:lvlText[@w:val = '']">ρ</xsl:when>
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
