@@ -10,14 +10,20 @@
     <office:document-settings>
       <office:settings>
         <config:config-item-set config:name="ooo:view-settings">
-          <xsl:if
+          <xsl:choose>
+            <xsl:when 
             test="document('word/document.xml')/w:document/w:body/descendant::w:ins or 
         document('word/document.xml')/w:document/w:body/descendant::w:del or
         document('word/document.xml')/w:document/w:body/descendant::w:pPrChange or
         document('word/document.xml')/w:document/w:body/descendant::w:rPrChange">
             <config:config-item config:name="ShowRedlineChanges" config:type="boolean"
             >true</config:config-item>
-          </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+              <config:config-item config:name="ShowRedlineChanges" config:type="boolean"
+              >false</config:config-item>
+            </xsl:otherwise>
+            </xsl:choose>
         </config:config-item-set>
       </office:settings>
     </office:document-settings>
