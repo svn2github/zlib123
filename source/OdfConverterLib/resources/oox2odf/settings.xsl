@@ -3,9 +3,23 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:ooo="http://openoffice.org/2004/office" office:version="1.0">
 
   <xsl:template name="settings">
-    <office:document-settings/>
+    <office:document-settings>
+      <office:settings>
+        <config:config-item-set config:name="ooo:view-settings">
+          <xsl:if
+            test="document('word/document.xml')/w:document/w:body/descendant::w:ins or 
+        document('word/document.xml')/w:document/w:body/descendant::w:del or
+        document('word/document.xml')/w:document/w:body/descendant::w:pPrChange or
+        document('word/document.xml')/w:document/w:body/descendant::w:rPrChange">
+            <config:config-item config:name="ShowRedlineChanges" config:type="boolean"
+            >true</config:config-item>
+          </xsl:if>
+        </config:config-item-set>
+      </office:settings>
+    </office:document-settings>
   </xsl:template>
 </xsl:stylesheet>

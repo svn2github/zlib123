@@ -90,6 +90,7 @@
     <EmbeddedResource Include="resources\oox2odf\indexes.xsl" />
     <EmbeddedResource Include="resources\oox2odf\sections.xsl" />
     <EmbeddedResource Include="resources\oox2odf\comments.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\track.xsl" />
     <Compile Include="OoxParagraphsPostProcessor.cs" />
     <Compile Include="OdfParagraphPostProcessor.cs" />
     <Compile Include="OoxSpacesPostProcessor.cs" />

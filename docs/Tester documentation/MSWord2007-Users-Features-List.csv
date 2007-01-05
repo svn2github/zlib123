@@ -484,12 +484,12 @@ References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Comp
 ;;;;;;;;;;;
 Review;Comments;New Comment;;;;2;0.3-M2;Completed;;;
 ;;;;;;;;;;;
-;Tracking;Track changes;;;;2;1.0;;;;
-;;Change tracking options;Markup;;;2;1.0;;;;
-;;;Moves;;;2;1.0;;;;
-;;;Table cell highlighting;;;2;1.0;;;;
-;;;Formatting;;;2;1.0;;;;
-;;;Baloons;;;2;1.0;;;;
+;Tracking;Track changes;;;;2;1.0;Completed;;;
+;;Change tracking options;Markup;;;2;1.0;;not in document properties;;
+;;;Moves;;;2;1.0;;not in document properties;;
+;;;Table cell highlighting;;;2;1.0;;not in document properties;;
+;;;Formatting;;;2;1.0;;not in document properties;;
+;;;Baloons;;;2;1.0;;not in document properties;;
 ;;;;;;;;;;;
 ;Protect;Protect document;;;;3;-;;not supported;;
 ;;;;;;;;;;;
