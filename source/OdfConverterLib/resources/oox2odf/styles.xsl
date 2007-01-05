@@ -1594,6 +1594,11 @@
               select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left "
             />
           </xsl:when>
+          <xsl:when test="contains($StyleId,'TOC')">
+            <xsl:value-of
+              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=concat('Contents_20_',substring-after($StyleId,'TOC'))]/w:pPr/w:ind/@w:left "
+            />
+          </xsl:when>
           <xsl:otherwise>
             <xsl:value-of
               select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"
