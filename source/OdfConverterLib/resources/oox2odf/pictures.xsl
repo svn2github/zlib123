@@ -584,6 +584,9 @@
             <xsl:when test="$align = 'outside' ">
               <xsl:text>bottom</xsl:text>
             </xsl:when>
+            <xsl:when test="$align = 'from-top' ">
+              <xsl:text>from-top</xsl:text>
+            </xsl:when>
           </xsl:choose>
         </xsl:attribute>
       </xsl:when>
