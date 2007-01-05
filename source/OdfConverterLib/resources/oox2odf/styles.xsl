@@ -1464,7 +1464,7 @@
   </xsl:template>
 
 
-  <xsl:template name="MarginLeft">
+  <xsl:template name="CalculateMarginLeft">
     <xsl:param name="StyleId"/>
     <xsl:param name="CheckIfList"/>
     <xsl:param name="IndHanging"/>
@@ -1775,7 +1775,7 @@
     </xsl:variable>
 
     <xsl:variable name="MarginLeft">
-      <xsl:call-template name="MarginLeft">
+      <xsl:call-template name="CalculateMarginLeft">
         <xsl:with-param name="StyleId">
           <xsl:value-of select="$StyleId"/>
         </xsl:with-param>
