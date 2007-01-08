@@ -70,6 +70,7 @@
         <xsl:call-template name="InsertBodyStyles"/>
         <xsl:call-template name="InsertListStyles"/>
         <xsl:call-template name="InsertSectionsStyles"/>
+        <xsl:call-template name="InsertFootnoteStyles"/>
       </office:automatic-styles>
       <office:body>
         <office:text>
@@ -107,6 +108,14 @@
         mode="automaticstyles"/>
       <!-- automatic list styles-->
       <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="InsertFootnoteStyles">
+    <xsl:if test="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr">
+      <xsl:apply-templates
+        select="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr"
+        mode="automaticstyles"/>
     </xsl:if>
   </xsl:template>
 
