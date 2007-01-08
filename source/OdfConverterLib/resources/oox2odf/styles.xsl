@@ -1469,7 +1469,7 @@
     <xsl:param name="CheckIfList"/>
     <xsl:param name="IndHanging"/>
     <xsl:param name="IndLeft"/>
-
+    
     <xsl:choose>
       <xsl:when test="$CheckIfList='true'">
         <xsl:variable name="NumId">
@@ -1478,9 +1478,9 @@
               <xsl:value-of select="w:numPr/w:numId/@w:val"/>
             </xsl:when>
             <xsl:when
-              test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+              test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:numId/@w:val">
               <xsl:value-of
-                select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val"
+                select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:numId/@w:val"
               />
             </xsl:when>
             <xsl:otherwise>
@@ -1496,15 +1496,15 @@
               <xsl:value-of select="w:numPr/w:ilvl/@w:val"/>
             </xsl:when>
             <xsl:when
-              test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val">
+              test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
               <xsl:value-of
-                select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val"
+                select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"
               />
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-
+        
         <xsl:variable name="AbstractNumId">
           <xsl:choose>
             <xsl:when
@@ -1516,7 +1516,7 @@
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-
+        
         <xsl:variable name="LeftNumber">
           <xsl:choose>
             <xsl:when
@@ -1533,7 +1533,7 @@
             </xsl:when>
           </xsl:choose>
         </xsl:variable>
-
+        
         <xsl:variable name="HangingNumber">
           <xsl:choose>
             <xsl:when
@@ -1551,7 +1551,7 @@
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-
+        
         <xsl:variable name="FirstLine">
           <xsl:choose>
             <xsl:when
@@ -1566,7 +1566,7 @@
         <xsl:choose>
           <xsl:when test=" $LeftNumber = '' and $IndLeft = ''">
             <xsl:value-of
-              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left - document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:hanging"
+              select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left - key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging"
             />
           </xsl:when>
           <xsl:when test="$IndLeft != ''">
@@ -1589,25 +1589,25 @@
             <xsl:value-of select="w:ind/@w:left"/>
           </xsl:when>
           <xsl:when
-            test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left">
+            test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left">
             <xsl:value-of
-              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:ind/@w:left "
+              select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "
             />
           </xsl:when>
           <xsl:when test="contains($StyleId,'TOC')">
             <xsl:value-of
-              select="document('word/styles.xml')/w:styles/w:style[@w:styleId=concat('Contents_20_',substring-after($StyleId,'TOC'))]/w:pPr/w:ind/@w:left "
+              select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left "
             />
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of
-              select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"
+              select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"
             />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
-
+    
   </xsl:template>
 
 
