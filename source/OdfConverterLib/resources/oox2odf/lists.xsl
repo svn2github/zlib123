@@ -658,6 +658,11 @@
     <xsl:param name="listLevel"/>
     <xsl:param name="isNestedList"/>
 
+    <xsl:choose>
+<!--      if this paragraph is attached to preceding in track changes mode-->
+      <xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
+      
+      <xsl:otherwise>
     <text:list-item>
       <xsl:variable name="followingParagraph" select="self::node()[1]/following-sibling::w:p[1]"/>
 
@@ -693,6 +698,8 @@
         </xsl:when>
       </xsl:choose>
     </text:list-item>
+      </xsl:otherwise>
+      </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertListItemContent">

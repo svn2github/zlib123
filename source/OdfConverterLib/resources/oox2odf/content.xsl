@@ -123,7 +123,6 @@
         <xsl:variable name="file">
           <xsl:value-of select="."/>
         </xsl:variable>
-      <!--  <xsl:value-of select="$file"/>-->
         <xsl:if test="document(concat('word/',$file))/descendant::w:ins or 
           document(concat('word/',$file))/descendant::w:del or
           document(concat('word/',$file))/descendant::w:pPrChange or
@@ -349,9 +348,14 @@
                 select="substring-before(substring-after($InstrText, 'CITATION '), ' \')"/>
             </xsl:with-param>
           </xsl:call-template>
+          <xsl:apply-templates select="following::w:p[1]/child::node()"/>
         </text:p>
       </xsl:when>
-
+      
+      <xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
+      
+      
+      
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != '' and $level &lt; 10">
         <xsl:apply-templates select="." mode="list">
@@ -393,7 +397,25 @@
       <!-- unnumbered heading is list header  -->
       <xsl:call-template name="InsertHeadingAsListHeader"/>
       <xsl:apply-templates/>
+      <xsl:if test="w:pPr/w:rPr/w:del">
+        <!--      if this following paragraph is attached to this one in track changes mode-->
+        <xsl:call-template name="InsertDeletedParagraph"/>
+      </xsl:if>
     </text:h>
+  </xsl:template>
+  
+  <xsl:template name="InsertDeletedParagraph">
+    <text:change>
+      <xsl:attribute name="text:change-id">
+        <xsl:value-of select="generate-id(w:pPr/w:rPr)"/>
+      </xsl:attribute>
+    </text:change>
+    <xsl:apply-templates select="following::w:p[1]/child::node()"/>
+    <xsl:if test="following::w:p[1]/w:pPr/w:rPr/w:del">
+      <xsl:for-each select="following::w:p[1]">
+        <xsl:call-template name="InsertDeletedParagraph"/>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertHeadingAsListHeader">
@@ -447,6 +469,10 @@
             </xsl:attribute>
           </xsl:if>
           <xsl:apply-templates/>
+          <!--      if this following paragraph is attached to this one in track changes mode-->
+          <xsl:if test="w:pPr/w:rPr/w:del">
+            <xsl:call-template name="InsertDeletedParagraph"/>
+          </xsl:if>
         </text:p>
       </xsl:otherwise>
     </xsl:choose>
@@ -487,11 +513,17 @@
 
       <!--  Track changes    -->
       <xsl:when test="parent::w:del">
-        <text:change>
-          <xsl:attribute name="text:change-id">
-            <xsl:value-of select="generate-id(.)"/>
-          </xsl:attribute>
-        </text:change>
+        <xsl:choose>
+          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
+          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
+          <xsl:otherwise>
+            <text:change>
+              <xsl:attribute name="text:change-id">
+                <xsl:value-of select="generate-id(.)"/>
+              </xsl:attribute>
+            </text:change>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:when test="parent::w:ins">
         <text:change-start>

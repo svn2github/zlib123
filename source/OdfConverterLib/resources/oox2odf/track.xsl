@@ -16,6 +16,10 @@
   <xsl:template match="w:r" mode="trackchanges">
     <xsl:choose>
       <xsl:when test="parent::w:del">
+        <xsl:choose>
+          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
+          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
+          <xsl:otherwise>
         <text:changed-region>
           <xsl:attribute name="text:id">
             <xsl:value-of select="generate-id(.)"/>
@@ -44,6 +48,8 @@
             </text:p>
           </text:deletion>
         </text:changed-region>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:when test="parent::w:ins">
         <text:changed-region>
@@ -94,6 +100,52 @@
         </text:changed-region>
       </xsl:when>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template match="w:rPr[parent::w:pPr]" mode="trackchanges">
+    <xsl:choose>
+      <xsl:when test="w:del">
+        <text:changed-region>
+          <xsl:attribute name="text:id">
+            <xsl:value-of select="generate-id(.)"/>
+          </xsl:attribute>
+          <text:deletion>
+            <office:change-info>
+              <dc:creator>
+                <xsl:value-of select="w:del/@w:author"/>
+              </dc:creator>
+              <dc:date>
+                <xsl:choose>
+                  <xsl:when test="contains(w:del/@w:date,'Z')">
+                    <xsl:value-of select="substring-before(w:del/@w:date,'Z')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="w:del/@w:date"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </dc:date>
+            </office:change-info>
+            <text:p>
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of select="generate-id(ancestor::w:p)"/>
+              </xsl:attribute>
+              <xsl:if test="ancestor::w:p/descendant::w:r[last()]/parent::w:del">
+                <xsl:value-of select="ancestor::w:p/descendant::w:r[last()]"/>
+              </xsl:if>
+            </text:p>
+            <text:p>
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of select="generate-id(following::w:p[1])"/>
+              </xsl:attribute>
+              <xsl:if test="following::w:p[1]/descendant::w:r[1]/parent::w:del">
+                <xsl:value-of select="following::w:p[1]/descendant::w:r[1]"/>
+              </xsl:if>
+            </text:p>
+          </text:deletion>
+        </text:changed-region>
+      </xsl:when>
+    </xsl:choose>
+    
   </xsl:template>
   
 </xsl:stylesheet>
