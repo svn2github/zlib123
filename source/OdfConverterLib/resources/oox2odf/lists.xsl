@@ -468,9 +468,7 @@
       <xsl:when test="w:lvlText[@w:val = '' ]">✗</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '-' ]">–</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '–' ]">–</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">–</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '']">ρ</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '']">ρ</xsl:when>
+      <xsl:when test="w:lvlText[@w:val = '' ]">–</xsl:when>      
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
