@@ -31,20 +31,20 @@ View;;;Layout Print;;;0.2-Final;Completed;;
 Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 ;;;Column Break;;0;0.2-Final;Completed;;540
 
-;Fields;;Date;;1;0.2-M1;Completed;;97;
-;;;Time;;1;0.2-M1;Completed;;98;
-;;;Page Number;;1;0.2-M1;Completed;;99;
-;;;Page Count;;1;0.2-M2;Completed;;;
-;;;Subject;;1;0.2-M2;Completed;;128;
-;;;Title;;1;0.2-M2;Completed;;104;
-;;;Author;;1;0.2-M2;Completed;;101;
-;;;Other;Document;3;0.2-Final;Completed;;95-105;
-;;;;Reference;3;0.3-Final;Completed;;85;
-;;;;Functions;;-;;;;
-;;;;Doc Information;Printed by (author);0.2-Final;Completed;;118-135;TODO : 
-;;;;Variables;;0.3-Final;Completed;Lost fields : DDE, formula;;
+;Fields;;Date;;1;0.2-M1;Completed;;97
+;;;Time;;1;0.2-M1;Completed;;98
+;;;Page Number;;1;0.2-M1;Completed;;99
+;;;Page Count;;1;0.2-M2;Completed;;
+;;;Subject;;1;0.2-M2;Completed;;128
+;;;Title;;1;0.2-M2;Completed;;104
+;;;Author;;1;0.2-M2;Completed;;101
+;;;Other;Document;3;0.2-Final;Completed;;95-105
+;;;;Reference;3;0.3-Final;Completed;;85
+;;;;Functions;;-;;;
+;;;;Doc Information;Printed by (author);0.2-Final;Completed;;118-135
+;;;;Variables;;0.3-Final;Completed;Lost fields : DDE, formula;
 
-;Special Characters;;;;0;0.1;Completed;;;
+;Special Characters;;;;0;0.1;Completed;;
 
 ;Formatting Mark;;Non-breaking space;;0;0.2-Final;Completed;;80
 ;;;Non-Breaking hyphen;;0;0.2-Final;Completed;;80
@@ -197,7 +197,7 @@ Insert;Manual Break;;Line Break;;0;0.2-M1;Completed;;540
 ;;;;Key seperated byt commas;;0.2-M2;Completed;;
 ;;;;Tab position relative to Paragraph Style indent;;0.2-M2;Completed;;
 
-;Indexes and Tables - Bibliography entry;Entry;From;;0;0.3-Final;;;
+;Indexes and Tables - Bibliography entry;Entry;From;;0;0.3-Final;Completed;;
 ;;Short name;;;;-;;;
 
 ;Envelope;Address;Database;;;0.3-Final;Completed;Convert manually entered adress (no database adress).;

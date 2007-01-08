@@ -53,6 +53,7 @@
   <xsl:key name="user-index-by-name" match="text:user-index/text:user-index-source"
     use="@text:index-name"/>
   <xsl:key name="alphabetical-indexes" match="text:alphabetical-index" use="''"/>
+  <xsl:key name="bibliography-entries" match="text:bibliography-mark" use="@text:identifier"/>
   <xsl:key name="index-styles" match="text:table-of-content-source/*" use="@text:style-name"/>
 
   <!-- Inserts item for all types of index  -->
@@ -118,6 +119,9 @@
         </xsl:when>
         <xsl:when test="ancestor::text:alphabetical-index">
           <xsl:call-template name="insertAlphabeticalPrefs"/>
+        </xsl:when>
+        <xsl:when test="ancestor::text:bibliography">
+          <xsl:call-template name="InsertBibliographyPrefs"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="InsertIndexFiguresPrefs"/>
@@ -616,6 +620,125 @@
     </xsl:choose>
   </xsl:template>
 
+
+  <!-- bibliography : defined like a TOC -->
+  <xsl:template name="InsertBibliographyPrefs">
+    <xsl:variable name="tocSource" select="ancestor::text:bibliography/text:bibliography-source"/>
+
+    <w:instrText xml:space="preserve"> TOC </w:instrText>
+
+    <!-- id to associate TC fields to this TOC. It should be unique -->
+    <w:instrText xml:space="preserve">\f "</w:instrText>
+    <w:instrText>
+      <xsl:value-of select="concat('Bibliography_', generate-id(ancestor::office:body))"/>
+    </w:instrText>
+    <w:instrText xml:space="preserve">" </w:instrText>
+
+    <!-- no page number -->
+    <w:instrText xml:space="preserve">\n </w:instrText>
+  </xsl:template>
+
+  <!-- bibliography entry -->
+  <xsl:template match="text:bibliography-mark" mode="paragraph">
+    <xsl:variable name="ref" select="generate-id(.)"/>
+    <!-- create an entry only for the first occurence of the reference -->
+    <xsl:if test="$ref = generate-id(key('bibliography-entries', @text:identifier)[1])">
+      <xsl:call-template name="InsertIndexFieldCodeSimpleStart"/>
+      <w:r>
+        <w:instrText xml:space="preserve"> TC "</w:instrText>
+        <!-- entry text -->
+        <xsl:variable name="bibliographyType" select="@text:bibliography-type"/>
+        <xsl:call-template name="InsertBibliographyEntryText">
+          <xsl:with-param name="bibliographyConfiguration"
+            select="document('styles.xml')/office:document-styles/office:styles/text:bibliography-configuration"/>
+          <xsl:with-param name="entryTemplate"
+            select="ancestor::office:text/text:bibliography/text:bibliography-source/text:bibliography-entry-template[@text:bibliography-type=$bibliographyType]/child::node()"
+          />
+        </xsl:call-template>
+        <w:instrText xml:space="preserve">" </w:instrText>
+        <!-- index id -->
+        <w:instrText xml:space="preserve">\f "</w:instrText>
+        <w:instrText>
+          <xsl:value-of select="concat('Bibliography_', generate-id(ancestor::office:body))"/>
+        </w:instrText>
+        <w:instrText xml:space="preserve">" </w:instrText>
+      </w:r>
+      <xsl:call-template name="InsertIndexFieldCodeEnd"/>
+    </xsl:if>
+    <xsl:apply-templates mode="paragraph"/>
+  </xsl:template>
+
+  <!-- insert the entry text of a bibliography entry -->
+  <xsl:template name="InsertBibliographyEntryText">
+    <xsl:param name="entryTemplate"/>
+    <xsl:param name="bibliographyConfiguration"/>
+    <xsl:choose>
+      <xsl:when test="$entryTemplate[self::text:index-entry-tab-stop]">
+        <w:instrText>
+          <xsl:call-template name="ComputeBibliographyEntry">
+            <xsl:with-param name="entryTemplate"
+              select="$entryTemplate[not(self::text:index-entry-tab-stop or preceding-sibling::text:index-entry-tab-stop)]"/>
+            <xsl:with-param name="bibliographyConfiguration" select="$bibliographyConfiguration"/>
+          </xsl:call-template>
+        </w:instrText>
+        <w:tab/>
+        <xsl:call-template name="InsertBibliographyEntryText">
+          <xsl:with-param name="bibliographyConfiguration" select="$bibliographyConfiguration"/>
+          <xsl:with-param name="entryTemplate"
+            select="$entryTemplate[preceding-sibling::text:index-entry-tab-stop]"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <w:instrText>
+          <xsl:call-template name="ComputeBibliographyEntry">
+            <xsl:with-param name="entryTemplate" select="$entryTemplate"/>
+            <xsl:with-param name="bibliographyConfiguration" select="$bibliographyConfiguration"/>
+          </xsl:call-template>
+        </w:instrText>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- compute the text of a bibliography entry -->
+  <xsl:template name="ComputeBibliographyEntry">
+    <xsl:param name="bibliographyConfiguration"/>
+    <xsl:param name="entryTemplate"/>
+
+    <xsl:if test="count($entryTemplate) &gt; 0">
+      <xsl:choose>
+        <xsl:when
+          test="$entryTemplate[1][self::text:index-entry-bibliography/@text:bibliography-data-field = 'identifier']">
+          <xsl:choose>
+            <xsl:when test="$bibliographyConfiguration/@text:numbered-entries = 'true' ">
+              <xsl:value-of
+                select="substring-before(substring-after(text(), $bibliographyConfiguration/@text:prefix), $bibliographyConfiguration/@text:suffix)"
+              />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of
+                select="concat($bibliographyConfiguration/@text:prefix, @text:identifier, $bibliographyConfiguration/@text:suffix)"
+              />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when
+          test="$entryTemplate[1][self::text:index-entry-bibliography/@text:bibliography-data-field != 'identifier']">
+          <xsl:value-of
+            select="@*[name() = concat('text:', $entryTemplate[1]/@text:bibliography-data-field)]"/>
+        </xsl:when>
+        <xsl:when test="$entryTemplate[1][self::text:index-entry-span]">
+          <xsl:value-of select="$entryTemplate[1]/text()"/>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
+
+      <!-- write next element -->
+      <xsl:call-template name="ComputeBibliographyEntry">
+        <xsl:with-param name="entryTemplate" select="$entryTemplate[position() &gt; 1]"/>
+        <xsl:with-param name="bibliographyConfiguration" select="$bibliographyConfiguration"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
 
   <!-- styles for indexes. They require a particular syntax -->
   <xsl:template name="InsertIndexStyles">
