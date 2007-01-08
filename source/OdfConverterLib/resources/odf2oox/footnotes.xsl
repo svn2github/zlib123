@@ -97,21 +97,26 @@
         select="key('page-layouts', $default-master-style/@style:page-layout-name)[1]/style:page-layout-properties/style:footnote-sep"/>
 
       <!-- warn loss of footnote separator attibute -->
-      <xsl:if test="$separatorProps/@style:width">
-        <xsl:message terminate="no">feedback:Footnote separator width</xsl:message>
-      </xsl:if>
-      <xsl:if test="$separatorProps/@style:rel-width">
-        <xsl:message terminate="no">feedback:Footnote separator length</xsl:message>
-      </xsl:if>
-      <xsl:if test="$separatorProps/@style:color">
-        <xsl:message terminate="no">feedback:Footnote separator color</xsl:message>
-      </xsl:if>
-      <xsl:if test="$separatorProps/@style:line-style">
-        <xsl:message terminate="no">feedback:Footnote separator style</xsl:message>
-      </xsl:if>
-      <xsl:if test="$separatorProps/parent::style:page-layout-properties/@style:footnote-max-height">
-        <xsl:message terminate="no">feedback:Footnote maximum height</xsl:message>
-      </xsl:if>
+      <xsl:for-each select="document('content.xml')">
+        <xsl:if test="key('footnotes', '')">
+          <xsl:if test="$separatorProps/@style:width">
+            <xsl:message terminate="no">feedback:Footnote separator width</xsl:message>
+          </xsl:if>
+          <xsl:if test="$separatorProps/@style:rel-width">
+            <xsl:message terminate="no">feedback:Footnote separator length</xsl:message>
+          </xsl:if>
+          <xsl:if test="$separatorProps/@style:color">
+            <xsl:message terminate="no">feedback:Footnote separator color</xsl:message>
+          </xsl:if>
+          <xsl:if test="$separatorProps/@style:line-style">
+            <xsl:message terminate="no">feedback:Footnote separator style</xsl:message>
+          </xsl:if>
+          <xsl:if
+            test="$separatorProps/parent::style:page-layout-properties/@style:footnote-max-height">
+            <xsl:message terminate="no">feedback:Footnote maximum height</xsl:message>
+          </xsl:if>
+        </xsl:if>
+      </xsl:for-each>
 
       <!-- spacing before/after -->
       <w:spacing w:line="240" w:lineRule="auto">
