@@ -74,7 +74,7 @@ Home;Font;Font;Font type;Selected font;;0;0.2-Final ;Completed;;;
 ;;Bullets;Bullets;Bullets library;;1;0.2-Final ;Partial;;;TODO only few types of bullets are converted
 ;;;;Define new bullet;Symbol;1;1.0;Partial;;;TODO only few types of bullets are converted
 ;;;;;Picture;1;1.0;Completed;;;
-;;;;;Font;1;1.0;Partial;;;
+;;;;;Font;1;1.0;Completed;;;
 ;;;;;Alignment;1;1.0;Completed;;;
 ;;Numbering;Number formats;;;1;0.2-Final ;Completed;;;
 ;;;Numbering value;Start at;;1;0.3-M2;Completed;;;

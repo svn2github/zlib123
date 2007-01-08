@@ -80,6 +80,15 @@
   </xsl:template>
 
   <xsl:template match="w:lvl">
+    
+    <xsl:variable name="lvl">
+      <xsl:value-of select="number(@w:ilvl)+1"/>
+    </xsl:variable>
+    
+    <xsl:variable name="StyleNameId">
+      <xsl:value-of select="generate-id(parent::w:abstractNum)"/>
+    </xsl:variable>
+    
     <xsl:choose>
 
       <!--check if it's numbering, bullet or picture bullet -->
@@ -120,7 +129,10 @@
           </xsl:with-param>
         </xsl:call-template>
 
-        <text:list-level-style-image text:level="{number(@w:ilvl)+1}">
+        <text:list-level-style-image>
+          <xsl:attribute name="text:level">
+            <xsl:value-of select="$lvl"/>
+          </xsl:attribute>
           <xsl:attribute name="xlink:href">
             <xsl:value-of select="$XlinkHref"/>
           </xsl:attribute>
@@ -132,8 +144,13 @@
       </xsl:when>
 
       <xsl:when test="w:numFmt[@w:val = 'bullet']">
-        <text:list-level-style-bullet text:level="{number(@w:ilvl)+1}"
-          text:style-name="Bullet_20_Symbols">
+        <text:list-level-style-bullet>
+          <xsl:attribute name="text:level">
+            <xsl:value-of select="$lvl"/>
+          </xsl:attribute>
+          <xsl:attribute name="text:style-name">
+            <xsl:value-of select="$StyleNameId"/>
+          </xsl:attribute>
           <xsl:attribute name="text:bullet-char">
             <xsl:call-template name="TextChar"/>
           </xsl:attribute>
@@ -144,7 +161,13 @@
         </text:list-level-style-bullet>
       </xsl:when>
       <xsl:otherwise>
-        <text:list-level-style-number text:level="{number(@w:ilvl)+1}">
+        <text:list-level-style-number>
+          <xsl:attribute name="text:level">
+            <xsl:value-of select="$lvl"/>
+          </xsl:attribute>
+          <xsl:attribute name="text:style-name">
+            <xsl:value-of select="$StyleNameId"/>
+          </xsl:attribute>
           <xsl:if test="not(number(substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))))">
             <xsl:attribute name="style:num-suffix">
               <xsl:value-of select="substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))"/>

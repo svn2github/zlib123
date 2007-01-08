@@ -57,7 +57,10 @@
           test="document('word/document.xml')//w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
           <xsl:call-template name="BibliographyConfiguration"/>
         </xsl:if>
-        <xsl:call-template name="LineNumbering"/>
+        <!-- Insert Line Numbering -->
+        <xsl:call-template name="InsertLineNumbering"/>
+        <!-- Insert List Style Properties -->
+        <xsl:call-template name="ListStyleProperties"/>
       </office:styles>
       <!-- automatic styles -->
       <office:automatic-styles>
@@ -479,19 +482,19 @@
       </xsl:for-each>
     </style:page-layout>
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-        <style:page-layout>
-          <xsl:if test="document('word/settings.xml')/w:settings/w:mirrorMargins">
-            <xsl:attribute name="style:page-usage">
-              <xsl:text>mirrored</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:attribute name="style:name">
-            <xsl:value-of select="concat('PAGE',generate-id(.))"/>
+      <style:page-layout>
+        <xsl:if test="document('word/settings.xml')/w:settings/w:mirrorMargins">
+          <xsl:attribute name="style:page-usage">
+            <xsl:text>mirrored</xsl:text>
           </xsl:attribute>
-          <style:page-layout-properties>
-            <xsl:call-template name="InsertPageLayoutProperties"/>
-          </style:page-layout-properties>
-        </style:page-layout>
+        </xsl:if>
+        <xsl:attribute name="style:name">
+          <xsl:value-of select="concat('PAGE',generate-id(.))"/>
+        </xsl:attribute>
+        <style:page-layout-properties>
+          <xsl:call-template name="InsertPageLayoutProperties"/>
+        </style:page-layout-properties>
+      </style:page-layout>
     </xsl:for-each>
   </xsl:template>
 
@@ -1371,8 +1374,8 @@
             </xsl:for-each>
           </xsl:if>
           <!--default text properties-->
-           <xsl:call-template name="InsertDefaultTextProperties"/>
-       </style:text-properties>
+          <xsl:call-template name="InsertDefaultTextProperties"/>
+        </style:text-properties>
       </xsl:if>
     </style:default-style>
   </xsl:template>
@@ -1439,10 +1442,10 @@
   </xsl:template>
 
   <xsl:template name="InsertDefaultTextProperties">
-      <!--auto text color-->
+    <!--auto text color-->
     <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
   </xsl:template>
-  
+
   <xsl:template name="CheckIfList">
     <xsl:param name="StyleId"/>
     <xsl:choose>
@@ -2764,7 +2767,7 @@
       </xsl:attribute>
     </xsl:if>
     <!--auto text color-->
-     <xsl:if test="w:color/@w:val = 'auto'">
+    <xsl:if test="w:color/@w:val = 'auto'">
       <xsl:attribute name="style:use-window-font-color">true</xsl:attribute>
     </xsl:if>
 
@@ -3092,7 +3095,9 @@
     </text:bibliography-configuration>
   </xsl:template>
 
-  <xsl:template name="LineNumbering">
+  <!-- Insert List Style Properties -->
+
+  <xsl:template name="InsertLineNumbering">
     <xsl:if test="not(document('word/document.xml')/w:document/w:body/w:p/descendant::w:sectPr)">
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr/w:lnNumType">
         <style:style style:name="Line_20_numbering" style:display-name="Line numbering"
@@ -3113,10 +3118,26 @@
               <xsl:with-param name="unit">cm</xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
-
         </text:linenumbering-configuration>
       </xsl:for-each>
     </xsl:if>
+  </xsl:template>
+
+  <!-- Insert List Style Properties -->
+
+  <xsl:template name="ListStyleProperties">
+    <xsl:for-each select="document('word/numbering.xml')/w:numbering/w:abstractNum">
+      <style:style style:family="text">
+        <xsl:attribute name="style:name">
+          <xsl:value-of select="generate-id()"/>
+        </xsl:attribute>
+        <style:text-properties>
+          <xsl:for-each select="w:lvl/w:rPr">
+            <xsl:call-template name="InsertTextProperties"/>
+          </xsl:for-each>
+        </style:text-properties>
+      </style:style>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>
