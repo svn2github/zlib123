@@ -464,7 +464,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private static void usage()
         {
-            Console.WriteLine("Usage: OdfConverterTest.exe /I PathOrFilename [/O PathOrFilename] [BATCH-ODT] [BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level] ");
+            Console.WriteLine("Usage: OdfConverterTest.exe /I PathOrFilename [/O PathOrFilename] [/BATCH-ODT] [/BATCH-DOCX] [/V] [/OPEN] [/XSLT Path] [/NOPACKAGING] [/SKIP name] [/REPORT Filename] [/LEVEL Level] ");
             Console.WriteLine("  Where options are:");
             Console.WriteLine("     /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)");
             Console.WriteLine("     /O PathOrFilename  Name of the output file (or output folder)");
