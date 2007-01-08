@@ -141,6 +141,10 @@
       />
     </w:instrText>
     <w:instrText xml:space="preserve">" </w:instrText>
+    <!-- no page numbering if not defined in index -->
+    <xsl:if test="not(parent::text:index-body/preceding-sibling::*/*/text:index-entry-page-number)">
+      <w:instrText xml:space="preserve">\n </w:instrText>
+    </xsl:if>
   </xsl:template>
 
   <!-- alphabetical index -->
