@@ -109,6 +109,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
         private bool validate = false;                   // validate the result of the transformations
         private bool open = false;                       // try to open the result of the transformations
         private bool recursiveMode = false;              // go in subfolders ?
+        private bool replace = false;					 // override existing files ?
         private string reportPath = null;                // file to save report
         private int reportLevel = Report.INFO_LEVEL;     // file to save report
         private string xslPath = null;                   // Path to an external stylesheet
@@ -249,7 +250,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             this.report.AddComment("Processing " + nbFiles + " ODT file(s)");
             foreach (string input in files)
             {
-                string output = this.GenerateOutputName(this.output, input, ".docx", true);
+                string output = this.GenerateOutputName(this.output, input, ".docx", this.replace);
                 int result = this.ProceedSingleFile(input, output, Direction.OdtToDocx);
                 switch (result)
                 {
@@ -304,7 +305,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             string[] files = Directory.GetFiles(this.input, "*.docx", option);
             foreach (string input in files)
             {
-                string output = this.GenerateOutputName(this.output, input, ".odt", true);
+                string output = this.GenerateOutputName(this.output, input, ".odt", this.replace);
                 this.ProceedSingleFile(input, output, Direction.DocxToOdt);
             }
         }
@@ -468,6 +469,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             Console.WriteLine("  Where options are:");
             Console.WriteLine("     /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)");
             Console.WriteLine("     /O PathOrFilename  Name of the output file (or output folder)");
+            Console.WriteLine("     /F                 Override existing output file");
             Console.WriteLine("     /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (note: existing files will be replaced)");
             Console.WriteLine("     /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (note: existing files will be replaced)");
             Console.WriteLine("     /V                 Validate the result of the transformation against the schemas");
@@ -577,6 +579,9 @@ namespace CleverAge.OdfConverter.CommandLineTool
 						this.transformDirectionOverride = true;
 						// System.Console.WriteLine("Override to docx\n");
 						break;
+					case "/F":
+						this.replace = true;
+						break;
                     default:
                         break;
                 }
@@ -661,7 +666,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     // we take input path
                     outputPath = Path.GetDirectoryName(this.input);
                 }
-                this.output = GenerateOutputName(outputPath, this.input, extension, false);
+                this.output = GenerateOutputName(outputPath, this.input, extension, this.replace);
             }
         }
 
