@@ -518,11 +518,11 @@
     <xsl:param name="property"/>
 
     <xsl:choose>
-      <xsl:when test="$node/descendant::w:numPr">
+      <xsl:when test="$node/descendant::w:numPr[not(ancestor::w:pPrChange)]">
         <xsl:value-of select="$node/descendant::w:numPr/child::node()[name() = $property]/@w:val"/>
       </xsl:when>
 
-      <xsl:when test="$node/descendant::w:pStyle">
+      <xsl:when test="$node/descendant::w:pStyle[not(ancestor::w:pPrChange)]">
         <xsl:variable name="styleId" select="$node/descendant::w:pStyle/@w:val"/>
 
         <xsl:variable name="pStyle"
@@ -736,7 +736,7 @@
         <xsl:with-param name="property">w:numId</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
+    
     <xsl:variable name="followingLevel">
       <xsl:call-template name="GetListProperty">
         <xsl:with-param name="node" select="$followingParagraph"/>
