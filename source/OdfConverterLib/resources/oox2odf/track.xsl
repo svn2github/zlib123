@@ -44,7 +44,20 @@
               <xsl:attribute name="text:style-name">
                 <xsl:value-of select="generate-id(ancestor::w:p)"/>
               </xsl:attribute>
-              <xsl:value-of select="w:delText"/>
+              <xsl:choose>
+                <!--check whether string contains  whitespace sequence-->
+                <xsl:when test="not(contains(w:delText,'  '))">
+                  <xsl:value-of select="w:delText"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <!--converts whitespaces sequence to text:s-->
+                  <xsl:call-template name="InsertWhiteSpaces">
+                    <xsl:with-param name="string">
+                      <xsl:value-of select="w:delText"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
             </text:p>
           </text:deletion>
         </text:changed-region>
@@ -181,7 +194,7 @@
         <xsl:value-of select="generate-id(.)"/>
       </xsl:attribute>
     </text:change-start>
-    <xsl:value-of select="descendant::text()"/>
+    <xsl:apply-templates select="descendant::w:t"/>
     <text:change-end>
       <xsl:attribute name="text:change-id">
         <xsl:value-of select="generate-id(.)"/>
