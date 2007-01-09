@@ -239,4 +239,8 @@
   
   <xsl:template match="w:delText" mode="trackchanges"/>
   
+  <xsl:template match="w:instrText" mode="trackchanges"/>
+  
+  <xsl:template match="wp:posOffset" mode="trackchanges"/>
+  
 </xsl:stylesheet>
