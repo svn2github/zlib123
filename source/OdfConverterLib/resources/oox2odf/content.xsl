@@ -119,30 +119,6 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template name="TrackChanges">
-    <text:tracked-changes>    
-    <xsl:if test="document('word/document.xml')/w:document/w:body/descendant::w:ins or 
-      document('word/document.xml')/w:document/w:body/descendant::w:del or
-      document('word/document.xml')/w:document/w:body/descendant::w:pPrChange or
-      document('word/document.xml')/w:document/w:body/descendant::w:rPrChange">
-        <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
-          mode="trackchanges"/>
-    </xsl:if>
-      <xsl:for-each select="document('word/_rels/document.xml.rels')/descendant::node()/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
-        <xsl:variable name="file">
-          <xsl:value-of select="."/>
-        </xsl:variable>
-        <xsl:if test="document(concat('word/',$file))/descendant::w:ins or 
-          document(concat('word/',$file))/descendant::w:del or
-          document(concat('word/',$file))/descendant::w:pPrChange or
-          document(concat('word/',$file))/descendant::w:rPrChange">
-          <xsl:apply-templates select="document(concat('word/',$file))"
-            mode="trackchanges"/>
-        </xsl:if>
-      </xsl:for-each>
-    </text:tracked-changes>
-  </xsl:template>
-
   <!--  inserts document elements-->
   <xsl:template name="InsertDocumentBody">
     <xsl:choose>
@@ -522,51 +498,13 @@
 
       <!--  Track changes    -->
       <xsl:when test="parent::w:del">
-        <xsl:choose>
-          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
-          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
-          <xsl:otherwise>
-            <text:change>
-              <xsl:attribute name="text:change-id">
-                <xsl:value-of select="generate-id(.)"/>
-              </xsl:attribute>
-            </text:change>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:call-template name="TrackChangesDeleteMade"/>
       </xsl:when>
       <xsl:when test="parent::w:ins">
-        <xsl:if test="w:br">
-          <text:line-break/>
-        </xsl:if>
-        <text:change-start>
-          <xsl:attribute name="text:change-id">
-            <xsl:value-of select="generate-id(.)"/>
-          </xsl:attribute>
-        </text:change-start>
-        <xsl:value-of select="descendant::text()"/>
-        <text:change-end>
-          <xsl:attribute name="text:change-id">
-            <xsl:value-of select="generate-id(.)"/>
-          </xsl:attribute>
-        </text:change-end>
+        <xsl:call-template name="TrackChangesInsertMade"/>
       </xsl:when>
       <xsl:when test="descendant::w:rPrChange">
-        <text:change-start>
-          <xsl:attribute name="text:change-id">
-            <xsl:value-of select="generate-id(.)"/>
-          </xsl:attribute>
-        </text:change-start>
-        <text:span>
-          <xsl:attribute name="text:style-name">
-            <xsl:value-of select="generate-id(.)"/>
-          </xsl:attribute>
-          <xsl:value-of select="descendant::text()"/>
-        </text:span>
-        <text:change-end>
-          <xsl:attribute name="text:change-id">
-            <xsl:value-of select="generate-id(.)"/>
-          </xsl:attribute>
-        </text:change-end>
+        <xsl:call-template name="TrackChangesChangesMade"/>
       </xsl:when>
       
       <!-- attach automatic style-->
