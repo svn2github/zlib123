@@ -535,6 +535,9 @@
         </xsl:choose>
       </xsl:when>
       <xsl:when test="parent::w:ins">
+        <xsl:if test="w:br">
+          <text:line-break/>
+        </xsl:if>
         <text:change-start>
           <xsl:attribute name="text:change-id">
             <xsl:value-of select="generate-id(.)"/>
