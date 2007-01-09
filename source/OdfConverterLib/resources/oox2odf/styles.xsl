@@ -1302,9 +1302,23 @@
         </style:style>
       </xsl:when>
       <xsl:otherwise>
-        <style:style style:name="{$currentStyleId}"
-          style:display-name="{self::node()/w:name/@w:val}">
-          <xsl:call-template name="InsertStyleFamily"/>
+         <style:style>
+           <xsl:attribute name="style:name">
+             <xsl:choose>
+               <xsl:when test="$currentStyleId='Normal' and not(//w:styles/w:style/@w:styleId='Standard')">
+                 <xsl:text>Standard</xsl:text>
+               </xsl:when>
+               <xsl:otherwise>
+                 <xsl:value-of select="$currentStyleId"/>
+               </xsl:otherwise>
+             </xsl:choose>             
+           </xsl:attribute>
+           <xsl:if test="not($currentStyleId='Normal')">
+              <xsl:attribute name="style:display-name">
+                <xsl:value-of select="self::node()/w:name/@w:val"/>
+              </xsl:attribute>
+            </xsl:if>            
+           <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn">
             <xsl:attribute name="style:parent-style-name">
               <xsl:value-of select="w:basedOn/@w:val"/>
