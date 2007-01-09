@@ -112,13 +112,14 @@
   </xsl:template>
   
   <xsl:template name="InsertFootnoteStyles">
-    <xsl:if test="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr">
+    <xsl:if test="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr | 
+      document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:pPr">
       <xsl:apply-templates
-        select="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr"
+        select="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p"
         mode="automaticstyles"/>
     </xsl:if>
   </xsl:template>
-
+  
   <!--  inserts document elements-->
   <xsl:template name="InsertDocumentBody">
     <xsl:choose>
