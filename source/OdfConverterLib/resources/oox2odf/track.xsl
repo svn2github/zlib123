@@ -194,7 +194,7 @@
         <xsl:value-of select="generate-id(.)"/>
       </xsl:attribute>
     </text:change-start>
-    <xsl:apply-templates select="descendant::w:t"/>
+    <xsl:apply-templates/>
     <text:change-end>
       <xsl:attribute name="text:change-id">
         <xsl:value-of select="generate-id(.)"/>
