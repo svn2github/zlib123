@@ -1,0 +1,6 @@
+LIBRARY	"OdfInstallHelper"
+EXPORTS
+	DetectPreviousConverters
+	GetWordVersion
+	DumpProperties
+	LaunchReadme

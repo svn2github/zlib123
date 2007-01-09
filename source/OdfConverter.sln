@@ -1,5 +1,6 @@
-﻿Microsoft Visual Studio Solution File, Format Version 9.00
-# SharpDevelop 2.0.0.1462
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfConverterLib", "OdfConverterLib\OdfConverterLib.csproj", "{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfZipUtils", "OdfZipUtils\OdfZipUtils.csproj", "{E51CB999-A720-4165-9DF2-A3E49547A40B}"
@@ -8,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfWord2007Addin", "OdfWord
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfWord2007AddinSetup", "OdfWord2007Addin\OdfWord2007AddinSetup\OdfWord2007AddinSetup.vdproj", "{05035DEA-21BC-490E-AEA7-A4C15F64ABFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineTool", "OdfConverterTest\OdfConverterTest.csproj", "{289C4B72-B929-4E3D-808F-F622E275AC70}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfConverterTest", "OdfConverterTest\OdfConverterTest.csproj", "{289C4B72-B929-4E3D-808F-F622E275AC70}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfWordAddinLib", "OdfWordAddinLib\OdfWordAddinLib.csproj", "{0313EE78-AD27-47E0-9902-3149046E2F5D}"
 EndProject
@@ -21,6 +22,8 @@ EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfWord2003AddinSetup", "OdfWord2003Addin\OdfWord2003AddinSetup\OdfWord2003AddinSetup.vdproj", "{6B410727-CB86-461B-92AA-A87AC98F991E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfConverterLauncher", "OdfConverterLauncher\OdfConverterLauncher.csproj", "{2FFDBC2D-0F7E-485E-9548-47CDBD7FE3C6}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup", "OdfAddInForWordSetup\OdfAddInForWordSetup.vdproj", "{68BE04F9-90B2-4BFA-BDEF-674545B9DA55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +75,10 @@ Global
 		{2FFDBC2D-0F7E-485E-9548-47CDBD7FE3C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FFDBC2D-0F7E-485E-9548-47CDBD7FE3C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FFDBC2D-0F7E-485E-9548-47CDBD7FE3C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68BE04F9-90B2-4BFA-BDEF-674545B9DA55}.Debug|Any CPU.ActiveCfg = Debug
+		{68BE04F9-90B2-4BFA-BDEF-674545B9DA55}.Debug|Any CPU.Build.0 = Debug
+		{68BE04F9-90B2-4BFA-BDEF-674545B9DA55}.Release|Any CPU.ActiveCfg = Release
+		{68BE04F9-90B2-4BFA-BDEF-674545B9DA55}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,120 @@
+<html>
+<head>
+<title>ODF Add-in for Word 2003</title>
+</head>
+<body>
+<h1>ODF Add-in for Microsoft Word 2003</h1>
+Thank you for downloading ODF Add-in for Microsoft Word 2003.<br />
+The purpose of the software is to enable users to open ODF Specification based documents in Microsoft Word 2003 and demonstrate the interoperability between OpenXML & ODF specifications. 
+This add-in is under development (see the roadmap at <a href="http://sourceforge.net/projects/odf-converter">http://sourceforge.net/projects/odf-converter</a> for more details about planned releases).
+We will provide stable nightly builds. You can install and test them at your own risk!
+
+<h2>Software Requirements</h2>
+To test the add-in, you will need the following:
+<ul>
+<li>Microsoft Word 2003 - SP2 with .NET Programmability installed, on Windows XP – SP2 or Windows Server 2003 with SP1</li>
+<li><a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=0856eacb-4362-4b0d-8edd-aab15c5e04f5&displaylang=en">.NET Framework 2.0</a></li>
+<li><a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=941B3470-3AE9-4AEE-8F43-C6BB74CD1466&displaylang=en">Microsoft Office Compatibility Pack for Word, Excel, and PowerPoint 2007 File Formats</a></li>
+</ul>
+<b>Note :</b> if you install Microsoft Word 2003 before .NET Framework, the ".NET Programmability
+    option" is not available during Word setup. You can add it later through Add/Remove
+    Programs control panel applet or else download and install the <a href="http://www.microsoft.com/downloads/details.aspx?familyid=3c9a983a-ac14-4125-8ba0-d36d67e0f4ad&displaylang=en">Office 2003 Primary
+    Interop Assemblies.</a>
+    
+<h2>Download and install the add-in</h2>
+Visit the Download Page and download the latest binary distribution of the add-in.  
+Run the downloaded executable to install the add-in for Word 2003.
+
+
+<h2>Test the add-in</h2>
+If installation is successful, you should see a new "Open ODF" entry in the “File” menu in Word 2003. It allows you to either import an ODF text file or export your current working document as an ODF text file (note that during development process, those functionalities might be temporary unavailable).
+<br />
+<b>Important note</b>: The ODF file opened by the add-in is converted into Office OpenXML (Office 2007 new file format) and imported into Word as a read-only file. If you want to save it as ODF, you have to use the "Export as ODF" button and provide a new file name (that can be the same as the current file name).
+
+
+<h2>Troubleshooting Guide</h2>
+If you don't see the ODF entry, it could be due to missing features in Word (see the Software Requirements listed above). After completing the ODF Add-in installation, you need to activate the Add-in by doing the following actions:
+<ol>
+<li>Go to Tools, then Customize, and then click the Commands tab. </li>
+<li>In the Categories box, click Tools. </li>
+<li>Drag COM Add-Ins from the Commands box over the Tools menu. When the Tools menu displays the menu commands, point to the location where you want the COM Add-Ins command to appear on the menu, and then release the mouse button. </li>
+<li>Click Close. </li>
+<li>On the Tools menu, click COM Add-Ins and do any of the following: </li>
+<li>To load an add-in, select the check box next to the add-in name in the Add-Ins available list. If the add-in you want isn't in the Add-Ins available list, click Add, locate the add-in, and then click OK.</li>
+</ol>
+
+<h2>ODF to OpenXml conversion currently supports :</h2>
+<ul>
+<li>Characters formatting</li>
+<li>Paragraph formatting</li>
+<li>Page formatting</li>
+<li>Columns</li>
+<li>Tables</li>
+<li>Numbering</li>
+<li>Table of content</li>
+<li>Index of tables</li>
+<li>Alphanumerical index</li>
+<li>Pictures</li>
+<li>OLE Objects</li>
+<li>Headers and footers</li>
+<li>Footnotes and endnotes</li>
+<li>Bookmarks and cross-references</li>
+<li>Change tracking</li>
+<li>Line numbering</li>
+<li>Fields (common and documents fields)</li>
+</ul>
+
+<h2>Features/options lost in the ODF to OpenXML translation</h2>
+<ul>
+<li>Table of content protection</li>
+<li>Text background color outside the 16 basic colors</li>
+<li>Page number offset</li>
+<li>Fields (chapter, description, printed by)</li>
+<li>Nested frames</li>
+<li>Frame absolute position</li>
+<li>Annotations in text-boxes</li>
+<li>Annotations in headers or footers</li>
+<li>Hidden sections</li>
+<li>Page break before endnotes</li>
+<li>Notes in lists</li>
+<li>SVM images</li>
+<li>Cropped images</li>
+<li>Embedded objects</li>
+<li>Shape top and bottom wrapping</li>
+<li>Distance between numbering and text</li>
+<li>Spacing at top of a page/table</li>
+<li>Next page style if no page break</li>
+<li>Alignment of last line in paragraphs</li>
+<li>Paragraph's background image</li>
+<li>Automatic page breaks</li>
+<li>Widow and orphan user defined line numbers</li>
+<li>Text blinking</li>
+<li>Text font weight</li>
+<li>Basic text rotation</li>
+<li>Capitalized text</li>
+<li>Lowercase text</li>
+<li>Text scale greater than 600%</li>
+<li>Tab stop leader text</li>
+<li>Individual page background color</li>
+<li>Header or footer dynamic text adaptation</li>
+<li>Shadow borders style</li>
+<li>Subtables borders and padding</li>
+<li>Tables repeat header option</li>
+<li>Tables keep with next paragraph option</li>
+<li>Unsplittable table option</li>
+<li>Table background image</li>
+<li>Tables with more than 64 columns</li>
+<li>Table cell protection</li>
+<li>Table cell shadow</li>
+</ul>
+
+<h2>OpenXML to ODF conversion currently supports :</h2>
+<ul>
+<li>Document structure</li>
+<li>Basic text and paragraph formatting</li>
+<li>Basic tables</li>
+<li>Basic document properties</li>
+</ul>
+
+</body>
+</html>
