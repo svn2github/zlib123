@@ -787,11 +787,12 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:if
-                test="preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w 
+                test="(preceding::w:sectPr[1]/w:pgSz/@w:w != following::w:sectPr[1]/w:pgSz/@w:w 
                 or preceding::w:sectPr[1]/w:pgSz/@w:h != following::w:sectPr[1]/w:pgSz/@w:h 
                 or preceding::w:sectPr[1]/w:pgSz/@w:orient != following::w:sectPr[1]/w:pgSz/@w:orient 
                 or following::w:sectPr[1]/w:headerReference 
-                or following::w:sectPr[1]/w:footerReference">
+                or following::w:sectPr[1]/w:footerReference) or
+                following::w:sectPr[1]/w:cols">
                 <xsl:attribute name="style:master-page-name">
                   <xsl:text>Standard</xsl:text>
                 </xsl:attribute>
