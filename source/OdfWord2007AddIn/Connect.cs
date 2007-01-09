@@ -226,7 +226,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                         Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref openAndRepair, ref missing, ref missing, ref missing);
 
                         // update document fields
-                        // doc.Fields.Update();
+                        doc.Fields.Update();
 
                         // and activate it
                         doc.Activate();
