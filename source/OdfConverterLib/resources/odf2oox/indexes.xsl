@@ -145,6 +145,9 @@
     <xsl:if test="not(parent::text:index-body/preceding-sibling::*/*/text:index-entry-page-number)">
       <w:instrText xml:space="preserve">\n </w:instrText>
     </xsl:if>
+    <xsl:if test="not(parent::text:index-body/preceding-sibling::*/*/text:index-entry-tab-stop[@style:type = 'right'])">
+      <w:instrText xml:space="preserve">\p " " </w:instrText>
+    </xsl:if>
   </xsl:template>
 
   <!-- alphabetical index -->
@@ -226,7 +229,7 @@
     </xsl:if>
 
     <!-- separator before page numbering. default is right align, null if no tab-stop defined -->
-    <xsl:if test="not($tocSource/text:table-of-content-entry-template/text:index-entry-tab-stop)">
+    <xsl:if test="not($tocSource/text:table-of-content-entry-template/text:index-entry-tab-stop[@style:type = 'right'])">
       <w:instrText xml:space="preserve">\p " " </w:instrText>
     </xsl:if>
 
