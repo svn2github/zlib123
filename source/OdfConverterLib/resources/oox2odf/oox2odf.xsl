@@ -26,9 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-  xmlns:oox="urn:oox"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oox="urn:oox"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
   exclude-result-prefixes="oox rels">
@@ -48,7 +46,7 @@
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
-  
+
   <!-- packages relationships -->
   <!--
   <xsl:variable name="package-rels" select="document('_rels/.rels')"/>

@@ -66,11 +66,11 @@
         <xsl:apply-templates select="document('word/fontTable.xml')/w:fonts"/>
       </office:font-face-decls>
       <office:automatic-styles>
-        <!--automatic styles for document body-->
-        <xsl:call-template name="InsertBodyStyles"/>
+        <!-- automatic styles for document body -->
+          <xsl:call-template name="InsertBodyStyles"/>
         <xsl:call-template name="InsertListStyles"/>
         <xsl:call-template name="InsertSectionsStyles"/>
-        <xsl:call-template name="InsertFootnoteStyles"/>
+          <xsl:call-template name="InsertFootnoteStyles"/>
       </office:automatic-styles>
       <office:body>
         <office:text>
@@ -110,21 +110,21 @@
       <xsl:apply-templates select="document('word/numbering.xml')/w:numbering/w:num"/>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertFootnoteStyles">
-    <xsl:if test="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr | 
+    <xsl:if
+      test="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr | 
       document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:pPr">
-      <xsl:apply-templates
-        select="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p"
+      <xsl:apply-templates select="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p"
         mode="automaticstyles"/>
     </xsl:if>
   </xsl:template>
-  
+
   <!--  inserts document elements-->
   <xsl:template name="InsertDocumentBody">
     <xsl:choose>
-      <xsl:when test="document('word/document.xml')//w:document/w:body/w:p/w:pPr/w:sectPr">
-        <xsl:apply-templates select="document('word/document.xml')//w:document/w:body"
+      <xsl:when test="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
+        <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
           mode="sections"/>
       </xsl:when>
     </xsl:choose>
@@ -135,7 +135,7 @@
 
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
   <xsl:template
-    match="w:pPr[parent::w:p]|w:r[parent::w:p and child::w:br[@w:type='page' or @w:type='column'] and not(parent::w:p[child::w:pPr])]"
+    match="w:pPr[parent::w:p]|w:r[parent::w:p[not(child::w:pPr)] and child::w:br[@w:type='page' or @w:type='column']]"
     mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
@@ -150,12 +150,12 @@
   </xsl:template>
 
   <xsl:template match="w:p[not (./w:pPr)]" mode="automaticstyles">
-    <xsl:if test="document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr">
+    <xsl:if test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr">
       <style:style style:name="{generate-id(.)}" style:family="paragraph">
         <xsl:call-template name="MasterPageName"/>
         <style:paragraph-properties>
           <xsl:for-each
-            select="document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr">
+            select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr">
             <xsl:call-template name="InsertParagraphProperties"/>
           </xsl:for-each>
         </style:paragraph-properties>
@@ -187,8 +187,8 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- create a style for each run. Do not take w:pPr/w:rPr into consideration. -->
-  <xsl:template match="w:rPr[parent::w:r]" mode="automaticstyles">
+  <!-- create a style for each run. Do not take w:pPr/w:rPr into consideration. Ignore runs with no properties. -->
+  <xsl:template match="w:rPr[parent::w:r and not(count(child::node())=1 and child::w:noProof)]" mode="automaticstyles">
     <xsl:message terminate="no">progress:w:rPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
       <xsl:choose>
@@ -337,11 +337,11 @@
           <xsl:apply-templates select="following::w:p[1]/child::node()"/>
         </text:p>
       </xsl:when>
-      
+
       <xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
-      
-      
-      
+
+
+
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != '' and $level &lt; 10">
         <xsl:apply-templates select="." mode="list">
@@ -389,7 +389,7 @@
       </xsl:if>
     </text:h>
   </xsl:template>
-  
+
   <xsl:template name="InsertDeletedParagraph">
     <text:change>
       <xsl:attribute name="text:change-id">
@@ -449,7 +449,7 @@
       <xsl:otherwise>
         <text:p>
           <xsl:if
-            test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or document('word/styles.xml')//w:styles/w:docDefaults/w:pPrDefault/w:pPr">
+            test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr">
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="generate-id(self::node())"/>
             </xsl:attribute>
@@ -507,9 +507,9 @@
       <xsl:when test="descendant::w:rPrChange">
         <xsl:call-template name="TrackChangesChangesMade"/>
       </xsl:when>
-      
+
       <!-- attach automatic style-->
-      <xsl:when test="w:rPr">
+      <xsl:when test="w:rPr[not(count(child::node())=1 and child::w:noProof)]">
         <text:span text:style-name="{generate-id(self::node())}">
           <xsl:apply-templates/>
         </text:span>

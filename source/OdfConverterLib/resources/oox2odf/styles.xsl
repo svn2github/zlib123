@@ -42,6 +42,7 @@
 
   <xsl:import href="footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
+  <xsl:key name="default-styles" match="w:style[@w:default = 1]" use="@w:type"/>
 
   <xsl:template name="styles">
     <office:document-styles>
@@ -54,7 +55,7 @@
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
         <xsl:call-template name="InsertNotesConfiguration"/>
         <xsl:if
-          test="document('word/document.xml')//w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
+          test="document('word/document.xml')/w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
           <xsl:call-template name="BibliographyConfiguration"/>
         </xsl:if>
         <!-- Insert Line Numbering -->
@@ -331,7 +332,7 @@
       </style:header>
     </xsl:if>
 
-    <xsl:if test="document('word/settings.xml')//w:settings/w:evenAndOddHeaders">
+    <xsl:if test="document('word/settings.xml')/w:settings/w:evenAndOddHeaders">
       <xsl:variable name="headerIdEven">
         <xsl:choose>
           <xsl:when test="w:headerReference/@w:type = 'even'">
@@ -379,7 +380,7 @@
       </style:footer>
     </xsl:if>
 
-    <xsl:if test="document('word/settings.xml')//w:settings/w:evenAndOddFooters">
+    <xsl:if test="document('word/settings.xml')/w:settings/w:evenAndOddFooters">
       <xsl:variable name="footerIdEven">
         <xsl:choose>
           <xsl:when test="w:footerReference/@w:type = 'even'">
@@ -1302,23 +1303,24 @@
         </style:style>
       </xsl:when>
       <xsl:otherwise>
-         <style:style>
-           <xsl:attribute name="style:name">
-             <xsl:choose>
-               <xsl:when test="$currentStyleId='Normal' and not(//w:styles/w:style/@w:styleId='Standard')">
-                 <xsl:text>Standard</xsl:text>
-               </xsl:when>
-               <xsl:otherwise>
-                 <xsl:value-of select="$currentStyleId"/>
-               </xsl:otherwise>
-             </xsl:choose>             
-           </xsl:attribute>
-           <xsl:if test="not($currentStyleId='Normal')">
-              <xsl:attribute name="style:display-name">
-                <xsl:value-of select="self::node()/w:name/@w:val"/>
-              </xsl:attribute>
-            </xsl:if>            
-           <xsl:call-template name="InsertStyleFamily"/>
+        <style:style>
+          <xsl:attribute name="style:name">
+            <xsl:choose>
+              <xsl:when
+                test="$currentStyleId='Normal' and not(//w:styles/w:style/@w:styleId='Standard')">
+                <xsl:text>Standard</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$currentStyleId"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <xsl:if test="not($currentStyleId='Normal')">
+            <xsl:attribute name="style:display-name">
+              <xsl:value-of select="self::node()/w:name/@w:val"/>
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:call-template name="InsertStyleFamily"/>
           <xsl:if test="w:basedOn">
             <xsl:attribute name="style:parent-style-name">
               <xsl:value-of select="w:basedOn/@w:val"/>
@@ -1486,7 +1488,7 @@
     <xsl:param name="CheckIfList"/>
     <xsl:param name="IndHanging"/>
     <xsl:param name="IndLeft"/>
-    
+
     <xsl:choose>
       <xsl:when test="$CheckIfList='true'">
         <xsl:variable name="NumId">
@@ -1494,11 +1496,8 @@
             <xsl:when test="w:numPr/w:numId/@w:val">
               <xsl:value-of select="w:numPr/w:numId/@w:val"/>
             </xsl:when>
-            <xsl:when
-              test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:numId/@w:val">
-              <xsl:value-of
-                select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:numId/@w:val"
-              />
+            <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:numId/@w:val">
+              <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:numId/@w:val"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of
@@ -1512,16 +1511,13 @@
             <xsl:when test="w:numPr/w:ilvl/@w:val">
               <xsl:value-of select="w:numPr/w:ilvl/@w:val"/>
             </xsl:when>
-            <xsl:when
-              test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
-              <xsl:value-of
-                select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"
-              />
+            <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
+              <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"/>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:variable name="AbstractNumId">
           <xsl:choose>
             <xsl:when
@@ -1533,7 +1529,7 @@
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:variable name="LeftNumber">
           <xsl:choose>
             <xsl:when
@@ -1550,7 +1546,7 @@
             </xsl:when>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:variable name="HangingNumber">
           <xsl:choose>
             <xsl:when
@@ -1568,7 +1564,7 @@
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:variable name="FirstLine">
           <xsl:choose>
             <xsl:when
@@ -1605,11 +1601,8 @@
           <xsl:when test="w:ind/@w:left">
             <xsl:value-of select="w:ind/@w:left"/>
           </xsl:when>
-          <xsl:when
-            test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left">
-            <xsl:value-of
-              select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "
-            />
+          <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left">
+            <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
           </xsl:when>
           <xsl:when test="contains($StyleId,'TOC')">
             <xsl:value-of
@@ -1617,14 +1610,12 @@
             />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of
-              select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"
-            />
+            <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
 
 

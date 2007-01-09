@@ -193,8 +193,9 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-    
-    <xsl:if test="parent::w:tbl/descendant::w:pageBreakBefore and 
+
+    <xsl:if
+      test="parent::w:tbl/descendant::w:pageBreakBefore and 
       not(generate-id(parent::w:tbl) = generate-id(ancestor::w:body/child::node()[1]))">
       <xsl:choose>
         <xsl:when test="not(parent::w:tbl/preceding::w:p[1]/w:pPr/w:sectPr)">
@@ -202,7 +203,8 @@
             <xsl:text>page</xsl:text>
           </xsl:attribute>
         </xsl:when>
-        <xsl:when test="(preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:w = following::w:sectPr/w:pgSz/@w:w
+        <xsl:when
+          test="(preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:w = following::w:sectPr/w:pgSz/@w:w
           and preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:h = following::w:sectPr/w:pgSz/@w:h
           and preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:orient = following::w:sectPr/w:pgSz/@w:orient
           and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:top = following::w:sectPr/w:pgMar/@w:top
@@ -266,9 +268,10 @@
     <xsl:variable name="mstyleId">
       <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     </xsl:variable>
-    <xsl:if test="document('word/styles.xml')//w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]">
+    <xsl:if
+      test="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]">
       <xsl:variable name="mstyle"
-        select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
+        select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
       <xsl:call-template name="InsertCellMargins">
         <xsl:with-param name="tcMar" select="w:tcMar/w:bottom"/>
         <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
@@ -289,142 +292,21 @@
       </xsl:call-template>
       <xsl:call-template name="InsertCellMargins">
         <xsl:with-param name="tcMar" select="w:tcMar/w:top"/>
-        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"></xsl:with-param> 
+        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"/>
         <xsl:with-param name="tblDefMar" select="$mstyle/w:top"/>
         <xsl:with-param name="attribute">fo:padding-top</xsl:with-param>
       </xsl:call-template>
     </xsl:if>
 
     <!--    borders-->
-    <xsl:choose>
-      <xsl:when test="w:tcBorders">
-        <xsl:variable name="styleId">
-          <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
-        </xsl:variable>
-        <xsl:variable name="style1"
-          select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:tblPr/w:tblBorders"/>
-        <xsl:variable name="style2"
-          select="document('word/styles.xml')//w:styles/w:style[@w:default = 1 and @w:type = 'table']/w:tblPr/w:tblBorders"/>
-        <xsl:variable name="style" select="$style1|$style2"/>
-        <xsl:call-template name="InsertCellBorder">
-          <xsl:with-param name="tcBorder" select="w:tcBorders/w:bottom"/>
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:bottom"/>
-          <xsl:with-param name="tblDefBorder" select="$style/w:bottom"/>
-          <xsl:with-param name="attribute">fo:border-bottom</xsl:with-param>
-          <xsl:with-param name="attribute2">style:border-line-width-bottom</xsl:with-param>
-        </xsl:call-template>
-        <xsl:call-template name="InsertCellBorder">
-          <xsl:with-param name="tcBorder" select="w:tcBorders/w:right"/>
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:right"/>
-          <xsl:with-param name="tblDefBorder" select="$style/w:right"/>
-          <xsl:with-param name="attribute">fo:border-right</xsl:with-param>
-          <xsl:with-param name="attribute2">style:border-line-width-right</xsl:with-param>
-        </xsl:call-template>
-        <xsl:call-template name="InsertCellBorder">
-          <xsl:with-param name="tcBorder" select="w:tcBorders/w:left"/>
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:left"/>
-          <xsl:with-param name="tblDefBorder" select="$style/w:left"/>
-          <xsl:with-param name="attribute">fo:border-left</xsl:with-param>
-          <xsl:with-param name="attribute2">style:border-line-width-left</xsl:with-param>
-        </xsl:call-template>
-        <xsl:call-template name="InsertCellBorder">
-          <xsl:with-param name="tcBorder" select="w:tcBorders/w:top"/>
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:top"/>
-          <xsl:with-param name="tblDefBorder" select="$style/w:top"/>
-          <xsl:with-param name="attribute">fo:border-top</xsl:with-param>
-          <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
+    <xsl:call-template name="InsertCellBorders"/>
 
-      <xsl:when test="not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:top) and not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:left) and not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:bottom) and not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:right) and ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:insideV/@w:val='none'">
-        
-        <xsl:variable name="styleId">
-          <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
-        </xsl:variable>        
-        <xsl:variable name="style"
-          select="document('word/styles.xml')//w:styles/w:style[@w:type = 'table']/w:tblPr/w:tblBorders"/>       
-        
-        <xsl:if test="not(../../following-sibling::w:tr)">
-          <xsl:call-template name="InsertCellBorder">            
-            <xsl:with-param name="tblBorder" select="$style/w:bottom"/>            
-            <xsl:with-param name="attribute">fo:border-bottom</xsl:with-param>
-            <xsl:with-param name="attribute2">style:border-line-width-bottom</xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
-        
-        <xsl:if test="not(../../preceding-sibling::w:tr)">
-          <xsl:call-template name="InsertCellBorder">            
-            <xsl:with-param name="tblBorder" select="$style/w:top"/>            
-            <xsl:with-param name="attribute">fo:border-top</xsl:with-param>
-            <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
-        
-        <xsl:if test="not(../preceding-sibling::w:tc)">
-          <xsl:call-template name="InsertCellBorder">            
-            <xsl:with-param name="tblBorder" select="$style/w:top"/>            
-            <xsl:with-param name="attribute">fo:border-left</xsl:with-param>
-            <xsl:with-param name="attribute2">style:border-line-width-left</xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
-        
-        <xsl:if test="not(../following-sibling::w:tc)">
-          <xsl:call-template name="InsertCellBorder">            
-            <xsl:with-param name="tblBorder" select="$style/w:right"/>            
-            <xsl:with-param name="attribute">fo:border-right</xsl:with-param>
-            <xsl:with-param name="attribute2">style:border-line-width-right</xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
-
-      </xsl:when>
-
-      <xsl:otherwise>
-        <xsl:variable name="styleId">
-          <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
-        </xsl:variable>
-        <!--<xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
-          <xsl:variable name="style" select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblBorders"/>-->
-
-        <xsl:variable name="style1"
-          select="document('word/styles.xml')//w:styles/w:style[@w:styleId = $styleId]/w:tblPr/w:tblBorders"/>
-        <xsl:variable name="style2"
-          select="document('word/styles.xml')//w:styles/w:style[@w:default = 1 and @w:type = 'table']/w:tblPr/w:tblBorders"/>
-        <xsl:variable name="style" select="$style1|$style2"/>
-        <xsl:call-template name="InsertTableBorder">
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:bottom"/>
-          <xsl:with-param name="tblDefBorder" select="$style/w:bottom"/>
-          <xsl:with-param name="attribute">fo:border-bottom</xsl:with-param>
-          <xsl:with-param name="attribute2">style:border-line-width-bottom</xsl:with-param>
-        </xsl:call-template>
-        <xsl:call-template name="InsertTableBorder">
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:right"/>
-          <xsl:with-param name="tblDefBorder" select="$style/w:right"/>
-          <xsl:with-param name="attribute">fo:border-right</xsl:with-param>
-          <xsl:with-param name="attribute2">style:border-line-width-right</xsl:with-param>
-        </xsl:call-template>
-        <xsl:call-template name="InsertTableBorder">
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:left"/>
-          <xsl:with-param name="tblDefBorder" select="$style/w:left"/>
-          <xsl:with-param name="attribute">fo:border-left</xsl:with-param>
-          <xsl:with-param name="attribute2">style:border-line-width-left</xsl:with-param>
-        </xsl:call-template>
-        <xsl:call-template name="InsertTableBorder">
-          <xsl:with-param name="tblBorder" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:top"/>
-          <xsl:with-param name="tblDefBorder" select="$style/w:top"/>
-          <xsl:with-param name="attribute">fo:border-top</xsl:with-param>
-          <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
-        </xsl:call-template>
-       <!--        </xsl:if>-->
-      </xsl:otherwise>
-    </xsl:choose>
-
-<!-- Background color -->
+    <!-- Background color -->
     <xsl:if test="w:shd">
       <xsl:attribute name="fo:background-color">
         <xsl:value-of select="concat('#', w:shd/@w:fill)"/>
       </xsl:attribute>
     </xsl:if>
-
   </xsl:template>
 
   <!--  insert cell margins-->
@@ -467,6 +349,111 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- insert cell borders using cell properties -->
+  <xsl:template name="InsertCellBorders">
+    <!-- table style id -->
+    <xsl:variable name="styleId" select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
+
+    <xsl:choose>
+      <xsl:when
+        test="not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:top) and not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:left) and not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:bottom) and not(ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:right) and ancestor::w:tbl[1]/w:tblPr/w:tblBorders/w:insideV/@w:val='none'">
+        <xsl:variable name="style"
+          select="document('word/styles.xml')/w:styles/w:style[@w:type = 'table']/w:tblPr/w:tblBorders"/>
+
+        <xsl:if test="not(../../following-sibling::w:tr)">
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="tblBorder" select="$style/w:bottom"/>
+            <xsl:with-param name="attribute">fo:border-bottom</xsl:with-param>
+            <xsl:with-param name="attribute2">style:border-line-width-bottom</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <xsl:if test="not(../../preceding-sibling::w:tr)">
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="tblBorder" select="$style/w:top"/>
+            <xsl:with-param name="attribute">fo:border-top</xsl:with-param>
+            <xsl:with-param name="attribute2">style:border-line-width-top</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <xsl:if test="not(../preceding-sibling::w:tc)">
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="tblBorder" select="$style/w:top"/>
+            <xsl:with-param name="attribute">fo:border-left</xsl:with-param>
+            <xsl:with-param name="attribute2">style:border-line-width-left</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <xsl:if test="not(../following-sibling::w:tc)">
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="tblBorder" select="$style/w:right"/>
+            <xsl:with-param name="attribute">fo:border-right</xsl:with-param>
+            <xsl:with-param name="attribute2">style:border-line-width-right</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <!--<xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
+          <xsl:variable name="style" select="document('word/styles.xml')//w:styles/w:style/w:tblPr/w:tblBorders"/>-->
+        <xsl:call-template name="InsertBorderPropertiesUsingSide">
+          <xsl:with-param name="side">bottom</xsl:with-param>
+          <xsl:with-param name="styleId" select="$styleId"/>
+          <xsl:with-param name="tcBorders" select="w:tcBorders"/>
+          <xsl:with-param name="tblBorders" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders"/>
+        </xsl:call-template>
+        <xsl:call-template name="InsertBorderPropertiesUsingSide">
+          <xsl:with-param name="side">right</xsl:with-param>
+          <xsl:with-param name="styleId" select="$styleId"/>
+          <xsl:with-param name="tcBorders" select="w:tcBorders"/>
+          <xsl:with-param name="tblBorders" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders"/>
+        </xsl:call-template>
+        <xsl:call-template name="InsertBorderPropertiesUsingSide">
+          <xsl:with-param name="side">left</xsl:with-param>
+          <xsl:with-param name="styleId" select="$styleId"/>
+          <xsl:with-param name="tcBorders" select="w:tcBorders"/>
+          <xsl:with-param name="tblBorders" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders"/>
+        </xsl:call-template>
+        <xsl:call-template name="InsertBorderPropertiesUsingSide">
+          <xsl:with-param name="side">top</xsl:with-param>
+          <xsl:with-param name="styleId" select="$styleId"/>
+          <xsl:with-param name="tcBorders" select="w:tcBorders"/>
+          <xsl:with-param name="tblBorders" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders"/>
+        </xsl:call-template>
+        <!--        </xsl:if>-->
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertBorderPropertiesUsingSide">
+    <xsl:param name="side"/>
+    <xsl:param name="styleId"/>
+    <xsl:param name="tcBorders"/>
+    <xsl:param name="tblBorders"/>
+
+    <xsl:for-each select="document('word/styles.xml')">
+      <xsl:choose>
+        <xsl:when test="key('StyleId', $styleId)/w:tblPr/w:tblBorders">
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="tcBorder" select="$tcBorders/*[name()=concat('w:', $side)]"/>
+            <xsl:with-param name="tblBorder" select="$tblBorders/*[name()=concat('w:', $side)]"/>
+            <xsl:with-param name="tblDefBorder"
+              select="key('StyleId', $styleId)/w:tblPr/w:tblBorders/*[name()=concat('w:', $side)]"/>
+            <xsl:with-param name="attribute" select="concat('fo:border-', $side)"/>
+            <xsl:with-param name="attribute2" select="concat('style:border-line-width-', $side)"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="InsertCellBorder">
+            <xsl:with-param name="tcBorder" select="$tcBorders/*[name()=concat('w:', $side)]"/>
+            <xsl:with-param name="tblBorder" select="$tblBorders/*[name()=concat('w:', $side)]"/>
+            <xsl:with-param name="tblDefBorder"
+              select="key('default-styles', 'tables')/w:tblPr/w:tblBorders/*[name()=concat('w:', $side)]"/>
+            <xsl:with-param name="attribute" select="concat('fo:border-', $side)"/>
+            <xsl:with-param name="attribute2" select="concat('style:border-line-width-', $side)"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+
   <!--  insert cell borders from cell properties-->
   <xsl:template name="InsertCellBorder">
     <xsl:param name="tcBorder"/>
@@ -502,12 +489,12 @@
                   <xsl:value-of select="'solid'"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <!-- Styles of Table Border to do (Open Office Bug)-->                 
+                  <!-- Styles of Table Border to do (Open Office Bug)-->
                   <xsl:value-of select="'solid'"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            
+
             <xsl:variable name="color">
               <xsl:choose>
                 <xsl:when test="$tcBorder/@w:color = 'auto'">
@@ -518,7 +505,7 @@
                       </xsl:variable>
                       <xsl:choose>
                         <xsl:when
-                          test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
+                          test="document('word/styles.xml')/w:styles/w:style/@w:styleId = $styleId">
                           <xsl:value-of select="$tblDefBorder/@w:color"/>
                         </xsl:when>
                         <xsl:otherwise>000000</xsl:otherwise>
@@ -574,7 +561,7 @@
               <xsl:value-of select="'solid'"/>
             </xsl:when>
             <xsl:otherwise>
-              <!-- Styles of Table Border to do (Open Office Bug)-->                            
+              <!-- Styles of Table Border to do (Open Office Bug)-->
               <xsl:value-of select="'solid'"/>
             </xsl:otherwise>
           </xsl:choose>
@@ -587,7 +574,7 @@
                 <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
               </xsl:variable>
               <xsl:choose>
-                <xsl:when test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
+                <xsl:when test="document('word/styles.xml')/w:styles/w:style/@w:styleId = $styleId">
                   <xsl:value-of select="$tblDefBorder/@w:color"/>
                 </xsl:when>
                 <xsl:otherwise>000000</xsl:otherwise>
@@ -606,7 +593,7 @@
         <xsl:variable name="styleId">
           <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
         </xsl:variable>
-        <xsl:if test="document('word/styles.xml')//w:styles/w:style/@w:styleId = $styleId">
+        <xsl:if test="document('word/styles.xml')/w:styles/w:style/@w:styleId = $styleId">
           <xsl:variable name="width">
             <xsl:call-template name="ConvertTwips">
               <xsl:with-param name="length">
@@ -620,7 +607,7 @@
               <xsl:when test="$tblDefBorder/@w:val = 'single'">
                 <xsl:value-of select="'solid'"/>
               </xsl:when>
-              <xsl:otherwise>          
+              <xsl:otherwise>
                 <!-- Styles of Table Border to do (Open Office Bug)-->
                 <xsl:value-of select="'solid'"/>
               </xsl:otherwise>
