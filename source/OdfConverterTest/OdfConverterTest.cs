@@ -658,7 +658,8 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 extension = ".xml";
             }
 
-            if (!File.Exists(this.output) && (this.output == null || !extension.Equals(Path.GetExtension(this.output).ToLowerInvariant())))
+            if (!transformDirectionOverride && 
+                !File.Exists(this.output) && (this.output == null || !extension.Equals(Path.GetExtension(this.output).ToLowerInvariant())))
             {
                 string outputPath = this.output;
                 if (outputPath == null)
