@@ -64,6 +64,13 @@
     </draw:a>
   </xsl:template>
 
+  <!-- text watermark feedback -->
+  <xsl:template match="w:pict[contains(v:shape/@id,'WaterMark')]">
+    <xsl:if test="v:shape/v:textpath">
+      <xsl:message terminate="no">feedback:Text watermark</xsl:message>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template match="v:textbox">
     <draw:text-box>
       <xsl:call-template name="InsertTextBoxAutomaticHeight"/>
