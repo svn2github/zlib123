@@ -30,6 +30,10 @@
     </draw:frame>
   </xsl:template>
   
+  <xsl:template match="o:extrusion">
+      <xsl:message terminate="no">feedback:Shape 3D effects</xsl:message>
+  </xsl:template>
+  
   <!--horizontal line-->
   <xsl:template match="v:rect">
     <draw:rect>   
@@ -72,6 +76,9 @@
   </xsl:template>
   
   <xsl:template match="v:textbox">
+    <xsl:if test="parent::v:stroke/@dashstyle">
+        <xsl:message terminate="no">feedback:Dashed textbox border</xsl:message>
+    </xsl:if>
     <draw:text-box>
       <xsl:call-template name="InsertTextBoxAutomaticHeight"/>
       <xsl:apply-templates select="w:txbxContent/child::node()"/>
@@ -296,7 +303,18 @@
     <xsl:attribute name="style:rel-height">
       <xsl:value-of select="$relativeHeight div 10"/>
     </xsl:attribute>
-  </xsl:template>
+    
+    <xsl:variable name="relativeTo">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-height-relative'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$relativeTo != ''">
+        <xsl:message terminate="no">feedback:Relative frame size </xsl:message>
+    </xsl:if>
+ </xsl:template>
 
   <xsl:template name="InsertShapeWidth">
     <xsl:param name="shape" select="."/>
@@ -360,6 +378,17 @@
     <xsl:attribute name="style:rel-width">
       <xsl:value-of select="$relativeWidth div 10"/>
     </xsl:attribute>
+    
+    <xsl:variable name="relativeTo">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-width-relative'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$relativeTo != ''">
+      <xsl:message terminate="no">feedback:Relative frame size </xsl:message>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="GetShapeProperty">

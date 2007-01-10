@@ -59,7 +59,23 @@
         <xsl:value-of select="$document"/>
       </xsl:with-param>
     </xsl:call-template>
-
+    
+    <xsl:if test="wp:cNvGraphicFramePr/a:graphicFrameLocks/@noChangeAspect">
+        <xsl:message terminate="no">feedback:Picture lock aspect ratio</xsl:message>
+    </xsl:if>
+    
+    <xsl:if test="a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPicPr/@preferRelativeResize">
+      <xsl:message terminate="no">feedback:Relative to orginal picture size</xsl:message>
+    </xsl:if>
+    
+    <xsl:if test="@locked = '1'">
+        <xsl:message terminate="no">feedback: Picture lock anchor</xsl:message>
+    </xsl:if>
+    
+    <xsl:if test="@allowOverlap = '1'">
+      <xsl:message terminate="no">feedback: Picture allow overlap</xsl:message>
+    </xsl:if>
+    
     <draw:frame>
      <!-- anchor type-->
       <xsl:call-template name="InsertImageAnchorType"/>

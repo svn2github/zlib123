@@ -527,24 +527,15 @@
   <xsl:template match="w:r">
     <xsl:message terminate="no">progress:w:r</xsl:message>
     <xsl:choose>
-      <!--  fieldchar hyperlink TODO: move hyperlink to fields  -->
-      <xsl:when
-        test="contains(preceding::w:instrText[1],'HYPERLINK') and 
-        count(preceding::w:fldChar[@w:fldCharType = 'begin']) &gt; count(preceding::w:fldChar[@w:fldCharType = 'end'])">
-        <xsl:call-template name="InsertHyperlink"/>
-      </xsl:when>
-      <!-- ignore text when we are in field-->
+
+      <!--fields-->
       <xsl:when test="preceding::w:fldChar[1][@w:fldCharType='begin' or @w:fldCharType='separate']">
-        <!-- catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
-        <xsl:if
-          test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin' or @w:fldCharType='separate']] ">
-          <xsl:apply-templates select="w:instrText[1]"/>
-        </xsl:if>
+        <xsl:call-template name="InsertField"/>
       </xsl:when>
 
       <!-- Comments -->
       <xsl:when test="w:commentReference/@w:id">
-        <xsl:call-template name="comments">
+        <xsl:call-template name="InsertComment">
           <xsl:with-param name="Id">
             <xsl:value-of select="w:commentReference/@w:id"/>
           </xsl:with-param>
@@ -575,7 +566,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
   <!-- path for hyperlinks-->
   <xsl:template name="GetLinkPath">
     <xsl:param name="linkHref"/>

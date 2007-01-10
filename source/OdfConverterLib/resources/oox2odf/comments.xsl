@@ -10,11 +10,9 @@
   xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" 
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  
   exclude-result-prefixes="office text  fo style dc meta pzip xlink w">
   
-  
-<xsl:template name="comments">
+<xsl:template name="InsertComment">
   <xsl:param name="Id"/>
   <office:annotation>
     <xsl:if test="document('word/comments.xml')/w:comments/w:comment[@w:id = $Id]/@w:author">
@@ -30,5 +28,4 @@
     <xsl:apply-templates select="document('word/comments.xml')/w:comments/w:comment[@w:id = $Id]/w:p"/>    
   </office:annotation>  
 </xsl:template>
-  
-</xsl:stylesheet>
+ </xsl:stylesheet>

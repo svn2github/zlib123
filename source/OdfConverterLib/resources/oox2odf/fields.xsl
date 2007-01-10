@@ -42,6 +42,69 @@
 
   <!-- process a field code -->
   <xsl:template match="w:instrText">
+    <xsl:param name="parentRunNode"/>
+    <text:span text:style-name="{generate-id(parent::w:r)}">
+      <!-- rebuild the field code using a series of instrText, in current run or followings -->
+      <xsl:variable name="fieldCode">
+        <xsl:call-template name="BuildFieldCode"/>
+      </xsl:variable>
+      <!-- first field instruction. Should contains field type. If not, switch to next instruction -->
+      <xsl:variable name="fieldType">
+        <xsl:call-template name="GetFieldTypeFromCode">
+          <xsl:with-param name="fieldCode" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$fieldType = 'XE' ">
+          <xsl:call-template name="InsertIndexMark">
+            <xsl:with-param name="instrText" select="following-sibling::instrText[1]"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'SET' ">
+          <xsl:call-template name="InsertUserVariable">
+            <xsl:with-param name="fieldCode" select="$fieldCode"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'HYPERLINK' ">
+          <xsl:call-template name="InsertHyperlinkField">
+            <xsl:with-param name="parentRunNode" select="$parentRunNode"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'REF' ">
+          <xsl:call-template name="InsertCrossReference">
+            <xsl:with-param name="fieldCode" select="$fieldCode"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'DATE'">
+          <xsl:call-template name="InsertDateField">
+            <xsl:with-param name="dateText" select="$fieldCode"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'NUMPAGE'">
+          <xsl:call-template name="InsertPageCount"/>
+         </xsl:when>
+        <xsl:when test="$fieldType = 'PAGE' ">
+          <xsl:call-template name="InsertPageNumberField"/>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'TIME' ">
+          <xsl:call-template name="InsertTimeField">
+            <xsl:with-param name="timeText" select="$fieldCode"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'USERINITIALS' ">
+          <xsl:call-template name="InsertUserInitials"/>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'USERNAME' ">
+          <xsl:call-template name="InsertUserName"/>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'AUTHOR'">
+          <xsl:call-template name="InsertAuthor"/>
+        </xsl:when>
+      </xsl:choose>
+    </text:span>
+  </xsl:template>
+
+  <xsl:template match="w:instrText" mode="automaticstyles">
     <!-- rebuild the field code using a series of instrText, in current run or followings -->
     <xsl:variable name="fieldCode">
       <xsl:call-template name="BuildFieldCode"/>
@@ -53,17 +116,24 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$fieldType = 'XE' ">
-        <xsl:call-template name="InsertIndexMark">
-          <xsl:with-param name="instrText" select="following-sibling::instrText[1]"/>
+      <xsl:when test="$fieldType = 'DATE' ">
+        <xsl:call-template name="InsertDateStyle">
+          <xsl:with-param name="dateText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$fieldType = 'SET' ">
-        <xsl:call-template name="InsertUserVariable">
-          <xsl:with-param name="fieldCode" select="$fieldCode"/>
+      <xsl:when test="$fieldType = 'TIME' ">
+        <xsl:call-template name="InsertTimeStyle">
+          <xsl:with-param name="timeText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
+  </xsl:template>
+
+  <!--cross-reference-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'REF')]" mode="fields">
+    <xsl:call-template name="InsertCrossReference">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+    </xsl:call-template>
   </xsl:template>
 
   <!-- build a field code using current instrText and recursively forward (go to next instrText) -->
@@ -233,11 +303,11 @@
     </text:alphabetical-index-mark>
   </xsl:template>
 
-  <!-- cross references -->
-  <xsl:template match="w:instrText[contains(self::node(),'REF')]">
+  <xsl:template name="InsertCrossReference">
+    <xsl:param name="fieldCode"/>
     <text:bookmark-ref text:reference-format="text">
       <xsl:attribute name="text:ref-name">
-        <xsl:value-of select="substring-before(substring-after(.,'REF '),' \')"/>
+        <xsl:value-of select="substring-before(substring-after($fieldCode,'REF '),' \')"/>
       </xsl:attribute>
       <xsl:apply-templates select="following::w:t[1]/ancestor::w:r/child::node()"/>
     </text:bookmark-ref>
@@ -264,73 +334,115 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE')]">
-    <text:span text:style-name="{generate-id(w:r)}">
+  <!--document title-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE')]" mode="fields">
       <text:title>
         <xsl:apply-templates select="w:r/child::node()"/>
       </text:title>
-    </text:span>
   </xsl:template>
-  
-  <xsl:template match="w:fldSimple[contains(@w:instr,'STYLEREF')]">
-    <text:span text:style-name="{generate-id(w:r)}">
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'USERNAME')]" mode="fields">
+      <xsl:call-template name="InsertUserName"/>
+  </xsl:template>
+
+  <xsl:template name="InsertUserName">
+    <text:author-name text:fixed="false">
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:author-name>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'AUTHOR')]" mode="fields">
+      <xsl:call-template name="InsertAuthor"/>
+  </xsl:template>
+
+  <xsl:template name="InsertAuthor">
+    <text:initial-creator>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:initial-creator>
+  </xsl:template>
+
+  <!--user initials-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'USERINITIALS')]" mode="fields">
+      <xsl:call-template name="InsertUserInitials"/>
+  </xsl:template>
+
+  <!--user initials-->
+  <xsl:template name="InsertUserInitials">
+    <text:author-initials>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:author-initials>
+  </xsl:template>
+
+  <!--chapter name or chapter number-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'STYLEREF')]" mode="fields">
       <text:chapter>
         <xsl:choose>
           <xsl:when test="self::node()[contains(@w:instr,'\n')]">
-          <xsl:attribute name="text:display">number</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="self::node()[contains(@w:instr,'\*')]">
-          <xsl:attribute name="text:display">name</xsl:attribute>
-        </xsl:when>
+            <xsl:attribute name="text:display">number</xsl:attribute>
+          </xsl:when>
+          <xsl:when test="self::node()[contains(@w:instr,'\*')]">
+            <xsl:attribute name="text:display">name</xsl:attribute>
+          </xsl:when>
         </xsl:choose>
         <xsl:if test="self::node()[contains(@w:instr,'Heading')]">
           <xsl:attribute name="text:outline-level">
-            <xsl:value-of select="substring-before(substring-after(./@w:instr,'Heading '),'&quot;')"/>
+            <xsl:value-of
+              select="substring-before(substring-after(./@w:instr,'Heading '),'&quot;')"/>
           </xsl:attribute>
         </xsl:if>
         <xsl:apply-templates select="w:r/child::node()"/>
       </text:chapter>
-    </text:span>
   </xsl:template>
 
-  <xsl:template match="w:fldSimple[contains(@w:instr,'SUBJECT')]">
-    <text:span text:style-name="{generate-id(w:r)}">
+  <!--document subject-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'SUBJECT')]" mode="fields">
       <text:subject>
         <xsl:apply-templates select="w:r/child::node()"/>
       </text:subject>
+  </xsl:template>
+  
+  <xsl:template match="w:fldSimple">
+    <text:span text:style-name="{generate-id(w:r)}">
+            <xsl:apply-templates select="." mode="fields"/>
     </text:span>
   </xsl:template>
-
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'DATE')] | w:instrText[contains(self::node(),'DATE')]">
+  
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')]" mode="fields">
     <xsl:call-template name="InsertDateField">
-      <xsl:with-param name="dateText" select="@w:instr | text()"/>
+      <xsl:with-param name="dateText" select="@w:instr"/>
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'TIME')] | w:instrText[contains(self::node(),'TIME')]">
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')]" mode="fields">
     <xsl:call-template name="InsertTimeField">
-      <xsl:with-param name="timeText" select="@w:instr | text()"/>
+      <xsl:with-param name="timeText" select="@w:instr"/>
     </xsl:call-template>
   </xsl:template>
 
+  <!--page number-->
   <xsl:template
-    match="w:fldSimple[contains(@w:instr,'PAGE ') and not(contains(@w:instr,'NUMPAGE'))] | w:instrText[contains(self::node(),'PAGE ') and not(contains(self::node(),'NUMPAGE'))] ">
-    <xsl:call-template name="InsertPageNumberField"/>
+    match="w:fldSimple[contains(@w:instr,'PAGE ') and not(contains(@w:instr,'NUMPAGE'))]" mode="fields">
+    <xsl:call-template name="InsertPageNumberField">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+    </xsl:call-template>
   </xsl:template>
 
-  <xsl:template
-    match="w:fldSimple[contains(@w:instr,'NUMPAGE')] | w:instrText[contains(self::node(),'NUMPAGE')] ">
-    <text:page-count>
+  <!--page-count-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGE')]" mode="fields">
+    <xsl:call-template name="InsertPageCount">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="InsertPageCount">
+<text:page-count>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:page-count>
   </xsl:template>
 
-  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')] | w:instrText[contains(., 'DATE')]"
-    mode="automaticstyles">
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')]" mode="automaticstyles">
     <xsl:call-template name="InsertDateStyle">
-      <xsl:with-param name="dateText" select="@w:instr | text()"/>
+      <xsl:with-param name="dateText" select="@w:instr"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -350,10 +462,9 @@
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')] | w:instrText[contains(., 'TIME')]"
-    mode="automaticstyles">
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')]" mode="automaticstyles">
     <xsl:call-template name="InsertTimeStyle">
-      <xsl:with-param name="timeText" select="@w:instr | text()"/>
+      <xsl:with-param name="timeText" select="@w:instr"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -867,7 +978,7 @@
 
   <!-- Page Number Field -->
   <xsl:template name="InsertPageNumberField">
-    <xsl:variable name="docName">
+<xsl:variable name="docName">
       <xsl:call-template name="GetDocumentName">
         <xsl:with-param name="rootId">
           <xsl:value-of select="generate-id(/node())"/>
@@ -949,7 +1060,7 @@
     </text:page-number>
   </xsl:template>
 
-  <!-- Insert Citations & Bibliography -->
+  <!-- Insert Citations -->
   <xsl:template name="TextBibliographyMark">
     <xsl:param name="TextIdentifier"/>
 
@@ -1115,9 +1226,27 @@
     </text:bibliography-mark>
   </xsl:template>
 
+  <xsl:template name="InsertHyperlinkField">
+    <xsl:param name="parentRunNode"/>
+    <xsl:if test="$parentRunNode">
+      <xsl:for-each select="$parentRunNode">
+        <xsl:call-template name="InsertHyperlink"/>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
 
-  <!--  <xsl:template match="w:instrText[contains(self::node(),'HYPERLINK')]">
-    
-    </xsl:template>-->
-
+  <xsl:template name="InsertField">
+    <xsl:choose>
+      <!-- default scenario - catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
+      <xsl:when test="w:instrText[1]">
+        <xsl:apply-templates select="w:instrText[1]"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <!--  the same hyperlink can be in more then one paragraph so print as hyperlink each run which is in hyperlink field (between w:fldChar begin - end)-->
+        <xsl:apply-templates select="preceding::w:instrText[1][contains(.,'HYPERLINK')]">
+          <xsl:with-param name="parentRunNode" select="."/>
+        </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>
