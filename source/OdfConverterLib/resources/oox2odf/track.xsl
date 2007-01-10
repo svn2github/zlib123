@@ -149,7 +149,14 @@
             </text:p>
             <text:p>
               <xsl:attribute name="text:style-name">
-                <xsl:value-of select="generate-id(following::w:p[1])"/>
+                <xsl:choose>
+                  <xsl:when test="following::w:p[1]/w:pPr/w:pPrChange/w:pPr/w:pStyle">
+                    <xsl:value-of select="following::w:p[1]/w:pPr/w:pPrChange/w:pPr/w:pStyle/@w:val"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="generate-id(following::w:p[1])"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:attribute>
               <xsl:if test="following::w:p[1]/descendant::w:r[1]/parent::w:del">
                 <xsl:value-of select="following::w:p[1]/descendant::w:r[1]"/>
