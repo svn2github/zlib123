@@ -203,20 +203,24 @@
             <xsl:text>page</xsl:text>
           </xsl:attribute>
         </xsl:when>
-        <xsl:when
-          test="(preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:w = following::w:sectPr/w:pgSz/@w:w
-          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:h = following::w:sectPr/w:pgSz/@w:h
-          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgSz/@w:orient = following::w:sectPr/w:pgSz/@w:orient
-          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:top = following::w:sectPr/w:pgMar/@w:top
-          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:left = following::w:sectPr/w:pgMar/@w:left
-          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:right = following::w:sectPr/w:pgMar/@w:right
-          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:bottom = following::w:sectPr/w:pgMar/@w:bottom
-          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:header = following::w:sectPr/w:pgMar/@w:header
-          and preceding::w:p[1]/w:pPr/w:sectPr/w:pgMar/@w:footer = following::w:sectPr/w:pgMar/@w:footer)">
-          <xsl:attribute name="fo:break-before">
-            <xsl:text>page</xsl:text>
-          </xsl:attribute>
-        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="precSectPr" select="preceding::w:p[1]/w:pPr/w:sectPr"/>
+          <xsl:variable name="followingSectPr" select="following::w:sectPr"/>
+          <xsl:if
+            test="($precSectPr/w:pgSz/@w:w = $followingSectPr/w:pgSz/@w:w
+            and $precSectPr/w:pgSz/@w:h = $followingSectPr/w:pgSz/@w:h
+            and $precSectPr/w:pgSz/@w:orient = $followingSectPr/w:pgSz/@w:orient
+            and $precSectPr/w:pgMar/@w:top = $followingSectPr/w:pgMar/@w:top
+            and $precSectPr/w:pgMar/@w:left = $followingSectPr/w:pgMar/@w:left
+            and $precSectPr/w:pgMar/@w:right = $followingSectPr/w:pgMar/@w:right
+            and $precSectPr/w:pgMar/@w:bottom = $followingSectPr/w:pgMar/@w:bottom
+            and $precSectPr/w:pgMar/@w:header = $followingSectPr/w:pgMar/@w:header
+            and $precSectPr/w:pgMar/@w:footer = $followingSectPr/w:pgMar/@w:footer)">
+            <xsl:attribute name="fo:break-before">
+              <xsl:text>page</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
   </xsl:template>

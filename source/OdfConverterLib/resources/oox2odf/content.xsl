@@ -68,10 +68,10 @@
       </office:font-face-decls>
       <office:automatic-styles>
         <!-- automatic styles for document body -->
-          <xsl:call-template name="InsertBodyStyles"/>
+        <xsl:call-template name="InsertBodyStyles"/>
         <xsl:call-template name="InsertListStyles"/>
         <xsl:call-template name="InsertSectionsStyles"/>
-          <xsl:call-template name="InsertFootnoteStyles"/>
+        <xsl:call-template name="InsertFootnoteStyles"/>
       </office:automatic-styles>
       <office:body>
         <office:text>
@@ -189,7 +189,8 @@
   </xsl:template>
 
   <!-- create a style for each run. Do not take w:pPr/w:rPr into consideration. Ignore runs with no properties. -->
-  <xsl:template match="w:rPr[parent::w:r and not(count(child::node())=1 and child::w:noProof)]" mode="automaticstyles">
+  <xsl:template match="w:rPr[parent::w:r and not(count(child::node())=1 and child::w:noProof)]"
+    mode="automaticstyles">
     <xsl:message terminate="no">progress:w:rPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
       <xsl:choose>
@@ -564,7 +565,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- path for hyperlinks-->
   <xsl:template name="GetLinkPath">
     <xsl:param name="linkHref"/>
@@ -635,7 +636,7 @@
     <xsl:variable name="NameBookmark">
       <xsl:value-of select="@w:name"/>
     </xsl:variable>
-    
+
     <xsl:variable name="OutlineLvl">
       <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
     </xsl:variable>
@@ -669,7 +670,7 @@
   <xsl:template match="w:bookmarkEnd">
     <xsl:variable name="NameBookmark">
       <xsl:value-of select="key('bookmarkStart', @w:id)/@w:name"/>
-    </xsl:variable>    
+    </xsl:variable>
     <xsl:variable name="OutlineLvl">
       <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
     </xsl:variable>

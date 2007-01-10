@@ -82,7 +82,7 @@
         </xsl:when>
         <xsl:when test="$fieldType = 'NUMPAGE'">
           <xsl:call-template name="InsertPageCount"/>
-         </xsl:when>
+        </xsl:when>
         <xsl:when test="$fieldType = 'PAGE' ">
           <xsl:call-template name="InsertPageNumberField"/>
         </xsl:when>
@@ -142,17 +142,31 @@
     <xsl:param name="fieldCode"/>
     <!-- context must be w:instrText -->
     <xsl:choose>
+      <!-- if next sibling instrText -->
       <xsl:when test="$instrText/following-sibling::w:instrText">
         <xsl:call-template name="BuildFieldCode">
           <xsl:with-param name="instrText" select="$instrText/following-sibling::w:instrText[1]"/>
           <xsl:with-param name="fieldCode" select="concat($fieldCode, $instrText/text())"/>
         </xsl:call-template>
       </xsl:when>
+      <!-- if next run with instrText, before end of field -->
       <xsl:when
-        test="$instrText/parent::w:r/following-sibling::node()[1][self::w:r and w:instrText]">
+        test="$instrText/parent::w:r/following-sibling::*[self::w:r[w:instrText] or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:r[w:instrText]]">
         <xsl:call-template name="BuildFieldCode">
+          <!-- we know now that first run having instrText is before end of field -->
           <xsl:with-param name="instrText"
-            select="$instrText/parent::w:r/following-sibling::node()[1][self::w:r]/w:instrText[1]"/>
+            select="$instrText/parent::w:r/following-sibling::*[self::w:r and w:instrText][1]/w:instrText[1]"/>
+          <xsl:with-param name="fieldCode" select="concat($fieldCode, $instrText/text())"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!-- if next paragraph with instrText, before end of field :
+      Find first paragraph having instrText before end of field, and then first run having instrText before end of field -->
+      <xsl:when
+        test="$instrText/ancestor::w:p/following-sibling::*[self::w:p[w:r/w:instrText or w:fldChar/@w:fldCharType = 'end']][1]/*[self::w:r[w:instrText] or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:r[w:instrText]]">
+        <xsl:call-template name="BuildFieldCode">
+          <!-- we know now that first run having instrText is before end of field -->
+          <xsl:with-param name="instrText"
+            select="$instrText/ancestor::w:p/following-sibling::*[self::w:p[w:r/w:instrText]][1]/w:r/w:instrText"/>
           <xsl:with-param name="fieldCode" select="concat($fieldCode, $instrText/text())"/>
         </xsl:call-template>
       </xsl:when>
@@ -336,13 +350,13 @@
 
   <!--document title-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE')]" mode="fields">
-      <text:title>
-        <xsl:apply-templates select="w:r/child::node()"/>
-      </text:title>
+    <text:title>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:title>
   </xsl:template>
 
   <xsl:template match="w:fldSimple[contains(@w:instr,'USERNAME')]" mode="fields">
-      <xsl:call-template name="InsertUserName"/>
+    <xsl:call-template name="InsertUserName"/>
   </xsl:template>
 
   <xsl:template name="InsertUserName">
@@ -352,7 +366,7 @@
   </xsl:template>
 
   <xsl:template match="w:fldSimple[contains(@w:instr,'AUTHOR')]" mode="fields">
-      <xsl:call-template name="InsertAuthor"/>
+    <xsl:call-template name="InsertAuthor"/>
   </xsl:template>
 
   <xsl:template name="InsertAuthor">
@@ -363,7 +377,7 @@
 
   <!--user initials-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'USERINITIALS')]" mode="fields">
-      <xsl:call-template name="InsertUserInitials"/>
+    <xsl:call-template name="InsertUserInitials"/>
   </xsl:template>
 
   <!--user initials-->
@@ -375,38 +389,38 @@
 
   <!--chapter name or chapter number-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'STYLEREF')]" mode="fields">
-      <text:chapter>
-        <xsl:choose>
-          <xsl:when test="self::node()[contains(@w:instr,'\n')]">
-            <xsl:attribute name="text:display">number</xsl:attribute>
-          </xsl:when>
-          <xsl:when test="self::node()[contains(@w:instr,'\*')]">
-            <xsl:attribute name="text:display">name</xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
-        <xsl:if test="self::node()[contains(@w:instr,'Heading')]">
-          <xsl:attribute name="text:outline-level">
-            <xsl:value-of
-              select="substring-before(substring-after(./@w:instr,'Heading '),'&quot;')"/>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:apply-templates select="w:r/child::node()"/>
-      </text:chapter>
+    <text:chapter>
+      <xsl:choose>
+        <xsl:when test="self::node()[contains(@w:instr,'\n')]">
+          <xsl:attribute name="text:display">number</xsl:attribute>
+        </xsl:when>
+        <xsl:when test="self::node()[contains(@w:instr,'\*')]">
+          <xsl:attribute name="text:display">name</xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:if test="self::node()[contains(@w:instr,'Heading')]">
+        <xsl:attribute name="text:outline-level">
+          <xsl:value-of
+            select="substring-before(substring-after(./@w:instr,'Heading '),'&quot;')"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:chapter>
   </xsl:template>
 
   <!--document subject-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'SUBJECT')]" mode="fields">
-      <text:subject>
-        <xsl:apply-templates select="w:r/child::node()"/>
-      </text:subject>
+    <text:subject>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:subject>
   </xsl:template>
-  
+
   <xsl:template match="w:fldSimple">
     <text:span text:style-name="{generate-id(w:r)}">
-            <xsl:apply-templates select="." mode="fields"/>
+      <xsl:apply-templates select="." mode="fields"/>
     </text:span>
   </xsl:template>
-  
+
   <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')]" mode="fields">
     <xsl:call-template name="InsertDateField">
       <xsl:with-param name="dateText" select="@w:instr"/>
@@ -421,7 +435,8 @@
 
   <!--page number-->
   <xsl:template
-    match="w:fldSimple[contains(@w:instr,'PAGE ') and not(contains(@w:instr,'NUMPAGE'))]" mode="fields">
+    match="w:fldSimple[contains(@w:instr,'PAGE ') and not(contains(@w:instr,'NUMPAGE'))]"
+    mode="fields">
     <xsl:call-template name="InsertPageNumberField">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
     </xsl:call-template>
@@ -435,7 +450,7 @@
   </xsl:template>
 
   <xsl:template name="InsertPageCount">
-<text:page-count>
+    <text:page-count>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:page-count>
   </xsl:template>
@@ -978,7 +993,7 @@
 
   <!-- Page Number Field -->
   <xsl:template name="InsertPageNumberField">
-<xsl:variable name="docName">
+    <xsl:variable name="docName">
       <xsl:call-template name="GetDocumentName">
         <xsl:with-param name="rootId">
           <xsl:value-of select="generate-id(/node())"/>
@@ -1238,7 +1253,8 @@
   <xsl:template name="InsertField">
     <xsl:choose>
       <!-- default scenario - catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
-      <xsl:when test="w:instrText[1]">
+      <xsl:when
+        test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin' or @w:fldCharType='separate']] ">
         <xsl:apply-templates select="w:instrText[1]"/>
       </xsl:when>
       <xsl:otherwise>
