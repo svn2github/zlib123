@@ -158,6 +158,30 @@
           </text:deletion>
         </text:changed-region>
       </xsl:when>
+      <xsl:when test="w:ins">
+        <text:changed-region>
+          <xsl:attribute name="text:id">
+            <xsl:value-of select="generate-id(ancestor::w:p)"/>
+          </xsl:attribute>
+          <text:insertion>
+            <office:change-info>
+              <dc:creator>
+                <xsl:value-of select="w:ins/@w:author"/>
+              </dc:creator>
+              <dc:date>
+                <xsl:choose>
+                  <xsl:when test="contains(w:ins/@w:date,'Z')">
+                    <xsl:value-of select="substring-before(w:ins/@w:date,'Z')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="w:ins/@w:date"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </dc:date>
+            </office:change-info>
+          </text:insertion>
+        </text:changed-region>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
   
@@ -186,9 +210,6 @@
   </xsl:template>
   
   <xsl:template name="TrackChangesInsertMade">
-    <xsl:if test="w:br">
-      <text:line-break/>
-    </xsl:if>
     <text:change-start>
       <xsl:attribute name="text:change-id">
         <xsl:value-of select="generate-id(.)"/>

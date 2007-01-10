@@ -369,12 +369,25 @@
   <!--paragraph with outline level is a heading-->
   <xsl:template match="w:p" mode="heading">
     <xsl:param name="outlineLevel"/>
+    <xsl:variable name="numId">
+      <xsl:call-template name="GetListProperty">
+        <xsl:with-param name="node" select="."/>
+        <xsl:with-param name="property">w:numId</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
     <text:h>
       <!--style name-->
       <xsl:if test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column']">
         <xsl:attribute name="text:style-name">
           <xsl:value-of select="generate-id(self::node())"/>
         </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="preceding::w:p[1]/w:pPr/w:rPr/w:ins and $numId!=''">
+        <text:change-end>
+          <xsl:attribute name="text:change-id">
+            <xsl:value-of select="generate-id(preceding::w:p[1])"/>
+          </xsl:attribute>
+        </text:change-end>
       </xsl:if>
       <!--header outline level -->
       <xsl:call-template name="InsertHeadingOutlineLvl">
@@ -387,7 +400,21 @@
         <!--      if this following paragraph is attached to this one in track changes mode-->
         <xsl:call-template name="InsertDeletedParagraph"/>
       </xsl:if>
+      <xsl:if test="w:pPr/w:rPr/w:ins">
+        <text:change-start>
+          <xsl:attribute name="text:change-id">
+            <xsl:value-of select="generate-id(self::node())"/>
+          </xsl:attribute>
+        </text:change-start>
+      </xsl:if>
     </text:h>
+    <xsl:if test="w:pPr/w:rPr/w:ins and $numId=''">
+      <text:change-end>
+        <xsl:attribute name="text:change-id">
+          <xsl:value-of select="generate-id(self::node())"/>
+        </xsl:attribute>
+      </text:change-end>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="InsertDeletedParagraph">
@@ -447,6 +474,12 @@
       </xsl:when>
       <!--default scenario-->
       <xsl:otherwise>
+        <xsl:variable name="numId">
+          <xsl:call-template name="GetListProperty">
+            <xsl:with-param name="node" select="."/>
+            <xsl:with-param name="property">w:numId</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
         <text:p>
           <xsl:if
             test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr">
@@ -454,12 +487,33 @@
               <xsl:value-of select="generate-id(self::node())"/>
             </xsl:attribute>
           </xsl:if>
+          <xsl:if test="preceding::w:p[1]/w:pPr/w:rPr/w:ins and $numId!=''">
+            <text:change-end>
+              <xsl:attribute name="text:change-id">
+                <xsl:value-of select="generate-id(preceding::w:p[1])"/>
+              </xsl:attribute>
+            </text:change-end>
+          </xsl:if>
           <xsl:apply-templates/>
           <!--      if this following paragraph is attached to this one in track changes mode-->
           <xsl:if test="w:pPr/w:rPr/w:del">
             <xsl:call-template name="InsertDeletedParagraph"/>
           </xsl:if>
+          <xsl:if test="w:pPr/w:rPr/w:ins">
+            <text:change-start>
+              <xsl:attribute name="text:change-id">
+                <xsl:value-of select="generate-id(self::node())"/>
+              </xsl:attribute>
+            </text:change-start>
+          </xsl:if>
         </text:p>
+        <xsl:if test="w:pPr/w:rPr/w:ins and $numId=''">
+          <text:change-end>
+            <xsl:attribute name="text:change-id">
+              <xsl:value-of select="generate-id(self::node())"/>
+            </xsl:attribute>
+          </text:change-end>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
