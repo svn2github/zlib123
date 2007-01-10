@@ -57,6 +57,7 @@
   <xsl:preserve-space elements="w:r"/>
 
   <xsl:key name="InstrText" match="w:instrText" use="''"/>
+  <xsl:key name="bookmarkStart" match="w:bookmarkStart" use="@w:id"/>
 
   <!--main document-->
   <xsl:template name="content">
@@ -242,9 +243,6 @@
     <xsl:param name="node"/>
     <xsl:for-each select="document('word/styles.xml')">
       <xsl:choose>
-        <xsl:when test="$node/w:pPr/w:outlineLvl/@w:val">
-          <xsl:value-of select="$node/w:pPr/w:outlineLvl/@w:val"/>
-        </xsl:when>
         <xsl:when test="$node/w:pPr/w:pStyle/@w:val">
           <xsl:variable name="outline">
             <xsl:value-of select="$node/w:pPr/w:pStyle/@w:val"/>
@@ -630,18 +628,67 @@
   <xsl:template match="w:hyperlink">
     <xsl:call-template name="InsertHyperlink"/>
   </xsl:template>
-  <!--  text bookmark mark -->
+
+  <!--  text bookmark-Start  -->
   <xsl:template match="w:bookmarkStart">
-    <text:bookmark-start>
-      <xsl:attribute name="text:name">
-        <xsl:value-of select="@w:name"/>
-      </xsl:attribute>
-    </text:bookmark-start>
-    <text:bookmark-end>
-      <xsl:attribute name="text:name">
-        <xsl:value-of select="@w:name"/>
-      </xsl:attribute>
-    </text:bookmark-end>
+
+    <xsl:variable name="NameBookmark">
+      <xsl:value-of select="@w:name"/>
+    </xsl:variable>
+    
+    <xsl:variable name="OutlineLvl">
+      <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="contains($NameBookmark, '_Toc') and $OutlineLvl != ''">
+        <text:bookmark>
+          <xsl:attribute name="text:name">
+            <xsl:value-of select="$NameBookmark"/>
+          </xsl:attribute>
+        </text:bookmark>
+        <text:toc-mark-start>
+          <xsl:attribute name="text:id">
+            <xsl:value-of select="@w:id"/>
+          </xsl:attribute>
+          <xsl:attribute name="text:outline-level">
+            <xsl:value-of select="$OutlineLvl + 1"/>
+          </xsl:attribute>
+        </text:toc-mark-start>
+      </xsl:when>
+      <xsl:otherwise>
+        <text:bookmark-start>
+          <xsl:attribute name="text:name">
+            <xsl:value-of select="$NameBookmark"/>
+          </xsl:attribute>
+        </text:bookmark-start>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+  <xsl:template match="w:bookmarkEnd">
+    <xsl:variable name="NameBookmark">
+      <xsl:value-of select="key('bookmarkStart', @w:id)/@w:name"/>
+    </xsl:variable>    
+    <xsl:variable name="OutlineLvl">
+      <xsl:value-of select="parent::w:p/w:pPr/w:outlineLvl/@w:val"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="contains($NameBookmark, '_Toc')  and  $OutlineLvl != ''">
+        <text:toc-mark-end>
+          <xsl:attribute name="text:id">
+            <xsl:value-of select="@w:id"/>
+          </xsl:attribute>
+        </text:toc-mark-end>
+      </xsl:when>
+      <xsl:otherwise>
+        <text:bookmark-end>
+          <xsl:attribute name="text:name">
+            <xsl:value-of select="$NameBookmark"/>
+          </xsl:attribute>
+        </text:bookmark-end>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- simple text  -->

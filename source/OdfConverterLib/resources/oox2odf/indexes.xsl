@@ -33,6 +33,8 @@
   xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
   exclude-result-prefixes="w text style">
   
+  <xsl:key name="OutlineLevel" match="w:outlineLvl" use="''"/>
+
   <!-- paragraph which starts table of content -->
   <xsl:template match="w:p" mode="tocstart">
     <xsl:choose>
@@ -215,6 +217,34 @@
     </xsl:choose>
   </xsl:template>
   
+<xsl:template name="GetOutlineLevelMax">
+    <xsl:param name="value"/>
+    <xsl:param name="count"/>
+      <xsl:variable name="getValue">
+        <xsl:value-of select="key('OutlineLevel', '')[$count]/@w:val"/>
+      </xsl:variable>
+  <xsl:choose>
+    <xsl:when test="$count > 0">      
+      <xsl:call-template name="GetOutlineLevelMax">
+        <xsl:with-param name="value">
+          <xsl:choose>
+            <xsl:when test="number($getValue) > number($value)">
+              <xsl:value-of select="$getValue"/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="$value"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="count">
+          <xsl:value-of select="$count - 1"/>
+        </xsl:with-param>
+      </xsl:call-template>      
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="$value + 1"/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
   <!-- insert table-of content properties -->
   <xsl:template name="InsertIndexProperties">
     <xsl:variable name="instrTextContent">
@@ -222,6 +252,7 @@
         <xsl:with-param name="textContent"/>
       </xsl:apply-templates>
     </xsl:variable>
+  
     <xsl:variable name="maxLevel">
       <xsl:choose>
         <xsl:when test="contains($instrTextContent,'\t')">
@@ -242,6 +273,29 @@
         <xsl:when test="contains($instrTextContent,'-')">
           <xsl:value-of select="substring-before(substring-after($instrTextContent,'-'),'&quot;')"/>
         </xsl:when>
+        
+        <xsl:when test="contains($instrTextContent,'\o')"> 
+        
+          <xsl:variable name="CountOutlineLevel">
+            <xsl:for-each select="document('word/document.xml')">
+              <xsl:value-of select="count(key('OutlineLevel', '')/@w:val)"/>
+            </xsl:for-each>  
+          </xsl:variable>         
+          <xsl:choose>
+            <xsl:when test="$CountOutlineLevel > 0">
+              <xsl:for-each select="document('word/document.xml')">
+                <xsl:call-template name="GetOutlineLevelMax">
+                  <xsl:with-param name="value">0</xsl:with-param>
+                  <xsl:with-param name="count">                    
+                    <xsl:value-of select="$CountOutlineLevel"/>
+                  </xsl:with-param>                 
+                </xsl:call-template>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>         
+
+        </xsl:when>        
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
