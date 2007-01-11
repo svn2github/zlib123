@@ -839,7 +839,7 @@
               <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:attribute name="style:parent-style-name">Standard</xsl:attribute>
+              <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
