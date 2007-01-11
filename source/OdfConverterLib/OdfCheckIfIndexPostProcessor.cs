@@ -156,7 +156,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		//method to check if element starts some kind of index(TOC or bibliography)
 		public bool IsIndex(string elementName)
 		{
-			if(elementName.Equals("table-of-content") || elementName.Equals("bibliography"))
+			if(elementName.Equals("table-of-content") || elementName.Equals("bibliography") || elementName.Equals("table-index") || elementName.Equals("alphabetical-index"))
 			{
 				return true;
 			}

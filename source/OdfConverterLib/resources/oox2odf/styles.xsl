@@ -1418,7 +1418,7 @@
           </xsl:for-each>
         </xsl:if>
 
-        <xsl:if test="contains(self::node()/@w:styleId,'TOC') and not(w:pPr/w:tabs)">
+        <xsl:if test="contains(self::node()/@w:styleId,'TOC') or contains(self::node()/@w:styleId,'TableofFigures') and not(w:pPr/w:tabs)">
           <xsl:call-template name="InsertExtraTabs">
             <xsl:with-param name="currentStyleId">
               <xsl:value-of select="self::node()/@w:styleId"/>

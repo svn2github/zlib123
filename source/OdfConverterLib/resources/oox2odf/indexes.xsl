@@ -39,12 +39,34 @@
   <xsl:template match="w:p" mode="tocstart">
     <xsl:choose>
       <xsl:when test="descendant::w:r[contains(w:instrText,'TOC')]">
-        <text:table-of-content text:style-name="Sect1" text:protected="true" text:name="Table of Contents1">
-          <xsl:call-template name="InsertIndexProperties"/>
+        <xsl:choose>
+          <xsl:when test="w:pPr[contains(w:pStyle/@w:val,'TOC') or contains(w:pStyle/@w:val,'Contents_20')]">
+        <text:table-of-content text:style-name="Sect1">
+          <xsl:message terminate="no">feedback:TOC protection against manual changes</xsl:message>
+          <xsl:attribute name="text:protected">false</xsl:attribute>
+          <xsl:attribute name="text:name">Table of Contents1</xsl:attribute>
+          <xsl:call-template name="InsertIndexProperties">
+            <xsl:with-param name="type">TOC</xsl:with-param>
+          </xsl:call-template>
           <text:index-body>
             <xsl:apply-templates select="." mode="index"/>
           </text:index-body>
         </text:table-of-content>
+          </xsl:when>
+          <xsl:otherwise>
+            <text:table-index text:style-name="Sect1">
+              <xsl:message terminate="no">feedback:TOC protection against manual changes</xsl:message>
+              <xsl:attribute name="text:protected">false</xsl:attribute>
+              <xsl:attribute name="text:name">Index of Tables1</xsl:attribute>
+              <xsl:call-template name="InsertIndexProperties">
+                <xsl:with-param name="type">INDEX</xsl:with-param>
+              </xsl:call-template>
+              <text:index-body>
+                <xsl:apply-templates select="." mode="index"/>
+              </text:index-body>
+            </text:table-index>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:when test="descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')]">
         <text:bibliography>
@@ -247,6 +269,7 @@
 
   <!-- insert table-of content properties -->
   <xsl:template name="InsertIndexProperties">
+    <xsl:param name="type"/>
     <xsl:variable name="instrTextContent">
       <xsl:apply-templates select="descendant::w:r/w:instrText[1]" mode="textContent">
         <xsl:with-param name="textContent"/>
@@ -299,47 +322,73 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$type='TOC'">
     <text:table-of-content-source text:outline-level="{$maxLevel}">
-      <xsl:if test="$maxLevel = 0">
-        <xsl:attribute name="text:outline-level">1</xsl:attribute>
-      </xsl:if>
-      <text:index-title-template text:style-name="Contents_20_Heading"/>
-      <xsl:variable name="level">
-        <xsl:choose>
-          <xsl:when test="contains($instrTextContent,'\t')">
-            <xsl:call-template name="GetMinLevelFromStyles">
-              <xsl:with-param name="stylesWithLevels">
-                <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')"/>
-              </xsl:with-param>
-              <xsl:with-param name="defaultLevel">
-                <xsl:choose>
-                  <xsl:when test="contains($instrTextContent,'-')">
-                    <xsl:value-of select="substring-after(substring-before($instrTextContent,'-'),'&quot;')"/>
-                  </xsl:when>
-                  <xsl:otherwise>10</xsl:otherwise>
-                </xsl:choose>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:when test="contains($instrTextContent,'-')">
-            <xsl:value-of select="substring-after(substring-before($instrTextContent,'-'),'&quot;')"/>
-          </xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      <xsl:call-template name="InsertTableOfContentEntryProperties">
-        <xsl:with-param name="level" select="$level"/>
+      <xsl:call-template name="InsertContentOfIndexProperties">
+        <xsl:with-param name="styleName">Contents_20_Heading</xsl:with-param>
         <xsl:with-param name="maxLevel" select="$maxLevel"/>
         <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+        <xsl:with-param name="type" select="$type"/>
       </xsl:call-template>
     </text:table-of-content-source>
+      </xsl:when>
+      <xsl:otherwise>
+        <text:table-index-source text:caption-sequence-name="{substring-before(substring-after($instrTextContent,'&quot;'),'&quot;')}" text:caption-sequence-format="text">
+          <xsl:call-template name="InsertContentOfIndexProperties">
+            <xsl:with-param name="styleName">Table_20_index_20_heading</xsl:with-param>
+            <xsl:with-param name="maxLevel" select="$maxLevel"/>
+            <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+          </xsl:call-template>
+          </text:table-index-source>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertContentOfIndexProperties">
+    <xsl:param name="styleName"/>
+    <xsl:param name="maxLevel"/>
+    <xsl:param name="instrTextContent"/>
+    <xsl:param name="type"/>
+    <xsl:if test="$maxLevel = 0"/>
+    <text:index-title-template text:style-name="{$styleName}"/>
+    <xsl:variable name="level">
+      <xsl:choose>
+        <xsl:when test="contains($instrTextContent,'\t')">
+          <xsl:call-template name="GetMinLevelFromStyles">
+            <xsl:with-param name="stylesWithLevels">
+              <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')"/>
+            </xsl:with-param>
+            <xsl:with-param name="defaultLevel">
+              <xsl:choose>
+                <xsl:when test="contains($instrTextContent,'-')">
+                  <xsl:value-of select="substring-after(substring-before($instrTextContent,'-'),'&quot;')"/>
+                </xsl:when>
+                <xsl:otherwise>10</xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="contains($instrTextContent,'-')">
+          <xsl:value-of select="substring-after(substring-before($instrTextContent,'-'),'&quot;')"/>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:call-template name="InsertIndexEntryProperties">
+      <xsl:with-param name="level" select="$level"/>
+      <xsl:with-param name="maxLevel" select="$maxLevel"/>
+      <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+      <xsl:with-param name="type" select="$type"/>
+    </xsl:call-template>
   </xsl:template>
   
   <!-- insert entry properties -->
-  <xsl:template name="InsertTableOfContentEntryProperties">
+  <xsl:template name="InsertIndexEntryProperties">
     <xsl:param name="level"/>
     <xsl:param name="maxLevel"/>
     <xsl:param name="instrTextContent"/>
+    <xsl:param name="type"/>
     <xsl:variable name="node" select="self::node()"/>
     <xsl:variable name="levelForStyle">
       <xsl:call-template name="GetStyleForLevel">
@@ -351,42 +400,72 @@
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="not(number($level) &gt; number($maxLevel)) and $levelForStyle!='NaN'">
-        <text:table-of-content-entry-template text:outline-level="{$level}"> 
-          <xsl:if test="$level = 0">
-            <xsl:attribute name="text:outline-level">1</xsl:attribute>
-          </xsl:if>
-          <xsl:attribute name="text:style-name">
-            <xsl:choose>
-              <xsl:when test="$level=0">
-                <xsl:call-template name="TocToContent">
-                  <xsl:with-param name="styleValue">
-                    <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:when test="contains($instrTextContent,'\t')">
-                <xsl:value-of select="concat('Contents_20_',$levelForStyle)"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="concat('Contents_20_',$level)"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-          <xsl:call-template name="EntryIterator">
-            <xsl:with-param name="fieldCharCount">0</xsl:with-param>
-            <xsl:with-param name="level" select="$level"/>
-            <xsl:with-param name="node" select="$node"/>
+        <xsl:choose>
+        <xsl:when test="$type='TOC'">
+        <text:table-of-content-entry-template text:outline-level="{$level}">
+          <xsl:call-template name="InsertContentOfIndexEntryProperties">
+          <xsl:with-param name="level" select="$level"/>
             <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+            <xsl:with-param name="levelForStyle" select="$levelForStyle"/>
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="type" select="$type"/>
           </xsl:call-template>
         </text:table-of-content-entry-template>
-        <xsl:call-template name="InsertTableOfContentEntryProperties">
+        </xsl:when>
+          <xsl:otherwise>
+            <text:table-index-entry-template>
+              <xsl:call-template name="InsertContentOfIndexEntryProperties">
+                <xsl:with-param name="level" select="$level"/>
+                <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+                <xsl:with-param name="levelForStyle" select="$levelForStyle"/>
+                <xsl:with-param name="node" select="$node"/>
+                <xsl:with-param name="type" select="$type"/>
+              </xsl:call-template>
+            </text:table-index-entry-template>
+          </xsl:otherwise>
+          </xsl:choose>
+        <xsl:call-template name="InsertIndexEntryProperties">
           <xsl:with-param name="level" select="number($level)+1"/>
           <xsl:with-param name="maxLevel" select="$maxLevel"/>
           <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+          <xsl:with-param name="type" select="$type"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise></xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertContentOfIndexEntryProperties">
+    <xsl:param name="level"/>
+    <xsl:param name="instrTextContent"/>
+    <xsl:param name="levelForStyle"/>
+    <xsl:param name="node"/>
+    <xsl:param name="type"/>
+    <xsl:if test="$level = 0"/>
+    <xsl:attribute name="text:style-name">
+      <xsl:choose>
+        <xsl:when test="$level=0">
+          <xsl:call-template name="TocToContent">
+            <xsl:with-param name="styleValue">
+              <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="contains($instrTextContent,'\t')">
+          <xsl:value-of select="concat('Contents_20_',$levelForStyle)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat('Contents_20_',$level)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    <xsl:call-template name="EntryIterator">
+      <xsl:with-param name="fieldCharCount">0</xsl:with-param>
+      <xsl:with-param name="level" select="$level"/>
+      <xsl:with-param name="node" select="$node"/>
+      <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+      <xsl:with-param name="type" select="$type"/>
+    </xsl:call-template>
   </xsl:template>
   
   <!--template which changes style 'TOC' to style 'Contents_20'-->
@@ -408,30 +487,31 @@
     <xsl:param name="level"/>
     <xsl:param name="node"/>
     <xsl:param name="instrTextContent"/>
+    <xsl:param name="type"/>
     <xsl:variable name="styleLevel">
       <xsl:choose>
-      <xsl:when test="contains($instrTextContent,'\t')">
-        <xsl:variable name="levelForStyle">
-        <xsl:call-template name="GetStyleForLevel">
-          <xsl:with-param name="stylesWithLevels">
-            <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')"/>
-          </xsl:with-param>
-          <xsl:with-param name="level" select="$level"/>
-        </xsl:call-template>
-        </xsl:variable>
-        <xsl:choose>
-          <xsl:when test="$levelForStyle!='NaN'">
-            <xsl:value-of select="$levelForStyle"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$level"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
+        <xsl:when test="contains($instrTextContent,'\t')">
+          <xsl:variable name="levelForStyle">
+            <xsl:call-template name="GetStyleForLevel">
+              <xsl:with-param name="stylesWithLevels">
+                <xsl:value-of select="substring-before(substring-after(substring-after($instrTextContent,'\t'),'&quot;'),'&quot;')"/>
+              </xsl:with-param>
+              <xsl:with-param name="level" select="$level"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="$levelForStyle!='NaN'">
+              <xsl:value-of select="$levelForStyle"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$level"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$level"/>
         </xsl:otherwise>
-        </xsl:choose>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="count">
       <xsl:choose>
@@ -448,22 +528,25 @@
     </xsl:variable>
     <xsl:if test="$count &gt; 0">
       <xsl:choose>
-      <xsl:when test="(contains(descendant::w:pStyle/@w:val,$styleLevel) and not(contains(preceding-sibling::w:p[(preceding-sibling::node()=$node or self::node()=$node)]/descendant::w:pStyle/@w:val,$styleLevel))) or $styleLevel = 0">
-        <text:index-entry-chapter/>
-        <text:index-entry-text/>
-        <xsl:apply-templates select="(descendant::w:r/w:tab)[number(last())]" mode="entry"/>
-        <text:index-entry-page-number/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each select="following-sibling::w:p[1]">
-          <xsl:call-template name="EntryIterator">
-            <xsl:with-param name="fieldCharCount" select="$count"/>
-            <xsl:with-param name="level" select="$level"/>
-            <xsl:with-param name="node" select="$node"/>
-            <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
-          </xsl:call-template>
-        </xsl:for-each>
-      </xsl:otherwise>
+        <xsl:when test="(contains(descendant::w:pStyle/@w:val,$styleLevel) and not(contains(preceding-sibling::w:p[(preceding-sibling::node()=$node or self::node()=$node)]/descendant::w:pStyle/@w:val,$styleLevel))) or $styleLevel = 0">
+          <xsl:if test="$type='TOC'">
+            <text:index-entry-chapter/>
+          </xsl:if>
+          <text:index-entry-text/>
+          <xsl:apply-templates select="(descendant::w:r/w:tab)[number(last())]" mode="entry"/>
+          <xsl:apply-templates select="(descendant::w:r/w:t)[number(last())]" mode="entry"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:for-each select="following-sibling::w:p[1]">
+            <xsl:call-template name="EntryIterator">
+              <xsl:with-param name="fieldCharCount" select="$count"/>
+              <xsl:with-param name="level" select="$level"/>
+              <xsl:with-param name="node" select="$node"/>
+              <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+              <xsl:with-param name="type" select="$type"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
   </xsl:template> 
@@ -585,6 +668,19 @@
     </xsl:choose>
       </text:bibliography-entry-template>
  </xsl:template>
+  
+  <!-- insert page number -->
+  <xsl:template match="w:t" mode="entry">
+    <xsl:variable name="text">
+      <xsl:value-of select="child::text()"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="number($text)">
+        <text:index-entry-page-number/>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
+  </xsl:template>
   
   <!-- insert entry properties for tabs -->
   <xsl:template match="w:tab[not(parent::w:tabs)]" mode="entry">
