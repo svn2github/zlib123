@@ -1278,7 +1278,7 @@
     <xsl:choose>
       <!-- default scenario - catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
       <xsl:when
-        test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin' or @w:fldCharType='separate']] ">
+        test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] ">
         <xsl:apply-templates select="w:instrText[1]"/>
       </xsl:when>
       <xsl:otherwise>
