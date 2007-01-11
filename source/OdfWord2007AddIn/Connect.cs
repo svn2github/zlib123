@@ -252,7 +252,9 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
             
             MSword.Document doc = this.applicationObject.ActiveDocument;
 
-            if (!doc.Saved)
+            // the second test deals with blank documents 
+            // (which are in a 'saved' state and have no extension yet(?))
+            if (!doc.Saved || doc.FullName.IndexOf('.') < 0)
             {
                 System.Windows.Forms.MessageBox.Show("Please save your document before exporting to ODF");
             }

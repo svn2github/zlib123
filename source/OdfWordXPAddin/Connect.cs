@@ -315,7 +315,9 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
 
             MSword.Document doc = this.applicationObject.ActiveDocument;
 
-            if (!doc.Saved)
+            // the second test deals with blank documents 
+            // (which are in a 'saved' state and have no extension yet(?))
+            if (!doc.Saved || doc.FullName.IndexOf('.') < 0)
             {
                 System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
             }
