@@ -516,15 +516,18 @@
   <xsl:template name="GetListProperty">
     <xsl:param name="node"/>
     <xsl:param name="property"/>
-
-    <xsl:choose>
-      <xsl:when test="$node/w:pPr/w:numPr[not(ancestor::w:pPrChange)]">
-        <xsl:value-of select="$node/w:pPr/w:numPr/*[name() = $property]/@w:val"/>
+    
+    <!-- second condition in xsl:when checks if there isn't another w:p node before decendant -->
+    <xsl:choose>      
+      <xsl:when test="$node/descendant::w:numPr[not(ancestor::w:pPrChange)] and 
+        generate-id($node)=generate-id($node/descendant::w:numPr[not(ancestor::w:pPrChange)]/ancestor::w:p[1])">
+        <xsl:value-of select="$node/descendant::w:numPr/child::node()[name() = $property]/@w:val"/>
       </xsl:when>
-
-      <xsl:when test="$node/w:pPr/w:pStyle[not(ancestor::w:pPrChange)]">
-        <xsl:variable name="styleId" select="$node/w:pPr/w:pStyle/@w:val"/>
-
+      
+      <xsl:when test="$node/descendant::w:pStyle[not(ancestor::w:pPrChange)] and 
+        generate-id($node)=generate-id($node/descendant::w:pStyle[not(ancestor::w:pPrChange)]/ancestor::w:p[1])">
+        <xsl:variable name="styleId" select="$node/descendant::w:pStyle/@w:val"/>
+        
         <xsl:variable name="pStyle"
           select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $styleId]"/>
         <xsl:variable name="propertyValue">
