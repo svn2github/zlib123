@@ -1496,8 +1496,11 @@
             <xsl:when test="w:numPr/w:numId/@w:val">
               <xsl:value-of select="w:numPr/w:numId/@w:val"/>
             </xsl:when>
-            <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:numId/@w:val">
-              <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:numId/@w:val"/>
+            <xsl:when
+              test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+              <xsl:value-of
+                select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of
@@ -1506,15 +1509,25 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
+        
         <xsl:variable name="Ivl">
           <xsl:choose>
             <xsl:when test="w:numPr/w:ilvl/@w:val">
               <xsl:value-of select="w:numPr/w:ilvl/@w:val"/>
             </xsl:when>
-            <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
-              <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"/>
-            </xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
+            <xsl:otherwise>
+              <xsl:for-each select="document('word/styles.xml')">
+              <xsl:choose>
+                <xsl:when
+                  test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
+                  <xsl:value-of
+                    select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"
+                  />
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+              </xsl:for-each>
+            </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
 
@@ -1578,9 +1591,11 @@
         </xsl:variable>
         <xsl:choose>
           <xsl:when test=" $LeftNumber = '' and $IndLeft = ''">
-            <xsl:value-of
-              select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left - key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging"
-            />
+            <xsl:for-each select="document('word/styles.xml')">
+              <xsl:value-of
+                select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left - key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging"
+              />
+            </xsl:for-each>
           </xsl:when>
           <xsl:when test="$IndLeft != ''">
             <xsl:choose>
@@ -1601,16 +1616,22 @@
           <xsl:when test="w:ind/@w:left">
             <xsl:value-of select="w:ind/@w:left"/>
           </xsl:when>
-          <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left">
-            <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
-          </xsl:when>
-          <xsl:when test="contains($StyleId,'TOC')">
-            <xsl:value-of
-              select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left "
-            />
-          </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
+            <xsl:for-each select="document('word/styles.xml')">
+              <xsl:choose>
+                <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left">
+                  <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
+                </xsl:when>
+                <xsl:when test="contains($StyleId,'TOC')">
+                  <xsl:value-of
+                    select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left "
+                  />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
