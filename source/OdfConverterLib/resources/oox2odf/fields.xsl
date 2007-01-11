@@ -100,6 +100,12 @@
         <xsl:when test="$fieldType = 'AUTHOR'">
           <xsl:call-template name="InsertAuthor"/>
         </xsl:when>
+        <!--caption field  from which Index of Figures is created -->
+        <xsl:when test="$fieldType = 'SEQ' ">
+          <xsl:call-template name="InsertSequence">
+            <xsl:with-param name="fieldCode" select="$fieldCode"/>
+          </xsl:call-template>
+        </xsl:when>
       </xsl:choose>
     </text:span>
   </xsl:template>
@@ -455,29 +461,28 @@
     </text:page-count>
   </xsl:template>
 
+
   <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')]" mode="automaticstyles">
     <xsl:call-template name="InsertDateStyle">
       <xsl:with-param name="dateText" select="@w:instr"/>
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="w:fldSimple[contains(@w:instr,'SEQ')] | w:instrText[contains(self::node(),'SEQ')]">
-    <xsl:variable name="text">
-      <xsl:choose>
-        <xsl:when test="self::node()[name()='w:fldSimple']">
-          <xsl:value-of select="@w:instr"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="child::text()"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+  <!--caption field  from which Index of Figures is created -->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'SEQ')]" mode="fields">
+      <xsl:call-template name="InsertSequence">
+          <xsl:with-param name="fieldCode" select="@w:instr"/>
+      </xsl:call-template>
+  </xsl:template>
+  
+  <xsl:template name="InsertSequence">
+    <xsl:param name="fieldCode"/>
     <xsl:variable name="refType">
-      <xsl:value-of select="substring-before(substring-after($text,'SEQ '),' ')"/>
+      <xsl:value-of select="substring-before(substring-after($fieldCode,'SEQ '),' ')"/>
     </xsl:variable>
     <text:sequence text:ref-name="{concat('ref',concat($refType,number((following::w:r/w:t)[1])-1))}" text:name="{$refType}" text:formula="{concat(concat('ooow:',$refType),'+1')}">
       <xsl:apply-templates select="(following::w:r/w:t)[1]"/>
-    </text:sequence>
+    </text:sequence>  
   </xsl:template>
   
   <xsl:template name="InsertDateStyle">
