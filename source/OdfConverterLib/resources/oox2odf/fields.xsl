@@ -104,6 +104,7 @@
         <xsl:when test="$fieldType = 'SEQ' ">
           <xsl:call-template name="InsertSequence">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
+            <xsl:with-param name="sequenceContext" select="following::w:r[w:t][1]"/>
           </xsl:call-template>
         </xsl:when>
       </xsl:choose>
@@ -470,20 +471,21 @@
 
   <!--caption field  from which Index of Figures is created -->
   <xsl:template match="w:fldSimple[contains(@w:instr,'SEQ')]" mode="fields">
-    <xsl:call-template name="InsertSequence">
-      <xsl:with-param name="fieldCode" select="@w:instr"/>
-    </xsl:call-template>
+      <xsl:call-template name="InsertSequence">
+          <xsl:with-param name="fieldCode" select="@w:instr"/>
+        <xsl:with-param name="sequenceContext" select="w:r"/>
+      </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="InsertSequence">
     <xsl:param name="fieldCode"/>
+    <xsl:param name="sequenceContext"/>
     <xsl:variable name="refType">
       <xsl:value-of select="substring-before(substring-after($fieldCode,'SEQ '),' ')"/>
     </xsl:variable>
-    <text:sequence
-      text:ref-name="{concat('ref',concat($refType,number((following::w:r/w:t)[1])-1))}"
-      text:name="{$refType}" text:formula="{concat(concat('ooow:',$refType),'+1')}">
-      <xsl:apply-templates select="(following::w:r/w:t)[1]"/>
+
+    <text:sequence text:ref-name="{concat('ref',concat($refType,number($sequenceContext/w:t)-1))}" text:name="{$refType}" text:formula="{concat(concat('ooow:',$refType),'+1')}">
+      <xsl:apply-templates select="$sequenceContext/child::node()"/>
     </text:sequence>
   </xsl:template>
 
