@@ -38,7 +38,7 @@
   <!-- paragraph which starts table of content -->
   <xsl:template match="w:p" mode="tocstart">
     <xsl:choose>
-      <xsl:when test="descendant::w:r[contains(w:instrText,'TOC')]">
+      <xsl:when test="w:r[contains(w:instrText,'TOC')]">
         <xsl:choose>
           <xsl:when test="w:pPr[contains(w:pStyle/@w:val,'TOC') or contains(w:pStyle/@w:val,'Contents_20')]">
         <text:table-of-content text:style-name="Sect1">
@@ -68,10 +68,10 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:when test="descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')]">
+      <xsl:when test="w:r[contains(w:instrText,'BIBLIOGRAPHY')]">
         <text:bibliography>
           <xsl:attribute name="text:name">
-            <xsl:value-of select="generate-id(descendant::w:r[contains(w:instrText,'BIBLIOGRAPHY')])"/>
+            <xsl:value-of select="generate-id(w:r[contains(w:instrText,'BIBLIOGRAPHY')])"/>
           </xsl:attribute>
           <text:bibliography-source>
             <text:index-title-template/>
@@ -271,7 +271,7 @@
   <xsl:template name="InsertIndexProperties">
     <xsl:param name="type"/>
     <xsl:variable name="instrTextContent">
-      <xsl:apply-templates select="descendant::w:r/w:instrText[1]" mode="textContent">
+      <xsl:apply-templates select="w:r/w:instrText[1]" mode="textContent">
         <xsl:with-param name="textContent"/>
       </xsl:apply-templates>
     </xsl:variable>
@@ -528,7 +528,7 @@
     </xsl:variable>
     <xsl:if test="$count &gt; 0">
       <xsl:choose>
-        <xsl:when test="(contains(descendant::w:pStyle/@w:val,$styleLevel) and not(contains(preceding-sibling::w:p[(preceding-sibling::node()=$node or self::node()=$node)]/descendant::w:pStyle/@w:val,$styleLevel))) or $styleLevel = 0">
+        <xsl:when test="(contains(w:pPr/w:pStyle/@w:val,$styleLevel) and not(contains(preceding-sibling::w:p[(preceding-sibling::node()=$node or self::node()=$node)]/w:pPr/w:pStyle/@w:val,$styleLevel))) or $styleLevel = 0">
           <xsl:if test="$type='TOC'">
             <text:index-entry-chapter/>
           </xsl:if>
@@ -789,7 +789,7 @@
     
     <xsl:variable name="ancestor-style" select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
     
-    <xsl:for-each select="document('word/document.xml')">
+    <xsl:for-each select="document('word/styles.xml')">
     <xsl:choose>
       <xsl:when test="$tabCount > 0">
         <xsl:choose>
