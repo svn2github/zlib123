@@ -204,7 +204,7 @@
     <xsl:param name="shape" select="."/>
     <xsl:attribute name="text:anchor-type">
       <xsl:choose>
-        <xsl:when test="descendant::w10:wrap/@type = 'none' ">
+        <xsl:when test="w10:wrap/@type = 'none' ">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
      <!--frames must be anchored as character in header of footer because otherwise they lost their size
@@ -216,7 +216,7 @@
         <xsl:when test="ancestor::w:r/parent::node()/w:r[2] and not(w10:wrap)">
           <xsl:text>as-char</xsl:text>          
         </xsl:when>        
-        <xsl:when test="descendant::w10:wrap/@anchorx = 'page' and descendant::w10:wrap/@anchory = 'page'  ">
+        <xsl:when test="w10:wrap/@anchorx = 'page' and w10:wrap/@anchory = 'page'  ">
           <xsl:text>page</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -587,8 +587,8 @@
   </xsl:template>
 
   <xsl:template name="InsertShapeWrap">
-    <xsl:if test="descendant::node()[contains(name(),'wrap')]">
-      <xsl:variable name="wrap" select="descendant::w10:wrap"/>
+    <xsl:if test="w10:wrap">
+      <xsl:variable name="wrap" select="w10:wrap"/>
       <xsl:variable name="zindex">
         <xsl:call-template name="GetShapeProperty">
           <xsl:with-param name="propertyName" select="'z-index'"/>
@@ -808,7 +808,7 @@
         </xsl:attribute>
       </xsl:when> 
     <!--  Word sets default values for borders  when no strokeweight and strokecolor is set and @stroked is not set to f (this does not work for ole-objects (v:imagedata))-->
-      <xsl:when test="not($shape/@strokeweight) and not($shape/@strokecolor) and not(descendant::v:imagedata)">
+      <xsl:when test="not($shape/@strokeweight) and not($shape/@strokecolor) and not($shape/v:imagedata)">
          <xsl:attribute name="fo:border">
            <xsl:text>0.0176cm solid #000000</xsl:text>
         </xsl:attribute>

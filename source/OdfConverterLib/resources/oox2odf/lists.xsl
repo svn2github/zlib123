@@ -479,23 +479,23 @@
     <xsl:param name="property"/>
 
     <xsl:choose>
-      <xsl:when test="$style/descendant::w:numPr">
+      <xsl:when test="$style/w:pPr/w:numPr">
         <xsl:choose>
           <xsl:when test="$property = 'w:ilvl' ">
             <xsl:choose>
               <xsl:when
-                test="$style/descendant::w:numPr/w:numId and not($style/descendant::w:numPr/w:ilvl)">
+                test="$style/w:pPr/w:numPr/w:numId and not($style/w:pPr/w:numPr/w:ilvl)">
                 <xsl:text>0</xsl:text>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of
-                  select="$style/descendant::w:numPr/child::node()[name() = $property]/@w:val"/>
+                  select="$style/w:pPr/w:numPr/child::node()[name() = $property]/@w:val"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of
-              select="$style/descendant::w:numPr/child::node()[name() = $property]/@w:val"/>
+              select="$style/w:pPr/w:numPr/child::node()[name() = $property]/@w:val"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -518,12 +518,12 @@
     <xsl:param name="property"/>
 
     <xsl:choose>
-      <xsl:when test="$node/descendant::w:numPr[not(ancestor::w:pPrChange)]">
-        <xsl:value-of select="$node/descendant::w:numPr/child::node()[name() = $property]/@w:val"/>
+      <xsl:when test="$node/w:pPr/w:numPr[not(ancestor::w:pPrChange)]">
+        <xsl:value-of select="$node/w:pPr/w:numPr/*[name() = $property]/@w:val"/>
       </xsl:when>
 
-      <xsl:when test="$node/descendant::w:pStyle[not(ancestor::w:pPrChange)]">
-        <xsl:variable name="styleId" select="$node/descendant::w:pStyle/@w:val"/>
+      <xsl:when test="$node/w:pPr/w:pStyle[not(ancestor::w:pPrChange)]">
+        <xsl:variable name="styleId" select="$node/w:pPr/w:pStyle/@w:val"/>
 
         <xsl:variable name="pStyle"
           select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $styleId]"/>
@@ -819,10 +819,10 @@
       <xsl:when test="$listLevel != '' ">
         <xsl:text>true</xsl:text>
       </xsl:when>
-      <xsl:when test="$node/preceding-sibling::node()[1]/descendant::w:numPr">
+      <xsl:when test="$node/preceding-sibling::node()[1]/w:pPr/w:numPr">
         <xsl:choose>
           <xsl:when
-            test="$node/preceding-sibling::node()[1]/descendant::w:numPr/w:numId/@w:val = $numId">
+            test="$node/preceding-sibling::node()[1]/w:pPr/w:numPr/w:numId/@w:val = $numId">
             <xsl:text>false</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -832,7 +832,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="pStyle"
-          select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $node/preceding-sibling::node()[1]/descendant::w:pStyle/@w:val]"/>
+          select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $node/preceding-sibling::node()[1]/w:pPr/w:pStyle/@w:val]"/>
         <xsl:variable name="precedingNumId">
           <xsl:call-template name="GetListProperty">
             <xsl:with-param name="node" select="$node/preceding-sibling::node()[1]"/>

@@ -111,8 +111,8 @@
 
   <xsl:template name="InsertImageAnchorType">
     <xsl:attribute name="text:anchor-type">
-      <xsl:variable name="verticalRelativeFrom" select="descendant::wp:positionV/@relativeFrom"/>
-      <xsl:variable name="horizontalRelativeFrom" select="descendant::wp:positionH/@relativeFrom"/>
+      <xsl:variable name="verticalRelativeFrom" select="wp:positionV/@relativeFrom"/>
+      <xsl:variable name="horizontalRelativeFrom" select="wp:positionH/@relativeFrom"/>
       <xsl:variable name="layoutInCell" select="@layoutInCell"/>
       
       <xsl:choose>
@@ -147,11 +147,11 @@
   
   <xsl:template name="SetSize">
     <xsl:choose>
-      <xsl:when test="descendant::a:ln">
+      <xsl:when test="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln">
       <xsl:variable name="border">
         <xsl:call-template name="ConvertEmu3">
           <xsl:with-param name="length">
-            <xsl:value-of select="descendant::a:ln/@w"/>
+            <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w"/>
           </xsl:with-param>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
@@ -343,18 +343,18 @@
   </xsl:template>
   
   <xsl:template name="InsertImageBorder">
-    <xsl:if test="descendant::a:ln[not(a:noFill)]">
+    <xsl:if test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln[not(a:noFill)]">
       <xsl:variable name="width">
         <xsl:call-template name="ConvertEmu3">
           <xsl:with-param name="length">
-            <xsl:value-of select="descendant::a:ln/@w"/>
+            <xsl:value-of select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w"/>
           </xsl:with-param>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="type">
         <xsl:choose>
-          <xsl:when test="descendant::a:ln/a:prstDash/@val = 'solid'">
+          <xsl:when test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:prstDash/@val = 'solid'">
             <xsl:text>solid</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -364,8 +364,8 @@
       </xsl:variable>
       <xsl:variable name="color">
         <xsl:choose>
-          <xsl:when test="descendant::a:ln/a:solidFill/a:srgbClr">
-            <xsl:value-of select="descendant::a:ln/a:solidFill/a:srgbClr/@val"/>
+          <xsl:when test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:solidFill/a:srgbClr">
+            <xsl:value-of select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:solidFill/a:srgbClr/@val"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>000000</xsl:text>
@@ -379,38 +379,38 @@
   </xsl:template>
   
   <xsl:template name="InsertImageWrap">
-    <xsl:if test="descendant::node()[contains(name(),'wp:wrap')]">
+    <xsl:if test="wp:anchor/*[self::wp:wrapNone or self::wp:wrapThrough or self::wp:wrapTigh or self::wp:wrapSquare or self::wrapTopAndBottom]">
       <xsl:attribute name="style:wrap">
 
-        <xsl:if test="descendant::wp:wrapSquare">
+        <xsl:if test="wp:anchor/wp:wrapSquare">
           <xsl:call-template name="InsertSquareWrap">
-            <xsl:with-param name="wrap" select="descendant::wp:wrapSquare/@wrapText"/>
+            <xsl:with-param name="wrap" select="wp:anchor/wp:wrapSquare/@wrapText"/>
           </xsl:call-template>
         </xsl:if>
 
-        <xsl:if test="descendant::wp:wrapTight">
+        <xsl:if test="wp:anchor/wp:wrapTight">
           <xsl:call-template name="InsertSquareWrap">
-            <xsl:with-param name="wrap" select="descendant::wp:wrapTight/@wrapText"/>
+            <xsl:with-param name="wrap" select="wp:anchor/wp:wrapTight/@wrapText"/>
           </xsl:call-template>
         </xsl:if>
 
-        <xsl:if test="descendant::wp:wrapTopAndBottom">
+        <xsl:if test="wp:anchor/wp:wrapTopAndBottom">
           <xsl:text>none</xsl:text>
         </xsl:if>
 
-        <xsl:if test="descendant::wp:wrapThrough">
+        <xsl:if test="wp:anchor/wp:wrapThrough">
           <xsl:call-template name="InsertSquareWrap">
-            <xsl:with-param name="wrap" select="descendant::wp:wrapThrough/@wrapText"/>
+            <xsl:with-param name="wrap" select="wp:anchor/wp:wrapThrough/@wrapText"/>
           </xsl:call-template>
         </xsl:if>
 
-        <xsl:if test="descendant::wp:wrapNone">
+        <xsl:if test="wp:anchor/wp:wrapNone">
           <xsl:text>run-through</xsl:text>
         </xsl:if>
       </xsl:attribute>
 
       <!--decide if in backround or in front of text-->
-      <xsl:if test="descendant::wp:anchor/@behindDoc = 1">
+      <xsl:if test="wp:anchor/wp:anchor/@behindDoc = 1">
         <xsl:attribute name="style:run-through">
           <xsl:text>background</xsl:text>
         </xsl:attribute>
@@ -419,32 +419,32 @@
   </xsl:template>
 
   <xsl:template name="InsertImageMargins">
-    <xsl:if test="descendant::wp:anchor">
+    <xsl:if test="wp:anchor">
 
       <xsl:attribute name="fo:margin-top">
         <xsl:call-template name="ConvertEmu">
-          <xsl:with-param name="length" select="descendant::wp:anchor/@distT"/>
+          <xsl:with-param name="length" select="wp:anchor/@distT"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
 
       <xsl:attribute name="fo:margin-bottom">
         <xsl:call-template name="ConvertEmu">
-          <xsl:with-param name="length" select="descendant::wp:anchor/@distB"/>
+          <xsl:with-param name="length" select="wp:anchor/@distB"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
 
       <xsl:attribute name="fo:margin-left">
         <xsl:call-template name="ConvertEmu">
-          <xsl:with-param name="length" select="descendant::wp:anchor/@distL"/>
+          <xsl:with-param name="length" select="wp:anchor/@distL"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
 
       <xsl:attribute name="fo:margin-right">
         <xsl:call-template name="ConvertEmu">
-          <xsl:with-param name="length" select="descendant::wp:anchor/@distR"/>
+          <xsl:with-param name="length" select="wp:anchor/@distR"/>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>

@@ -470,21 +470,23 @@
 
   <!--caption field  from which Index of Figures is created -->
   <xsl:template match="w:fldSimple[contains(@w:instr,'SEQ')]" mode="fields">
-      <xsl:call-template name="InsertSequence">
-          <xsl:with-param name="fieldCode" select="@w:instr"/>
-      </xsl:call-template>
+    <xsl:call-template name="InsertSequence">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+    </xsl:call-template>
   </xsl:template>
-  
+
   <xsl:template name="InsertSequence">
     <xsl:param name="fieldCode"/>
     <xsl:variable name="refType">
       <xsl:value-of select="substring-before(substring-after($fieldCode,'SEQ '),' ')"/>
     </xsl:variable>
-    <text:sequence text:ref-name="{concat('ref',concat($refType,number((following::w:r/w:t)[1])-1))}" text:name="{$refType}" text:formula="{concat(concat('ooow:',$refType),'+1')}">
+    <text:sequence
+      text:ref-name="{concat('ref',concat($refType,number((following::w:r/w:t)[1])-1))}"
+      text:name="{$refType}" text:formula="{concat(concat('ooow:',$refType),'+1')}">
       <xsl:apply-templates select="(following::w:r/w:t)[1]"/>
-    </text:sequence>  
+    </text:sequence>
   </xsl:template>
-  
+
   <xsl:template name="InsertDateStyle">
     <xsl:param name="dateText"/>
     <xsl:variable name="FormatDate">
@@ -1050,30 +1052,32 @@
 
         <xsl:variable name="rId">
           <xsl:value-of
-            select="document('word/_rels/document.xml.rels')/descendant::node()[@Target = $docName]/@Id"
+            select="document('word/_rels/document.xml.rels')/Relationships/Relationship[@Target = $docName]/@Id"
           />
         </xsl:variable>
-        <xsl:for-each
-          select="document('word/document.xml')/descendant::w:sectPr[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]">
-          <xsl:if test="w:pgNumType/@w:chapStyle">
-            <text:chapter>
-              <xsl:attribute name="text:display">
-                <xsl:text>number</xsl:text>
-              </xsl:attribute>
-              <xsl:attribute name="text:outline-level">
-                <xsl:value-of select="w:pgNumType/@w:chapStyle"/>
-              </xsl:attribute>
-            </text:chapter>
-            <xsl:choose>
-              <xsl:when test="w:pgNumType/@w:chapSep = 'period'">
-                <xsl:text>.</xsl:text>
-              </xsl:when>
-              <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:chapSep = 'colon'">
-                <xsl:text>:</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>-</xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
+        <xsl:for-each select="document('word/document.xml')">
+          <xsl:for-each
+            select="key('sectPr', '')[w:headerReference/@r:id = $rId or w:footerReference/@r:id = $rId]">
+            <xsl:if test="w:pgNumType/@w:chapStyle">
+              <text:chapter>
+                <xsl:attribute name="text:display">
+                  <xsl:text>number</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="text:outline-level">
+                  <xsl:value-of select="w:pgNumType/@w:chapStyle"/>
+                </xsl:attribute>
+              </text:chapter>
+              <xsl:choose>
+                <xsl:when test="w:pgNumType/@w:chapSep = 'period'">
+                  <xsl:text>.</xsl:text>
+                </xsl:when>
+                <xsl:when test="following::w:sectPr[1]/w:pgNumType/@w:chapSep = 'colon'">
+                  <xsl:text>:</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>-</xsl:otherwise>
+              </xsl:choose>
+            </xsl:if>
+          </xsl:for-each>
         </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
@@ -1277,8 +1281,7 @@
   <xsl:template name="InsertField">
     <xsl:choose>
       <!-- default scenario - catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
-      <xsl:when
-        test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] ">
+      <xsl:when test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] ">
         <xsl:apply-templates select="w:instrText[1]"/>
       </xsl:when>
       <xsl:otherwise>
