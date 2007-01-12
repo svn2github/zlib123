@@ -155,7 +155,7 @@
       <xsl:call-template name="InsertParagraphParentStyle"/>
 
       <style:paragraph-properties>
-        <xsl:call-template name="InsertDefaultParagraphProperties"/>
+        <xsl:call-template name="InsertDefaultTabStop"/>
         <xsl:call-template name="InsertParagraphProperties"/>
       </style:paragraph-properties>
     </style:style>
