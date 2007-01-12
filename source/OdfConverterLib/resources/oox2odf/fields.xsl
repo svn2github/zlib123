@@ -55,53 +55,53 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:choose>
-        <xsl:when test="$fieldType = 'XE' ">
+        <xsl:when test="$fieldType = 'XE' or $fieldType = 'xe' ">
           <xsl:call-template name="InsertIndexMark">
             <xsl:with-param name="instrText" select="following-sibling::instrText[1]"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'SET' ">
+        <xsl:when test="$fieldType = 'SET' or $fieldType = 'set' ">
           <xsl:call-template name="InsertUserVariable">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'HYPERLINK' ">
+        <xsl:when test="$fieldType = 'HYPERLINK' or $fieldType = 'hyperlink' ">
           <xsl:call-template name="InsertHyperlinkField">
             <xsl:with-param name="parentRunNode" select="$parentRunNode"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'REF' ">
+        <xsl:when test="$fieldType = 'REF' or $fieldType = 'ref' ">
           <xsl:call-template name="InsertCrossReference">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'DATE'">
+        <xsl:when test="$fieldType = 'DATE' or $fieldType = 'date' ">
           <xsl:call-template name="InsertDateField">
             <xsl:with-param name="dateText" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'NUMPAGE'">
+        <xsl:when test="$fieldType = 'NUMPAGE' or $fieldType = 'numpage' ">
           <xsl:call-template name="InsertPageCount"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'PAGE' ">
+        <xsl:when test="$fieldType = 'PAGE' or $fieldType = 'page' ">
           <xsl:call-template name="InsertPageNumberField"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'TIME' ">
+        <xsl:when test="$fieldType = 'TIME' or $fieldType = 'time' ">
           <xsl:call-template name="InsertTimeField">
             <xsl:with-param name="timeText" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'USERINITIALS' ">
+        <xsl:when test="$fieldType = 'USERINITIALS' or $fieldType = 'userinitials' ">
           <xsl:call-template name="InsertUserInitials"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'USERNAME' ">
+        <xsl:when test="$fieldType = 'USERNAME' or $fieldType = 'username' ">
           <xsl:call-template name="InsertUserName"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'AUTHOR'">
+        <xsl:when test="$fieldType = 'AUTHOR' or $fieldType = 'author' ">
           <xsl:call-template name="InsertAuthor"/>
         </xsl:when>
         <!--caption field  from which Index of Figures is created -->
-        <xsl:when test="$fieldType = 'SEQ' ">
+        <xsl:when test="$fieldType = 'SEQ' or $fieldType = 'seq' ">
           <xsl:call-template name="InsertSequence">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="sequenceContext" select="following::w:r[w:t][1]"/>
@@ -158,24 +158,33 @@
       </xsl:when>
       <!-- if next run with instrText, before end of field -->
       <xsl:when
-        test="$instrText/parent::w:r/following-sibling::*[self::w:r[w:instrText] or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:r[w:instrText]]">
+        test="$instrText/parent::w:r/following-sibling::w:r/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
         <xsl:call-template name="BuildFieldCode">
           <!-- we know now that first run having instrText is before end of field -->
           <xsl:with-param name="instrText"
-            select="$instrText/parent::w:r/following-sibling::*[self::w:r and w:instrText][1]/w:instrText[1]"/>
+            select="$instrText/parent::w:r/following-sibling::w:r[w:instrText][1]/w:instrText[1]"/>
           <xsl:with-param name="fieldCode" select="concat($fieldCode, $instrText/text())"/>
         </xsl:call-template>
       </xsl:when>
       <!-- if next paragraph with instrText, before end of field :
       Find first paragraph having instrText before end of field, and then first run having instrText before end of field -->
       <xsl:when
-        test="$instrText/ancestor::w:p/following-sibling::*[self::w:p[w:r/w:instrText or w:fldChar/@w:fldCharType = 'end']][1]/*[self::w:r[w:instrText] or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:r[w:instrText]]">
-        <xsl:call-template name="BuildFieldCode">
-          <!-- we know now that first run having instrText is before end of field -->
-          <xsl:with-param name="instrText"
-            select="$instrText/ancestor::w:p/following-sibling::*[self::w:p[w:r/w:instrText]][1]/w:r/w:instrText"/>
-          <xsl:with-param name="fieldCode" select="concat($fieldCode, $instrText/text())"/>
-        </xsl:call-template>
+        test="$instrText/ancestor::w:p/following-sibling::w:p/w:r[w:instrText or w:fldChar[@w:fldCharType = 'end']][1]/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
+        <!-- check first is field does not end in context paragraph -->
+        <xsl:choose>
+          <xsl:when
+            test="not($instrText/parent::w:r/following-sibling::w:r/w:fldChar[@w:fldCharType = 'end'])">
+            <xsl:call-template name="BuildFieldCode">
+              <!-- we know now that first run having instrText is before end of field -->
+              <xsl:with-param name="instrText"
+                select="$instrText/ancestor::w:p/following-sibling::w:p[w:r/w:instrText][1]/w:r[w:instrText][1]/w:instrText[1]"/>
+              <xsl:with-param name="fieldCode" select="concat($fieldCode, $instrText/text())"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($fieldCode, $instrText/text())"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="concat($fieldCode, $instrText/text())"/>
@@ -471,10 +480,10 @@
 
   <!--caption field  from which Index of Figures is created -->
   <xsl:template match="w:fldSimple[contains(@w:instr,'SEQ')]" mode="fields">
-      <xsl:call-template name="InsertSequence">
-          <xsl:with-param name="fieldCode" select="@w:instr"/>
-        <xsl:with-param name="sequenceContext" select="w:r"/>
-      </xsl:call-template>
+    <xsl:call-template name="InsertSequence">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+      <xsl:with-param name="sequenceContext" select="w:r"/>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="InsertSequence">
@@ -484,7 +493,8 @@
       <xsl:value-of select="substring-before(substring-after($fieldCode,'SEQ '),' ')"/>
     </xsl:variable>
 
-    <text:sequence text:ref-name="{concat('ref',concat($refType,number($sequenceContext/w:t)-1))}" text:name="{$refType}" text:formula="{concat(concat('ooow:',$refType),'+1')}">
+    <text:sequence text:ref-name="{concat('ref',concat($refType,number($sequenceContext/w:t)-1))}"
+      text:name="{$refType}" text:formula="{concat(concat('ooow:',$refType),'+1')}">
       <xsl:apply-templates select="$sequenceContext/child::node()"/>
     </text:sequence>
   </xsl:template>
