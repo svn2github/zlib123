@@ -430,12 +430,12 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;;;;;;;;;;
 References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Completed;;;
 ;;;Right align page numbers;;;1;0.3-M2;Completed;;;
-;;;Use hyperlinks instead of page numbers;;;1;1.0;;;;
+;;;Use hyperlinks instead of page numbers;;;1;1.0;Completed;;;
 ;;;Tab leader;;;1;0.3-M2;Completed;;;
 ;;;Show levels;;;1;0.3-M2;Completed;;;
 ;;;Options;Build TOC from;Styles;1;1.0;Completed;;;
 ;;;;;Outline levels;1;0.3-M2;Completed;;;
-;;;;;Table entry fields;1;1.0;;;;
+;;;;;Table entry fields;1;1.0;Completed;;;
 ;;;;;;;;;;;
 ;Foot notes;Footnote and Endnote;Footnotes;;;2;0.3-M1;Completed;;;
 ;;;Endnotes;;;2;0.3-M1;Completed;;;
@@ -465,7 +465,7 @@ References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Comp
 ;;;Exclude label from caption;;;3;1.0;;;;
 ;;Insert table of figures;Show page numbers;;;3;1.0;Completed;;;
 ;;;Right align page numbers;;;3;1.0;Completed;;;
-;;;Use hyperlinks instead of page numbers;;;3;1.0;;;;
+;;;Use hyperlinks instead of page numbers;;;3;1.0;;not supported;;
 ;;;Tab leader;;;3;1.0;Completed;;;
 ;;;Caption label;;;3;1.0;;;;
 ;;;Include label and number;;;3;1.0;;;;

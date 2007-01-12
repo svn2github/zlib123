@@ -31,6 +31,8 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
+ xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   exclude-result-prefixes="w text style">
   
   <xsl:key name="OutlineLevel" match="w:outlineLvl" use="''"/>
@@ -526,7 +528,26 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+     <xsl:variable name="instrText">
+      <xsl:choose>
+        <xsl:when test="contains($instrTextContent, 'PAGEREF')">
+            <xsl:value-of select="substring-before($instrTextContent, 'PAGEREF')"/>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:value-of select="$instrTextContent"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:if test="$count &gt; 0">
+
+      <xsl:if test="contains($instrText, '\h') and not(contains($instrText, '\c'))">
+          <text:index-entry-link-start>
+            <xsl:attribute name="text:style-name">
+              <xsl:value-of select="ancestor::w:p/w:hyperlink/w:r/w:rPr/w:rStyle/@w:val"/>
+            </xsl:attribute>
+          </text:index-entry-link-start>
+        </xsl:if>
+
       <xsl:choose>
         <xsl:when test="(contains(w:pPr/w:pStyle/@w:val,$styleLevel) and not(contains(preceding-sibling::w:p[(preceding-sibling::node()=$node or self::node()=$node)]/w:pPr/w:pStyle/@w:val,$styleLevel))) or $styleLevel = 0">
           <xsl:if test="$type='TOC'">
@@ -548,6 +569,9 @@
           </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
+      <xsl:if test="contains($instrText,'\h') and not(contains($instrText, '\c'))">
+      <text:index-entry-link-end/>
+        </xsl:if>
     </xsl:if>
   </xsl:template> 
 
@@ -831,8 +855,20 @@
   <!-- handle text in table-of content -->
   <xsl:template match="text()" mode="entry"/>
   
-  <!-- handle runs -->
+<!-- handle runs -->
   <xsl:template match="w:r" mode="index">
+    <xsl:choose>
+      <xsl:when test="parent::w:hyperlink">
+        <xsl:call-template name="InsertTOCHyperlink"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="InsertTOCText"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- Insert TOC text -->
+  <xsl:template name="InsertTOCText">
     <xsl:choose>
       <!--  ignore text when we are in field-->
       <xsl:when test="w:fldChar or w:instrText"/>
@@ -848,4 +884,16 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+ <!-- Insert TOC Hyperlinks -->
+  <xsl:template name="InsertTOCHyperlink">    
+    <text:a xlink:type="simple">
+      <xsl:attribute name="xlink:href">
+        <xsl:value-of select="concat('#',parent::w:hyperlink/@w:anchor)"/>
+      </xsl:attribute>
+      <!--TOC hyperlink text-->
+      <xsl:call-template name="InsertTOCText"/>
+    </text:a>
+  </xsl:template>
+
 </xsl:stylesheet>
