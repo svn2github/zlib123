@@ -12,23 +12,103 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
-  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" exclude-result-prefixes="w">
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  exclude-result-prefixes="w number wp xlink r b">
 
   <!-- Date and Time Fields -->
-  <xsl:template name="InsertDateField">
+  <xsl:template name="InsertDate">
     <xsl:param name="dateText"/>
     <text:date>
-      <xsl:attribute name="style:data-style-name">
-        <xsl:value-of select="generate-id(.)"/>
-      </xsl:attribute>
-      <xsl:attribute name="text:date-value">
-        <xsl:value-of select="$dateText"/>
-      </xsl:attribute>
-      <xsl:value-of select="$dateText"/>
+      <xsl:call-template name="InsertDateContent">
+        <xsl:with-param name="dateText" select="$dateText"/>
+      </xsl:call-template>
     </text:date>
   </xsl:template>
 
-  <xsl:template name="InsertTimeField">
+  <xsl:template name="InsertDateType">
+    <xsl:param name="fieldCode"/>
+    <xsl:param name="fieldType"/>
+    <xsl:choose>
+      <xsl:when test="$fieldType = 'DATE'">
+        <xsl:call-template name="InsertDate">
+          <xsl:with-param name="dateText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$fieldType = 'CREATEDATE'">
+        <xsl:call-template name="InsertCreationDate">
+          <xsl:with-param name="dateText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$fieldType = 'PRINTDATE'">
+        <xsl:call-template name="InsertPrintDate">
+          <xsl:with-param name="dateText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$fieldType = 'SAVEDATE'">
+        <xsl:call-template name="InsertModificationDate">
+          <xsl:with-param name="dateText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertCreationDate">
+    <xsl:param name="dateText"/>
+    <text:creation-date>
+      <xsl:call-template name="InsertDateContent">
+        <xsl:with-param name="dateText" select="$dateText"/>
+      </xsl:call-template>
+    </text:creation-date>
+  </xsl:template>
+
+  <xsl:template name="InsertPrintDate">
+    <xsl:param name="dateText"/>
+    <text:print-date>
+      <xsl:call-template name="InsertDateContent">
+        <xsl:with-param name="dateText" select="$dateText"/>
+      </xsl:call-template>
+    </text:print-date>
+  </xsl:template>
+
+  <xsl:template name="InsertModificationDate">
+    <xsl:param name="dateText"/>
+    <text:modification-date>
+      <xsl:call-template name="InsertDateContent">
+        <xsl:with-param name="dateText" select="$dateText"/>
+      </xsl:call-template>
+    </text:modification-date>
+  </xsl:template>
+
+  <xsl:template name="InsertDateContent">
+    <xsl:param name="dateText"/>
+    <xsl:attribute name="style:data-style-name">
+      <xsl:value-of select="generate-id(.)"/>
+    </xsl:attribute>
+    <xsl:attribute name="text:date-value">
+      <xsl:value-of select="$dateText"/>
+    </xsl:attribute>
+    <xsl:value-of select="$dateText"/>
+  </xsl:template>
+
+  <xsl:template name="InsertTimeType">
+    <xsl:param name="fieldCode"/>
+    <xsl:param name="fieldType"/>
+
+    <xsl:choose>
+      <xsl:when test="$fieldType = 'TIME' ">
+        <xsl:call-template name="InsertTime">
+          <xsl:with-param name="timeText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$fieldType = 'EDITTIME' ">
+        <xsl:call-template name="InsertEditTime">
+          <xsl:with-param name="timeText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertTime">
     <xsl:param name="timeText"/>
     <text:time>
       <xsl:attribute name="style:data-style-name">
@@ -38,6 +118,15 @@
         <xsl:value-of select="$timeText"/>
       </xsl:attribute>
     </text:time>
+  </xsl:template>
+
+  <xsl:template name="InsertEditTime">
+    <xsl:param name="timeText"/>
+    <text:editing-duration>
+      <xsl:attribute name="style:data-style-name">
+        <xsl:value-of select="generate-id(.)"/>
+      </xsl:attribute>
+    </text:editing-duration>
   </xsl:template>
 
   <!-- process a field code -->
@@ -75,20 +164,24 @@
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'DATE' or $fieldType = 'date' ">
-          <xsl:call-template name="InsertDateField">
-            <xsl:with-param name="dateText" select="$fieldCode"/>
+        <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE-->
+        <xsl:when test="contains($fieldType,'DATE') or contains($fieldType,'date')">
+          <xsl:call-template name="InsertDateType">
+            <xsl:with-param name="fieldCode" select="$fieldCode"/>
+            <xsl:with-param name="fieldType" select="$fieldType"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:when test="$fieldType = 'NUMPAGE' or $fieldType = 'numpage' ">
           <xsl:call-template name="InsertPageCount"/>
         </xsl:when>
         <xsl:when test="$fieldType = 'PAGE' or $fieldType = 'page' ">
-          <xsl:call-template name="InsertPageNumberField"/>
+          <xsl:call-template name="InsertPageNumber"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'TIME' or $fieldType = 'time' ">
-          <xsl:call-template name="InsertTimeField">
-            <xsl:with-param name="timeText" select="$fieldCode"/>
+        <!-- possible time types: TIME, EDITTIME-->
+        <xsl:when test="contains($fieldType,'TIME') or contains($fieldType,'time') ">
+          <xsl:call-template name="InsertTimeType">
+            <xsl:with-param name="fieldCode" select="$fieldCode"/>
+            <xsl:with-param name="fieldType" select="$fieldType"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:when test="$fieldType = 'USERINITIALS' or $fieldType = 'userinitials' ">
@@ -97,6 +190,7 @@
         <xsl:when test="$fieldType = 'USERNAME' or $fieldType = 'username' ">
           <xsl:call-template name="InsertUserName"/>
         </xsl:when>
+        <!--initiial creator name-->
         <xsl:when test="$fieldType = 'AUTHOR' or $fieldType = 'author' ">
           <xsl:call-template name="InsertAuthor"/>
         </xsl:when>
@@ -106,6 +200,40 @@
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="sequenceContext" select="following::w:r[w:t][1]"/>
           </xsl:call-template>
+        </xsl:when>
+        <!--creator name-->
+        <xsl:when test="$fieldType = 'LASTSAVEDBY' or $fieldType = 'lastsavedby' ">
+          <xsl:call-template name="InsertCreator"/>
+        </xsl:when>
+        <!--editing cycles number-->
+        <xsl:when test="$fieldType = 'REVNUM' or $fieldType = 'revnum' ">
+          <xsl:call-template name="InsertEditingCycles"/>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'FILENAME' or $fieldType = 'filename' ">
+          <xsl:call-template name="InsertFileName"/>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'KEYWORDS' or $fieldType = 'keywords' ">
+          <xsl:call-template name="InsertKeywords"/>
+        </xsl:when>
+        <xsl:when
+          test="($fieldType = 'DOCPROPERTY' or $fieldType = 'docproperty') and contains($fieldCode,'Company') ">
+          <xsl:call-template name="InsertCompany"/>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'USERADDRESS' or $fieldType = 'useraddress' ">
+          <xsl:call-template name="InsertUserAddress"/>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'TEMPLATE' or $fieldType = 'template' ">
+          <xsl:call-template name="InsertTemplate"/>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'NUMWORDS' or $fieldType = 'numwords' ">
+          <xsl:call-template name="InsertWordCount"/>
+        </xsl:when>
+        <xsl:when test="$fieldType = 'NUMCHARS' or $fieldType = 'numchars' ">
+          <xsl:call-template name="InsertCharacterCount"/>
+        </xsl:when>
+        <xsl:when
+          test="($fieldType = 'DOCPROPERTY' or $fieldType = 'docproperty')   and contains($fieldCode,'Paragraphs') ">
+          <xsl:call-template name="InsertCompany"/>
         </xsl:when>
       </xsl:choose>
     </text:span>
@@ -123,12 +251,14 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$fieldType = 'DATE' ">
+      <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE-->
+      <xsl:when test="contains($fieldType,'DATE')">
         <xsl:call-template name="InsertDateStyle">
           <xsl:with-param name="dateText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$fieldType = 'TIME' ">
+      <!-- possible time types: TIME, EDITTIME-->
+      <xsl:when test="contains($fieldType,'TIME')">
         <xsl:call-template name="InsertTimeStyle">
           <xsl:with-param name="timeText" select="$fieldCode"/>
         </xsl:call-template>
@@ -167,7 +297,7 @@
         </xsl:call-template>
       </xsl:when>
       <!-- if next paragraph with instrText, before end of field :
-      Find first paragraph having instrText before end of field, and then first run having instrText before end of field -->
+        Find first paragraph having instrText before end of field, and then first run having instrText before end of field -->
       <xsl:when
         test="$instrText/ancestor::w:p/following-sibling::w:p/w:r[w:instrText or w:fldChar[@w:fldCharType = 'end']][1]/*[self::w:instrText or self::w:fldChar[@w:fldCharType = 'end']][1][self::w:instrText]">
         <!-- check first is field does not end in context paragraph -->
@@ -391,6 +521,16 @@
     </text:initial-creator>
   </xsl:template>
 
+  <xsl:template match="w:fldSimple[contains(@w:instr,'LASTSAVEDBY')]" mode="fields">
+    <xsl:call-template name="InsertCreator"/>
+  </xsl:template>
+
+  <xsl:template name="InsertCreator">
+    <text:creator>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:creator>
+  </xsl:template>
+
   <!--user initials-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'USERINITIALS')]" mode="fields">
     <xsl:call-template name="InsertUserInitials"/>
@@ -437,15 +577,29 @@
     </text:span>
   </xsl:template>
 
+  <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')]" mode="fields">
-    <xsl:call-template name="InsertDateField">
-      <xsl:with-param name="dateText" select="@w:instr"/>
+    <xsl:variable name="fieldType">
+      <xsl:call-template name="GetFieldTypeFromCode">
+        <xsl:with-param name="fieldCode" select="@w:instr"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:call-template name="InsertDateType">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+      <xsl:with-param name="fieldType" select="$fieldType"/>
     </xsl:call-template>
   </xsl:template>
 
+  <!-- possible time types: TIME, EDITTIME-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')]" mode="fields">
-    <xsl:call-template name="InsertTimeField">
-      <xsl:with-param name="timeText" select="@w:instr"/>
+    <xsl:variable name="fieldType">
+      <xsl:call-template name="GetFieldTypeFromCode">
+        <xsl:with-param name="fieldCode" select="@w:instr"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:call-template name="InsertTimeType">
+      <xsl:with-param name="fieldCode" select="@w:instr"/>
+      <xsl:with-param name="fieldType" select="$fieldType"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -453,7 +607,7 @@
   <xsl:template
     match="w:fldSimple[contains(@w:instr,'PAGE ') and not(contains(@w:instr,'NUMPAGE'))]"
     mode="fields">
-    <xsl:call-template name="InsertPageNumberField">
+    <xsl:call-template name="InsertPageNumber">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
     </xsl:call-template>
   </xsl:template>
@@ -505,7 +659,7 @@
       <xsl:value-of
         select="substring-before(substring-after($dateText, '&quot;'), '&quot;')"/>
     </xsl:variable>
-    <xsl:call-template name="InsertDate">
+    <xsl:call-template name="InsertDateFormat">
       <xsl:with-param name="FormatDate">
         <xsl:value-of select="$FormatDate"/>
       </xsl:with-param>
@@ -527,7 +681,7 @@
       <xsl:value-of
         select="substring-before(substring-after($timeText, '&quot;'), '&quot;')"/>
     </xsl:variable>
-    <xsl:call-template name="InsertDate">
+    <xsl:call-template name="InsertDateFormat">
       <xsl:with-param name="FormatDate">
         <xsl:value-of select="$FormatDate"/>
       </xsl:with-param>
@@ -538,17 +692,18 @@
   </xsl:template>
 
   <xsl:template match="w:fldSimple" mode="automaticstyles">
+    <!--TODO uppercase, lowercase for fields -->
     <xsl:apply-templates select="w:r/w:rPr" mode="automaticstyles"/>
   </xsl:template>
 
-  <xsl:template name="InsertDate">
+  <xsl:template name="InsertDateFormat">
     <xsl:param name="FormatDate"/>
     <xsl:param name="ParamField"/>
     <number:date-style>
       <xsl:attribute name="style:name">
         <xsl:value-of select="generate-id()"/>
       </xsl:attribute>
-      <xsl:call-template name="InsertFormatDate">
+      <xsl:call-template name="InsertFormatDateStyle">
         <xsl:with-param name="FormatDate">
           <xsl:choose>
             <xsl:when test="$FormatDate!=''">
@@ -570,7 +725,7 @@
     </number:date-style>
   </xsl:template>
 
-  <xsl:template name="InsertFormatDate">
+  <xsl:template name="InsertFormatDateStyle">
     <xsl:param name="FormatDate"/>
     <xsl:param name="DateText"/>
     <xsl:choose>
@@ -582,7 +737,7 @@
           </number:text>
         </xsl:if>
         <number:year number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'yyyy')"/>
           </xsl:with-param>
@@ -596,7 +751,7 @@
           </number:text>
         </xsl:if>
         <number:year/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'yy')"/>
           </xsl:with-param>
@@ -610,7 +765,7 @@
           </number:text>
         </xsl:if>
         <number:year/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'y')"/>
           </xsl:with-param>
@@ -624,7 +779,7 @@
           </number:text>
         </xsl:if>
         <number:year number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'YYYY')"/>
           </xsl:with-param>
@@ -638,7 +793,7 @@
           </number:text>
         </xsl:if>
         <number:year/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'YY')"/>
           </xsl:with-param>
@@ -652,7 +807,7 @@
           </number:text>
         </xsl:if>
         <number:year/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'Y')"/>
           </xsl:with-param>
@@ -666,7 +821,7 @@
           </number:text>
         </xsl:if>
         <number:month number:style="long" number:textual="true"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'MMMM')"/>
           </xsl:with-param>
@@ -680,7 +835,7 @@
           </number:text>
         </xsl:if>
         <number:month number:textual="true"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'MMM')"/>
           </xsl:with-param>
@@ -694,7 +849,7 @@
           </number:text>
         </xsl:if>
         <number:month number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'MM')"/>
           </xsl:with-param>
@@ -708,7 +863,7 @@
           </number:text>
         </xsl:if>
         <number:month/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'M')"/>
           </xsl:with-param>
@@ -722,7 +877,7 @@
           </number:text>
         </xsl:if>
         <number:day-of-week number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'dddd')"/>
           </xsl:with-param>
@@ -736,7 +891,7 @@
           </number:text>
         </xsl:if>
         <number:day-of-week/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'ddd')"/>
           </xsl:with-param>
@@ -750,7 +905,7 @@
           </number:text>
         </xsl:if>
         <number:day number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'dd')"/>
           </xsl:with-param>
@@ -764,7 +919,7 @@
           </number:text>
         </xsl:if>
         <number:day number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'd')"/>
           </xsl:with-param>
@@ -778,7 +933,7 @@
           </number:text>
         </xsl:if>
         <number:day-of-week number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'DDDD')"/>
           </xsl:with-param>
@@ -792,7 +947,7 @@
           </number:text>
         </xsl:if>
         <number:day-of-week/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'DDD')"/>
           </xsl:with-param>
@@ -806,7 +961,7 @@
           </number:text>
         </xsl:if>
         <number:day number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'DD')"/>
           </xsl:with-param>
@@ -820,7 +975,7 @@
           </number:text>
         </xsl:if>
         <number:day number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'D')"/>
           </xsl:with-param>
@@ -835,7 +990,7 @@
           </number:text>
         </xsl:if>
         <number:hours number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'hh')"/>
           </xsl:with-param>
@@ -849,7 +1004,7 @@
           </number:text>
         </xsl:if>
         <number:hours/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'h')"/>
           </xsl:with-param>
@@ -863,7 +1018,7 @@
           </number:text>
         </xsl:if>
         <number:hours number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'HH')"/>
           </xsl:with-param>
@@ -877,7 +1032,7 @@
           </number:text>
         </xsl:if>
         <number:hours/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'H')"/>
           </xsl:with-param>
@@ -891,7 +1046,7 @@
           </number:text>
         </xsl:if>
         <number:minutes number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'mm')"/>
           </xsl:with-param>
@@ -905,7 +1060,7 @@
           </number:text>
         </xsl:if>
         <number:minutes/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'm')"/>
           </xsl:with-param>
@@ -919,7 +1074,7 @@
           </number:text>
         </xsl:if>
         <number:seconds number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'ss')"/>
           </xsl:with-param>
@@ -933,7 +1088,7 @@
           </number:text>
         </xsl:if>
         <number:seconds/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 's')"/>
           </xsl:with-param>
@@ -947,7 +1102,7 @@
           </number:text>
         </xsl:if>
         <number:seconds number:style="long"/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'SS')"/>
           </xsl:with-param>
@@ -961,7 +1116,7 @@
           </number:text>
         </xsl:if>
         <number:seconds/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'S')"/>
           </xsl:with-param>
@@ -975,7 +1130,7 @@
           </number:text>
         </xsl:if>
         <number:am-pm/>
-        <xsl:call-template name="InsertFormatDate">
+        <xsl:call-template name="InsertFormatDateStyle">
           <xsl:with-param name="FormatDate">
             <xsl:value-of select="substring-after($FormatDate, 'am/pm')"/>
           </xsl:with-param>
@@ -989,7 +1144,7 @@
 
         <xsl:choose>
           <xsl:when test="contains(substring($FormatDate, 1, 1), $Apostrof)">
-            <xsl:call-template name="InsertFormatDate">
+            <xsl:call-template name="InsertFormatDateStyle">
               <xsl:with-param name="FormatDate">
                 <xsl:value-of
                   select="substring-after(substring-after($FormatDate, $Apostrof), $Apostrof)"/>
@@ -1003,7 +1158,7 @@
           </xsl:when>
 
           <xsl:when test="substring-after($FormatDate, substring($FormatDate, 1, 1))">
-            <xsl:call-template name="InsertFormatDate">
+            <xsl:call-template name="InsertFormatDateStyle">
               <xsl:with-param name="FormatDate">
                 <xsl:value-of select="substring-after($FormatDate, substring($FormatDate, 1, 1))"/>
               </xsl:with-param>
@@ -1030,7 +1185,7 @@
   </xsl:template>
 
   <!-- Page Number Field -->
-  <xsl:template name="InsertPageNumberField">
+  <xsl:template name="InsertPageNumber">
     <xsl:variable name="docName">
       <xsl:call-template name="GetDocumentName">
         <xsl:with-param name="rootId">
@@ -1297,11 +1452,107 @@
         <xsl:apply-templates select="w:instrText[1]"/>
       </xsl:when>
       <xsl:otherwise>
-        <!--  the same hyperlink can be in more then one paragraph so print as hyperlink each run which is in hyperlink field (between w:fldChar begin - end)-->
+        <!--  the same hyperlink can be in more then one paragraph so print as seperate text:a for each run which is in hyperlink field (between w:fldChar begin - end)-->
         <xsl:apply-templates select="preceding::w:instrText[1][contains(.,'HYPERLINK')]">
           <xsl:with-param name="parentRunNode" select="."/>
         </xsl:apply-templates>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertEditingCycles">
+    <text:editing-cycles>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:editing-cycles>
+  </xsl:template>
+
+  <!--editing cycles number-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'REVNUM')]" mode="fields">
+    <xsl:call-template name="InsertEditingCycles"/>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'FILENAME')]" mode="fields">
+    <xsl:call-template name="InsertFileName"/>
+  </xsl:template>
+
+  <xsl:template name="InsertFileName">
+    <text:file-name text:display="name">
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:file-name>
+  </xsl:template>
+
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'KEYWORDS')]" mode="fields">
+    <xsl:call-template name="InsertKeywords"/>
+  </xsl:template>
+
+  <xsl:template name="InsertKeywords">
+    <text:keywords>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:keywords>
+  </xsl:template>
+
+  <xsl:template
+    match="w:fldSimple[contains(@w:instr,'DOCPROPERTY') and contains(@w:instr,'Company')]"
+    mode="fields">
+    <xsl:call-template name="InsertCompany"/>
+  </xsl:template>
+
+  <xsl:template name="InsertCompany">
+    <text:sender-company>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:sender-company>
+  </xsl:template>
+
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'USERADDRESS')]" mode="fields">
+    <xsl:call-template name="InsertUserAddress"/>
+  </xsl:template>
+
+  <xsl:template name="InsertUserAddress">
+    <text:sender-street>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:sender-street>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TEMPLATE')]" mode="fields">
+    <xsl:call-template name="InsertTemplate"/>
+  </xsl:template>
+
+  <xsl:template name="InsertTemplate">
+    <text:template-name text:display="name">
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:template-name>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMWORDS')]" mode="fields">
+    <xsl:call-template name="InsertWordCount"/>
+  </xsl:template>
+
+  <xsl:template name="InsertWordCount">
+    <text:word-count>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:word-count>
+  </xsl:template>
+
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMCHARS')]" mode="fields">
+    <xsl:call-template name="InsertCharacterCount"/>
+  </xsl:template>
+
+  <xsl:template name="InsertCharacterCount">
+    <text:character-count>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:character-count>> </xsl:template>
+
+  <xsl:template
+    match="w:fldSimple[contains(@w:instr,'DOCPROPERTY') and contains(@w:instr,'Paragraphs')]"
+    mode="fields">
+    <xsl:call-template name="InsertParagraphCount"/>
+  </xsl:template>
+
+  <xsl:template name="InsertParagraphCount">
+    <text:paragraph-count>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:paragraph-count>
   </xsl:template>
 </xsl:stylesheet>
