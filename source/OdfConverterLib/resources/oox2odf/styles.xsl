@@ -1502,11 +1502,9 @@
                 select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val"
               />
             </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of
-                select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"
-              />
-            </xsl:otherwise>
+            <xsl:when test="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
+              <xsl:value-of select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"/>
+            </xsl:when>
           </xsl:choose>
         </xsl:variable>
         
@@ -1524,7 +1522,7 @@
                     select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"
                   />
                 </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
+                <xsl:otherwise/>
               </xsl:choose>
               </xsl:for-each>
             </xsl:otherwise>
@@ -1539,7 +1537,6 @@
                 select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
               />
             </xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
 
@@ -1590,11 +1587,14 @@
           </xsl:choose>
         </xsl:variable>
         <xsl:choose>
-          <xsl:when test=" $LeftNumber = '' and $IndLeft = ''">
+          <xsl:when test=" $LeftNumber = '' and $IndLeft =''">
             <xsl:for-each select="document('word/styles.xml')">
-              <xsl:value-of
-                select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left - key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging"
-              />
+              <xsl:choose>
+                <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != '' and key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging != ''"> <xsl:value-of
+                  select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left - key('StyleId',$StyleId)/w:pPr/w:ind/@w:hanging"
+                /></xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
             </xsl:for-each>
           </xsl:when>
           <xsl:when test="$IndLeft != ''">
@@ -1603,9 +1603,10 @@
                 <xsl:value-of select="$IndLeft - $LeftNumber + $HangingNumber"/>
               </xsl:when>
               <xsl:when test="$IndLeft = $IndHanging">0</xsl:when>
-              <xsl:otherwise>
+              <xsl:when test="$IndLeft != ''">
                 <xsl:value-of select="$IndLeft"/>
-              </xsl:otherwise>
+              </xsl:when>
+              <xsl:otherwise>0</xsl:otherwise>
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>0</xsl:otherwise>
@@ -1613,23 +1614,24 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="w:ind/@w:left">
+          <xsl:when test="w:ind/@w:left != ''">
             <xsl:value-of select="w:ind/@w:left"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:for-each select="document('word/styles.xml')">
               <xsl:choose>
-                <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left">
+                <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left != ''">
                   <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:ind/@w:left "/>
                 </xsl:when>
-                <xsl:when test="contains($StyleId,'TOC')">
+                <xsl:when test="contains($StyleId,'TOC') and key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left != ''">
                   <xsl:value-of
-                    select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left "
+                    select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left"
                   />
                 </xsl:when>
-                <xsl:otherwise>
+                <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
                   <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
-                </xsl:otherwise>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
             </xsl:for-each>
           </xsl:otherwise>
@@ -1825,16 +1827,20 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:if test="$MarginLeft != ''">
-      <xsl:attribute name="fo:margin-left">
+ <xsl:attribute name="fo:margin-left">
+    <xsl:choose>
+      <xsl:when test="$MarginLeft != '' and $MarginLeft != 'NaN'">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">
             <xsl:value-of select="$MarginLeft"/>
           </xsl:with-param>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>0cm</xsl:otherwise>
+    </xsl:choose>
+ </xsl:attribute>
+    
 
     <xsl:variable name="TextIndent">
       <xsl:choose>
@@ -2451,16 +2457,16 @@
         </xsl:if>
         <!-- position 
           TODO : what if @w:pos < 0 ? -->
-        <xsl:if test="./@w:pos >= 0">
+        <xsl:if test="./@w:pos >= 0 and ./@w:pos != ''">
           <xsl:attribute name="style:position">
             <xsl:call-template name="ConvertTwips">
               <xsl:with-param name="length">
                 <xsl:choose>
-                  <xsl:when test="$MarginLeft != ''">
-                    <xsl:value-of select="./@w:pos - number($MarginLeft)"/>
+                  <xsl:when test="$MarginLeft != '' and $MarginLeft != 'NaN'">
+                    <xsl:value-of select="number(./@w:pos) - number($MarginLeft)"/>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="./@w:pos"/>
+                    <xsl:value-of select="number(./@w:pos)"/>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:with-param>
