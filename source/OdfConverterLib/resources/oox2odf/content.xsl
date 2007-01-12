@@ -158,6 +158,12 @@
         <xsl:call-template name="InsertDefaultTabStop"/>
         <xsl:call-template name="InsertParagraphProperties"/>
       </style:paragraph-properties>
+      <!-- add text-properties to empty paragraphs. -->
+      <xsl:if test="parent::w:p[not(w:r)]/w:pPr/w:rPr">
+        <style:text-properties>
+          <xsl:call-template name="InsertTextProperties"/>
+        </style:text-properties>
+      </xsl:if>
     </style:style>
   </xsl:template>
 
@@ -165,12 +171,6 @@
     <xsl:if test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr">
       <style:style style:name="{generate-id(.)}" style:family="paragraph">
         <xsl:call-template name="MasterPageName"/>
-        <style:paragraph-properties>
-          <xsl:for-each
-            select="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr">
-            <xsl:call-template name="InsertParagraphProperties"/>
-          </xsl:for-each>
-        </style:paragraph-properties>
       </style:style>
     </xsl:if>
     <xsl:apply-templates mode="automaticstyles"/>
