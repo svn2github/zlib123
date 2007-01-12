@@ -581,6 +581,9 @@
         test="contains($linkHref, 'file:///') or contains($linkHref, 'http://') or contains($linkHref, 'mailto:')">
         <xsl:value-of select="$linkHref"/>
       </xsl:when>
+      <xsl:when test="contains($linkHref,'#')">
+        <xsl:value-of select="$linkHref"/>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="concat('../',$linkHref)"/>
       </xsl:otherwise>

@@ -773,4 +773,29 @@
   <xsl:template match="w:drawing">
     <xsl:apply-templates select="wp:inline | wp:anchor"/>
   </xsl:template>
+
+  <xsl:template match="w:drawing[descendant::a:hlinkClick]">
+    <draw:a xlink:type="simple">      
+      <xsl:attribute name="xlink:href">        
+        <xsl:variable name="relationshipId" select="descendant::a:hlinkClick/@r:id"/>
+        <xsl:variable name="document">
+          <xsl:call-template name="GetDocumentName">
+            <xsl:with-param name="rootId" select="generate-id(/node())"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="relDestination">
+          <xsl:call-template name="GetTarget">
+            <xsl:with-param name="document" select="$document"/>            
+            <xsl:with-param name="id" select="$relationshipId"/>            
+          </xsl:call-template>        
+        </xsl:variable>
+        
+        <xsl:call-template name="GetLinkPath">
+          <xsl:with-param name="linkHref" select="$relDestination"/>
+        </xsl:call-template>        
+      </xsl:attribute>      
+      <xsl:apply-templates select="wp:inline | wp:anchor"/>
+    </draw:a>
+    
+  </xsl:template>
 </xsl:stylesheet>

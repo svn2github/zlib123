@@ -95,4 +95,17 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="GetTarget">
+    <xsl:param name="document"/>
+    <xsl:param name="id"/>
+    
+    <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
+      <xsl:for-each
+        select="document(concat('word/_rels/',$document,'.rels'))//node()[name() = 'Relationship']">
+        <xsl:if test="./@Id=$id">
+          <xsl:value-of select="./@Target"/>   
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
 </xsl:stylesheet>
