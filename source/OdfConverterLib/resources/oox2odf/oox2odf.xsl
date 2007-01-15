@@ -44,7 +44,7 @@
   <xsl:import href="track.xsl"/>
 
   <xsl:param name="outputFile"/>
-  <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+  <xsl:output method="xml" encoding="UTF-8"/>
 
 
   <!-- packages relationships -->
