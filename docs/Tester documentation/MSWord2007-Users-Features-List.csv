@@ -130,7 +130,7 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted bec
 ;;Quick Parts;Document Property;Selected option;;2;;;;;
 ;;;Field;Selected field;;2;1.0;Partial;completed are date, time, page number ;;
 ;;Drop cap;Position;None / Dropped/ In margin;;3;1.0;Completed;"""In margin""";;
-;;;Options;Font;;3;1.0;Completed;Font encapsulated in an automatic style and connected to the drop cap definition. Though, this has no effect.;;
+;;;Options;Font;;3;1.0;Completed;;;
 ;;;;Lines to drop;;3;1.0;Completed;;;
 ;;;;Distance from text;;3;1.0;Completed;;;
 ;;Word Art;;;;2;Delayed;;;;
