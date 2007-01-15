@@ -1,5 +1,5 @@
 Main Tab;Top level Menu Item;Sub Menu Item;Section / Tab;Feature;Sub Feature;Priority;Delivery Milestone;Completion Status;Lost during conversion;Schema Conversion Map reference;Comments
-
+;;;;;;;;;;;
 Home;Font;Font;Font type;Selected font;;0;0.2-Final ;Completed;;;
 ;;;Font Style;Regular/Italic/Bold / Bold Italic;;0;0.2-Final ;Completed;;;
 ;;;Size;Selected size;;0;0.2-Final ;Completed;;;
@@ -14,63 +14,63 @@ Home;Font;Font;Font type;Selected font;;0;0.2-Final ;Completed;;;
 ;;;;Outline;;1;0.3-M1;Completed;;;
 ;;;;Emboss;;1;0.2-Final ;Completed;;;
 ;;;;Engrave;;1;-;;not supported in ODF;;
-;;;;Small caps;;0;0.2-Final ;Completed
-;;;;All caps;;0;0.2-Final ;Completed
-;;;;Hidden;;1;0.3-M1;Completed
-
-;;Character spacing;Scale;Selected value;;1;0.2-Final ;Completed
-;;;Spacing;Expanded/ Condensed;;1;0.2-Final ;Completed
-;;;Position;Normal/ Raised / Lowered;;1;0.2-Final ;Completed
-;;;Kerning for fonts;;;1;0.2-Final ;Completed
-
-;;Font color;Selected font color;;;1;0.2-Final ;Completed
-
-;;Text Highlight color;Selected text highlight color;;;1;0.2-Final ;Completed
-
-;Paragraph;Indents and spacing;Alignment;Left / Right / Centered / Justified;;0;0.2-Final ;Completed
-;;;Outline level;Body Text;;0;0.2-Final ;Completed
-;;;;Level1 to Leve9;;0;0.2-Final ;Completed
-;;;Indentation;Left;;0;0.2-Final ;Completed;
-;;;;Right;;0;0.2-Final ;Completed;
-;;;;Mirror indents;;1;-;;this feature is unsupported in ODF
-;;;;Special;None;0;0.2-Final ;Completed;
-;;;;;First line;0;0.2-Final ;Completed;
-;;;;;Hanging;0;0.2-Final ;Completed;
-;;;Spacing;Before;;0;0.2-Final ;Completed;
-;;;;After;;0;0.2-Final ;Completed;
-;;;;Line Spacing;Single;1;0.2-Final ;Completed;
-;;;;;1.5 lines;1;0.2-Final ;Completed;
-;;;;;Double;1;0.2-Final ;Completed;
-;;;;;At least;1;0.2-Final ;Completed;
-;;;;;Exactly;1;0.2-Final ;Completed;
-;;;;;Multiple;1;0.2-Final ;Completed;at least 2 lines is supported
-;;;;Don’t add space between paragraphs of the same style;;1;-;;not supported in ODF
-;;;Tabs;Tab stop position;;0;0.2-Final ;Completed;
-;;;;Default tab stops;Selected value;0;-;;not supported in ODF
-;;;;Alignment;Left/Center/Right/Decimal/Bar;0;0.2-Final ;Completed;bar is not supported
-;;;;Leader;1/ 2/ 3/ 4;2;0.2-Final ;Completed;
-
-;;Line and Page Breaks;Pagination;Widow/Orphan control;;0;0.2-Final ;Completed;
-;;;;Keep with next;;0;0.2-Final ;Completed;
-;;;;Keep lines together;;1;0.2-Final ;Completed;
-;;;;Page break before;;0;0.2-Final ;Completed;
-;;;Formatting Exception;Suppress line numbers;;2;1.0;Completed;
-
-;;Borders and shading;Borders;Settings;None;2;0.2-Final ;Completed;
-;;;;;Box;2;0.2-Final ;Completed;
-;;;;;Shadow;2;1.0;Completed;
-;;;;;3-D;2;1.0;Completed;
-;;;;;Custom;2;1.0;Completed;
-;;;;Style;Selected style;1;-;;not supported in ODF
+;;;;Small caps;;0;0.2-Final ;Completed;;;
+;;;;All caps;;0;0.2-Final ;Completed;;;
+;;;;Hidden;;1;0.3-M1;Completed;;;
+;;;;;;;;;;;
+;;Character spacing;Scale;Selected value;;1;0.2-Final ;Completed;;;
+;;;Spacing;Expanded/ Condensed;;1;0.2-Final ;Completed;;;
+;;;Position;Normal/ Raised / Lowered;;1;0.2-Final ;Completed;;;
+;;;Kerning for fonts;;;1;0.2-Final ;Completed;;;
+;;;;;;;;;;;
+;;Font color;Selected font color;;;1;0.2-Final ;Completed;;;
+;;;;;;;;;;;
+;;Text Highlight color;Selected text highlight color;;;1;0.2-Final ;Completed;;;
+;;;;;;;;;;;
+;Paragraph;Indents and spacing;Alignment;Left / Right / Centered / Justified;;0;0.2-Final ;Completed;;;
+;;;Outline level;Body Text;;0;0.2-Final ;Completed;;;
+;;;;Level1 to Leve9;;0;0.2-Final ;Completed;;;
+;;;Indentation;Left;;0;0.2-Final ;Completed;;;
+;;;;Right;;0;0.2-Final ;Completed;;;
+;;;;Mirror indents;;1;-;;this feature is unsupported in ODF;;
+;;;;Special;None;0;0.2-Final ;Completed;;;
+;;;;;First line;0;0.2-Final ;Completed;;;
+;;;;;Hanging;0;0.2-Final ;Completed;;;
+;;;Spacing;Before;;0;0.2-Final ;Completed;;;
+;;;;After;;0;0.2-Final ;Completed;;;
+;;;;Line Spacing;Single;1;0.2-Final ;Completed;;;
+;;;;;1.5 lines;1;0.2-Final ;Completed;;;
+;;;;;Double;1;0.2-Final ;Completed;;;
+;;;;;At least;1;0.2-Final ;Completed;;;
+;;;;;Exactly;1;0.2-Final ;Completed;;;
+;;;;;Multiple;1;0.2-Final ;Completed;at least 2 lines is supported;;
+;;;;Don’t add space between paragraphs of the same style;;1;-;;not supported in ODF;;
+;;;Tabs;Tab stop position;;0;0.2-Final ;Completed;;;
+;;;;Default tab stops;Selected value;0;-;;not supported in ODF;;
+;;;;Alignment;Left/Center/Right/Decimal/Bar;0;0.2-Final ;Completed;bar is not supported;;
+;;;;Leader;1/ 2/ 3/ 4;2;0.2-Final ;Completed;;;
+;;;;;;;;;;;
+;;Line and Page Breaks;Pagination;Widow/Orphan control;;0;0.2-Final ;Completed;;;
+;;;;Keep with next;;0;0.2-Final ;Completed;;;
+;;;;Keep lines together;;1;0.2-Final ;Completed;;;
+;;;;Page break before;;0;0.2-Final ;Completed;;;
+;;;Formatting Exception;Suppress line numbers;;2;1.0;Completed;;;
+;;;;;;;;;;;
+;;Borders and shading;Borders;Settings;None;2;0.2-Final ;Completed;;;
+;;;;;Box;2;0.2-Final ;Completed;;;
+;;;;;Shadow;2;1.0;Completed;;;
+;;;;;3-D;2;1.0;Completed;;;
+;;;;;Custom;2;1.0;Completed;;;
+;;;;Style;Selected style;1;-;;not supported in ODF;;
 ;;;;Color;Selected color;1;0.2-Final ;Completed;;;
 ;;;;Width;Selected width;1;0.2-Final ;Completed;;;
 ;;;Options (Text spacing from border);Top / Bottom/ Left/ Right;;1;0.2-Final ;Completed;;;
 ;;;Shading;Fill;Selected fill color;2;-;;not supported in ODF;;
 ;;;;Patterns;Selected style;2;-;;not supported in ODF;;
-
+;;;;;;;;;;;
 ;;Horizontal Line;Selected Line;;;1;0.3-M2;Completed;;;
 ;;;Imported line;;;1;0.3-M2;Completed;;;
-
+;;;;;;;;;;;
 ;;Bullets;Bullets;Bullets library;;1;0.2-Final ;Completed;;;not supperted, only few types of bullets are converted
 ;;;;Define new bullet;Symbol;1;1.0;Completed;;;not supperted, only few types of bullets are converted
 ;;;;;Picture;1;1.0;Completed;;;
@@ -78,46 +78,46 @@ Home;Font;Font;Font type;Selected font;;0;0.2-Final ;Completed;;;
 ;;;;;Alignment;1;1.0;Completed;;;
 ;;Numbering;Number formats;;;1;0.2-Final ;Completed;;;
 ;;;Numbering value;Start at;;1;0.3-M2;Completed;;;
-
-;;Multi level list;;;;1;0.3-M2;Completed;
-
-;;List indents;Number position;;;1;0.3-M1;Completed;
-;;;Text indent;;;1;1.0;;
-;;;Follow number with;;;1;0.3-M1;Completed;
-;;;Add tab stop at;;;1;0.3-M1;Completed;
-
-;Styles;Styles;Selected style;;;1;0.2-Final ;Completed;
-
-Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted because it's only supported  in Word. (feature depends on application)
-;;;;No of rows;;1;-;;It's not converted because it's only supported  in Word. (feature depends on application)
-;;;Autofit behavior;Fixed column width;Auto;1;-;;It's not converted because it's only supported  in Word. (feature depends on application)
-;;;;;Selected value;1;-;;It's not converted because it's only supported  in Word. (feature depends on application)
-;;;;AutoFit to contents;;1;-;;It's not converted because it's only supported  in Word. (feature depends on application)
-;;;;AutoFit to window;;1;-;;It's not converted because it's only supported  in Word. (feature depends on application)
-
-;Illustrations;Picture;;;;0;0.2-Final ;Completed
-;;Clip Art;;;;2;Delayed;
-;;Shapes;;;;2;Delayed;
-;;Smart Art;;;;2;Delayed;
-;;Chart;;;;2;Delayed;
-
-;Pages;Page break;;;;0;0.2-Final ;Completed
-
-;Links;Hyperlink;;;;1;0.2-Final ;Completed
-;;;Link to;Existing file or web page;;1;0.2-Final ;Completed
-;;;;Place in the document;;1;0.2-Final ;Completed
-;;;;Create new document;Target frame;1;0.2-Final ;Completed
-;;;;E-mail address;E-mail address;1;0.2-Final ;Completed
-;;;;;Subject;1;0.2-Final ;Completed
-
+;;;;;;;;;;;
+;;Multi level list;;;;1;0.3-M2;Completed;;;
+;;;;;;;;;;;
+;;List indents;Number position;;;1;0.3-M1;Completed;;;
+;;;Text indent;;;1;1.0;;;;
+;;;Follow number with;;;1;0.3-M1;Completed;;;
+;;;Add tab stop at;;;1;0.3-M1;Completed;;;
+;;;;;;;;;;;
+;Styles;Styles;Selected style;;;1;0.2-Final ;Completed;;;
+;;;;;;;;;;;
+Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;;No of rows;;1;-;;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;Autofit behavior;Fixed column width;Auto;1;-;;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;;;Selected value;1;-;;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;;AutoFit to contents;;1;-;;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;;AutoFit to window;;1;-;;It's not converted because it's only supported  in Word. (feature depends on application);;
+;;;;;;;;;;;
+;Illustrations;Picture;;;;0;0.2-Final ;Completed;;;
+;;Clip Art;;;;2;Delayed;;;;
+;;Shapes;;;;2;Delayed;;;;
+;;Smart Art;;;;2;Delayed;;;;
+;;Chart;;;;2;Delayed;;;;
+;;;;;;;;;;;
+;Pages;Page break;;;;0;0.2-Final ;Completed;;;
+;;;;;;;;;;;
+;Links;Hyperlink;;;;1;0.2-Final ;Completed;;;
+;;;Link to;Existing file or web page;;1;0.2-Final ;Completed;;;
+;;;;Place in the document;;1;0.2-Final ;Completed;;;
+;;;;Create new document;Target frame;1;0.2-Final ;Completed;;;
+;;;;E-mail address;E-mail address;1;0.2-Final ;Completed;;;
+;;;;;Subject;1;0.2-Final ;Completed;;;
+;;;;;;;;;;;
 ;;Bookmark;;;;2;1.0;Completed;;;
-
+;;;;;;;;;;;
 ;;Cross Reference;Reference type;;;2;1.0;Completed;;;
 ;;;Insert reference to;Selected destination;;2;1.0;Completed;;;
 ;;;;Include above/below;;2;1.0;Completed;;;
 ;;;Insert as hyperlink;;;2;1.0;Completed;;;
 ;;;Seperate numbers with;;;3;1.0;;;;
-
+;;;;;;;;;;;
 ;Header & Footer;Header;;;;1;0.3-M1;Completed;;;
 ;;Footer;;;;1;0.3-M1;Completed;;;
 ;;Page Number;Number format;;;1;0.3-M1;Completed;;;
@@ -125,56 +125,56 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted bec
 ;;;;Use separator;;1;0.3-M2;Completed;;;
 ;;;Page numbering;Continue from previous section;;1;0.3-M1;Completed;;;
 ;;;;Start at;;;-;;;;This feature is unsupported in OO 
-
-;Text;Text Box;;;;2;0.3-M2;Completed;;
-;;Quick Parts;Document Property;Selected option;;2;;;;
-;;;Field;Selected field;;2;1.0;Partial;completed are date, time, page number ;
-;;Drop cap;Position;None / Dropped/ In margin;;3;1.0;;;
-;;;Options;Font;;3;1.0;;;
-;;;;Lines to drop;;3;1.0;;;
-;;;;Distance from text;;3;1.0;;;
-;;Word Art;;;;2;Delayed;;;
-;;Date and Time;;;;0;0.3-M2;Completed;;
-;;;Date format;;;0;0.3-M2;Completed;;
-;;;Language;;;0;0.3-M2;Completed;;
-
-;;Object;;;;1;0.3-M2;Completed;;
-;;;Object type;;;1;0.3-M2;Completed;;Object of Open Office are not supported correctly.
-;;;Display as icon;;;1;-;-;not supported;
-;;;Create from file;Selected file;;1;0.3-M2;Completed;;
-;;;;Link to file;;1;0.3-M2;Completed;
-
-;;Signature Line;;;;2;-;;not supported
-
-;Symbols;Symbol;;;;0;0.2-Final ;Completed;
-;;Equation;;;;0;0.2-Final ;Completed;
-
-Table Tools;Layout;Table - Properties;Table;Size;;0;0.2-Final ;Completed;
-;;;;Alignment;Left /Center/right;0;0.2-Final ;Completed;
-;;;;;Indent from left;0;0.2-Final ;Completed;
-;;;;Text wrapping;None / Around;1;-;;not supported
-;;;;Options(Default cell margins);Top/Bottom/Left/Right;1;0.2-Final ;Completed;
-;;;;;Default cell spacing;1;-;;not supported
-;;;;;Automatically resize to fit contents;1;-;;not supported
-;;;Row;Size;Height;2;0.2-Final ;Completed;
-;;;;;At least / Exactly;2;0.3-M1;Completed;
-;;;;Options;Allow row to break across pages;2;0.3-M1;Completed;;
-;;;;;Repeat as header row at the top of each page;2;0.3-M2;Completed;;
-;;;Column;Size;Width;2;0.2-Final ;Completed;;
-;;;Cell;Size;Width;2;0.3-M1;Completed;;
-;;;;Vertical alignment;Top/Center/Bottom;2;0.2-Final ;Completed;;
-;;;;Options;Cell margins;2;0.2-Final ;Completed;;
-;;;;;Wrap text;2;-;-;not supported;
-;;;;;Fit text;2;-;;not supported;
-;;;;Text direction;;2;-;;not supported;
-
-;;;Borders and Shadings;Settings;None/ Box /All /Grid /Custom;2;0.2-Final ;Completed;;
-;;;;Style;;2;-;;not supported;It's open office Bug, see coment in Conversion Issues.
-;;;;Color;;2;0.2-Final ;Completed;;
-;;;;Width;;2;0.2-Final ;Completed;;
-;;;;Shading;Fill color;2;0.3-M1;Completed;;
-;;;;;Patterns;2;-;;not supported;
-
+;;;;;;;;;;;
+;Text;Text Box;;;;2;0.3-M2;Completed;;;
+;;Quick Parts;Document Property;Selected option;;2;;;;;
+;;;Field;Selected field;;2;1.0;Partial;completed are date, time, page number ;;
+;;Drop cap;Position;None / Dropped/ In margin;;3;1.0;;;;
+;;;Options;Font;;3;1.0;;;;
+;;;;Lines to drop;;3;1.0;;;;
+;;;;Distance from text;;3;1.0;;;;
+;;Word Art;;;;2;Delayed;;;;
+;;Date and Time;;;;0;0.3-M2;Completed;;;
+;;;Date format;;;0;0.3-M2;Completed;;;
+;;;Language;;;0;0.3-M2;Completed;;;
+;;;;;;;;;;;
+;;Object;;;;1;0.3-M2;Completed;;;
+;;;Object type;;;1;0.3-M2;Completed;;Object of Open Office are not supported correctly.;
+;;;Display as icon;;;1;-;-;not supported;;
+;;;Create from file;Selected file;;1;0.3-M2;Completed;;;
+;;;;Link to file;;1;0.3-M2;Completed;;;
+;;;;;;;;;;;
+;;Signature Line;;;;2;-;;not supported;;
+;;;;;;;;;;;
+;Symbols;Symbol;;;;0;0.2-Final ;Completed;;;
+;;Equation;;;;0;0.2-Final ;Completed;;;
+;;;;;;;;;;;
+Table Tools;Layout;Table - Properties;Table;Size;;0;0.2-Final ;Completed;;;
+;;;;Alignment;Left /Center/right;0;0.2-Final ;Completed;;;
+;;;;;Indent from left;0;0.2-Final ;Completed;;;
+;;;;Text wrapping;None / Around;1;-;;not supported;;
+;;;;Options(Default cell margins);Top/Bottom/Left/Right;1;0.2-Final ;Completed;;;
+;;;;;Default cell spacing;1;-;;not supported;;
+;;;;;Automatically resize to fit contents;1;-;;not supported;;
+;;;Row;Size;Height;2;0.2-Final ;Completed;;;
+;;;;;At least / Exactly;2;0.3-M1;Completed;;;
+;;;;Options;Allow row to break across pages;2;0.3-M1;Completed;;;
+;;;;;Repeat as header row at the top of each page;2;0.3-M2;Completed;;;
+;;;Column;Size;Width;2;0.2-Final ;Completed;;;
+;;;Cell;Size;Width;2;0.3-M1;Completed;;;
+;;;;Vertical alignment;Top/Center/Bottom;2;0.2-Final ;Completed;;;
+;;;;Options;Cell margins;2;0.2-Final ;Completed;;;
+;;;;;Wrap text;2;-;-;not supported;;
+;;;;;Fit text;2;-;;not supported;;
+;;;;Text direction;;2;-;;not supported;;
+;;;;;;;;;;;
+;;;Borders and Shadings;Settings;None/ Box /All /Grid /Custom;2;0.2-Final ;Completed;;;
+;;;;Style;;2;-;;not supported;It's open office Bug, see coment in Conversion Issues.;
+;;;;Color;;2;0.2-Final ;Completed;;;
+;;;;Width;;2;0.2-Final ;Completed;;;
+;;;;Shading;Fill color;2;0.3-M1;Completed;;;
+;;;;;Patterns;2;-;;not supported;;
+;;;;;;;;;;;
 Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;;;Width;1;0.2-Final ;Completed;;;
 ;;;;;Rotation;1;0.3-M1;Completed;Rotation is not supported for pictures in OO. Only vertical or horizontal flip are supported;;
@@ -184,7 +184,7 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;;;Relative to orginal picture size;1;-;;there is no equivalent in OO;;
 ;;;;Crop from;Left/Right/Top/Bottom;3;0.3-M1;Completed;crop is supported for 100% image scale - details are in Conversion issues;;
 ;;;Alt Text;;;;;;;;
-
+;;;;;;;;;;;
 ;;Advanced Layout;Picture position;Horizontal;Alignment;2;0.3-M1;Completed;;;
 ;;;;;Book layout;2;0.3-M1;Completed;;;
 ;;;;;Absolute position;2;0.3-M1;Completed;;;
@@ -196,7 +196,7 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;;;Lock anchor;2;-;;not supported ;;in OO only position can be locked
 ;;;;;Allow overlap;2;-;;not supported;;
 ;;;;;Layout in table cell;2;0.3-M1;Completed;the behaviour is similar but not the same - picture hovers the table in OO;;"corresponding feature in OO: anchor set ""to page"""
-
+;;;;;;;;;;;
 ;;;Text Wrapping;Wrapping style;Square;2;0.3-M1;Completed;;;
 ;;;;;Tight;2;0.3-M1;Completed;;;
 ;;;;;Throught;2;0.3-M1;Completed;;;
@@ -206,38 +206,38 @@ Picture Tools;Format;Size;Size;Size and rotate;Height;1;0.2-Final ;Completed;;;
 ;;;;;In line with text;2;0.3-M1;Completed;;;
 ;;;;Wrap text;Both sides;2;0.3-M1;Completed;;;
 ;;;;;Left only ;2;0.3-M1;Completed;;;
-;;;;;Right only;2;0.3-M1;Completed;
-;;;;;Largest only;2;0.3-M1;Completed;
-;;;;Distance from text;Top;2;0.3-M1;Completed;
-;;;;;Bottom;2;0.3-M1;Completed;
-;;;;;Left;2;0.3-M1;Completed;
-;;;;;Right;2;0.3-M1;Completed;
-
-;;Picture styles;Fill;;;3;-;;not supported
-;;;Line color;;;3;1.0;Completed;
-;;;Line Style;;;3;1.0;Completed;
-;;;Shadow;;;3;-;;not supported
-;;;3-D Format;;;3;-;;not supported
-;;;3-D Rotation;;;3;-;;not supported
-;;;Picture;;;3;-;;not supported
-;;;Text Box;;;3;1.0;Completed;
-
-Header and Footer Tools;Design;Position;Header from top;;;1;0.3-M2;Completed;
-;;;Footer from bottom;;;1;0.3-M2;Completed;
-;;;Insert alignment tab;Alignment;Left /center / Right;1;-;-;not supported
-;;;;Alignment relative to;Margin / Indent;1;-;;not supported
-;;;;Leader;1/2/3/4/5;1;-;-;not supported
-;;Options;Different First Page;;;1;0.3-M2;Completed;
-;;;Different Odd and Even Pages;;;1;0.3-M2;Completed;
-
-Textbox Tools;Format;Text box styles;Size;Height;Absolute;2;0.3-M2;Completed;
-;;;;;Relative to Margin;2;0.3-M2;Completed;
-;;;;;Relative to Page;2;-;-;not supported
-;;;;;Relative to Top margin;2;-;-;not supported
-;;;;;Relative to Bottom margin;2;-;-;not supported
-;;;;;Relative to Inside margin;2;-;-;not supported
-;;;;;Relative to Outside margin;2;-;-;not supported
-;;;;Width;Absolute;2;0.3-M2;Completed;
+;;;;;Right only;2;0.3-M1;Completed;;;
+;;;;;Largest only;2;0.3-M1;Completed;;;
+;;;;Distance from text;Top;2;0.3-M1;Completed;;;
+;;;;;Bottom;2;0.3-M1;Completed;;;
+;;;;;Left;2;0.3-M1;Completed;;;
+;;;;;Right;2;0.3-M1;Completed;;;
+;;;;;;;;;;;
+;;Picture styles;Fill;;;3;-;;not supported;;
+;;;Line color;;;3;1.0;Completed;;;
+;;;Line Style;;;3;1.0;Completed;;;
+;;;Shadow;;;3;-;;not supported;;
+;;;3-D Format;;;3;-;;not supported;;
+;;;3-D Rotation;;;3;-;;not supported;;
+;;;Picture;;;3;-;;not supported;;
+;;;Text Box;;;3;1.0;Completed;;;
+;;;;;;;;;;;
+Header and Footer Tools;Design;Position;Header from top;;;1;0.3-M2;Completed;;;
+;;;Footer from bottom;;;1;0.3-M2;Completed;;;
+;;;Insert alignment tab;Alignment;Left /center / Right;1;-;-;not supported;;
+;;;;Alignment relative to;Margin / Indent;1;-;;not supported;;
+;;;;Leader;1/2/3/4/5;1;-;-;not supported;;
+;;Options;Different First Page;;;1;0.3-M2;Completed;;;
+;;;Different Odd and Even Pages;;;1;0.3-M2;Completed;;;
+;;;;;;;;;;;
+Textbox Tools;Format;Text box styles;Size;Height;Absolute;2;0.3-M2;Completed;;;
+;;;;;Relative to Margin;2;0.3-M2;Completed;;;
+;;;;;Relative to Page;2;-;-;not supported;;
+;;;;;Relative to Top margin;2;-;-;not supported;;
+;;;;;Relative to Bottom margin;2;-;-;not supported;;
+;;;;;Relative to Inside margin;2;-;-;not supported;;
+;;;;;Relative to Outside margin;2;-;-;not supported;;
+;;;;Width;Absolute;2;0.3-M2;Completed;;;
 ;;;;;Relative to Margin;2;0.3-M2;Completed;;;
 ;;;;;Relative to Page;2;-;-;not supported;;
 ;;;;;Relative to Top margin;2;-;-;not supported;;
@@ -249,140 +249,140 @@ Textbox Tools;Format;Text box styles;Size;Height;Absolute;2;0.3-M2;Completed;
 ;;;;;Width;2;-;-;;;property is not saved in xml - is is used to calculate absolute size
 ;;;;;Lock aspect ratio;2;-;-;;;in OO only position can be locked
 ;;;;;Relative to orginal picture size;2;-;-;there is no equivalent in OO;;
-
+;;;;;;;;;;;
 ;;;Layout;Wrapping style;In line with text;2;0.3-M2;Completed;;;
 ;;;;;Square;2;0.3-M2;Completed;;;
 ;;;;;Tight;2;0.3-M2;Completed;;;
 ;;;;;Behind text;2;0.3-M2;Completed;;;
-;;;;;In front of text;2;0.3-M2;Completed;
-;;;;Horizontal alignment;Left  / Center / Right / Other;2;-;-;not supported
-;;;Advanced Layout;Picture position;Horizontal;2;0.3-M2;Completed;
-;;;;;Vertical;2;0.3-M2;Completed;
-;;;;;Options;2;0.3-M2;Completed;allow overlap - no equivalent in OO, lock anchor not supported (in OO only position can be locked)
-;;;;Text Wrapping;Wrapping style;2;0.3-M2;Completed;
-;;;;;Wrap text;2;0.3-M2;Completed;
-;;;;;Distance from text;2;0.3-M2;Completed;
-;;;Text Box;Internal margin;Left/ Top / Right / Bottom;2;0.3-M2;Completed;
-;;;;Vertical alignment;Top/ Center / Bottom;2;-;-;not supported
-;;;;Options;Word wrap text in Autoshape;2;0.3-M2;Completed;
-;;;;;Resize autoshape to fit text;2;0.3-M2;Completed;
-;;;Colors and Lines;Fill;Color;3;1.0;Completed;
-;;;;;Fill Effects;3;1.0;;
-;;;;Line;Color;3;1.0;Completed;
-;;;;;Style;3;1.0;Completed;
-;;;;;Weight;3;1.0;Completed;
-;;;;;Dashed;3;-;;not supported
-;;;Alt Text;;;3;0.3-M2;-;not supported
-;;;;Arrows;Begin / end style Begin / end size;3;0.3-M2;-;not supported
-;;;;;;3;;;
-;;Text;Text direction;;;3;0.3-M2;Completed;only vertical right to left is supported in OO
-;;;Hyperlink;;;3;0.3-M2;Completed;
-
-;;Shadow effects;;;;3;1.0;Completed;opacity lost, perspective shadow lost.
-`;;3D Effects;;;;3;-;;not supported
-
-Drawing Tools;Shape styles;Colors and lines;Fill;Color;;2;Delayed;;
-;;;;Transparency;;2;Delayed;;
-;;;Line;Color;;2;Delayed;;
-;;;;Style;;2;Delayed;;
-;;;;Dashed;;2;Delayed;;
-;;;;Weight;;2;Delayed
-
-;;Size;Height;Absolute;;2;Delayed
-;;;;Relative to Margin;;2;Delayed
-;;;;Relative to Page;;2;Delayed
-;;;;Relative to Top margin;;2;Delayed
-;;;;Relative to Bottom margin;;2;Delayed
-;;;;Relative to Inside margin;;2;Delayed
-;;;;Relative to Outside margin;;2;Delayed
-;;;Width;Absolute;;2;Delayed
-;;;;Relative to Margin;;2;Delayed
-;;;;Relative to Page;;2;Delayed
-;;;;Relative to Top margin;;2;Delayed
-;;;;Relative to Bottom margin;;2;Delayed
-;;;;Relative to Inside margin;;2;Delayed
-;;;;Relative to Outside margin;;2;Delayed
-;;;Rotate;;;2;Delayed
-;;;Scale;Height;;2;Delayed
-;;;;Width;;2;Delayed
-;;;;Lock aspect ratio;;2;Delayed
-;;;;Relative to orginal picture size;;2;Delayed
-
-;;Layout;Wrapping style;In line with text;;2;Delayed
-;;;;Square;;2;Delayed
-;;;;Tight;;2;Delayed
-;;;;Behind text;;2;Delayed
-;;;;In front of text;;2;Delayed
-;;;Horizontal alignment;Left  / Center / Right / Other;;2;Delayed
-
-;;Advanced Layout;Picture position;Horizontal;Alignment;2;Delayed
-;;;;;Book layout;2;Delayed
-;;;;;Absolute position;2;Delayed
-;;;;;Relative position;2;Delayed
-;;;;Vertical;Alignment;2;Delayed
-;;;;;Absolute position;2;Delayed
-;;;;;Relative position;2;Delayed
-;;;;Options;Move object with text;2;Delayed
-;;;;;Lock anchor;2;Delayed
-;;;;;Allow overlap;2;Delayed
-;;;;;Layout in table cell;2;Delayed
-;;;Text Wrapping;Wrapping style;;2;Delayed
-;;;;Wrap text;;2;Delayed
-;;;;Distance from text;;2;Delayed
-;;Alt Text;;;;2;Delayed
-
-;Shadow Effects;;;;;3;Delayed
-
-;3-D Effects;;;;;3;Delayed
-
-Smart Art Tools;Format;Shape Styles;Fill;;;3;Delayed
-;;;Line color;;;3;Delayed
-;;;Line Style;;;3;Delayed
-;;;Shadow;;;3;Delayed
-;;;3-D Format;;;3;Delayed
-;;;3-D Rotation;;;3;Delayed
-;;;Picture;;;3;Delayed
-;;;Text Box;;;3;Delayed
-;;;;;;3;Delayed
-;;WordArt Styles;Fill;;;3;Delayed
-;;;Line color;;;3;Delayed
-;;;Line Style;;;3;Delayed
-;;;Shadow;;;3;Delayed
-;;;3-D Format;;;3;Delayed
-;;;3-D Rotation;;;3;Delayed
-;;;Picture;;;3;Delayed
-;;;Text Box;;;3;Delayed
-;;Arrange;Picture position;Horizontal;Alignment;3;Delayed
-;;;;;Book layout;3;Delayed
-;;;;;Absolute position;3;Delayed
-;;;;;Relative position;3;Delayed
-;;;;Vertical;Alignment;3;Delayed
-;;;;;Absolute position;3;Delayed
-;;;;;Relative position;3;Delayed
-;;;;Options;Move object with text;3;Delayed
-;;;;;Lock anchor;3;Delayed
-;;;;;Allow overlap;3;Delayed
-;;;;;Layout in table cell;3;Delayed
-
-;;;Text Wrapping;Wrapping style;Square;3;Delayed
-;;;;;Tight;3;Delayed
-;;;;;Throught;3;Delayed
-;;;;;Top and Bottom;3;Delayed
-;;;;;Behind text;3;Delayed
-;;;;;In front of text;3;Delayed
-;;;;;In line with text;3;Delayed
-;;;;Wrap text;Both sides;3;Delayed
-;;;;;Left only ;3;Delayed
-;;;;;Right only;3;Delayed
-;;;;;Largest only;3;Delayed
-;;;;Distance from text;Top;3;Delayed
-;;;;;Bottom;3;Delayed
-;;;;;Left;3;Delayed
-;;;;;Right;3;Delayed
-
-;;Size;Height;;;3;Delayed
-;;;Width;;;3;Delayed
-
+;;;;;In front of text;2;0.3-M2;Completed;;;
+;;;;Horizontal alignment;Left  / Center / Right / Other;2;-;-;not supported;;
+;;;Advanced Layout;Picture position;Horizontal;2;0.3-M2;Completed;;;
+;;;;;Vertical;2;0.3-M2;Completed;;;
+;;;;;Options;2;0.3-M2;Completed;allow overlap - no equivalent in OO, lock anchor not supported (in OO only position can be locked);;
+;;;;Text Wrapping;Wrapping style;2;0.3-M2;Completed;;;
+;;;;;Wrap text;2;0.3-M2;Completed;;;
+;;;;;Distance from text;2;0.3-M2;Completed;;;
+;;;Text Box;Internal margin;Left/ Top / Right / Bottom;2;0.3-M2;Completed;;;
+;;;;Vertical alignment;Top/ Center / Bottom;2;-;-;not supported;;
+;;;;Options;Word wrap text in Autoshape;2;0.3-M2;Completed;;;
+;;;;;Resize autoshape to fit text;2;0.3-M2;Completed;;;
+;;;Colors and Lines;Fill;Color;3;1.0;Completed;;;
+;;;;;Fill Effects;3;1.0;;;;
+;;;;Line;Color;3;1.0;Completed;;;
+;;;;;Style;3;1.0;Completed;;;
+;;;;;Weight;3;1.0;Completed;;;
+;;;;;Dashed;3;-;;not supported;;
+;;;Alt Text;;;3;0.3-M2;-;not supported;;
+;;;;Arrows;Begin / end style Begin / end size;3;0.3-M2;-;not supported;;
+;;;;;;3;;;;;
+;;Text;Text direction;;;3;0.3-M2;Completed;only vertical right to left is supported in OO;;
+;;;Hyperlink;;;3;0.3-M2;Completed;;;
+;;;;;;;;;;;
+;;Shadow effects;;;;3;1.0;Completed;opacity lost, perspective shadow lost.;;
+`;;3D Effects;;;;3;-;;not supported;;
+;;;;;;;;;;;
+Drawing Tools;Shape styles;Colors and lines;Fill;Color;;2;Delayed;;;;
+;;;;Transparency;;2;Delayed;;;;
+;;;Line;Color;;2;Delayed;;;;
+;;;;Style;;2;Delayed;;;;
+;;;;Dashed;;2;Delayed;;;;
+;;;;Weight;;2;Delayed;;;;
+;;;;;;;;;;;
+;;Size;Height;Absolute;;2;Delayed;;;;
+;;;;Relative to Margin;;2;Delayed;;;;
+;;;;Relative to Page;;2;Delayed;;;;
+;;;;Relative to Top margin;;2;Delayed;;;;
+;;;;Relative to Bottom margin;;2;Delayed;;;;
+;;;;Relative to Inside margin;;2;Delayed;;;;
+;;;;Relative to Outside margin;;2;Delayed;;;;
+;;;Width;Absolute;;2;Delayed;;;;
+;;;;Relative to Margin;;2;Delayed;;;;
+;;;;Relative to Page;;2;Delayed;;;;
+;;;;Relative to Top margin;;2;Delayed;;;;
+;;;;Relative to Bottom margin;;2;Delayed;;;;
+;;;;Relative to Inside margin;;2;Delayed;;;;
+;;;;Relative to Outside margin;;2;Delayed;;;;
+;;;Rotate;;;2;Delayed;;;;
+;;;Scale;Height;;2;Delayed;;;;
+;;;;Width;;2;Delayed;;;;
+;;;;Lock aspect ratio;;2;Delayed;;;;
+;;;;Relative to orginal picture size;;2;Delayed;;;;
+;;;;;;;;;;;
+;;Layout;Wrapping style;In line with text;;2;Delayed;;;;
+;;;;Square;;2;Delayed;;;;
+;;;;Tight;;2;Delayed;;;;
+;;;;Behind text;;2;Delayed;;;;
+;;;;In front of text;;2;Delayed;;;;
+;;;Horizontal alignment;Left  / Center / Right / Other;;2;Delayed;;;;
+;;;;;;;;;;;
+;;Advanced Layout;Picture position;Horizontal;Alignment;2;Delayed;;;;
+;;;;;Book layout;2;Delayed;;;;
+;;;;;Absolute position;2;Delayed;;;;
+;;;;;Relative position;2;Delayed;;;;
+;;;;Vertical;Alignment;2;Delayed;;;;
+;;;;;Absolute position;2;Delayed;;;;
+;;;;;Relative position;2;Delayed;;;;
+;;;;Options;Move object with text;2;Delayed;;;;
+;;;;;Lock anchor;2;Delayed;;;;
+;;;;;Allow overlap;2;Delayed;;;;
+;;;;;Layout in table cell;2;Delayed;;;;
+;;;Text Wrapping;Wrapping style;;2;Delayed;;;;
+;;;;Wrap text;;2;Delayed;;;;
+;;;;Distance from text;;2;Delayed;;;;
+;;Alt Text;;;;2;Delayed;;;;
+;;;;;;;;;;;
+;Shadow Effects;;;;;3;Delayed;;;;
+;;;;;;;;;;;
+;3-D Effects;;;;;3;Delayed;;;;
+;;;;;;;;;;;
+Smart Art Tools;Format;Shape Styles;Fill;;;3;Delayed;;;;
+;;;Line color;;;3;Delayed;;;;
+;;;Line Style;;;3;Delayed;;;;
+;;;Shadow;;;3;Delayed;;;;
+;;;3-D Format;;;3;Delayed;;;;
+;;;3-D Rotation;;;3;Delayed;;;;
+;;;Picture;;;3;Delayed;;;;
+;;;Text Box;;;3;Delayed;;;;
+;;;;;;3;Delayed;;;;
+;;WordArt Styles;Fill;;;3;Delayed;;;;
+;;;Line color;;;3;Delayed;;;;
+;;;Line Style;;;3;Delayed;;;;
+;;;Shadow;;;3;Delayed;;;;
+;;;3-D Format;;;3;Delayed;;;;
+;;;3-D Rotation;;;3;Delayed;;;;
+;;;Picture;;;3;Delayed;;;;
+;;;Text Box;;;3;Delayed;;;;
+;;Arrange;Picture position;Horizontal;Alignment;3;Delayed;;;;
+;;;;;Book layout;3;Delayed;;;;
+;;;;;Absolute position;3;Delayed;;;;
+;;;;;Relative position;3;Delayed;;;;
+;;;;Vertical;Alignment;3;Delayed;;;;
+;;;;;Absolute position;3;Delayed;;;;
+;;;;;Relative position;3;Delayed;;;;
+;;;;Options;Move object with text;3;Delayed;;;;
+;;;;;Lock anchor;3;Delayed;;;;
+;;;;;Allow overlap;3;Delayed;;;;
+;;;;;Layout in table cell;3;Delayed;;;;
+;;;;;;;;;;;
+;;;Text Wrapping;Wrapping style;Square;3;Delayed;;;;
+;;;;;Tight;3;Delayed;;;;
+;;;;;Throught;3;Delayed;;;;
+;;;;;Top and Bottom;3;Delayed;;;;
+;;;;;Behind text;3;Delayed;;;;
+;;;;;In front of text;3;Delayed;;;;
+;;;;;In line with text;3;Delayed;;;;
+;;;;Wrap text;Both sides;3;Delayed;;;;
+;;;;;Left only ;3;Delayed;;;;
+;;;;;Right only;3;Delayed;;;;
+;;;;;Largest only;3;Delayed;;;;
+;;;;Distance from text;Top;3;Delayed;;;;
+;;;;;Bottom;3;Delayed;;;;
+;;;;;Left;3;Delayed;;;;
+;;;;;Right;3;Delayed;;;;
+;;;;;;;;;;;
+;;Size;Height;;;3;Delayed;;;;
+;;;Width;;;3;Delayed;;;;
+;;;;;;;;;;;
 Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;Completed;;;
 ;;;;Gutter/ Gutter position;;0;0.2-Final ;Completed;;;
 ;;;Orientation;Portrait/Landscape;;0;0.2-Final ;Completed;;;
@@ -398,101 +398,101 @@ Page layout;Page setup;Margins;Margins;Top / Bottom/ Right /Left;;0;0.2-Final ;C
 ;;;;;Odd page;1;-;;;;There is Word 2007 bug, see coment in Conversion Issues.
 ;;;;;Continuous;1;0.3-M2;Completed;;;
 ;;;;;New column;1;0.3-M2;Completed;;;
-;;;Header and Footer;Different odd and even;;1;0.3-M2;Completed;
-;;;;Different first page;;1;0.3-M2;Completed;
-;;;;From edge;Header;1;0.3-M2;Completed;
-;;;;;Footer;1;0.3-M2;Completed;
-;;;Page;Vertical alignment to;Top;0;-;;not supported
-;;;;;Center;0;-;;not supported
-;;;;;Justified;0;-;;not supported
-;;;;;Bottom;0;-;;not supported
-;;Preview;Line Numbers;Start at;;;;;not supported
-;;;;From text;;;;Completed;
-;;;;Count by;;;;Completed;
-;;;;Numbering;Restart each page;;;Completed;
-;;;;;Restart each section;;;;not supported
-;;;;;Continuous;;;Completed;
-;;Columns;Presets;One /Two / Three/ Left / Right;;1;0.3-M2;Completed;
-;;;Number of columns;;;1;0.3-M2;Completed;
+;;;Header and Footer;Different odd and even;;1;0.3-M2;Completed;;;
+;;;;Different first page;;1;0.3-M2;Completed;;;
+;;;;From edge;Header;1;0.3-M2;Completed;;;
+;;;;;Footer;1;0.3-M2;Completed;;;
+;;;Page;Vertical alignment to;Top;0;-;;not supported;;
+;;;;;Center;0;-;;not supported;;
+;;;;;Justified;0;-;;not supported;;
+;;;;;Bottom;0;-;;not supported;;
+;;Preview;Line Numbers;Start at;;;;;not supported;;
+;;;;From text;;;;Completed;;;
+;;;;Count by;;;;Completed;;;
+;;;;Numbering;Restart each page;;;Completed;;;
+;;;;;Restart each section;;;;not supported;;
+;;;;;Continuous;;;Completed;;;
+;;Columns;Presets;One /Two / Three/ Left / Right;;1;0.3-M2;Completed;;;
+;;;Number of columns;;;1;0.3-M2;Completed;;;
 ;;;Line Between;;;1;0.3-M2;Completed;;;
 ;;;Width and spacing;;;1;0.3-M2;Completed;;;
 ;;;Equal column width;;;1;0.3-M2;Completed;;;
-
+;;;;;;;;;;;
 ;Page background;Page color;Selected color;;;2;0.2-Final ;Completed;In ODF page background color is set excluding the margin area;;
 ;;Page Borders;Settings;None/Box/Shadow/3D/custom;;2;0.3-M2;Completed;;;
 ;;;Style;Selected style;;2;0.3-M2;Completed;;;
 ;;;Color;Selected color;;2;0.3-M2;Completed;;;
 ;;;Width;Selected width;;2;0.3-M2;Completed;;;
-
+;;;;;;;;;;;
 ;Themes;Colors;;;;2;Delayed;;;;Level 2
 ;;Fonts;;;;2;Delayed;;;;Level 2
 ;;Effects;;;;2;Delayed;;;;Level 2
-
+;;;;;;;;;;;
 References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Completed;;;
 ;;;Right align page numbers;;;1;0.3-M2;Completed;;;
-;;;Use hyperlinks instead of page numbers;;;1;1.0;Completed;
-;;;Tab leader;;;1;0.3-M2;Completed;
-;;;Show levels;;;1;0.3-M2;Completed;
-;;;Options;Build TOC from;Styles;1;1.0;Completed;
-;;;;;Outline levels;1;0.3-M2;Completed;
-;;;;;Table entry fields;1;1.0;Completed;
-
-;Foot notes;Footnote and Endnote;Footnotes;;;2;0.3-M1;Completed;
-;;;Endnotes;;;2;0.3-M1;Completed;
-;;;Format;Number format;;2;0.3-M1;Completed;
-;;;;Custom mark;;2;0.3-M1;Completed;
-;;;;Start at;;2;-;;not supported
-;;;;Numbering;Continuous;2;-;;not supported
-;;;;;Restart each section;2;-;;not supported
-;;;;Apply changes to;This section;2;-;;not supported
-;;;;;Whole document;2;-;;not supported
-;Index;Mark entry;Index;Main entry;;3;1.0;Completed
-;;;;subentry;;3;1.0;
-;;;Options;Cross reference;;3;1.0;
-;;;;Current page;;3;1.0;
-;;;;Page range;;3;1.0;
-;;;Page number format;Bold / Italic;;3;1.0;
-;;Insert index;Type;Indented /  Run-in;;3;1.0;
-;;;Columns;;;3;1.0;
-;;;Language;;;3;1.0;
-;;;Right align page numbers;;;3;1.0;
-;;;Tab  leader;;;3;1.0;
-
-;Captions;Insert caption;Caption;;;3;1.0;Completed
-;;;Label;Figure / Table;;3;1.0;Completed
-;;;Position;Above / Below selected item;;3;1.0;Completed
-;;;Numbering;;;3;1.0;Completed
-;;;Exclude label from caption;;;3;1.0;;
-;;Insert table of figures;Show page numbers;;;3;1.0;Completed;
-;;;Right align page numbers;;;3;1.0;Completed;
-;;;Use hyperlinks instead of page numbers;;;3;1.0;;not supported
-;;;Tab leader;;;3;1.0;Completed;
-;;;Caption label;;;3;1.0;Completed;
-;;;Include label and number;;;3;1.0;;
-;;;Options;Build TOF from;Style;3;1.0;;
-;;;;;Table entry fields;3;1.0;;
-;;;;Table identifier;;3;1.0;;
-
-;Citations & Bibliography;Insert citation;Add new source;Type of Source;;2;0.3-M2;Completed;
-;;;;Author;;2;0.3-M2;Completed;
-;;;;Corporate Author;;2;0.3-M2;Completed;
-;;;;Title;;2;0.3-M2;Completed;
-;;;;Year;;2;0.3-M2;Completed;
-;;;;City;;2;0.3-M2;Completed;
-;;;;Publisher;;2;0.3-M2;Completed;
-;;Bibliography;Insert Bibliography;;;2;0.3-M2;Completed;
-
-Review;Comments;New Comment;;;;2;0.3-M2;Completed;
-
-;Tracking;Track changes;;;;2;1.0;Completed;
-;;Change tracking options;Markup;;;2;1.0;;not in document properties
-;;;Moves;;;2;1.0;;not in document properties
-;;;Table cell highlighting;;;2;1.0;;not in document properties
-;;;Formatting;;;2;1.0;;not in document properties
-;;;Baloons;;;2;1.0;;not in document properties
-
-;Protect;Protect document;;;;3;-;;not supported
-
-Developer;Controls;Controls;;;;3;Delayed;;
-;;Legacy Forms;(check box, Text box, Dropdown list etc.);;;3;Delayed
-;;ActiveXcontrols;(Combo box, radio button, scroll bar etc.);;;3;Delayed
+;;;Use hyperlinks instead of page numbers;;;1;1.0;Completed;;;
+;;;Tab leader;;;1;0.3-M2;Completed;;;
+;;;Show levels;;;1;0.3-M2;Completed;;;
+;;;Options;Build TOC from;Styles;1;1.0;Completed;;;
+;;;;;Outline levels;1;0.3-M2;Completed;;;
+;;;;;Table entry fields;1;1.0;Completed;;;
+;;;;;;;;;;;
+;Foot notes;Footnote and Endnote;Footnotes;;;2;0.3-M1;Completed;;;
+;;;Endnotes;;;2;0.3-M1;Completed;;;
+;;;Format;Number format;;2;0.3-M1;Completed;;;
+;;;;Custom mark;;2;0.3-M1;Completed;;;
+;;;;Start at;;2;-;;not supported;;
+;;;;Numbering;Continuous;2;-;;not supported;;
+;;;;;Restart each section;2;-;;not supported;;
+;;;;Apply changes to;This section;2;-;;not supported;;
+;;;;;Whole document;2;-;;not supported;;
+;Index;Mark entry;Index;Main entry;;3;1.0;Completed;;;
+;;;;subentry;;3;1.0;Completed;;;
+;;;Options;Cross reference;;3;1.0;;not supported;;
+;;;;Current page;;3;1.0;Completed;;;
+;;;;Page range;;3;1.0;;not supported;;
+;;;Page number format;Bold / Italic;;3;1.0;;not supported;;
+;;Insert index;Type;Indented /  Run-in;;3;1.0;;;;
+;;;Columns;;;3;1.0;;;;
+;;;Language;;;3;1.0;;;;
+;;;Right align page numbers;;;3;1.0;;;;
+;;;Tab  leader;;;3;1.0;;;;
+;;;;;;;;;;;
+;Captions;Insert caption;Caption;;;3;1.0;Completed;;;
+;;;Label;Figure / Table;;3;1.0;Completed;;;
+;;;Position;Above / Below selected item;;3;1.0;Completed;;;
+;;;Numbering;;;3;1.0;Completed;;;
+;;;Exclude label from caption;;;3;1.0;;;;
+;;Insert table of figures;Show page numbers;;;3;1.0;Completed;;;
+;;;Right align page numbers;;;3;1.0;Completed;;;
+;;;Use hyperlinks instead of page numbers;;;3;1.0;;not supported;;
+;;;Tab leader;;;3;1.0;Completed;;;
+;;;Caption label;;;3;1.0;Completed;;;
+;;;Include label and number;;;3;1.0;;;;
+;;;Options;Build TOF from;Style;3;1.0;;;;
+;;;;;Table entry fields;3;1.0;;;;
+;;;;Table identifier;;3;1.0;;;;
+;;;;;;;;;;;
+;Citations & Bibliography;Insert citation;Add new source;Type of Source;;2;0.3-M2;Completed;;;
+;;;;Author;;2;0.3-M2;Completed;;;
+;;;;Corporate Author;;2;0.3-M2;Completed;;;
+;;;;Title;;2;0.3-M2;Completed;;;
+;;;;Year;;2;0.3-M2;Completed;;;
+;;;;City;;2;0.3-M2;Completed;;;
+;;;;Publisher;;2;0.3-M2;Completed;;;
+;;Bibliography;Insert Bibliography;;;2;0.3-M2;Completed;;;
+;;;;;;;;;;;
+Review;Comments;New Comment;;;;2;0.3-M2;Completed;;;
+;;;;;;;;;;;
+;Tracking;Track changes;;;;2;1.0;Completed;;;
+;;Change tracking options;Markup;;;2;1.0;;not in document properties;;
+;;;Moves;;;2;1.0;;not in document properties;;
+;;;Table cell highlighting;;;2;1.0;;not in document properties;;
+;;;Formatting;;;2;1.0;;not in document properties;;
+;;;Baloons;;;2;1.0;;not in document properties;;
+;;;;;;;;;;;
+;Protect;Protect document;;;;3;-;;not supported;;
+;;;;;;;;;;;
+Developer;Controls;Controls;;;;3;Delayed;;;;
+;;Legacy Forms;(check box, Text box, Dropdown list etc.);;;3;Delayed;;;;
+;;ActiveXcontrols;(Combo box, radio button, scroll bar etc.);;;3;Delayed;;;;
