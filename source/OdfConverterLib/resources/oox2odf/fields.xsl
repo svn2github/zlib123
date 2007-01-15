@@ -146,7 +146,7 @@
       <xsl:choose>
         <xsl:when test="$fieldType = 'XE' or $fieldType = 'xe' ">
           <xsl:call-template name="InsertIndexMark">
-            <xsl:with-param name="instrText" select="following-sibling::instrText[1]"/>
+            <xsl:with-param name="instrText" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:when test="$fieldType = 'SET' or $fieldType = 'set' ">
@@ -456,10 +456,43 @@
   <!-- alphabetical index mark -->
   <xsl:template name="InsertIndexMark">
     <xsl:param name="instrText"/>
+    <xsl:variable name="Value">
+      <xsl:value-of select="substring-before(substring-after($instrText,'&quot;'),'&quot;')"/>
+    </xsl:variable>
     <text:alphabetical-index-mark>
-      <xsl:attribute name="text:string-value">
-        <xsl:value-of select="$instrText/text()"/>
-      </xsl:attribute>
+      <xsl:choose>
+        <xsl:when test="not(contains($Value, ':'))">
+          <xsl:attribute name="text:string-value">
+            <xsl:value-of select="$Value"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="contains($Value, ':')">
+          <xsl:variable name="TextKey1">
+            <xsl:value-of select="substring-before($Value, ':')"/>
+          </xsl:variable>
+          <xsl:variable name="TextKey2">
+            <xsl:value-of select="substring-after($Value, ':')"/>  
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="contains($TextKey2, ':')">
+              <xsl:attribute name="text:string-value">
+                <xsl:value-of select="substring-after($TextKey2, ':')"/>
+              </xsl:attribute>
+              <xsl:attribute name="text:key2">
+                <xsl:value-of select="substring-before($TextKey2, ':')"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="text:string-value">
+                <xsl:value-of select="$TextKey2"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:attribute name="text:key1">
+            <xsl:value-of select="$TextKey1"/>
+          </xsl:attribute>
+        </xsl:when>        
+      </xsl:choose>
     </text:alphabetical-index-mark>
   </xsl:template>
 
