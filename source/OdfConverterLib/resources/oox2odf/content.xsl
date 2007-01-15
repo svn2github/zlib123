@@ -330,6 +330,11 @@
         <xsl:apply-templates select="." mode="tocstart"/>
       </xsl:when>
 
+       <xsl:when
+        test="descendant::w:r[contains(w:instrText,'INDEX')]">
+        <xsl:apply-templates select="." mode="tocstart"/>
+      </xsl:when>
+
       <!-- check if the pargraph is Citations -->
 
       <xsl:when test="w:r[contains(w:instrText,'CITATION')]">

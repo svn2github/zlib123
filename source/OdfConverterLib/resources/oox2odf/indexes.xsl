@@ -70,6 +70,19 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
+      <xsl:when test="w:r[contains(w:instrText,'INDEX')]">
+        <text:alphabetical-index text:protected="true" text:name="Alphabetical Index1">
+          <xsl:attribute name="text:style-name">
+            <xsl:value-of select="generate-id(following::w:p/descendant::w:sectPr)"/>
+          </xsl:attribute>
+          <xsl:call-template name="InsertIndexProperties">
+            <xsl:with-param name="type">INDEXA</xsl:with-param>
+          </xsl:call-template>
+          <text:index-body>
+            <xsl:apply-templates select="." mode="indexa"/>
+          </text:index-body>
+        </text:alphabetical-index>
+      </xsl:when>
       <xsl:when test="w:r[contains(w:instrText,'BIBLIOGRAPHY')]">
         <text:bibliography>
           <xsl:attribute name="text:name">
@@ -95,6 +108,26 @@
     <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
       <xsl:apply-templates select="following-sibling::w:p[1]" mode="index"/>
     </xsl:if>
+  </xsl:template>
+  
+  <!-- paragraph in alphabetical index-->
+  <xsl:template match="w:p" mode="indexa">
+    <xsl:choose>
+      <xsl:when test="descendant::w:r[contains(w:instrText,'INDEX')]">
+        <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
+          <xsl:apply-templates select="following-sibling::w:p[1]" mode="indexa"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+    <text:p>
+      <xsl:attribute name="text:style-name">Normal</xsl:attribute>
+      <xsl:apply-templates mode="indexa"/>
+    </text:p>
+    <xsl:if test="following-sibling::w:p[1][count(preceding::w:fldChar[@w:fldCharType='begin']) &gt; count(preceding::w:fldChar[@w:fldCharType='end']) and descendant::text()]">
+      <xsl:apply-templates select="following-sibling::w:p[1]" mode="indexa"/>
+    </xsl:if>
+      </xsl:otherwise>
+      </xsl:choose>
   </xsl:template>
   
   <!--take content from multiple w:instrText elements -->
@@ -319,8 +352,8 @@
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>         
-
         </xsl:when>        
+        <xsl:when test="$type='INDEXA'">3</xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -334,6 +367,19 @@
         <xsl:with-param name="type" select="$type"/>
       </xsl:call-template>
     </text:table-of-content-source>
+      </xsl:when>
+      <xsl:when test="$type='INDEXA'">
+        <text:alphabetical-index-source text:sort-algorithm="alphanumeric">
+          <xsl:if test="contains($instrTextContent,'\h')">
+            <xsl:attribute name="text:alphabetical-separators">true</xsl:attribute>
+          </xsl:if>
+          <xsl:call-template name="InsertContentOfIndexProperties">
+            <xsl:with-param name="styleName">Index_20_Heading</xsl:with-param>
+            <xsl:with-param name="maxLevel" select="$maxLevel"/>
+            <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+            <xsl:with-param name="type" select="$type"/>
+          </xsl:call-template>
+        </text:alphabetical-index-source>
       </xsl:when>
       <xsl:otherwise>
         <text:table-index-source text:caption-sequence-name="{substring-before(substring-after($instrTextContent,'&quot;'),'&quot;')}" text:caption-sequence-format="text">
@@ -356,6 +402,7 @@
     <text:index-title-template text:style-name="{$styleName}"/>
     <xsl:variable name="level">
       <xsl:choose>
+        <xsl:when test="$type='INDEXA'">0</xsl:when>
         <xsl:when test="contains($instrTextContent,'\t')">
           <xsl:call-template name="GetMinLevelFromStyles">
             <xsl:with-param name="stylesWithLevels">
@@ -414,6 +461,27 @@
           </xsl:call-template>
         </text:table-of-content-entry-template>
         </xsl:when>
+        <xsl:when test="$type='INDEXA'">
+            <text:alphabetical-index-entry-template>
+              <xsl:choose>
+                <xsl:when test="$level = '0'">
+                  <xsl:attribute name="text:outline-level">separator</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:attribute name="text:outline-level">
+                    <xsl:value-of select="$level"/>
+                  </xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>
+              <xsl:call-template name="InsertContentOfIndexEntryProperties">
+                <xsl:with-param name="level" select="$level"/>
+                <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
+                <xsl:with-param name="levelForStyle" select="$levelForStyle"/>
+                <xsl:with-param name="node" select="$node"/>
+                <xsl:with-param name="type" select="$type"/>
+              </xsl:call-template>
+            </text:alphabetical-index-entry-template>
+          </xsl:when>
           <xsl:otherwise>
             <text:table-index-entry-template>
               <xsl:call-template name="InsertContentOfIndexEntryProperties">
@@ -446,6 +514,7 @@
     <xsl:if test="$level = 0"/>
     <xsl:attribute name="text:style-name">
       <xsl:choose>
+        <xsl:when test="$type='INDEXA'">Normal</xsl:when>
         <xsl:when test="$level=0">
           <xsl:call-template name="TocToContent">
             <xsl:with-param name="styleValue">
@@ -549,6 +618,18 @@
         </xsl:if>
 
       <xsl:choose>
+        <xsl:when test="$type='INDEXA'">
+          <xsl:choose>
+            <xsl:when test="$level = 0">
+              <text:index-entry-text/>
+            </xsl:when>
+            <xsl:otherwise>
+              <text:index-entry-text/>
+              <text:index-entry-span>, </text:index-entry-span>
+              <text:index-entry-page-number/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
         <xsl:when test="(contains(w:pPr/w:pStyle/@w:val,$styleLevel) and not(contains(preceding-sibling::w:p[(preceding-sibling::node()=$node or self::node()=$node)]/w:pPr/w:pStyle/@w:val,$styleLevel))) or $styleLevel = 0">
           <xsl:if test="$type='TOC'">
             <text:index-entry-chapter/>
@@ -857,6 +938,17 @@
   
 <!-- handle runs -->
   <xsl:template match="w:r" mode="index">
+    <xsl:choose>
+      <xsl:when test="parent::w:hyperlink">
+        <xsl:call-template name="InsertTOCHyperlink"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="InsertTOCText"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template match="w:r" mode="indexa">
     <xsl:choose>
       <xsl:when test="parent::w:hyperlink">
         <xsl:call-template name="InsertTOCHyperlink"/>

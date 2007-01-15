@@ -12,6 +12,14 @@
     <xsl:variable name="id2">
       <xsl:value-of select="generate-id(.)"/>
     </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="preceding::w:p[descendant::w:sectPr]/descendant::w:r[contains(w:instrText,'INDEX')]
+        or parent::w:p[descendant::w:sectPr]/descendant::w:r[contains(w:instrText,'INDEX')]">
+        <xsl:apply-templates
+          select="document('word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"/>
+      </xsl:when>
+      <xsl:otherwise>
+    
     <text:section>
       <xsl:attribute name="text:style-name">
         <xsl:value-of select="$id2"/>
@@ -22,6 +30,8 @@
       <xsl:apply-templates
         select="document('word/document.xml')/w:document/w:body/child::node()[(generate-id(following::w:sectPr) = $id2 and generate-id(.) != $id2 and generate-id(.) != $id and not(descendant::w:sectPr)) or generate-id(descendant::w:sectPr) = $id2]"/>
     </text:section>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template name="InsertColumns">
