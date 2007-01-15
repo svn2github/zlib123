@@ -74,8 +74,11 @@ namespace OdfConverterLauncher
                 _docsType = _documents.GetType();
             }
             object[] args = new object[] { document };
-            _docsType.InvokeMember("Open", BindingFlags.InvokeMethod, null, _documents, args);
-
+            object aDoc = _docsType.InvokeMember("Open", BindingFlags.InvokeMethod, null, _documents, args);
+            Type aType = aDoc.GetType();
+            object fields = aType.InvokeMember("Fields", BindingFlags.GetProperty, null, aDoc, null);
+            Type fieldsType = fields.GetType();
+            fieldsType.InvokeMember("Update", BindingFlags.InvokeMethod, null, fields, null);
         }
     }
 
