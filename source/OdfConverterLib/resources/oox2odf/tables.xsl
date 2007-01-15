@@ -360,21 +360,22 @@
 
   <!-- insert cell borders using cell properties -->
   <xsl:template name="InsertCellBorders">
-    <xsl:call-template name="InsertBorderPropertiesUsingSide">
+    <xsl:call-template name="InsertTopBottomBorderPropertiesUsingSide">
       <xsl:with-param name="side">bottom</xsl:with-param>
     </xsl:call-template>
-    <xsl:call-template name="InsertBorderPropertiesUsingSide">
+    <xsl:call-template name="InsertLeftRightBorderPropertiesUsingSide">
       <xsl:with-param name="side">right</xsl:with-param>
     </xsl:call-template>
-    <xsl:call-template name="InsertBorderPropertiesUsingSide">
+    <xsl:call-template name="InsertLeftRightBorderPropertiesUsingSide">
       <xsl:with-param name="side">left</xsl:with-param>
     </xsl:call-template>
-    <xsl:call-template name="InsertBorderPropertiesUsingSide">
+    <xsl:call-template name="InsertTopBottomBorderPropertiesUsingSide">
       <xsl:with-param name="side">top</xsl:with-param>
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template name="InsertBorderPropertiesUsingSide">
+  <!-- find border properties element, for top and bottom sides -->
+  <xsl:template name="InsertTopBottomBorderPropertiesUsingSide">
     <xsl:param name="side"/>
     <xsl:param name="contextCell" select="parent::w:tc"/>
     <xsl:param name="styleId" select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
@@ -383,54 +384,77 @@
 
     <xsl:choose>
       <!-- use cell definition -->
-      <xsl:when test="$tcBorders/*[name()=concat('w:', $side)]">
+      <xsl:when
+        test="$side = 'top' and $tcBorders/w:top and not($contextCell/parent::w:tr/preceding-sibling::w:tr)">
         <xsl:call-template name="InsertCellBorder">
-          <xsl:with-param name="border" select="$tcBorders/*[name()=concat('w:', $side)]"/>
+          <xsl:with-param name="border" select="$tcBorders/w:top"/>
           <xsl:with-param name="side" select="$side"/>
           <xsl:with-param name="styleId" select="$styleId"/>
         </xsl:call-template>
       </xsl:when>
-      <!-- use table definition if very top border -->
       <xsl:when
-        test="$side = 'top' and $tblBorders/w:top and $contextCell/parent::w:tr/preceding-sibling::w:tr">
+        test="$side = 'top' and $tcBorders/w:insideV and $contextCell/parent::w:tr/preceding-sibling::w:tr">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tcBorders/w:insideV"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'bottom' and $tcBorders/w:bottom and not($contextCell/parent::w:tr/following-sibling::w:tr)">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tcBorders/w:bottom"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'bottom' and $tcBorders/w:insideV and $contextCell/parent::w:tr/following-sibling::w:tr">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tcBorders/w:insideV"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!-- use table definition -->
+      <xsl:when
+        test="$side = 'top' and $tblBorders/w:top and not($contextCell/parent::w:tr/preceding-sibling::w:tr)">
         <xsl:call-template name="InsertCellBorder">
           <xsl:with-param name="border" select="$tblBorders/w:top"/>
           <xsl:with-param name="side" select="$side"/>
           <xsl:with-param name="styleId" select="$styleId"/>
         </xsl:call-template>
       </xsl:when>
-      <!-- use table definition if very bottom border -->
       <xsl:when
-        test="$side = 'bottom' and $tblBorders/w:bottom and $contextCell/parent::w:tr/following-sibling::w:tr">
+        test="$side = 'top' and $tblBorders/w:insideV and $contextCell/parent::w:tr/preceding-sibling::w:tr">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tblBorders/w:insideV"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'bottom' and $tblBorders/w:bottom and not($contextCell/parent::w:tr/following-sibling::w:tr)">
         <xsl:call-template name="InsertCellBorder">
           <xsl:with-param name="border" select="$tblBorders/w:bottom"/>
           <xsl:with-param name="side" select="$side"/>
           <xsl:with-param name="styleId" select="$styleId"/>
         </xsl:call-template>
       </xsl:when>
-      <!-- use table definition if very left border -->
       <xsl:when
-        test="$side = 'left' and $tblBorders/w:left and $contextCell/preceding-sibling::w:tc">
+        test="$side = 'bottom' and $tblBorders/w:insideV and $contextCell/parent::w:tr/following-sibling::w:tr">
         <xsl:call-template name="InsertCellBorder">
-          <xsl:with-param name="border" select="$tblBorders/w:left"/>
+          <xsl:with-param name="border" select="$tblBorders/w:insideV"/>
           <xsl:with-param name="side" select="$side"/>
           <xsl:with-param name="styleId" select="$styleId"/>
         </xsl:call-template>
       </xsl:when>
-      <!-- use table definition if very right border -->
-      <xsl:when
-        test="$side = 'right' and $tblBorders/w:right and $contextCell/following-sibling::w:tc">
-        <xsl:call-template name="InsertCellBorder">
-          <xsl:with-param name="border" select="$tblBorders/w:right"/>
-          <xsl:with-param name="side" select="$side"/>
-          <xsl:with-param name="styleId" select="$styleId"/>
-        </xsl:call-template>
-      </xsl:when>
+      <!-- climb style hierarchy -->
       <xsl:otherwise>
         <xsl:for-each select="document('word/styles.xml')">
           <xsl:choose>
             <xsl:when test="key('StyleId', $styleId)">
-              <xsl:call-template name="InsertBorderPropertiesUsingSide">
+              <xsl:call-template name="InsertTopBottomBorderPropertiesUsingSide">
                 <xsl:with-param name="side" select="$side"/>
                 <xsl:with-param name="contextCell" select="$contextCell"/>
                 <xsl:with-param name="styleId"
@@ -443,7 +467,118 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:if test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
-                <xsl:call-template name="InsertBorderPropertiesUsingSide">
+                <xsl:call-template name="InsertTopBottomBorderPropertiesUsingSide">
+                  <xsl:with-param name="side" select="$side"/>
+                  <xsl:with-param name="contextCell" select="$contextCell"/>
+                  <xsl:with-param name="styleId"
+                    select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
+                  <xsl:with-param name="tcBorders"
+                    select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
+                  <xsl:with-param name="tblBorders"
+                    select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- find border properties element, for right and left sides -->
+  <xsl:template name="InsertLeftRightBorderPropertiesUsingSide">
+    <xsl:param name="side"/>
+    <xsl:param name="contextCell" select="parent::w:tc"/>
+    <xsl:param name="styleId" select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
+    <xsl:param name="tcBorders" select="w:tcBorders"/>
+    <xsl:param name="tblBorders" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders"/>
+
+    <xsl:choose>
+      <!-- use cell definition -->
+      <xsl:when
+        test="$side = 'left' and $tcBorders/w:left and not($contextCell/preceding-sibling::w:tc)">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tcBorders/w:left"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'left' and $tcBorders/w:insideH and $contextCell/preceding-sibling::w:tc">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tcBorders/w:insideH"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'right' and $tcBorders/w:bottom and not($contextCell/following-sibling::w:tc)">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tcBorders/w:right"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'right' and $tcBorders/w:insideH and $contextCell/following-sibling::w:tc">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tcBorders/w:insideH"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!-- use table definition -->
+      <xsl:when
+        test="$side = 'left' and $tblBorders/w:left and not($contextCell/preceding-sibling::w:tc)">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tblBorders/w:left"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'left' and $tblBorders/w:insideH and $contextCell/preceding-sibling::w:tc">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tblBorders/w:insideH"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'right' and $tblBorders/w:right and not($contextCell/following-sibling::w:tc)">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tblBorders/w:right"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'right' and $tblBorders/w:insideH and $contextCell/following-sibling::w:tc">
+        <xsl:call-template name="InsertCellBorder">
+          <xsl:with-param name="border" select="$tblBorders/w:insideH"/>
+          <xsl:with-param name="side" select="$side"/>
+          <xsl:with-param name="styleId" select="$styleId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!-- climb style hierarchy -->
+      <xsl:otherwise>
+        <xsl:for-each select="document('word/styles.xml')">
+          <xsl:choose>
+            <xsl:when test="key('StyleId', $styleId)">
+              <xsl:call-template name="InsertLeftRightBorderPropertiesUsingSide">
+                <xsl:with-param name="side" select="$side"/>
+                <xsl:with-param name="contextCell" select="$contextCell"/>
+                <xsl:with-param name="styleId"
+                  select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
+                <xsl:with-param name="tcBorders"
+                  select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
+                <xsl:with-param name="tblBorders"
+                  select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
+                <xsl:call-template name="InsertLeftRightBorderPropertiesUsingSide">
                   <xsl:with-param name="side" select="$side"/>
                   <xsl:with-param name="contextCell" select="$contextCell"/>
                   <xsl:with-param name="styleId"
@@ -469,7 +604,7 @@
 
     <xsl:if test="$border">
       <xsl:choose>
-        <xsl:when test="$border/@w:val = 'nil'">
+        <xsl:when test="$border/@w:val = 'nil' or $border/@w:val = 'none' ">
           <xsl:attribute name="{concat('fo:border-', $side)}">
             <xsl:value-of select="'none'"/>
           </xsl:attribute>
@@ -504,11 +639,21 @@
           <!-- compute color -->
           <xsl:variable name="color">
             <xsl:choose>
-              <xsl:when test="$border/@w:color = 'auto'">
-                <xsl:call-template name="GetCellBorderColor">
-                  <xsl:with-param name="side" select="$side"/>
-                  <xsl:with-param name="styleId" select="$styleId"/>
-                </xsl:call-template>
+              <xsl:when test="$border/@w:color = 'auto' ">
+                <xsl:choose>
+                  <xsl:when test="$side = 'top' or $side = 'bottom' ">
+                    <xsl:call-template name="GetTopBottomCellBorderColor">
+                      <xsl:with-param name="side" select="$side"/>
+                      <xsl:with-param name="styleId" select="$styleId"/>
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:when test="$side = 'left' or $side = 'right' ">
+                    <xsl:call-template name="GetLeftRightCellBorderColor">
+                      <xsl:with-param name="side" select="$side"/>
+                      <xsl:with-param name="styleId" select="$styleId"/>
+                    </xsl:call-template>
+                  </xsl:when>
+                </xsl:choose>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$border/@w:color"/>
@@ -525,7 +670,7 @@
   </xsl:template>
 
   <!-- find the color in case it is set to automatic -->
-  <xsl:template name="GetCellBorderColor">
+  <xsl:template name="GetTopBottomCellBorderColor">
     <xsl:param name="side"/>
     <xsl:param name="styleId"/>
     <xsl:param name="contextCell" select="parent::w:tc"/>
@@ -534,34 +679,45 @@
 
     <xsl:choose>
       <!-- use cell definition -->
-      <xsl:when test="$tcBorders/*[name()=concat('w:', $side)]/@color != 'auto' ">
-        <xsl:value-of select="$tcBorders/*[name()=concat('w:', $side)]/@color != 'auto' "/>
-      </xsl:when>
-      <!-- use table definition if very top border -->
       <xsl:when
-        test="$side = 'top' and $tblBorders/w:top/@color != 'auto'  and $contextCell/parent::w:tr/preceding-sibling::w:tr">
+        test="$side = 'top' and $tcBorders/w:top/@color != 'auto' and not($contextCell/parent::w:tr/preceding-sibling::w:tr)">
+        <xsl:value-of select="$tcBorders/w:top/@color"/>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'top' and $tcBorders/w:insideH/@color != 'auto' and $contextCell/parent::w:tr/preceding-sibling::w:tr">
+        <xsl:value-of select="$tcBorders/w:insideH/@color"/>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'bottom' and $tcBorders/w:bottom/@color != 'auto' and not($contextCell/parent::w:tr/following-sibling::w:tr)">
+        <xsl:value-of select="$tcBorders/w:bottom/@color"/>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'bottom' and $tcBorders/w:insideH/@color != 'auto' and $contextCell/parent::w:tr/following-sibling::w:tr">
+        <xsl:value-of select="$tcBorders/w:insideH/@color"/>
+      </xsl:when>
+      <!-- use table definition -->
+      <xsl:when
+        test="$side = 'top' and $tblBorders/w:left/@color != 'auto' and not($contextCell/parent::w:tr/preceding-sibling::w:tr)">
         <xsl:value-of select="$tblBorders/w:top/@color"/>
       </xsl:when>
-      <!-- use table definition if very bottom border -->
       <xsl:when
-        test="$side = 'bottom' and $tblBorders/w:bottom/@color != 'auto'  and $contextCell/parent::w:tr/following-sibling::w:tr">
-        <xsl:value-of select="$tblBorders/w:bottom/@color"/>
+        test="$side = 'top' and $tblBorders/w:insideH/@color != 'auto' and $contextCell/parent::w:tr/preceding-sibling::w:tr">
+        <xsl:value-of select="$tblBorders/w:insideH/@color"/>
       </xsl:when>
-      <!-- use table definition if very left border -->
       <xsl:when
-        test="$side = 'left' and $tblBorders/w:left/@color != 'auto'  and $contextCell/preceding-sibling::w:tc">
-        <xsl:value-of select="$tblBorders/w:left/@color"/>
-      </xsl:when>
-      <!-- use table definition if very right border -->
-      <xsl:when
-        test="$side = 'right' and $tblBorders/w:right/@color != 'auto'  and $contextCell/following-sibling::w:tc">
+        test="$side = 'bottom' and $tblBorders/w:bottom/@color != 'auto' and not($contextCell/parent::w:tr/following-sibling::w:tr)">
         <xsl:value-of select="$tblBorders/w:right/@color"/>
       </xsl:when>
+      <xsl:when
+        test="$side = 'bottom' and $tblBorders/w:insideH/@color != 'auto' and $contextCell/parent::w:tr/following-sibling::w:tr">
+        <xsl:value-of select="$tblBorders/w:insideH/@color"/>
+      </xsl:when>
+      <!-- climb style hierarchy -->
       <xsl:otherwise>
         <xsl:for-each select="document('word/styles.xml')">
           <xsl:choose>
             <xsl:when test="key('StyleId', $styleId)">
-              <xsl:call-template name="GetCellBorderColor">
+              <xsl:call-template name="GetTopBottomCellBorderColor">
                 <xsl:with-param name="side" select="$side"/>
                 <xsl:with-param name="contextCell" select="$contextCell"/>
                 <xsl:with-param name="styleId"
@@ -576,7 +732,90 @@
               <xsl:choose>
                 <xsl:when
                   test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
-                  <xsl:call-template name="GetCellBorderColor">
+                  <xsl:call-template name="GetTopBottomCellBorderColor">
+                    <xsl:with-param name="side" select="$side"/>
+                    <xsl:with-param name="contextCell" select="$contextCell"/>
+                    <xsl:with-param name="styleId"
+                      select="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val"/>
+                    <xsl:with-param name="tcBorders"
+                      select="key('default-styles', 'table')/w:tcPr/w:tcBorders"/>
+                    <xsl:with-param name="tblBorders"
+                      select="key('default-styles', 'table')/w:tblPr/w:tblBorders"/>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>000000</xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- find the color in case it is set to automatic -->
+  <xsl:template name="GetLeftRightCellBorderColor">
+    <xsl:param name="side"/>
+    <xsl:param name="styleId"/>
+    <xsl:param name="contextCell" select="parent::w:tc"/>
+    <xsl:param name="tcBorders" select="w:tcBorders"/>
+    <xsl:param name="tblBorders" select="ancestor::w:tbl[1]/w:tblPr/w:tblBorders"/>
+
+    <xsl:choose>
+      <!-- use cell definition -->
+      <xsl:when
+        test="$side = 'left' and $tcBorders/w:left/@color != 'auto' and not($contextCell/preceding-sibling::w:tc)">
+        <xsl:value-of select="$tcBorders/w:left/@color"/>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'left' and $tcBorders/w:insideH/@color != 'auto' and $contextCell/preceding-sibling::w:tc">
+        <xsl:value-of select="$tcBorders/w:insideH/@color"/>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'right' and $tcBorders/w:bottom/@color != 'auto' and not($contextCell/following-sibling::w:tc)">
+        <xsl:value-of select="$tcBorders/w:right/@color"/>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'right' and $tcBorders/w:insideH/@color != 'auto' and $contextCell/following-sibling::w:tc">
+        <xsl:value-of select="$tcBorders/w:insideH/@color"/>
+      </xsl:when>
+      <!-- use table definition -->
+      <xsl:when
+        test="$side = 'left' and $tblBorders/w:left/@color != 'auto' and not($contextCell/preceding-sibling::w:tc)">
+        <xsl:value-of select="$tblBorders/w:left/@color"/>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'left' and $tblBorders/w:insideH/@color != 'auto' and $contextCell/preceding-sibling::w:tc">
+        <xsl:value-of select="$tblBorders/w:insideH/@color"/>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'right' and $tblBorders/w:right/@color != 'auto' and not($contextCell/following-sibling::w:tc)">
+        <xsl:value-of select="$tblBorders/w:right/@color"/>
+      </xsl:when>
+      <xsl:when
+        test="$side = 'right' and $tblBorders/w:insideH/@color != 'auto' and $contextCell/following-sibling::w:tc">
+        <xsl:value-of select="$tblBorders/w:insideH/@color"/>
+      </xsl:when>
+      <!-- climb style hierarchy -->
+      <xsl:otherwise>
+        <xsl:for-each select="document('word/styles.xml')">
+          <xsl:choose>
+            <xsl:when test="key('StyleId', $styleId)">
+              <xsl:call-template name="GetLeftRightCellBorderColor">
+                <xsl:with-param name="side" select="$side"/>
+                <xsl:with-param name="contextCell" select="$contextCell"/>
+                <xsl:with-param name="styleId"
+                  select="key('StyleId', $styleId)/w:tblPr/w:tblStyle/@w:val"/>
+                <xsl:with-param name="tcBorders"
+                  select="key('StyleId', $styleId)/w:tcPr/w:tcBorders"/>
+                <xsl:with-param name="tblBorders"
+                  select="key('StyleId', $styleId)/w:tblPr/w:tblBorders"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when
+                  test="key('default-styles', 'table')/w:tblPr/w:tblStyle/@w:val != $styleId">
+                  <xsl:call-template name="GetLeftRightCellBorderColor">
                     <xsl:with-param name="side" select="$side"/>
                     <xsl:with-param name="contextCell" select="$contextCell"/>
                     <xsl:with-param name="styleId"
