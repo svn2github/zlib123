@@ -382,7 +382,13 @@
         </text:alphabetical-index-source>
       </xsl:when>
       <xsl:otherwise>
-        <text:table-index-source text:caption-sequence-name="{substring-before(substring-after($instrTextContent,'&quot;'),'&quot;')}" text:caption-sequence-format="text">
+        <text:table-index-source text:caption-sequence-name="{substring-before(substring-after($instrTextContent,'&quot;'),'&quot;')}">
+          <xsl:attribute name="text:caption-sequence-format">
+            <xsl:choose>
+              <xsl:when test="contains($instrTextContent,'\a')">caption</xsl:when>
+              <xsl:otherwise>text</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
           <xsl:call-template name="InsertContentOfIndexProperties">
             <xsl:with-param name="styleName">Table_20_index_20_heading</xsl:with-param>
             <xsl:with-param name="maxLevel" select="$maxLevel"/>

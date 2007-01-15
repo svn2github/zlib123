@@ -680,7 +680,7 @@
       <xsl:value-of select="substring-before(substring-after($fieldCode,'SEQ '),' ')"/>
     </xsl:variable>
 
-    <text:sequence text:ref-name="{concat('ref',concat($refType,number($sequenceContext/w:t)-1))}"
+    <text:sequence text:ref-name="{concat('ref',concat($refType,$sequenceContext/w:t))}"
       text:name="{$refType}" text:formula="{concat(concat('ooow:',$refType),'+1')}">
       <xsl:apply-templates select="$sequenceContext/child::node()"/>
     </text:sequence>
