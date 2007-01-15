@@ -1006,7 +1006,7 @@
   </xsl:template>
 
   <xsl:template name="InsertTextBoxAutomaticHeight">
-    <xsl:if test="@style ='mso-fit-shape-to-text:t'">
+    <xsl:if test="contains(@style,'mso-fit-shape-to-text:t')">
       <xsl:attribute name="fo:min-height">
         <xsl:text>0cm</xsl:text>
       </xsl:attribute>
