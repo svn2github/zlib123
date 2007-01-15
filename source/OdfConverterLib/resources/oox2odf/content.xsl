@@ -715,41 +715,32 @@
   <!-- simple text  -->
   <xsl:template match="w:t">
     <xsl:message terminate="no">progress:w:t</xsl:message>
-    <xsl:variable name="t">
-      <xsl:choose>
-        <!-- drop cap concatenation (only on first w:t of first w:r of w:p) -->
-        <xsl:when
-          test="not(preceding-sibling::w:t[1]) and not(parent::w:r/preceding-sibling::w:r[1])">
-          <xsl:variable name="prev-paragraph"
-            select="ancestor-or-self::w:p[1]/preceding-sibling::w:p[1]"/>
-          <xsl:choose>
-            <xsl:when test="$prev-paragraph/w:pPr/w:framePr[@w:dropCap = 'drop']">
-              <xsl:value-of select="concat($prev-paragraph/w:r[1]/w:t, .)"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="."/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="."/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+    <xsl:call-template name="InsertDropCapText"/>
     <xsl:choose>
       <!--check whether string contains  whitespace sequence-->
-      <xsl:when test="not(contains($t, '  '))">
-        <xsl:value-of select="$t"/>
+      <xsl:when test="not(contains(., '  '))">
+        <xsl:value-of select="."/>
       </xsl:when>
       <xsl:otherwise>
         <!--converts whitespaces sequence to text:s-->
-        <xsl:call-template name="InsertWhiteSpaces">
-          <xsl:with-param name="string" select="$t"/>
-        </xsl:call-template>
+        <xsl:call-template name="InsertWhiteSpaces"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
+
+  <!-- drop cap text  (only on first w:t of first w:r of w:p) -->
+  <xsl:template name="InsertDropCapText">
+    <xsl:if test="not(preceding-sibling::w:t[1]) and not(parent::w:r/preceding-sibling::w:r[1])">
+      <xsl:variable name="prev-paragraph"
+        select="ancestor-or-self::w:p[1]/preceding-sibling::w:p[1]"/>
+      <xsl:if test="$prev-paragraph/w:pPr/w:framePr[@w:dropCap = 'drop']">
+        <text:span text:style-name="{generate-id($prev-paragraph/w:r[1])}">
+          <xsl:value-of select="$prev-paragraph/w:r[1]/w:t"/>
+        </text:span>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
 
 
   <!--  convert multiple white spaces  -->

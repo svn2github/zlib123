@@ -1533,9 +1533,6 @@
             </xsl:call-template>
           </xsl:attribute>
         </xsl:if>
-        <xsl:if test="$prev-paragraph/w:r[1]/w:rPr/w:rFonts">
-          <xsl:message terminate="no">feedback:ui.translation.issue.dropcap.fonts</xsl:message>
-        </xsl:if>
       </style:drop-cap>
     </xsl:if>
   </xsl:template>
@@ -2661,9 +2658,13 @@
   <xsl:template name="InsertTextProperties">
     <!-- attributes using match -->
     <xsl:apply-templates mode="rPrChildren"/>
+    <!-- other attributes forbidden in drop cap text style -->
+    <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap = 'drop'])">
+      <xsl:apply-templates mode="rPrChildren-dropcap-forbidden"/>
+      <xsl:call-template name="InsertTextPosition"/>
+    </xsl:if>
     <!-- attributes from child elements -->
     <xsl:call-template name="InsertTextStrikeLine"/>
-    <xsl:call-template name="InsertTextPosition"/>
   </xsl:template>
 
   <!-- font weigth -->
@@ -2926,13 +2927,16 @@
   </xsl:template>
 
   <!-- font size -->
-  <xsl:template match="w:sz" mode="rPrChildren">
+  <xsl:template match="w:sz" mode="rPrChildren-dropcap-forbidden">
+    <!-- do not insert this property into drop cap text style -->
+    <!--xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap = 'drop'])"-->
     <xsl:attribute name="fo:font-size">
       <xsl:call-template name="ConvertHalfPoints">
         <xsl:with-param name="length" select="@w:val"/>
         <xsl:with-param name="unit">pt</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
+    <!--/xsl:if-->
   </xsl:template>
 
   <xsl:template match="w:szCs" mode="rPrChildren">
