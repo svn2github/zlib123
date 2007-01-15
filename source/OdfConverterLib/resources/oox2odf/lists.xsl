@@ -80,15 +80,15 @@
   </xsl:template>
 
   <xsl:template match="w:lvl">
-    
+
     <xsl:variable name="lvl">
       <xsl:value-of select="number(@w:ilvl)+1"/>
     </xsl:variable>
-    
+
     <xsl:variable name="StyleNameId">
       <xsl:value-of select="generate-id(parent::w:abstractNum)"/>
     </xsl:variable>
-    
+
     <xsl:choose>
 
       <!--check if it's numbering, bullet or picture bullet -->
@@ -407,7 +407,7 @@
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
-    
+
     <!-- Picture Bullet Size -->
     <xsl:if test="w:lvlPicBulletId/@w:val != ''">
       <xsl:attribute name="fo:width">
@@ -437,20 +437,20 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-  
-    <!-- Bullet Align -->    
+
+    <!-- Bullet Align -->
     <xsl:attribute name="fo:text-align">
       <xsl:choose>
         <xsl:when test="w:lvlJc/@w:val='center'">
           <xsl:text>center</xsl:text>
-        </xsl:when>        
+        </xsl:when>
         <xsl:otherwise>
           <xsl:text>left</xsl:text>
         </xsl:otherwise>
-      </xsl:choose>    
+      </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-  
+
   <!-- types of bullets -->
 
   <xsl:template name="TextChar">
@@ -468,7 +468,7 @@
       <xsl:when test="w:lvlText[@w:val = '' ]">✗</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '-' ]">–</xsl:when>
       <xsl:when test="w:lvlText[@w:val = '–' ]">–</xsl:when>
-      <xsl:when test="w:lvlText[@w:val = '' ]">–</xsl:when>      
+      <xsl:when test="w:lvlText[@w:val = '' ]">–</xsl:when>
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -483,19 +483,17 @@
         <xsl:choose>
           <xsl:when test="$property = 'w:ilvl' ">
             <xsl:choose>
-              <xsl:when
-                test="$style/w:pPr/w:numPr/w:numId and not($style/w:pPr/w:numPr/w:ilvl)">
+              <xsl:when test="$style/w:pPr/w:numPr/w:numId and not($style/w:pPr/w:numPr/w:ilvl)">
                 <xsl:text>0</xsl:text>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of
-                  select="$style/w:pPr/w:numPr/child::node()[name() = $property]/@w:val"/>
+                <xsl:value-of select="$style/w:pPr/w:numPr/child::node()[name() = $property]/@w:val"
+                />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of
-              select="$style/w:pPr/w:numPr/child::node()[name() = $property]/@w:val"/>
+            <xsl:value-of select="$style/w:pPr/w:numPr/child::node()[name() = $property]/@w:val"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -516,18 +514,20 @@
   <xsl:template name="GetListProperty">
     <xsl:param name="node"/>
     <xsl:param name="property"/>
-    
+
     <!-- second condition in xsl:when checks if there isn't another w:p node before decendant -->
-    <xsl:choose>      
-      <xsl:when test="$node/descendant::w:numPr[not(ancestor::w:pPrChange)] and 
+    <xsl:choose>
+      <xsl:when
+        test="$node/descendant::w:numPr[not(ancestor::w:pPrChange)] and 
         generate-id($node)=generate-id($node/descendant::w:numPr[not(ancestor::w:pPrChange)]/ancestor::w:p[1])">
         <xsl:value-of select="$node/descendant::w:numPr/child::node()[name() = $property]/@w:val"/>
       </xsl:when>
-      
-      <xsl:when test="$node/descendant::w:pStyle[not(ancestor::w:pPrChange)] and 
+
+      <xsl:when
+        test="$node/descendant::w:pStyle[not(ancestor::w:pPrChange)] and 
         generate-id($node)=generate-id($node/descendant::w:pStyle[not(ancestor::w:pPrChange)]/ancestor::w:p[1])">
         <xsl:variable name="styleId" select="$node/descendant::w:pStyle/@w:val"/>
-        
+
         <xsl:variable name="pStyle"
           select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $styleId]"/>
         <xsl:variable name="propertyValue">
@@ -662,47 +662,47 @@
     <xsl:param name="isNestedList"/>
 
     <xsl:choose>
-<!--      if this paragraph is attached to preceding in track changes mode-->
+      <!--      if this paragraph is attached to preceding in track changes mode-->
       <xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
-      
+
       <xsl:otherwise>
-    <text:list-item>
-      <xsl:variable name="followingParagraph" select="self::node()[1]/following-sibling::w:p[1]"/>
+        <text:list-item>
+          <xsl:variable name="followingParagraph" select="self::node()[1]/following-sibling::w:p[1]"/>
 
-      <xsl:choose>
-        <xsl:when test="$listLevel = $level">
+          <xsl:choose>
+            <xsl:when test="$listLevel = $level">
 
-          <xsl:call-template name="InsertListItemContent">
-            <xsl:with-param name="node" select="self::node()[1]"/>
-          </xsl:call-template>
-
-          <xsl:if test="$isNestedList = 'true' ">
-            <xsl:variable name="followingLevel">
-              <xsl:call-template name="GetListProperty">
-                <xsl:with-param name="node" select="$followingParagraph"/>
-                <xsl:with-param name="property">w:ilvl</xsl:with-param>
+              <xsl:call-template name="InsertListItemContent">
+                <xsl:with-param name="node" select="self::node()[1]"/>
               </xsl:call-template>
-            </xsl:variable>
 
-            <xsl:apply-templates select="$followingParagraph" mode="list">
-              <xsl:with-param name="numId" select="$numId"/>
-              <xsl:with-param name="level" select="$followingLevel"/>
-              <xsl:with-param name="listLevel" select="$listLevel + 1"/>
-            </xsl:apply-templates>
-          </xsl:if>
-        </xsl:when>
+              <xsl:if test="$isNestedList = 'true' ">
+                <xsl:variable name="followingLevel">
+                  <xsl:call-template name="GetListProperty">
+                    <xsl:with-param name="node" select="$followingParagraph"/>
+                    <xsl:with-param name="property">w:ilvl</xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
 
-        <xsl:when test="$isNestedList = 'true' ">
-          <xsl:apply-templates select="self::node()" mode="list">
-            <xsl:with-param name="numId" select="$numId"/>
-            <xsl:with-param name="level" select="$level"/>
-            <xsl:with-param name="listLevel" select="$listLevel + 1"/>
-          </xsl:apply-templates>
-        </xsl:when>
-      </xsl:choose>
-    </text:list-item>
+                <xsl:apply-templates select="$followingParagraph" mode="list">
+                  <xsl:with-param name="numId" select="$numId"/>
+                  <xsl:with-param name="level" select="$followingLevel"/>
+                  <xsl:with-param name="listLevel" select="$listLevel + 1"/>
+                </xsl:apply-templates>
+              </xsl:if>
+            </xsl:when>
+
+            <xsl:when test="$isNestedList = 'true' ">
+              <xsl:apply-templates select="self::node()" mode="list">
+                <xsl:with-param name="numId" select="$numId"/>
+                <xsl:with-param name="level" select="$level"/>
+                <xsl:with-param name="listLevel" select="$listLevel + 1"/>
+              </xsl:apply-templates>
+            </xsl:when>
+          </xsl:choose>
+        </text:list-item>
       </xsl:otherwise>
-      </xsl:choose>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertListItemContent">
@@ -739,7 +739,7 @@
         <xsl:with-param name="property">w:numId</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="followingLevel">
       <xsl:call-template name="GetListProperty">
         <xsl:with-param name="node" select="$followingParagraph"/>
@@ -824,8 +824,7 @@
       </xsl:when>
       <xsl:when test="$node/preceding-sibling::node()[1]/w:pPr/w:numPr">
         <xsl:choose>
-          <xsl:when
-            test="$node/preceding-sibling::node()[1]/w:pPr/w:numPr/w:numId/@w:val = $numId">
+          <xsl:when test="$node/preceding-sibling::node()[1]/w:pPr/w:numPr/w:numId/@w:val = $numId">
             <xsl:text>false</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -888,27 +887,29 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:variable name="followingLevel">
-      <xsl:call-template name="GetListProperty">
-        <xsl:with-param name="node" select="$followingParagraph"/>
-        <xsl:with-param name="property">w:ilvl</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:if test="$followingNumId = $numId">
+      <xsl:variable name="followingLevel">
+        <xsl:call-template name="GetListProperty">
+          <xsl:with-param name="node" select="$followingParagraph"/>
+          <xsl:with-param name="property">w:ilvl</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
 
-    <xsl:choose>
-      <xsl:when test="$followingNumId = $numId and $followingLevel = $level">
-        <xsl:value-of select="generate-id($followingParagraph)"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:if test="$followingLevel &gt;= $level">
-          <xsl:call-template name="GetCurrentLevelItem">
-            <xsl:with-param name="node" select="$followingParagraph"/>
-            <xsl:with-param name="level" select="$level"/>
-            <xsl:with-param name="numId" select="$numId"/>
-          </xsl:call-template>
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="$followingLevel = $level">
+          <xsl:value-of select="generate-id($followingParagraph)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="$followingLevel &gt;= $level">
+            <xsl:call-template name="GetCurrentLevelItem">
+              <xsl:with-param name="node" select="$followingParagraph"/>
+              <xsl:with-param name="level" select="$level"/>
+              <xsl:with-param name="numId" select="$numId"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
 
   <!-- inserts automatic list styles with empty num format for elements which has non-existent w:num attached -->
