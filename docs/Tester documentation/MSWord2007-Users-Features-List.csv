@@ -452,11 +452,11 @@ References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Comp
 ;;;;Current page;;3;1.0;Completed;;;
 ;;;;Page range;;3;1.0;;not supported;;
 ;;;Page number format;Bold / Italic;;3;1.0;;not supported;;
-;;Insert index;Type;Indented /  Run-in;;3;1.0;;;;
-;;;Columns;;;3;1.0;;;;
-;;;Language;;;3;1.0;;;;
-;;;Right align page numbers;;;3;1.0;;;;
-;;;Tab  leader;;;3;1.0;;;;
+;;Insert index;Type;Indented /  Run-in;;3;1.0;;not supported;;
+;;;Columns;;;3;1.0;Completed;;;
+;;;Language;;;3;1.0;;not supported;;
+;;;Right align page numbers;;;3;1.0;;not supported;;
+;;;Tab  leader;;;3;1.0;;not supported;;
 ;;;;;;;;;;;
 ;Captions;Insert caption;Caption;;;3;1.0;Completed;;;
 ;;;Label;Figure / Table;;3;1.0;Completed;;;
