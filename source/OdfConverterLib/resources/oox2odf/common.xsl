@@ -79,7 +79,7 @@
       <xsl:when test="$unit = 'px'">
         <xsl:value-of select="concat(format-number($length * 96.19 div 1440,'#.###'),'px')"/>
       </xsl:when>
-      <xsl:when test="$unit='pct'">        
+      <xsl:when test="$unit='pct'">
         <xsl:value-of select="concat(format-number($length div 50, '#.###'), '%')"/>
       </xsl:when>
       <xsl:when test="not($length)">
@@ -215,7 +215,7 @@
     </xsl:choose>
   </xsl:template>
 
-<!--  converts emu to given unit-->
+  <!--  converts emu to given unit-->
   <xsl:template name="ConvertEmu">
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
@@ -226,14 +226,15 @@
       <xsl:when test="$unit = 'cm'">
         <xsl:value-of select="concat(format-number($length div 360000, '#.##'), 'cm')"/>
       </xsl:when>
-     </xsl:choose>
+    </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="ConvertEmu3">
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
     <xsl:choose>
-      <xsl:when test="not($length) or $length = 0 or format-number($length div 360000, '#.###') = ''">
+      <xsl:when
+        test="not($length) or $length = 0 or format-number($length div 360000, '#.###') = ''">
         <xsl:value-of select="concat(0,'cm')"/>
       </xsl:when>
       <xsl:when test="$unit = 'cm'">
@@ -274,41 +275,43 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-   
+
   <xsl:template name="ConvertMeasure">
     <xsl:param name="length"/>
-  <xsl:param name="sourceUnit"/>
+    <xsl:param name="sourceUnit"/>
     <xsl:param name="destUnit"/>
+    <xsl:param name="addUnit">true</xsl:param>
     <xsl:choose>
-   <!-- used when unit type is given in length string-->
+      <!-- used when unit type is given in length string-->
       <xsl:when test="$sourceUnit = ''">
-            <xsl:call-template name="ConvertToMeasure">
-                <xsl:with-param name="length" select="$length"/>
-              <xsl:with-param name="destUnit" select="$destUnit"/>
-            </xsl:call-template>
+        <xsl:call-template name="ConvertToMeasure">
+          <xsl:with-param name="length" select="$length"/>
+          <xsl:with-param name="destUnit" select="$destUnit"/>
+          <xsl:with-param name="addUnit" select="$addUnit"/>
+        </xsl:call-template>
       </xsl:when>
       <!-- used when unit type is not given in length string-->
       <xsl:otherwise>
-          <xsl:call-template name="ConvertFromMeasure">
-              <xsl:with-param name="length" select="$length"/>
-              <xsl:with-param name="sourceUnit" select="$sourceUnit"/>
-              <xsl:with-param name="destUnit" select="$destUnit"/>
-          </xsl:call-template>
+        <xsl:call-template name="ConvertFromMeasure">
+          <xsl:with-param name="length" select="$length"/>
+          <xsl:with-param name="sourceUnit" select="$sourceUnit"/>
+          <xsl:with-param name="destUnit" select="$destUnit"/>
+        </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!--  converts from given measure - for usage when unit type is not given in string-->
   <xsl:template name="ConvertFromMeasure">
-  <xsl:param name="length"/>
+    <xsl:param name="length"/>
     <xsl:param name="destUnit"/>
     <xsl:param name="sourceUnit"/>
     <xsl:choose>
       <xsl:when test="$sourceUnit = 'eighths-points' ">
-          <xsl:call-template name="ConvertEighthsPoints">
-              <xsl:with-param name="length" select="$length"/>
-              <xsl:with-param name="unit" select="$destUnit"/>
-           </xsl:call-template>
+        <xsl:call-template name="ConvertEighthsPoints">
+          <xsl:with-param name="length" select="$length"/>
+          <xsl:with-param name="unit" select="$destUnit"/>
+        </xsl:call-template>
       </xsl:when>
       <xsl:when test="$sourceUnit = 'half-points' ">
         <xsl:call-template name="ConvertHalfPoints">
@@ -335,48 +338,55 @@
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
-   </xsl:template>
-  
-<!--  converts to given measure - for usage when unit type is given in string-->
+  </xsl:template>
+
+  <!--  converts to given measure - for usage when unit type is given in string-->
   <xsl:template name="ConvertToMeasure">
     <xsl:param name="length"/>
     <xsl:param name="destUnit"/>
+    <xsl:param name="addUnit">true</xsl:param>
     <xsl:choose>
       <xsl:when test="contains($destUnit, 'cm')">
         <xsl:call-template name="ConvertToCentimeters">
           <xsl:with-param name="length" select="$length"/>
-          </xsl:call-template>
+          <xsl:with-param name="addUnit" select="$addUnit"/>
+        </xsl:call-template>
       </xsl:when>
-     <!-- TODO other units-->
-   </xsl:choose>
+      <!-- TODO other units-->
+    </xsl:choose>
   </xsl:template>
-  
+
   <!-- converts given unit to cm -->
   <xsl:template name="ConvertToCentimeters">
     <xsl:param name="length"/>
     <xsl:param name="round">false</xsl:param>
+    <xsl:param name="addUnit">true</xsl:param>
     <xsl:variable name="newlength">
       <xsl:choose>
         <xsl:when test="contains($length, 'cm')">
           <xsl:value-of select="$length"/>
         </xsl:when>
         <xsl:when test="contains($length, 'mm')">
-              <xsl:value-of select="format-number(substring-before($length, 'mm') div 10,'#.###')"/>
+          <xsl:value-of select="format-number(substring-before($length, 'mm') div 10,'#.###')"/>
         </xsl:when>
         <xsl:when test="contains($length, 'in')">
           <xsl:value-of select="format-number(substring-before($length, 'in') * 2.54,'#.###')"/>
         </xsl:when>
         <xsl:when test="contains($length, 'pt')">
-          <xsl:value-of select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')"/>
+          <xsl:value-of
+            select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')"/>
         </xsl:when>
         <xsl:when test="contains($length, 'twip')">
-          <xsl:value-of select="format-number(substring-before($length, 'twip') * 2.54 div 1440,'#.###')"/>
+          <xsl:value-of
+            select="format-number(substring-before($length, 'twip') * 2.54 div 1440,'#.###')"/>
         </xsl:when>
         <xsl:when test="contains($length, 'pica')">
-          <xsl:value-of select="format-number(substring-before($length, 'pica') * 2.54 div 6,'#.###')"/>
+          <xsl:value-of
+            select="format-number(substring-before($length, 'pica') * 2.54 div 6,'#.###')"/>
         </xsl:when>
         <xsl:when test="contains($length, 'dpt')">
-          <xsl:value-of select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')"/>
+          <xsl:value-of
+            select="format-number(substring-before($length, 'pt') * 2.54 div 72,'#.###')"/>
         </xsl:when>
         <xsl:when test="contains($length, 'px')">
           <xsl:value-of select="format-number(substring-before($length, 'px') * 0.0264,'#.###')"/>
@@ -387,29 +397,39 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:variable name="roundLength">
+      <xsl:choose>
+        <xsl:when test="$round='true'">
+          <xsl:value-of select="round($newlength)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="(round($newlength * 1000)) div 1000"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$round='true'">
-        <xsl:value-of select="concat(round($newlength),'cm')"/>
+      <xsl:when test="$addUnit = 'true' ">
+        <xsl:value-of select="concat($roundLength, 'cm')"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="concat((round($newlength * 1000)) div 1000,'cm')"/>
+        <xsl:value-of select="$roundLength"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertColor">
     <xsl:param name="color"/>
     <xsl:choose>
       <xsl:when test="contains($color,'#')">
         <xsl:choose>
           <xsl:when test="contains($color,' ')">
-              <xsl:value-of select="substring-before($color,' ')"/>
+            <xsl:value-of select="substring-before($color,' ')"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$color"/>
           </xsl:otherwise>
         </xsl:choose>
-     </xsl:when>
+      </xsl:when>
       <xsl:otherwise>
         <!--TODO standard colors mapping (there are 10 standard colors in Word)-->
         <xsl:choose>
