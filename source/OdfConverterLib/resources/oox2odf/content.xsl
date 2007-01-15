@@ -171,6 +171,7 @@
     <xsl:if test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr">
       <style:style style:name="{generate-id(.)}" style:family="paragraph">
         <xsl:call-template name="MasterPageName"/>
+        <xsl:call-template name="InsertDefaultParagraphProperties"/>
       </style:style>
     </xsl:if>
     <xsl:apply-templates mode="automaticstyles"/>
@@ -330,8 +331,7 @@
         <xsl:apply-templates select="." mode="tocstart"/>
       </xsl:when>
 
-       <xsl:when
-        test="descendant::w:r[contains(w:instrText,'INDEX')]">
+      <xsl:when test="descendant::w:r[contains(w:instrText,'INDEX')]">
         <xsl:apply-templates select="." mode="tocstart"/>
       </xsl:when>
 
@@ -475,6 +475,11 @@
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
+
+  <!-- skip drop-capped paragraph -->
+  <xsl:template match="w:p[w:pPr/w:framePr/@w:dropCap = 'drop' ]"/>
+  <!--xsl:template match="w:p[w:pPr/w:framePr/@w:dropCap = 'drop' ]" mode="automaticstyles"/-->
+
 
   <!--  paragraphs-->
   <xsl:template match="w:p" mode="paragraph">
@@ -710,17 +715,42 @@
   <!-- simple text  -->
   <xsl:template match="w:t">
     <xsl:message terminate="no">progress:w:t</xsl:message>
+    <xsl:variable name="t">
+      <xsl:choose>
+        <!-- drop cap concatenation (only on first w:t of first w:r of w:p) -->
+        <xsl:when
+          test="not(preceding-sibling::w:t[1]) and not(parent::w:r/preceding-sibling::w:r[1])">
+          <xsl:variable name="prev-paragraph"
+            select="ancestor-or-self::w:p[1]/preceding-sibling::w:p[1]"/>
+          <xsl:choose>
+            <xsl:when test="$prev-paragraph/w:pPr/w:framePr[@w:dropCap = 'drop']">
+              <xsl:value-of select="concat($prev-paragraph/w:r[1]/w:t, .)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="."/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="."/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
       <!--check whether string contains  whitespace sequence-->
-      <xsl:when test="not(contains(.,'  '))">
-        <xsl:value-of select="."/>
+      <xsl:when test="not(contains($t, '  '))">
+        <xsl:value-of select="$t"/>
       </xsl:when>
       <xsl:otherwise>
         <!--converts whitespaces sequence to text:s-->
-        <xsl:call-template name="InsertWhiteSpaces"/>
+        <xsl:call-template name="InsertWhiteSpaces">
+          <xsl:with-param name="string" select="$t"/>
+        </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+
 
   <!--  convert multiple white spaces  -->
   <xsl:template name="InsertWhiteSpaces">

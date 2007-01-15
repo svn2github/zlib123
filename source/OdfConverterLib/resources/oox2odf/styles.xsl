@@ -1500,6 +1500,48 @@
     </style:tab-stops>
   </xsl:template>
 
+  <!-- Properties for paragraphs having no w:pPr element -->
+  <xsl:template name="InsertDefaultParagraphProperties">
+    <xsl:if test="self::w:p[not(w:pPr)]">
+      <style:paragraph-properties>
+        <xsl:call-template name="InsertDropCapProperties"/>
+      </style:paragraph-properties>
+    </xsl:if>
+  </xsl:template>
+
+
+  <!-- Retrieve drop cap properties, if any -->
+  <xsl:template name="InsertDropCapProperties">
+    <xsl:variable name="prev-paragraph" select="ancestor-or-self::w:p[1]/preceding-sibling::w:p[1]"/>
+    <xsl:if test="$prev-paragraph/w:pPr/w:framePr[@w:dropCap = 'drop']">
+      <xsl:variable name="dropcap-properties" select="$prev-paragraph/w:pPr/w:framePr"/>
+      <style:drop-cap style:length="{string-length($prev-paragraph/w:r[1]/w:t)}"
+        style:style-name="{generate-id($prev-paragraph/w:r[1])}">
+        <xsl:attribute name="style:lines">
+          <xsl:choose>
+            <xsl:when test="$dropcap-properties/@w:lines">
+              <xsl:value-of select="$dropcap-properties/@w:lines"/>
+            </xsl:when>
+            <xsl:otherwise>2</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:if test="$dropcap-properties/@w:hSpace">
+          <xsl:attribute name="style:distance">
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length" select="$dropcap-properties/@w:hSpace"/>
+              <xsl:with-param name="unit" select="'cm'"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="$prev-paragraph/w:r[1]/w:rPr/w:rFonts">
+          <xsl:message terminate="no">feedback:ui.translation.issue.dropcap.fonts</xsl:message>
+        </xsl:if>
+      </style:drop-cap>
+    </xsl:if>
+  </xsl:template>
+
+
+
   <!-- Compute style and text properties of context style. -->
   <xsl:template name="InsertStyleProperties">
 
@@ -1530,6 +1572,9 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
+
+        <!-- Drop cap paragraph properties -->
+        <xsl:call-template name="InsertDropCapProperties"/>
       </style:paragraph-properties>
     </xsl:if>
 
@@ -1719,8 +1764,11 @@
                     select="key('StyleId',concat('Contents_20',substring-after($StyleId,'TOC')))/w:pPr/w:ind/@w:left"
                   />
                 </xsl:when>
-                <xsl:when test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
-                  <xsl:value-of select="w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left"/>
+                <xsl:when
+                  test="w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left">
+                  <xsl:value-of
+                    select="w:styles/w:styles/w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on' and w:type='paragraph']/w:pPr/w:ind/@w:left"
+                  />
                 </xsl:when>
                 <xsl:when test="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left != ''">
                   <xsl:value-of select="w:styles/w:docDefaults/w:pPrDefault/w:pPr/w:ind/@w:left"/>
@@ -1819,7 +1867,8 @@
       <xsl:with-param name="parentStyleId" select="w:pStyle/@w:val|parent::w:style/w:basedOn/@w:val"
       />
     </xsl:call-template>
-    <!-- TODO : drop cap, background image -->
+    <!-- drop cap properties -->
+    <xsl:call-template name="InsertDropCapProperties"/>
   </xsl:template>
 
   <xsl:template match="w:keepNext" mode="pPrChildren">
