@@ -116,7 +116,7 @@ Insert;Tables;Insert Table;Table Size;No of columns;;1;-;;It's not converted bec
 ;;;Insert reference to;Selected destination;;2;1.0;Completed;;;
 ;;;;Include above/below;;2;1.0;Completed;;;
 ;;;Insert as hyperlink;;;2;1.0;Completed;;;
-;;;Seperate numbers with;;;3;1.0;;;;
+;;;Seperate numbers with;;;3;1.0;;not supported;;
 ;;;;;;;;;;;
 ;Header & Footer;Header;;;;1;0.3-M1;Completed;;;
 ;;Footer;;;;1;0.3-M1;Completed;;;
