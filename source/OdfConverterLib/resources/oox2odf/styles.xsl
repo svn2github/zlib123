@@ -1513,7 +1513,7 @@
   <!-- Retrieve drop cap properties, if any -->
   <xsl:template name="InsertDropCapProperties">
     <xsl:variable name="prev-paragraph" select="ancestor-or-self::w:p[1]/preceding-sibling::w:p[1]"/>
-    <xsl:if test="$prev-paragraph/w:pPr/w:framePr[@w:dropCap = 'drop']">
+    <xsl:if test="$prev-paragraph/w:pPr/w:framePr[@w:dropCap]">
       <xsl:variable name="dropcap-properties" select="$prev-paragraph/w:pPr/w:framePr"/>
       <style:drop-cap style:length="{string-length($prev-paragraph/w:r[1]/w:t)}"
         style:style-name="{generate-id($prev-paragraph/w:r[1])}">
@@ -2659,7 +2659,7 @@
     <!-- attributes using match -->
     <xsl:apply-templates mode="rPrChildren"/>
     <!-- other attributes forbidden in drop cap text style -->
-    <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap = 'drop'])">
+    <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap])">
       <xsl:apply-templates mode="rPrChildren-dropcap-forbidden"/>
       <xsl:call-template name="InsertTextPosition"/>
     </xsl:if>
@@ -2929,14 +2929,12 @@
   <!-- font size -->
   <xsl:template match="w:sz" mode="rPrChildren-dropcap-forbidden">
     <!-- do not insert this property into drop cap text style -->
-    <!--xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap = 'drop'])"-->
     <xsl:attribute name="fo:font-size">
       <xsl:call-template name="ConvertHalfPoints">
         <xsl:with-param name="length" select="@w:val"/>
         <xsl:with-param name="unit">pt</xsl:with-param>
       </xsl:call-template>
     </xsl:attribute>
-    <!--/xsl:if-->
   </xsl:template>
 
   <xsl:template match="w:szCs" mode="rPrChildren">

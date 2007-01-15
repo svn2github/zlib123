@@ -476,9 +476,12 @@
     </xsl:attribute>
   </xsl:template>
 
-  <!-- skip drop-capped paragraph -->
-  <xsl:template match="w:p[w:pPr/w:framePr/@w:dropCap = 'drop' ]"/>
-  <!--xsl:template match="w:p[w:pPr/w:framePr/@w:dropCap = 'drop' ]" mode="automaticstyles"/-->
+  <!-- skip drop-capped paragraphs -->
+  <xsl:template match="w:p[w:pPr/w:framePr/@w:dropCap]"/>
+  <!-- margin drop cap -->
+  <xsl:template match="w:p[w:pPr/w:framePr/@w:dropCap = 'margin' ]" mode="automaticstyles">
+    <xsl:message terminate="no">feedback:ui.translation.issue.dropcap.margin</xsl:message>
+  </xsl:template>
 
 
   <!--  paragraphs-->
@@ -734,7 +737,7 @@
     <xsl:if test="not(preceding-sibling::w:t[1]) and not(parent::w:r/preceding-sibling::w:r[1])">
       <xsl:variable name="prev-paragraph"
         select="ancestor-or-self::w:p[1]/preceding-sibling::w:p[1]"/>
-      <xsl:if test="$prev-paragraph/w:pPr/w:framePr[@w:dropCap = 'drop']">
+      <xsl:if test="$prev-paragraph/w:pPr/w:framePr[@w:dropCap]">
         <text:span text:style-name="{generate-id($prev-paragraph/w:r[1])}">
           <xsl:value-of select="$prev-paragraph/w:r[1]/w:t"/>
         </text:span>
