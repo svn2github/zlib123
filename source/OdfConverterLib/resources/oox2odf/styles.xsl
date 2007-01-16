@@ -1741,7 +1741,14 @@
           <xsl:when test="$IndLeft != ''">
             <xsl:choose>
               <xsl:when test="$IndLeft != $IndHanging or ($IndHanging = 0 and $IndLeft= 0)">
-                <xsl:value-of select="$IndLeft - $LeftNumber + $HangingNumber"/>
+                <xsl:choose>
+                  <xsl:when test="$LeftNumber = $HangingNumber and ($IndHanging = '' or $IndHanging = 'Nan')">
+                    <xsl:value-of select="$IndLeft - $HangingNumber"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$IndLeft - $LeftNumber + $HangingNumber"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:when>
               <xsl:when test="$IndLeft = $IndHanging">0</xsl:when>
               <xsl:when test="$IndLeft != ''">
