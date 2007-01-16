@@ -88,6 +88,7 @@
     Use only last instance of default style if several of a certain type (cf OOX spec)
   -->
   <xsl:template name="InsertDefaultStyles">
+
     <xsl:for-each select="document('word/styles.xml')">
       <!-- paragraph default -->
       <xsl:call-template name="InsertDefaultParagraphStyle"/>
@@ -101,7 +102,7 @@
 
   <!-- compute default paragraph props. Use default style, then docDefaults. -->
   <xsl:template name="InsertDefaultParagraphStyle">
-    <xsl:if test="w:docDefaults[w:pPrDefault or w:rPrDefault] or key('default-styles', 'paragraph')">
+    <xsl:if test="w:styles/w:docDefaults[w:pPrDefault or w:rPrDefault] or key('default-styles', 'paragraph')">
       <style:default-style style:family="paragraph">
         <style:paragraph-properties>
           <xsl:call-template name="InsertDefaultTabStop"/>
@@ -153,6 +154,10 @@
                   test="not(key('default-styles', 'paragraph')[last()]/w:rPr/*[name() = $elementName])">
                   <xsl:apply-templates select="." mode="rPrChildren"/>
                 </xsl:if>
+                <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap])">
+                  <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
+                  <xsl:call-template name="InsertTextPosition"/>
+                </xsl:if>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each>
@@ -190,7 +195,7 @@
 
   <!-- default character style -->
   <xsl:template name="InsertDefaultTextStyle">
-    <xsl:if test="w:docDefaults[w:rPrDefault] or key('default-styles', 'character')">
+    <xsl:if test="w:styles/w:docDefaults[w:rPrDefault] or key('default-styles', 'character')">
       <style:default-style style:family="text">
         <style:text-properties>
           <xsl:for-each select="key('default-styles', 'character')[last()]/w:rPr">
@@ -214,6 +219,10 @@
                 <xsl:if
                   test="not(key('default-styles', 'character')[last()]/w:rPr/*[name() = $elementName])">
                   <xsl:apply-templates select="." mode="rPrChildren"/>
+                </xsl:if>
+                <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap])">
+                  <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
+                  <xsl:call-template name="InsertTextPosition"/>
                 </xsl:if>
               </xsl:otherwise>
             </xsl:choose>
@@ -2903,7 +2912,7 @@
   <xsl:template match="w:spacing" mode="rPrChildren">
     <xsl:attribute name="fo:letter-spacing">
       <xsl:choose>
-        <xsl:when test="@w:val=0">normal</xsl:when>
+        <xsl:when test="@w:val=0 or not(@w:val)">normal</xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length" select="@w:val"/>
