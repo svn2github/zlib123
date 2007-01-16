@@ -29,6 +29,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oox="urn:oox"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
+  xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   exclude-result-prefixes="oox rels">
 
   <xsl:import href="common.xsl"/>
@@ -99,6 +100,17 @@
             manifest:full-path="/"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="content.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="styles.xml"/>
+          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml"/>
+          <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
+          <xsl:for-each select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+              <xsl:call-template name="InsertManifestFileEntry"/>
+          </xsl:for-each>
+          <xsl:for-each select="document('word/_rels/footer1.xml.rels')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+            <xsl:call-template name="InsertManifestFileEntry"/>
+          </xsl:for-each>
+          <xsl:for-each select="document('word/_rels/header1.xml.rels')//node()[name() = 'Relationship'][substring-before(@Target,'/') = 'media']">
+            <xsl:call-template name="InsertManifestFileEntry"/>
+          </xsl:for-each>
         </manifest:manifest>
       </pzip:entry>
 
@@ -125,5 +137,27 @@
     </pzip:archive>
   </xsl:template>
 
+  <xsl:template name="InsertManifestFileEntry">
+    <manifest:file-entry>
+      <xsl:attribute name="manifest:media-type">
+        <xsl:if test="substring-after(@Target,'.') = 'gif'">
+          <xsl:text>image/gif</xsl:text>
+        </xsl:if>                
+        <xsl:if test="substring-after(@Target,'.') = 'jpg' or substring-after(@Target,'.') = 'jpeg'  or 
+          substring-after(@Target,'.') = 'jpe' or substring-after(@Target,'.') = 'jfif' ">
+          <xsl:text>image/jpeg</xsl:text>
+        </xsl:if>
+        <xsl:if test="substring-after(@Target,'.') = 'tif' or substring-after(@Target,'.') = 'tiff'">
+          <xsl:text>image/tiff</xsl:text>
+        </xsl:if>                
+        <xsl:if test="substring-after(@Target,'.') = 'png'">
+          <xsl:text>image/png</xsl:text>
+        </xsl:if>               
+      </xsl:attribute>
+      <xsl:attribute name="manifest:full-path">
+        <xsl:text>Pictures/</xsl:text><xsl:value-of select="substring-after(@Target,'/')"/>
+      </xsl:attribute>
+    </manifest:file-entry>
+  </xsl:template>
 
 </xsl:stylesheet>
