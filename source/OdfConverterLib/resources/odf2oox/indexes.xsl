@@ -148,6 +148,13 @@
     <xsl:if test="not(parent::text:index-body/preceding-sibling::*/*/text:index-entry-tab-stop[@style:type = 'right'])">
       <w:instrText xml:space="preserve">\p " " </w:instrText>
     </xsl:if>
+    <!-- caption-format = 'text' is default. ='category-and-value' not handled -->
+    <xsl:if test="parent::text:index-body/preceding-sibling::*/@text:caption-sequence-format = 'caption' ">
+      <w:instrText xml:space="preserve">\a </w:instrText>
+    </xsl:if>
+    <xsl:if test="parent::text:index-body/preceding-sibling::*/@text:caption-sequence-format = 'category-and-value' ">
+      <xsl:message terminate="no">feedback:Table of illustration caption format</xsl:message>
+    </xsl:if>
   </xsl:template>
 
   <!-- alphabetical index -->
