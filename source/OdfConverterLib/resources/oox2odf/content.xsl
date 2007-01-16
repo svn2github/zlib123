@@ -186,6 +186,9 @@
             <xsl:when test="contains(w:pStyle/@w:val,'TOC')">
               <xsl:value-of select="concat('Contents_20_',substring-after(w:pStyle/@w:val,'TOC'))"/>
             </xsl:when>
+            <xsl:when test="w:pStyle/@w:val='FootnoteText'">
+              <xsl:text>Footnote_20_Symbol</xsl:text>
+            </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="w:pStyle/@w:val"/>
             </xsl:otherwise>
