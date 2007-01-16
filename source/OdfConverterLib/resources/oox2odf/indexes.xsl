@@ -71,10 +71,13 @@
         </xsl:choose>
       </xsl:when>
       <xsl:when test="w:r[contains(w:instrText,'INDEX')]">
-        <text:alphabetical-index text:protected="true" text:name="Alphabetical Index1">
+        <text:alphabetical-index>
           <xsl:attribute name="text:style-name">
             <xsl:value-of select="generate-id(following::w:p/descendant::w:sectPr)"/>
           </xsl:attribute>
+          <xsl:message terminate="no">feedback:TOC protection against manual changes</xsl:message>
+          <xsl:attribute name="text:protected">false</xsl:attribute>
+          <xsl:attribute name="text:name">Alphabetical Index1</xsl:attribute>
           <xsl:call-template name="InsertIndexProperties">
             <xsl:with-param name="type">INDEXA</xsl:with-param>
           </xsl:call-template>
@@ -615,16 +618,12 @@
     </xsl:variable>
     <xsl:if test="$count &gt; 0">
 
-      <xsl:if test="contains($instrText, '\h') and not(contains($instrText, '\c'))">
-          <text:index-entry-link-start>
-            <xsl:attribute name="text:style-name">
-              <xsl:value-of select="ancestor::w:p/w:hyperlink/w:r/w:rPr/w:rStyle/@w:val"/>
-            </xsl:attribute>
-          </text:index-entry-link-start>
-        </xsl:if>
-
       <xsl:choose>
         <xsl:when test="$type='INDEXA'">
+          <xsl:if test="contains($instrText, '\h') and not(contains($instrText, '\c'))">
+            <xsl:call-template name="InsertHyperlinkStartToTOC"/>
+          </xsl:if>
+          
           <xsl:choose>
             <xsl:when test="$level = 0">
               <text:index-entry-text/>
@@ -633,16 +632,26 @@
               <text:index-entry-text/>
               <text:index-entry-span>, </text:index-entry-span>
               <text:index-entry-page-number/>
+              <xsl:if test="contains($instrText,'\h') and not(contains($instrText, '\c'))">
+                <text:index-entry-link-end/>
+              </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
         <xsl:when test="(contains(w:pPr/w:pStyle/@w:val,$styleLevel) and not(contains(preceding-sibling::w:p[(preceding-sibling::node()=$node or self::node()=$node)]/w:pPr/w:pStyle/@w:val,$styleLevel))) or $styleLevel = 0">
+          <xsl:if test="contains($instrText, '\h') and not(contains($instrText, '\c'))">
+            <xsl:call-template name="InsertHyperlinkStartToTOC"/>
+          </xsl:if>
+          
           <xsl:if test="$type='TOC'">
             <text:index-entry-chapter/>
           </xsl:if>
           <text:index-entry-text/>
           <xsl:apply-templates select="(descendant::w:r/w:tab)[number(last())]" mode="entry"/>
           <xsl:apply-templates select="(descendant::w:r/w:t)[number(last())]" mode="entry"/>
+          <xsl:if test="contains($instrText,'\h') and not(contains($instrText, '\c'))">
+            <text:index-entry-link-end/>
+          </xsl:if>
         </xsl:when>
         <xsl:otherwise>
           <xsl:for-each select="following-sibling::w:p[1]">
@@ -656,11 +665,17 @@
           </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
-      <xsl:if test="contains($instrText,'\h') and not(contains($instrText, '\c'))">
-      <text:index-entry-link-end/>
-        </xsl:if>
     </xsl:if>
   </xsl:template> 
+  
+  <!-- template which inserts hyperlink start tag in TOC formatting-->
+  <xsl:template name="InsertHyperlinkStartToTOC">
+    <text:index-entry-link-start>
+      <xsl:attribute name="text:style-name">
+        <xsl:value-of select="w:hyperlink/w:r/w:rPr/w:rStyle/@w:val"/>
+      </xsl:attribute>
+    </text:index-entry-link-start>
+  </xsl:template>
 
   <!--insert Bibliography properties -->
   
