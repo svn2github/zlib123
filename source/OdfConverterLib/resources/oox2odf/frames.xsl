@@ -38,19 +38,7 @@
   <xsl:template match="v:rect">
     <draw:rect>
       <xsl:call-template name="InsertCommonShapeProperties"/>
-      <xsl:call-template name="InsertVRectAbsolutePos"/>
     </draw:rect>
-  </xsl:template>
-
-  <!--TODO-->
-  <xsl:template name="InsertVRectAbsolutePos">
-    <xsl:attribute name="svg:x">
-      <xsl:text>0cm</xsl:text>
-    </xsl:attribute>
-
-    <xsl:attribute name="svg:y">
-      <xsl:text>0cm</xsl:text>
-    </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="InsertCommonShapeProperties">
@@ -208,9 +196,15 @@
         <xsl:when test="w10:wrap/@type = 'none' ">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
-        <!--frames must be anchored as character in header of footer because otherwise they lost their size
+        <!-- In header of footer, frames that are not in background must be anchored as character because otherwise they lose their size
        and horizontal and vertical position (when anchored as character horizontal position is lost)-->
-        <xsl:when test="ancestor::w:hdr or ancestor::w:ftr ">
+        <xsl:when test="(ancestor::w:hdr or ancestor::w:ftr) and w10:wrap/@type != '' ">
+          <xsl:if test="ancestor::w:hdr">
+            <xsl:message terminate="no">feedback:Position of frame in header</xsl:message>
+          </xsl:if>
+          <xsl:if test="ancestor::w:ftr">
+            <xsl:message terminate="no">feedback:Position of frame in footer</xsl:message>
+          </xsl:if>
           <xsl:text>as-char</xsl:text>
         </xsl:when>
         <!-- if there is another run exept that one containing shape and shape doesn't have wrapping style set then shape should be anchored 'as-text' -->
@@ -469,8 +463,10 @@
 
   <xsl:template name="InsertShapeWrappedParagraph">
     <!-- TODO inverstigate when this should not be set-->
+    <!-- COMMENT : does not exist in OOX, so default value should be no-limit (rather than 1) -->
     <xsl:attribute name="style:number-wrapped-paragraphs">
-      <xsl:text>1</xsl:text>
+      <!--xsl:text>1</xsl:text-->
+      <xsl:text>no-limit</xsl:text>
     </xsl:attribute>
   </xsl:template>
 
@@ -634,9 +630,13 @@
   <xsl:template name="InsertShapeFlowWithText">
     <xsl:param name="shape" select="."/>
     <xsl:variable name="layouitInCell" select="$shape/@o:allowincell"/>
-    <xsl:attribute name="draw:flow-with-text">
+    <xsl:attribute name="style:flow-with-text">
       <xsl:choose>
         <xsl:when test="$layouitInCell = 'f' ">
+          <xsl:text>false</xsl:text>
+        </xsl:when>
+        <!-- if ancestor if header or footer and frame is in background -->
+        <xsl:when test="(ancestor::w:hdr or ancestor::w:ftr) and not(w10:wrap/@type)">
           <xsl:text>false</xsl:text>
         </xsl:when>
         <xsl:otherwise>

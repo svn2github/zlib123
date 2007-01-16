@@ -157,7 +157,11 @@
           <style:list-level-properties>
             <xsl:call-template name="InsertListLevelProperties"/>
           </style:list-level-properties>
-          <style:text-properties style:font-name="StarSymbol"/>
+          <style:text-properties>
+            <xsl:for-each select="w:rPr">
+              <xsl:call-template name="InsertTextProperties"/>
+            </xsl:for-each>
+          </style:text-properties>
         </text:list-level-style-bullet>
       </xsl:when>
       <xsl:otherwise>
