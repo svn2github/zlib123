@@ -612,17 +612,16 @@
         <xsl:otherwise>
           <!-- compute width -->
           <xsl:variable name="width">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:choose>
-                  <xsl:when test="$border/@w:sz != 0">
-                    <xsl:value-of select="$border/@w:sz"/>
-                  </xsl:when>
-                  <xsl:otherwise>2</xsl:otherwise>
-                </xsl:choose>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
+            <xsl:choose>
+              <xsl:when test="$border/@w:sz != 0">
+                <xsl:call-template name="ConvertEighthsPoints">
+                  <xsl:with-param name="length" select="$border/@w:sz"/>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <!-- default value (arbitrary) -->
+              <xsl:otherwise>0.002cm</xsl:otherwise>
+            </xsl:choose>
           </xsl:variable>
           <!-- compute style -->
           <xsl:variable name="style">
