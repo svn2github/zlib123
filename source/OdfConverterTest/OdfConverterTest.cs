@@ -469,7 +469,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             Console.WriteLine("  Where options are:");
             Console.WriteLine("     /I PathOrFilename  Name of the file to transform (or input folder in case of batch conversion)");
             Console.WriteLine("     /O PathOrFilename  Name of the output file (or output folder)");
-            Console.WriteLine("     /F                 Override existing output file");
+            Console.WriteLine("     /F                 Replace existing file");
             Console.WriteLine("     /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (note: existing files will be replaced)");
             Console.WriteLine("     /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (note: existing files will be replaced)");
             Console.WriteLine("     /V                 Validate the result of the transformation against the schemas");
