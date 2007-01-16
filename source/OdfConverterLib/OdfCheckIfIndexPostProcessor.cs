@@ -54,6 +54,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 			{
 				this.isIndex = true;
 				this.nextWriter.WriteStartElement(prefix,localName,ns);
+				if(IsAlphabetical(localName)){
+					this.numberOfParagraphs++;
+					this.context++;
+				}
 			}
 			else
 			{
@@ -161,6 +165,15 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 				return true;
 			}
 			return false;
+		}
+		
+		public bool IsAlphabetical(string elementName)
+		{
+			if(elementName.Equals("alphabetical-index"))
+			   {
+			   	return true;
+			   }
+			   return false;
 		}
 		//method to check if element is paragraph
 		public bool IsParagraph(string elementName)
