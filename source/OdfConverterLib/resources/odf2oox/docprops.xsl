@@ -255,6 +255,11 @@
         <xsl:value-of select="meta:document-statistic/@meta:character-count"/>
       </CharactersWithSpaces>
     </xsl:if>
+    <xsl:if test="meta:document-statistic/@meta:non-whitespace-character-count">
+      <Characters xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
+        <xsl:value-of select="meta:document-statistic/@meta:non-whitespace-character-count"/>
+      </Characters>
+    </xsl:if>
     <SharedDoc xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
       >false</SharedDoc>
     <HyperlinksChanged
