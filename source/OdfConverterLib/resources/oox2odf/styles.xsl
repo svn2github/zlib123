@@ -2681,6 +2681,10 @@
     </xsl:if>
     <!-- attributes from child elements -->
     <xsl:call-template name="InsertTextStrikeLine"/>
+    <!-- if in field content render field text style options -->
+    <xsl:if test="ancestor::w:fldSimple or ancestor::w:r/w:instrText">
+      <xsl:call-template name="InsertFieldProperties"/>
+    </xsl:if>
   </xsl:template>
 
   <!-- font weigth -->
@@ -2729,7 +2733,9 @@
   <xsl:template match="w:caps" mode="rPrChildren">
     <xsl:attribute name="fo:text-transform">
       <xsl:choose>
-        <xsl:when test="@w:val='off' or @w:val='false' or @w:val=0">none</xsl:when>
+        <!--ignore when in field because they can have it's own text transform properties see: InsertFieldProperties -->
+        <xsl:when test="ancestor::w:r/w:instrText or ancestor::w:r/parent::w:fldSimple"/>
+         <xsl:when test="@w:val='off' or @w:val='false' or @w:val=0">none</xsl:when>
         <xsl:when test="@w:val='on' or @w:val='true' or @w:val=1">uppercase</xsl:when>
         <xsl:otherwise>uppercase</xsl:otherwise>
       </xsl:choose>
@@ -2919,6 +2925,8 @@
   <xsl:template match="w:spacing" mode="rPrChildren">
     <xsl:attribute name="fo:letter-spacing">
       <xsl:choose>
+        <!--ignore when in field because they can have it's own letter spacing properties see: InsertFieldProperties -->
+        <xsl:when test="ancestor::w:r/w:instrText or ancestor::w:r/parent::w:fldSimple"/>
         <xsl:when test="@w:val=0 or not(@w:val)">normal</xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="ConvertTwips">

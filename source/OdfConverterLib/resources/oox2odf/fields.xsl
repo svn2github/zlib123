@@ -105,7 +105,25 @@
           <xsl:with-param name="timeText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
+      <!-- DOCPROPERTY CreateTime-->
+      <xsl:when test="contains($fieldCode,'CreateTime') ">
+        <xsl:call-template name="InsertCreationTime">
+          <xsl:with-param name="timeText" select="$fieldCode"/>
+        </xsl:call-template>
+      </xsl:when>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertCreationTime">
+    <xsl:param name="timeText"/>
+    <text:creation-time>
+      <xsl:attribute name="style:data-style-name">
+        <xsl:value-of select="generate-id(.)"/>
+      </xsl:attribute>
+      <xsl:attribute name="text:time-value">
+        <xsl:value-of select="$timeText"/>
+      </xsl:attribute>
+    </text:creation-time>
   </xsl:template>
 
   <xsl:template name="InsertTime">
@@ -177,8 +195,9 @@
         <xsl:when test="$fieldType = 'PAGE' or $fieldType = 'page' ">
           <xsl:call-template name="InsertPageNumber"/>
         </xsl:when>
-        <!-- possible time types: TIME, EDITTIME-->
-        <xsl:when test="contains($fieldType,'TIME') or contains($fieldType,'time') ">
+        <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime-->
+        <xsl:when
+          test="contains($fieldType,'TIME') or contains($fieldType,'time') or contains($fieldType,'Time') ">
           <xsl:call-template name="InsertTimeType">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="fieldType" select="$fieldType"/>
@@ -212,11 +231,14 @@
         <xsl:when test="$fieldType = 'FILENAME' or $fieldType = 'filename' ">
           <xsl:call-template name="InsertFileName"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'KEYWORDS' or $fieldType = 'keywords' ">
+        <!-- KEYWORDS, DOCPROPERTY Keywords -->
+        <xsl:when
+          test="contains($fieldCode,'KEYWORDS') or contains($fieldCode,'keywords') or contains($fieldCode,'Keywords')">
           <xsl:call-template name="InsertKeywords"/>
         </xsl:when>
+        <!-- DOCPROPERTY Company, INFO Company-->
         <xsl:when
-          test="($fieldType = 'DOCPROPERTY' or $fieldType = 'docproperty') and contains($fieldCode,'Company') ">
+          test="contains($fieldCode,'Company') or contains($fieldCode,'Company')">
           <xsl:call-template name="InsertCompany"/>
         </xsl:when>
         <xsl:when test="$fieldType = 'USERADDRESS' or $fieldType = 'useraddress' ">
@@ -231,8 +253,8 @@
         <xsl:when test="$fieldType = 'NUMCHARS' or $fieldType = 'numchars' ">
           <xsl:call-template name="InsertCharacterCount"/>
         </xsl:when>
-        <xsl:when
-          test="($fieldType = 'DOCPROPERTY' or $fieldType = 'docproperty')   and contains($fieldCode,'Paragraphs') ">
+       <!-- DOCPROPERTY Paragraphs, INFO Paragraphs-->
+        <xsl:when test="contains($fieldCode,'Paragraphs') or contains($fieldCode,'paragraphs') ">
           <xsl:call-template name="InsertCompany"/>
         </xsl:when>
       </xsl:choose>
@@ -457,7 +479,8 @@
   <xsl:template name="InsertIndexMark">
     <xsl:param name="instrText"/>
     <xsl:variable name="Value">
-      <xsl:value-of select="substring-before(substring-after($instrText,'&quot;'),'&quot;')"/>
+      <xsl:value-of select="substring-before(substring-after($instrText,'&quot;'),'&quot;')"
+      />
     </xsl:variable>
     <text:alphabetical-index-mark>
       <xsl:choose>
@@ -471,7 +494,7 @@
             <xsl:value-of select="substring-before($Value, ':')"/>
           </xsl:variable>
           <xsl:variable name="TextKey2">
-            <xsl:value-of select="substring-after($Value, ':')"/>  
+            <xsl:value-of select="substring-after($Value, ':')"/>
           </xsl:variable>
           <xsl:choose>
             <xsl:when test="contains($TextKey2, ':')">
@@ -491,7 +514,7 @@
           <xsl:attribute name="text:key1">
             <xsl:value-of select="$TextKey1"/>
           </xsl:attribute>
-        </xsl:when>        
+        </xsl:when>
       </xsl:choose>
     </text:alphabetical-index-mark>
   </xsl:template>
@@ -623,8 +646,9 @@
     </xsl:call-template>
   </xsl:template>
 
-  <!-- possible time types: TIME, EDITTIME-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')]" mode="fields">
+  <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr,'Time')]"
+    mode="fields">
     <xsl:variable name="fieldType">
       <xsl:call-template name="GetFieldTypeFromCode">
         <xsl:with-param name="fieldCode" select="@w:instr"/>
@@ -725,8 +749,52 @@
   </xsl:template>
 
   <xsl:template match="w:fldSimple" mode="automaticstyles">
-    <!--TODO uppercase, lowercase for fields -->
     <xsl:apply-templates select="w:r/w:rPr" mode="automaticstyles"/>
+  </xsl:template>
+
+  <xsl:template name="InsertFieldProperties">
+    <xsl:param name="fieldCodeContainer" select="ancestor::w:fldSimple | ancestor::w:r/w:instrText"/>
+
+    <xsl:variable name="fieldCode">
+      <xsl:choose>
+        <xsl:when test="$fieldCodeContainer/@w:instr">
+          <xsl:value-of select="$fieldCodeContainer/@w:instr"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="BuildFieldCode">
+            <xsl:with-param name="instrText" select="$fieldCodeContainer"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="contains($fieldCode,'Upper')">
+        <xsl:attribute name="fo:text-transform">
+          <xsl:text>uppercase</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="contains($fieldCode,'Lower')">
+        <xsl:attribute name="fo:text-transform">
+          <xsl:text>lowercase</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="contains($fieldCode,'FirstCap') or contains($fieldCode,'Caps')">
+        <xsl:attribute name="fo:text-transform">
+          <xsl:text>capitalize</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="contains($fieldCode,'SBCHAR')">
+        <xsl:attribute name="fo:letter-spacing">
+          <xsl:text>-0.018cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="contains($fieldCode,'DBCHAR')">
+        <xsl:attribute name="fo:letter-spacing">
+          <xsl:text>0.176cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertDateFormat">
@@ -1514,8 +1582,9 @@
     </text:file-name>
   </xsl:template>
 
-
-  <xsl:template match="w:fldSimple[contains(@w:instr,'KEYWORDS')]" mode="fields">
+  <!--KEYWORDS and DOCPROPERTY Keywords-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'KEYWORDS') or contains(@w:instr,'Keywords')]"
+    mode="fields">
     <xsl:call-template name="InsertKeywords"/>
   </xsl:template>
 
@@ -1525,8 +1594,9 @@
     </text:keywords>
   </xsl:template>
 
+  <!-- DOCPROPERTY Paragraphs, INFO Paragraphs-->
   <xsl:template
-    match="w:fldSimple[contains(@w:instr,'DOCPROPERTY') and contains(@w:instr,'Company')]"
+    match="w:fldSimple[contains(@w:instr,'Company')]"
     mode="fields">
     <xsl:call-template name="InsertCompany"/>
   </xsl:template>
@@ -1577,8 +1647,9 @@
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:character-count>> </xsl:template>
 
+  <!-- DOCPROPERTY Paragraphs, INFO Paragraphs-->
   <xsl:template
-    match="w:fldSimple[contains(@w:instr,'DOCPROPERTY') and contains(@w:instr,'Paragraphs')]"
+    match="w:fldSimple[contains(@w:instr,'Paragraphs')]"
     mode="fields">
     <xsl:call-template name="InsertParagraphCount"/>
   </xsl:template>
