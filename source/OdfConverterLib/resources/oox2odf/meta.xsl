@@ -47,7 +47,7 @@
                 <xsl:if test="document('docProps/core.xml')/cp:coreProperties/cp:lastModifiedBy">
                     <dc:creator>
                         <xsl:value-of
-                            select="document('docProps/core.xml')/cp:coreProperties/cp:lastModifiedBy"
+                            select="document('docProps/core.xml')/cp:coreProperties/lastModifiedBy"
                         />
                     </dc:creator>
                 </xsl:if>
@@ -59,13 +59,11 @@
                         />
                     </dc:date>
                 </xsl:if>
-                <!-- last printed by : not available in OOX -->
                 <!-- last print date -->
                 <xsl:if test="document('docProps/core.xml')/cp:coreProperties/cp:lastPrinted">
                     <meta:print-date>
                         <xsl:value-of
-                            select="document('docProps/core.xml')/cp:coreProperties/cp:lastPrinted"
-                        />
+                            select="document('docProps/core.xml')/cp:coreProperties/lastPrinted"/>
                     </meta:print-date>
                 </xsl:if>
                 <!-- subject -->
@@ -105,17 +103,29 @@
                         </xsl:choose>
                     </meta:editing-duration>
                 </xsl:if>
-                <!-- custom properties-->        
-               <xsl:if test="document('docProps/custom.xml')/cust-p:Properties/cust-p:property">
-                   <xsl:for-each select="document('docProps/custom.xml')/cust-p:Properties/cust-p:property">
-                       <xsl:variable name="numer"><xsl:number/></xsl:variable>
-                       <xsl:if test="$numer &lt; 5">
-                           <meta:user-defined meta:name="Info {$numer}">
-                               <xsl:value-of select="@name"/><xsl:text>: </xsl:text><xsl:value-of select="vt:lpwstr/text()"/>
-                           </meta:user-defined>
-                       </xsl:if>
-                   </xsl:for-each>
-               </xsl:if>        
+                <!-- revision number -->
+                <xsl:if test="document('docProps/core.xml')/cp:coreProperties/cp:revision">
+                    <meta:editing-cycles>
+                        <xsl:value-of
+                            select="document('docProps/core.xml')/cp:coreProperties/cp:modified"/>
+                    </meta:editing-cycles>
+                </xsl:if>
+                <!-- custom properties-->
+                <xsl:if test="document('docProps/custom.xml')/cust-p:Properties/cust-p:property">
+                    <xsl:for-each
+                        select="document('docProps/custom.xml')/cust-p:Properties/cust-p:property">
+                        <xsl:variable name="numer">
+                            <xsl:number/>
+                        </xsl:variable>
+                        <xsl:if test="$numer &lt; 5">
+                            <meta:user-defined meta:name="Info {$numer}">
+                                <xsl:value-of select="@name"/>
+                                <xsl:text>: </xsl:text>
+                                <xsl:value-of select="vt:lpwstr/text()"/>
+                            </meta:user-defined>
+                        </xsl:if>
+                    </xsl:for-each>
+                </xsl:if>
                 <!-- keywords -->
                 <xsl:if test="document('docProps/core.xml')/cp:coreProperties/cp:keywords">
                     <meta:keyword>
@@ -130,11 +140,46 @@
                             select="document('docProps/core.xml')/cp:coreProperties/dc:language"/>
                     </dc:language>
                 </xsl:if>
-                <!--TODO:<meta:document-statistic>
-                    <xsl:attribute name="meta:page-count">
-                         <xsl:value-of select="document('docProps/app.xml')/Properties/Pages"/>
-                    </xsl:attribute>
-                </meta:document-statistic>-->
+                <!-- document statistics -->
+                <meta:document-statistic>
+                    <xsl:for-each select="document('docProps/app.xml')/Properties">
+                        <!-- word count -->
+                        <xsl:if test="Word">
+                            <xsl:attribute name="meta:word-count">
+                                <xsl:value-of select="Word"/>
+                            </xsl:attribute>
+                        </xsl:if>
+                        <!-- page count -->
+                        <xsl:if test="Pages">
+                            <xsl:attribute name="meta:page-count">
+                                <xsl:value-of select="Pages"/>
+                            </xsl:attribute>
+                        </xsl:if>
+                        <!-- paragraph count -->
+                        <xsl:if test="Paragraphs">
+                            <xsl:attribute name="meta:paragraph-count">
+                                <xsl:value-of select="Paragraphs"/>
+                            </xsl:attribute>
+                        </xsl:if>
+                        <!-- character count -->
+                        <xsl:if test="Characters">
+                            <xsl:attribute name="meta:non-whitespace-character-count">
+                                <xsl:value-of select="Characters"/>
+                            </xsl:attribute>
+                        </xsl:if>
+                        <!-- character count -->
+                        <xsl:if test="CharactersWithSpaces">
+                            <xsl:attribute name="meta:character-count">
+                                <xsl:value-of select="CharactersWithSpaces"/>
+                            </xsl:attribute>
+                        </xsl:if>
+                    </xsl:for-each>
+                </meta:document-statistic>
+                <!-- other properties to fit :
+                    core : category, contentStatus, contentType
+                    app : Application, AppVersion, Company, DigSig, DocSecurity, HeadingPairs, HiddenSlides, HLinks, HyperlinkBase, HyperlinksChanged,
+                    Lines, LinksUpToDate, Manager, MMClips, Notes, PresentationFormat, Properties, ScaleCrop, SharedDoc, Slides, Template, TitlesOfParts.
+                -->
             </office:meta>
         </office:document-meta>
     </xsl:template>
