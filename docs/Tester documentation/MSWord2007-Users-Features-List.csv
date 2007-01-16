@@ -471,7 +471,7 @@ References;Table of contents;Table of contents;Show page numbers;;;1;0.3-M2;Comp
 ;;;Include label and number;;;3;1.0;Completed;;;
 ;;;Options;Build TOF from;Style;3;1.0;;not supported;;
 ;;;;;Table entry fields;3;1.0;Completed;;;
-;;;;Table identifier;;3;1.0;;;;
+;;;;Table identifier;;3;1.0;;not supported;;
 ;;;;;;;;;;;
 ;Citations & Bibliography;Insert citation;Add new source;Type of Source;;2;0.3-M2;Completed;;;
 ;;;;Author;;2;0.3-M2;Completed;;;
