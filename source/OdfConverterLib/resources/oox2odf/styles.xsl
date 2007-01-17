@@ -3256,6 +3256,7 @@
   <xsl:template name="InsertLineNumbering">
     <xsl:if test="not(document('word/document.xml')/w:document/w:body/w:p/descendant::w:sectPr)">
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr/w:lnNumType">
+        <xsl:message terminate="no">feedback:Line numbering - restart each section</xsl:message>
         <style:style style:name="Line_20_numbering" style:display-name="Line numbering"
           style:family="text"/>
         <text:linenumbering-configuration text:style-name="Line_20_numbering" style:num-format="1"

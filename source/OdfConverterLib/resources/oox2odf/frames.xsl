@@ -208,7 +208,7 @@
           <xsl:text>as-char</xsl:text>
         </xsl:when>
         <!-- if there is another run exept that one containing shape and shape doesn't have wrapping style set then shape should be anchored 'as-text' -->
-        <xsl:when test="ancestor::w:r/parent::node()/w:r[2] and not(w10:wrap) and not(contains($shape/@style, 'position:absolute'))">
+        <xsl:when test="ancestor::w:r/parent::node()/w:r[2] and not(w10:wrap) and (not(contains($shape/@style, 'position:absolute')) or contains($shape/@style, 'mso-position-horizontal-relative:text') or contains($shape/@style, 'mso-position-horizontal-relative:text'))">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
         <xsl:when test="w10:wrap/@anchorx = 'page' and w10:wrap/@anchory = 'page'  ">
