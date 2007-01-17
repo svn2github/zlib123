@@ -2469,7 +2469,19 @@
           <xsl:when test="contains($horizontalRel, 'frame')">mso-position-horizontal-relative:text;</xsl:when>
           <!-- char -->
           <xsl:when test="$horizontalRel = 'char' ">mso-position-horizontal-relative:char;</xsl:when>
-          <xsl:otherwise/>
+          <xsl:otherwise>
+            <!-- no default value suggested. use anchor -->
+            <xsl:choose>
+              <xsl:when test="$anchor = 'page' ">mso-position-horizontal-relative:page;</xsl:when>
+              <xsl:when test="$anchor = 'paragraph' or $anchor = 'frame' "
+                >mso-position-horizontal-relative:text;</xsl:when>
+              <xsl:when test="$anchor = 'char' ">mso-position-horizontal-relative:char;</xsl:when>
+              <xsl:otherwise>
+                <!-- as-char anchor already handled (cf above). In case nothing is ever specified : use default = text -->
+                <xsl:text>mso-position-horizontal-relative:text;</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
@@ -2507,8 +2519,21 @@
           <!-- frame, frame-content -->
           <xsl:when test="contains($verticalRel, 'frame')">mso-position-vertical-relative:text;</xsl:when>
           <!-- char, line, baseline, text -->
+          <xsl:when
+            test="$verticalRel = 'char' or $verticalRel = 'line' or $verticalRel = 'baseline' or $verticalRel = 'text' "
+            >mso-position-vertical-relative:char;</xsl:when>
           <xsl:otherwise>
-            <xsl:if test="$verticalRel != '' ">mso-position-vertical-relative:char;</xsl:if>
+            <!-- no default value suggested. use anchor -->
+            <xsl:choose>
+              <xsl:when test="$anchor = 'page' ">mso-position-horizontal-relative:page;</xsl:when>
+              <xsl:when test="$anchor = 'paragraph' or $anchor = 'frame' "
+                >mso-position-horizontal-relative:text;</xsl:when>
+              <xsl:when test="$anchor = 'char' ">mso-position-horizontal-relative:line;</xsl:when>
+              <xsl:otherwise>
+                <!-- as-char anchor already handled (cf above). In case nothing is ever specified : use default = text -->
+                <xsl:text>mso-position-horizontal-relative:text;</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
@@ -3338,7 +3363,8 @@
               <xsl:text>mso-rotate:180:</xsl:text>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:message terminate="no">translation.odf2oox.textOrientationInsideTextbox</xsl:message>
+              <xsl:message terminate="no"
+              >translation.odf2oox.textOrientationInsideTextbox</xsl:message>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>

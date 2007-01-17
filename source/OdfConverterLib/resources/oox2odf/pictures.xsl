@@ -59,27 +59,27 @@
         <xsl:value-of select="$document"/>
       </xsl:with-param>
     </xsl:call-template>
-    
+
     <xsl:if test="wp:cNvGraphicFramePr/a:graphicFrameLocks/@noChangeAspect">
-        <xsl:message terminate="no">feedback:Picture lock aspect ratio</xsl:message>
+      <xsl:message terminate="no">feedback:Picture lock aspect ratio</xsl:message>
     </xsl:if>
-    
+
     <xsl:if test="a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPicPr/@preferRelativeResize">
       <xsl:message terminate="no">feedback:Relative to orginal picture size</xsl:message>
     </xsl:if>
-    
+
     <xsl:if test="@locked = '1'">
-        <xsl:message terminate="no">feedback: Picture lock anchor</xsl:message>
+      <xsl:message terminate="no">feedback: Picture lock anchor</xsl:message>
     </xsl:if>
-    
+
     <xsl:if test="@allowOverlap = '1'">
       <xsl:message terminate="no">feedback: Picture allow overlap</xsl:message>
     </xsl:if>
-    
+
     <draw:frame>
-     <!-- anchor type-->
+      <!-- anchor type-->
       <xsl:call-template name="InsertImageAnchorType"/>
-      
+
       <!--style name-->
       <xsl:attribute name="draw:style-name">
         <xsl:value-of select="generate-id(ancestor::w:drawing)"/>
@@ -114,7 +114,7 @@
       <xsl:variable name="verticalRelativeFrom" select="wp:positionV/@relativeFrom"/>
       <xsl:variable name="horizontalRelativeFrom" select="wp:positionH/@relativeFrom"/>
       <xsl:variable name="layoutInCell" select="@layoutInCell"/>
-      
+
       <xsl:choose>
         <xsl:when test="name() = 'wp:inline' ">
           <xsl:text>as-char</xsl:text>
@@ -144,18 +144,18 @@
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-  
+
   <xsl:template name="SetSize">
     <xsl:choose>
       <xsl:when test="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln">
-      <xsl:variable name="border">
-        <xsl:call-template name="ConvertEmu3">
-          <xsl:with-param name="length">
-            <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">cm</xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
+        <xsl:variable name="border">
+          <xsl:call-template name="ConvertEmu3">
+            <xsl:with-param name="length">
+              <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
         <xsl:variable name="height">
           <xsl:call-template name="ConvertEmu">
             <xsl:with-param name="length" select="wp:extent/@cy"/>
@@ -169,27 +169,31 @@
           </xsl:call-template>
         </xsl:variable>
         <xsl:attribute name="svg:height">
-          <xsl:value-of select="concat(substring-before($height,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"/>
+          <xsl:value-of
+            select="concat(substring-before($height,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"
+          />
         </xsl:attribute>
         <xsl:attribute name="svg:width">
-          <xsl:value-of select="concat(substring-before($width,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"/>
+          <xsl:value-of
+            select="concat(substring-before($width,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"
+          />
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
-    <xsl:attribute name="svg:height">
-      <xsl:call-template name="ConvertEmu">
-        <xsl:with-param name="length" select="wp:extent/@cy"/>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
-    </xsl:attribute>
-    <xsl:attribute name="svg:width">
-      <xsl:call-template name="ConvertEmu">
-        <xsl:with-param name="length" select="wp:extent/@cx"/>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
-    </xsl:attribute>
+        <xsl:attribute name="svg:height">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="wp:extent/@cy"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:attribute name="svg:width">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="wp:extent/@cx"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
       </xsl:otherwise>
-      </xsl:choose>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="SetPosition">
@@ -254,10 +258,10 @@
     <xsl:param name="rId"/>
     <xsl:param name="targetName"/>
     <xsl:param name="srcFolder" select="'Pictures'"/>
-    
+
     <xsl:variable name="id">
       <xsl:choose>
-        <xsl:when test="$rId != ''">  
+        <xsl:when test="$rId != ''">
           <xsl:value-of select="$rId"/>
         </xsl:when>
         <xsl:otherwise>
@@ -299,7 +303,7 @@
   </xsl:template>
 
   <xsl:template match="w:drawing" mode="automaticstyles">
-    
+
     <style:style style:name="{generate-id(.)}" style:family="graphic">
 
       <!--in Word there are no parent style for image - make default Graphics in OO -->
@@ -333,28 +337,32 @@
           <xsl:text>false</xsl:text>
         </xsl:when>
         <xsl:when test="$layoutInCell = 1">
-            <xsl:text>true</xsl:text>
+          <xsl:text>true</xsl:text>
         </xsl:when>
-       <xsl:otherwise>
-            <xsl:text>false</xsl:text>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-  
+
   <xsl:template name="InsertImageBorder">
-    <xsl:if test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln[not(a:noFill)]">
+    <xsl:if
+      test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln[not(a:noFill)]">
       <xsl:variable name="width">
         <xsl:call-template name="ConvertEmu3">
           <xsl:with-param name="length">
-            <xsl:value-of select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w"/>
+            <xsl:value-of
+              select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w"
+            />
           </xsl:with-param>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="type">
         <xsl:choose>
-          <xsl:when test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:prstDash/@val = 'solid'">
+          <xsl:when
+            test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:prstDash/@val = 'solid'">
             <xsl:text>solid</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -364,8 +372,11 @@
       </xsl:variable>
       <xsl:variable name="color">
         <xsl:choose>
-          <xsl:when test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:solidFill/a:srgbClr">
-            <xsl:value-of select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:solidFill/a:srgbClr/@val"/>
+          <xsl:when
+            test="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:solidFill/a:srgbClr">
+            <xsl:value-of
+              select="*[self::wp:inline or self::wp:anchor]/a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/a:solidFill/a:srgbClr/@val"
+            />
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>000000</xsl:text>
@@ -377,9 +388,10 @@
       </xsl:attribute>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertImageWrap">
-    <xsl:if test="wp:anchor/*[self::wp:wrapNone or self::wp:wrapThrough or self::wp:wrapTigh or self::wp:wrapSquare or self::wrapTopAndBottom]">
+    <xsl:if
+      test="wp:anchor/*[self::wp:wrapNone or self::wp:wrapThrough or self::wp:wrapTigh or self::wp:wrapSquare or self::wrapTopAndBottom]">
       <xsl:attribute name="style:wrap">
 
         <xsl:if test="wp:anchor/wp:wrapSquare">
@@ -501,7 +513,7 @@
 
     <xsl:if test="descendant::wp:positionH">
 
-      
+
       <xsl:call-template name="InsertGraphicPosH">
         <xsl:with-param name="align" select="descendant::wp:positionH/wp:align"/>
       </xsl:call-template>
@@ -514,19 +526,20 @@
 
   <xsl:template name="InsertGraphicPosH">
     <xsl:param name="align"/>
-   
-    <xsl:choose>
-      <xsl:when test="$align and $align != ''">
-        <xsl:attribute name="style:horizontal-pos">
-         <xsl:value-of select="$align"/>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:attribute name="style:horizontal-pos">
+
+    <xsl:attribute name="style:horizontal-pos">
+      <xsl:choose>
+        <xsl:when test="$align = 'absolute' ">
           <xsl:text>from-left</xsl:text>
-        </xsl:attribute>
-      </xsl:otherwise>
-    </xsl:choose>
+        </xsl:when>
+        <xsl:when test="$align and $align != '' ">
+          <xsl:value-of select="$align"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>from-left</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="InsertGraphicPosRelativeH">
@@ -540,15 +553,19 @@
         <xsl:when test="$relativeFrom ='page'">
           <xsl:text>page</xsl:text>
         </xsl:when>
+        <xsl:when test="$relativeFrom ='text' or $relativeFrom = '' ">
+          <xsl:text>paragraph</xsl:text>
+        </xsl:when>
         <xsl:when test="$relativeFrom = 'leftMargin' or $relativeFrom = 'outsideMargin'">
           <xsl:text>page-start-margin</xsl:text>
         </xsl:when>
         <xsl:when test="$relativeFrom = 'rightMargin' or $relativeFrom = 'insideMargin'">
           <xsl:text>page-end-margin</xsl:text>
         </xsl:when>
-        <xsl:when test="$relativeFrom = 'character'">
+        <xsl:when test="$relativeFrom = 'character' or $relativeFrom = 'char'">
           <xsl:text>char</xsl:text>
         </xsl:when>
+        <!-- COMMENT : following values not defined in OOX spec, but used by Word 2007 -->
         <xsl:when test="$relativeFrom = 'left-margin-area' ">
           <xsl:text>page-start-margin</xsl:text>
         </xsl:when>
@@ -569,9 +586,9 @@
     <xsl:param name="align"/>
     <xsl:param name="relativeFrom"/>
 
-    <xsl:choose>
-      <xsl:when test="$align and $align != ''">
-        <xsl:attribute name="style:vertical-pos">
+    <xsl:attribute name="style:vertical-pos">
+      <xsl:choose>
+        <xsl:when test="$align and $align != ''">
           <xsl:choose>
             <!--special rules-->
             <xsl:when
@@ -604,60 +621,58 @@
               <xsl:text>from-top</xsl:text>
             </xsl:when>
           </xsl:choose>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:choose>
-          <!-- if there is vertical position offset -->
-          <xsl:when test="contains(@style,'margin-top') or wp:anchor/wp:positionV/wp:posOffset/text() != ''">
-            <xsl:attribute name="style:vertical-pos">
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <!-- if there is vertical position offset -->
+            <xsl:when
+              test="contains(@style,'margin-top') or wp:anchor/wp:positionV/wp:posOffset/text() != ''">
               <xsl:text>from-top</xsl:text>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="style:vertical-pos">
+            </xsl:when>
+            <xsl:otherwise>
               <xsl:text>top</xsl:text>
-            </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:otherwise>
-    </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="InsertGraphicPosRelativeV">
     <xsl:param name="relativeFrom"/>
     <xsl:param name="align"/>
 
-    <xsl:if test="$relativeFrom and $relativeFrom != ''">
-      <xsl:attribute name="style:vertical-rel">
-        <xsl:choose>
-          <xsl:when test="$relativeFrom = 'margin' ">
-            <xsl:text>page-content</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom ='page'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'topMargin'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'bottomMargin'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'insideMargin'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'outsideMargin'">
-            <xsl:text>page</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'line'">
-            <xsl:text>line</xsl:text>
-          </xsl:when>
-          <xsl:when test="$relativeFrom = 'paragraph'">
-            <xsl:text>paragraph-content</xsl:text>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:attribute>
-    </xsl:if>
+    <xsl:attribute name="style:vertical-rel">
+      <xsl:choose>
+        <xsl:when test="$relativeFrom = 'margin' ">
+          <xsl:text>page-content</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom ='page'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'topMargin'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'bottomMargin'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'insideMargin'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'outsideMargin'">
+          <xsl:text>page</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'line'">
+          <xsl:text>line</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'paragraph'">
+          <xsl:text>paragraph-content</xsl:text>
+        </xsl:when>
+        <xsl:when test="$relativeFrom = 'text' or $relativeFrom = '' ">
+          <xsl:text>paragraph-content</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:attribute>
 
     <xsl:if
       test="$relativeFrom = 'line' and ($align = 'center'  or $align =  'outside' or $align = 'bottom' ) ">
@@ -775,8 +790,8 @@
   </xsl:template>
 
   <xsl:template match="w:drawing[descendant::a:hlinkClick]">
-    <draw:a xlink:type="simple">      
-      <xsl:attribute name="xlink:href">        
+    <draw:a xlink:type="simple">
+      <xsl:attribute name="xlink:href">
         <xsl:variable name="relationshipId" select="descendant::a:hlinkClick/@r:id"/>
         <xsl:variable name="document">
           <xsl:call-template name="GetDocumentName">
@@ -785,17 +800,17 @@
         </xsl:variable>
         <xsl:variable name="relDestination">
           <xsl:call-template name="GetTarget">
-            <xsl:with-param name="document" select="$document"/>            
-            <xsl:with-param name="id" select="$relationshipId"/>            
-          </xsl:call-template>        
+            <xsl:with-param name="document" select="$document"/>
+            <xsl:with-param name="id" select="$relationshipId"/>
+          </xsl:call-template>
         </xsl:variable>
-        
+
         <xsl:call-template name="GetLinkPath">
           <xsl:with-param name="linkHref" select="$relDestination"/>
-        </xsl:call-template>        
-      </xsl:attribute>      
+        </xsl:call-template>
+      </xsl:attribute>
       <xsl:apply-templates select="wp:inline | wp:anchor"/>
     </draw:a>
-    
+
   </xsl:template>
 </xsl:stylesheet>

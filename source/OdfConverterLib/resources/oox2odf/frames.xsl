@@ -208,7 +208,8 @@
           <xsl:text>as-char</xsl:text>
         </xsl:when>
         <!-- if there is another run exept that one containing shape and shape doesn't have wrapping style set then shape should be anchored 'as-text' -->
-        <xsl:when test="ancestor::w:r/parent::node()/w:r[2] and not(w10:wrap) and (not(contains($shape/@style, 'position:absolute')) or contains($shape/@style, 'mso-position-horizontal-relative:text') or contains($shape/@style, 'mso-position-horizontal-relative:text'))">
+        <xsl:when
+          test="ancestor::w:r/parent::node()/w:r[2] and not(w10:wrap) and (not(contains($shape/@style, 'position:absolute')) or contains($shape/@style, 'mso-position-horizontal-relative:text') or contains($shape/@style, 'mso-position-horizontal-relative:text'))">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
         <xsl:when test="w10:wrap/@anchorx = 'page' and w10:wrap/@anchory = 'page'  ">
@@ -627,7 +628,7 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-    
+
     <xsl:attribute name="draw:fill-color">
       <xsl:call-template name="InsertColor">
         <xsl:with-param name="color" select="$bgColor"/>
@@ -684,15 +685,13 @@
       </xsl:otherwise>
     </xsl:choose>
 
-    <xsl:variable name="horizontalRelative">
-      <xsl:call-template name="GetShapeProperty">
-        <xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
-        <xsl:with-param name="shape" select="."/>
-      </xsl:call-template>
-    </xsl:variable>
-
     <xsl:call-template name="InsertGraphicPosRelativeH">
-      <xsl:with-param name="relativeFrom" select="$horizontalRelative"/>
+      <xsl:with-param name="relativeFrom">
+        <xsl:call-template name="GetShapeProperty">
+          <xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
+          <xsl:with-param name="shape" select="."/>
+        </xsl:call-template>
+      </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
 
@@ -847,83 +846,77 @@
 
     <xsl:variable name="textBoxInset" select="@inset"/>
 
-    <xsl:variable name="paddingLeft">
-      <xsl:call-template name="ConvertMeasure">
-        <xsl:with-param name="length">
-          <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="'1'"/>
-            <xsl:with-param name="text" select="$textBoxInset"/>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="destUnit" select="'cm'"/>
-      </xsl:call-template>
-    </xsl:variable>
-
     <xsl:attribute name="fo:padding-left">
-      <xsl:value-of select="$paddingLeft"/>
-    </xsl:attribute>
-
-    <xsl:variable name="paddingTop">
       <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
           <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="'2'"/>
+            <xsl:with-param name="elementNum" select="1"/>
             <xsl:with-param name="text" select="$textBoxInset"/>
           </xsl:call-template>
         </xsl:with-param>
         <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
-    </xsl:variable>
+    </xsl:attribute>
 
     <xsl:attribute name="fo:padding-top">
-      <xsl:value-of select="$paddingTop"/>
-    </xsl:attribute>
-
-    <xsl:variable name="paddingRight">
       <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
           <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="'3'"/>
+            <xsl:with-param name="elementNum" select="2"/>
             <xsl:with-param name="text" select="$textBoxInset"/>
           </xsl:call-template>
         </xsl:with-param>
         <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
-    </xsl:variable>
+    </xsl:attribute>
 
     <xsl:attribute name="fo:padding-right">
-      <xsl:value-of select="$paddingRight"/>
-    </xsl:attribute>
-
-    <xsl:variable name="paddingBottom">
       <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
           <xsl:call-template name="ExplodeValues">
-            <xsl:with-param name="elementNum" select="'4'"/>
+            <xsl:with-param name="elementNum" select="3"/>
             <xsl:with-param name="text" select="$textBoxInset"/>
           </xsl:call-template>
         </xsl:with-param>
         <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
-    </xsl:variable>
+    </xsl:attribute>
 
     <xsl:attribute name="fo:padding-bottom">
-      <xsl:value-of select="$paddingBottom"/>
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:call-template name="ExplodeValues">
+            <xsl:with-param name="elementNum" select="4"/>
+            <xsl:with-param name="text" select="$textBoxInset"/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="destUnit" select="'cm'"/>
+      </xsl:call-template>
     </xsl:attribute>
   </xsl:template>
 
   <xsl:template name="ExplodeValues">
     <xsl:param name="elementNum"/>
     <xsl:param name="text"/>
-    <xsl:param name="counter" select="'1'"/>
+    <xsl:param name="counter" select="1"/>
     <xsl:choose>
       <xsl:when test="$elementNum = $counter">
+        <xsl:variable name="length">
+          <xsl:choose>
+            <xsl:when test="contains($text,',')">
+              <xsl:value-of select="substring-before($text,',')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$text"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
         <xsl:choose>
-          <xsl:when test="contains($text,',')">
-            <xsl:value-of select="substring-before($text,',')"/>
-          </xsl:when>
+          <!-- default values -->
+          <xsl:when test="$length = '' and ($counter = 1 or $counter = 3)">0.1in</xsl:when>
+          <xsl:when test="$length = '' and ($counter = 2 or $counter = 4)">0.05in</xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$text"/>
+            <xsl:value-of select="$length"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
