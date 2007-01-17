@@ -159,7 +159,7 @@
         <xsl:call-template name="InsertParagraphProperties"/>
       </style:paragraph-properties>
       <!-- add text-properties to empty paragraphs. -->
-      <xsl:if test="parent::w:p[not(w:r)]/w:pPr/w:rPr">
+      <xsl:if test="parent::w:p[not(child::node())]/w:pPr/w:rPr">
         <style:text-properties>
           <xsl:call-template name="InsertTextProperties"/>
         </style:text-properties>
