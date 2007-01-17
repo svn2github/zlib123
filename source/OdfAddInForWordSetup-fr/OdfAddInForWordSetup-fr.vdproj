@@ -160,6 +160,12 @@
         "Entry"
         {
         "MsmKey" = "8:_AF2CF672DB386745CEAB7FF0F8BBC14D"
+        "OwnerKey" = "8:_511A01B9E02449EF86E487F68561FC7A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AF2CF672DB386745CEAB7FF0F8BBC14D"
         "OwnerKey" = "8:_C6056A85BC17472F8390D1B2BD96A7F2"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -173,12 +179,6 @@
         {
         "MsmKey" = "8:_AF2CF672DB386745CEAB7FF0F8BBC14D"
         "OwnerKey" = "8:_86E0F7EEA75740FBAA09CAA12E186B30"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_AF2CF672DB386745CEAB7FF0F8BBC14D"
-        "OwnerKey" = "8:_511A01B9E02449EF86E487F68561FC7A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -515,7 +515,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=0.2.3.40155, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=0.2.3.42974, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_046C90EE474A8817D1A2D2160336237E"
@@ -617,7 +617,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfWordAddinLib, Version=0.2.3.40157, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfWordAddinLib, Version=0.2.3.42975, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_511A01B9E02449EF86E487F68561FC7A"
@@ -699,7 +699,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=0.2.3.40155, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=0.2.3.42974, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_A7E2C6017FC1AA906E926ED64540BD04"
@@ -792,7 +792,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=0.2.3.40156, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=0.2.3.42974, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_AF2CF672DB386745CEAB7FF0F8BBC14D"
@@ -1144,7 +1144,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Add-In ODF pour Microsoft Word"
+        "ProductName" = "8:Add-in ODF pour Microsoft Word"
         "ProductCode" = "8:{E6738F45-D704-4D83-9E51-24695E717D09}"
         "PackageCode" = "8:{341B4E60-70C6-4FD4-BEED-568C604934FA}"
         "UpgradeCode" = "8:{429EF697-737F-49D5-A58E-8C8C81FCD580}"
@@ -1156,11 +1156,11 @@
         "Manufacturer" = "8:Clever Age"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:Add-In ODF pour Microsoft Word"
+        "Title" = "8:Add-in ODF pour Microsoft Word"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Clever Age"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:Add-In ODF pour Microsoft Word"
+        "ARPCOMMENTS" = "8:Add-in ODF pour Microsoft Word"
         "ARPURLINFOABOUT" = "8:"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
