@@ -1013,9 +1013,15 @@
       <!-- otherwise, look into styles.xml (add the offset) -->
       <xsl:otherwise>
         <xsl:for-each select="document('styles.xml')">
-          <xsl:value-of
-            select="count(key('list-style', $styleName)/preceding-sibling::text:list-style)+2+$automaticListStylesCount"
-          />
+          <xsl:choose>
+            <xsl:when test="key('list-style', $styleName)">
+              <xsl:value-of
+                select="count(key('list-style', $styleName)/preceding-sibling::text:list-style)+2+$automaticListStylesCount"
+              />
+            </xsl:when>
+            <!-- protection against lack of style : use default list -->
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>
         </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
