@@ -114,7 +114,7 @@
       <xsl:otherwise>
         <w:fldSimple>
           <xsl:if test="@number:automatic-order='true' ">
-            <xsl:message terminate="no">feedback:Date format</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.dateFormat</xsl:message>
           </xsl:if>
           <xsl:variable name="curStyle" select="@style:data-style-name"/>
           <xsl:variable name="fieldType">
@@ -385,7 +385,7 @@
   <xsl:template match="text:chapter" mode="paragraph">
     <xsl:if test="@text:outline-level">
       <!-- COMMENT : if the style changes name in the application, it may not be found and cause an error. -->
-      <xsl:message terminate="no">feedback:Chapter field (if style not defined)</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.chapterField</xsl:message>
 
       <xsl:variable name="outline-level" select="@text:outline-level"/>
       <!-- find the style to match -->
@@ -588,25 +588,25 @@
 
   <!-- report lost fields -->
   <xsl:template match="text:description" mode="paragraph">
-    <xsl:message terminate="no">feedback:Description field</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.descriptionField</xsl:message>
   </xsl:template>
 
   <xsl:template match="text:printed-by" mode="paragraph">
-    <xsl:message terminate="no">feedback:Printed-by field</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.printedByField</xsl:message>
   </xsl:template>
 
   <xsl:template match="text:page-variable-set | text:page-variable-get" mode="paragraph">
-    <xsl:message terminate="no">feedback:Page variable field</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.pageVariableField</xsl:message>
     <xsl:apply-templates mode="paragraph"/>
   </xsl:template>
 
   <xsl:template match="text:dde-connection-decls[text:dde-connection-decl/@text:name]">
     <!-- lost because not in the spec, although DDE and DDEAUTO are available in Word -->
-    <xsl:message terminate="no">feedback:DDE Connection</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.ddeConnection</xsl:message>
   </xsl:template>
 
   <xsl:template match="text:expression" mode="paragraph">
-    <xsl:message terminate="no">feedback:Formula field</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.formulaField</xsl:message>
     <xsl:apply-templates mode="paragraph"/>
   </xsl:template>
 

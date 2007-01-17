@@ -447,11 +447,11 @@
                 <xsl:choose>
                   <!--   ignore embedded text-box and draw:rect becouse word doesn't support it-->
                   <xsl:when test="self::node()[name(draw:text-box|draw:rect)]">
-                    <xsl:message terminate="no">feedback:Nested frames</xsl:message>
+                    <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
                   </xsl:when>
                   <!-- warn loss of positioning for embedded drawn objects or pictures -->
                   <xsl:when test="contains(name(), 'draw:')">
-                    <xsl:message terminate="no">feedback:Position of object inside text-box</xsl:message>
+                    <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
                     <w:p>
                       <xsl:apply-templates select="." mode="paragraph"/>
                     </w:p>
@@ -471,11 +471,11 @@
                   <xsl:choose>
                     <!--   ignore embedded text-box and draw:rect becouse word doesn't support it-->
                     <xsl:when test="self::node()[name(draw:text-box|draw:rect)]">
-                      <xsl:message terminate="no">feedback:Nested frames</xsl:message>
+                      <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
                     </xsl:when>
                     <!-- warn loss of positioning for embedded drawn objects or pictures -->
                     <xsl:when test="contains(name(), 'draw:')">
-                      <xsl:message terminate="no">feedback:Position of object inside text-box</xsl:message>
+                      <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
                       <w:p>
                         <xsl:apply-templates select="." mode="paragraph"/>
                       </w:p>

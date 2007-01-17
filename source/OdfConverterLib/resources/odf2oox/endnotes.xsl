@@ -68,13 +68,13 @@
       <xsl:for-each select="document('content.xml')">
         <!-- warn loss of page break before endnotes -->
         <xsl:if test="key('endnotes', '')">
-          <xsl:message terminate="no">feedback:Page break before endnotes</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.pageBreakBeforeEndnotes</xsl:message>
         </xsl:if>
         <xsl:for-each select="key('endnotes', '')">
           <w:endnote w:type="normal" w:id="{position() + 1}">
             <!-- warn if list in note -->
             <xsl:if test="text:note-body/descendant-or-self::text:list">
-              <xsl:message terminate="no">feedback:Note in list</xsl:message>
+              <xsl:message terminate="no">translation.odf2oox.noteInList</xsl:message>
             </xsl:if>
             <xsl:apply-templates select="text:note-body"/>
           </w:endnote>

@@ -44,12 +44,12 @@
   <xsl:template match="table:table">
     <!-- warn if subtable -->
     <xsl:if test="@table:is-sub-table='true' ">
-      <xsl:message terminate="no">feedback:Subtable borders and padding</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.subtableBordersPadding</xsl:message>
     </xsl:if>
     <!-- warn if consecutive tables -->
     <xsl:if
       test="preceding-sibling::table:table[not(@table:is-sub-table='true')] and not(@table:is-sub-table='true')">
-      <xsl:message terminate="no">feedback:Consecutive tables</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.consecutiveTables</xsl:message>
     </xsl:if>
     <w:tbl>
       <xsl:call-template name="MarkMasterPage"/>
@@ -66,10 +66,10 @@
       <xsl:call-template name="InsertTblGrid"/>
       <!-- Header rows not handled the same way in OOX -->
       <xsl:if test="table:table-header-rows/table:table-row">
-        <xsl:message terminate="no">feedback:Table header repeated on every page</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.tableHeaderRepeated</xsl:message>
       </xsl:if>
       <xsl:if test="count(table:table-header-rows/table:table-row) &gt; 1">
-        <xsl:message terminate="no">feedback:Table header rows</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.tableHeaderRows</xsl:message>
       </xsl:if>
       <xsl:apply-templates select="table:table-header-rows/table:table-row | table:table-row"/>
     </w:tbl>
@@ -84,16 +84,16 @@
 
     <!-- report lost attributes -->
     <xsl:if test="$tableProp/@fo:keep-with-next">
-      <xsl:message terminate="no">feedback:Table together with next paragraph</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.tableTogetherWithParagraph</xsl:message>
     </xsl:if>
     <xsl:if test="not($tableProp/@style:may-break-between-rows='true')">
-      <xsl:message terminate="no">feedback:Unsplitable table</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.unsplitableTable</xsl:message>
     </xsl:if>
     <xsl:if test="$tableProp/@style:background-image">
-      <xsl:message terminate="no">feedback:Table background image</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.tableBgImage</xsl:message>
     </xsl:if>
     <xsl:if test="$tableProp/@style:shadow">
-      <xsl:message terminate="no">feedback:Table shadow</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.tableShadow</xsl:message>
     </xsl:if>
 
     <!-- table width -->
@@ -124,7 +124,7 @@
       <xsl:choose>
         <xsl:when test="$tableProp/@table:align = 'margins'">
           <!--User agents that do not support the "margins" value, may treat this value as "left".-->
-          <xsl:message terminate="no">feedback:Manual alignment of table</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.tableManualAlignment</xsl:message>
           <w:jc w:val="left"/>
         </xsl:when>
         <xsl:otherwise>
@@ -174,16 +174,16 @@
 
     <!-- report lost attributes -->
     <xsl:if test="$tableProp/@fo:keep-with-next">
-      <xsl:message terminate="no">feedback:Table together with next paragraph</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.tableTogetherWithParagraph</xsl:message>
     </xsl:if>
     <xsl:if test="not($tableProp/@style:may-break-between-rows='true')">
-      <xsl:message terminate="no">feedback:Unsplitable table</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.unsplitableTable</xsl:message>
     </xsl:if>
     <xsl:if test="$tableProp/@style:background-image">
-      <xsl:message terminate="no">feedback:Table background image</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.tableBgImage</xsl:message>
     </xsl:if>
     <xsl:if test="$tableProp/@style:shadow">
-      <xsl:message terminate="no">feedback:Table shadow</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.tableShadow</xsl:message>
     </xsl:if>
 
     <w:tblW>
@@ -452,7 +452,7 @@
         </xsl:with-param>
       </xsl:apply-templates>
       <xsl:if test="*[position() &gt;= 64]">
-        <xsl:message terminate="no">feedback:Table with more than 64 columns</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.tableWith64Columns</xsl:message>
       </xsl:if>
     </w:tr>
     <xsl:if test="$number > 1">
@@ -468,7 +468,7 @@
     <!-- report lost attributes -->
     <xsl:if
       test="key('automatic-styles',@table:style-name)/style:table-row-properties/@style:background-image">
-      <xsl:message terminate="no">feedback:Row background image</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.rowBgImage</xsl:message>
     </xsl:if>
 
     <xsl:call-template name="InsertRowHeaderMark"/>
@@ -582,25 +582,25 @@
 
     <!-- report lost attributes -->
     <xsl:if test="$cellProp/@style:cell-protect">
-      <xsl:message terminate="no">feedback:Protected cell</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.protectedCell</xsl:message>
     </xsl:if>
     <xsl:if test="$cellProp/@style:background-image">
-      <xsl:message terminate="no">feedback:Cell background image</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.cellBgImage</xsl:message>
     </xsl:if>
     <xsl:if test="$tableProp/@style:shadow">
-      <xsl:message terminate="no">feedback:Cell shadow</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.cellShadow</xsl:message>
     </xsl:if>
     <xsl:if test="$tableProp/@style:print-content = 'false' ">
-      <xsl:message terminate="no">feedback:Cell content not printed</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.cellContentNotPrinted</xsl:message>
     </xsl:if>
     <xsl:if test="$tableProp/@style:repeat-content = 'true' ">
-      <xsl:message terminate="no">feedback:Cell content repeated</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.cellContentRepeated</xsl:message>
     </xsl:if>
     <xsl:if test="$tableProp/@style:rotation-angle">
-      <xsl:message terminate="no">feedback:Cell rotation angle</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.cellRotationAngle</xsl:message>
     </xsl:if>
     <xsl:if test="$tableProp/@style:rotation-align">
-      <xsl:message terminate="no">feedback:Cell rotation alignment</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.cellRotationAlignment</xsl:message>
     </xsl:if>
 
     <xsl:call-template name="InsertCellWidth">

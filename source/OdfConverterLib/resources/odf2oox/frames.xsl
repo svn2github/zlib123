@@ -115,7 +115,9 @@
     <xsl:variable name="support">
       <xsl:choose>
         <xsl:when test="contains($name, '.svm')">
-          <xsl:message terminate="no">feedback:SVM image</xsl:message> false </xsl:when>
+          <xsl:message terminate="no">translation.odf2oox.svmImage</xsl:message>
+          <xsl:text>false</xsl:text>
+        </xsl:when>
         <!-- WMF images inside text-box are properly displayed in Word 2007, but cause an opening crash in prior Word versions -->
         <!--xsl:when test="contains($name, '.wmf') and ancestor::draw:text-box">
           <xsl:message terminate="no">feedback:WMF image inside text-box</xsl:message> false </xsl:when-->
@@ -198,24 +200,24 @@
   <xsl:template match="draw:frame[./draw:object]" mode="paragraph">
     <!-- insert link to TOC field when required (user indexes) -->
     <!--sl:call-template name="InsertTCField"/-->
-    <xsl:message terminate="no">feedback:Embedded object</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.embeddedObject</xsl:message>
   </xsl:template>
 
   <!-- plugin (for instance audio and video content) -->
   <xsl:template match="draw:plugin" mode="paragraph">
-    <xsl:message terminate="no">feedback:Embedded file with plug-in</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.embeddedPluginFile</xsl:message>
   </xsl:template>
 
   <!-- plugin (for instance audio and video content) -->
   <xsl:template match="draw:applet" mode="paragraph">
-    <xsl:message terminate="no">feedback:Applet</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.applet</xsl:message>
   </xsl:template>
 
   <!-- plugin (for instance audio and video content) -->
   <xsl:template match="draw:floating-frame" mode="paragraph">
     <!-- insert link to TOC field when required (user indexes) -->
     <!--sl:call-template name="InsertTCField"/-->
-    <xsl:message terminate="no">feedback:Floating frame</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.floatingFrame</xsl:message>
   </xsl:template>
 
   <!-- conversion of external images -->
@@ -533,7 +535,7 @@
             <a:blip r:embed="{generate-id(draw:image)}"/>
             <xsl:if
               test="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip">
-              <xsl:message terminate="no">feedback:Cropped image</xsl:message>
+              <xsl:message terminate="no">translation.odf2oox.croppedImage</xsl:message>
               <xsl:call-template name="InsertImageCropProperties">
                 <xsl:with-param name="clip"
                   select="key('automatic-styles', @draw:style-name)/style:graphic-properties/@fo:clip"
@@ -2333,7 +2335,7 @@
       <xsl:choose>
         <xsl:when test="contains($shapeProperties/@style:rel-width, 'scale')">
           <!-- warn loss of scaled images (scale, scale-min) -->
-          <xsl:message terminate="no">feedback:Scaled image</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.scaledImage</xsl:message>
         </xsl:when>
         <xsl:otherwise>
           <xsl:variable name="relWidth"
@@ -2352,7 +2354,7 @@
       <xsl:choose>
         <xsl:when test="contains($shapeProperties/@style:rel-height, 'scale')">
           <!-- warn loss of scaled images (scale, scale-min) -->
-          <xsl:message terminate="no">feedback:Scaled image</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.scaledImage</xsl:message>
         </xsl:when>
         <xsl:otherwise>
           <xsl:variable name="relHeight"
@@ -3123,7 +3125,7 @@
     <xsl:param name="shapeProperties"/>
     <!-- report lost properties -->
     <xsl:if test="$shapeStyle/style:graphic-properties/@draw:textarea-vertical-align != 'top' ">
-      <xsl:message terminate="no">feedback:Vertical alignment of text inside text-box</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.valignInsideTextbox</xsl:message>
     </xsl:if>
 
     <xsl:if test="$shapeProperties/@draw:name">
@@ -3258,7 +3260,7 @@
         <w10:wrap type="square" side="right"/>
       </xsl:when>
       <xsl:when test="$frameWrap = 'none'">
-        <xsl:message terminate="no">feedback:Shape top-and-bottom wrapping</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.shapeTopBottomWrapping</xsl:message>
         <w10:wrap type="topAndBottom"/>
       </xsl:when>
       <xsl:when test="$frameWrap = 'parallel' ">
@@ -3336,7 +3338,7 @@
               <xsl:text>mso-rotate:180:</xsl:text>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:message terminate="no">feedback:Text orientation in text-box</xsl:message>
+              <xsl:message terminate="no">translation.odf2oox.textOrientationInsideTextbox</xsl:message>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>
@@ -3352,12 +3354,12 @@
           <xsl:choose>
             <!--   ignore embedded text-box and draw:rect becouse word doesn't support it-->
             <xsl:when test="self::node()[name(draw:text-box|draw:rect)]">
-              <xsl:message terminate="no">feedback:Nested frames</xsl:message>
+              <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
             </xsl:when>
 
             <!-- warn loss of positioning for embedded drawn objects or pictures -->
             <xsl:when test="contains(name(), 'draw:')">
-              <xsl:message terminate="no">feedback:Position of object inside text-box</xsl:message>
+              <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
               <w:p>
                 <xsl:apply-templates select="." mode="paragraph"/>
               </w:p>

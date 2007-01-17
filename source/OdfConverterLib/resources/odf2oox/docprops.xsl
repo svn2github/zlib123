@@ -56,10 +56,10 @@
   <xsl:template match="/office:document-meta/office:meta" mode="core">
     <!-- report lost properties -->
     <xsl:if test="meta:auto-reload">
-      <xsl:message terminate="no">feedback:Internet properties</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.internetProperties</xsl:message>
     </xsl:if>
     <xsl:if test="meta:hyperlink-behaviour">
-      <xsl:message terminate="no">feedback:Internet properties</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.internetProperties</xsl:message>
     </xsl:if>
     <!-- creation date -->
     <xsl:if test="meta:creation-date">
@@ -78,7 +78,7 @@
           </dcterms:created>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:message terminate="no">feedback:Document creation date</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.documentCreationDate</xsl:message>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
@@ -144,7 +144,7 @@
           </dcterms:modified>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:message terminate="no">feedback:Document last modification date</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.documentModificationDate</xsl:message>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>

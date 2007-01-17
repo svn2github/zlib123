@@ -56,7 +56,7 @@
         <xsl:if
           test="document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']/text:footnote-continuation-notice-forward
           or document('styles.xml')/office:document-styles/office:styles/text:notes-configuration[@text:note-class='footnote']/text:footnote-continuation-notice-backward">
-          <xsl:message terminate="no">feedback:Footnote continuation separator</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.footnoteContinuationSeparator</xsl:message>
         </xsl:if>
         <w:p>
           <w:pPr>
@@ -77,7 +77,7 @@
           <w:footnote w:type="normal" w:id="{position() + 1}">
             <!-- warn if list in note -->
             <xsl:if test="text:note-body/descendant-or-self::text:list">
-              <xsl:message terminate="no">feedback:Note in list</xsl:message>
+              <xsl:message terminate="no">translation.odf2oox.noteInList</xsl:message>
             </xsl:if>
             <xsl:apply-templates select="text:note-body"/>
           </w:footnote>
@@ -100,20 +100,20 @@
       <xsl:for-each select="document('content.xml')">
         <xsl:if test="key('footnotes', '')">
           <xsl:if test="$separatorProps/@style:width">
-            <xsl:message terminate="no">feedback:Footnote separator width</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.footnoteSeparatorWidth</xsl:message>
           </xsl:if>
           <xsl:if test="$separatorProps/@style:rel-width">
-            <xsl:message terminate="no">feedback:Footnote separator length</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.footnoteSeparatorLength</xsl:message>
           </xsl:if>
           <xsl:if test="$separatorProps/@style:color">
-            <xsl:message terminate="no">feedback:Footnote separator color</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.footnoteSeparatorColor</xsl:message>
           </xsl:if>
           <xsl:if test="$separatorProps/@style:line-style">
-            <xsl:message terminate="no">feedback:Footnote separator style</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.footnoteSeparatorStyle</xsl:message>
           </xsl:if>
           <xsl:if
             test="$separatorProps/parent::style:page-layout-properties/@style:footnote-max-height">
-            <xsl:message terminate="no">feedback:Footnote maximum height</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.footnoteMaximumHeight</xsl:message>
           </xsl:if>
         </xsl:if>
       </xsl:for-each>

@@ -80,7 +80,7 @@
       <!-- warn if more than one master page style -->
       <xsl:if
         test="count(document('styles.xml')/office:document-styles/office:master-styles/style:master-page) &gt; 1">
-        <xsl:message terminate="no">feedback:Page layout</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.pageLayout</xsl:message>
       </xsl:if>
     </w:styles>
   </xsl:template>
@@ -249,10 +249,10 @@
   <xsl:template match="style:paragraph-properties" mode="pPr">
     <!-- report lost attributes -->
     <xsl:if test="@fo:text-align-last">
-      <xsl:message terminate="no">feedback:Alignment of last line</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.alignmentLastLine</xsl:message>
     </xsl:if>
     <xsl:if test="@style:background-image">
-      <xsl:message terminate="no">feedback:Paragraph background image</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.paragraphBgImage</xsl:message>
     </xsl:if>
 
     <!-- keep with next -->
@@ -271,7 +271,7 @@
         <w:pageBreakBefore/>
       </xsl:when>
       <xsl:when test="@fo:break-before='auto'">
-        <xsl:message terminate="no">feedback:Automatic page break</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.automaticPageBreak</xsl:message>
         <w:pageBreakBefore w:val="off"/>
       </xsl:when>
       <xsl:otherwise/>
@@ -281,7 +281,7 @@
     <xsl:choose>
       <xsl:when test="@fo:widows != '0' or @fo:orphans != '0'">
         <xsl:if test="@fo:widows &gt; 2 or @fo:orphans &gt; 2">
-          <xsl:message terminate="no">feedback:Widows and orphans number</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.numberWidowsOrphans</xsl:message>
         </xsl:if>
         <w:widowControl w:val="on"/>
       </xsl:when>
@@ -714,10 +714,10 @@
 
     <!-- report lost attributes -->
     <xsl:if test="@style:text-blinking">
-      <xsl:message terminate="no">feedback:Blinking text</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.blinkingText</xsl:message>
     </xsl:if>
     <xsl:if test="@style:text-rotation-angle or @style:text-rotation-scale">
-      <xsl:message terminate="no">feedback:Rotated text</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.rotatedText</xsl:message>
     </xsl:if>
 
     <!-- fonts -->
@@ -793,7 +793,7 @@
         <xsl:when test="@fo:font-weight != 'normal'">
           <xsl:choose>
             <xsl:when test="@fo:font-weight != 'bold' and number(@fo:font-weight)">
-              <xsl:message terminate="no">feedback:Font weight</xsl:message>
+              <xsl:message terminate="no">translation.odf2oox.fontWeight</xsl:message>
             </xsl:when>
             <xsl:otherwise>
               <w:b w:val="on"/>
@@ -846,11 +846,11 @@
         </xsl:when>
         <xsl:when test="@fo:text-transform = 'capitalize'">
           <!-- no equivalent of capitalize in OOX spec -->
-          <xsl:message terminate="no">feedback:Capitalized text</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.capitalizedText</xsl:message>
           <w:caps w:val="off"/>
         </xsl:when>
         <xsl:when test="@fo:text-transform = 'lowercase'">
-          <xsl:message terminate="no">feedback:Lowercase text</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.lowercaseText</xsl:message>
           <w:caps w:val="off"/>
         </xsl:when>
         <xsl:when test="@fo:text-transform = 'none' or @fo:font-variant = 'small-caps'">
@@ -978,7 +978,8 @@
               <xsl:value-of select="$scale"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:message terminate="no">feedback:Text scale greater than 600%</xsl:message> 600
+              <xsl:message terminate="no">translation.odf2oox.textScale600pct</xsl:message>
+              <xsl:text>600</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
@@ -1531,7 +1532,7 @@
             <xsl:value-of select="'heavy'"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:message terminate="no">feedback:Leader text</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.leaderText</xsl:message>
             <xsl:value-of select="'none'"/>
           </xsl:otherwise>
         </xsl:choose>
@@ -1640,7 +1641,7 @@
     <!-- background color lost if it is not main layout -->
     <xsl:if
       test="@fo:background-color != 'transparent' and parent::style:page-layout/@style:name != $default-master-style/@style:page-layout-name">
-      <xsl:message terminate="no">feedback:Page background color</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.pageBgColor</xsl:message>
     </xsl:if>
     <!-- page type -->
     <!-- TODO : review. This entails a page jump on an even or odd page with a potential unwanted blank page in between... -->
@@ -1691,7 +1692,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:if test="@style:paper-tray-name != '' ">
-          <xsl:message terminate="no">feedback:Paper tray</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.paperTray</xsl:message>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
@@ -1731,7 +1732,7 @@
         <w:lnNumType>
           <xsl:if
             test="@text:style-name or @style:num-format or @text:number-position or @text:count-text-boxes or @text:restart-on-page or @text:linenumbering-separator">
-            <xsl:message terminate="no">feedback:Line numbering</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.lineNumbering</xsl:message>
           </xsl:if>
           <xsl:if test="@text:increment">
             <xsl:attribute name="w:countBy">
@@ -1806,10 +1807,10 @@
     <!-- this attribute exists when the user choose to automatically adapt the header/footer height,
           otherwise svg:height is used and it gives the exact header/footer height -->
     <xsl:if test="$header-properties/@fo:min-height">
-      <xsl:message terminate="no">feedback:Header distance</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.headerDistance</xsl:message>
     </xsl:if>
     <xsl:if test="$footer-properties/@fo:min-height">
-      <xsl:message terminate="no">feedback:Footer distance</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.footerDistance</xsl:message>
     </xsl:if>
     <w:pgMar>
       <xsl:if
@@ -1971,7 +1972,7 @@
       <!-- separator -->
       <xsl:if test="style:column-sep">
         <!-- report lost attributes -->
-        <xsl:message terminate="no">feedback:Column separator attributes</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.columnSeparatorAttributes</xsl:message>
         <xsl:attribute name="w:sep">
           <xsl:value-of select="1"/>
         </xsl:attribute>
@@ -2171,7 +2172,7 @@
       </xsl:when>
       <xsl:when test="$node/@style:shadow != 'none' ">
         <!-- border shadow may not be displayed properly -->
-        <xsl:message terminate="no">feedback:Paragraph/page shadow</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.paragraphPageShadow</xsl:message>
         <xsl:variable name="firstShadow">
           <xsl:value-of select=" substring-before(substring-after($node/@style:shadow, ' '), ' ')"/>
         </xsl:variable>
@@ -2216,7 +2217,7 @@
     <!-- insert shadow -->
     <xsl:if test="$node/@style:shadow != 'none' ">
       <!-- border shadow may not be displayed properly -->
-      <xsl:message terminate="no">feedback:Paragraph/page shadow</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.paragraphPageShadow</xsl:message>
       <xsl:variable name="firstShadow">
         <xsl:value-of select=" substring-before(substring-after($node/@style:shadow, ' '), ' ')"/>
       </xsl:variable>
@@ -2358,12 +2359,12 @@
       <xsl:choose>
         <xsl:when test="$side = 'top' and contains($secondShadow,'-')">
           <!-- border shadow may not be displayed properly -->
-          <xsl:message terminate="no">feedback:Paragraph/page shadow</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.paragraphPageShadow</xsl:message>
           <xsl:attribute name="w:shadow">true</xsl:attribute>
         </xsl:when>
         <xsl:when test="$side = 'left' and contains($firstShadow,'-')">
           <!-- border shadow may not be displayed properly -->
-          <xsl:message terminate="no">feedback:Paragraph/page shadow</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.paragraphPageShadow</xsl:message>
           <xsl:attribute name="w:shadow">true</xsl:attribute>
         </xsl:when>
         <xsl:when test="$side = 'bottom' and not(contains($secondShadow,'-'))">

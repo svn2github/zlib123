@@ -335,8 +335,10 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$result > 31"><xsl:message terminate="no">feedback:Padding
-        shortened</xsl:message>31</xsl:when>
+      <xsl:when test="$result > 31">
+        <xsl:message terminate="no">translation.odf2oox.paddingShortened</xsl:message>
+        <xsl:text>31</xsl:text>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$result"/>
       </xsl:otherwise>
@@ -351,8 +353,10 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$result > 620"><xsl:message terminate="no">feedback:Padding
-        shortened</xsl:message>620</xsl:when>
+      <xsl:when test="$result > 620">
+        <xsl:message terminate="no">translation.odf2oox.paddingShortened</xsl:message>
+        <xsl:text>620</xsl:text>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$result"/>
       </xsl:otherwise>
@@ -366,15 +370,15 @@
     <xsl:param name="unit"/>
     <xsl:choose>
       <xsl:when test="$unit = 'twips' and $length &gt; 240">
-        <xsl:message terminate="no">feedback:Border shortened</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.borderShortened</xsl:message>
         <xsl:text>240</xsl:text>
       </xsl:when>
       <xsl:when test="$unit = 'eightspoint' and $length &gt; 96">
-        <xsl:message terminate="no">feedback:Border shortened</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.borderShortened</xsl:message>
         <xsl:text>96</xsl:text>
       </xsl:when>
       <xsl:when test="$unit = 'emu' and $length &gt; 152400">
-        <xsl:message terminate="no">feedback:Border shortened</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.borderShortened</xsl:message>
         <xsl:text>152400</xsl:text>
       </xsl:when>
       <xsl:otherwise>
@@ -453,8 +457,10 @@
       <xsl:when test="$code='FF0000'">red</xsl:when>
       <xsl:when test="$code='FFFFFF'">white</xsl:when>
       <xsl:when test="$code='FFFF00'">yellow</xsl:when>
-      <xsl:otherwise><xsl:message terminate="no">feedback:Text background
-      color</xsl:message>yellow</xsl:otherwise>
+      <xsl:otherwise>
+        <xsl:message terminate="no">translation.odf2oox.textBgColor</xsl:message>
+        <xsl:text>yellow</xsl:text>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 

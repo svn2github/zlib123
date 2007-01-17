@@ -172,7 +172,7 @@
 
       <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
       <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
-        <xsl:message terminate="no">feedback:Nested frames</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
         <xsl:apply-templates select="child::node()[not(descendant-or-self::draw:text-box)]" mode="paragraph"/>
       </xsl:when>
 
@@ -180,7 +180,7 @@
       <xsl:when test="child::draw:frame">
         <xsl:choose>
           <xsl:when test="ancestor::draw:text-box">
-            <xsl:message terminate="no">feedback:Position of object inside text-box</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
             <xsl:variable name="wrapping">
               <xsl:call-template name="GetGraphicProperties">
                 <xsl:with-param name="shapeStyle"
@@ -207,7 +207,7 @@
       <xsl:when test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape">
         <!-- warn loss of positioning for embedded drawn objects or pictures -->
         <xsl:if test="ancestor::draw:text-box">
-          <xsl:message terminate="no">feedback:Position of object inside text-box</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
         </xsl:if>
         <xsl:apply-templates mode="shapes"/>
       </xsl:when>
@@ -651,11 +651,11 @@
 
       <!--annotation embedded in text-box is not supported in Word-->
       <xsl:when test="ancestor::draw:text-box">
-        <xsl:message terminate="no">feedback:Annotations in text-box</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.annotationsInsideTextbox</xsl:message>
       </xsl:when>
       <xsl:when
         test="ancestor::style:header or ancestor::style:header-left or ancestor::style:footer or ancestor::style:footer-left">
-        <xsl:message terminate="no">feedback:Annotations in header or footer</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.annotationsInsideHeaderFooter</xsl:message>
       </xsl:when>
       <!--default scenario-->
       <xsl:otherwise>
@@ -698,10 +698,10 @@
         <w:hyperlink r:id="{generate-id()}" w:history="1">
           <!-- warn loss of hyperlink properties -->
           <xsl:if test="@office:name">
-            <xsl:message terminate="no">feedback:Name of hyperlink</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.hyperlinkName</xsl:message>
           </xsl:if>
           <xsl:if test="@text:visited-style-name">
-            <xsl:message terminate="no">feedback:Style of visited link</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.visitedLinkStyle</xsl:message>
           </xsl:if>
           <xsl:if test="@office:target-frame-name">
             <xsl:attribute name="w:tgtFrame">
@@ -1076,18 +1076,18 @@
   <!-- Sections -->
   <!-- Hidden sections -->
   <xsl:template match="text:section[@text:display = 'none' ]" priority="3">
-    <xsl:message terminate="no">feedback:Hidden section</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.hiddenSection</xsl:message>
   </xsl:template>
 
   <!-- Conditional hidden sections -->
   <xsl:template match="text:section[@text:is-hidden = 'true' ]" priority="3">
-    <xsl:message terminate="no">feedback:Conditional hidden section</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.conditionalHiddenSection</xsl:message>
   </xsl:template>
 
   <!-- Protected sections -->
   <xsl:template match="text:section[@text:protected = 'true' ]" priority="2">
     <xsl:if test="@text:protection-key">
-      <xsl:message terminate="no">feedback:Protection key for<xsl:value-of select="@text:name"
+      <xsl:message terminate="no">translation.odf2oox.protectionKey<xsl:value-of select="@text:name"
       /></xsl:message>
     </xsl:if>
     <xsl:choose>
@@ -1187,7 +1187,7 @@
 
   <xsl:template name="InsertDropCapAttributes">
     <xsl:param name="dropcap"/>
-    <xsl:message terminate="no">feedback:Dropcap size</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.dropcapSize</xsl:message>
 
     <!-- if @style:lines is 0 or 1 dropcap is disabled -->
     <xsl:if test="$dropcap[@style:lines &gt; 1]">

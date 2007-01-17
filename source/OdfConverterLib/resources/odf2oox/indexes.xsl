@@ -153,7 +153,7 @@
       <w:instrText xml:space="preserve">\a </w:instrText>
     </xsl:if>
     <xsl:if test="parent::text:index-body/preceding-sibling::*/@text:caption-sequence-format = 'category-and-value' ">
-      <xsl:message terminate="no">feedback:Table of illustration caption format</xsl:message>
+      <xsl:message terminate="no">"translation.odf2oox.TableIllustrationCaptionFormat</xsl:message>
     </xsl:if>
   </xsl:template>
 
@@ -173,7 +173,7 @@
     <xsl:choose>
       <xsl:when
         test="key('styles', ancestor-or-self::text:alphabetical-index/@text:style-name)/style:section-properties/style:columns/@fo:column-count >4">
-        <xsl:message terminate="no">feedback:Alphabetical index column number</xsl:message>
+        <xsl:message terminate="no">translation.odf2oox.alphabeticalIndexColumnNumber</xsl:message>
         <w:instrText xml:space="preserve">\c "4" </w:instrText>
       </xsl:when>
       <xsl:when
@@ -958,31 +958,27 @@
     </xsl:variable>
     <xsl:if test="*/@text:index-scope = 'chapter' ">
       <xsl:message terminate="no">
-        <xsl:text>feedback:Index '</xsl:text>
+        <xsl:text>translation.odf2oox.indexChapterScope</xsl:text>
         <xsl:value-of select="$indexName"/>
-        <xsl:text>' chapter scope</xsl:text>
       </xsl:message>
     </xsl:if>
     <xsl:if test="*/@text:relative-tab-stop-position = 'false' ">
       <xsl:message terminate="no">
-        <xsl:text>feedback:Index '</xsl:text>
+        <xsl:text>translation.odf2oox.indexIndentProperty</xsl:text>
         <xsl:value-of select="$indexName"/>
-        <xsl:text>' indent property</xsl:text>
       </xsl:message>
     </xsl:if>
     <xsl:if test="*/@text:sort-algorithm">
       <xsl:message terminate="no">
-        <xsl:text>feedback:Index '</xsl:text>
+        <xsl:text>translation.odf2oox.indexSortAlgorithm</xsl:text>
         <xsl:value-of select="$indexName"/>
-        <xsl:text>' sort algorithm</xsl:text>
       </xsl:message>
     </xsl:if>
     <!-- report loss of toc protection -->
     <xsl:if test="@text:protected = 'true' ">
       <xsl:message terminate="no">
-        <xsl:text>feedback:Index '</xsl:text>
+        <xsl:text>translation.odf2oox.indexProtection</xsl:text>
         <xsl:value-of select="$indexName"/>
-        <xsl:text>' protection</xsl:text>
       </xsl:message>
     </xsl:if>
     <xsl:apply-templates/>
@@ -990,7 +986,7 @@
 
   <!-- loss of concordance file -->
   <xsl:template match="text:alphabetical-index-auto-mark-file">
-    <xsl:message terminate="no">feedback:Alphabetical index concordance file</xsl:message>
+    <xsl:message terminate="no">translation.odf2oox.alphabeticalIndexConcordanceFile</xsl:message>
   </xsl:template>
 
 </xsl:stylesheet>

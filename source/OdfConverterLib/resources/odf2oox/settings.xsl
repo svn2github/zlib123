@@ -129,7 +129,7 @@
             <xsl:choose>
               <xsl:when
                 test="$configuration-settings/config:config-item[@config:name='AddParaTableSpacingAtStart']/text()='false'">
-                <xsl:message terminate="no">feedback:Spacing at top of page/table</xsl:message>
+                <xsl:message terminate="no">translation.odf2oox.spacingTopPageAndTable</xsl:message>
                 <xsl:value-of select="'true'"/>
               </xsl:when>
               <xsl:otherwise>

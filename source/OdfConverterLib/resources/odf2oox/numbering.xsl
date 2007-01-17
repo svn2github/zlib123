@@ -148,7 +148,7 @@
     <!-- report lost features -->
     <xsl:if
       test="style:list-level-properties/@style:vertical-pos|style:list-level-properties/@style:horizontal-pos">
-      <xsl:message terminate="no">feedback:List bullet alignment</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.listBulletAlignment</xsl:message>
     </xsl:if>
 
     <!-- odf supports list level up to 10-->
@@ -365,7 +365,7 @@
     </xsl:variable>
     <!-- report lost min-label-distance -->
     <xsl:if test="$minLabelDistanceTwip != 0">
-      <xsl:message terminate="no">feedback:Distance between numbering and text</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.distanceNumberingText</xsl:message>
     </xsl:if>
 
     <!-- If @text:display-levels is defined and greater than 1, the tabs may not be well converted. -->
@@ -1123,7 +1123,7 @@
         </xsl:variable>
         <!-- report lost distance because of displayed levels -->
         <xsl:if test="$displayedLevels &gt; 1">
-          <xsl:message terminate="no">feedback:Distance between numbering and text</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.distanceNumberingText</xsl:message>
         </xsl:if>
 
         <!-- Minimum width of a number -->
@@ -1154,7 +1154,7 @@
         </xsl:variable>
         <!-- report lost min-label-distance -->
         <xsl:if test="$minLabelDistanceTwip != 0">
-          <xsl:message terminate="no">feedback:Distance between numbering and text</xsl:message>
+          <xsl:message terminate="no">translation.odf2oox.distanceNumberingText</xsl:message>
         </xsl:if>
 
         <!-- dispatch to appropriate property -->
