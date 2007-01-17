@@ -2874,7 +2874,7 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:if test="@w:ascii">
+    <xsl:if test="@w:ascii and not(ancestor::w:lvl)">
       <xsl:attribute name="style:font-name">
         <xsl:value-of select="@w:ascii"/>
       </xsl:attribute>
