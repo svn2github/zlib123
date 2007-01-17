@@ -267,7 +267,7 @@ Textbox Tools;Format;Text box styles;Size;Height;Absolute;2;0.3-M2;Completed;;;
 ;;;;Options;Word wrap text in Autoshape;2;0.3-M2;Completed;;;
 ;;;;;Resize autoshape to fit text;2;0.3-M2;Completed;;;
 ;;;Colors and Lines;Fill;Color;3;1.0;Completed;;;
-;;;;;Fill Effects;3;1.0;;;;
+;;;;;Fill Effects;3;1.0;;not supported;;
 ;;;;Line;Color;3;1.0;Completed;;;
 ;;;;;Style;3;1.0;Completed;;;
 ;;;;;Weight;3;1.0;Completed;;;
