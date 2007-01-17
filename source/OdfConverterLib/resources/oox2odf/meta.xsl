@@ -110,20 +110,25 @@
                             select="document('docProps/core.xml')/cp:coreProperties/cp:modified"/>
                     </meta:editing-cycles>
                 </xsl:if>
-                <!-- custom properties-->
+                <!-- custom properties-->        
                 <xsl:if test="document('docProps/custom.xml')/cust-p:Properties/cust-p:property">
-                    <xsl:for-each
-                        select="document('docProps/custom.xml')/cust-p:Properties/cust-p:property">
-                        <xsl:variable name="numer">
-                            <xsl:number/>
-                        </xsl:variable>
-                        <xsl:if test="$numer &lt; 5">
-                            <meta:user-defined meta:name="Info {$numer}">
-                                <xsl:value-of select="@name"/>
-                                <xsl:text>: </xsl:text>
-                                <xsl:value-of select="vt:lpwstr/text()"/>
-                            </meta:user-defined>
-                        </xsl:if>
+                    <xsl:for-each select="document('docProps/custom.xml')/cust-p:Properties/cust-p:property">
+                        <meta:user-defined meta:name="{@name}" >
+                            <xsl:attribute name="meta:type">
+                                <xsl:choose>
+                                    <xsl:when test="vt:bool">
+                                        <xsl:text>boolean</xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="vt:filetime">
+                                        <xsl:text>date</xsl:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>string</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:attribute>
+                            <xsl:value-of select="child::node()/text()"/>
+                        </meta:user-defined>
                     </xsl:for-each>
                 </xsl:if>
                 <!-- keywords -->
