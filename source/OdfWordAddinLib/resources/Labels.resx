@@ -276,9 +276,9 @@
   <data name="translation.odf2oox.cellRotationAngle" xml:space="preserve"><value>Cell rotation angle property lost</value></data>
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve"><value>Cell rotation alignment property lost</value></data>
   <!-- added 16/01 -->
-  <data aname="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve"><value>Table of illustration caption format</value></data>
+  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve"><value>Table of illustration caption format</value></data>
   <!-- added 17/01 -->
-  <data aname="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>Line through width property lost</value></data>
-  <data aname="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Line through color property lost</value></data>
+  <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>Line through width property lost</value></data>
+  <data name="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Line through color property lost</value></data>
  
 </root>

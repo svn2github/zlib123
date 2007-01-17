@@ -270,9 +270,9 @@
   <data name="translation.odf2oox.cellRotationAngle" xml:space="preserve"><value>Angle de rotation d'une cellule</value></data>
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve"><value>Alignement de rotation d'une cellule</value></data>
   <!-- added 16/01 -->
-  <data aname="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve"><value>Table of illustration caption format</value></data>
+  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve"><value>Table of illustration caption format</value></data>
   <!-- added 17/01 -->
-  <data aname="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>¨Propriété ligne barrée perdue</value></data>
-  <data aname="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Propriété couleur de ligne barrée perdue</value></data>
+  <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>¨Propriété ligne barrée perdue</value></data>
+  <data name="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Propriété couleur de ligne barrée perdue</value></data>
   
 </root>
