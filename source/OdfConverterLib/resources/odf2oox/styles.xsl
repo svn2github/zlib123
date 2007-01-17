@@ -1520,62 +1520,62 @@
     <xsl:param name="tabStop" select="."/>
 
     <xsl:choose>
+      <!-- leader character in paragraphs -->
       <xsl:when test="$tabStop/@style:leader-text">
         <xsl:choose>
           <xsl:when test="$tabStop/@style:leader-text = '.' ">
-            <xsl:value-of select="'dot'"/>
+            <xsl:text>dot</xsl:text>
           </xsl:when>
           <xsl:when test="$tabStop/@style:leader-text = '-' ">
-            <xsl:value-of select="'hyphen'"/>
+            <xsl:text>hyphen</xsl:text>
           </xsl:when>
           <xsl:when test="$tabStop/@style:leader-text = '_' ">
-            <xsl:value-of select="'heavy'"/>
+            <xsl:text>heavy</xsl:text>
           </xsl:when>
           <xsl:otherwise>
             <xsl:message terminate="no">translation.odf2oox.leaderText</xsl:message>
-            <xsl:value-of select="'none'"/>
+            <xsl:text>none</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:when test="$tabStop/@style:leader-style and not($tabStop/@style:leader-text)">
         <xsl:choose>
           <xsl:when test="$tabStop/@style:leader-style = 'dotted' ">
-            <xsl:value-of select="'dot'"/>
+            <xsl:text>dot</xsl:text>
           </xsl:when>
           <xsl:when test="$tabStop/@style:leader-style = 'solid' ">
-            <xsl:value-of select="'heavy'"/>
+            <xsl:text>heavy</xsl:text>
           </xsl:when>
           <xsl:when test="$tabStop/@style:leader-style = 'dash' ">
-            <xsl:value-of select="'hyphen'"/>
-          </xsl:when>
-          <xsl:when test="$tabStop/@style:leader-style = 'dotted' ">
-            <xsl:value-of select="'dot'"/>
+            <xsl:text>hyphen</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="'none'"/>
+            <xsl:if test="$tabStop/@style:leader-style != 'none' ">
+              <xsl:message terminate="no">translation.odf2oox.leaderText</xsl:message>
+            </xsl:if>
+            <xsl:text>none</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
+      <!-- leader character in indexes -->
       <xsl:when test="$tabStop/@style:leader-char">
         <xsl:choose>
           <xsl:when test="$tabStop/@style:leader-char = '.' ">
-            <xsl:value-of select="'dot'"/>
+            <xsl:text>dot</xsl:text>
           </xsl:when>
           <xsl:when test="$tabStop/@style:leader-char = '-' ">
-            <xsl:value-of select="'hyphen'"/>
+            <xsl:text>hyphen</xsl:text>
           </xsl:when>
           <xsl:when test="$tabStop/@style:leader-char = '_' ">
-            <xsl:value-of select="'heavy'"/>
+            <xsl:text>heavy</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:message terminate="no">translation.odf2oox.leaderChar</xsl:message>
-            <xsl:value-of select="'none'"/>
+            <xsl:message terminate="no">translation.odf2oox.leaderText</xsl:message>
+            <xsl:text>none</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="'none'"/>
-      </xsl:otherwise>
+      <xsl:otherwise>none</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
