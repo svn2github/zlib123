@@ -31,6 +31,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-de", "
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-nl", "OdfAddInForWordSetup-nl\OdfAddInForWordSetup-nl.vdproj", "{5ADA2AAA-219C-4516-BBFB-19C3200F52CF}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-pl", "OdfAddInForWordSetup-pl\OdfAddInForWordSetup-pl.vdproj", "{2099AD46-0024-41BF-A108-0388F0C6107A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,10 @@ Global
 		{5ADA2AAA-219C-4516-BBFB-19C3200F52CF}.Debug|Any CPU.Build.0 = Debug
 		{5ADA2AAA-219C-4516-BBFB-19C3200F52CF}.Release|Any CPU.ActiveCfg = Release
 		{5ADA2AAA-219C-4516-BBFB-19C3200F52CF}.Release|Any CPU.Build.0 = Release
+		{2099AD46-0024-41BF-A108-0388F0C6107A}.Debug|Any CPU.ActiveCfg = Debug
+		{2099AD46-0024-41BF-A108-0388F0C6107A}.Debug|Any CPU.Build.0 = Debug
+		{2099AD46-0024-41BF-A108-0388F0C6107A}.Release|Any CPU.ActiveCfg = Release
+		{2099AD46-0024-41BF-A108-0388F0C6107A}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
