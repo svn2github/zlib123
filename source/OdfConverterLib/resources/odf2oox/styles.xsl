@@ -887,12 +887,12 @@
 
     <xsl:if test="@style:text-line-through-width != 'none'">
       <!-- TODO : localize this -->
-      <xsl:message terminate="no">feedback:Line through width</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.lineThroughWidth</xsl:message>
     </xsl:if>
 
     <xsl:if test="@style:text-line-through-color != 'none'">
       <!-- TODO : localize this -->
-      <xsl:message terminate="no">feedback:Line through color</xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.lineThroughColor</xsl:message>
     </xsl:if>
 
     <xsl:if test="@style:text-outline">
@@ -1568,7 +1568,7 @@
             <xsl:value-of select="'heavy'"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:message terminate="no">feedback:Leader char</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.leaderChar</xsl:message>
             <xsl:value-of select="'none'"/>
           </xsl:otherwise>
         </xsl:choose>
