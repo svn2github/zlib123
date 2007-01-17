@@ -72,10 +72,10 @@
       </xsl:when>
       <xsl:when test="w:r[contains(w:instrText,'INDEX')]">
         <text:alphabetical-index>
+          <xsl:message terminate="no">feedback:many alphabetical index properties</xsl:message>
           <xsl:attribute name="text:style-name">
             <xsl:value-of select="generate-id(following::w:p/descendant::w:sectPr)"/>
           </xsl:attribute>
-          <xsl:message terminate="no">feedback:TOC protection against manual changes</xsl:message>
           <xsl:attribute name="text:protected">false</xsl:attribute>
           <xsl:attribute name="text:name">Alphabetical Index1</xsl:attribute>
           <xsl:call-template name="InsertIndexProperties">

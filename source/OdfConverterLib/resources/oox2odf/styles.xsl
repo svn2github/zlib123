@@ -75,7 +75,6 @@
       </office:automatic-styles>
       <!-- master styles -->
       <office:master-styles>
-        <!-- TODO : create other master-page styles. This one handles only the default (last w:sectPr of document.xml). -->
         <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr">
           <xsl:call-template name="InsertDefaultMasterPage"/>
         </xsl:if>
