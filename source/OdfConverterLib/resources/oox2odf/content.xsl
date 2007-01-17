@@ -542,7 +542,22 @@
 
   <!--tabs-->
   <xsl:template match="w:tab[not(parent::w:tabs)]">
-    <text:tab/>
+    <xsl:choose>
+      <xsl:when test="ancestor::w:footnote or ancestor::w:endnote">
+        <xsl:variable name="StyleId">
+          <xsl:value-of select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:tab[1]) and (ancestor::w:p/w:pPr/w:ind/@w:hanging != '' or document('word/styles.xml')/w:styles/w:style[@w:styleId = $StyleId]/w:pPr/w:ind/@w:hanging != '')"/>
+          <xsl:otherwise>
+            <text:tab/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <text:tab/>    
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- run -->
