@@ -34,17 +34,17 @@
           <xsl:with-param name="dateText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$fieldType = 'CREATEDATE'">
+      <xsl:when test="$fieldType = 'CREATEDATE' or contains($fieldCode, 'CreateDate')">
         <xsl:call-template name="InsertCreationDate">
           <xsl:with-param name="dateText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$fieldType = 'PRINTDATE'">
+      <xsl:when test="$fieldType = 'PRINTDATE' or contains($fieldCode, 'PrintDate')">
         <xsl:call-template name="InsertPrintDate">
           <xsl:with-param name="dateText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$fieldType = 'SAVEDATE'">
+      <xsl:when test="$fieldType = 'SAVEDATE' or contains($fieldCode,'LastSavedTime') or contains($fieldCode, 'SaveDate')">
         <xsl:call-template name="InsertModificationDate">
           <xsl:with-param name="dateText" select="$fieldCode"/>
         </xsl:call-template>
@@ -100,7 +100,8 @@
           <xsl:with-param name="timeText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$fieldType = 'EDITTIME' ">
+      <!-- EDITTIME, DOCPROPERTY TotalEditingTime-->
+      <xsl:when test="$fieldType = 'EDITTIME' or contains($fieldCode,'TotalEditingTime') or contains($fieldCode, 'EditTime')">
         <xsl:call-template name="InsertEditTime">
           <xsl:with-param name="timeText" select="$fieldCode"/>
         </xsl:call-template>
@@ -182,22 +183,26 @@
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
           </xsl:call-template>
         </xsl:when>
-        <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE-->
-        <xsl:when test="contains($fieldType,'DATE') or contains($fieldType,'date')">
+        <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE, INFO CreateDate, INFO PrintDate, INFO Savedate-->
+        <xsl:when test="contains($fieldCode, 'DATE' ) or contains($fieldCode,  'date') 
+          or contains($fieldCode,'LastSavedTime') or contains($fieldCode,'CreateDate')
+          or contains($fieldCode, 'PrintDate') or contains($fieldCode,'SaveDate')">
           <xsl:call-template name="InsertDateType">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="fieldType" select="$fieldType"/>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="$fieldType = 'NUMPAGE' or $fieldType = 'numpage' ">
+        <!--page-count NUMPAGE, DOCPROPERTY Pages-->
+        <xsl:when test="$fieldType = 'NUMPAGE' or $fieldType = 'numpage' or contains($fieldCode,'Pages')">
           <xsl:call-template name="InsertPageCount"/>
         </xsl:when>
         <xsl:when test="$fieldType = 'PAGE' or $fieldType = 'page' ">
           <xsl:call-template name="InsertPageNumber"/>
         </xsl:when>
-        <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime-->
+        <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime, DOCPROPERTY TotalEditingTime,  INFO EditTime-->
         <xsl:when
-          test="contains($fieldType,'TIME') or contains($fieldType,'time') or contains($fieldType,'Time') ">
+          test="$fieldType = 'TIME' or $fieldType = 'time' or contains($fieldCode,'CreateTime') 
+          or contains($fieldCode,'TotalEditingTime') or contains($fieldCode, 'EditTime')">
           <xsl:call-template name="InsertTimeType">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="fieldType" select="$fieldType"/>
@@ -209,8 +214,8 @@
         <xsl:when test="$fieldType = 'USERNAME' or $fieldType = 'username' ">
           <xsl:call-template name="InsertUserName"/>
         </xsl:when>
-        <!--initiial creator name-->
-        <xsl:when test="$fieldType = 'AUTHOR' or $fieldType = 'author' ">
+        <!--initiial creator name   AUTHOR and DOCPROPERTY Author-->
+        <xsl:when test="$fieldType = 'AUTHOR' or $fieldType = 'author'  or contains($fieldCode,'Author')">
           <xsl:call-template name="InsertAuthor"/>
         </xsl:when>
         <!--caption field  from which Index of Figures is created -->
@@ -220,15 +225,17 @@
             <xsl:with-param name="sequenceContext" select="following::w:r[w:t][1]"/>
           </xsl:call-template>
         </xsl:when>
-        <!--creator name-->
-        <xsl:when test="$fieldType = 'LASTSAVEDBY' or $fieldType = 'lastsavedby' ">
+        <!--creator name LASTSAVEDBY, DOCPROPERTY LastSavedBy-->
+        <xsl:when test="$fieldType = 'LASTSAVEDBY' or $fieldType = 'lastsavedby'  or  contains($fieldCode,'LastSavedBy')">
           <xsl:call-template name="InsertCreator"/>
         </xsl:when>
-        <!--editing cycles number-->
-        <xsl:when test="$fieldType = 'REVNUM' or $fieldType = 'revnum' ">
+        <!--editing cycles number REVNUM, DOCPROPERTY RevisionNumber, INFO RevNum-->
+        <xsl:when test="$fieldType = 'REVNUM' or $fieldType = 'revnum' 
+          or contains($fieldCode,'RevisionNumber') or contains($fieldCode, 'RevNum')">
           <xsl:call-template name="InsertEditingCycles"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'FILENAME' or $fieldType = 'filename' ">
+        <!--FILENAME, INFO FileName-->
+        <xsl:when test="$fieldType = 'FILENAME' or $fieldType = 'filename' or contains($fieldCode,'FileName')">
           <xsl:call-template name="InsertFileName"/>
         </xsl:when>
         <!-- KEYWORDS, DOCPROPERTY Keywords -->
@@ -238,24 +245,40 @@
         </xsl:when>
         <!-- DOCPROPERTY Company, INFO Company-->
         <xsl:when
-          test="contains($fieldCode,'Company') or contains($fieldCode,'Company')">
+          test="contains($fieldCode,'Company') or contains($fieldCode, 'company')">
           <xsl:call-template name="InsertCompany"/>
         </xsl:when>
         <xsl:when test="$fieldType = 'USERADDRESS' or $fieldType = 'useraddress' ">
           <xsl:call-template name="InsertUserAddress"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'TEMPLATE' or $fieldType = 'template' ">
+        <!--TEMPLATE, DOCPROPERTY Template-->
+        <xsl:when test="$fieldType = 'TEMPLATE' or $fieldType = 'template'  or contains($fieldCode,'Template')">
           <xsl:call-template name="InsertTemplate"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'NUMWORDS' or $fieldType = 'numwords' ">
+        <!--NUMWORDS, DOCPROPERTY Words-->
+        <xsl:when test="$fieldType = 'NUMWORDS' or $fieldType = 'numwords' or contains($fieldCode,'Words')">
           <xsl:call-template name="InsertWordCount"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'NUMCHARS' or $fieldType = 'numchars' ">
+        <!--NUMCHARS and DOCPROPERTY Characters,  INFO NumChars-->
+        <xsl:when test="$fieldType = 'NUMCHARS' or $fieldType = 'numchars' 
+          or contains($fieldCode,'Characters') or contains($fieldCode, 'NumChars')">
           <xsl:call-template name="InsertCharacterCount"/>
         </xsl:when>
        <!-- DOCPROPERTY Paragraphs, INFO Paragraphs-->
         <xsl:when test="contains($fieldCode,'Paragraphs') or contains($fieldCode,'paragraphs') ">
           <xsl:call-template name="InsertCompany"/>
+        </xsl:when>
+        <!-- COMMENTS, DOCPROPERTY Comments-->
+        <xsl:when test="contains($fieldCode,'COMMENTS') or contains($fieldCode,'Comments') ">
+          <xsl:call-template name="InsertComments"/>
+        </xsl:when>
+        <!--document subject SUBJECT, DOCPROPERTY Subject-->
+        <xsl:when test="contains($fieldCode,'SUBJECT') or contains($fieldCode,'Subject') or contains($fieldCode,'subject')">
+          <xsl:call-template name="InsertSubject"/>
+        </xsl:when>
+       <!--document title TITLE, DOCPROPERTY Title-->
+        <xsl:when test="contains($fieldCode,'TITLE') or contains($fieldCode,'Title') or contains($fieldCode,'title')">
+          <xsl:call-template name="InsertSubject"/>
         </xsl:when>
       </xsl:choose>
     </text:span>
@@ -552,8 +575,8 @@
     </xsl:for-each>
   </xsl:template>
 
-  <!--document title-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE')]" mode="fields">
+  <!--document title TITLE, DOCPROPERTY Title-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE') or contains(@w:instr, 'Title')]" mode="fields">
     <text:title>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:title>
@@ -568,8 +591,9 @@
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:author-name>
   </xsl:template>
-
-  <xsl:template match="w:fldSimple[contains(@w:instr,'AUTHOR')]" mode="fields">
+  
+  <!--AUTHOR and DOCPROPERTY Author-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'AUTHOR') or contains(@w:instr,' Author')]" mode="fields">
     <xsl:call-template name="InsertAuthor"/>
   </xsl:template>
 
@@ -579,7 +603,8 @@
     </text:initial-creator>
   </xsl:template>
 
-  <xsl:template match="w:fldSimple[contains(@w:instr,'LASTSAVEDBY')]" mode="fields">
+  <!--creator-name LASTSAVEDBY, DOCPROPERTY LastSavedBy-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'LASTSAVEDBY') or contains(@w:instr,'LastSavedBy')]" mode="fields">
     <xsl:call-template name="InsertCreator"/>
   </xsl:template>
 
@@ -622,35 +647,41 @@
     </text:chapter>
   </xsl:template>
 
-  <!--document subject-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'SUBJECT')]" mode="fields">
+  <!--document subject SUBJECT, DOCPROPERTY Subject-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'SUBJECT') or contains(@w:instr, 'Subject')]" mode="fields">
+      <xsl:call-template name="InsertSubject"/>
+  </xsl:template>
+
+  <xsl:template name="InsertSubject">
     <text:subject>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:subject>
   </xsl:template>
-
+  
   <xsl:template match="w:fldSimple">
     <text:span text:style-name="{generate-id(w:r)}">
       <xsl:apply-templates select="." mode="fields"/>
     </text:span>
   </xsl:template>
 
-  <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')]" mode="fields">
+  <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE, 
+    DOPCPROPERTY LastSavedTime, INFO CreateDate, INFO PrintDate, INFO Savedate-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') 
+    or contains(@w:instr,'CreateDate') or contains(@w:instr, 'PrintDate') or contains(@w:instr, 'SaveDate')] " mode="fields">
     <xsl:variable name="fieldType">
       <xsl:call-template name="GetFieldTypeFromCode">
         <xsl:with-param name="fieldCode" select="@w:instr"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:call-template name="InsertDateType">
+     <xsl:call-template name="InsertDateType">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
       <xsl:with-param name="fieldType" select="$fieldType"/>
     </xsl:call-template>
   </xsl:template>
 
-  <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr,'Time')]"
-    mode="fields">
+  <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime, DOCPROPERTY TotalEditingTime, INFO EditTime-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr,'CreateTime') 
+    or contains(@w:instr, 'TotalEditingTime') or contains(@w:instr, 'EditTime')]"  mode="fields">
     <xsl:variable name="fieldType">
       <xsl:call-template name="GetFieldTypeFromCode">
         <xsl:with-param name="fieldCode" select="@w:instr"/>
@@ -671,8 +702,8 @@
     </xsl:call-template>
   </xsl:template>
 
-  <!--page-count-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGE')]" mode="fields">
+  <!--page-count NUMPAGE, DOCPROPERTY Pages-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMPAGE') or contains(@w:instr,'Pages')]" mode="fields">
     <xsl:call-template name="InsertPageCount">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
     </xsl:call-template>
@@ -1568,13 +1599,14 @@
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:editing-cycles>
   </xsl:template>
-
-  <!--editing cycles number-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'REVNUM')]" mode="fields">
+  
+  <!--editing cycles number REVNUM, DOCPROPERTY RevisionNumber, INFO RevNum-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'REVNUM') or contains(@w:instr, 'RevisionNumber') or contains(@w:instr, 'RevNum')]" mode="fields">
     <xsl:call-template name="InsertEditingCycles"/>
   </xsl:template>
-
-  <xsl:template match="w:fldSimple[contains(@w:instr,'FILENAME')]" mode="fields">
+  
+  <!--FILENAME, INFO FileName-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'FILENAME') or contains(@w:instr, 'FileName')]" mode="fields">
     <xsl:call-template name="InsertFileName"/>
   </xsl:template>
 
@@ -1619,8 +1651,9 @@
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:sender-street>
   </xsl:template>
-
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TEMPLATE')]" mode="fields">
+  
+<!--TEMPLATE, DOCPROPERTY Template-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TEMPLATE')or contains(@w:instr, 'Template')]" mode="fields">
     <xsl:call-template name="InsertTemplate"/>
   </xsl:template>
 
@@ -1629,8 +1662,9 @@
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:template-name>
   </xsl:template>
-
-  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMWORDS')]" mode="fields">
+  
+<!--NUMWORDS, DOCPROPERTY Words-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMWORDS') or contains(@w:instr, 'Words')]" mode="fields">
     <xsl:call-template name="InsertWordCount"/>
   </xsl:template>
 
@@ -1639,8 +1673,10 @@
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:word-count>
   </xsl:template>
-
-  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMCHARS')]" mode="fields">
+  
+  <!--NUMCHARS and DOCPROPERTY Characters, INFO NumChars-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'NUMCHARS') 
+    or contains(@w:instr, 'Characters') or contains(@w:instr, 'NumChars')]" mode="fields">
     <xsl:call-template name="InsertCharacterCount"/>
   </xsl:template>
 
@@ -1660,5 +1696,16 @@
     <text:paragraph-count>
       <xsl:apply-templates select="w:r/child::node()"/>
     </text:paragraph-count>
+  </xsl:template>
+  
+  <!-- COMMENTS, DOCPROPERTY Comments-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'COMMENTS') or contains(@w:instr, 'Comments')]" mode="fields">
+    <xsl:call-template name="InsertComments"/>
+  </xsl:template>
+  
+  <xsl:template name="InsertComments">
+    <text:description>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:description>
   </xsl:template>
 </xsl:stylesheet>
