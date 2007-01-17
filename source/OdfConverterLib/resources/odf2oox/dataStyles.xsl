@@ -490,13 +490,16 @@
   <xsl:template name="InsertUserFieldDeclaration">
     <xsl:if test="parent::office:text">
       <xsl:if test="not(preceding-sibling::*[self::text:p or self::text:h])">
-        <xsl:for-each select="preceding-sibling::text:user-field-decls/text:user-field-decl">
-          <xsl:call-template name="InsertVariableField"/>
-        </xsl:for-each>
+        <xsl:apply-templates select="preceding-sibling::text:user-field-decls/text:user-field-decl"/>
       </xsl:if>
     </xsl:if>
   </xsl:template>
 
+  <!-- convert user-field-decl into regular variable field. -->
+  <xsl:template match="text:user-field-decl">
+    <xsl:call-template name="InsertVariableField"/>
+  </xsl:template>
+  
   <!-- insert declaration of variable, and potentially a reference to display it. -->
   <xsl:template name="InsertVariableField">
     <xsl:variable name="varName">

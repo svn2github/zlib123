@@ -423,6 +423,8 @@
       </xsl:choose>
     </xsl:variable>
 
+    <!-- COMMENT : variable fields should be declared before set, but application should support direct set before declaration,
+      and it is too complex to find wether the field has already been declared. So no declaration is performed. -->
     <text:variable-set>
       <xsl:attribute name="text:name">
         <xsl:value-of select="$fieldName"/>
