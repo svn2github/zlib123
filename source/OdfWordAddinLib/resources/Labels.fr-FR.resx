@@ -180,4 +180,99 @@
   <data name="UnableToCreateOutputDetail" xml:space="preserve">
     <value>Impossible de créer le fichier cible : vérifiez que le chemin est correct et que le fichier n'est pas en cours d'utilisation par une autre application.</value>
   </data>
+  
+  <!-- xsl messages -->
+  <data name="translation.odf2oox.paddingShortened" xml:space="preserve"><value>Espacement raccourci</value></data>
+  <data name="translation.odf2oox.borderShortened" xml:space="preserve"><value>Bordure raccourcie</value></data>
+  <data name="translation.odf2oox.textBgColor" xml:space="preserve"><value>Couleur de fond du texte</value></data>
+  <data name="translation.odf2oox.dateFormat" xml:space="preserve"><value>Formattage de date perdu</value></data>
+  <data name="translation.odf2oox.chapterField" xml:space="preserve"><value>Champ du nom de chapitre (si le style n'est pas défini)</value></data>
+  <data name="translation.odf2oox.descriptionField" xml:space="preserve"><value>Champ de description</value></data>
+  <data name="translation.odf2oox.printedByField" xml:space="preserve"><value>Champ de l'auteur de la dernière impression</value></data>
+  <data name="translation.odf2oox.pageVariableField" xml:space="preserve"><value>Champ de variable de page</value></data>
+  <data name="translation.odf2oox.ddeConnection" xml:space="preserve"><value>Champ DDE</value></data>
+  <data name="translation.odf2oox.formulaField" xml:space="preserve"><value>Champ de formule</value></data>
+  <data name="translation.odf2oox.internetProperties" xml:space="preserve"><value>Propriétés internet</value></data>
+  <data name="translation.odf2oox.documentCreationDate" xml:space="preserve"><value>Date de création du document</value></data>
+  <data name="translation.odf2oox.documentModificationDate" xml:space="preserve"><value>Date de la dernière modification du document</value></data>
+  <data name="translation.odf2oox.nestedFrames" xml:space="preserve"><value>Cadres imbriqués</value></data>
+  <data name="translation.odf2oox.positionInsideTextbox" xml:space="preserve"><value>Position d'un objet à l'intérieur d'un cadre de texte</value></data>
+  <data name="translation.odf2oox.annotationsInsideTextbox" xml:space="preserve"><value>Note à l'intérieur d'un cadre de texte</value></data>
+  <data name="translation.odf2oox.annotationsInsideHeaderFooter" xml:space="preserve"><value>Note dans un en-tête ou un pied de page</value></data>
+  <data name="translation.odf2oox.hyperlinkName" xml:space="preserve"><value>Nom d'un hyperlien</value></data>
+  <data name="translation.odf2oox.visitedLinkStyle" xml:space="preserve"><value>Style d'un lien visité</value></data>
+  <data name="translation.odf2oox.hiddenSection" xml:space="preserve"><value>Section cachée</value></data>
+  <data name="translation.odf2oox.conditionalHiddenSection" xml:space="preserve"><value>Section cachée sous condition</value></data>
+  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Clé de protection pour {0} </value></data>
+  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Portée de chapitre de l'index {0}</value></data>
+  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Propriété d'indentation de l'index {0}</value></data>
+  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Algorithme de tri de l'index {0}</value></data>
+  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Protection de l'index {0}</value></data>
+  <data name="translation.odf2oox.alphabeticalIndexConcordanceFile" xml:space="preserve"><value>Fichier de concordance de l'index lexical</value></data>
+  <data name="translation.odf2oox.dropcapSize" xml:space="preserve"><value>Taille de lettrine</value></data>
+  <data name="translation.odf2oox.pageBreakBeforeEndnotes" xml:space="preserve"><value>Saut de page avant les notes de fin</value></data>
+  <data name="translation.odf2oox.noteInList" xml:space="preserve"><value>Note dans une liste</value></data>
+  <data name="translation.odf2oox.footnoteContinuationSeparator" xml:space="preserve"><value>Trait de séparation des notes de bas de page</value></data>
+  <data name="translation.odf2oox.footnoteSeparatorWidth" xml:space="preserve"><value>Largeur du trait de séparation des notes de bas de page</value></data>
+  <data name="translation.odf2oox.footnoteSeparatorLength" xml:space="preserve"><value>Longueur du trait de séparation des notes de bas de page</value></data>
+  <data name="translation.odf2oox.footnoteSeparatorColor" xml:space="preserve"><value>Couleur du trait de séparation des notes de bas de page</value></data>
+  <data name="translation.odf2oox.footnoteSeparatorStyle" xml:space="preserve"><value>Style du trait de séparation des notes de bas de page</value></data>
+  <data name="translation.odf2oox.footnoteMaximumHeight" xml:space="preserve"><value>Hauteur maximale du trait de séparation des notes de bas de page</value></data>
+  <data name="translation.odf2oox.svmImage" xml:space="preserve"><value>Image SVM</value></data>
+  <data name="translation.odf2oox.embeddedObject" xml:space="preserve"><value>Objet inclus</value></data>
+  <data name="translation.odf2oox.embeddedPluginFile" xml:space="preserve"><value>Fichier inclus utilisant un plug-in</value></data>
+  <data name="translation.odf2oox.applet" xml:space="preserve"><value>Applet</value></data>
+  <data name="translation.odf2oox.floatingFrame" xml:space="preserve"><value>Cadre flottant</value></data>
+  <data name="translation.odf2oox.croppedImage" xml:space="preserve"><value>Image rognée</value></data>
+  <data name="translation.odf2oox.scaledImage" xml:space="preserve"><value>Image ré-échelonnée</value></data>
+  <data name="translation.odf2oox.valignInsideTextbox" xml:space="preserve"><value>Alignement vertical de texte à l'intérieur d'un cadre de texte</value></data>
+  <data name="translation.odf2oox.shapeTopBottomWrapping" xml:space="preserve"><value>Adaptation du texte de type 'aucune'</value></data>
+  <data name="translation.odf2oox.textOrientationInsideTextbox" xml:space="preserve"><value>Orientation du texte à l'intérieur d'un cadre de texte</value></data>
+  <data name="translation.odf2oox.alphabeticalIndexColumnNumber" xml:space="preserve"><value>Nombre de colonnes dans un index lexical</value></data>
+  <data name="translation.odf2oox.listBulletAlignment" xml:space="preserve"><value>Alignement des puces dans une liste</value></data>
+  <data name="translation.odf2oox.distanceNumberingText" xml:space="preserve"><value>Distance entre numérotation et texte</value></data>
+  <data name="translation.odf2oox.spacingTopPageAndTable" xml:space="preserve"><value>Espacement en haut d'une page/table</value></data>
+  <data name="translation.odf2oox.pageLayout" xml:space="preserve"><value>Mise en page</value></data>
+  <data name="translation.odf2oox.alignmentLastLine" xml:space="preserve"><value>Alignement de la dernière ligne</value></data>
+  <data name="translation.odf2oox.paragraphBgImage" xml:space="preserve"><value>Image de fond d'un paragraphe</value></data>
+  <data name="translation.odf2oox.automaticPageBreak" xml:space="preserve"><value>Saut de page automatique</value></data>
+  <data name="translation.odf2oox.numberWidowsOrphans" xml:space="preserve"><value>Nombre d'orphelines et de veuves</value></data>
+  <data name="translation.odf2oox.blinkingText" xml:space="preserve"><value>Texte clignotant</value></data>
+  <data name="translation.odf2oox.rotatedText" xml:space="preserve"><value>Texte définissant une rotation</value></data>
+  <data name="translation.odf2oox.fontWeight" xml:space="preserve"><value>Taille de police</value></data>
+  <data name="translation.odf2oox.capitalizedText" xml:space="preserve"><value>Texte en petites majuscules</value></data>
+  <data name="translation.odf2oox.lowercaseText" xml:space="preserve"><value>Texte en minuscules</value></data>
+  <data name="translation.odf2oox.textScale600pct" xml:space="preserve"><value>Echelle de texte plus grande que 600%</value></data>
+  <data name="translation.odf2oox.leaderText" xml:space="preserve"><value>Caractères de remplissage</value></data>
+  <data name="translation.odf2oox.pageBgColor" xml:space="preserve"><value>Couleur de fond d'une page</value></data>
+  <data name="translation.odf2oox.paperTray" xml:space="preserve"><value>Source du papier</value></data>
+  <data name="translation.odf2oox.lineNumbering" xml:space="preserve"><value>Numérotation des lignes</value></data>
+  <data name="translation.odf2oox.headerDistance" xml:space="preserve"><value>Distance de l'en-tête</value></data>
+  <data name="translation.odf2oox.footerDistance" xml:space="preserve"><value>Distance du pied de page</value></data>
+  <data name="translation.odf2oox.columnSeparatorAttributes" xml:space="preserve"><value>Propriétés du séparateur de colonnes</value></data>
+  <data name="translation.odf2oox.paragraphPageShadow" xml:space="preserve"><value>Ombre des paragraphes/pages</value></data>
+  <data name="translation.odf2oox.subtableBordersPadding" xml:space="preserve"><value>Bordure et espacement des tableaux imbriquées</value></data>
+  <data name="translation.odf2oox.consecutiveTables" xml:space="preserve"><value>Tableaux consécutifs</value></data>
+  <data name="translation.odf2oox.tableHeaderRepeated" xml:space="preserve"><value>Répétition de l'en-tête du tableau sur chaque page</value></data>
+  <data name="translation.odf2oox.tableHeaderRows" xml:space="preserve"><value>Nombre de ligne d'en-tête dans un tableau</value></data>
+  <data name="translation.odf2oox.tableTogetherWithParagraph" xml:space="preserve"><value>Tableau solidaire avec le pargraphe suivant</value></data>
+  <data name="translation.odf2oox.unsplitableTable" xml:space="preserve"><value>Tableau non fragmentable</value></data>
+  <data name="translation.odf2oox.tableBgImage" xml:space="preserve"><value>Image de fond d'un tableau</value></data>
+  <data name="translation.odf2oox.tableShadow" xml:space="preserve"><value>Ombre dans un tableau</value></data>
+  <data name="translation.odf2oox.tableManualAlignment" xml:space="preserve"><value>Alignement manuel d'un tableau</value></data>
+  <data name="translation.odf2oox.tableWith64Columns" xml:space="preserve"><value>Tableau comprenant plus de 64 colomnes</value></data>
+  <data name="translation.odf2oox.rowBgImage" xml:space="preserve"><value>Image de fond d'une ligne</value></data>
+  <data name="translation.odf2oox.protectedCell" xml:space="preserve"><value>Protection de cellule</value></data>
+  <data name="translation.odf2oox.cellBgImage" xml:space="preserve"><value>Image de fond d'une cellule</value></data>
+  <data name="translation.odf2oox.cellShadow" xml:space="preserve"><value>Ombre d'une cellule</value></data>
+  <data name="translation.odf2oox.cellContentNotPrinted" xml:space="preserve"><value>Contenu d'une cellule non imprimé</value></data>
+  <data name="translation.odf2oox.cellContentRepeated" xml:space="preserve"><value>Contenu d'une cellule répété</value></data>
+  <data name="translation.odf2oox.cellRotationAngle" xml:space="preserve"><value>Angle de rotation d'une cellule</value></data>
+  <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve"><value>Alignement de rotation d'une cellule</value></data>
+  <!-- added 16/01 -->
+  <data aname="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve"><value>Table of illustration caption format</value></data>
+  <!-- added 17/01 -->
+  <data aname="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>¨Propriété ligne barrée perdue</value></data>
+  <data aname="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Propriété couleur de ligne barrée perdue</value></data>
+  
 </root>

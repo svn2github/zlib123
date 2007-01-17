@@ -215,12 +215,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     progressMessageIntercepted(this, null);
                 }
             }
-            else if (e.Message.StartsWith("feedback:"))
+            else if (e.Message.StartsWith("translation.odf2oox."))
             {
                 if (feedbackMessageIntercepted != null)
                 {
-                    feedbackMessageIntercepted(this, new OdfEventArgs(e.Message.Substring("feedback:".Length)));
+                    feedbackMessageIntercepted(this, new OdfEventArgs(e.Message));
                 }
+            }
+            else if (e.Message.StartsWith("feedback:"))
+            {
+            	if (feedbackMessageIntercepted != null)
+            	{
+            		feedbackMessageIntercepted(this, new OdfEventArgs(e.Message.Substring("feedback:".Length)));
+            	}
             }
         }
 

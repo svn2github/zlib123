@@ -139,10 +139,12 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
 
         private void FeedbackMessageInterceptor(object sender, EventArgs e)
         {
-            string message = ((OdfEventArgs)e).Message;
-            if (!lostElements.Contains(message))
+            string messageKey = ((OdfEventArgs)e).Message;
+            string messageValue = manager.GetString(messageKey);
+            
+            if (messageValue != null && !lostElements.Contains(messageValue))
             {
-                lostElements.Add(message);
+                lostElements.Add(messageValue);
             }
         }
 
