@@ -4,3 +4,4 @@ EXPORTS
 	GetWordVersion
 	DumpProperties
 	LaunchReadme
+	ForceUniqueInstall

@@ -13,6 +13,24 @@ extern "C" {
 		MessageBox(NULL, sBuf, sTitle, MB_OK);
 	}
 
+	static LPCTSTR MyEventName = _T("{78FF3DDE-04DF-44eb-9FFB-EA6468418DCD}");
+	static LPCTSTR ConcurrentInstallProperty = _T("CONCURRENTINSTALL");
+
+	UINT __stdcall ForceUniqueInstall(MSIHANDLE hInstall)
+	{
+		// Clear last error
+		SetLastError(0);
+		HANDLE hEvent = CreateEvent(NULL, FALSE, FALSE, MyEventName);
+		if ((hEvent != NULL) && (GetLastError() == ERROR_ALREADY_EXISTS)) {
+			// Close the handle as we don't need it anymore
+			CloseHandle(hEvent);
+
+			// And set the property
+			MsiSetProperty(hInstall, ConcurrentInstallProperty, _T("True"));
+		}
+		return ERROR_SUCCESS;
+	}
+
 	typedef struct _ProductDetection {
 		LPCTSTR ProductCode;
 		LPCTSTR ProductProperty;

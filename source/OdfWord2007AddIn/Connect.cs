@@ -104,9 +104,22 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 		public void OnConnection(object application, Extensibility.ext_ConnectMode connectMode, object addInInst, ref System.Array custom)
         {
             this.applicationObject = (MSword.Application)application;
-            // set culture to match current application culture
-            int officeUICulture = this.applicationObject.LanguageSettings.get_LanguageID(MsoAppLanguageID.msoLanguageIDUI);
-            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(officeUICulture);
+            // set culture to match current application culture or user's choice
+            int culture = 0;
+            string languageVal = Microsoft.Win32.Registry
+                .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "Language", null) as string;
+            if (languageVal != null)
+            {
+                int.TryParse(languageVal, out culture);
+            }
+            if (culture == 0)
+            {
+                culture = this.applicationObject.LanguageSettings
+                    .get_LanguageID(MsoAppLanguageID.msoLanguageIDUI);
+            }
+            System.Threading.Thread.CurrentThread.CurrentUICulture =
+                new System.Globalization.CultureInfo(culture);
+
 		}
 
 		/// <summary>

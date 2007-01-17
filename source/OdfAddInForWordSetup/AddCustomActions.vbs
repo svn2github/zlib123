@@ -45,8 +45,9 @@ sub main()
     set database = installer.OpenDatabase(databasePath, openMode)
     
 
-    AjouterAction installer, database, "OdfInstallHelper", dllPath, "DetectPreviousConverters", 300
-    AjouterAction installer, database, "OdfInstallHelper", "", "GetWordVersion", 301
+    AjouterAction installer, database, "OdfInstallHelper", dllPath, "ForceUniqueInstall", 300
+    AjouterAction installer, database, "OdfInstallHelper", "", "DetectPreviousConverters", 301
+    AjouterAction installer, database, "OdfInstallHelper", "", "GetWordVersion", 302
     AjouterAction installer, database, "OdfInstallHelper", "", "LaunchReadme", 1400
     
     WScript.Echo "Custom actions installed"
