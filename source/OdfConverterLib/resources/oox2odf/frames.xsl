@@ -208,7 +208,7 @@
           <xsl:text>as-char</xsl:text>
         </xsl:when>
         <!-- if there is another run exept that one containing shape and shape doesn't have wrapping style set then shape should be anchored 'as-text' -->
-        <xsl:when test="ancestor::w:r/parent::node()/w:r[2] and not(w10:wrap)">
+        <xsl:when test="ancestor::w:r/parent::node()/w:r[2] and not(w10:wrap) and not(contains($shape/@style, 'position:absolute'))">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
         <xsl:when test="w10:wrap/@anchorx = 'page' and w10:wrap/@anchory = 'page'  ">
@@ -620,6 +620,14 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
+    <xsl:if test="(not($isFilled) or $isFilled != 'f') and ($bgColor = '' or not($bgColor))">
+      <xsl:attribute name="fo:background-color">
+        <xsl:call-template name="InsertColor">
+          <xsl:with-param name="color">#ffffff</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    
     <xsl:attribute name="draw:fill-color">
       <xsl:call-template name="InsertColor">
         <xsl:with-param name="color" select="$bgColor"/>
