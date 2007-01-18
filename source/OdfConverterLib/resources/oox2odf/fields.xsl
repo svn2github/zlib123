@@ -34,7 +34,7 @@
           <xsl:with-param name="dateText" select="$fieldCode"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="$fieldType = 'CREATEDATE' or contains($fieldCode, 'CreateDate')">
+      <xsl:when test="$fieldType = 'CREATEDATE' or contains($fieldCode, 'CreateDate') or contains($fieldCode, 'CreateTime')">
         <xsl:call-template name="InsertCreationDate">
           <xsl:with-param name="dateText" select="$fieldCode"/>
         </xsl:call-template>
@@ -186,7 +186,7 @@
         <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE, INFO CreateDate, INFO PrintDate, INFO Savedate-->
         <xsl:when test="contains($fieldCode, 'DATE' ) or contains($fieldCode,  'date') 
           or contains($fieldCode,'LastSavedTime') or contains($fieldCode,'CreateDate')
-          or contains($fieldCode, 'PrintDate') or contains($fieldCode,'SaveDate')">
+          or contains($fieldCode, 'PrintDate') or contains($fieldCode,'SaveDate') or contains($fieldCode,'CreateTime')">
           <xsl:call-template name="InsertDateType">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="fieldType" select="$fieldType"/>
@@ -201,8 +201,7 @@
         </xsl:when>
         <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime, DOCPROPERTY TotalEditingTime,  INFO EditTime-->
         <xsl:when
-          test="$fieldType = 'TIME' or $fieldType = 'time' or contains($fieldCode,'CreateTime') 
-          or contains($fieldCode,'TotalEditingTime') or contains($fieldCode, 'EditTime')">
+          test="$fieldType = 'TIME' or $fieldType = 'time' or contains($fieldCode,'TotalEditingTime') or contains($fieldCode, 'EditTime')">
           <xsl:call-template name="InsertTimeType">
             <xsl:with-param name="fieldCode" select="$fieldCode"/>
             <xsl:with-param name="fieldType" select="$fieldType"/>
@@ -665,8 +664,8 @@
   </xsl:template>
 
   <!--  possible date types: DATE, PRINTDATE, SAVEDATE, CREATEDATE, 
-    DOPCPROPERTY LastSavedTime, INFO CreateDate, INFO PrintDate, INFO Savedate-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') 
+    DOPCPROPERTY LastSavedTime, DOCPROPERTY CreateTime, INFO CreateDate, INFO PrintDate, INFO Savedate-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') or contains(@w:instr, 'CreateTime')
     or contains(@w:instr,'CreateDate') or contains(@w:instr, 'PrintDate') or contains(@w:instr, 'SaveDate')] " mode="fields">
     <xsl:variable name="fieldType">
       <xsl:call-template name="GetFieldTypeFromCode">
@@ -679,9 +678,8 @@
     </xsl:call-template>
   </xsl:template>
 
-  <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime, DOCPROPERTY TotalEditingTime, INFO EditTime-->
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr,'CreateTime') 
-    or contains(@w:instr, 'TotalEditingTime') or contains(@w:instr, 'EditTime')]"  mode="fields">
+  <!-- possible time types: TIME, EDITTIME, DOCPROPERTY TotalEditingTime, INFO EditTime-->
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr, 'TotalEditingTime') or contains(@w:instr, 'EditTime')]"  mode="fields">
     <xsl:variable name="fieldType">
       <xsl:call-template name="GetFieldTypeFromCode">
         <xsl:with-param name="fieldCode" select="@w:instr"/>
@@ -716,7 +714,8 @@
   </xsl:template>
 
 
-  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE')]" mode="automaticstyles">
+  <xsl:template match="w:fldSimple[contains(@w:instr,'DATE') or contains(@w:instr,'LastSavedTime') or contains(@w:instr, 'CreateTime')
+    or contains(@w:instr,'CreateDate') or contains(@w:instr, 'PrintDate') or contains(@w:instr, 'SaveDate')]" mode="automaticstyles">
     <xsl:call-template name="InsertDateStyle">
       <xsl:with-param name="dateText" select="@w:instr"/>
     </xsl:call-template>
@@ -749,17 +748,64 @@
       <xsl:value-of
         select="substring-before(substring-after($dateText, '&quot;'), '&quot;')"/>
     </xsl:variable>
-    <xsl:call-template name="InsertDateFormat">
-      <xsl:with-param name="FormatDate">
-        <xsl:value-of select="$FormatDate"/>
-      </xsl:with-param>
-      <xsl:with-param name="ParamField">
-        <xsl:text>DATE</xsl:text>
-      </xsl:with-param>
-    </xsl:call-template>
+    <!-- some of the DOCPROPERTY date field types have constant date format, 
+      which is not saved in fieldCode so it need to be given directly in these cases-->
+    <xsl:choose>
+      <xsl:when test="contains($dateText, 'CreateTime') or contains($dateText,'LastSavedTime')">
+            <xsl:call-template name="InsertDocprTimeStyle"/>
+      </xsl:when>
+      <xsl:when test="contains($dateText,'CreateDate') or contains($dateText, 'SaveDate') or contains($dateText, 'PrintDate')">
+          <xsl:call-template name="InsertDocprLongDateStyle"/>
+      </xsl:when>
+      <!--default scenario-->
+      <xsl:otherwise>
+        <xsl:call-template name="InsertDateFormat">
+          <xsl:with-param name="FormatDate">
+            <xsl:value-of select="$FormatDate"/>
+          </xsl:with-param>
+          <xsl:with-param name="ParamField">
+            <xsl:text>DATE</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+      </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME')]" mode="automaticstyles">
+  <!--DOCPROPERTY CreateDate, SaveDate, PrintDate default format-->
+  <xsl:template name="InsertDocprLongDateStyle">
+    <number:date-style style:name="{generate-id()}">
+      <number:month number:style="long"/>
+      <number:text>-</number:text>
+      <number:day number:style="long"/>
+      <number:text>-</number:text>
+      <number:year number:style="long"/>
+      <number:text><xsl:text> </xsl:text> </number:text>
+      <number:hours number:style="long"/>
+      <number:text>:</number:text>
+      <number:minutes number:style="long"/>
+      <number:text>:</number:text>
+      <number:seconds number:style="long"/>
+      <number:text><xsl:text> </xsl:text> </number:text>
+      <number:am-pm/>
+    </number:date-style>
+  </xsl:template>
+  
+  <!--DOCPROPERTY CreateTime, LastSavedTime default format-->
+  <xsl:template name="InsertDocprTimeStyle">
+    <number:date-style style:name="{generate-id()}">
+      <number:year number:style="long"/>
+      <number:text>-</number:text>
+      <number:month number:style="long"/>
+      <number:text>-</number:text>
+      <number:day number:style="long"/>
+      <number:text><xsl:text> </xsl:text> </number:text>
+      <number:hours number:style="long"/>
+      <number:text>:</number:text>
+      <number:minutes number:style="long"/>
+    </number:date-style>
+  </xsl:template>
+  
+  <xsl:template match="w:fldSimple[contains(@w:instr,'TIME') or contains(@w:instr, 'TotalEditingTime') or contains(@w:instr, 'EditTime')]" mode="automaticstyles">
     <xsl:call-template name="InsertTimeStyle">
       <xsl:with-param name="timeText" select="@w:instr"/>
     </xsl:call-template>
