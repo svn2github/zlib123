@@ -2329,7 +2329,8 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length" select="substring-before($borderStr,  ' ')"/>
+                <xsl:with-param name="length"
+                  select="substring-before(substring-after($borderStr,  ' '), ' ')"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
