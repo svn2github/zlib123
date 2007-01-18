@@ -36,7 +36,8 @@
 
 
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
-
+ 
+  
   <xsl:template match="text:page-number" mode="paragraph">
     <w:r>
       <w:fldChar w:fldCharType="begin"/>
@@ -489,14 +490,14 @@
   <!-- insert field declarations only in the first paragraph -->
   <xsl:template name="InsertUserFieldDeclaration">
     <xsl:if test="parent::office:text">
-      <xsl:if test="not(preceding-sibling::*[self::text:p or self::text:h])">
-        <xsl:apply-templates select="preceding-sibling::text:user-field-decls/text:user-field-decl"/>
+      <xsl:if test="not(preceding-sibling::*[1][self::text:p or self::text:h])">
+        <xsl:apply-templates select="preceding-sibling::text:user-field-decls/text:user-field-decl" mode="user-field-decl"/>
       </xsl:if>
     </xsl:if>
   </xsl:template>
 
   <!-- convert user-field-decl into regular variable field. -->
-  <xsl:template match="text:user-field-decl">
+  <xsl:template match="text:user-field-decl" mode="user-field-decl">
     <xsl:call-template name="InsertVariableField"/>
   </xsl:template>
   
