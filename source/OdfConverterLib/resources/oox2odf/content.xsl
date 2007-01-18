@@ -328,33 +328,13 @@
     </xsl:variable>
 
     <xsl:choose>
-
-      <!--check if the paragraph starts a table-of content or Bibliography-->
-      <xsl:when test="w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY')]">
+    <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
+      <xsl:when test="w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText, 'INDEX' )]">
         <xsl:apply-templates select="." mode="tocstart"/>
       </xsl:when>
 
-      <xsl:when test="descendant::w:r[contains(w:instrText,'INDEX')]">
-        <xsl:apply-templates select="." mode="tocstart"/>
-      </xsl:when>
-
-      <!-- check if the pargraph is Citations -->
-
-      <xsl:when test="w:r[contains(w:instrText,'CITATION')]">
-        <text:p>
-          <xsl:call-template name="TextBibliographyMark">
-            <xsl:with-param name="TextIdentifier">
-              <xsl:value-of
-                select="substring-before(substring-after(w:r/w:instrText, 'CITATION '), ' \')"/>
-            </xsl:with-param>
-          </xsl:call-template>
-          <xsl:apply-templates select="following::w:p[1]/child::node()"/>
-        </text:p>
-      </xsl:when>
-
+     <!-- ignore paragraph if it's deleted in change tracking mode-->
       <xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
-
-
 
       <!--  check if the paragraf is list element (it can be a heading also) -->
       <xsl:when test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
