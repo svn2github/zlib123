@@ -392,8 +392,9 @@
           <xsl:value-of select="format-number(substring-before($length, 'px') * 0.0264,'#.###')"/>
         </xsl:when>
         <xsl:when test="not($length) or $length='' ">0</xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$length"/>
+        <xsl:otherwise>          
+          <xsl:value-of
+            select="format-number($length * 2.54 div 1440,'#.###')"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>

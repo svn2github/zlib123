@@ -444,6 +444,9 @@
 
   <xsl:template name="InsertShapeStyleProperties">
     <xsl:for-each select="v:shape | v:rect">
+      <xsl:if test="parent::node()[name()='v:group']">
+        <!-- TO DO v:shapes in v:group -->
+      </xsl:if>
       <xsl:call-template name="InsertShapeWrap"/>
       <xsl:call-template name="InsertShapeFromTextDistance"/>
       <xsl:call-template name="InsertShapeBorders"/>
