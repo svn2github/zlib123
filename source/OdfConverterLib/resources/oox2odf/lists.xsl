@@ -60,17 +60,31 @@
 
   <xsl:template match="w:abstractNum">
     <xsl:param name="id"/>
-    <text:list-style style:name="{concat('L',$id)}">
+    <text:list-style>
+      <xsl:attribute name="style:name">
+        <xsl:choose>
+          
+          <!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId --> 
+          <xsl:when test="key('numId',$id)/w:lvlOverride">
+            <xsl:value-of select="concat('LO',$id)"/>
+          </xsl:when>
+          
+          <!-- otherwise, list style is referred to abstractNumId -->
+          <xsl:otherwise>
+            <xsl:value-of select="concat('L',@w:abstractNumId)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
       <xsl:for-each select="w:lvl">
         <xsl:variable name="level" select="@w:ilvl"/>
         <xsl:choose>
-
+          
           <!-- when numbering style is overriden, num template is used -->
           <xsl:when test="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl">
             <xsl:apply-templates
               select="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl[@w:ilvl = $level]"/>
           </xsl:when>
-
+          
           <xsl:otherwise>
             <xsl:apply-templates select="."/>
           </xsl:otherwise>
@@ -582,8 +596,23 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <xsl:variable name="listNum">
+      <xsl:choose>
+        
+        <!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId -->
+        <xsl:when test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:lvlOverride">
+          <xsl:value-of select="concat('LO',$numId)"/>
+        </xsl:when>
+        
+        <!-- otherwise, list style is referred to abstractNumId -->
+        <xsl:otherwise>
+          <xsl:value-of select="concat('L',document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val)"/>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:variable>
+    
     <xsl:if test="$isFirstListItem = 'true'">
-      <text:list text:style-name="{concat('L',$numId)}">
+      <text:list text:style-name="{$listNum}">
 
         <!--  TODO - continue numbering-->
         <xsl:attribute name="text:continue-numbering">true</xsl:attribute>
@@ -919,7 +948,9 @@
   <!-- inserts automatic list styles with empty num format for elements which has non-existent w:num attached -->
   <xsl:template name="InsertDefaultListStyle">
     <xsl:param name="numId"/>
-    <xsl:variable name="listName" select="concat('L',$numId)"/>
+    
+    <!-- list style with empty num format must be referred to numId, because there is no abstractNumId -->
+    <xsl:variable name="listName" select="concat('LO',$numId)"/>
     <text:list-style style:name="{$listName}">
       <xsl:call-template name="InsertDefaultLevelProperties">
         <xsl:with-param name="levelNum" select="'1'"/>
