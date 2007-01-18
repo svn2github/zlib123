@@ -2409,11 +2409,11 @@
     <xsl:variable name="firstVal">
       <xsl:choose>
         <xsl:when test="w:right/@w:shadow='true' or w:right/@w:shadow=1 or w:right/@w:shadow='on'"
-          >0.0701in</xsl:when>
+          >0.019 in</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="w:left/@w:shadow='true' or w:left/@w:shadow=1 or w:left/@w:shadow='on'"
-              >0.0701in</xsl:when>
+              >0.019in</xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
@@ -2424,11 +2424,11 @@
       <xsl:choose>
         <xsl:when
           test="w:bottom/@w:shadow='true' or w:bottom/@w:shadow=1 or w:bottom/@w:shadow='on'"
-          >0.0701in</xsl:when>
+          >0.019in</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="w:top/@w:shadow='true' or w:top/@w:shadow=1 or w:top/@w:shadow='on'"
-              >0.0701in</xsl:when>
+              >0.019in</xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
