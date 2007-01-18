@@ -1044,10 +1044,10 @@
       </xsl:otherwise>
     </xsl:choose>
 
-    <xsl:if test="@fo:font-size-complex">
+    <xsl:if test="@style:font-size-complex">
       <w:szCs>
         <xsl:attribute name="w:val">
-          <xsl:value-of select="number(substring-before(@fo:font-size-complex, 'pt')) * 2"/>
+          <xsl:value-of select="number(substring-before(@style:font-size-complex, 'pt')) * 2"/>
         </xsl:attribute>
       </w:szCs>
     </xsl:if>

@@ -525,7 +525,18 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             public void Replace(object child, object newChild)
             {
-                if (((child as Attribute) != null) && ((newChild as Attribute) != null))
+                // replace a string child
+                if ((child is string) && (newChild is string))
+                {
+                    if (this.GetTextChildren().Contains(child))
+                    {
+                        int index = this.children.IndexOf(child);
+                        this.children.Remove(child);
+                        this.children.Insert(index, newChild);
+                    }
+                }
+                // replace an attribute child
+                else if (((child as Attribute) != null) && ((newChild as Attribute) != null))
                 {
                     if (this.attributes.Contains(child))
                     {
@@ -534,6 +545,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         this.attributes.Insert(index, newChild);
                     }
                 }
+                // replace an element child
                 else if (this.children.Contains(child))
                 {
                     int index = this.children.IndexOf(child);

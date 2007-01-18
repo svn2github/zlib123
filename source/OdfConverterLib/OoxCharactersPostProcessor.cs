@@ -393,7 +393,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (startChar.Equals(0))
             {
                 // get end of special symbol substring
-                endChar = text.LastIndexOfAny(charTable);
+                endChar = this.GetLastIndexOfCharSetInString(text, startChar, charTable);
                 // retrieve substring from run
                 r.ReplaceFirstTextChild(text.Substring(endChar + 1, text.Length - endChar - 1));
                 // return substring. Do not apply character processing to special characters.
@@ -414,6 +414,25 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 extractedText.IsReverse = false;
             }
             return extractedText;
+        }
+
+
+        // Find the last character of a certain char-set in a string.
+        private int GetLastIndexOfCharSetInString(string text, int startIndex, char[] charTable)
+        {
+            int i = startIndex;
+            while (i < text.Length && this.IsContainedInCharTable((text.Substring(i, 1)), charTable))
+            {
+                i++;
+            }
+            return i-1;
+        }
+
+
+        // Check if a character is contained in a char-set table
+        private bool IsContainedInCharTable(string character, char[] charTable)
+        {
+            return character.IndexOfAny(charTable) >= 0;
         }
 
 
@@ -562,12 +581,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 if (this.GetChild("t", NAMESPACE) != null)
                 {
-                    if (this.GetChild("t", NAMESPACE).GetTextChild() != newText)
+                    string oldText = this.GetChild("t", NAMESPACE).GetTextChild();
+                    if (!oldText.Equals(newText))
                     {
-                        Element oldT = this.GetChild("t", NAMESPACE);
-                        Element newT = new Element("w", "t", NAMESPACE);
-                        newT.AddChild(newText);
-                        this.Replace(oldT, newT);
+                        this.GetChild("t", NAMESPACE).Replace(oldText, newText);
                     }
                 }
             }
