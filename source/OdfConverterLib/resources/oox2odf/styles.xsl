@@ -1603,15 +1603,15 @@
   <xsl:template name="CheckIfList">
     <xsl:param name="StyleId"/>
     <xsl:choose>
-      <xsl:when test="w:numPr/w:numId/@w:val">
+      <xsl:when test="w:numPr/w:numId/@w:val and w:numPr/w:ilvl/@w:val &lt; 10">
         <xsl:text>true</xsl:text>
       </xsl:when>
-      <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+      <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">
         <xsl:text>true</xsl:text>
       </xsl:when>
 
       <xsl:when
-        test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+        test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">
         <xsl:text>true</xsl:text>
       </xsl:when>
       <xsl:otherwise>
