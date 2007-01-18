@@ -1045,11 +1045,14 @@
     </xsl:choose>
 
     <xsl:if test="@style:font-size-complex">
-      <w:szCs>
-        <xsl:attribute name="w:val">
-          <xsl:value-of select="number(substring-before(@style:font-size-complex, 'pt')) * 2"/>
-        </xsl:attribute>
-      </w:szCs>
+      <xsl:variable name="sz">
+        <xsl:call-template name="computeSize">
+          <xsl:with-param name="fontStyle">style:font-size-complex</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="number($sz)">
+        <w:szCs w:val="{$sz}"/>
+      </xsl:if>
     </xsl:if>
 
     <xsl:if test="@fo:background-color">
@@ -1277,13 +1280,15 @@
     -->
   <xsl:template name="computeSize">
     <xsl:param name="node" select="."/>
+    <xsl:param name="fontStyle">fo:font-size</xsl:param>
     <xsl:choose>
       <!-- when there's no unit -->
-      <xsl:when test="number($node/@fo:font-size)">
-        <xsl:value-of select="number($node/@fo:font-size) * 2"/>
+      <xsl:when test="number($node/@*[name() = $fontStyle])">
+        <xsl:value-of select="number($node/@*[name() = $fontStyle]) * 2"/>
       </xsl:when>
-      <xsl:when test="contains($node/@fo:font-size, 'pt')">
-        <xsl:value-of select="round(number(substring-before($node/@fo:font-size, 'pt')) * 2)"/>
+      <xsl:when test="contains($node/@*[name() = $fontStyle], 'pt')">
+        <xsl:value-of
+          select="round(number(substring-before($node/@*[name() = $fontStyle], 'pt')) * 2)"/>
       </xsl:when>
       <xsl:otherwise>
         <!-- look for font size in parent context -->
@@ -1295,6 +1300,7 @@
                 <xsl:call-template name="computeSize">
                   <xsl:with-param name="node"
                     select="key('styles', $parentStyleName)/style:text-properties"/>
+                  <xsl:with-param name="fontStyle" select="$fontStyle"/>
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
@@ -1304,9 +1310,9 @@
         <xsl:choose>
           <xsl:when test="number($value)">
             <xsl:choose>
-              <xsl:when test="contains($node/@fo:font-size, '%')">
+              <xsl:when test="contains($node/@*[name() = $fontStyle], '%')">
                 <xsl:value-of
-                  select="round(number(substring-before($node/@fo:font-size, '%')) div 100 * number($value))"
+                  select="round(number(substring-before($node/@*[name() = $fontStyle], '%')) div 100 * number($value))"
                 />
               </xsl:when>
               <xsl:otherwise>
@@ -1323,15 +1329,15 @@
               <xsl:for-each select="document('styles.xml')">
                 <xsl:choose>
                   <xsl:when
-                    test="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@fo:font-size">
+                    test="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@*[name() = $fontStyle]">
                     <xsl:value-of
-                      select="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@fo:font-size"
+                      select="office:document-styles/office:styles/style:default-style[@style:family=$family]/style:text-properties/@*[name() = $fontStyle]"
                     />
                   </xsl:when>
                   <xsl:otherwise>
                     <!-- when there is no other possibility -->
                     <xsl:value-of
-                      select="office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties/@fo:font-size"
+                      select="office:document-styles/office:styles/style:default-style[@style:family='paragraph']/style:text-properties/@*[name() = $fontStyle]"
                     />
                   </xsl:otherwise>
                 </xsl:choose>
@@ -1340,9 +1346,9 @@
             <xsl:variable name="defaultValue"
               select="number(substring-before($defaultProps, 'pt'))*2"/>
             <xsl:choose>
-              <xsl:when test="contains($node/@fo:font-size, '%')">
+              <xsl:when test="contains($node/@*[name() = $fontStyle], '%')">
                 <xsl:value-of
-                  select="round(number(substring-before($node/@fo:font-size, '%')) div 100 * number($defaultValue))"
+                  select="round(number(substring-before($node/@*[name() = $fontStyle], '%')) div 100 * number($defaultValue))"
                 />
               </xsl:when>
               <xsl:otherwise>
@@ -2329,8 +2335,11 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="eightspoint-measure">
-                <xsl:with-param name="length"
-                  select="substring-before(substring-after($borderStr,  ' '), ' ')"/>
+                <xsl:with-param name="length">
+                  <xsl:call-template name="ParseBorderWidth">
+                    <xsl:with-param name="border" select="$borderStr"/>
+                  </xsl:call-template>
+                </xsl:with-param>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -2379,6 +2388,44 @@
 
   </xsl:template>
 
+  <!-- find which of the three arguments in the string is a length value, and return it -->
+  <xsl:template name="ParseBorderWidth">
+    <xsl:param name="border"/>
+    <xsl:param name="argNumber" select="1"/>
+    <!-- find the value corresponding to the argument position -->
+    <xsl:variable name="argument">
+      <xsl:choose>
+        <xsl:when test="$argNumber = 1">
+          <xsl:value-of select="substring-before($border, ' ')"/>
+        </xsl:when>
+        <xsl:when test="$argNumber = 2">
+          <xsl:value-of select="substring-before(substring-after($border, ' '), ' ')"/>
+        </xsl:when>
+        <xsl:when test="$argNumber = 3">
+          <xsl:value-of select="substring-after(substring-after($border, ' '), ' ')"/>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="argVaue">
+      <xsl:call-template name="GetValue">
+        <xsl:with-param name="length" select="$argument"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <!-- if value is a number, return it. Otherwise, switch to next argument -->
+    <xsl:choose>
+      <xsl:when test="number($argVaue)">
+        <xsl:value-of select="$argument"/>
+      </xsl:when>
+      <xsl:when test="$argNumber &lt; 3">
+        <xsl:call-template name="ParseBorderWidth">
+          <xsl:with-param name="border" select="$border"/>
+          <xsl:with-param name="argNumber" select="$argNumber + 1"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
   <!-- compute the width of a border using border-line-width attribute -->
   <xsl:template name="ComputeBorderLineWidth">
