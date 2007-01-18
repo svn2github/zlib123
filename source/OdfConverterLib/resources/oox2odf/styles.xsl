@@ -101,7 +101,8 @@
 
   <!-- compute default paragraph props. Use default style, then docDefaults. -->
   <xsl:template name="InsertDefaultParagraphStyle">
-    <xsl:if test="w:styles/w:docDefaults[w:pPrDefault or w:rPrDefault] or key('default-styles', 'paragraph')">
+    <xsl:if
+      test="w:styles/w:docDefaults[w:pPrDefault or w:rPrDefault] or key('default-styles', 'paragraph')">
       <style:default-style style:family="paragraph">
         <style:paragraph-properties>
           <xsl:call-template name="InsertDefaultTabStop"/>
@@ -1741,7 +1742,8 @@
             <xsl:choose>
               <xsl:when test="$IndLeft != $IndHanging or ($IndHanging = 0 and $IndLeft= 0)">
                 <xsl:choose>
-                  <xsl:when test="$LeftNumber = $HangingNumber and ($IndHanging = '' or $IndHanging = 'Nan')">
+                  <xsl:when
+                    test="$LeftNumber = $HangingNumber and ($IndHanging = '' or $IndHanging = 'Nan')">
                     <xsl:value-of select="$IndLeft - $HangingNumber"/>
                   </xsl:when>
                   <xsl:otherwise>
@@ -2734,7 +2736,7 @@
       <xsl:choose>
         <!--ignore when in field because they can have it's own text transform properties see: InsertFieldProperties -->
         <xsl:when test="ancestor::w:r/w:instrText or ancestor::w:r/parent::w:fldSimple"/>
-         <xsl:when test="@w:val='off' or @w:val='false' or @w:val=0">none</xsl:when>
+        <xsl:when test="@w:val='off' or @w:val='false' or @w:val=0">none</xsl:when>
         <xsl:when test="@w:val='on' or @w:val='true' or @w:val=1">uppercase</xsl:when>
         <xsl:otherwise>uppercase</xsl:otherwise>
       </xsl:choose>
@@ -2874,7 +2876,7 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:if test="@w:ascii and not(ancestor::w:lvl)">
+    <xsl:if test="@w:ascii">
       <xsl:attribute name="style:font-name">
         <xsl:value-of select="@w:ascii"/>
       </xsl:attribute>

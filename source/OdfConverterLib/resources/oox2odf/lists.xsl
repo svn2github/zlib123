@@ -85,10 +85,6 @@
       <xsl:value-of select="number(@w:ilvl)+1"/>
     </xsl:variable>
 
-    <xsl:variable name="StyleNameId">
-      <xsl:value-of select="generate-id(parent::w:abstractNum)"/>
-    </xsl:variable>
-
     <xsl:choose>
 
       <!--check if it's numbering, bullet or picture bullet -->
@@ -148,9 +144,11 @@
           <xsl:attribute name="text:level">
             <xsl:value-of select="$lvl"/>
           </xsl:attribute>
-          <xsl:attribute name="text:style-name">
-            <xsl:value-of select="$StyleNameId"/>
-          </xsl:attribute>
+          <xsl:if test="w:rPr/w:rStyle">
+            <xsl:attribute name="text:style-name">
+              <xsl:value-of select="w:rPr/w:rStyle"/>
+            </xsl:attribute>
+          </xsl:if>
           <xsl:attribute name="text:bullet-char">
             <xsl:call-template name="TextChar"/>
           </xsl:attribute>
@@ -169,9 +167,11 @@
           <xsl:attribute name="text:level">
             <xsl:value-of select="$lvl"/>
           </xsl:attribute>
-          <xsl:attribute name="text:style-name">
-            <xsl:value-of select="$StyleNameId"/>
-          </xsl:attribute>
+          <xsl:if test="w:rPr/w:rStyle">
+            <xsl:attribute name="text:style-name">
+              <xsl:value-of select="w:rPr/w:rStyle"/>
+            </xsl:attribute>
+          </xsl:if>
           <xsl:if test="not(number(substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))))">
             <xsl:attribute name="style:num-suffix">
               <xsl:value-of select="substring(w:lvlText/@w:val,string-length(w:lvlText/@w:val))"/>
