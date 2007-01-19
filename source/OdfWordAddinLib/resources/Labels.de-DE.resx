@@ -151,7 +151,7 @@
     <value>%1 wird übersetzt.</value>
   </data>
   <data name="FeedbackLabel" xml:space="preserve">
-    <value>Einige Elemente können durch die Übersetzung verloren gegangen sein. Klicken Sie auf "Einzelheiten", um eine Liste von möglicherweise verlorenen Elementen zu sehen.</value>
+    <value>Einige Elemente können durch die Übersetzung verloren gegangen sein. Klicken Sie auf "Details", um eine Liste von möglicherweise verlorenen Elementen zu sehen.</value>
   </data>
   <data name="EncryptedDocumentDetail" xml:space="preserve">
     <value>Dieses Feature wird von der aktuellen Version des Add-Ins nicht unterstützt.</value>
@@ -183,8 +183,7 @@
   <data name="UnableToCreateOutputLabel" xml:space="preserve">
     <value>Die Datei kann nicht angelegt werden</value>
   </data>
-
-  <!-- xsl messages -->
+  <!-- ODF to OOX translation messages -->
   <data name="translation.odf2oox.paddingShortened" xml:space="preserve"><value>Zeilenfüllwert gekürzt</value></data>
   <data name="translation.odf2oox.borderShortened" xml:space="preserve"><value>Rahmenwert verkleinert</value></data>
   <data name="translation.odf2oox.textBgColor" xml:space="preserve"><value>Text-Hintergrundfarbe</value></data>
@@ -272,12 +271,29 @@
   <data name="translation.odf2oox.cellContentNotPrinted" xml:space="preserve"><value>Zellinhalt soll nicht gedruckt werden</value></data>
   <data name="translation.odf2oox.cellContentRepeated" xml:space="preserve"><value>Zellinhalt soll wiederholt werden</value></data>
   <data name="translation.odf2oox.cellRotationAngle" xml:space="preserve"><value>Drehwinkel einer Zelle</value></data>
-  <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve"><value>Ausrichtung einer Zelldrehung:</value></data>
-  
+  <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve"><value>Ausrichtung einer Zelldrehung:</value></data> 
   <!-- added 16/01 -->
-  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve"><value>Table of illustration caption format lost</value></data>
+  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve"><value>Format der Beschriftung für Abbildungsverzeichnis bleibt nicht erhalten</value></data>
   <!-- added 17/01 -->
-  <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>Line through width property lost</value></data>
-  <data name="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Line through color property lost</value></data>
+  <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>Dicke der Durchstrichlinie bleibt nicht erhalten</value></data>
+  <data name="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Farbe der Durchstrichlinie bleibt nicht erhalten</value></data>
+   
+  <!-- OOX to ODF translation messages -->
+  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve"><value>3D Effekte bei Formen bleiben nicht erhalten</value></data>
+  <data name="translation.oox2odf.shape.shadow" xml:space="preserve"><value>Lichtundurchlässigkeit bei Formschatten bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve"><value>Unschärfe bei Formschatten bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve"><value>Komplexe Perspektiven bei Formschatten bleiben nicht erhalten</value></data>
+  <data name="translation.oox2odf.background.textWatermark" xml:space="preserve"><value>Wasserzeichen bleiben nicht erhalten</value></data>
+  <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve"><value>gestrichelte Rahmen bei Textfeldern bleiben nicht erhalten</value></data>
+  <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve"><value>Schutz des Inhaltsverzeichnisses vor manuellen Änderungen bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.frame.inHeader" xml:space="preserve"><value>Rahmenposition in der Kopfzeile bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.frame.inFooter" xml:space="preserve"><value>Rahmenposition in der Fußzeile bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve"><value>relative Rahmengröße bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve"><value>Sperren des Bildseitenverhältnis bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve"><value>Skalierung relativ zur ursprünglichen Bildgröße bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve"><value>Sperren des Bildankers bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.picture.overlap" xml:space="preserve"><value>Eigenschaft "Erlaube überlappende Bilder" bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve"><value>Eigenschaft "Initialen im Seitenrand" bleibt nicht erhalten</value></data>
+  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve"><value>Eigenschaft "Neustart der Zeilennummerierung bei jedem Abschnitt" bleibt nicht erhalten</value></data>
  
 </root>
