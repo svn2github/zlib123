@@ -121,19 +121,19 @@
       Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="OdfImportLabel" xml:space="preserve">
-    <value>ODF Dateien öffnen...</value>
+    <value>ODF Dateien öffnen</value>
   </data>
   <data name="OdfImportDescription" xml:space="preserve">
-    <value>Eine Datei im OpenDocument Format (ODF) öffnen.</value>
+    <value>Dateien im OpenDocument Format (ODF) öffnen.</value>
   </data>
   <data name="OdfExportLabel" xml:space="preserve">
-    <value>Speichern als ODF...</value>
+    <value>Speichern als ODF</value>
   </data>
   <data name="OdfExportDescription" xml:space="preserve">
     <value>Eine Kopie des Dokumentes im OpenDocument Format (ODF) erstellen.</value>
   </data>
   <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
+    <value>ODF</value>
   </data>
   <data name="OdfUnexpectedError" xml:space="preserve">
     <value>Ein unerwarteter Fehler ereignete sich. Sie können den Fehler zusammen mit dem angehängten Dokument auf der Projekt-Website (http://odf-converter.sourceforge.net) melden.</value>
