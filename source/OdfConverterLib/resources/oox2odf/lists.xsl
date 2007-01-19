@@ -330,20 +330,20 @@
     </xsl:variable>
 
     <xsl:variable name="WFirstLine">
-      <xsl:choose>
-        <xsl:when test="$Ind/@w:firstLine">
-          <xsl:value-of select="$Ind/@w:firstLine"/>
-        </xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
-      </xsl:choose>
+      <xsl:call-template name="FirstLine"/>
     </xsl:variable>
-
-    <xsl:choose>
+    
+     <xsl:choose>
       <xsl:when test="$Ind/@w:hanging">
         <xsl:attribute name="text:space-before">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:value-of select="$WLeft - $WHanging"/>
+              <xsl:choose>
+                <xsl:when test="$WFirstLine = '0'">
+                  <xsl:value-of select="$WLeft - $WHanging"/>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -352,49 +352,56 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
-                <xsl:when
-                  test="w:suff/@w:val='nothing' or ($paragraph/w:pPr/w:ind/@w:left = 0 and $tab = '')"
-                  >0</xsl:when>
-                <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
-                <xsl:when test="$tab != '' and (number($WLeft) - number($tab) >= 0)">
-                  <xsl:value-of select="$tab - $WLeft + $WHanging"/>
+                <xsl:when test="$WFirstLine = '0'">
+                  <xsl:choose>
+                    <xsl:when
+                      test="w:suff/@w:val='nothing' or ($paragraph/w:pPr/w:ind/@w:left = 0 and $tab = '')"
+                      >0</xsl:when>
+                    <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
+                    <xsl:when test="$tab != '' and (number($WLeft) - number($tab) >= 0)">
+                      <xsl:value-of select="$tab - $WLeft + $WHanging"/>
+                    </xsl:when>
+                    <xsl:when test="$paragraph/w:pPr/w:ind/@w:hanging">
+                      <xsl:value-of select="$paragraph/w:pPr/w:ind/@w:hanging"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$Ind/@w:hanging"/>
+                    </xsl:otherwise>
+                  </xsl:choose>    
                 </xsl:when>
-                <xsl:when test="$paragraph/w:pPr/w:ind/@w:hanging">
-                  <xsl:value-of select="$paragraph/w:pPr/w:ind/@w:hanging"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$Ind/@w:hanging"/>
-                </xsl:otherwise>
+                <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name="text:min-label-distance">
-          <xsl:if test="$paragraph/w:pPr/w:ind/@w:left = 0 and $tab = ''">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of
-                  select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-          </xsl:if>
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length">
+                  <xsl:choose>
+                    <xsl:when test="$WFirstLine != '0'">
+                      <xsl:choose>
+                        <xsl:when test="$tab != '' and $tab - $WFirstLine > 0 ">
+                          <xsl:value-of select="$tab - $WFirstLine"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of
+                            select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:otherwise>0</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="text:space-before">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-              <xsl:choose>
-                <xsl:when
-                  test="w:pPr/w:outlineLvl/@w:val or document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:outlineLvl/@w:val">
-                  <xsl:value-of select="number($WLeft) + number($WFirstLine)"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="number($WLeft) + number($WFirstLine)"/>
-                </xsl:otherwise>
-              </xsl:choose>
+                  <xsl:value-of select="number($WLeft)"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -403,25 +410,42 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
-                <xsl:when
-                  test="../w:multiLevelType/@w:val='multilevel' and number($tab) > (number($WLeft) - number($WFirstLine))">
-                  <xsl:value-of select="$tab - number($WLeft) - number($WFirstLine)"/>
+                <xsl:when test="$WFirstLine = '0'">
+                  <xsl:choose>
+                    <xsl:when
+                      test="../w:multiLevelType/@w:val='multilevel' and number($tab) > (number($WLeft) - number($WFirstLine))">
+                      <xsl:value-of select="$tab - number($WLeft) - number($WFirstLine)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      0
+                    </xsl:otherwise>
+                  </xsl:choose>    
                 </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="number($WFirstLine)"/>
-                </xsl:otherwise>
+                <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name="text:min-label-distance">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
           <xsl:choose>
+            <xsl:when test="$tab != '' and $WFirstLine != '0'">
+              <xsl:value-of select="$tab - $WFirstLine"/>
+            </xsl:when>
+            <xsl:when test="$WFirstLine != '0'">
+              <xsl:value-of
+                select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+            </xsl:when>
             <xsl:when test="(3 * number($WFirstLine)) &lt; (number($tab) - number($WLeft)) ">
               <xsl:value-of select="number($tab) - number($WLeft) - (2 * number($WFirstLine))"/>
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>

@@ -1620,7 +1620,89 @@
     </xsl:choose>
   </xsl:template>
 
+<xsl:template name="FirstLine">
+  
+  <xsl:variable name="StyleId">
+    <xsl:value-of select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
+  </xsl:variable>
+  
+  <xsl:variable name="NumId">
+    <xsl:choose>
+      <xsl:when test="w:numPr/w:numId/@w:val">
+        <xsl:value-of select="w:numPr/w:numId/@w:val"/>
+      </xsl:when>
+      <xsl:when
+        test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+        <xsl:value-of
+          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val"
+        />
+      </xsl:when>
+      <xsl:when
+        test="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
+        <xsl:value-of
+          select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"
+        />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="Abstract">
+          <xsl:value-of select="parent::w:abstractNum/@w:abstractNumId"/>
+        </xsl:variable>
+        <xsl:value-of select="document('word/numbering.xml')/w:numbering/w:num[w:abstractNumId/@w:val = $Abstract]/@w:numId"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  
+  <xsl:variable name="Ivl">
+    <xsl:choose>
+      <xsl:when test="w:numPr/w:ilvl/@w:val">
+        <xsl:value-of select="w:numPr/w:ilvl/@w:val"/>
+      </xsl:when>
+      <xsl:when test="./@w:ilvl">
+        <xsl:value-of select="./@w:ilvl"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each select="document('word/styles.xml')">
+          <xsl:choose>
+            <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
+              <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"/>
+            </xsl:when>
+            <xsl:otherwise/>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  
+  <xsl:variable name="AbstractNumId">
+    <xsl:choose>
+      <xsl:when
+        test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val">
+        <xsl:value-of
+          select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
+        />
+      </xsl:when>
+    </xsl:choose>
+  </xsl:variable>
+  
+  <xsl:choose>
+    <xsl:when test="w:ind/@w:firstLine != ''">
+      <xsl:value-of select="w:ind/@w:firstLine"/>
+    </xsl:when>
+    <xsl:when
+      test="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine">
+      <xsl:value-of
+        select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
+      />
+    </xsl:when>
+    <xsl:when test="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine">
+          <xsl:value-of select="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine"/>
+    </xsl:when>
+    <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
 
+  
+</xsl:template>
+  
   <xsl:template name="CalculateMarginLeft">
     <xsl:param name="StyleId"/>
     <xsl:param name="CheckIfList"/>
@@ -1715,6 +1797,9 @@
 
         <xsl:variable name="FirstLine">
           <xsl:choose>
+            <xsl:when test="w:ind/@w:firstLine != ''">
+              <xsl:value-of select="w:ind/@w:firstLine"/>
+            </xsl:when>
             <xsl:when
               test="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine">
               <xsl:value-of
@@ -1723,8 +1808,13 @@
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
-        </xsl:variable>
+          </xsl:variable>
+        
+        <!-- left indent -->
         <xsl:choose>
+          <xsl:when test="$FirstLine != '0'">
+            <xsl:value-of select="$IndLeft"/>
+          </xsl:when>
           <xsl:when test=" $LeftNumber = '' and $IndLeft =''">
             <xsl:for-each select="document('word/styles.xml')">
               <xsl:choose>
@@ -1794,7 +1884,6 @@
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
 
 
@@ -1857,8 +1946,9 @@
           <xsl:value-of select="$IndHanging"/>
         </xsl:with-param>
         <xsl:with-param name="IndLeft">
-          <xsl:value-of select="$IndLeft"/>
+          <xsl:value-of select="$IndLeft"/>        
         </xsl:with-param>
+       
       </xsl:call-template>
     </xsl:variable>
 
@@ -2025,11 +2115,15 @@
         <xsl:otherwise>0cm</xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
+    
+    <xsl:variable name="FirstLine">
+      <xsl:call-template name="FirstLine"/>
+    </xsl:variable>
 
     <xsl:variable name="TextIndent">
       <xsl:choose>
-        <xsl:when test="w:ind/@w:firstLine">
-          <xsl:value-of select="w:ind/@w:firstLine"/>
+        <xsl:when test="$FirstLine != '0'">
+          <xsl:value-of select="$FirstLine"/>
         </xsl:when>
         <xsl:when test="$CheckIfList = 'true' and $IndHanging = $IndLeft and $IndLeft != ''">0</xsl:when>
         <xsl:when test="$CheckIfList = 'true' and $IndHanging != '' and $IndLeft !=''">
