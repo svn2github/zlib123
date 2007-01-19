@@ -198,7 +198,7 @@
         </xsl:when>
         <!--page-count NUMPAGE, DOCPROPERTY Pages-->
         <xsl:when
-          test="$fieldType = 'NUMPAGE' or $fieldType = 'numpage' or contains($fieldCode,'Pages')">
+          test="$fieldType = 'NUMPAGE' or  contains(.,'NUMPAGES') or $fieldType = 'numpage' or contains($fieldCode,'Pages')">
           <xsl:call-template name="InsertPageCount"/>
         </xsl:when>
         <xsl:when test="$fieldType = 'PAGE' or $fieldType = 'page' ">
