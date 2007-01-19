@@ -12,58 +12,62 @@
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   exclude-result-prefixes="w r xlink number wp ">
-  
+
+  <xsl:key name="track-changes" match="w:ins|w:del|w:pPrChange|w:rPrChange" use="''"/>
+
   <xsl:template match="w:r" mode="trackchanges">
     <xsl:choose>
       <xsl:when test="parent::w:del">
         <xsl:choose>
-          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
-          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
+          <xsl:when
+            test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
+          <xsl:when
+            test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
           <xsl:otherwise>
-        <text:changed-region>
-          <xsl:attribute name="text:id">
-            <xsl:value-of select="generate-id(.)"/>
-          </xsl:attribute>
-          <text:deletion>
-            <office:change-info>
-              <dc:creator>
-                <xsl:value-of select="parent::w:del/@w:author"/>
-              </dc:creator>
-              <dc:date>
-                <xsl:choose>
-                  <xsl:when test="contains(parent::w:del/@w:date,'Z')">
-                    <xsl:value-of select="substring-before(parent::w:del/@w:date,'Z')"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="parent::w:del/@w:date"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </dc:date>
-            </office:change-info>
-            <text:p>
-              <xsl:attribute name="text:style-name">
-                <xsl:value-of select="generate-id(ancestor::w:p)"/>
+            <text:changed-region>
+              <xsl:attribute name="text:id">
+                <xsl:value-of select="generate-id(.)"/>
               </xsl:attribute>
-              <xsl:choose>
-                <!--check whether string contains  whitespace sequence-->
-                <xsl:when test="not(contains(w:delText,'  '))">
-                  <xsl:value-of select="w:delText"/>
-                  <xsl:if test="w:delInstrText">
-                    <xsl:value-of select="w:delInstrText"/>
-                  </xsl:if>
-                </xsl:when>
-                <xsl:otherwise>
-                  <!--converts whitespaces sequence to text:s-->
-                  <xsl:call-template name="InsertWhiteSpaces">
-                    <xsl:with-param name="string">
+              <text:deletion>
+                <office:change-info>
+                  <dc:creator>
+                    <xsl:value-of select="parent::w:del/@w:author"/>
+                  </dc:creator>
+                  <dc:date>
+                    <xsl:choose>
+                      <xsl:when test="contains(parent::w:del/@w:date,'Z')">
+                        <xsl:value-of select="substring-before(parent::w:del/@w:date,'Z')"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="parent::w:del/@w:date"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </dc:date>
+                </office:change-info>
+                <text:p>
+                  <xsl:attribute name="text:style-name">
+                    <xsl:value-of select="generate-id(ancestor::w:p)"/>
+                  </xsl:attribute>
+                  <xsl:choose>
+                    <!--check whether string contains  whitespace sequence-->
+                    <xsl:when test="not(contains(w:delText,'  '))">
                       <xsl:value-of select="w:delText"/>
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:otherwise>
-              </xsl:choose>
-            </text:p>
-          </text:deletion>
-        </text:changed-region>
+                      <xsl:if test="w:delInstrText">
+                        <xsl:value-of select="w:delInstrText"/>
+                      </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <!--converts whitespaces sequence to text:s-->
+                      <xsl:call-template name="InsertWhiteSpaces">
+                        <xsl:with-param name="string">
+                          <xsl:value-of select="w:delText"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </text:p>
+              </text:deletion>
+            </text:changed-region>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -118,7 +122,7 @@
     </xsl:choose>
     <xsl:apply-templates mode="trackchanges"/>
   </xsl:template>
-  
+
   <xsl:template match="w:rPr[parent::w:pPr]" mode="trackchanges">
     <xsl:choose>
       <xsl:when test="w:del">
@@ -154,7 +158,8 @@
               <xsl:attribute name="text:style-name">
                 <xsl:choose>
                   <xsl:when test="following::w:p[1]/w:pPr/w:pPrChange/w:pPr/w:pStyle">
-                    <xsl:value-of select="following::w:p[1]/w:pPr/w:pPrChange/w:pPr/w:pStyle/@w:val"/>
+                    <xsl:value-of select="following::w:p[1]/w:pPr/w:pPrChange/w:pPr/w:pStyle/@w:val"
+                    />
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="generate-id(following::w:p[1])"/>
@@ -194,31 +199,45 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="TrackChanges">
-    <text:tracked-changes>    
-      <xsl:if test="document('word/document.xml')/w:document/w:body/descendant::w:ins or 
-        document('word/document.xml')/w:document/w:body/descendant::w:del or
-        document('word/document.xml')/w:document/w:body/descendant::w:pPrChange or
-        document('word/document.xml')/w:document/w:body/descendant::w:rPrChange">
-        <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
-          mode="trackchanges"/>
-      </xsl:if>
-      <xsl:for-each select="document('word/_rels/document.xml.rels')/descendant::node()/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
+    <xsl:variable name="hasTrackChanges">
+      <xsl:for-each select="document('word/document.xml')/w:document/w:body">
+        <xsl:if test="key('track-changes', '')">true</xsl:if>
+      </xsl:for-each>
+      <xsl:for-each
+        select="document('word/_rels/document.xml.rels')/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
         <xsl:variable name="file">
           <xsl:value-of select="."/>
         </xsl:variable>
-        <xsl:if test="document(concat('word/',$file))/descendant::w:ins or 
-          document(concat('word/',$file))/descendant::w:del or
-          document(concat('word/',$file))/descendant::w:pPrChange or
-          document(concat('word/',$file))/descendant::w:rPrChange">
-          <xsl:apply-templates select="document(concat('word/',$file))"
-            mode="trackchanges"/>
-        </xsl:if>
+        <xsl:for-each select="document(concat('word/',$file))">
+          <xsl:if test="key('track-changes', '')">true</xsl:if>
+        </xsl:for-each>
       </xsl:for-each>
-    </text:tracked-changes>
+    </xsl:variable>
+    <xsl:if test="$hasTrackChanges = 'true' ">
+      <text:tracked-changes>
+        <xsl:for-each select="document('word/document.xml')/w:document/w:body">
+          <xsl:if test="key('track-changes', '')">
+            <xsl:apply-templates select="document('word/document.xml')/w:document/w:body"
+              mode="trackchanges"/>
+          </xsl:if>
+        </xsl:for-each>
+        <xsl:for-each
+          select="document('word/_rels/document.xml.rels')/Relationships/Relationship/@Target[contains(.,'footer') or contains(.,'header') or contains(.,'footnotes') or contains(.,'endnotes')]">
+          <xsl:variable name="file">
+            <xsl:value-of select="."/>
+          </xsl:variable>
+          <xsl:for-each select="document(concat('word/',$file))">
+            <xsl:if test="key('track-changes', '')">
+              <xsl:apply-templates select="document(concat('word/',$file))" mode="trackchanges"/>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:for-each>
+      </text:tracked-changes>
+    </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="TrackChangesInsertMade">
     <text:change-start>
       <xsl:attribute name="text:change-id">
@@ -232,11 +251,13 @@
       </xsl:attribute>
     </text:change-end>
   </xsl:template>
-  
+
   <xsl:template name="TrackChangesDeleteMade">
     <xsl:choose>
-      <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
-      <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
+      <xsl:when
+        test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[last()]) and ancestor::w:p/w:pPr/w:rPr/w:del"/>
+      <xsl:when
+        test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:r[1]) and preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
       <xsl:otherwise>
         <text:change>
           <xsl:attribute name="text:change-id">
@@ -246,7 +267,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="TrackChangesChangesMade">
     <text:change-start>
       <xsl:attribute name="text:change-id">
@@ -265,15 +286,15 @@
       </xsl:attribute>
     </text:change-end>
   </xsl:template>
-  
+
   <xsl:template match="w:t" mode="trackchanges"/>
-  
+
   <xsl:template match="w:delText" mode="trackchanges"/>
-  
+
   <xsl:template match="w:delInstrText" mode="trackchanges"/>
-  
+
   <xsl:template match="w:instrText" mode="trackchanges"/>
-  
+
   <xsl:template match="wp:posOffset" mode="trackchanges"/>
-  
+
 </xsl:stylesheet>
