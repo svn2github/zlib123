@@ -206,11 +206,12 @@
   <data name="translation.odf2oox.visitedLinkStyle" xml:space="preserve"><value>Formatvorlage für besuchte Hyperlinks</value></data>
   <data name="translation.odf2oox.hiddenSection" xml:space="preserve"><value>versteckter Abschnitt</value></data>
   <data name="translation.odf2oox.conditionalHiddenSection" xml:space="preserve"><value>bedingter versteckter Abschnitt</value></data>
-  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Passwort für {0} </value></data>
-  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Index {0} für Kapitelbereich (???)</value></data>
-  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Index {0} für Einzugseigenschaft (???)</value></data>
-  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Index {0} Sortieralgorithmus (???)</value></data>
-  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Index {0} Schutz (???) </value></data>
+  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Passwort für %1 </value></data>
+  <!-- TODO : review those messages -->
+  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Index %1 für Kapitelbereich (???)</value></data>
+  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Index %1 für Einzugseigenschaft (???)</value></data>
+  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Index %1 Sortieralgorithmus (???)</value></data>
+  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Index %1 Schutz (???) </value></data>
   <data name="translation.odf2oox.alphabeticalIndexConcordanceFile" xml:space="preserve"><value>Alphabetical index concordance file (???)</value></data>
   <data name="translation.odf2oox.dropcapSize" xml:space="preserve"><value>Größe der Initialen</value></data>
   <data name="translation.odf2oox.pageBreakBeforeEndnotes" xml:space="preserve"><value>Seitenumbruch vor Endnoten</value></data>

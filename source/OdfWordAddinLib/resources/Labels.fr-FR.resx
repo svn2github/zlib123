@@ -203,11 +203,11 @@
   <data name="translation.odf2oox.visitedLinkStyle" xml:space="preserve"><value>Style d'un lien visité</value></data>
   <data name="translation.odf2oox.hiddenSection" xml:space="preserve"><value>Section cachée</value></data>
   <data name="translation.odf2oox.conditionalHiddenSection" xml:space="preserve"><value>Section cachée sous condition</value></data>
-  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Clé de protection pour {0} </value></data>
-  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Portée de chapitre de l'index {0}</value></data>
-  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Propriété d'indentation de l'index {0}</value></data>
-  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Algorithme de tri de l'index {0}</value></data>
-  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Protection de l'index {0}</value></data>
+  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Clé de protection pour %1 </value></data>
+  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Portée de chapitre de l'index %1</value></data>
+  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Propriété d'indentation de l'index %1</value></data>
+  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Algorithme de tri de l'index %1</value></data>
+  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Protection de l'index %1</value></data>
   <data name="translation.odf2oox.alphabeticalIndexConcordanceFile" xml:space="preserve"><value>Fichier de concordance de l'index lexical</value></data>
   <data name="translation.odf2oox.dropcapSize" xml:space="preserve"><value>Taille de lettrine</value></data>
   <data name="translation.odf2oox.pageBreakBeforeEndnotes" xml:space="preserve"><value>Saut de page avant les notes de fin</value></data>

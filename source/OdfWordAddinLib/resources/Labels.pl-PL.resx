@@ -206,11 +206,11 @@
   <data name="translation.odf2oox.visitedLinkStyle" xml:space="preserve"><value>Styl odsyłacza odwiedzonego</value></data>
   <data name="translation.odf2oox.hiddenSection" xml:space="preserve"><value>Sekcja ukryta</value></data>
   <data name="translation.odf2oox.conditionalHiddenSection" xml:space="preserve"><value>Sekcja ukryta warunkowo</value></data>
-  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Klucz zabezpieczenia pamięci dla {0} </value></data>
-  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Indeks {0} zasięgu rozdziału</value></data>
-  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Indeks {0} właściwości wcięcia</value></data>
-  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Indeks {0} algorytmu sortowania</value></data>
-  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Indeks {0} zabezpieczenia</value></data>
+  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Klucz zabezpieczenia pamięci dla %1 </value></data>
+  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Indeks %1 zasięgu rozdziału</value></data>
+  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Indeks %1 właściwości wcięcia</value></data>
+  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Indeks %1 algorytmu sortowania</value></data>
+  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Indeks %1 zabezpieczenia</value></data>
   <data name="translation.odf2oox.alphabeticalIndexConcordanceFile" xml:space="preserve"><value>Indeks alfabetyczny pliku skorowidzowego</value></data>
   <data name="translation.odf2oox.dropcapSize" xml:space="preserve"><value>Rozmiar inicjału</value></data>
   <data name="translation.odf2oox.pageBreakBeforeEndnotes" xml:space="preserve"><value>Podział strony przed przypisem końcowym</value></data>

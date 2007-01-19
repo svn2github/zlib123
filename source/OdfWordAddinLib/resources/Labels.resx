@@ -206,11 +206,11 @@
   <data name="translation.odf2oox.visitedLinkStyle" xml:space="preserve"><value>Style of visited link lost</value></data>
   <data name="translation.odf2oox.hiddenSection" xml:space="preserve"><value>Hidden section lost</value></data>
   <data name="translation.odf2oox.conditionalHiddenSection" xml:space="preserve"><value>Conditional hidden section lost</value></data>
-  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Protection key for {0} lost</value></data>
-  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Index {0} chapter scope lost</value></data>
-  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Index {0} indent property lost</value></data>
-  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Index {0} sort algorithm lost</value></data>
-  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Index {0} protection lost</value></data>
+  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Protection key for %1 lost</value></data>
+  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Index %1 chapter scope lost</value></data>
+  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Index %1 indent property lost</value></data>
+  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Index %1 sort algorithm lost</value></data>
+  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Index %1 protection lost</value></data>
   <data name="translation.odf2oox.alphabeticalIndexConcordanceFile" xml:space="preserve"><value>Alphabetical index concordance file lost</value></data>
   <data name="translation.odf2oox.dropcapSize" xml:space="preserve"><value>Dropcap size lost</value></data>
   <data name="translation.odf2oox.pageBreakBeforeEndnotes" xml:space="preserve"><value>Page break before endnotes lost</value></data>
