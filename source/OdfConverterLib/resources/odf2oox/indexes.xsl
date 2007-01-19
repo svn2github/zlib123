@@ -958,26 +958,26 @@
     </xsl:variable>
     <xsl:if test="*/@text:index-scope = 'chapter' ">
       <xsl:message terminate="no">
-        <xsl:text>translation.odf2oox.indexChapterScope</xsl:text>
+        <xsl:text>translation.odf2oox.indexChapterScope%</xsl:text>
         <xsl:value-of select="$indexName"/>
       </xsl:message>
     </xsl:if>
     <xsl:if test="*/@text:relative-tab-stop-position = 'false' ">
       <xsl:message terminate="no">
-        <xsl:text>translation.odf2oox.indexIndentProperty</xsl:text>
+        <xsl:text>translation.odf2oox.indexIndentProperty%</xsl:text>
         <xsl:value-of select="$indexName"/>
       </xsl:message>
     </xsl:if>
     <xsl:if test="*/@text:sort-algorithm">
       <xsl:message terminate="no">
-        <xsl:text>translation.odf2oox.indexSortAlgorithm</xsl:text>
+        <xsl:text>translation.odf2oox.indexSortAlgorithm%</xsl:text>
         <xsl:value-of select="$indexName"/>
       </xsl:message>
     </xsl:if>
     <!-- report loss of toc protection -->
     <xsl:if test="@text:protected = 'true' ">
       <xsl:message terminate="no">
-        <xsl:text>translation.odf2oox.indexProtection</xsl:text>
+        <xsl:text>translation.odf2oox.indexProtection%</xsl:text>
         <xsl:value-of select="$indexName"/>
       </xsl:message>
     </xsl:if>

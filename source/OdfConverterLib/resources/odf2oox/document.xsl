@@ -1087,7 +1087,7 @@
   <!-- Protected sections -->
   <xsl:template match="text:section[@text:protected = 'true' ]" priority="2">
     <xsl:if test="@text:protection-key">
-      <xsl:message terminate="no">translation.odf2oox.protectionKey<xsl:value-of select="@text:name"
+      <xsl:message terminate="no">translation.odf2oox.protectionKey%<xsl:value-of select="@text:name"
       /></xsl:message>
     </xsl:if>
     <xsl:choose>
