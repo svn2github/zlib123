@@ -4,7 +4,7 @@ include $(top_srcdir)/build/common.mk
 
 ifeq ($(OS),Cygwin)
 CC=gcc -mno-cygwin
-CFLAGS=-Wall -I win32-zlib
+CFLAGS=-Wall -I ../..
 else
 LD=ld
 CC=cc
