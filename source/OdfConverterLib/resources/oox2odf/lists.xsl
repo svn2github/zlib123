@@ -604,6 +604,16 @@
           <xsl:value-of select="concat('LO',$numId)"/>
         </xsl:when>
         
+        <xsl:when test="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink">
+          <xsl:variable name="linkedStyle">
+            <xsl:value-of select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink/@w:val"/>
+          </xsl:variable>
+          <xsl:variable name="linkedNumId">
+            <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $linkedStyle]/w:pPr/w:numPr/w:numId/@w:val"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('L',document('word/numbering.xml')/w:numbering/w:num[@w:numId=$linkedNumId]/w:abstractNumId/@w:val)"/>
+        </xsl:when>
+        
         <!-- otherwise, list style is referred to abstractNumId -->
         <xsl:otherwise>
           <xsl:value-of select="concat('L',document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val)"/>
