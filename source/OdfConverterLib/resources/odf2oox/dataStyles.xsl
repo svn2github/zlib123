@@ -65,6 +65,9 @@
             </w:instrText>
           </xsl:if>
         </w:r>
+        <w:r>
+          <w:fldChar w:fldCharType="separate"/>
+        </w:r>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:apply-templates mode="paragraph"/>
