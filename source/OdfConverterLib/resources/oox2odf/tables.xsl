@@ -259,7 +259,8 @@
     <xsl:variable name="mstyleId">
       <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     </xsl:variable>
-    <xsl:if
+    <xsl:choose>
+      <xsl:when 
       test="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]">
       <xsl:variable name="mstyle"
         select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
@@ -287,8 +288,30 @@
         <xsl:with-param name="tblDefMar" select="$mstyle/w:top"/>
         <xsl:with-param name="attribute">fo:padding-top</xsl:with-param>
       </xsl:call-template>
-    </xsl:if>
-
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="InsertCellMargins">
+          <xsl:with-param name="tcMar" select="w:tcMar/w:bottom"/>
+          <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
+          <xsl:with-param name="attribute">fo:padding-bottom</xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertCellMargins">
+          <xsl:with-param name="tcMar" select="w:tcMar/w:left"/>
+          <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:left"/>
+          <xsl:with-param name="attribute">fo:padding-left</xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertCellMargins">
+          <xsl:with-param name="tcMar" select="w:tcMar/w:right"/>
+          <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:right"/>
+          <xsl:with-param name="attribute">fo:padding-right</xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertCellMargins">
+          <xsl:with-param name="tcMar" select="w:tcMar/w:top"/>
+          <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"/>
+          <xsl:with-param name="attribute">fo:padding-top</xsl:with-param>
+        </xsl:call-template> 
+      </xsl:otherwise>
+    </xsl:choose>
     <!--    borders-->
     <xsl:call-template name="InsertCellBorders"/>
 
