@@ -368,7 +368,7 @@
           </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="$tblDefMar">
         <xsl:attribute name="{$attribute}">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
@@ -377,7 +377,7 @@
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
-      </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 
