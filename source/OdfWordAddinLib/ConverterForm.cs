@@ -140,7 +140,27 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
         private void FeedbackMessageInterceptor(object sender, EventArgs e)
         {
             string messageKey = ((OdfEventArgs)e).Message;
-            string messageValue = manager.GetString(messageKey);
+            string messageValue = null;
+            
+        	int index = messageKey.IndexOf('%');
+        	// parameters substitution
+        	if (index > 0)
+        	{
+        		string [] param  = messageKey.Substring(index+1).Split(new char [] {'%'});
+        		messageValue = manager.GetString(messageKey.Substring(0, index));
+        		
+        		if (messageValue != null)
+        		{
+        			for (int i = 0; i < param.Length; i++)
+        			{
+        				messageValue = messageValue.Replace("%"+(i+1), param[i]);
+        			}
+        		}
+        	}
+        	else 
+        	{
+            	messageValue = manager.GetString(messageKey);
+        	}
             
             if (messageValue != null && !lostElements.Contains(messageValue))
             {
