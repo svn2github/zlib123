@@ -740,9 +740,7 @@
   </xsl:template>
 
   <xsl:template name="InsertPageCount">
-    <text:page-count>
-      <xsl:apply-templates select="w:r/child::node()"/>
-    </text:page-count>
+    <text:page-count/>
   </xsl:template>
 
 

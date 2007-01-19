@@ -48,6 +48,9 @@
                 <!--check whether string contains  whitespace sequence-->
                 <xsl:when test="not(contains(w:delText,'  '))">
                   <xsl:value-of select="w:delText"/>
+                  <xsl:if test="w:delInstrText">
+                    <xsl:value-of select="w:delInstrText"/>
+                  </xsl:if>
                 </xsl:when>
                 <xsl:otherwise>
                   <!--converts whitespaces sequence to text:s-->
@@ -266,6 +269,8 @@
   <xsl:template match="w:t" mode="trackchanges"/>
   
   <xsl:template match="w:delText" mode="trackchanges"/>
+  
+  <xsl:template match="w:delInstrText" mode="trackchanges"/>
   
   <xsl:template match="w:instrText" mode="trackchanges"/>
   
