@@ -36,7 +36,7 @@
 
   <!--horizontal line-->
   <xsl:template match="v:rect">
-<!--    version 1.1-->
+    <!--    version 1.1-->
     <!--<draw:rect>
       <xsl:call-template name="InsertCommonShapeProperties"/>
     </draw:rect>-->
@@ -1034,4 +1034,5 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
 </xsl:stylesheet>

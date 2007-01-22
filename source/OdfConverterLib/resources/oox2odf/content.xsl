@@ -27,6 +27,7 @@
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
@@ -151,8 +152,8 @@
     mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">
-      <xsl:call-template name="MasterPageName"/>
       <xsl:call-template name="InsertParagraphParentStyle"/>
+      <xsl:call-template name="MasterPageName"/>
 
       <style:paragraph-properties>
         <xsl:call-template name="InsertDefaultTabStop"/>
@@ -328,16 +329,18 @@
     </xsl:variable>
 
     <xsl:choose>
-    <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
-      <xsl:when test="w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText, 'INDEX' )]">
+      <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
+      <xsl:when
+        test="w:r[contains(w:instrText,'TOC') or contains(w:instrText,'BIBLIOGRAPHY') or contains(w:instrText, 'INDEX' )]">
         <xsl:apply-templates select="." mode="tocstart"/>
       </xsl:when>
 
-     <!-- ignore paragraph if it's deleted in change tracking mode-->
+      <!-- ignore paragraph if it's deleted in change tracking mode-->
       <xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
 
       <!--  check if the paragraf is list element (it can be a heading also) -->
-      <xsl:when test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
+      <xsl:when
+        test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
         <xsl:apply-templates select="." mode="list">
           <xsl:with-param name="numId" select="$numId"/>
           <xsl:with-param name="level" select="$level"/>
@@ -528,14 +531,15 @@
           <xsl:value-of select="ancestor::w:p/w:pPr/w:pStyle/@w:val"/>
         </xsl:variable>
         <xsl:choose>
-          <xsl:when test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:tab[1]) and (ancestor::w:p/w:pPr/w:ind/@w:hanging != '' or document('word/styles.xml')/w:styles/w:style[@w:styleId = $StyleId]/w:pPr/w:ind/@w:hanging != '')"/>
+          <xsl:when
+            test="generate-id(.) = generate-id(ancestor::w:p/descendant::w:tab[1]) and (ancestor::w:p/w:pPr/w:ind/@w:hanging != '' or document('word/styles.xml')/w:styles/w:style[@w:styleId = $StyleId]/w:pPr/w:ind/@w:hanging != '')"/>
           <xsl:otherwise>
             <text:tab/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <text:tab/>    
+        <text:tab/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -847,97 +851,54 @@
     <xsl:variable name="mainSectPr"
       select="document('word/document.xml')/w:document/w:body/w:sectPr"/>
 
-    <xsl:if test="not(preceding::w:p)">
-      <xsl:choose>
-        <xsl:when test="$followingSectPr">
+    <xsl:choose>
+      <xsl:when test="not(preceding::w:p)">
+        <xsl:choose>
+          <xsl:when test="$followingSectPr">
+            <xsl:choose>
+              <xsl:when test="$followingSectPr/w:titlePg">
+                <xsl:attribute name="style:master-page-name">
+                  <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="style:master-page-name">
+                  <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="$mainSectPr/w:titlePg">
+                <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="preceding::w:p[parent::w:body][1]/w:pPr/w:sectPr">
           <xsl:choose>
-            <xsl:when test="$followingSectPr/w:titlePg">
+            <xsl:when test="not($precSectPr/w:type/@w:val = 'continuous')">
               <xsl:attribute name="style:master-page-name">
-                <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
+                <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
               </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:attribute name="style:master-page-name">
-                <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
-              </xsl:attribute>
+              <xsl:if test="$followingSectPr/w:titlePg">
+                <xsl:attribute name="style:master-page-name">
+                  <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
+                </xsl:attribute>
+              </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when test="$mainSectPr/w:titlePg">
-              <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
-    <xsl:if test="preceding::w:p[parent::w:body][1]/w:pPr/w:sectPr">
-      <xsl:choose>
-        <xsl:when
-          test="( $precSectPr/w:pgSz/@w:w != $followingSectPr/w:pgSz/@w:w
-          or $precSectPr/w:pgSz/@w:h != $followingSectPr/w:pgSz/@w:h
-          or $precSectPr/w:pgSz/@w:orient != $followingSectPr/w:pgSz/@w:orient
-          or $mainSectPr/w:pgSz/@w:w != $followingSectPr/w:pgSz/@w:w
-          or $mainSectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
-          or $mainSectPr/w:pgSz/@w:orient != $followingSectPr/w:pgSz/@w:orient )
-          and not($followingSectPr/w:headerReference)
-          and not($followingSectPr/w:footerReference)">
-          <xsl:attribute name="style:master-page-name">
-            <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when test="$followingSectPr">
-              <xsl:choose>
-                <xsl:when test="$followingSectPr/w:titlePg">
-                  <xsl:attribute name="style:master-page-name">
-                    <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
-                  </xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:if
-                    test="($precSectPr/w:pgSz/@w:w != $followingSectPr/w:pgSz/@w:w
-                    or $precSectPr/w:pgSz/@w:h != $followingSectPr/w:pgSz/@w:h
-                    or $precSectPr/w:pgSz/@w:orient != $followingSectPr/w:pgSz/@w:orient 
-                    or $mainSectPr/w:pgSz/@w:w != $followingSectPr/w:pgSz/@w:w
-                    or $mainSectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
-                    or $mainSectPr/w:pgSz/@w:orient != $followingSectPr/w:pgSz/@w:orient) 
-                    or $followingSectPr/w:headerReference 
-                    or $followingSectPr/w:footerReference">
-                    <xsl:attribute name="style:master-page-name">
-                      <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:choose>
-                <xsl:when test="following::w:sectPr/w:titlePg">
-                  <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:if
-                    test="( $precSectPr/w:pgSz/@w:w != $mainSectPr/w:pgSz/@w:w 
-                    or $precSectPr/w:pgSz/@w:h != $mainSectPr/w:pgSz/@w:h 
-                    or $precSectPr/w:pgSz/@w:orient != $mainSectPr/w:pgSz/@w:orient 
-                    or $mainSectPr/w:headerReference 
-                    or $mainSectPr/w:footerReference )
-                    or $mainSectPr/w:cols">
-                    <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
-                  </xsl:if>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
