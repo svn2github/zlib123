@@ -2048,6 +2048,10 @@
 
   <!-- Section properties -->
   <xsl:template match="style:section-properties" mode="section">
+    <!-- report lost attributes -->
+    <xsl:if test="text:notes-configuration[@text:note-class='footnote']">
+      <xsl:message terminate="no">translation.odf2oox.sectionFootnotes</xsl:message>
+    </xsl:if>
     <!-- margins -->
     <xsl:if test="@fo:margin-left != '' or @fo:margin-right != '' ">
       <w:pgMar>
