@@ -1,1168 +1,192 @@
-<html xmlns:v="urn:schemas-microsoft-com:vml"
-xmlns:o="urn:schemas-microsoft-com:office:office"
-xmlns:w="urn:schemas-microsoft-com:office:word"
-xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
-xmlns="http://www.w3.org/TR/REC-html40">
+<html>
+    <head>
+        <title>ODF Add-in for Microsoft Word</title>
+    </head>
+    <body>
+        <h1>
+            <a name="top">ODF Add-in for Microsoft Word</a>
+        </h1>
 
-<head>
-<meta http-equiv=Content-Type content="text/html; charset=us-ascii">
-<meta name=ProgId content=Word.Document>
-<meta name=Generator content="Microsoft Word 12">
-<meta name=Originator content="Microsoft Word 12">
-<link rel=File-List href="Readme2007.en_files/filelist.xml">
-<title>ODF Add-in for Microsoft Word</title>
-<!--[if gte mso 9]><xml>
- <o:DocumentProperties>
-  <o:Author>Vijay Rajagopalan</o:Author>
-  <o:Template>Normal</o:Template>
-  <o:LastAuthor>Vijay Rajagopalan</o:LastAuthor>
-  <o:Revision>3</o:Revision>
-  <o:TotalTime>0</o:TotalTime>
-  <o:Created>2007-01-20T03:14:00Z</o:Created>
-  <o:LastSaved>2007-01-20T03:43:00Z</o:LastSaved>
-  <o:Pages>2</o:Pages>
-  <o:Words>739</o:Words>
-  <o:Characters>4215</o:Characters>
-  <o:Company>Microsoft</o:Company>
-  <o:Lines>35</o:Lines>
-  <o:Paragraphs>9</o:Paragraphs>
-  <o:CharactersWithSpaces>4945</o:CharactersWithSpaces>
-  <o:Version>12.00</o:Version>
- </o:DocumentProperties>
-</xml><![endif]-->
-<link rel=themeData href="Readme2007.en_files/themedata.thmx">
-<link rel=colorSchemeMapping href="Readme2007.en_files/colorschememapping.xml">
-<!--[if gte mso 9]><xml>
- <w:WordDocument>
-  <w:SpellingState>Clean</w:SpellingState>
-  <w:GrammarState>Clean</w:GrammarState>
-  <w:TrackMoves>false</w:TrackMoves>
-  <w:TrackFormatting/>
-  <w:ValidateAgainstSchemas/>
-  <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
-  <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
-  <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
-  <w:DoNotPromoteQF/>
-  <w:LidThemeOther>EN-US</w:LidThemeOther>
-  <w:LidThemeAsian>X-NONE</w:LidThemeAsian>
-  <w:LidThemeComplexScript>X-NONE</w:LidThemeComplexScript>
-  <w:Compatibility>
-   <w:BreakWrappedTables/>
-   <w:SnapToGridInCell/>
-   <w:WrapTextWithPunct/>
-   <w:UseAsianBreakRules/>
-   <w:DontGrowAutofit/>
-   <w:SplitPgBreakAndParaMark/>
-   <w:DontVertAlignCellWithSp/>
-   <w:DontBreakConstrainedForcedTables/>
-   <w:DontVertAlignInTxbx/>
-   <w:Word11KerningPairs/>
-   <w:CachedColBalance/>
-  </w:Compatibility>
-  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
-  <m:mathPr>
-   <m:mathFont m:val="Cambria Math"/>
-   <m:brkBin m:val="before"/>
-   <m:brkBinSub m:val="--"/>
-   <m:smallFrac m:val="off"/>
-   <m:dispDef/>
-   <m:lMargin m:val="0"/>
-   <m:rMargin m:val="0"/>
-   <m:defJc m:val="centerGroup"/>
-   <m:wrapIndent m:val="1440"/>
-   <m:intLim m:val="subSup"/>
-   <m:naryLim m:val="undOvr"/>
-  </m:mathPr></w:WordDocument>
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <w:LatentStyles DefLockedState="false" DefUnhideWhenUsed="true"
-  DefSemiHidden="true" DefQFormat="false" DefPriority="99"
-  LatentStyleCount="267">
-  <w:LsdException Locked="false" Priority="0" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Normal"/>
-  <w:LsdException Locked="false" Priority="9" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="heading 1"/>
-  <w:LsdException Locked="false" Priority="9" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="heading 2"/>
-  <w:LsdException Locked="false" Priority="9" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="heading 3"/>
-  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 4"/>
-  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 5"/>
-  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 6"/>
-  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 7"/>
-  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 8"/>
-  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 9"/>
-  <w:LsdException Locked="false" Priority="39" Name="toc 1"/>
-  <w:LsdException Locked="false" Priority="39" Name="toc 2"/>
-  <w:LsdException Locked="false" Priority="39" Name="toc 3"/>
-  <w:LsdException Locked="false" Priority="39" Name="toc 4"/>
-  <w:LsdException Locked="false" Priority="39" Name="toc 5"/>
-  <w:LsdException Locked="false" Priority="39" Name="toc 6"/>
-  <w:LsdException Locked="false" Priority="39" Name="toc 7"/>
-  <w:LsdException Locked="false" Priority="39" Name="toc 8"/>
-  <w:LsdException Locked="false" Priority="39" Name="toc 9"/>
-  <w:LsdException Locked="false" Priority="35" QFormat="true" Name="caption"/>
-  <w:LsdException Locked="false" Priority="10" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Title"/>
-  <w:LsdException Locked="false" Priority="1" Name="Default Paragraph Font"/>
-  <w:LsdException Locked="false" Priority="11" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Subtitle"/>
-  <w:LsdException Locked="false" Priority="22" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Strong"/>
-  <w:LsdException Locked="false" Priority="20" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Emphasis"/>
-  <w:LsdException Locked="false" Priority="59" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Table Grid"/>
-  <w:LsdException Locked="false" UnhideWhenUsed="false" Name="Placeholder Text"/>
-  <w:LsdException Locked="false" Priority="1" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="No Spacing"/>
-  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Shading"/>
-  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light List"/>
-  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Grid"/>
-  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 1"/>
-  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 2"/>
-  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 1"/>
-  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 2"/>
-  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 1"/>
-  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 2"/>
-  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 3"/>
-  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Dark List"/>
-  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Shading"/>
-  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful List"/>
-  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Grid"/>
-  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Shading Accent 1"/>
-  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light List Accent 1"/>
-  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Grid Accent 1"/>
-  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 1"/>
-  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 1"/>
-  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 1 Accent 1"/>
-  <w:LsdException Locked="false" UnhideWhenUsed="false" Name="Revision"/>
-  <w:LsdException Locked="false" Priority="34" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="List Paragraph"/>
-  <w:LsdException Locked="false" Priority="29" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Quote"/>
-  <w:LsdException Locked="false" Priority="30" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Intense Quote"/>
-  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 2 Accent 1"/>
-  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 1"/>
-  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 1"/>
-  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 1"/>
-  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Dark List Accent 1"/>
-  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Shading Accent 1"/>
-  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful List Accent 1"/>
-  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Grid Accent 1"/>
-  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Shading Accent 2"/>
-  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light List Accent 2"/>
-  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Grid Accent 2"/>
-  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 2"/>
-  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 2"/>
-  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 1 Accent 2"/>
-  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 2 Accent 2"/>
-  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 2"/>
-  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 2"/>
-  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 2"/>
-  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Dark List Accent 2"/>
-  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Shading Accent 2"/>
-  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful List Accent 2"/>
-  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Grid Accent 2"/>
-  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Shading Accent 3"/>
-  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light List Accent 3"/>
-  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Grid Accent 3"/>
-  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 3"/>
-  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 3"/>
-  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 1 Accent 3"/>
-  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 2 Accent 3"/>
-  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 3"/>
-  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 3"/>
-  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 3"/>
-  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Dark List Accent 3"/>
-  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Shading Accent 3"/>
-  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful List Accent 3"/>
-  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Grid Accent 3"/>
-  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Shading Accent 4"/>
-  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light List Accent 4"/>
-  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Grid Accent 4"/>
-  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 4"/>
-  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 4"/>
-  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 1 Accent 4"/>
-  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 2 Accent 4"/>
-  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 4"/>
-  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 4"/>
-  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 4"/>
-  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Dark List Accent 4"/>
-  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Shading Accent 4"/>
-  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful List Accent 4"/>
-  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Grid Accent 4"/>
-  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Shading Accent 5"/>
-  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light List Accent 5"/>
-  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Grid Accent 5"/>
-  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 5"/>
-  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 5"/>
-  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 1 Accent 5"/>
-  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 2 Accent 5"/>
-  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 5"/>
-  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 5"/>
-  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 5"/>
-  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Dark List Accent 5"/>
-  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Shading Accent 5"/>
-  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful List Accent 5"/>
-  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Grid Accent 5"/>
-  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Shading Accent 6"/>
-  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light List Accent 6"/>
-  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Light Grid Accent 6"/>
-  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 6"/>
-  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 6"/>
-  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 1 Accent 6"/>
-  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium List 2 Accent 6"/>
-  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 6"/>
-  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 6"/>
-  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 6"/>
-  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Dark List Accent 6"/>
-  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Shading Accent 6"/>
-  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful List Accent 6"/>
-  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
-   UnhideWhenUsed="false" Name="Colorful Grid Accent 6"/>
-  <w:LsdException Locked="false" Priority="19" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Subtle Emphasis"/>
-  <w:LsdException Locked="false" Priority="21" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Intense Emphasis"/>
-  <w:LsdException Locked="false" Priority="31" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Subtle Reference"/>
-  <w:LsdException Locked="false" Priority="32" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Intense Reference"/>
-  <w:LsdException Locked="false" Priority="33" SemiHidden="false"
-   UnhideWhenUsed="false" QFormat="true" Name="Book Title"/>
-  <w:LsdException Locked="false" Priority="37" Name="Bibliography"/>
-  <w:LsdException Locked="false" Priority="39" QFormat="true" Name="TOC Heading"/>
- </w:LatentStyles>
-</xml><![endif]-->
-<style>
-<!--
- /* Font Definitions */
- @font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;
-	mso-font-charset:0;
-	mso-generic-font-family:roman;
-	mso-font-pitch:variable;
-	mso-font-signature:-1610611985 1107304683 0 0 159 0;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-style-parent:"";
-	margin:0in;
-	margin-bottom:.0001pt;
-	mso-pagination:widow-orphan;
-	font-size:12.0pt;
-	font-family:"Times New Roman","serif";
-	mso-fareast-font-family:"Times New Roman";
-	mso-fareast-theme-font:minor-fareast;}
-h1
-	{mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-style-link:"Heading 1 Char";
-	mso-margin-top-alt:auto;
-	margin-right:0in;
-	mso-margin-bottom-alt:auto;
-	margin-left:0in;
-	mso-pagination:widow-orphan;
-	mso-outline-level:1;
-	font-size:24.0pt;
-	font-family:"Times New Roman","serif";
-	mso-fareast-font-family:"Times New Roman";
-	mso-fareast-theme-font:minor-fareast;
-	font-weight:bold;}
-h2
-	{mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-style-link:"Heading 2 Char";
-	mso-margin-top-alt:auto;
-	margin-right:0in;
-	mso-margin-bottom-alt:auto;
-	margin-left:0in;
-	mso-pagination:widow-orphan;
-	mso-outline-level:2;
-	font-size:18.0pt;
-	font-family:"Times New Roman","serif";
-	mso-fareast-font-family:"Times New Roman";
-	mso-fareast-theme-font:minor-fareast;
-	font-weight:bold;}
-h3
-	{mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-style-link:"Heading 3 Char";
-	mso-margin-top-alt:auto;
-	margin-right:0in;
-	mso-margin-bottom-alt:auto;
-	margin-left:0in;
-	mso-pagination:widow-orphan;
-	mso-outline-level:3;
-	font-size:13.5pt;
-	font-family:"Times New Roman","serif";
-	mso-fareast-font-family:"Times New Roman";
-	mso-fareast-theme-font:minor-fareast;
-	font-weight:bold;}
-a:link, span.MsoHyperlink
-	{mso-style-noshow:yes;
-	mso-style-priority:99;
-	color:blue;
-	text-decoration:underline;
-	text-underline:single;}
-a:visited, span.MsoHyperlinkFollowed
-	{mso-style-noshow:yes;
-	mso-style-priority:99;
-	color:purple;
-	text-decoration:underline;
-	text-underline:single;}
-p
-	{mso-style-noshow:yes;
-	mso-style-priority:99;
-	mso-margin-top-alt:auto;
-	margin-right:0in;
-	mso-margin-bottom-alt:auto;
-	margin-left:0in;
-	mso-pagination:widow-orphan;
-	font-size:12.0pt;
-	font-family:"Times New Roman","serif";
-	mso-fareast-font-family:"Times New Roman";
-	mso-fareast-theme-font:minor-fareast;}
-span.Heading1Char
-	{mso-style-name:"Heading 1 Char";
-	mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-style-locked:yes;
-	mso-style-link:"Heading 1";
-	mso-ansi-font-size:14.0pt;
-	mso-bidi-font-size:14.0pt;
-	font-family:"Cambria","serif";
-	mso-ascii-font-family:Cambria;
-	mso-ascii-theme-font:major-latin;
-	mso-fareast-font-family:"Times New Roman";
-	mso-fareast-theme-font:major-fareast;
-	mso-hansi-font-family:Cambria;
-	mso-hansi-theme-font:major-latin;
-	mso-bidi-font-family:"Times New Roman";
-	mso-bidi-theme-font:major-bidi;
-	color:#365F91;
-	mso-themecolor:accent1;
-	mso-themeshade:191;
-	font-weight:bold;}
-span.Heading2Char
-	{mso-style-name:"Heading 2 Char";
-	mso-style-noshow:yes;
-	mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-style-locked:yes;
-	mso-style-link:"Heading 2";
-	mso-ansi-font-size:13.0pt;
-	mso-bidi-font-size:13.0pt;
-	font-family:"Cambria","serif";
-	mso-ascii-font-family:Cambria;
-	mso-ascii-theme-font:major-latin;
-	mso-fareast-font-family:"Times New Roman";
-	mso-fareast-theme-font:major-fareast;
-	mso-hansi-font-family:Cambria;
-	mso-hansi-theme-font:major-latin;
-	mso-bidi-font-family:"Times New Roman";
-	mso-bidi-theme-font:major-bidi;
-	color:#4F81BD;
-	mso-themecolor:accent1;
-	font-weight:bold;}
-span.Heading3Char
-	{mso-style-name:"Heading 3 Char";
-	mso-style-noshow:yes;
-	mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-style-locked:yes;
-	mso-style-link:"Heading 3";
-	mso-ansi-font-size:12.0pt;
-	mso-bidi-font-size:12.0pt;
-	font-family:"Cambria","serif";
-	mso-ascii-font-family:Cambria;
-	mso-ascii-theme-font:major-latin;
-	mso-fareast-font-family:"Times New Roman";
-	mso-fareast-theme-font:major-fareast;
-	mso-hansi-font-family:Cambria;
-	mso-hansi-theme-font:major-latin;
-	mso-bidi-font-family:"Times New Roman";
-	mso-bidi-theme-font:major-bidi;
-	color:#4F81BD;
-	mso-themecolor:accent1;
-	font-weight:bold;}
-span.SpellE
-	{mso-style-name:"";
-	mso-spl-e:yes;}
-span.GramE
-	{mso-style-name:"";
-	mso-gram-e:yes;}
-.MsoChpDefault
-	{mso-style-type:export-only;
-	mso-default-props:yes;
-	font-size:10.0pt;
-	mso-ansi-font-size:10.0pt;
-	mso-bidi-font-size:10.0pt;}
-@page Section1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.0in 1.0in 1.0in;
-	mso-header-margin:.5in;
-	mso-footer-margin:.5in;
-	mso-paper-source:0;}
-div.Section1
-	{page:Section1;}
- /* List Definitions */
- @list l0
-	{mso-list-id:159395009;
-	mso-list-template-ids:1117714732;}
-@list l0:level1
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:Symbol;}
-@list l0:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1
-	{mso-list-id:623005441;
-	mso-list-template-ids:1662043494;}
-@list l1:level1
-	{mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2
-	{mso-list-id:1216307595;
-	mso-list-template-ids:-1393110770;}
-@list l2:level1
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:Symbol;}
-@list l2:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3
-	{mso-list-id:1278836088;
-	mso-list-template-ids:1304355900;}
-@list l3:level1
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:Symbol;}
-@list l3:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4
-	{mso-list-id:1598445885;
-	mso-list-template-ids:1714561326;}
-@list l4:level1
-	{mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5
-	{mso-list-id:1872103957;
-	mso-list-template-ids:-462488950;}
-@list l5:level1
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:Symbol;}
-@list l5:level2
-	{mso-level-number-format:bullet;
-	mso-level-text:o;
-	mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:"Courier New";
-	mso-bidi-font-family:"Times New Roman";}
-@list l5:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-ol
-	{margin-bottom:0in;}
-ul
-	{margin-bottom:0in;}
--->
-</style>
-<!--[if gte mso 10]>
-<style>
- /* Style Definitions */
- table.MsoNormalTable
-	{mso-style-name:"Table Normal";
-	mso-tstyle-rowband-size:0;
-	mso-tstyle-colband-size:0;
-	mso-style-noshow:yes;
-	mso-style-priority:99;
-	mso-style-qformat:yes;
-	mso-style-parent:"";
-	mso-padding-alt:0in 5.4pt 0in 5.4pt;
-	mso-para-margin:0in;
-	mso-para-margin-bottom:.0001pt;
-	mso-pagination:widow-orphan;
-	font-size:10.0pt;
-	font-family:"Times New Roman","serif";}
-</style>
-<![endif]--><!--[if gte mso 9]><xml>
- <o:shapedefaults v:ext="edit" spidmax="3074"/>
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <o:shapelayout v:ext="edit">
-  <o:idmap v:ext="edit" data="1"/>
- </o:shapelayout></xml><![endif]-->
-</head>
+        <p> Thank you for downloading ODF Add-in for Word. The purpose of this software is to enable
+            users to open ODF Specification based documents in Microsoft Word and demonstrate the
+            interoperability between OpenXML &amp; ODF specifications.  This interoperability project is hosted on
+            <a href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>. For more details and future updates on 
+            the project, please look at the RoadMap document.</p>
 
-<body lang=EN-US link=blue vlink=purple style='tab-interval:.5in'>
+        <h2>Table of Content</h2>
+        <ul>
+            <li>
+                <a href="#hRequirements">Software Requirements</a>
+            </li>
+            <li>
+                <a href="#hInstall">Installing the add-in</a>
+            </li>
+            <li>
+                <a href="#hTroobleshooting">Troubleshooting Guide</a>
+            </li>
+            <li>
+                <a>Features/options not supported</a>
+                <ul>
+                    <li>
+                        <a href="#hFeatureDirect">ODF to OpenXML conversion</a>
+                    </li>
+                    <li>
+                        <a href="#hFeatureReverse">OpenXML to ODF conversion</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
 
-<div class=Section1>
+        <h2>
+            <a name="hRequirements"> Software Requirements</a>
+        </h2>
+        <p>Before installing the add-in, make sure you have the following...</p>
+        <ul>
+            <li><a href="http://www.microsoft.com/office/preview/beta/download/en/default.mspx">Word
+                    2007 RTM</a> with .NET Programmability Support activated</li>
+            <li>
+                <a
+                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
+                    >.NET framework 2.0</a>
+            </li>
+        </ul>
 
-<h1><a name=top><span style='mso-fareast-font-family:"Times New Roman"'>ODF
-Add-in for Microsoft Word</span></a><span style='mso-fareast-font-family:"Times New Roman"'>
-<o:p></o:p></span></h1>
+        <p><strong>Warning:</strong> if you install Microsoft Word before the .NET Framework, you will
+            need to update your Word installation, by running the following these steps below. </p>
+        <ol>
+            <li>Open "Add or remove Programs" from the Control Panel</li>
+            <li>Find the Microsoft Word entry and choose "Modify"</li>
+            <li>Within the installation process, choose "Add or remove features" then add ".NET
+                Programmability Support" in the "Microsoft Office Word" section. </li>
+        </ol>
+        <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
 
-<p>Thank you for downloading ODF Add-in for Word. The purpose of this software
-is to enable users to open ODF Specification based documents in Microsoft Word
-and demonstrate the interoperability between <span class=SpellE>OpenXML</span>
-&amp; ODF specifications. This interoperability project is hosted on <a
-href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>. For
-more details and future updates on the project, please look at the &#8220;<span
-class=SpellE>RoadMap</span>&#8221; document. </p>
+        <h2>
+            <a name="hInstall">Installing the add-in</a>
+        </h2>
+        <p>Double click the &quot;OdfAddInForWordSetup.exe&quot; file</p>
 
-<h2><span style='mso-fareast-font-family:"Times New Roman"'>Table of Content<o:p></o:p></span></h2>
+        <p> If installation is successful, you should be able to open an &quot;.ODT&quot;
+            file from Microsoft Word (see menu &quot;File>ODF...&quot;). Also, when
+            right-clicking on a &quot;.ODT&quot; file in explorer, you should have the
+            option to open the document in Microsoft Word (menu &quot;Open with Word&quot;). </p>
+        <p>
+            <strong>Important note:</strong> The ODF file opened by the add-in is imported in
+            Microsoft Word as a read-only .DOCX file. If you want to save it as ODF, you will have
+            to first make a copy of the document (&quot;Menu>Save As&quot;) and then use the
+            &quot;Export as ODF&quot; menu. </p>
+        <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
 
-<ul type=disc>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo1;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'><a href="#hRequirements">Software Requirements</a> <o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo1;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'><a href="#hInstall">Installing the add-in</a> <o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo1;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'><a href="#hTroobleshooting">Troubleshooting Guide</a> <o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo1;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Features/options not supported <o:p></o:p></span></li>
- <ul type=circle>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l5 level2 lfo1;tab-stops:list 1.0in'><span
-      style='mso-fareast-font-family:"Times New Roman"'><a
-      href="#hFeatureDirect">ODF to <span class=SpellE>OpenXML</span> conversion</a>
-      <o:p></o:p></span></li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l5 level2 lfo1;tab-stops:list 1.0in'><span
-      style='mso-fareast-font-family:"Times New Roman"'><a
-      href="#hFeatureReverse"><span class=SpellE>OpenXML</span> to ODF
-      conversion</a> <o:p></o:p></span></li>
- </ul>
-</ul>
+        <h2>
+            <a name="hTroobleshooting">Troubleshooting</a>
+        </h2>
+        <p> If you don't see the ODF entry in Microsoft Word menu, it could be due to missing
+            features in Word (see <a href="#hRequirements">Software Requirements</a> section) or a
+            failure in the installation of Word Primary Interop Assemblies. You will then need to
+            activate the Add-in manually by doing the following... </p>
+        <ol>
+            <li>Click &quot;Word Options&quot; in the &quot;File&quot; menu</li>
+            <li>In the &quot;Add-ins&quot; section, select &quot;COM Add-ins&quot;
+                in the list box and press the &quot;Go&quot; button</li>
+            <li>Make sure to select the checkbox &quot;ODF Word Add-in&quot; and
+                validate with the &quot;OK&quot; button.</li>
+        </ol>
+       <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
 
-<h2><a name=hRequirements><span style='mso-fareast-font-family:"Times New Roman"'>Software
-Requirements</span></a><span style='mso-fareast-font-family:"Times New Roman"'>
-<o:p></o:p></span></h2>
-
-<p>Before installing the add-in, make sure you have the following...</p>
-
-<ul type=disc>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l0 level1 lfo2;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'><a
-     href="http://www.microsoft.com/office/preview/beta/download/en/default.mspx">Word
-     2007 RTM</a> with .NET Programmability Support activated<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l0 level1 lfo2;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'><a
-     href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET
-     framework 2.0</a> <o:p></o:p></span></li>
-</ul>
-
-<p><strong>Warning:</strong> if you install Microsoft Word before the .NET Framework,
-you will need to update your Word installation, by running the following these
-steps below. </p>
-
-<ol start=1 type=1>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l4 level1 lfo3;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Open &quot;Add or remove Programs&quot; from the
-     Control Panel<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l4 level1 lfo3;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Find the Microsoft Word entry and choose
-     &quot;Modify&quot;<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l4 level1 lfo3;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Within the installation process, choose &quot;Add or
-     remove features&quot; then add &quot;.NET Programmability Support&quot; in
-     the &quot;Microsoft Office Word&quot; section. <o:p></o:p></span></li>
-</ol>
-
-<p><a href="#top">Back to top</a> </p>
-
-<h2><a name=hInstall><span style='mso-fareast-font-family:"Times New Roman"'>Installing
-the add-in</span></a><span style='mso-fareast-font-family:"Times New Roman"'> <o:p></o:p></span></h2>
-
-<p>Double click the OdfAddInForWordSetup-en-1.0.MSI file</p>
-
-<p>If installation is successful, you should be able to open an
-&quot;.ODT&quot; file from Microsoft Word (see menu
-&quot;File&gt;ODF...&quot;). Also, when right-clicking on <span class=GramE>a</span>
-&quot;.ODT&quot; file in explorer, you should have the option to open the
-document in Microsoft Word (menu &quot;Open with Word&quot;). </p>
-
-<p><strong>Important note:</strong> The ODF file opened by the add-in is
-imported in Microsoft Word as a read-only .DOCX file. If you want to save it as
-ODF, you will have to first make a copy of the document (&quot;Menu&gt;Save
-As&quot;) and then use the &quot;Export as ODF&quot; menu. </p>
-
-<p><a href="#top">Back to top</a> </p>
-
-<h2><a name=hTroobleshooting><span style='mso-fareast-font-family:"Times New Roman"'>Troubleshooting</span></a><span
-style='mso-fareast-font-family:"Times New Roman"'> <o:p></o:p></span></h2>
-
-<p>If you don't see the ODF entry in Microsoft Word menu, it could be due to
-missing features in Word (see <a href="#hRequirements">Software Requirements</a>
-section) or a failure in the installation of Word Primary <span class=SpellE>Interop</span>
-Assemblies. You will then need to activate the Add-in manually by doing the
-following... </p>
-
-<ol start=1 type=1>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo4;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Click &quot;Word Options&quot; in the &quot;File&quot;
-     menu<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo4;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>In the &quot;Add-ins&quot; section, select &quot;COM
-     Add-ins&quot; in the list box and press the &quot;Go&quot; button<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo4;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Make sure to select the checkbox &quot;ODF Word
-     Add-in&quot; and validate with the &quot;OK&quot; button.<o:p></o:p></span></li>
-</ol>
-
-<p><a href="#top">Back to top</a> </p>
-
-<h2><span style='mso-fareast-font-family:"Times New Roman"'>Features/options
-not supported <o:p></o:p></span></h2>
-
-<h3><a name=hFeatureDirect><span style='mso-fareast-font-family:"Times New Roman"'>Opening
-an ODF File...</span></a><span style='mso-fareast-font-family:"Times New Roman"'>
-<o:p></o:p></span></h3>
-
-<ul type=disc>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Text blinking<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Table cell protection<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Number of widow or orphans lines<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>'Manual' and 'From left' alignment in tables<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Last line alignment in justified paragraph<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Max number of table columns<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>'Leading' line spacing in a paragraph<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Tabs fill character of a paragraph<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>'Title' and 'lowercase' style options<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Keep with next paragraph for table<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Don't split table<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Hidden Sections<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Background Image in Tables<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Break before Table<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Even Column Height<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Font Size for Super/Subscript<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Character rotation<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Repeat Heading in a Table<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Copy Heading while splitting Table<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Table Shadowing Style<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>List Vertical Numbering<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>List : Minimum Space Between Numbering and Text<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Tab-stop in numbering<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Image position in frame<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Text background color<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Foot notes reference auto numbering<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Next Master style lost without page-break<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Keep ratio feature for frames<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Columns for frames/text-boxes<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Background color of pages<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Section's background color<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Notes embedded in text-boxes<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Image borders<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>ENTRY TOC<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Background opacity<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Page break<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Cropped images<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>00 'spacing at tops of pages' option<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>SVM images<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Font weight<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Image wrapping<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Paragraph Border with Image Inside<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>TOC protection against manual changes<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Line Numbering<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Table of Contents Protection<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Date format<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Paragraph and Page shadow<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Column separator<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Footnote/endnote in a list<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Relative picture position<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo5;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Text vertical alignment in text-box<o:p></o:p></span></li>
-</ul>
-
-<p><a href="#top">Back to top</a> </p>
-
-<h3><a name=hFeatureReverse><span style='mso-fareast-font-family:"Times New Roman"'>Saving
-an ODF File...</span></a><span style='mso-fareast-font-family:"Times New Roman"'>
-<o:p></o:p></span></h3>
-
-<ul type=disc>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Scale relative to <span class=SpellE>orginal</span>
-     picture size<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Picture rotation<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Footnote and Endnote<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Table Text Wrapping<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Table Style Border<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Picture position option: &quot;move object with
-     text&quot;, &quot;lock anchor', &quot;allow overlap&quot;<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Start Page Numbering (starting with something other
-     than 1)<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Adjust List Indents (Follow number with: space)<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Alignment tabs in header/footer<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Space size when text is &quot;Justify&quot;<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Frame anchor in header and footer<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Text watermarks<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Hyperlinks in Table of Figures<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Mark entry<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Change multiple characters in numbering<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Columns after section<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Font style in fields<o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Build Table Of Figures from styles <o:p></o:p></span></li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo6;tab-stops:list .5in'><span style='mso-fareast-font-family:
-     "Times New Roman"'>Table Identifier<o:p></o:p></span></li>
-</ul>
-
-<p><a href="#top">Back to top</a> </p>
-
-</div>
-
-</body>
-
+        <h2>
+            <a>Features/options not supported</a>
+        </h2>
+        <h3>
+            <a name="hFeatureDirect">Opening an ODF File...</a>
+        </h3>
+        <ul>
+            <li>Text blinking</li>
+            <li>Table cell protection</li>
+            <li>Number of widow or orphans lines</li>
+            <li>'Manual' and 'From left' alignment in tables</li>
+            <li>Last line alignment in justified paragraph</li>
+            <li>Max number of table columns</li>
+            <li>'Leading' line spacing in a paragraph</li>
+            <li>Tabs fill character of a paragraph</li>
+            <li>'Title' and 'lowercase' style options</li>
+            <li>Keep with next paragraph for table</li>
+            <li>Don't split table</li>
+            <li>Hidden Sections</li>
+            <li>Background Image in Tables</li>
+            <li>Break before Table</li>
+            <li>Even Column Height</li>
+            <li>Font Size for Super/Subscript</li>
+            <li>Character rotation</li>
+            <li>Repeat Heading in a Table</li>
+            <li>Copy Heading while splitting Table</li>
+            <li>Table Shadowing Style</li>
+            <li>List Vertical Numbering</li>
+            <li>List : Minimum Space Between Numbering and Text</li>
+            <li>Tab-stop in numbering</li>
+            <li>Image position in frame</li>
+            <li>Text background color</li>
+            <li>Foot notes reference auto numbering</li>
+            <li>Next Master style lost without page-break</li>
+            <li>Keep ratio feature for frames</li>
+            <li>Columns for frames/text-boxes</li>
+            <li>Background color of pages</li>
+            <li>Section's background color</li>
+            <li>Notes embedded in text-boxes</li>
+            <li>Image borders</li>
+            <li>Text references (Entry) in Table of Content</li>
+            <li>Background opacity</li>
+            <li>Page break</li>
+            <li>Cropped images</li>
+            <li>'Spacing at tops of pages' option</li>
+            <li>SVM images</li>
+            <li>Font weight</li>
+            <li>Image wrapping</li>
+            <li>Paragraph Border with Image Inside</li>
+            <li>Table of Content protection against manual changes</li>
+            <li>Line Numbering</li>
+            <li>Table of Contents Protection</li>
+            <li>Date format</li>
+            <li>Paragraph and Page shadow</li>
+            <li>Column separator</li>
+            <li>Footnote/endnote in a list</li>
+            <li>Relative picture position</li>
+            <li>Text vertical alignment in text-box</li>
+        </ul>
+        <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
+        <h3>
+            <a name="hFeatureReverse">Saving an ODF File...</a>
+        </h3>
+        <ul>
+            <li>Scale relative to orginal picture size</li>
+            <li>Picture rotation</li>
+            <li>Footnote and Endnote</li>
+            <li>Table Text Wrapping</li>
+            <li>Table Style Border</li>
+            <li>Picture position option: "move object with text", "lock anchor', "allow overlap"</li>
+            <li>Start Page Numbering (starting with something other than 1)</li>
+            <li>Adjust List Indents (Follow number with: space)</li>
+            <li>Alignment tabs in header/footer</li>
+            <li>Space size when text is "Justify"</li>
+            <li>Frame anchor in header and footer</li>
+            <li>Text watermarks</li>
+            <li>Hyperlinks in Table of Figures</li>
+            <li>Mark entry</li>
+            <li>Change multiple characters in numbering</li>
+            <li>Columns after section</li>
+            <li>Font style in fields</li>
+            <li>Build Table Of Figures from styles </li>
+            <li>Table Identifier</li>
+        </ul>
+        <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
+    </body>
 </html>

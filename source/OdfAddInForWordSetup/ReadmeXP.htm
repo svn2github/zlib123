@@ -1,939 +1,213 @@
-<html xmlns:v="urn:schemas-microsoft-com:vml"
-xmlns:o="urn:schemas-microsoft-com:office:office"
-xmlns:w="urn:schemas-microsoft-com:office:word"
-xmlns="http://www.w3.org/TR/REC-html40"
-xmlns:ns0="http://schemas.microsoft.com/office/2004/12/omml">
-
-<head>
-<meta http-equiv=Content-Type content="text/html; charset=us-ascii">
-<meta name=ProgId content=Word.Document>
-<meta name=Generator content="Microsoft Word 11">
-<meta name=Originator content="Microsoft Word 11">
-<link rel=File-List href="ReadmeXP.en._files/filelist.xml">
-<title>ODF Add-in for Microsoft Word</title>
-<!--[if gte mso 9]><xml>
- <o:DocumentProperties>
-  <o:Author>Vijay Rajagopalan</o:Author>
-  <o:Template>Normal</o:Template>
-  <o:LastAuthor>v-preetk</o:LastAuthor>
-  <o:Revision>7</o:Revision>
-  <o:TotalTime>9</o:TotalTime>
-  <o:Created>2007-01-20T03:15:00Z</o:Created>
-  <o:LastSaved>2007-01-22T05:38:00Z</o:LastSaved>
-  <o:Pages>1</o:Pages>
-  <o:Words>829</o:Words>
-  <o:Characters>4726</o:Characters>
-  <o:Company>Microsoft</o:Company>
-  <o:Lines>39</o:Lines>
-  <o:Paragraphs>11</o:Paragraphs>
-  <o:CharactersWithSpaces>5544</o:CharactersWithSpaces>
-  <o:Version>11.8107</o:Version>
- </o:DocumentProperties>
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <w:WordDocument>
-  <w:ValidateAgainstSchemas/>
-  <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
-  <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
-  <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
-  <w:Compatibility>
-   <w:BreakWrappedTables/>
-   <w:SnapToGridInCell/>
-   <w:WrapTextWithPunct/>
-   <w:UseAsianBreakRules/>
-   <w:DontGrowAutofit/>
-   <w:SplitPgBreakAndParaMark/>
-   <w:DontVertAlignCellWithSp/>
-   <w:DontBreakConstrainedForcedTables/>
-   <w:DontVertAlignInTxbx/>
-   <w:Word11KerningPairs/>
-   <w:CachedColBalance/>
-  </w:Compatibility>
-  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
-  <w:TrackMoves>false</w:TrackMoves>
-  <w:TrackFormatting/>
-  <w:DoNotPromoteQF/>
-  <w:LidThemeOther>EN-US</w:LidThemeOther>
-  <w:LidThemeAsian>X-NONE</w:LidThemeAsian>
-  <w:LidThemeComplexScript>X-NONE</w:LidThemeComplexScript>
-  <m:mathPr>
-   <m:mathFont m:val="Cambria Math"/>
-   <m:brkBin m:val="before"/>
-   <m:brkBinSub m:val="--"/>
-   <m:smallFrac m:val="off"/>
-   <m:dispDef/>
-   <m:lMargin m:val="0"/>
-   <m:rMargin m:val="0"/>
-   <m:defJc m:val="centerGroup"/>
-   <m:wrapIndent m:val="1440"/>
-   <m:intLim m:val="subSup"/>
-   <m:naryLim m:val="undOvr"/>
-  </m:mathPr>
- </w:WordDocument>
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <w:LatentStyles DefLockedState="false" LatentStyleCount="156">
- </w:LatentStyles>
-</xml><![endif]-->
-<style>
-<!--p.MSONORMAL
-	{mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-fareast-theme-font:minor-fareast;}
-li.MSONORMAL
-	{mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-fareast-theme-font:minor-fareast;}
-div.MSONORMAL
-	{mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-fareast-theme-font:minor-fareast;}
-h1
-	{mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-fareast-theme-font:minor-fareast;}
-h2
-	{mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-fareast-theme-font:minor-fareast;}
-h3
-	{mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-style-qformat:yes;
-	mso-fareast-theme-font:minor-fareast;}
-a:link
-	{mso-style-priority:99;}
-span.MSOHYPERLINK
-	{mso-style-priority:99;}
-a:visited
-	{mso-style-priority:99;}
-span.MSOHYPERLINKFOLLOWED
-	{mso-style-priority:99;}
-p
-	{mso-style-priority:99;
-	mso-fareast-theme-font:minor-fareast;}
-span.HEADING1CHAR
-	{mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-ascii-theme-font:major-latin;
-	mso-fareast-theme-font:major-fareast;
-	mso-hansi-theme-font:major-latin;
-	mso-bidi-theme-font:major-bidi;
-	mso-themecolor:accent1;
-	mso-themeshade:191;}
-span.HEADING2CHAR
-	{mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-ascii-theme-font:major-latin;
-	mso-fareast-theme-font:major-fareast;
-	mso-hansi-theme-font:major-latin;
-	mso-bidi-theme-font:major-bidi;
-	mso-themecolor:accent1;}
-span.HEADING3CHAR
-	{mso-style-priority:9;
-	mso-style-unhide:no;
-	mso-ascii-theme-font:major-latin;
-	mso-fareast-theme-font:major-fareast;
-	mso-hansi-theme-font:major-latin;
-	mso-bidi-theme-font:major-bidi;
-	mso-themecolor:accent1;}
-.MSOCHPDEFAULT
-	{mso-default-props:yes;}
-table.MSONORMALTABLE
-	{mso-style-priority:99;
-	mso-style-qformat:yes;}
-
- /* Font Definitions */
- @font-face
-	{font-family:Cambria;
-	panose-1:2 4 5 3 5 4 6 3 2 4;
-	mso-font-charset:0;
-	mso-generic-font-family:roman;
-	mso-font-pitch:variable;
-	mso-font-signature:-1610611985 1073741899 0 0 159 0;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{mso-style-parent:"";
-	margin:0in;
-	margin-bottom:.0001pt;
-	mso-pagination:widow-orphan;
-	font-size:12.0pt;
-	font-family:"Times New Roman";
-	mso-fareast-font-family:"Times New Roman";}
-h1
-	{mso-style-link:"Heading 1 Char";
-	mso-margin-top-alt:auto;
-	margin-right:0in;
-	mso-margin-bottom-alt:auto;
-	margin-left:0in;
-	mso-pagination:widow-orphan;
-	mso-outline-level:1;
-	font-size:24.0pt;
-	font-family:"Times New Roman";
-	font-weight:bold;}
-h2
-	{mso-style-link:"Heading 2 Char";
-	mso-margin-top-alt:auto;
-	margin-right:0in;
-	mso-margin-bottom-alt:auto;
-	margin-left:0in;
-	mso-pagination:widow-orphan;
-	mso-outline-level:2;
-	font-size:18.0pt;
-	font-family:"Times New Roman";
-	font-weight:bold;}
-h3
-	{mso-style-link:"Heading 3 Char";
-	mso-margin-top-alt:auto;
-	margin-right:0in;
-	mso-margin-bottom-alt:auto;
-	margin-left:0in;
-	mso-pagination:widow-orphan;
-	mso-outline-level:3;
-	font-size:13.5pt;
-	font-family:"Times New Roman";
-	font-weight:bold;}
-a:link, span.MsoHyperlink
-	{mso-style-noshow:yes;
-	color:blue;
-	text-decoration:underline;
-	text-underline:single;}
-a:visited, span.MsoHyperlinkFollowed
-	{mso-style-noshow:yes;
-	color:purple;
-	text-decoration:underline;
-	text-underline:single;}
-p
-	{mso-style-noshow:yes;
-	mso-margin-top-alt:auto;
-	margin-right:0in;
-	mso-margin-bottom-alt:auto;
-	margin-left:0in;
-	mso-pagination:widow-orphan;
-	font-size:12.0pt;
-	font-family:"Times New Roman";
-	mso-fareast-font-family:"Times New Roman";}
-span.Heading1Char
-	{mso-style-name:"Heading 1 Char";
-	mso-style-locked:yes;
-	mso-style-link:"Heading 1";
-	mso-ansi-font-size:14.0pt;
-	mso-bidi-font-size:14.0pt;
-	font-family:Cambria;
-	mso-ascii-font-family:Cambria;
-	mso-fareast-font-family:"Times New Roman";
-	mso-hansi-font-family:Cambria;
-	mso-bidi-font-family:"Times New Roman";
-	color:#365F91;
-	font-weight:bold;}
-span.Heading2Char
-	{mso-style-name:"Heading 2 Char";
-	mso-style-noshow:yes;
-	mso-style-locked:yes;
-	mso-style-link:"Heading 2";
-	mso-ansi-font-size:13.0pt;
-	mso-bidi-font-size:13.0pt;
-	font-family:Cambria;
-	mso-ascii-font-family:Cambria;
-	mso-fareast-font-family:"Times New Roman";
-	mso-hansi-font-family:Cambria;
-	mso-bidi-font-family:"Times New Roman";
-	color:#4F81BD;
-	font-weight:bold;}
-span.Heading3Char
-	{mso-style-name:"Heading 3 Char";
-	mso-style-noshow:yes;
-	mso-style-locked:yes;
-	mso-style-link:"Heading 3";
-	mso-ansi-font-size:12.0pt;
-	mso-bidi-font-size:12.0pt;
-	font-family:Cambria;
-	mso-ascii-font-family:Cambria;
-	mso-fareast-font-family:"Times New Roman";
-	mso-hansi-font-family:Cambria;
-	mso-bidi-font-family:"Times New Roman";
-	color:#4F81BD;
-	font-weight:bold;}
-@page Section1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.0in 1.0in 1.0in;
-	mso-header-margin:.5in;
-	mso-footer-margin:.5in;
-	mso-paper-source:0;}
-div.Section1
-	{page:Section1;}
- /* List Definitions */
- @list l0
-	{mso-list-id:223763452;
-	mso-list-template-ids:975972644;}
-@list l0:level1
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:Symbol;}
-@list l0:level2
-	{mso-level-number-format:bullet;
-	mso-level-text:o;
-	mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:"Courier New";
-	mso-bidi-font-family:"Times New Roman";}
-@list l0:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l0:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1
-	{mso-list-id:1063136337;
-	mso-list-template-ids:-856787346;}
-@list l1:level1
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:Symbol;}
-@list l1:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l1:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2
-	{mso-list-id:1077437040;
-	mso-list-template-ids:1196743406;}
-@list l2:level1
-	{mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l2:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3
-	{mso-list-id:1128091450;
-	mso-list-template-ids:1955603456;}
-@list l3:level1
-	{mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l3:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4
-	{mso-list-id:1345061038;
-	mso-list-template-ids:1605930452;}
-@list l4:level1
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:Symbol;}
-@list l4:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l4:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5
-	{mso-list-id:2053458698;
-	mso-list-template-ids:403496960;}
-@list l5:level1
-	{mso-level-number-format:bullet;
-	mso-level-text:\F0B7;
-	mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;
-	mso-ansi-font-size:10.0pt;
-	font-family:Symbol;}
-@list l5:level2
-	{mso-level-tab-stop:1.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l5:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l6
-	{mso-list-id:2136288393;
-	mso-list-template-ids:964559354;}
-@list l6:level1
-	{mso-level-tab-stop:.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l6:level2
-	{mso-level-number-format:roman-upper;
-	mso-level-tab-stop:63.0pt;
-	mso-level-number-position:right;
-	margin-left:63.0pt;
-	text-indent:-9.0pt;}
-@list l6:level3
-	{mso-level-tab-stop:1.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l6:level4
-	{mso-level-tab-stop:2.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l6:level5
-	{mso-level-tab-stop:2.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l6:level6
-	{mso-level-tab-stop:3.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l6:level7
-	{mso-level-tab-stop:3.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l6:level8
-	{mso-level-tab-stop:4.0in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-@list l6:level9
-	{mso-level-tab-stop:4.5in;
-	mso-level-number-position:left;
-	text-indent:-.25in;}
-ol
-	{margin-bottom:0in;}
-ul
-	{margin-bottom:0in;}
--->
-</style>
-<!--[if gte mso 10]>
-<style>
- /* Style Definitions */
- table.MsoNormalTable
-	{mso-style-name:"Table Normal";
-	mso-tstyle-rowband-size:0;
-	mso-tstyle-colband-size:0;
-	mso-style-noshow:yes;
-	mso-style-parent:"";
-	mso-padding-alt:0in 5.4pt 0in 5.4pt;
-	mso-para-margin:0in;
-	mso-para-margin-bottom:.0001pt;
-	mso-pagination:widow-orphan;
-	font-size:10.0pt;
-	font-family:"Times New Roman";
-	mso-ansi-language:#0400;
-	mso-fareast-language:#0400;
-	mso-bidi-language:#0400;}
-</style>
-<![endif]-->
-<link rel=themeData href="ReadmeXP.en._files/themedata.thmx">
-<link rel=colorSchemeMapping href="ReadmeXP.en._files/colorschememapping.xml">
-<!--[if gte mso 9]><xml>
- <o:shapedefaults v:ext="edit" spidmax="4098"/>
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <o:shapelayout v:ext="edit">
-  <o:idmap v:ext="edit" data="1"/>
- </o:shapelayout></xml><![endif]-->
-</head>
-
-<body lang=EN-US link=blue vlink=purple style='tab-interval:.5in'>
-
-<div class=Section1>
-
-<h1><a name=top>ODF Add-in for Microsoft Word</a> </h1>
-
-<p>Thank you for downloading ODF Add-in for Word. The purpose of this software
-is to enable users to open ODF Specification based documents in Microsoft Word
-and demonstrate the interoperability between OpenXML &amp; ODF specifications.
-This interoperability project is hosted on <a
-href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>. For
-more details and future updates on the project, please look at the
-&#8220;RoadMap&#8221; document. </p>
-
-<h2>Table of Content</h2>
-
-<ul type=disc>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l0 level1 lfo1;tab-stops:list .5in'><a href="#hRequirements">Software
-     Requirements</a> </li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l0 level1 lfo1;tab-stops:list .5in'><a href="#hInstall">Installing
-     the add-in</a> </li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l0 level1 lfo1;tab-stops:list .5in'><a href="#hTroobleshooting">Troubleshooting
-     Guide</a> </li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l0 level1 lfo1;tab-stops:list .5in'>Features/options not
-     supported </li>
- <ul type=circle>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l0 level2 lfo1;tab-stops:list 1.0in'><a
-      href="#hFeatureDirect">ODF to OpenXML conversion</a> </li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l0 level2 lfo1;tab-stops:list 1.0in'><a
-      href="#hFeatureReverse">OpenXML to ODF conversion</a> </li>
- </ul>
-</ul>
-
-<h2><a name=hRequirements>Software Requirements</a> </h2>
-
-<p>Before installing the add-in, make sure you have the following...</p>
-
-<ul type=disc>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l4 level1 lfo2;tab-stops:list .5in'>Microsoft Word XP</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l4 level1 lfo2;tab-stops:list .5in'><a
-     href="http://www.microsoft.com/office/preview/beta/converter.mspx">Office
-     Compatibility Pack</a> </li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l4 level1 lfo2;tab-stops:list .5in'><a
-     href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en">.NET
-     framework 2.0</a> </li>
-</ul>
-
-<p><strong>Warning:</strong> if you install Microsoft Word before the .NET
-Framework, you will need to update your Word installation, by running the
-following these steps below. </p>
-
-<ol start=1 type=1>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo3;tab-stops:list .5in'>Open &quot;Add or remove
-     Programs&quot; from the Control Panel</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo3;tab-stops:list .5in'>Find the Microsoft Word entry
-     and choose &quot;Modify&quot;</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l3 level1 lfo3;tab-stops:list .5in'>Within the installation
-     process, choose &quot;Add or remove features&quot; then add &quot;.NET
-     Programmability Support&quot; in the &quot;Microsoft Office Word&quot;
-     section. </li>
-</ol>
-
-<p><a href="#top">Back to top</a> </p>
-
-<h2><a name=hInstall>Installing the add-in</a> </h2>
-
-<p>Double click the OdfAddInForWordSetup-en-1.0.EXE file</p>
-
-<p>If installation is successful, you should be able to open an
-&quot;.ODT&quot; file from Microsoft Word (see menu
-&quot;File&gt;ODF...&quot;). Also, when right-clicking on a &quot;.ODT&quot;
-file in explorer, you should have the option to open the document in Microsoft
-Word (menu &quot;Open with Word&quot;). </p>
-
-<p><strong>Important note:</strong> The ODF file opened by the add-in is imported
-in Microsoft Word as a read-only .DOCX file. If you want to save it as ODF, you
-will have to first make a copy of the document (&quot;Menu&gt;Save As&quot;)
-and then use the &quot;Export as ODF&quot; menu. </p>
-
-<p><a href="#top">Back to top</a> </p>
-
-<h2><a name=hTroobleshooting>Troubleshooting</a> </h2>
-
-<p>If you don't see the ODF entry in Microsoft Word menu, it could be due to
-missing features in Word (see <a href="#hRequirements">Software Requirements</a>
-section) or a failure in the installation of Word Primary Interop Assemblies.
-You will then need to activate the Add-in manually by doing the following... </p>
-
-<ol start=1 type=1>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo4;tab-stops:list .5in'>Select &quot;Templates and
-     Add-ins&quot; in the &#8220;Tools&#8221; menu.</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo4;tab-stops:list .5in'>In the &quot;Add-ins&quot; list,
-     select the checkbox &quot;ODF Add-in for Word XP&quot; and click the
-     &#8220;OK&#8221; button.</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo4;tab-stops:list .5in'>To check that the pre-requisites
-     are correctly installed:</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo4;tab-stops:list .5in'>Go to &quot;Add or Remove
-     Programs&quot; in Control Panel and check that the following items appear:
-     </li>
- <ol start=1 type=1>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>Compatibility Pack for
-      Microsoft Office 2007 File Formats</li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>Microsoft .NET
-      Framework 2.0</li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>Microsoft Office XP...</li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>ODF Add-in for Word XP</li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>Shared Add-in
-      Extensibility Update for Microsoft .NET Framework 2.0 (KB908002)</li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>Shared Add-in Support
-      Update for Microsoft .NET Framework 2.0 (KB908002)</li>
- </ol>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l2 level1 lfo4;tab-stops:list .5in'>Open
-     &quot;\Windows\Assembly&quot; folder with Windows Explorer and check that you
-     have the following entries: </li>
- <ol start=1 type=1>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>Extensibility, version
-      7.0.3300.0</li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>Microsoft.Office.Interop.Word,
-      version 10.0.4504.0</li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>Microsoft.Vbe.Interop,
-      version 10.0.4504.0</li>
-  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
-      auto;mso-list:l2 level2 lfo4;tab-stops:list 1.0in'>Office, version
-      7.0.3300.0</li>
- </ol>
-</ol>
-
-<p><a href="#top">Back to top</a> </p>
-
-<h2>Features/options not supported </h2>
-
-<h3><a name=hFeatureDirect>Opening an ODF File...</a> </h3>
-
-<ul type=disc>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Text blinking</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Table cell protection</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Number of widow or orphans
-     lines</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>'Manual' and 'From left'
-     alignment in tables</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Last line alignment in
-     justified paragraph</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Max number of table columns</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>'Leading' line spacing in a
-     paragraph</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Tabs fill character of a
-     paragraph</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>'Title' and 'lowercase' style
-     options</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Keep with next paragraph for
-     table</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Don't split table</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Hidden Sections</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Background Image in Tables</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Break before Table</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Even Column Height</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Font Size for Super/Subscript</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Character rotation</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Repeat Heading in a Table</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Copy Heading while splitting
-     Table</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Table Shadowing Style</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>List Vertical Numbering</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>List : Minimum Space Between
-     Numbering and Text</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Tab-stop in numbering</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Image position in frame</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Text background color</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Foot notes reference auto
-     numbering</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Next Master style lost
-     without page-break</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Keep ratio feature for frames</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Columns for frames/text-boxes</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Background color of pages</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Section's background color</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Notes embedded in text-boxes</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Image borders</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>ENTRY TOC</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Background opacity</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Page break</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Cropped images</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>00 'spacing at tops of pages'
-     option</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>SVM images</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Font weight</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Image wrapping</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Paragraph Border with Image
-     Inside</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>TOC protection against manual
-     changes</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Line Numbering</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Table of Contents Protection</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Date format</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Paragraph and Page shadow</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Column separator</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Footnote/endnote in a list</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Relative picture position</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l1 level1 lfo5;tab-stops:list .5in'>Text vertical alignment in
-     text-box</li>
-</ul>
-
-<p><a href="#top">Back to top</a> </p>
-
-<h3><a name=hFeatureReverse>Saving an ODF File...</a> </h3>
-
-<ul type=disc>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Scale relative to orginal
-     picture size</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Picture rotation</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Footnote and Endnote</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Table Text Wrapping</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Table Style Border</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Picture position option:
-     &quot;move object with text&quot;, &quot;lock anchor', &quot;allow
-     overlap&quot;</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Start Page Numbering
-     (starting with something other than 1)</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Adjust List Indents (Follow
-     number with: space)</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Alignment tabs in
-     header/footer</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Space size when text is
-     &quot;Justify&quot;</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Frame anchor in header and
-     footer</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Text watermarks</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Hyperlinks in Table of
-     Figures</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Mark entry</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Change multiple characters in
-     numbering</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Columns after section</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Font style in fields</li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Build Table Of Figures from
-     styles </li>
- <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
-     mso-list:l5 level1 lfo6;tab-stops:list .5in'>Table Identifier</li>
-</ul>
-
-<p><a href="#top">Back to top</a> </p>
-
-</div>
-
-</body>
-
+<html>
+    <head>
+        <title>ODF Add-in for Microsoft Word</title>
+    </head>
+    <body>
+        <h1>
+            <a name="top">ODF Add-in for Microsoft Word</a>
+        </h1>
+        
+        <p> Thank you for downloading ODF Add-in for Word. The purpose of this software is to enable
+            users to open ODF Specification based documents in Microsoft Word and demonstrate the
+            interoperability between OpenXML &amp; ODF specifications.  This interoperability project is hosted on
+            <a href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>. For more details and future updates on 
+                the project, please look at the RoadMap document.</p>
+        
+        <h2>Table of Content</h2>
+        <ul>
+            <li>
+                <a href="#hRequirements">Software Requirements</a>
+            </li>
+            <li>
+                <a href="#hInstall">Installing the add-in</a>
+            </li>
+            <li>
+                <a href="#hTroobleshooting">Troubleshooting Guide</a>
+            </li>
+            <li>
+                <a>Features/options not supported</a>
+                <ul>
+                    <li>
+                        <a href="#hFeatureDirect">ODF to OpenXML conversion</a>
+                    </li>
+                    <li>
+                        <a href="#hFeatureReverse">OpenXML to ODF conversion</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        
+        <h2>
+            <a name="hRequirements"> Software Requirements</a>
+        </h2>
+        <p>Before installing the add-in, make sure you have the following...</p>
+        <ul>
+            <li>Microsoft Word XP</li>
+            <li>
+                <a href="http://www.microsoft.com/office/preview/beta/converter.mspx">Office
+                    Compatibility Pack</a>
+            </li>
+            <li>
+                <a
+                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
+                    >.NET framework 2.0</a>
+            </li>
+        </ul>        
+        <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
+        
+        <h2>
+            <a name="hInstall">Installing the add-in</a>
+        </h2>
+        <p>Double click the &quot;OdfAddInForWordSetup.exe&quot; file</p>
+        <p> If installation is successful, you should be able to open an &quot;.ODT&quot;
+            file from Microsoft Word (see menu &quot;File>ODF...&quot;). Also, when
+            right-clicking on a &quot;.ODT&quot; file in explorer, you should have the
+            option to open the document in Microsoft Word (menu &quot;Open with Word&quot;). </p>
+        <p>
+            <strong>Important note:</strong> The ODF file opened by the add-in is imported in
+            Microsoft Word as a read-only .DOCX file. If you want to save it as ODF, you will have
+            to first make a copy of the document (&quot;Menu>Save As&quot;) and then use the
+            &quot;Export as ODF&quot; menu. </p>
+        <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
+        
+        <h2>
+            <a name="hTroobleshooting">Troubleshooting</a>
+        </h2>
+        <p> If you don't see the ODF entry in Microsoft Word menu, it could be due to missing
+            features in Word (see <a href="#hRequirements">Software Requirements</a> section) or a
+            failure in the installation of Word Primary Interop Assemblies. You will then need to
+            activate the Add-in manually by doing the following... </p>
+            <ol>
+                <li>Go to Tools &gt; Customize, and then click the Commands tab.</li>
+                <li>In the Categories box, click Tools.</li>
+                <li>Drag COM Add-Ins from the Commands box over the Tools menu. When the Tools menu
+                    displays the menu commands, point to the location where you want the COM Add-Ins command
+                    to appear on the menu, and then release the mouse button. </li>
+                <li>Click Close.</li>
+                <li>In the Tools menu, click COM Add-Ins and check box next to the add-in name in the
+                    available list. If the add-in you want isn't in the list, click Add, locate the add-in, and 
+                    then click OK.</li>
+            </ol>
+            
+            <p>To check that the pre-requisites are correctly installed :</p>
+            <ol>
+            <li>Go to "Add or Remove Programs" in Control Panel and check that the following items
+                appear: <ol>
+                    <li>Compatibility Pack for Microsoft Office 2007 File Formats</li>
+                    <li>Microsoft .NET Framework 2.0</li>
+                    <li>Microsoft Office XP...</li>
+                    <li>ODF Add-in for Word XP</li>
+                    <li>Shared Add-in Extensibility Update for Microsoft .NET Framework 2.0
+                        (KB908002)</li>
+                    <li>Shared Add-in Support Update for Microsoft .NET Framework 2.0
+                        (KB908002)</li>
+                </ol>
+            </li>
+            <li>Open "\Windows\Assembly" folder with Windows Explorer and check that you have the
+                following entries: <ol>
+                    <li>Extensibility, version 7.0.3300.0</li>
+                    <li>Microsoft.Office.Interop.Word, version 10.0.4504.0</li>
+                    <li>Microsoft.Vbe.Interop, version 10.0.4504.0</li>
+                    <li>Office, version 7.0.3300.0</li>
+                </ol>
+            </li>
+        </ol>
+        <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
+        
+        <h2>
+            <a>Features/options not supported</a>
+        </h2>
+        <h3>
+            <a name="hFeatureDirect">Opening an ODF File...</a>
+        </h3>
+        <ul>
+            <li>Text blinking</li>
+            <li>Table cell protection</li>
+            <li>Number of widow or orphans lines</li>
+            <li>'Manual' and 'From left' alignment in tables</li>
+            <li>Last line alignment in justified paragraph</li>
+            <li>Max number of table columns</li>
+            <li>'Leading' line spacing in a paragraph</li>
+            <li>Tabs fill character of a paragraph</li>
+            <li>'Title' and 'lowercase' style options</li>
+            <li>Keep with next paragraph for table</li>
+            <li>Don't split table</li>
+            <li>Hidden Sections</li>
+            <li>Background Image in Tables</li>
+            <li>Break before Table</li>
+            <li>Even Column Height</li>
+            <li>Font Size for Super/Subscript</li>
+            <li>Character rotation</li>
+            <li>Repeat Heading in a Table</li>
+            <li>Copy Heading while splitting Table</li>
+            <li>Table Shadowing Style</li>
+            <li>List Vertical Numbering</li>
+            <li>List : Minimum Space Between Numbering and Text</li>
+            <li>Tab-stop in numbering</li>
+            <li>Image position in frame</li>
+            <li>Text background color</li>
+            <li>Foot notes reference auto numbering</li>
+            <li>Next Master style lost without page-break</li>
+            <li>Keep ratio feature for frames</li>
+            <li>Columns for frames/text-boxes</li>
+            <li>Background color of pages</li>
+            <li>Section's background color</li>
+            <li>Notes embedded in text-boxes</li>
+            <li>Image borders</li>
+            <li>Text references (Entry) in Table of Content</li>
+            <li>Background opacity</li>
+            <li>Page break</li>
+            <li>Cropped images</li>
+            <li>'Spacing at tops of pages' option</li>
+            <li>SVM images</li>
+            <li>Font weight</li>
+            <li>Image wrapping</li>
+            <li>Paragraph Border with Image Inside</li>
+            <li>Table of Content protection against manual changes</li>
+            <li>Line Numbering</li>
+            <li>Table of Contents Protection</li>
+            <li>Date format</li>
+            <li>Paragraph and Page shadow</li>
+            <li>Column separator</li>
+            <li>Footnote/endnote in a list</li>
+            <li>Relative picture position</li>
+            <li>Text vertical alignment in text-box</li>
+        </ul>
+        <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
+        <h3>
+            <a name="hFeatureReverse">Saving an ODF File...</a>
+        </h3>
+        <ul>
+            <li>Scale relative to orginal picture size</li>
+            <li>Picture rotation</li>
+            <li>Footnote and Endnote</li>
+            <li>Table Text Wrapping</li>
+            <li>Table Style Border</li>
+            <li>Picture position option: "move object with text", "lock anchor', "allow overlap"</li>
+            <li>Start Page Numbering (starting with something other than 1)</li>
+            <li>Adjust List Indents (Follow number with: space)</li>
+            <li>Alignment tabs in header/footer</li>
+            <li>Space size when text is "Justify"</li>
+            <li>Frame anchor in header and footer</li>
+            <li>Text watermarks</li>
+            <li>Hyperlinks in Table of Figures</li>
+            <li>Mark entry</li>
+            <li>Change multiple characters in numbering</li>
+            <li>Columns after section</li>
+            <li>Font style in fields</li>
+            <li>Build Table Of Figures from styles </li>
+            <li>Table Identifier</li>
+        </ul>
+        <p>
+            <a href="#top" class="back">Back to top</a>
+        </p>
+    </body>
 </html>
