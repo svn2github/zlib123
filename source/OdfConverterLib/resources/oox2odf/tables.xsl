@@ -103,7 +103,9 @@
       </xsl:if>
       <xsl:call-template name="MasterPageName"/>
       <style:table-properties table:border-model="collapsing">
-        <xsl:call-template name="InsertTableProperties"/>
+        <xsl:call-template name="InsertTableProperties">
+          <xsl:with-param name="Default">StyleTableProperties</xsl:with-param>
+        </xsl:call-template>
       </style:table-properties>
     </style:style>
   </xsl:template>
@@ -141,6 +143,7 @@
 
   <!--  insert table properties: width, align, indent-->
   <xsl:template name="InsertTableProperties">
+    <xsl:param name="Default"/>
     <xsl:choose>
       <xsl:when test="w:tblW/@w:type='pct'">
         <xsl:attribute name="style:rel-width">
@@ -223,7 +226,26 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-  </xsl:template>
+    
+<xsl:if test="$Default='StyleTableProperties'">
+<xsl:choose>
+  <xsl:when test="w:tblpPr/@w:bottomFromText">
+    <xsl:attribute name="fo:margin-bottom">
+      <xsl:call-template name="ConvertTwips">
+        <xsl:with-param name="length">
+          <xsl:value-of select="w:tblpPr/@w:bottomFromText"/>
+        </xsl:with-param>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>      
+    </xsl:attribute>
+  </xsl:when>
+  <xsl:otherwise>
+    <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
+  </xsl:otherwise>
+</xsl:choose>
+</xsl:if>
+    
+</xsl:template>
 
   <xsl:template name="InsertTableAlign">
     <xsl:choose>
