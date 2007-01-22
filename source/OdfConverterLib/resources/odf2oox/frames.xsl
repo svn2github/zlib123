@@ -3378,8 +3378,8 @@
         <xsl:for-each select="child::node()">
 
           <xsl:choose>
-            <!--   ignore embedded text-box and draw:rect becouse word doesn't support it-->
-            <xsl:when test="self::node()[name(draw:text-box|draw:rect)]">
+            <!--   ignore embedded text-box and other shapes because word doesn't support it-->
+            <xsl:when test="self::draw:text-box or self::draw:rect or self::draw:custom-shape">
               <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
             </xsl:when>
 

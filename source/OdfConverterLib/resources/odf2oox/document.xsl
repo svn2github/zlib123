@@ -205,11 +205,14 @@
 
       <!-- drawing shapes -->
       <xsl:when test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape">
-        <!-- warn loss of positioning for embedded drawn objects or pictures -->
-        <xsl:if test="ancestor::draw:text-box">
-          <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
-        </xsl:if>
-        <xsl:apply-templates mode="shapes"/>
+        <xsl:choose>
+          <xsl:when test="ancestor::draw:text-box">
+            <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates mode="shapes"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
 
       <xsl:otherwise>
