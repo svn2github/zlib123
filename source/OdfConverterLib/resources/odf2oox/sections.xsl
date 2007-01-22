@@ -155,10 +155,12 @@
               <xsl:value-of select="$style/@style:master-page-name"/>
             </xsl:when>
             <xsl:when test="$style/@style:parent-style-name">
-              <xsl:call-template name="GetMasterPageNameFromHierarchy">
-                <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
-                <xsl:with-param name="context" select="$context"/>
-              </xsl:call-template>
+              <xsl:if test="$style/@style:parent-style-name != $style-name">
+                <xsl:call-template name="GetMasterPageNameFromHierarchy">
+                  <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
+                  <xsl:with-param name="context" select="$context"/>
+                </xsl:call-template>
+              </xsl:if>
             </xsl:when>
           </xsl:choose>
         </xsl:for-each>
@@ -191,10 +193,12 @@
               <xsl:value-of select="$style/style:paragraph-properties/@style:page-number"/>
             </xsl:when>
             <xsl:when test="$style/@style:parent-style-name">
-              <xsl:call-template name="GetPageStartNumber">
-                <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
-                <xsl:with-param name="context" select="$context"/>
-              </xsl:call-template>
+              <xsl:if test="$style/@style:parent-style-name != $style-name">
+                <xsl:call-template name="GetPageStartNumber">
+                  <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
+                  <xsl:with-param name="context" select="$context"/>
+                </xsl:call-template>
+              </xsl:if>
             </xsl:when>
           </xsl:choose>
         </xsl:for-each>

@@ -173,7 +173,8 @@
       <!-- ignore draw:frame/draw:text-box if it's embedded in another draw:frame/draw:text-box becouse word doesn't support it -->
       <xsl:when test="self::node()[ancestor::draw:text-box and descendant::draw:text-box]">
         <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
-        <xsl:apply-templates select="child::node()[not(descendant-or-self::draw:text-box)]" mode="paragraph"/>
+        <xsl:apply-templates select="child::node()[not(descendant-or-self::draw:text-box)]"
+          mode="paragraph"/>
       </xsl:when>
 
       <!-- frames -->
@@ -534,10 +535,12 @@
             <xsl:when test="$style/style:paragraph-properties/@fo:break-before = 'page' ">true</xsl:when>
             <xsl:when test="$style/@style:master-page-name != '' ">true</xsl:when>
             <xsl:when test="$style/@style:parent-style-name">
-              <xsl:call-template name="GetBreakBeforeProperty">
-                <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
-                <xsl:with-param name="context" select="$context"/>
-              </xsl:call-template>
+              <xsl:if test="$style/@style:parent-style-name != $style-name">
+                <xsl:call-template name="GetBreakBeforeProperty">
+                  <xsl:with-param name="style-name" select="$style/@style:parent-style-name"/>
+                  <xsl:with-param name="context" select="$context"/>
+                </xsl:call-template>
+              </xsl:if>
             </xsl:when>
             <xsl:otherwise>false</xsl:otherwise>
           </xsl:choose>
@@ -1090,8 +1093,8 @@
   <!-- Protected sections -->
   <xsl:template match="text:section[@text:protected = 'true' ]" priority="2">
     <xsl:if test="@text:protection-key">
-      <xsl:message terminate="no">translation.odf2oox.protectionKey%<xsl:value-of select="@text:name"
-      /></xsl:message>
+      <xsl:message terminate="no">translation.odf2oox.protectionKey%<xsl:value-of
+          select="@text:name"/></xsl:message>
     </xsl:if>
     <xsl:choose>
       <!-- in a read-only odf document : grant permission not needed -->
@@ -1168,11 +1171,13 @@
               </xsl:call-template>
             </xsl:when>
             <xsl:when test="key('styles', $styleName)[1]/@style:parent-style-name">
-              <xsl:call-template name="InsertDropCap">
-                <xsl:with-param name="styleName"
-                  select="key('styles', $styleName)[1]/@style:parent-style-name"/>
-                <xsl:with-param name="context" select="$context"/>
-              </xsl:call-template>
+              <xsl:if test="key('styles', $styleName)[1]/@style:parent-style-name != $styleName">
+                <xsl:call-template name="InsertDropCap">
+                  <xsl:with-param name="styleName"
+                    select="key('styles', $styleName)[1]/@style:parent-style-name"/>
+                  <xsl:with-param name="context" select="$context"/>
+                </xsl:call-template>
+              </xsl:if>
             </xsl:when>
           </xsl:choose>
         </xsl:for-each>
