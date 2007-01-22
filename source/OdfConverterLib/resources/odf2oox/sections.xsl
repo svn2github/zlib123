@@ -245,8 +245,7 @@
         select="$following-section and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id($following-section))"/>
 
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
-      <xsl:variable name="ancestor-sections" select="ancestor::text:section"/>
-      <xsl:variable name="previous-section" select="$ancestor-sections[1]"/>
+      <xsl:variable name="previous-section" select="ancestor::text:section[1]"/>
       <!-- the following neighbour's ancestor section and the current section are different -->
       <xsl:variable name="next-end-section"
         select="$previous-section and not(generate-id($followings[1]/ancestor::text:section[1]) = generate-id($previous-section))"/>
@@ -266,8 +265,7 @@
         And there mustn't exist a text:note-body or table:table ancestor
       -->
       <xsl:if
-        test="((($next-page-break='true' or $next-master-page != '' ) ) 
-        or (($next-new-section = 'true' or $next-end-section = 'true') and count($ancestor-sections) &lt; 2)) 
+        test="($next-page-break='true' or $next-master-page != '' or $next-new-section = 'true' or $next-end-section = 'true' ) 
         and not(ancestor::text:note-body or ancestor::table:table)">
         <w:sectPr>
           <xsl:if test="$next-master-page != '' ">
@@ -328,8 +326,7 @@
         select="$following-section and (generate-id($followings[1]/ancestor::text:section[1]) = generate-id($following-section))"/>
 
       <!-- 3 - Section ends. We are in a section and the following paragraph isn't -->
-      <xsl:variable name="ancestor-sections" select="ancestor::text:section"/>
-      <xsl:variable name="previous-section" select="$ancestor-sections[1]"/>
+      <xsl:variable name="previous-section" select="ancestor::text:section[1]"/>
       <!-- the following neighbour's ancestor section and the current section are different -->
       <xsl:variable name="next-end-section"
         select="$previous-section and not(generate-id($followings[1]/ancestor::text:section[1]) = generate-id($previous-section))"/>
@@ -343,8 +340,7 @@
 
 
       <xsl:if
-        test="(($next-master-page != '' )
-        or (($next-new-section = 'true' or $next-end-section = 'true') and count($ancestor-sections) &lt; 2))
+        test="($next-master-page != '' or $next-new-section = 'true' or $next-end-section = 'true')
          and not(ancestor::text:note-body)">
         <w:p>
           <w:pPr>
