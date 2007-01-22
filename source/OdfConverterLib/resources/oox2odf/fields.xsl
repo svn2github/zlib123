@@ -666,7 +666,7 @@
       <xsl:if test="self::node()[contains(@w:instr,'Heading')]">
         <xsl:attribute name="text:outline-level">
           <xsl:value-of
-            select="substring-before(substring-after(./@w:instr,'Heading '),'&quot;')"/>
+            select="substring(substring-before(@w:instr,' \'),string-length(substring-before(@w:instr,' \')))"/>
         </xsl:attribute>
       </xsl:if>
       <xsl:apply-templates select="w:r/child::node()"/>
