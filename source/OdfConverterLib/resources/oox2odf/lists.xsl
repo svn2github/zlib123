@@ -63,12 +63,12 @@
     <text:list-style>
       <xsl:attribute name="style:name">
         <xsl:choose>
-          
-          <!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId --> 
+
+          <!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId -->
           <xsl:when test="key('numId',$id)/w:lvlOverride">
             <xsl:value-of select="concat('LO',$id)"/>
           </xsl:when>
-          
+
           <!-- otherwise, list style is referred to abstractNumId -->
           <xsl:otherwise>
             <xsl:value-of select="concat('L',@w:abstractNumId)"/>
@@ -78,13 +78,13 @@
       <xsl:for-each select="w:lvl">
         <xsl:variable name="level" select="@w:ilvl"/>
         <xsl:choose>
-          
+
           <!-- when numbering style is overriden, num template is used -->
           <xsl:when test="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl">
             <xsl:apply-templates
               select="key('numId',$id)/w:lvlOverride[@w:ilvl = $level]/w:lvl[@w:ilvl = $level]"/>
           </xsl:when>
-          
+
           <xsl:otherwise>
             <xsl:apply-templates select="."/>
           </xsl:otherwise>
@@ -332,8 +332,8 @@
     <xsl:variable name="WFirstLine">
       <xsl:call-template name="FirstLine"/>
     </xsl:variable>
-    
-     <xsl:choose>
+
+    <xsl:choose>
       <xsl:when test="$Ind/@w:hanging">
         <xsl:attribute name="text:space-before">
           <xsl:call-template name="ConvertTwips">
@@ -367,7 +367,7 @@
                     <xsl:otherwise>
                       <xsl:value-of select="$Ind/@w:hanging"/>
                     </xsl:otherwise>
-                  </xsl:choose>    
+                  </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
@@ -376,32 +376,32 @@
           </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name="text:min-label-distance">
-              <xsl:call-template name="ConvertTwips">
-                <xsl:with-param name="length">
+          <xsl:call-template name="ConvertTwips">
+            <xsl:with-param name="length">
+              <xsl:choose>
+                <xsl:when test="$WFirstLine != '0'">
                   <xsl:choose>
-                    <xsl:when test="$WFirstLine != '0'">
-                      <xsl:choose>
-                        <xsl:when test="$tab != '' and $tab - $WFirstLine > 0 ">
-                          <xsl:value-of select="$tab - $WFirstLine"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of
-                            select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
+                    <xsl:when test="$tab != '' and $tab - $WFirstLine > 0 ">
+                      <xsl:value-of select="$tab - $WFirstLine"/>
                     </xsl:when>
-                    <xsl:otherwise>0</xsl:otherwise>
+                    <xsl:otherwise>
+                      <xsl:value-of
+                        select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+                    </xsl:otherwise>
                   </xsl:choose>
-                </xsl:with-param>
-                <xsl:with-param name="unit">cm</xsl:with-param>
-              </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="text:space-before">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-                  <xsl:value-of select="number($WLeft)"/>
+              <xsl:value-of select="number($WLeft)"/>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -416,10 +416,8 @@
                       test="../w:multiLevelType/@w:val='multilevel' and number($tab) > (number($WLeft) - number($WFirstLine))">
                       <xsl:value-of select="$tab - number($WLeft) - number($WFirstLine)"/>
                     </xsl:when>
-                    <xsl:otherwise>
-                      0
-                    </xsl:otherwise>
-                  </xsl:choose>    
+                    <xsl:otherwise> 0 </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
@@ -430,19 +428,19 @@
         <xsl:attribute name="text:min-label-distance">
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
-          <xsl:choose>
-            <xsl:when test="$tab != '' and $WFirstLine != '0'">
-              <xsl:value-of select="$tab - $WFirstLine"/>
-            </xsl:when>
-            <xsl:when test="$WFirstLine != '0'">
-              <xsl:value-of
-                select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
-            </xsl:when>
-            <xsl:when test="(3 * number($WFirstLine)) &lt; (number($tab) - number($WLeft)) ">
-              <xsl:value-of select="number($tab) - number($WLeft) - (2 * number($WFirstLine))"/>
-            </xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
-          </xsl:choose>
+              <xsl:choose>
+                <xsl:when test="$tab != '' and $WFirstLine != '0'">
+                  <xsl:value-of select="$tab - $WFirstLine"/>
+                </xsl:when>
+                <xsl:when test="$WFirstLine != '0'">
+                  <xsl:value-of
+                    select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
+                </xsl:when>
+                <xsl:when test="(3 * number($WFirstLine)) &lt; (number($tab) - number($WLeft)) ">
+                  <xsl:value-of select="number($tab) - number($WLeft) - (2 * number($WFirstLine))"/>
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
@@ -521,32 +519,26 @@
     <xsl:param name="property"/>
 
     <xsl:choose>
-      <xsl:when test="$style/w:pPr/w:numPr">
+      <xsl:when test="$style/w:pPr/w:numPr and $property = 'w:ilvl' ">
         <xsl:choose>
-          <xsl:when test="$property = 'w:ilvl' ">
-            <xsl:choose>
-              <xsl:when test="$style/w:pPr/w:numPr/w:numId and not($style/w:pPr/w:numPr/w:ilvl)">
-                <xsl:text>0</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$style/w:pPr/w:numPr/child::node()[name() = $property]/@w:val"
-                />
-              </xsl:otherwise>
-            </xsl:choose>
+          <xsl:when test="$style/w:pPr/w:numPr/w:ilvl">
+            <xsl:value-of select="$style/w:pPr/w:numPr/w:ilvl/@w:val"/>
           </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$style/w:pPr/w:numPr/child::node()[name() = $property]/@w:val"/>
-          </xsl:otherwise>
+          <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:when>
+      <xsl:when test="$style/w:pPr/w:numPr/*[name() = $property]/@w:val">
+        <xsl:value-of select="$style/w:pPr/w:numPr/*[name() = $property]/@w:val"/>
+      </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="w:basedOn">
-          <xsl:variable name="parentStyle"
-            select="document('word/styles.xml')/w:styles/w:style[@w:styleId = w:basedOn/@w:val]"/>
-          <xsl:call-template name="GetListStyleProperty">
-            <xsl:with-param name="style" select="$parentStyle"/>
-            <xsl:with-param name="property" select="$property"/>
-          </xsl:call-template>
+        <xsl:if test="$style/w:basedOn">
+          <xsl:variable name="parentStyle" select="$style/w:basedOn/@w:val"/>
+          <xsl:for-each select="document('word/styles.xml')">
+            <xsl:call-template name="GetListStyleProperty">
+              <xsl:with-param name="style" select="key('StyleId', $parentStyle)"/>
+              <xsl:with-param name="property" select="$property"/>
+            </xsl:call-template>
+          </xsl:for-each>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
@@ -622,29 +614,39 @@
 
     <xsl:variable name="listNum">
       <xsl:choose>
-        
+
         <!-- if there is w:lvlOverride, numbering properties can be taken from w:num, and list style must be referred to numId -->
-        <xsl:when test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:lvlOverride">
+        <xsl:when
+          test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:lvlOverride">
           <xsl:value-of select="concat('LO',$numId)"/>
         </xsl:when>
-        
-        <xsl:when test="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink">
+
+        <xsl:when
+          test="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink">
           <xsl:variable name="linkedStyle">
-            <xsl:value-of select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink/@w:val"/>
+            <xsl:value-of
+              select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val]/w:numStyleLink/@w:val"
+            />
           </xsl:variable>
           <xsl:variable name="linkedNumId">
-            <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $linkedStyle]/w:pPr/w:numPr/w:numId/@w:val"/>
+            <xsl:value-of
+              select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $linkedStyle]/w:pPr/w:numPr/w:numId/@w:val"
+            />
           </xsl:variable>
-          <xsl:value-of select="concat('L',document('word/numbering.xml')/w:numbering/w:num[@w:numId=$linkedNumId]/w:abstractNumId/@w:val)"/>
+          <xsl:value-of
+            select="concat('L',document('word/numbering.xml')/w:numbering/w:num[@w:numId=$linkedNumId]/w:abstractNumId/@w:val)"
+          />
         </xsl:when>
-        
+
         <!-- otherwise, list style is referred to abstractNumId -->
         <xsl:otherwise>
-          <xsl:value-of select="concat('L',document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val)"/>
+          <xsl:value-of
+            select="concat('L',document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val)"
+          />
         </xsl:otherwise>
-      </xsl:choose>      
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:if test="$isFirstListItem = 'true'">
       <text:list text:style-name="{$listNum}">
 
@@ -982,7 +984,7 @@
   <!-- inserts automatic list styles with empty num format for elements which has non-existent w:num attached -->
   <xsl:template name="InsertDefaultListStyle">
     <xsl:param name="numId"/>
-    
+
     <!-- list style with empty num format must be referred to numId, because there is no abstractNumId -->
     <xsl:variable name="listName" select="concat('LO',$numId)"/>
     <text:list-style style:name="{$listName}">
