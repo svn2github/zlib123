@@ -528,6 +528,7 @@
       <xsl:value-of select="substring-before(substring-after($instrText,'&quot;'),'&quot;')"
       />
     </xsl:variable>
+
     <text:alphabetical-index-mark>
       <xsl:choose>
         <xsl:when test="not(contains($Value, ':'))">
@@ -1505,6 +1506,9 @@
         <xsl:when test="$Path/b:Author/b:Author/b:NameList/b:Person/b:Last">
           <xsl:value-of select="$Path/b:Author/b:Author/b:NameList/b:Person/b:Last"/>
         </xsl:when>
+        <xsl:when test="$Path/b:Author/b:Author/b:Corporate">
+          <xsl:value-of select="$Path/b:Author/b:Author/b:Corporate"/>
+        </xsl:when>
         <xsl:otherwise/>
       </xsl:choose>
     </xsl:variable>
@@ -1590,10 +1594,18 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
+    
+    <xsl:variable name="TextIdent">
+      <xsl:value-of select="$LastName"/>  
+      <xsl:if test="$Path/b:Year">
+      <xsl:text>, </xsl:text>
+      <xsl:value-of select="$Path/b:Year"/>
+      </xsl:if>
+    </xsl:variable>
 
     <text:bibliography-mark>
       <xsl:attribute name="text:identifier">
-        <xsl:value-of select="$LastName"/>
+        <xsl:value-of select="$TextIdent"/>
       </xsl:attribute>
       <xsl:attribute name="text:bibliography-type">
         <xsl:choose>
