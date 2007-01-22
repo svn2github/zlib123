@@ -78,20 +78,43 @@
   </xsl:template>
 
   <xsl:template match="w:tc">
-    <table:table-cell>
-      <xsl:attribute name="table:style-name">
-        <xsl:value-of select="generate-id(self::w:tc)"/>
-      </xsl:attribute>
+    <xsl:choose>
+      <xsl:when test="w:tcPr/w:vMerge and not(w:tcPr/w:vMerge/@w:val = 'restart')">
+        <table:covered-table-cell>
+          <xsl:attribute name="table:style-name">
+            <xsl:value-of select="generate-id(self::w:tc)"/>
+          </xsl:attribute>
+          <!-- COMMENT : no span attributes -->
+          <xsl:apply-templates/>
+        </table:covered-table-cell>
+      </xsl:when>
+      <xsl:otherwise>
+        <table:table-cell>
+          <xsl:attribute name="table:style-name">
+            <xsl:value-of select="generate-id(self::w:tc)"/>
+          </xsl:attribute>
 
-      <!-- column-span -->
-      <xsl:if test="w:tcPr/w:gridSpan and w:tcPr/w:gridSpan/@w:val != '0'">
-        <xsl:attribute name="table:number-columns-spanned">
-          <xsl:value-of select="w:tcPr/w:gridSpan/@w:val"/>
-        </xsl:attribute>
-      </xsl:if>
+          <!-- column-span -->
+          <xsl:if test="w:tcPr/w:gridSpan and w:tcPr/w:gridSpan/@w:val != '0'">
+            <xsl:attribute name="table:number-columns-spanned">
+              <xsl:value-of select="w:tcPr/w:gridSpan/@w:val"/>
+            </xsl:attribute>
+          </xsl:if>
+          <!-- row-span -->
+          <xsl:if test="w:tcPr/w:vMerge and w:tcPr/w:vMerge/@w:val = 'restart' ">
+            <xsl:attribute name="table:number-rows-spanned">
+              <xsl:call-template name="ComputeNumberRowsSpanned">
+                <xsl:with-param name="cellPosition">
+                  <xsl:call-template name="GetCellPosition"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:if>
 
-      <xsl:apply-templates/>
-    </table:table-cell>
+          <xsl:apply-templates/>
+        </table:table-cell>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="w:tblPr" mode="automaticstyles">
@@ -139,6 +162,81 @@
         <xsl:call-template name="InsertRowProperties"/>
       </style:table-row-properties>
     </style:style>
+  </xsl:template>
+
+  <!-- compute the number of rows that are spanned by context cell -->
+  <xsl:template name="ComputeNumberRowsSpanned">
+    <xsl:param name="cellPosition"/>
+    <xsl:param name="rowCount" select="1"/>
+
+    <xsl:choose>
+      <xsl:when test="ancestor::w:tr[1]/following-sibling::w:tr">
+        <xsl:for-each select="ancestor::w:tr[1]/following-sibling::w:tr[1]/w:tc[1]">
+          <xsl:call-template name="ComputeNumberRowsSpannedUsingCells">
+            <xsl:with-param name="cellPosition" select="$cellPosition"/>
+            <xsl:with-param name="rowCount" select="$rowCount"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$rowCount"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="ComputeNumberRowsSpannedUsingCells">
+    <xsl:param name="cellPosition"/>
+    <xsl:param name="rowCount"/>
+
+    <xsl:variable name="currentPosition">
+      <xsl:call-template name="GetCellPosition"/>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$currentPosition = $cellPosition">
+        <xsl:if test="w:tcPr/w:vMerge and not(w:tcPr/w:vMerge/@w:val = 'restart')">
+          <xsl:value-of select="$rowCount + 1"/>
+        </xsl:if>
+      </xsl:when>
+      <xsl:when test="$currentPosition &lt; $cellPosition and following-sibling::w:tc[1]">
+        <xsl:for-each select="following-sibling::w:tc[1]">
+          <xsl:call-template name="ComputeNumberRowsSpannedUsingCells">
+            <xsl:with-param name="cellPosition" select="$cellPosition"/>
+            <xsl:with-param name="rowCount" select="$rowCount"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$rowCount"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- find the position of context cell -->
+  <xsl:template name="GetCellPosition">
+    <xsl:param name="currentPosition" select="1"/>
+    <xsl:choose>
+      <xsl:when test="preceding-sibling::w:tc">
+        <xsl:for-each select="preceding-sibling::w:tc[1]">
+          <xsl:choose>
+            <xsl:when test="w:tcPr/w:gridSpan and w:tcPr/w:gridSpan/@w:val != '0' ">
+              <xsl:call-template name="GetCellPosition">
+                <xsl:with-param name="currentPosition"
+                  select="$currentPosition+number(w:tcPr/w:gridSpan/@w:val)"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetCellPosition">
+                <xsl:with-param name="currentPosition" select="$currentPosition+1"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$currentPosition"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!--  insert table properties: width, align, indent-->
@@ -226,26 +324,26 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-    
-<xsl:if test="$Default='StyleTableProperties'">
-<xsl:choose>
-  <xsl:when test="w:tblpPr/@w:bottomFromText">
-    <xsl:attribute name="fo:margin-bottom">
-      <xsl:call-template name="ConvertTwips">
-        <xsl:with-param name="length">
-          <xsl:value-of select="w:tblpPr/@w:bottomFromText"/>
-        </xsl:with-param>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>      
-    </xsl:attribute>
-  </xsl:when>
-  <xsl:otherwise>
-    <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
-  </xsl:otherwise>
-</xsl:choose>
-</xsl:if>
-    
-</xsl:template>
+
+    <xsl:if test="$Default='StyleTableProperties'">
+      <xsl:choose>
+        <xsl:when test="w:tblpPr/@w:bottomFromText">
+          <xsl:attribute name="fo:margin-bottom">
+            <xsl:call-template name="ConvertTwips">
+              <xsl:with-param name="length">
+                <xsl:value-of select="w:tblpPr/@w:bottomFromText"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+
+  </xsl:template>
 
   <xsl:template name="InsertTableAlign">
     <xsl:choose>
@@ -282,34 +380,34 @@
       <xsl:value-of select="ancestor::w:tbl[1]/w:tblPr/w:tblStyle/@w:val"/>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when 
-      test="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]">
-      <xsl:variable name="mstyle"
-        select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
-      <xsl:call-template name="InsertCellMargins">
-        <xsl:with-param name="tcMar" select="w:tcMar/w:bottom"/>
-        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
-        <xsl:with-param name="tblDefMar" select="$mstyle/w:bottom"/>
-        <xsl:with-param name="attribute">fo:padding-bottom</xsl:with-param>
-      </xsl:call-template>
-      <xsl:call-template name="InsertCellMargins">
-        <xsl:with-param name="tcMar" select="w:tcMar/w:left"/>
-        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:left"/>
-        <xsl:with-param name="tblDefMar" select="$mstyle/w:left"/>
-        <xsl:with-param name="attribute">fo:padding-left</xsl:with-param>
-      </xsl:call-template>
-      <xsl:call-template name="InsertCellMargins">
-        <xsl:with-param name="tcMar" select="w:tcMar/w:right"/>
-        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:right"/>
-        <xsl:with-param name="tblDefMar" select="$mstyle/w:right"/>
-        <xsl:with-param name="attribute">fo:padding-right</xsl:with-param>
-      </xsl:call-template>
-      <xsl:call-template name="InsertCellMargins">
-        <xsl:with-param name="tcMar" select="w:tcMar/w:top"/>
-        <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"/>
-        <xsl:with-param name="tblDefMar" select="$mstyle/w:top"/>
-        <xsl:with-param name="attribute">fo:padding-top</xsl:with-param>
-      </xsl:call-template>
+      <xsl:when
+        test="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]">
+        <xsl:variable name="mstyle"
+          select="document('word/styles.xml')/w:styles/w:style[@w:styleId = $mstyleId or @w:styleId = concat('CONTENT_',$mstyleId)]/w:tblPr/w:tblCellMar"/>
+        <xsl:call-template name="InsertCellMargins">
+          <xsl:with-param name="tcMar" select="w:tcMar/w:bottom"/>
+          <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:bottom"/>
+          <xsl:with-param name="tblDefMar" select="$mstyle/w:bottom"/>
+          <xsl:with-param name="attribute">fo:padding-bottom</xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertCellMargins">
+          <xsl:with-param name="tcMar" select="w:tcMar/w:left"/>
+          <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:left"/>
+          <xsl:with-param name="tblDefMar" select="$mstyle/w:left"/>
+          <xsl:with-param name="attribute">fo:padding-left</xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertCellMargins">
+          <xsl:with-param name="tcMar" select="w:tcMar/w:right"/>
+          <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:right"/>
+          <xsl:with-param name="tblDefMar" select="$mstyle/w:right"/>
+          <xsl:with-param name="attribute">fo:padding-right</xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertCellMargins">
+          <xsl:with-param name="tcMar" select="w:tcMar/w:top"/>
+          <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"/>
+          <xsl:with-param name="tblDefMar" select="$mstyle/w:top"/>
+          <xsl:with-param name="attribute">fo:padding-top</xsl:with-param>
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="InsertCellMargins">
@@ -331,7 +429,7 @@
           <xsl:with-param name="tcMar" select="w:tcMar/w:top"/>
           <xsl:with-param name="tblMar" select="ancestor::w:tbl[1]/w:tblPr/w:tblCellMar/w:top"/>
           <xsl:with-param name="attribute">fo:padding-top</xsl:with-param>
-        </xsl:call-template> 
+        </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
     <!--    borders-->
