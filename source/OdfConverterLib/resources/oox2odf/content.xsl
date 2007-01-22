@@ -39,6 +39,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:v="urn:schemas-microsoft-com:vml"
   exclude-result-prefixes="w r xlink number wp ">
 
   <xsl:import href="tables.xsl"/>
@@ -148,7 +149,7 @@
 
   <!-- create a style for each paragraph. Do not take w:sectPr/w:rPr into consideration. -->
   <xsl:template
-    match="w:pPr[parent::w:p]|w:r[parent::w:p[not(child::w:pPr)] and child::w:br[@w:type='page' or @w:type='column']]"
+    match="w:pPr[parent::w:p]|w:r[parent::w:p[not(child::w:pPr)] and (child::w:br[@w:type='page' or @w:type='column'] or contains(child::w:pict/v:shape/@style,'mso-position-horizontal-relative:char'))]"
     mode="automaticstyles">
     <xsl:message terminate="no">progress:w:pPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:p)}" style:family="paragraph">

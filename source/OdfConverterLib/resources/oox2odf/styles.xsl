@@ -38,6 +38,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:v="urn:schemas-microsoft-com:vml"
   exclude-result-prefixes="w r draw number wp xlink">
 
   <xsl:import href="footnotes.xsl"/>
@@ -1952,6 +1953,11 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <!-- handle frames in text used as char-->
+    <xsl:if test="contains(parent::w:p/w:r/w:pict/v:shape/@style,'mso-position-horizontal-relative:char') and not(w:textAlignment)">
+      <xsl:attribute name="style:vertical-align">bottom</xsl:attribute>
+    </xsl:if>
+    
     <!-- insert attributes using match -->
     <xsl:apply-templates mode="pPrChildren"/>
     <!-- insert attributes using template -->
