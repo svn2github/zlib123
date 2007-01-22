@@ -36,8 +36,8 @@
 
 
   <xsl:key name="date-style" match="number:date-style" use="@style:name"/>
- 
-  
+
+
   <xsl:template match="text:page-number" mode="paragraph">
     <w:r>
       <w:fldChar w:fldCharType="begin"/>
@@ -84,6 +84,11 @@
     <w:r>
       <xsl:call-template name="InsertRunProperties"/>
       <w:instrText xml:space="preserve">NUMPAGES </w:instrText>
+    </w:r>
+    <w:r>
+      <w:fldChar w:fldCharType="separate"/>
+    </w:r>
+    <w:r>
       <xsl:apply-templates mode="text"/>
     </w:r>
     <w:r>
@@ -494,7 +499,8 @@
   <xsl:template name="InsertUserFieldDeclaration">
     <xsl:if test="parent::office:text">
       <xsl:if test="not(preceding-sibling::*[1][self::text:p or self::text:h])">
-        <xsl:apply-templates select="preceding-sibling::text:user-field-decls/text:user-field-decl" mode="user-field-decl"/>
+        <xsl:apply-templates select="preceding-sibling::text:user-field-decls/text:user-field-decl"
+          mode="user-field-decl"/>
       </xsl:if>
     </xsl:if>
   </xsl:template>
@@ -503,7 +509,7 @@
   <xsl:template match="text:user-field-decl" mode="user-field-decl">
     <xsl:call-template name="InsertVariableField"/>
   </xsl:template>
-  
+
   <!-- insert declaration of variable, and potentially a reference to display it. -->
   <xsl:template name="InsertVariableField">
     <xsl:variable name="varName">
