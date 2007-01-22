@@ -57,6 +57,9 @@
     <EmbeddedResource Include="resources\Labels.de-DE.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="resources\Labels.nl-NL.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="resources\Labels.pl-PL.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
