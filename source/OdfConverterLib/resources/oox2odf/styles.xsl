@@ -2342,25 +2342,27 @@
   <xsl:template name="InsertParagraphTabStops">
     <xsl:param name="MarginLeft"/>
     <xsl:param name="parentStyleId"/>
-    <xsl:if test="w:tabs">
-      <style:tab-stops>
+    <xsl:if test="w:tabs or document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentStyleId]/w:tabs">
+    <style:tab-stops>
         <xsl:for-each select="w:tabs/w:tab">
           <xsl:call-template name="InsertTabs">
             <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
           </xsl:call-template>
         </xsl:for-each>
-      </style:tab-stops>
-    </xsl:if>
-    <xsl:if test="not(w:tabs)">
       <xsl:for-each select="document('word/styles.xml')">
-        <xsl:for-each select="key('StyleId', $parentStyleId)">
-          <xsl:call-template name="InsertParagraphTabStops">
-            <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
-            <xsl:with-param name="parentStyleId"
-              select="key('StyleId', $parentStyleId)/w:basedOn/@w:val"/>
-          </xsl:call-template>
+        <xsl:for-each select="key('StyleId', $parentStyleId)/w:pPr">
+          <xsl:if test="w:tabs"> 
+              <xsl:for-each select="w:tabs/w:tab">
+                <xsl:if test="not(document('word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos)">
+                <xsl:call-template name="InsertTabs">
+                  <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
+                </xsl:call-template>
+                </xsl:if>
+              </xsl:for-each> 
+            </xsl:if>
         </xsl:for-each>
       </xsl:for-each>
+    </style:tab-stops>
     </xsl:if>
   </xsl:template>
 
