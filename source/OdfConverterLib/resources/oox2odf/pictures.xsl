@@ -626,7 +626,7 @@
           <xsl:choose>
             <!-- if there is vertical position offset -->
             <xsl:when
-              test="contains(@style,'margin-top') or wp:anchor/wp:positionV/wp:posOffset/text() != ''">
+              test="contains(@style,'margin-top') or wp:anchor/wp:positionV/wp:posOffset/text() != '' or (w:pPr/w:framePr/@w:y and not(w:pPr/w:framePr/@w:yAlign))">
               <xsl:text>from-top</xsl:text>
             </xsl:when>
             <xsl:otherwise>

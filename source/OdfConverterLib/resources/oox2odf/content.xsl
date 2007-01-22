@@ -462,11 +462,113 @@
     </xsl:attribute>
   </xsl:template>
 
-  <!-- skip drop-capped paragraphs -->
-  <xsl:template match="w:p[w:pPr/w:framePr/@w:dropCap]"/>
-  <!-- margin drop cap -->
-  <xsl:template match="w:p[w:pPr/w:framePr/@w:dropCap = 'margin' ]" mode="automaticstyles">
-    <xsl:message terminate="no">feedback:ui.translation.issue.dropcap.margin</xsl:message>
+  <!-- text frame paragraphs-->
+  <xsl:template match="w:p[w:pPr/w:framePr]">
+    <xsl:choose>
+      <!-- skip drop-capped paragraphs --> 
+      <xsl:when test="w:p[w:pPr/w:framePr/@w:dropCap]"/>
+      <xsl:otherwise>
+        <!-- if previous node wasn't a text frame paragraph-->
+        <xsl:if test="not(preceding::w:p[position()=1][descendant::w:framePr])">
+          <text:p>
+            <xsl:attribute name="text:style-name">
+              <xsl:choose>
+                <xsl:when test="w:pPr/w:pStyle/@w:val">
+                  <xsl:value-of select="w:pPr/w:pStyle/@w:val"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="generate-id()"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>      
+            <draw:frame>
+              <xsl:call-template name="InsertShapeStyleName">
+                <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+              </xsl:call-template>
+              <xsl:call-template name="InsertShapeAnchor">
+                <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+              </xsl:call-template>
+              <xsl:call-template name="InsertShapeWidth">
+                <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+              </xsl:call-template>
+              <xsl:call-template name="InsertShapeHeight">
+                <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+              </xsl:call-template>
+              <xsl:call-template name="InsertshapeAbsolutePos">
+                <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+              </xsl:call-template>
+              <!-- TO DO margin horizontal and vertical -->
+              <draw:text-box>
+                <xsl:call-template name="InsertTextBoxAutomaticHeight">
+                  <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+                </xsl:call-template>
+                <xsl:call-template name="InsertParagraphToFrame"/>
+              </draw:text-box>
+            </draw:frame>
+          </text:p>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>    
+  </xsl:template>
+  
+  <xsl:template name="InsertParagraphToFrame">
+    <xsl:param name="paragraph" select="."/>
+    <text:p>                
+      <xsl:attribute name="text:style-name">
+        <xsl:choose>
+          <xsl:when test="$paragraph/w:pPr/w:pStyle/@w:val">
+            <xsl:value-of select="$paragraph/w:pPr/w:pStyle/@w:val"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="generate-id($paragraph)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>      
+      <xsl:apply-templates select="$paragraph/node()"/>
+    </text:p>
+    <!-- if next paragraph is also a text frame paragraph then insert its content to the same text-box -->
+    <xsl:if test="$paragraph/following::*[position()=1][w:pPr/w:framePr]">
+      <xsl:call-template name="InsertParagraphToFrame">
+        <xsl:with-param name="paragraph" select="$paragraph/following::*[position()=1][w:pPr/w:framePr]"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="w:p[w:pPr/w:framePr]" mode="automaticstyles">
+    <xsl:choose>
+      <!-- margin drop cap -->
+      <xsl:when test="w:p[w:pPr/w:framePr/@w:dropCap]">
+        <xsl:message terminate="no">feedback:ui.translation.issue.dropcap.margin</xsl:message>
+      </xsl:when>
+      <xsl:otherwise>
+        <style:style style:name="{generate-id(w:pPr/w:framePr)}" style:family="graphic" style:parent-style-name="Frame">
+          <style:graphic-properties>
+            <xsl:call-template name="InsertShapeWrap">
+              <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+            </xsl:call-template>
+            <xsl:call-template name="InsertShapeFromTextDistance">
+              <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+            </xsl:call-template>
+            <xsl:call-template name="InsertShapeHorizontalPos">
+              <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+            </xsl:call-template>
+            <xsl:call-template name="InsertShapeVerticalPos">
+              <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+            </xsl:call-template>
+            <xsl:call-template name="InsertShapeAutomaticWidth">
+              <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
+            </xsl:call-template>            
+            <xsl:if test="not(w:pPr/w:pBdr)">
+              <xsl:attribute name="fo:border">
+                <xsl:text>none</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates select='w:pPr' mode="pPrChildren"/>           
+          </style:graphic-properties>
+        </style:style>        
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:apply-templates mode="automaticstyles"/>
   </xsl:template>
 
 
