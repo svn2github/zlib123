@@ -103,6 +103,19 @@
     <xsl:call-template name="InsertEmbeddedTextboxes"/>
   </xsl:template>
 
+  <!-- forward shapes in paragraph mode to shapes mode -->
+  <xsl:template match="draw:custom-shape|draw:rect|draw:ellipse" mode="paragraph">
+    <!-- COMMENT : many other shapes to be handled by 1.1 -->
+    <xsl:choose>
+      <xsl:when test="ancestor::draw:text-box">
+        <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="." mode="shapes"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- inserts textboxes which are embedded in odf as one after another in word -->
   <xsl:template name="InsertEmbeddedTextboxes">
     <xsl:apply-templates select="draw:text-box" mode="paragraph"/>

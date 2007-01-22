@@ -208,7 +208,7 @@
       <xsl:when test="child::draw:ellipse|child::draw:rect|child::draw:custom-shape">
         <xsl:choose>
           <xsl:when test="ancestor::draw:text-box">
-            <xsl:message terminate="no">translation.odf2oox.positionInsideTextbox</xsl:message>
+            <xsl:message terminate="no">translation.odf2oox.nestedFrames</xsl:message>
           </xsl:when>
           <xsl:otherwise>
             <xsl:apply-templates mode="shapes"/>
