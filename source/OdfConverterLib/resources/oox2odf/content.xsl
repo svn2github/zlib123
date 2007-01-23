@@ -179,7 +179,7 @@
   </xsl:template>
 
   <xsl:template match="w:p[not (./w:pPr)]" mode="automaticstyles">
-    <xsl:if test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr">
+    <xsl:if test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
       <style:style style:name="{generate-id(.)}" style:family="paragraph">
         <xsl:call-template name="MasterPageName"/>
         <xsl:call-template name="InsertDefaultParagraphProperties"/>
@@ -600,7 +600,7 @@
         </xsl:variable>
         <text:p>
           <xsl:if
-            test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault/w:pPr">
+            test="w:pPr or w:r/w:br[@w:type='page' or @w:type='column'] or document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
             <xsl:attribute name="text:style-name">
               <xsl:value-of select="generate-id(self::node())"/>
             </xsl:attribute>
@@ -966,9 +966,9 @@
 
     <xsl:choose>
       <xsl:when test="not(preceding::w:p)">
-        <xsl:choose>
+          <xsl:choose>
           <xsl:when test="$followingSectPr">
-            <xsl:choose>
+          <xsl:choose>
               <xsl:when test="$followingSectPr/w:titlePg">
                 <xsl:attribute name="style:master-page-name">
                   <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
@@ -984,7 +984,7 @@
           <xsl:otherwise>
             <xsl:choose>
               <xsl:when test="$mainSectPr/w:titlePg">
-                <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
+                   <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
@@ -1002,16 +1002,22 @@
               </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:if test="$followingSectPr/w:titlePg">
-                <xsl:attribute name="style:master-page-name">
-                  <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
-                </xsl:attribute>
-              </xsl:if>
+              <xsl:choose>
+                <xsl:when test="$followingSectPr[not(child::w:titlePg)]">
+                  <xsl:attribute name="style:master-page-name">
+                    <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
+                  </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:attribute name="style:master-page-name">
+                    <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
+                  </xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
 </xsl:stylesheet>
