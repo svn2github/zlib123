@@ -791,15 +791,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
 
             // columns
-            Element cols = (Element)page.GetChild("cols", W_NAMESPACE);
-            if (cols != null)
+            Element cols = (Element)this.odfSectPr.GetChild("cols", W_NAMESPACE);
+            if (this.nextIsEndSection && cols != null)
             {
                 cols.Write(nextWriter);
             }
             else
             {
-                if (this.nextIsEndSection &&
-                    (cols = (Element)this.odfSectPr.GetChild("cols", W_NAMESPACE)) != null)
+                if ((cols = (Element)page.GetChild("cols", W_NAMESPACE)) != null)
                 {
                     cols.Write(nextWriter);
                 }
