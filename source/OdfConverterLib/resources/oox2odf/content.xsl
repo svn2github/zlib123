@@ -39,8 +39,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-  xmlns:v="urn:schemas-microsoft-com:vml"
-  exclude-result-prefixes="w r xlink number wp ">
+  xmlns:v="urn:schemas-microsoft-com:vml" exclude-result-prefixes="w r xlink number wp ">
 
   <xsl:import href="tables.xsl"/>
   <xsl:import href="lists.xsl"/>
@@ -76,6 +75,7 @@
         <xsl:call-template name="InsertListStyles"/>
         <xsl:call-template name="InsertSectionsStyles"/>
         <xsl:call-template name="InsertFootnoteStyles"/>
+        <xsl:call-template name="InsertEndnoteStyles"/>
       </office:automatic-styles>
       <office:body>
         <office:text>
@@ -130,6 +130,15 @@
       test="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:r/w:rPr | 
       document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:pPr">
       <xsl:apply-templates select="document('word/footnotes.xml')/w:footnotes/w:footnote/w:p"
+        mode="automaticstyles"/>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertEndnoteStyles">
+    <xsl:if
+      test="document('word/endnotes.xml')/w:endnotes/w:endnote/w:p/w:r/w:rPr | 
+      document('word/footnotes.xml')/w:footnotes/w:footnote/w:p/w:pPr">
+      <xsl:apply-templates select="document('word/endnotes.xml')/w:endnotes/w:endnote/w:p"
         mode="automaticstyles"/>
     </xsl:if>
   </xsl:template>
@@ -466,7 +475,7 @@
   <!-- text frame paragraphs-->
   <xsl:template match="w:p[w:pPr/w:framePr]">
     <xsl:choose>
-      <!-- skip drop-capped paragraphs --> 
+      <!-- skip drop-capped paragraphs -->
       <xsl:when test="w:p[w:pPr/w:framePr/@w:dropCap]"/>
       <xsl:otherwise>
         <!-- if previous node wasn't a text frame paragraph-->
@@ -481,7 +490,7 @@
                   <xsl:value-of select="generate-id()"/>
                 </xsl:otherwise>
               </xsl:choose>
-            </xsl:attribute>      
+            </xsl:attribute>
             <draw:frame>
               <xsl:call-template name="InsertShapeStyleName">
                 <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
@@ -508,12 +517,12 @@
           </text:p>
         </xsl:if>
       </xsl:otherwise>
-    </xsl:choose>    
+    </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertParagraphToFrame">
     <xsl:param name="paragraph" select="."/>
-    <text:p>                
+    <text:p>
       <xsl:attribute name="text:style-name">
         <xsl:choose>
           <xsl:when test="$paragraph/w:pPr/w:pStyle/@w:val">
@@ -523,17 +532,18 @@
             <xsl:value-of select="generate-id($paragraph)"/>
           </xsl:otherwise>
         </xsl:choose>
-      </xsl:attribute>      
+      </xsl:attribute>
       <xsl:apply-templates select="$paragraph/node()"/>
     </text:p>
     <!-- if next paragraph is also a text frame paragraph then insert its content to the same text-box -->
     <xsl:if test="$paragraph/following::*[position()=1][w:pPr/w:framePr]">
       <xsl:call-template name="InsertParagraphToFrame">
-        <xsl:with-param name="paragraph" select="$paragraph/following::*[position()=1][w:pPr/w:framePr]"/>
+        <xsl:with-param name="paragraph"
+          select="$paragraph/following::*[position()=1][w:pPr/w:framePr]"/>
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="w:p[w:pPr/w:framePr]" mode="automaticstyles">
     <xsl:choose>
       <!-- margin drop cap -->
@@ -541,7 +551,8 @@
         <xsl:message terminate="no">feedback:ui.translation.issue.dropcap.margin</xsl:message>
       </xsl:when>
       <xsl:otherwise>
-        <style:style style:name="{generate-id(w:pPr/w:framePr)}" style:family="graphic" style:parent-style-name="Frame">
+        <style:style style:name="{generate-id(w:pPr/w:framePr)}" style:family="graphic"
+          style:parent-style-name="Frame">
           <style:graphic-properties>
             <xsl:call-template name="InsertShapeWrap">
               <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
@@ -557,15 +568,15 @@
             </xsl:call-template>
             <xsl:call-template name="InsertShapeAutomaticWidth">
               <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
-            </xsl:call-template>            
+            </xsl:call-template>
             <xsl:if test="not(w:pPr/w:pBdr)">
               <xsl:attribute name="fo:border">
                 <xsl:text>none</xsl:text>
               </xsl:attribute>
             </xsl:if>
-            <xsl:apply-templates select='w:pPr' mode="pPrChildren"/>           
+            <xsl:apply-templates select="w:pPr" mode="pPrChildren"/>
           </style:graphic-properties>
-        </style:style>        
+        </style:style>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:apply-templates mode="automaticstyles"/>
@@ -948,8 +959,8 @@
   <xsl:template match="text()" mode="automaticstyles"/>
 
   <xsl:template name="MasterPageName">
-    <xsl:variable name="precSectPr" select="preceding::w:p/w:pPr/w:sectPr[1]"/>
-    <xsl:variable name="followingSectPr" select="following::w:p/w:pPr/w:sectPr[1]"/>
+    <xsl:variable name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
+    <xsl:variable name="followingSectPr" select="following::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
     <xsl:variable name="mainSectPr"
       select="document('word/document.xml')/w:document/w:body/w:sectPr"/>
 

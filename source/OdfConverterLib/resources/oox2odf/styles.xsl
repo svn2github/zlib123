@@ -38,8 +38,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:v="urn:schemas-microsoft-com:vml"
-  exclude-result-prefixes="w r draw number wp xlink">
+  xmlns:v="urn:schemas-microsoft-com:vml" exclude-result-prefixes="w r draw number wp xlink">
 
   <xsl:import href="footnotes.xsl"/>
   <xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
@@ -61,10 +60,10 @@
           test="document('word/document.xml')/w:document/descendant::w:r[contains(w:instrText,'CITATION')]">
           <xsl:call-template name="BibliographyConfiguration"/>
         </xsl:if>
-        <!-- Insert Line Numbering -->
-        <xsl:call-template name="InsertLineNumbering"/>
         <!-- Insert List Style Properties -->
         <xsl:call-template name="ListStyleProperties"/>
+        <!-- Insert Line Numbering -->
+        <xsl:call-template name="InsertLineNumbering"/>
       </office:styles>
       <!-- automatic styles -->
       <office:automatic-styles>
@@ -1607,7 +1606,8 @@
       <xsl:when test="w:numPr/w:numId/@w:val and w:numPr/w:ilvl/@w:val &lt; 10">
         <xsl:text>true</xsl:text>
       </xsl:when>
-      <xsl:when test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">
+      <xsl:when
+        test="parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val and parent::w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:ilvl/@w:val &lt; 10">
         <xsl:text>true</xsl:text>
       </xsl:when>
 
@@ -1621,89 +1621,94 @@
     </xsl:choose>
   </xsl:template>
 
-<xsl:template name="FirstLine">
-  
-  <xsl:variable name="StyleId">
-    <xsl:value-of select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
-  </xsl:variable>
-  
-  <xsl:variable name="NumId">
+  <xsl:template name="FirstLine">
+
+    <xsl:variable name="StyleId">
+      <xsl:value-of select="w:pStyle/@w:val|parent::w:style/@w:styleId"/>
+    </xsl:variable>
+
+    <xsl:variable name="NumId">
+      <xsl:choose>
+        <xsl:when test="w:numPr/w:numId/@w:val">
+          <xsl:value-of select="w:numPr/w:numId/@w:val"/>
+        </xsl:when>
+        <xsl:when
+          test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+          <xsl:value-of
+            select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val"
+          />
+        </xsl:when>
+        <xsl:when
+          test="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
+          <xsl:value-of
+            select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"
+          />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="Abstract">
+            <xsl:value-of select="parent::w:abstractNum/@w:abstractNumId"/>
+          </xsl:variable>
+          <xsl:value-of
+            select="document('word/numbering.xml')/w:numbering/w:num[w:abstractNumId/@w:val = $Abstract]/@w:numId"
+          />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="Ivl">
+      <xsl:choose>
+        <xsl:when test="w:numPr/w:ilvl/@w:val">
+          <xsl:value-of select="w:numPr/w:ilvl/@w:val"/>
+        </xsl:when>
+        <xsl:when test="./@w:ilvl">
+          <xsl:value-of select="./@w:ilvl"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:for-each select="document('word/styles.xml')">
+            <xsl:choose>
+              <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
+                <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"/>
+              </xsl:when>
+              <xsl:otherwise/>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="AbstractNumId">
+      <xsl:choose>
+        <xsl:when
+          test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val">
+          <xsl:value-of
+            select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
+          />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:choose>
-      <xsl:when test="w:numPr/w:numId/@w:val">
-        <xsl:value-of select="w:numPr/w:numId/@w:val"/>
+      <xsl:when test="w:ind/@w:firstLine != ''">
+        <xsl:value-of select="w:ind/@w:firstLine"/>
       </xsl:when>
       <xsl:when
-        test="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val">
+        test="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
         <xsl:value-of
-          select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$StyleId]/w:pPr/w:numPr/w:numId/@w:val"
+          select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
         />
       </xsl:when>
       <xsl:when
-        test="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val != ''">
+        test="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
         <xsl:value-of
-          select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:pStyle[@w:val=$StyleId]/following-sibling::w:numPr/w:numId/@w:val"
+          select="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine"
         />
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:variable name="Abstract">
-          <xsl:value-of select="parent::w:abstractNum/@w:abstractNumId"/>
-        </xsl:variable>
-        <xsl:value-of select="document('word/numbering.xml')/w:numbering/w:num[w:abstractNumId/@w:val = $Abstract]/@w:numId"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-  
-  <xsl:variable name="Ivl">
-    <xsl:choose>
-      <xsl:when test="w:numPr/w:ilvl/@w:val">
-        <xsl:value-of select="w:numPr/w:ilvl/@w:val"/>
-      </xsl:when>
-      <xsl:when test="./@w:ilvl">
-        <xsl:value-of select="./@w:ilvl"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:for-each select="document('word/styles.xml')">
-          <xsl:choose>
-            <xsl:when test="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val">
-              <xsl:value-of select="key('StyleId',$StyleId)/w:pPr/w:numPr/w:ilvl/@w:val"/>
-            </xsl:when>
-            <xsl:otherwise/>
-          </xsl:choose>
-        </xsl:for-each>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-  
-  <xsl:variable name="AbstractNumId">
-    <xsl:choose>
-      <xsl:when
-        test="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val">
-        <xsl:value-of
-          select="document('word/numbering.xml')/w:numbering/w:num[@w:numId=$NumId]/w:abstractNumId/@w:val"
-        />
-      </xsl:when>
-    </xsl:choose>
-  </xsl:variable>
-  
-  <xsl:choose>
-    <xsl:when test="w:ind/@w:firstLine != ''">
-      <xsl:value-of select="w:ind/@w:firstLine"/>
-    </xsl:when>
-    <xsl:when
-      test="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
-      <xsl:value-of
-        select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
-      />
-    </xsl:when>
-    <xsl:when test="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
-          <xsl:value-of select="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine"/>
-    </xsl:when>
-    <xsl:otherwise>0</xsl:otherwise>
+      <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
 
-  
-</xsl:template>
-  
+
+  </xsl:template>
+
   <xsl:template name="CalculateMarginLeft">
     <xsl:param name="StyleId"/>
     <xsl:param name="CheckIfList"/>
@@ -1809,8 +1814,8 @@
             </xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
-          </xsl:variable>
-        
+        </xsl:variable>
+
         <!-- left indent -->
         <xsl:choose>
           <xsl:when test="$FirstLine != '0'">
@@ -1947,17 +1952,18 @@
           <xsl:value-of select="$IndHanging"/>
         </xsl:with-param>
         <xsl:with-param name="IndLeft">
-          <xsl:value-of select="$IndLeft"/>        
+          <xsl:value-of select="$IndLeft"/>
         </xsl:with-param>
-       
+
       </xsl:call-template>
     </xsl:variable>
 
     <!-- handle frames in text used as char-->
-    <xsl:if test="contains(parent::w:p/w:r/w:pict/v:shape/@style,'mso-position-horizontal-relative:char') and not(w:textAlignment)">
+    <xsl:if
+      test="contains(parent::w:p/w:r/w:pict/v:shape/@style,'mso-position-horizontal-relative:char') and not(w:textAlignment)">
       <xsl:attribute name="style:vertical-align">bottom</xsl:attribute>
     </xsl:if>
-    
+
     <!-- insert attributes using match -->
     <xsl:apply-templates mode="pPrChildren"/>
     <!-- insert attributes using template -->
@@ -1970,6 +1976,7 @@
       <xsl:with-param name="IndLeft" select="$IndLeft"/>
     </xsl:call-template>
     <xsl:call-template name="InsertParagraphWidowControl"/>
+    <xsl:call-template name="InsertSuppressLineNumbering"/>
     <!-- child elements : -->
     <!-- tab-stops -->
     <xsl:call-template name="InsertParagraphTabStops">
@@ -2121,7 +2128,7 @@
         <xsl:otherwise>0cm</xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
-    
+
     <xsl:variable name="FirstLine">
       <xsl:call-template name="FirstLine"/>
     </xsl:variable>
@@ -2348,27 +2355,29 @@
   <xsl:template name="InsertParagraphTabStops">
     <xsl:param name="MarginLeft"/>
     <xsl:param name="parentStyleId"/>
-    <xsl:if test="w:tabs or document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentStyleId]/w:tabs">
-    <style:tab-stops>
+    <xsl:if
+      test="w:tabs or document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentStyleId]/w:tabs">
+      <style:tab-stops>
         <xsl:for-each select="w:tabs/w:tab">
           <xsl:call-template name="InsertTabs">
             <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
           </xsl:call-template>
         </xsl:for-each>
-      <xsl:for-each select="document('word/styles.xml')">
-        <xsl:for-each select="key('StyleId', $parentStyleId)/w:pPr">
-          <xsl:if test="w:tabs"> 
+        <xsl:for-each select="document('word/styles.xml')">
+          <xsl:for-each select="key('StyleId', $parentStyleId)/w:pPr">
+            <xsl:if test="w:tabs">
               <xsl:for-each select="w:tabs/w:tab">
-                <xsl:if test="not(document('word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos)">
-                <xsl:call-template name="InsertTabs">
-                  <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
-                </xsl:call-template>
+                <xsl:if
+                  test="not(document('word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos)">
+                  <xsl:call-template name="InsertTabs">
+                    <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
+                  </xsl:call-template>
                 </xsl:if>
-              </xsl:for-each> 
+              </xsl:for-each>
             </xsl:if>
+          </xsl:for-each>
         </xsl:for-each>
-      </xsl:for-each>
-    </style:tab-stops>
+      </style:tab-stops>
     </xsl:if>
   </xsl:template>
 
@@ -2750,6 +2759,48 @@
       </xsl:if>
     </style:tab-stop>
   </xsl:template>
+
+  <!-- suppress line numbering if paragraph is in a not-numbered section -->
+  <xsl:template name="InsertSuppressLineNumbering">
+    <xsl:if test="$lines-are-numbered">
+      <xsl:choose>
+        <xsl:when test="w:suppressLineNumbers">
+          <!-- problem already handled by match template, nothing to do -->
+        </xsl:when>
+        <xsl:when test="ancestor::w:p and not(ancestor::w:body)">
+          <!-- never include paragraphs outside of body (header, footer, endnotes, footnotes) -->
+          <xsl:attribute name="text:number-lines">false</xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="ancestor::w:body and not(ancestor::w:tbl or ancestor::w:txbxContent)">
+            <!-- check if paragraph is in a numbered section -->
+            <xsl:choose>
+              <xsl:when test="w:sectPr">
+                <xsl:if test="w:sectPr[not(w:lnNumType)]">
+                  <xsl:attribute name="text:number-lines">false</xsl:attribute>
+                </xsl:if>
+              </xsl:when>
+              <xsl:when
+                test="ancestor::w:p[parent::w:body]/following-sibling::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr">
+                <xsl:variable name="followingSectPr"
+                  select="ancestor::w:p[parent::w:body]/following-sibling::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
+                <xsl:if test="$followingSectPr[not(w:lnNumType)]">
+                  <xsl:attribute name="text:number-lines">false</xsl:attribute>
+                </xsl:if>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:variable name="mainSectPr" select="ancestor::w:body/w:sectPr"/>
+                <xsl:if test="$mainSectPr[not(w:lnNumType)]">
+                  <xsl:attribute name="text:number-lines">false</xsl:attribute>
+                </xsl:if>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
 
   <!-- ODF Text properties contained in OOX pPr element -->
   <xsl:template name="InsertpPrTextProperties">
@@ -3355,29 +3406,41 @@
     </text:bibliography-configuration>
   </xsl:template>
 
-  <!-- Insert List Style Properties -->
+  <!-- global variable to warn if document is number (retrieve numbering when necessary -->
+  <xsl:variable name="lines-are-numbered">
+    <xsl:for-each select="document('word/document.xml')">
+      <xsl:if test="key('sectPr', '')/w:lnNumType">true</xsl:if>
+    </xsl:for-each>
+  </xsl:variable>
 
+  <!-- Insert line numbering. If numbering not applied to a section, retrieve property in paragraphs -->
   <xsl:template name="InsertLineNumbering">
-    <xsl:if test="not(document('word/document.xml')/w:document/w:body/w:p/descendant::w:sectPr)">
-      <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr/w:lnNumType">
-        <xsl:message terminate="no">feedback:Line numbering - restart each section</xsl:message>
-        <style:style style:name="Line_20_numbering" style:display-name="Line numbering"
-          style:family="text"/>
+    <xsl:if test="$lines-are-numbered">
+      <style:style style:name="Line_20_numbering" style:display-name="Line numbering"
+        style:family="text"/>
+      <xsl:for-each select="document('word/document.xml')">
         <text:linenumbering-configuration text:style-name="Line_20_numbering" style:num-format="1"
-          text:number-position="left">
-          <xsl:if test="not(./@w:restart)">
+          text:count-empty-lines="false" text:number-position="left">
+          <!-- if no section is set to continuous, restart on every page -->
+          <xsl:if test="not(key('sectPr', '')/w:lnNumType/@w:restart = 'continuous')">
             <xsl:attribute name="text:restart-on-page">true</xsl:attribute>
           </xsl:if>
           <xsl:attribute name="text:increment">
-            <xsl:value-of select="./@w:countBy"/>
+            <xsl:value-of select="key('sectPr', '')/w:lnNumType/@w:countBy"/>
           </xsl:attribute>
           <xsl:attribute name="text:offset">
-            <xsl:call-template name="ConvertTwips">
-              <xsl:with-param name="length">
-                <xsl:value-of select="./@w:distance"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
+            <xsl:choose>
+              <xsl:when test="key('sectPr', '')/w:lnNumType/@w:distance">
+                <xsl:call-template name="ConvertTwips">
+                  <xsl:with-param name="length">
+                    <xsl:value-of select="key('sectPr', '')/w:lnNumType/@w:distance"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="unit">cm</xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <!-- requires default value (otherwise, 0) -->
+              <xsl:otherwise>0.75cm</xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
         </text:linenumbering-configuration>
       </xsl:for-each>
@@ -3385,7 +3448,6 @@
   </xsl:template>
 
   <!-- Insert List Style Properties -->
-
   <xsl:template name="ListStyleProperties">
     <xsl:for-each select="document('word/numbering.xml')/w:numbering/w:abstractNum">
       <style:style style:family="text">
