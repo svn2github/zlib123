@@ -100,6 +100,10 @@
     </xsl:variable>
 
     <xsl:choose>
+      <!-- if numFmt is none, nothing to do -->
+      <xsl:when test="w:numFmt/@w:val = 'none' ">
+        <text:list-level-style-number text:level="{$lvl}" style:num-format=""/>
+      </xsl:when>
 
       <!--check if it's numbering, bullet or picture bullet -->
       <xsl:when test="w:numFmt[@w:val = 'bullet'] and w:lvlPicBulletId/@w:val != ''">
