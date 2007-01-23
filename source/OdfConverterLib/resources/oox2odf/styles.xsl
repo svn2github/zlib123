@@ -2333,20 +2333,12 @@
   <xsl:template name="InsertParagraphWidowControl">
     <xsl:choose>
       <xsl:when test="w:widowControl/@w:val='0'">
-        <xsl:attribute name="fo:widows">
-          <xsl:value-of select="1"/>
-        </xsl:attribute>
-        <xsl:attribute name="fo:orphans">
-          <xsl:value-of select="1"/>
-        </xsl:attribute>
+        <xsl:attribute name="fo:widows">0</xsl:attribute>
+        <xsl:attribute name="fo:orphans">0</xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:attribute name="fo:widows">
-          <xsl:value-of select="2"/>
-        </xsl:attribute>
-        <xsl:attribute name="fo:orphans">
-          <xsl:value-of select="2"/>
-        </xsl:attribute>
+        <xsl:attribute name="fo:widows">2</xsl:attribute>
+        <xsl:attribute name="fo:orphans">2</xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -2762,7 +2754,7 @@
 
   <!-- suppress line numbering if paragraph is in a not-numbered section -->
   <xsl:template name="InsertSuppressLineNumbering">
-    <xsl:if test="$lines-are-numbered">
+    <xsl:if test="$lines-are-numbered = 'true' ">
       <xsl:choose>
         <xsl:when test="w:suppressLineNumbers">
           <!-- problem already handled by match template, nothing to do -->
@@ -3409,13 +3401,16 @@
   <!-- global variable to warn if document is number (retrieve numbering when necessary -->
   <xsl:variable name="lines-are-numbered">
     <xsl:for-each select="document('word/document.xml')">
-      <xsl:if test="key('sectPr', '')/w:lnNumType">true</xsl:if>
+      <xsl:choose>
+        <xsl:when test="key('sectPr', '')/w:lnNumType">true</xsl:when>
+        <xsl:otherwise>false</xsl:otherwise>
+      </xsl:choose>
     </xsl:for-each>
   </xsl:variable>
 
   <!-- Insert line numbering. If numbering not applied to a section, retrieve property in paragraphs -->
   <xsl:template name="InsertLineNumbering">
-    <xsl:if test="$lines-are-numbered">
+    <xsl:if test="$lines-are-numbered = 'true' ">
       <style:style style:name="Line_20_numbering" style:display-name="Line numbering"
         style:family="text"/>
       <xsl:for-each select="document('word/document.xml')">
