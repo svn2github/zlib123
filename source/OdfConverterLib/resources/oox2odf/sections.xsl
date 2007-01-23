@@ -131,8 +131,23 @@
     <style:style style:name="{generate-id(.)}" style:family="section">
       <style:section-properties>
         <xsl:call-template name="InsertColumns"/>
+        <xsl:call-template name="InsertSectionNotesConfig"/>
       </style:section-properties>
     </style:style>
+  </xsl:template>
+
+  <xsl:template name="InsertSectionNotesConfig">
+    <!-- TODO : more attributes -->
+    <xsl:if test="w:footnotePr/w:pos/@w:val = 'beneathText' ">
+      <xsl:call-template name="InsertNotesConfigurationContent">
+        <xsl:with-param name="noteType">footnote</xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    <xsl:if test="w:endnotePr/w:pos/@w:val = 'sectEnd' ">
+      <xsl:call-template name="InsertNotesConfigurationContent">
+        <xsl:with-param name="noteType">endnote</xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="text()" mode="sections"/>

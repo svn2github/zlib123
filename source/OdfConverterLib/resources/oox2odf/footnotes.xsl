@@ -124,7 +124,9 @@
         <xsl:when test="$noteType='footnote' ">
           <xsl:attribute name="text:citation-style-name">Footnote_20_anchor</xsl:attribute>
           <xsl:attribute name="text:citation-body-style-name">Footnote_20_anchor</xsl:attribute>
-          <xsl:attribute name="text:start-numbering-at">document</xsl:attribute>
+          <xsl:if test="not(parent::w:sectPr)">
+            <xsl:attribute name="text:start-numbering-at">document</xsl:attribute>
+          </xsl:if>
         </xsl:when>
         <xsl:when test="$noteType='endnote' ">
           <xsl:attribute name="text:citation-style-name">Endnote_20_Symbol</xsl:attribute>

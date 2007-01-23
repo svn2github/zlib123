@@ -3426,7 +3426,12 @@
             <xsl:attribute name="text:restart-on-page">true</xsl:attribute>
           </xsl:if>
           <xsl:attribute name="text:increment">
-            <xsl:value-of select="key('sectPr', '')/w:lnNumType/@w:countBy"/>
+            <xsl:choose>
+              <xsl:when test="key('sectPr', '')/w:lnNumType/@w:countBy">
+                <xsl:value-of select="key('sectPr', '')/w:lnNumType/@w:countBy"/>
+              </xsl:when>
+              <xsl:otherwise>1</xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
           <xsl:attribute name="text:offset">
             <xsl:choose>
