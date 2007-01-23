@@ -100,7 +100,7 @@
     </xsl:variable>
 
     <xsl:choose>
-      <!-- if numFmt is none, nothing to do -->
+<!-- if numFmt is none, nothing to do -->
       <xsl:when test="w:numFmt/@w:val = 'none' ">
         <text:list-level-style-number text:level="{$lvl}" style:num-format=""/>
       </xsl:when>
@@ -343,7 +343,7 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
-                <xsl:when test="$WFirstLine = '0'">
+                <xsl:when test="$WFirstLine = 'NaN'">
                   <xsl:value-of select="$WLeft - $WHanging"/>
                 </xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
@@ -356,7 +356,7 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
-                <xsl:when test="$WFirstLine = '0'">
+                <xsl:when test="$WFirstLine = 'NaN'">
                   <xsl:choose>
                     <xsl:when
                       test="w:suff/@w:val='nothing' or ($paragraph/w:pPr/w:ind/@w:left = 0 and $tab = '')"
@@ -383,7 +383,7 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
-                <xsl:when test="$WFirstLine != '0'">
+                <xsl:when test="$WFirstLine != 'NaN'">
                   <xsl:choose>
                     <xsl:when test="$tab != '' and $tab - $WFirstLine > 0 ">
                       <xsl:value-of select="$tab - $WFirstLine"/>
@@ -414,11 +414,11 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
-                <xsl:when test="$WFirstLine = '0'">
+                <xsl:when test="$WFirstLine = 'NaN'">
                   <xsl:choose>
                     <xsl:when
-                      test="../w:multiLevelType/@w:val='multilevel' and number($tab) > (number($WLeft) - number($WFirstLine))">
-                      <xsl:value-of select="$tab - number($WLeft) - number($WFirstLine)"/>
+                      test="../w:multiLevelType/@w:val='multilevel' and number($tab) > number($WLeft)">
+                      <xsl:value-of select="$tab - number($WLeft)"/>
                     </xsl:when>
                     <xsl:otherwise> 0 </xsl:otherwise>
                   </xsl:choose>
@@ -433,10 +433,10 @@
           <xsl:call-template name="ConvertTwips">
             <xsl:with-param name="length">
               <xsl:choose>
-                <xsl:when test="$tab != '' and $WFirstLine != '0'">
+                <xsl:when test="$tab != '' and $WFirstLine != 'NaN'">
                   <xsl:value-of select="$tab - $WFirstLine"/>
                 </xsl:when>
-                <xsl:when test="$WFirstLine != '0'">
+                <xsl:when test="$WFirstLine != 'NaN'">
                   <xsl:value-of
                     select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/>
                 </xsl:when>

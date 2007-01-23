@@ -572,7 +572,7 @@
       <xsl:attribute name="text:ref-name">
         <xsl:value-of select="substring-before(substring-after($fieldCode,'REF '),' \')"/>
       </xsl:attribute>
-      <xsl:apply-templates select="descendant::w:r/child::node()"/>
+      <xsl:apply-templates select="ancestor::w:p/descendant::w:t"/>
     </text:bookmark-ref>
   </xsl:template>
 
