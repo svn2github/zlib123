@@ -5,13 +5,12 @@
     <body>
         <h1>
             <a name="top">ODF Add-in for Microsoft Word</a>
-        </h1>
-        
-        <p> Thank you for downloading ODF Add-in for Word. The purpose of this software is to enable
+        </h1>        
+        <p>Thank you for downloading ODF Add-in for Word. The purpose of this software is to enable
             users to open ODF Specification based documents in Microsoft Word and demonstrate the
             interoperability between OpenXML &amp; ODF specifications.  This interoperability project is hosted on
             <a href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a>. For more details and future updates on 
-                the project, please look at the RoadMap document.</p>
+            the project, please look at the RoadMap document.</p>
         
         <h2>Table of Content</h2>
         <ul>
@@ -19,13 +18,17 @@
                 <a href="#hRequirements">Software Requirements</a>
             </li>
             <li>
-                <a href="#hInstall">Installing the add-in</a>
+                <a href="#hInstall">Installing the add-in</a>                
             </li>
             <li>
                 <a href="#hTroobleshooting">Troubleshooting Guide</a>
+                <ul>
+                    <li><a href="#hTroobleshootingXP2003">Microsoft Word XP/2003</a></li>
+                    <li><a href="#hTroobleshooting2007">Microsoft Word 2007</a></li>
+                </ul>
             </li>
             <li>
-                <a>Features/options not supported</a>
+                <a href="#hFeatures">Features/options not supported</a>
                 <ul>
                     <li>
                         <a href="#hFeatureDirect">ODF to OpenXML conversion</a>
@@ -37,10 +40,8 @@
             </li>
         </ul>
         
-        <h2>
-            <a name="hRequirements"> Software Requirements</a>
-        </h2>
-        <p>Before installing the add-in, make sure you have the following...</p>
+        <h2><a name="hRequirements"> Software Requirements</a></h2>
+        <p>Before installing the add-in, make sure you have one of the followings...</p>
         <ul>
             <li>Microsoft Word XP</li>
             <li>
@@ -52,7 +53,37 @@
                     href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
                     >.NET framework 2.0</a>
             </li>
-        </ul>        
+        </ul>      
+        <p><strong>or</strong></p>        
+        <ul>
+            <li>Microsoft Word 2003</li>
+            <li><a href="http://www.microsoft.com/office/preview/beta/converter.mspx">Office Compatibility Pack</a></li>
+            <li>
+                <a
+                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
+                    >.NET framework 2.0*</a>
+            </li>
+        </ul>
+        <p><strong>or</strong></p>
+        <ul>
+            <li><a href="http://www.microsoft.com/office/preview/beta/download/en/default.mspx">Word 2007</a>
+                with .NET Programmability Support activated</li>
+            <li>
+                <a
+                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
+                    >.NET framework 2.0*</a>
+            </li>
+        </ul>
+        
+        
+        <p><strong>(*) Warning:</strong> if you install Microsoft Word before the .NET Framework, you will
+            need to update your Word installation, by running the following these steps below. </p>
+        <ol>
+            <li>Open "Add or remove Programs" from the Control Panel</li>
+            <li>Find the Microsoft Word entry and choose "Modify"</li>
+            <li>Within the installation process, choose "Add or remove features" then add ".NET
+                Programmability Support" in the "Microsoft Office Word" section. </li>
+        </ol>
         <p>
             <a href="#top" class="back">Back to top</a>
         </p>
@@ -60,7 +91,7 @@
         <h2>
             <a name="hInstall">Installing the add-in</a>
         </h2>
-        <p>Double click the &quot;OdfAddInForWordSetup.exe&quot; file</p>
+        <p>Double click the <strong>&quot;OdfAddInForWordSetup-en-1.0.exe&quot;</strong> file</p>
         <p> If installation is successful, you should be able to open an &quot;.ODT&quot;
             file from Microsoft Word (see menu &quot;File>ODF...&quot;). Also, when
             right-clicking on a &quot;.ODT&quot; file in explorer, you should have the
@@ -81,7 +112,8 @@
             features in Word (see <a href="#hRequirements">Software Requirements</a> section) or a
             failure in the installation of Word Primary Interop Assemblies. You will then need to
             activate the Add-in manually by doing the following... </p>
-            <ol>
+        <h3><a name="hTroobleshootingXP2003">Microsoft Word XP/2003</a></h3>
+        <ol>
                 <li>Go to Tools &gt; Customize, and then click the Commands tab.</li>
                 <li>In the Categories box, click Tools.</li>
                 <li>Drag COM Add-Ins from the Commands box over the Tools menu. When the Tools menu
@@ -89,123 +121,25 @@
                     to appear on the menu, and then release the mouse button. </li>
                 <li>Click Close.</li>
                 <li>In the Tools menu, click COM Add-Ins and check box next to the add-in name in the
-                    available list. If the add-in you want isn't in the list, click Add, locate the add-in, and 
-                    then click OK.</li>
-            </ol>
-            
-            <p>To check that the pre-requisites are correctly installed :</p>
-            <ol>
-            <li>Go to "Add or Remove Programs" in Control Panel and check that the following items
-                appear: <ol>
-                    <li>Compatibility Pack for Microsoft Office 2007 File Formats</li>
-                    <li>Microsoft .NET Framework 2.0</li>
-                    <li>Microsoft Office XP...</li>
-                    <li>ODF Add-in for Word XP</li>
-                    <li>Shared Add-in Extensibility Update for Microsoft .NET Framework 2.0
-                        (KB908002)</li>
-                    <li>Shared Add-in Support Update for Microsoft .NET Framework 2.0
-                        (KB908002)</li>
-                </ol>
-            </li>
-            <li>Open "\Windows\Assembly" folder with Windows Explorer and check that you have the
-                following entries: <ol>
-                    <li>Extensibility, version 7.0.3300.0</li>
-                    <li>Microsoft.Office.Interop.Word, version 10.0.4504.0</li>
-                    <li>Microsoft.Vbe.Interop, version 10.0.4504.0</li>
-                    <li>Office, version 7.0.3300.0</li>
-                </ol>
-            </li>
+                        available list. If the add-in you want isn't in the list, click Add, locate the add-in, and 
+                        then click OK.</li>
         </ol>
-        <p>
-            <a href="#top" class="back">Back to top</a>
-        </p>
+        <h3><a name="hTroobleshooting2007">Microsoft Word 2007</a></h3>
+        <ol>
+            <li>Click &quot;Word Options&quot; in the &quot;File&quot; menu</li>
+            <li>In the &quot;Add-ins&quot; section, select &quot;COM Add-ins&quot;
+                in the list box and press the &quot;Go&quot; button</li>
+            <li>Make sure to select the checkbox &quot;ODF Word Add-in&quot; and
+                validate with the &quot;OK&quot; button.</li>
+        </ol>
+        <p><a href="#top" class="back">Back to top</a></p>
         
         <h2>
-            <a>Features/options not supported</a>
+            <a name="hFeatures">Features/options not supported</a>
         </h2>
-        <h3>
-            <a name="hFeatureDirect">Opening an ODF File...</a>
-        </h3>
-        <ul>
-            <li>Text blinking</li>
-            <li>Table cell protection</li>
-            <li>Number of widow or orphans lines</li>
-            <li>'Manual' and 'From left' alignment in tables</li>
-            <li>Last line alignment in justified paragraph</li>
-            <li>Max number of table columns</li>
-            <li>'Leading' line spacing in a paragraph</li>
-            <li>Tabs fill character of a paragraph</li>
-            <li>'Title' and 'lowercase' style options</li>
-            <li>Keep with next paragraph for table</li>
-            <li>Don't split table</li>
-            <li>Hidden Sections</li>
-            <li>Background Image in Tables</li>
-            <li>Break before Table</li>
-            <li>Even Column Height</li>
-            <li>Font Size for Super/Subscript</li>
-            <li>Character rotation</li>
-            <li>Repeat Heading in a Table</li>
-            <li>Copy Heading while splitting Table</li>
-            <li>Table Shadowing Style</li>
-            <li>List Vertical Numbering</li>
-            <li>List : Minimum Space Between Numbering and Text</li>
-            <li>Tab-stop in numbering</li>
-            <li>Image position in frame</li>
-            <li>Text background color</li>
-            <li>Foot notes reference auto numbering</li>
-            <li>Next Master style lost without page-break</li>
-            <li>Keep ratio feature for frames</li>
-            <li>Columns for frames/text-boxes</li>
-            <li>Background color of pages</li>
-            <li>Section's background color</li>
-            <li>Notes embedded in text-boxes</li>
-            <li>Image borders</li>
-            <li>Text references (Entry) in Table of Content</li>
-            <li>Background opacity</li>
-            <li>Page break</li>
-            <li>Cropped images</li>
-            <li>'Spacing at tops of pages' option</li>
-            <li>SVM images</li>
-            <li>Font weight</li>
-            <li>Image wrapping</li>
-            <li>Paragraph Border with Image Inside</li>
-            <li>Table of Content protection against manual changes</li>
-            <li>Line Numbering</li>
-            <li>Table of Contents Protection</li>
-            <li>Date format</li>
-            <li>Paragraph and Page shadow</li>
-            <li>Column separator</li>
-            <li>Footnote/endnote in a list</li>
-            <li>Relative picture position</li>
-            <li>Text vertical alignment in text-box</li>
-        </ul>
         <p>
-            <a href="#top" class="back">Back to top</a>
+            The complete list of unsupported features is maintained on our web site. You can find it on <a href="http://odf-converter.sourceforge.net/features.html">this page</a>.
         </p>
-        <h3>
-            <a name="hFeatureReverse">Saving an ODF File...</a>
-        </h3>
-        <ul>
-            <li>Scale relative to orginal picture size</li>
-            <li>Picture rotation</li>
-            <li>Footnote and Endnote</li>
-            <li>Table Text Wrapping</li>
-            <li>Table Style Border</li>
-            <li>Picture position option: "move object with text", "lock anchor', "allow overlap"</li>
-            <li>Start Page Numbering (starting with something other than 1)</li>
-            <li>Adjust List Indents (Follow number with: space)</li>
-            <li>Alignment tabs in header/footer</li>
-            <li>Space size when text is "Justify"</li>
-            <li>Frame anchor in header and footer</li>
-            <li>Text watermarks</li>
-            <li>Hyperlinks in Table of Figures</li>
-            <li>Mark entry</li>
-            <li>Change multiple characters in numbering</li>
-            <li>Columns after section</li>
-            <li>Font style in fields</li>
-            <li>Build Table Of Figures from styles </li>
-            <li>Table Identifier</li>
-        </ul>
         <p>
             <a href="#top" class="back">Back to top</a>
         </p>
