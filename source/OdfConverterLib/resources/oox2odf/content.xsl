@@ -498,7 +498,6 @@
               <xsl:call-template name="InsertshapeAbsolutePos">
                 <xsl:with-param name="shape" select="w:pPr/w:framePr"/>
               </xsl:call-template>
-              <!-- TO DO margin horizontal and vertical -->
               <draw:text-box>
                 <xsl:call-template name="InsertTextBoxAutomaticHeight">
                   <xsl:with-param name="shape" select="w:pPr/w:framePr"/>

@@ -725,7 +725,7 @@
 
   <!--page number-->
   <xsl:template
-    match="w:fldSimple[contains(@w:instr,'PAGE ') and not(contains(@w:instr,'NUMPAGE'))]"
+    match="w:fldSimple[(contains(@w:instr,'PAGE ') or contains(@w:instr,'page ')) and not(contains(@w:instr,'NUMPAGE'))]"
     mode="fields">
     <xsl:call-template name="InsertPageNumber">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
