@@ -282,6 +282,9 @@
     <xsl:param name="destUnit"/>
     <xsl:param name="addUnit">true</xsl:param>
     <xsl:choose>
+      <xsl:when test="$length='' or $length='0' or $length='0cm' or $length='0mm' or $length='0in' or $length='0pt' or $length='0twip' or $length='0pika' or $length='0dpt' or $length='0px'">
+        <xsl:value-of select="'0'"/>
+      </xsl:when>      
       <!-- used when unit type is given in length string-->
       <xsl:when test="$sourceUnit = ''">
         <xsl:call-template name="ConvertToMeasure">

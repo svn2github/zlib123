@@ -686,6 +686,35 @@
   <xsl:template name="InsertShapeFlowWithText">
     <xsl:param name="shape" select="."/>
     <xsl:variable name="layouitInCell" select="$shape/@o:allowincell"/>
+    
+    <xsl:variable name="verticalRelative">
+      <xsl:choose>
+        <xsl:when test="$shape[name()='w:framePr']">
+          <xsl:value-of select="$shape/@w:vAnchor"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
+            <xsl:with-param name="shape" select="."/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:variable>
+    
+    <xsl:variable name="horizontalRelative">
+      <xsl:choose>
+        <xsl:when test="$shape[name()='w:framePr']">
+          <xsl:value-of select="$shape/@w:hAnchor"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
+            <xsl:with-param name="shape" select="."/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:variable>
+    
     <xsl:attribute name="style:flow-with-text">
       <xsl:choose>
         <xsl:when test="$layouitInCell = 'f' ">
@@ -693,6 +722,9 @@
         </xsl:when>
         <!-- if ancestor if header or footer and frame is in background -->
         <xsl:when test="(ancestor::w:hdr or ancestor::w:ftr) and not(w10:wrap/@type)">
+          <xsl:text>false</xsl:text>
+        </xsl:when>
+        <xsl:when test="$verticalRelative='page' and $horizontalRelative='page'">
           <xsl:text>false</xsl:text>
         </xsl:when>
         <xsl:otherwise>
@@ -741,10 +773,17 @@
 
     <xsl:call-template name="InsertGraphicPosRelativeH">
       <xsl:with-param name="relativeFrom">
-        <xsl:call-template name="GetShapeProperty">
-          <xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
-          <xsl:with-param name="shape" select="."/>
-        </xsl:call-template>
+        <xsl:choose>
+          <xsl:when test="$shape[name()='w:framePr']">
+            <xsl:value-of select="$shape/@w:hAnchor"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="GetShapeProperty">
+              <xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
+              <xsl:with-param name="shape" select="."/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
@@ -768,10 +807,17 @@
     </xsl:variable>
 
     <xsl:variable name="verticalRelative">
-      <xsl:call-template name="GetShapeProperty">
-        <xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
-        <xsl:with-param name="shape" select="."/>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="$shape[name()='w:framePr']">
+          <xsl:value-of select="$shape/@w:vAnchor"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
+            <xsl:with-param name="shape" select="."/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>      
     </xsl:variable>
 
     <xsl:call-template name="InsertGraphicPosV">
@@ -859,18 +905,81 @@
   <xsl:template name="InsertShapeFromTextDistance">
     <xsl:param name="shape" select="."/>
 
-    <xsl:variable name="margin-top">
+    <xsl:variable name="horizontalRelative">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']">
-          <xsl:value-of select="$shape/@w:vSpace"/>
+          <xsl:value-of select="$shape/@w:hAnchor"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="GetShapeProperty">
-            <xsl:with-param name="propertyName" select="'mso-wrap-distance-top'"/>
+            <xsl:with-param name="propertyName" select="'mso-position-horizontal-relative'"/>
             <xsl:with-param name="shape" select="$shape"/>
           </xsl:call-template>
         </xsl:otherwise>
-      </xsl:choose>
+      </xsl:choose>      
+    </xsl:variable>
+    
+    <xsl:variable name="verticalRelative">
+      <xsl:choose>
+        <xsl:when test="$shape[name()='w:framePr']">
+          <xsl:value-of select="$shape/@w:vAnchor"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="propertyName" select="'mso-position-vertical-relative'"/>
+            <xsl:with-param name="shape" select="$shape"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:variable>
+    
+    <xsl:variable name="horizontalPosition">
+      <xsl:choose>
+        <xsl:when test="$shape[name()='w:framePr']">
+          <xsl:value-of select="$shape/@w:xAlign"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="propertyName" select="'mso-position-horizontal'"/>
+            <xsl:with-param name="shape" select="$shape"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>     
+    </xsl:variable>
+    
+    <xsl:variable name="verticalPosition">
+      <xsl:choose>
+        <xsl:when test="$shape[name()='w:framePr']">
+          <xsl:value-of select="$shape/@w:yAlign"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="propertyName" select="'mso-position-vertical'"/>
+            <xsl:with-param name="shape" select="$shape"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>     
+    </xsl:variable>
+    
+    <xsl:variable name="margin-top">
+      <xsl:choose>
+        <xsl:when test="$verticalRelative='page' and $verticalPosition='top'">
+          <xsl:text>0</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>        
+            <xsl:when test="$shape[name()='w:framePr']">
+              <xsl:value-of select="$shape/@w:vSpace"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetShapeProperty">
+                <xsl:with-param name="propertyName" select="'mso-wrap-distance-top'"/>
+                <xsl:with-param name="shape" select="$shape"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>          
+        </xsl:otherwise>
+      </xsl:choose>      
     </xsl:variable>
 
     <xsl:if test="$margin-top !=''">
@@ -882,14 +991,21 @@
 
     <xsl:variable name="margin-bottom">
       <xsl:choose>
-        <xsl:when test="$shape[name()='w:framePr']">
-          <xsl:value-of select="$shape/@w:vSpace"/>
+        <xsl:when test="$verticalRelative='page' and $verticalPosition='bottom'">
+          <xsl:text>0</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="GetShapeProperty">
-            <xsl:with-param name="propertyName" select="'mso-wrap-distance-bottom'"/>
-            <xsl:with-param name="shape" select="$shape"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="$shape[name()='w:framePr']">
+              <xsl:value-of select="$shape/@w:vSpace"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetShapeProperty">
+                <xsl:with-param name="propertyName" select="'mso-wrap-distance-bottom'"/>
+                <xsl:with-param name="shape" select="$shape"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -903,14 +1019,21 @@
 
     <xsl:variable name="margin-left">
       <xsl:choose>
-        <xsl:when test="$shape[name()='w:framePr']">
-          <xsl:value-of select="$shape/@w:hSpace"/>
+        <xsl:when test="$horizontalRelative='page' and $horizontalPosition='left'">
+          <xsl:text>0</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="GetShapeProperty">
-            <xsl:with-param name="propertyName" select="'mso-wrap-distance-left'"/>
-            <xsl:with-param name="shape" select="$shape"/>
-          </xsl:call-template>
+          <xsl:choose>        
+            <xsl:when test="$shape[name()='w:framePr']">
+              <xsl:value-of select="$shape/@w:hSpace"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetShapeProperty">
+                <xsl:with-param name="propertyName" select="'mso-wrap-distance-left'"/>
+                <xsl:with-param name="shape" select="$shape"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -924,14 +1047,21 @@
 
     <xsl:variable name="margin-right">
       <xsl:choose>
-        <xsl:when test="$shape[name()='w:framePr']">
-          <xsl:value-of select="$shape/@w:hSpace"/>
+        <xsl:when test="$horizontalRelative='page' and $horizontalPosition='right'">
+          <xsl:text>0</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="GetShapeProperty">
-            <xsl:with-param name="propertyName" select="'mso-wrap-distance-right'"/>
-            <xsl:with-param name="shape" select="$shape"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="$shape[name()='w:framePr']">
+              <xsl:value-of select="$shape/@w:hSpace"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetShapeProperty">
+                <xsl:with-param name="propertyName" select="'mso-wrap-distance-right'"/>
+                <xsl:with-param name="shape" select="$shape"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -972,7 +1102,7 @@
         <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:attribute>
-
+    
     <xsl:attribute name="fo:padding-top">
       <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
