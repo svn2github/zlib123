@@ -2513,7 +2513,7 @@
     <xsl:variable name="firstVal">
       <xsl:choose>
         <xsl:when test="w:right/@w:shadow='true' or w:right/@w:shadow=1 or w:right/@w:shadow='on'"
-          >0.019 in</xsl:when>
+          >0.019in</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="w:left/@w:shadow='true' or w:left/@w:shadow=1 or w:left/@w:shadow='on'"
