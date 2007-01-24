@@ -958,17 +958,47 @@
   <!--ignore text in automatic styles mode-->
   <xsl:template match="text()" mode="automaticstyles"/>
 
+  <!-- insert a master page name when required -->
   <xsl:template name="MasterPageName">
-    <xsl:variable name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
-    <xsl:variable name="followingSectPr" select="following::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
-    <xsl:variable name="mainSectPr"
-      select="document('word/document.xml')/w:document/w:body/w:sectPr"/>
+    <xsl:choose>
+      <!-- particular case : if paragraph is last one of a section -->
+      <xsl:when test="w:sectPr">
+        <xsl:call-template name="ComputeMasterPageName">
+          <xsl:with-param name="followingSectPr" select="w:sectPr"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="ComputeMasterPageName"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="ComputeMasterPageName">
+    <!-- NB : precSectPr defines properties of preceding section,
+        whereas followingSectPr defines properties of current section -->
+    <xsl:param name="precSectPr" select="preceding::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
+    <xsl:param name="followingSectPr" select="following::w:p[w:pPr/w:sectPr][1]/w:pPr/w:sectPr"/>
+    <xsl:param name="mainSectPr" select="document('word/document.xml')/w:document/w:body/w:sectPr"/>
 
     <xsl:choose>
+      <xsl:when test="$followingSectPr/w:type/@w:val = 'continuous' ">
+        <!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
+        <xsl:if
+          test="$followingSectPr/w:headerReference[@w:type='default']/@r:id != $precSectPr/w:headerReference[@w:type='default']/@r:id
+          or $followingSectPr/w:headerReference[@w:type='even']/@r:id != $precSectPr/w:headerReference[@w:type='even']/@r:id 
+          or $followingSectPr/w:headerReference[@w:type='first']/@r:id != $precSectPr/w:headerReference[@w:type='first']/@r:id 
+          or $followingSectPr/w:footerReference[@w:type='default']/@r:id != $precSectPr/w:footerReference[@w:type='default']/@r:id
+          or $followingSectPr/w:footerReference[@w:type='even']/@r:id != $precSectPr/w:footerReference[@w:type='even']/@r:id 
+          or $followingSectPr/w:footerReference[@w:type='first']/@r:id != $precSectPr/w:footerReference[@w:type='first']/@r:id">
+          <xsl:message terminate="no">
+            <xsl:text>feedback:Header/footer change after continuous section break.</xsl:text>
+          </xsl:message>
+        </xsl:if>
+      </xsl:when>
       <xsl:when test="not(preceding::w:p)">
-          <xsl:choose>
+        <xsl:choose>
           <xsl:when test="$followingSectPr">
-          <xsl:choose>
+            <xsl:choose>
               <xsl:when test="$followingSectPr/w:titlePg">
                 <xsl:attribute name="style:master-page-name">
                   <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
@@ -984,7 +1014,7 @@
           <xsl:otherwise>
             <xsl:choose>
               <xsl:when test="$mainSectPr/w:titlePg">
-                   <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
+                <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
@@ -996,22 +1026,57 @@
       <xsl:otherwise>
         <xsl:if test="preceding::w:p[parent::w:body][1]/w:pPr/w:sectPr">
           <xsl:choose>
-            <xsl:when test="not($precSectPr/w:type/@w:val = 'continuous')">
+            <xsl:when
+              test="not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
               <xsl:attribute name="style:master-page-name">
-                <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
+                <xsl:choose>
+                  <!-- jslaurent : hack to make it work in any situation. Does not make any sense though.
+                  master page names should be reviewed and unified : many names not consistent, many styles never used -->
+                  <xsl:when test="w:sectPr">
+                    <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="concat('PAGE_',generate-id($followingSectPr))"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="$followingSectPr[not(child::w:titlePg)]">
-                  <xsl:attribute name="style:master-page-name">
-                    <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
-                  </xsl:attribute>
+                <xsl:when test="$followingSectPr">
+                  <xsl:choose>
+                    <xsl:when test="$followingSectPr/w:titlePg">
+                      <xsl:attribute name="style:master-page-name">
+                        <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:if
+                        test="$followingSectPr/w:headerReference or $followingSectPr/w:footerReference">
+                        <xsl:attribute name="style:master-page-name">
+                          <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:attribute name="style:master-page-name">
-                    <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="$mainSectPr/w:titlePg">
+                      <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:if
+                        test="( $precSectPr/w:pgSz/@w:w != $mainSectPr/w:pgSz/@w:w 
+                        or $precSectPr/w:pgSz/@w:h != $mainSectPr/w:pgSz/@w:h 
+                        or $precSectPr/w:pgSz/@w:orient != $mainSectPr/w:pgSz/@w:orient 
+                        or $mainSectPr/w:headerReference 
+                        or $mainSectPr/w:footerReference )
+                        or $mainSectPr/w:cols">
+                        <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+                      </xsl:if>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
