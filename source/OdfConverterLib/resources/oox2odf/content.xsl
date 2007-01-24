@@ -219,18 +219,11 @@
     mode="automaticstyles">
     <xsl:message terminate="no">progress:w:rPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
-      <xsl:choose>
-        <xsl:when test="w:rStyle">
+        <xsl:if test="w:rStyle">
           <xsl:attribute name="style:parent-style-name">
             <xsl:value-of select="w:rStyle/@w:val"/>
           </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="style:parent-style-name">
-            <xsl:text>Normal</xsl:text>
-          </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
+        </xsl:if>
       <style:text-properties>
         <xsl:call-template name="InsertTextProperties"/>
       </style:text-properties>
