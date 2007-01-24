@@ -849,7 +849,7 @@
       </xsl:when>
 
       <xsl:otherwise>
-        <wp:wrapNone/>
+        <wp:wrapTopAndBottom/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
