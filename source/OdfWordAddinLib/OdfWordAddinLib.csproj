@@ -50,8 +50,16 @@
     </Compile>
     <Compile Include="OdfWordAddinLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ConverterForm.de-DE.resx">
+      <DependentUpon>ConverterForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="ConverterForm.resx">
       <DependentUpon>ConverterForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InfoBox.de-DE.resx">
+      <DependentUpon>InfoBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="resources\Labels.de-DE.resx">
