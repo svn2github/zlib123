@@ -1488,7 +1488,7 @@
           <xsl:otherwise>1</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      <xsl:value-of select="$WInstr"/>
+     <xsl:value-of select="./w:r/w:t"/>
     </text:page-number>
   </xsl:template>
 
