@@ -198,10 +198,10 @@
         </xsl:when>
         <!--page-count NUMPAGE, DOCPROPERTY Pages-->
         <xsl:when
-          test="$fieldType = 'NUMPAGE' or  contains(.,'NUMPAGES') or $fieldType = 'numpage' or contains($fieldCode,'Pages')">
+          test="($fieldType = 'NUMPAGE' or  contains(.,'NUMPAGES') or $fieldType = 'numpage' or contains($fieldCode,'Pages')) and not(contains(.,'PAGE/NUMPAGES'))  and not(contains(.,'PAGE/NumPages'))">
           <xsl:call-template name="InsertPageCount"/>
         </xsl:when>
-        <xsl:when test="$fieldType = 'PAGE' or $fieldType = 'page' ">
+        <xsl:when test="$fieldType = 'PAGE' or $fieldType = 'page'  and not(contains(.,'PAGE/NUMPAGES'))  and not(contains(.,'PAGE/NumPages'))">
           <xsl:call-template name="InsertPageNumber"/>
         </xsl:when>
         <!-- possible time types: TIME, EDITTIME, DOCPROPERTY CreateTime, DOCPROPERTY TotalEditingTime,  INFO EditTime-->
