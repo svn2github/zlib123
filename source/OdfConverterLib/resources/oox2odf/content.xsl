@@ -86,13 +86,14 @@
     </office:document-content>
   </xsl:template>
 
-<!--  generates automatic styles for frames -->
+  <!--  generates automatic styles for frames -->
   <xsl:template name="InsertFrameStyle">
     <xsl:if test="document('word/document.xml')/w:document/w:body/w:p/w:r/w:pict">
-      <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/w:p/w:r/w:pict" mode="automaticstyles"/>
+      <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/w:p/w:r/w:pict"
+        mode="automaticstyles"/>
     </xsl:if>
   </xsl:template>
-  
+
   <!--  generates automatic styles for sections-->
   <xsl:template name="InsertSectionsStyles">
     <xsl:if test="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
@@ -226,11 +227,11 @@
     mode="automaticstyles">
     <xsl:message terminate="no">progress:w:rPr</xsl:message>
     <style:style style:name="{generate-id(parent::w:r)}" style:family="text">
-        <xsl:if test="w:rStyle">
-          <xsl:attribute name="style:parent-style-name">
-            <xsl:value-of select="w:rStyle/@w:val"/>
-          </xsl:attribute>
-        </xsl:if>
+      <xsl:if test="w:rStyle">
+        <xsl:attribute name="style:parent-style-name">
+          <xsl:value-of select="w:rStyle/@w:val"/>
+        </xsl:attribute>
+      </xsl:if>
       <style:text-properties>
         <xsl:call-template name="InsertTextProperties"/>
       </style:text-properties>
@@ -916,7 +917,7 @@
         <xsl:if test="preceding::w:p[parent::w:body][1]/w:pPr/w:sectPr">
           <xsl:choose>
             <xsl:when
-              test="not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
+              test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
               <xsl:attribute name="style:master-page-name">
                 <xsl:choose>
                   <!-- jslaurent : hack to make it work in any situation. Does not make any sense though.
