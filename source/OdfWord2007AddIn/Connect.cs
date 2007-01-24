@@ -269,7 +269,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
             // (which are in a 'saved' state and have no extension yet(?))
             if (!doc.Saved || doc.FullName.IndexOf('.') < 0)
             {
-                System.Windows.Forms.MessageBox.Show("Please save your document before exporting to ODF");
+                System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
             }
             else
             {
