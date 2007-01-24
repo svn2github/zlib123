@@ -4,7 +4,7 @@ SEDVersion=3
 [Options]
 PackagePurpose=InstallApp
 ShowInstallProgramWindow=1
-HideExtractAnimation=0
+HideExtractAnimation=1
 UseLongFileName=1
 InsideCompressed=0
 CAB_FixedSize=0
