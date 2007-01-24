@@ -62,7 +62,7 @@
             <xsl:attribute name="table:style-name">
               <xsl:value-of select="generate-id(self::w:tr)"/>
             </xsl:attribute>
-            <xsl:apply-templates select="w:tc"/>
+            <xsl:apply-templates />
           </table:table-row>
         </table:table-header-rows>
       </xsl:when>
@@ -71,7 +71,7 @@
           <xsl:attribute name="table:style-name">
             <xsl:value-of select="generate-id(self::w:tr)"/>
           </xsl:attribute>
-          <xsl:apply-templates select="w:tc"/>
+          <xsl:apply-templates />
         </table:table-row>
       </xsl:otherwise>
     </xsl:choose>
