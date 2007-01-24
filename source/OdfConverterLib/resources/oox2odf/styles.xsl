@@ -339,82 +339,67 @@
   <!-- handle default master page style -->
   <xsl:template name="InsertDefaultMasterPage">
 
+    <!-- default master page -->
     <style:master-page style:name="Standard" style:page-layout-name="pm1">
       <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
         <xsl:call-template name="HeaderFooter"/>
       </xsl:for-each>
     </style:master-page>
+    <!-- first page default master page -->
+    <xsl:if
+      test="document('word/document.xml')/w:document/w:body/w:sectPr[w:titlePg or w:headerReference[@w:type='first']/@r:id != '']">
+      <style:master-page style:name="First_Page" style:page-layout-name="pm1"
+        style:next-style-name="Standard" style:display-name="First Page">
+        <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
+          <xsl:call-template name="HeaderFooterFirst"/>
+        </xsl:for-each>
+      </style:master-page>
+    </xsl:if>
 
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
-      <xsl:choose>
-        <xsl:when test="w:titlePg">
-
-          <style:master-page>
-            <xsl:attribute name="style:name">
-              <xsl:value-of select="concat('First_H_',generate-id(.))"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:next-style-name">
-              <xsl:value-of select="concat('H_',generate-id(.))"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:page-layout-name">
-              <xsl:choose>
-                <xsl:when
-                  test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
-                  <xsl:value-of select="concat('PAGE',generate-id(.))"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>pm1</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:attribute name="style:display-name">
-              <xsl:value-of select="concat('First_H_',generate-id(.))"/>
-            </xsl:attribute>
+      <!-- create first-page of section master page -->
+      <xsl:if
+        test="w:titlePg or document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg or w:headerReference[@w:type='first']/@r:id != '' ">
+        <style:master-page>
+          <xsl:attribute name="style:name">
+            <xsl:value-of select="concat('First_H_',generate-id(.))"/>
+          </xsl:attribute>
+          <xsl:attribute name="style:next-style-name">
+            <xsl:value-of select="concat('H_',generate-id(.))"/>
+          </xsl:attribute>
+          <xsl:attribute name="style:page-layout-name">
             <xsl:choose>
               <xsl:when
-                test="w:headerReference/@w:type = 'first' or w:footerReference/@w:type = 'first'">
-                <xsl:call-template name="HeaderFooterFirst"/>
+                test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
+                or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
+                or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient
+                or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
+                or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
+                or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
+                <xsl:value-of select="concat('PAGE',generate-id(.))"/>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
-                  <xsl:call-template name="HeaderFooterFirst"/>
-                </xsl:for-each>
+                <xsl:text>pm1</xsl:text>
               </xsl:otherwise>
             </xsl:choose>
-          </style:master-page>
-
-        </xsl:when>
-        <xsl:when test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
-
-          <style:master-page>
-            <xsl:attribute name="style:name">
-              <xsl:value-of select="concat('First_H_',generate-id(.))"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:next-style-name">
-              <xsl:value-of select="concat('H_',generate-id(.))"/>
-            </xsl:attribute>
-            <xsl:attribute name="style:page-layout-name">
-              <xsl:choose>
-                <xsl:when
-                  test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
-                  <xsl:value-of select="concat('PAGE',generate-id(.))"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>pm1</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:attribute name="style:display-name">
-              <xsl:value-of select="concat('First_H_',generate-id(.))"/>
-            </xsl:attribute>
-            <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
+          </xsl:attribute>
+          <xsl:attribute name="style:display-name">
+            <xsl:value-of select="concat('First_H_',generate-id(.))"/>
+          </xsl:attribute>
+          <xsl:choose>
+            <xsl:when
+              test="w:headerReference/@w:type = 'first' or w:footerReference/@w:type = 'first'">
               <xsl:call-template name="HeaderFooterFirst"/>
-            </xsl:for-each>
-          </style:master-page>
-
-        </xsl:when>
-      </xsl:choose>
-
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
+                <xsl:call-template name="HeaderFooterFirst"/>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
+        </style:master-page>
+      </xsl:if>
+      <!-- insert master page of current section -->
       <style:master-page>
         <xsl:attribute name="style:name">
           <xsl:value-of select="concat('H_',generate-id(.))"/>
@@ -435,22 +420,16 @@
         </xsl:attribute>
         <xsl:call-template name="HeaderFooter"/>
       </style:master-page>
-
     </xsl:for-each>
-    <xsl:if test="document('word/document.xml')/w:document/w:body/w:sectPr/w:titlePg">
 
-      <style:master-page style:name="First_Page" style:page-layout-name="pm1"
-        style:next-style-name="Standard" style:display-name="First Page">
-        <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:sectPr">
-          <xsl:call-template name="HeaderFooterFirst"/>
-        </xsl:for-each>
-      </style:master-page>
-
-    </xsl:if>
     <xsl:for-each select="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
       <xsl:if
-        test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
-
+        test="preceding::w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
+        or preceding::w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
+        or preceding::w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient
+        or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:w != ./w:pgSz/@w:w
+        or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:h != ./w:pgSz/@w:h
+        or document('word/document.xml')/w:document/w:body/w:sectPr/w:pgSz/@w:orient != ./w:pgSz/@w:orient ">
         <style:master-page>
           <xsl:attribute name="style:name">
             <xsl:value-of select="concat('PAGE_',generate-id(.))"/>
@@ -463,7 +442,6 @@
           </xsl:attribute>
           <xsl:call-template name="HeaderFooter"/>
         </style:master-page>
-
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
@@ -541,7 +519,7 @@
       </style:footer>
     </xsl:if>
 
-    <xsl:if test="document('word/settings.xml')/w:settings/w:evenAndOddFooters">
+    <xsl:if test="document('word/settings.xml')/w:settings/w:evenAndOddHeaders">
       <xsl:variable name="footerIdEven">
         <xsl:choose>
           <xsl:when test="w:footerReference/@w:type = 'even'">
@@ -1688,19 +1666,22 @@
     </xsl:variable>
 
     <xsl:choose>
-    <xsl:when test="w:ind/@w:firstLine != ''">
-      <xsl:value-of select="w:ind/@w:firstLine"/>
-    </xsl:when>
-    <xsl:when
-      test="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
-      <xsl:value-of
-        select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
-      />
-    </xsl:when>
-    <xsl:when test="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
-          <xsl:value-of select="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine"/>
-    </xsl:when>
-    <xsl:otherwise>NaN</xsl:otherwise>
+      <xsl:when test="w:ind/@w:firstLine != ''">
+        <xsl:value-of select="w:ind/@w:firstLine"/>
+      </xsl:when>
+      <xsl:when
+        test="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
+        <xsl:value-of
+          select="document('word/numbering.xml')/w:numbering/w:abstractNum[@w:abstractNumId = $AbstractNumId]/w:lvl[@w:ilvl=$Ivl]/w:pPr/w:ind/@w:firstLine"
+        />
+      </xsl:when>
+      <xsl:when
+        test="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine and $Ivl &lt; 10">
+        <xsl:value-of
+          select="document('word/document.xml')/w:document/w:body/w:p[w:pPr/w:numPr/w:numId/@w:val = $NumId]/w:pPr/w:ind/@w:firstLine"
+        />
+      </xsl:when>
+      <xsl:otherwise>NaN</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -1813,7 +1794,7 @@
 
         <!-- left indent -->
         <xsl:choose>
-         <xsl:when test="$FirstLine != 'NaN'">
+          <xsl:when test="$FirstLine != 'NaN'">
             <xsl:value-of select="$IndLeft"/>
           </xsl:when>
           <xsl:when test=" $LeftNumber = '' and $IndLeft =''">
@@ -1987,7 +1968,7 @@
   <xsl:template match="w:t" mode="pPrChildren">
     <xsl:apply-templates mode="automaticstyles"/>
   </xsl:template>
-  
+
   <xsl:template match="w:keepNext" mode="pPrChildren">
     <xsl:attribute name="fo:keep-with-next">
       <xsl:choose>
@@ -2135,7 +2116,7 @@
 
     <xsl:variable name="TextIndent">
       <xsl:choose>
-         <xsl:when test="$FirstLine != 'NaN'">
+        <xsl:when test="$FirstLine != 'NaN'">
           <xsl:value-of select="$FirstLine"/>
         </xsl:when>
         <xsl:when test="$CheckIfList = 'true' and $IndHanging = $IndLeft and $IndLeft != ''">0</xsl:when>
@@ -2173,7 +2154,7 @@
   </xsl:template>
 
   <!-- spacing before/after and line spacing -->
- <xsl:template match="w:spacing" mode="pPrChildren">
+  <xsl:template match="w:spacing" mode="pPrChildren">
     <!-- spacing before/after -->
     <xsl:if test="@w:before">
       <xsl:attribute name="fo:margin-top">

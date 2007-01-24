@@ -889,7 +889,8 @@
         <xsl:choose>
           <xsl:when test="$followingSectPr">
             <xsl:choose>
-              <xsl:when test="$followingSectPr/w:titlePg">
+              <xsl:when
+                test="$followingSectPr/w:titlePg or $followingSectPr/w:headerReference[@w:type='first']/@r:id != '' ">
                 <xsl:attribute name="style:master-page-name">
                   <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
                 </xsl:attribute>
@@ -903,7 +904,8 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:choose>
-              <xsl:when test="$mainSectPr/w:titlePg">
+              <xsl:when
+                test="$mainSectPr/w:titlePg or $mainSectPr/w:headerReference[@w:type='first']/@r:id != '' ">
                 <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
               </xsl:when>
               <xsl:otherwise>
@@ -935,7 +937,8 @@
               <xsl:choose>
                 <xsl:when test="$followingSectPr">
                   <xsl:choose>
-                    <xsl:when test="$followingSectPr/w:titlePg">
+                    <xsl:when
+                      test="$followingSectPr/w:titlePg or $followingSectPr/w:headerReference[@w:type='first']/@r:id != '' ">
                       <xsl:attribute name="style:master-page-name">
                         <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
                       </xsl:attribute>
@@ -952,7 +955,8 @@
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:choose>
-                    <xsl:when test="$mainSectPr/w:titlePg">
+                    <xsl:when
+                      test="$mainSectPr/w:titlePg or $mainSectPr/w:headerReference[@w:type='first']/@r:id != '' ">
                       <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
                     </xsl:when>
                     <xsl:otherwise>
