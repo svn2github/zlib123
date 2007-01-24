@@ -1983,6 +1983,11 @@
     <xsl:call-template name="InsertDropCapProperties"/>
   </xsl:template>
 
+  <!-- avoid inserting text in paragraph properties -->
+  <xsl:template match="w:t" mode="pPrChildren">
+    <xsl:apply-templates mode="automaticstyles"/>
+  </xsl:template>
+  
   <xsl:template match="w:keepNext" mode="pPrChildren">
     <xsl:attribute name="fo:keep-with-next">
       <xsl:choose>
@@ -2168,7 +2173,7 @@
   </xsl:template>
 
   <!-- spacing before/after and line spacing -->
-  <xsl:template match="w:spacing" mode="pPrChildren">
+ <xsl:template match="w:spacing" mode="pPrChildren">
     <!-- spacing before/after -->
     <xsl:if test="@w:before">
       <xsl:attribute name="fo:margin-top">
