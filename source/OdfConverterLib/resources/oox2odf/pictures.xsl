@@ -99,7 +99,7 @@
       <xsl:call-template name="SetSize"/>
 
       <!-- image href from relationships-->
-      <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+      <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" xlink:href="">
         <xsl:if test="document(concat('word/_rels/',$document,'.rels'))">
           <xsl:call-template name="InsertImageHref">
             <xsl:with-param name="document" select="$document"/>
