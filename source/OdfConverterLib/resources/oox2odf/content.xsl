@@ -389,6 +389,12 @@
           <xsl:value-of select="generate-id(self::node())"/>
         </xsl:attribute>
       </xsl:if>
+      <!--header outline level -->
+      <xsl:call-template name="InsertHeadingOutlineLvl">
+        <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
+      </xsl:call-template>
+      <!-- unnumbered heading is list header  -->
+      <xsl:call-template name="InsertHeadingAsListHeader"/>
       <xsl:if test="preceding::w:p[1]/w:pPr/w:rPr/w:ins and $numId!=''">
         <text:change-end>
           <xsl:attribute name="text:change-id">
@@ -396,12 +402,6 @@
           </xsl:attribute>
         </text:change-end>
       </xsl:if>
-      <!--header outline level -->
-      <xsl:call-template name="InsertHeadingOutlineLvl">
-        <xsl:with-param name="outlineLevel" select="$outlineLevel"/>
-      </xsl:call-template>
-      <!-- unnumbered heading is list header  -->
-      <xsl:call-template name="InsertHeadingAsListHeader"/>
       <xsl:apply-templates/>
       <xsl:if test="w:pPr/w:rPr/w:del">
         <!--      if this following paragraph is attached to this one in track changes mode-->
