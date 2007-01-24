@@ -21,6 +21,7 @@
   </xsl:template>
 
   <xsl:template match="v:shape">
+    <xsl:if test="not(parent::v:group)">
     <draw:frame>
       <xsl:call-template name="InsertCommonShapeProperties"/>
       <xsl:call-template name="InsertShapeZindex"/>
@@ -28,6 +29,7 @@
       <!--  some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
       <xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame"/>
     </draw:frame>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="o:extrusion">
