@@ -170,6 +170,10 @@
           </xsl:for-each>
           <!--default text properties-->
           <xsl:call-template name="InsertDefaultTextProperties"/>
+          <!-- enforce default properties -->
+          <xsl:call-template name="EnforceDefaultProperties">
+            <xsl:with-param name="type">paragraph</xsl:with-param>
+          </xsl:call-template>
         </style:text-properties>
       </style:default-style>
     </xsl:if>
@@ -229,8 +233,28 @@
           </xsl:for-each>
           <!--default text properties-->
           <xsl:call-template name="InsertDefaultTextProperties"/>
+          <!-- enforce default properties -->
+          <xsl:call-template name="EnforceDefaultProperties">
+            <xsl:with-param name="type">character</xsl:with-param>
+          </xsl:call-template>
         </style:text-properties>
       </style:default-style>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- for the following properties, check if they are are ever mentionned. If not, use a defined default value -->
+  <xsl:template name="EnforceDefaultProperties">
+    <xsl:param name="type"/>
+    <!-- font size -->
+    <xsl:if
+      test="not(key('default-styles', $type)//w:rPr/w:sz) and not(w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:sz)">
+      <xsl:attribute name="fo:font-size">10pt</xsl:attribute>
+    </xsl:if>
+    <!-- font size asian and complex-->
+    <xsl:if
+      test="not(key('default-styles', $type)//w:rPr/w:szCs) and not(w:styles/w:docDefaults/w:rPrDefault/w:rPr/w:szCs)">
+      <xsl:attribute name="style:font-size-complex">10pt</xsl:attribute>
+      <xsl:attribute name="style:font-size-asian">10pt</xsl:attribute>
     </xsl:if>
   </xsl:template>
 
