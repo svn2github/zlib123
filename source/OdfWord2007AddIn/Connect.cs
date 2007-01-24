@@ -299,7 +299,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                     string docxFile = (string)initialName;
 
                     this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
-                    
+
                     if (doc.SaveFormat != 12)
                     {
                         // duplicate the file
@@ -311,23 +311,31 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                         object readOnly = false;
                         object isVisible = false;
                         object missing = Type.Missing;
+
                         MSword.Document newDoc = this.applicationObject.Documents.Open(ref newName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
-                        
                         // generate docx file from the duplicated file (under a temporary file)
                         tmpFileName = Path.GetTempFileName();
                         object format = MSword.WdSaveFormat.wdFormatXMLDocument;
                         newDoc.SaveAs(ref tmpFileName, ref format, ref missing, ref missing, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing);
 
                         // close and remove the duplicated file
-                        object saveChanges = false;
-                        newDoc.Close(ref saveChanges, ref missing, ref missing);
-                        File.Delete((string)newName);
-
+                        object saveChanges = Microsoft.Office.Interop.Word.WdSaveOptions.wdDoNotSaveChanges;
+                        object originalFormat = Microsoft.Office.Interop.Word.WdOriginalFormat.wdOriginalDocumentFormat;
+                        newDoc.Close(ref saveChanges, ref originalFormat, ref missing);
+                        try
+                        {
+                            File.Delete((string)newName);
+                        }
+                        catch (IOException e)
+                        {
+                            // bug #1610099
+                            // deletion failed : file currently used by another application.
+                            System.Windows.Forms.MessageBox.Show("Failed to delete file " + newName
+                            , DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                        }
                         docxFile = (string)tmpFileName;
+                        OoxToOdf(docxFile, odfFile, true);
                     }
-
-                    OoxToOdf(docxFile, odfFile, true);
-
                     if (tmpFileName != null && File.Exists((string)tmpFileName))
                     {
                         File.Delete((string)tmpFileName);
