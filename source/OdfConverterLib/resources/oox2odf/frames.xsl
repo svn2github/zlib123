@@ -1276,10 +1276,10 @@
         <xsl:with-param name="propertyName" select="'mso-wrap-style'"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:choose>
+   <xsl:choose>
       <xsl:when
-        test="($wrapStyle != '' and $wrapStyle = 'none') or ( $shape/w:wrap and not($shape/@w:wrap='none'))">
-        <xsl:attribute name="fo:min-width">
+        test="($wrapStyle != '' and $wrapStyle = 'none') or ( $shape/@w:wrap and $shape/@w:wrap != 'none' )">
+         <xsl:attribute name="fo:min-width">
           <xsl:text>0cm</xsl:text>
         </xsl:attribute>
       </xsl:when>
