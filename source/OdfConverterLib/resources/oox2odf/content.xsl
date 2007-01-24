@@ -48,7 +48,6 @@
   <xsl:import href="footnotes.xsl"/>
   <xsl:import href="indexes.xsl"/>
   <xsl:import href="track.xsl"/>
-
   <xsl:import href="frames.xsl"/>
   <xsl:import href="sections.xsl"/>
   <xsl:import href="comments.xsl"/>
@@ -76,6 +75,7 @@
         <xsl:call-template name="InsertSectionsStyles"/>
         <xsl:call-template name="InsertFootnoteStyles"/>
         <xsl:call-template name="InsertEndnoteStyles"/>
+        <xsl:call-template name="InsertFrameStyle"/>
       </office:automatic-styles>
       <office:body>
         <office:text>
@@ -86,6 +86,13 @@
     </office:document-content>
   </xsl:template>
 
+<!--  generates automatic styles for frames -->
+  <xsl:template name="InsertFrameStyle">
+    <xsl:if test="document('word/document.xml')/w:document/w:body/w:p/w:r/w:pict">
+      <xsl:apply-templates select="document('word/document.xml')/w:document/w:body/w:p/w:r/w:pict" mode="automaticstyles"/>
+    </xsl:if>
+  </xsl:template>
+  
   <!--  generates automatic styles for sections-->
   <xsl:template name="InsertSectionsStyles">
     <xsl:if test="document('word/document.xml')/w:document/w:body/w:p/w:pPr/w:sectPr">
@@ -178,7 +185,7 @@
     </style:style>
   </xsl:template>
 
-  <xsl:template match="w:p[not (./w:pPr)]" mode="automaticstyles">
+  <xsl:template match="w:p[not (./w:pPr) and not(descendant::w:pict)]" mode="automaticstyles">
     <xsl:if test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
       <style:style style:name="{generate-id(.)}" style:family="paragraph">
         <xsl:call-template name="MasterPageName"/>
