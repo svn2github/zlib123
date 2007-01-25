@@ -119,7 +119,42 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Transform(inputFile, null);
         }
 
+        /// <summary>
+        /// bug #1644285 Unexpected error on non-ascii file name
+        /// Zlib crashes on non-ascii file names.
+        /// </summary>
         public void Transform(string inputFile, string outputFile)
+        {
+            // Get the \Temp path
+            string tempInputFile = Path.GetTempPath().ToString() + "odf-converter.input";
+            string tempOutputFile = outputFile == null ? null : Path.GetTempPath().ToString() + "odf-converter.output";
+
+            try
+            {
+                File.Copy(inputFile, tempInputFile, true);
+
+                _Transform(tempInputFile, tempOutputFile);
+
+                if (outputFile != null)
+                {
+                    if (File.Exists(outputFile))
+                    {
+                        File.Delete(outputFile);
+                    }
+                    File.Move(tempOutputFile, outputFile);
+                    // File.Replace(outputFile, tempOutputFile, null);
+                }
+            }
+            finally
+            {
+                if (File.Exists(tempInputFile))
+                {
+                    File.Delete(tempInputFile);
+                }
+            }
+        }
+
+        private void _Transform(string inputFile, string outputFile)
         {
             // this throws an exception in the the following cases:
             // - input file is not a valid file
