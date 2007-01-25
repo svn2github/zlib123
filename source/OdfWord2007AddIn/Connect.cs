@@ -330,17 +330,18 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                         {
                             // bug #1610099
                             // deletion failed : file currently used by another application.
-                            System.Windows.Forms.MessageBox.Show("Failed to delete file " + newName
-                            , DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                           // System.Windows.Forms.MessageBox.Show("Failed to delete file " + newName
+                           //  , DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
                         }
                         docxFile = (string)tmpFileName;
-                        OoxToOdf(docxFile, odfFile, true);
                     }
+                        
+                    OoxToOdf(docxFile, odfFile, true);
+                    
                     if (tmpFileName != null && File.Exists((string)tmpFileName))
                     {
                         File.Delete((string)tmpFileName);
                     }
-
                 }
             }
 		}
