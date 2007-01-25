@@ -921,16 +921,9 @@
             <xsl:when
               test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
               <xsl:attribute name="style:master-page-name">
-                <xsl:choose>
                   <!-- jslaurent : hack to make it work in any situation. Does not make any sense though.
                   master page names should be reviewed and unified : many names not consistent, many styles never used -->
-                  <xsl:when test="w:sectPr">
-                    <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="concat('PAGE_',generate-id($followingSectPr))"/>
-                  </xsl:otherwise>
-                </xsl:choose>
+                 <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
               </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
