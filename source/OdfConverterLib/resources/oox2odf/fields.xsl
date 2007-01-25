@@ -662,6 +662,9 @@
         <xsl:when test="self::node()[contains(@w:instr,'\*')]">
           <xsl:attribute name="text:display">name</xsl:attribute>
         </xsl:when>
+        <xsl:when test="self::node()[contains(@w:instr,'\s')]">
+          <xsl:attribute name="text:display">plain-number</xsl:attribute>
+        </xsl:when>
       </xsl:choose>
       <xsl:if test="self::node()[contains(@w:instr,'Heading')]">
         <xsl:attribute name="text:outline-level">

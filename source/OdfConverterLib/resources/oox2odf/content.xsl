@@ -834,6 +834,8 @@
     <text:line-break/>
   </xsl:template>
 
+  <xsl:template match="w:noBreakHyphen">–</xsl:template>
+  
   <!-- page or column break must have style defined in paragraph -->
   <xsl:template match="w:br[@w:type='page' or @w:type='column']" mode="automaticstyles">
     <xsl:if test="not(ancestor::w:p/w:pPr)">
