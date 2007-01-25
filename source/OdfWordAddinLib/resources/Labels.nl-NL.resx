@@ -150,11 +150,11 @@
   <data name="translation.odf2oox.visitedLinkStyle" xml:space="preserve"><value>Stijl van bezochte link</value></data>
   <data name="translation.odf2oox.hiddenSection" xml:space="preserve"><value>Verborgen sectie</value></data>
   <data name="translation.odf2oox.conditionalHiddenSection" xml:space="preserve"><value>Voorwaardelijke verborgen sectie</value></data>
-  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Beschermingssleutel voor {0} </value></data>
-  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Index {0} bereik hoofdstuk</value></data>
-  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Index {0} eigenschap inspringing</value></data>
-  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Index {0} sorteeralgoritme</value></data>
-  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Index {0} bescherming</value></data>
+  <data name="translation.odf2oox.protectionKey" xml:space="preserve"><value>Beschermingssleutel voor %1 </value></data>
+  <data name="translation.odf2oox.indexChapterScope" xml:space="preserve"><value>Index %1 bereik hoofdstuk</value></data>
+  <data name="translation.odf2oox.indexIndentProperty" xml:space="preserve"><value>Index %1 eigenschap inspringing</value></data>
+  <data name="translation.odf2oox.indexSortAlgorithm" xml:space="preserve"><value>Index %1 sorteeralgoritme</value></data>
+  <data name="translation.odf2oox.indexProtection" xml:space="preserve"><value>Index %1 bescherming</value></data>
   <data name="translation.odf2oox.alphabeticalIndexConcordanceFile" xml:space="preserve"><value>Alfabetische index overeenstemmingsbestand</value></data>
   <data name="translation.odf2oox.dropcapSize" xml:space="preserve"><value>Omvang dropcap </value></data>
   <data name="translation.odf2oox.pageBreakBeforeEndnotes" xml:space="preserve"><value>Pagina-einde voor eindnoten</value></data>
