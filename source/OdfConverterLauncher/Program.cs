@@ -90,23 +90,29 @@ namespace OdfConverterLauncher
         [STAThread]
         static void Main(string[] args)
         {
-            if (args.Length == 1) {
+            if (args.Length == 1) 
+            {
                 string input = args[0];
+                OdfWordAddinLib lib = new OdfWordAddinLib();
                 try
                 {
-                    bool showUserInterface = true;
-                    OdfWordAddinLib lib = new OdfWordAddinLib();
+                    bool showUserInterface = true;   
                     string output = lib.GetTempFileName(input);
                     lib.OdfToOox(input, output, showUserInterface);
                     Word word = new Word();
                     word.Visible = true;
                     word.Open(output);
                 }
-                catch
+                catch (Exception e)
                 {
-                    // Fail silently (?)
+                    System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfWordAddinLib.resources.Labels", 
+                        Assembly.GetAssembly(lib.GetType()));
+                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")",  rm);
+                    infoBox.ShowDialog();
                 }
+
             }
         }
+
     }
 }
