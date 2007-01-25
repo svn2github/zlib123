@@ -181,7 +181,7 @@
     <value>CenterParent</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>Otwórz plik ODF</value>
+    <value>OtwÃ³rz plik ODF</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>ConverterForm</value>
