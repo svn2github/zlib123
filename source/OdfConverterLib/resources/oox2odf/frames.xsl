@@ -22,13 +22,13 @@
 
   <xsl:template match="v:shape">
     <xsl:if test="not(parent::v:group)">
-    <draw:frame>
-      <xsl:call-template name="InsertCommonShapeProperties"/>
-      <xsl:call-template name="InsertShapeZindex"/>
-      <xsl:apply-templates/>
-      <!--  some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
-      <xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame"/>
-    </draw:frame>
+      <draw:frame>
+        <xsl:call-template name="InsertCommonShapeProperties"/>
+        <xsl:call-template name="InsertShapeZindex"/>
+        <xsl:apply-templates/>
+        <!--  some of the shape types must be in odf draw:frame even if they are outside of v:shape in oox-->
+        <xsl:apply-templates select="self::node()/following-sibling::node()[1]" mode="draw:frame"/>
+      </draw:frame>
     </xsl:if>
   </xsl:template>
 
@@ -225,9 +225,21 @@
           </xsl:if>
           <xsl:text>as-char</xsl:text>
         </xsl:when>
-        <!-- if there is another run exept that one containing shape and shape doesn't have wrapping style set then shape should be anchored 'as-text' -->
+        <!-- anchor should be 'as-char' in some particular cases. Explanation of test :
+        1. if no wrap is defined (default in OOX is inline with text)
+          AND
+        2. if there is another run in current paragraph OR we are in a table cell
+          AND
+        3. No absolute position is defined OR wrapping is explicitely set to 'as-char' -->
         <xsl:when
-          test="ancestor::w:r/parent::node()/w:r[2] and not(w10:wrap) and (not(contains($shape/@style, 'position:absolute')) or contains($shape/@style, 'mso-position-horizontal-relative:text') or contains($shape/@style, 'mso-position-vertical-relative:text')  or ($shape/@vAnchor='text') or ($shape/@hAnchor='relative'))">
+          test="not(w10:wrap) and ( 
+          count(ancestor::w:r[1]/parent::node()/w:r) &gt; 1
+          or (not(count(ancestor::w:r[1]/parent::node()/w:r) &gt; 1) and ancestor::w:tc)
+          ) and (
+          not(contains($shape/@style, 'position:absolute'))
+          or contains($shape/@style, 'mso-position-horizontal-relative:text')
+          or contains($shape/@style, 'mso-position-vertical-relative:text')
+          or ($shape/@vAnchor='text') or ($shape/@hAnchor='relative') )">
           <xsl:text>as-char</xsl:text>
         </xsl:when>
         <xsl:when
@@ -688,7 +700,7 @@
   <xsl:template name="InsertShapeFlowWithText">
     <xsl:param name="shape" select="."/>
     <xsl:variable name="layouitInCell" select="$shape/@o:allowincell"/>
-    
+
     <xsl:variable name="verticalRelative">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']">
@@ -700,9 +712,9 @@
             <xsl:with-param name="shape" select="."/>
           </xsl:call-template>
         </xsl:otherwise>
-      </xsl:choose>      
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="horizontalRelative">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']">
@@ -714,9 +726,9 @@
             <xsl:with-param name="shape" select="."/>
           </xsl:call-template>
         </xsl:otherwise>
-      </xsl:choose>      
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:attribute name="style:flow-with-text">
       <xsl:choose>
         <xsl:when test="$layouitInCell = 'f' ">
@@ -819,7 +831,7 @@
             <xsl:with-param name="shape" select="."/>
           </xsl:call-template>
         </xsl:otherwise>
-      </xsl:choose>      
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:call-template name="InsertGraphicPosV">
@@ -918,9 +930,9 @@
             <xsl:with-param name="shape" select="$shape"/>
           </xsl:call-template>
         </xsl:otherwise>
-      </xsl:choose>      
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="verticalRelative">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']">
@@ -932,9 +944,9 @@
             <xsl:with-param name="shape" select="$shape"/>
           </xsl:call-template>
         </xsl:otherwise>
-      </xsl:choose>      
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="horizontalPosition">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']">
@@ -946,9 +958,9 @@
             <xsl:with-param name="shape" select="$shape"/>
           </xsl:call-template>
         </xsl:otherwise>
-      </xsl:choose>     
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="verticalPosition">
       <xsl:choose>
         <xsl:when test="$shape[name()='w:framePr']">
@@ -960,16 +972,16 @@
             <xsl:with-param name="shape" select="$shape"/>
           </xsl:call-template>
         </xsl:otherwise>
-      </xsl:choose>     
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="margin-top">
       <xsl:choose>
         <xsl:when test="$verticalRelative='page' and $verticalPosition='top'">
           <xsl:text>0</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:choose>        
+          <xsl:choose>
             <xsl:when test="$shape[name()='w:framePr']">
               <xsl:value-of select="$shape/@w:vSpace"/>
             </xsl:when>
@@ -979,9 +991,9 @@
                 <xsl:with-param name="shape" select="$shape"/>
               </xsl:call-template>
             </xsl:otherwise>
-          </xsl:choose>          
+          </xsl:choose>
         </xsl:otherwise>
-      </xsl:choose>      
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:if test="$margin-top !=''">
@@ -1025,7 +1037,7 @@
           <xsl:text>0</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:choose>        
+          <xsl:choose>
             <xsl:when test="$shape[name()='w:framePr']">
               <xsl:value-of select="$shape/@w:hSpace"/>
             </xsl:when>
@@ -1104,7 +1116,7 @@
         <xsl:with-param name="destUnit" select="'cm'"/>
       </xsl:call-template>
     </xsl:attribute>
-    
+
     <xsl:attribute name="fo:padding-top">
       <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
@@ -1278,10 +1290,10 @@
         <xsl:with-param name="propertyName" select="'mso-wrap-style'"/>
       </xsl:call-template>
     </xsl:variable>
-   <xsl:choose>
+    <xsl:choose>
       <xsl:when
         test="($wrapStyle != '' and $wrapStyle = 'none') or ( $shape/@w:wrap and $shape/@w:wrap != 'none' )">
-         <xsl:attribute name="fo:min-width">
+        <xsl:attribute name="fo:min-width">
           <xsl:text>0cm</xsl:text>
         </xsl:attribute>
       </xsl:when>
@@ -1335,7 +1347,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertParagraphToFrame">
     <xsl:param name="paragraph" select="."/>
     <text:p>
@@ -1359,7 +1371,7 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="w:p[w:pPr/w:framePr]" mode="automaticstyles">
     <xsl:choose>
       <!-- margin drop cap -->
@@ -1397,5 +1409,5 @@
     </xsl:choose>
     <xsl:apply-templates mode="automaticstyles"/>
   </xsl:template>
-  
+
 </xsl:stylesheet>
