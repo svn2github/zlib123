@@ -39,16 +39,22 @@
 
   <!-- paragraph which starts table of content -->
   <xsl:template match="w:p" mode="tocstart">
+    <xsl:variable name="instrTextContent">
+      <xsl:apply-templates select="w:r/w:instrText[1]" mode="textContent">
+        <xsl:with-param name="textContent"/>
+      </xsl:apply-templates>
+    </xsl:variable>
     <xsl:choose>
       <xsl:when test="w:r[contains(w:instrText,'TOC')]">
         <xsl:choose>
-          <xsl:when test="w:pPr[contains(w:pStyle/@w:val,'TOC') or contains(w:pStyle/@w:val,'Contents_20')]">
+          <xsl:when test="contains($instrTextContent,'-')">
         <text:table-of-content text:style-name="Sect1">
           <xsl:message terminate="no">feedback:TOC protection against manual changes</xsl:message>
           <xsl:attribute name="text:protected">false</xsl:attribute>
           <xsl:attribute name="text:name">Table of Contents1</xsl:attribute>
           <xsl:call-template name="InsertIndexProperties">
             <xsl:with-param name="type">TOC</xsl:with-param>
+            <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
           </xsl:call-template>
           <text:index-body>
             <xsl:apply-templates select="." mode="index"/>
@@ -62,6 +68,7 @@
               <xsl:attribute name="text:name">Index of Tables1</xsl:attribute>
               <xsl:call-template name="InsertIndexProperties">
                 <xsl:with-param name="type">INDEX</xsl:with-param>
+                <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
               </xsl:call-template>
               <text:index-body>
                 <xsl:apply-templates select="." mode="index"/>
@@ -80,6 +87,7 @@
           <xsl:attribute name="text:name">Alphabetical Index1</xsl:attribute>
           <xsl:call-template name="InsertIndexProperties">
             <xsl:with-param name="type">INDEXA</xsl:with-param>
+            <xsl:with-param name="instrTextContent" select="$instrTextContent"/>
           </xsl:call-template>
           <text:index-body>
             <xsl:apply-templates select="." mode="indexa"/>
@@ -308,12 +316,7 @@
   <!-- insert table-of content properties -->
   <xsl:template name="InsertIndexProperties">
     <xsl:param name="type"/>
-    <xsl:variable name="instrTextContent">
-      <xsl:apply-templates select="w:r/w:instrText[1]" mode="textContent">
-        <xsl:with-param name="textContent"/>
-      </xsl:apply-templates>
-    </xsl:variable>
-  
+    <xsl:param name="instrTextContent"/>
     <xsl:variable name="maxLevel">
       <xsl:choose>
         <xsl:when test="contains($instrTextContent,'\t')">
@@ -876,7 +879,7 @@
     <xsl:choose>
       <xsl:when test="$tabCount > 0">
         <xsl:choose>
-          <xsl:when test="preceding::w:tabs[1]/w:tab[number($tabCount)]">
+          <xsl:when test="preceding::w:tabs[1]/w:tab[number($tabCount)][not($param='w:val' and @w:val='clear')]">
             <xsl:choose>
               <xsl:when test="preceding::w:tabs[1]/w:tab[number($tabCount)]/attribute::node()[name()=$param]">
                 <xsl:value-of select="preceding::w:tabs[1]/w:tab[number($tabCount)]/attribute::node()[name()=$param]"/>
@@ -919,7 +922,7 @@
     <xsl:choose>
       <xsl:when test="$tabCount > 0">
         <xsl:choose>
-          <xsl:when test="key('StyleId', $tabStyle)[1]/w:pPr/w:tabs/w:tab[number($tabCount)]">
+          <xsl:when test="key('StyleId', $tabStyle)[1]/w:pPr/w:tabs/w:tab[number($tabCount)][not($attribute='w:val' and @w:val='clear')]">
             <xsl:choose>
               <xsl:when test="key('StyleId', $tabStyle)[1]/w:pPr/w:tabs/w:tab[number($tabCount)]/attribute::node()[name()=$attribute]">
                 <xsl:value-of select="key('StyleId', $tabStyle)[1]/w:pPr/w:tabs/w:tab[number($tabCount)]/attribute::node()[name()=$attribute]"/>
