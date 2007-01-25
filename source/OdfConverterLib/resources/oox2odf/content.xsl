@@ -340,6 +340,8 @@
       </xsl:call-template>
     </xsl:variable>
 
+    <xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
+    
     <xsl:choose>
       <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
       <xsl:when
@@ -350,9 +352,12 @@
       <!-- ignore paragraph if it's deleted in change tracking mode-->
       <xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
 
-      <!--  check if the paragraf is list element (it can be a heading also) -->
+        
+      <!--  check if the paragraf is list element (it can be a heading but only if it's style is NOT linked to a list level 
+        - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
       <xsl:when
-        test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != ''">
+        test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
+        and not(document('word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])">
         <xsl:apply-templates select="." mode="list">
           <xsl:with-param name="numId" select="$numId"/>
           <xsl:with-param name="level" select="$level"/>
@@ -397,6 +402,7 @@
       </xsl:call-template>
       <!-- unnumbered heading is list header  -->
       <xsl:call-template name="InsertHeadingAsListHeader"/>
+      <!--change track end-->
       <xsl:if test="preceding::w:p[1]/w:pPr/w:rPr/w:ins and $numId!=''">
         <text:change-end>
           <xsl:attribute name="text:change-id">
@@ -440,6 +446,7 @@
     </xsl:if>
   </xsl:template>
 
+  <!--  set heading as list header (needed when number was deleted manually)-->
   <xsl:template name="InsertHeadingAsListHeader">
     <xsl:variable name="numId">
       <xsl:call-template name="GetListProperty">
@@ -447,13 +454,41 @@
         <xsl:with-param name="property">w:numId</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:if test="$numId = ''">
-      <xsl:attribute name="text:is-list-header">
-        <xsl:text>true</xsl:text>
-      </xsl:attribute>
-    </xsl:if>
+    
+    <!--check if there's a any numId in document--> 
+    <xsl:for-each select="document('word/document.xml')">
+      <xsl:choose>
+        <xsl:when test="key('pPr', '')/w:numPr/w:numId">
+          <xsl:call-template name="InsertListHeader">
+            <xsl:with-param name="numId" select="$numId"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <!--check if there's a any numId in styles--> 
+          <xsl:for-each select="document('word/styles.xml')">
+            <xsl:if test="key('pPr', '')/w:numPr/w:numId">
+              <xsl:call-template name="InsertListHeader">
+                <xsl:with-param name="numId" select="$numId"/>
+              </xsl:call-template>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
+<!--  set heading as list header (needed when number was deleted manually)-->
+  <xsl:template name="InsertListHeader">
+    <xsl:param name="numId"/>
+    <xsl:for-each select="document('word/numbering.xml')">
+      <xsl:if test="not(key('numId', $numId))">
+        <xsl:attribute name="text:is-list-header">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>  
+  </xsl:template>
+  
   <xsl:template name="InsertHeadingOutlineLvl">
     <xsl:param name="outlineLevel"/>
     <xsl:attribute name="text:outline-level">

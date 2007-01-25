@@ -52,6 +52,10 @@
       </office:font-face-decls>
       <!-- document styles -->
       <office:styles>
+        <!--heading numbering style, insert outline numbering style only if heading style is linked to level in Word (numId and outlineLvl are in styles.xml Heading style defintion) -->
+        <xsl:if test="document('word/styles.xml')/w:styles/w:style[child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId]">
+          <xsl:call-template name="InsertOutlineListStyle"/>
+        </xsl:if>
         <!-- document styles -->
         <xsl:call-template name="InsertDefaultStyles"/>
         <xsl:apply-templates select="document('word/styles.xml')/w:styles"/>
