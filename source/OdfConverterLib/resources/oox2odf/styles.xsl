@@ -1969,7 +1969,7 @@
       <xsl:attribute name="style:vertical-align">bottom</xsl:attribute>
     </xsl:if>
     <!-- no spacing in OOX. when the paragraph is in table-->
-      <xsl:if test="ancestor::w:tc">
+    <xsl:if test="ancestor::w:tc">
       <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
       <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
     </xsl:if>
@@ -2199,7 +2199,7 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-  <xsl:if test="@w:after">
+    <xsl:if test="@w:after">
       <xsl:attribute name="fo:margin-bottom">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">
@@ -2346,7 +2346,8 @@
   <!-- widow and orphan-->
   <xsl:template name="InsertParagraphWidowControl">
     <xsl:choose>
-      <xsl:when test="w:widowControl/@w:val='0'">
+      <xsl:when
+        test="w:widowControl/@w:val='0' or w:widowControl/@w:val='false' or w:widowControl/@w:val='off' ">
         <xsl:attribute name="fo:widows">0</xsl:attribute>
         <xsl:attribute name="fo:orphans">0</xsl:attribute>
       </xsl:when>

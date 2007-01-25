@@ -877,17 +877,19 @@
 
   <!-- insert a master page name when required -->
   <xsl:template name="MasterPageName">
-    <xsl:choose>
-      <!-- particular case : if paragraph is last one of a section -->
-      <xsl:when test="w:sectPr">
-        <xsl:call-template name="ComputeMasterPageName">
-          <xsl:with-param name="followingSectPr" select="w:sectPr"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="ComputeMasterPageName"/>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:if test="ancestor::w:body">
+      <xsl:choose>
+        <!-- particular case : if paragraph is last one of a section -->
+        <xsl:when test="w:sectPr">
+          <xsl:call-template name="ComputeMasterPageName">
+            <xsl:with-param name="followingSectPr" select="w:sectPr"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="ComputeMasterPageName"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="ComputeMasterPageName">
