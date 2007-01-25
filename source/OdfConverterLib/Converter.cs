@@ -65,7 +65,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private string[] ODF_POST_PROCESSORS = {
 			"OdfParagraphPostProcessor",
-			"OdfCheckIfIndexPostProcessor"
+			"OdfCheckIfIndexPostProcessor",
+        	"OdfCharactersPostProcessor"
  		};
 
         private bool isDirectTransform = true;
@@ -224,10 +225,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             else if (e.Message.StartsWith("feedback:"))
             {
-            	if (feedbackMessageIntercepted != null)
-            	{
-            		feedbackMessageIntercepted(this, new OdfEventArgs(e.Message.Substring("feedback:".Length)));
-            	}
+                if (feedbackMessageIntercepted != null)
+                {
+                    feedbackMessageIntercepted(this, new OdfEventArgs(e.Message.Substring("feedback:".Length)));
+                }
             }
         }
 
@@ -261,24 +262,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 Debug.WriteLine(e.Message);
                 throw new NotAnOdfDocumentException(e.Message);
             }
-            
+
             XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
             if (nodes.Count > 0)
             {
                 throw new EncryptedDocumentException(fileName + " is an encrypted document");
             }
-            
+
             // Check the document mime-type.
-      		XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
-      		nsmgr.AddNamespace("manifest", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
-           
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
+            nsmgr.AddNamespace("manifest", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
+
             XmlNode node = doc.SelectSingleNode("/manifest:manifest/manifest:file-entry[@manifest:media-type='"
                                                 + ODF_MIME_TYPE + "']", nsmgr);
-           	if (node == null) 
+            if (node == null)
             {
-            	throw new NotAnOdfDocumentException("Could not convert "+ fileName 
-           		                                    + ". Invalid OASIS OpenDocument file");
-            }        
+                throw new NotAnOdfDocumentException("Could not convert " + fileName
+                                                    + ". Invalid OASIS OpenDocument file");
+            }
         }
 
         private void CheckOoxFile(string fileName)
@@ -288,7 +289,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         private XmlWriter GetWriter(XmlWriter writer)
         {
-            string [] postProcessors = OOX_POST_PROCESSORS;
+            string[] postProcessors = OOX_POST_PROCESSORS;
             if (!this.isDirectTransform)
             {
                 postProcessors = ODF_POST_PROCESSORS;

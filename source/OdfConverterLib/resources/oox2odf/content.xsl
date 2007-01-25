@@ -27,6 +27,7 @@
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:pchar="urn:cleverage:xmlns:post-processings:characters"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
@@ -843,6 +844,30 @@
         </style:paragraph-properties>
       </style:style>
     </xsl:if>
+  </xsl:template>
+
+  <!-- symbols : text style -->
+  <xsl:template match="w:sym" mode="automaticstyles">
+    <style:style style:name="{generate-id(.)}" style:family="text">
+      <xsl:if test="@w:font">
+        <style:text-properties>
+          <xsl:attribute name="style:font-name">
+            <xsl:value-of select="@w:font"/>
+          </xsl:attribute>
+          <xsl:attribute name="style:font-name-complex">
+            <xsl:value-of select="@w:font"/>
+          </xsl:attribute>
+        </style:text-properties>
+      </xsl:if>
+    </style:style>
+  </xsl:template>
+
+  <!-- symbols -->
+  <xsl:template match="w:sym">
+    <text:span text:style-name="{generate-id(.)}">
+      <!-- character post-processing -->
+      <pchar:symbol pchar:code="{@w:char}"/>
+    </text:span>
   </xsl:template>
 
   <!--ignore text in automatic styles mode-->

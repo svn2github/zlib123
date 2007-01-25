@@ -36,6 +36,7 @@
     <Compile Include="AbstractPostProcessor.cs" />
     <Compile Include="EncryptedDocumentException.cs" />
     <Compile Include="NotAnOoxDocumentException.cs" />
+    <Compile Include="OdfCharactersPostProcessor.cs" />
     <Compile Include="OdfEventArgs.cs" />
     <Compile Include="OoxAutomaticStylesPostProcessor.cs" />
     <Compile Include="OoxChangeTrackingPostProcessor.cs" />
