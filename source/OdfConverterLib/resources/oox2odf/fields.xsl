@@ -569,10 +569,20 @@
   <xsl:template name="InsertCrossReference">
     <xsl:param name="fieldCode"/>
     <text:bookmark-ref text:reference-format="text">
-      <xsl:attribute name="text:ref-name">
-        <xsl:value-of select="substring-before(substring-after($fieldCode,'REF '),' \')"/>
-      </xsl:attribute>
-      <xsl:apply-templates select="ancestor::w:p/descendant::w:t"/>
+      <xsl:choose>
+        <xsl:when test="contains($fieldCode,'PAGEREF')">
+          <xsl:attribute name="text:ref-name"> 
+            <xsl:value-of select="substring-before(concat('_',substring-after($fieldCode,'_')),' \')"/>
+          </xsl:attribute>
+          <xsl:apply-templates select="w:r/w:t"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="text:ref-name">
+            <xsl:value-of select="substring-before(substring-after($fieldCode,'REF '),' \')"/>
+          </xsl:attribute>
+          <xsl:apply-templates select="ancestor::w:p/descendant::w:t"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </text:bookmark-ref>
   </xsl:template>
 
@@ -728,7 +738,7 @@
 
   <!--page number-->
   <xsl:template
-    match="w:fldSimple[(contains(@w:instr,'PAGE') or contains(@w:instr,'page')) and not(contains(@w:instr,'NUMPAGE'))]"
+    match="w:fldSimple[(contains(@w:instr,'PAGE') or contains(@w:instr,'page')) and not(contains(@w:instr,'NUMPAGE')) and not(contains(@w:instr,'PAGEREF'))]"
     mode="fields">
     <xsl:call-template name="InsertPageNumber">
       <xsl:with-param name="fieldCode" select="@w:instr"/>
