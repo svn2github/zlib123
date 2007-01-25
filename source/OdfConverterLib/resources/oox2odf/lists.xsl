@@ -362,8 +362,8 @@
                       test="w:suff/@w:val='nothing' or ($paragraph/w:pPr/w:ind/@w:left = 0 and $tab = '')"
                       >0</xsl:when>
                     <xsl:when test="w:suff/@w:val='space'">350</xsl:when>
-                    <xsl:when test="$tab != '' and (number($WLeft) - number($tab) >= 0)">
-                      <xsl:value-of select="$tab - $WLeft + $WHanging"/>
+                    <xsl:when test="$tab != '' and (number($tab) - number($WLeft) >= 0) and not(number($WLeft) = number($WHanging))">
+                      <xsl:value-of select="number($tab) - number($WLeft) + number($WHanging)"/>
                     </xsl:when>
                     <xsl:when test="$paragraph/w:pPr/w:ind/@w:hanging">
                       <xsl:value-of select="$paragraph/w:pPr/w:ind/@w:hanging"/>
@@ -373,7 +373,7 @@
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:when>
-				<xsl:when test="$WFirstLine = '0'"><xsl:value-of
+		<xsl:when test="$WFirstLine = '0'"><xsl:value-of
                   select="document('word/settings.xml')/w:settings/w:defaultTabStop/@w:val"/></xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
