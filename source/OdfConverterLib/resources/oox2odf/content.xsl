@@ -981,15 +981,25 @@
                       <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:if
-                        test="( $precSectPr/w:pgSz/@w:w != $mainSectPr/w:pgSz/@w:w 
-                        or $precSectPr/w:pgSz/@w:h != $mainSectPr/w:pgSz/@w:h 
-                        or $precSectPr/w:pgSz/@w:orient != $mainSectPr/w:pgSz/@w:orient 
-                        or $mainSectPr/w:headerReference 
-                        or $mainSectPr/w:footerReference )
-                        or $mainSectPr/w:cols">
-                        <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
-                      </xsl:if>
+                      <xsl:choose>
+                        <xsl:when test="$precSectPr and $mainSectPr/w:type/@w:val = 'continuous' ">
+                          <!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
+                          <xsl:if
+                            test="$mainSectPr/w:headerReference[@w:type='default']/@r:id != $precSectPr/w:headerReference[@w:type='default']/@r:id
+                            or $mainSectPr/w:headerReference[@w:type='even']/@r:id != $precSectPr/w:headerReference[@w:type='even']/@r:id 
+                            or $mainSectPr/w:headerReference[@w:type='first']/@r:id != $precSectPr/w:headerReference[@w:type='first']/@r:id 
+                            or $mainSectPr/w:footerReference[@w:type='default']/@r:id != $precSectPr/w:footerReference[@w:type='default']/@r:id
+                            or $mainSectPr/w:footerReference[@w:type='even']/@r:id != $precSectPr/w:footerReference[@w:type='even']/@r:id 
+                            or $mainSectPr/w:footerReference[@w:type='first']/@r:id != $precSectPr/w:footerReference[@w:type='first']/@r:id">
+                            <xsl:message terminate="no">
+                              <xsl:text>feedback:Header/footer change after continuous section break.</xsl:text>
+                            </xsl:message>
+                          </xsl:if>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:attribute name="style:master-page-name">Standard</xsl:attribute>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:otherwise>
