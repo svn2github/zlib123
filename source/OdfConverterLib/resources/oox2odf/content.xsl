@@ -835,7 +835,7 @@
   </xsl:template>
 
   <xsl:template match="w:noBreakHyphen">–</xsl:template>
-  
+
   <!-- page or column break must have style defined in paragraph -->
   <xsl:template match="w:br[@w:type='page' or @w:type='column']" mode="automaticstyles">
     <xsl:if test="not(ancestor::w:p/w:pPr)">
@@ -898,7 +898,8 @@
     <xsl:param name="mainSectPr" select="document('word/document.xml')/w:document/w:body/w:sectPr"/>
 
     <xsl:choose>
-      <xsl:when test="$followingSectPr/w:type/@w:val = 'continuous' ">
+      <!-- first case : current section is continuous with preceding section (test if precSectPr exist to avoid bugs) -->
+      <xsl:when test="$precSectPr and $followingSectPr/w:type/@w:val = 'continuous' ">
         <!-- no new master page. Warn loss of page header/footer change (should not occure in OOX, but Word 2007 handles it) -->
         <xsl:if
           test="$followingSectPr/w:headerReference[@w:type='default']/@r:id != $precSectPr/w:headerReference[@w:type='default']/@r:id
@@ -948,9 +949,9 @@
             <xsl:when
               test="$followingSectPr and not($followingSectPr/w:headerReference) and not($followingSectPr/w:footerReference)">
               <xsl:attribute name="style:master-page-name">
-                  <!-- jslaurent : hack to make it work in any situation. Does not make any sense though.
+                <!-- jslaurent : hack to make it work in any situation. Does not make any sense though.
                   master page names should be reviewed and unified : many names not consistent, many styles never used -->
-                 <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
+                <xsl:value-of select="concat('H_',generate-id($followingSectPr))"/>
               </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>

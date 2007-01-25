@@ -37,6 +37,7 @@
   <xsl:import href="pictures.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="meta.xsl"/>
+  <xsl:import href="frames.xsl"/>
   <xsl:import href="settings.xsl"/>
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="footnotes.xsl"/>
