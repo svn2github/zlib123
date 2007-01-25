@@ -13,6 +13,8 @@
     <xsl:template name="meta">
         <office:document-meta>
             <office:meta>
+                <!-- generator -->
+                <meta:generator>ODF Converter v<xsl:value-of select="$app-version"/></meta:generator>
                 <!-- title -->
                 <xsl:if test="document('docProps/core.xml')/cp:coreProperties/dc:title">
                     <dc:title>

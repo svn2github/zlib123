@@ -61,7 +61,7 @@
   <!-- App version number -->
   <!-- WARNING: it has to be of type xx.yy -->
   <!-- (otherwise Word cannot open the doc) -->
-  <xsl:variable name="app-version">0.2</xsl:variable>
+  <xsl:variable name="app-version">1.00</xsl:variable>
 
   <!-- existence of docProps/custom.xml file -->
   <xsl:variable name="docprops-custom-file"

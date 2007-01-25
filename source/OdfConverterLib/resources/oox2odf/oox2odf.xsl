@@ -84,11 +84,8 @@
     select="concat($document-path, document($part-relationships)/rels:Relationships/rels:Relationship[@Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments']/@Target)"/>
   -->
 
-
   <!-- App version number -->
-  <!-- WARNING: it has to be of type xx.yy -->
-  <!-- (otherwise Word cannot open the doc) -->
-  <xsl:variable name="app-version">0.3</xsl:variable>
+  <xsl:variable name="app-version">1.0.0</xsl:variable>
 
   <xsl:template match="/oox:source">
 
