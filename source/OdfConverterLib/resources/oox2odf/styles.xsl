@@ -1515,6 +1515,11 @@
   <xsl:template name="InsertDefaultParagraphProperties">
     <xsl:if test="self::w:p[not(w:pPr)]">
       <style:paragraph-properties>
+        <!-- no spacing in OOX. when the paragraph is in table-->
+        <xsl:if test="ancestor::w:tc">
+          <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
+          <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
+        </xsl:if>
         <xsl:call-template name="InsertDropCapProperties"/>
       </style:paragraph-properties>
     </xsl:if>
@@ -1963,7 +1968,11 @@
       test="contains(parent::w:p/w:r/w:pict/v:shape/@style,'mso-position-horizontal-relative:char') and not(w:textAlignment)">
       <xsl:attribute name="style:vertical-align">bottom</xsl:attribute>
     </xsl:if>
-
+    <!-- no spacing in OOX. when the paragraph is in table-->
+      <xsl:if test="ancestor::w:tc">
+      <xsl:attribute name="fo:margin-bottom">0cm</xsl:attribute>
+      <xsl:attribute name="fo:margin-top">0cm</xsl:attribute>
+    </xsl:if>
     <!-- insert attributes using match -->
     <xsl:apply-templates mode="pPrChildren"/>
     <!-- insert attributes using template -->
@@ -2190,7 +2199,7 @@
         </xsl:call-template>
       </xsl:attribute>
     </xsl:if>
-    <xsl:if test="@w:after">
+  <xsl:if test="@w:after">
       <xsl:attribute name="fo:margin-bottom">
         <xsl:call-template name="ConvertTwips">
           <xsl:with-param name="length">
