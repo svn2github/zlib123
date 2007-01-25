@@ -153,10 +153,7 @@
                 <xsl:if
                   test="not(key('default-styles', 'paragraph')[last()]/w:rPr/*[name() = $elementName])">
                   <xsl:apply-templates select="." mode="rPrChildren"/>
-                </xsl:if>
-                <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap])">
                   <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
-                  <xsl:call-template name="InsertTextPosition"/>
                 </xsl:if>
               </xsl:otherwise>
             </xsl:choose>
@@ -199,14 +196,15 @@
 
   <!-- default character style -->
   <xsl:template name="InsertDefaultTextStyle">
-    <xsl:if test="w:styles/w:docDefaults[w:rPrDefault] or key('default-styles', 'character')">
+    <xsl:if
+      test="w:styles/w:docDefaults[w:rPrDefault] or key('default-styles', 'character') or key('default-styles', 'paragraph')/w:rPr">
       <style:default-style style:family="text">
         <style:text-properties>
           <xsl:for-each select="key('default-styles', 'character')[last()]/w:rPr">
             <xsl:call-template name="InsertTextProperties"/>
           </xsl:for-each>
-          <!-- do not retain docDefault pPr properties that are already retained -->
-          <xsl:for-each select="w:styles/w:docDefaults/w:rPrDefault/w:rPr/child::node()">
+          <!-- do not retain rPr in default paragraph properties that are already retained -->
+          <xsl:for-each select="key('default-styles', 'paragraph')/w:rPr/child::node()">
             <xsl:variable name="elementName" select="name()"/>
             <xsl:choose>
               <!-- insert attribute using template name -->
@@ -223,10 +221,39 @@
                 <xsl:if
                   test="not(key('default-styles', 'character')[last()]/w:rPr/*[name() = $elementName])">
                   <xsl:apply-templates select="." mode="rPrChildren"/>
-                </xsl:if>
-                <xsl:if test="not(ancestor::w:p[1]/w:pPr/w:framePr[@w:dropCap])">
                   <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
+                </xsl:if>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+          <!-- do not retain docDefault pPr properties that are already retained -->
+          <xsl:for-each select="w:styles/w:docDefaults/w:rPrDefault/w:rPr/child::node()">
+            <xsl:variable name="elementName" select="name()"/>
+            <xsl:choose>
+              <!-- insert attribute using template name -->
+              <xsl:when
+                test="self::w:dstrike or self::w:strike and not(key('default-styles', 'character')[last()]/w:rPr[w:dstrike or w:strike])">
+                <xsl:if
+                  test="not(key('default-styles', 'paragraph')[last()]/w:rPr[w:dstrike or w:strike])">
+                  <xsl:call-template name="InsertTextStrikeLine"/>
+                </xsl:if>
+              </xsl:when>
+              <xsl:when
+                test="self::w:vertAlign or self::w:position and not(key('default-styles', 'character')[last()]/w:rPr[w:vertAlign or w:position])">
+                <xsl:if
+                  test="not(key('default-styles', 'paragraph')[last()]/w:rPr[w:dstrike or w:strike])">
                   <xsl:call-template name="InsertTextPosition"/>
+                </xsl:if>
+              </xsl:when>
+              <xsl:otherwise>
+                <!-- insert attributes using match -->
+                <xsl:if
+                  test="not(key('default-styles', 'character')[last()]/w:rPr/*[name() = $elementName])">
+                  <xsl:if
+                    test="not(key('default-styles', 'paragraph')[last()]/w:rPr/*[name() = $elementName])">
+                    <xsl:apply-templates select="." mode="rPrChildren"/>
+                    <xsl:apply-templates select="." mode="rPrChildren-dropcap-forbidden"/>
+                  </xsl:if>
                 </xsl:if>
               </xsl:otherwise>
             </xsl:choose>
