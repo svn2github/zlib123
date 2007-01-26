@@ -473,6 +473,9 @@
           <xsl:when test="$color = 'red'">
             <xsl:text>#ff0000</xsl:text>
           </xsl:when>
+          <xsl:when test="$color = 'silver'">
+            <xsl:text>#c0c0c0</xsl:text>
+          </xsl:when>
           <xsl:when test="$color = 'teal'">
             <xsl:text>#008080</xsl:text>
           </xsl:when>
