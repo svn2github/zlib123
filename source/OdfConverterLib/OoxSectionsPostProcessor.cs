@@ -590,7 +590,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             if (this.nextIsPageBreak && !this.skip)
             {
                 Page page = (Page)this.pages[this.name];
-                this.name = page.GetAttributeValue("next-style", PSECT_NAMESPACE);
+                if (page != null)
+                {
+                    this.name = page.GetAttributeValue("next-style", PSECT_NAMESPACE);
+                }
             }
 
             if (!this.nextIsPageBreak || !this.skip)
