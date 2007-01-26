@@ -1,193 +1,136 @@
 <html>
     <head>
-        <title>ODF Add-in for Microsoft Word</title>
+        <title>ODF Add-in voor Microsoft Word</title>
     </head>
     <body>
         <h1>
-            <a name="top">ODF Add-in for Microsoft Word</a>
-        </h1>
-
-        <p> Thank you for downloading ODF Add-in for Word. The purpose of this software is to enable
-            users to open ODF Specification based documents in Microsoft Word and demonstrate the
-            interoperability between OpenXML &amp; ODF specifications. This add-in is under
-            development on <a href="http://sourceforge.net/projects/odf-converter"
-            >sourceforge.net</a> (see the roadmap for more details about planned releases). We will
-            provide stable nightly builds. You can install and test them at your own risk! </p>
-
-        <h2>Table of Content</h2>
+            <a name="top">ODF Add-in voor Microsoft Word</a>
+        </h1>        
+        <p>Bedankt om ODF Add-in voor Word te downloaden. Deze software is bedoeld om de gebruikers de mogelijkheid te
+            bieden documenten op basis van de ODF-specificatie in Microsoft Word te openen en de interoperabiliteit aan te tonen 
+            tussen OpenXML- &amp; ODF-specificaties. Deze add-in is nog in ontwikkeling op 
+            <a href="http://sourceforge.net/projects/odf-converter">sourceforge.net</a> (zie de roadmap voor meer details over 
+            geplande releases).</p>
+        <p>Dit Add-In werd door <a href="http://www.microsoft.com/">Microsoft</a> gefinancierd en door <a href="http://www.clever-age.com/">Clever Age</a>, <a href="http://www.dialogika.de/">DIaLOGIKa</a> en <a href="http://www.aztecsoft.com/">Aztecsoft</a> ontwikkeld (zie de project <a href="http://odf-converter.sourceforge.net/">website</a> voor meer informaties).</p>
+        
+        <h2>Inhoudstafel</h2>
         <ul>
             <li>
-                <a href="#hRequirements">Software Requirements</a>
+                <a href="#hRequirements">Softwarevereisten</a>
             </li>
             <li>
-                <a href="#hInstall">Installing the add-in</a>
+                <a href="#hInstall">Installatie van de add-in</a>                
             </li>
             <li>
-                <a href="#hTroobleshooting">Troubleshooting Guide</a>
-            </li>
-            <li>
-                <a>Features/options not supported</a>
+                <a href="#hTroobleshooting">Gids Foutenopsporing</a>
                 <ul>
-                    <li>
-                        <a href="#hFeatureDirect">ODF to OpenXML conversion</a>
-                    </li>
-                    <li>
-                        <a href="#hFeatureReverse">OpenXML to ODF conversion</a>
-                    </li>
+                    <li><a href="#hTroobleshootingXP2003">Microsoft Word XP/2003</a></li>
+                    <li><a href="#hTroobleshooting2007">Microsoft Word 2007</a></li>
                 </ul>
             </li>
+            <li><a href="#hFeatures">Niet ondersteunde functies/opties</a></li>
         </ul>
-
-        <h2>
-            <a name="hRequirements"> Software Requirements</a>
-        </h2>
-        <p>Before installing the add-in, make sure you have the following...</p>
+        
+        <h2><a name="hRequirements">Softwarevereisten</a></h2>
+        <p>Voor het installeren van de toevoegt-in uitvoering zeker u hebt een van het volgt...</p>
         <ul>
-            <li><a href="http://www.microsoft.com/office/preview/beta/download/en/default.mspx">Word
-                    2007 RTM</a> with .NET Programmability Support activated</li>
+            <li>Microsoft Word XP</li>
+            <li>
+                <a href="http://www.microsoft.com/office/preview/beta/converter.mspx">Office
+                    Compatibility Pack</a>
+            </li>
             <li>
                 <a
                     href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
                     >.NET framework 2.0</a>
             </li>
+        </ul>      
+        <p><strong>or</strong></p>        
+        <ul>
+            <li>Microsoft Word 2003</li>
+            <li><a href="http://www.microsoft.com/office/preview/beta/converter.mspx">Office Compatibility Pack</a></li>
+            <li>
+                <a
+                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
+                    >.NET framework 2.0*</a>
+            </li>
         </ul>
-
-        <p><strong>Warning:</strong> if you install Microsoft Word before the .NET Framework, you will
-            need to update your Word installation, by running the following these steps below. </p>
+        <p><strong>or</strong></p>
+        <ul>
+            <li><a href="http://www.microsoft.com/office/preview/beta/download/en/default.mspx">Word 2007</a>
+                met .NET Programmability Support geactiveerd</li>
+            <li>
+                <a
+                    href="http://www.microsoft.com/downloads/details.aspx?familyid=0856eacb-4362-4b0d-8edd-aab15c5e04f5&amp;displaylang=en"
+                    >.NET framework 2.0*</a>
+            </li>
+        </ul>
+        
+        
+        <p><strong>(*) Waarschuwing:</strong> als u Microsoft Word installeert v&oacute;&oacute;r .NET Framework, dan moet u uw Word-installatie aanpassen 
+            door volgende stappen te volgen. </p>
         <ol>
-            <li>Open "Add or remove Programs" from the Control Panel</li>
-            <li>Find the Microsoft Word entry and choose "Modify"</li>
-            <li>Within the installation process, choose "Add or remove features" then add ".NET
-                Programmability Support" in the "Microsoft Office Word" section. </li>
+            <li>Open &quot;Programma&apos;s toevoegen of wissen&quot; vanuit het Configuratiescherm</li>
+            <li>Zoek het element Microsoft Word en kies &quot;Wijzigen&quot;</li>
+            <li>Binnen het installatieproces kiest u &quot;Functies toevoegen of wissen&quot; en voegt u
+                &quot;.NET Programmability Support&quot; toe in de sectie &quot;Microsoft Office Word&quot;.  </li>
         </ol>
         <p>
-            <a href="#top" class="back">Back to top</a>
+            <a href="#top" class="back">Terug naar begin</a>
         </p>
-
+        
         <h2>
-            <a name="hInstall">Installing the add-in</a>
+            <a name="hInstall">Installatie van de add-in</a>
         </h2>
-        <p>Double click the .MSI file</p>
-
-        <p> If installation is successful, you should be able to open an &quot;.ODT&quot;
-            file from Microsoft Word (see menu &quot;File>ODF...&quot;). Also, when
-            right-clicking on a &quot;.ODT&quot; file in explorer, you should have the
-            option to open the document in Microsoft Word (menu &quot;Open with Word&quot;). </p>
+        <p>Dubbelklik op het <strong>&quot;OdfAddInForWordSetup-nl-1.0.exe&quot;</strong> bestaid.</p>
+        <p> Als de installatie gelukt is, zou u een ".ODT&quot;-bestand vanuit Microsoft Word moeten kunnen openen
+            (zie menu &quot;Bestand&quot;>ODF...&quot;). Wanneer u met de rechter muisknop klikt op een &quot;.ODT&quot;-bestand in 
+            Explorer, zou u de optie moeten hebben om het document te openen in Microsoft Word (menu 
+            &quot;Openen met Word&quot;).</p>
         <p>
-            <strong>Important note:</strong> The ODF file opened by the add-in is imported in
-            Microsoft Word as a read-only .DOCX file. If you want to save it as ODF, you will have
-            to first make a copy of the document (&quot;Menu>Save As&quot;) and then use the
-            &quot;Export as ODF&quot; menu. </p>
+            <strong>Belangrijke opmerking:</strong> Het ODF-bestand dat geopend wordt door de add-in, 
+            wordt ge&iuml;mporteerd in Microsoft Word als een
+            read-only .DOCX-bestand. Als u het wilt opslaan als een ODF, moet u eerst een kopie maken van 
+            het document (&quot;Menu>Opslaan als&quot;) en dan verder gaan via het menu &quot;Exporteren
+            als ODF&quot;. </p>
         <p>
-            <a href="#top" class="back">Back to top</a>
+            <a href="#top" class="back">Terug naar begin</a>
         </p>
-
+        
         <h2>
-            <a name="hTroobleshooting">Troubleshooting</a>
+            <a name="hTroobleshooting">Foutenopsporing</a>
         </h2>
-        <p> If you don't see the ODF entry in Microsoft Word menu, it could be due to missing
-            features in Word (see <a href="#hRequirements">Software Requirements</a> section) or a
-            failure in the installation of Word Primary Interop Assemblies. You will then need to
-            activate the Add-in manually by doing the following... </p>
+        <p> Als u geen element ODF in uw Microsoft Word-menu terugvindt, kan dit te wijten
+            zijn aan ontbrekende functies in Word (zie de sectie <a href="#hRequirements">Softwarevereisten</a> ) 
+            of een fout in de installatie van Word Primary Interop Assemblies. U moet de Add-in dan manueel activeren
+            door het volgende te doen... </p>
+        <h3><a name="hTroobleshootingXP2003">Microsoft Word XP/2003</a></h3>
         <ol>
-            <li>Click &quot;Word Options&quot; in the &quot;File&quot; menu</li>
-            <li>In the &quot;Add-ins&quot; section, select &quot;COM Add-ins&quot;
-                in the list box and press the &quot;Go&quot; button</li>
-            <li>Make sure to select the checkbox &quot;ODF Word Add-in&quot; and
-                validate with the &quot;OK&quot; button.</li>
+                <li>Ga naar Werktuigen> Aanpas en klik dan het Bevelen label. </li>
+                <li>In de Categorieën doos klik Werktuigen. </li>
+                <li>Ruk "COM" Toevoegt-In van de Bevelen doos over het Werktuigen menu. Wanneer het Werktuigen menu de menu bevelen toont, wijs naar de locatie waar u de "COM" wil Toevoeg bevelvoerend om op het menu te verschijnen en geef dan de muis knoop vrij.  </li>
+                <li>Click Close.</li>
+                <li>In het Werktuigen menu boksen klik "COM" Toevoegt-In en controle naast de toevoegt-in naam in de verkrijgbare lijst. Indien de toevoegt-in u nood niet in de lijst is, Voegt klik Toe, spoor de toevoegt-in op en klik dan OKAY. </li>
         </ol>
-       <p>
-            <a href="#top" class="back">Back to top</a>
-        </p>
-
+        <h3><a name="hTroobleshooting2007">Microsoft Word 2007</a></h3>
+        <ol>
+            <li>Klik op &quot;Word-opties&quot; in het menu &quot;Bestand&quot;</li>
+            <li>In de sectie &quot;Add-ins&quot; kiest u &quot;COM Add-ins&quot; in de 
+                keuzelijst en u drukt op de knop &quot;Go&quot;</li>
+            <li>Zorg ervoor dat u het selectievakje &quot;ODF Word Add-in&quot; kiest en 
+                valideer met de knop &quot;OK&quot;.</li>
+        </ol>
+        <p><a href="#top" class="back">Terug naar begin</a></p>
+        
         <h2>
-            <a>Features/options not supported</a>
+            <a name="hFeatures">Opties niet aanwezig</a>
         </h2>
-        <h3>
-            <a name="hFeatureDirect">Opening an ODF File...</a>
-        </h3>
-        <ul>
-            <li>Text blinking</li>
-            <li>Table cell protection</li>
-            <li>Number of widow or orphans lines</li>
-            <li>'Manual' and 'From left' alignment in tables</li>
-            <li>Last line alignment in justified paragraph</li>
-            <li>Max number of table columns</li>
-            <li>'Leading' line spacing in a paragraph</li>
-            <li>Tabs fill character of a paragraph</li>
-            <li>'Title' and 'lowercase' style options</li>
-            <li>Keep with next paragraph for table</li>
-            <li>Don't split table</li>
-            <li>Hidden Sections</li>
-            <li>Background Image in Tables</li>
-            <li>Break before Table</li>
-            <li>Even Column Height</li>
-            <li>Font Size for Super/Subscript</li>
-            <li>Character rotation</li>
-            <li>Repeat Heading in a Table</li>
-            <li>Copy Heading while splitting Table</li>
-            <li>Table Shadowing Style</li>
-            <li>List Vertical Numbering</li>
-            <li>List : Minimum Space Between Numbering and Text</li>
-            <li>Tab-stop in numbering</li>
-            <li>Image position in frame</li>
-            <li>Text background color</li>
-            <li>Foot notes reference auto numbering</li>
-            <li>Next Master style lost without page-break</li>
-            <li>Keep ratio feature for frames</li>
-            <li>Columns for frames/text-boxes</li>
-            <li>Background color of pages</li>
-            <li>Section's background color</li>
-            <li>Notes embedded in text-boxes</li>
-            <li>Image borders</li>
-            <li>ENTRY TOC</li>
-            <li>Background opacity</li>
-            <li>Page break</li>
-            <li>Cropped images</li>
-            <li>00 'spacing at tops of pages' option</li>
-            <li>SVM images</li>
-            <li>Font weight</li>
-            <li>Image wrapping</li>
-            <li>Paragraph Border with Image Inside</li>
-            <li>TOC protection against manual changes</li>
-            <li>Line Numbering</li>
-            <li>Table of Contents Protection</li>
-            <li>Date format</li>
-            <li>Paragraph and Page shadow</li>
-            <li>Column separator</li>
-            <li>Footnote/endnote in a list</li>
-            <li>Relative picture position</li>
-            <li>Text vertical alignment in text-box</li>
-        </ul>
         <p>
-            <a href="#top" class="back">Back to top</a>
+            De volledige lijst van niet ondersteunde kenmerken is op onze website gehandhaafd. U kan hem op <a href="http://odf-converter.sourceforge.net/features.html">deze pagina</a> vinden.
         </p>
-        <h3>
-            <a name="hFeatureReverse">Saving an ODF File...</a>
-        </h3>
-        <ul>
-            <li>Scale relative to orginal picture size</li>
-            <li>Picture rotation</li>
-            <li>Footnote and Endnote</li>
-            <li>Table Text Wrapping</li>
-            <li>Table Style Border</li>
-            <li>Picture position option: "move object with text", "lock anchor', "allow overlap"</li>
-            <li>Start Page Numbering (starting with something other than 1)</li>
-            <li>Adjust List Indents (Follow number with: space)</li>
-            <li>Alignment tabs in header/footer</li>
-            <li>Space size when text is "Justify"</li>
-            <li>Frame anchor in header and footer</li>
-            <li>Text watermarks</li>
-            <li>Hyperlinks in Table of Figures</li>
-            <li>Mark entry</li>
-            <li>Change multiple characters in numbering</li>
-            <li>Columns after section</li>
-            <li>Font style in fields</li>
-            <li>Build Table Of Figures from styles </li>
-            <li>Table Identifier</li>
-        </ul>
         <p>
-            <a href="#top" class="back">Back to top</a>
+            <a href="#top" class="back">Terug naar begin</a>
         </p>
     </body>
 </html>
+
