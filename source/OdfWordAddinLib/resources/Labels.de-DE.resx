@@ -11,7 +11,7 @@
     associated with the data types.
     
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -415,7 +415,7 @@
     <value>händische Ausrichtung einer Tabelle</value>
   </data>
   <data name="translation.odf2oox.tableWith64Columns" xml:space="preserve">
-    <value>Tabelle mit mehr als 64 Spalten</value>
+    <value>Tabellenspalten ab Spalte 65</value>
   </data>
   <data name="translation.odf2oox.rowBgImage" xml:space="preserve">
     <value>Hintergrundbild einer Tabellenzeile</value>
