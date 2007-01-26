@@ -31,6 +31,7 @@ using System.Windows.Forms;
 using CleverAge.OdfConverter.OdfWordAddinLib;
 using System.Runtime.InteropServices;
 using System.Reflection;
+using System.IO;
 
 namespace OdfConverterLauncher
 {
@@ -80,6 +81,36 @@ namespace OdfConverterLauncher
             Type fieldsType = fields.GetType();
             fieldsType.InvokeMember("Update", BindingFlags.InvokeMethod, null, fields, null);
         }
+
+        public void getLanguage()
+        {
+
+            // set culture to match current application culture or user's choice
+            int culture = 0;
+            string languageVal = Microsoft.Win32.Registry
+                .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "Language", null) as string;
+            
+            if (languageVal != null)
+            {
+                int.TryParse(languageVal, out culture);
+            }
+
+            if (culture == 0)
+            {
+                object _languageSettings;
+                Type _languageSettingsType;
+
+                _languageSettings = _type.InvokeMember("LanguageSettings", BindingFlags.GetProperty, null, _instance, null);
+                _languageSettingsType = _languageSettings.GetType();
+
+                object[] args = new object[] { 2 };
+                culture = (int)_languageSettingsType.InvokeMember("LanguageID", BindingFlags.GetProperty, null, _languageSettings, args);
+
+            }
+
+            System.Threading.Thread.CurrentThread.CurrentUICulture =
+                new System.Globalization.CultureInfo(culture);
+        }
     }
 
     static class Program
@@ -94,23 +125,28 @@ namespace OdfConverterLauncher
             {
                 string input = args[0];
                 OdfWordAddinLib lib = new OdfWordAddinLib();
+                Word word = null;
+
                 try
                 {
                     bool showUserInterface = true;   
                     string output = lib.GetTempFileName(input);
+                    word = new Word();
+                    word.getLanguage();
                     lib.OdfToOox(input, output, showUserInterface);
-
-                    if (System.IO.File.Exists(output))
+                    if (File.Exists((string)output))
                     {
-                        Word word = new Word();
                         word.Visible = true;
                         word.Open(output);
+                    }
+                    else {
+                        word.Quit();
                     }
                 }
                 catch (Exception e)
                 {
                     System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfWordAddinLib.resources.Labels", 
-                        Assembly.GetAssembly(lib.GetType()));
+                    Assembly.GetAssembly(lib.GetType()));
                     InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")",  rm);
                     infoBox.ShowDialog();
                 }
