@@ -1304,7 +1304,7 @@
   <xsl:template match="w:p[w:pPr/w:framePr]">
     <xsl:choose>
       <!-- skip drop-capped paragraphs -->
-      <xsl:when test="w:pPr/w:framePr[@w:dropCap]"/>
+      <xsl:when test="w:pPr/w:framePr[@w:dropCap = 'drop']"/>
       <!-- margin drop cap -->
       <xsl:when test="w:pPr/w:framePr[@w:dropCap = 'margin' ]">
         <xsl:message terminate="no">translation.oox2odf.dropcap.inMargin</xsl:message>
