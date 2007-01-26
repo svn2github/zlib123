@@ -220,7 +220,8 @@
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
     <xsl:choose>
-      <xsl:when test="not($length) or $length = 0 or format-number($length div 360000, '#.##') = ''">
+      <xsl:when
+        test="$length = '' or not($length) or $length = 0 or format-number($length div 360000, '#.##') = ''">
         <xsl:value-of select="concat(0,'cm')"/>
       </xsl:when>
       <xsl:when test="$unit = 'cm'">
@@ -234,7 +235,7 @@
     <xsl:param name="unit"/>
     <xsl:choose>
       <xsl:when
-        test="not($length) or $length = 0 or format-number($length div 360000, '#.###') = ''">
+        test="$length = '' or not($length) or $length = 0 or format-number($length div 360000, '#.###') = ''">
         <xsl:value-of select="concat(0,'cm')"/>
       </xsl:when>
       <xsl:when test="$unit = 'cm'">
@@ -282,9 +283,10 @@
     <xsl:param name="destUnit"/>
     <xsl:param name="addUnit">true</xsl:param>
     <xsl:choose>
-      <xsl:when test="$length='' or $length='0' or $length='0cm' or $length='0mm' or $length='0in' or $length='0pt' or $length='0twip' or $length='0pika' or $length='0dpt' or $length='0px'">
+      <xsl:when
+        test="$length='' or $length='0' or $length='0cm' or $length='0mm' or $length='0in' or $length='0pt' or $length='0twip' or $length='0pika' or $length='0dpt' or $length='0px'">
         <xsl:value-of select="'0'"/>
-      </xsl:when>      
+      </xsl:when>
       <!-- used when unit type is given in length string-->
       <xsl:when test="$sourceUnit = ''">
         <xsl:call-template name="ConvertToMeasure">
@@ -395,9 +397,8 @@
           <xsl:value-of select="format-number(substring-before($length, 'px') * 0.0264,'#.###')"/>
         </xsl:when>
         <xsl:when test="not($length) or $length='' ">0</xsl:when>
-        <xsl:otherwise>          
-          <xsl:value-of
-            select="format-number($length * 2.54 div 1440,'#.###')"/>
+        <xsl:otherwise>
+          <xsl:value-of select="format-number($length * 2.54 div 1440,'#.###')"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -492,8 +493,8 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-<!--  hex to decimal -->
+
+  <!--  hex to decimal -->
   <xsl:template name="HexToDec">
     <xsl:param name="number"/>
     <xsl:param name="step" select="0"/>
@@ -531,7 +532,9 @@
         <xsl:variable name="power">
           <xsl:call-template name="Power">
             <xsl:with-param name="base">16</xsl:with-param>
-            <xsl:with-param name="exponent"><xsl:value-of select="number($step)"/></xsl:with-param>
+            <xsl:with-param name="exponent">
+              <xsl:value-of select="number($step)"/>
+            </xsl:with-param>
             <xsl:with-param name="value1">16</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
@@ -556,7 +559,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="Power">
     <xsl:param name="base"/>
     <xsl:param name="exponent"/>
@@ -586,7 +589,7 @@
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
 </xsl:stylesheet>
