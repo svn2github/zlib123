@@ -99,9 +99,13 @@ namespace OdfConverterLauncher
                     bool showUserInterface = true;   
                     string output = lib.GetTempFileName(input);
                     lib.OdfToOox(input, output, showUserInterface);
-                    Word word = new Word();
-                    word.Visible = true;
-                    word.Open(output);
+
+                    if (System.IO.File.Exists(output))
+                    {
+                        Word word = new Word();
+                        word.Visible = true;
+                        word.Open(output);
+                    }
                 }
                 catch (Exception e)
                 {
