@@ -438,52 +438,52 @@
       <xsl:otherwise>
         <!--TODO standard colors mapping (there are 10 standard colors in Word)-->
         <xsl:choose>
-          <xsl:when test="$color = 'aqua'">
+          <xsl:when test="$color = 'aqua' or contains($color,'aqua')">
             <xsl:text>#00ffff</xsl:text>
           </xsl:when>
           <xsl:when test="$color = 'black' or contains($color,'black')">
             <xsl:text>#000000</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'blue'">
-            <xsl:text>#000080</xsl:text>
+          <xsl:when test="$color = 'blue' or contains($color,'blue')">
+            <xsl:text>#0000ff</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'fuchsia'">
+          <xsl:when test="$color = 'fuchsia' or contains($color,'fuchsia')">
             <xsl:text>#ff00ff</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'gray'">
+          <xsl:when test="$color = 'gray' or contains($color,'gray')">
             <xsl:text>#808080</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'green'">
+          <xsl:when test="$color = 'green' or contains($color,'green')">
             <xsl:text>#008000</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'lime'">
+          <xsl:when test="$color = 'lime' or contains($color,'lime')">
             <xsl:text>#00ff00</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'maroon'">
+          <xsl:when test="$color = 'maroon' or contains($color,'maroon')">
             <xsl:text>#800000</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'navy'">
+          <xsl:when test="$color = 'navy' or contains($color,'navy')">
             <xsl:text>#000080</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'olive'">
+          <xsl:when test="$color = 'olive' or contains($color,'olive')">
             <xsl:text>#808000</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'purple'">
+          <xsl:when test="$color = 'purple' or contains($color,'purple')">
             <xsl:text>#800080</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'red'">
+          <xsl:when test="$color = 'red' or contains($color,'red')">
             <xsl:text>#ff0000</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'silver'">
+          <xsl:when test="$color = 'silver' or contains($color,'silver')">
             <xsl:text>#c0c0c0</xsl:text>
           </xsl:when>
-          <xsl:when test="$color = 'teal'">
+          <xsl:when test="$color = 'teal' or contains($color,'teal')">
             <xsl:text>#008080</xsl:text>
           </xsl:when>
           <xsl:when test="$color = 'white' or contains($color,'white')">
             <xsl:text>#ffffff</xsl:text>
           </xsl:when>
-          <xsl:when test="$color='yellow'">
+          <xsl:when test="$color='yellow' or contains($color,'yellow')">
             <xsl:text>#ffff00</xsl:text>
           </xsl:when>
           <xsl:otherwise>
