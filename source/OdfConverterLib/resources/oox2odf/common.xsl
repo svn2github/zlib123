@@ -449,6 +449,9 @@
           <xsl:when test="$color = 'fuchsia'">
             <xsl:text>#ff00ff</xsl:text>
           </xsl:when>
+          <xsl:when test="$color = 'gray'">
+            <xsl:text>#808080</xsl:text>
+          </xsl:when>
           <xsl:when test="$color = 'green'">
             <xsl:text>#008000</xsl:text>
           </xsl:when>
@@ -469,6 +472,9 @@
           </xsl:when>
           <xsl:when test="$color = 'red'">
             <xsl:text>#ff0000</xsl:text>
+          </xsl:when>
+          <xsl:when test="$color = 'teal'">
+            <xsl:text>#008080</xsl:text>
           </xsl:when>
           <xsl:when test="$color = 'white' or contains($color,'white')">
             <xsl:text>#ffffff</xsl:text>
