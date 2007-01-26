@@ -2393,8 +2393,11 @@
   <xsl:template name="InsertParagraphTabStops">
     <xsl:param name="MarginLeft"/>
     <xsl:param name="parentStyleId"/>
+    <xsl:variable name="parentParentStyleId">
+      <xsl:value-of select="document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentStyleId]/w:basedOn/@w:val"/>
+    </xsl:variable>
     <xsl:if
-      test="w:tabs or document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentStyleId]/w:pPr/w:tabs">
+      test="w:tabs or document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentStyleId]/w:pPr/w:tabs or document('word/styles.xml')/w:styles/w:style[@w:styleId=$parentParentStyleId]/w:pPr/w:tabs">
       <style:tab-stops>
         <xsl:for-each select="w:tabs/w:tab">
           <xsl:call-template name="InsertTabs">
@@ -2406,7 +2409,19 @@
             <xsl:if test="w:tabs">
               <xsl:for-each select="w:tabs/w:tab">
                 <xsl:if
-                  test="not(document('word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:pPr/w:tabs/w:tab/@w:pos = ./@w:pos)">
+                  test="not(document('word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos)">
+                  <xsl:call-template name="InsertTabs">
+                    <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
+                  </xsl:call-template>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:if>
+          </xsl:for-each>
+          <xsl:for-each select="key('StyleId', $parentParentStyleId)/w:pPr">
+            <xsl:if test="w:tabs">
+              <xsl:for-each select="w:tabs/w:tab">
+                <xsl:if
+                  test="not(document('word/document.xml')/w:document/w:body/w:p/w:pPr[w:pStyle/@w:val = $parentStyleId]/w:tabs/w:tab/@w:pos = ./@w:pos) and not(key('StyleId',$parentStyleId)/w:pPr/w:tabs/w:tab/@w:pos = ./@w:pos)">
                   <xsl:call-template name="InsertTabs">
                     <xsl:with-param name="MarginLeft" select="$MarginLeft"/>
                   </xsl:call-template>
