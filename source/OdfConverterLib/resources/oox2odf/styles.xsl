@@ -1500,7 +1500,15 @@
           </xsl:attribute>
           <xsl:if test="w:name/@w:val != '' ">
             <xsl:attribute name="style:display-name">
-              <xsl:value-of select="w:name/@w:val"/>
+              <xsl:choose>
+               <!-- change display name for: heading to Heading to avoid duplicate styles (Heading 1-9 are added by default by  OO)-->
+                <xsl:when test="contains(w:name/@w:val, 'heading')">
+                      <xsl:value-of select="translate(w:name/@w:val,'h','H')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="w:name/@w:val"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
           </xsl:if>
           <xsl:call-template name="InsertStyleFamily"/>
