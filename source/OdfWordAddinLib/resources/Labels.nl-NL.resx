@@ -217,27 +217,26 @@
   <data name="translation.odf2oox.cellRotationAngle" xml:space="preserve"><value>Draaihoek cel</value></data>
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve"><value>Uitlijning draaihoek cel</value></data>
   <!-- added 16/01 -->
-  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve"><value>Table of illustration caption format</value></data>
+  <data name="translation.odf2oox.tableIllustration.captionFormat" xml:space="preserve"><value>Betitel formaat in tafel van illustratie niet vasthield</value></data>
   <!-- added 17/01 -->
-  <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>Line through width property lost</value></data>
-  <data name="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Line through color property lost</value></data>
-  
+  <data name="translation.odf2oox.text.lineThrough.width" xml:space="preserve"><value>De lijn door breedte eigendom hield niet vast</value></data>
+  <data name="translation.odf2oox.text.lineThrough.color" xml:space="preserve"><value>De lijn door breedte eigendom hield niet vast</value></data>
   <!-- OOX to ODF translation messages -->
-  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.shape.shadow" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.background.textWatermark" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.frame.inHeader" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.frame.inFooter" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.picture.overlap" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve"><value></value></data>
- 
+  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve"><value>3D gevolgen voor behouden niet vormen</value></data>
+  <data name="translation.oox2odf.shape.shadow" xml:space="preserve"><value>De opaciteit van de schaduw op behouden niet vormen</value></data>
+  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve"><value>Shadow obscurity on shapes not retained</value></data>
+  <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve"><value>Obscurity van de schaduw op behouden niet vormen</value></data>
+  <data name="translation.oox2odf.background.textWatermark" xml:space="preserve"><value>Text watermark feature not retained</value></data>
+  <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve"><value>Behouden niet het watermerkeigenschap van de tekst</value></data>
+  <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve"><value>De bescherming van TOC tegen hand behouden niet veranderingeneigenschap</value></data>
+  <data name="translation.oox2odf.frame.inHeader" xml:space="preserve"><value>Positie van behouden niet kader in header</value></data>
+  <data name="translation.oox2odf.frame.inFooter" xml:space="preserve"><value>Positie van behouden niet kader in footer</value></data>
+  <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve"><value>Het relatieve behouden niet bezit van de kadergrootte</value></data>
+  <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve"><value>Het slotvan het beeld aspectverhouding behouden niet bezit</value></data>
+  <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve"><value>Het schrapen beeld met betrekking tot zijn behouden niet orginalgrootte </value></data>
+  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve"><value>Het behouden niet bezit van het slotanker van het beeld</value></data>
+  <data name="translation.oox2odf.picture.overlap" xml:space="preserve"><value>Sta het behouden niet bezit van het overlappingsbeeld toe </value></data>
+  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve"><value>"In Margin" dropcap hield optie niet vast</value></data>
+  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve"><value>De starten opnieuw lijn nummerend op elk niet vastgehouden onderdeel</value></data>
+  
 </root>
