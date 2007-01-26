@@ -61,19 +61,19 @@
     </xsl:call-template>
 
     <xsl:if test="wp:cNvGraphicFramePr/a:graphicFrameLocks/@noChangeAspect">
-      <xsl:message terminate="no">feedback:Picture lock aspect ratio</xsl:message>
+      <xsl:message terminate="no">translation.oox2odf.picture.size.lockAspectRation</xsl:message>
     </xsl:if>
 
     <xsl:if test="a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPicPr/@preferRelativeResize">
-      <xsl:message terminate="no">feedback:Relative to orginal picture size</xsl:message>
+      <xsl:message terminate="no">translation.oox2odf.frame.relativeSize</xsl:message>
     </xsl:if>
 
     <xsl:if test="@locked = '1'">
-      <xsl:message terminate="no">feedback: Picture lock anchor</xsl:message>
+      <xsl:message terminate="no">translation.oox2odf.picture.anchor.lock</xsl:message>
     </xsl:if>
 
     <xsl:if test="@allowOverlap = '1'">
-      <xsl:message terminate="no">feedback: Picture allow overlap</xsl:message>
+      <xsl:message terminate="no">translation.oox2odf.picture.overlap</xsl:message>
     </xsl:if>
 
     <draw:frame>

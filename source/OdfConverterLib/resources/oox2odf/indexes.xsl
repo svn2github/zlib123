@@ -49,7 +49,7 @@
         <xsl:choose>
           <xsl:when test="contains($instrTextContent,'-')">
         <text:table-of-content text:style-name="Sect1">
-          <xsl:message terminate="no">feedback:TOC protection against manual changes</xsl:message>
+          <xsl:message terminate="no">translation.oox2odf.toc.protection.manualChange</xsl:message>
           <xsl:attribute name="text:protected">false</xsl:attribute>
           <xsl:attribute name="text:name">Table of Contents1</xsl:attribute>
           <xsl:call-template name="InsertIndexProperties">
@@ -63,7 +63,7 @@
           </xsl:when>
           <xsl:otherwise>
             <text:table-index text:style-name="Sect1">
-              <xsl:message terminate="no">feedback:TOC protection against manual changes</xsl:message>
+              <xsl:message terminate="no">translation.oox2odf.toc.protection.manualChange</xsl:message>
               <xsl:attribute name="text:protected">false</xsl:attribute>
               <xsl:attribute name="text:name">Index of Tables1</xsl:attribute>
               <xsl:call-template name="InsertIndexProperties">
@@ -79,6 +79,7 @@
       </xsl:when>
       <xsl:when test="w:r[contains(w:instrText,'INDEX')]">
         <text:alphabetical-index>
+          <!-- TODO : localization -->
           <xsl:message terminate="no">feedback:many alphabetical index properties</xsl:message>
           <xsl:attribute name="text:style-name">
             <xsl:value-of select="generate-id(following::w:p/descendant::w:sectPr)"/>

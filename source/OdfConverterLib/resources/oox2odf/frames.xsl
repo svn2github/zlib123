@@ -33,7 +33,7 @@
   </xsl:template>
 
   <xsl:template match="o:extrusion">
-    <xsl:message terminate="no">feedback:Shape 3D effects</xsl:message>
+    <xsl:message terminate="no">translation.oox2odf.shape.3dEffect</xsl:message>
   </xsl:template>
 
   <!--horizontal line-->
@@ -62,13 +62,13 @@
   <!-- text watermark feedback -->
   <xsl:template match="w:pict[contains(v:shape/@id,'WaterMark')]">
     <xsl:if test="v:shape/v:textpath">
-      <xsl:message terminate="no">feedback:Text watermark</xsl:message>
+      <xsl:message terminate="no">translation.oox2odf.background.textWatermark</xsl:message>
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="v:textbox">
     <xsl:if test="parent::v:stroke/@dashstyle">
-      <xsl:message terminate="no">feedback:Dashed textbox border</xsl:message>
+      <xsl:message terminate="no">translation.oox2odf.textbox.boder.dashed</xsl:message>
     </xsl:if>
     <draw:text-box>
       <xsl:call-template name="InsertTextBoxAutomaticHeight"/>
@@ -218,10 +218,10 @@
         <xsl:when
           test="(ancestor::w:hdr or ancestor::w:ftr) and(w10:wrap/@type != '' or $shape/@w:wrap != '')">
           <xsl:if test="ancestor::w:hdr">
-            <xsl:message terminate="no">feedback:Position of frame in header</xsl:message>
+            <xsl:message terminate="no">translation.oox2odf.frame.inHeader</xsl:message>
           </xsl:if>
           <xsl:if test="ancestor::w:ftr">
-            <xsl:message terminate="no">feedback:Position of frame in footer</xsl:message>
+            <xsl:message terminate="no">translation.oox2odf.frame.inFooter</xsl:message>
           </xsl:if>
           <xsl:text>as-char</xsl:text>
         </xsl:when>
@@ -352,7 +352,7 @@
     </xsl:variable>
 
     <xsl:if test="$relativeTo != ''">
-      <xsl:message terminate="no">feedback:Relative frame size </xsl:message>
+      <xsl:message terminate="no">translation.oox2odf.frame.relativeSize</xsl:message>
     </xsl:if>
   </xsl:template>
 
@@ -442,7 +442,7 @@
     </xsl:variable>
 
     <xsl:if test="$relativeTo != ''">
-      <xsl:message terminate="no">feedback:Relative frame size </xsl:message>
+      <xsl:message terminate="no">translation.oox2odf.frame.relativeSize</xsl:message>
     </xsl:if>
   </xsl:template>
 
@@ -550,16 +550,16 @@
           <xsl:otherwise>
             <!-- report lost attributes -->
             <xsl:if test="@opacity">
-              <xsl:message terminate="no">feedback:Shadow opacity</xsl:message>
+              <xsl:message terminate="no">translation.oox2odf.shape.shadow</xsl:message>
             </xsl:if>
             <xsl:if test="@obscured">
-              <xsl:message terminate="no">feedback:Shadow obscurity</xsl:message>
+              <xsl:message terminate="no">translation.oox2odf.shape.shadow.obscurity</xsl:message>
             </xsl:if>
             <xsl:if test="@type">
-              <xsl:message terminate="no">feedback:Shadow obscurity</xsl:message>
+              <xsl:message terminate="no">translation.oox2odf.shape.shadow.obscurity</xsl:message>
             </xsl:if>
             <xsl:if test="@matrix">
-              <xsl:message terminate="no">feedback:Shadow complex perspective</xsl:message>
+              <xsl:message terminate="no">translation.oox2odf.shape.shadow.complexPerspective</xsl:message>
             </xsl:if>
             <!-- compute color -->
             <xsl:call-template name="InsertColor">
@@ -1376,7 +1376,7 @@
     <xsl:choose>
       <!-- margin drop cap -->
       <xsl:when test="w:p[w:pPr/w:framePr/@w:dropCap]">
-        <xsl:message terminate="no">feedback:ui.translation.issue.dropcap.margin</xsl:message>
+        <xsl:message terminate="no">translation.oox2odf.dropcap.inMargin</xsl:message>
       </xsl:when>
       <xsl:otherwise>
         <style:style style:name="{generate-id(w:pPr/w:framePr)}" style:family="graphic"
