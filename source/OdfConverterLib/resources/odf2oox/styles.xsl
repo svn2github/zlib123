@@ -1737,7 +1737,8 @@
       <xsl:if test="not(@text:number-lines='false')">
         <w:lnNumType>
           <xsl:if
-            test="@text:style-name or @style:num-format or @text:number-position or @text:count-text-boxes or @text:restart-on-page or @text:linenumbering-separator">
+            test="@text:style-name or @style:num-format or @text:number-position or @text:count-text-boxes or @text:linenumbering-separator">
+            <!-- TODO : Considering the above test, this message may not be really explicit... -->
             <xsl:message terminate="no">translation.odf2oox.lineNumbering</xsl:message>
           </xsl:if>
           <xsl:if test="@text:increment">
@@ -1752,7 +1753,12 @@
               </xsl:call-template>
             </xsl:attribute>
           </xsl:if>
-          <xsl:attribute name="w:restart">continuous</xsl:attribute>
+          <xsl:attribute name="w:restart">
+            <xsl:choose>
+              <xsl:when test="@text:restart-on-page">newPage</xsl:when>
+              <xsl:otherwise>continuous</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
         </w:lnNumType>
       </xsl:if>
     </xsl:for-each>
