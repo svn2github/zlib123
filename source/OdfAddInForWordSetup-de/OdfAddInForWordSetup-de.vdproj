@@ -622,7 +622,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=1.0.0.22649, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=1.0.0.29325, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_4BBD6CF0C0106C9E38ADBC0348C9642F"
@@ -673,7 +673,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=1.0.0.22649, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=1.0.0.29324, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_9003BC9B4CD70303297F2215FDD8CE41"
@@ -910,7 +910,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=1.0.0.22649, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=1.0.0.29324, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_E120AABD661C706F8BB8B8ABD0CE54A2"
@@ -1012,7 +1012,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfWordAddinLib, Version=0.2.3.22650, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfWordAddinLib, Version=0.2.3.29325, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_FA2FB82185A53B939D5541C8E12F98C4"
@@ -1151,7 +1151,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ODF Add-in für Microsoft Word"
         "ProductCode" = "8:{E6738F45-D704-4D83-9E51-24695E717D09}"
-        "PackageCode" = "8:{4D9015A9-D37E-423D-8C27-D4C91AE4F5E6}"
+        "PackageCode" = "8:{AC832E49-A641-4C4D-9E7E-C4AC14BCE0D5}"
         "UpgradeCode" = "8:{429EF697-737F-49D5-A58E-8C8C81FCD580}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -2032,7 +2032,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:Basierend auf der Erkennung Microsoft Word Version wird das folgende Add-In installiert:"
+                            "Value" = "8:Basierend auf der Erkennung der Microsoft Word Version wird das folgende Add-In installiert:"
                             "DefaultValue" = "8:#1215"
                             "UsePlugInResources" = "11:TRUE"
                             }
