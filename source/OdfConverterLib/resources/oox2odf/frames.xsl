@@ -1304,7 +1304,11 @@
   <xsl:template match="w:p[w:pPr/w:framePr]">
     <xsl:choose>
       <!-- skip drop-capped paragraphs -->
-      <xsl:when test="w:p[w:pPr/w:framePr/@w:dropCap]"/>
+      <xsl:when test="w:pPr/w:framePr[@w:dropCap]"/>
+      <!-- margin drop cap -->
+      <xsl:when test="w:pPr/w:framePr[@w:dropCap = 'margin' ]">
+        <xsl:message terminate="no">translation.oox2odf.dropcap.inMargin</xsl:message>
+      </xsl:when>
       <xsl:otherwise>
         <!-- if previous node wasn't a text frame paragraph-->
         <xsl:if test="not(preceding::w:p[position()=1][descendant::w:framePr])">
@@ -1374,8 +1378,9 @@
 
   <xsl:template match="w:p[w:pPr/w:framePr]" mode="automaticstyles">
     <xsl:choose>
+      <xsl:when test="w:pPr/w:framePr[@w:dropCap = 'drop' ]"/>
       <!-- margin drop cap -->
-      <xsl:when test="w:p[w:pPr/w:framePr/@w:dropCap]">
+      <xsl:when test="w:pPr/w:framePr[@w:dropCap = 'margin' ]">
         <xsl:message terminate="no">translation.oox2odf.dropcap.inMargin</xsl:message>
       </xsl:when>
       <xsl:otherwise>
