@@ -366,7 +366,16 @@
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$type='TOC'">
-    <text:table-of-content-source text:outline-level="{$maxLevel}">
+    <text:table-of-content-source>
+      <xsl:attribute name="text:outline-level">
+        <xsl:choose>
+          <xsl:when test="$maxLevel=0">1</xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$maxLevel"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        
+      </xsl:attribute>
       <xsl:call-template name="InsertContentOfIndexProperties">
         <xsl:with-param name="styleName">Contents_20_Heading</xsl:with-param>
         <xsl:with-param name="maxLevel" select="$maxLevel"/>

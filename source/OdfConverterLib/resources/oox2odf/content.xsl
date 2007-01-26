@@ -698,7 +698,7 @@
 
   <!--  text bookmark-Start  -->
   <xsl:template match="w:bookmarkStart">
-
+<xsl:if test="ancestor::w:p">
     <xsl:variable name="NameBookmark">
       <xsl:value-of select="@w:name"/>
     </xsl:variable>
@@ -731,9 +731,10 @@
         </text:bookmark-start>
       </xsl:otherwise>
     </xsl:choose>
-
+</xsl:if>
   </xsl:template>
   <xsl:template match="w:bookmarkEnd">
+    <xsl:if test="ancestor::w:p">
     <xsl:variable name="NameBookmark">
       <xsl:value-of select="key('bookmarkStart', @w:id)/@w:name"/>
     </xsl:variable>
@@ -756,6 +757,7 @@
         </text:bookmark-end>
       </xsl:otherwise>
     </xsl:choose>
+      </xsl:if>
   </xsl:template>
 
   <!-- simple text  -->
