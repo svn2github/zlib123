@@ -282,20 +282,20 @@
   <data name="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Line through color property lost</value></data>
  
   <!-- OOX to ODF translation messages -->
-  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.shape.shadow" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.background.textWatermark" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.frame.inHeader" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.frame.inFooter" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.picture.overlap" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve"><value></value></data>
-  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve"><value></value></data>
+  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve"><value>3D effects not retained shapes</value></data>
+  <data name="translation.oox2odf.shape.shadow" xml:space="preserve"><value>Shadow effect not retained on shapes</value></data>
+  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve"><value>Shadow obscurity effect not retained on shapes</value></data>
+  <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve"><value>Perspective shadow effect not retained on shapes</value></data>
+  <data name="translation.oox2odf.background.textWatermark" xml:space="preserve"><value>Watermarked background not retained</value></data>
+  <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve"><value>Dashed border effect not retained on text boxes</value></data>
+  <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve"><value>Protection against manual changes not retained on TOC</value></data>
+  <data name="translation.oox2odf.frame.inHeader" xml:space="preserve"><value>Frames located in headers not retained</value></data>
+  <data name="translation.oox2odf.frame.inFooter" xml:space="preserve"><value>Frames located in footers not retained</value></data>
+  <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve"><value>Relative size of frames not retained</value></data>
+  <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve"><value>Locking aspect ratio option for pictures not retained</value></data>
+  <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve"><value>Relative to original size option not retained on pictures</value></data>
+  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve"><value>Anchor locking of pictures not retained</value></data>
+  <data name="translation.oox2odf.picture.overlap" xml:space="preserve"><value>Overlap pictures option not retained</value></data>
+  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve"><value>In margin option for dropcaps not retained</value></data>
+  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve"><value>Restarting line numbering per section not retained</value></data>
 </root>
