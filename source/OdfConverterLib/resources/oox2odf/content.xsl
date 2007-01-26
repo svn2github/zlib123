@@ -187,7 +187,9 @@
     </style:style>
   </xsl:template>
 
-  <xsl:template match="w:p[not (./w:pPr) and not(descendant::w:pict)]" mode="automaticstyles">
+  <xsl:template
+    match="w:p[not(./w:pPr) and not(w:r/w:br[@w:type='page' or @w:type='column']) and not(descendant::w:pict)]"
+    mode="automaticstyles">
     <xsl:if test="document('word/styles.xml')/w:styles/w:docDefaults/w:pPrDefault">
       <style:style style:name="{generate-id(.)}" style:family="paragraph">
         <xsl:call-template name="MasterPageName"/>
@@ -341,7 +343,7 @@
     </xsl:variable>
 
     <xsl:variable name="styleId" select="w:pPr/w:pStyle/@w:val"/>
-    
+
     <xsl:choose>
       <!--check if the paragraph starts a table-of content or Bibliography or Alphabetical Index -->
       <xsl:when
@@ -352,7 +354,7 @@
       <!-- ignore paragraph if it's deleted in change tracking mode-->
       <xsl:when test="preceding::w:p[1]/w:pPr/w:rPr/w:del"/>
 
-        
+
       <!--  check if the paragraf is list element (it can be a heading but only if it's style is NOT linked to a list level 
         - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
       <xsl:when
@@ -454,8 +456,8 @@
         <xsl:with-param name="property">w:numId</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
-    <!--check if there's a any numId in document--> 
+
+    <!--check if there's a any numId in document-->
     <xsl:for-each select="document('word/document.xml')">
       <xsl:choose>
         <xsl:when test="key('pPr', '')/w:numPr/w:numId">
@@ -464,7 +466,7 @@
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
-          <!--check if there's a any numId in styles--> 
+          <!--check if there's a any numId in styles-->
           <xsl:for-each select="document('word/styles.xml')">
             <xsl:if test="key('pPr', '')/w:numPr/w:numId">
               <xsl:call-template name="InsertListHeader">
@@ -477,7 +479,7 @@
     </xsl:for-each>
   </xsl:template>
 
-<!--  set heading as list header (needed when number was deleted manually)-->
+  <!--  set heading as list header (needed when number was deleted manually)-->
   <xsl:template name="InsertListHeader">
     <xsl:param name="numId"/>
     <xsl:for-each select="document('word/numbering.xml')">
@@ -486,9 +488,9 @@
           <xsl:text>true</xsl:text>
         </xsl:attribute>
       </xsl:if>
-    </xsl:for-each>  
+    </xsl:for-each>
   </xsl:template>
-  
+
   <xsl:template name="InsertHeadingOutlineLvl">
     <xsl:param name="outlineLevel"/>
     <xsl:attribute name="text:outline-level">
@@ -955,7 +957,7 @@
           <xsl:when test="$followingSectPr">
             <xsl:choose>
               <xsl:when
-                test="$followingSectPr/w:titlePg or $followingSectPr/w:headerReference[@w:type='first']/@r:id != '' ">
+                test="$followingSectPr/w:titlePg">
                 <xsl:attribute name="style:master-page-name">
                   <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
                 </xsl:attribute>
@@ -970,7 +972,7 @@
           <xsl:otherwise>
             <xsl:choose>
               <xsl:when
-                test="$mainSectPr/w:titlePg or $mainSectPr/w:headerReference[@w:type='first']/@r:id != '' ">
+                test="$mainSectPr/w:titlePg">
                 <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
               </xsl:when>
               <xsl:otherwise>
@@ -1014,7 +1016,7 @@
                 <xsl:otherwise>
                   <xsl:choose>
                     <xsl:when
-                      test="$mainSectPr/w:titlePg or $mainSectPr/w:headerReference[@w:type='first']/@r:id != '' ">
+                      test="$mainSectPr/w:titlePg">
                       <xsl:attribute name="style:master-page-name">First_Page</xsl:attribute>
                     </xsl:when>
                     <xsl:otherwise>
