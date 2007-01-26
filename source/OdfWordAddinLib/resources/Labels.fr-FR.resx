@@ -275,4 +275,21 @@
   <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>¨Propriété ligne barrée perdue</value></data>
   <data name="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Propriété couleur de ligne barrée perdue</value></data>
   
+  <!-- OOX to ODF translation messages -->
+  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve"><value>Effet 3D des figures géométriques perdu</value></data>
+  <data name="translation.oox2odf.shape.shadow" xml:space="preserve"><value>Effet d'ombrage des figures géométriques perdu</value></data>
+  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve"><value></value></data>
+  <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve"><value></value></data>
+  <data name="translation.oox2odf.background.textWatermark" xml:space="preserve"><value></value></data>
+  <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve"><value>Effet de bordure pointillée non retenu pour les boîtes de texte</value></data>
+  <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve"><value>Option de protection des tables des matières contre les modifications non retenue</value></data>
+  <data name="translation.oox2odf.frame.inHeader" xml:space="preserve"><value>Perte des cadres situés dans les en-têtes</value></data>
+  <data name="translation.oox2odf.frame.inFooter" xml:space="preserve"><value>Perte des cadres situés dans les pieds de page</value></data>
+  <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve"><value>Perte de la taille relative des cadres</value></data>
+  <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve"><value>Option de vérouillage du ratio des images non retenue</value></data>
+  <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve"><value></value></data>
+  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve"><value>Option de vérouillage de l'ancrage des images non retenue</value></data>
+  <data name="translation.oox2odf.picture.overlap" xml:space="preserve"><value>Option de recouvrement des images non retenue</value></data>
+  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve"><value>Lettrines en marge non retenues</value></data>
+  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve"><value>Option de numérotation par page non retenue</value></data>
 </root>

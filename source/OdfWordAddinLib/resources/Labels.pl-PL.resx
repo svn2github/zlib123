@@ -273,12 +273,31 @@
   <data name="translation.odf2oox.cellRotationAngle" xml:space="preserve"><value>Kąt obrotu dla komórki</value></data>
   <data name="translation.odf2oox.cellRotationAlignment" xml:space="preserve"><value>Wyrównanie obróconej komórki</value></data>
   <!-- TODO : translate this -->
+ 
   <!-- added 16/01 -->
-  <data name="translation.odf2oox.TableIllustrationCaptionFormat" xml:space="preserve"><value>Table of illustration caption format</value></data>
+  <data name="translation.odf2oox.tableIllustration.captionFormat" xml:space="preserve"><value>Format podpisu dla obrazów w Indeksie Obrazów nie jest zachowywany</value></data>
   <!-- added 17/01 -->
-  <data name="translation.odf2oox.lineThroughWidth" xml:space="preserve"><value>Line through width property lost</value></data>
-  <data name="translation.odf2oox.lineThroughColor" xml:space="preserve"><value>Line through color property lost</value></data>
+  <data name="translation.odf2oox.text.lineThrough.width" xml:space="preserve"><value>Grubość przekreślenia tekstu nie jest zachowywana</value></data>
+  <data name="translation.odf2oox.text.lineThrough.color" xml:space="preserve"><value>Kolor przekreślenia testu nie jest zachowywany</value></data>
  <!-- TODO : translation.oox2odf -->
+  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve"><value>Efekty 3D kształtów nie są zachowywane </value></data>
+  <data name="translation.oox2odf.shape.shadow" xml:space="preserve"><value>Przezroczyśtość cienia kształtów nie jest zachowywana</value></data>
+  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve"><value>Właściwości cienia kształtów nie są zachowywane</value></data>
+  <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve"><value>Perspektywa cienia kształtów nie jest zachowywana</value></data>
+  <data name="translation.oox2odf.background.textWatermark" xml:space="preserve"><value>Znak wodny nie jest zachowywany</value></data>
+  <data name="translation.oox2odf.textbox.boder.dashed" xml:space="preserve"><value>Przerywany styl obramowania ramek tekstowych nie jest zachowywany</value></data>
+  <data name="translation.oox2odf.toc.protection.manualChange" xml:space="preserve"><value>Zabezpieczenie spisu treści przed zmianami nie jest zachowywane</value></data>
+  <data name="translation.oox2odf.frame.inHeader" xml:space="preserve"><value>Pozycja ramki tekstowej w nagłówku nie jest zachowywana</value></data>
+  <data name="translation.oox2odf.frame.inFooter" xml:space="preserve"><value>Pozycja ramki tekstowej w stopce nie jest zachowywana</value></data>
+  <data name="translation.oox2odf.frame.relativeSize" xml:space="preserve"><value>Względny rozmiar ramki tekstowej nie jest zachowywany</value></data>
+  <data name="translation.oox2odf.picture.size.lockAspectRation" xml:space="preserve"><value>Zabezpieczenie proporcji kształtu obrazu nie jest zachowywane</value></data>
+  <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve"><value>Opcja skalowania obrazu w stosunku do oryginalnego rozmiaru nie jest zachowywana</value></data>
+  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve"><value>Blokada zakotwiczenia obrazu nie jest zachowywana</value></data>
+  <data name="translation.oox2odf.picture.overlap" xml:space="preserve"><value>Opcja nachodzenia na siebie obrazów nie jest zachowywana </value></data>
+  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve"><value>Opcja "W obrębie marginesu" dla inicjału nie jest zachowywana</value></data>
+  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve"><value>Wznowienie numerowania linii dla sekcji nie jest zachowywane</value></data>
+  
+  
   
   
 </root>
