@@ -1000,7 +1000,7 @@
                 <xsl:when test="$followingSectPr">
                   <xsl:choose>
                     <xsl:when
-                      test="$followingSectPr/w:titlePg or $followingSectPr/w:headerReference[@w:type='first']/@r:id != '' ">
+                      test="$followingSectPr/w:titlePg">
                       <xsl:attribute name="style:master-page-name">
                         <xsl:value-of select="concat('First_H_',generate-id($followingSectPr))"/>
                       </xsl:attribute>
