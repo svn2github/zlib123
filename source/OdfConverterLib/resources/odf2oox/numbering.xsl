@@ -1209,39 +1209,52 @@
         <xsl:value-of select="boolean(key('styles', $styleName))"/>
       </xsl:for-each>
     </xsl:variable>
+    <xsl:variable name="listStyle">
+      <xsl:choose>
+        <xsl:when test="$exists = 'true' ">
+          <xsl:for-each select="document($context)">
+            <xsl:choose>
+              <xsl:when test="key('styles',$styleName)/@style:list-style-name">
+                <xsl:value-of select="key('styles',$styleName)/@style:list-style-name"/>
+              </xsl:when>
+              <xsl:when test="$context ='content.xml' and ancestor::text:list/@text:style-name">
+                <xsl:value-of select="ancestor::text:list[@text:style-name][1]/@text:style-name"/>
+              </xsl:when>
+              <!-- if no style to climb and outline is defined, use outline-style -->
+              <xsl:when
+                test="not(key('styles', $styleName)[1]/@style:parent-style-name) and (number($defaultOutlineLevel) or $defaultOutlineLevel = 0)"
+                >outline-style</xsl:when>
+              <xsl:otherwise>
+                <!-- climb style hierarchy -->
+                <xsl:call-template name="GetListStyleName">
+                  <xsl:with-param name="styleName"
+                    select="key('styles', $styleName)[1]/@style:parent-style-name"/>
+                  <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
+                  <xsl:with-param name="context" select="$context"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="$context != 'styles.xml'">
+          <xsl:call-template name="GetListStyleName">
+            <xsl:with-param name="styleName" select="$styleName"/>
+            <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
+            <xsl:with-param name="context" select="'styles.xml'"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    <!-- if no style was found in hierarchy, look into parent lists -->
     <xsl:choose>
-      <xsl:when test="$exists = 'true' ">
-        <xsl:for-each select="document($context)">
-          <xsl:choose>
-            <xsl:when test="key('styles',$styleName)/@style:list-style-name">
-              <xsl:value-of select="key('styles',$styleName)/@style:list-style-name"/>
-            </xsl:when>
-            <xsl:when test="$context ='content.xml' and ancestor::text:list/@text:style-name">
-              <xsl:value-of select="ancestor::text:list[@text:style-name][1]/@text:style-name"/>
-            </xsl:when>
-            <!-- if no style to climb and outline is defined, use outline-style -->
-            <xsl:when
-              test="not(key('styles', $styleName)[1]/@style:parent-style-name) and (number($defaultOutlineLevel) or $defaultOutlineLevel = 0)"
-              >outline-style</xsl:when>
-            <xsl:otherwise>
-              <!-- climb style hierarchy -->
-              <xsl:call-template name="GetListStyleName">
-                <xsl:with-param name="styleName"
-                  select="key('styles', $styleName)[1]/@style:parent-style-name"/>
-                <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
-                <xsl:with-param name="context" select="$context"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
+      <xsl:when test="$listStyle != '' ">
+        <xsl:value-of select="$listStyle"/>
       </xsl:when>
-      <xsl:when test="$context != 'styles.xml'">
-        <xsl:call-template name="GetListStyleName">
-          <xsl:with-param name="styleName" select="$styleName"/>
-          <xsl:with-param name="defaultOutlineLevel" select="$defaultOutlineLevel"/>
-          <xsl:with-param name="context" select="'styles.xml'"/>
-        </xsl:call-template>
-      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if test="$context = 'content.xml' ">
+          <xsl:value-of select="ancestor::text:list[@text:style-name][1]/@text:style-name"/>
+        </xsl:if>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -1530,11 +1543,12 @@
               </xsl:otherwise>
             </xsl:choose>
             <w:numId>
-              <xsl:attribute name="w:val">  
+              <xsl:attribute name="w:val">
                 <xsl:choose>
                   <xsl:when test="self::text:list-item">
                     <xsl:call-template name="GetNumberingId">
-                      <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
+                      <xsl:with-param name="styleName"
+                        select="ancestor::text:list[@text:style-name][1]/@text:style-name"/>
                     </xsl:call-template>
                   </xsl:when>
                   <xsl:otherwise>
@@ -1559,9 +1573,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
-  
+
+
+
 
   <!-- insert numbering properties of header element -->
   <xsl:template name="InsertHeaderNumbering">
@@ -1613,7 +1627,7 @@
         <w:numPr>
           <w:ilvl w:val="{number(text:h/@text:outline-level) - 1}"/>
           <w:numId>
-            <xsl:attribute name="w:val">  
+            <xsl:attribute name="w:val">
               <xsl:call-template name="GetNumberingId">
                 <xsl:with-param name="styleName" select="ancestor::text:list/@text:style-name"/>
               </xsl:call-template>
