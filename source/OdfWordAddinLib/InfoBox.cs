@@ -84,51 +84,73 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
 
         private void InfoBox_Load(object sender, EventArgs e)
         {
+            try {
+                // Change the title
+                string newTitle = manager.GetString("OdfConverterTitle");
+                if (!string.IsNullOrEmpty(newTitle)) {
+                    Text = newTitle;
+                }
+                // Store the offsets of buttons and groupbox
+                Size proposedSize = new Size(label.Width, 2000); // No vertical constraint
+                Size newSize = label.GetPreferredSize(proposedSize);
+                int newHeight = newSize.Height;
+                int offset = newHeight - label.Height;
 
-            // Change the title
-            string newTitle = manager.GetString("OdfConverterTitle");
-            if (!string.IsNullOrEmpty(newTitle))
-            {
-                Text = newTitle;
+                // Redim/move windows and controls
+                label.Height = newHeight;
+                smallSize.Height += offset;
+                OK.Top += offset;
+                Details.Top += offset;
+
+                // Test if everything fits
+                int offsetRight = 0;
+                int offsetBottom = 0;
+                int leftMargin = label.Left;
+                if (Details.Left < OK.Right) {
+                    offsetRight = (OK.Right + leftMargin - Details.Left);
+                    Details.Left += offsetRight;
+                    grpDetails.Width += offsetRight;
+                }
+                if (Details.Right + leftMargin > smallSize.Width) {
+                    offsetRight += Details.Right + leftMargin - smallSize.Width;
+                    this.Width += offsetRight;
+                    smallSize.Width += offsetRight;
+                }
+                if (Details.Bottom + leftMargin > smallSize.Height) {
+                    offsetBottom = Details.Bottom + leftMargin - smallSize.Height;
+                    this.Height += offsetBottom;
+                    smallSize.Height += offsetBottom;
+                }
+
+                grpDetails.Top += offset + offsetBottom;
+
+                // Now compute the size needed for details text box and form with details are shown
+                int marginBottom = ClientSize.Height - grpDetails.Bottom;
+
+                label1.Text = txtDetails.Text + "_";
+                proposedSize = new Size(label1.Width, 2000);
+                newSize = label1.GetPreferredSize(proposedSize);
+                newHeight = newSize.Height;
+                if (newHeight > txtDetails.Height) {
+                    // Will add scrollbars
+                    txtDetails.ScrollBars = ScrollBars.Vertical;
+                } else {
+                    // No scrollbar needed
+                    int offset2 = newHeight - txtDetails.Height;
+                    txtDetails.Height = newHeight;
+                    txtDetails.ScrollBars = ScrollBars.None;
+                    grpDetails.Height += offset2;
+                }
+                largeSize = smallSize;
+                largeSize.Height = grpDetails.Bottom + marginBottom + offset;
+                // At loadtime : no details
+                this.showDetails = false;
+                this.ClientSize = smallSize;
+                txtDetails.Visible = showDetails;
+                grpDetails.Visible = showDetails;
+            } catch {
+                // No message no crash
             }
-            // Store the offsets of buttons and groupbox
-            Size proposedSize = new Size(label.Width, 2000); // No vertical constraint
-            Size newSize = label.GetPreferredSize(proposedSize);
-            int newHeight = newSize.Height;
-            int offset = newHeight - label.Height;
-
-            // Redim/move windows and controls
-            label.Height = newHeight;
-            smallSize.Height += offset;
-            OK.Top += offset;
-            Details.Top += offset;
-            grpDetails.Top += offset;
-
-            // Now compute the size needed for details text box and form with details are shown
-            int marginBottom = ClientSize.Height - grpDetails.Bottom;
-
-            label1.Text = txtDetails.Text + "_";
-            proposedSize = new Size(label1.Width, 2000);
-            newSize = label1.GetPreferredSize(proposedSize);
-            newHeight = newSize.Height;
-            if (newHeight > txtDetails.Height) {
-                // Will add scrollbars
-                txtDetails.ScrollBars = ScrollBars.Vertical;
-            } else {
-                // No scrollbar needed
-                int offset2 = newHeight - txtDetails.Height;
-                txtDetails.Height = newHeight;
-                txtDetails.ScrollBars = ScrollBars.None;
-                grpDetails.Height += offset2;
-            }
-            largeSize = smallSize;
-            largeSize.Height = grpDetails.Bottom + marginBottom + offset;
-            // At loadtime : no details
-            this.showDetails = false;
-            this.ClientSize = smallSize;
-            txtDetails.Visible = showDetails;
-            grpDetails.Visible = showDetails;
-
         }
 
         private void Details_Click(object sender, EventArgs e)
