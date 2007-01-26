@@ -258,11 +258,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     feedbackMessageIntercepted(this, new OdfEventArgs(e.Message));
                 }
             }
-            else if (e.Message.StartsWith("feedback:"))
+            else if (e.Message.StartsWith("translation.oox2odf."))
             {
                 if (feedbackMessageIntercepted != null)
                 {
-                    feedbackMessageIntercepted(this, new OdfEventArgs(e.Message.Substring("feedback:".Length)));
+                    feedbackMessageIntercepted(this, new OdfEventArgs(e.Message));
                 }
             }
         }
