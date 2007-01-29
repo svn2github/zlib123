@@ -7,7 +7,10 @@ SUBDIRS= \
 	source/OdfZipUtils \
 	source/OdfConverterLib \
 	source/OdfConverterTest
-DISTFILES=build/common.mk
+DISTFILES= \
+	build/common.mk \
+	source/AdditionalTools/zlib123/zconf.h \
+	source/AdditionalTools/zlib123/zlib.h
 
 include $(top_srcdir)/build/common.mk
 
