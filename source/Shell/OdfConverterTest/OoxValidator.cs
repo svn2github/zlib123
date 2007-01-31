@@ -86,7 +86,8 @@ namespace CleverAge.OdfConverter.CommandLineTool
             this.report = report;
 			
 			// resolver
-			ResourceResolver resolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCES_LOCATION);
+			EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetExecutingAssembly(), 
+                this.GetType().Namespace + "." + RESOURCES_LOCATION, true);
 			this.settings.XmlResolver = resolver;			
 			
 			// schemas

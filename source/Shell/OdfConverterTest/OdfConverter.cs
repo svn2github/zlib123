@@ -35,6 +35,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using CleverAge.OdfConverter.OdfZipUtils;
 using CleverAge.OdfConverter.OdfConverterLib;
+using CleverAge.OdfConverter.Word;
 
 namespace CleverAge.OdfConverter.CommandLineTool
 {
@@ -100,7 +101,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
     /// 
     /// Execute the command without argument to see the options.
     /// </summary>
-    public class OdfConverterTest
+    public class OdfConverter
     {
         private string input = null;                     // input path
         private string output = null;                    // output path
@@ -155,7 +156,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
         /// <param name="args">Command Line arguments</param>
         public static void Main(String[] args)
         {
-            OdfConverterTest tester = new OdfConverterTest();
+            OdfConverter tester = new OdfConverter();
             ControlHandlerFonction myHandler = new ControlHandlerFonction(tester.MyHandler);
             SetConsoleCtrlHandler(myHandler, true);
             try
@@ -181,7 +182,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
         }
 
-        private OdfConverterTest()
+        private OdfConverter()
         {
             this.skipedPostProcessors = new ArrayList();
         }
@@ -341,7 +342,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             try
             {
                 DateTime start = DateTime.Now;
-                Converter converter = new Converter();
+                AbstractConverter converter = new Converter();
                 converter.ExternalResources = this.xslPath;
                 converter.SkipedPostProcessors = this.skipedPostProcessors;
                 converter.DirectTransform = transformDirection == Direction.OdtToDocx;

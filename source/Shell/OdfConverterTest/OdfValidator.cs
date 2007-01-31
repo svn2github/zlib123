@@ -84,10 +84,10 @@ namespace CleverAge.OdfConverter.CommandLineTool
 		/// </summary>
 		public OdfValidator(Report report)
 		{
-            ResourceResolver resolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCES_LOCATION);
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.ValidationType = ValidationType.None;
-            settings.XmlResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCES_LOCATION);
+            settings.XmlResolver = new EmbeddedResourceResolver(Assembly.GetExecutingAssembly(), 
+                this.GetType().Namespace + "." + RESOURCES_LOCATION, false);
             this.grammarName = XmlReader.Create(ODF_SCHEMA, settings);
             this.report = report;
             try
