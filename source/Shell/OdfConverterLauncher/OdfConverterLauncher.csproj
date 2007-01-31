@@ -61,11 +61,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OdfConverterLib\OdfConverterLib.csproj">
+    <ProjectReference Include="..\..\Common\OdfConverterLib\OdfConverterLib.csproj">
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OdfWordAddinLib\OdfWordAddinLib.csproj">
+    <ProjectReference Include="..\..\Word\OdfWordAddinLib\OdfWordAddinLib.csproj">
       <Project>{0313EE78-AD27-47E0-9902-3149046E2F5D}</Project>
       <Name>OdfWordAddinLib</Name>
     </ProjectReference>

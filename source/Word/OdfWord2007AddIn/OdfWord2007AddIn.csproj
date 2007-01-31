@@ -66,7 +66,7 @@
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
-    <ProjectReference Include="..\OdfConverterLib\OdfConverterLib.csproj">
+    <ProjectReference Include="..\..\Common\OdfConverterLib\OdfConverterLib.csproj">
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
     </ProjectReference>

@@ -20,7 +20,7 @@ main
 sub main()
     Dim WshShell
     Set WshShell = WScript.CreateObject("WScript.Shell")
-    WScript.Echo WshShell.CurrentDirectory
+    'WScript.Echo WshShell.CurrentDirectory
 
     dim databasePath
     dim dllPath
@@ -32,8 +32,8 @@ sub main()
 	databasePath = WScript.Arguments(0)
     	dllPath = WScript.Arguments(1)
 	
-	WScript.Echo "Target MSI : " + databasePath
-	WScript.Echo "Source DLL : " + dllPath
+	'WScript.Echo "Target MSI : " + databasePath
+	'WScript.Echo "Source DLL : " + dllPath
 
     dim installer
     set installer = Wscript.CreateObject("WindowsInstaller.Installer")
@@ -49,8 +49,8 @@ sub main()
     AjouterAction installer, database, "OdfInstallHelper", "", "DetectPreviousConverters", 301
     AjouterAction installer, database, "OdfInstallHelper", "", "GetWordVersion", 302
     AjouterAction installer, database, "OdfInstallHelper", "", "LaunchReadme", 1400
-    
-    WScript.Echo "Custom actions installed"
+
+    'WScript.Echo "Custom actions installed"
 end sub
 
 
