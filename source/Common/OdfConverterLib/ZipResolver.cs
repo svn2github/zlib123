@@ -113,15 +113,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 				return stream;
 				
 			} 
-			
-			catch (Exception) {
-				return new ResourceResolver(Assembly.GetExecutingAssembly(), 
-				                            this.GetType().Namespace +
-				                            ".resources.odf2oox").GetInnerStream("source.xml");
+			catch (Exception) 
+			{
+				return EmbeddedResourceResolver.GetSharedResource("source.xml");
 			}
 		}
-		
-		private const string PROLOG = "<?xml version='1.0' encoding='UTF-8'?><dummy/>";
 		
 		
 	}

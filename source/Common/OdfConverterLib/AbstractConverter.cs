@@ -41,40 +41,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     /// <summary>
     /// Core conversion methods 
     /// </summary>
-    public class Converter
+    public abstract class AbstractConverter
     {
-        private const string RESOURCE_LOCATION = "resources";
-        private const string ODFToOOX_LOCATION = "odf2oox";
-        private const string ODFToOOX_XSL = "odf2oox.xsl";
         private const string ODFToOOX_COMPUTE_SIZE_XSL = "odf2oox-compute-size.xsl";
-        private const string OOXToODF_LOCATION = "oox2odf";
-        private const string OOXToODF_XSL = "oox2odf.xsl";
         private const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
-        private const string SOURCE_XML = "source.xml";
-        private const string ODF_MIME_TYPE = "application/vnd.oasis.opendocument.text";
-
-        private string[] OOX_POST_PROCESSORS = 
-        {
-            "OoxChangeTrackingPostProcessor",
-            "OoxSpacesPostProcessor",
-        	"OoxSectionsPostProcessor", 
-        	"OoxAutomaticStylesPostProcessor",
-        	"OoxParagraphsPostProcessor",
-        	"OoxCharactersPostProcessor" 
-        };
-
-        private string[] ODF_POST_PROCESSORS = {
-			"OdfParagraphPostProcessor",
-			"OdfCheckIfIndexPostProcessor",
-        	"OdfCharactersPostProcessor"
- 		};
-
+      
         private bool isDirectTransform = true;
         private ArrayList skipedPostProcessors = null;
         private string externalResource = null;
         private bool packaging = true;
-
-        public Converter()
+        
+        protected AbstractConverter()
         {
             this.skipedPostProcessors = new ArrayList();
         }
@@ -82,6 +59,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         public bool DirectTransform
         {
             set { this.isDirectTransform = value; }
+            get { return this.isDirectTransform; }
         }
 
         public ArrayList SkipedPostProcessors
@@ -92,11 +70,60 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         public string ExternalResources
         {
             set { this.externalResource = value; }
+            get { return this.externalResource; }
         }
 
         public bool Packaging
         {
             set { this.packaging = value; }
+        }
+
+        /// <summary>
+        /// Specify a chain of post processors to be hooked to the xslt output for the direct conversion
+        /// </summary>
+        protected abstract string[] DirectPostProcessorsChain
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Specify a chain of post processors to be hooked to the xslt output for the reverse conversion
+        /// </summary>
+        protected abstract string[] ReversePostProcessorsChain
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Specify how to resolve the xsl documents uri's
+        /// </summary>
+        protected abstract XmlUrlResolver ResourceResolver
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Get the input xml document to the xsl transformation
+        /// </summary>
+        protected abstract XmlReader Source
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Get the input xsl document to the xsl transformation
+        /// </summary>
+        protected abstract XPathDocument XslDoc
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Get the xslt settings
+        /// </summary>
+        protected abstract XsltSettings XsltProcSettings
+        {
+            get;
         }
 
         public delegate void MessageListener(object sender, EventArgs e);
@@ -120,10 +147,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
         /// <summary>
-        /// bug #1644285 Unexpected error on non-ascii file name
-        /// Zlib crashes on non-ascii file names.
+        /// bug #1644285 Zlib crashes on non-ascii file names.
         /// </summary>
-        public void Transform(string inputFile, string outputFile)
+        public void _Transform(string inputFile, string outputFile)
         {
             // Get the \Temp path
             string tempInputFile = Path.GetTempPath().ToString() + "odf-converter.input";
@@ -132,7 +158,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             try
             {
                 File.Copy(inputFile, tempInputFile, true);
-
                 _Transform(tempInputFile, tempOutputFile);
 
                 if (outputFile != null)
@@ -142,7 +167,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                         File.Delete(outputFile);
                     }
                     File.Move(tempOutputFile, outputFile);
-                    // File.Replace(outputFile, tempOutputFile, null);
                 }
             }
             finally
@@ -154,61 +178,30 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void _Transform(string inputFile, string outputFile)
+        public void Transform(string inputFile, string outputFile)
         {
             // this throws an exception in the the following cases:
             // - input file is not a valid file
             // - input file is an encrypted file
             CheckFile(inputFile);
 
-            XmlUrlResolver resourceResolver;
-            XPathDocument xslDoc;
-            XmlReaderSettings xrs = new XmlReaderSettings();
             XmlReader source = null;
             XmlWriter writer = null;
             ZipResolver zipResolver = null;
-
+           
             try
             {
-
-                // do not look for DTD
-                xrs.ProhibitDtd = true;
-                string resourcesLocation = ODFToOOX_LOCATION;
-                string xslLocation = ODFToOOX_XSL;
-                if (!this.isDirectTransform)
-                {
-                    resourcesLocation = OOXToODF_LOCATION;
-                    xslLocation = OOXToODF_XSL;
-                }
-
-                if (this.externalResource == null)
-                {
-
-                    resourceResolver = new ResourceResolver(Assembly.GetExecutingAssembly(), this.GetType().Namespace + "." + RESOURCE_LOCATION + "." + resourcesLocation);
-                    xslDoc = new XPathDocument(((ResourceResolver)resourceResolver).GetInnerStream(xslLocation));
-                    xrs.XmlResolver = resourceResolver;
-                    source = XmlReader.Create(SOURCE_XML, xrs);
-
-                }
-                else
-                {
-                    resourceResolver = new XmlUrlResolver();
-                    xslDoc = new XPathDocument(this.externalResource + "/" + xslLocation);
-                    source = XmlReader.Create(this.externalResource + "/" + SOURCE_XML, xrs);
-                }
-
                 // create a xsl transformer
                 XslCompiledTransform xslt = new XslCompiledTransform();
-                // Enable xslt 'document()' function
-                XsltSettings settings = new XsltSettings(true, false);
-                // compile the stylesheet
-                xslt.Load(xslDoc, settings, resourceResolver);
-
+                
+                // compile the stylesheet. 
+                // Input stylesheet, xslt settings and uri resolver are retrieve from the implementation class.
+                xslt.Load(this.XslDoc, this.XsltProcSettings, this.ResourceResolver);
 
                 zipResolver = new ZipResolver(inputFile);
                 XsltArgumentList parameters = new XsltArgumentList();
-
                 parameters.XsltMessageEncountered += new XsltMessageEncounteredEventHandler(MessageCallBack);
+                
                 if (outputFile != null)
                 {
                     parameters.AddParam("outputFile", "", outputFile);
@@ -227,7 +220,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     writer = new XmlTextWriter(new StringWriter());
                 }
-
+                source = this.Source;
                 // Apply the transformation
                 xslt.Transform(source, parameters, writer, zipResolver);
             }
@@ -279,60 +272,32 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        private void CheckOdfFile(string fileName)
-        {
-            // Test for encryption
-            XmlDocument doc;
-            try
-            {
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.XmlResolver = new ZipResolver(fileName);
-                settings.ProhibitDtd = false;
-                doc = new XmlDocument();
-                XmlReader reader = XmlReader.Create("META-INF/manifest.xml", settings);
-                doc.Load(reader);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                throw new NotAnOdfDocumentException(e.Message);
-            }
+        /// <summary>
+        /// Test if the input file is an ODF document.
+        /// Throw NotAndOdfDocumentException and/or EncryptedDocumentException
+        /// </summary>
+        /// <param name="fileName">input file name</param>
+        protected abstract void CheckOdfFile(string fileName);
 
-            XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
-            if (nodes.Count > 0)
-            {
-                throw new EncryptedDocumentException(fileName + " is an encrypted document");
-            }
+        /// <summary>
+        /// Test if the input file is an OOX document
+        /// Throw NotAndOoxDocumentException 
+        /// </summary>
+        /// <param name="fileName"></param>
+        protected abstract void CheckOoxFile(string fileName);
 
-            // Check the document mime-type.
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
-            nsmgr.AddNamespace("manifest", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
-
-            XmlNode node = doc.SelectSingleNode("/manifest:manifest/manifest:file-entry[@manifest:media-type='"
-                                                + ODF_MIME_TYPE + "']", nsmgr);
-            if (node == null)
-            {
-                throw new NotAnOdfDocumentException("Could not convert " + fileName
-                                                    + ". Invalid OASIS OpenDocument file");
-            }
-        }
-
-        private void CheckOoxFile(string fileName)
-        {
-            // TODO: implement
-        }
 
         private XmlWriter GetWriter(XmlWriter writer)
         {
-            string[] postProcessors = OOX_POST_PROCESSORS;
+            string [] postProcessors = this.DirectPostProcessorsChain;
             if (!this.isDirectTransform)
             {
-                postProcessors = ODF_POST_PROCESSORS;
+                postProcessors = this.ReversePostProcessorsChain;
             }
             return InstanciatePostProcessors(postProcessors, writer);
         }
 
-        private XmlWriter InstanciatePostProcessors(string[] procNames, XmlWriter lastProcessor)
+        private XmlWriter InstanciatePostProcessors(string [] procNames, XmlWriter lastProcessor)
         {
             XmlWriter currentProc = lastProcessor;
             for (int i = procNames.Length - 1; i >= 0; --i)
