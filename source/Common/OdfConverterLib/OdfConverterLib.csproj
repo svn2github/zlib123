@@ -63,10 +63,7 @@
     <EmbeddedResource Include="resources\source.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="resources\odf2oox\common.xsl" />
-    <EmbeddedResource Include="resources\odf2oox\tables.xsl" />
-  </ItemGroup>
-  <ItemGroup>
+    <Folder Include="resources\odf2oox\" />
     <Folder Include="resources\oox2odf\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
