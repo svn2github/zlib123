@@ -67,7 +67,26 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="resources\oox2odf\" />
+    <EmbeddedResource Include="resources\oox2odf\comments.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\common.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\content.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\fields.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\fonts.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\footnotes.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\frames.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\indexes.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\lists.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\meta.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\pictures.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\sections.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\source.xml" />
+    <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\tables.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\track.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
