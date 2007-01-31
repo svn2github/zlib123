@@ -37,6 +37,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Threading;
 using CleverAge.OdfConverter.OdfConverterLib;
+using CleverAge.OdfConverter.Word;
 using System.Resources;
 using System.Collections;
 
@@ -105,7 +106,7 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
         private void DoConvert()
         {
             try {
-                Converter converter = new Converter();
+                AbstractConverter converter = new Converter();
                 converter.AddProgressMessageListener(new Converter.MessageListener(ProgressMessageInterceptor));
                 converter.AddFeedbackMessageListener(new Converter.MessageListener(FeedbackMessageInterceptor));
                 converter.DirectTransform = this.isDirect;

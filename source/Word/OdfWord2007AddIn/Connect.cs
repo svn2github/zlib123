@@ -326,7 +326,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                         {
                             File.Delete((string)newName);
                         }
-                        catch (IOException e)
+                        catch (IOException)
                         {
                             // bug #1610099
                             // deletion failed : file currently used by another application.

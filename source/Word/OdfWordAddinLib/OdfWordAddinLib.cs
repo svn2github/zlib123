@@ -33,6 +33,7 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 using CleverAge.OdfConverter.OdfConverterLib;
+using CleverAge.OdfConverter.Word;
 
 namespace CleverAge.OdfConverter.OdfWordAddinLib
 {
@@ -124,7 +125,7 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
             {
                 try
                 {
-                    Converter conv = new Converter();
+                    AbstractConverter conv = new Converter();
                     conv.DirectTransform = true;
                     conv.Transform(inputFile, outputFile);
                 }
