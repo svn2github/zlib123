@@ -149,7 +149,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// <summary>
         /// bug #1644285 Zlib crashes on non-ascii file names.
         /// </summary>
-        public void _Transform(string inputFile, string outputFile)
+        public void Transform(string inputFile, string outputFile)
         {
             // Get the \Temp path
             string tempInputFile = Path.GetTempPath().ToString() + "odf-converter.input";
@@ -173,12 +173,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 if (File.Exists(tempInputFile))
                 {
-                    File.Delete(tempInputFile);
+                    try
+                    {
+                        File.Delete(tempInputFile);
+                    }
+                    catch (IOException)
+                    {
+                        Debug.Write("could not delete temporary input file");
+                    }
                 }
             }
         }
 
-        public void Transform(string inputFile, string outputFile)
+        private void _Transform(string inputFile, string outputFile)
         {
             // this throws an exception in the the following cases:
             // - input file is not a valid file
