@@ -83,7 +83,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert a measure in points to a 'unit' measure -->
+  <!-- Convert a measure in points to a specified unit -->
   <xsl:template name="ConvertPoints">
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
@@ -131,7 +131,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert a measure in half points to a 'unit' measure -->
+  <!-- Convert a measure in half points to a specified unit -->
   <xsl:template name="ConvertHalfPoints">
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
@@ -169,7 +169,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert a measure in eigths of a point to a 'unit' measure -->
+  <!-- Convert a measure in eigths of a point to a specified unit -->
   <xsl:template name="ConvertEighthsPoints">
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
@@ -207,7 +207,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--  converts emu to given unit-->
+  <!--  Convert emu to a specified unit (2 decimals) -->
   <xsl:template name="ConvertEmu">
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
@@ -222,6 +222,7 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Convert emu to a specified unit (3 decimals) -->
   <xsl:template name="ConvertEmu3">
     <xsl:param name="length"/>
     <xsl:param name="unit"/>
@@ -236,6 +237,7 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Extract scalar from length -->
   <xsl:template name="GetValue">
     <xsl:param name="length"/>
     <xsl:choose>
@@ -269,6 +271,7 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Convert length from specified unit to a speficied target unit -->
   <xsl:template name="ConvertMeasure">
     <xsl:param name="length"/>
     <xsl:param name="sourceUnit"/>
@@ -298,7 +301,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--  converts from given measure - for usage when unit type is not given in string-->
+  <!--  Convert from given measure - for usage when unit type is not given in string-->
   <xsl:template name="ConvertFromMeasure">
     <xsl:param name="length"/>
     <xsl:param name="destUnit"/>
@@ -337,7 +340,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--  converts to given measure - for usage when unit type is given in string-->
+  <!--  Convert to given measure - for usage when unit type is given in string-->
   <xsl:template name="ConvertToMeasure">
     <xsl:param name="length"/>
     <xsl:param name="destUnit"/>
@@ -353,7 +356,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- converts given unit to cm -->
+  <!-- Convert given unit to cm -->
   <xsl:template name="ConvertToCentimeters">
     <xsl:param name="length"/>
     <xsl:param name="round">false</xsl:param>
@@ -415,8 +418,7 @@
   </xsl:template>
 
   
-
-  <!--  hex to decimal -->
+  <!-- Convert hex to decimal -->
   <xsl:template name="HexToDec">
     <xsl:param name="number"/>
     <xsl:param name="step" select="0"/>
