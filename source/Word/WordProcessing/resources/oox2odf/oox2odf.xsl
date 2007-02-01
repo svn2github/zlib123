@@ -32,6 +32,7 @@
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
   exclude-result-prefixes="oox rels">
 
+  <xsl:import href="measures.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="content.xsl"/>
   <xsl:import href="pictures.xsl"/>

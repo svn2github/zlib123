@@ -33,6 +33,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   exclude-result-prefixes="odf style text number">
 
+  <xsl:import href="measures.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="docprops.xsl"/>
   <xsl:import href="document.xsl"/>
