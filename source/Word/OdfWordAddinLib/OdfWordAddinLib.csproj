@@ -116,9 +116,9 @@
       <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
       <Name>OdfZipUtils</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WordProcessing\WordProcessing.csproj">
+    <ProjectReference Include="..\Converter\Converter.csproj">
       <Project>{F9071930-348E-4A30-A0F6-A1A3DF3A587B}</Project>
-      <Name>WordProcessing</Name>
+      <Name>Converter %28Word\Converter%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

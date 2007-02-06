@@ -321,9 +321,9 @@
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Word\WordProcessing\WordProcessing.csproj">
+    <ProjectReference Include="..\..\Word\Converter\Converter.csproj">
       <Project>{F9071930-348E-4A30-A0F6-A1A3DF3A587B}</Project>
-      <Name>WordProcessing</Name>
+      <Name>Converter %28Word\Converter%29</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
