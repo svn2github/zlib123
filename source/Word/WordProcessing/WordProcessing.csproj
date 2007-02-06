@@ -35,6 +35,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converter.cs" />
+    <Compile Include="OdfCheckIfIndexPostProcessor.cs" />
+    <Compile Include="OdfParagraphPostProcessor.cs" />
+    <Compile Include="OoxAutomaticStylesPostProcessor.cs" />
+    <Compile Include="OoxChangeTrackingPostProcessor.cs" />
+    <Compile Include="OoxParagraphsPostProcessor.cs" />
+    <Compile Include="OoxSectionsPostProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="resources\odf2oox\bookmarks.xsl" />
     <EmbeddedResource Include="resources\odf2oox\change-tracking.xsl" />

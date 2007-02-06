@@ -88,7 +88,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		
 		public override object GetEntity(Uri absoluteUri, string role, Type ofObjectToReturn)
 		{
-			// Console.WriteLine("GetEntity: absoluteUri="+absoluteUri);
             if (ASSEMBLY_URI_SCHEME.Equals(absoluteUri.Scheme))
             {
                 string resource = absoluteUri.OriginalString.Remove(0, ASSEMBLY_URI_SCHEME.Length + ASSEMBLY_URI_HOST.Length + 4).Replace("/", ".");

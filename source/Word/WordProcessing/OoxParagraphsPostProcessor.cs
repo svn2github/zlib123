@@ -30,8 +30,9 @@ using System;
 using System.Text;
 using System.Xml;
 using System.Collections;
+using CleverAge.OdfConverter.OdfConverterLib;
 
-namespace CleverAge.OdfConverter.OdfConverterLib
+namespace CleverAge.OdfConverter.Word
 {
 
     /// <summary>

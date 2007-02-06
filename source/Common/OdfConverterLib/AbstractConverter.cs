@@ -43,6 +43,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     /// </summary>
     public abstract class AbstractConverter
     {
+        private const string ODFToOOX_LOCATION = "odf2oox";
+        private const string OOXToODF_LOCATION = "oox2odf";
+        private const string ODFToOOX_XSL = "odf2oox.xsl";
+        private const string OOXToODF_XSL = "oox2odf.xsl";
+        private const string SOURCE_XML = "source.xml";
         private const string ODFToOOX_COMPUTE_SIZE_XSL = "odf2oox-compute-size.xsl";
         private const string OOXToODF_COMPUTE_SIZE_XSL = "oox2odf-compute-size.xsl";
       
@@ -50,9 +55,13 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private ArrayList skipedPostProcessors = null;
         private string externalResource = null;
         private bool packaging = true;
+        private EmbeddedResourceResolver _resolver;
+        private Assembly resourcesAssembly;
+
         
-        protected AbstractConverter()
+        protected AbstractConverter(Assembly resourcesAssembly)
         {
+            this.resourcesAssembly = resourcesAssembly;
             this.skipedPostProcessors = new ArrayList();
         }
 
@@ -79,67 +88,117 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         }
 
         /// <summary>
-        /// Specify a chain of post processors to be hooked to the xslt output for the direct conversion
+        /// Pull the chain of post processors for the direct conversion
         /// </summary>
-        protected abstract string[] DirectPostProcessorsChain
+        protected virtual string [] DirectPostProcessorsChain
         {
-            get;
+            get { return null; }
         }
 
         /// <summary>
-        /// Specify a chain of post processors to be hooked to the xslt output for the reverse conversion
+        /// Pull the chain of post processors for the reverse conversion
         /// </summary>
-        protected abstract string[] ReversePostProcessorsChain
+        protected virtual string [] ReversePostProcessorsChain
         {
-            get;
+            get { return null; }
         }
 
         /// <summary>
-        /// Specify how to resolve the xsl documents uri's
+        /// Pull an XmlUrlResolver for embedded resources
         /// </summary>
-        protected abstract XmlUrlResolver ResourceResolver
+        protected virtual XmlUrlResolver ResourceResolver
         {
-            get;
+            get
+            {
+                if (this.ExternalResources == null)
+                {
+                    if (this._resolver == null)
+                    {
+                        string resourcesLocation = this.DirectTransform ? ODFToOOX_LOCATION : OOXToODF_LOCATION;
+                        this._resolver = new EmbeddedResourceResolver(this.resourcesAssembly,
+                            this.GetType().Namespace + ".resources." + resourcesLocation,
+                            this.DirectTransform);
+                    }
+                    return this._resolver;
+                }
+                else
+                {
+                    return new SharedXmlUrlResolver(this.DirectTransform);
+                }
+            }
         }
 
         /// <summary>
-        /// Get the input xml document to the xsl transformation
+        /// Pull the input xml document to the xsl transformation
         /// </summary>
-        protected abstract XmlReader Source
+        protected virtual XmlReader Source
         {
-            get;
+            get
+            {
+                XmlReaderSettings xrs = new XmlReaderSettings();
+                // do not look for DTD
+                xrs.ProhibitDtd = true;
+                if (this.ExternalResources == null)
+                {
+                    xrs.XmlResolver = this.ResourceResolver;
+                    return XmlReader.Create(SOURCE_XML, xrs);
+                }
+                else
+                {
+                    return XmlReader.Create(this.ExternalResources + "/" + SOURCE_XML, xrs);
+                }
+            }
         }
 
         /// <summary>
-        /// Get the input xsl document to the xsl transformation
+        /// Pull the input xsl document to the xsl transformation
         /// </summary>
-        protected abstract XPathDocument XslDoc
+        protected virtual XPathDocument GetXslDoc(bool computeSize)
         {
-            get;
+                string xslLocation = this.DirectTransform ? ODFToOOX_XSL : OOXToODF_XSL;
+                if (this.ExternalResources == null)
+                {
+                    if (computeSize) 
+                    {
+                        xslLocation = this.DirectTransform ? ODFToOOX_COMPUTE_SIZE_XSL : OOXToODF_COMPUTE_SIZE_XSL;
+                    }
+                    return new XPathDocument(((EmbeddedResourceResolver)
+                        this.ResourceResolver).GetInnerStream(xslLocation));
+                }
+                else
+                {
+                    return new XPathDocument(this.ExternalResources + "/" + xslLocation);
+                }
         }
 
         /// <summary>
-        /// Get the xslt settings
+        /// Pull the xslt settings
         /// </summary>
-        protected abstract XsltSettings XsltProcSettings
+        protected virtual XsltSettings XsltProcSettings
         {
-            get;
+            get
+            {
+                // Enable xslt 'document()' function
+                return new XsltSettings(true, false);
+            }
         }
 
-        public delegate void MessageListener(object sender, EventArgs e);
+        /// <summary>
+        /// Test if the input file is an ODF document.
+        /// Throw NotAndOdfDocumentException and/or EncryptedDocumentException
+        /// </summary>
+        /// <param name="fileName">input file name</param>
+        protected virtual void CheckOdfFile(string fileName) { }
 
-        private event MessageListener progressMessageIntercepted;
-        private event MessageListener feedbackMessageIntercepted;
+        /// <summary>
+        /// Test if the input file is an OOX document
+        /// Throw NotAndOoxDocumentException 
+        /// </summary>
+        /// <param name="fileName"></param>
+        protected virtual void CheckOoxFile(string fileName) { }
 
-        public void AddProgressMessageListener(MessageListener listener)
-        {
-            progressMessageIntercepted += listener;
-        }
 
-        public void AddFeedbackMessageListener(MessageListener listener)
-        {
-            feedbackMessageIntercepted += listener;
-        }
+
 
         public void ComputeSize(string inputFile)
         {
@@ -148,13 +207,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         /// <summary>
         /// bug #1644285 Zlib crashes on non-ascii file names.
+        /// TODO : temp folders
         /// </summary>
         public void Transform(string inputFile, string outputFile)
         {
-            // Get the \Temp path
-            string tempInputFile = Path.GetTempPath().ToString() + "odf-converter.input";
-            string tempOutputFile = outputFile == null ? null : Path.GetTempPath().ToString() + "odf-converter.output";
-
+            string tempInputFile = Path.GetTempFileName();
+            string tempOutputFile = outputFile == null ? null : Path.GetTempFileName();
             try
             {
                 File.Copy(inputFile, tempInputFile, true);
@@ -200,10 +258,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 // create a xsl transformer
                 XslCompiledTransform xslt = new XslCompiledTransform();
-                
+
                 // compile the stylesheet. 
                 // Input stylesheet, xslt settings and uri resolver are retrieve from the implementation class.
-                xslt.Load(this.XslDoc, this.XsltProcSettings, this.ResourceResolver);
+                xslt.Load(this.GetXslDoc(outputFile==null), this.XsltProcSettings, this.ResourceResolver);
 
                 zipResolver = new ZipResolver(inputFile);
                 XsltArgumentList parameters = new XsltArgumentList();
@@ -279,20 +337,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        /// <summary>
-        /// Test if the input file is an ODF document.
-        /// Throw NotAndOdfDocumentException and/or EncryptedDocumentException
-        /// </summary>
-        /// <param name="fileName">input file name</param>
-        protected abstract void CheckOdfFile(string fileName);
-
-        /// <summary>
-        /// Test if the input file is an OOX document
-        /// Throw NotAndOoxDocumentException 
-        /// </summary>
-        /// <param name="fileName"></param>
-        protected abstract void CheckOoxFile(string fileName);
-
+  
 
         private XmlWriter GetWriter(XmlWriter writer)
         {
@@ -304,20 +349,51 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return InstanciatePostProcessors(postProcessors, writer);
         }
 
+
         private XmlWriter InstanciatePostProcessors(string [] procNames, XmlWriter lastProcessor)
         {
             XmlWriter currentProc = lastProcessor;
-            for (int i = procNames.Length - 1; i >= 0; --i)
+            if (procNames != null)
             {
-                if (!this.skipedPostProcessors.Contains(procNames[i]))
+                for (int i = procNames.Length - 1; i >= 0; --i)
                 {
-                    Type type = Type.GetType("CleverAge.OdfConverter.OdfConverterLib." + procNames[i]);
-                    object[] parameters = { currentProc };
-                    XmlWriter newProc = (XmlWriter)Activator.CreateInstance(type, parameters);
-                    currentProc = newProc;
+                    if (!Contains(procNames[i], this.skipedPostProcessors))
+                    {
+                        Type type = Type.GetType(procNames[i]);
+                        object [] parameters = { currentProc };
+                        XmlWriter newProc = (XmlWriter) Activator.CreateInstance(type, parameters);
+                        currentProc = newProc;
+                    }
                 }
             }
             return currentProc;
+        }
+
+
+        private bool Contains(string processorFullName, ArrayList names)
+        {
+            foreach (string name in names)
+            {
+                if (processorFullName.Contains(name))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public delegate void MessageListener(object sender, EventArgs e);
+        private event MessageListener progressMessageIntercepted;
+        private event MessageListener feedbackMessageIntercepted;
+
+        public void AddProgressMessageListener(MessageListener listener)
+        {
+            progressMessageIntercepted += listener;
+        }
+
+        public void AddFeedbackMessageListener(MessageListener listener)
+        {
+            feedbackMessageIntercepted += listener;
         }
     }
 }

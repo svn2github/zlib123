@@ -40,16 +40,10 @@
     <Compile Include="NotAnOoxDocumentException.cs" />
     <Compile Include="OdfCharactersPostProcessor.cs" />
     <Compile Include="OdfEventArgs.cs" />
-    <Compile Include="OoxAutomaticStylesPostProcessor.cs" />
-    <Compile Include="OoxChangeTrackingPostProcessor.cs" />
     <Compile Include="OoxCharactersPostProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NotAnOdfDocumentException.cs" />
-    <Compile Include="OoxSectionsPostProcessor.cs" />
-    <Compile Include="OoxParagraphsPostProcessor.cs" />
-    <Compile Include="OdfParagraphPostProcessor.cs" />
     <Compile Include="OoxSpacesPostProcessor.cs" />
-    <Compile Include="OdfCheckIfIndexPostProcessor.cs" />
     <Compile Include="SharedXmlUrlResolver.cs" />
     <Compile Include="ZipResolver.cs" />
   </ItemGroup>
