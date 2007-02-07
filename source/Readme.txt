@@ -16,11 +16,13 @@ The project is made of several subprojects and has the following struture:
   + Common                           Common projects
   | + OdfConverterLib                The main converter library
   | + OdfZipUtils                    A library used to zip/unzip files
-  + PowerPoint                       PowerPoint converter
+  + Presentation                     Presentation converter
+  + Spreadsheet			     Spreadsheet converter
   + Shell                            Shell and standalone converter
   | + OdfConverterLauncher           The project in charge of windows explorer contextual menu
   | + OdfConverterTest               A command line tool
   + Word                             Word Converters
+    + Converter			     Word converter engine
     + Setup                          Setup projects
     | + OdfAddInForWordSetup         The ODF Add-in setup programs in english
     | | + dotnetfx                   Visual Studio patch for building setup executable
