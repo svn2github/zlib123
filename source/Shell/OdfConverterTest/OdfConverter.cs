@@ -36,6 +36,9 @@ using System.Threading;
 using CleverAge.OdfConverter.OdfZipUtils;
 using CleverAge.OdfConverter.OdfConverterLib;
 using CleverAge.OdfConverter.Word;
+using CleverAge.OdfConverter.Presentation;
+using CleverAge.OdfConverter.Spreadsheet;
+
 
 namespace CleverAge.OdfConverter.CommandLineTool
 {
@@ -46,6 +49,17 @@ namespace CleverAge.OdfConverter.CommandLineTool
         CTRL_CLOSE_EVENT = 2,
         CTRL_LOGOFF_EVENT = 5,
         CTRL_SHUTDOWN_EVENT = 6
+    };
+
+    enum Direction 
+    { 
+        None,
+        OdtToDocx, 
+        DocxToOdt, 
+        OdsToXlsx, 
+        XlsxToOds, 
+        OdpToPptx, 
+        PptxToOdp 
     };
 
     delegate int ControlHandlerFonction(ControlType control);
@@ -105,8 +119,6 @@ namespace CleverAge.OdfConverter.CommandLineTool
     {
         private string input = null;                     // input path
         private string output = null;                    // output path
-        private bool batchOdt = false;                   // do batch transform on ODT files
-        private bool batchDocx = false;                  // do batch transform on DOCX files
         private bool validate = false;                   // validate the result of the transformations
         private bool open = false;                       // try to open the result of the transformations
         private bool recursiveMode = false;              // go in subfolders ?
@@ -117,13 +129,13 @@ namespace CleverAge.OdfConverter.CommandLineTool
         private ArrayList skipedPostProcessors = null;   // Post processors to skip (identified by their names)
         private bool packaging = true;                   // Build the zip archive after conversion
 
-        private enum Direction { OdtToDocx, DocxToOdt };
 	   	private Direction transformDirection = Direction.OdtToDocx; // direction of conversion
 		private bool transformDirectionOverride = false; // whether conversion direction has been specified
         private Report report = null;
         private Word word = null;
         private OoxValidator ooxValidator = null;
         private OdfValidator odfValidator = null;
+        private Direction batch = Direction.None;
 
 #if MONO
 		static bool SetConsoleCtrlHandler(ControlHandlerFonction handlerRoutine, bool add) 
@@ -190,39 +202,44 @@ namespace CleverAge.OdfConverter.CommandLineTool
         private void Proceed()
         {
             this.report = new Report(this.reportPath, this.reportLevel);
-            if (this.batchOdt)
-            {
-                this.ProceedBatchOdt();
-            }
-            else if (this.batchDocx)
-            {
-                this.ProceedBatchDocx();
-            }
-            else
-            {
 
-                // instanciate word if needed
-               	if (this.transformDirection == Direction.OdtToDocx && this.open)
-                {
-                    word = new Word();
-                    word.Visible = false;
-                }
+            switch (this.batch)
+            {
+                case Direction.OdsToXlsx:
+                case Direction.OdpToPptx:
+                case Direction.OdtToDocx:
+                    this.ProceedBatchOdf();
+                    break;
+                case Direction.DocxToOdt:
+                case Direction.PptxToOdp:
+                case Direction.XlsxToOds:
+                    this.ProceedBatchOox();
+                    break;
+                default:  // no batch mode
+                    // instanciate word if needed
+                    if (this.transformDirection == Direction.OdtToDocx && this.open)
+                    {
+                        word = new Word();
+                        word.Visible = false;
+                    }
 
- 				this.ProceedSingleFile(this.input, this.output, this.transformDirection);
-                
-                // close word if needed
-                if (this.open)
-                {
-                    word.Quit();
-                }
+                    this.ProceedSingleFile(this.input, this.output, this.transformDirection);
+
+                    // close word if needed
+                    if (this.open)
+                    {
+                        word.Quit();
+                    }
+                    break;
             }
+
             this.report.Close();
         }
 
-        private void ProceedBatchOdt()
+        private void ProceedBatchOdf()
         {
             // instanciate word if needed
-            if (this.open)
+            if (this.open && (this.batch == Direction.OdtToDocx))
             {
                 this.word = new Word();
                 this.word.Visible = false;
@@ -241,18 +258,40 @@ namespace CleverAge.OdfConverter.CommandLineTool
             {
                 option = SearchOption.AllDirectories;
             }
-            string[] files = Directory.GetFiles(this.input, "*.odt", option);
+
+            string ext = null;
+            string targetExt = null;
+
+            switch (this.batch)
+            {
+                case Direction.OdtToDocx:
+                    ext = "odt";
+                    targetExt = ".docx";
+                    break;
+                case Direction.OdsToXlsx:
+                    ext = "ods";
+                    targetExt = ".xlsx";
+                    break;
+                case Direction.OdpToPptx:
+                    ext = "odp";
+                    targetExt = ".pptx";
+                    break;
+                default:
+                    throw new ArgumentException("unsupported batch type");
+                    break;
+            }
+            string [] files = Directory.GetFiles(this.input, "*."+ext, option);
             int nbFiles = files.Length;
             int nbConverted = 0;
             int nbValidatedAndOpened = 0;
             int nbValidatedAndNotOpened = 0;
             int nbNotValidatedAndOpened = 0;
             int nbNotValidatedAndNotOpened = 0;
-            this.report.AddComment("Processing " + nbFiles + " ODT file(s)");
+            this.report.AddComment("Processing " + nbFiles + " " + ext.ToUpper() + "  file(s)");
             foreach (string input in files)
             {
-                string output = this.GenerateOutputName(this.output, input, ".docx", this.replace);
-                int result = this.ProceedSingleFile(input, output, Direction.OdtToDocx);
+                string output = this.GenerateOutputName(this.output, input, targetExt, this.replace);
+                int result = this.ProceedSingleFile(input, output, this.batch);
                 switch (result)
                 {
                     case NOT_CONVERTED:
@@ -289,8 +328,27 @@ namespace CleverAge.OdfConverter.CommandLineTool
             this.report.AddComment("   " + nbNotValidatedAndNotOpened + " were not validated and could not be opened in Word");
         }
 
-        private void ProceedBatchDocx()
+        private void ProceedBatchOox()
         {
+            string ext;
+            string targetExt;
+            switch (this.batch)
+            {
+                case Direction.DocxToOdt:
+                    ext = "docx";
+                    targetExt = ".odt";
+                    break;
+                case Direction.XlsxToOds:
+                    ext = "xlsx";
+                    targetExt = ".ods";
+                    break;
+                case Direction.PptxToOdp:
+                    ext = "pptx";
+                    targetExt = ".odp";
+                    break;
+                default:
+                    throw new ArgumentException("wrong batch mode");
+            }
             // instanciate validator if needed
             if (this.validate)
             {
@@ -303,11 +361,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
             {
                 option = SearchOption.AllDirectories;
             }
-            string[] files = Directory.GetFiles(this.input, "*.docx", option);
+            string [] files = Directory.GetFiles(this.input, "*."+ext, option);
             foreach (string input in files)
             {
-                string output = this.GenerateOutputName(this.output, input, ".odt", this.replace);
-                this.ProceedSingleFile(input, output, Direction.DocxToOdt);
+                string output = this.GenerateOutputName(this.output, input, targetExt, this.replace);
+                this.ProceedSingleFile(input, output, this.batch);
             }
         }
 
@@ -342,10 +400,13 @@ namespace CleverAge.OdfConverter.CommandLineTool
             try
             {
                 DateTime start = DateTime.Now;
-                AbstractConverter converter = new Converter();
+                AbstractConverter converter = ConverterFactory.Instance(this.transformDirection);
                 converter.ExternalResources = this.xslPath;
                 converter.SkipedPostProcessors = this.skipedPostProcessors;
-                converter.DirectTransform = transformDirection == Direction.OdtToDocx;
+                converter.DirectTransform = 
+                    transformDirection == Direction.OdtToDocx 
+                    || transformDirection == Direction.OdpToPptx
+                    || transformDirection == Direction.OdsToXlsx;
                 converter.Packaging = this.packaging;
                 converter.Transform(input, output);
                 TimeSpan duration = DateTime.Now - start;
@@ -366,7 +427,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
             catch (NotAnOoxDocumentException e)
             {
-                this.report.AddLog(input, "Conversion failed - Input file is not a valid DOCX file", Report.ERROR_LEVEL);
+                this.report.AddLog(input, "Conversion failed - Input file is not a valid Office OpenXML file", Report.ERROR_LEVEL);
                 this.report.AddLog(input, e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
                 return false;
             }
@@ -473,6 +534,10 @@ namespace CleverAge.OdfConverter.CommandLineTool
             Console.WriteLine("     /F                 Replace existing file");
             Console.WriteLine("     /BATCH-ODT         Do a batch conversion over every ODT file in the input folder (note: existing files will be replaced)");
             Console.WriteLine("     /BATCH-DOCX        Do a batch conversion over every DOCX file in the input folder (note: existing files will be replaced)");
+            Console.WriteLine("     /BATCH-ODP         Do a batch conversion over every ODP file in the input folder (note: existing files will be replaced)");
+            Console.WriteLine("     /BATCH-PPTX        Do a batch conversion over every PPTX file in the input folder (note: existing files will be replaced)");
+            Console.WriteLine("     /BATCH-ODS         Do a batch conversion over every ODS file in the input folder (note: existing files will be replaced)");
+            Console.WriteLine("     /BATCH-XLSX        Do a batch conversion over every XLSX file in the input folder (note: existing files will be replaced)");
             Console.WriteLine("     /V                 Validate the result of the transformation against the schemas");
             Console.WriteLine("     /OPEN              Try to open the converted files (works only for ODF->OOX, Microsoft Word required)");
             Console.WriteLine("     /XSLT Path         Path to a folder containing XSLT files (must be the same as used in the lib)");
@@ -482,6 +547,10 @@ namespace CleverAge.OdfConverter.CommandLineTool
             Console.WriteLine("     /LEVEL Level       Level of reporting: 1=DEBUG, 2=INFO, 3=WARNING, 4=ERROR");
           	Console.WriteLine("     /ODT2DOCX          Force conversion to DOCX regardless of input file extension");
 			Console.WriteLine("     /DOCX2ODT          Force conversion to ODT regardless of input file extension");
+            Console.WriteLine("     /ODS2XLSX          Force conversion to XLSX regardless of input file extension");
+            Console.WriteLine("     /XLSX2ODS          Force conversion to ODS regardless of input file extension");
+            Console.WriteLine("     /ODP2PPTX          Force conversion to PPTX regardless of input file extension");
+            Console.WriteLine("     /PPTX2ODP          Force conversion to ODP regardless of input file extension");
         }
 
         private void ParseCommandLine(string[] args)
@@ -541,10 +610,22 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         this.packaging = false;
                         break;
                     case "/BATCH-ODT":
-                        this.batchOdt = true;
+                        this.batch = Direction.OdtToDocx; 
                         break;
                     case "/BATCH-DOCX":
-                        this.batchDocx = true;
+                        this.batch = Direction.DocxToOdt;
+                        break;
+                    case "/BATCH-ODP":
+                        this.batch = Direction.OdpToPptx;
+                        break;
+                    case "/BATCH-PPTX":
+                        this.batch = Direction.PptxToOdp;
+                        break;
+                    case "/BATCH-ODS":
+                        this.batch = Direction.OdsToXlsx;
+                        break;
+                    case "/BATCH-XLSX":
+                        this.batch = Direction.XlsxToOds;
                         break;
                     case "/SKIP":
                         if (++i == args.Length)
@@ -580,6 +661,26 @@ namespace CleverAge.OdfConverter.CommandLineTool
 						this.transformDirectionOverride = true;
 						// System.Console.WriteLine("Override to docx\n");
 						break;
+                    case "/XLSX2ODS":
+                        this.transformDirection = Direction.XlsxToOds;
+                        this.transformDirectionOverride = true;
+                        // System.Console.WriteLine("Override to odt\n");
+                        break;
+                    case "/ODS2XLSX":
+                        this.transformDirection = Direction.OdsToXlsx;
+                        this.transformDirectionOverride = true;
+                        // System.Console.WriteLine("Override to docx\n");
+                        break;
+                    case "/PPTX2ODP":
+                        this.transformDirection = Direction.PptxToOdp;
+                        this.transformDirectionOverride = true;
+                        // System.Console.WriteLine("Override to odt\n");
+                        break;
+                    case "/ODP2PPTX":
+                        this.transformDirection = Direction.OdpToPptx;
+                        this.transformDirectionOverride = true;
+                        // System.Console.WriteLine("Override to docx\n");
+                        break;
 					case "/F":
 						this.replace = true;
 						break;
@@ -595,7 +696,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             {
                 throw new OdfCommandLineException("Input is missing");
             }
-            if (this.batchDocx || this.batchOdt)
+            if (this.batch != Direction.None)
             {
                 this.CheckBatch();
             }
@@ -643,15 +744,62 @@ namespace CleverAge.OdfConverter.CommandLineTool
             string extension = null;
             if (transformDirectionOverride)
             {
-            	extension = transformDirection == Direction.OdtToDocx ? ".odt" : ".docx";
+                switch (this.transformDirection) 
+                {
+                    case Direction.DocxToOdt:
+                        extension = ".odt";
+                        break;
+                    case Direction.OdtToDocx:
+                        extension = ".docx";
+                        break;
+                    case Direction.PptxToOdp:
+                        extension = ".odp";
+                        break;
+                    case Direction.OdpToPptx:
+                        extension = ".pptx";
+                        break;
+                    case Direction.OdsToXlsx:
+                        extension = ".xlsx";
+                        break;
+                    case Direction.XlsxToOds:
+                        extension = ".ods";
+                        break;
+                }
             }
             else
             {
                 extension = ".docx";
-                if (extension.Equals(Path.GetExtension(this.input).ToLowerInvariant()))
+                string inputExtension = Path.GetExtension(this.input).ToLowerInvariant();
+                switch (inputExtension)
                 {
-                	this.transformDirection = Direction.DocxToOdt;
-                	extension = ".odt";
+                    case ".odt":
+                        this.transformDirection = Direction.OdtToDocx;
+                        extension = ".docx";
+                        break;
+                    case ".docx":
+                        this.transformDirection = Direction.DocxToOdt;
+                        extension = ".odt";
+                        break;
+                    case ".odp":
+                        this.transformDirection = Direction.OdpToPptx;
+                        extension = ".pptx";
+                        break;
+                    case ".pptx":
+                        this.transformDirection = Direction.PptxToOdp;
+                        extension = ".odp";
+                        break;
+                    case ".ods":
+                        this.transformDirection = Direction.OdsToXlsx;
+                        extension = ".xlsx";
+                        break;
+                    case ".xlsx":
+                        this.transformDirection = Direction.XlsxToOds;
+                        extension = ".ods";
+                        break;
+                    default:
+                        this.transformDirection = Direction.OdtToDocx;
+                        extension = ".docx";
+                        break;
                 }
             }
             if (!this.packaging)
@@ -689,6 +837,47 @@ namespace CleverAge.OdfConverter.CommandLineTool
         private const int VALIDATED_AND_NOT_OPENED = 2;
         private const int NOT_VALIDATED_AND_OPENED = 3;
         private const int NOT_VALIDATED_AND_NOT_OPENED = 4;
+    }
+
+    class ConverterFactory
+    {
+        private static AbstractConverter wordInstance;
+        private static AbstractConverter presentationInstance;
+        private static AbstractConverter spreadsheetInstance;
+       
+        protected ConverterFactory()
+        {
+        }
+
+        public static AbstractConverter Instance(Direction transformDirection)
+        {
+            switch (transformDirection)
+            {
+                case Direction.DocxToOdt:
+                case Direction.OdtToDocx:
+                    if (wordInstance == null)
+                    {
+                        wordInstance = new CleverAge.OdfConverter.Word.Converter();
+                    }
+                    return wordInstance;
+                case Direction.PptxToOdp:
+                case Direction.OdpToPptx:
+                    if (presentationInstance == null)
+                    {
+                        presentationInstance = new CleverAge.OdfConverter.Presentation.Converter();
+                    }
+                    return presentationInstance;
+                case Direction.XlsxToOds:
+                case Direction.OdsToXlsx:
+                    if (spreadsheetInstance == null)
+                    {
+                        spreadsheetInstance = new CleverAge.OdfConverter.Spreadsheet.Converter();
+                    }
+                    return spreadsheetInstance;
+                default:
+                    throw new ArgumentException("invalid transform direction type");
+            }
+        }
     }
 
     public class Report
