@@ -34,6 +34,7 @@
     exclude-result-prefixes="odf style text number">
     
     <xsl:import href="workbook.xsl"/>
+    <xsl:import href="sharedStrings.xsl"/>
     <xsl:import href="odf2oox-compute-size.xsl"/>
     
     <xsl:strip-space elements="*"/>
@@ -73,9 +74,9 @@
             <!-- input: content.xml -->
             
             <!-- shared strings (ewentualny postprocessing)-->
-            <!-- <pzip:entry pzip:target="xl/sharedStrings.xml">
-                <xsl:call-template name="InsertSharedStrings"/>
-            </pzip:entry>-->
+            <pzip:entry pzip:target="xl/sharedStrings.xml">
+              <xsl:call-template name="InsertSharedStrings"/>
+            </pzip:entry>
             <!-- input: content.xml -->
             <!-- output: xl/sharedStrings.xml -->
             

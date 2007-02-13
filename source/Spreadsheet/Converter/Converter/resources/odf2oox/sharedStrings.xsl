@@ -27,39 +27,36 @@
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"  
-    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
-    
-  <xsl:import href="worksheets.xsl"/>
-  <xsl:import href="sharedStrings.xsl"/>
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   
-  
-  <!-- main workbook template-->
-    <xsl:template name="InsertWorkbook">    
-      <xsl:apply-templates select="document('content.xml')/office:document-content"/>
-    </xsl:template>
-    
-  <!-- workbook body template -->
-    <xsl:template match="office:body">
-    <workbook>
-      <xsl:apply-templates select="office:spreadsheet"/>
-    </workbook>
-    </xsl:template>
-  
-  <!-- insert references to all sheets -->
-  <xsl:template match="office:spreadsheet">
-      <sheets>
-        <xsl:for-each select="table:table">
-          <sheet name="{@table:name}" sheetId="{count(preceding-sibling::table:table)+1}" r:id="{generate-id(.)}"/>
-        </xsl:for-each>
-      </sheets>
+
+  <xsl:template name="InsertSharedStrings">
+    <sst>
+      <xsl:variable name="Count">
+        <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p">
+          <xsl:value-of select="last()"/>
+        </xsl:for-each>  
+      </xsl:variable>
+      <xsl:attribute name="count">
+        <xsl:value-of select="$Count"/>
+      </xsl:attribute>        
+      <xsl:attribute name="uniqueCount">
+        <xsl:value-of select="$Count"/>
+      </xsl:attribute>
+        <xsl:call-template name="InsertString"/>    
+    </sst>
   </xsl:template>
   
-  <!-- insert all sheets -->
-  <xsl:template name="InsertSheets">
-    <xsl:apply-templates select="document('content.xml')/office:document-content" mode="sheet"/>
+  <xsl:template name="InsertString">    
+    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p">
+      <si>
+        <t><xsl:value-of select="."/></t>
+      </si>
+    </xsl:for-each> 
   </xsl:template>
   
 </xsl:stylesheet>
