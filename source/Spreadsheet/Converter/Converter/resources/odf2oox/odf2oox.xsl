@@ -33,24 +33,8 @@
     xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
     exclude-result-prefixes="odf style text number">
     
-    <xsl:import href="common.xsl"/>
-    <xsl:import href="docprops.xsl"/>
-    <xsl:import href="document.xsl"/>
-    <xsl:import href="numbering.xsl"/>
-    <xsl:import href="footnotes.xsl"/>
-    <xsl:import href="endnotes.xsl"/>
-    <xsl:import href="header-footer.xsl"/>
-    <xsl:import href="fonts.xsl"/>
-    <xsl:import href="styles.xsl"/>
-    <xsl:import href="dataStyles.xsl"/>
-    <xsl:import href="frames.xsl"/>
-    <xsl:import href="settings.xsl"/>
-    <xsl:import href="sections.xsl"/>
-    <xsl:import href="part_relationships.xsl"/>
-    <xsl:import href="package_relationships.xsl"/>
-    <xsl:import href="contentTypes.xsl"/>
-    <xsl:import href="comments.xsl"/>
-    <xsl:import href="change-tracking.xsl"/>
+    <xsl:import href="workbook.xsl"/>
+    <xsl:import href="odf2oox-compute-size.xsl"/>
     
     <xsl:strip-space elements="*"/>
     <xsl:preserve-space elements="text:p text:span number:text"/>
@@ -74,44 +58,24 @@
         
         
         <pzip:archive pzip:target="{$outputFile}">
-            
-            <!-- sections preformatting -->
-            <xsl:call-template name="sectionsPreProcessing"/>
-            
-            
-            <!-- Document core properties -->
-            <pzip:entry pzip:target="docProps/core.xml">
-                <xsl:call-template name="docprops-core"/>
-            </pzip:entry>
-            
-            <!-- Document app properties -->
-            <pzip:entry pzip:target="docProps/app.xml">
-                <xsl:call-template name="docprops-app"/>
-            </pzip:entry>
-            
-            <!-- Document custom properties -->
-            <xsl:if test="$docprops-custom-file > 0">
-                <pzip:entry pzip:target="docProps/custom.xml">
-                    <xsl:call-template name="docprops-custom"/>
-                </pzip:entry>
-            </xsl:if>
- <!----------------------------------- CHANGE -------------------------------------------->          
+   
+ <!-- CHANGE -->          
             <!-- styles -->
-            <pzip:entry pzip:target="xl/styles.xml">
+            <!--<pzip:entry pzip:target="xl/styles.xml">
                 <xsl:call-template name="styles"/>
-            </pzip:entry>
+            </pzip:entry>-->
             <!-- input: styles.xml -->
             
             <!-- main content -->
             <pzip:entry pzip:target="xl/workbook.xml">
-                <xsl:call-template name="workbook"/>
+                <xsl:call-template name="InsertWorkbook"/>
             </pzip:entry>
             <!-- input: content.xml -->
             
             <!-- shared strings (ewentualny postprocessing)-->
-            <pzip:entry pzip:target="xl/sharedStrings.xml">
+            <!-- <pzip:entry pzip:target="xl/sharedStrings.xml">
                 <xsl:call-template name="InsertSharedStrings"/>
-            </pzip:entry>
+            </pzip:entry>-->
             <!-- input: content.xml -->
             <!-- output: xl/sharedStrings.xml -->
             
@@ -121,7 +85,7 @@
             <!-- output:  xl/worksheets/sheet_N_.xml -->
             
             <!-- insert drawings -->
-            <xsl:call-template name="InsertDrawings"/>
+            <!--<xsl:call-template name="InsertDrawings"/>-->
             <!-- input: content.xml 
                               Object_N_/content.xml
                               Pictures/_imageFile_
@@ -132,7 +96,7 @@
                                  xl/media/_imageFile_ -->
             
             <!-- insert pivotTables -->
-            <xsl:call-template name="InsertPivotTables"/>
+            <!-- <xsl:call-template name="InsertPivotTables"/> -->
             <!-- input: content.xml -->
             <!-- output:  xl/pivotTable/pivotTable_N_.xml 
                                  xl/pivotTable/_rels/pivotTable_N_.xml.rels 
@@ -142,7 +106,7 @@
             -->
             
             <!-- insert revisions -->
-            <xsl:call-template name="InsertRevisions"/>
+            <!-- <xsl:call-template name="InsertRevisions"/> -->
             <!-- input: content.xml -->
             <!-- output: xl/revisions/revisionHeaders.xml
                                 xl/revisions/revisionLog_N_.xml
@@ -151,37 +115,27 @@
             -->
             
             <!-- connections -->
-            <pzip:entry pzip:target="xl/connections.xml">
+            <!--<pzip:entry pzip:target="xl/connections.xml">
                 <xsl:call-template name="InsertConnections"/>
-            </pzip:entry>
+            </pzip:entry>-->
             <!-- input: content.xml -->
             
             <!-- queryTables -->
-            <xsl:call-template name="InsertQueryTables"/>
+            <!--<xsl:call-template name="InsertQueryTables"/>-->
             <!-- input: content.xml -->
             <!-- output:  xl/queryTables/queryTableN.xml -->
             
             <!-- settings  -->
-            <pzip:entry pzip:target="xl/settings.xml">
+            <!-- <pzip:entry pzip:target="xl/settings.xml">
                 <xsl:call-template name="InsertSettings"/>
-            </pzip:entry>
+            </pzip:entry>-->
             <!-- input: content.xml -->
             
             <!-- part relationship item -->
-            <pzip:entry pzip:target="xl/_rels/document.xml.rels">
+            <!--<pzip:entry pzip:target="xl/_rels/document.xml.rels">
                 <xsl:call-template name="InsertPartRelationships"/>
-            </pzip:entry>            
-<!----------------------------------- /CHANGE -------------------------------------------->
-            
-            <!-- content types -->
-            <pzip:entry pzip:target="[Content_Types].xml">
-                <xsl:call-template name="contentTypes"/>
-            </pzip:entry>
-            
-            <!-- package relationship item -->
-            <pzip:entry pzip:target="_rels/.rels">
-                <xsl:call-template name="package-relationships"/>
-            </pzip:entry>
+            </pzip:entry> -->           
+<!-- /CHANGE -->
             
         </pzip:archive>
     </xsl:template>
