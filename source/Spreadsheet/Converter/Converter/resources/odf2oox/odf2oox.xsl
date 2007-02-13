@@ -36,7 +36,8 @@
     <xsl:import href="workbook.xsl"/>
     <xsl:import href="sharedStrings.xsl"/>
     <xsl:import href="odf2oox-compute-size.xsl"/>
-    
+    <xsl:import href="contentTypes.xsl"/>
+  
     <xsl:strip-space elements="*"/>
     <xsl:preserve-space elements="text:p text:span number:text"/>
     
@@ -60,6 +61,9 @@
         
         <pzip:archive pzip:target="{$outputFile}">
    
+          <pzip:entry pzip:target="[Content_Types].xml">
+            <xsl:call-template name="ContentTypes"/>
+          </pzip:entry>
  <!-- CHANGE -->          
             <!-- styles -->
             <!--<pzip:entry pzip:target="xl/styles.xml">
