@@ -39,6 +39,7 @@
     <xsl:import href="contentTypes.xsl"/>
     <xsl:import href="package_relationships.xsl"/>
     <xsl:import href="docprops.xsl"/>
+    <xsl:import href="part_relationships.xsl"/>
   
     <xsl:strip-space elements="*"/>
     <xsl:preserve-space elements="text:p text:span number:text"/>
@@ -143,6 +144,11 @@
                 <xsl:call-template name="InsertPartRelationships"/>
             </pzip:entry> -->           
 <!-- /CHANGE -->
+          
+          <!-- part relationship item -->
+          <pzip:entry pzip:target="xl/_rels/workbook.xml.rels">
+            <xsl:call-template name="InsertPartRelationships"/>
+          </pzip:entry>
             
           <!-- Document core properties -->
           <pzip:entry pzip:target="docProps/core.xml">
