@@ -42,13 +42,10 @@
    
  <!-- Sheet relationship -->
     <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
-      <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet">
+      <Relationship Id="{generate-id(.)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet">
         <xsl:variable name="NumberSheet">
           <xsl:value-of select="position()"/>    
-        </xsl:variable>
-        <xsl:attribute name="id">
-          <xsl:value-of select="generate-id(.)"/>
-        </xsl:attribute>     
+        </xsl:variable>    
         <xsl:attribute name="Target">          
           <xsl:value-of select="concat('worksheets/sheet', $NumberSheet)"/>
         </xsl:attribute>        

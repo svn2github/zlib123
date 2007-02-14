@@ -30,7 +30,8 @@
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   
   <!-- table is converted into sheet -->
   <xsl:template match="table:table" mode="sheet">
@@ -45,7 +46,129 @@
   <!-- insert sheet -->
   <xsl:template name="InsertWorksheet">
     <worksheets>
-      <sheetData/>
+      <sheetData>
+        
+        <!-- insert first row -->
+        <xsl:apply-templates select="table:table-row[1]" mode="sheet">
+          <xsl:with-param name="rowNumber">1</xsl:with-param>
+        </xsl:apply-templates>
+        
+      </sheetData>
     </worksheets>
   </xsl:template>
+  
+  <!-- insert row into sheet -->
+  <xsl:template match="table:table-row" mode="sheet">
+    <xsl:param name="rowNumber"/>
+      <xsl:if test="table:table-cell[child::text:p]">
+        <row r="{$rowNumber}">
+          
+          <!-- insert first cell -->
+          <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
+            <xsl:with-param name="colNumber">0</xsl:with-param>
+            <xsl:with-param name="rowNumber" select="$rowNumber"/>
+          </xsl:apply-templates>
+          
+        </row>
+      </xsl:if>
+    
+    <!-- insert next row -->
+      <xsl:if test="following-sibling::table:table-row">
+        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="sheet">
+          <xsl:with-param name="rowNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-rows-repeated">
+                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$rowNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:if>
+    
+  </xsl:template>
+  
+  <!-- insert cell into row -->
+  <xsl:template match="table:table-cell" mode="sheet">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:if test="child::text:p">
+      <c>
+        <xsl:attribute name="r">
+          <xsl:variable name="colChar">
+            <xsl:call-template name="NumbersToChars">
+              <xsl:with-param name="num" select="$colNumber"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="concat($colChar,$rowNumber)"/>
+        </xsl:attribute>
+      </c>
+    </xsl:if>
+    
+    <!-- insert next cell --> 
+    <xsl:if test="following-sibling::table:table-cell">
+      <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="sheet">
+        <xsl:with-param name="colNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated">
+              <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$colNumber+1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="rowNumber" select="$rowNumber"/>
+      </xsl:apply-templates>
+    </xsl:if>
+    
+  </xsl:template>
+  
+  <!-- converting number of column to char name of column -->
+  <xsl:template name="NumbersToChars">
+    <xsl:param name="num"/>
+  <xsl:choose>
+    <xsl:when test="$num = 0">A</xsl:when>
+    <xsl:when test="$num = 1">B</xsl:when>
+    <xsl:when test="$num = 2">C</xsl:when>
+    <xsl:when test="$num = 3">D</xsl:when>
+    <xsl:when test="$num = 4">E</xsl:when>
+    <xsl:when test="$num = 5">F</xsl:when>
+    <xsl:when test="$num = 6">G</xsl:when>
+    <xsl:when test="$num = 7">H</xsl:when>
+    <xsl:when test="$num = 8">I</xsl:when>
+    <xsl:when test="$num = 9">J</xsl:when>
+    <xsl:when test="$num = 10">K</xsl:when>
+    <xsl:when test="$num = 11">L</xsl:when>
+    <xsl:when test="$num = 12">M</xsl:when>
+    <xsl:when test="$num = 13">N</xsl:when>
+    <xsl:when test="$num = 14">O</xsl:when>
+    <xsl:when test="$num = 15">P</xsl:when>
+    <xsl:when test="$num = 16">Q</xsl:when>
+    <xsl:when test="$num = 17">R</xsl:when>
+    <xsl:when test="$num = 18">S</xsl:when>
+    <xsl:when test="$num = 19">T</xsl:when>
+    <xsl:when test="$num = 20">U</xsl:when>
+    <xsl:when test="$num = 21">V</xsl:when>
+    <xsl:when test="$num = 22">W</xsl:when>
+    <xsl:when test="$num = 23">X</xsl:when>
+    <xsl:when test="$num = 24">Y</xsl:when>
+    <xsl:when test="$num = 25">Z</xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="NumbersToChars">
+        <xsl:with-param name="num">
+          <xsl:value-of select="floor($num div 26)-1"/>
+        </xsl:with-param>
+      </xsl:call-template>
+      <xsl:call-template name="NumbersToChars">
+        <xsl:with-param name="num">
+          <xsl:value-of select="$num - 26*floor($num div 26)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:otherwise>
+  </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>
