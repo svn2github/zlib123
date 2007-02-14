@@ -23,8 +23,6 @@
     </xsl:template>
 
     <xsl:template name="InsertSheets">
-
-
         <office:body>
             <office:spreadsheet>
                 <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
@@ -47,6 +45,26 @@
 
     <xsl:template name="InsertSheetContent">
         <xsl:param name="sheet"/>
+
+        <xsl:variable name="sheetWidth">
+            <xsl:choose>
+                <xsl:when
+                    test="contains(document(concat('xl/',$sheet))/e:worksheet/e:dimension/@ref,':')">
+                    <xsl:call-template name="GetColNum">
+                        <xsl:with-param name="cell">
+                            <xsl:value-of
+                                select="substring-after(document(concat('xl/',$sheet))/e:worksheet/e:dimension/@ref,':')"
+                            />
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>1</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <!-- temporary; for succesful validation -->
+        <table:table-column table:number-columns-repeated="{$sheetWidth}"/>
+
         <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet"/>
     </xsl:template>
 
@@ -90,13 +108,19 @@
             </xsl:call-template>
         </xsl:variable>
 
+        <xsl:variable name="lastCellColumnNumber">
+            <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                    <xsl:value-of select="e:c[last()]/@r"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:variable>
+
         <xsl:choose>
+            <!-- if first rows are empty-->
             <xsl:when test="position()=1 and @r>1">
                 <table:table-row table:number-rows-repeated="{@r - 1}">
                     <table:table-cell table:number-columns-repeated="{$sheetWidth}"/>
-                </table:table-row>
-                <table:table-row>
-                    <xsl:apply-templates/>
                 </table:table-row>
             </xsl:when>
             <xsl:otherwise>
@@ -106,13 +130,20 @@
                         <xsl:attribute name="table:number-rows-repeated">
                             <xsl:value-of select="@r -1 - preceding::e:row[1]/@r"/>
                         </xsl:attribute>
+                        <table:table-cell table:number-columns-repeated="{$sheetWidth}"/>
                     </table:table-row>
                 </xsl:if>
-                <table:table-row>
-                    <xsl:apply-templates/>
-                </table:table-row>
             </xsl:otherwise>
         </xsl:choose>
+
+        <table:table-row>
+            <xsl:apply-templates/>
+            <xsl:if test="$lastCellColumnNumber &lt; $sheetWidth">
+                <table:table-cell
+                    table:number-columns-repeated="{$sheetWidth - $lastCellColumnNumber}"/>
+            </xsl:if>
+        </table:table-row>
+
     </xsl:template>
 
     <xsl:template match="e:c">
