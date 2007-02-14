@@ -37,6 +37,8 @@
     <xsl:import href="sharedStrings.xsl"/>
     <xsl:import href="odf2oox-compute-size.xsl"/>
     <xsl:import href="contentTypes.xsl"/>
+    <xsl:import href="package_relationships.xsl"/>
+    <xsl:import href="docprops.xsl"/>
   
     <xsl:strip-space elements="*"/>
     <xsl:preserve-space elements="text:p text:span number:text"/>
@@ -142,6 +144,28 @@
             </pzip:entry> -->           
 <!-- /CHANGE -->
             
+          <!-- Document core properties -->
+          <pzip:entry pzip:target="docProps/core.xml">
+            <xsl:call-template name="docprops-core"/>
+          </pzip:entry>
+          
+          <!-- Document app properties -->
+          <pzip:entry pzip:target="docProps/app.xml">
+            <xsl:call-template name="docprops-app"/>
+          </pzip:entry>
+          
+          <!-- Document custom properties -->
+          <xsl:if test="$docprops-custom-file > 0">
+            <pzip:entry pzip:target="docProps/custom.xml">
+              <xsl:call-template name="docprops-custom"/>
+            </pzip:entry>
+          </xsl:if>
+          
+          <!-- package relationship item -->
+          <pzip:entry pzip:target="_rels/.rels">
+            <xsl:call-template name="package-relationships"/>
+          </pzip:entry>
+          
         </pzip:archive>
     </xsl:template>
     
