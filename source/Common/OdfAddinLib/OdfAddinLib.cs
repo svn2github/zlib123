@@ -38,67 +38,78 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 {
 
     /// <summary>
-    /// Chained resource managers
+    //  Chained resource managers
     /// </summary>
-    internal class AddinResourceManager : System.Resources.ResourceManager
+    internal class ChainResourceManager : System.Resources.ResourceManager
     {
-        private System.Resources.ResourceManager primaryResourceManager;
+        private ArrayList managers;
 
-        /// <summary>
-        /// Default resource manager
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="assembly"></param>
-        public AddinResourceManager(string path, Assembly assembly) : base (path, assembly)
-        { }
-
-        public System.Resources.ResourceManager PrimaryResourceManager
+        public ChainResourceManager()
         {
-            set { this.primaryResourceManager = value; }
+            this.managers = new ArrayList();
         }
 
-        public override string GetString(string name)
+        public void Add(System.Resources.ResourceManager manager)
         {
-            if (this.primaryResourceManager != null)
+            managers.Add(manager);
+        }
+
+        public override string GetString(string key)
+        {
+            for (int i = this.managers.Count - 1; i >= 0; i--)
             {
-                string s = this.primaryResourceManager.GetString(name);   
-                if (s != null && s.Length > 0)
+                System.Resources.ResourceManager manager = (System.Resources.ResourceManager) this.managers[i];
+                if (manager != null)
                 {
-                    return s;
+                    string value = manager.GetString(key);
+                    if (value != null && value.Length > 0)
+                    {
+                        return value;
+                    }
                 }
             }
-            return base.GetString(name);
+            return null;
         }
-
-
     }
-
+  
+    /// <summary>
+    /// Base class MS Office add-in implementations.
+    /// </summary>
     public class OdfAddinLib
     {
         private AbstractConverter converter;
-        private System.Resources.ResourceManager resourceManager;
+        private ChainResourceManager resourceManager;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="converter">An implementation of AbstractConverter</param>
         public OdfAddinLib(AbstractConverter converter)
         {
             this.converter = converter;
-            this.resourceManager = 
-                new AddinResourceManager("OdfAddinLib.resources.Labels", 
-                Assembly.GetExecutingAssembly());
+            this.resourceManager = new ChainResourceManager();
+            // Add a default resource managers (for common labels)
+            this.resourceManager.Add(new System.Resources.ResourceManager("OdfAddinLib.resources.Labels",
+                Assembly.GetExecutingAssembly()));
         }
-
-        public System.Resources.ResourceManager OverrideResourceManager
-        {
-            set { ((AddinResourceManager) this.resourceManager).PrimaryResourceManager = value; }
-        }
-
 
         /// <summary>
-        /// Returns the ResourceManager containing the labels of the application.
+        /// Override default resource manager.
         /// </summary>
-        /// <returns>The ResourceManager.</returns>
-        public string GetString(string name)
+        public System.Resources.ResourceManager OverrideResourceManager
         {
-            return this.resourceManager.GetString(name);
+            set { this.resourceManager.Add(value); }
+        }
+
+
+       /// <summary>
+       /// Retrieve the label associated to the specified key
+       /// </summary>
+       /// <param name="key"></param>
+       /// <returns></returns>
+        public string GetString(string key)
+        {
+            return this.resourceManager.GetString(key);
         }
 
         /// <summary>
