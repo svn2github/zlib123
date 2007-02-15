@@ -64,6 +64,7 @@
     <!-- convert first table -->
     <xsl:apply-templates select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[1]" mode="sheet">
       <xsl:with-param name="cellNumber">0</xsl:with-param>
+      <xsl:with-param name="sheetId">1</xsl:with-param>
     </xsl:apply-templates>
     
   </xsl:template>

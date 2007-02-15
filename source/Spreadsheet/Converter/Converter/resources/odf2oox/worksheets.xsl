@@ -31,14 +31,15 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0">
   
+  <xsl:import href="measures.xsl"/>
+  <xsl:key name="style" match="style:style" use="@style:name"/>
   <!-- table is converted into sheet -->
   <xsl:template match="table:table" mode="sheet">
     <xsl:param name="cellNumber"/>
-    <xsl:variable name="sheetId">
-      <xsl:value-of select="count(preceding-sibling::table:table)+1"/>
-    </xsl:variable>
+    <xsl:param name="sheetId"/>
     <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
       <xsl:call-template name="InsertWorksheet">
         <xsl:with-param name="cellNumber" select="$cellNumber"/>
@@ -49,6 +50,9 @@
       <xsl:apply-templates select="following-sibling::table:table[1]" mode="sheet">
         <xsl:with-param name="cellNumber">
           <xsl:value-of select="$cellNumber + count(table:table-row/table:table-cell[text:p])"/>
+        </xsl:with-param>
+        <xsl:with-param name="sheetId">
+          <xsl:value-of select="$sheetId + 1"/>
         </xsl:with-param>
       </xsl:apply-templates>
     
@@ -74,8 +78,18 @@
   <xsl:template match="table:table-row" mode="sheet">
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
-      <xsl:if test="table:table-cell[child::text:p]">
         <row r="{$rowNumber}">
+          
+          <!-- insert row height -->
+          <xsl:attribute name="ht">
+            <xsl:call-template name="ConvertMeasure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
+              </xsl:with-param>
+              <xsl:with-param name="unit">point</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <xsl:attribute name="customHeight">1</xsl:attribute>
           
           <!-- insert first cell -->
           <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
@@ -85,7 +99,6 @@
           </xsl:apply-templates>
           
         </row>
-      </xsl:if>
     
     <!-- insert next row -->
       <xsl:if test="following-sibling::table:table-row">
