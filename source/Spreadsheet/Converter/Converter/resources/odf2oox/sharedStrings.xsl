@@ -37,9 +37,8 @@
   <xsl:template name="InsertSharedStrings">
     <sst>
       <xsl:variable name="Count">
-        <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p">
-          <xsl:value-of select="last()"/>
-        </xsl:for-each>  
+        <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p"/>
+        <xsl:value-of select="last()"/>
       </xsl:variable>
       <xsl:attribute name="count">
         <xsl:value-of select="$Count"/>
@@ -56,7 +55,7 @@
       <si>
         <t><xsl:value-of select="."/></t>
       </si>
-    </xsl:for-each> 
+    </xsl:for-each>
   </xsl:template>
   
 </xsl:stylesheet>
