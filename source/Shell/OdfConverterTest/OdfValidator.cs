@@ -70,7 +70,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 	/// <summary>Check the validity of a odf file. Throw an OdfValidatorException if errors occurs</summary>
 	public class OdfValidator
 	{
-        private const string RESOURCES_LOCATION = "resources";
+        private const string RESOURCES_LOCATION = ".resources.";
 		
         // namespaces and related schemas
         private static string ODF_SCHEMA = "odfschemas.OpenDocumentSchema10.rng";
@@ -87,7 +87,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.ValidationType = ValidationType.None;
             settings.XmlResolver = new EmbeddedResourceResolver(Assembly.GetExecutingAssembly(), 
-                this.GetType().Namespace + "." + RESOURCES_LOCATION, false);
+                this.GetType().Namespace, RESOURCES_LOCATION, false);
             this.grammarName = XmlReader.Create(ODF_SCHEMA, settings);
             this.report = report;
             try

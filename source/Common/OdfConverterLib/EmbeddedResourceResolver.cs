@@ -41,13 +41,17 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 	/// </summary>
 	public class EmbeddedResourceResolver : XmlUrlResolver
     {
+        private const string ODFToOOX_LOCATION = ".resources.odf2oox.";
+        private const string OOXToODF_LOCATION = ".resources.oox2odf.";
         public const string ASSEMBLY_URI_SCHEME = "assembly";
         public const string ASSEMBLY_URI_HOST = "localhost";
       
-		private Assembly assembly;
-		private Assembly shared;
-		private string prefix;
+		private Assembly appAssembly;
+		private Assembly defaultAssembly;
+		private string appNamespace;
+        private string defaultNamespace;
 		private bool isDirectTransform;
+        private string resourceLocation;
 		
 		/// <summary>
 		/// Constructor
@@ -55,17 +59,24 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		/// <param name="assembly">The assembly embedding resources</param>
 		/// <param name="prefix">The prefix used to locate resources within the assembly</param>
         /// <param name="isDirectTransform">Is the direction of conversion direct</param>
-		public EmbeddedResourceResolver(Assembly assembly, string prefix, bool isDirectTransform) :
-            this(assembly, prefix)
+		public EmbeddedResourceResolver(Assembly appAssembly, string appNamespace, bool isDirectTransform) :
+            this(appAssembly, appNamespace)
 		{
             this.isDirectTransform = isDirectTransform;
 		}
 
-        public EmbeddedResourceResolver(Assembly assembly, string prefix)
+        public EmbeddedResourceResolver(Assembly appAssembly, string appNamespace, string resourceLocation, bool isDirectTransform) :
+            this (appAssembly, appNamespace, isDirectTransform)
         {
-            this.assembly = assembly;
-            this.prefix = prefix;
-            this.shared = Assembly.GetExecutingAssembly();
+            this.resourceLocation = resourceLocation;
+        }
+
+        public EmbeddedResourceResolver(Assembly appAssembly, string appNamespace)
+        {
+            this.appAssembly = appAssembly;
+            this.appNamespace = appNamespace;
+            this.defaultNamespace = this.GetType().Namespace;
+            this.defaultAssembly = Assembly.GetExecutingAssembly();
         }
 
         public bool IsDirectTransform
@@ -90,8 +101,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		{
             if (ASSEMBLY_URI_SCHEME.Equals(absoluteUri.Scheme))
             {
-                string resource = absoluteUri.OriginalString.Remove(0, ASSEMBLY_URI_SCHEME.Length + ASSEMBLY_URI_HOST.Length + 4).Replace("/", ".");
-			    Stream stream = this.assembly.GetManifestResourceStream(this.prefix + "." + resource);
+                if (resourceLocation == null)
+                {
+                    resourceLocation = this.isDirectTransform ? ODFToOOX_LOCATION : OOXToODF_LOCATION;
+                }
+                string resource = resourceLocation + absoluteUri.OriginalString.Remove(0, ASSEMBLY_URI_SCHEME.Length + ASSEMBLY_URI_HOST.Length + 4).Replace("/", ".");
+                Stream stream = this.appAssembly.GetManifestResourceStream(this.appNamespace + resource);
                 if (stream != null)
                 {
                     return stream;
@@ -99,9 +114,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 // fallback to the shared embedded resources
                 else
                 {
-                    string path = isDirectTransform ? this.GetType().Namespace + ".resources.odf2oox." + resource :
-                                this.GetType().Namespace + ".resources.oox2odf." + resource;
-                    stream = this.shared.GetManifestResourceStream(path);
+                    stream = this.defaultAssembly.GetManifestResourceStream(this.defaultNamespace+resource);
                     if (stream != null)
                     {
                         return stream;
@@ -115,7 +128,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 	
 		public Stream GetInnerStream(String fileName) 
         {
-			return this.assembly.GetManifestResourceStream(this.prefix + "." + fileName);
+            if (resourceLocation == null)
+            {
+                resourceLocation = this.isDirectTransform ? ODFToOOX_LOCATION : OOXToODF_LOCATION;
+            }
+            string path = this.appNamespace + resourceLocation;
+			return this.appAssembly.GetManifestResourceStream(path + fileName);
 		}
 		
 

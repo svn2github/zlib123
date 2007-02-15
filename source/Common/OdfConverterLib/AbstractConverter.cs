@@ -43,8 +43,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
     /// </summary>
     public abstract class AbstractConverter
     {
-        private const string ODFToOOX_LOCATION = "odf2oox";
-        private const string OOXToODF_LOCATION = "oox2odf";
         private const string ODFToOOX_XSL = "odf2oox.xsl";
         private const string OOXToODF_XSL = "oox2odf.xsl";
         private const string SOURCE_XML = "source.xml";
@@ -67,7 +65,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         public bool DirectTransform
         {
-            set { this.isDirectTransform = value; }
+            set 
+            { 
+                this.isDirectTransform = value;
+                EmbeddedResourceResolver r = (EmbeddedResourceResolver)this.ResourceResolver;
+                r.IsDirectTransform = this.isDirectTransform;
+            }
             get { return this.isDirectTransform; }
         }
 
@@ -114,9 +117,8 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 {
                     if (this._resolver == null)
                     {
-                        string resourcesLocation = this.DirectTransform ? ODFToOOX_LOCATION : OOXToODF_LOCATION;
-                        this._resolver = new EmbeddedResourceResolver(this.resourcesAssembly,
-                            this.GetType().Namespace + ".resources." + resourcesLocation,
+
+                        this._resolver = new EmbeddedResourceResolver(this.resourcesAssembly, this.GetType().Namespace,
                             this.DirectTransform);
                     }
                     return this._resolver;
@@ -158,12 +160,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 string xslLocation = this.DirectTransform ? ODFToOOX_XSL : OOXToODF_XSL;
                 if (this.ExternalResources == null)
                 {
-                    if (computeSize) 
+                    if (computeSize)
                     {
                         xslLocation = this.DirectTransform ? ODFToOOX_COMPUTE_SIZE_XSL : OOXToODF_COMPUTE_SIZE_XSL;
                     }
-                    return new XPathDocument(((EmbeddedResourceResolver)
-                        this.ResourceResolver).GetInnerStream(xslLocation));
+                    EmbeddedResourceResolver r = (EmbeddedResourceResolver) this.ResourceResolver;
+                    return new XPathDocument(r.GetInnerStream(xslLocation));
                 }
                 else
                 {
