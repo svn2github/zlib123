@@ -98,13 +98,17 @@
     <None Include="ImageInstaller.PNG" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\OdfAddinLib\OdfAddinLib.csproj">
+      <Project>{599773FF-1E86-4AC2-8B24-34BBAC707370}</Project>
+      <Name>OdfAddinLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\OdfConverterLib\OdfConverterLib.csproj">
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OdfWordAddinLib\OdfWordAddinLib.csproj">
-      <Project>{0313EE78-AD27-47E0-9902-3149046E2F5D}</Project>
-      <Name>OdfWordAddinLib</Name>
+    <ProjectReference Include="..\Add-In\Addin.csproj">
+      <Project>{CB7A2D8C-3159-4FCE-8256-2B7D450A462C}</Project>
+      <Name>Addin</Name>
     </ProjectReference>
   </ItemGroup>
   <ProjectExtensions>

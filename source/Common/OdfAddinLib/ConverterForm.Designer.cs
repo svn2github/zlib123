@@ -26,7 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace CleverAge.OdfConverter.OdfWordAddinLib
+namespace CleverAge.OdfConverter.OdfConverterLib
 {
     partial class ConverterForm
     {

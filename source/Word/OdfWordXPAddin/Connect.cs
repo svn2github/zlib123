@@ -103,7 +103,7 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
         /// </summary>
         public Connect()
         {
-            this.addinLib = new OdfWordAddinLib();
+            this.addinLib = new CleverAge.OdfConverter.Word.Addin();
         }
 
         /// <summary>
@@ -424,7 +424,7 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
         }
 
         private MSword.Application applicationObject;
-        private OdfWordAddinLib addinLib;
+        private OdfAddinLib addinLib;
         private CommandBarButton importButton, exportButton;
 
         #region IOdfConverter Members

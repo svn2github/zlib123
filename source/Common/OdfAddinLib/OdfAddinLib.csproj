@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0313EE78-AD27-47E0-9902-3149046E2F5D}</ProjectGuid>
+    <ProjectGuid>{599773FF-1E86-4AC2-8B24-34BBAC707370}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OdfWordAddinLib</RootNamespace>
-    <AssemblyName>OdfWordAddinLib</AssemblyName>
+    <RootNamespace>OdfAddinLib</RootNamespace>
+    <AssemblyName>OdfAddinLib</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,7 +48,7 @@
     <Compile Include="InfoBox.Designer.cs">
       <DependentUpon>InfoBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="OdfWordAddinLib.cs" />
+    <Compile Include="OdfAddinLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ConverterForm.de-DE.resx">
       <DependentUpon>ConverterForm.cs</DependentUpon>
@@ -115,10 +115,6 @@
     <ProjectReference Include="..\..\Common\OdfZipUtils\OdfZipUtils.csproj">
       <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
       <Name>OdfZipUtils</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Converter\Converter.csproj">
-      <Project>{F9071930-348E-4A30-A0F6-A1A3DF3A587B}</Project>
-      <Name>Converter %28Word\Converter%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -37,17 +37,17 @@ using System.Windows.Forms;
 using System.IO;
 using System.Threading;
 using CleverAge.OdfConverter.OdfConverterLib;
-using CleverAge.OdfConverter.Word;
 using System.Resources;
 using System.Collections;
 
-namespace CleverAge.OdfConverter.OdfWordAddinLib
+namespace CleverAge.OdfConverter.OdfConverterLib
 {
 
     public partial class ConverterForm : Form
     {
         delegate void WorkCompleteCallback(Exception e);
 
+        private AbstractConverter converter;
         private string inputFile;
         private string outputFile;
         private ResourceManager manager;
@@ -59,9 +59,10 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
         private bool converting;
         private ArrayList lostElements;
 
-        public ConverterForm(string inputFile, string outputFile, ResourceManager manager, bool isDirect)
+        public ConverterForm(AbstractConverter converter, string inputFile, string outputFile, ResourceManager manager, bool isDirect)
         {
             InitializeComponent();
+            this.converter = converter;
             this.inputFile = inputFile;
             this.outputFile = outputFile;
             this.manager = manager;
@@ -106,9 +107,8 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
         private void DoConvert()
         {
             try {
-                AbstractConverter converter = new Converter();
-                converter.AddProgressMessageListener(new Converter.MessageListener(ProgressMessageInterceptor));
-                converter.AddFeedbackMessageListener(new Converter.MessageListener(FeedbackMessageInterceptor));
+                converter.AddProgressMessageListener(new AbstractConverter.MessageListener(ProgressMessageInterceptor));
+                converter.AddFeedbackMessageListener(new AbstractConverter.MessageListener(FeedbackMessageInterceptor));
                 converter.DirectTransform = this.isDirect;
                 this.computeSize = true;
                 converter.ComputeSize(this.inputFile);

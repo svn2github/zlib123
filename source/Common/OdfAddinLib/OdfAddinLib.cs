@@ -33,19 +33,64 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 using CleverAge.OdfConverter.OdfConverterLib;
-using CleverAge.OdfConverter.Word;
 
-namespace CleverAge.OdfConverter.OdfWordAddinLib
+namespace CleverAge.OdfConverter.OdfConverterLib
 {
-    public class OdfWordAddinLib
+
+    /// <summary>
+    /// Chained resource managers
+    /// </summary>
+    internal class AddinResourceManager : System.Resources.ResourceManager
     {
+        private System.Resources.ResourceManager primaryResourceManager;
 
-        private System.Resources.ResourceManager labelsResourceManager;
+        /// <summary>
+        /// Default resource manager
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="assembly"></param>
+        public AddinResourceManager(string path, Assembly assembly) : base (path, assembly)
+        { }
 
-        public OdfWordAddinLib()
+        public System.Resources.ResourceManager PrimaryResourceManager
         {
-            this.labelsResourceManager = new System.Resources.ResourceManager("OdfWordAddinLib.resources.Labels", Assembly.GetExecutingAssembly());
+            set { this.primaryResourceManager = value; }
         }
+
+        public override string GetString(string name)
+        {
+            if (this.primaryResourceManager != null)
+            {
+                string s = this.primaryResourceManager.GetString(name);   
+                if (s != null && s.Length > 0)
+                {
+                    return s;
+                }
+            }
+            return base.GetString(name);
+        }
+
+
+    }
+
+    public class OdfAddinLib
+    {
+        private AbstractConverter converter;
+        private System.Resources.ResourceManager resourceManager;
+
+        public OdfAddinLib(AbstractConverter converter)
+        {
+            this.converter = converter;
+            this.resourceManager = 
+                new AddinResourceManager("OdfAddinLib.resources.Labels", 
+                Assembly.GetExecutingAssembly());
+        }
+
+        public System.Resources.ResourceManager OverrideResourceManager
+        {
+            set { ((AddinResourceManager) this.resourceManager).PrimaryResourceManager = value; }
+        }
+
 
         /// <summary>
         /// Returns the ResourceManager containing the labels of the application.
@@ -53,7 +98,7 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
         /// <returns>The ResourceManager.</returns>
         public string GetString(string name)
         {
-            return this.labelsResourceManager.GetString(name);
+            return this.resourceManager.GetString(name);
         }
 
         /// <summary>
@@ -71,14 +116,14 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                     // create a temporary file
 
                     // call the converter
-                    using (ConverterForm form = new ConverterForm(inputFile, outputFile, this.labelsResourceManager, true))
+                    using (ConverterForm form = new ConverterForm(this.converter, inputFile, outputFile, this.resourceManager, true))
                     {
                         if (System.Windows.Forms.DialogResult.OK == form.ShowDialog())
                         {
                             if (form.HasLostElements)
                             {
                                 ArrayList elements = form.LostElements;
-                                InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.labelsResourceManager);
+                                InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
                                 infoBox.ShowDialog();
                             }
                         }
@@ -97,22 +142,22 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                 }
                 catch (EncryptedDocumentException)
                 {
-                    InfoBox infoBox = new InfoBox("EncryptedDocumentLabel", "EncryptedDocumentDetail", this.labelsResourceManager);
+                    InfoBox infoBox = new InfoBox("EncryptedDocumentLabel", "EncryptedDocumentDetail", this.resourceManager);
                     infoBox.ShowDialog();
                 }
                 catch (NotAnOdfDocumentException)
                 {
-                    InfoBox infoBox = new InfoBox("NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail", this.labelsResourceManager);
+                    InfoBox infoBox = new InfoBox("NotAnOdfDocumentLabel", "NotAnOdfDocumentDetail", this.resourceManager);
                     infoBox.ShowDialog();
                 }
                 catch (OdfZipUtils.ZipCreationException)
                 {
-                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "UnableToCreateOutputDetail", this.labelsResourceManager);
+                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "UnableToCreateOutputDetail", this.resourceManager);
                     infoBox.ShowDialog();
                 }
                 catch (Exception e)
                 {
-                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.labelsResourceManager);
+                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.resourceManager);
                     infoBox.ShowDialog();
 
                     if (File.Exists(outputFile))
@@ -125,9 +170,8 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
             {
                 try
                 {
-                    AbstractConverter conv = new Converter();
-                    conv.DirectTransform = true;
-                    conv.Transform(inputFile, outputFile);
+                    converter.DirectTransform = true;
+                    converter.Transform(inputFile, outputFile);
                 }
                 catch (Exception e)
                 {
@@ -152,14 +196,14 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
             {
                 try
                 {
-                    using (ConverterForm form = new ConverterForm(inputFile, outputFile, this.labelsResourceManager, false))
+                    using (ConverterForm form = new ConverterForm(this.converter, inputFile, outputFile, this.resourceManager, false))
                     {
                         System.Windows.Forms.DialogResult dr = form.ShowDialog();
 
                         if (form.HasLostElements)
                         {
                             ArrayList elements = form.LostElements;
-                            InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.labelsResourceManager);
+                            InfoBox infoBox = new InfoBox("FeedbackLabel", elements, this.resourceManager);
                             infoBox.ShowDialog();
                         }
 
@@ -169,12 +213,12 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                         }
                     }
                 } catch (OdfZipUtils.ZipCreationException zipEx) {
-                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", zipEx.Message ?? "UnableToCreateOutputDetail", this.labelsResourceManager);
+                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", zipEx.Message ?? "UnableToCreateOutputDetail", this.resourceManager);
                     infoBox.ShowDialog();
                 } 
                 catch (Exception e)
                 {
-                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.labelsResourceManager);
+                    InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.resourceManager);
                     infoBox.ShowDialog();
 
                     if (File.Exists(outputFile))
@@ -187,9 +231,8 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
             {
                 try
                 {
-                    Converter conv = new Converter();
-                    conv.DirectTransform = false;
-                    conv.Transform(inputFile, outputFile);
+                    converter.DirectTransform = false;
+                    converter.Transform(inputFile, outputFile);
                 }
                 catch (Exception e)
                 {
@@ -224,7 +267,7 @@ namespace CleverAge.OdfConverter.OdfWordAddinLib
                 return null;
             }
             System.Drawing.Bitmap image = new System.Drawing.Bitmap(stream);
-            return OdfWordAddinLib.ConvertImage.Convert(image);
+            return OdfAddinLib.ConvertImage.Convert(image);
         }
 
         /// <summary>

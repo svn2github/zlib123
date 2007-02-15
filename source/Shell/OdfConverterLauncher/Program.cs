@@ -28,7 +28,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using CleverAge.OdfConverter.OdfWordAddinLib;
+using CleverAge.OdfConverter.OdfConverterLib;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.IO;
@@ -124,7 +124,7 @@ namespace OdfConverterLauncher
             if (args.Length == 1) 
             {
                 string input = args[0];
-                OdfWordAddinLib lib = new OdfWordAddinLib();
+                OdfAddinLib lib = new CleverAge.OdfConverter.Word.Addin();
                 Word word = null;
 
                 try
@@ -145,7 +145,7 @@ namespace OdfConverterLauncher
                 }
                 catch (Exception e)
                 {
-                    System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfWordAddinLib.resources.Labels", 
+                    System.Resources.ResourceManager rm = new System.Resources.ResourceManager("OdfAddinLib.resources.Labels", 
                     Assembly.GetAssembly(lib.GetType()));
                     InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")",  rm);
                     infoBox.ShowDialog();

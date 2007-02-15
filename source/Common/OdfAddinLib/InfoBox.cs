@@ -38,7 +38,7 @@ using System.Resources;
 using System.Collections;
 
 using System.Runtime.InteropServices;
-namespace CleverAge.OdfConverter.OdfWordAddinLib
+namespace CleverAge.OdfConverter.OdfConverterLib
 {
     public partial class InfoBox : Form
     {

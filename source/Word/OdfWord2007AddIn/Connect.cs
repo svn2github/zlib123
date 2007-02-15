@@ -84,7 +84,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 		/// </summary>
         public Connect()
 		{
-            this.addinLib = new OdfWordAddinLib();
+            this.addinLib = new CleverAge.OdfConverter.Word.Addin();
 		}
 
 		/// <summary>
@@ -390,7 +390,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
         }
 
 		private MSword.Application applicationObject;
-        private OdfWordAddinLib addinLib;
+        private OdfAddinLib addinLib;
 
         #region IOdfConverter Members
 
