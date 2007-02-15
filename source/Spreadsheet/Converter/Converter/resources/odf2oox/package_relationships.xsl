@@ -39,11 +39,11 @@
       <Relationship Id="rId3"
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"
         Target="docProps/app.xml"/>
-      <!--xsl:if test="$docprops-custom-file > 0">
+      <xsl:if test="$docprops-custom-file > 0">
         <Relationship Id="rId4"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties"
           Target="docProps/custom.xml"/>
-      </xsl:if-->
+      </xsl:if>
     </Relationships>
   </xsl:template>
 
