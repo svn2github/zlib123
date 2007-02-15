@@ -35,22 +35,35 @@
   
   <!-- table is converted into sheet -->
   <xsl:template match="table:table" mode="sheet">
+    <xsl:param name="cellNumber"/>
     <xsl:variable name="sheetId">
       <xsl:value-of select="count(preceding-sibling::table:table)+1"/>
     </xsl:variable>
     <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
-      <xsl:call-template name="InsertWorksheet"/>
+      <xsl:call-template name="InsertWorksheet">
+        <xsl:with-param name="cellNumber" select="$cellNumber"/>
+      </xsl:call-template>
     </pzip:entry>
+    
+    <!-- convert next table -->
+      <xsl:apply-templates select="following-sibling::table:table[1]" mode="sheet">
+        <xsl:with-param name="cellNumber">
+          <xsl:value-of select="$cellNumber + count(table:table-row/table:table-cell[text:p])"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+    
   </xsl:template>
   
   <!-- insert sheet -->
   <xsl:template name="InsertWorksheet">
+    <xsl:param name="cellNumber"/>
     <worksheet>
       <sheetData>
         
         <!-- insert first row -->
         <xsl:apply-templates select="table:table-row[1]" mode="sheet">
           <xsl:with-param name="rowNumber">1</xsl:with-param>
+          <xsl:with-param name="cellNumber" select="$cellNumber"/>
         </xsl:apply-templates>
         
       </sheetData>
@@ -60,6 +73,7 @@
   <!-- insert row into sheet -->
   <xsl:template match="table:table-row" mode="sheet">
     <xsl:param name="rowNumber"/>
+    <xsl:param name="cellNumber"/>
       <xsl:if test="table:table-cell[child::text:p]">
         <row r="{$rowNumber}">
           
@@ -67,6 +81,7 @@
           <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
             <xsl:with-param name="colNumber">0</xsl:with-param>
             <xsl:with-param name="rowNumber" select="$rowNumber"/>
+            <xsl:with-param name="cellNumber" select="$cellNumber"/>
           </xsl:apply-templates>
           
         </row>
@@ -84,7 +99,10 @@
                 <xsl:value-of select="$rowNumber+1"/>
               </xsl:otherwise>
             </xsl:choose>
-          </xsl:with-param>
+            </xsl:with-param>
+            <xsl:with-param name="cellNumber">
+              <xsl:value-of select="$cellNumber + count(child::table:table-cell[text:p])"/>
+            </xsl:with-param>
         </xsl:apply-templates>
       </xsl:if>
     
@@ -94,6 +112,7 @@
   <xsl:template match="table:table-cell" mode="sheet">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
+    <xsl:param name="cellNumber"/>
     <xsl:if test="child::text:p">
       <c>
         <xsl:attribute name="r">
@@ -104,6 +123,10 @@
           </xsl:variable>
           <xsl:value-of select="concat($colChar,$rowNumber)"/>
         </xsl:attribute>
+        <xsl:attribute name="t">s</xsl:attribute>
+        <v>
+          <xsl:value-of select="number($cellNumber)"/>
+        </v>
       </c>
     </xsl:if>
     
@@ -121,6 +144,16 @@
           </xsl:choose>
         </xsl:with-param>
         <xsl:with-param name="rowNumber" select="$rowNumber"/>
+        <xsl:with-param name="cellNumber">
+          <xsl:choose>
+            <xsl:when test="child::text:p">
+              <xsl:value-of select="$cellNumber + 1"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$cellNumber"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
       </xsl:apply-templates>
     </xsl:if>
     
