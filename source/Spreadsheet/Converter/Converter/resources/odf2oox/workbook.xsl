@@ -29,6 +29,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"  
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  	xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
     
