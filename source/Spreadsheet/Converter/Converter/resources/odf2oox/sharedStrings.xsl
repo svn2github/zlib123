@@ -28,6 +28,7 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"  
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -37,8 +38,7 @@
   <xsl:template name="InsertSharedStrings">
     <sst>
       <xsl:variable name="Count">
-        <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p"/>
-        <xsl:value-of select="last()"/>
+        <xsl:value-of select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[child::text:p])"/>
       </xsl:variable>
       <xsl:attribute name="count">
         <xsl:value-of select="$Count"/>

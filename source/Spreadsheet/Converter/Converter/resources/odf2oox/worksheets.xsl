@@ -45,7 +45,7 @@
   
   <!-- insert sheet -->
   <xsl:template name="InsertWorksheet">
-    <worksheets>
+    <worksheet>
       <sheetData>
         
         <!-- insert first row -->
@@ -54,7 +54,7 @@
         </xsl:apply-templates>
         
       </sheetData>
-    </worksheets>
+    </worksheet>
   </xsl:template>
   
   <!-- insert row into sheet -->

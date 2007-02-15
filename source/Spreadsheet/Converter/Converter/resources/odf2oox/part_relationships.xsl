@@ -47,7 +47,7 @@
           <xsl:value-of select="position()"/>    
         </xsl:variable>    
         <xsl:attribute name="Target">          
-          <xsl:value-of select="concat('worksheets/sheet', $NumberSheet)"/>
+          <xsl:value-of select="concat(concat('worksheets/sheet', $NumberSheet), '.xml')"/>
         </xsl:attribute>        
       </Relationship>
     </xsl:for-each>
