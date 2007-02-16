@@ -29,13 +29,17 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"  
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  	xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+    xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+    xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
     
   <xsl:import href="worksheets.xsl"/>
   <xsl:import href="sharedStrings.xsl"/>
   
+
+  <xsl:key name="ConfigItem" match="config:config-item" use="@config:name"/>
   
   <!-- main workbook template-->
     <xsl:template name="InsertWorkbook">    
@@ -45,15 +49,64 @@
   <!-- workbook body template -->
     <xsl:template match="office:body">
     <workbook>
+      <xsl:call-template name="workbookView"/>
       <xsl:apply-templates select="office:spreadsheet"/>
     </workbook>
     </xsl:template>
   
+  <!-- workbook  view template-->
+  <xsl:template name="workbookView">
+    <bookViews>
+      <workbookView>
+        
+        <!-- Insert firstSheet attribute when first sheet is hidden -->        
+        <xsl:if test="key('style',office:spreadsheet/table:table[position()=1]/@table:style-name)/style:table-properties/@table:display = 'false'">
+          <xsl:attribute name="firstSheet">
+            <xsl:variable name="TableStyleName">
+              <xsl:value-of select="office:spreadsheet/table:table[key('style',@table:style-name)/style:table-properties/@table:display != 'false']/@table:style-name"/>
+            </xsl:variable>
+            <xsl:for-each select="office:spreadsheet/table:table[@table:style-name=$TableStyleName][position()=1]">
+              <xsl:value-of select="count(preceding-sibling::table:table)"/>
+            </xsl:for-each>  
+          </xsl:attribute>
+        </xsl:if>
+        
+        <!-- Insert activeTab (Active sheet after open the file) -->        
+        <xsl:attribute name="activeTab">
+          <xsl:variable name="ActiveTable">
+            <xsl:for-each select="document('settings.xml')">
+              <xsl:value-of select="key('ConfigItem', 'ActiveTable')"/>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:for-each select="office:spreadsheet/table:table[@table:name=$ActiveTable]">
+            <xsl:value-of select="count(preceding-sibling::table:table)"/>        
+          </xsl:for-each>
+        </xsl:attribute>
+        
+      </workbookView>
+    </bookViews>
+  </xsl:template>  
+    
   <!-- insert references to all sheets -->
   <xsl:template match="office:spreadsheet">
       <sheets>
         <xsl:for-each select="table:table">
-          <sheet name="{@table:name}" sheetId="{count(preceding-sibling::table:table)+1}" r:id="{generate-id(.)}"/>
+          <sheet>
+            <xsl:attribute name="name">
+              <xsl:value-of select="@table:name"/>
+            </xsl:attribute>
+            <xsl:attribute name="sheetId">
+              <xsl:value-of select="position()"/>
+            </xsl:attribute>
+            <xsl:attribute name="r:id">
+              <xsl:value-of select="generate-id(.)"/>
+            </xsl:attribute>
+            <xsl:if test="key('style',@table:style-name)/style:table-properties/@table:display = 'false'">
+              <xsl:attribute name="state">
+                <xsl:text>hidden</xsl:text>
+              </xsl:attribute>
+            </xsl:if>            
+          </sheet>
         </xsl:for-each>
       </sheets>
   </xsl:template>
