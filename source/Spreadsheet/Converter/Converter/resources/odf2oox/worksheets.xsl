@@ -35,7 +35,9 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0">
   
   <xsl:import href="measures.xsl"/>
+  <xsl:import href="pixel-measure.xsl"/>
   <xsl:key name="style" match="style:style" use="@style:name"/>
+  
   <!-- table is converted into sheet -->
   <xsl:template match="table:table" mode="sheet">
     <xsl:param name="cellNumber"/>
@@ -62,6 +64,16 @@
   <xsl:template name="InsertWorksheet">
     <xsl:param name="cellNumber"/>
     <worksheet>
+      <xsl:if test="table:table-column">
+        <cols>
+          
+          <!-- insert first column -->
+          <xsl:apply-templates select="table:table-column[1]" mode="sheet">
+            <xsl:with-param name="colNumber">1</xsl:with-param>
+          </xsl:apply-templates>
+          
+        </cols>
+      </xsl:if>
       <sheetData>
         
         <!-- insert first row -->
@@ -72,6 +84,59 @@
         
       </sheetData>
     </worksheet>
+  </xsl:template>
+  
+  <!-- insert column properties into sheet -->
+  <xsl:template match="table:table-column" mode="sheet">
+    <xsl:param name="colNumber"/>
+    <col min="{$colNumber}">
+      <xsl:attribute name="max">
+        <xsl:choose>
+          <xsl:when test="@table:number-columns-repeated">
+            <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$colNumber"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      
+      <!-- insert column width -->
+      <xsl:attribute name="width">
+        <xsl:variable name="pixelWidth">
+          <xsl:call-template name="pixel-measure">
+            <xsl:with-param name="length">
+          <xsl:value-of select="key('style',@table:style-name)/style:table-column-properties/@style:column-width"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="fontSize">
+          <xsl:call-template name="pixel-measure">
+            <xsl:with-param name="length">11pt</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="($pixelWidth+5) div (2 div 3 * $fontSize)"/>
+      </xsl:attribute>
+      <xsl:attribute name="customWidth">1</xsl:attribute>
+      
+    </col>    
+    
+    <!-- insert next column -->
+    <xsl:if test="following-sibling::table:table-column">
+      <xsl:apply-templates select="following-sibling::table:table-column[1]" mode="sheet">
+        <xsl:with-param name="colNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated">
+              <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$colNumber+1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
+    
   </xsl:template>
   
   <!-- insert row into sheet -->
@@ -90,6 +155,7 @@
         </xsl:call-template>
       </xsl:attribute>
       <xsl:attribute name="customHeight">1</xsl:attribute>
+      
       <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
         <xsl:attribute name="hidden">1</xsl:attribute>
       </xsl:if>
