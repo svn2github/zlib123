@@ -119,6 +119,9 @@
       </xsl:attribute>
       <xsl:attribute name="customWidth">1</xsl:attribute>
       
+      <xsl:if test="@table:visibility = 'collapse'">
+        <xsl:attribute name="hidden">1</xsl:attribute>
+      </xsl:if>
     </col>    
     
     <!-- insert next column -->
