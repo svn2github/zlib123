@@ -78,46 +78,48 @@
   <xsl:template match="table:table-row" mode="sheet">
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
-        <row r="{$rowNumber}">
-          
-          <!-- insert row height -->
-          <xsl:attribute name="ht">
-            <xsl:call-template name="ConvertMeasure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
-              </xsl:with-param>
-              <xsl:with-param name="unit">point</xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-          <xsl:attribute name="customHeight">1</xsl:attribute>
-          
-          <!-- insert first cell -->
-          <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
-            <xsl:with-param name="colNumber">0</xsl:with-param>
-            <xsl:with-param name="rowNumber" select="$rowNumber"/>
-            <xsl:with-param name="cellNumber" select="$cellNumber"/>
-          </xsl:apply-templates>
-          
-        </row>
+    <row r="{$rowNumber}">
+      
+      <!-- insert row height -->
+      <xsl:attribute name="ht">
+        <xsl:call-template name="ConvertMeasure">
+          <xsl:with-param name="length">
+            <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
+          </xsl:with-param>
+          <xsl:with-param name="unit">point</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:attribute name="customHeight">1</xsl:attribute>
+      <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
+        <xsl:attribute name="hidden">1</xsl:attribute>
+      </xsl:if>
+      <!-- insert first cell -->
+      <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
+        <xsl:with-param name="colNumber">0</xsl:with-param>
+        <xsl:with-param name="rowNumber" select="$rowNumber"/>
+        <xsl:with-param name="cellNumber" select="$cellNumber"/>
+      </xsl:apply-templates>
+      
+    </row>
     
     <!-- insert next row -->
-      <xsl:if test="following-sibling::table:table-row">
-        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="sheet">
-          <xsl:with-param name="rowNumber">
-            <xsl:choose>
-              <xsl:when test="@table:number-rows-repeated">
-                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$rowNumber+1"/>
-              </xsl:otherwise>
-            </xsl:choose>
-            </xsl:with-param>
-            <xsl:with-param name="cellNumber">
-              <xsl:value-of select="$cellNumber + count(child::table:table-cell[text:p])"/>
-            </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:if>
+    <xsl:if test="following-sibling::table:table-row">
+      <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="sheet">
+        <xsl:with-param name="rowNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-rows-repeated">
+              <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$rowNumber+1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="cellNumber">
+          <xsl:value-of select="$cellNumber + count(child::table:table-cell[text:p])"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
     
   </xsl:template>
   
