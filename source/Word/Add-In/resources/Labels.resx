@@ -117,66 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OdfImportLabel" xml:space="preserve">
-    <value>English import label...</value>
-  </data>
-  <data name="OdfImportDescription" xml:space="preserve">
-    <value>Open an Open Document Format (ODF) file.</value>
-  </data>
-  <data name="OdfExportDescription" xml:space="preserve">
-    <value>Save a copy of the document with Open Document Format (ODF).</value>
-  </data>
-  <data name="OdfMenuLabel" xml:space="preserve">
-    <value>ODF...</value>
-  </data>
-  <data name="OdfUnexpectedError" xml:space="preserve">
-    <value>An unexpected error occured. Please feel free to fill a bug report on the project web site (http://odf-converter.sourceforge.net) with your file attached.</value>
-  </data>
-  <data name="AllFileType" xml:space="preserve">
-    <value>All Files</value>
-  </data>
-  <data name="OdfFileType" xml:space="preserve">
-    <value>OpenDocument Text files</value>
-  </data>
-  <data name="NotImplemented" xml:space="preserve">
-    <value>Sorry, this feature is not yet implemented</value>
-  </data>
-  <data name="ConversionFormTitle" xml:space="preserve">
-    <value>Converting %1...</value>
-  </data>
-  <data name="FeedbackLabel" xml:space="preserve">
-    <value>Some elements may have been lost during the transformation. To see a list of potentially lost elements, click on "Details".</value>
-  </data>
-  <data name="EncryptedDocumentDetail" xml:space="preserve">
-    <value>This feature is not implemented by the current version of the add-in.</value>
-  </data>
-  <data name="EncryptedDocumentLabel" xml:space="preserve">
-    <value>This document is password protected.</value>
-  </data>
-  <data name="NotAnOdfDocumentDetail" xml:space="preserve">
-    <value>If you think it is a valid ODF document, you should fill a bug report on the project web site  (http://odf-converter.sourceforge.net) with your file attached.</value>
-  </data>
-  <data name="NotAnOdfDocumentLabel" xml:space="preserve">
-    <value>This document doesn't seem to be a valid OASIS OpenDocument file.</value>
-  </data>
-  <data name="OdfConverterNotInstalled" xml:space="preserve">
-    <value>Office 2007 File converters are not installed : the ODF convertion cannot work without.</value>
-  </data>
-  <data name="OdfExportErrorTryDocxFirst" xml:space="preserve">
-    <value>Conversion failed, please try to save the document in Word 2007 format first.</value>
-  </data>
-  <data name="OdfSaveDocumentBeforeExport" xml:space="preserve">
-    <value>Please save your document before exporting to ODF</value>
-  </data>
-  <data name="OdfConverterTitle" xml:space="preserve">
-    <value>ODF Converter</value>
-  </data>
-  <data name="UnableToCreateOutputDetail" xml:space="preserve">
-    <value>Unable to create target file : check that the path is correct and that the file is not in use by another application.</value>
-  </data>
-  <data name="UnableToCreateOutputLabel" xml:space="preserve">
-    <value>Unable to create target file</value>
-  </data>
+ 
   <data name="translation.odf2oox.paddingShortened" xml:space="preserve">
     <value>Padding size</value>
   </data>
@@ -447,7 +388,15 @@
   <data name="translation.odf2oox.lineThroughColor" xml:space="preserve">
     <value>Line through color property</value>
   </data>
-  
+  <data name="translation.oox2odf.shape.3dEffect" xml:space="preserve">
+    <value>3D effects on shapes</value>
+  </data>
+  <data name="translation.oox2odf.shape.shadow" xml:space="preserve">
+    <value>Shadow effect on shapes</value>
+  </data>
+  <data name="translation.oox2odf.shape.shadow.obscurity" xml:space="preserve">
+    <value>Shadow obscurity effect on shapes</value>
+  </data>
   <data name="translation.oox2odf.shape.shadow.complexPerspective" xml:space="preserve">
     <value>Perspective shadow effect on shapes</value>
   </data>
@@ -474,5 +423,17 @@
   </data>
   <data name="translation.oox2odf.picture.size.relativeToOriginal" xml:space="preserve">
     <value>Relative to original size option on pictures</value>
+  </data>
+  <data name="translation.oox2odf.picture.anchor.lock" xml:space="preserve">
+    <value>Anchor locking of pictures</value>
+  </data>
+  <data name="translation.oox2odf.picture.overlap" xml:space="preserve">
+    <value>Overlap pictures option</value>
+  </data>
+  <data name="translation.oox2odf.dropcap.inMargin" xml:space="preserve">
+    <value>In margin option for dropcaps</value>
+  </data>
+  <data name="translation.oox2odf.pageSetup.lineNumbers.restartEachSection" xml:space="preserve">
+    <value>Restarting line numbering per section</value>
   </data>
 </root>
