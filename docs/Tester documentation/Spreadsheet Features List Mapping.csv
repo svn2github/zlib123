@@ -1,347 +1,347 @@
 Top level Menu Item;Sub Menu Item;Section / Tab;Feature;Sub Feature;Supported by MS Excel (Y/N);"Common
 XSLT
 (Y/N)";"Implemented
-(Y/N)";Milestone;Milestone Features;Comments;;;
-File;New;;Text Document;;N;-;-;-;;Application-level feature;;;
-File;New;;Spreadsheet;;N;-;-;-;;Application-level feature;;;
-File;New;;Presentation;;N;-;-;-;;Application-level feature;;;
-File;New;;Drawing;;N;-;-;-;;Application-level feature;;;
-File;New;;Data Base;;N;-;-;-;;Application-level feature;;;
-File;New;;Html Document;;N;-;-;-;;Application-level feature;;;
-File;New;;XML Form Document;;N;-;-;-;;Application-level feature;;;
-File;New;;Master Document;;N;-;-;-;;Application-level feature;;;
-File;New;;Formula;;N;-;-;-;;Application-level feature;;;
-File;New;;Labels;;N;-;-;-;;Application-level feature;;;
-File;New;;Business Cards;;N;-;-;-;;Application-level feature;;;
-File;New;;Templates and Documents;;N;-;-;-;;Application-level feature;;;
-File;Open;Open Dialog box;Look in;;Y;-;-;-;;Application-level feature;;;
-File;Open;Open Dialog box;Recent Documents;;Y;-;-;-;;Application-level feature;;;
-File;Open;Open Dialog box;Desktop;;Y;-;-;-;;Application-level feature;;;
-File;Open;Open Dialog box;My Computer;;Y;-;-;-;;Application-level feature;;;
-File;Open;Open Dialog box;My network places;;Y;-;-;-;;Application-level feature;;;
-File;Recent Documents;;;;Y;-;-;-;;Application-level feature;;;
-File;Wizards;Letter…;;;N;-;-;-;;Application-level feature;;;
-File;Wizards;Fax…;;;N;-;-;-;;Application-level feature;;;
-File;Wizards;Agenda…;;;N;-;-;-;;Application-level feature;;;
-File;Wizards;Presentation…;;;N;-;-;-;;Application-level feature;;;
-File;Wizards;Document Converter…;;;N;-;-;-;;Application-level feature;;;
-File;Wizards;Euro Converter…;;;N;-;-;-;;Application-level feature;;;
-File;Wizards;Address Data Source…;;;N;-;-;-;;Application-level feature;;;
-File;Wizards;Install New Dictionaries…;;;N;-;-;-;;Application-level feature;;;
-File;Wizards;Install Fonts From the Web..;;;N;-;-;-;;Application-level feature;;;
-File;Properties;General;Title;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;General;Created;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;General;Type;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;General;Modified;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;General;Digitally Signed;Add;Y;Y;N;-;;v 1.1 (not done in Word converter);;;
-File;Properties;General;Digitally Signed;View;Y;Y;N;-;;v 1.1 (not done in Word converter);;;
-File;Properties;General;Digitally Signed;Remove;Y;Y;N;-;;v 1.1 (not done in Word converter);;;
-File;Properties;General;Total Editing Time;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;General;Revision Number;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;General;Apply User Data;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;Description;Title;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;Description;Subject;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;Description;Keywords;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;Description;Comments;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;User Defined;Info 1;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;User Defined;Info 2;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;User Defined;Info 3;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;User Defined;Info 4;;Y;Y;Y;M1;Document Metadata;;;;Completed
-File;Properties;Internet;Do Not Refresh Automatically;;N;-;-;-;;;;;
-File;Properties;Internet;Refresh this document;;N;-;-;-;;;;;
-File;Properties;Internet;Refresh this document;every;N;-;-;-;;;;;
-File;Properties;Internet;Redirect this document;;N;-;-;-;;;;;
-File;Properties;Internet;Redirect this document;after;N;-;-;-;;;;;
-File;Properties;Internet;Redirect this document;To URL;N;-;-;-;;;;;
-File;Properties;Internet;Redirect this document;To Frame;N;-;-;-;;;;;
-File;Properties;Statistics;Number of Sheets;;N;-;-;-;;;;;
-File;Properties;Statistics;Number of cells;;N;-;-;-;;;;;
-File;Properties;Statistics;Number of pages;;N;-;-;-;;;;;
-File;Version;;Date & Time;;N;-;-;-;;;;;
-File;Version;;Saved By;;N;-;-;-;;;;;
-File;Version;;Comments;;N;-;-;-;;;;;
-Edit;Changes;Record;;;Y;N;N;M4;Change Tracking;;;;
-Edit;Fill;Down;;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Right;;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Up;;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Left;;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Sheet..;;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Series..;Direction;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Series..;Series Type;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Series..;Time Unit;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Series..;Start Value;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Series..;End Value;;Y;-;-;-;;Application-level feature;;;
-Edit;Fill;Series..;Increment;;Y;-;-;-;;Application-level feature;;;
-Edit;Sheets;Move/Copy;To document;;Y;-;-;-;;Application-level feature;;;
-Edit;Sheets;Move/Copy;Insert before;;Y;-;-;-;;Application-level feature;;;
-Edit;Sheets;Move/Copy;Copy;;Y;-;-;-;;Application-level feature;;;
-Edit;Sheets;Select;Selected Sheets;;Y;-;-;-;;Application-level feature;;;
-Edit;Sheets;Delete;;;Y;-;-;-;;Application-level feature;;;
-Edit;Plug in;;;;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Pointer;;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Drag Mode;Insert as Hyper Link;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Drag Mode;Insert as Link;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Drag Mode;Insert as copy;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Sheets;;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Range Names;;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Database Ranges;;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Linked Areas;;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Graphics;;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;OLE Objects;;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Notes;;Y;-;-;-;;Application-level feature;;;
-Edit;Navigator;;Drawing objects;;Y;-;-;-;;Application-level feature;;;
-Edit;Headers & Footers;Header;;;Y;N;N;M2;Headers & Footers;;;;
-Edit;Headers & Footers;Footer;;;Y;N;N;M2;Headers & Footers;;;;
-View;normal;;;;Y;N;N;M2;Page Styles and Layout;;;;
-View;Page Break Preview;;;;Y;N;N;M2;Page Styles and Layout;;;;
-View;Full Screen;;;;Y;-;-;-;;Application-level feature;;;
-View;Work Book Views;;;;N;-;-;-;;;;;
-View;Columns  and Row Headers;;;;Y;N;N;M2;Page Styles and Layout;;;;
-View;Value Highlighting;;;;N;-;-;-;;Application-level feature;;;
-View;Data source;;;;N;-;-;-;;Application-level feature;;;
-View;Toolbars;;;;Y;-;-;-;;Application-level feature;;;
-View;Status Bar;;;;Y;-;-;-;;Application-level feature;;;
-View;Input Status Method;;;;N;-;-;-;;Application-level feature. Only supported under Unix;;;
-View;Zoom;;;;Y;N;N;M2;Page Styles and Layout;Not kept in Word converter;;;
-Insert;Manual Break;;Line Break;;Y;N;N;M3;Manual Breaks;;;;
-Insert;Manual Break;;Column Break;;Y;N;N;M3;Manual Breaks;;;;
-Insert;Cells..;Shift Cells Down;;;Y;-;-;-;;Application-level feature;;;
-Insert;Cells..;Shift Cells Right;;;Y;-;-;-;;Application-level feature;;;
-Insert;Cells..;Entire Row;;;Y;-;-;-;;Application-level feature;;;
-Insert;Cells..;Entire Column;;;Y;-;-;-;;Application-level feature;;;
-Insert;Rows;;;;Y;-;-;-;;Application-level feature;;;
-Insert;Columns;;;;Y;-;-;-;;Application-level feature;;;
-Insert;Sheet;Position;;;Y;-;-;-;;Application-level feature;;;
-Insert;Sheet;Sheet;;;Y;-;-;-;;Application-level feature;;;
-Insert;Sheet;From file..;;;Y;-;-;-;;Application-level feature;;;
-Insert;Link to external data..;Url of external data source;;;Y;N;N;M3;Link to external data..;It's not possible to link to Access file;;;
-Insert;Link to external data..;Available Tables /ranges;;;Y;N;N;M3;Link to external data..;;;;
-Insert;Link to external data..;Update every;;;Y;N;N;M3;Link to external data..;;;;
-Insert;Special Character;;;;Y;N;N;M3;Special Character & Formatting Marks;;;;
-Insert;Formatting Mark;Non- breaking space;;;N;-;-;-;;;;;
-Insert;Formatting Mark;Non- breaking hyphen;;;N;-;-;-;;;;;
-Insert;Formatting Mark;Optional Hyphen;;;N;-;-;-;;;;;
-Insert;Hyperlink;Internet;Hyperlink Type;web;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Internet;Hyperlink Type;FTP;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Internet;Hyperlink Type;Telnet;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Internet;Further Settings;Frame;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Internet;Further Settings;Text;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Internet;Further Settings;Name;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Mail & News;Mail & News;Receiver;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Mail & News;Mail & News;Subject;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Mail & News;Further Settings;Frame;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Mail & News;Further Settings;Text;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Mail & News;Further Settings;Name;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Document;Document;Path;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Document;Target in Document;Target;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Document;Target in Document;Url;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Document;Further Settings;Frame;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Document;Further Settings;Text;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;Document;Further Settings;Name;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;New Document;New Document ;;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;New Document;File Type;;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;New Document;Further Settings;Frame;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;New Document;Further Settings;Text;Y;N;N;M3;Hyperlinks;;;;
-Insert;Hyperlink;New Document;Further Settings;Name;Y;N;N;M3;Hyperlinks;;;;
-Insert;Functions…;Functions;Category;;Y;N;N;-;;v 1.1 (Formulas);;;
-Insert;Functions…;Functions;Function;;Y;N;N;-;;v 1.1 (Formulas);;;
-Insert;Functions…;Functions;Result;;Y;N;N;-;;v 1.1 (Formulas);;;
-Insert;Functions…;Functions;Functional Result;;Y;N;N;-;;v 1.1 (Formulas);;;
-Insert;Name;Define..;Name;;Y;N;N;M4;Names and Labels for Data Ranges;;;;
-Insert;Name;Define..;Assigned To;;Y;N;N;M4;Names and Labels for Data Ranges;;;;
-Insert;Name;Insert..;Insert Name;;Y;N;N;M4;Names and Labels for Data Ranges;;;;
-Insert;Name;Create..;Create Names From;;N;-;-;-;;Application-level feature;;;
-Insert;Name;Labels..;Range;;N;-;-;-;;;;;
-Insert;Name;Labels..;For Data Range;;N;-;-;-;;;;;
-Insert;Name;Labels..;Add;;N;-;-;-;;;;;
-Insert;Note;;;;Y;N;N;M2;Annotations;;;;
-Insert;Picture;;;;Y;N;N;M2;Pictures;;;;
-Insert;Move and Sound;;;;N;-;-;-;;;;;
-Insert;Object;;;;Y;N;N;M3;OLE Object;;;;
-Insert;Chart;;;;Y;Y;N;M5;Charts;;;;
-Insert;Floating Frame;;;;N;-;-;-;;;;;
-Format;Default Formatting;;;;N;-;-;-;;;;;
-Format;Cells..;Numbers;Category;;Y;N;N;M2;Data styles;;;;
-Format;Cells..;Numbers;Format;;Y;N;N;M2;Data styles;;;;
-Format;Cells..;Numbers;Options;;Y;N;N;M2;Data styles;;;;
-Format;Cells..;Numbers;Format Code;;Y;N;N;M2;Data styles;;;;
-Format;Cells..;Font;Font ;;Y;N;N;M1;Basic Text and Paragraph Formatting;;;;
-Format;Cells..;Font;Type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;;;;
-Format;Cells..;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;;;;
-Format;Cells..;Font;Language;;Y;N;N;M1;Basic Text and Paragraph Formatting;;;;
-Format;Cells..;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Font Effects;Strike Through;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Font Effects;Font Color;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Font Effects;Relief;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Text Alignment;Horizontal;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Text Alignment;Vertical;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Text Alignment;Text Orientation;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Borders;;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Background;;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Protection;Hide all;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Cells..;Protection;Hide (When Print);;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Row;Height..;;;Y;N;Y;M1;Basic and Advanced Table Model;;;;
-Format;Row;Optimal Height;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel;;;
-Format;Row;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;;;
-Format;Row;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;;;
-Format;Column;Width;;;Y;N;Y;M1;Basic and Advanced Table Model;;;;
-Format;Column;Optimal Width;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel;;;
-Format;Column;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;;;
-Format;Column;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;;;
-Format;Sheet;Rename..;;;Y;N;N;M1;Document structure;;;;Completed
-Format;Sheet;Hide;;;Y;N;N;M1;Document structure;;;;Completed
-Format;Sheet;Show;;;Y;N;N;M1;Document structure;;;;Completed
-Format;Sheet;Right - Left;;;Y;N;N;M1;Document structure;;;;
-Format;Merge Cells;;;;Y;N;N;M1;Basic and Advanced Table Model;;;;
-Format;Page;;;;Y;N;N;M2;Page Styles and Layout;;;;
-Format;Page;Organizer;;;Y;N;N;M2;Page Styles and Layout;;;;
-Format;Page;Page;;;Y;N;N;M2;Page Styles and Layout;;;;
-Format;Page;Borders;;;Y;N;N;M2;Page Styles and Layout;;;;
-Format;Page;Background;;;Y;N;N;M2;Page Styles and Layout;;;;
-Format;Page;Header;;;Y;N;N;M2;Page Styles and Layout;;;;
-Format;Page;Footer;;;Y;N;N;M2;Page Styles and Layout;;;;
-Format;Page;Sheet;;;Y;N;N;M2;Page Styles and Layout;;;;
-Format;Character;Font;Font;;Y;N;N;M1;Basic Text and Paragraph Formatting;;;;
-Format;Character;Font;type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;;;;
-Format;Character;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;;;;
-Format;Character;Font;Language;;Y;N;N;M1;Basic Text and Paragraph Formatting;;;;
-Format;Character;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Character;Font Effects;Color;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Character;Font Effects;Strike through;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Character;Font Effects;Font Color;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Character;Font Effects;Relief;Outline;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Character;Font Effects;Relief;Shadow;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Character;Position;Superscript;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Character;Position;Superscript;Raise/Lower By;N;-;-;-;;;;;
-Format;Character;Position;Normal;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Character;Position;subscript;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Character;Scaling;Scale width;;N;-;-;-;;;;;
-Format;Character;Spacing;Scale width;;N;-;-;-;;;;;
-Format;Styles and Formating;Cell Styles;;;Y;N;N;M2;Styles and Default styles;;;;
-Format;Conditional Formatting;Condition1;;;Y;N;N;M2;Conditional Formatting;;;;
-Format;Conditional Formatting;Condition2;;;Y;N;N;M2;Conditional Formatting;;;;
-Format;Conditional Formatting;Condition3;;;Y;N;N;M2;Conditional Formatting;;;;
-Format;Group;Group;;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Group;Ungroup;;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Group;Entire Group;;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Group;Exit Group;;;Y;N;N;M2;Text & Paragraph formatting;;;;
-Format;Control;;;;Y;N;N;-;;not implemented for Word V1.0.;;;
-Format;Form;;;;Y;N;N;-;;not implemented for Word V1.0.;;;
-Tools;Spell Check;;;;Y;N;;-;;Application-level feature;;;
-Tools;Language;;;;Y;N;;M2;Language Settings;;;;
-Tools;Detective;Trace Precedents;;;Y;N;N;-;; Application-level feature in Excel;;;
-Tools;Detective;Remove Precedents;;;Y;N;N;-;; Application-level feature in Excel;;;
-Tools;Detective;Trace Dependents;;;Y;N;N;-;; Application-level feature in Excel;;;
-Tools;Detective;Remove Dependents;;;Y;N;N;-;; Application-level feature in Excel;;;
-Tools;Detective;Remove All Traces;;;Y;N;N;-;; Application-level feature in Excel;;;
-Tools;Detective;Trace Error;;;Y;N;N;-;; Application-level feature in Excel;;;
-Tools;Detective;Mark Invalid Data;;;Y;N;N;-;; Application-level feature in Excel;;;
-Tools;Detective;Refresh Traces;;;Y;N;N;-;; Application-level feature in Excel;;;
-Tools;Detective;Auto Refresh;;;Y;N;N;-;; Application-level feature in Excel;;;
-Tools;Detective;Fill Mode;;;N;N;N;-;;;;;
-Tools;Goal Seek;Default Settings;Formulae Cell;;Y;N;N;-;;Application-level feature;;;
-Tools;Goal Seek;Default Settings;Target Value;;Y;N;N;-;;Application-level feature;;;
-Tools;Goal Seek;Default Settings;Variable Cell;;Y;N;N;-;;Application-level feature;;;
-Tools;Scenario;Name of Scenario;;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis""";;;
-Tools;Scenario;Comment;;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis""";;;
-Tools;Scenario;Settings;Display border;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis""";;;
-Tools;Scenario;Settings;Copy Back;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis""";;;
-Tools;Scenario;Settings;Copy entire sheet;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis""";;;
-Tools;Scenario;Settings;Prevent Changes;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis""";;;
-Tools;Protect Sheet;Password;;;Y;N;N;-;;v 1.1;;;
-Tools;Protect Sheet;Confirm Password;;;Y;N;N;-;;v 1.1;;;
-Tools;Protect Document;Password;;;Y;N;N;-;;v 1.1;;;
-Tools;Protect Document;Confirm Password;;;Y;N;N;-;;v 1.1;;;
-Tools;Cell Contents;Recalculate ;;;Y;N;N;-;;Application-level feature;;;
-Tools;Cell Contents;Auto Calculate;;;Y;N;N;M4;;;;;
-Tools;Cell Contents;Auto input;;;Y;N;N;-;;Application-level feature;;;
-Tools;Gallery;;;;Y;-;-;-;;Application-level feature;;;
-Tools;Media Player;;;;N;-;-;-;;Application-level feature;;;
-Tools;Macro;Record Macro;;;Y;N;N;-;;v 1.1;;;
-Tools;Macro;Run Macro;Library ;;Y;N;N;-;;v 1.1;;;
-Tools;Macro;Run Macro;Macro Name;;Y;N;N;-;;v 1.1;;;
-Tools;Macro;Organize Macro;Open Office.org Basic Macros;Macro Name;Y;N;N;-;;v 1.1;;;
-Tools;Macro;Organize Macro;Open Office.org Basic Macros;Macro From;Y;N;N;-;;v 1.1;;;
-Tools;Macro;Organize Macro;Open Office.org Basic Macros;Existing Macros;Y;N;N;-;;v 1.1;;;
-Tools;Macro;Organize Dialogues;Modules;Modules;Y;N;N;-;;v 1.1;;;
-Tools;Macro;Organize Dialogues;Dialogues;Dialogues;Y;N;N;-;;v 1.1;;;
-Tools;Macro;Organize Dialogues;Libraries;Location;Y;N;N;-;;v 1.1;;;
-Tools;Macro;Organize Dialogues;Libraries;Library;Y;N;N;-;;v 1.1;;;
-Tools;Package Manager;Browse Packages;;;Y;-;-;-;;Application-level feature;;;
-Tools;Package Manager;Add..;;;Y;-;-;-;;Application-level feature;;;
-Tools;Xml filter settings;;;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Menus..;Menu;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Menus..;Menu Content;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Menus..;Save in;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Menus..;Description;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Key board;Shortcut keys;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Key board;Functions;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Tool Bar;Tool bar;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Tool Bar;Toolbar content;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Tool Bar;Save in;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Events;Save in;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Events;Assign Macro;;Y;-;-;-;;Application-level feature;;;
-Tools;customize..;Events;Remove Macro;;Y;-;-;-;;Application-level feature;;;
-Tools;Options..;Open Office.Org;;;Y;-;-;-;;Application-level feature;;;
-Tools;Options..;Load Save;;;Y;-;-;-;;Application-level feature;;;
-Tools;Options..;Language Settings;;;Y;-;-;-;;Application-level feature;;;
-Tools;Options..;Open OfficeOrg.Calc;;;Y;-;-;-;;Application-level feature;;;
-Tools;Options..;OpenOfficeOrg.Base;;;Y;-;-;-;;Application-level feature;;;
-Tools;Options..;Charts;;;Y;-;-;-;;Application-level feature;;;
-Tools;Options..;Internet;;;Y;-;-;-;;Application-level feature;;;
-Data;Define Range;Name;;;N;-;-;-;;This relates to database ranges (implicit in Excel);;;
-Data;Define Range;Range;;;N;-;-;-;;This relates to database ranges (implicit in Excel);;;
-Data;Select Range ;Ranges;;;N;-;-;-;;This relates to database ranges (implicit in Excel);;;
-Data;Sort;Sort by;Ascending;;Y;N;N;M3;Sort;;;;
-Data;Sort;Sort by;Descending;;Y;N;N;M3;Sort;;;;
-Data;Sort;Then by;Ascending;;Y;N;N;M3;Sort;;;;
-Data;Sort;Then by;Descending;;Y;N;N;M3;Sort;;;;
-Data;Sort;Then by;Ascending;;Y;N;N;M3;Sort;;;;
-Data;Sort;Then by;Descending;;Y;N;N;M3;Sort;;;;
-Data;Sort;Options;Case Sensitive;;Y;N;N;M3;Sort;;;;
-Data;Sort;Options;Range Contains Col. Names;;Y;N;N;M3;Sort;;;;
-Data;Sort;Options;Include Formats;;Y;N;N;M3;Sort;;;;
-Data;Sort;Options;Copy sort  results to;;N;-;-;M3;Sort;;;;
-Data;Sort;Options;Custom sort order;;Y;N;N;M3;Sort;;;;
-Data;Sort;Options;Language;;N;-;-;M3;Sort;;;;
-Data;Sort;Options;Direction;;Y;N;N;M3;Sort;;;;
-Data;Sort;Options;Data Area;;Y;-;-;M3;Sort;Implicit in Excel;;;
-Data;Filter;Auto filter;;;Y;N;N;M3;Filters;;;;
-Data;Filter;Standard Filter..;;;Y;N;N;M3;Filters;;;;
-Data;Filter;Advanced Filter..;;;Y;N;N;M3;Filters;;;;
-Data;Filter;Remove Filter;;;Y;N;N;M3;Filters;;;;
-Data;Filter;Hide Auto filter;;;Y;N;N;M3;Filters;;;;
-Data;Subtotals;1st group;Group by;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;1st group;Calculate Sub totals for;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;1st group;Use function;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;2nd group;Group by;;N;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;2nd group;Calculate Sub totals for;;N;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;2nd group;Use function;;N;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;3rd group;Group by;;N;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;3rd group;Calculate Sub totals for;;N;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;3rd group;Use function;;N;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;Options;Groups;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Subtotals;Options;Sort;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel);;;
-Data;Validity;Criteria;Allow;;Y;N;N;M3;Data Validation;;;;
-Data;Validity;Criteria;Data;;Y;N;N;M3;Data Validation;;;;
-Data;Validity;Criteria;Value;;Y;N;N;M3;Data Validation;;;;
-Data;Validity;Input help;Show input help when cell is selected;;Y;N;N;M3;Data Validation;;;;
-Data;Validity;Input help;contents;;Y;N;N;M3;Data Validation;;;;
-Data;Validity;Error Alert;Show Error message;;Y;N;N;M3;Data Validation;;;;
-Data;Validity;Error Alert;Contents;;Y;N;N;M3;Data Validation;;;;
-Data;Consolidate;Function;;;Y;-;-;M3;Data Consolidation;;;;
-Data;Consolidate;Consolidation Ranges;;;Y;-;-;M3;Data Consolidation;;;;
-Data;Consolidate;Source Data Range;;;Y;-;-;M3;Data Consolidation;;;;
-Data;Consolidate;Copy Results to;;;N;-;-;-;;;;;
-Data;Outline;Hide Details;;;Y;N;N;M3;Data Grouping;;;;
-Data;Outline;Show Details;;;Y;N;N;M3;Data Grouping;;;;
-Data;Outline;Group;;;Y;N;N;M3;Data Grouping;;;;
-Data;Outline;Ungroup;;;Y;N;N;M3;Data Grouping;;;;
-Data;Outline;Auto Outline ;;;Y;N;N;M3;Data Grouping;;;;
-Data;Outline;Remove;;;Y;N;N;M3;Data Grouping;;;;
-Data;Data Pilot;Start;Current Selection;;Y;N;N;M4;Data Pilot Tables;;;;
-Data;Data Pilot;Start;Data Source ;;Y;N;N;M4;Data Pilot Tables;;;;
-Data;Data Pilot;Start;External Source/Interface…;;Y;N;N;M4;Data Pilot Tables;;;;
-Data;Data Pilot;Refresh;;;Y;-;-;-;;Application-level feature;;;
-Data;Data Pilot;Delete;;;N;-;-;-;;Application-level feature;;;
-Drawing;TextBox;;;;Y;Y;N;M2;Text boxes;;;;
+(Y/N)";Milestone;Milestone Features;Comments
+File;New;;Text Document;;N;-;-;-;;Application-level feature
+File;New;;Spreadsheet;;N;-;-;-;;Application-level feature
+File;New;;Presentation;;N;-;-;-;;Application-level feature
+File;New;;Drawing;;N;-;-;-;;Application-level feature
+File;New;;Data Base;;N;-;-;-;;Application-level feature
+File;New;;Html Document;;N;-;-;-;;Application-level feature
+File;New;;XML Form Document;;N;-;-;-;;Application-level feature
+File;New;;Master Document;;N;-;-;-;;Application-level feature
+File;New;;Formula;;N;-;-;-;;Application-level feature
+File;New;;Labels;;N;-;-;-;;Application-level feature
+File;New;;Business Cards;;N;-;-;-;;Application-level feature
+File;New;;Templates and Documents;;N;-;-;-;;Application-level feature
+File;Open;Open Dialog box;Look in;;Y;-;-;-;;Application-level feature
+File;Open;Open Dialog box;Recent Documents;;Y;-;-;-;;Application-level feature
+File;Open;Open Dialog box;Desktop;;Y;-;-;-;;Application-level feature
+File;Open;Open Dialog box;My Computer;;Y;-;-;-;;Application-level feature
+File;Open;Open Dialog box;My network places;;Y;-;-;-;;Application-level feature
+File;Recent Documents;;;;Y;-;-;-;;Application-level feature
+File;Wizards;Letter…;;;N;-;-;-;;Application-level feature
+File;Wizards;Fax…;;;N;-;-;-;;Application-level feature
+File;Wizards;Agenda…;;;N;-;-;-;;Application-level feature
+File;Wizards;Presentation…;;;N;-;-;-;;Application-level feature
+File;Wizards;Document Converter…;;;N;-;-;-;;Application-level feature
+File;Wizards;Euro Converter…;;;N;-;-;-;;Application-level feature
+File;Wizards;Address Data Source…;;;N;-;-;-;;Application-level feature
+File;Wizards;Install New Dictionaries…;;;N;-;-;-;;Application-level feature
+File;Wizards;Install Fonts From the Web..;;;N;-;-;-;;Application-level feature
+File;Properties;General;Title;;Y;Y;Y;M1;Document Metadata;
+File;Properties;General;Created;;Y;Y;Y;M1;Document Metadata;
+File;Properties;General;Type;;Y;Y;Y;M1;Document Metadata;
+File;Properties;General;Modified;;Y;Y;Y;M1;Document Metadata;
+File;Properties;General;Digitally Signed;Add;Y;Y;N;-;;v 1.1 (not done in Word converter)
+File;Properties;General;Digitally Signed;View;Y;Y;N;-;;v 1.1 (not done in Word converter)
+File;Properties;General;Digitally Signed;Remove;Y;Y;N;-;;v 1.1 (not done in Word converter)
+File;Properties;General;Total Editing Time;;Y;Y;Y;M1;Document Metadata;
+File;Properties;General;Revision Number;;Y;Y;Y;M1;Document Metadata;
+File;Properties;General;Apply User Data;;Y;Y;Y;M1;Document Metadata;
+File;Properties;Description;Title;;Y;Y;Y;M1;Document Metadata;
+File;Properties;Description;Subject;;Y;Y;Y;M1;Document Metadata;
+File;Properties;Description;Keywords;;Y;Y;Y;M1;Document Metadata;
+File;Properties;Description;Comments;;Y;Y;Y;M1;Document Metadata;
+File;Properties;User Defined;Info 1;;Y;Y;Y;M1;Document Metadata;
+File;Properties;User Defined;Info 2;;Y;Y;Y;M1;Document Metadata;
+File;Properties;User Defined;Info 3;;Y;Y;Y;M1;Document Metadata;
+File;Properties;User Defined;Info 4;;Y;Y;Y;M1;Document Metadata;
+File;Properties;Internet;Do Not Refresh Automatically;;N;-;-;-;;
+File;Properties;Internet;Refresh this document;;N;-;-;-;;
+File;Properties;Internet;Refresh this document;every;N;-;-;-;;
+File;Properties;Internet;Redirect this document;;N;-;-;-;;
+File;Properties;Internet;Redirect this document;after;N;-;-;-;;
+File;Properties;Internet;Redirect this document;To URL;N;-;-;-;;
+File;Properties;Internet;Redirect this document;To Frame;N;-;-;-;;
+File;Properties;Statistics;Number of Sheets;;N;-;-;-;;
+File;Properties;Statistics;Number of cells;;N;-;-;-;;
+File;Properties;Statistics;Number of pages;;N;-;-;-;;
+File;Version;;Date & Time;;N;-;-;-;;
+File;Version;;Saved By;;N;-;-;-;;
+File;Version;;Comments;;N;-;-;-;;
+Edit;Changes;Record;;;Y;N;N;M4;Change Tracking;
+Edit;Fill;Down;;;Y;-;-;-;;Application-level feature
+Edit;Fill;Right;;;Y;-;-;-;;Application-level feature
+Edit;Fill;Up;;;Y;-;-;-;;Application-level feature
+Edit;Fill;Left;;;Y;-;-;-;;Application-level feature
+Edit;Fill;Sheet..;;;Y;-;-;-;;Application-level feature
+Edit;Fill;Series..;Direction;;Y;-;-;-;;Application-level feature
+Edit;Fill;Series..;Series Type;;Y;-;-;-;;Application-level feature
+Edit;Fill;Series..;Time Unit;;Y;-;-;-;;Application-level feature
+Edit;Fill;Series..;Start Value;;Y;-;-;-;;Application-level feature
+Edit;Fill;Series..;End Value;;Y;-;-;-;;Application-level feature
+Edit;Fill;Series..;Increment;;Y;-;-;-;;Application-level feature
+Edit;Sheets;Move/Copy;To document;;Y;-;-;-;;Application-level feature
+Edit;Sheets;Move/Copy;Insert before;;Y;-;-;-;;Application-level feature
+Edit;Sheets;Move/Copy;Copy;;Y;-;-;-;;Application-level feature
+Edit;Sheets;Select;Selected Sheets;;Y;-;-;-;;Application-level feature
+Edit;Sheets;Delete;;;Y;-;-;-;;Application-level feature
+Edit;Plug in;;;;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Pointer;;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Drag Mode;Insert as Hyper Link;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Drag Mode;Insert as Link;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Drag Mode;Insert as copy;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Sheets;;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Range Names;;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Database Ranges;;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Linked Areas;;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Graphics;;Y;-;-;-;;Application-level feature
+Edit;Navigator;;OLE Objects;;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Notes;;Y;-;-;-;;Application-level feature
+Edit;Navigator;;Drawing objects;;Y;-;-;-;;Application-level feature
+Edit;Headers & Footers;Header;;;Y;N;N;M2;Headers & Footers;
+Edit;Headers & Footers;Footer;;;Y;N;N;M2;Headers & Footers;
+View;normal;;;;Y;N;N;M2;Page Styles and Layout;
+View;Page Break Preview;;;;Y;N;N;M2;Page Styles and Layout;
+View;Full Screen;;;;Y;-;-;-;;Application-level feature
+View;Work Book Views;;;;N;-;-;-;;
+View;Columns  and Row Headers;;;;Y;N;N;M2;Page Styles and Layout;
+View;Value Highlighting;;;;N;-;-;-;;Application-level feature
+View;Data source;;;;N;-;-;-;;Application-level feature
+View;Toolbars;;;;Y;-;-;-;;Application-level feature
+View;Status Bar;;;;Y;-;-;-;;Application-level feature
+View;Input Status Method;;;;N;-;-;-;;Application-level feature. Only supported under Unix
+View;Zoom;;;;Y;N;N;M2;Page Styles and Layout;Not kept in Word converter
+Insert;Manual Break;;Line Break;;Y;N;N;M3;Manual Breaks;
+Insert;Manual Break;;Column Break;;Y;N;N;M3;Manual Breaks;
+Insert;Cells..;Shift Cells Down;;;Y;-;-;-;;Application-level feature
+Insert;Cells..;Shift Cells Right;;;Y;-;-;-;;Application-level feature
+Insert;Cells..;Entire Row;;;Y;-;-;-;;Application-level feature
+Insert;Cells..;Entire Column;;;Y;-;-;-;;Application-level feature
+Insert;Rows;;;;Y;-;-;-;;Application-level feature
+Insert;Columns;;;;Y;-;-;-;;Application-level feature
+Insert;Sheet;Position;;;Y;-;-;-;;Application-level feature
+Insert;Sheet;Sheet;;;Y;-;-;-;;Application-level feature
+Insert;Sheet;From file..;;;Y;-;-;-;;Application-level feature
+Insert;Link to external data..;Url of external data source;;;Y;N;N;M3;Link to external data..;It's not possible to link to Access file
+Insert;Link to external data..;Available Tables /ranges;;;Y;N;N;M3;Link to external data..;
+Insert;Link to external data..;Update every;;;Y;N;N;M3;Link to external data..;
+Insert;Special Character;;;;Y;N;N;M3;Special Character & Formatting Marks;
+Insert;Formatting Mark;Non- breaking space;;;N;-;-;-;;
+Insert;Formatting Mark;Non- breaking hyphen;;;N;-;-;-;;
+Insert;Formatting Mark;Optional Hyphen;;;N;-;-;-;;
+Insert;Hyperlink;Internet;Hyperlink Type;web;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Internet;Hyperlink Type;FTP;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Internet;Hyperlink Type;Telnet;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Internet;Further Settings;Frame;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Internet;Further Settings;Text;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Internet;Further Settings;Name;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Mail & News;Mail & News;Receiver;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Mail & News;Mail & News;Subject;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Mail & News;Further Settings;Frame;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Mail & News;Further Settings;Text;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Mail & News;Further Settings;Name;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Document;Document;Path;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Document;Target in Document;Target;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Document;Target in Document;Url;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Document;Further Settings;Frame;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Document;Further Settings;Text;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;Document;Further Settings;Name;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;New Document;New Document ;;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;New Document;File Type;;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;New Document;Further Settings;Frame;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;New Document;Further Settings;Text;Y;N;N;M3;Hyperlinks;
+Insert;Hyperlink;New Document;Further Settings;Name;Y;N;N;M3;Hyperlinks;
+Insert;Functions…;Functions;Category;;Y;N;N;-;;v 1.1 (Formulas)
+Insert;Functions…;Functions;Function;;Y;N;N;-;;v 1.1 (Formulas)
+Insert;Functions…;Functions;Result;;Y;N;N;-;;v 1.1 (Formulas)
+Insert;Functions…;Functions;Functional Result;;Y;N;N;-;;v 1.1 (Formulas)
+Insert;Name;Define..;Name;;Y;N;N;M4;Names and Labels for Data Ranges;
+Insert;Name;Define..;Assigned To;;Y;N;N;M4;Names and Labels for Data Ranges;
+Insert;Name;Insert..;Insert Name;;Y;N;N;M4;Names and Labels for Data Ranges;
+Insert;Name;Create..;Create Names From;;N;-;-;-;;Application-level feature
+Insert;Name;Labels..;Range;;N;-;-;-;;
+Insert;Name;Labels..;For Data Range;;N;-;-;-;;
+Insert;Name;Labels..;Add;;N;-;-;-;;
+Insert;Note;;;;Y;N;N;M2;Annotations;
+Insert;Picture;;;;Y;N;N;M2;Pictures;
+Insert;Move and Sound;;;;N;-;-;-;;
+Insert;Object;;;;Y;N;N;M3;OLE Object;
+Insert;Chart;;;;Y;Y;N;M5;Charts;
+Insert;Floating Frame;;;;N;-;-;-;;
+Format;Default Formatting;;;;N;-;-;-;;
+Format;Cells..;Numbers;Category;;Y;N;N;M2;Data styles;
+Format;Cells..;Numbers;Format;;Y;N;N;M2;Data styles;
+Format;Cells..;Numbers;Options;;Y;N;N;M2;Data styles;
+Format;Cells..;Numbers;Format Code;;Y;N;N;M2;Data styles;
+Format;Cells..;Font;Font ;;Y;N;N;M1;Basic Text and Paragraph Formatting;
+Format;Cells..;Font;Type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;
+Format;Cells..;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;
+Format;Cells..;Font;Language;;Y;N;N;M1;Basic Text and Paragraph Formatting;
+Format;Cells..;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Font Effects;Strike Through;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Font Effects;Font Color;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Font Effects;Relief;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Text Alignment;Horizontal;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Text Alignment;Vertical;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Text Alignment;Text Orientation;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Borders;;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Background;;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Protection;Hide all;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Cells..;Protection;Hide (When Print);;Y;N;N;M2;Text & Paragraph formatting;
+Format;Row;Height..;;;Y;N;Y;M1;Basic and Advanced Table Model;
+Format;Row;Optimal Height;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel
+Format;Row;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;
+Format;Row;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;
+Format;Column;Width;;;Y;N;Y;M1;Basic and Advanced Table Model;
+Format;Column;Optimal Width;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel
+Format;Column;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;
+Format;Column;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;
+Format;Sheet;Rename..;;;Y;N;Y;M1;Document structure;
+Format;Sheet;Hide;;;Y;N;Y;M1;Document structure;
+Format;Sheet;Show;;;Y;N;Y;M1;Document structure;
+Format;Sheet;Right - Left;;;Y;N;N;M1;Document structure;
+Format;Merge Cells;;;;Y;N;N;M1;Basic and Advanced Table Model;
+Format;Page;;;;Y;N;N;M2;Page Styles and Layout;
+Format;Page;Organizer;;;Y;N;N;M2;Page Styles and Layout;
+Format;Page;Page;;;Y;N;N;M2;Page Styles and Layout;
+Format;Page;Borders;;;Y;N;N;M2;Page Styles and Layout;
+Format;Page;Background;;;Y;N;N;M2;Page Styles and Layout;
+Format;Page;Header;;;Y;N;N;M2;Page Styles and Layout;
+Format;Page;Footer;;;Y;N;N;M2;Page Styles and Layout;
+Format;Page;Sheet;;;Y;N;N;M2;Page Styles and Layout;
+Format;Character;Font;Font;;Y;N;N;M1;Basic Text and Paragraph Formatting;
+Format;Character;Font;type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;
+Format;Character;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;
+Format;Character;Font;Language;;Y;N;N;M1;Basic Text and Paragraph Formatting;
+Format;Character;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Character;Font Effects;Color;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Character;Font Effects;Strike through;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Character;Font Effects;Font Color;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Character;Font Effects;Relief;Outline;Y;N;N;M2;Text & Paragraph formatting;
+Format;Character;Font Effects;Relief;Shadow;Y;N;N;M2;Text & Paragraph formatting;
+Format;Character;Position;Superscript;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Character;Position;Superscript;Raise/Lower By;N;-;-;-;;
+Format;Character;Position;Normal;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Character;Position;subscript;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Character;Scaling;Scale width;;N;-;-;-;;
+Format;Character;Spacing;Scale width;;N;-;-;-;;
+Format;Styles and Formating;Cell Styles;;;Y;N;N;M2;Styles and Default styles;
+Format;Conditional Formatting;Condition1;;;Y;N;N;M2;Conditional Formatting;
+Format;Conditional Formatting;Condition2;;;Y;N;N;M2;Conditional Formatting;
+Format;Conditional Formatting;Condition3;;;Y;N;N;M2;Conditional Formatting;
+Format;Group;Group;;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Group;Ungroup;;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Group;Entire Group;;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Group;Exit Group;;;Y;N;N;M2;Text & Paragraph formatting;
+Format;Control;;;;Y;N;N;-;;not implemented for Word V1.0.
+Format;Form;;;;Y;N;N;-;;not implemented for Word V1.0.
+Tools;Spell Check;;;;Y;N;;-;;Application-level feature
+Tools;Language;;;;Y;N;;M2;Language Settings;
+Tools;Detective;Trace Precedents;;;Y;N;N;-;; Application-level feature in Excel
+Tools;Detective;Remove Precedents;;;Y;N;N;-;; Application-level feature in Excel
+Tools;Detective;Trace Dependents;;;Y;N;N;-;; Application-level feature in Excel
+Tools;Detective;Remove Dependents;;;Y;N;N;-;; Application-level feature in Excel
+Tools;Detective;Remove All Traces;;;Y;N;N;-;; Application-level feature in Excel
+Tools;Detective;Trace Error;;;Y;N;N;-;; Application-level feature in Excel
+Tools;Detective;Mark Invalid Data;;;Y;N;N;-;; Application-level feature in Excel
+Tools;Detective;Refresh Traces;;;Y;N;N;-;; Application-level feature in Excel
+Tools;Detective;Auto Refresh;;;Y;N;N;-;; Application-level feature in Excel
+Tools;Detective;Fill Mode;;;N;N;N;-;;
+Tools;Goal Seek;Default Settings;Formulae Cell;;Y;N;N;-;;Application-level feature
+Tools;Goal Seek;Default Settings;Target Value;;Y;N;N;-;;Application-level feature
+Tools;Goal Seek;Default Settings;Variable Cell;;Y;N;N;-;;Application-level feature
+Tools;Scenario;Name of Scenario;;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis"""
+Tools;Scenario;Comment;;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis"""
+Tools;Scenario;Settings;Display border;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis"""
+Tools;Scenario;Settings;Copy Back;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis"""
+Tools;Scenario;Settings;Copy entire sheet;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis"""
+Tools;Scenario;Settings;Prevent Changes;;Y;N;N;M4;Advanced Tables (Scenario Tables);"Excel: See ""What-if-Analysis"""
+Tools;Protect Sheet;Password;;;Y;N;N;-;;v 1.1
+Tools;Protect Sheet;Confirm Password;;;Y;N;N;-;;v 1.1
+Tools;Protect Document;Password;;;Y;N;N;-;;v 1.1
+Tools;Protect Document;Confirm Password;;;Y;N;N;-;;v 1.1
+Tools;Cell Contents;Recalculate ;;;Y;N;N;-;;Application-level feature
+Tools;Cell Contents;Auto Calculate;;;Y;N;N;M4;;
+Tools;Cell Contents;Auto input;;;Y;N;N;-;;Application-level feature
+Tools;Gallery;;;;Y;-;-;-;;Application-level feature
+Tools;Media Player;;;;N;-;-;-;;Application-level feature
+Tools;Macro;Record Macro;;;Y;N;N;-;;v 1.1
+Tools;Macro;Run Macro;Library ;;Y;N;N;-;;v 1.1
+Tools;Macro;Run Macro;Macro Name;;Y;N;N;-;;v 1.1
+Tools;Macro;Organize Macro;Open Office.org Basic Macros;Macro Name;Y;N;N;-;;v 1.1
+Tools;Macro;Organize Macro;Open Office.org Basic Macros;Macro From;Y;N;N;-;;v 1.1
+Tools;Macro;Organize Macro;Open Office.org Basic Macros;Existing Macros;Y;N;N;-;;v 1.1
+Tools;Macro;Organize Dialogues;Modules;Modules;Y;N;N;-;;v 1.1
+Tools;Macro;Organize Dialogues;Dialogues;Dialogues;Y;N;N;-;;v 1.1
+Tools;Macro;Organize Dialogues;Libraries;Location;Y;N;N;-;;v 1.1
+Tools;Macro;Organize Dialogues;Libraries;Library;Y;N;N;-;;v 1.1
+Tools;Package Manager;Browse Packages;;;Y;-;-;-;;Application-level feature
+Tools;Package Manager;Add..;;;Y;-;-;-;;Application-level feature
+Tools;Xml filter settings;;;;Y;-;-;-;;Application-level feature
+Tools;customize..;Menus..;Menu;;Y;-;-;-;;Application-level feature
+Tools;customize..;Menus..;Menu Content;;Y;-;-;-;;Application-level feature
+Tools;customize..;Menus..;Save in;;Y;-;-;-;;Application-level feature
+Tools;customize..;Menus..;Description;;Y;-;-;-;;Application-level feature
+Tools;customize..;Key board;Shortcut keys;;Y;-;-;-;;Application-level feature
+Tools;customize..;Key board;Functions;;Y;-;-;-;;Application-level feature
+Tools;customize..;Tool Bar;Tool bar;;Y;-;-;-;;Application-level feature
+Tools;customize..;Tool Bar;Toolbar content;;Y;-;-;-;;Application-level feature
+Tools;customize..;Tool Bar;Save in;;Y;-;-;-;;Application-level feature
+Tools;customize..;Events;Save in;;Y;-;-;-;;Application-level feature
+Tools;customize..;Events;Assign Macro;;Y;-;-;-;;Application-level feature
+Tools;customize..;Events;Remove Macro;;Y;-;-;-;;Application-level feature
+Tools;Options..;Open Office.Org;;;Y;-;-;-;;Application-level feature
+Tools;Options..;Load Save;;;Y;-;-;-;;Application-level feature
+Tools;Options..;Language Settings;;;Y;-;-;-;;Application-level feature
+Tools;Options..;Open OfficeOrg.Calc;;;Y;-;-;-;;Application-level feature
+Tools;Options..;OpenOfficeOrg.Base;;;Y;-;-;-;;Application-level feature
+Tools;Options..;Charts;;;Y;-;-;-;;Application-level feature
+Tools;Options..;Internet;;;Y;-;-;-;;Application-level feature
+Data;Define Range;Name;;;N;-;-;-;;This relates to database ranges (implicit in Excel)
+Data;Define Range;Range;;;N;-;-;-;;This relates to database ranges (implicit in Excel)
+Data;Select Range ;Ranges;;;N;-;-;-;;This relates to database ranges (implicit in Excel)
+Data;Sort;Sort by;Ascending;;Y;N;N;M3;Sort;
+Data;Sort;Sort by;Descending;;Y;N;N;M3;Sort;
+Data;Sort;Then by;Ascending;;Y;N;N;M3;Sort;
+Data;Sort;Then by;Descending;;Y;N;N;M3;Sort;
+Data;Sort;Then by;Ascending;;Y;N;N;M3;Sort;
+Data;Sort;Then by;Descending;;Y;N;N;M3;Sort;
+Data;Sort;Options;Case Sensitive;;Y;N;N;M3;Sort;
+Data;Sort;Options;Range Contains Col. Names;;Y;N;N;M3;Sort;
+Data;Sort;Options;Include Formats;;Y;N;N;M3;Sort;
+Data;Sort;Options;Copy sort  results to;;N;-;-;M3;Sort;
+Data;Sort;Options;Custom sort order;;Y;N;N;M3;Sort;
+Data;Sort;Options;Language;;N;-;-;M3;Sort;
+Data;Sort;Options;Direction;;Y;N;N;M3;Sort;
+Data;Sort;Options;Data Area;;Y;-;-;M3;Sort;Implicit in Excel
+Data;Filter;Auto filter;;;Y;N;N;M3;Filters;
+Data;Filter;Standard Filter..;;;Y;N;N;M3;Filters;
+Data;Filter;Advanced Filter..;;;Y;N;N;M3;Filters;
+Data;Filter;Remove Filter;;;Y;N;N;M3;Filters;
+Data;Filter;Hide Auto filter;;;Y;N;N;M3;Filters;
+Data;Subtotals;1st group;Group by;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;1st group;Calculate Sub totals for;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;1st group;Use function;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;2nd group;Group by;;N;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;2nd group;Calculate Sub totals for;;N;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;2nd group;Use function;;N;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;3rd group;Group by;;N;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;3rd group;Calculate Sub totals for;;N;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;3rd group;Use function;;N;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;Options;Groups;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Subtotals;Options;Sort;;Y;-;-;-;Data Subtotals;Application-level feature (in Excel)
+Data;Validity;Criteria;Allow;;Y;N;N;M3;Data Validation;
+Data;Validity;Criteria;Data;;Y;N;N;M3;Data Validation;
+Data;Validity;Criteria;Value;;Y;N;N;M3;Data Validation;
+Data;Validity;Input help;Show input help when cell is selected;;Y;N;N;M3;Data Validation;
+Data;Validity;Input help;contents;;Y;N;N;M3;Data Validation;
+Data;Validity;Error Alert;Show Error message;;Y;N;N;M3;Data Validation;
+Data;Validity;Error Alert;Contents;;Y;N;N;M3;Data Validation;
+Data;Consolidate;Function;;;Y;-;-;M3;Data Consolidation;
+Data;Consolidate;Consolidation Ranges;;;Y;-;-;M3;Data Consolidation;
+Data;Consolidate;Source Data Range;;;Y;-;-;M3;Data Consolidation;
+Data;Consolidate;Copy Results to;;;N;-;-;-;;
+Data;Outline;Hide Details;;;Y;N;N;M3;Data Grouping;
+Data;Outline;Show Details;;;Y;N;N;M3;Data Grouping;
+Data;Outline;Group;;;Y;N;N;M3;Data Grouping;
+Data;Outline;Ungroup;;;Y;N;N;M3;Data Grouping;
+Data;Outline;Auto Outline ;;;Y;N;N;M3;Data Grouping;
+Data;Outline;Remove;;;Y;N;N;M3;Data Grouping;
+Data;Data Pilot;Start;Current Selection;;Y;N;N;M4;Data Pilot Tables;
+Data;Data Pilot;Start;Data Source ;;Y;N;N;M4;Data Pilot Tables;
+Data;Data Pilot;Start;External Source/Interface…;;Y;N;N;M4;Data Pilot Tables;
+Data;Data Pilot;Refresh;;;Y;-;-;-;;Application-level feature
+Data;Data Pilot;Delete;;;N;-;-;-;;Application-level feature
+Drawing;TextBox;;;;Y;Y;N;M2;Text boxes;
