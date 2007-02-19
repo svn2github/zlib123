@@ -165,10 +165,10 @@ Format;Cells..;Numbers;Category;;Y;N;N;M2;Data styles;
 Format;Cells..;Numbers;Format;;Y;N;N;M2;Data styles;
 Format;Cells..;Numbers;Options;;Y;N;N;M2;Data styles;
 Format;Cells..;Numbers;Format Code;;Y;N;N;M2;Data styles;
-Format;Cells..;Font;Font ;;Y;N;N;M1;Basic Text and Paragraph Formatting;
-Format;Cells..;Font;Type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;
-Format;Cells..;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;
-Format;Cells..;Font;Language;;Y;N;N;M1;Basic Text and Paragraph Formatting;
+Format;Cells..;Font;Font ;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse
+Format;Cells..;Font;Type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse
+Format;Cells..;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse
+Format;Cells..;Font;Language;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse
 Format;Cells..;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;
 Format;Cells..;Font Effects;Strike Through;;Y;N;N;M2;Text & Paragraph formatting;
 Format;Cells..;Font Effects;Font Color;;Y;N;N;M2;Text & Paragraph formatting;
