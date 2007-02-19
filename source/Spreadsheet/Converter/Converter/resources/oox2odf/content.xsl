@@ -22,6 +22,7 @@
             </office:font-face-decls>
             <office:automatic-styles>
                 <xsl:call-template name="InsertColumnStyles"/>
+                <xsl:call-template name="InsertRowStyles"/>
                 <xsl:call-template name="InsertCellStyles"/>
             </office:automatic-styles>
             <xsl:call-template name="InsertSheets"/>
@@ -51,22 +52,6 @@
 
     <xsl:template name="InsertSheetContent">
         <xsl:param name="sheet"/>
-
-        <xsl:variable name="sheetWidth">
-            <xsl:choose>
-                <xsl:when
-                    test="contains(document(concat('xl/',$sheet))/e:worksheet/e:dimension/@ref,':')">
-                    <xsl:call-template name="GetColNum">
-                        <xsl:with-param name="cell">
-                            <xsl:value-of
-                                select="substring-after(document(concat('xl/',$sheet))/e:worksheet/e:dimension/@ref,':')"
-                            />
-                        </xsl:with-param>
-                    </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>1</xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
 
         <!-- temporary; for succesful validation -->
         <xsl:call-template name="InsertColumns">
@@ -99,8 +84,33 @@
     <xsl:template name="InsertSheetColumnStyles">
         <xsl:param name="sheet"/>
 
-        <!-- default style (set before conversion of column styles from the first sheet) -->
-        <xsl:if test="position()=1">
+        <!-- default style -->
+        <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}" style:family="table-column">
+            <style:table-column-properties fo:break-before="auto">
+                <xsl:attribute name="style:column-width">
+                    <xsl:choose>
+                        <xsl:when
+                            test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+                            <xsl:call-template name="ConvertFromCharacters">
+                                <xsl:with-param name="value">
+                                    <xsl:value-of
+                                        select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
+                                    />
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <!-- Excel application default-->
+                            <xsl:call-template name="ConvertToCentimeters">
+                                <xsl:with-param name="length" select="'64px'"/>                                
+                            </xsl:call-template>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+            </style:table-column-properties>
+        </style:style>
+        
+<!--        <xsl:if test="position()=1">
             <style:style style:name="co1" style:family="table-column">
                 <style:table-column-properties fo:break-before="auto">
                     <xsl:attribute name="style:column-width">
@@ -115,15 +125,15 @@
                                     </xsl:with-param>
                                 </xsl:call-template>
                             </xsl:when>
-                            <xsl:otherwise>
+                            <xsl:otherwise> -->
                                 <!-- Calc application default-->
-                                <xsl:text>2.267cm</xsl:text>
+<!--                                <xsl:text>2.267cm</xsl:text>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
                 </style:table-column-properties>
             </style:style>
-        </xsl:if>
+        </xsl:if> -->
 
         <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols"
             mode="automaticstyles"/>
@@ -142,8 +152,28 @@
             </style:table-column-properties>
         </style:style>
     </xsl:template>
+    
+    <xsl:template name="InsertRowStyles">
+        <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+            <xsl:call-template name="InsertSheetRowStyles">
+                <xsl:with-param name="sheet">
+                    <xsl:call-template name="GetTarget">
+                        <xsl:with-param name="id">
+                            <xsl:value-of select="@r:id"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+                    </xsl:call-template>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:for-each>        
+    </xsl:template>
 
-    <xsl:template name="InsertCellStyles">
+    <xsl:template name="InsertSheetRowStyles">
+        <xsl:param name="sheet"/>
+        
+    </xsl:template>
+    
+        <xsl:template name="InsertCellStyles">
         <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs"
             mode="automaticstyles"/>
     </xsl:template>
@@ -161,21 +191,6 @@
 
     <xsl:template match="e:row">
 
-        <xsl:variable name="sheetWidth">
-            <xsl:choose>
-                <xsl:when test="contains(ancestor::e:worksheet/e:dimension/@ref,':')">
-                    <xsl:call-template name="GetColNum">
-                        <xsl:with-param name="cell">
-                            <xsl:value-of
-                                select="substring-after(ancestor::e:worksheet/e:dimension/@ref,':')"
-                            />
-                        </xsl:with-param>
-                    </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>1</xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-
         <xsl:variable name="lastCellColumnNumber">
             <xsl:call-template name="GetColNum">
                 <xsl:with-param name="cell">
@@ -189,7 +204,7 @@
             <xsl:when test="position()=1">
                 <xsl:if test="@r>1">
                     <table:table-row table:number-rows-repeated="{@r - 1}">
-                        <table:table-cell table:number-columns-repeated="{$sheetWidth}"/>
+                        <table:table-cell table:number-columns-repeated="256"/>
                     </table:table-row>
                 </xsl:if>
             </xsl:when>
@@ -200,7 +215,7 @@
                         <xsl:attribute name="table:number-rows-repeated">
                             <xsl:value-of select="@r -1 - preceding::e:row[1]/@r"/>
                         </xsl:attribute>
-                        <table:table-cell table:number-columns-repeated="{$sheetWidth}"/>
+                        <table:table-cell table:number-columns-repeated="256"/>
                     </table:table-row>
                 </xsl:if>
             </xsl:otherwise>
@@ -208,9 +223,9 @@
 
         <table:table-row>
             <xsl:apply-templates/>
-            <xsl:if test="$lastCellColumnNumber &lt; $sheetWidth">
+            <xsl:if test="$lastCellColumnNumber &lt; 256">
                 <table:table-cell
-                    table:number-columns-repeated="{$sheetWidth - $lastCellColumnNumber}"/>
+                    table:number-columns-repeated="{256 - $lastCellColumnNumber}"/>
             </xsl:if>
         </table:table-row>
     </xsl:template>
@@ -424,27 +439,11 @@
     <xsl:template name="InsertColumns">
         <xsl:param name="sheet"/>
 
-        <xsl:variable name="sheetWidth">
-            <xsl:choose>
-                <xsl:when
-                    test="contains(document(concat('xl/',$sheet))/e:worksheet/e:dimension/@ref,':')">
-                    <xsl:call-template name="GetColNum">
-                        <xsl:with-param name="cell">
-                            <xsl:value-of
-                                select="substring-after(document(concat('xl/',$sheet))/e:worksheet/e:dimension/@ref,':')"
-                            />
-                        </xsl:with-param>
-                    </xsl:call-template>
-                </xsl:when>
-                <xsl:otherwise>1</xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-
         <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col">
             <!-- insert blank columns before this one-->
             <xsl:choose>
                 <xsl:when test="position()=1 and @min>1">
-                    <table:table-column table:style-name="co1"
+                    <table:table-column table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
                         table:number-columns-repeated="{@min - 1}">
                         <xsl:attribute name="table:default-cell-style-name">
                             <xsl:value-of select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
@@ -452,7 +451,7 @@
                     </table:table-column>                    
                 </xsl:when>
                 <xsl:when test="preceding::e:col[1]/@max &lt; @min - 1">
-                    <table:table-column table:style-name="co1"
+                    <table:table-column table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
                         table:number-columns-repeated="{@min - preceding::e:col[1]/@max - 1}">
                         <xsl:attribute name="table:default-cell-style-name">
                             <xsl:value-of select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
@@ -477,22 +476,21 @@
         <!-- apply default column style for last columns which style wasn't changed -->
         <xsl:choose>
             <xsl:when test="not(document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col)">
-                <table:table-column table:number-columns-repeated="{$sheetWidth}">
+                <table:table-column table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+                    table:number-columns-repeated="256">
                     <xsl:attribute name="table:default-cell-style-name">
                         <xsl:value-of select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
                     </xsl:attribute>                    
                 </table:table-column>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max &lt; $sheetWidth">
-                    <table:table-column table:style-name="co1"
-                        table:number-columns-repeated="{$sheetWidth - document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max}"
+                    <table:table-column table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+                        table:number-columns-repeated="{256 - document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max}"
                     >
                         <xsl:attribute name="table:default-cell-style-name">
                             <xsl:value-of select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
                         </xsl:attribute>                    
                     </table:table-column>                
-                </xsl:if>
             </xsl:otherwise>
         </xsl:choose>
         
@@ -513,7 +511,7 @@
 
         <xsl:call-template name="ConvertToCentimeters">
             <xsl:with-param name="length">
-                <xsl:value-of select="concat(round(($avgDigitWidth * $value)),'px')"/>
+                <xsl:value-of select="concat(round(($avgDigitWidth * $value) + 5),'px')"/>
             </xsl:with-param>
         </xsl:call-template>
     </xsl:template>
