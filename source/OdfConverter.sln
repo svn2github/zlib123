@@ -39,13 +39,13 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OdfAddInForWordSetup-pl", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter", "Presentation\Converter\Converter.csproj", "{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter", "Spreadsheet\Converter\Converter\Converter.csproj", "{E7055581-7C0C-429F-8134-99D3413C5756}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter", "Word\Converter\Converter.csproj", "{F9071930-348E-4A30-A0F6-A1A3DF3A587B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdfAddinLib", "Common\OdfAddinLib\OdfAddinLib.csproj", "{599773FF-1E86-4AC2-8B24-34BBAC707370}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Addin", "Word\Add-In\Addin.csproj", "{CB7A2D8C-3159-4FCE-8256-2B7D450A462C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter", "Spreadsheet\Converter\Converter.csproj", "{E7055581-7C0C-429F-8134-99D3413C5756}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,10 +105,6 @@ Global
 		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E7055581-7C0C-429F-8134-99D3413C5756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E7055581-7C0C-429F-8134-99D3413C5756}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E7055581-7C0C-429F-8134-99D3413C5756}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E7055581-7C0C-429F-8134-99D3413C5756}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F9071930-348E-4A30-A0F6-A1A3DF3A587B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F9071930-348E-4A30-A0F6-A1A3DF3A587B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9071930-348E-4A30-A0F6-A1A3DF3A587B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -121,6 +117,10 @@ Global
 		{CB7A2D8C-3159-4FCE-8256-2B7D450A462C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB7A2D8C-3159-4FCE-8256-2B7D450A462C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB7A2D8C-3159-4FCE-8256-2B7D450A462C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7055581-7C0C-429F-8134-99D3413C5756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7055581-7C0C-429F-8134-99D3413C5756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7055581-7C0C-429F-8134-99D3413C5756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7055581-7C0C-429F-8134-99D3413C5756}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
