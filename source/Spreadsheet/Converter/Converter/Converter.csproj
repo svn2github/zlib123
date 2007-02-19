@@ -43,8 +43,25 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="resources\odf2oox\" />
-    <Folder Include="resources\oox2odf\" />
+    <EmbeddedResource Include="resources\odf2oox\contentTypes.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\docprops.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\odf2oox-compute-size.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\odf2oox.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\package_relationships.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\part_relationships.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\pixel-measure.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\sharedStrings.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\source.xml" />
+    <EmbeddedResource Include="resources\odf2oox\workbook.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\worksheets.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\content.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\meta.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\source.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
