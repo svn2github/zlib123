@@ -26,23 +26,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-  <xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oox="urn:oox"
-    xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
-    xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"    
-    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-    exclude-result-prefixes="oox e r">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oox="urn:oox"
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  exclude-result-prefixes="oox e r">
 
   <xsl:import href="content.xsl"/>
   <xsl:import href="meta.xsl"/>
   <xsl:import href="relationships.xsl"/>
-    
+  <xsl:import href="settings.xsl"/>
+
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
 
   <!-- App version number -->
   <xsl:variable name="app-version">1.0.0</xsl:variable>
-    
+
   <xsl:template match="/oox:source">
     <pzip:archive pzip:target="{$outputFile}">
 
@@ -57,7 +57,7 @@
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
         </manifest:manifest>
       </pzip:entry>
-      
+
       <!-- main content -->
       <pzip:entry pzip:target="content.xml">
         <xsl:call-template name="content"/>
@@ -67,8 +67,13 @@
       <pzip:entry pzip:target="meta.xml">
         <xsl:call-template name="meta"/>
       </pzip:entry>
-      
+
+      <!-- settings  -->
+      <pzip:entry pzip:target="settings.xml">
+        <xsl:call-template name="InsertSettings"/>
+      </pzip:entry>
+
     </pzip:archive>
   </xsl:template>
-    
-  </xsl:stylesheet>
+
+</xsl:stylesheet>

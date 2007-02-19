@@ -14,8 +14,7 @@
   <xsl:import href="styles.xsl"/>
 
   <xsl:template name="content">
-    <office:document-content>
-      <office:scripts/>
+    <office:document-content><office:scripts/>
       <office:font-face-decls>
         <xsl:call-template name="InsertFonts"/>
       </office:font-face-decls>
