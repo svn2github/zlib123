@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+    xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
     xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     exclude-result-prefixes="e r">
 
     <xsl:import href="relationships.xsl"/>
     <xsl:import href="measures.xsl"/>
+    <xsl:import href="styles.xsl"/>
 
     <xsl:template name="content">
         <office:document-content>
             <office:scripts/>
-            <office:font-face-decls/>
+            <office:font-face-decls>
+               <xsl:call-template name="InsertFonts"/>
+            </office:font-face-decls>
             <office:automatic-styles>
                 <xsl:call-template name="InsertColumnStyles"/>
+                <xsl:call-template name="InsertCellStyles"/>
             </office:automatic-styles>
             <xsl:call-template name="InsertSheets"/>
         </office:document-content>
@@ -94,7 +99,7 @@
     <xsl:template name="InsertSheetColumnStyles">
         <xsl:param name="sheet"/>
 
-        <!-- default style (set during conversion of the first sheet) -->
+        <!-- default style (set before conversion of column styles from the first sheet) -->
         <xsl:if test="position()=1">
             <style:style style:name="co1" style:family="table-column">
                 <style:table-column-properties fo:break-before="auto">
@@ -125,7 +130,6 @@
     </xsl:template>
 
     <xsl:template match="e:col" mode="automaticstyles">
-
         <style:style style:name="{generate-id(.)}" style:family="table-column">
             <style:table-column-properties>
                 <xsl:if test="@width">
@@ -139,6 +143,22 @@
         </style:style>
     </xsl:template>
 
+    <xsl:template name="InsertCellStyles">
+        <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs"
+            mode="automaticstyles"/>
+    </xsl:template>
+
+    <xsl:template match="e:xf" mode="automaticstyles">
+        <style:style style:name="{generate-id(.)}" style:family="table-cell">
+            <style:text-properties>
+                <xsl:variable name="this" select="."/>
+                <xsl:apply-templates
+                    select="ancestor::e:styleSheet/e:fonts/e:font[position() = $this/@fontId + 1]"
+                    mode="style"/>
+            </style:text-properties>
+        </style:style>
+    </xsl:template>
+
     <xsl:template match="e:row">
 
         <xsl:variable name="sheetWidth">
@@ -146,15 +166,16 @@
                 <xsl:when test="contains(ancestor::e:worksheet/e:dimension/@ref,':')">
                     <xsl:call-template name="GetColNum">
                         <xsl:with-param name="cell">
-                                <xsl:value-of
-                                    select="substring-after(ancestor::e:worksheet/e:dimension/@ref,':')"/>
+                            <xsl:value-of
+                                select="substring-after(ancestor::e:worksheet/e:dimension/@ref,':')"
+                            />
                         </xsl:with-param>
                     </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>1</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:variable name="lastCellColumnNumber">
             <xsl:call-template name="GetColNum">
                 <xsl:with-param name="cell">
@@ -167,9 +188,9 @@
             <!-- if first rows are empty-->
             <xsl:when test="position()=1">
                 <xsl:if test="@r>1">
-                <table:table-row table:number-rows-repeated="{@r - 1}">
-                    <table:table-cell table:number-columns-repeated="{$sheetWidth}"/>
-                </table:table-row>
+                    <table:table-row table:number-rows-repeated="{@r - 1}">
+                        <table:table-cell table:number-columns-repeated="{$sheetWidth}"/>
+                    </table:table-row>
                 </xsl:if>
             </xsl:when>
             <xsl:otherwise>
@@ -192,10 +213,11 @@
                     table:number-columns-repeated="{$sheetWidth - $lastCellColumnNumber}"/>
             </xsl:if>
         </table:table-row>
-
     </xsl:template>
 
     <xsl:template match="e:c">
+
+        <xsl:variable name="this" select="."/>
 
         <xsl:variable name="colNum">
             <xsl:call-template name="GetColNum">
@@ -219,6 +241,7 @@
             </xsl:choose>
         </xsl:variable>
 
+        <!-- insert blank cells before this one-->
         <xsl:choose>
             <xsl:when test="position()=1 and $colNum>1">
                 <table:table-cell>
@@ -236,12 +259,20 @@
             </xsl:when>
         </xsl:choose>
 
+        <!-- insert this one cell-->
         <table:table-cell>
             <xsl:choose>
                 <xsl:when test="@t='s'">
                     <xsl:attribute name="office:value-type">
                         <xsl:text>string</xsl:text>
                     </xsl:attribute>
+                    <xsl:if test="@s">
+                        <xsl:attribute name="table:style-name">
+                            <xsl:value-of
+                                select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
+                            />
+                        </xsl:attribute>
+                    </xsl:if>
                     <xsl:variable name="id">
                         <xsl:value-of select="e:v"/>
                     </xsl:variable>
@@ -264,6 +295,7 @@
     <xsl:template name="GetColNum">
         <xsl:param name="cell"/>
         <xsl:param name="columnId"/>
+
         <xsl:choose>
             <!-- when whole literal column id has been extracted than convert alphabetic index to number -->
             <xsl:when test="number(substring($cell,1,1))">
@@ -361,6 +393,7 @@
         <xsl:param name="base"/>
         <xsl:param name="exponent"/>
         <xsl:param name="value1" select="$base"/>
+
         <xsl:choose>
             <xsl:when test="$exponent = 0">
                 <xsl:text>1</xsl:text>
@@ -408,36 +441,57 @@
         </xsl:variable>
 
         <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col">
+            <!-- insert blank columns before this one-->
             <xsl:choose>
                 <xsl:when test="position()=1 and @min>1">
                     <table:table-column table:style-name="co1"
-                        table:number-columns-repeated="{@min - 1}"/>                    
+                        table:number-columns-repeated="{@min - 1}">
+                        <xsl:attribute name="table:default-cell-style-name">
+                            <xsl:value-of select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
+                        </xsl:attribute>
+                    </table:table-column>                    
                 </xsl:when>
                 <xsl:when test="preceding::e:col[1]/@max &lt; @min - 1">
                     <table:table-column table:style-name="co1"
-                        table:number-columns-repeated="{@min - preceding::e:col[1]/@max - 1}"/>
+                        table:number-columns-repeated="{@min - preceding::e:col[1]/@max - 1}">
+                        <xsl:attribute name="table:default-cell-style-name">
+                            <xsl:value-of select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
+                        </xsl:attribute>
+                    </table:table-column>
                 </xsl:when>
             </xsl:choose>
-            
+
+            <!-- insert this one column -->
             <table:table-column table:style-name="{generate-id(.)}">
                 <xsl:if test="not(@min = @max)">
                     <xsl:attribute name="table:number-columns-repeated">
                         <xsl:value-of select="@max - @min"/>
                     </xsl:attribute>
                 </xsl:if>
+                <xsl:attribute name="table:default-cell-style-name">
+                    <xsl:value-of select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
+                </xsl:attribute>                    
             </table:table-column>
         </xsl:for-each>
         
         <!-- apply default column style for last columns which style wasn't changed -->
         <xsl:choose>
             <xsl:when test="not(document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col)">
-                <table:table-column table:number-columns-repeated="{$sheetWidth}"> </table:table-column>
+                <table:table-column table:number-columns-repeated="{$sheetWidth}">
+                    <xsl:attribute name="table:default-cell-style-name">
+                        <xsl:value-of select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
+                    </xsl:attribute>                    
+                </table:table-column>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max &lt; $sheetWidth">
                     <table:table-column table:style-name="co1"
                         table:number-columns-repeated="{$sheetWidth - document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max}"
-                    />                
+                    >
+                        <xsl:attribute name="table:default-cell-style-name">
+                            <xsl:value-of select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
+                        </xsl:attribute>                    
+                    </table:table-column>                
                 </xsl:if>
             </xsl:otherwise>
         </xsl:choose>
@@ -462,6 +516,14 @@
                 <xsl:value-of select="concat(round(($avgDigitWidth * $value)),'px')"/>
             </xsl:with-param>
         </xsl:call-template>
-
     </xsl:template>
+
+<xsl:template name="InsertFonts">
+    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font">
+        <style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}">
+        </style:font-face>
+        
+    </xsl:for-each>
+</xsl:template>
+    
 </xsl:stylesheet>
