@@ -66,7 +66,6 @@
   <xsl:template name="InsertSheetContent">
     <xsl:param name="sheet"/>
 
-    <!-- temporary; for succesful validation -->
     <xsl:call-template name="InsertColumns">
       <xsl:with-param name="sheet" select="$sheet"/>
     </xsl:call-template>
@@ -77,130 +76,6 @@
         <table:table-cell/>
       </table:table-row>
     </xsl:if>
-  </xsl:template>
-
-  <xsl:template name="InsertColumnStyles">
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-      <xsl:call-template name="InsertSheetColumnStyles">
-        <xsl:with-param name="sheet">
-          <xsl:call-template name="GetTarget">
-            <xsl:with-param name="id">
-              <xsl:value-of select="@r:id"/>
-            </xsl:with-param>
-            <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
-          </xsl:call-template>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:for-each>
-  </xsl:template>
-
-  <xsl:template name="InsertSheetColumnStyles">
-    <xsl:param name="sheet"/>
-
-    <!-- default style -->
-    <style:style
-      style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
-      style:family="table-column">
-      <style:table-column-properties fo:break-before="auto">
-        <xsl:attribute name="style:column-width">
-          <xsl:choose>
-            <xsl:when
-              test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
-              <xsl:call-template name="ConvertFromCharacters">
-                <xsl:with-param name="value">
-                  <xsl:value-of
-                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
-                  />
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <!-- Excel application default-->
-              <xsl:call-template name="ConvertToCentimeters">
-                <xsl:with-param name="length" select="'64px'"/>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </style:table-column-properties>
-    </style:style>
-
-    <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols"
-      mode="automaticstyles"/>
-  </xsl:template>
-
-  <xsl:template match="e:col" mode="automaticstyles">
-    <style:style style:name="{generate-id(.)}" style:family="table-column">
-      <style:table-column-properties>
-        <xsl:if test="@width">
-          <xsl:attribute name="style:column-width">
-            <xsl:call-template name="ConvertFromCharacters">
-              <xsl:with-param name="value" select="@width"/>
-            </xsl:call-template>
-          </xsl:attribute>
-        </xsl:if>
-      </style:table-column-properties>
-    </style:style>
-  </xsl:template>
-
-<!--  Insert Table Properties -->
-
-  <xsl:template name="InsertStyleTableProperties">
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-      <style:style>
-        <xsl:attribute name="style:name">
-          <xsl:value-of select="generate-id()"/>
-        </xsl:attribute>
-        <xsl:attribute name="style:family">
-          <xsl:text>table</xsl:text>
-        </xsl:attribute>
-        <style:table-properties>
-          <xsl:if test="@state='hidden'">
-            <xsl:attribute name="table:display">
-              <xsl:text>false</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-        </style:table-properties>
-      </style:style>
-    </xsl:for-each>
-  </xsl:template>
-
-
-
-  <xsl:template name="InsertRowStyles">
-    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-      <xsl:call-template name="InsertSheetRowStyles">
-        <xsl:with-param name="sheet">
-          <xsl:call-template name="GetTarget">
-            <xsl:with-param name="id">
-              <xsl:value-of select="@r:id"/>
-            </xsl:with-param>
-            <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
-          </xsl:call-template>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:for-each>
-  </xsl:template>
-
-  <xsl:template name="InsertSheetRowStyles">
-    <xsl:param name="sheet"/>
-
-  </xsl:template>
-
-  <xsl:template name="InsertCellStyles">
-    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs"
-      mode="automaticstyles"/>
-  </xsl:template>
-
-  <xsl:template match="e:xf" mode="automaticstyles">
-    <style:style style:name="{generate-id(.)}" style:family="table-cell">
-      <style:text-properties>
-        <xsl:variable name="this" select="."/>
-        <xsl:apply-templates
-          select="ancestor::e:styleSheet/e:fonts/e:font[position() = $this/@fontId + 1]"
-          mode="style"/>
-      </style:text-properties>
-    </style:style>
   </xsl:template>
 
   <xsl:template match="e:row">
