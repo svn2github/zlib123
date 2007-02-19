@@ -102,22 +102,24 @@
       </xsl:attribute>
       
       <!-- insert column width -->
-      <xsl:attribute name="width">
-        <xsl:variable name="pixelWidth">
-          <xsl:call-template name="pixel-measure">
-            <xsl:with-param name="length">
-          <xsl:value-of select="key('style',@table:style-name)/style:table-column-properties/@style:column-width"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="fontSize">
-          <xsl:call-template name="pixel-measure">
-            <xsl:with-param name="length">11pt</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:value-of select="($pixelWidth+5) div (2 div 3 * $fontSize)"/>
-      </xsl:attribute>
-      <xsl:attribute name="customWidth">1</xsl:attribute>
+      <xsl:if test="key('style',@table:style-name)/style:table-column-properties/@style:column-width">
+        <xsl:attribute name="width">
+          <xsl:variable name="pixelWidth">
+            <xsl:call-template name="pixel-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="key('style',@table:style-name)/style:table-column-properties/@style:column-width"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="fontSize">
+            <xsl:call-template name="pixel-measure">
+              <xsl:with-param name="length">11pt</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="($pixelWidth+5) div (2 div 3 * $fontSize)"/>
+        </xsl:attribute>
+        <xsl:attribute name="customWidth">1</xsl:attribute>
+      </xsl:if>
       
       <xsl:if test="@table:visibility = 'collapse'">
         <xsl:attribute name="hidden">1</xsl:attribute>
@@ -149,15 +151,17 @@
     <row r="{$rowNumber}">
       
       <!-- insert row height -->
-      <xsl:attribute name="ht">
-        <xsl:call-template name="ConvertMeasure">
-          <xsl:with-param name="length">
-            <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
-          </xsl:with-param>
-          <xsl:with-param name="unit">point</xsl:with-param>
-        </xsl:call-template>
-      </xsl:attribute>
-      <xsl:attribute name="customHeight">1</xsl:attribute>
+      <xsl:if test="key('style',@table:style-name)/style:table-row-properties/@style:row-height">
+        <xsl:attribute name="ht">
+          <xsl:call-template name="ConvertMeasure">
+            <xsl:with-param name="length">
+              <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
+            </xsl:with-param>
+            <xsl:with-param name="unit">point</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:attribute name="customHeight">1</xsl:attribute>
+      </xsl:if>
       
       <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
         <xsl:attribute name="hidden">1</xsl:attribute>
