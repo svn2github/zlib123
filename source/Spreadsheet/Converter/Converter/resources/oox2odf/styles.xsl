@@ -4,7 +4,7 @@
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
     xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" 
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-    exclude-result-prefixes="e">
+    exclude-result-prefixes="e r">
 
     <xsl:import href="relationships.xsl"/>
     
@@ -90,6 +90,50 @@
     <xsl:template name="InsertSheetRowStyles">
         <xsl:param name="sheet"/>
         
+        <!-- default style -->
+        <style:style
+            style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+            style:family="table-row">
+            <style:table-row-properties fo:break-before="auto">
+                <xsl:attribute name="style:row-height">
+                    <xsl:choose>
+                        <xsl:when
+                            test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
+                            <xsl:call-template name="ConvertToCentimeters">
+                                <xsl:with-param name="length">
+                                    <xsl:value-of
+                                        select="concat(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight,'pt')"
+                                    />
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <!-- Excel application default-->
+                            <xsl:call-template name="ConvertToCentimeters">
+                                <xsl:with-param name="length" select="'20px'"/>
+                            </xsl:call-template>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+            </style:table-row-properties>
+        </style:style>
+        
+        <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:sheetData"
+            mode="automaticstyles"/>
+    </xsl:template>
+    
+    <xsl:template match="e:row" mode="automaticstyles">
+        <xsl:if test="@ht">
+            <style:style style:name="{generate-id(.)}" style:family="table-row">
+                <style:table-row-properties fo:break-before="auto">
+                        <xsl:attribute name="style:row-height">
+                            <xsl:call-template name="ConvertToCentimeters">
+                                <xsl:with-param name="length" select="concat(@ht,'pt')"/>
+                            </xsl:call-template>
+                        </xsl:attribute>
+                </style:table-row-properties>
+            </style:style>
+        </xsl:if>
     </xsl:template>
     
     <!--  Insert Table Properties -->

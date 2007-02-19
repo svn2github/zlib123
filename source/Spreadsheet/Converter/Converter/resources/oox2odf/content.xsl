@@ -14,7 +14,8 @@
   <xsl:import href="styles.xsl"/>
 
   <xsl:template name="content">
-    <office:document-content><office:scripts/>
+    <office:document-content>
+      <office:scripts/>
       <office:font-face-decls>
         <xsl:call-template name="InsertFonts"/>
       </office:font-face-decls>
@@ -70,28 +71,48 @@
     </xsl:call-template>
 
     <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet"/>
-    <xsl:if test="not(document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row/e:c/e:v)">
-      <table:table-row>
-        <table:table-cell/>
-      </table:table-row>
-    </xsl:if>
+      
+    <xsl:choose>
+      <!-- when sheet is empty -->
+      <xsl:when test="not(document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row/e:c/e:v)">
+        <table:table-row
+          table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+          table:number-rows-repeated="65535">
+          <table:table-cell/>
+        </table:table-row>
+      </xsl:when>
+      <xsl:otherwise>
+        <table:table-row
+          table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+          table:number-rows-repeated="{65535 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r}">
+          <table:table-cell/>
+        </table:table-row>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="e:row">
 
     <xsl:variable name="lastCellColumnNumber">
-      <xsl:call-template name="GetColNum">
-        <xsl:with-param name="cell">
-          <xsl:value-of select="e:c[last()]/@r"/>
-        </xsl:with-param>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="e:c[last()]/@r">
+          <xsl:call-template name="GetColNum">
+            <xsl:with-param name="cell">
+              <xsl:value-of select="e:c[last()]/@r"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
+    <!-- insert blank rows before this one -->
     <xsl:choose>
       <!-- if first rows are empty-->
       <xsl:when test="position()=1">
         <xsl:if test="@r>1">
-          <table:table-row table:number-rows-repeated="{@r - 1}">
+          <table:table-row table:style-name="{generate-id(ancestor::e:worksheet/e:sheetFormatPr)}"
+            table:number-rows-repeated="{@r - 1}">
             <table:table-cell table:number-columns-repeated="256"/>
           </table:table-row>
         </xsl:if>
@@ -99,7 +120,7 @@
       <xsl:otherwise>
         <!-- if there's a gap between rows -->
         <xsl:if test="preceding::e:row[1]/@r &lt;  @r - 1">
-          <table:table-row>
+          <table:table-row table:style-name="{generate-id(ancestor::e:worksheet/e:sheetFormatPr)}">
             <xsl:attribute name="table:number-rows-repeated">
               <xsl:value-of select="@r -1 - preceding::e:row[1]/@r"/>
             </xsl:attribute>
@@ -109,8 +130,26 @@
       </xsl:otherwise>
     </xsl:choose>
 
+    <!-- insert this one row -->
     <table:table-row>
+      <xsl:attribute name="table:style-name">
+        <xsl:choose>
+          <xsl:when test="@ht">
+            <xsl:value-of select="generate-id(.)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="generate-id(ancestor::e:worksheet/e:sheetFormatPr)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:if test="@hidden=1">
+        <xsl:attribute name="table:visibility">
+            <xsl:text>collapse</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+
       <xsl:apply-templates/>
+
       <xsl:if test="$lastCellColumnNumber &lt; 256">
         <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}"/>
       </xsl:if>
@@ -359,6 +398,11 @@
           <xsl:value-of
             select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
         </xsl:attribute>
+        <xsl:if test="@hidden=1">
+          <xsl:attribute name="table:visibility">
+            <xsl:text>collapse</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
       </table:table-column>
     </xsl:for-each>
 
@@ -385,7 +429,6 @@
         </table:table-column>
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
 
   <xsl:template name="ConvertFromCharacters">
@@ -409,8 +452,7 @@
 
   <xsl:template name="InsertFonts">
     <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font">
-      <style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}"> </style:font-face>
-
+      <style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}"/>
     </xsl:for-each>
   </xsl:template>
 
