@@ -1,0 +1,698 @@
+Workbook;;
+;book Views (Workbook Views);
+;calcPr (Calculation Properties);
+;customWorkbookView (Custom Workbook View);
+;customWorkbookViews (Custom Workbook Views);
+;definedName (Defined Name);
+;definedNames (Defined Names);
+;ext;
+;externalReference (External Reference);
+;externalReferences (External References);
+;fileRecoveryPr (File Recovery Properties);
+;fileSharing (File Sharing);
+;file Version (File Version);
+;functionGroup (Function Group);
+;functionGroups (Function Groups);
+;oleSize (OLE Size);
+;pivotCache (Pivot Cache);
+;pivotCaches (Pivot Caches);
+;sheet (Sheet Information);
+;sheets (Sheets);
+;smartTagPr (Smart Tag Properties);
+;smartTagType (Smart Tag Type);
+;smartTagTypes (Smart Tag Types);
+;webPublishing (Web Publishing Properties);
+;webPublishingObject;
+;webPublishingObjects;
+;workbook (Workbook);
+;workbookPr (Workbook Properties);
+;workbookProtection (Workbook Protection);
+;workbookView (Workbook View);
+Worksheets;;
+;Worksheets;
+;;autoFilter (AutoFilter Settings)
+;;brk (Break)
+;;c (Cell)
+;;cellSmartTag (Cell Smart Tag)
+;;cellSmartTagPr (Cell Smart Tag Properties)
+;;cellSmartTags (Cell Smart Tags)
+;;cellWatch (Cell Watch Item)
+;;cellWatches (Cell Watch Items)
+;;cfRule (Conditional Formating Rule)
+;;cfvo (Conditional Format Value Object)
+;;chartsheet(Chart Sheet)
+;;col (Column Width & Formating)
+;;colBreaks (Vertical Page Breaks)
+;;color (Data Bar Color)
+;;colorScale (Color Scale)
+;;cols (Column Information)
+;;conditionalFormating (Conditional Formating)
+;;control (Embedded Control)
+;;controls (Embedded Controls)
+;;customPr (Custom Properties)
+;;customProperties (Custom Properties)
+;;customSheetView (Custom Chart Sheet View)
+;;customSheetView (Custom Sheet View)
+;;customSheetViews (Custom Chart Sheet Views)
+;;customSheetViews (Custom Sheet Views)
+;;dataBar (Data Bar)
+;;dataConsolidate (Data Consolidate)
+;;dataRef (Data Consolidation Reference)
+;;dataRefs (Data Consolidation References)
+;;dataValidation (Data Validation)
+;;dataValidations (Data Validations)
+;;dialogsheet (Dialog Sheet)
+;;dimension (Worksheet Dimensions)
+;;drawing (Drawing)
+;;evenFooter (Even Page Footer)
+;;evenHeader (Even Page Header)
+;;firstFooter (First Page Footer)
+;;firstHeader (First Page Header)
+;;headerFooter (Header Footer Settings)
+;;hyperlink (Hyperlink)
+;;hyperlinks (Hyperlinks)
+;;iconSet (Icon Set)
+;;ignoredError
+;;ignoredErrors
+;;inputCells (Input Cells)
+;;is (Rich Text Inline)
+;;legacyDrawing (Legacy Drawing)
+;;legacyDrawingHF (Legacy Drawing Header Footer)
+;;mergeCell (Merged Cell)
+;;mergeCells (Merged Cells)
+;;oddFooter (Odd Page Footer)
+;;oddHeader (Odd Header)
+;;oleObject (OLE Object)
+;;oleObjects (OLE Objects)
+;;outlinePr (Outline Properties)
+;;pageMargins (Page Margins)
+;;pageSetup (Page Setup Settings)
+;;pageSetUpPr (Page Setup Properties)
+;;pane (View Pane)
+;;picture (Background Image)
+;;pivotArea (Pivot Area)
+;;pivotSelection (PivotTable Selection)
+;;printOptions (Print Options)
+;;protectedRange (Protected Range)
+;;protectedRanges (Protected Ranges)
+;;row (Row)
+;;rowBreaks (Horizontal Page Breaks (Row))
+;;scenario (Scenario)
+;;scenarios (Scenarios)
+;;selection (Selection)
+;;sheetCalcPr (Sheet Calculation Properties)
+;;sheetData (Sheet Data)
+;;sheetFormatPr (Sheet Format Properties)
+;;sheetPr (Sheet Properties)
+;;sheetPr (Chart Sheet Properties)
+;;sheetProtection (Sheet Protection Options)
+;;sheetProtection (Chart Sheet Protection)
+;;sheetView (Worksheet View)
+;;sheetView (Chart Sheet View)
+;;sheetViews (Sheet Views)
+;;sheetViews (Chart Sheet Views)
+;;smartTags (Smart Tags)
+;;sortState (Sort State)
+;;tabColor (Sheet Tab Color)
+;;tablePart (Table Part)
+;;tableParts (Table Parts)
+;;v (Cell Value)
+;;webPublishItem (Web Publish Item)
+;;webPublishItems (Web Publish Items)
+;;worksheet (Worksheet)
+;AutoFilter Settings;
+;;colorFilter (Color Filter Criteria)
+;;customFilter (Custom Filter Criteria)
+;;customFilters (Custom Filters)
+;;dateGroupItem (Date Grouping)
+;;dynamicFilter (Dynamic Filter)
+;;filter (Filter)
+;;filterColumn (AutoFilter Column)
+;;filters (Filters)
+;;iconFilter (Icon Filter)
+;;sortCondition (Sort Condition)
+;;top10 (Top 10)
+Shared String Table;;
+;charset (Character Set);
+;outline (Outline);
+;phoneticPr (Phonetic Properties);
+;r (Rich Text Run);
+;rFont (Font);
+;rPh (Phonetic Run);
+;rPr (Run Properties);
+;si (String Item);
+;sst (Shared String Table);
+;strike (Strike Through);
+;sz (Font Size);
+;t (Text);
+;u (Underline);
+;vertAlign (Vertical Alignment);
+Tables;;
+;Tables;
+;;calculatedColumnFormula (Calculated Column Formula)
+;;table (Table)
+;;tableColumn (Table Column)
+;;tableColumns (Table Columns)
+;;tableStyleInfo (Table Style)
+;;totalsRowFormula (Totals Row Formula)
+;;xmlColumnPr (XML Column Properties)
+;Single Cell Tables;
+;;singleXmlCell (Table Properties)
+;;singleXmlCells (Single Cells)
+;;xmlCellPr (Cell Properties)
+;;xmlPr (Column XML Properties)
+Calculation Chain;;
+;c (Cell);
+;calcChain (Calculation Chain Info);
+Comments;;
+;author (Author);
+;authors (Authors);
+;comment (Comment);
+;commentList (List of Comments);
+;comments (Comments);
+;text (Comment Text);
+Styles;;
+;alignment (Alignment);
+;b (Bold);
+;bgColor (Background Color);
+;border (Border);
+;borders (Borders);
+;cellStyle (Cell Style);
+;cellStyles (Cell Styles);
+;cellStyleXfs (Formating Records);
+;cellXfs (Cell Formats);
+;colors (Colors);
+;condence (Condence);
+;diagonal (Diagonal);
+;dxf (Formating);
+;dxfs (Formats);
+;extend (Extend);
+;family (Font Family);
+;fgColor (Foreground Color);
+;fill (Fill);
+;fills (Fills);
+;font (Font);
+;fonts (Fonts);
+;gradientFill (Gradient);
+;horizontal (Horizontal Inner Borders);
+;i (Italic);
+;indexedColors (Color Indexes);
+;left (Left Border);
+;mruColors (MRU Colors);
+;name (Font Name);
+;numFmt (Number Format);
+;numFmts (Number Formats);
+;patternFill (Pattern);
+;protection (Protection Properties);
+;rgbColor (RGB Color);
+;right (Right Border);
+;scheme (Scheme);
+;shadow (Shadow);
+;stop (Gradient Stop);
+;styleSheet (Style Sheet);
+;tableStyle (Table Styles);
+;tableStyleElement (Table Style);
+;tableStyles (Table Styles);
+;top (Top Border);
+;vertical (Vertical Inner Border);
+;xf (Format);
+Metadata;;
+;bk (Metadata Block);
+;bk (Future Metadata Block);
+;cellMetadata (Cell Metadata);
+;futureMetadata (Future Metadata);
+;k (KPI MDX Metadata);
+;mdx (MDX Metadata Record);
+;mdxMetadata (MDX Metadata Information);
+;metadata (Metadata);
+;metadataStrings (Metadata String Store);
+;metadataType (Metadata Type Information);
+;metadataTypes (Metadata Types Collection);
+;ms (Set MDX Metadata);
+;n (Member Unique Name Index);
+;p (Member Property MDX Metadata);
+;rc (Metadata Record);
+;t (Tuple MDX Metadata);
+;valueMetadata (Value Metadata);
+Pivot Tables;;
+;Pivot Tables;
+;;autoSortScope (AutoSort Scope)
+;;b (Boolean)
+;;cacheField (PivotCache Field)
+;;cacheFields (PivotCache Fields)
+;;cacheHierarchies (PivotCache Hierarchies)
+;;cacheHierarchy (Pivot Cache OLAP Hierarchy)
+;;cacheSource (PivotCache Source Description)
+;;calculatedItem (Calculated Item Formulas)
+;;calculatedItems (Calculated Item Formulas)
+;;calculatedMember (Calculated OLAP Hierarchy)
+;;calculatedMembers (OLAP Calculated Members)
+;;chartFormat (PivotChart Format)
+;;chartFormats (PivotChart Formats)
+;;colFields (Row Index)
+;;colHierarchiesUsage (Column OLAP Hierarchy References)
+;;colHierarchyUsage (Column OLAP Hierarchies)
+;;colItems (Column Items)
+;;conditionalFormat (Conditional Formating)
+;;conditionalFormats (Conditional Formats)
+;;consolidation (Consolidation Source)
+;;d (Date Time)
+;;dataField (Data Field Items)
+;;dataFields (Page Region Items)
+;;dimension (PivotTable OLAP Dimension)
+;;dimensions (OLAP Dimensions)
+;;discretePr (Discrete Grouping Properties)
+;;e (Error Value)
+;;entries (Entries)
+;;field (Column Items)
+;;fieldGroup (Field Group Properties)
+;;fieldsUsage (Fields Usage)
+;;fieldUsage (PivotTable Advanced Filter)
+;;filter (PivotTable Advanced Filter)
+;;filters (Filters)
+;;format (PivotTable Format)
+;;formats (PivotTable Formats)
+;;group (OLAP Group)
+;;groupItems (Group Items)
+;;groupLevel (OLAP Grouping Levels)
+;;groupLevels (OLAP Grouping Levels)
+;;groupMemeber (OLAP Group Member)
+;;groupMemebers (OLAP Group Members)
+;;groups (OLAP Level Groups)
+;;i (Row Items)
+;;item (PivotTable Field Item)
+;;items (Field Items)
+;;kpi (OLAP KPI)
+;;kpis (OLAP KPIs)
+;;location (PivotTable Location)
+;;m (No Value)
+;;map (OLAP Measure Group)
+;;maps (OLAP Measure Group)
+;;measureGroup (OLAP Measure Group)
+;;measureGroups (OLAP Measure Groups)
+;;member (Member)
+;;members (Members)
+;;mp (OLAP Member Property)
+;;mpMap (Memeber Properties Map)
+;;mps (OLAP Member Properties)
+;;n (Numeric)
+;;page (Page Items)
+;;pageField (Page Field)
+;;pageFields (Page Fields)
+;;pageItem (Page Item)
+;;pages (Page Item Values)
+;;pivotAreas (Pivot Areas)
+;;pivotCacheDefinition (PivotCache Definition)
+;;pivotCacheRecords (PivotCache Records)
+;;pivotField (Pivot Table Field)
+;;pivotFields (Pivot Table Fields)
+;;pivotHierarchies (Pivot OLAP Hierarchies)
+;;pivotHierarchy (OLAP Hierarchy)
+;;pivotTableDefinition (Pivot Table Definition)
+;;pivotTableStyleInfo (Table Style)
+;;query (Query)
+;;queryCache (OLAP Query Cache)
+;;r (PivotCache Record)
+;;rangePr (Range Grouping Properties)
+;;rangeSet (Range Set)
+;;rangeSets (Range Sets)
+;;rowFields (Row Indexes)
+;;rowHierarchiesUsage (Row OLAP Hierarchy References)
+;;rowHierarchyUsage (Row OLAP Hierarchies)
+;;rowItems (Row Items)
+;;s (Character Value)
+;;serverFormat
+;;serverFormats
+;;set (OLAP Set)
+;;sets (Sets)
+;;sharedItems (Shared Items)
+;;sortByTuple (Sort By Tuple)
+;;tpl (Tuple)
+;;tpls (Tuples)
+;;tupleCache (Tuple Cache)
+;;worksheetSource (Worksheet PivotCache Source)
+;;x (Member Property Index)
+;;x (Shared Items Index)
+;Shared Pivot Table Data;
+;;reference (Reference)
+;;references (References)
+Shared Workbook Data;;
+;Shared Workbook Data;
+;;header (Header)
+;;headers (Revision Headers)
+;;nc (New Cell Data)
+;;ndxf (New Formating Information)
+;;oc (Old Cell Data)
+;;odxf (Old Formating Information)
+;;oldFormula (Old Formula)
+;;raf (Revision Auto Format)
+;;rcc (Revision Cell Change)
+;;rcft (Revision Merge Conflict)
+;;rcmt (Revision Cell Comment)
+;;rcv (Revision Custom View)
+;;rdn (Revision Custom Name)
+;;reviewed (Reviewed)
+;;reviewedList (Reviewed List)
+;;revisions (Revisions)
+;;rfmt (Revision Format)
+;;ris (Revision Insert sheet)
+;;rm (Revision Cell Move)
+;;rqt (Revision Query Table)
+;;rrc (Revision Row Column Insert Delete)
+;;rsnm  (Revision Sheet Name)
+;;sheetId (Sheet Id)
+;;sheetIdMap (Sheet Id Map)
+;;undo (Undo)
+;Shared Workbook User Data;
+;;userInfo (User Information)
+;;users (User List)
+Query Table Data;;
+;deletedField (Deleted Field);
+;queryTable (Query Table);
+;queryTableDeletedFields (Deleted Fields);
+;queryTableField (Query Table Field);
+;queryTableFields (Query Table Fields);
+;queryTableRefresh (Query Table Refresh Information);
+External Data Connections;;
+;connection (Connection);
+;connections (Connections);
+;dbPr (ODBC & OLE DB Properties);
+;m (No Value);
+;olapPr (OLAP Properties);
+;parameter (Parameter Properties);
+;parameters (Query Parameters);
+;s (Character Value);
+;tables (Tables);
+;textField (Text Import Field Settings);
+;textFields (Fields);
+;textPr (Text Import Settings);
+;webPr (Web Query Properties);
+Suplementary Workbook Data;;
+;cell (External Cell Data);
+;ddeItem (DDE Item Definition);
+;ddeItems (DDE Items Collection);
+;ddeLink;
+;definedName (Defined Name);
+;definedNames (Named Links);
+;externalBook (External Workbook);
+;externalLink (External Reference);
+;oleItem (OLE Link);
+;oleItems;
+;oleLink;
+;row (Row);
+;sheetData (External Sheet Data Set);
+;sheetDataSet (Cached Worksheet Data);
+;sheetName (Sheet Name);
+;sheetNames (Supporting Workbook Sheet Names);
+;val (DDE Link Value);
+;value (Value);
+;values (DDE Name Values);
+Volatile Dependecies;;
+;main (Main);
+;stp (Strings in Subtopic);
+;tp (Topic);
+;tr (References);
+;volType (Volatile Dependency Type);
+;volTypes (Volatile Dependency Types);
+Custom XML Mappings;;
+;DataBinding (XML Mapping);
+;Map (XML Mapping Properties);
+;MapInfo (XML Mapping);
+;Schema (XML Schema);
+DrawingML - SpreadsheetML Drawing;;
+;absoluteAnchor;
+;blipFill;
+;clientData;
+;cNvCxnSpPr (Non-Visual Connector Shape Properties);
+;cNvGraphicFramePr;
+;cNvGrpSpPr;
+;cNvPicPr;
+;cNvPr (Connection Non-Visual Properties);
+;cNvSpPr (Connection Shape Non-Visual Properties);
+;col;
+;colOff;
+;cxnSp (Connection Shape);
+;ext;
+;from;
+;graphicFrame;
+;grpSp (Group Shape);
+;grpSpPr (Group Shape Properties);
+;nvCxnSpPr (Non-Visual Connection Shape Properties);
+;nvGraphicFramePr (Non-Visual Graphic Frame Properties);
+;nvGrpSpPr (Non-Visual Grouping Shape Properties);
+;nvPicPr;
+;nvSpPr (Non-Visual Shape Properties);
+;oneCellAnchor;
+;pic;
+;pos;
+;row;
+;rowOff;
+;sp;
+;spPr (Shape Properties);
+;style;
+;to;
+;twoCellAnchor;
+;txBody;
+;wsDr;
+;xfrm;
+DrawingML - Charts;;
+;applyToEnd;
+;applyToFront;
+;applyToSides;
+;area3DChart (3D Area Charts);
+;areaChart (Area Charts);
+;auto (Automatic Category Axis);
+;autoTitleDeleted;
+;autoUpdate;
+;axId (Axis ID);
+;axPos (Axis Position);
+;backWall (Back Wall);
+;backward (Backward);
+;bandFmt;
+;bandFmts;
+;bar3DChart (3D Bar Charts);
+;barChart (Bar Charts);
+;barDir (Bar Direction);
+;baseTimeUnit (Base Time Unit);
+;bubble3D (3D Bubble);
+;bubbleChart (Bubble Charts);
+;bubbleScale (Bubble Scale);
+;bubbleSize (Bubble Size);
+;builtInUnit (Built in Display Unit Label Size);
+;cat (Category Axis Data);
+;catAx (Category Axis Data);
+;chart;
+;chart (Chart);
+;chartObject;
+;chartSpace (Chart Space);
+;clrMapOvr;
+;crossAx;
+;crossBetween (Cross Between);
+;crosses;
+;crossesAt;
+;custSplit (Custom Split);
+;custUnit (Custom Display Unit);
+;DataBinding (XML Mapping);
+;date1904 (1904 Date System);
+;dateAx;
+;delete (Delete);
+;depthPercent (Depth Percent);
+;dispBlanksAs (Display Blanks As);
+;dispEq (Display Equation);
+;dispRSqr (Display R Squared Value);
+;dispUnits (Display Units);
+;dispUnitsLbl (Display Units Label);
+;dLbl (Data Label);
+;sLblPos (Data Label Position);
+;dLbls (Data Labels);
+;doughnutChart (Doughnut Charts);
+;downBars (Down Bars);
+;dPt (Data Point);
+;dropLines (Drop Lines);
+;dTable (Data Table);
+;errBars (Error Bars);
+;errBarType (Error Bar Type);
+;errDir (Error Bar Direction);
+;errValType (Error Bar Value Type);
+;explosion (Explosion);
+;ext;
+;externalData (External Data Relationship);
+;extList (Chart Extensibility);
+;f (Formula);
+;firstSliceAng (First Slice Angle);
+;floor (Floor);
+;fmtId (Format ID);
+;formatCode;
+;formatting;
+;forward (Forward);
+;gapDepth (Gap Depth);
+;gapWidth (Gap Width);
+;grouping (Grouping);
+;h (Height);
+;hiLowLines (High Low Lines);
+;holeSize (Hole Size);
+;hPercent (Height Percent);
+;idx (Index);
+;intercept (Intercept);
+;invertIfNegative (Invert If Negative);
+;layout (Layout);
+;layoutTarget (Layout Target);
+;lblAlgn (Label Align);
+;lblOffset (Label Offset);
+;leaderLines (Leader Lines);
+;legend (Legend);
+;legendEntry (Legend Entry);
+;legendPos (Legend Position);
+;line3DChart (3D Line Charts);
+;lineChart (Line Charts);
+;logBase (Logarithmic Base);
+;lvl (Level);
+;majorGridlines (Major Gridlines);
+;majorTickMark (Major Tick Mark);
+;majorTimeUnit (Major Time Unit);
+;majorUnit (Major Unit);
+;manualLayout (Manual Layout);
+;marker (Marker);
+;max (Maximum);
+;min (Minimum);
+;minorGridlines (Minor Gridlines);
+;minorTickMark (Minor Tick Mark);
+;minorTimeUnit (Minor Time Unit);
+;minorUnit (Minor Unit);
+;minus (Minus);
+;multiLvlStrCache (Multi Level String Cache);
+;multiLvlStrRef (Multi Level String Reference);
+;name (Name);
+;noEndCap (No End Cap);
+;noMultiLvlLbl (No Multi Level Labels);
+;numCache (Number Cache);
+;numFmt (Number Format);
+;numLit (Number Literal);
+;numRef (Number Reference);
+;ofPieChart (Pie of Pie or Bar of Pie Charts);
+;ofPieType (Pie of Pie or Bar of Pie Type);
+;order (Order);
+;orientation (Axis Orientation);
+;overlap (Overlap);
+;overlay (Overlay);
+;pageMargins;
+;pageSetup;
+;period (Period);
+;perspective (Perspective);
+;pictureFormat;
+;pictureOptions;
+;pictureStackUnit;
+;pie3DChart (3D Pie Charts);
+;pieChart (Pie Charts);
+;pivotFmt;
+;pivotFmts;
+;pivotSource;
+;plotArea (Plot Area);
+;plotVisOnly (Plot Visible Only);
+;plus (Plus);
+;printSettings;
+;protection;
+;pt;
+;ptCount;
+;radarChart (Radar Charts);
+;radarStyle (Radar Style);
+;rAngAx (Right Angle Axes);
+;rich (Rich Text);
+;rotX (X Rotation);
+;rotY (Y Rotation);
+;scaling (Scaling);
+;scatterChart (Scatter Charts);
+;scatterStyle (Scatter Style);
+;secondPiePt;
+;secondPieSize (Second Pie Size);
+;selection;
+;separator (Separator);
+;ser;
+;serAx (SeriesAx);
+;serLines;
+;shape;
+;showBubbleSize;
+;showCatName;
+;showDLblsOverMax;
+;showHorzBorder;
+;showKeys;
+;showLeaderLines;
+;showLegendKey;
+;showNegBubbles;
+;showOutline;
+;showPercent;
+;showSerName;
+;shoeVal;
+;shoeVertBorder;
+;sideWall;
+;size;
+;sizeRepresents;
+;smooth;
+;splitPos;
+;splitType;
+;spPr;
+;stockChart (Stock Charts);
+;strCache;
+;strLit;
+;strRef;
+;style;
+;surface3DChart (3D Surface Charts);
+;surfaceChart (Surface Charts);
+;symbol;
+;thickness;
+;tickLblPos;
+;tickLblSkip;
+;tickMarkSkip;
+;title;
+;trendline;
+;trendlineLbl;
+;trendlineType;
+;tx;
+;txPr;
+;upBars;
+;upDownBars;
+;userInterface;
+;userShapes;
+;v;
+;val;
+;valAx;
+;varyColors;
+;view3D;
+;w;
+;wireframe;
+;x;
+;xMode;
+;xVal;
+;y;
+;yMode;
+;yVal;
+DrawingML - Chart Drawings;;
+;absSizeAnchor;
+;blipFill;
+;cNvCxnSpPr (Connector Non Visual Properties);
+;cNvGraphicFramePr (Chart Non Visual Graphic Frame Properties);
+;cNvGrpSpPr (Chart Non Visual Group Shape Properties);
+;cNvPicPr;
+;cNvPr (Chart Non Visual Properties);
+;cNvSpPr (Chart Non Visual Shape Properties);
+;cxnSp (Connector Shape);
+;ext;
+;from (From);
+;graphicFrame (Graphic Frame);
+;grpSp (Group Shape);
+;grpSpPr (Group Shape Properties);
+;nvCxnSpPr (Connector Non Visual Properties);
+;nvGraphicFramePr (Graphic Frame Non Visual Properties);
+;nvGrpSpPr (Group Shape Non Visual Properties);
+;nvPicPr;
+;nvSpPr (Shape Non Visual Properties);
+;pic;
+;relSizeAnchor;
+;sp (Shape Definition);
+;spPr (Connection Shape Properties);
+;style (Shape Style);
+;to (Relative Anchor End Point);
+;txBody (Shape Text);
+;x (Relative X Coordinate);
+;xfrm (Graphic Frame Transform);
+;y (Relative Y Coordinate);
