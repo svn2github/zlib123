@@ -165,9 +165,9 @@ Format;Cells..;Numbers;Category;;Y;N;N;M2;Data styles;;
 Format;Cells..;Numbers;Format;;Y;N;N;M2;Data styles;;
 Format;Cells..;Numbers;Options;;Y;N;N;M2;Data styles;;
 Format;Cells..;Numbers;Format Code;;Y;N;N;M2;Data styles;;
-Format;Cells..;Font;Font ;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;
-Format;Cells..;Font;Type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;
-Format;Cells..;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;
+Format;Cells..;Font;Font ;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;mirek-odf - Reverse
+Format;Cells..;Font;Type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;mirek-odf - Reverse
+Format;Cells..;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;mirek-odf - Reverse
 Format;Cells..;Font;Language;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;
 Format;Cells..;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;;
 Format;Cells..;Font Effects;Strike Through;;Y;N;N;M2;Text & Paragraph formatting;;
@@ -180,17 +180,17 @@ Format;Cells..;Borders;;;Y;N;N;M2;Text & Paragraph formatting;;
 Format;Cells..;Background;;;Y;N;N;M2;Text & Paragraph formatting;;
 Format;Cells..;Protection;Hide all;;Y;N;N;M2;Text & Paragraph formatting;;
 Format;Cells..;Protection;Hide (When Print);;Y;N;N;M2;Text & Paragraph formatting;;
-Format;Row;Height..;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
+Format;Row;Height..;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse
 Format;Row;Optimal Height;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel;
-Format;Row;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
-Format;Row;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
-Format;Column;Width;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
+Format;Row;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse
+Format;Row;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse
+Format;Column;Width;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse
 Format;Column;Optimal Width;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel;
-Format;Column;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
-Format;Column;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
-Format;Sheet;Rename..;;;Y;N;Y;M1;Document structure;;
-Format;Sheet;Hide;;;Y;N;Y;M1;Document structure;;
-Format;Sheet;Show;;;Y;N;Y;M1;Document structure;;
+Format;Column;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse
+Format;Column;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse
+Format;Sheet;Rename..;;;Y;N;Y;M1;Document structure;;mirek-odf - Reverse
+Format;Sheet;Hide;;;Y;N;Y;M1;Document structure;;mirek-odf - Reverse
+Format;Sheet;Show;;;Y;N;Y;M1;Document structure;;mirek-odf - Reverse
 Format;Sheet;Right - Left;;;Y;N;N;M1;Document structure;;
 Format;Merge Cells;;;;Y;N;N;M1;Basic and Advanced Table Model;;
 Format;Page;;;;Y;N;N;M2;Page Styles and Layout;;
