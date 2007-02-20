@@ -68,8 +68,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             set 
             { 
                 this.isDirectTransform = value;
-                EmbeddedResourceResolver r = (EmbeddedResourceResolver)this.ResourceResolver;
-                r.IsDirectTransform = this.isDirectTransform;
+                if (this.ResourceResolver is EmbeddedResourceResolver)
+                {
+                    EmbeddedResourceResolver r = (EmbeddedResourceResolver)this.ResourceResolver;
+                    r.IsDirectTransform = this.isDirectTransform;
+                }
             }
             get { return this.isDirectTransform; }
         }
