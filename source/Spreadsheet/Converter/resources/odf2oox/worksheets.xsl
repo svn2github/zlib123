@@ -67,6 +67,7 @@
   <xsl:template name="InsertWorksheet">
     <xsl:param name="cellNumber"/>
     <worksheet>
+      <sheetFormatPr defaultRowHeight="15" defaultColWidth="12.40909090909091"/>
       <xsl:if test="table:table-column">
         <cols>
 
@@ -176,19 +177,21 @@
   <xsl:template match="table:table-row" mode="sheet">
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
+    <xsl:variable name="height">
+    <xsl:call-template name="ConvertMeasure">
+      <xsl:with-param name="length">
+        <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
+      </xsl:with-param>
+      <xsl:with-param name="unit">point</xsl:with-param>
+    </xsl:call-template>
+    </xsl:variable>
+    <xsl:if test="table:table-cell/text:p or (@table:visibility!='' and  table:visibility!='visible') or ($height != 15)">
     <row r="{$rowNumber}">
 
       <!-- insert row height -->
-      <xsl:if test="key('style',@table:style-name)/style:table-row-properties/@style:row-height">
+      <xsl:if test="$height">
         <xsl:attribute name="ht">
-          <xsl:call-template name="ConvertMeasure">
-            <xsl:with-param name="length">
-              <xsl:value-of
-                select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"
-              />
-            </xsl:with-param>
-            <xsl:with-param name="unit">point</xsl:with-param>
-          </xsl:call-template>
+          <xsl:value-of select="$height"/>
         </xsl:attribute>
         <xsl:attribute name="customHeight">1</xsl:attribute>
       </xsl:if>
@@ -217,6 +220,7 @@
         </xsl:with-param>
         <xsl:with-param name="rowNumber" select="$rowNumber"/>
       </xsl:call-template>
+    </xsl:if>
     </xsl:if>
 
     <!-- insert next row -->
