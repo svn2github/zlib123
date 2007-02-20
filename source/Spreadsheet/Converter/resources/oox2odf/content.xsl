@@ -71,7 +71,7 @@
     </xsl:call-template>
 
     <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet"/>
-      
+
     <xsl:choose>
       <!-- when sheet is empty -->
       <xsl:when test="not(document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row/e:c/e:v)">
@@ -144,7 +144,7 @@
       </xsl:attribute>
       <xsl:if test="@hidden=1">
         <xsl:attribute name="table:visibility">
-            <xsl:text>collapse</xsl:text>
+          <xsl:text>collapse</xsl:text>
         </xsl:attribute>
       </xsl:if>
 
@@ -391,7 +391,7 @@
       <table:table-column table:style-name="{generate-id(.)}">
         <xsl:if test="not(@min = @max)">
           <xsl:attribute name="table:number-columns-repeated">
-            <xsl:value-of select="@max - @min"/>
+            <xsl:value-of select="@max - @min + 1"/>
           </xsl:attribute>
         </xsl:if>
         <xsl:attribute name="table:default-cell-style-name">
@@ -434,20 +434,28 @@
   <xsl:template name="ConvertFromCharacters">
     <xsl:param name="value"/>
 
+    <!-- strange but true: the best result is when you WON'T convert average digit width from pt to px-->
     <xsl:variable name="defaultFontSize">
-      <xsl:value-of select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+      <xsl:choose>
+        <xsl:when test="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font">
+          <xsl:value-of select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:sz/@val"
+          />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>11</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
-    <!-- formula below is true only for proportional fonts -->
+    <!-- for proportional fonts average digit width is 2/3 of font size-->
     <xsl:variable name="avgDigitWidth">
-      <xsl:value-of select="floor($defaultFontSize * 0.66666)"/>
+      <xsl:value-of select="$defaultFontSize * 0.66666"/>
     </xsl:variable>
-
     <xsl:call-template name="ConvertToCentimeters">
       <xsl:with-param name="length">
-        <xsl:value-of select="concat(round(($avgDigitWidth * $value) + 5),'px')"/>
+        <xsl:value-of select="concat(($avgDigitWidth * $value) + 5,'px')"/>
       </xsl:with-param>
-    </xsl:call-template>
+  </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="InsertFonts">

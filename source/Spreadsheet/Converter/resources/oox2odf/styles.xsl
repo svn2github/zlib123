@@ -2,12 +2,12 @@
     xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
     xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-    xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" 
+    xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
     exclude-result-prefixes="e r">
 
     <xsl:import href="relationships.xsl"/>
-    
+
     <xsl:template name="InsertColumnStyles">
         <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
             <xsl:call-template name="InsertSheetColumnStyles">
@@ -22,10 +22,10 @@
             </xsl:call-template>
         </xsl:for-each>
     </xsl:template>
-    
+
     <xsl:template name="InsertSheetColumnStyles">
         <xsl:param name="sheet"/>
-        
+
         <!-- default style -->
         <style:style
             style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
@@ -45,19 +45,19 @@
                         </xsl:when>
                         <xsl:otherwise>
                             <!-- Excel application default-->
-                            <xsl:call-template name="ConvertToCentimeters">
-                                <xsl:with-param name="length" select="'64px'"/>
+                            <xsl:call-template name="ConvertFromCharacters">
+                                <xsl:with-param name="value" select="'8.43'"/>
                             </xsl:call-template>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>
             </style:table-column-properties>
         </style:style>
-        
+
         <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols"
             mode="automaticstyles"/>
     </xsl:template>
-    
+
     <xsl:template match="e:col" mode="automaticstyles">
         <style:style style:name="{generate-id(.)}" style:family="table-column">
             <style:table-column-properties>
@@ -71,7 +71,7 @@
             </style:table-column-properties>
         </style:style>
     </xsl:template>
-    
+
     <xsl:template name="InsertRowStyles">
         <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
             <xsl:call-template name="InsertSheetRowStyles">
@@ -86,10 +86,10 @@
             </xsl:call-template>
         </xsl:for-each>
     </xsl:template>
-    
+
     <xsl:template name="InsertSheetRowStyles">
         <xsl:param name="sheet"/>
-        
+
         <!-- default style -->
         <style:style
             style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
@@ -117,25 +117,25 @@
                 </xsl:attribute>
             </style:table-row-properties>
         </style:style>
-        
+
         <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:sheetData"
             mode="automaticstyles"/>
     </xsl:template>
-    
+
     <xsl:template match="e:row" mode="automaticstyles">
         <xsl:if test="@ht">
             <style:style style:name="{generate-id(.)}" style:family="table-row">
                 <style:table-row-properties fo:break-before="auto">
-                        <xsl:attribute name="style:row-height">
-                            <xsl:call-template name="ConvertToCentimeters">
-                                <xsl:with-param name="length" select="concat(@ht,'pt')"/>
-                            </xsl:call-template>
-                        </xsl:attribute>
+                    <xsl:attribute name="style:row-height">
+                        <xsl:call-template name="ConvertToCentimeters">
+                            <xsl:with-param name="length" select="concat(@ht,'pt')"/>
+                        </xsl:call-template>
+                    </xsl:attribute>
                 </style:table-row-properties>
             </style:style>
         </xsl:if>
     </xsl:template>
-    
+
     <!--  Insert Table Properties -->
     <xsl:template name="InsertStyleTableProperties">
         <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
@@ -156,12 +156,12 @@
             </style:style>
         </xsl:for-each>
     </xsl:template>
-    
+
     <xsl:template name="InsertCellStyles">
         <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs"
             mode="automaticstyles"/>
     </xsl:template>
-    
+
     <xsl:template match="e:xf" mode="automaticstyles">
         <style:style style:name="{generate-id(.)}" style:family="table-cell">
             <style:text-properties>
@@ -172,7 +172,7 @@
             </style:text-properties>
         </style:style>
     </xsl:template>
-    
+
     <xsl:template match="e:b" mode="style">
         <xsl:attribute name="fo:font-weight">
             <xsl:text>bold</xsl:text>
@@ -307,18 +307,18 @@
             </xsl:attribute>
         </xsl:if>
     </xsl:template>
-    
+
     <xsl:template match="e:sz" mode="style">
         <!-- do not insert this property into drop cap text style -->
         <xsl:attribute name="fo:font-size">
             <xsl:value-of select="@val"/>
         </xsl:attribute>
     </xsl:template>
-    
+
     <xsl:template match="e:name" mode="style">
         <xsl:attribute name="style:font-name">
             <xsl:value-of select="@val"/>
         </xsl:attribute>
     </xsl:template>
-    
+
 </xsl:stylesheet>

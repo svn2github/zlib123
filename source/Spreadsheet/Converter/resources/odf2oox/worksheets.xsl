@@ -113,11 +113,13 @@
             </xsl:call-template>
           </xsl:variable>
           <xsl:variable name="fontSize">
-            <xsl:call-template name="pixel-measure">
+<!--            <xsl:call-template name="pixel-measure">
               <xsl:with-param name="length">11pt</xsl:with-param>
-            </xsl:call-template>
+  </xsl:call-template> -->
+            <xsl:text>11</xsl:text>
           </xsl:variable>
           <xsl:value-of select="($pixelWidth+5) div (2 div 3 * $fontSize)"/>
+<!--          <xsl:value-of select="$fontSize"/> -->
         </xsl:attribute>
         <xsl:attribute name="customWidth">1</xsl:attribute>
       </xsl:if>
