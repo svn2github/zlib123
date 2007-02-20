@@ -447,7 +447,9 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private bool ValidateFile(string input, string output, Direction transformDirection)
         {
-            if (transformDirection == Direction.OdtToDocx)
+            if (transformDirection == Direction.OdtToDocx 
+                || transformDirection == Direction.OdsToXlsx
+                || transformDirection == Direction.OdpToPptx)
             {
                 try
                 {
