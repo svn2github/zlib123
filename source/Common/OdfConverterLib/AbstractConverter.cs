@@ -53,27 +53,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private ArrayList skipedPostProcessors = null;
         private string externalResource = null;
         private bool packaging = true;
-        private EmbeddedResourceResolver _resolver;
         private Assembly resourcesAssembly;
-
+        private Hashtable compiledProcessors;
         
         protected AbstractConverter(Assembly resourcesAssembly)
         {
             this.resourcesAssembly = resourcesAssembly;
             this.skipedPostProcessors = new ArrayList();
+            this.compiledProcessors = new Hashtable();
         }
 
         public bool DirectTransform
         {
-            set 
-            { 
-                this.isDirectTransform = value;
-                if (this.ResourceResolver is EmbeddedResourceResolver)
-                {
-                    EmbeddedResourceResolver r = (EmbeddedResourceResolver)this.ResourceResolver;
-                    r.IsDirectTransform = this.isDirectTransform;
-                }
-            }
+            set { this.isDirectTransform = value; }
             get { return this.isDirectTransform; }
         }
 
@@ -112,19 +104,14 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// <summary>
         /// Pull an XmlUrlResolver for embedded resources
         /// </summary>
-        protected virtual XmlUrlResolver ResourceResolver
+        private XmlUrlResolver ResourceResolver
         {
             get
             {
                 if (this.ExternalResources == null)
                 {
-                    if (this._resolver == null)
-                    {
-
-                        this._resolver = new EmbeddedResourceResolver(this.resourcesAssembly, this.GetType().Namespace,
-                            this.DirectTransform);
-                    }
-                    return this._resolver;
+                    return new EmbeddedResourceResolver(this.resourcesAssembly,
+                      this.GetType().Namespace, this.DirectTransform);
                 }
                 else
                 {
@@ -136,7 +123,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// <summary>
         /// Pull the input xml document to the xsl transformation
         /// </summary>
-        protected virtual XmlReader Source
+        private XmlReader Source
         {
             get
             {
@@ -155,31 +142,44 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
         }
 
-        /// <summary>
-        /// Pull the input xsl document to the xsl transformation
-        /// </summary>
-        protected virtual XPathDocument GetXslDoc(bool computeSize)
+      
+        private XslCompiledTransform Load(bool computeSize)
         {
-                string xslLocation = this.DirectTransform ? ODFToOOX_XSL : OOXToODF_XSL;
-                if (this.ExternalResources == null)
+            string xslLocation = this.DirectTransform ? ODFToOOX_XSL : OOXToODF_XSL;
+            XPathDocument xslDoc = null;
+            XmlUrlResolver resolver = this.ResourceResolver;
+
+            if (this.ExternalResources == null)
+            {
+                if (computeSize)
                 {
-                    if (computeSize)
-                    {
-                        xslLocation = this.DirectTransform ? ODFToOOX_COMPUTE_SIZE_XSL : OOXToODF_COMPUTE_SIZE_XSL;
-                    }
-                    EmbeddedResourceResolver r = (EmbeddedResourceResolver) this.ResourceResolver;
-                    return new XPathDocument(r.GetInnerStream(xslLocation));
+                    xslLocation = this.DirectTransform ? ODFToOOX_COMPUTE_SIZE_XSL : OOXToODF_COMPUTE_SIZE_XSL;
                 }
-                else
-                {
-                    return new XPathDocument(this.ExternalResources + "/" + xslLocation);
-                }
+                EmbeddedResourceResolver emr = (EmbeddedResourceResolver) resolver;
+                emr.IsDirectTransform = this.DirectTransform;
+                xslDoc = new XPathDocument(emr.GetInnerStream(xslLocation));
+            }
+            else
+            {
+                xslDoc =  new XPathDocument(this.ExternalResources + "/" + xslLocation);
+            }
+
+            if (!this.compiledProcessors.Contains(xslLocation))
+            {
+                // create a xsl transformer
+                XslCompiledTransform xslt = new XslCompiledTransform();
+                // compile the stylesheet. 
+                // Input stylesheet, xslt settings and uri resolver are retrieve from the implementation class.
+                xslt.Load(xslDoc, this.XsltProcSettings, this.ResourceResolver);
+                this.compiledProcessors.Add(xslLocation, xslt);
+            }
+            return (XslCompiledTransform) this.compiledProcessors[xslLocation];
         }
 
         /// <summary>
         /// Pull the xslt settings
         /// </summary>
-        protected virtual XsltSettings XsltProcSettings
+        private XsltSettings XsltProcSettings
         {
             get
             {
@@ -261,13 +261,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
            
             try
             {
-                // create a xsl transformer
-                XslCompiledTransform xslt = new XslCompiledTransform();
-
-                // compile the stylesheet. 
-                // Input stylesheet, xslt settings and uri resolver are retrieve from the implementation class.
-                xslt.Load(this.GetXslDoc(outputFile==null), this.XsltProcSettings, this.ResourceResolver);
-
+                XslCompiledTransform xslt = this.Load(outputFile == null);
                 zipResolver = new ZipResolver(inputFile);
                 XsltArgumentList parameters = new XsltArgumentList();
                 parameters.XsltMessageEncountered += new XsltMessageEncounteredEventHandler(MessageCallBack);
@@ -373,7 +367,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             }
             return currentProc;
         }
-
 
         private bool Contains(string processorFullName, ArrayList names)
         {
