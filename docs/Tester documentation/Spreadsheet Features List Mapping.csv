@@ -180,14 +180,14 @@ Format;Cells..;Borders;;;Y;N;N;M2;Text & Paragraph formatting;;
 Format;Cells..;Background;;;Y;N;N;M2;Text & Paragraph formatting;;
 Format;Cells..;Protection;Hide all;;Y;N;N;M2;Text & Paragraph formatting;;
 Format;Cells..;Protection;Hide (When Print);;Y;N;N;M2;Text & Paragraph formatting;;
-Format;Row;Height..;;;Y;N;Y;M1;Basic and Advanced Table Model;;
+Format;Row;Height..;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
 Format;Row;Optimal Height;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel;
-Format;Row;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;
-Format;Row;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;
-Format;Column;Width;;;Y;N;Y;M1;Basic and Advanced Table Model;;
+Format;Row;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
+Format;Row;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
+Format;Column;Width;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
 Format;Column;Optimal Width;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel;
-Format;Column;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;
-Format;Column;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;
+Format;Column;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
+Format;Column;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct
 Format;Sheet;Rename..;;;Y;N;Y;M1;Document structure;;
 Format;Sheet;Hide;;;Y;N;Y;M1;Document structure;;
 Format;Sheet;Show;;;Y;N;Y;M1;Document structure;;
