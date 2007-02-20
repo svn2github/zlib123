@@ -101,11 +101,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 		{
             if (ASSEMBLY_URI_SCHEME.Equals(absoluteUri.Scheme))
             {
-                if (resourceLocation == null)
+                string location = null;
+                if (this.resourceLocation == null)
                 {
-                    resourceLocation = this.isDirectTransform ? ODFToOOX_LOCATION : OOXToODF_LOCATION;
+                    location = this.isDirectTransform ? ODFToOOX_LOCATION : OOXToODF_LOCATION;
                 }
-                string resource = resourceLocation + absoluteUri.OriginalString.Remove(0, ASSEMBLY_URI_SCHEME.Length + ASSEMBLY_URI_HOST.Length + 4).Replace("/", ".");
+                else
+                {
+                    location = this.resourceLocation;
+                }
+                string resource = location + absoluteUri.OriginalString.Remove(0, ASSEMBLY_URI_SCHEME.Length + ASSEMBLY_URI_HOST.Length + 4).Replace("/", ".");
                 Stream stream = this.appAssembly.GetManifestResourceStream(this.appNamespace + resource);
                 if (stream != null)
                 {
@@ -128,11 +133,16 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 	
 		public Stream GetInnerStream(String fileName) 
         {
-            if (resourceLocation == null)
+            string location = null;
+            if (this.resourceLocation == null)
             {
-                resourceLocation = this.isDirectTransform ? ODFToOOX_LOCATION : OOXToODF_LOCATION;
+                location = this.isDirectTransform ? ODFToOOX_LOCATION : OOXToODF_LOCATION;
             }
-            string path = this.appNamespace + resourceLocation;
+            else
+            {
+                location = this.resourceLocation;
+            }
+            string path = this.appNamespace + location;
 			return this.appAssembly.GetManifestResourceStream(path + fileName);
 		}
 		
