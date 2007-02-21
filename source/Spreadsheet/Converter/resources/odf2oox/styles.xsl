@@ -62,9 +62,21 @@
             </xsl:attribute>
 
             <!-- default font-->
-            <xsl:apply-templates
-                select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties"
-                mode="fonts"/>
+            <xsl:choose>
+                <xsl:when
+                    test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties">
+                    <xsl:apply-templates
+                        select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties"
+                        mode="fonts"/>
+                </xsl:when>
+                <!-- application default-->
+                <xsl:otherwise>
+                    <font>
+                        <sz val="10"/>
+                        <name val="Arial"/>
+                    </font>
+                </xsl:otherwise>
+            </xsl:choose>
 
             <xsl:apply-templates
                 select="document('content.xml')/office:document-content/office:automatic-styles"
