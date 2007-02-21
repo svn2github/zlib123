@@ -391,7 +391,7 @@
     </xsl:variable>
     <xsl:call-template name="ConvertToCentimeters">
       <xsl:with-param name="length">
-        <xsl:value-of select="concat(($avgDigitWidth * $value) + 5,'px')"/>
+        <xsl:value-of select="concat(($avgDigitWidth * $value) - 5,'px')"/>
       </xsl:with-param>
   </xsl:call-template>
   </xsl:template>
