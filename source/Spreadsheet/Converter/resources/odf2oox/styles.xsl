@@ -235,6 +235,7 @@
                 </xsl:if>
             </xsl:when>
             <xsl:when test="$mode = 'fonts'">
+              <xsl:if test="key('font',@style:font-name)/@svg:font-family">
                 <name>
                     <xsl:attribute name="val">
                         <xsl:choose>
@@ -251,6 +252,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                 </name>
+              </xsl:if>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
