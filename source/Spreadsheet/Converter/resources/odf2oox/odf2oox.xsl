@@ -40,6 +40,8 @@
     <xsl:import href="package_relationships.xsl"/>
     <xsl:import href="docprops.xsl"/>
     <xsl:import href="part_relationships.xsl"/>
+    <xsl:import href="common.xsl"/>
+    <xsl:import href="merge_cell.xsl"/>
   
     <xsl:strip-space elements="*"/>
     <xsl:preserve-space elements="text:p text:span number:text"/>
