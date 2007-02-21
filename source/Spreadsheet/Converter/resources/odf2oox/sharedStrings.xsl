@@ -33,7 +33,8 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0">
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0">
   
   <xsl:key name="textstyle" match="style:style" use="@style:name"/>
   <xsl:template name="InsertSharedStrings">
@@ -81,6 +82,12 @@
   
   <xsl:template match="style:style" mode="styles">
     <rPr>
+      <xsl:if test="style:text-properties/@fo:font-weight='bold'">
+        <b/>
+      </xsl:if>
+      <xsl:if test="style:text-properties/@fo:font-style='italic'">
+        <i/>
+      </xsl:if>
       <rFont val="{style:text-properties/@style:font-name}"/>
     </rPr>
   </xsl:template>
