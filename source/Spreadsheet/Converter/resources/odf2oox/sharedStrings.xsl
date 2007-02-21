@@ -32,9 +32,10 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0">
   
-
+  <xsl:key name="textstyle" match="style:style" use="@style:name"/>
   <xsl:template name="InsertSharedStrings">
     <sst>
       <xsl:variable name="Count">
@@ -53,9 +54,35 @@
   <xsl:template name="InsertString">    
     <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[@office:value-type='string']/text:p">
       <si>
-        <t><xsl:value-of select="."/></t>
+        <xsl:choose>
+          <xsl:when test="text:span">
+            <xsl:apply-templates mode="run"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <t><xsl:value-of select="."/></t>
+          </xsl:otherwise>
+        </xsl:choose>
       </si>
     </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template match="text:span" mode="run">
+    <r>
+      <xsl:apply-templates select="key('textstyle',@text:style-name)" mode="styles"/>
+      <t><xsl:value-of select="."/></t>
+      </r>
+  </xsl:template>
+  
+  <xsl:template match="text()" mode="run">
+  <r>
+    <t><xsl:value-of select="."/></t>
+  </r>  
+  </xsl:template>
+  
+  <xsl:template match="style:style" mode="styles">
+    <rPr>
+      <rFont val="{style:text-properties/@style:font-name}"/>
+    </rPr>
   </xsl:template>
   
 </xsl:stylesheet>
