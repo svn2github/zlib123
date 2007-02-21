@@ -36,6 +36,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0">
   
+  <xsl:import href="measures.xsl"/>
   <xsl:key name="textstyle" match="style:style" use="@style:name"/>
   <xsl:template name="InsertSharedStrings">
     <sst>
@@ -87,6 +88,17 @@
       </xsl:if>
       <xsl:if test="style:text-properties/@fo:font-style='italic'">
         <i/>
+      </xsl:if>
+      <xsl:if test="style:text-properties/@fo:font-size">
+        <sz>
+          <xsl:attribute name="val">
+            <xsl:call-template name="point-measure">
+              <xsl:with-param name="length">
+                <xsl:value-of select="style:text-properties/@fo:font-size"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </sz>
       </xsl:if>
       <rFont val="{style:text-properties/@style:font-name}"/>
     </rPr>
