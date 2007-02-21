@@ -42,12 +42,7 @@
     </Properties>
   </xsl:template>  
 
-  <xsl:template match="/office:document-meta/office:meta/meta:keyword">
-    <xsl:if test="not(position() = 1)">
-      <xsl:text> </xsl:text>
-    </xsl:if>
-    <xsl:value-of select="."/>
-  </xsl:template>
+  
 
   <xsl:template match="/office:document-meta/office:meta" mode="app">
     <!-- page count -->
