@@ -37,6 +37,7 @@
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="settings.xsl"/>
   <xsl:import href="common.xsl"/>
+  <xsl:import href="styles.xsl"/>
 
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
@@ -64,6 +65,11 @@
         <xsl:call-template name="content"/>
       </pzip:entry>
 
+      <!-- styles  -->
+      <pzip:entry pzip:target="styles.xml">
+        <xsl:call-template name="styles"/>
+      </pzip:entry>
+      
       <!-- meta -->
       <pzip:entry pzip:target="meta.xml">
         <xsl:call-template name="meta"/>

@@ -250,6 +250,12 @@
           </text:p>
         </xsl:when>
         <xsl:otherwise>
+          <xsl:attribute name="office:value-type">
+            <xsl:text>float</xsl:text>
+          </xsl:attribute>
+          <xsl:attribute name="office:value">
+            <xsl:value-of select="e:v"/>
+          </xsl:attribute>
           <text:p>
             <xsl:value-of select="e:v"/>
           </text:p>
@@ -388,12 +394,6 @@
         <xsl:value-of select="concat(($avgDigitWidth * $value) + 5,'px')"/>
       </xsl:with-param>
   </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template name="InsertFonts">
-    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font">
-      <style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}"/>
-    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>

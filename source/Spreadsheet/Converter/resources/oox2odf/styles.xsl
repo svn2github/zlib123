@@ -27,13 +27,40 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+    xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
     xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
     exclude-result-prefixes="e r">
 
     <xsl:import href="relationships.xsl"/>
+
+    <xsl:template name="styles">
+        <office:document-styles>
+            <office:font-face-decls>
+                <xsl:call-template name="InsertFonts"/>
+            </office:font-face-decls>
+            <office:styles>
+                <xsl:call-template name="InsertDefaultTableCellStyle"/>
+            </office:styles>
+        </office:document-styles>
+    </xsl:template>
+
+    <xsl:template name="InsertFonts">
+        <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font">
+            <style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}"/>
+        </xsl:for-each>
+    </xsl:template>
+
+    <xsl:template name="InsertDefaultTableCellStyle">
+        <style:style style:name="Default" style:family="table-cell">
+            <style:text-properties>
+                    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]" mode="style"/>
+            </style:text-properties>
+        </style:style>
+    </xsl:template>
 
     <xsl:template name="InsertColumnStyles">
         <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
@@ -260,7 +287,6 @@
     </xsl:template>
 
     <xsl:template match="e:sz" mode="style">
-        <!-- do not insert this property into drop cap text style -->
         <xsl:attribute name="fo:font-size">
             <xsl:value-of select="@val"/>
         </xsl:attribute>
