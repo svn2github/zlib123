@@ -160,9 +160,19 @@
             <u>
                 <xsl:attribute name="val">
                     <xsl:choose>
-                        <xsl:when test="@style:text-underline-type = 'double' ">double</xsl:when>
-                        <xsl:otherwise>single</xsl:otherwise>
-                    </xsl:choose>
+                        <xsl:when test="@style:text-underline-style = 'accounting' ">
+                            <xsl:choose>
+                                <xsl:when test="@style:text-underline-type = 'double' ">doubleAccounting</xsl:when>
+                                <xsl:otherwise>singleAccounting</xsl:otherwise>
+                            </xsl:choose>
+                    </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:choose>
+                                <xsl:when test="@style:text-underline-type = 'double' ">double</xsl:when>
+                                <xsl:otherwise>single</xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:otherwise>
+                    </xsl:choose>                    
                 </xsl:attribute>
             </u>
         </xsl:if>
