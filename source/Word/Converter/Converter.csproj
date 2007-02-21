@@ -82,7 +82,6 @@
     <EmbeddedResource Include="resources\oox2odf\frames.xsl" />
     <EmbeddedResource Include="resources\oox2odf\indexes.xsl" />
     <EmbeddedResource Include="resources\oox2odf\lists.xsl" />
-    <EmbeddedResource Include="resources\oox2odf\meta.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
     <EmbeddedResource Include="resources\oox2odf\pictures.xsl" />

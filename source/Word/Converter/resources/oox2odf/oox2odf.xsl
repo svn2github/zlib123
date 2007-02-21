@@ -33,11 +33,11 @@
   exclude-result-prefixes="oox rels">
 
   <xsl:import href="measures.xsl"/>
+  <xsl:import href="common-meta.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="content.xsl"/>
   <xsl:import href="pictures.xsl"/>
   <xsl:import href="styles.xsl"/>
-  <xsl:import href="meta.xsl"/>
   <xsl:import href="frames.xsl"/>
   <xsl:import href="settings.xsl"/>
   <xsl:import href="relationships.xsl"/>
@@ -128,7 +128,9 @@
 
       <!-- meta -->
       <pzip:entry pzip:target="meta.xml">
-        <xsl:call-template name="meta"/>
+        <xsl:call-template name="meta">
+          <xsl:with-param name="app-version" select="$app-version"/>
+        </xsl:call-template>
       </pzip:entry>
 
       <!-- settings -->
