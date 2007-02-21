@@ -309,6 +309,16 @@
           <xsl:value-of select="concat($colChar,$rowNumber)"/>
         </xsl:attribute>
 
+        <!-- insert cell style number-->
+        <xsl:if test="@table:style-name">
+            <xsl:for-each select="key('style',@table:style-name)/style:text-properties">
+              <xsl:attribute name="s">
+                <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
+                  level="any"/>
+              </xsl:attribute>
+            </xsl:for-each>  
+        </xsl:if>
+        
         <!-- convert cell type -->
         <xsl:choose>
           <xsl:when test="@office:value-type!='string'">
