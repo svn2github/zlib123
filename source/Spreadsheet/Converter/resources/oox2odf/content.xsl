@@ -112,7 +112,7 @@
         <table:table-row
           table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
           table:number-rows-repeated="{65535 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r}">
-          <table:table-cell/>
+          <table:table-cell  table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:otherwise>
     </xsl:choose>
@@ -357,6 +357,7 @@
         </table:table-column>
       </xsl:when>
       <xsl:otherwise>
+        <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max &lt; 256">
         <table:table-column
           table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
           table:number-columns-repeated="{256 - document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max}">
@@ -365,6 +366,7 @@
               select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
           </xsl:attribute>
         </table:table-column>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
