@@ -181,11 +181,11 @@ Format;Cells..;Background;;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Cells..;Protection;Hide all;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Cells..;Protection;Hide (When Print);;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Row;Height..;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
-Format;Row;Optimal Height;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel;;
+Format;Row;Optimal Height;;;N;N;N;M1;Basic and Advanced Table Model;not supported in excel;;
 Format;Row;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
 Format;Row;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
 Format;Column;Width;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
-Format;Column;Optimal Width;;;Y;N;N;M1;Basic and Advanced Table Model;not supported in excel;;
+Format;Column;Optimal Width;;;N;N;N;M1;Basic and Advanced Table Model;not supported in excel;;
 Format;Column;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
 Format;Column;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
 Format;Sheet;Rename..;;;Y;N;Y;M1;Document structure;;michkaminski;
@@ -204,7 +204,7 @@ Format;Page;Sheet;;;Y;N;N;M2;Page Styles and Layout;;;
 Format;Character;Font;Font;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;Yes in direct
 Format;Character;Font;type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;Yes in direct
 Format;Character;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;Yes in direct
-Format;Character;Font;Language;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;not supported in excel
+Format;Character;Font;Language;;N;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;not supported in excel
 Format;Character;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Character;Font Effects;Color;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Character;Font Effects;Strike through;;Y;N;N;M2;Text & Paragraph formatting;;;
