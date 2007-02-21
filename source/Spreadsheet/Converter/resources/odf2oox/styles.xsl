@@ -161,7 +161,7 @@
     </xsl:template>
 
     <xsl:template name="InsertUnderline">
-        <xsl:if test="@style:text-underline-style">
+        <xsl:if test="@style:text-underline-style != 'none' ">
             <u>
                 <xsl:attribute name="val">
                     <xsl:choose>
