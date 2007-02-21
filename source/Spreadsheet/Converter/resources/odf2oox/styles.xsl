@@ -35,7 +35,8 @@
     xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
     xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0">
+    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  exclude-result-prefixes="svg">
 
     <xsl:import href="measures.xsl"/>
     <xsl:key name="font" match="style:font-face" use="@style:name"/>
@@ -148,27 +149,9 @@
     <xsl:template match="style:text-properties[parent::node()/@style:family='table-cell']"
         mode="fonts">
         <font>
-            <xsl:if test="@fo:font-weight='bold'">
-                <b/>
-            </xsl:if>
-            <xsl:if test="@fo:font-style='italic'">
-                <i/>
-            </xsl:if>
-            <xsl:if test="@style:text-underline-style">
-                <xsl:call-template name="InsertUnderline"/>
-            </xsl:if>
-            <xsl:if test="@fo:font-size">
-                <sz>
-                    <xsl:attribute name="val">
-                        <xsl:call-template name="point-measure">
-                            <xsl:with-param name="length">
-                                <xsl:value-of select="@fo:font-size"/>
-                            </xsl:with-param>
-                        </xsl:call-template>
-                    </xsl:attribute>
-                </sz>
-            </xsl:if>
-            <name val="{key('font',@style:font-name)/@svg:font-family}"/>
+          <xsl:call-template name="InsertTextProperties">
+            <xsl:with-param name="mode">fonts</xsl:with-param>
+          </xsl:call-template>
         </font>
     </xsl:template>
 
@@ -194,4 +177,53 @@
             </xsl:attribute>
         </xf>
     </xsl:template>
+  
+  <!-- insert run properties -->
+  <xsl:template match="style:style" mode="textstyles">
+    <xsl:if test="style:text-properties">
+      <rPr>
+        <xsl:apply-templates select="style:text-properties" mode="textstyles"/>
+      </rPr>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- convert text properties -->
+  <xsl:template match="style:text-properties" mode="textstyles">
+    <xsl:call-template name="InsertTextProperties">
+      <xsl:with-param name="mode">textstyles</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+  
+  <!-- insert text properties -->
+  <xsl:template name="InsertTextProperties">
+    <xsl:param name="mode"/>
+    <xsl:if test="@fo:font-weight='bold'">
+      <b/>
+    </xsl:if>
+    <xsl:if test="@fo:font-style='italic'">
+      <i/>
+    </xsl:if>
+    <xsl:if test="@fo:font-size">
+      <sz>
+        <xsl:attribute name="val">
+          <xsl:call-template name="point-measure">
+            <xsl:with-param name="length">
+              <xsl:value-of select="@fo:font-size"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </sz>
+    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="$mode = 'textstyles'">
+    <xsl:if test="@style:font-name">
+      <rFont val="{@style:font-name}"/>
+    </xsl:if>
+      </xsl:when>
+      <xsl:when test="$mode = 'fonts'">
+        <name val="{key('font',@style:font-name)/@svg:font-family}"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>

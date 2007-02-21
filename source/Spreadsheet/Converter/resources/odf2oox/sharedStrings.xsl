@@ -38,6 +38,8 @@
   
   <xsl:import href="measures.xsl"/>
   <xsl:key name="textstyle" match="style:style" use="@style:name"/>
+  
+  <!-- template which inserts sharedstringscontent -->
   <xsl:template name="InsertSharedStrings">
     <sst>
       <xsl:variable name="Count">
@@ -53,6 +55,7 @@
     </sst>
   </xsl:template>
   
+  <!-- template which inserts a string into sharedstrings -->
   <xsl:template name="InsertString">    
     <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[@office:value-type='string']/text:p">
       <si>
@@ -68,40 +71,19 @@
     </xsl:for-each>
   </xsl:template>
   
+  <!-- text:span conversion -->
   <xsl:template match="text:span" mode="run">
     <r>
-      <xsl:apply-templates select="key('textstyle',@text:style-name)" mode="styles"/>
+      <xsl:apply-templates select="key('textstyle',@text:style-name)" mode="textstyles"/>
       <t><xsl:value-of select="."/></t>
       </r>
   </xsl:template>
   
+  <!-- when there is formatted text in a string, all texts must be in runs -->
   <xsl:template match="text()" mode="run">
   <r>
     <t><xsl:value-of select="."/></t>
   </r>  
-  </xsl:template>
-  
-  <xsl:template match="style:style" mode="styles">
-    <rPr>
-      <xsl:if test="style:text-properties/@fo:font-weight='bold'">
-        <b/>
-      </xsl:if>
-      <xsl:if test="style:text-properties/@fo:font-style='italic'">
-        <i/>
-      </xsl:if>
-      <xsl:if test="style:text-properties/@fo:font-size">
-        <sz>
-          <xsl:attribute name="val">
-            <xsl:call-template name="point-measure">
-              <xsl:with-param name="length">
-                <xsl:value-of select="style:text-properties/@fo:font-size"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-        </sz>
-      </xsl:if>
-      <rFont val="{style:text-properties/@style:font-name}"/>
-    </rPr>
   </xsl:template>
   
 </xsl:stylesheet>
