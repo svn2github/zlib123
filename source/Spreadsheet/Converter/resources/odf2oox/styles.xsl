@@ -203,6 +203,9 @@
     <xsl:if test="@fo:font-style='italic'">
       <i/>
     </xsl:if>
+    <xsl:if test="@style:text-underline-style">
+      <xsl:call-template name="InsertUnderline"/>
+    </xsl:if>
     <xsl:if test="@fo:font-size">
       <sz>
         <xsl:attribute name="val">
