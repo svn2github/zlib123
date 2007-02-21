@@ -103,7 +103,7 @@
     <xsl:template match="meta:keyword">
         <cp:keywords
             xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
-            <xsl:apply-templates select="."/>
+            <xsl:value-of select="."/>
         </cp:keywords>
     </xsl:template>
 
