@@ -112,7 +112,7 @@
         <table:table-row
           table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
           table:number-rows-repeated="{65535 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r}">
-          <table:table-cell  table:number-columns-repeated="256"/>
+          <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:otherwise>
     </xsl:choose>
@@ -229,41 +229,43 @@
 
     <!-- insert this one cell-->
     <table:table-cell>
-      <xsl:choose>
-        <xsl:when test="@t='s'">
-          <xsl:attribute name="office:value-type">
-            <xsl:text>string</xsl:text>
-          </xsl:attribute>
-          <xsl:if test="@s">
-            <xsl:attribute name="table:style-name">
-              <xsl:value-of
-                select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
-              />
+      <xsl:if test="@s">
+        <xsl:attribute name="table:style-name">
+          <xsl:value-of
+            select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
+          />
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="e:v">
+        <xsl:choose>
+          <xsl:when test="@t='s'">
+            <xsl:attribute name="office:value-type">
+              <xsl:text>string</xsl:text>
             </xsl:attribute>
-          </xsl:if>
-          <xsl:variable name="id">
-            <xsl:value-of select="e:v"/>
-          </xsl:variable>
-          <text:p>
-            <xsl:value-of select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]/e:t"
-            />
-          </text:p>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="office:value-type">
-            <xsl:text>float</xsl:text>
-          </xsl:attribute>
-          <xsl:attribute name="office:value">
-            <xsl:value-of select="e:v"/>
-          </xsl:attribute>
-          <text:p>
-            <xsl:value-of select="e:v"/>
-          </text:p>
-        </xsl:otherwise>
-      </xsl:choose>
+            <xsl:variable name="id">
+              <xsl:value-of select="e:v"/>
+            </xsl:variable>
+            <text:p>
+              <xsl:value-of
+                select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]/e:t"/>
+            </text:p>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="office:value-type">
+              <xsl:text>float</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="office:value">
+              <xsl:value-of select="e:v"/>
+            </xsl:attribute>
+            <text:p>
+              <xsl:value-of select="e:v"/>
+            </text:p>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
     </table:table-cell>
   </xsl:template>
-  
+
   <!-- calculates power function -->
   <xsl:template name="Power">
     <xsl:param name="base"/>
@@ -357,15 +359,16 @@
         </table:table-column>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max &lt; 256">
-        <table:table-column
-          table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
-          table:number-columns-repeated="{256 - document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max}">
-          <xsl:attribute name="table:default-cell-style-name">
-            <xsl:value-of
-              select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
-          </xsl:attribute>
-        </table:table-column>
+        <xsl:if
+          test="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max &lt; 256">
+          <table:table-column
+            table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+            table:number-columns-repeated="{256 - document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col[last()]/@max}">
+            <xsl:attribute name="table:default-cell-style-name">
+              <xsl:value-of
+                select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
+            </xsl:attribute>
+          </table:table-column>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
@@ -395,7 +398,7 @@
       <xsl:with-param name="length">
         <xsl:value-of select="concat(($avgDigitWidth * $value) - 5,'px')"/>
       </xsl:with-param>
-  </xsl:call-template>
+    </xsl:call-template>
   </xsl:template>
 
 </xsl:stylesheet>

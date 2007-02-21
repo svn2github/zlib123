@@ -67,7 +67,7 @@
   <xsl:template name="InsertWorksheet">
     <xsl:param name="cellNumber"/>
     <worksheet>
-      
+
       <!-- compute default row height -->
       <xsl:variable name="defaultRowHeight">
         <xsl:choose>
@@ -75,7 +75,9 @@
             <xsl:for-each select="table:table-row[@table:number-rows-repeated > 32768]">
               <xsl:call-template name="ConvertMeasure">
                 <xsl:with-param name="length">
-                  <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
+                  <xsl:value-of
+                    select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"
+                  />
                 </xsl:with-param>
                 <xsl:with-param name="unit">point</xsl:with-param>
               </xsl:call-template>
@@ -84,8 +86,9 @@
           <xsl:otherwise>15</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
-      <sheetFormatPr defaultColWidth="12.40909090909091" defaultRowHeight="{$defaultRowHeight}" customHeight="true"/>
+
+      <sheetFormatPr defaultColWidth="12.40909090909091" defaultRowHeight="{$defaultRowHeight}"
+        customHeight="true"/>
       <xsl:if test="table:table-column">
         <cols>
 
@@ -109,7 +112,7 @@
 
       <!-- Insert Merge Cells -->
       <xsl:call-template name="CheckMergeCell"/>
-      
+
     </worksheet>
 
   </xsl:template>
@@ -179,51 +182,53 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="defaultRowHeight"/>
     <xsl:variable name="height">
-    <xsl:call-template name="ConvertMeasure">
-      <xsl:with-param name="length">
-        <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
-      </xsl:with-param>
-      <xsl:with-param name="unit">point</xsl:with-param>
-    </xsl:call-template>
-    </xsl:variable>
-    <xsl:if test="table:table-cell/text:p or (@table:visibility!='' and  table:visibility!='visible') or ($height != $defaultRowHeight)">
-    <row r="{$rowNumber}">
-
-      <!-- insert row height -->
-      <xsl:if test="$height">
-        <xsl:attribute name="ht">
-          <xsl:value-of select="$height"/>
-        </xsl:attribute>
-        <xsl:attribute name="customHeight">1</xsl:attribute>
-      </xsl:if>
-
-      <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
-        <xsl:attribute name="hidden">1</xsl:attribute>
-      </xsl:if>
-
-      <!-- insert first cell -->
-      <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
-        <xsl:with-param name="colNumber">0</xsl:with-param>
-        <xsl:with-param name="rowNumber" select="$rowNumber"/>
-        <xsl:with-param name="cellNumber" select="$cellNumber"/>
-      </xsl:apply-templates>
-
-    </row>
-
-    <!-- insert repeated rows -->
-    <xsl:if test="@table:number-rows-repeated">
-      <xsl:call-template name="InsertRepeatedRows">
-        <xsl:with-param name="numberRowsRepeated">
-          <xsl:value-of select="@table:number-rows-repeated"/>
+      <xsl:call-template name="ConvertMeasure">
+        <xsl:with-param name="length">
+          <xsl:value-of
+            select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
         </xsl:with-param>
-        <xsl:with-param name="numberOfAllRowsRepeated">
-          <xsl:value-of select="@table:number-rows-repeated"/>
-        </xsl:with-param>
-        <xsl:with-param name="rowNumber" select="$rowNumber"/>
-        <xsl:with-param name="height" select="$height"/>
-        <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+        <xsl:with-param name="unit">point</xsl:with-param>
       </xsl:call-template>
-    </xsl:if>
+    </xsl:variable>
+    <xsl:if
+      test="table:table-cell/text:p or (@table:visibility!='' and  table:visibility!='visible') or ($height != $defaultRowHeight)">
+      <row r="{$rowNumber}">
+
+        <!-- insert row height -->
+        <xsl:if test="$height">
+          <xsl:attribute name="ht">
+            <xsl:value-of select="$height"/>
+          </xsl:attribute>
+          <xsl:attribute name="customHeight">1</xsl:attribute>
+        </xsl:if>
+
+        <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
+          <xsl:attribute name="hidden">1</xsl:attribute>
+        </xsl:if>
+
+        <!-- insert first cell -->
+        <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
+          <xsl:with-param name="colNumber">0</xsl:with-param>
+          <xsl:with-param name="rowNumber" select="$rowNumber"/>
+          <xsl:with-param name="cellNumber" select="$cellNumber"/>
+        </xsl:apply-templates>
+
+      </row>
+
+      <!-- insert repeated rows -->
+      <xsl:if test="@table:number-rows-repeated">
+        <xsl:call-template name="InsertRepeatedRows">
+          <xsl:with-param name="numberRowsRepeated">
+            <xsl:value-of select="@table:number-rows-repeated"/>
+          </xsl:with-param>
+          <xsl:with-param name="numberOfAllRowsRepeated">
+            <xsl:value-of select="@table:number-rows-repeated"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNumber" select="$rowNumber"/>
+          <xsl:with-param name="height" select="$height"/>
+          <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+        </xsl:call-template>
+      </xsl:if>
     </xsl:if>
 
     <!-- insert next row -->
@@ -259,9 +264,10 @@
     <xsl:param name="defaultRowHeight"/>
     <xsl:choose>
       <xsl:when test="$numberRowsRepeated &gt; 1">
-        <xsl:if test="table:table-cell/text:p or (@table:visibility!='' and  table:visibility!='visible') or ($height != $defaultRowHeight)">
+        <xsl:if
+          test="table:table-cell/text:p or (@table:visibility!='' and  table:visibility!='visible') or ($height != $defaultRowHeight)">
           <row r="{$rowNumber + 1 + $numberOfAllRowsRepeated - $numberRowsRepeated}">
-            
+
             <!-- insert row height -->
             <xsl:if test="$height">
               <xsl:attribute name="ht">
@@ -269,13 +275,13 @@
               </xsl:attribute>
               <xsl:attribute name="customHeight">1</xsl:attribute>
             </xsl:if>
-            
+
             <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
               <xsl:attribute name="hidden">1</xsl:attribute>
             </xsl:if>
           </row>
         </xsl:if>
-        
+
         <!-- insert repeated rows -->
         <xsl:if test="@table:number-rows-repeated">
           <xsl:call-template name="InsertRepeatedRows">
@@ -288,7 +294,7 @@
             <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
           </xsl:call-template>
         </xsl:if>
-        
+
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -298,51 +304,51 @@
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
-    <xsl:if test="child::text:p">
-      <c>
-        <xsl:attribute name="r">
-          <xsl:variable name="colChar">
-            <xsl:call-template name="NumbersToChars">
-              <xsl:with-param name="num" select="$colNumber"/>
+
+    <c>
+      <xsl:attribute name="r">
+        <xsl:variable name="colChar">
+          <xsl:call-template name="NumbersToChars">
+            <xsl:with-param name="num" select="$colNumber"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="concat($colChar,$rowNumber)"/>
+      </xsl:attribute>
+
+      <!-- insert cell style number-->
+      <xsl:if test="@table:style-name">
+        <xsl:for-each select="key('style',@table:style-name)/style:text-properties">
+          <xsl:attribute name="s">
+            <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
+              level="any"/>
+          </xsl:attribute>
+        </xsl:for-each>
+      </xsl:if>
+
+      <!-- convert cell type -->
+      <xsl:if test="child::text:p">
+      <xsl:choose>
+        <xsl:when test="@office:value-type!='string'">
+          <xsl:attribute name="t">
+            <xsl:call-template name="ConvertTypes">
+              <xsl:with-param name="type">
+                <xsl:value-of select="@office:value-type"/>
+              </xsl:with-param>
             </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="concat($colChar,$rowNumber)"/>
-        </xsl:attribute>
-
-        <!-- insert cell style number-->
-        <xsl:if test="@table:style-name">
-            <xsl:for-each select="key('style',@table:style-name)/style:text-properties">
-              <xsl:attribute name="s">
-                <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
-                  level="any"/>
-              </xsl:attribute>
-            </xsl:for-each>  
-        </xsl:if>
-        
-        <!-- convert cell type -->
-        <xsl:choose>
-          <xsl:when test="@office:value-type!='string'">
-            <xsl:attribute name="t">
-              <xsl:call-template name="ConvertTypes">
-                <xsl:with-param name="type">
-                  <xsl:value-of select="@office:value-type"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-            <v>
-              <xsl:value-of select="text:p"/>
-            </v>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="t">s</xsl:attribute>
-            <v>
-              <xsl:value-of select="number($cellNumber)"/>
-            </v>
-          </xsl:otherwise>
-        </xsl:choose>
-
-      </c>
-    </xsl:if>
+          </xsl:attribute>
+          <v>
+            <xsl:value-of select="text:p"/>
+          </v>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="t">s</xsl:attribute>
+          <v>
+            <xsl:value-of select="number($cellNumber)"/>
+          </v>
+        </xsl:otherwise>
+      </xsl:choose>
+      </xsl:if>
+    </c>
 
     <!-- insert next cell -->
     <xsl:if test="following-sibling::table:table-cell">
@@ -373,4 +379,4 @@
 
   </xsl:template>
 
- </xsl:stylesheet>
+</xsl:stylesheet>
