@@ -35,6 +35,9 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
+  <xsl:import href="relationships.xsl"/>
+  <xsl:import href="common.xsl"/>
+
   <xsl:template name="InsertSettings">
     <office:document-settings>
       <office:settings>
@@ -59,11 +62,49 @@
                   </xsl:for-each>
                 </xsl:for-each>
               </config:config-item>
-
+              <config:config-item-map-named config:name="Tables">
+                <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+                  <xsl:call-template name="InsertCursorPosition">
+                    <xsl:with-param name="sheet">
+                      <xsl:call-template name="GetTarget">
+                        <xsl:with-param name="id">
+                          <xsl:value-of select="@r:id"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:for-each>
+              </config:config-item-map-named>
             </config:config-item-map-entry>
           </config:config-item-map-indexed>
         </config:config-item-set>
       </office:settings>
     </office:document-settings>
+  </xsl:template>
+
+  <xsl:template name="InsertCursorPosition">
+    <xsl:param name="sheet"/>
+    <config:config-item-map-entry config:name="{@name}">
+      <!--      <selection activeCell="A2"-->
+      <config:config-item config:name="CursorPositionX" config:type="int">
+        <xsl:call-template name="GetColNum">
+          <xsl:with-param name="cell">
+            <xsl:value-of
+              select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
+            />
+          </xsl:with-param>
+        </xsl:call-template>
+      </config:config-item>
+      <config:config-item config:name="CursorPositionY" config:type="int">
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell">
+            <xsl:value-of
+              select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
+            />
+          </xsl:with-param>
+        </xsl:call-template>
+      </config:config-item>
+    </config:config-item-map-entry>
   </xsl:template>
 </xsl:stylesheet>
