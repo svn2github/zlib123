@@ -31,9 +31,10 @@
     xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
     xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+    xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
     xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-    exclude-result-prefixes="e r">
+    exclude-result-prefixes="a e r">
 
     <xsl:import href="relationships.xsl"/>
 
@@ -62,6 +63,7 @@
         </style:style>
     </xsl:template>
 
+    <!-- insert column styles from all sheets -->
     <xsl:template name="InsertColumnStyles">
         <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
             <xsl:call-template name="InsertSheetColumnStyles">
@@ -77,6 +79,7 @@
         </xsl:for-each>
     </xsl:template>
 
+    <!-- insert column styles from selected sheet -->
     <xsl:template name="InsertSheetColumnStyles">
         <xsl:param name="sheet"/>
 
@@ -126,6 +129,7 @@
         </style:style>
     </xsl:template>
 
+    <!-- insert row styles from all sheets -->    
     <xsl:template name="InsertRowStyles">
         <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
             <xsl:call-template name="InsertSheetRowStyles">
@@ -141,6 +145,7 @@
         </xsl:for-each>
     </xsl:template>
 
+    <!-- insert row styles from selected sheet -->
     <xsl:template name="InsertSheetRowStyles">
         <xsl:param name="sheet"/>
 
@@ -216,6 +221,7 @@
             mode="automaticstyles"/>
     </xsl:template>
 
+    <!-- cell formats -->
     <xsl:template match="e:xf" mode="automaticstyles">
         <style:style style:name="{generate-id(.)}" style:family="table-cell">
             <style:text-properties>
@@ -327,6 +333,20 @@
     <xsl:template match="e:strike" mode="style">
         <xsl:attribute name="style:text-line-through-style">
             <xsl:text>solid</xsl:text>
+        </xsl:attribute>
+    </xsl:template>
+    
+    <xsl:template match="e:color" mode="style">
+        <xsl:attribute name="fo:color">
+        <xsl:choose>
+            <xsl:when test="@rgb">
+                <xsl:value-of select="concat('#',substring(@rgb,3,9))"/>
+            </xsl:when>
+            <xsl:when test="@theme">
+                <xsl:variable name="this" select="."/>
+                <xsl:value-of select="concat('#',document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/a:srgbClr/@val)"/>
+            </xsl:when>
+        </xsl:choose>
         </xsl:attribute>
     </xsl:template>
 

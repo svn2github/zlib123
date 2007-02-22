@@ -171,8 +171,8 @@ Format;Cells..;Font;size;;Y;N;Y;M1;Basic Text and Paragraph Formatting;;mirek-od
 Format;Cells..;Font;Language;;N;N;N;M1;Basic Text and Paragraph Formatting;;mirek-odf;not supported in excel
 Format;Cells..;Font Effects;Underlining;;Y;N;Y;M2;Text & Paragraph formatting;;mirek-odf;
 Format;Cells..;Font Effects;Strike Through;;Y;N;Y;M2;Text & Paragraph formatting;;mirek-odf;
-Format;Cells..;Font Effects;Font Color;;Y;N;N;M2;Text & Paragraph formatting;;;
-Format;Cells..;Font Effects;Relief;;N;N;N;M2;Text & Paragraph formatting;;;not supported in excel
+Format;Cells..;Font Effects;Font Color;;Y;N;Y;M2;Text & Paragraph formatting;;mirek-odf;
+Format;Cells..;Font Effects;Relief;;N;N;N;M2;Text & Paragraph formatting;;mirek-odf;not supported in excel
 Format;Cells..;Text Alignment;Horizontal;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Cells..;Text Alignment;Vertical;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Cells..;Text Alignment;Text Orientation;;Y;N;N;M2;Text & Paragraph formatting;;;
@@ -201,9 +201,9 @@ Format;Page;Background;;;Y;N;N;M2;Page Styles and Layout;;;
 Format;Page;Header;;;Y;N;N;M2;Page Styles and Layout;;;
 Format;Page;Footer;;;Y;N;N;M2;Page Styles and Layout;;;
 Format;Page;Sheet;;;Y;N;N;M2;Page Styles and Layout;;;
-Format;Character;Font;Font;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;Yes in direct
-Format;Character;Font;type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;Yes in direct
-Format;Character;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;Yes in direct
+Format;Character;Font;Font;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;
+Format;Character;Font;type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;
+Format;Character;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;
 Format;Character;Font;Language;;N;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;not supported in excel
 Format;Character;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Character;Font Effects;Color;;Y;N;N;M2;Text & Paragraph formatting;;;
