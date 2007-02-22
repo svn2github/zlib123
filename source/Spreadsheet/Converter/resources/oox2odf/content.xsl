@@ -51,6 +51,7 @@
         <xsl:call-template name="InsertRowStyles"/>
         <xsl:call-template name="InsertCellStyles"/>
         <xsl:call-template name="InsertStyleTableProperties"/>
+        <xsl:call-template name="InsertTextStyles"/>
       </office:automatic-styles>
       <xsl:call-template name="InsertSheets"/>
     </office:document-content>
@@ -286,8 +287,10 @@
               <xsl:value-of select="e:v"/>
             </xsl:variable>
             <text:p>
-              <xsl:value-of
-                select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]/e:t"/>
+              <xsl:for-each
+                select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]">
+                <xsl:apply-templates/>
+              </xsl:for-each>
             </text:p>
           </xsl:when>
           <xsl:otherwise>
@@ -308,7 +311,18 @@
  </xsl:choose>
   </xsl:template>
     
-
+  <!-- convert run into span -->
+  <xsl:template match="e:r">
+    <text:span>
+      <xsl:if test="e:rPr">
+        <xsl:attribute name="text:style-name">
+          <xsl:value-of select="generate-id(.)"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:value-of select="e:t"/>
+    </text:span>
+  </xsl:template>
+  
   <!-- calculates power function -->
   <xsl:template name="Power">
     <xsl:param name="base"/>

@@ -227,22 +227,46 @@
         </style:style>
     </xsl:template>
 
+  <!-- convert font name-->
+  <xsl:template match="e:rFont" mode="style">
+    <xsl:attribute name="style:font-name">
+      <xsl:value-of select="@val"/>
+    </xsl:attribute>
+  </xsl:template>
+  
+  <!-- bold -->
     <xsl:template match="e:b" mode="style">
         <xsl:attribute name="fo:font-weight">
             <xsl:text>bold</xsl:text>
         </xsl:attribute>
     </xsl:template>
 
+  <!-- italic -->
     <xsl:template match="e:i" mode="style">
         <xsl:attribute name="fo:font-style">
             <xsl:text>italic</xsl:text>
         </xsl:attribute>
     </xsl:template>
 
+  <!-- insert underline -->
     <xsl:template match="e:u" mode="style">
         <xsl:call-template name="InsertUnderline"/>
     </xsl:template>
 
+  <!-- insert text styles -->
+  <xsl:template name="InsertTextStyles">
+    <xsl:apply-templates select="document('xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]" mode="automaticstyles"/>
+  </xsl:template>
+  
+  <!-- convert run properties into span style -->
+  <xsl:template match="e:r" mode="automaticstyles">
+    <style:style style:name="{generate-id(.)}" style:family="text">
+      <style:text-properties>
+        <xsl:apply-templates select="e:rPr" mode="style"/>
+      </style:text-properties>
+    </style:style>
+  </xsl:template>
+  
     <xsl:template name="InsertUnderline">
         <xsl:choose>
             <xsl:when test="@val = 'double'">
@@ -286,6 +310,7 @@
         </xsl:if>
     </xsl:template>
 
+  <!-- convert font size -->
     <xsl:template match="e:sz" mode="style">
         <xsl:attribute name="fo:font-size">
             <xsl:value-of select="@val"/>
@@ -298,6 +323,7 @@
         </xsl:attribute>
     </xsl:template>
     
+  <!-- insert text-line-through -->
     <xsl:template match="e:strike" mode="style">
         <xsl:attribute name="style:text-line-through-style">
             <xsl:text>solid</xsl:text>
