@@ -100,8 +100,8 @@
     </xsl:call-template>
 
     <xsl:for-each select="document(concat('xl/',$sheet))">
-     
-    <xsl:apply-templates select="e:worksheet/e:sheetData/e:row"/>
+
+      <xsl:apply-templates select="e:worksheet/e:sheetData/e:row"/>
     </xsl:for-each>
     <xsl:choose>
       <!-- when sheet is empty -->
@@ -137,19 +137,17 @@
       </xsl:choose>
     </xsl:variable>
 
-    <!-- insert blank rows before this one -->
+    <!-- if there were empty rows before this one then insert empty rows -->
     <xsl:choose>
-      <!-- if first rows are empty-->
-      <xsl:when test="position()=1">
-        <xsl:if test="@r>1">
-          <table:table-row table:style-name="{generate-id(ancestor::e:worksheet/e:sheetFormatPr)}"
-            table:number-rows-repeated="{@r - 1}">
-            <table:table-cell table:number-columns-repeated="256"/>
-          </table:table-row>
-        </xsl:if>
+      <!-- when this row is the first non-empty one but not row 1 -->
+      <xsl:when test="position()=1 and @r>1">
+        <table:table-row table:style-name="{generate-id(ancestor::e:worksheet/e:sheetFormatPr)}"
+          table:number-rows-repeated="{@r - 1}">
+          <table:table-cell table:number-columns-repeated="256"/>
+        </table:table-row>
       </xsl:when>
       <xsl:otherwise>
-        <!-- if there's a gap between rows -->
+        <!-- when this row is not first one and there were empty rows after previous non-empty row -->
         <xsl:if test="preceding::e:row[1]/@r &lt;  @r - 1">
           <table:table-row table:style-name="{generate-id(ancestor::e:worksheet/e:sheetFormatPr)}">
             <xsl:attribute name="table:number-rows-repeated">
@@ -161,7 +159,7 @@
       </xsl:otherwise>
     </xsl:choose>
 
-    <!-- insert this one row -->
+    <!-- insert this row -->
     <table:table-row>
       <xsl:attribute name="table:style-name">
         <xsl:choose>
@@ -187,7 +185,7 @@
     </table:table-row>
   </xsl:template>
 
-   <xsl:template match="e:c">
+  <xsl:template match="e:c">
 
     <xsl:variable name="this" select="."/>
 
@@ -199,7 +197,7 @@
       </xsl:call-template>
     </xsl:variable>
 
- <xsl:variable name="rowNum">
+    <xsl:variable name="rowNum">
       <xsl:call-template name="GetRowNum">
         <xsl:with-param name="cell">
           <xsl:value-of select="@r"/>
@@ -221,19 +219,20 @@
       </xsl:choose>
     </xsl:variable>
 
-  <xsl:variable name="CheckIfMerge">    
-        <xsl:call-template name="CheckIfMerge">
-          <xsl:with-param name="colNum">
-            <xsl:value-of select="$colNum"/>
-          </xsl:with-param>
-          <xsl:with-param name="rowNum">
-            <xsl:value-of select="$rowNum"/>
-          </xsl:with-param>
-        </xsl:call-template>      
-   </xsl:variable>
+    <xsl:variable name="CheckIfMerge">
+      <xsl:call-template name="CheckIfMerge">
+        <xsl:with-param name="colNum">
+          <xsl:value-of select="$colNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="rowNum">
+          <xsl:value-of select="$rowNum"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
 
-    <!-- insert blank cells before this one-->
+    <!-- if there were empty cells in a row before this one then insert empty cells-->
     <xsl:choose>
+      <!-- when this cell is the first one in a row but not in column A -->
       <xsl:when test="position()=1 and $colNum>1">
         <table:table-cell>
           <xsl:attribute name="table:number-columns-repeated">
@@ -241,6 +240,7 @@
           </xsl:attribute>
         </table:table-cell>
       </xsl:when>
+      <!-- when this cell is not first one in a row and there were empty cells after previous non-empty cell -->
       <xsl:when test="position()>1 and $colNum>$prevCellColNum+1">
         <table:table-cell>
           <xsl:attribute name="table:number-columns-repeated">
@@ -249,68 +249,66 @@
         </table:table-cell>
       </xsl:when>
     </xsl:choose>
-     
 
+    <!-- insert this cell-->
+    <xsl:choose>
+      <xsl:when test="$CheckIfMerge = 'true'">
+        <table:covered-table-cell/>
+      </xsl:when>
+      <xsl:otherwise>
+        <table:table-cell>
+          <xsl:if test="$CheckIfMerge != 'false'">
+            <xsl:attribute name="table:number-rows-spanned">
+              <xsl:value-of select="substring-before($CheckIfMerge, ':')"/>
+            </xsl:attribute>
+            <xsl:attribute name="table:number-columns-spanned">
+              <xsl:value-of select="substring-after($CheckIfMerge, ':')"/>
+            </xsl:attribute>
+          </xsl:if>
 
+          <xsl:if test="@s">
+            <xsl:attribute name="table:style-name">
+              <xsl:value-of
+                select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
+              />
+            </xsl:attribute>
+          </xsl:if>
 
-<!-- insert this one cell-->
- <xsl:choose>
-   <xsl:when test="$CheckIfMerge = 'true'">
-     <table:covered-table-cell/>
-   </xsl:when>
-   <xsl:otherwise>
-     <table:table-cell>
-       <xsl:if test="$CheckIfMerge != 'false'">
-         <xsl:attribute name="table:number-rows-spanned">
-           <xsl:value-of select="substring-before($CheckIfMerge, ':')"/>
-         </xsl:attribute>
-         <xsl:attribute name="table:number-columns-spanned">
-           <xsl:value-of select="substring-after($CheckIfMerge, ':')"/>           
-         </xsl:attribute>
-       </xsl:if>
-       
-       <xsl:if test="@s">
-        <xsl:attribute name="table:style-name">
-          <xsl:value-of
-            select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
-          />
-        </xsl:attribute>
-       </xsl:if>
-       
-      <xsl:if test="e:v">
-        <xsl:choose>
-          <xsl:when test="@t='s'">
-            <xsl:attribute name="office:value-type">
-              <xsl:text>string</xsl:text>
-            </xsl:attribute>
-            <xsl:variable name="id">
-              <xsl:value-of select="e:v"/>
-            </xsl:variable>
-            <text:p>
-              <xsl:for-each
-                select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]">
-                <xsl:apply-templates/>
-              </xsl:for-each>
-            </text:p>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="office:value-type">
-              <xsl:text>float</xsl:text>
-            </xsl:attribute>
-            <xsl:attribute name="office:value">
-              <xsl:value-of select="e:v"/>
-            </xsl:attribute>
-            <text:p>
-              <xsl:value-of select="e:v"/>
-            </text:p>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:if>
-     </table:table-cell>
-   </xsl:otherwise>
- </xsl:choose>
+          <!-- insert cell content -->
+          <xsl:if test="e:v">
+            <xsl:choose>
+              <xsl:when test="@t='s'">
+                <xsl:attribute name="office:value-type">
+                  <xsl:text>string</xsl:text>
+                </xsl:attribute>
+                <xsl:variable name="id">
+                  <xsl:value-of select="e:v"/>
+                </xsl:variable>
+                <text:p>
+                  <xsl:for-each
+                    select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]">
+                    <xsl:apply-templates/>
+                  </xsl:for-each>
+                </text:p>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="office:value-type">
+                  <xsl:text>float</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="office:value">
+                  <xsl:value-of select="e:v"/>
+                </xsl:attribute>
+                <text:p>
+                  <xsl:value-of select="e:v"/>
+                </text:p>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+        </table:table-cell>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
-    
+
   <!-- convert run into span -->
   <xsl:template match="e:r">
     <text:span>
@@ -322,13 +320,14 @@
       <xsl:value-of select="e:t"/>
     </text:span>
   </xsl:template>
-  
+
   <xsl:template name="InsertColumns">
     <xsl:param name="sheet"/>
 
     <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col">
-      <!-- insert blank columns before this one-->
+      <!-- if there were columns with default properties before this column then insert default columns-->
       <xsl:choose>
+        <!-- when this column is the first non-default one but it's not the column A -->
         <xsl:when test="position()=1 and @min>1">
           <table:table-column
             table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
@@ -339,6 +338,7 @@
             </xsl:attribute>
           </table:table-column>
         </xsl:when>
+        <!-- when this column is not first non-default one and there were default columns after previous non-default column -->
         <xsl:when test="preceding::e:col[1]/@max &lt; @min - 1">
           <table:table-column
             table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
@@ -351,7 +351,7 @@
         </xsl:when>
       </xsl:choose>
 
-      <!-- insert this one column -->
+      <!-- insert this column -->
       <table:table-column table:style-name="{generate-id(.)}">
         <xsl:if test="not(@min = @max)">
           <xsl:attribute name="table:number-columns-repeated">
