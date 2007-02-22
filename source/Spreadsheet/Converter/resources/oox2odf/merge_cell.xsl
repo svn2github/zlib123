@@ -41,14 +41,21 @@
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:for-each select="ancestor::e:worksheet">
-      <xsl:apply-templates select="e:mergeCells/e:mergeCell[1]" mode="merge">
-        <xsl:with-param name="colNum">
-          <xsl:value-of select="$colNum"/>
-        </xsl:with-param>
-        <xsl:with-param name="rowNum">
-          <xsl:value-of select="$rowNum"/>
-        </xsl:with-param>
-      </xsl:apply-templates>
+      <xsl:choose>
+        <xsl:when test="e:mergeCells/e:mergeCell">
+          <xsl:apply-templates select="e:mergeCells/e:mergeCell[1]" mode="merge">
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$colNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:for-each>
   </xsl:template>
 

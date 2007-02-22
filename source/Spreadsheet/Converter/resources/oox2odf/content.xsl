@@ -99,27 +99,8 @@
     </xsl:call-template>
 
     <xsl:for-each select="document(concat('xl/',$sheet))">
-      
-      <!-- Check MergeCell -->
-    <xsl:variable name="CheckMergeCell">
-      <xsl:choose>
-        <xsl:when test="e:worksheet/e:mergeCells">
-          <xsl:choose>
-            <xsl:when test="e:worksheet/e:mergeCells/@count">
-              <xsl:value-of select="e:worksheet/e:mergeCells/@count"/>
-            </xsl:when>
-            <xsl:otherwise>1</xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>0</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-      
-    <xsl:apply-templates select="e:worksheet/e:sheetData/e:row">
-      <xsl:with-param name="CheckMergeCell">
-        <xsl:value-of select="$CheckMergeCell"/>
-      </xsl:with-param>
-    </xsl:apply-templates>
+     
+    <xsl:apply-templates select="e:worksheet/e:sheetData/e:row"/>
     </xsl:for-each>
     <xsl:choose>
       <!-- when sheet is empty -->
@@ -141,7 +122,6 @@
   </xsl:template>
 
   <xsl:template match="e:row">
-	<xsl:param name="CheckMergeCell"/>
 
     <xsl:variable name="lastCellColumnNumber">
       <xsl:choose>
@@ -198,11 +178,7 @@
         </xsl:attribute>
       </xsl:if>
 
-      <xsl:apply-templates>
-        <xsl:with-param name="CheckMergeCell">
-          <xsl:value-of select="$CheckMergeCell"/>
-        </xsl:with-param>
-      </xsl:apply-templates>
+      <xsl:apply-templates select="e:c"/>
 
       <xsl:if test="$lastCellColumnNumber &lt; 256">
         <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}"/>
@@ -211,7 +187,6 @@
   </xsl:template>
 
    <xsl:template match="e:c">
-    <xsl:param name="CheckMergeCell"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -245,7 +220,7 @@
       </xsl:choose>
     </xsl:variable>
 
-<xsl:variable name="CheckIfMerge">
+  <xsl:variable name="CheckIfMerge">    
         <xsl:call-template name="CheckIfMerge">
           <xsl:with-param name="colNum">
             <xsl:value-of select="$colNum"/>
@@ -253,8 +228,8 @@
           <xsl:with-param name="rowNum">
             <xsl:value-of select="$rowNum"/>
           </xsl:with-param>
-        </xsl:call-template>
-    </xsl:variable>
+        </xsl:call-template>      
+   </xsl:variable>
 
     <!-- insert blank cells before this one-->
     <xsl:choose>
@@ -273,6 +248,8 @@
         </table:table-cell>
       </xsl:when>
     </xsl:choose>
+     
+
 
 
 <!-- insert this one cell-->
@@ -297,7 +274,8 @@
             select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
           />
         </xsl:attribute>
-      </xsl:if>
+       </xsl:if>
+       
       <xsl:if test="e:v">
         <xsl:choose>
           <xsl:when test="@t='s'">
