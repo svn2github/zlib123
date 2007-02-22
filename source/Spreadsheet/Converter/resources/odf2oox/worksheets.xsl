@@ -31,6 +31,7 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
@@ -43,9 +44,11 @@
   <xsl:template match="table:table" mode="sheet">
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
+    
     <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
       <xsl:call-template name="InsertWorksheet">
         <xsl:with-param name="cellNumber" select="$cellNumber"/>
+        <xsl:with-param name="sheetId" select="$sheetId"/>
       </xsl:call-template>
     </pzip:entry>
 
@@ -66,6 +69,7 @@
   <!-- insert sheet -->
   <xsl:template name="InsertWorksheet">
     <xsl:param name="cellNumber"/>
+    <xsl:param name="sheetId"/>
     <worksheet>
 
       <!-- compute default row height -->
@@ -87,6 +91,48 @@
         </xsl:choose>
       </xsl:variable>
 
+      <!-- insert cursor position -->
+      <sheetViews>
+        <sheetView  workbookViewId="0">
+          
+          <xsl:variable name="ActiveTable">
+            <xsl:for-each select="document('settings.xml')">
+              <xsl:value-of select="key('ConfigItem', 'ActiveTable')"/>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          <xsl:variable name="ActiveTableNumber">
+            <xsl:for-each select="office:spreadsheet/table:table[@table:name=$ActiveTable]">
+              <xsl:value-of select="count(preceding-sibling::table:table)"/>        
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:if test="$sheetId = $ActiveTableNumber">
+            <xsl:attribute name="activeTab"><xsl:text>1</xsl:text></xsl:attribute>
+          </xsl:if>
+          
+          <!--          <selection activeCell="C7" sqref="C7">-->
+          <selection>
+          <xsl:variable name="col">
+            <xsl:call-template name="NumbersToChars">
+              <xsl:with-param name="num">
+                <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']"/>                
+              </xsl:with-param>
+              </xsl:call-template>
+          </xsl:variable>
+            <xsl:variable name="row">
+              <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']"/>
+            </xsl:variable>
+            <xsl:attribute name="activeCell">
+              <xsl:value-of select="concat($col,$row)"/>
+            </xsl:attribute>
+            <xsl:attribute name="sqref">
+              <xsl:value-of select="concat($col,$row)"/>
+            </xsl:attribute>
+          </selection>
+        </sheetView>
+      </sheetViews>
+      
       <sheetFormatPr defaultColWidth="12.40909090909091" defaultRowHeight="{$defaultRowHeight}"
         customHeight="true"/>
       <xsl:if test="table:table-column">

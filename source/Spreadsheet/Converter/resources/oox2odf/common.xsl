@@ -148,5 +148,37 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- calculates power function -->
+  <xsl:template name="Power">
+    <xsl:param name="base"/>
+    <xsl:param name="exponent"/>
+    <xsl:param name="value1" select="$base"/>
+    
+    <xsl:choose>
+      <xsl:when test="$exponent = 0">
+        <xsl:text>1</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$exponent &gt; 1">
+            <xsl:call-template name="Power">
+              <xsl:with-param name="base">
+                <xsl:value-of select="$base"/>
+              </xsl:with-param>
+              <xsl:with-param name="exponent">
+                <xsl:value-of select="$exponent -1"/>
+              </xsl:with-param>
+              <xsl:with-param name="value1">
+                <xsl:value-of select="$value1 * $base"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$value1"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   
   </xsl:stylesheet>
