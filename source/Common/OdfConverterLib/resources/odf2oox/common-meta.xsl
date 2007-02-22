@@ -32,7 +32,7 @@
         <!-- identifier -->
         <xsl:apply-templates select="dc:identifier"/>
         <!-- keywords -->
-        <xsl:apply-templates select="meta:keyword"/>
+        <xsl:call-template name="MetaKeywords"/>
         <!-- language -->
         <xsl:apply-templates select="dc:language"/>
         <!-- last modification author -->
@@ -100,11 +100,18 @@
     </xsl:template>
 
     <!-- keywords -->
-    <xsl:template match="meta:keyword">
+    <xsl:template name="MetaKeywords">
+      <xsl:if test="/office:document-meta/office:meta/meta:keyword">
         <cp:keywords
-            xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+           xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+          <xsl:for-each select="/office:document-meta/office:meta/meta:keyword">
+            <xsl:if test="not(position() = 1)">
+              <xsl:text> </xsl:text>
+            </xsl:if>
             <xsl:value-of select="."/>
+          </xsl:for-each>
         </cp:keywords>
+      </xsl:if>
     </xsl:template>
 
     <!-- language -->
