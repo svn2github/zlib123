@@ -297,5 +297,11 @@
             <xsl:value-of select="@val"/>
         </xsl:attribute>
     </xsl:template>
+    
+    <xsl:template match="e:strike" mode="style">
+        <xsl:attribute name="style:text-line-through-style">
+            <xsl:text>solid</xsl:text>
+        </xsl:attribute>
+    </xsl:template>
 
 </xsl:stylesheet>

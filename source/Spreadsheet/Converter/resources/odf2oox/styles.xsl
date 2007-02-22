@@ -228,6 +228,9 @@
                 </xsl:attribute>
             </sz>
         </xsl:if>
+        <xsl:if test="@style:text-line-through-style and @style:text-line-through-style != 'none' ">
+            <strike/>
+        </xsl:if>
         <xsl:choose>
             <xsl:when test="$mode = 'textstyles'">
                 <xsl:if test="@style:font-name">

@@ -165,14 +165,14 @@ Format;Cells..;Numbers;Category;;Y;N;N;M2;Data styles;;;
 Format;Cells..;Numbers;Format;;Y;N;N;M2;Data styles;;;
 Format;Cells..;Numbers;Options;;Y;N;N;M2;Data styles;;;
 Format;Cells..;Numbers;Format Code;;Y;N;N;M2;Data styles;;;
-Format;Cells..;Font;Font ;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;mirek-odf - Reverse;
-Format;Cells..;Font;Type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;mirek-odf - Reverse;
-Format;Cells..;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;mirek-odf - Reverse;
-Format;Cells..;Font;Language;;Y;N;N;M1;Basic Text and Paragraph Formatting;Yes in reverse;;
-Format;Cells..;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;;;
-Format;Cells..;Font Effects;Strike Through;;Y;N;N;M2;Text & Paragraph formatting;;;
+Format;Cells..;Font;Font ;;Y;N;Y;M1;Basic Text and Paragraph Formatting;;mirek-odf;
+Format;Cells..;Font;Type face;;Y;N;Y;M1;Basic Text and Paragraph Formatting;;mirek-odf;
+Format;Cells..;Font;size;;Y;N;Y;M1;Basic Text and Paragraph Formatting;;mirek-odf;
+Format;Cells..;Font;Language;;N;N;N;M1;Basic Text and Paragraph Formatting;;mirek-odf;not supported in excel
+Format;Cells..;Font Effects;Underlining;;Y;N;Y;M2;Text & Paragraph formatting;;mirek-odf;
+Format;Cells..;Font Effects;Strike Through;;Y;N;Y;M2;Text & Paragraph formatting;;mirek-odf;
 Format;Cells..;Font Effects;Font Color;;Y;N;N;M2;Text & Paragraph formatting;;;
-Format;Cells..;Font Effects;Relief;;Y;N;N;M2;Text & Paragraph formatting;;;
+Format;Cells..;Font Effects;Relief;;N;N;N;M2;Text & Paragraph formatting;;;not supported in excel
 Format;Cells..;Text Alignment;Horizontal;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Cells..;Text Alignment;Vertical;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Cells..;Text Alignment;Text Orientation;;Y;N;N;M2;Text & Paragraph formatting;;;
@@ -181,11 +181,11 @@ Format;Cells..;Background;;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Cells..;Protection;Hide all;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Cells..;Protection;Hide (When Print);;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Row;Height..;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
-Format;Row;Optimal Height;;;N;N;N;M1;Basic and Advanced Table Model;not supported in excel;;
+Format;Row;Optimal Height;;;N;N;N;M1;Basic and Advanced Table Model;;;not supported in excel
 Format;Row;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
 Format;Row;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
 Format;Column;Width;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
-Format;Column;Optimal Width;;;N;N;N;M1;Basic and Advanced Table Model;not supported in excel;;
+Format;Column;Optimal Width;;;N;N;N;M1;Basic and Advanced Table Model;;;not supported in excel
 Format;Column;Hide;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
 Format;Column;Show;;;Y;N;Y;M1;Basic and Advanced Table Model;;tomek_mueller - Direct, mirek-odf -Reverse;
 Format;Sheet;Rename..;;;Y;N;Y;M1;Document structure;;michkaminski;
