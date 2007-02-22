@@ -146,7 +146,7 @@
             defaultPivotStyle="PivotStyleLight16"/>
     </xsl:template>
 
-    <xsl:template match="style:text-properties[parent::node()/@style:family='table-cell']"
+    <xsl:template match="style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']]"
         mode="fonts">
         <font>
             <xsl:call-template name="InsertTextProperties">

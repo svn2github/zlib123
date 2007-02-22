@@ -50,7 +50,7 @@
     </xsl:template>
 
     <xsl:template name="InsertFonts">
-        <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font">
+        <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[e:name]">
             <style:font-face style:name="{e:name/@val}" svg:font-family="{e:name/@val}"/>
         </xsl:for-each>
     </xsl:template>
