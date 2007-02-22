@@ -59,6 +59,22 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- gets a row number from cell coordinates -->
+  <xsl:template name="GetRowNum">
+    <xsl:param name="cell"/>
+    
+    <xsl:choose>      
+      <xsl:when test="number($cell)">
+        <xsl:value-of select="$cell"/>
+      </xsl:when>      
+      <xsl:otherwise>
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell" select="substring-after($cell,substring($cell,1,1))"/>          
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <!-- translates literal index to number -->
   <xsl:template name="GetAlphabeticPosition">
     <xsl:param name="literal"/>

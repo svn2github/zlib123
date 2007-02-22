@@ -57,6 +57,7 @@
   </xsl:template>
 
   <xsl:template name="InsertSheets">
+
     <office:body>
       <office:spreadsheet>
         <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
@@ -97,8 +98,29 @@
       <xsl:with-param name="sheet" select="$sheet"/>
     </xsl:call-template>
 
-    <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet"/>
-
+    <xsl:for-each select="document(concat('xl/',$sheet))">
+      
+      <!-- Check MergeCell -->
+    <xsl:variable name="CheckMergeCell">
+      <xsl:choose>
+        <xsl:when test="e:worksheet/e:mergeCells">
+          <xsl:choose>
+            <xsl:when test="e:worksheet/e:mergeCells/@count">
+              <xsl:value-of select="e:worksheet/e:mergeCells/@count"/>
+            </xsl:when>
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+      
+    <xsl:apply-templates select="e:worksheet/e:sheetData/e:row">
+      <xsl:with-param name="CheckMergeCell">
+        <xsl:value-of select="$CheckMergeCell"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+    </xsl:for-each>
     <xsl:choose>
       <!-- when sheet is empty -->
       <xsl:when test="not(document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row/e:c/e:v)">
@@ -119,6 +141,7 @@
   </xsl:template>
 
   <xsl:template match="e:row">
+	<xsl:param name="CheckMergeCell"/>
 
     <xsl:variable name="lastCellColumnNumber">
       <xsl:choose>
@@ -175,7 +198,11 @@
         </xsl:attribute>
       </xsl:if>
 
-      <xsl:apply-templates/>
+      <xsl:apply-templates>
+        <xsl:with-param name="CheckMergeCell">
+          <xsl:value-of select="$CheckMergeCell"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
 
       <xsl:if test="$lastCellColumnNumber &lt; 256">
         <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}"/>
@@ -183,12 +210,21 @@
     </table:table-row>
   </xsl:template>
 
-  <xsl:template match="e:c">
+   <xsl:template match="e:c">
+    <xsl:param name="CheckMergeCell"/>
 
     <xsl:variable name="this" select="."/>
 
     <xsl:variable name="colNum">
       <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="@r"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+ <xsl:variable name="rowNum">
+      <xsl:call-template name="GetRowNum">
         <xsl:with-param name="cell">
           <xsl:value-of select="@r"/>
         </xsl:with-param>
@@ -209,6 +245,17 @@
       </xsl:choose>
     </xsl:variable>
 
+<xsl:variable name="CheckIfMerge">
+        <xsl:call-template name="CheckIfMerge">
+          <xsl:with-param name="colNum">
+            <xsl:value-of select="$colNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum"/>
+          </xsl:with-param>
+        </xsl:call-template>
+    </xsl:variable>
+
     <!-- insert blank cells before this one-->
     <xsl:choose>
       <xsl:when test="position()=1 and $colNum>1">
@@ -227,9 +274,24 @@
       </xsl:when>
     </xsl:choose>
 
-    <!-- insert this one cell-->
-    <table:table-cell>
-      <xsl:if test="@s">
+
+<!-- insert this one cell-->
+ <xsl:choose>
+   <xsl:when test="$CheckIfMerge = 'true'">
+     <table:covered-table-cell/>
+   </xsl:when>
+   <xsl:otherwise>
+     <table:table-cell>
+       <xsl:if test="$CheckIfMerge != 'false'">
+         <xsl:attribute name="table:number-rows-spanned">
+           <xsl:value-of select="substring-before($CheckIfMerge, ':')"/>
+         </xsl:attribute>
+         <xsl:attribute name="table:number-columns-spanned">
+           <xsl:value-of select="substring-after($CheckIfMerge, ':')"/>           
+         </xsl:attribute>
+       </xsl:if>
+       
+       <xsl:if test="@s">
         <xsl:attribute name="table:style-name">
           <xsl:value-of
             select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
@@ -263,8 +325,11 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:if>
-    </table:table-cell>
+     </table:table-cell>
+   </xsl:otherwise>
+ </xsl:choose>
   </xsl:template>
+    
 
   <!-- calculates power function -->
   <xsl:template name="Power">

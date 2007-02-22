@@ -38,6 +38,7 @@
   <xsl:import href="settings.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="styles.xsl"/>
+  <xsl:import href="merge_cell.xsl"/>
 
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>

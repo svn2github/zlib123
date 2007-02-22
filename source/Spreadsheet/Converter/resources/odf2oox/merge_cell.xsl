@@ -39,6 +39,9 @@
   <xsl:template name="CheckMergeCell">
     <xsl:if test="table:table-row/table:table-cell[@table:number-columns-spanned]">
       <mergeCells>
+        <xsl:attribute name="count">
+          <xsl:value-of select="count(table:table-row/table:table-cell[@table:number-columns-spanned])"/>
+        </xsl:attribute>
         <xsl:variable name="rowNumber">
           <xsl:choose>
             <xsl:when test="table:table-row[1]/@table:number-rows-repeated">
