@@ -123,11 +123,22 @@
             <xsl:variable name="row">
               <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']"/>
             </xsl:variable>
+            
+            <!-- activeCell row value cannot be 0 -->
+            <xsl:variable name="checkedRow">
+              <xsl:choose>
+                <xsl:when test="$row = 0">1</xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$row"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+
             <xsl:attribute name="activeCell">
-              <xsl:value-of select="concat($col,$row)"/>
+              <xsl:value-of select="concat($col,$checkedRow)"/>
             </xsl:attribute>
             <xsl:attribute name="sqref">
-              <xsl:value-of select="concat($col,$row)"/>
+              <xsl:value-of select="concat($col,$checkedRow)"/>
             </xsl:attribute>
           </selection>
         </sheetView>
