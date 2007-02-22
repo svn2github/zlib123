@@ -85,9 +85,10 @@
 
   <xsl:template name="InsertCursorPosition">
     <xsl:param name="sheet"/>
-    <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
     <config:config-item-map-entry config:name="{@name}">
       <config:config-item config:name="CursorPositionX" config:type="int">
+        <xsl:choose>
+          <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
         <xsl:call-template name="GetColNum">
           <xsl:with-param name="cell">
             <xsl:value-of
@@ -95,8 +96,15 @@
             />
           </xsl:with-param>
         </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </config:config-item>
       <config:config-item config:name="CursorPositionY" config:type="int">
+        <xsl:choose>
+          <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">            
         <xsl:call-template name="GetRowNum">
           <xsl:with-param name="cell">
             <xsl:value-of
@@ -104,8 +112,12 @@
             />
           </xsl:with-param>
         </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </config:config-item>
     </config:config-item-map-entry>
-  </xsl:if>
   </xsl:template>
 </xsl:stylesheet>
