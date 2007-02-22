@@ -201,9 +201,9 @@ Format;Page;Background;;;Y;N;N;M2;Page Styles and Layout;;;
 Format;Page;Header;;;Y;N;N;M2;Page Styles and Layout;;;
 Format;Page;Footer;;;Y;N;N;M2;Page Styles and Layout;;;
 Format;Page;Sheet;;;Y;N;N;M2;Page Styles and Layout;;;
-Format;Character;Font;Font;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;
-Format;Character;Font;type face;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;
-Format;Character;Font;size;;Y;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;
+Format;Character;Font;Font;;Y;N;Y;M1;Basic Text and Paragraph Formatting;;tomek_mueller;
+Format;Character;Font;type face;;Y;N;Y;M1;Basic Text and Paragraph Formatting;;tomek_mueller;
+Format;Character;Font;size;;Y;N;Y;M1;Basic Text and Paragraph Formatting;;tomek_mueller;
 Format;Character;Font;Language;;N;N;N;M1;Basic Text and Paragraph Formatting;;tomek_mueller;not supported in excel
 Format;Character;Font Effects;Underlining;;Y;N;N;M2;Text & Paragraph formatting;;;
 Format;Character;Font Effects;Color;;Y;N;N;M2;Text & Paragraph formatting;;;
