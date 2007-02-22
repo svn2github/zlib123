@@ -85,8 +85,8 @@
 
   <xsl:template name="InsertCursorPosition">
     <xsl:param name="sheet"/>
+    <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
     <config:config-item-map-entry config:name="{@name}">
-      <!--      <selection activeCell="A2"-->
       <config:config-item config:name="CursorPositionX" config:type="int">
         <xsl:call-template name="GetColNum">
           <xsl:with-param name="cell">
@@ -106,5 +106,6 @@
         </xsl:call-template>
       </config:config-item>
     </config:config-item-map-entry>
+  </xsl:if>
   </xsl:template>
 </xsl:stylesheet>
