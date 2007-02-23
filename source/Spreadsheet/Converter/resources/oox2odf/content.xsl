@@ -177,7 +177,8 @@
         </xsl:attribute>
       </xsl:if>
 
-      <xsl:apply-templates select="e:c"/>
+      <!-- Insert First Coll in Row  -->      
+      <xsl:apply-templates select="e:c[1]"/>
 
       <xsl:if test="$lastCellColumnNumber &lt; 256">
         <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}"/>
@@ -186,6 +187,7 @@
   </xsl:template>
 
   <xsl:template match="e:c">
+     <xsl:param name="BeforeMerge"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -233,7 +235,7 @@
     <!-- if there were empty cells in a row before this one then insert empty cells-->
     <xsl:choose>
       <!-- when this cell is the first one in a row but not in column A -->
-      <xsl:when test="position()=1 and $colNum>1">
+      <xsl:when test="not(preceding-sibling::e:c) and $colNum>1 and $BeforeMerge != 'true'">
         <table:table-cell>
           <xsl:attribute name="table:number-columns-repeated">
             <xsl:value-of select="$colNum - 1"/>
@@ -241,7 +243,7 @@
         </table:table-cell>
       </xsl:when>
       <!-- when this cell is not first one in a row and there were empty cells after previous non-empty cell -->
-      <xsl:when test="position()>1 and $colNum>$prevCellColNum+1">
+      <xsl:when test="preceding-sibling::e:c and $colNum>$prevCellColNum+1">
         <table:table-cell>
           <xsl:attribute name="table:number-columns-repeated">
             <xsl:value-of select="$colNum - $prevCellColNum - 1"/>
@@ -250,63 +252,126 @@
       </xsl:when>
     </xsl:choose>
 
-    <!-- insert this cell-->
-    <xsl:choose>
-      <xsl:when test="$CheckIfMerge = 'true'">
-        <table:covered-table-cell/>
-      </xsl:when>
-      <xsl:otherwise>
-        <table:table-cell>
-          <xsl:if test="$CheckIfMerge != 'false'">
-            <xsl:attribute name="table:number-rows-spanned">
-              <xsl:value-of select="substring-before($CheckIfMerge, ':')"/>
-            </xsl:attribute>
-            <xsl:attribute name="table:number-columns-spanned">
-              <xsl:value-of select="substring-after($CheckIfMerge, ':')"/>
-            </xsl:attribute>
-          </xsl:if>
+    
 
-          <xsl:if test="@s">
-            <xsl:attribute name="table:style-name">
-              <xsl:value-of
-                select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
-              />
+ <xsl:choose>  
+<!-- Insert covered cell if this is Merge Cell -->
+   <xsl:when test="contains($CheckIfMerge,'true')">
+		<xsl:choose>
+           <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 1">            
+             <table:covered-table-cell>                    
+               <xsl:attribute name="table:number-columns-repeated">
+                   <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
+               </xsl:attribute>
+               </table:covered-table-cell>
+           </xsl:when>
+           <xsl:otherwise>
+             <table:covered-table-cell/>             
+           </xsl:otherwise>
+         </xsl:choose>       
+   </xsl:when>
+   
+   <xsl:otherwise>
+     
+  <!-- insert this one cell-->    
+     <table:table-cell>
+       
+  <!-- Insert "Merge Cell" if "Merge Cell" is starting in this cell -->
+       <xsl:if test="$CheckIfMerge != 'false'">
+         <xsl:attribute name="table:number-rows-spanned">
+           <xsl:value-of select="substring-before($CheckIfMerge, ':')"/>
+         </xsl:attribute>
+         <xsl:attribute name="table:number-columns-spanned">
+           <xsl:value-of select="substring-after($CheckIfMerge, ':')"/>
+         </xsl:attribute>
+       </xsl:if>
+       
+       <xsl:if test="@s">
+        <xsl:attribute name="table:style-name">
+          <xsl:value-of
+            select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
+          />
+        </xsl:attribute>
+       </xsl:if>
+      <xsl:if test="e:v">
+        <xsl:choose>
+          <xsl:when test="@t='s'">
+            <xsl:attribute name="office:value-type">
+              <xsl:text>string</xsl:text>
             </xsl:attribute>
-          </xsl:if>
+            <xsl:variable name="id">
+              <xsl:value-of select="e:v"/>
+            </xsl:variable>
+            <text:p>
+              <xsl:for-each
+                select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]">
+                <xsl:apply-templates/>
+              </xsl:for-each>
+            </text:p>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="office:value-type">
+              <xsl:text>float</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="office:value">
+              <xsl:value-of select="e:v"/>
+            </xsl:attribute>
+            <text:p>
+              <xsl:value-of select="e:v"/>
+            </text:p>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+     </table:table-cell>
 
-          <!-- insert cell content -->
-          <xsl:if test="e:v">
-            <xsl:choose>
-              <xsl:when test="@t='s'">
-                <xsl:attribute name="office:value-type">
-                  <xsl:text>string</xsl:text>
-                </xsl:attribute>
-                <xsl:variable name="id">
-                  <xsl:value-of select="e:v"/>
-                </xsl:variable>
-                <text:p>
-                  <xsl:for-each
-                    select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]">
-                    <xsl:apply-templates/>
-                  </xsl:for-each>
-                </text:p>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:attribute name="office:value-type">
-                  <xsl:text>float</xsl:text>
-                </xsl:attribute>
-                <xsl:attribute name="office:value">
-                  <xsl:value-of select="e:v"/>
-                </xsl:attribute>
-                <text:p>
-                  <xsl:value-of select="e:v"/>
-                </text:p>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:if>
-        </table:table-cell>
-      </xsl:otherwise>
-    </xsl:choose>
+<!-- Insert covered cell if Merge Cell is starting-->     
+     <xsl:if test="$CheckIfMerge != 'false' and substring-after($CheckIfMerge, ':') &gt; 1">
+         <table:covered-table-cell>
+           <xsl:attribute name="table:number-columns-repeated">
+             <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
+           </xsl:attribute>
+         </table:covered-table-cell>
+     </xsl:if>
+   </xsl:otherwise>
+ </xsl:choose>
+ 
+<!-- Insert next coll -->
+    
+     <xsl:choose>
+       
+ <!-- Skips empty coll (in Merge Cell) -->
+       
+       <xsl:when test="$CheckIfMerge != 'false'">         
+         <xsl:choose>           
+           <xsl:when test="contains($CheckIfMerge,'true') and substring-after($CheckIfMerge, ':') &gt; 1">
+             <xsl:if test="following-sibling::e:c[number(substring-after($CheckIfMerge, ':')) - 1]">          
+               <xsl:apply-templates select="following-sibling::e:c[number(substring-after($CheckIfMerge, ':')) - 1]">
+                 <xsl:with-param name="BeforeMerge">               
+                   <xsl:text>true</xsl:text>               
+                 </xsl:with-param>
+               </xsl:apply-templates>
+             </xsl:if>
+           </xsl:when>
+           <xsl:otherwise>
+             <xsl:if test="following-sibling::e:c[number(substring-after($CheckIfMerge, ':'))]">          
+               <xsl:apply-templates select="following-sibling::e:c[number(substring-after($CheckIfMerge, ':'))]">
+                 <xsl:with-param name="BeforeMerge">               
+                   <xsl:text>true</xsl:text>               
+                 </xsl:with-param>
+               </xsl:apply-templates>
+             </xsl:if>
+           </xsl:otherwise>
+         </xsl:choose>         
+       </xsl:when> 
+
+       <xsl:otherwise>
+         <xsl:if test="following-sibling::e:c">
+           <xsl:apply-templates select="following-sibling::e:c[1]"/>
+         </xsl:if>
+       </xsl:otherwise>
+       
+     </xsl:choose>
+     
   </xsl:template>
 
   <!-- convert run into span -->

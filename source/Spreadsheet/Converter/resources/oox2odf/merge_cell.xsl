@@ -40,8 +40,12 @@
   <xsl:template name="CheckIfMerge">
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
+
     <xsl:for-each select="ancestor::e:worksheet">
+
+<!-- Checks if Merge Cells exist  in the document-->
       <xsl:choose>
+        
         <xsl:when test="e:mergeCells/e:mergeCell">
           <xsl:apply-templates select="e:mergeCells/e:mergeCell[1]" mode="merge">
             <xsl:with-param name="colNum">
@@ -62,7 +66,6 @@
   <xsl:template match="e:mergeCell" mode="merge">
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
-
 
     <xsl:variable name="StartMergeCell">
       <xsl:value-of select="substring-before(@ref, ':')"/>
@@ -105,29 +108,35 @@
     </xsl:variable>
 
     <xsl:choose>
+
+      <!-- Checks if "Merge Cell" is starting in this cell -->
       <xsl:when test="$colNum = $StartColNum and $rowNum = $StartRowNum">
-        <xsl:value-of select="concat(number($EndRowNum - $StartRowNum + 1), concat(':',number($EndColNum - $StartColNum+1)))"/>
+        <xsl:value-of
+          select="concat(number($EndRowNum - $StartRowNum + 1), concat(':',number($EndColNum - $StartColNum+1)))"
+        />
       </xsl:when>
+
+      <!-- Checks if this cell is in "Merge Cell" -->
       <xsl:when
-        test="$colNum &gt;= $StartColNum and $EndColNum &gt;= $colNum and $rowNum &gt;= $StartRowNum and $EndRowNum &gt;= $rowNum">
-        <xsl:text>true</xsl:text>
+        test="$colNum = $StartColNum and $EndColNum &gt;= $colNum and $rowNum &gt;= $StartRowNum and $EndRowNum &gt;= $rowNum">
+        <xsl:value-of select="concat('true:', number($EndColNum - $StartColNum +1 ))"/>
       </xsl:when>
       <xsl:otherwise>
-              <xsl:choose>
-                <xsl:when test="following-sibling::e:mergeCell">
-                  <xsl:apply-templates select="following-sibling::e:mergeCell[1]" mode="merge">
-                    <xsl:with-param name="colNum">
-                      <xsl:value-of select="$colNum"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="rowNum">
-                      <xsl:value-of select="$rowNum"/>
-                    </xsl:with-param>
-                  </xsl:apply-templates>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>false</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="following-sibling::e:mergeCell">
+            <xsl:apply-templates select="following-sibling::e:mergeCell[1]" mode="merge">
+              <xsl:with-param name="colNum">
+                <xsl:value-of select="$colNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum"/>
+              </xsl:with-param>
+            </xsl:apply-templates>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
 
