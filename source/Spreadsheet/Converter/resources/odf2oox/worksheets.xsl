@@ -87,7 +87,7 @@
               </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
-          <xsl:otherwise>15</xsl:otherwise>
+          <xsl:otherwise>13</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
 
@@ -247,7 +247,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:if
-      test="table:table-cell/text:p or (@table:visibility!='' and  table:visibility!='visible') or ($height != $defaultRowHeight)">
+      test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or $height != $defaultRowHeight">
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
@@ -321,7 +321,7 @@
     <xsl:choose>
       <xsl:when test="$numberRowsRepeated &gt; 1">
         <xsl:if
-          test="table:table-cell/text:p or (@table:visibility!='' and  table:visibility!='visible') or ($height != $defaultRowHeight)">
+          test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight)">
           <row r="{$rowNumber + 1 + $numberOfAllRowsRepeated - $numberRowsRepeated}">
 
             <!-- insert row height -->
