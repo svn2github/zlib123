@@ -111,7 +111,6 @@
             <xsl:attribute name="activeTab"><xsl:text>1</xsl:text></xsl:attribute>
           </xsl:if>
           
-          <!--          <selection activeCell="C7" sqref="C7">-->
           <selection>
           <xsl:variable name="col">
             <xsl:call-template name="NumbersToChars">
@@ -129,7 +128,7 @@
               <xsl:choose>
                 <xsl:when test="$row = 0">1</xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="$row"/>
+                  <xsl:value-of select="$row + 1"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>

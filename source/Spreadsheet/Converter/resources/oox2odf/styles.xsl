@@ -58,7 +58,8 @@
     <xsl:template name="InsertDefaultTableCellStyle">
         <style:style style:name="Default" style:family="table-cell">
             <style:text-properties>
-                    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]" mode="style"/>
+                <xsl:apply-templates
+                    select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]" mode="style"/>
             </style:text-properties>
         </style:style>
     </xsl:template>
@@ -129,7 +130,7 @@
         </style:style>
     </xsl:template>
 
-    <!-- insert row styles from all sheets -->    
+    <!-- insert row styles from all sheets -->
     <xsl:template name="InsertRowStyles">
         <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
             <xsl:call-template name="InsertSheetRowStyles">
@@ -233,46 +234,47 @@
         </style:style>
     </xsl:template>
 
-  <!-- convert font name-->
-  <xsl:template match="e:rFont" mode="style">
-    <xsl:attribute name="style:font-name">
-      <xsl:value-of select="@val"/>
-    </xsl:attribute>
-  </xsl:template>
-  
-  <!-- bold -->
+    <!-- convert font name-->
+    <xsl:template match="e:rFont" mode="style">
+        <xsl:attribute name="style:font-name">
+            <xsl:value-of select="@val"/>
+        </xsl:attribute>
+    </xsl:template>
+
+    <!-- bold -->
     <xsl:template match="e:b" mode="style">
         <xsl:attribute name="fo:font-weight">
             <xsl:text>bold</xsl:text>
         </xsl:attribute>
     </xsl:template>
 
-  <!-- italic -->
+    <!-- italic -->
     <xsl:template match="e:i" mode="style">
         <xsl:attribute name="fo:font-style">
             <xsl:text>italic</xsl:text>
         </xsl:attribute>
     </xsl:template>
 
-  <!-- insert underline -->
+    <!-- insert underline -->
     <xsl:template match="e:u" mode="style">
         <xsl:call-template name="InsertUnderline"/>
     </xsl:template>
 
-  <!-- insert text styles -->
-  <xsl:template name="InsertTextStyles">
-    <xsl:apply-templates select="document('xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]" mode="automaticstyles"/>
-  </xsl:template>
-  
-  <!-- convert run properties into span style -->
-  <xsl:template match="e:r" mode="automaticstyles">
-    <style:style style:name="{generate-id(.)}" style:family="text">
-      <style:text-properties>
-        <xsl:apply-templates select="e:rPr" mode="style"/>
-      </style:text-properties>
-    </style:style>
-  </xsl:template>
-  
+    <!-- insert text styles -->
+    <xsl:template name="InsertTextStyles">
+        <xsl:apply-templates select="document('xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]"
+            mode="automaticstyles"/>
+    </xsl:template>
+
+    <!-- convert run properties into span style -->
+    <xsl:template match="e:r" mode="automaticstyles">
+        <style:style style:name="{generate-id(.)}" style:family="text">
+            <style:text-properties>
+                <xsl:apply-templates select="e:rPr" mode="style"/>
+            </style:text-properties>
+        </style:style>
+    </xsl:template>
+
     <xsl:template name="InsertUnderline">
         <xsl:choose>
             <xsl:when test="@val = 'double'">
@@ -316,7 +318,7 @@
         </xsl:if>
     </xsl:template>
 
-  <!-- convert font size -->
+    <!-- convert font size -->
     <xsl:template match="e:sz" mode="style">
         <xsl:attribute name="fo:font-size">
             <xsl:value-of select="@val"/>
@@ -328,25 +330,37 @@
             <xsl:value-of select="@val"/>
         </xsl:attribute>
     </xsl:template>
-    
-  <!-- insert text-line-through -->
+
+    <!-- insert text-line-through -->
     <xsl:template match="e:strike" mode="style">
         <xsl:attribute name="style:text-line-through-style">
             <xsl:text>solid</xsl:text>
         </xsl:attribute>
     </xsl:template>
-    
+
     <xsl:template match="e:color" mode="style">
+        
         <xsl:attribute name="fo:color">
-        <xsl:choose>
-            <xsl:when test="@rgb">
-                <xsl:value-of select="concat('#',substring(@rgb,3,9))"/>
-            </xsl:when>
-            <xsl:when test="@theme">
-                <xsl:variable name="this" select="."/>
-                <xsl:value-of select="concat('#',document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/a:srgbClr/@val)"/>
-            </xsl:when>
-        </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="@rgb">
+                    <xsl:value-of select="concat('#',substring(@rgb,3,9))"/>
+                </xsl:when>
+                <xsl:when test="@theme">
+                    <xsl:variable name="this" select="."/>                    
+                    <xsl:variable name="color">
+                        <xsl:choose>
+                            <!-- if color is in 'sysClr' node -->
+                            <xsl:when test="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@lastClr">
+                                <xsl:value-of select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@lastClr"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@val"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:variable>
+                    <xsl:value-of select="concat('#',$color)"/>
+                </xsl:when>
+            </xsl:choose>
         </xsl:attribute>
     </xsl:template>
 

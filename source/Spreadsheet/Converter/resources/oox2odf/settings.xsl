@@ -89,6 +89,7 @@
       <config:config-item config:name="CursorPositionX" config:type="int">
         <xsl:choose>
           <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
+            <xsl:variable name="col">
         <xsl:call-template name="GetColNum">
           <xsl:with-param name="cell">
             <xsl:value-of
@@ -96,6 +97,8 @@
             />
           </xsl:with-param>
         </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$col - 1"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>0</xsl:text>
@@ -104,7 +107,8 @@
       </config:config-item>
       <config:config-item config:name="CursorPositionY" config:type="int">
         <xsl:choose>
-          <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">            
+          <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
+            <xsl:variable name="row">
         <xsl:call-template name="GetRowNum">
           <xsl:with-param name="cell">
             <xsl:value-of
@@ -112,6 +116,8 @@
             />
           </xsl:with-param>
         </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$row - 1"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>0</xsl:text>
