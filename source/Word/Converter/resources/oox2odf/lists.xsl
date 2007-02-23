@@ -1037,19 +1037,19 @@
           <xsl:for-each select="document('word/numbering.xml')">
             <xsl:variable name="abstractNum" select="key('abstractNumId',key('numId',$numId)/w:abstractNumId/@w:val)"/>
            <!--w:lvl shows which level defintion should be taken from abstract num-->
-            <xsl:for-each select="$abstractNum/w:lvl[@w:ilvl = $levelId]">
-              <xsl:if test="./w:lvlText/@w:val != ''">
-                <xsl:call-template name="NumFormat">
-                  <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
-                  <xsl:with-param name="BeforeAfterNum" select="./w:lvlText/@w:val"/>
-                </xsl:call-template>
-              </xsl:if>
+            <xsl:for-each select="$abstractNum/w:lvl[@w:ilvl = $levelId][1]">
               <xsl:if
                 test="not(number(substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val)))) and ./w:lvlText/@w:val != 'nothing'">
                 <xsl:attribute name="style:num-suffix">
                   <xsl:value-of select="substring(./w:lvlText/@w:val,string-length(./w:lvlText/@w:val))"
                   />
                 </xsl:attribute>
+              </xsl:if>
+              <xsl:if test="./w:lvlText/@w:val != ''">
+                <xsl:call-template name="NumFormat">
+                  <xsl:with-param name="format" select="./w:numFmt/@w:val"/>
+                  <xsl:with-param name="BeforeAfterNum" select="./w:lvlText/@w:val"/>
+                </xsl:call-template>
               </xsl:if>
               <xsl:variable name="display">
                 <xsl:call-template name="CountDisplayListLevels">
