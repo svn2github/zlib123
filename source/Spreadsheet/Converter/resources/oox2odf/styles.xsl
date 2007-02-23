@@ -225,12 +225,120 @@
     <!-- cell formats -->
     <xsl:template match="e:xf" mode="automaticstyles">
         <style:style style:name="{generate-id(.)}" style:family="table-cell">
-            <style:text-properties>
-                <xsl:variable name="this" select="."/>
-                <xsl:apply-templates
-                    select="ancestor::e:styleSheet/e:fonts/e:font[position() = $this/@fontId + 1]"
-                    mode="style"/>
-            </style:text-properties>
+            <xsl:if test="@applyAlignment = 1">
+                <style:table-cell-properties>
+                    <!-- vertical-align -->
+                    <xsl:attribute name="style:vertical-align">
+                        <xsl:choose>
+                            <xsl:when test="e:alignment/@vertical = 'center' ">
+                                <xsl:text>middle</xsl:text>
+                            </xsl:when>
+                            <xsl:when test="not(e:alignment/@vertical)">
+                                <xsl:text>bottom</xsl:text>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="e:alignment/@vertical"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <xsl:if test="e:alignment/@horizontal = 'fill' ">
+                        <xsl:attribute name="style:repeat-content">
+                            <xsl:text>true</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if
+                        test="e:alignment/@horizontal = 'distributed' or e:alignment/@vertical = 'distributed' ">
+                        <xsl:attribute name="fo:wrap-option">
+                            <xsl:text>wrap</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
+
+                    <!-- text orientation -->
+                    <xsl:if test="e:alignment/@textRotation">
+                        <xsl:choose>
+                            <xsl:when test="e:alignment/@textRotation = 255">
+                                <xsl:attribute name="style:direction">
+                                    <xsl:text>ttb</xsl:text>
+                                </xsl:attribute>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="style:rotation-angle">
+                                    <xsl:choose>
+                                        <xsl:when
+                                            test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 90">
+                                            <xsl:value-of select="e:alignment/@textRotation"/>
+                                        </xsl:when>
+                                        <xsl:when test="e:alignment/@textRotation &gt; 90">
+                                            <xsl:value-of select="450 - e:alignment/@textRotation"/>
+                                        </xsl:when>
+                                    </xsl:choose>
+                                </xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:attribute name="style:rotation-align">
+                            <xsl:text>none</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
+                </style:table-cell-properties>
+
+                <!-- default horizontal alignment when text has angle orientation  -->
+                <xsl:if test="not(e:alignment/@horizontal) and e:alignment/@textRotation">
+                    <style:paragraph-properties>
+                        <xsl:attribute name="fo:text-align">
+                            <xsl:choose>
+                                <xsl:when
+                                    test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 180">
+                                    <xsl:text>start</xsl:text>
+                                </xsl:when>
+                                <xsl:when
+                                    test="e:alignment/@textRotation &gt; 90 and e:alignment/@textRotation &lt; 180">
+                                    <xsl:text>end</xsl:text>
+                                </xsl:when>
+                                <xsl:when test="e:alignment/@textRotation = 255">
+                                    <xsl:text>center</xsl:text>
+                                </xsl:when>
+                            </xsl:choose>
+                        </xsl:attribute>
+                    </style:paragraph-properties>
+                </xsl:if>
+
+                <xsl:if test="e:alignment/@horizontal">
+                    <style:paragraph-properties>
+                        <!-- horizontal-align -->
+                        <xsl:attribute name="fo:text-align">
+                            <xsl:choose>
+                                <xsl:when test="e:alignment/@horizontal = 'left' ">
+                                    <xsl:text>start</xsl:text>
+                                </xsl:when>
+                                <xsl:when test="e:alignment/@horizontal = 'center' ">
+                                    <xsl:text>center</xsl:text>
+                                </xsl:when>
+                                <xsl:when test="e:alignment/@horizontal = 'right' ">
+                                    <xsl:text>end</xsl:text>
+                                </xsl:when>
+                                <xsl:when test="e:alignment/@horizontal = 'justify' ">
+                                    <xsl:text>justify</xsl:text>
+                                </xsl:when>
+                                <xsl:when test="e:alignment/@horizontal = 'centerContinuous' ">
+                                    <xsl:text>center</xsl:text>
+                                </xsl:when>
+                                <xsl:when test="e:alignment/@horizontal = 'distributed' ">
+                                    <xsl:text>center</xsl:text>
+                                </xsl:when>
+                            </xsl:choose>
+                        </xsl:attribute>
+                    </style:paragraph-properties>
+                </xsl:if>
+            </xsl:if>
+
+            <xsl:if test="@applyFont = 1">
+                <style:text-properties>
+                    <xsl:variable name="this" select="."/>
+                    <xsl:apply-templates
+                        select="ancestor::e:styleSheet/e:fonts/e:font[position() = $this/@fontId + 1]"
+                        mode="style"/>
+                </style:text-properties>
+            </xsl:if>
         </style:style>
     </xsl:template>
 
@@ -339,22 +447,27 @@
     </xsl:template>
 
     <xsl:template match="e:color" mode="style">
-        
+
         <xsl:attribute name="fo:color">
             <xsl:choose>
                 <xsl:when test="@rgb">
                     <xsl:value-of select="concat('#',substring(@rgb,3,9))"/>
                 </xsl:when>
                 <xsl:when test="@theme">
-                    <xsl:variable name="this" select="."/>                    
+                    <xsl:variable name="this" select="."/>
                     <xsl:variable name="color">
                         <xsl:choose>
                             <!-- if color is in 'sysClr' node -->
-                            <xsl:when test="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@lastClr">
-                                <xsl:value-of select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@lastClr"/>
+                            <xsl:when
+                                test="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@lastClr">
+                                <xsl:value-of
+                                    select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@lastClr"
+                                />
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:value-of select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@val"/>
+                                <xsl:value-of
+                                    select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@val"
+                                />
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:variable>
