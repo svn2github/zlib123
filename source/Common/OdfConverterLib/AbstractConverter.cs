@@ -220,7 +220,6 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string tempOutputFile = outputFile == null ? null : Path.GetTempFileName();
             try
             {
-                Console.WriteLine("temp file is = " + tempInputFile);
                 File.Copy(inputFile, tempInputFile, true);
                 File.SetAttributes(tempInputFile, FileAttributes.Normal);
                 _Transform(tempInputFile, tempOutputFile);
