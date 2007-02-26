@@ -256,7 +256,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:if
-      test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or $height != $defaultRowHeight">
+      test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or $height != $defaultRowHeight or table:covered-table-cell">
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
@@ -272,12 +272,19 @@
         </xsl:if>
 
         <!-- insert first cell -->
-        <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
+        <xsl:choose>
+          <xsl:when test="node()[1][name()='table:table-cell']">
+          <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
           <xsl:with-param name="colNumber">0</xsl:with-param>
           <xsl:with-param name="rowNumber" select="$rowNumber"/>
           <xsl:with-param name="cellNumber" select="$cellNumber"/>
-        </xsl:apply-templates>
-
+          </xsl:apply-templates>
+          </xsl:when>
+          <xsl:when test="node()[1][name()='table:covered-table-cell']">            
+          </xsl:when>
+          <xsl:otherwise/>
+        </xsl:choose>
+        
       </row>
 
       <!-- insert repeated rows -->
@@ -365,68 +372,159 @@
   </xsl:template>
 
   <!-- insert cell into row -->
-  <xsl:template match="table:table-cell" mode="sheet">
+ <xsl:template match="table:table-cell" mode="sheet">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
+    <xsl:param name="ColumnRepeated"/>
 
-    <c>
-      <xsl:attribute name="r">
-        <xsl:variable name="colChar">
-          <xsl:call-template name="NumbersToChars">
-            <xsl:with-param name="num" select="$colNumber"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:value-of select="concat($colChar,$rowNumber)"/>
-      </xsl:attribute>
-
-      <!-- insert cell style number-->
-      <xsl:if test="@table:style-name">
-        <xsl:for-each select="key('style',@table:style-name)/style:text-properties">
-          <xsl:attribute name="s">
-            <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
-              level="any"/>
-          </xsl:attribute>
-        </xsl:for-each>
-      </xsl:if>
-
-      <!-- convert cell type -->
-      <xsl:if test="child::text:p">
-      <xsl:choose>
-        <xsl:when test="@office:value-type!='string'">
-          <xsl:attribute name="t">
-            <xsl:call-template name="ConvertTypes">
-              <xsl:with-param name="type">
-                <xsl:value-of select="@office:value-type"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-          <v>
-            <xsl:value-of select="text:p"/>
-          </v>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="t">s</xsl:attribute>
-          <v>
-            <xsl:value-of select="number($cellNumber)"/>
-          </v>
-        </xsl:otherwise>
-      </xsl:choose>
-      </xsl:if>
-    </c>
+    <xsl:call-template name="InsertCell">
+      <xsl:with-param name="colNumber">
+        <xsl:value-of select="$colNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="rowNumber">
+        <xsl:value-of select="$rowNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellNumber">
+        <xsl:value-of select="$cellNumber"/>
+      </xsl:with-param>      
+    </xsl:call-template>
 
     <!-- insert next cell -->
-    <xsl:if test="following-sibling::table:table-cell">
-      <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="sheet">
+    <xsl:call-template name="InsertNextCell">
+      <xsl:with-param name="colNumber">
+        <xsl:value-of select="$colNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="rowNumber">
+        <xsl:value-of select="$rowNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellNumber">
+        <xsl:value-of select="$cellNumber"/>
+      </xsl:with-param>      
+    </xsl:call-template>
+  </xsl:template>
+  
+  <xsl:template name="InsertNextCell">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="cellNumber"/>
+    
+    <!-- insert next cell -->
+    <xsl:if test="following-sibling::table:table-cell or following-sibling::table:covered-table-cell">
+      <xsl:choose>
+        <xsl:when test="following-sibling::node()[1][name()='table:table-cell']">          
+          <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="sheet">
+            <xsl:with-param name="colNumber">
+              <xsl:choose>
+                <xsl:when test="@table:number-columns-repeated">
+                  <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$colNumber+1"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="rowNumber" select="$rowNumber"/>
+            <xsl:with-param name="cellNumber">
+              <xsl:choose>
+                <xsl:when test="child::text:p and @office:value-type='string'">
+                  <xsl:value-of select="$cellNumber + 1"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$cellNumber"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:apply-templates>
+          
+        </xsl:when>
+        <xsl:when test="following-sibling::node()[1][name()='table:covered-table-cell']">          
+          <xsl:apply-templates select="following-sibling::table:covered-table-cell[1]" mode="sheet">
+            <xsl:with-param name="colNumber">
+              <xsl:choose>
+                <xsl:when test="@table:number-columns-repeated">
+                  <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$colNumber+1"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="rowNumber" select="$rowNumber"/>
+            <xsl:with-param name="cellNumber">
+              <xsl:choose>
+                <xsl:when test="child::text:p and @office:value-type='string'">
+                  <xsl:value-of select="$cellNumber + 1"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$cellNumber"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="ColumnRepeated">1</xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:when>  
+      </xsl:choose>
+      </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="table:covered-table-cell" mode="sheet">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="cellNumber"/>
+    <xsl:param name="ColumnRepeated"/>
+    
+    <xsl:call-template name="InsertConvertCell">
+      <xsl:with-param name="colNumber">
+        <xsl:value-of select="$colNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="rowNumber">
+        <xsl:value-of select="$rowNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellNumber">
+        <xsl:value-of select="$cellNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="ColumnRepeated">
+        <xsl:value-of select="$ColumnRepeated"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    
+    <!-- insert next cell -->
+    <xsl:call-template name="InsertNextCell">
+      <xsl:with-param name="colNumber">
+        <xsl:value-of select="$colNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="rowNumber">
+        <xsl:value-of select="$rowNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellNumber">
+        <xsl:value-of select="$cellNumber"/>
+      </xsl:with-param>      
+    </xsl:call-template>    
+  </xsl:template>
+  
+  <xsl:template name="InsertConvertCell">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="cellNumber"/>
+    <xsl:param name="ColumnRepeated"/>
+    
+    <xsl:call-template name="InsertCell">
+      <xsl:with-param name="colNumber">
+        <xsl:value-of select="$colNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="rowNumber">
+        <xsl:value-of select="$rowNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="cellNumber">
+        <xsl:value-of select="$cellNumber"/>
+      </xsl:with-param>      
+    </xsl:call-template>
+    
+    <xsl:if test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated">      
+      <xsl:call-template name="InsertConvertCell">
         <xsl:with-param name="colNumber">
-          <xsl:choose>
-            <xsl:when test="@table:number-columns-repeated">
-              <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$colNumber+1"/>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:value-of select="$colNumber+1"/>
         </xsl:with-param>
         <xsl:with-param name="rowNumber" select="$rowNumber"/>
         <xsl:with-param name="cellNumber">
@@ -439,9 +537,59 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:with-param>
-      </xsl:apply-templates>
-    </xsl:if>
-
+        <xsl:with-param name="ColumnRepeated"><xsl:value-of select="$ColumnRepeated + 1"/></xsl:with-param>
+      </xsl:call-template>
+    </xsl:if> 
+  </xsl:template>
+  
+  <xsl:template name="InsertCell">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="cellNumber"/>    
+    <c>
+      <xsl:attribute name="r">
+        <xsl:variable name="colChar">
+          <xsl:call-template name="NumbersToChars">
+            <xsl:with-param name="num" select="$colNumber"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="concat($colChar,$rowNumber)"/>
+      </xsl:attribute>
+      
+      <!-- insert cell style number-->
+      <xsl:if test="@table:style-name">
+        <xsl:for-each select="key('style',@table:style-name)/style:text-properties">
+          <xsl:attribute name="s">
+            <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
+              level="any"/>
+          </xsl:attribute>
+        </xsl:for-each>
+      </xsl:if>
+      
+      <!-- convert cell type -->
+      <xsl:if test="child::text:p">
+        <xsl:choose>
+          <xsl:when test="@office:value-type!='string'">
+            <xsl:attribute name="t">
+              <xsl:call-template name="ConvertTypes">
+                <xsl:with-param name="type">
+                  <xsl:value-of select="@office:value-type"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+            <v>
+              <xsl:value-of select="text:p"/>
+            </v>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="t">s</xsl:attribute>
+            <v>
+              <xsl:value-of select="number($cellNumber)"/>
+            </v>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </c>
   </xsl:template>
 
 </xsl:stylesheet>
