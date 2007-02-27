@@ -63,16 +63,31 @@
   <xsl:template match="table:table-row" mode="merge">
     <xsl:param name="rowNumber"/>
     
-    <!-- Check if atribute table:number-columns-spanned exist -->
-    <xsl:if test="table:table-cell[@table:number-columns-spanned]">        
-      <xsl:for-each select="table:table-cell[1]">
-        <xsl:call-template name="MergeRow">
-          <xsl:with-param name="rowNumber">
-            <xsl:value-of select="$rowNumber"/>
-          </xsl:with-param>
-          <xsl:with-param name="colNumber">1</xsl:with-param>
-        </xsl:call-template>
-      </xsl:for-each>
+    <!-- Check if "Merge Cell" exist in row-->
+    <xsl:if test="table:table-cell[@table:number-columns-spanned]">   
+      <xsl:choose>
+        <xsl:when test="node()[1][name()='table:covered-table-cell']">          
+          <xsl:for-each select="table:covered-table-cell[1]">
+            <xsl:call-template name="MergeRow">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">1</xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>            
+        </xsl:when>          
+        <xsl:otherwise>
+          <xsl:for-each select="table:table-cell[1]">
+            <xsl:call-template name="MergeRow">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">1</xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+      
     </xsl:if>
     
     <!-- Check if next row exist -->
@@ -134,42 +149,47 @@
     
     <xsl:if test="following-sibling::table:table-cell">
       
-      <xsl:variable name="CoveredTable">
-        <xsl:choose>
-          <xsl:when test="following-sibling::node()[1][name()='table:covered-table-cell']/@table:number-columns-repeated">
-            <xsl:value-of select="following-sibling::table:covered-table-cell[1]/@table:number-columns-repeated"/>
-          </xsl:when>
-          <xsl:when test="following-sibling::node()[1][name()='table:covered-table-cell']">1</xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>        
-      </xsl:variable>
-      
       <xsl:variable name="ColumnsRepeated">
-        <xsl:choose>          
-          <xsl:when test="@table:number-columns-spanned">
-            <xsl:value-of select="$colNumber + @table:number-columns-spanned"/>
-          </xsl:when>
+        <xsl:choose>
           <xsl:when test="@table:number-columns-repeated">
-            <xsl:value-of select="$colNumber + @table:number-columns-repeated + $CoveredTable"/>
+            <xsl:value-of select="$colNumber + @table:number-columns-repeated"/>
           </xsl:when>        
           <xsl:otherwise>
-            <xsl:value-of select="$colNumber + 1 + $CoveredTable"/>
+            <xsl:value-of select="$colNumber + 1"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       
-      <xsl:for-each select="following-sibling::table:table-cell[1]">
-        <xsl:call-template name="MergeRow">
-          <xsl:with-param name="rowNumber">
-            <xsl:value-of select="$rowNumber"/>
-          </xsl:with-param>
-          <xsl:with-param name="colNumber">
-            <xsl:value-of select="$ColumnsRepeated"/>            
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="following-sibling::node()[1][name()='table:covered-table-cell']">
+          <xsl:for-each select="following-sibling::table:covered-table-cell[1]">
+            <xsl:call-template name="MergeRow">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">
+                <xsl:value-of select="$ColumnsRepeated"/>            
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>    
+        </xsl:when>
+        
+        <xsl:otherwise>
+			<xsl:for-each select="following-sibling::table:table-cell[1]">
+            <xsl:call-template name="MergeRow">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">
+                <xsl:value-of select="$ColumnsRepeated"/>            
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+		</xsl:otherwise>
+      </xsl:choose>   
       
     </xsl:if>
+    
   </xsl:template>
   
 </xsl:stylesheet>

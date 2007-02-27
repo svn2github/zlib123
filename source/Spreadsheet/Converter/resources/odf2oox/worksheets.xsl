@@ -301,6 +301,7 @@
           <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
         </xsl:call-template>
       </xsl:if>
+      
     </xsl:if>
 
     <!-- insert next row -->
@@ -378,7 +379,7 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="ColumnRepeated"/>
 
-    <xsl:call-template name="InsertCell">
+   <xsl:call-template name="InsertCell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
       </xsl:with-param>
@@ -402,16 +403,18 @@
         <xsl:value-of select="$cellNumber"/>
       </xsl:with-param>      
     </xsl:call-template>
+   
   </xsl:template>
   
+  <!-- insert cell -->
   <xsl:template name="InsertNextCell">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
-    
-    <!-- insert next cell -->
+   
     <xsl:if test="following-sibling::table:table-cell or following-sibling::table:covered-table-cell">
       <xsl:choose>
+        <!-- Checks if  next index is table:table-cell-->
         <xsl:when test="following-sibling::node()[1][name()='table:table-cell']">          
           <xsl:apply-templates select="following-sibling::table:table-cell[1]" mode="sheet">
             <xsl:with-param name="colNumber">
@@ -436,8 +439,8 @@
               </xsl:choose>
             </xsl:with-param>
           </xsl:apply-templates>
-          
         </xsl:when>
+        <!--  Checks if next index is table:covered-table-cell-->
         <xsl:when test="following-sibling::node()[1][name()='table:covered-table-cell']">          
           <xsl:apply-templates select="following-sibling::table:covered-table-cell[1]" mode="sheet">
             <xsl:with-param name="colNumber">
@@ -468,7 +471,7 @@
       </xsl:if>
   </xsl:template>
   
-  <xsl:template match="table:covered-table-cell" mode="sheet">
+    <xsl:template match="table:covered-table-cell" mode="sheet">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
@@ -503,6 +506,7 @@
     </xsl:call-template>    
   </xsl:template>
   
+  <!-- Insert empty Cell for "table:covered-table-cell"-->
   <xsl:template name="InsertConvertCell">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
@@ -521,6 +525,7 @@
       </xsl:with-param>      
     </xsl:call-template>
     
+    <!-- Insert cells if "@table:number-columns-repeated"  > 1 -->   
     <xsl:if test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated">      
       <xsl:call-template name="InsertConvertCell">
         <xsl:with-param name="colNumber">
