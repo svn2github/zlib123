@@ -191,8 +191,11 @@
       </xsl:if>
 
       <!-- text -alignment -->
+      <!-- 1st 'or' - horizontal alignment
+            2nd 'or' - horizontal alignment 'fill'
+             3rd 'or' - vertical alignment -->
       <xsl:if
-        test="style:paragraph-properties/@fo:text-align or style:table-cell-properties/@style:repeat-content = 'true' ">
+        test="style:paragraph-properties/@fo:text-align or style:table-cell-properties/@style:repeat-content = 'true' or style:table-cell-properties/@style:vertical-align">
         <xsl:attribute name="applyAlignment">
           <xsl:text>1</xsl:text>
         </xsl:attribute>
@@ -225,6 +228,24 @@
               </xsl:choose>
             </xsl:attribute>
           </xsl:if>
+
+          <!-- vertical-alignment -->
+          <xsl:if test="style:table-cell-properties/@style:vertical-align">
+            <xsl:attribute name="vertical">
+              <xsl:choose>
+                <xsl:when test="style:table-cell-properties/@style:vertical-align = 'automatic' ">
+                  <xsl:text>bottom</xsl:text>
+                </xsl:when>
+                <xsl:when test="style:table-cell-properties/@style:vertical-align = 'middle' ">
+                  <xsl:text>center</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="style:table-cell-properties/@style:vertical-align"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
+
         </alignment>
       </xsl:if>
     </xf>
