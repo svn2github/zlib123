@@ -280,7 +280,7 @@
                   <xsl:text>start</xsl:text>
                 </xsl:when>
                 <xsl:when
-                  test="e:alignment/@textRotation &gt; 90 and e:alignment/@textRotation &lt; 180">
+                  test="e:alignment/@textRotation &gt; 89 and e:alignment/@textRotation &lt; 180">
                   <xsl:text>end</xsl:text>
                 </xsl:when>
                 <xsl:when test="e:alignment/@textRotation = 255">
@@ -299,14 +299,8 @@
                 <xsl:when test="e:alignment/@horizontal = 'left' ">
                   <xsl:text>start</xsl:text>
                 </xsl:when>
-                <xsl:when test="e:alignment/@horizontal = 'center' ">
-                  <xsl:text>center</xsl:text>
-                </xsl:when>
                 <xsl:when test="e:alignment/@horizontal = 'right' ">
                   <xsl:text>end</xsl:text>
-                </xsl:when>
-                <xsl:when test="e:alignment/@horizontal = 'justify' ">
-                  <xsl:text>justify</xsl:text>
                 </xsl:when>
                 <xsl:when test="e:alignment/@horizontal = 'centerContinuous' ">
                   <xsl:text>center</xsl:text>
@@ -314,6 +308,9 @@
                 <xsl:when test="e:alignment/@horizontal = 'distributed' ">
                   <xsl:text>center</xsl:text>
                 </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="e:alignment/@horizontal"/>
+                </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
           </style:paragraph-properties>
