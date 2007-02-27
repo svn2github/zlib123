@@ -57,14 +57,14 @@
   
   <!-- template which inserts a string into sharedstrings -->
   <xsl:template name="InsertString">    
-    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[@office:value-type='string']/text:p">
+    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[child::text:p and @office:value-type='string']">
       <si>
         <xsl:choose>
-          <xsl:when test="text:span">
+          <xsl:when test="text:span|text:p/text:span">
             <xsl:apply-templates mode="run"/>
           </xsl:when>
           <xsl:otherwise>
-            <t><xsl:value-of select="."/></t>
+            <t><xsl:apply-templates mode="text"/></t>
           </xsl:otherwise>
         </xsl:choose>
       </si>
@@ -84,6 +84,23 @@
   <r>
     <t><xsl:value-of select="."/></t>
   </r>  
+  </xsl:template>
+  
+  <xsl:template match="text()" mode="text">
+    <xsl:value-of select="."/>
+  </xsl:template>
+  
+  <!-- when there are more than one line of text, enter must be added -->
+  <xsl:template match="text:p[preceding-sibling::text:p]" mode="run">
+    <r>
+      <t><xsl:value-of select="'&#xA;'"/></t>
+    </r>
+    <xsl:apply-templates mode="run"/>
+  </xsl:template>
+  
+  <xsl:template match="text:p[preceding-sibling::text:p]" mode="text">
+    <xsl:value-of select="'&#xA;'"/>                                                                 
+    <xsl:apply-templates mode="text"/>
   </xsl:template>
   
 </xsl:stylesheet>
