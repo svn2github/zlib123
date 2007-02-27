@@ -563,9 +563,9 @@
       
       <!-- insert cell style number-->
       <xsl:if test="@table:style-name">
-        <xsl:for-each select="key('style',@table:style-name)/style:text-properties">
+        <xsl:for-each select="key('style',@table:style-name)">
           <xsl:attribute name="s">
-            <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
+            <xsl:number count="style:style[@style:family='table-cell']"
               level="any"/>
           </xsl:attribute>
         </xsl:for-each>

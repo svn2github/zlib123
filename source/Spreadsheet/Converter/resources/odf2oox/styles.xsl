@@ -118,7 +118,7 @@
         <cellXfs>
             <xsl:attribute name="count">
                 <xsl:value-of
-                    select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1"
+                    select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
                 />
             </xsl:attribute>
 
@@ -127,7 +127,7 @@
 
             <xsl:apply-templates
                 select="document('content.xml')/office:document-content/office:automatic-styles"
-                mode="applyFont"/>
+                mode="cellFormats"/>
         </cellXfs>
     </xsl:template>
 
@@ -179,13 +179,21 @@
         </xsl:if>
     </xsl:template>
 
-    <xsl:template match="style:text-properties[parent::node()/@style:family='table-cell']"
-        mode="applyFont">
-        <xf numFmtId="0" fillId="0" borderId="0" xfId="0" applyFont="1">
-            <xsl:attribute name="fontId">
-                <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
+    <xsl:template match="style:style[@style:family='table-cell']" mode="cellFormats">
+        <xf numFmtId="0" fillId="0" borderId="0" xfId="0">
+            <!-- font -->
+            <xsl:if test="style:text-properties">
+                <xsl:attribute name="applyFont">
+                    <xsl:text>1</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="fontId">
+                    <!-- change referencing node to style:text-properties and count-->
+                    <xsl:for-each select="style:text-properties">
+                        <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
                     level="any"/>
-            </xsl:attribute>
+                    </xsl:for-each>
+                </xsl:attribute>
+            </xsl:if>
         </xf>
     </xsl:template>
 
