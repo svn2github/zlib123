@@ -34,6 +34,7 @@
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
 
   <xsl:import href="measures.xsl"/>
@@ -89,6 +90,36 @@
           </xsl:when>
           <xsl:otherwise>13</xsl:otherwise>
         </xsl:choose>
+      </xsl:variable>
+      
+      <!-- get default font size -->
+      <xsl:variable name="baseFontSize">
+        <xsl:choose>
+          <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
+            <xsl:value-of select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"/>
+          </xsl:when>
+          <xsl:otherwise>10</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="defaultFontSize">
+        <xsl:choose>
+          <xsl:when test="contains($baseFontSize,'pt')">
+            <xsl:value-of select="substring-before($baseFontSize,'pt')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$baseFontSize"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+      <!-- compute default column width -->
+      <xsl:variable name="defaultColWidth">
+        <xsl:call-template name="ConvertToCharacters">
+          <xsl:with-param name="width">
+            <xsl:value-of select="concat('0.8925','in')"/>
+          </xsl:with-param>
+          <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+        </xsl:call-template>    
       </xsl:variable>
 
       <!-- insert cursor position -->
@@ -152,7 +183,7 @@
         </sheetView>
       </sheetViews>
       
-      <sheetFormatPr defaultColWidth="12.40909090909091" defaultRowHeight="{$defaultRowHeight}"
+      <sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}"
         customHeight="true"/>
       <xsl:if test="table:table-column">
         <cols>
@@ -160,6 +191,7 @@
           <!-- insert first column -->
           <xsl:apply-templates select="table:table-column[1]" mode="sheet">
             <xsl:with-param name="colNumber">1</xsl:with-param>
+            <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
           </xsl:apply-templates>
 
         </cols>
@@ -185,6 +217,7 @@
   <!-- insert column properties into sheet -->
   <xsl:template match="table:table-column" mode="sheet">
     <xsl:param name="colNumber"/>
+    <xsl:param name="defaultFontSize"/>
     <col min="{$colNumber}">
       <xsl:attribute name="max">
         <xsl:choose>
@@ -201,19 +234,14 @@
       <xsl:if
         test="key('style',@table:style-name)/style:table-column-properties/@style:column-width">
         <xsl:attribute name="width">
-          <xsl:variable name="pixelWidth">
-            <xsl:call-template name="pixel-measure">
-              <xsl:with-param name="length">
+          <xsl:call-template name="ConvertToCharacters">
+            <xsl:with-param name="width">
                 <xsl:value-of
                   select="key('style',@table:style-name)/style:table-column-properties/@style:column-width"
                 />
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="fontSize">
-            <xsl:text>11</xsl:text>
-          </xsl:variable>
-          <xsl:value-of select="($pixelWidth+5) div (2 div 3 * $fontSize)"/>
+            </xsl:with-param>
+            <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+          </xsl:call-template>
         </xsl:attribute>
         <xsl:attribute name="customWidth">1</xsl:attribute>
       </xsl:if>
@@ -236,6 +264,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:with-param>
+        <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
       </xsl:apply-templates>
     </xsl:if>
 

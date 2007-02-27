@@ -90,4 +90,18 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- template to convert column width -->
+  <xsl:template name="ConvertToCharacters">
+    <xsl:param name="width"/>
+    <xsl:param name="defaultFontSize"/>
+    <xsl:variable name="pixelWidth">
+      <xsl:call-template name="pixel-measure">
+        <xsl:with-param name="length">
+          <xsl:value-of select="$width"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="($pixelWidth+5) div (2 div 3 * $defaultFontSize)"/>
+  </xsl:template>
+  
 </xsl:stylesheet>
