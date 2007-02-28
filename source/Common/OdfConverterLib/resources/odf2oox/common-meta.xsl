@@ -26,7 +26,7 @@
         <!-- creation date -->
         <xsl:apply-templates select="meta:creation-date"/>
         <!-- creator -->
-        <xsl:apply-templates select="meta:initial-creator"/>  
+        <xsl:apply-templates select="meta:initial-creator"/>
         <!-- description -->
         <xsl:apply-templates select="dc:description"/>
         <!-- identifier -->
@@ -79,7 +79,7 @@
     </xsl:template>
 
     <!-- initial creator -->
-    <xsl:template match="meta:inital-creator">
+    <xsl:template match="meta:initial-creator">
         <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">
             <xsl:value-of select="."/>
         </dc:creator>
