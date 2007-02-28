@@ -33,7 +33,7 @@
   exclude-result-prefixes="oox e r">
 
   <xsl:import href="content.xsl"/>
-  <xsl:import href="meta.xsl"/>
+  <xsl:import href="common-meta.xsl"/>
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="settings.xsl"/>
   <xsl:import href="common.xsl"/>

@@ -30,6 +30,7 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   exclude-result-prefixes="odf style text number">
 
@@ -38,7 +39,7 @@
   <xsl:import href="odf2oox-compute-size.xsl"/>
   <xsl:import href="contentTypes.xsl"/>
   <xsl:import href="package_relationships.xsl"/>
-  <xsl:import href="docprops.xsl"/>
+  <xsl:import href="common-meta.xsl"/>
   <xsl:import href="part_relationships.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="merge_cell.xsl"/>
@@ -178,5 +179,13 @@
     </pzip:archive>
   </xsl:template>
 
-
+ <xsl:template name="docprops-app">
+   <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
+     xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
+     xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <xsl:call-template name="GetDocSecurityExtendedProperty"/>
+   <xsl:call-template name="GetApplicationExtendedProperty"/>
+  </Properties>
+</xsl:template>
+  
 </xsl:stylesheet>
