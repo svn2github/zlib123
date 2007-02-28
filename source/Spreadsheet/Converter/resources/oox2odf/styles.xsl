@@ -184,6 +184,16 @@
               <xsl:with-param name="length" select="concat(@ht,'pt')"/>
             </xsl:call-template>
           </xsl:attribute>
+          <xsl:attribute name="style:use-optimal-row-height">
+            <xsl:choose>
+              <xsl:when test="@customHeight">
+                <xsl:text>false</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>true</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
         </style:table-row-properties>
       </style:style>
     </xsl:if>
