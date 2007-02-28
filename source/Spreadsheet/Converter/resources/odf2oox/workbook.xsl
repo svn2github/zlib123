@@ -36,6 +36,7 @@
     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
     
   <xsl:import href="worksheets.xsl"/>
+  <xsl:import href="cell.xsl"/>
   <xsl:import href="sharedStrings.xsl"/>
   
 
