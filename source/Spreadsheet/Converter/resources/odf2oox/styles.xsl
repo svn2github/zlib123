@@ -193,18 +193,21 @@
       <!-- text -alignment -->
       <!-- 1st 'or' - horizontal alignment
             2nd 'or' - horizontal alignment 'fill'
-             3rd 'or' - vertical alignment -->
+             3rd 'or' - vertical alignment 
+             4th 'or' - angle oriented text
+             5th 'or' - vertically stacked text-->
       <xsl:if
-        test="style:paragraph-properties/@fo:text-align or style:table-cell-properties/@style:repeat-content = 'true' or style:table-cell-properties/@style:vertical-align">
+        test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true') or (style:table-cell-properties/@style:vertical-align) or (style:table-cell-properties/@style:rotation-angle) or (style:table-cell-properties/@style:direction='ttb') ">
         <xsl:attribute name="applyAlignment">
           <xsl:text>1</xsl:text>
         </xsl:attribute>
         <alignment>
           <!-- horizontal alignment -->
           <!-- 1st 'or' - horizontal alignment 
-                 2nd 'or' - horizontal alignment 'fill' -->
+                2nd 'or' - horizontal alignment 'fill' 
+          -->
           <xsl:if
-            test="style:paragraph-properties/@fo:text-align or style:table-cell-properties/@style:repeat-content = 'true' ">
+            test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true')">
             <xsl:attribute name="horizontal">
               <xsl:choose>
                 <xsl:when test="style:table-cell-properties/@style:repeat-content = 'true' ">
@@ -227,6 +230,31 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
+          </xsl:if>          
+          <!-- change default horizontal alignment-->
+          <xsl:if test="not(style:paragraph-properties/@fo:text-align)">
+            <xsl:choose>
+            <!-- change default horizontal alignment  of vertically stacked text to 'left' -->
+            <xsl:when
+              test="style:table-cell-properties/@style:direction='ttb' ">
+              <xsl:attribute name="horizontal">
+              <xsl:text>left</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            <!-- change default horizontal alignment of angle oriented text when angle equals -90 degrees -->
+            <xsl:when
+              test="style:table-cell-properties/@style:rotation-angle = 270">
+              <xsl:attribute name="horizontal">
+                <xsl:text>right</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            <!-- change default alignment of angle oriented text when angle equals (-90,0) degrees or (0,90) degrees -->                  
+            <xsl:when test="((style:table-cell-properties/@style:rotation-angle &lt; 90 and style:table-cell-properties/@style:rotation-angle &gt; 0) or style:table-cell-properties/@style:rotation-angle &gt; 270)">
+              <xsl:attribute name="horizontal">
+                <xsl:text>center</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            </xsl:choose>
           </xsl:if>
 
           <!-- vertical-alignment -->
@@ -246,6 +274,29 @@
             </xsl:attribute>
           </xsl:if>
 
+          <!-- text rotation -->
+          <xsl:if
+            test="(style:table-cell-properties/@style:rotation-angle and style:table-cell-properties/@style:rotation-angle != '0') or style:table-cell-properties/@style:direction='ttb' ">
+            <xsl:attribute name="textRotation">
+              <xsl:choose>
+                <!-- ascending text angle -->
+                <xsl:when
+                  test="style:table-cell-properties/@style:rotation-angle &lt; 91 and not(style:table-cell-properties/@style:direction='ttb')">
+                  <xsl:value-of select="style:table-cell-properties/@style:rotation-angle"/>
+                </xsl:when>
+                <!-- descending text angle -->
+                <xsl:when test="style:table-cell-properties/@style:rotation-angle &gt; 269">
+                  <xsl:value-of select="450 - style:table-cell-properties/@style:rotation-angle"/>
+                </xsl:when>
+                <xsl:when test="style:table-cell-properties/@style:direction='ttb' ">
+                  <xsl:text>255</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>0</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
         </alignment>
       </xsl:if>
     </xf>
