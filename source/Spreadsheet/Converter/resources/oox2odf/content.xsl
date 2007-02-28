@@ -108,16 +108,19 @@
       <xsl:when test="not(document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row/e:c/e:v)">
         <table:table-row
           table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
-          table:number-rows-repeated="65535">
+          table:number-rows-repeated="65536">
           <table:table-cell/>
         </table:table-row>
       </xsl:when>
       <xsl:otherwise>
+        <!-- it is necessary when sheet has different default row height -->
+        <xsl:if test="65536 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r &gt; 0">
         <table:table-row
           table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
-          table:number-rows-repeated="{65535 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r}">
+          table:number-rows-repeated="{65536 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
