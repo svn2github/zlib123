@@ -370,13 +370,29 @@
       </xsl:attribute>
 
       <!-- insert cell style number-->
-      <xsl:if test="@table:style-name">
-        <xsl:for-each select="key('style',@table:style-name)">
-          <xsl:attribute name="s">
-            <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-          </xsl:attribute>
-        </xsl:for-each>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="@table:style-name">
+          <xsl:for-each select="key('style',@table:style-name)">
+            <xsl:attribute name="s">
+              <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+            </xsl:attribute>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="columnCellStyle">
+            <xsl:call-template name="GetColumnCellStyle">
+              <xsl:with-param name="colNum">
+                <xsl:value-of select="$colNumber + 1"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:for-each select="key('style',$columnCellStyle)">
+            <xsl:attribute name="s">
+              <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+            </xsl:attribute>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <!-- convert cell type -->
       <xsl:if test="child::text:p">
@@ -402,6 +418,37 @@
         </xsl:choose>
       </xsl:if>
     </c>
+  </xsl:template>
+
+  <xsl:template name="GetColumnCellStyle">
+    <xsl:param name="colNum"/>
+    <xsl:param name="table-column_tagNum" select="1"/>
+    <xsl:param name="column" select="1"/>
+
+    <xsl:choose>
+      <xsl:when test="$colNum = $column or ($colNum &lt; $column + ancestor::table:table/table:table-column[$table-column_tagNum]/@table:number-columns-repeated)">
+        <xsl:value-of select="ancestor::table:table/table:table-column[$table-column_tagNum]/@table:default-cell-style-name"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="GetColumnCellStyle">
+          <xsl:with-param name="colNum" select="$colNum"/>
+          <xsl:with-param name="table-column_tagNum" select="$table-column_tagNum + 1"/>
+          <xsl:with-param name="column">
+            <xsl:choose>
+              <xsl:when
+                test="ancestor::table:table/table:table-column[$table-column_tagNum]/@table:number-columns-repeated">
+                <xsl:value-of
+                  select="$column + ancestor::table:table/table:table-column[$table-column_tagNum]/@table:number-columns-repeated"
+                />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$column +1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
