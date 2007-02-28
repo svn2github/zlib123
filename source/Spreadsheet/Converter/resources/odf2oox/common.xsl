@@ -101,7 +101,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:value-of select="($pixelWidth+5) div (2 div 3 * $defaultFontSize)"/>
+    <xsl:value-of select="($pixelWidth) div round(2 div 3 * $defaultFontSize)"/>
   </xsl:template>
   
 </xsl:stylesheet>

@@ -487,11 +487,11 @@
 
     <!-- for proportional fonts average digit width is 2/3 of font size-->
     <xsl:variable name="avgDigitWidth">
-      <xsl:value-of select="$defaultFontSize * 2 div 3"/>
+      <xsl:value-of select="round($defaultFontSize * 2 div 3)"/>
     </xsl:variable>
     <xsl:call-template name="ConvertToCentimeters">
       <xsl:with-param name="length">
-        <xsl:value-of select="concat(($avgDigitWidth * $value) - 5,'px')"/>
+        <xsl:value-of select="concat(($avgDigitWidth * $value),'px')"/>
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
