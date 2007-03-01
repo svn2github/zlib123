@@ -372,7 +372,7 @@
   <!-- convert run properties into span style -->
   <xsl:template match="e:r" mode="automaticstyles">
     <style:style style:name="{generate-id(.)}" style:family="text">
-      <style:text-properties>
+      <style:text-properties fo:font-weight="normal" fo:font-style="normal" style:text-underline-type="none">
         <xsl:apply-templates select="e:rPr" mode="style"/>
       </style:text-properties>
     </style:style>
