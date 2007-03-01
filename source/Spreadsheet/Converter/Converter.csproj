@@ -44,7 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="resources\odf2oox\contentTypes.xsl" />
-    <EmbeddedResource Include="resources\odf2oox\docprops.xsl" />
     <EmbeddedResource Include="resources\odf2oox\odf2oox-compute-size.xsl" />
     <EmbeddedResource Include="resources\odf2oox\odf2oox.xsl" />
     <EmbeddedResource Include="resources\odf2oox\package_relationships.xsl" />
@@ -57,7 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
-    <EmbeddedResource Include="resources\oox2odf\meta.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
     <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
