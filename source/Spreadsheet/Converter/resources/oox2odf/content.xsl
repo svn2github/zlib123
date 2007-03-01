@@ -114,12 +114,13 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- it is necessary when sheet has different default row height -->
-        <xsl:if test="65536 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r &gt; 0">
-        <table:table-row
-          table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
-          table:number-rows-repeated="{65536 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r}">
-          <table:table-cell table:number-columns-repeated="256"/>
-        </table:table-row>
+        <xsl:if
+          test="65536 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r &gt; 0">
+          <table:table-row
+            table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+            table:number-rows-repeated="{65536 - document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[last()]/@r}">
+            <table:table-cell table:number-columns-repeated="256"/>
+          </table:table-row>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
@@ -489,11 +490,19 @@
     <xsl:variable name="avgDigitWidth">
       <xsl:value-of select="round($defaultFontSize * 2 div 3)"/>
     </xsl:variable>
-    <xsl:call-template name="ConvertToCentimeters">
-      <xsl:with-param name="length">
-        <xsl:value-of select="concat(($avgDigitWidth * $value),'px')"/>
-      </xsl:with-param>
-    </xsl:call-template>
+
+    <xsl:choose>
+      <xsl:when test="$avgDigitWidth * $value = 0">
+        <xsl:text>0cm</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="ConvertToCentimeters">
+          <xsl:with-param name="length">
+            <xsl:value-of select="concat(($avgDigitWidth * $value),'px')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
