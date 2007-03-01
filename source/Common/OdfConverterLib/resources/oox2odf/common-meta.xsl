@@ -19,42 +19,42 @@
                             select="$app-version"/></xsl:if></meta:generator>
                 <!-- title -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dc:title"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dc:title" mode="meta"/>
                 <!-- description -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dc:description"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dc:description" mode="meta"/>
                 <!-- creator -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dc:creator"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dc:creator" mode="meta"/>
                 <!-- creation date -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dcterms:created"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dcterms:created" mode="meta"/>
                 <!-- last modifier -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/cp:lastModifiedBy"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/cp:lastModifiedBy" mode="meta"/>
                 <!-- last modification date -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dcterms:modified"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dcterms:modified" mode="meta"/>
                 <!-- last print date -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/cp:lastPrinted"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/cp:lastPrinted" mode="meta"/>
                 <!-- subject -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dc:subject"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dc:subject" mode="meta"/>
                 <!-- editing time -->
-                <xsl:apply-templates select="document('docProps/core.xml')/Properties/TotalTime"/>
+                <xsl:apply-templates select="document('docProps/core.xml')/Properties/TotalTime" mode="meta"/>
                 <!-- revision number -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/cp:revision"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/cp:revision" mode="meta"/>
                 <!-- custom properties-->
                 <xsl:apply-templates
-                    select="document('docProps/custom.xml')/cust-p:Properties/cust-p:property"/>
+                    select="document('docProps/custom.xml')/cust-p:Properties/cust-p:property" mode="meta"/>
                 <!-- keywords -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/cp:keywords"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/cp:keywords" mode="meta"/>
                 <!-- language -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dc:language"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dc:language" mode="meta"/>
 
                 <!-- document statistics -->
                 <xsl:call-template name="GetDocumentStatistics"/>
@@ -63,63 +63,63 @@
     </xsl:template>
 
     <!-- title -->
-    <xsl:template match="dc:title">
+    <xsl:template match="dc:title" mode="meta">
         <dc:title>
             <xsl:value-of select="."/>
         </dc:title>
     </xsl:template>
 
     <!-- description -->
-    <xsl:template match="dc:description">
+    <xsl:template match="dc:description" mode="meta">
         <dc:description>
             <xsl:value-of select="."/>
         </dc:description>
     </xsl:template>
 
     <!-- creator -->
-    <xsl:template match="dc:creator">
+    <xsl:template match="dc:creator" mode="meta">
         <meta:initial-creator>
             <xsl:value-of select="."/>
         </meta:initial-creator>
     </xsl:template>
 
     <!-- creation date -->
-    <xsl:template match="dcterms:created">
+    <xsl:template match="dcterms:created" mode="meta">
         <meta:creation-date>
             <xsl:value-of select="."/>
         </meta:creation-date>
     </xsl:template>
 
     <!-- last modifier -->
-    <xsl:template match="cp:lastModifiedBy">
+    <xsl:template match="cp:lastModifiedBy" mode="meta">
         <dc:creator>
             <xsl:value-of select="."/>
         </dc:creator>
     </xsl:template>
 
     <!-- last modification date -->
-    <xsl:template match="dcterms:modified">
+    <xsl:template match="dcterms:modified" mode="meta">
         <dc:date>
             <xsl:value-of select="."/>
         </dc:date>
     </xsl:template>
 
     <!-- last print date -->
-    <xsl:template match="cp:lastPrinted">
+    <xsl:template match="cp:lastPrinted" mode="meta">
         <meta:print-date>
             <xsl:value-of select="."/>
         </meta:print-date>
     </xsl:template>
 
     <!-- subject -->
-    <xsl:template match="dc:subject">
+    <xsl:template match="dc:subject" mode="meta">
         <dc:subject>
             <xsl:value-of select="."/>
         </dc:subject>
     </xsl:template>
 
     <!-- editing time -->
-    <xsl:template match="TotalTime">
+    <xsl:template match="TotalTime" mode="meta">
         <meta:editing-duration>
             <xsl:choose>
                 <xsl:when test=". &gt; 60">
@@ -146,14 +146,14 @@
 
 
     <!-- revision number -->
-    <xsl:template match="cp:revision">
+    <xsl:template match="cp:revision" mode="meta">
         <meta:editing-cycles>
             <xsl:value-of select="."/>
         </meta:editing-cycles>
     </xsl:template>
 
     <!-- custom properties-->
-    <xsl:template match="cust-p:property">
+    <xsl:template match="cust-p:property" mode="meta">
         <xsl:for-each select=".">
             <meta:user-defined meta:name="{@name}">
                 <xsl:attribute name="meta:type">
@@ -175,14 +175,14 @@
     </xsl:template>
 
     <!-- keywords -->
-    <xsl:template match="cp:keywords">
+    <xsl:template match="cp:keywords" mode="meta">
         <meta:keyword>
             <xsl:value-of select="."/>
         </meta:keyword>
     </xsl:template>
 
     <!-- language -->
-    <xsl:template match="dc:language">
+    <xsl:template match="dc:language" mode="meta">
         <dc:language>
             <xsl:value-of select="."/>
         </dc:language>

@@ -13,51 +13,51 @@
                 mode="core"/>
         </cp:coreProperties>
     </xsl:template>
-    
+
     <xsl:template name="docprops-custom">
         <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta"
             mode="custom"/>
     </xsl:template>
-    
+
     <xsl:template match="/office:document-meta/office:meta" mode="core">
         <!-- report lost properties -->
-        <xsl:apply-templates select="meta:auto-reload"/>
-        <xsl:apply-templates select="meta:hyperlink-behaviour"/>
+        <xsl:apply-templates select="meta:auto-reload" mode="core"/>
+        <xsl:apply-templates select="meta:hyperlink-behaviour" mode="core"/>
         <!-- creation date -->
-        <xsl:apply-templates select="meta:creation-date"/>
+        <xsl:apply-templates select="meta:creation-date" mode="core"/>
         <!-- creator -->
-        <xsl:apply-templates select="meta:initial-creator"/>
+        <xsl:apply-templates select="meta:initial-creator" mode="core"/>
         <!-- description -->
-        <xsl:apply-templates select="dc:description"/>
+        <xsl:apply-templates select="dc:description" mode="core"/>
         <!-- identifier -->
-        <xsl:apply-templates select="dc:identifier"/>
+        <xsl:apply-templates select="dc:identifier" mode="core"/>
         <!-- keywords -->
         <xsl:call-template name="MetaKeywords"/>
         <!-- language -->
-        <xsl:apply-templates select="dc:language"/>
+        <xsl:apply-templates select="dc:language" mode="core"/>
         <!-- last modification author -->
-        <xsl:apply-templates select="dc:creator"/>
+        <xsl:apply-templates select="dc:creator" mode="core"/>
         <!-- last printing -->
-        <xsl:apply-templates select="meta:printed-date"/>
+        <xsl:apply-templates select="meta:printed-date" mode="core"/>
         <!-- last modification date -->
-        <xsl:apply-templates select="dc:date"/>
+        <xsl:apply-templates select="dc:date" mode="core"/>
         <!-- number of times it was saved -->
-        <xsl:apply-templates select="meta:editing-cycles"/>
+        <xsl:apply-templates select="meta:editing-cycles" mode="core"/>
         <!-- topic -->
-        <xsl:apply-templates select="dc:subject"/>
+        <xsl:apply-templates select="dc:subject" mode="core"/>
         <!-- title -->
-        <xsl:apply-templates select="dc:title"/>
+        <xsl:apply-templates select="dc:title" mode="core"/>
     </xsl:template>
-    
+
     <xsl:template match="/office:document-meta/office:meta" mode="custom">
         <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
             xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
             <xsl:apply-templates select="meta:user-defined"/>
         </Properties>
     </xsl:template>
-    
+
     <!-- creation date -->
-    <xsl:template match="meta:creation-date">
+    <xsl:template match="meta:creation-date" mode="core">
         <xsl:variable name="dateIsValid">
             <xsl:call-template name="validateDate">
                 <xsl:with-param name="date">
@@ -79,21 +79,21 @@
     </xsl:template>
 
     <!-- initial creator -->
-    <xsl:template match="meta:initial-creator">
+    <xsl:template match="meta:initial-creator" mode="core">
         <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">
             <xsl:value-of select="."/>
         </dc:creator>
     </xsl:template>
 
     <!-- description -->
-    <xsl:template match="dc:description">
+    <xsl:template match="dc:description" mode="core">
         <dc:description xmlns:dc="http://purl.org/dc/elements/1.1/">
             <xsl:value-of select="."/>
         </dc:description>
     </xsl:template>
 
     <!-- identifier -->
-    <xsl:template match="dc:identifier">
+    <xsl:template match="dc:identifier" mode="core">
         <dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/">
             <xsl:value-of select="."/>
         </dc:identifier>
@@ -101,28 +101,28 @@
 
     <!-- keywords -->
     <xsl:template name="MetaKeywords">
-      <xsl:if test="/office:document-meta/office:meta/meta:keyword">
-        <cp:keywords
-           xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
-          <xsl:for-each select="/office:document-meta/office:meta/meta:keyword">
-            <xsl:if test="not(position() = 1)">
-              <xsl:text> </xsl:text>
-            </xsl:if>
-            <xsl:value-of select="."/>
-          </xsl:for-each>
-        </cp:keywords>
-      </xsl:if>
+        <xsl:if test="/office:document-meta/office:meta/meta:keyword">
+            <cp:keywords
+                xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+                <xsl:for-each select="/office:document-meta/office:meta/meta:keyword">
+                    <xsl:if test="not(position() = 1)">
+                        <xsl:text> </xsl:text>
+                    </xsl:if>
+                    <xsl:value-of select="."/>
+                </xsl:for-each>
+            </cp:keywords>
+        </xsl:if>
     </xsl:template>
 
     <!-- language -->
-    <xsl:template match="dc:language">
+    <xsl:template match="dc:language" mode="core">
         <dc:language xmlns:dc="http://purl.org/dc/elements/1.1/">
             <xsl:value-of select="."/>
         </dc:language>
     </xsl:template>
 
     <!-- last modification author -->
-    <xsl:template match="dc:creator">
+    <xsl:template match="dc:creator" mode="core">
         <cp:lastModifiedBy
             xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
             <xsl:value-of select="."/>
@@ -130,7 +130,7 @@
     </xsl:template>
 
     <!-- last printing -->
-    <xsl:template match="meta:printed-date">
+    <xsl:template match="meta:printed-date" mode="core">
         <cp:lastPrinted
             xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
             <xsl:value-of select="."/>
@@ -138,7 +138,7 @@
     </xsl:template>
 
     <!-- last modification date -->
-    <xsl:template match="dc:date">
+    <xsl:template match="dc:date" mode="core">
         <xsl:variable name="dateIsValid">
             <xsl:call-template name="validateDate">
                 <xsl:with-param name="date">
@@ -161,7 +161,7 @@
     </xsl:template>
 
     <!-- number of times it was saved -->
-    <xsl:template match="meta:editing-cycles">
+    <xsl:template match="meta:editing-cycles" mode="core">
         <cp:revision
             xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
             <xsl:value-of select="."/>
@@ -169,25 +169,25 @@
     </xsl:template>
 
     <!-- topic -->
-    <xsl:template match="dc:subject">
+    <xsl:template match="dc:subject" mode="core">
         <dc:subject xmlns:dc="http://purl.org/dc/elements/1.1/">
             <xsl:value-of select="."/>
         </dc:subject>
     </xsl:template>
 
     <!-- title -->
-    <xsl:template match="dc:title">
+    <xsl:template match="dc:title" mode="core">
         <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">
             <xsl:value-of select="."/>
         </dc:title>
     </xsl:template>
 
     <!-- report lost properties -->
-    <xsl:template match="meta:auto-reload">
+    <xsl:template match="meta:auto-reload" mode="core">
         <xsl:message terminate="no">translation.odf2oox.internetProperties</xsl:message>
     </xsl:template>
 
-    <xsl:template match="meta:hyperlink-behaviour">
+    <xsl:template match="meta:hyperlink-behaviour" mode="core">
         <xsl:message terminate="no">translation.odf2oox.internetProperties</xsl:message>
     </xsl:template>
 
@@ -292,7 +292,7 @@
         </xsl:if>
     </xsl:template>
 
-    
+
     <!-- characters with spaces statistics -->
     <xsl:template match="@meta:character-count">
         <CharactersWithSpaces
@@ -300,15 +300,16 @@
             <xsl:value-of select="."/>
         </CharactersWithSpaces>
     </xsl:template>
-    
+
     <!-- non whitespace character count statistics -->
     <xsl:template match="@meta:non-whitespace-character-count">
-        <Characters xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
+        <Characters
+            xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
             <xsl:value-of select="meta:document-statistic/@meta:non-whitespace-character-count"/>
         </Characters>
     </xsl:template>
-    
-    
+
+
     <!-- check if a date is valid regarding W3C format -->
     <xsl:template name="validateDate">
         <xsl:param name="date"/>
