@@ -444,12 +444,18 @@
   <xsl:template match="e:color" mode="style">
 
     <xsl:attribute name="fo:color">
+      <xsl:variable name="this" select="."/>
       <xsl:choose>
         <xsl:when test="@rgb">
           <xsl:value-of select="concat('#',substring(@rgb,3,9))"/>
         </xsl:when>
+        <xsl:when test="@indexed">
+          <xsl:variable name="color">
+            <xsl:value-of select="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]/@rgb"/>
+          </xsl:variable>
+          <xsl:value-of select="concat('#',substring($color,3,9))"/>
+        </xsl:when>
         <xsl:when test="@theme">
-          <xsl:variable name="this" select="."/>
           <xsl:variable name="color">
             <xsl:choose>
               <!-- if color is in 'sysClr' node -->
