@@ -53,6 +53,10 @@
     <EmbeddedResource Include="resources\odf2oox\source.xml" />
     <EmbeddedResource Include="resources\odf2oox\workbook.xsl" />
     <EmbeddedResource Include="resources\odf2oox\worksheets.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\cell.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\merge_cell.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\common.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
@@ -60,11 +64,9 @@
     <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
     <EmbeddedResource Include="resources\oox2odf\relationships.xsl" />
     <EmbeddedResource Include="resources\oox2odf\source.xml" />
-  </ItemGroup>
-  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\common.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\merge_cell.xsl" />
     <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
