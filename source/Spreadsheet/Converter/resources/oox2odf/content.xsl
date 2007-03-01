@@ -389,10 +389,101 @@
           <xsl:value-of select="generate-id(.)"/>
         </xsl:attribute>
       </xsl:if>
-      <xsl:value-of select="e:t"/>
+      <xsl:apply-templates/>
     </text:span>
   </xsl:template>
+  
+  <xsl:template match="e:t">    
+    <xsl:choose>
+      <!--check whether string contains  whitespace sequence-->
+      <xsl:when test="not(contains(., '  '))">
+        <xsl:value-of select="."/>
+      </xsl:when>
+      <xsl:otherwise>
+        <!--converts whitespaces sequence to text:s-->
+        <xsl:call-template name="InsertWhiteSpaces"/>
+      </xsl:otherwise>
+    </xsl:choose>    
+  </xsl:template>
 
+  <!--  convert multiple white spaces  -->
+  <xsl:template name="InsertWhiteSpaces">
+    <xsl:param name="string" select="."/>
+    <xsl:param name="length" select="string-length(.)"/>
+    <!-- string which doesn't contain whitespaces-->
+    <xsl:choose>
+      <xsl:when test="not(contains($string,' '))">
+        <xsl:value-of select="$string"/>
+      </xsl:when>
+      <!-- convert white spaces  -->
+      <xsl:otherwise>
+        <xsl:variable name="before">
+          <xsl:value-of select="substring-before($string,' ')"/>
+        </xsl:variable>
+        <xsl:variable name="after">
+          <xsl:call-template name="CutStartSpaces">
+            <xsl:with-param name="cuted">
+              <xsl:value-of select="substring-after($string,' ')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$before != '' ">
+          <xsl:value-of select="concat($before,' ')"/>
+        </xsl:if>
+        <!--add remaining whitespaces as text:s if there are any-->
+        <xsl:if test="string-length(concat($before,' ', $after)) &lt; $length ">
+          <xsl:choose>
+            <xsl:when test="($length - string-length(concat($before, $after))) = 1">
+              <text:s/>
+            </xsl:when>
+            <xsl:otherwise>
+              <text:s>
+                <xsl:attribute name="text:c">
+                  <xsl:choose>
+                    <xsl:when test="$before = ''">
+                      <xsl:value-of select="$length - string-length($after)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$length - string-length(concat($before,' ', $after))"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </text:s>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+        <!--repeat it for substring which has whitespaces-->
+        <xsl:if test="contains($string,' ') and $length &gt; 0">
+          <xsl:call-template name="InsertWhiteSpaces">
+            <xsl:with-param name="string">
+              <xsl:value-of select="$after"/>
+            </xsl:with-param>
+            <xsl:with-param name="length">
+              <xsl:value-of select="string-length($after)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!--  cut start spaces -->
+  <xsl:template name="CutStartSpaces">
+    <xsl:param name="cuted"/>
+    <xsl:choose>
+      <xsl:when test="starts-with($cuted,' ')">
+        <xsl:call-template name="CutStartSpaces">
+          <xsl:with-param name="cuted">
+            <xsl:value-of select="substring-after($cuted,' ')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$cuted"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <xsl:template name="InsertColumns">
     <xsl:param name="sheet"/>
 
