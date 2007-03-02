@@ -226,7 +226,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     this.ProceedSingleFile(this.input, this.output, this.transformDirection);
 
                     // close word if needed
-                    if (this.open)
+                    if (this.transformDirection == Direction.OdtToDocx && this.open)
                     {
                         word.Quit();
                     }
