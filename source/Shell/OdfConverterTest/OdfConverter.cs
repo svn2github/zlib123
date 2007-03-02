@@ -395,18 +395,18 @@ namespace CleverAge.OdfConverter.CommandLineTool
             else return NOT_VALIDATED_AND_NOT_OPENED;
         }
 
-        private bool ConvertFile(string input, string output, Direction transformDirection)
+        private bool ConvertFile(string input, string output, Direction direction)
         {
             try
             {
                 DateTime start = DateTime.Now;
-                AbstractConverter converter = ConverterFactory.Instance(this.transformDirection);
+                AbstractConverter converter = ConverterFactory.Instance(direction);
                 converter.ExternalResources = this.xslPath;
                 converter.SkipedPostProcessors = this.skipedPostProcessors;
                 converter.DirectTransform = 
-                    transformDirection == Direction.OdtToDocx 
-                    || transformDirection == Direction.OdpToPptx
-                    || transformDirection == Direction.OdsToXlsx;
+                    direction == Direction.OdtToDocx 
+                    || direction == Direction.OdpToPptx
+                    || direction == Direction.OdsToXlsx;
                 converter.Packaging = this.packaging;
                 converter.Transform(input, output);
                 TimeSpan duration = DateTime.Now - start;
