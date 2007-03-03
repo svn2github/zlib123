@@ -218,7 +218,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                 String odfFile = fd.SelectedItems.Item(i);
 
                 // create a temporary file
-                object fileName = this.addinLib.GetTempFileName(odfFile);
+                object fileName = this.addinLib.GetTempFileName(odfFile, ".docx");
 
                 this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
                 OdfToOox(odfFile, (string)fileName, true);

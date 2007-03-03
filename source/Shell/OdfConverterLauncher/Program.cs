@@ -130,7 +130,7 @@ namespace OdfConverterLauncher
                 try
                 {
                     bool showUserInterface = true;   
-                    string output = lib.GetTempFileName(input);
+                    string output = lib.GetTempFileName(input, ".docx");
                     word = new Word();
                     word.getLanguage();
                     lib.OdfToOox(input, output, showUserInterface);

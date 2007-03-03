@@ -285,8 +285,9 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         /// Build a temporary file.
         /// </summary>
         /// <param name="input">The orginal odf file name</param>
+        /// <param name="extension">temp file name extension</param>
         /// <returns>A temporary file name pointing to the user's \Temp folder</returns>
-        public string GetTempFileName(string input)
+        public string GetTempFileName(string input, string extension)
         {
             // Get the \Temp path
             string tempPath = Path.GetTempPath().ToString();
@@ -310,12 +311,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                 root = root.Substring(0, index);
             }
 
-            string output = tempPath + root + "_tmp.docx";
+            string output = tempPath + root + "_tmp" + extension;
             int i = 1;
 
             while (File.Exists(output) || Directory.Exists(output))
             {
-                output = tempPath + root + "_tmp" + i + ".docx";
+                output = tempPath + root + "_tmp" + i + extension;
                 i++;
             }
             return output;

@@ -78,7 +78,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Add-In\Addin.csproj">
       <Project>{CB7A2D8C-3159-4FCE-8256-2B7D450A462C}</Project>
-      <Name>Addin</Name>
+      <Name>Addin %28Word\Addin%29</Name>
     </ProjectReference>
   </ItemGroup>
   <ProjectExtensions>

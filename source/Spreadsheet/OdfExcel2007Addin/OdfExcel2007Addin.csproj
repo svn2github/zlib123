@@ -4,11 +4,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{82DF891A-E0DE-42CB-9941-AF0DFBCDCCDF}</ProjectGuid>
+    <ProjectGuid>{44851BA9-366B-4DAB-BB05-9E4CF24601AA}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <StartupObject>
+    </StartupObject>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>OdfWord2003Addin</AssemblyName>
-    <RootNamespace>CleverAge.OdfConverter.OdfWord2003Addin</RootNamespace>
+    <AssemblyName>OdfExcel2007Addin</AssemblyName>
+    <RootNamespace>CleverAge.OdfConverter.OdfExcel2007Addin</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,23 +34,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Extensibility, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.Office.Interop.Word, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Microsoft.Office.Interop.Word.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Vbe.Interop, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Microsoft.Vbe.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="OFFICE, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\OFFICE.DLL</HintPath>
-    </Reference>
+    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System">
       <HintPath>System.dll</HintPath>
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data">
       <HintPath>System.Data.dll</HintPath>
       <Name>System.Data</Name>
@@ -68,34 +58,32 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ConverterInterface.cs" />
-    <Compile Include="DependencyChecker.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="DependencyChecker.Designer.cs">
-      <DependentUpon>DependencyChecker.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FrmPrerequisites.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FrmPrerequisites.Designer.cs">
-      <DependentUpon>FrmPrerequisites.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="FrmPrerequisites.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>FrmPrerequisites.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="Error.PNG" />
-    <None Include="ImageInstaller.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>4</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>6</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\OdfAddinLib\OdfAddinLib.csproj">
@@ -106,14 +94,23 @@
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Add-In\Addin.csproj">
-      <Project>{CB7A2D8C-3159-4FCE-8256-2B7D450A462C}</Project>
-      <Name>Addin %28Word\Addin%29</Name>
+    <ProjectReference Include="..\Addin\Addin.csproj">
+      <Project>{792B426E-9ED5-414C-9853-98137AE0CC50}</Project>
+      <Name>Addin %28Spreadsheet\Addin%29</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\customUI.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
 </Project>

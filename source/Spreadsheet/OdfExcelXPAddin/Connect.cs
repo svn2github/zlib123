@@ -25,8 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-namespace CleverAge.OdfConverter.OdfWordXPAddin
+namespace CleverAge.OdfConverter.OdfExcelXPAddin
 {
     using System;
     using System.Reflection;
@@ -36,66 +35,29 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
     using Extensibility;
     using System.Runtime.InteropServices;
     using System.Collections;
-    using MSword = Microsoft.Office.Interop.Word;
+    using MSExcel = Microsoft.Office.Interop.Excel;
     using CleverAge.OdfConverter.OdfConverterLib;
-    using CleverAge.OdfConverter.OdfWordAddinLib;
+    using CleverAge.OdfConverter.OdfExcelAddinLib;
 
-    #region Read me for Add-in installation and setup information.
-    // When run, the Add-in wizard prepared the registry for the Add-in.
-    // At a later time, if the Add-in becomes unavailable for reasons such as:
-    //   1) You moved this project to a computer other than which is was originally created on.
-    //   2) You chose 'Yes' when presented with a message asking if you wish to remove the Add-in.
-    //   3) Registry corruption.
-    // you will need to re-register the Add-in by building the OdfWordXPAddinSetup project, 
-    // right click the project in the Solution Explorer, then choose install.
-    #endregion
-
-
-
-
-    /// <summary>
-    ///   The object for implementing an Add-in.
-    /// </summary>
-    /// <seealso class='IDTExtensibility2' />
-    [GuidAttribute("A77A8471-D758-457E-BD12-03E9FCBF25F4"), ProgId("OdfWordXPAddin.Connect")]
-    public class Connect : Object, Extensibility.IDTExtensibility2, IOdfConverter
+	#region Read me for Add-in installation and setup information.
+	// When run, the Add-in wizard prepared the registry for the Add-in.
+	// At a later time, if the Add-in becomes unavailable for reasons such as:
+	//   1) You moved this project to a computer other than which is was originally created on.
+	//   2) You chose 'Yes' when presented with a message asking if you wish to remove the Add-in.
+	//   3) Registry corruption.
+	// you will need to re-register the Add-in by building the OdfExcelXPAddinSetup project, 
+	// right click the project in the Solution Explorer, then choose install.
+	#endregion
+	
+	/// <summary>
+	///   The object for implementing an Add-in.
+	/// </summary>
+	/// <seealso class='IDTExtensibility2' />
+    [GuidAttribute("267FE118-B41F-491A-BFE8-9781766BF6F4"), ProgId("OdfExcelXPAddin.Connect")]
+    public class Connect : Object, Extensibility.IDTExtensibility2
     {
-
-        private string DialogBoxTitle = "ODF Converter";
-
-        /// <summary>
-        /// Class name for Word12 documents
-        /// </summary>
-        private const string Word12Class = "Word12";
-
-        /// <summary>
-        /// Format Id for Word12 documents in current configuration
-        /// </summary>
-        private int Word12SaveFormat = -1;
-
-        /// <summary>
-        /// Initializes Word12Format field
-        /// </summary>
-        private void FindWord12SaveFormat()
-        {
-            try
-            {
-                MSword.FileConverters converters = this.applicationObject.FileConverters;
-                foreach (MSword.FileConverter converter in converters)
-                {
-                    if (converter.ClassName == Word12Class)
-                    {
-                        // Converter found
-                        Word12SaveFormat = converter.SaveFormat;
-                        break;
-                    }
-                }
-            }
-            catch
-            {
-                // No user disturbance...
-            }
-        }
+        private const int xlOpenXMLWorkbook = 51; // ".xslx" file format
+        private string DialogBoxTitle;
 
         /// <summary>
         ///		Implements the constructor for the Add-in object.
@@ -103,7 +65,7 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
         /// </summary>
         public Connect()
         {
-            this.addinLib = new CleverAge.OdfConverter.Word.Addin();
+            this.addinLib = new CleverAge.OdfConverter.Spreadsheet.Addin();
         }
 
         /// <summary>
@@ -122,11 +84,11 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
         /// <seealso class='IDTExtensibility2' />
         public void OnConnection(object application, Extensibility.ext_ConnectMode connectMode, object addInInst, ref System.Array custom)
         {
-            this.applicationObject = (MSword.Application)application;
+            this.applicationObject = (MSExcel.Application)application;
             // set culture to match current application culture or user's choice
             int culture = 0;
             string languageVal = Microsoft.Win32.Registry
-                .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Word", "Language", null) as string;
+                .GetValue(@"HKEY_CURRENT_USER\Software\Clever Age\Odf Add-in for Excel", "Language", null) as string;
             if (languageVal != null)
             {
                 int.TryParse(languageVal, out culture);
@@ -139,14 +101,12 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
             System.Threading.Thread.CurrentThread.CurrentUICulture =
                 new System.Globalization.CultureInfo(culture);
 
-            
-            FindWord12SaveFormat();
             this.DialogBoxTitle = addinLib.GetString("OdfConverterTitle");
-
             if (connectMode != Extensibility.ext_ConnectMode.ext_cm_Startup)
             {
                 OnStartupComplete(ref custom);
             }
+
         }
 
         /// <summary>
@@ -211,7 +171,7 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
             importButton.Caption = this.addinLib.GetString("OdfImportLabel");
             importButton.Tag = this.addinLib.GetString("OdfImportLabel");
             // set action
-            importButton.OnAction = "!<OdfWordXPAddin.Connect>";
+            importButton.OnAction = "!<OdfExcelXPAddin.Connect>";
             importButton.Visible = true;
             importButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.importButton_Click);
 
@@ -230,13 +190,10 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
             exportButton.Caption = this.addinLib.GetString("OdfExportLabel");
             exportButton.Tag = this.addinLib.GetString("OdfExportLabel");
             // set action
-            exportButton.OnAction = "!<OdfWordXPAddin.Connect>";
+            exportButton.OnAction = "!<OdfExcelXPAddin.Connect>";
             exportButton.Visible = true;
             exportButton.Enabled = true;
             exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
-
-            // Tell Word that the Normal.dot template should not be saved (unless the user later on makes it dirty)
-            applicationObject.NormalTemplate.Saved = true;
         }
 
         /// <summary>
@@ -255,17 +212,20 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
             button.Delete(Type.Missing);
             button = (CommandBarButton)applicationObject.CommandBars.FindControl(Type.Missing, Type.Missing, this.addinLib.GetString("OdfExportLabel"), Type.Missing);
             button.Delete(Type.Missing);
-            applicationObject.NormalTemplate.Save();
         }
 
+        /// <summary>
+        /// Read an ODF file
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
         private void importButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
         {
-            FileDialog fd = applicationObject.get_FileDialog(MsoFileDialogType.msoFileDialogFilePicker);
+            FileDialog fd = this.applicationObject.get_FileDialog(MsoFileDialogType.msoFileDialogFilePicker);
             // allow multiple file opening
             fd.AllowMultiSelect = true;
-            // add filter for ODT files
+            // add filter for ODS files
             fd.Filters.Clear();
-            fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.odt", Type.Missing);
+            fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.ods", Type.Missing);
             fd.Filters.Add(this.addinLib.GetString("AllFileType"), "*.*", Type.Missing);
             // set title
             fd.Title = this.addinLib.GetString("OdfImportLabel");
@@ -279,150 +239,161 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
                 String odfFile = fd.SelectedItems.Item(i);
 
                 // create a temporary file
-                object fileName = this.addinLib.GetTempFileName(odfFile, ".docx");
+                object fileName = this.addinLib.GetTempFileName(odfFile, ".xlsx");
 
-                this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
+               // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
                 OdfToOox(odfFile, (string)fileName, true);
-                this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorNormal;
+                // this.applicationObject.System.Cursor =  WdCursorType.wdCursorNormal;
 
                 try
                 {
-                    // open the document
+                    // open the workbook
                     object readOnly = true;
                     object addToRecentFiles = false;
                     object isVisible = true;
                     object openAndRepair = false;
-                    object missing = Type.Missing;
+                    object missing = Missing.Value;
 
                     // conversion may have been cancelled and file deleted.
                     if (File.Exists((string)fileName))
                     {
-                        Microsoft.Office.Interop.Word.Document doc = this.applicationObject.Documents.Open(ref fileName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref openAndRepair, ref missing, ref missing);
-
-                        // update document fields
-                        doc.Fields.Update();
-
-                        // and activate it
-                        doc.Activate();
+                        // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
+                        System.Globalization.CultureInfo ci;
+                        ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+                        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+                   
+                        Microsoft.Office.Interop.Excel.Workbook wb =
+                            this.applicationObject.Workbooks.Open((string) fileName, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+                        
+                        wb.Activate();
+                       
+                        System.Threading.Thread.CurrentThread.CurrentCulture = ci;
                     }
-                } 
+                }
                 catch (Exception ex)
                 {
-                	this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorNormal;
-                  	System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
-                   	System.Windows.Forms.MessageBox.Show(this.addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                  	return;
+                    // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorNormal;
+                    System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
+                    System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                    return;
                 }
             }
         }
 
+        /// <summary>
+        /// Save as ODF.
+        /// </summary>
+        /// <param name="control">An IRibbonControl instance</param>
         private void exportButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
         {
-            // 1. Check if Word12 converter is installed
-            if (Word12SaveFormat == -1)
+            // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
+            System.Globalization.CultureInfo ci;
+            ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+            try
             {
-                System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfConverterNotInstalled"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                return;
-            }
+                System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-            MSword.Document doc = this.applicationObject.ActiveDocument;
+                MSExcel.Workbook wb = this.applicationObject.ActiveWorkbook;
 
-            // the second test deals with blank documents 
-            // (which are in a 'saved' state and have no extension yet(?))
-            if (!doc.Saved || doc.FullName.IndexOf('.') < 0)
-            {
-                System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-            }
-            else
-            {
-                System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
-                // sfd.SupportMultiDottedExtensions = true;
-                sfd.AddExtension = true;
-                sfd.DefaultExt = "odt";
-                sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.odt)|*.odt|"
-                             + this.addinLib.GetString("AllFileType") + " (*.*)|*.*";
-                sfd.InitialDirectory = doc.Path;
-                sfd.OverwritePrompt = true;
-                sfd.Title = this.addinLib.GetString("OdfExportLabel");
-                string ext = '.' + sfd.DefaultExt;
-                sfd.FileName = doc.FullName.Substring(0, doc.FullName.LastIndexOf('.')) + ext;
-
-                // process the chosen documents	
-                if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
+                // the second test deals with blank workbooks
+                // (which are in a 'saved' state and have no extension yet(?))
+                if (!wb.Saved || wb.FullName.IndexOf('.') < 0)
                 {
-                    // name of the file to create
-                    string odfFileName = sfd.FileName;
-                    // multi dotted extensions support
-                    if (!odfFileName.Equals(ext))
-                    {
-                    	odfFileName += ext;
-                    }
-                    // name of the document to convert
-                    object sourceFileName = doc.FullName;
-                    // name of the temporary Word12 file created if current file is not already a Word12 document
-                    object tempDocxName = null;
-                    // store current cursor
-                    MSword.WdCursorType currentCursor = applicationObject.System.Cursor;
-                    // display hourglass
-                    this.applicationObject.System.Cursor = MSword.WdCursorType.wdCursorWait;
+                    System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                }
+                else
+                {
+                    System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+                    // sfd.SupportMultiDottedExtensions = true;
+                    sfd.AddExtension = true;
+                    sfd.DefaultExt = "ods";
+                    sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.ods)|*.ods|"
+                            + this.addinLib.GetString("AllFileType") + " (*.*)|*.*";
+                    sfd.InitialDirectory = wb.Path;
+                    sfd.OverwritePrompt = true;
+                    sfd.Title = this.addinLib.GetString("OdfExportLabel");
+                    string ext = '.' + sfd.DefaultExt;
+                    sfd.FileName = wb.FullName.Substring(0, wb.FullName.LastIndexOf('.')) + ext;
 
-
-                    if (doc.SaveFormat != Word12SaveFormat)
+                    // process the chosen workbooks	
+                    if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
                     {
-                        try
+                        // retrieve file name
+                        string odfFile = sfd.FileName;
+                        if (!odfFile.EndsWith(ext))
+                        { // multi dotted extension support
+                            odfFile += ext;
+                        }
+                        object initialName = wb.FullName;
+                        object tmpFileName = null;
+                        string xlsxFile = (string)initialName;
+
+                        //this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
+
+                        if ("xlOpenXMLWorkbook".Equals(wb.FileFormat.ToString()))
                         {
-                            // if file is not currently in Word12 format
-                            // 1. Create a copy
-                            // 2. Open it and do a "Save as Word12" (copy needed not to perturb current openened document
-                            // 3. Convert the Word12 copy to odf
-                            // 4. Remove both temporary created files
-
-                            // duplicate the file to keep current file "as is"
-                            object tempCopyName = Path.GetTempFileName() + Path.GetExtension((string)sourceFileName);
-                            File.Copy((string)sourceFileName, (string)tempCopyName);
+                            // duplicate the file
+                            object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
+                            File.Copy((string)initialName, (string)newName);
 
                             // open the duplicated file
                             object addToRecentFiles = false;
                             object readOnly = false;
                             object isVisible = false;
-                            object missing = Type.Missing;
-                            MSword.Document newDoc = this.applicationObject.Documents.Open(ref tempCopyName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing/*, ref missing*/);
+                            object missing = Missing.Value;
 
-                            // generate docx file from the duplicated file (under a temporary file)
-                            tempDocxName = Path.GetTempFileName();
-                            object word12 = Word12SaveFormat;
-                            newDoc.SaveAs(ref tempDocxName, ref word12, ref missing, ref missing, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing);
-
-                            // close and remove the duplicated file
-                            object saveChanges = false;
-                            newDoc.Close(ref saveChanges, ref missing, ref missing);
-                            File.Delete((string)tempCopyName);
-
-                            // Now the file to be converted is
-                            sourceFileName = tempDocxName;
+                            MSExcel.Workbook newWb = this.applicationObject.Workbooks.Open((string)newName, missing, readOnly, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+                            // generate xlsx file from the duplicated file (under a temporary file)
+                            tmpFileName = Path.GetTempFileName();
+                            try
+                            {
+                                newWb.SaveAs((string)tmpFileName, xlOpenXMLWorkbook, missing, missing, missing, missing, MSExcel.XlSaveAsAccessMode.xlNoChange, missing, missing, missing, missing, missing);
+                            }
+                            catch (Exception e)
+                            {
+                                // xlOpenXMLWorkbook file format not supported. Compatibility pack not installed.
+                                System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfConverterNotInstalled"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                                return;
+                            }
+                            finally
+                            {
+                                // close and remove the duplicated file
+                                newWb.Close(false, false, missing);
+                                try
+                                {
+                                    File.Delete((string)newName);
+                                }
+                                catch (IOException)
+                                {
+                                    // bug #1610099
+                                    // deletion failed : file currently used by another application.
+                                    // do nothing
+                                }
+                            }
+                            xlsxFile = (string)tmpFileName;
                         }
-                        catch (Exception ex)
+
+                        OoxToOdf(xlsxFile, odfFile, true);
+
+                        if (tmpFileName != null && File.Exists((string)tmpFileName))
                         {
-                            this.applicationObject.System.Cursor = currentCursor;
-                            System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
-                            System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfExportErrorTryDocxFirst"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                            return;
+                            File.Delete((string)tmpFileName);
                         }
                     }
-
-                    OoxToOdf((string)sourceFileName, odfFileName, true);
-
-                    if (tempDocxName != null && File.Exists((string)tempDocxName))
-                    {
-                        File.Delete((string)tempDocxName);
-                    }
-                    this.applicationObject.System.Cursor = currentCursor;
-
                 }
+            }
+            catch (Exception e)
+            {
+                // Need to catch a file format exception here.
+            }
+            finally
+            {
+                System.Threading.Thread.CurrentThread.CurrentCulture = ci;
             }
         }
 
-        private MSword.Application applicationObject;
+
+        private MSExcel.Application applicationObject;
         private OdfAddinLib addinLib;
         private CommandBarButton importButton, exportButton;
 
@@ -438,5 +409,6 @@ namespace CleverAge.OdfConverter.OdfWordXPAddin
         }
 
         #endregion
+    
     }
 }
