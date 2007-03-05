@@ -323,7 +323,7 @@
               />
             </xsl:attribute>
           </xsl:if>
-          <xsl:if test="e:v">
+          <xsl:if test="e:v and not(e:v = '#REF!' or e:v='#DIV/0!' )">
             <xsl:choose>
               <xsl:when test="@t='s'">
                 <xsl:attribute name="office:value-type">
