@@ -38,6 +38,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" exclude-result-prefixes="svg">
 
   <xsl:import href="measures.xsl"/>
+  <xsl:import href="border.xsl"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
 
   <xsl:template name="styles">
@@ -95,7 +96,11 @@
   </xsl:template>
 
   <xsl:template name="InsertBorders">
-    <borders count="1">
+    <xsl:for-each select="document('content.xml')">
+    <borders>
+      <xsl:attribute name="count">
+        <xsl:value-of select="count(key('StyleFamily','table-cell')/style:table-cell-properties)"/>
+      </xsl:attribute>
       <border>
         <left/>
         <right/>
@@ -103,7 +108,12 @@
         <bottom/>
         <diagonal/>
       </border>
+      <xsl:apply-templates select="office:document-content/office:automatic-styles" mode="border"/>
     </borders>
+    </xsl:for-each>
+    
+
+    
   </xsl:template>
 
   <xsl:template name="InsertFormatingRecords">
@@ -176,7 +186,7 @@
   </xsl:template>
 
   <xsl:template match="style:style[@style:family='table-cell']" mode="cellFormats">
-    <xf numFmtId="0" fillId="0" borderId="0" xfId="0">
+    <xf numFmtId="0" fillId="0">
       <!-- font -->
       <xsl:if test="style:text-properties">
         <xsl:attribute name="applyFont">
@@ -189,6 +199,13 @@
           </xsl:for-each>
         </xsl:attribute>
       </xsl:if>
+      <!-- border -->
+      <xsl:if test="style:table-cell-properties">
+        <xsl:attribute name="borderId">
+          <xsl:number count="key('StyleFamily','table-cell')" level="any"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="xfId">0</xsl:attribute>
 
       <!-- text -alignment -->
       <!-- 1st 'or' - horizontal alignment

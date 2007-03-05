@@ -40,6 +40,7 @@
   <xsl:import href="measures.xsl"/>
   <xsl:import href="pixel-measure.xsl"/>
   <xsl:key name="style" match="style:style" use="@style:name"/>
+  <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
 
   <!-- table is converted into sheet -->
   <xsl:template match="table:table" mode="sheet">

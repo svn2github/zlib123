@@ -57,6 +57,7 @@
     <EmbeddedResource Include="resources\odf2oox\merge_cell.xsl" />
     <EmbeddedResource Include="resources\odf2oox\common.xsl" />
     <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\border.xsl" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />

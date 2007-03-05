@@ -109,8 +109,10 @@
     </xsl:variable>
     <xsl:if
       test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or $height != $defaultRowHeight or table:covered-table-cell">
-      <row r="{$rowNumber}">
-
+      <row>
+          <xsl:attribute name="r">
+            <xsl:value-of select="$rowNumber"/>
+          </xsl:attribute>
         <!-- insert row height -->
         <xsl:if test="$height">
           <xsl:attribute name="ht">
@@ -150,6 +152,9 @@
           <xsl:with-param name="numberOfAllRowsRepeated">
             <xsl:value-of select="@table:number-rows-repeated"/>
           </xsl:with-param>
+          <xsl:with-param name="CellNumber">
+            <xsl:value-of select="$cellNumber"/>
+          </xsl:with-param>
           <xsl:with-param name="rowNumber" select="$rowNumber"/>
           <xsl:with-param name="height" select="$height"/>
           <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
@@ -186,26 +191,37 @@
   <xsl:template name="InsertRepeatedRows">
     <xsl:param name="numberRowsRepeated"/>
     <xsl:param name="numberOfAllRowsRepeated"/>
+    <xsl:param name="cellNumber"/>
     <xsl:param name="rowNumber"/>
     <xsl:param name="height"/>
     <xsl:param name="defaultRowHeight"/>
     <xsl:choose>
       <xsl:when test="$numberRowsRepeated &gt; 1">
         <xsl:if
-          test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight)">
-          <row r="{$rowNumber + 1 + $numberOfAllRowsRepeated - $numberRowsRepeated}">
-
-            <!-- insert row height -->
-            <xsl:if test="$height">
-              <xsl:attribute name="ht">
-                <xsl:value-of select="$height"/>
-              </xsl:attribute>
-              <xsl:attribute name="customHeight">1</xsl:attribute>
-            </xsl:if>
-
-            <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
-              <xsl:attribute name="hidden">1</xsl:attribute>
-            </xsl:if>
+          test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight) or table:table-cell[@table:number-columns-repeated != '']">
+        
+        <xsl:variable name="NumberRow">
+          <xsl:value-of select="$rowNumber + 1 + $numberOfAllRowsRepeated - $numberRowsRepeated"/>
+        </xsl:variable>
+        
+          <row>
+            
+            <xsl:attribute name="r">
+              <xsl:value-of select="$NumberRow"/>
+            </xsl:attribute>
+            
+           <xsl:call-template name="InsertCols">
+             <xsl:with-param name="height">
+               <xsl:value-of select="$height"/>
+             </xsl:with-param>
+             <xsl:with-param name="rowNumber">
+               <xsl:value-of select="$NumberRow"/>
+             </xsl:with-param>
+             <xsl:with-param name="cellNumber">
+               <xsl:value-of select="$cellNumber"/>
+             </xsl:with-param>
+           </xsl:call-template>
+            
           </row>
         </xsl:if>
 
@@ -224,6 +240,43 @@
 
       </xsl:when>
     </xsl:choose>
+  </xsl:template>
+  
+  <!-- Insert Cols -->
+  
+  <xsl:template name="InsertCols">
+    <xsl:param name="height"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="cellNumber"/>
+    
+    <!-- insert row height -->
+    <xsl:if test="$height">
+      <xsl:attribute name="ht">
+        <xsl:value-of select="$height"/>
+      </xsl:attribute>
+      <xsl:if
+        test="not(key('style',@table:style-name)/style:table-row-properties/@style:use-optimal-row-height = 'true' )">
+        <xsl:attribute name="customHeight">1</xsl:attribute>
+      </xsl:if>
+    </xsl:if>
+    
+    <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
+      <xsl:attribute name="hidden">1</xsl:attribute>
+    </xsl:if>
+    
+    <!-- insert first cell -->
+    <xsl:choose>
+      <xsl:when test="node()[1][name()='table:table-cell']">
+        <xsl:apply-templates select="table:table-cell[1]" mode="sheet">
+          <xsl:with-param name="colNumber">0</xsl:with-param>
+          <xsl:with-param name="rowNumber" select="$rowNumber"/>
+          <xsl:with-param name="cellNumber" select="$cellNumber"/>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:when test="node()[1][name()='table:covered-table-cell']"> </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
+    
   </xsl:template>
 
   <!-- insert cell into row -->
@@ -371,10 +424,10 @@
 
       <!-- insert cell style number-->
       <xsl:choose>
-        <xsl:when test="@table:style-name">
+        <xsl:when test="@table:style-name != ''">
           <xsl:for-each select="key('style',@table:style-name)">
             <xsl:attribute name="s">
-              <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+              <xsl:number count="key('StyleFamily','table-cell')" level="any"/>              
             </xsl:attribute>
           </xsl:for-each>
         </xsl:when>
@@ -388,7 +441,7 @@
           </xsl:variable>
           <xsl:for-each select="key('style',$columnCellStyle)">
             <xsl:attribute name="s">
-              <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+              <xsl:number count="key('StyleFamily','table-cell')" level="any"/>
             </xsl:attribute>
           </xsl:for-each>
         </xsl:otherwise>
