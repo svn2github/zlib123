@@ -64,7 +64,7 @@
             <xsl:apply-templates mode="run"/>
           </xsl:when>
           <xsl:otherwise>
-            <t><xsl:apply-templates mode="text"/></t>
+            <t  xml:space="preserve"><xsl:apply-templates mode="text"/></t>
           </xsl:otherwise>
         </xsl:choose>
       </si>
@@ -88,6 +88,16 @@
   
   <xsl:template match="text()" mode="text">
     <xsl:value-of select="."/>
+  </xsl:template>
+  
+  <xsl:template match="text:s" mode="text">
+    <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
+      <xsl:if test="@text:c">
+        <xsl:attribute name="pxs:c">
+          <xsl:value-of select="@text:c"/>
+        </xsl:attribute>
+      </xsl:if>
+    </pxs:s>
   </xsl:template>
   
   <!-- when there are more than one line of text, enter must be added -->

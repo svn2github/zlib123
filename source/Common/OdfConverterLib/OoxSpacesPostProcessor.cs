@@ -43,6 +43,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private const string W_NAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         private const string PXS_NAMESPACE = "urn:cleverage:xmlns:post-processings:extra-spaces";
        	private const string XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
+       	private const string DEFAULT_NAMESPACE = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         
         private Stack currentNode;
         private Stack context;
@@ -72,6 +73,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
             	StartP();
             }
+            else if (IsSi())
+            {
+            	StartSi();
+            }
             else
             {
                 this.nextWriter.WriteStartElement(prefix, localName, ns);
@@ -92,6 +97,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         	else if (IsP())
         	{
         		EndP();
+        	}
+        	else if (IsSi())
+        	{
+        		EndSi();
         	}
             else
             {
@@ -159,7 +168,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          private bool IsT()
          {
          	Element e = (Element) this.currentNode.Peek();
-         	return "t".Equals(e.Name) && W_NAMESPACE.Equals(e.Ns);
+         	return "t".Equals(e.Name) && (W_NAMESPACE.Equals(e.Ns) || DEFAULT_NAMESPACE.Equals(e.Ns));
          }
         
          private bool InT()
@@ -216,7 +225,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          		
          		// Two more cases to handle :
          		// 1. there shouldn't be a white space as the first character
-         		// of a paragraph.
+         		// of a paragraph or string item.
          		if (this.isFirstTextNode && trim.IndexOf('\u0020') == 0)
          		{
          			trim = trim.Substring(1);
@@ -343,10 +352,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         
         // There's one more special thing to do : 
         // remove the eventual first white space on the first text node of the
-        // first run of a paragraph.
+        // first run of a paragraph or string item.
         
         /**
-         * Paragraphs
+         * Paragraphs and String items
          */
          private bool isFirstTextNode = false;
           
@@ -364,6 +373,25 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          }
          
          private void EndP()
+         {
+         	this.nextWriter.WriteEndElement();
+         	this.isFirstTextNode = false;
+         }
+         
+         private bool IsSi()
+         {
+         	Element e = (Element) this.currentNode.Peek();
+         	return "si".Equals(e.Name) && DEFAULT_NAMESPACE.Equals(e.Ns);
+         }
+         
+         private void StartSi()
+         {
+         	Element si = (Element) this.currentNode.Peek();
+         	this.nextWriter.WriteStartElement(si.Prefix, si.Name, si.Ns);
+         	this.isFirstTextNode = true;
+         }
+         
+         private void EndSi()
          {
          	this.nextWriter.WriteEndElement();
          	this.isFirstTextNode = false;
