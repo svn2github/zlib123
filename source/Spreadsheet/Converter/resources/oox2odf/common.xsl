@@ -82,7 +82,7 @@
     <xsl:param name="level" select="0"/>
     
     <xsl:variable name="lastCharacter">
-      <xsl:value-of select="substring($literal,string-length($literal))"/>
+      <xsl:value-of select="substring($literal,string-length($literal),1)"/>
     </xsl:variable>
     
     <xsl:variable name="lastCharacterPosition">
@@ -101,7 +101,7 @@
     <xsl:choose>
       <xsl:when test="string-length($literal)>1">
         <xsl:call-template name="GetAlphabeticPosition">
-          <xsl:with-param name="literal" select="substring-before($literal,$lastCharacter)"/>
+          <xsl:with-param name="literal" select="substring($literal,0,string-length($literal))"/>
           <xsl:with-param name="level" select="$level+1"/>
           <xsl:with-param name="number">
             <xsl:value-of select="$lastCharacterPosition*$power + $number"/>
