@@ -128,6 +128,8 @@
 
   <xsl:template match="e:row">
 
+    <xsl:variable name="this" select="."/>
+
     <xsl:variable name="lastCellColumnNumber">
       <xsl:choose>
         <xsl:when test="e:c[last()]/@r">
@@ -184,8 +186,18 @@
       <!-- Insert First Coll in Row  -->
       <xsl:apply-templates select="e:c[1]"/>
 
+      <!-- complete row with empty cells if last cell number < 256 -->
       <xsl:if test="$lastCellColumnNumber &lt; 256">
-        <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}"/>
+        <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
+          <!-- if there is a default cell style for the row -->
+          <xsl:if test="@s">
+            <xsl:attribute name="table:style-name">
+              <xsl:value-of
+                select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@s + 1])"
+              />
+            </xsl:attribute>
+          </xsl:if>
+        </table:table-cell>
       </xsl:if>
     </table:table-row>
   </xsl:template>
@@ -244,6 +256,14 @@
           <xsl:attribute name="table:number-columns-repeated">
             <xsl:value-of select="$colNum - 1"/>
           </xsl:attribute>
+          <!-- if there is a default cell style for the row -->
+          <xsl:if test="parent::node()/@s">
+            <xsl:attribute name="table:style-name">
+              <xsl:value-of
+                select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/parent::node()/@s + 1])"
+              />
+            </xsl:attribute>
+          </xsl:if>
         </table:table-cell>
       </xsl:when>
       <!-- when this cell is not first one in a row and there were empty cells after previous non-empty cell -->
@@ -252,11 +272,17 @@
           <xsl:attribute name="table:number-columns-repeated">
             <xsl:value-of select="$colNum - $prevCellColNum - 1"/>
           </xsl:attribute>
+          <!-- if there is a default cell style for the row -->
+          <xsl:if test="parent::node()/@s">
+            <xsl:attribute name="table:style-name">
+              <xsl:value-of
+                select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/parent::node()/@s + 1])"
+              />
+            </xsl:attribute>
+          </xsl:if>
         </table:table-cell>
       </xsl:when>
     </xsl:choose>
-
-
 
     <xsl:choose>
       <!-- Insert covered cell if this is Merge Cell -->
@@ -487,7 +513,9 @@
   <xsl:template name="InsertColumns">
     <xsl:param name="sheet"/>
 
-    <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col">
+    <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col">      
+      <xsl:variable name="this" select="."/>
+      
       <!-- if there were columns with default properties before this column then insert default columns-->
       <xsl:choose>
         <!-- when this column is the first non-default one but it's not the column A -->
@@ -499,9 +527,16 @@
               <xsl:value-of
                 select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[1])"/>
             </xsl:attribute>
+            <xsl:if test="@style">
+              <xsl:attribute name="table:default-cell-style-name">
+                <xsl:value-of
+                  select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@style + 1])"
+                />
+              </xsl:attribute>
+            </xsl:if>
           </table:table-column>
         </xsl:when>
-        <!-- when this column is not first non-default one and there were default columns after previous non-default column -->
+        <!-- when this column is not first non-default one and there were default columns after previous non-default column (if there was a gap between this and previous column)-->
         <xsl:when test="preceding::e:col[1]/@max &lt; @min - 1">
           <table:table-column
             table:style-name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
@@ -528,6 +563,13 @@
         <xsl:if test="@hidden=1">
           <xsl:attribute name="table:visibility">
             <xsl:text>collapse</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="@style">
+          <xsl:attribute name="table:default-cell-style-name">
+            <xsl:value-of
+              select="generate-id(document('xl/styles.xml')/e:styleSheet/e:cellXfs/e:xf[position() = $this/@style + 1])"
+            />
           </xsl:attribute>
         </xsl:if>
       </table:table-column>

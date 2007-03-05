@@ -72,6 +72,14 @@
       <xsl:if test="@table:visibility = 'collapse'">
         <xsl:attribute name="hidden">1</xsl:attribute>
       </xsl:if>
+      
+      <xsl:if test="@table:default-cell-style-name != 'Default' ">
+          <xsl:for-each select="key('style',@table:default-cell-style-name)">
+            <xsl:attribute name="style">
+              <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+            </xsl:attribute>
+          </xsl:for-each>
+      </xsl:if>
     </col>
 
     <!-- insert next column -->
