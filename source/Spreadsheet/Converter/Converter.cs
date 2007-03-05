@@ -27,44 +27,6 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 };
             }
         }
-
-        protected override void CheckOdfFile(string fileName)
-        {
-            // Test for encryption
-            XmlDocument doc;
-            try
-            {
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.XmlResolver = new ZipResolver(fileName);
-                settings.ProhibitDtd = false;
-                doc = new XmlDocument();
-                XmlReader reader = XmlReader.Create("META-INF/manifest.xml", settings);
-                doc.Load(reader);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                throw new NotAnOdfDocumentException(e.Message);
-            }
-
-            XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
-            if (nodes.Count > 0)
-            {
-                throw new EncryptedDocumentException(fileName + " is an encrypted document");
-            }
-
-            // Check the document mime-type.
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
-            nsmgr.AddNamespace("manifest", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
-
-            XmlNode node = doc.SelectSingleNode("/manifest:manifest/manifest:file-entry[@manifest:media-type='"
-                                                + ODF_TEXT_MIME + "']", nsmgr);
-            if (node == null)
-            {
-                throw new NotAnOdfDocumentException("Could not convert " + fileName
-                                                    + ". Invalid OASIS OpenDocument file");
-            }
-        }
     
     }
 }
