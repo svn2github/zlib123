@@ -212,9 +212,10 @@
             2nd 'or' - horizontal alignment 'fill'
              3rd 'or' - vertical alignment 
              4th 'or' - angle oriented text
-             5th 'or' - vertically stacked text-->
+             5th 'or' - vertically stacked text 
+             6th 'or' - wraped text -->
       <xsl:if
-        test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true') or (style:table-cell-properties/@style:vertical-align) or (style:table-cell-properties/@style:rotation-angle) or (style:table-cell-properties/@style:direction='ttb') ">
+        test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true') or (style:table-cell-properties/@style:vertical-align) or (style:table-cell-properties/@style:rotation-angle) or (style:table-cell-properties/@style:direction='ttb') or (style:table-cell-properties/@fo:wrap-option='wrap')">
         <xsl:attribute name="applyAlignment">
           <xsl:text>1</xsl:text>
         </xsl:attribute>
@@ -312,6 +313,13 @@
                   <xsl:text>0</xsl:text>
                 </xsl:otherwise>
               </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
+          
+          <!-- wraped text -->
+          <xsl:if test="style:table-cell-properties/@fo:wrap-option='wrap'">
+            <xsl:attribute name="wrapText">
+              <xsl:text>1</xsl:text>
             </xsl:attribute>
           </xsl:if>
         </alignment>

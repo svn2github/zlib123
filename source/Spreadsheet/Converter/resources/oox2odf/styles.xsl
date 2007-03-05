@@ -253,6 +253,12 @@
               <xsl:text>wrap</xsl:text>
             </xsl:attribute>
           </xsl:if>
+          <xsl:if test="e:alignment/@wrapText">
+            <xsl:attribute name="fo:wrap-option">
+              <xsl:text>wrap</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+            
 
           <!-- text orientation -->
           <xsl:if test="e:alignment/@textRotation">
