@@ -154,19 +154,21 @@
   </xsl:template>
 
   <xsl:template name="InsertUnderline">
-    <xsl:if test="@style:text-underline-style != 'none' ">
+    <xsl:param name="underlineStyle"/>
+    <xsl:param name="underlineType"/>
+    <xsl:if test="$underlineStyle != 'none' ">
       <u>
         <xsl:attribute name="val">
           <xsl:choose>
-            <xsl:when test="@style:text-underline-style = 'accounting' ">
+            <xsl:when test="$underlineStyle = 'accounting' ">
               <xsl:choose>
-                <xsl:when test="@style:text-underline-type = 'double' ">doubleAccounting</xsl:when>
+                <xsl:when test="$underlineType = 'double' ">doubleAccounting</xsl:when>
                 <xsl:otherwise>singleAccounting</xsl:otherwise>
               </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="@style:text-underline-type = 'double' ">double</xsl:when>
+                <xsl:when test="$underlineType = 'double' ">double</xsl:when>
                 <xsl:otherwise>single</xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
@@ -313,53 +315,134 @@
 
   <!-- insert run properties -->
   <xsl:template match="style:style" mode="textstyles">
+    <xsl:param name="parentCellStyleName"/>
+    <xsl:param name="defaultCellStyleName"/>
     <xsl:if test="style:text-properties">
       <rPr>
-        <xsl:apply-templates select="style:text-properties" mode="textstyles"/>
+        <xsl:apply-templates select="style:text-properties" mode="textstyles">
+          <xsl:with-param name="parentCellStyleName" select="$parentCellStyleName"/>
+          <xsl:with-param name="defaultCellStyleName" select="$defaultCellStyleName"/>
+        </xsl:apply-templates>
       </rPr>
     </xsl:if>
   </xsl:template>
 
   <!-- convert text properties -->
   <xsl:template match="style:text-properties" mode="textstyles">
+    <xsl:param name="parentCellStyleName"/>
+    <xsl:param name="defaultCellStyleName"/>
     <xsl:call-template name="InsertTextProperties">
       <xsl:with-param name="mode">textstyles</xsl:with-param>
+      <xsl:with-param name="parentCellStyleName" select="$parentCellStyleName"/>
+      <xsl:with-param name="defaultCellStyleName" select="$defaultCellStyleName"/>
     </xsl:call-template>
   </xsl:template>
 
   <!-- insert text properties -->
   <xsl:template name="InsertTextProperties">
     <xsl:param name="mode"/>
-    <xsl:if test="@fo:font-weight='bold'">
+    <xsl:param name="parentCellStyleName"/>
+    <xsl:param name="defaultCellStyleName"/>
+    <xsl:if test="@fo:font-weight='bold' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='bold' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='bold'">
       <b/>
     </xsl:if>
-    <xsl:if test="@fo:font-style='italic'">
+    <xsl:if test="@fo:font-style='italic' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='italic' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='italic'">
       <i/>
     </xsl:if>
-    <xsl:if test="@style:text-underline-style">
-      <xsl:call-template name="InsertUnderline"/>
+    <xsl:if test="@style:text-underline-style or key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style or key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style">
+      <xsl:choose>
+        <xsl:when test="@style:text-underline-style">
+      <xsl:call-template name="InsertUnderline">
+        <xsl:with-param name="underlineStyle">
+          <xsl:value-of select="@style:text-underline-style"/>
+        </xsl:with-param>
+        <xsl:with-param name="underlineType">
+          <xsl:value-of select="@style:text-underline-type"/>
+        </xsl:with-param>
+      </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style">
+          <xsl:call-template name="InsertUnderline">
+            <xsl:with-param name="underlineStyle">
+              <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style"/>
+            </xsl:with-param>
+            <xsl:with-param name="underlineType">
+              <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-type"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style">
+          <xsl:call-template name="InsertUnderline">
+            <xsl:with-param name="underlineStyle">
+              <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style"/>
+            </xsl:with-param>
+            <xsl:with-param name="underlineType">
+              <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-type"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
     </xsl:if>
-    <xsl:if test="@fo:font-size">
+    <xsl:if test="@fo:font-size or key('style',$parentCellStyleName)/style:text-properties/@fo:font-size or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size">
+      <xsl:variable name="fontSize">
+        <xsl:choose>
+          <xsl:when test="@fo:font-size">
+            <xsl:value-of select="@fo:font-size"/>
+          </xsl:when>
+          <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@fo:font-size">
+            <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@fo:font-size"/>
+          </xsl:when>
+          <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size">
+            <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
       <sz>
         <xsl:attribute name="val">
           <xsl:call-template name="point-measure">
             <xsl:with-param name="length">
-              <xsl:value-of select="@fo:font-size"/>
+              <xsl:value-of select="$fontSize"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
       </sz>
     </xsl:if>
-    <xsl:if test="@style:text-line-through-style and @style:text-line-through-style != 'none' ">
+    <xsl:if test="@style:text-line-through-style and @style:text-line-through-style != 'none'  or key('style',$parentCellStyleName)/style:text-properties[@style:text-line-through-style and @style:text-line-through-style != 'none'] or key('style',$defaultCellStyleName)/style:text-properties[@style:text-line-through-style and @style:text-line-through-style != 'none']">
       <strike/>
     </xsl:if>
-    <xsl:if test="@fo:color">
-      <color rgb="{concat('FF',substring-after(@fo:color,'#'))}"/>
+    <xsl:if test="@fo:color or key('style',$parentCellStyleName)/style:text-properties/@fo:color or key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
+      <xsl:variable name="fontColor">
+        <xsl:choose>
+          <xsl:when test="@fo:color">
+            <xsl:value-of select="@fo:color"/>
+          </xsl:when>
+          <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@fo:color">
+            <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@fo:color"/>
+          </xsl:when>
+          <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
+            <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@fo:color"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
+      <color rgb="{concat('FF',substring-after($fontColor,'#'))}"/>
     </xsl:if>
     <xsl:choose>
       <xsl:when test="$mode = 'textstyles'">
-        <xsl:if test="@style:font-name">
-          <rFont val="{@style:font-name}"/>
+        <xsl:if test="@style:font-name or key('style',$parentCellStyleName)/style:text-properties/@style:font-name or key('style',$defaultCellStyleName)/style:text-properties/@style:font-name">
+          <xsl:variable name="fontName">
+            <xsl:choose>
+              <xsl:when test="@style:font-name">
+                <xsl:value-of select="@style:font-name"/>
+              </xsl:when>
+              <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@style:font-name">
+                <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@style:font-name"/>
+              </xsl:when>
+              <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@style:font-name">
+                <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@style:font-name"/>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:variable>
+          <rFont val="{$fontName}"/>
         </xsl:if>
       </xsl:when>
       <xsl:when test="$mode = 'fonts'">

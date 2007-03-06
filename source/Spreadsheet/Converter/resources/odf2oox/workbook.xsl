@@ -41,6 +41,7 @@
   
 
   <xsl:key name="ConfigItem" match="config:config-item" use="@config:name"/>
+  <xsl:key name="style" match="style:style" use="@style:name"/>
   
   <!-- main workbook template-->
     <xsl:template name="InsertWorkbook">    

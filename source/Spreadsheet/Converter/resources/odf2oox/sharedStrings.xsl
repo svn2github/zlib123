@@ -37,7 +37,6 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0">
   
   <xsl:import href="measures.xsl"/>
-  <xsl:key name="textstyle" match="style:style" use="@style:name"/>
   
   <!-- template which inserts sharedstringscontent -->
   <xsl:template name="InsertSharedStrings">
@@ -74,7 +73,14 @@
   <!-- text:span conversion -->
   <xsl:template match="text:span" mode="run">
     <r>
-      <xsl:apply-templates select="key('textstyle',@text:style-name)" mode="textstyles"/>
+      <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
+        <xsl:with-param name="parentCellStyleName">
+          <xsl:value-of select="ancestor::table:table-cell/@table:style-name"/>
+        </xsl:with-param>
+        <xsl:with-param name="defaultCellStyleName">
+          <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
       <t><xsl:value-of select="."/></t>
       </r>
   </xsl:template>
@@ -82,6 +88,11 @@
   <!-- when there is formatted text in a string, all texts must be in runs -->
   <xsl:template match="text()" mode="run">
   <r>
+    <xsl:apply-templates select="key('style',ancestor::table:table-cell/@table:style-name)" mode="textstyles">
+      <xsl:with-param name="defaultCellStyleName">
+        <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
     <t><xsl:value-of select="."/></t>
   </r>  
   </xsl:template>
