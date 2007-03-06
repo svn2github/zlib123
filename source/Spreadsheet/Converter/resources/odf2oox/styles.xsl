@@ -96,11 +96,7 @@
   </xsl:template>
 
   <xsl:template name="InsertBorders">
-    <xsl:for-each select="document('content.xml')">
-    <borders>
-      <xsl:attribute name="count">
-        <xsl:value-of select="count(key('StyleFamily','table-cell')/style:table-cell-properties)"/>
-      </xsl:attribute>
+    <borders count="1">
       <border>
         <left/>
         <right/>
@@ -108,12 +104,7 @@
         <bottom/>
         <diagonal/>
       </border>
-      <xsl:apply-templates select="office:document-content/office:automatic-styles" mode="border"/>
     </borders>
-    </xsl:for-each>
-    
-
-    
   </xsl:template>
 
   <xsl:template name="InsertFormatingRecords">
@@ -186,7 +177,7 @@
   </xsl:template>
 
   <xsl:template match="style:style[@style:family='table-cell']" mode="cellFormats">
-    <xf numFmtId="0" fillId="0">
+    <xf numFmtId="0" fillId="0" borderId="0" xfId="0">
       <!-- font -->
       <xsl:if test="style:text-properties">
         <xsl:attribute name="applyFont">
@@ -199,13 +190,6 @@
           </xsl:for-each>
         </xsl:attribute>
       </xsl:if>
-      <!-- border -->
-      <xsl:if test="style:table-cell-properties">
-        <xsl:attribute name="borderId">
-          <xsl:number count="key('StyleFamily','table-cell')" level="any"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:attribute name="xfId">0</xsl:attribute>
 
       <!-- text -alignment -->
       <!-- 1st 'or' - horizontal alignment
