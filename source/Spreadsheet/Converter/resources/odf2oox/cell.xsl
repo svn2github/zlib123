@@ -458,18 +458,44 @@
       <!-- convert cell type -->
       <xsl:if test="child::text:p">
         <xsl:choose>
-          <xsl:when test="@office:value-type!='string'">
-            <xsl:attribute name="t">
+          <xsl:when test="@office:value-type!='string' and @office:value-type != 'percentage' and @office:value-type != 'date' and @office:value-type != 'time'">
+          <xsl:variable name="Type">
               <xsl:call-template name="ConvertTypes">
                 <xsl:with-param name="type">
                   <xsl:value-of select="@office:value-type"/>
                 </xsl:with-param>
               </xsl:call-template>
+            </xsl:variable>
+            <xsl:attribute name="t">
+              <xsl:value-of select="$Type"/>            
             </xsl:attribute>
             <v>
-              <xsl:value-of select="text:p"/>
+                 <xsl:choose>
+                <xsl:when test="$Type = 'n'">
+                  <xsl:choose>
+                    <xsl:when test="@office:value != ''">
+                      <xsl:value-of select="@office:value"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate(text:p,',','.')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="text:p"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </v>
           </xsl:when>
+          <!-- TO DO  percentage-->
+          <xsl:when test="@office:value-type = 'percentage'">
+            <xsl:attribute name="t">n</xsl:attribute>
+            <v>
+              <xsl:value-of select="translate(substring-before(text:p, '%'), ',', '.')"/>  
+            </v>
+          </xsl:when>
+          <!-- TO DO  date and time-->
+          <xsl:when test="@office:value-type = 'date' or @office:value-type = 'time'"></xsl:when>
           <xsl:otherwise>
             <xsl:attribute name="t">s</xsl:attribute>
             <v>
