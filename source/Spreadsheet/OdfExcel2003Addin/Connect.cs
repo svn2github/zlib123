@@ -304,7 +304,7 @@ namespace OdfExcel2003Addin
 
                         //this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
 
-                        if ("xlOpenXMLWorkbook".Equals(wb.FileFormat.ToString()))
+                        if (!"50".Equals(wb.FileFormat.ToString()))
                         {
                             // duplicate the file
                             object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
