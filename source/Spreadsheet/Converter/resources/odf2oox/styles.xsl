@@ -343,12 +343,16 @@
     <xsl:param name="mode"/>
     <xsl:param name="parentCellStyleName"/>
     <xsl:param name="defaultCellStyleName"/>
+    
+    <!-- font weight -->
     <xsl:if test="@fo:font-weight='bold' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='bold' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='bold'">
       <b/>
     </xsl:if>
     <xsl:if test="@fo:font-style='italic' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='italic' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='italic'">
       <i/>
     </xsl:if>
+    
+    <!-- underline -->
     <xsl:if test="@style:text-underline-style or key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style or key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style">
       <xsl:choose>
         <xsl:when test="@style:text-underline-style">
@@ -383,6 +387,8 @@
         </xsl:when>
       </xsl:choose>
     </xsl:if>
+    
+    <!-- font size -->
     <xsl:if test="@fo:font-size or key('style',$parentCellStyleName)/style:text-properties/@fo:font-size or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size">
       <xsl:variable name="fontSize">
         <xsl:choose>
@@ -407,9 +413,13 @@
         </xsl:attribute>
       </sz>
     </xsl:if>
+    
+    <!-- strikethrough -->
     <xsl:if test="@style:text-line-through-style and @style:text-line-through-style != 'none'  or key('style',$parentCellStyleName)/style:text-properties[@style:text-line-through-style and @style:text-line-through-style != 'none'] or key('style',$defaultCellStyleName)/style:text-properties[@style:text-line-through-style and @style:text-line-through-style != 'none']">
       <strike/>
     </xsl:if>
+    
+    <!-- font color -->
     <xsl:if test="@fo:color or key('style',$parentCellStyleName)/style:text-properties/@fo:color or key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
       <xsl:variable name="fontColor">
         <xsl:choose>
@@ -426,23 +436,25 @@
       </xsl:variable>
       <color rgb="{concat('FF',substring-after($fontColor,'#'))}"/>
     </xsl:if>
+    
+    <!-- font family -->
     <xsl:choose>
       <xsl:when test="$mode = 'textstyles'">
         <xsl:if test="@style:font-name or key('style',$parentCellStyleName)/style:text-properties/@style:font-name or key('style',$defaultCellStyleName)/style:text-properties/@style:font-name">
-          <xsl:variable name="fontName">
+          <xsl:variable name="fontFamily">
             <xsl:choose>
               <xsl:when test="@style:font-name">
-                <xsl:value-of select="@style:font-name"/>
+                <xsl:value-of select="translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"/>
               </xsl:when>
               <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@style:font-name">
-                <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@style:font-name"/>
+                <xsl:value-of select="translate(key('font',key('style',$parentCellStyleName)/style:text-properties/@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"/>
               </xsl:when>
               <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@style:font-name">
-                <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@style:font-name"/>
+                <xsl:value-of select="translate(key('font',key('style',$defaultCellStyleName)/style:text-properties/@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"/>
               </xsl:when>
             </xsl:choose>
           </xsl:variable>
-          <rFont val="{$fontName}"/>
+          <rFont val="{$fontFamily}"/>
         </xsl:if>
       </xsl:when>
       <xsl:when test="$mode = 'fonts'">
