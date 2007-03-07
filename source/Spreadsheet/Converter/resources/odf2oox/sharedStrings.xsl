@@ -63,7 +63,7 @@
             <xsl:apply-templates mode="run"/>
           </xsl:when>
           <xsl:otherwise>
-            <t  xml:space="preserve"><xsl:apply-templates mode="text"/></t>
+            <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
           </xsl:otherwise>
         </xsl:choose>
       </si>
@@ -81,7 +81,7 @@
           <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
         </xsl:with-param>
       </xsl:apply-templates>
-      <t><xsl:value-of select="."/></t>
+      <t xml:space="preserve"><xsl:value-of select="."/></t>
       </r>
   </xsl:template>
   
@@ -93,7 +93,7 @@
         <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
       </xsl:with-param>
     </xsl:apply-templates>
-    <t><xsl:value-of select="."/></t>
+    <t xml:space="preserve"><xsl:value-of select="."/></t>
   </r>  
   </xsl:template>
   
@@ -114,7 +114,7 @@
   <!-- when there are more than one line of text, enter must be added -->
   <xsl:template match="text:p[preceding-sibling::text:p]" mode="run">
     <r>
-      <t><xsl:value-of select="'&#xA;'"/></t>
+      <t xml:space="preserve"><xsl:value-of select="'&#xA;'"/></t>
     </r>
     <xsl:apply-templates mode="run"/>
   </xsl:template>
