@@ -35,13 +35,12 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
-  
-  
+
   <!-- gets a column number from cell coordinates -->
   <xsl:template name="GetColNum">
     <xsl:param name="cell"/>
     <xsl:param name="columnId"/>
-    
+
     <xsl:choose>
       <!-- when whole literal column id has been extracted than convert alphabetic index to number -->
       <xsl:when test="number(substring($cell,1,1))">
@@ -58,46 +57,46 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- gets a row number from cell coordinates -->
   <xsl:template name="GetRowNum">
     <xsl:param name="cell"/>
-    
-    <xsl:choose>      
+
+    <xsl:choose>
       <xsl:when test="number($cell)">
         <xsl:value-of select="$cell"/>
-      </xsl:when>      
+      </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="GetRowNum">
-          <xsl:with-param name="cell" select="substring-after($cell,substring($cell,1,1))"/>          
+          <xsl:with-param name="cell" select="substring-after($cell,substring($cell,1,1))"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- translates literal index to number -->
   <xsl:template name="GetAlphabeticPosition">
     <xsl:param name="literal"/>
     <xsl:param name="number" select="0"/>
     <xsl:param name="level" select="0"/>
-    
+
     <xsl:variable name="lastCharacter">
       <xsl:value-of select="substring($literal,string-length($literal),1)"/>
     </xsl:variable>
-    
+
     <xsl:variable name="lastCharacterPosition">
       <xsl:call-template name="CharacterToPosition">
         <xsl:with-param name="character" select="$lastCharacter"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="power">
       <xsl:call-template name="Power">
         <xsl:with-param name="base" select="26"/>
         <xsl:with-param name="exponent" select="$level"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="string-length($literal)>1">
         <xsl:call-template name="GetAlphabeticPosition">
@@ -113,11 +112,11 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- returns position in alphabet of a single character-->
   <xsl:template name="CharacterToPosition">
     <xsl:param name="character"/>
-    
+
     <xsl:choose>
       <xsl:when test="$character='A'">1</xsl:when>
       <xsl:when test="$character='B'">2</xsl:when>
@@ -147,13 +146,13 @@
       <xsl:when test="$character='Z'">26</xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- calculates power function -->
   <xsl:template name="Power">
     <xsl:param name="base"/>
     <xsl:param name="exponent"/>
     <xsl:param name="value1" select="$base"/>
-    
+
     <xsl:choose>
       <xsl:when test="$exponent = 0">
         <xsl:text>1</xsl:text>
@@ -180,5 +179,458 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  </xsl:stylesheet>
+
+  <!-- conversion based on http://support.microsoft.com/kb/29240 -->
+  <xsl:template name="RGBtoHLS">
+    <xsl:param name="rgb"/>
+
+    <xsl:variable name="HLSMAX" select="255"/>
+    <xsl:variable name="RGBMAX" select="255"/>
+    <xsl:variable name="UNDEFINED">
+      <xsl:value-of select="$HLSMAX * 2 div 3"/>
+    </xsl:variable>
+
+    <xsl:variable name="r">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number">
+          <xsl:value-of select="substring($rgb,1,2)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="g">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number">
+          <xsl:value-of select="substring($rgb,3,2)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="b">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number">
+          <xsl:value-of select="substring($rgb,5,2)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="max">
+      <xsl:choose>
+        <xsl:when test="$r &gt; $g">
+          <xsl:choose>
+            <xsl:when test="$r &gt; $b">
+              <xsl:value-of select="$r"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$b"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$g &gt; $b">
+              <xsl:value-of select="$g"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$b"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="min">
+      <xsl:choose>
+        <xsl:when test="$r &lt; $g">
+          <xsl:choose>
+            <xsl:when test="$r &lt; $b">
+              <xsl:value-of select="$r"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$b"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$g &lt; $b">
+              <xsl:value-of select="$g"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$b"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="l">
+      <xsl:value-of select="floor(( (($max + $min) * $HLSMAX) + $RGBMAX ) div (2 * $RGBMAX))"/>
+    </xsl:variable>
+
+    <xsl:variable name="s">
+      <xsl:choose>
+        <xsl:when test="$max = $min">
+          <xsl:text>0</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="($l &lt; ($HLSMAX div 2)) or ($l = ($HLSMAX div 2))">
+              <xsl:value-of
+                select="floor(( (($max - $min) * $HLSMAX) + (($max + $min) div 2) ) div ($max + $min))"
+              />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of
+                select="floor(( (($max - $min) * $HLSMAX) + ((2 * $RGBMAX - $max - $min) div 2) ) div (2 * $RGBMAX - $max - $min))"
+              />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="Rdelta">
+      <xsl:value-of
+        select="( (($max - $r) * ($HLSMAX div 6)) + (($max - $min) div 2) ) div ($max - $min)"/>
+    </xsl:variable>
+    <xsl:variable name="Gdelta">
+      <xsl:value-of
+        select="( (($max - $g) * ($HLSMAX div 6)) + (($max - $min) div 2) ) div ($max - $min)"/>
+    </xsl:variable>
+    <xsl:variable name="Bdelta">
+      <xsl:value-of
+        select="( (($max - $b) * ($HLSMAX div 6)) + (($max - $min) div 2) ) div ($max - $min)"/>
+    </xsl:variable>
+
+    <xsl:variable name="h_part">
+      <xsl:choose>
+        <xsl:when test="$max = $min">
+          <xsl:value-of select="$UNDEFINED"/>
+        </xsl:when>
+        <xsl:when test="$r = $max">
+          <xsl:value-of select="$Bdelta - $Gdelta"/>
+        </xsl:when>
+        <xsl:when test="$g = $max">
+          <xsl:value-of select="($HLSMAX div 3) + $Rdelta - $Bdelta"/>
+        </xsl:when>
+        <xsl:when test="$b = $max">
+          <xsl:value-of select="((2 * $HLSMAX) div 3) + $Gdelta - $Rdelta"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="h">
+      <xsl:choose>
+        <xsl:when test="$h_part &lt; 0">
+          <xsl:value-of select="floor($h_part + $HLSMAX)"/>
+        </xsl:when>
+        <xsl:when test="$h_part &gt; $HLSMAX">
+          <xsl:value-of select="floor($h_part - $HLSMAX)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="floor($h_part)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:value-of select="concat($h,',',$l,',',$s)"/>
+  </xsl:template>
+
+  <!-- conversion based on http://support.microsoft.com/kb/29240 -->
+  <xsl:template name="HueToRGB">
+    <xsl:param name="n1"/>
+    <xsl:param name="n2"/>
+    <xsl:param name="hue"/>
+
+    <xsl:variable name="HLSMAX" select="255"/>
+
+    <xsl:variable name="h">
+      <xsl:choose>
+        <xsl:when test="$hue &lt; 0">
+          <xsl:value-of select="$hue + $HLSMAX"/>
+        </xsl:when>
+        <xsl:when test="$hue &gt; $HLSMAX">
+          <xsl:value-of select="$hue - $HLSMAX"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$hue"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$h &lt; ($HLSMAX div 6)">
+        <xsl:value-of select="$n1 + ((($n2 - $n1) * $h + ($HLSMAX div 12)) div ($HLSMAX div 6))"/>
+      </xsl:when>
+      <xsl:when test="$h &lt; ($HLSMAX div 2)">
+        <xsl:value-of select="$n2"/>
+      </xsl:when>
+      <xsl:when test="$h &lt; (($HLSMAX * 2) div 3)">
+        <xsl:value-of
+          select="$n1 + ((($n2 - $n1) * ((($HLSMAX * 2) div 3) - $h) + ($HLSMAX div 12)) div ($HLSMAX div 6))"
+        />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$n1"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- conversion based on http://support.microsoft.com/kb/29240 -->
+  <xsl:template name="HLStoRGB">
+    <xsl:param name="hls"/>
+
+    <xsl:variable name="HLSMAX" select="255"/>
+    <xsl:variable name="RGBMAX" select="255"/>
+
+    <xsl:variable name="hue">
+      <xsl:value-of select="substring-before($hls,',')"/>
+    </xsl:variable>
+    <xsl:variable name="lum">
+      <xsl:value-of select="substring-before(substring-after($hls,','),',')"/>
+    </xsl:variable>
+    <xsl:variable name="sat">
+      <xsl:value-of select="substring-after(substring-after($hls,','),',')"/>
+    </xsl:variable>
+
+    <xsl:variable name="magic2">
+      <xsl:choose>
+        <xsl:when test="$lum &gt; $HLSMAX div 2">
+          <xsl:value-of select="$lum + $sat - (($lum * $sat) + ($HLSMAX div 2)) div $HLSMAX"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="($lum * ($HLSMAX + $sat) + ($HLSMAX div 2)) div $HLSMAX"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="magic1">
+      <xsl:value-of select="2 * $lum - $magic2"/>
+    </xsl:variable>
+
+    <xsl:variable name="red">
+      <xsl:choose>
+        <xsl:when test="$sat = 0">
+          <xsl:value-of select="($lum * $RGBMAX) div $HLSMAX"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="hueR">
+            <xsl:call-template name="HueToRGB">
+              <xsl:with-param name="n1">
+                <xsl:value-of select="$magic1"/>
+              </xsl:with-param>
+              <xsl:with-param name="n2">
+                <xsl:value-of select="$magic2"/>
+              </xsl:with-param>
+              <xsl:with-param name="hue">
+                <xsl:value-of select="$hue + ($HLSMAX div 3)"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="($hueR * $RGBMAX + ($HLSMAX div 2)) div $HLSMAX"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="green">
+      <xsl:choose>
+        <xsl:when test="$sat = 0">
+          <xsl:value-of select="($lum * $RGBMAX) div $HLSMAX"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="hueG">
+            <xsl:call-template name="HueToRGB">
+              <xsl:with-param name="n1">
+                <xsl:value-of select="$magic1"/>
+              </xsl:with-param>
+              <xsl:with-param name="n2">
+                <xsl:value-of select="$magic2"/>
+              </xsl:with-param>
+              <xsl:with-param name="hue">
+                <xsl:value-of select="$hue"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="($hueG * $RGBMAX + ($HLSMAX div 2)) div $HLSMAX"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="blue">
+      <xsl:choose>
+        <xsl:when test="$sat = 0">
+          <xsl:value-of select="($lum * $RGBMAX) div $HLSMAX"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="hueB">
+            <xsl:call-template name="HueToRGB">
+              <xsl:with-param name="n1">
+                <xsl:value-of select="$magic1"/>
+              </xsl:with-param>
+              <xsl:with-param name="n2">
+                <xsl:value-of select="$magic2"/>
+              </xsl:with-param>
+              <xsl:with-param name="hue">
+                <xsl:value-of select="$hue - ($HLSMAX div 3)"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="($hueB * $RGBMAX + ($HLSMAX div 2)) div $HLSMAX"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:value-of select="concat(floor($red),',',floor($green),',',floor($blue))"/>
+  </xsl:template>
+
+  <xsl:template name="CalculateTintedColor">
+    <xsl:param name="color"/>
+    <xsl:param name="tint"/>
+
+    <xsl:variable name="HLSMAX" select="255"/>
+
+    <xsl:variable name="hls">
+      <xsl:call-template name="RGBtoHLS">
+        <xsl:with-param name="rgb" select="$color"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="hue">
+      <xsl:value-of select="substring-before($hls,',')"/>
+    </xsl:variable>
+    <xsl:variable name="lum">
+      <xsl:value-of select="substring-before(substring-after($hls,','),',')"/>
+    </xsl:variable>
+    <xsl:variable name="sat">
+      <xsl:value-of select="substring-after(substring-after($hls,','),',')"/>
+    </xsl:variable>
+
+    <xsl:variable name="newLum">
+      <xsl:choose>
+        <xsl:when test="$tint &lt; 0">
+          <xsl:value-of select="floor($lum * (1 + $tint))"/>
+        </xsl:when>
+        <xsl:when test="$tint > 0">
+          <xsl:value-of select="floor($lum * (1 - $tint) + ($HLSMAX - $HLSMAX * (1 - $tint)))"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$lum"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="rgb">
+      <xsl:call-template name="HLStoRGB">
+        <xsl:with-param name="hls">
+          <xsl:value-of select="concat($hue,',',$newLum,',',$sat)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="red">
+      <xsl:call-template name="DecToHex">
+        <xsl:with-param name="number">
+          <xsl:value-of select="substring-before($rgb,',')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="green">
+      <xsl:call-template name="DecToHex">
+        <xsl:with-param name="number">
+          <xsl:value-of select="substring-before(substring-after($rgb,','),',')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="blue">
+      <xsl:call-template name="DecToHex">
+        <xsl:with-param name="number">
+          <xsl:value-of select="substring-after(substring-after($rgb,','),',')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:value-of select="concat($red,$green,$blue)"/>
+
+  </xsl:template>
+
+  <!-- Convert hex to decimal -->
+  <xsl:template name="DecToHex">
+    <xsl:param name="number"/>
+
+    <xsl:variable name="high">
+      <xsl:call-template name="HexMap">
+        <xsl:with-param name="value">
+          <xsl:value-of select="floor($number div 16)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="low">
+      <xsl:call-template name="HexMap">
+        <xsl:with-param name="value">
+          <xsl:value-of select="$number mod 16"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:value-of select="concat($high,$low)"/>
+  </xsl:template>
+
+  <xsl:template name="HexMap">
+    <xsl:param name="value"/>
+    <xsl:choose>
+      <xsl:when test="$value = 10">
+        <xsl:text>A</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 11">
+        <xsl:text>B</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 12">
+        <xsl:text>C</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 13">
+        <xsl:text>D</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 14">
+        <xsl:text>E</xsl:text>
+      </xsl:when>
+      <xsl:when test="$value = 15">
+        <xsl:text>F</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="ConvertScientific">
+    <xsl:param name="value"/>
+
+    <xsl:variable name="base">
+      <xsl:value-of select="substring-before($value,'E')"/>
+    </xsl:variable>
+    <!-- after E- or E+ -->
+    <xsl:variable name="exponent">
+      <xsl:value-of select="substring(substring-after($value,'E'),2)"/>
+    </xsl:variable>
+    <xsl:variable name="sign">
+      <xsl:value-of select="substring(substring-after($value,'E'),1,1)"/>
+    </xsl:variable>
+
+    <xsl:variable name="factor">
+      <xsl:call-template name="Power">
+        <xsl:with-param name="base" select="10"/>
+        <xsl:with-param name="exponent" select="$exponent"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+  <xsl:choose>
+    <xsl:when test="$sign = '+'">
+      <xsl:value-of select="$base * $factor"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="$base div $factor"/>
+    </xsl:otherwise>
+  </xsl:choose>
+    
+<!--    <xsl:value-of select="concat($base,',',$exponent,$sign)"/>-->
+  </xsl:template>
+</xsl:stylesheet>

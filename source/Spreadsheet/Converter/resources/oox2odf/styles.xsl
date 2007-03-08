@@ -258,7 +258,7 @@
               <xsl:text>wrap</xsl:text>
             </xsl:attribute>
           </xsl:if>
-            
+
 
           <!-- text orientation -->
           <xsl:if test="e:alignment/@textRotation">
@@ -457,27 +457,79 @@
         </xsl:when>
         <xsl:when test="@indexed">
           <xsl:variable name="color">
-            <xsl:value-of select="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]/@rgb"/>
+            <xsl:value-of
+              select="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]/@rgb"
+            />
           </xsl:variable>
           <xsl:value-of select="concat('#',substring($color,3,9))"/>
         </xsl:when>
         <xsl:when test="@theme">
-          <xsl:variable name="color">
+          <xsl:variable name="theme">
+            <xsl:choose>
+              <xsl:when test="@theme = 0">
+                <xsl:text>1</xsl:text>
+              </xsl:when>
+              <xsl:when test="@theme = 1">
+                <xsl:text>0</xsl:text>
+              </xsl:when>
+              <xsl:when test="@theme = 2">
+                <xsl:text>3</xsl:text>
+              </xsl:when>
+              <xsl:when test="@theme = 3">
+                <xsl:text>2</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="@theme"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <!-- color from theme -->
+          <xsl:variable name="themeColor">
             <xsl:choose>
               <!-- if color is in 'sysClr' node -->
               <xsl:when
-                test="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@lastClr">
+                test="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr">
                 <xsl:value-of
-                  select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@lastClr"
+                  select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr"
                 />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of
-                  select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $this/@theme]/child::node()/@val"
+                  select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@val"
                 />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
+
+          <xsl:variable name="color">
+            <xsl:choose>
+              <!-- if tinted color -->
+              <xsl:when test="@tint">
+                <xsl:call-template name="CalculateTintedColor">
+                  <xsl:with-param name="color" select="$themeColor"/>
+                  <xsl:with-param name="tint">
+                    <xsl:choose>
+                      <xsl:when test="contains(@tint,'E')">
+                        <xsl:call-template name="ConvertScientific">
+                          <xsl:with-param name="value">
+                            <xsl:value-of select="@tint"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="@tint"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$themeColor"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
           <xsl:value-of select="concat('#',$color)"/>
         </xsl:when>
       </xsl:choose>
