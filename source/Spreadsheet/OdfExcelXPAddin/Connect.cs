@@ -347,6 +347,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                             tmpFileName = Path.GetTempFileName();
                             try
                             {
+                                this.applicationObject.DisplayAlerts = false;
                                 newWb.SaveAs((string)tmpFileName, xlOpenXMLWorkbook, missing, missing, missing, missing, MSExcel.XlSaveAsAccessMode.xlNoChange, missing, missing, missing, missing, missing);
                             }
                             catch (Exception e)
@@ -357,6 +358,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                             }
                             finally
                             {
+                                this.applicationObject.DisplayAlerts = true;
                                 // close and remove the duplicated file
                                 newWb.Close(false, false, missing);
                                 try

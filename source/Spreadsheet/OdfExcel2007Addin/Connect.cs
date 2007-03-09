@@ -304,8 +304,10 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                             // generate xlsx file from the duplicated file (under a temporary file)
                             tmpFileName = Path.GetTempFileName();
 
-                            // object format = MSExcel.WdSaveFormat.wdFormatXMLDocument;
+                            // object format = MSExcel.WdSaveFormat.wdFormatXMLDocument
+                            this.applicationObject.DisplayAlerts = false;
                             newWb.SaveAs((string)tmpFileName, MSExcel.XlFileFormat.xlOpenXMLWorkbook, missing, missing, missing, missing, MSExcel.XlSaveAsAccessMode.xlNoChange, missing, missing, missing, missing, missing);
+                            this.applicationObject.DisplayAlerts = true;
 
                             // close and remove the duplicated file
                             newWb.Close(false, false, missing);
