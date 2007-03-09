@@ -80,9 +80,14 @@
               <xsl:value-of select="key('ConfigItem', 'ActiveTable')"/>
             </xsl:for-each>
           </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="office:spreadsheet/table:table[@table:name=$ActiveTable]">
           <xsl:for-each select="office:spreadsheet/table:table[@table:name=$ActiveTable]">
             <xsl:value-of select="count(preceding-sibling::table:table)"/>        
           </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
         
       </workbookView>
