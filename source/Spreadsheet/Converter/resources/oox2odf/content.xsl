@@ -39,7 +39,7 @@
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="measures.xsl"/>
   <xsl:import href="styles.xsl"/>
-  
+
   <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="''"/>
   <xsl:key name="Sst" match="e:si" use="''"/>
   <xsl:key name="SheetFormatPr" match="e:sheetFormatPr" use="''"/>
@@ -98,41 +98,38 @@
   </xsl:template>
 
   <xsl:template name="InsertSheetContent">
-    <xsl:param name="sheet"/>    
-    
+    <xsl:param name="sheet"/>
+
 
     <xsl:call-template name="InsertColumns">
       <xsl:with-param name="sheet" select="$sheet"/>
     </xsl:call-template>
 
-    <xsl:for-each select="document(concat('xl/',$sheet))">     
-      
+    <xsl:for-each select="document(concat('xl/',$sheet))">
+
 
       <xsl:apply-templates select="e:worksheet/e:sheetData/e:row"/>
-    
-    <xsl:choose>
-      <!-- when sheet is empty -->
-      <xsl:when test="not(e:worksheet/e:sheetData/e:row/e:c/e:v)">
-        <table:table-row
-          table:style-name="{generate-id(key('SheetFormatPr', ''))}"
-          table:number-rows-repeated="65536">
-          <table:table-cell/>
-        </table:table-row>
-      </xsl:when>
-      <xsl:otherwise>
-        <!-- it is necessary when sheet has different default row height -->
-        <xsl:if
-          test="65536 - e:worksheet/e:sheetData/e:row[last()]/@r &gt; 0">
-          <table:table-row
-            table:style-name="{generate-id(key('SheetFormatPr', ''))}"
-            table:number-rows-repeated="{65536 - e:worksheet/e:sheetData/e:row[last()]/@r}">
-            <table:table-cell table:number-columns-repeated="256"/>
+
+      <xsl:choose>
+        <!-- when sheet is empty -->
+        <xsl:when test="not(e:worksheet/e:sheetData/e:row/e:c/e:v)">
+          <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+            table:number-rows-repeated="65536">
+            <table:table-cell/>
           </table:table-row>
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- it is necessary when sheet has different default row height -->
+          <xsl:if test="65536 - e:worksheet/e:sheetData/e:row[last()]/@r &gt; 0">
+            <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+              table:number-rows-repeated="{65536 - e:worksheet/e:sheetData/e:row[last()]/@r}">
+              <table:table-cell table:number-columns-repeated="256"/>
+            </table:table-row>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:for-each>
-    
+
   </xsl:template>
 
   <xsl:template match="e:row">
@@ -193,8 +190,8 @@
       </xsl:if>
 
       <!-- Insert First Cell in Row  -->
-      <xsl:apply-templates select="e:c[1]"/>        
-      
+      <xsl:apply-templates select="e:c[1]"/>
+
 
       <!-- complete row with empty cells if last cell number < 256 -->
       <xsl:if test="$lastCellColumnNumber &lt; 256">
@@ -203,9 +200,7 @@
           <xsl:if test="@s">
             <xsl:attribute name="table:style-name">
               <xsl:for-each select="document('xl/styles.xml')">
-              <xsl:value-of
-                select="generate-id(key('Xf', '')[position() = $this/@s + 1])"
-              />
+                <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
               </xsl:for-each>
             </xsl:attribute>
           </xsl:if>
@@ -262,9 +257,7 @@
             </xsl:variable>
             <xsl:attribute name="table:style-name">
               <xsl:for-each select="document('xl/styles.xml')">
-              <xsl:value-of
-                select="generate-id(key('Xf', '')[position() = $position])"
-              />
+                <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
               </xsl:for-each>
             </xsl:attribute>
           </xsl:if>
@@ -274,36 +267,33 @@
       <xsl:when test="$prevCellCol != ''">
         <xsl:variable name="prevCellColNum">
           <xsl:choose>
-          <xsl:when
-          test="$prevCellCol != ''">
-          <xsl:call-template name="GetColNum">
-          <xsl:with-param name="cell">
-          <xsl:value-of select="$prevCellCol"/>
-          </xsl:with-param>
-          </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>-1</xsl:otherwise>
+            <xsl:when test="$prevCellCol != ''">
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of select="$prevCellCol"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>-1</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
         <xsl:if test="$colNum>$prevCellColNum+1">
-        <table:table-cell>
-          <xsl:attribute name="table:number-columns-repeated">
-            <xsl:value-of select="$colNum - $prevCellColNum - 1"/>
-          </xsl:attribute>
-          <!-- if there is a default cell style for the row -->
-          <xsl:if test="parent::node()/@s">
-            <xsl:variable name="position">
-              <xsl:value-of select="$this/parent::node()/@s + 1"/>
-            </xsl:variable>
-            <xsl:attribute name="table:style-name">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of
-                  select="generate-id(key('Xf', '')[position() = $position])"
-                />
-              </xsl:for-each>
+          <table:table-cell>
+            <xsl:attribute name="table:number-columns-repeated">
+              <xsl:value-of select="$colNum - $prevCellColNum - 1"/>
             </xsl:attribute>
-          </xsl:if>
-        </table:table-cell>
+            <!-- if there is a default cell style for the row -->
+            <xsl:if test="parent::node()/@s">
+              <xsl:variable name="position">
+                <xsl:value-of select="$this/parent::node()/@s + 1"/>
+              </xsl:variable>
+              <xsl:attribute name="table:style-name">
+                <xsl:for-each select="document('xl/styles.xml')">
+                  <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+                </xsl:for-each>
+              </xsl:attribute>
+            </xsl:if>
+          </table:table-cell>
         </xsl:if>
       </xsl:when>
     </xsl:choose>
@@ -345,13 +335,11 @@
             </xsl:variable>
             <xsl:attribute name="table:style-name">
               <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of
-                  select="generate-id(key('Xf', '')[position() = $position])"
-                />
-              </xsl:for-each>              
+                <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+              </xsl:for-each>
             </xsl:attribute>
           </xsl:if>
-          <xsl:if test="e:v and not(e:v = '#REF!' or e:v='#DIV/0!' )">
+          <xsl:if test="e:v">
             <xsl:choose>
               <xsl:when test="@t='s'">
                 <xsl:attribute name="office:value-type">
@@ -361,9 +349,18 @@
                   <xsl:value-of select="e:v"/>
                 </xsl:variable>
                 <text:p>
-                  <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]">
+                  <xsl:for-each
+                    select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]">
                     <xsl:apply-templates/>
                   </xsl:for-each>
+                </text:p>
+              </xsl:when>
+              <xsl:when test="@t = 'e' ">
+                <xsl:attribute name="office:value-type">
+                  <xsl:text>string</xsl:text>
+                </xsl:attribute>
+                <text:p>
+                  <xsl:value-of select="e:v"/>
                 </text:p>
               </xsl:when>
               <xsl:otherwise>
@@ -400,7 +397,8 @@
 
       <xsl:when test="$CheckIfMerge != 'false'">
         <xsl:choose>
-          <xsl:when test="contains($CheckIfMerge,'true') and substring-after($CheckIfMerge, ':') &gt; 1">
+          <xsl:when
+            test="contains($CheckIfMerge,'true') and substring-after($CheckIfMerge, ':') &gt; 1">
             <xsl:if test="following-sibling::e:c[number(substring-after($CheckIfMerge, ':')) - 1]">
               <xsl:apply-templates
                 select="following-sibling::e:c[number(substring-after($CheckIfMerge, ':')) - 1]">
@@ -554,27 +552,27 @@
         <xsl:value-of select="generate-id(key('Xf', '')[1])"/>
       </xsl:for-each>
     </xsl:variable>
-    
-    
+
+
     <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:cols/e:col">
       <xsl:variable name="this" select="."/>
-      
+
       <!-- if there were columns with default properties before this column then insert default columns-->
       <xsl:choose>
         <!-- when this column is the first non-default one but it's not the column A -->
         <xsl:when test="position()=1 and @min>1">
           <table:table-column>
-            
+
             <xsl:attribute name="table:style-name">
-             <xsl:for-each select="document(concat('xl/',$sheet))">
-               <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
-             </xsl:for-each>
+              <xsl:for-each select="document(concat('xl/',$sheet))">
+                <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+              </xsl:for-each>
             </xsl:attribute>
-            
+
             <xsl:attribute name="table:number-columns-repeated">
               <xsl:value-of select="@min - 1"/>
             </xsl:attribute>
-            
+
             <xsl:attribute name="table:default-cell-style-name">
               <xsl:value-of select="$DefaultCellStyleName"/>
             </xsl:attribute>
@@ -584,33 +582,31 @@
               </xsl:variable>
               <xsl:attribute name="table:default-cell-style-name">
                 <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of
-                  select="generate-id(key('Xf', '')[position() = $position])"
-                />
-               </xsl:for-each>
+                  <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+                </xsl:for-each>
               </xsl:attribute>
             </xsl:if>
           </table:table-column>
-          
+
         </xsl:when>
         <!-- when this column is not first non-default one and there were default columns after previous non-default column (if there was a gap between this and previous column)-->
         <xsl:when test="preceding::e:col[1]/@max &lt; @min - 1">
           <table:table-column>
-            
+
             <xsl:attribute name="table:style-name">
               <xsl:for-each select="document(concat('xl/',$sheet))">
-              <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+                <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
               </xsl:for-each>
             </xsl:attribute>
-            
+
             <xsl:attribute name="table:number-columns-repeated">
               <xsl:value-of select="@min - preceding::e:col[1]/@max - 1"/>
             </xsl:attribute>
-            
+
             <xsl:attribute name="table:default-cell-style-name">
               <xsl:value-of select="$DefaultCellStyleName"/>
             </xsl:attribute>
-            
+
           </table:table-column>
         </xsl:when>
       </xsl:choose>
@@ -624,7 +620,7 @@
         </xsl:if>
         <xsl:attribute name="table:default-cell-style-name">
 
-            <xsl:value-of select="$DefaultCellStyleName"/>
+          <xsl:value-of select="$DefaultCellStyleName"/>
 
         </xsl:attribute>
         <xsl:if test="@hidden=1">
@@ -638,39 +634,35 @@
           </xsl:variable>
           <xsl:attribute name="table:default-cell-style-name">
             <xsl:for-each select="document('xl/styles.xml')">
-            <xsl:value-of
-              select="generate-id(key('Xf', '')[position() = $position])"
-            />
+              <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
             </xsl:for-each>
           </xsl:attribute>
         </xsl:if>
       </table:table-column>
     </xsl:for-each>
 
-    <!-- apply default column style for last columns which style wasn't changed -->    
+    <!-- apply default column style for last columns which style wasn't changed -->
     <xsl:for-each select="document(concat('xl/',$sheet))">
-    <xsl:choose>      
-      <xsl:when test="not(key('Col', ''))">
-        <table:table-column
-          table:style-name="{generate-id(key('SheetFormatPr', ''))}"
-          table:number-columns-repeated="256">
-          <xsl:attribute name="table:default-cell-style-name">
-            <xsl:value-of select="$DefaultCellStyleName"/>
-          </xsl:attribute>
-        </table:table-column>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:if test="key('Col', '')[last()]/@max &lt; 256">
-          <table:table-column
-            table:style-name="{generate-id(key('SheetFormatPr', ''))}"
-            table:number-columns-repeated="{256 - key('Col', '')[last()]/@max}">
+      <xsl:choose>
+        <xsl:when test="not(key('Col', ''))">
+          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+            table:number-columns-repeated="256">
             <xsl:attribute name="table:default-cell-style-name">
               <xsl:value-of select="$DefaultCellStyleName"/>
             </xsl:attribute>
           </table:table-column>
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="key('Col', '')[last()]/@max &lt; 256">
+            <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+              table:number-columns-repeated="{256 - key('Col', '')[last()]/@max}">
+              <xsl:attribute name="table:default-cell-style-name">
+                <xsl:value-of select="$DefaultCellStyleName"/>
+              </xsl:attribute>
+            </table:table-column>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:for-each>
   </xsl:template>
 
@@ -680,14 +672,14 @@
     <!-- strange but true: the best result is when you WON'T convert average digit width from pt to px-->
     <xsl:variable name="defaultFontSize">
       <xsl:for-each select="document('xl/styles.xml')">
-      <xsl:choose>
-        <xsl:when test="e:styleSheet/e:fonts/e:font">
-          <xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>11</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="e:styleSheet/e:fonts/e:font">
+            <xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>11</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
 
