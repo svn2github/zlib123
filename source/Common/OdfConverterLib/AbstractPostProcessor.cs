@@ -380,6 +380,22 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             	}
             	return "";
             }
+            
+            public Element GetChildWithAttribute(string name, string ns, string attrName, string attrNs, string attrValue)
+            {
+            	foreach(object node in this.children)
+            	{
+            		if(node is Element)
+            		{
+            			Element element = ((Element)node);
+            			if (element.Name.Equals(name) && element.Ns.Equals(ns) && attrValue.Equals(element.GetAttributeValue(attrName,attrNs)))
+                        {
+                            return element;
+                        }
+            		}
+            	}
+            	return null;
+            }
 
             public ArrayList GetChildren(string name, string ns)
             {

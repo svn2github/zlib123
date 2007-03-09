@@ -66,6 +66,14 @@
 
     <office:body>
       <office:spreadsheet>
+        
+        <!-- insert strings from sharedStrings to be moved later by post-processor-->
+        <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst">
+          <pxsi:sst xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
+            <xsl:apply-templates select="e:si"/>
+          </pxsi:sst>
+        </xsl:for-each>
+        
         <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
           <table:table>
 
@@ -91,12 +99,21 @@
                 </xsl:call-template>
               </xsl:with-param>
             </xsl:call-template>
+            
           </table:table>
         </xsl:for-each>
+        
       </office:spreadsheet>
     </office:body>
   </xsl:template>
 
+  <!-- insert string -->
+  <xsl:template match="e:si">
+    <pxsi:si  pxsi:number="{count(preceding-sibling::e:si)}" xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
+      <xsl:apply-templates/>
+    </pxsi:si>
+  </xsl:template>
+  
   <xsl:template name="InsertSheetContent">
     <xsl:param name="sheet"/>
 
@@ -349,10 +366,12 @@
                   <xsl:value-of select="e:v"/>
                 </xsl:variable>
                 <text:p>
-                  <xsl:for-each
-                    select="document('xl/sharedStrings.xml')/e:sst/e:si[position()=$id+1]">
-                    <xsl:apply-templates/>
-                  </xsl:for-each>
+                  
+                  <!-- a postprocessor puts here strings from sharedstrings -->
+                  <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
+                    <xsl:value-of select="e:v"/>
+                  </pxsi:v>
+
                 </text:p>
               </xsl:when>
               <xsl:when test="@t = 'e' ">

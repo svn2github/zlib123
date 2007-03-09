@@ -28,6 +28,16 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 };
             }
         }
+        protected override string [] ReversePostProcessorsChain
+        {
+            get
+            {
+                string fullname = Assembly.GetExecutingAssembly().FullName;
+                return new string []  {
+                    "CleverAge.OdfConverter.Spreadsheet.OdfSharedStringsPostProcessor,"+fullname
+                };
+            }
+        }
     
         protected override void CheckOdfFile(string fileName)
         {
