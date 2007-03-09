@@ -425,7 +425,7 @@
                   <xsl:text>true</xsl:text>
                 </xsl:with-param>
                 <xsl:with-param name="prevCellCol">
-                  <xsl:value-of select="@r"/>
+                  <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
@@ -438,7 +438,7 @@
                   <xsl:text>true</xsl:text>
                 </xsl:with-param>
                 <xsl:with-param name="prevCellCol">
-                  <xsl:value-of select="@r"/>
+                  <xsl:value-of select="number(substring-after($CheckIfMerge, ':'))"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
