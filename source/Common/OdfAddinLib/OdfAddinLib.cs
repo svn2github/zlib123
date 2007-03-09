@@ -223,10 +223,19 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                             throw form.Exception;
                         }
                     }
-                } catch (OdfZipUtils.ZipCreationException zipEx) {
+                }
+                catch (OdfZipUtils.ZipCreationException zipEx)
+                {
                     InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", zipEx.Message ?? "UnableToCreateOutputDetail", this.resourceManager);
                     infoBox.ShowDialog();
-                } 
+                }
+                catch (System.IO.IOException e)
+                {
+                    // this is meant to catch "file already accessed by another process", though there's no .NET fine-grain exception for this.
+                    // bug #1676586  Concurrent file access crashes the addin
+                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", e.Message, this.resourceManager);
+                    infoBox.ShowDialog();
+                }
                 catch (Exception e)
                 {
                     InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.resourceManager);
