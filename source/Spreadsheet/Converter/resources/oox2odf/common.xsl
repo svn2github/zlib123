@@ -631,6 +631,76 @@
     </xsl:otherwise>
   </xsl:choose>
     
-<!--    <xsl:value-of select="concat($base,',',$exponent,$sign)"/>-->
+  </xsl:template>
+  
+  <xsl:template name="GetBuildInColor">
+    <xsl:param name="index"/>
+      
+      <xsl:choose>
+        <xsl:when test="$index=0"><xsl:text>000000</xsl:text></xsl:when>
+        <xsl:when test="$index=1"><xsl:text>FFFFFF</xsl:text></xsl:when>
+        <xsl:when test="$index=2"><xsl:text>FF0000</xsl:text></xsl:when>
+        <xsl:when test="$index=3"><xsl:text>00FF00</xsl:text></xsl:when>
+        <xsl:when test="$index=4"><xsl:text>0000FF</xsl:text></xsl:when>
+        <xsl:when test="$index=5"><xsl:text>FFFF00</xsl:text></xsl:when>
+        <xsl:when test="$index=6"><xsl:text>FF00FF</xsl:text></xsl:when>
+        <xsl:when test="$index=7"><xsl:text>00FFFF</xsl:text></xsl:when>
+        <xsl:when test="$index=8"><xsl:text>000000</xsl:text></xsl:when>
+        <xsl:when test="$index=9"><xsl:text>FFFFFF</xsl:text></xsl:when>
+        <xsl:when test="$index=10"><xsl:text>FF0000</xsl:text></xsl:when>
+        <xsl:when test="$index=11"><xsl:text>00FF00</xsl:text></xsl:when>
+        <xsl:when test="$index=12"><xsl:text>0000FF</xsl:text></xsl:when>
+        <xsl:when test="$index=13"><xsl:text>FFFF00</xsl:text></xsl:when>
+        <xsl:when test="$index=14"><xsl:text>FF00FF</xsl:text></xsl:when>
+        <xsl:when test="$index=15"><xsl:text>00FFFF</xsl:text></xsl:when>
+        <xsl:when test="$index=16"><xsl:text>800000</xsl:text></xsl:when>
+        <xsl:when test="$index=17"><xsl:text>008000</xsl:text></xsl:when>
+        <xsl:when test="$index=18"><xsl:text>000080</xsl:text></xsl:when>
+        <xsl:when test="$index=19"><xsl:text>808000</xsl:text></xsl:when>
+        <xsl:when test="$index=20"><xsl:text>800080</xsl:text></xsl:when>
+        <xsl:when test="$index=21"><xsl:text>008080</xsl:text></xsl:when>
+        <xsl:when test="$index=22"><xsl:text>C0C0C0</xsl:text></xsl:when>
+        <xsl:when test="$index=23"><xsl:text>808080</xsl:text></xsl:when>
+        <xsl:when test="$index=24"><xsl:text>8080FF</xsl:text></xsl:when>
+        <xsl:when test="$index=25"><xsl:text>802060</xsl:text></xsl:when>
+        <xsl:when test="$index=26"><xsl:text>FFFFC0</xsl:text></xsl:when>
+        <xsl:when test="$index=27"><xsl:text>A0E0E0</xsl:text></xsl:when>
+        <xsl:when test="$index=28"><xsl:text>600080</xsl:text></xsl:when>
+        <xsl:when test="$index=29"><xsl:text>FF8080</xsl:text></xsl:when>
+        <xsl:when test="$index=30"><xsl:text>0080C0</xsl:text></xsl:when>
+        <xsl:when test="$index=31"><xsl:text>C0C0FF</xsl:text></xsl:when>
+        <xsl:when test="$index=32"><xsl:text>000080</xsl:text></xsl:when>
+        <xsl:when test="$index=33"><xsl:text>FF00FF</xsl:text></xsl:when>
+        <xsl:when test="$index=34"><xsl:text>FFFF00</xsl:text></xsl:when>
+        <xsl:when test="$index=35"><xsl:text>00FFFF</xsl:text></xsl:when>
+        <xsl:when test="$index=36"><xsl:text>800080</xsl:text></xsl:when>
+        <xsl:when test="$index=37"><xsl:text>800000</xsl:text></xsl:when>
+        <xsl:when test="$index=38"><xsl:text>008080</xsl:text></xsl:when>
+        <xsl:when test="$index=39"><xsl:text>0000FF</xsl:text></xsl:when>
+        <xsl:when test="$index=40"><xsl:text>00CCFF</xsl:text></xsl:when>
+        <xsl:when test="$index=41"><xsl:text>69FFFF</xsl:text></xsl:when>
+        <xsl:when test="$index=42"><xsl:text>CCFFCC</xsl:text></xsl:when>
+        <xsl:when test="$index=43"><xsl:text>FFFF99</xsl:text></xsl:when>
+        <xsl:when test="$index=44"><xsl:text>A6CAF0</xsl:text></xsl:when>
+        <xsl:when test="$index=45"><xsl:text>CC9CCC</xsl:text></xsl:when>
+        <xsl:when test="$index=46"><xsl:text>CC99FF</xsl:text></xsl:when>
+        <xsl:when test="$index=47"><xsl:text>E3E3E3</xsl:text></xsl:when>
+        <xsl:when test="$index=48"><xsl:text>3366FF</xsl:text></xsl:when>
+        <xsl:when test="$index=49"><xsl:text>33CCCC</xsl:text></xsl:when>
+        <xsl:when test="$index=50"><xsl:text>339933</xsl:text></xsl:when>
+        <xsl:when test="$index=51"><xsl:text>999933</xsl:text></xsl:when>
+        <xsl:when test="$index=52"><xsl:text>996633</xsl:text></xsl:when>
+        <xsl:when test="$index=53"><xsl:text>996666</xsl:text></xsl:when>
+        <xsl:when test="$index=54"><xsl:text>666699</xsl:text></xsl:when>
+        <xsl:when test="$index=55"><xsl:text>969696</xsl:text></xsl:when>
+        <xsl:when test="$index=56"><xsl:text>3333CC</xsl:text></xsl:when>
+        <xsl:when test="$index=57"><xsl:text>336666</xsl:text></xsl:when>
+        <xsl:when test="$index=58"><xsl:text>003300</xsl:text></xsl:when>
+        <xsl:when test="$index=59"><xsl:text>333300</xsl:text></xsl:when>
+        <xsl:when test="$index=60"><xsl:text>663300</xsl:text></xsl:when>
+        <xsl:when test="$index=61"><xsl:text>993366</xsl:text></xsl:when>
+        <xsl:when test="$index=62"><xsl:text>333399</xsl:text></xsl:when>
+        <xsl:when test="$index=63"><xsl:text>424242</xsl:text></xsl:when>
+      </xsl:choose>
   </xsl:template>
 </xsl:stylesheet>

@@ -456,12 +456,26 @@
           <xsl:value-of select="concat('#',substring(@rgb,3,9))"/>
         </xsl:when>
         <xsl:when test="@indexed">
-          <xsl:variable name="color">
-            <xsl:value-of
-              select="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]/@rgb"
-            />
-          </xsl:variable>
-          <xsl:value-of select="concat('#',substring($color,3,9))"/>
+            <xsl:choose>
+              <xsl:when test="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]">
+                <xsl:variable name="color">
+                  <xsl:value-of
+                  select="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]/@rgb"
+                  />
+                  </xsl:variable>
+                <xsl:value-of select="concat('#',substring($color,3,9))"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:variable name="color">
+                  <xsl:call-template name="GetBuildInColor">
+                  <xsl:with-param name="index">
+                    <xsl:value-of select="@indexed"/>
+                  </xsl:with-param>
+                  </xsl:call-template>
+                  </xsl:variable>
+                <xsl:value-of select="concat('#',$color)"/>
+              </xsl:otherwise>
+            </xsl:choose>            
         </xsl:when>
         <xsl:when test="@theme">
           <xsl:variable name="theme">
