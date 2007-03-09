@@ -202,11 +202,21 @@
       </xsl:if>
       <sheetData>
 
+       <xsl:variable name="ColumnTagNum">
+          <xsl:apply-templates select="table:table-column[1]" mode="tag">
+            <xsl:with-param name="colNumber">1</xsl:with-param>
+            <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+          </xsl:apply-templates>
+        </xsl:variable>
+
         <!-- insert first row -->
         <xsl:apply-templates select="table:table-row[1]" mode="sheet">
           <xsl:with-param name="rowNumber">1</xsl:with-param>
           <xsl:with-param name="cellNumber" select="$cellNumber"/>
           <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+          <xsl:with-param name="TableColumnTagNum">
+            <xsl:value-of select="$ColumnTagNum"/>
+          </xsl:with-param>
         </xsl:apply-templates>
 
       </sheetData>
