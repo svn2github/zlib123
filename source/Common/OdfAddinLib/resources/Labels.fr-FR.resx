@@ -159,6 +159,9 @@
   <data name="EncryptedDocumentLabel" xml:space="preserve">
     <value>Le document est protégé par un mot de passe.</value>
   </data>
+  <data name="PossiblyEncryptedDocument" xml:space="preserve">
+    <value>L'archive ZIP ne peut être ouverte. Verifiez que le document n'est pas encrypté.</value>
+  </data>
   <data name="NotAnOdfDocumentDetail" xml:space="preserve">
     <value>Si vous pensez que ce document est un document ODF valide, vous pouvez signaler une anomalie sur le site du projet (http://odf-converter.sourceforge.net) en joignant le fichier qui a déclenché l'erreur.</value>
   </data>

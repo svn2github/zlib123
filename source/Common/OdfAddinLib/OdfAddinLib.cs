@@ -229,6 +229,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", zipEx.Message ?? "UnableToCreateOutputDetail", this.resourceManager);
                     infoBox.ShowDialog();
                 }
+                catch (OdfZipUtils.ZipException e) 
+                {
+                    InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "PossiblyEncryptedDocument", this.resourceManager);
+                    infoBox.ShowDialog();
+                }
                 catch (System.IO.IOException e)
                 {
                     // this is meant to catch "file already accessed by another process", though there's no .NET fine-grain exception for this.
