@@ -5,7 +5,13 @@
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
     exclude-result-prefixes="office meta">
 
+    <!-- @Filename: common-meta.xsl -->
+    <!-- @Description: This stylesheet is used to perform direct conversion on document metadata -->
+    <!-- @Created: 2006-12-12 -->
+    
+    
     <xsl:template name="docprops-core">
+        <!-- @Description:  ??? -->
         <cp:coreProperties
             xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
             xmlns:dcmitype="http://purl.org/dc/dcmitype/">
@@ -15,6 +21,7 @@
     </xsl:template>
 
     <xsl:template name="docprops-custom">
+        <!--  @Des-->
         <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta"
             mode="custom"/>
     </xsl:template>
