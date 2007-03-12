@@ -57,7 +57,7 @@
  <xsl:variable name="key-nodes" select="/xsl:stylesheet/xsl:key"/> <!-- A collection of key nodes defined at the root -->
  <xsl:variable name="variable-nodes" select="/xsl:stylesheet/xsl:variable"/> <!-- A collection of variable nodes defined at the root -->
  <xsl:variable name="parameters-nodes" select="/xsl:stylesheet/xsl:param"/> <!-- A collection of parameter nodes defined at the root -->
- <xsl:variable name="readmode" select="'public' "/>  <!-- Determines whether private templates are to be displayed -->
+ <xsl:variable name="readmode" select="'private' "/>  <!-- Determines whether private templates are to be displayed -->
  <xsl:variable name="invalidChars">/@*:|[]()=</xsl:variable> <!-- Invalid URL characters -->
  <xsl:variable name="URLchars">-_x..</xsl:variable> <!-- Characters replacing invalid URL charaters -->  
  
@@ -130,7 +130,7 @@
     <xsl:if test="@mode">-<xsl:value-of select="translate(@mode, $invalidChars,$URLchars)"/></xsl:if>
    </xsl:variable>
    
-   <h3 id="t-{translate(@name|@match,$invalidChars,$URLchars)}{mode-name}">
+   <h3 id="t-{translate(@name|@match,$invalidChars,$URLchars)}{$mode-name}">
      <xsl:call-template name="template-heading">
       <xsl:with-param name="isPrivate" select="boolean($private)"></xsl:with-param>
      </xsl:call-template>
