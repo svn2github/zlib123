@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="xsl2html.xsl" type="text/xsl" media="screen"?>
+
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
     xmlns:cust-p="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
@@ -10,8 +12,16 @@
     xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
     exclude-result-prefixes="vt cust-p cp">
 
+    <!-- @Filename: common-meta.xsl -->
+    <!-- @Description: This stylesheet is used to perform reverse conversion on document metadata -->
+    <!-- @Created: 2006-12-12 -->
+    
     <xsl:template name="meta">
-        <xsl:param name="app-version"/>
+        <!-- @Description: Generates the openOffice element containing the document metadata. -->
+        <!-- @Context: Any -->
+        
+        <xsl:param name="app-version"/> <!-- The application version -->
+        
         <office:document-meta>
             <office:meta>
                 <!-- generator -->
@@ -62,64 +72,97 @@
         </office:document-meta>
     </xsl:template>
 
-    <!-- title -->
+
     <xsl:template match="dc:title" mode="meta">
+        <!-- @Description: Generates the &lt;dc:title&gt; element (last modification date) -->
+        <!-- @Context: Any &lt;dc:title&gt; element -->
+        <!-- @Private -->
+        
         <dc:title>
             <xsl:value-of select="."/>
         </dc:title>
     </xsl:template>
 
-    <!-- description -->
+
     <xsl:template match="dc:description" mode="meta">
+        <!-- @Description: Generates the &lt;dc:description&gt; element (last modification date) -->
+        <!-- @Context: Any &lt;dc:description&gt; element -->
+        <!-- @Private -->
+        
         <dc:description>
             <xsl:value-of select="."/>
         </dc:description>
     </xsl:template>
 
-    <!-- creator -->
+
     <xsl:template match="dc:creator" mode="meta">
+        <!-- @Description: Generates the &lt;meta:initial-creator&gt; element (last modification date) -->
+        <!-- @Context: Any &lt;dc:creator&gt; element -->
+        <!-- @Private -->
+        
         <meta:initial-creator>
             <xsl:value-of select="."/>
         </meta:initial-creator>
     </xsl:template>
 
-    <!-- creation date -->
+
     <xsl:template match="dcterms:created" mode="meta">
+        <!-- @Description: Generates the &lt;meta:creation-date&gt; element (last modification date) -->
+        <!-- @Context: Any &lt;dcterms:created&gt; element -->
+        <!-- @Private -->
+        
         <meta:creation-date>
             <xsl:value-of select="."/>
         </meta:creation-date>
     </xsl:template>
 
-    <!-- last modifier -->
+
     <xsl:template match="cp:lastModifiedBy" mode="meta">
+        <!-- @Description: Generates the &lt;dc:creator&gt; element (last modification date) -->
+        <!-- @Context: Any &lt;cp:lastModifiedBy&gt; element -->
+        <!-- @Private -->
+        
         <dc:creator>
             <xsl:value-of select="."/>
         </dc:creator>
     </xsl:template>
 
-    <!-- last modification date -->
+
     <xsl:template match="dcterms:modified" mode="meta">
+        <!-- @Description: Generates the &lt;dc:date&gt; element (last modification date) -->
+        <!-- @Context: Any &lt;dcterms:modified&gt; element -->
+        <!-- @Private -->
+        
         <dc:date>
             <xsl:value-of select="."/>
         </dc:date>
     </xsl:template>
 
-    <!-- last print date -->
     <xsl:template match="cp:lastPrinted" mode="meta">
+        <!-- @Description: Generates the &lt;meta:print-date&gt; element -->
+        <!-- @Context: Any &lt;cp:lastPrinted&gt; element -->
+        <!-- @Private -->
+        
         <meta:print-date>
             <xsl:value-of select="."/>
         </meta:print-date>
     </xsl:template>
 
-    <!-- subject -->
     <xsl:template match="dc:subject" mode="meta">
+        <!-- @Description: Generates the &lt;dc:subject&gt; element -->
+        <!-- @Context: Any  &lt;dc:subject&gt; element -->
+        <!-- @Private -->
+        
         <dc:subject>
             <xsl:value-of select="."/>
         </dc:subject>
     </xsl:template>
 
-    <!-- editing time -->
     <xsl:template match="TotalTime" mode="meta">
+        <!-- @Description: Generates the &lt;meta:editing-duration&gt; element -->
+        <!-- @Context: Any &lt;TotalTime&gt; element-->
+        <!-- @Private -->
+        
         <meta:editing-duration>
             <xsl:choose>
                 <xsl:when test=". &gt; 60">
@@ -144,16 +187,22 @@
         </meta:editing-duration>
     </xsl:template>
 
-
-    <!-- revision number -->
     <xsl:template match="cp:revision" mode="meta">
+        <!-- @Description: Generates the &lt;meta:editing-cycles&gt; element -->
+        <!-- @Context: Any &lt;cp:revision&gt; element -->
+        <!-- @Private -->
+                
         <meta:editing-cycles>
             <xsl:value-of select="."/>
         </meta:editing-cycles>
     </xsl:template>
 
-    <!-- custom properties-->
+    
     <xsl:template match="cust-p:property" mode="meta">
+        <!-- @Description: Generates the &lt;meta:user-defined&gt; element(s) -->
+        <!-- @Context: Any &lt;cust-p:property&gt; -->
+        <!-- @Private -->
+        
         <xsl:for-each select=".">
             <meta:user-defined meta:name="{@name}">
                 <xsl:attribute name="meta:type">
@@ -174,21 +223,32 @@
         </xsl:for-each>
     </xsl:template>
 
-    <!-- keywords -->
+
     <xsl:template match="cp:keywords" mode="meta">
+        <!-- @Description: Generates the &lt;meta:keyword&gt; element(s) -->
+        <!-- @Context: Any &lt;cp:keywords&gt; element-->
+        <!-- @Private -->
+        
         <meta:keyword>
             <xsl:value-of select="."/>
         </meta:keyword>
     </xsl:template>
 
-    <!-- language -->
     <xsl:template match="dc:language" mode="meta">
+        <!-- @Description: Generates the &lt;dc:language&gt; element -->
+        <!-- @Context: Any &lt;dc:language&gt; element-->
+        <!-- @Private -->
+        
         <dc:language>
             <xsl:value-of select="."/>
         </dc:language>
     </xsl:template>
 
     <xsl:template name="GetDocumentStatistics">
+        <!-- @Description: Generates the &lt;meta:document-statistic&gt; element -->
+        <!-- @Context: Any -->
+        <!-- @Private -->
+        
         <meta:document-statistic>
             <xsl:for-each select="document('docProps/app.xml')/Properties">
                 <!-- word count -->
@@ -224,6 +284,7 @@
             </xsl:for-each>
         </meta:document-statistic>
     </xsl:template>
+    
     <!-- other properties to fit :
         core : category, contentStatus, contentType
         app : Application, AppVersion, Company, DigSig, DocSecurity, HeadingPairs, HiddenSlides, HLinks, HyperlinkBase, HyperlinksChanged,
