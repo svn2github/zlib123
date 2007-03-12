@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<?xml-stylesheet href="xsl2html.xsl" type="text/xsl" media="screen"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+<!--
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
  * 
@@ -11,7 +14,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of Clever Age nor the names of its contributors 
+ *     * Neither the name of Clever Age nor the names of its contributors
  *       may be used to endorse or promote products derived from this software
  *       without specific prior written permission.
  *
@@ -26,21 +29,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-  <!--      U n i t s
-		1 pt = 20 twip
-		1 in = 72 pt = 1440 twip
-		1 cm = 1440 / 2.54 twip
-		1 pica = 12 pt
-		1 dpt (didot point) = 1/72 in (almost the same as 1 pt)
-		1 px = 0.0264cm at 96dpi (Windows default)
-		1 milimeter(mm) = 0.1cm 
-  -->
   
-  <!-- Gets the unit of a length -->
+  <!-- @Filename: measures.xsl -->
+  <!-- @Description: This stylesheet is used as a toolkit library to perform 
+    direct conversion between the different measure units. Units supported are:
+    <ul>
+    <li>pt (points)</li>
+    <li>in (inches)</li>
+    <li>cm (centimeter)</li>
+    <li>mm (milimeter)</li>
+    <li>px (pixels)</li>
+    <li>pica (1 PostScript pica)</li>
+    <li>dpt (Didot point)</li>
+    </ul>
+  -->
+  <!-- @Created: 2006-12-12 -->    
+ 
   <xsl:template name="GetUnit">
-    <xsl:param name="length"/>
+    <!-- @Description: Gets the unit of a length. -->  
+    <!-- @Context: None -->
+   
+    <xsl:param name="length"/> <!-- (string) The length including the unit to be returned 
+                                      (see units supported above) -->
+    
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">cm</xsl:when>
       <xsl:when test="contains($length, 'mm')">mm</xsl:when>
@@ -54,9 +65,11 @@
   </xsl:template>
 
 
-  <!-- Gets the unit-less value of a measured length -->
   <xsl:template name="GetValue">
-    <xsl:param name="length"/>
+    <!-- @Description: Gets the unit-less value of a measured length -->  
+    <!-- @Context: None -->
+    
+    <xsl:param name="length"/> <!-- (string) The length including the unit -->
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="substring-before($length,'cm')"/>
@@ -88,10 +101,24 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert a measure with a given unit -->
+
   <xsl:template name="ConvertMeasure">
-    <xsl:param name="length"/>
-    <xsl:param name="unit"/>
+    <!-- @Description: Converts a measure with a given unit. The conversion table is as follows:
+      <ul>
+      <li>1 pt   = 20 twip                             </li>
+      <li>1 in   = 72 pt = 1440 twip                   </li>
+      <li>1 cm   = 1440 / 2.54 twip                    </li>
+      <li>1 pica = 12 pt                               </li>
+      <li>1 dpt  = 1/72 in (almost the same as 1 pt)   </li>
+      <li>1 px   = 0.0264cm at 96dpi (Windows default) </li>
+      <li>1 mm   = 0.1cm                               </li>
+      </ul>
+    -->
+    <!-- @Context: None -->
+
+    <xsl:param name="length"/> <!-- (string) The length including the unit -->
+    <xsl:param name="unit"/>   <!-- (string) The unit to be converted to -->
+    
     <xsl:choose>
       <xsl:when test="$unit = 'twips' ">
         <xsl:call-template name="twips-measure">
@@ -121,13 +148,51 @@
       <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  
+  <xsl:template name="DegreesAngle">
+    <!-- @Description: Converts a radian angle to degrees. Returns 0 if no value is specified. -->  
+    <!-- @Context: None -->
+    
+    <xsl:param name="angle"/><!-- (number) The angle to be converted (in radiant) -->
+    <xsl:param name="select" select="'false'"/><!-- (string) If set to 'true', only converts the values pi, pi/2, -pi, -pi/2 -->
+    <xsl:param name="revert" select="'false'"/><!-- (string) If set to 'true', returns a negated result -->
+    
+    <xsl:variable name="val"><!-- Contains the convertion's result  -->     
+      <xsl:choose>
+        <xsl:when test="not($angle)">0</xsl:when>
+        <xsl:when test="not($select = 'true')">
+          <xsl:value-of select="round(number($angle) * 90 div 1.5707963267946)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$angle = 1.5707963267946">90</xsl:when>
+            <xsl:when test="$angle = -1.5707963267946">-90</xsl:when>
+            <xsl:when test="$angle = 3.1415926535892">180</xsl:when>
+            <xsl:when test="$angle = -3.1415926535892">180</xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="$revert = 'true' ">
+        <xsl:value-of select=" - number($val)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$val"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
-
-  <!-- 
-		Convert various length units to twips (twentieths of a point)
-	-->
   <xsl:template name="twips-measure">
-    <xsl:param name="length"/>
+    <!-- @Private -->
+    <!-- @Description: Convert various length units to twips (twentieths of a point)	-->
+    <!-- @Context: None -->
+    
+    <xsl:param name="length"/> <!-- (string) The length including the unit -->
+    
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="round(number(substring-before($length, 'cm')) * 1440 div 2.54)"/>
@@ -159,11 +224,14 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  <!-- 
-		Convert various length units to milimeters
-	-->
+
   <xsl:template name="milimeter-measure">
-    <xsl:param name="length"/>
+    <!-- @Private -->
+    <!-- @Description:  Convert various length units to milimeters -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="length"/> <!-- (string) The length including the unit -->
+    
     <xsl:param name="round">true</xsl:param>
     <xsl:variable name="newlength">
       <xsl:choose>
@@ -206,11 +274,14 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  <!-- 
-		Convert  length units to eights of a point
-	-->
+
   <xsl:template name="eightspoint-measure">
-    <xsl:param name="length"/>
+    <!-- @Private -->
+    <!-- @Description: Convert  length units to eights of a point	-->
+    <!-- @Context: None -->
+    
+    <xsl:param name="length"/> <!-- (string) The length including the unit -->
+    
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="round(number(substring-before($length, 'cm')) * 576 div 2.54)"/>
@@ -240,11 +311,13 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- 
-		Convert  length units to point
-	-->
   <xsl:template name="point-measure">
-    <xsl:param name="length"/>
+    <!-- @Private -->
+    <!-- @Description: Convert  length units to point -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="length"/> <!-- (string) The length including the unit -->
+    
     <xsl:param name="round">true</xsl:param>
     <xsl:variable name="newlength">
       <xsl:choose>
@@ -285,12 +358,13 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- 
-		Convert to emu
-		1cm = 360000 emu
-	-->
   <xsl:template name="emu-measure">
-    <xsl:param name="length"/>
+    <!-- @Private -->
+    <!-- @Description: Convert to emu (1cm = 360000 emu) -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="length"/> <!-- (string) The length including the unit -->
+    
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="round(number(substring-before($length, 'cm')) * 360000)"/>
@@ -315,44 +389,4 @@
     </xsl:choose>
   </xsl:template>
 
-
-
-  <!--
-    Convert a radian angle to degrees
-    'select' param indicates that only a few values are allowed (90,180)
-  -->
-  <xsl:template name="DegreesAngle">
-    <xsl:param name="angle"/>
-    <xsl:param name="select" select="'false'"/>
-    <xsl:param name="revert" select="'false'"/>
-
-    <xsl:variable name="val">
-      <xsl:choose>
-        <xsl:when test="not($angle)">0</xsl:when>
-        <xsl:when test="not($select = 'true')">
-          <xsl:value-of select="round(number($angle) * 90 div 1.5707963267946)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when test="$angle = 1.5707963267946">90</xsl:when>
-            <xsl:when test="$angle = -1.5707963267946">-90</xsl:when>
-            <xsl:when test="$angle = 3.1415926535892">180</xsl:when>
-            <xsl:when test="$angle = -3.1415926535892">180</xsl:when>
-            <xsl:otherwise>0</xsl:otherwise>
-          </xsl:choose>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:choose>
-      <xsl:when test="$revert = 'true' ">
-        <xsl:value-of select=" - number($val)"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$val"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-
-   
 </xsl:stylesheet>

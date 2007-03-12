@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="xsl2html.xsl" type="text/xsl" media="screen"?>
 <!-- 
  * Copyright (c) 2006, Clever Age
  * All rights reserved.
@@ -27,22 +28,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-  <!--      U n i t s
-		1 pt = 20 twip
-		1 in = 72 pt = 1440 twip
-		1 cm = 1440 / 2.54 twip
-		1 pica = 12 pt
-		1 dpt (didot point) = 1/72 in (almost the same as 1 pt)
-		1 px = 0.0264cm at 96dpi (Windows default)
-		1 milimeter(mm) = 0.1cm
-               1cm = 360000 emu
+  <!-- @Filename: measure.xsl -->
+  <!-- @Description: This stylesheet is used as a toolkit library to perform 
+    reverse conversion between the different measure units. Units supported are:
+    <ul>
+    <li>pt (points)</li>
+    <li>in (inches)</li>
+    <li>cm (centimeter)</li>
+    <li>mm (milimeter)</li>
+    <li>px (pixels)</li>
+    <li>pica (1 PostScript pica)</li>
+    <li>dpt (Didot point)</li>
+    </ul>
+  -->
+  <!-- @Created: 2006-12-12 -->
+  <!-- @TODO:
+    <ul>
+    <li>Named template 'ConvertToMeasure' currently only support 'cm' unit.</li>
+    </ul>
   -->
   
-  <!-- Convert a measure in twips to a 'unit' measure -->
+ 
   <xsl:template name="ConvertTwips">
-    <xsl:param name="length"/>
-    <xsl:param name="unit"/>
+    <!-- @Description: Convert a measure in twips to a 'unit' measure -->
+    <!-- @Context: None -->
+    <!-- @Private -->
+    
+    <xsl:param name="length"/> <!-- (number) The length (in twips) to convert -->
+    <xsl:param name="unit"/>   <!-- (string) The unit to convert to -->
+    
     <xsl:choose>
       <xsl:when test="$length='0' or $length=''">
         <xsl:value-of select="concat(0, $unit)"/>
@@ -83,11 +97,15 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert a measure in points to a specified unit -->
   <xsl:template name="ConvertPoints">
-    <xsl:param name="length"/>
-    <xsl:param name="unit"/>
-    <xsl:variable name="lengthVal">
+    <!-- @Description: Convert a measure in points to a specified unit -->
+    <!-- @Context: None -->
+    <!-- @Private -->
+    
+    <xsl:param name="length"/> <!-- (number|string) The length to convert (including or not the unit) -->
+    <xsl:param name="unit"/>   <!-- (string) The unit to converted to -->
+    
+    <xsl:variable name="lengthVal"> <!-- The actual length (with unit removed if needed) -->
       <xsl:choose>
         <xsl:when test="contains($length,'pt')">
           <xsl:value-of select="substring-before($length,'pt')"/>
@@ -97,6 +115,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
     <xsl:choose>
       <xsl:when test="$lengthVal='0' or $lengthVal=''">
         <xsl:value-of select="concat(0, $unit)"/>
@@ -131,10 +150,14 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert a measure in half points to a specified unit -->
   <xsl:template name="ConvertHalfPoints">
-    <xsl:param name="length"/>
-    <xsl:param name="unit"/>
+    <!-- @Description: Convert a measure in half points to a specified unit -->
+    <!-- @Context: None -->
+    <!-- @Private -->
+    
+    <xsl:param name="length"/> <!-- (number) The length to convert -->
+    <xsl:param name="unit"/>   <!-- (string) The unit to convert to -->
+    
     <xsl:choose>
       <xsl:when test="$length='0' or $length=''">
         <xsl:value-of select="concat(0, $unit)"/>
@@ -169,10 +192,14 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert a measure in eigths of a point to a specified unit -->
   <xsl:template name="ConvertEighthsPoints">
-    <xsl:param name="length"/>
-    <xsl:param name="unit"/>
+    <!-- @Description: Convert a measure in eigths of a point to a specified unit -->
+    <!-- @Context: None -->
+    <!-- @Private -->
+    
+    <xsl:param name="length"/> <!-- (number) The length (in eigths of a point) to convert -->
+    <xsl:param name="unit"/> <!-- (string) The unit to converted to -->
+    
     <xsl:choose>
       <xsl:when test="$length='0' or $length=''">
         <xsl:value-of select="concat(0, $unit)"/>
@@ -207,10 +234,14 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--  Convert emu to a specified unit (2 decimals) -->
   <xsl:template name="ConvertEmu">
-    <xsl:param name="length"/>
-    <xsl:param name="unit"/>
+    <!--  @Description: Convert emu to a specified unit (2 decimals) -->
+    <!-- @Context: None -->
+    <!-- @Private -->
+    
+    <xsl:param name="length"/> <!-- (number) The length (in emu) to convert -->
+    <xsl:param name="unit"/>   <!-- (string) The unit to converted to -->
+    
     <xsl:choose>
       <xsl:when
         test="$length = '' or not($length) or $length = 0 or format-number($length div 360000, '#.##') = ''">
@@ -222,10 +253,13 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert emu to a specified unit (3 decimals) -->
   <xsl:template name="ConvertEmu3">
-    <xsl:param name="length"/>
-    <xsl:param name="unit"/>
+    <!-- @Description: Convert emu to a specified unit (3 decimals) -->
+    <!-- @Context: None -->
+    <!-- @Private -->
+    
+    <xsl:param name="length"/> <!-- (number) The length (in emu) to convert -->
+    <xsl:param name="unit"/>   <!-- (string) The unit to converted to -->
     <xsl:choose>
       <xsl:when
         test="$length = '' or not($length) or $length = 0 or format-number($length div 360000, '#.###') = ''">
@@ -237,9 +271,11 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Extract scalar from length -->
   <xsl:template name="GetValue">
-    <xsl:param name="length"/>
+    <!-- @Description: Extract scalar from length -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="length"/> <!-- (string) The length including the unit -->
     <xsl:choose>
       <xsl:when test="contains($length, 'cm')">
         <xsl:value-of select="substring-before($length,'cm')"/>
@@ -271,18 +307,32 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert length from specified unit to a speficied target unit -->
   <xsl:template name="ConvertMeasure">
-    <xsl:param name="length"/>
-    <xsl:param name="sourceUnit"/>
-    <xsl:param name="destUnit"/>
-    <xsl:param name="addUnit">true</xsl:param>
+    <!-- @Description: Convert length from specified unit to a speficied target unit.
+      The conversion table is as follows:
+      <ul>
+      <li>1 pt   = 20 twip                             </li>
+      <li>1 in   = 72 pt = 1440 twip                   </li>
+      <li>1 cm   = 1440 / 2.54 twip                    </li>
+      <li>1 pica = 12 pt                               </li>
+      <li>1 dpt  = 1/72 in (almost the same as 1 pt)   </li>
+      <li>1 px   = 0.0264cm at 96dpi (Windows default) </li>
+      <li>1 mm   = 0.1cm                               </li>
+      </ul>
+    -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="length"/>                 <!-- (number|string) The length to convert including or not the unit -->
+    <xsl:param name="sourceUnit"/>             <!-- (string) The unit to convert from. If omitted, the unit should be specified in the length parameter -->
+    <xsl:param name="destUnit"/>               <!-- (string) The unit to convert to -->
+    <xsl:param name="addUnit">true</xsl:param> <!-- (string) If set to 'true', will append the convertion unit to the result -->
+    
     <xsl:choose>
       <xsl:when
         test="$length='' or $length='0' or $length='0cm' or $length='0mm' or $length='0in' or $length='0pt' or $length='0twip' or $length='0pika' or $length='0dpt' or $length='0px'">
         <xsl:value-of select="'0'"/>
       </xsl:when>
-      <!-- used when unit type is given in length string-->
+      <!-- used when unit type is given in length string -->
       <xsl:when test="$sourceUnit = ''">
         <xsl:call-template name="ConvertToMeasure">
           <xsl:with-param name="length" select="$length"/>
@@ -290,7 +340,7 @@
           <xsl:with-param name="addUnit" select="$addUnit"/>
         </xsl:call-template>
       </xsl:when>
-      <!-- used when unit type is not given in length string-->
+      <!-- used when unit type is not given in length string -->
       <xsl:otherwise>
         <xsl:call-template name="ConvertFromMeasure">
           <xsl:with-param name="length" select="$length"/>
@@ -301,11 +351,15 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--  Convert from given measure - for usage when unit type is not given in string-->
   <xsl:template name="ConvertFromMeasure">
-    <xsl:param name="length"/>
-    <xsl:param name="destUnit"/>
-    <xsl:param name="sourceUnit"/>
+    <!--  @Description: Convert from given measure - for usage when unit type is not given in string-->
+    <!-- @Private -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="length"/>     <!-- (number) The length to convert -->
+    <xsl:param name="sourceUnit"/> <!-- (string) The unit to convert from -->
+    <xsl:param name="destUnit"/>   <!-- (string) The unit to convert to -->
+    
     <xsl:choose>
       <xsl:when test="$sourceUnit = 'eighths-points' ">
         <xsl:call-template name="ConvertEighthsPoints">
@@ -340,11 +394,16 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--  Convert to given measure - for usage when unit type is given in string-->
   <xsl:template name="ConvertToMeasure">
-    <xsl:param name="length"/>
-    <xsl:param name="destUnit"/>
-    <xsl:param name="addUnit">true</xsl:param>
+    <!--  @Description: Convert to given measure - for usage when unit type is given in string-->
+    <!-- @Context: None -->
+    <!-- @Private -->
+    <!-- @TODO: other units (at the moment only cm is supported)-->
+    
+    <xsl:param name="length"/>                 <!-- (string) The length to convert (including the unit) -->
+    <xsl:param name="destUnit"/>               <!-- (string) The unit to convert to -->
+    <xsl:param name="addUnit">true</xsl:param> <!-- (string) If set to true, wil append 'cm' to the result -->
+    
     <xsl:choose>
       <xsl:when test="contains($destUnit, 'cm')">
         <xsl:call-template name="ConvertToCentimeters">
@@ -352,16 +411,20 @@
           <xsl:with-param name="addUnit" select="$addUnit"/>
         </xsl:call-template>
       </xsl:when>
-      <!-- TODO other units-->
+      
     </xsl:choose>
   </xsl:template>
 
-  <!-- Convert given unit to cm -->
   <xsl:template name="ConvertToCentimeters">
-    <xsl:param name="length"/>
-    <xsl:param name="round">false</xsl:param>
-    <xsl:param name="addUnit">true</xsl:param>
-    <xsl:variable name="newlength">
+    <!-- @Description: Convert given unit to cm -->
+    <!-- @Context: None -->
+    <!-- @Private -->
+    
+    <xsl:param name="length"/>                <!-- (string) The length to convert (including the unit) -->
+    <xsl:param name="round">false</xsl:param> <!-- (string) If set to true, the result will be rounded to the nearest integer, otherwise the result will be a 3 decimal digit -->
+    <xsl:param name="addUnit">true</xsl:param><!-- (string) If set to true, wil append 'cm' to the result -->
+    
+    <xsl:variable name="newlength"> <!-- The convertion's result -->
       <xsl:choose>
         <xsl:when test="contains($length, 'cm')">
           <xsl:value-of select="$length"/>
@@ -397,7 +460,8 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="roundLength">
+    
+    <xsl:variable name="roundLength"> <!-- The result of the rounding -->
       <xsl:choose>
         <xsl:when test="$round='true'">
           <xsl:value-of select="round($newlength)"/>
@@ -407,8 +471,9 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
     <xsl:choose>
-      <xsl:when test="$addUnit = 'true' ">
+      <xsl:when test="$addUnit = 'true' "> 
         <xsl:value-of select="concat($roundLength, 'cm')"/>
       </xsl:when>
       <xsl:otherwise>
@@ -418,17 +483,22 @@
   </xsl:template>
 
   
-  <!-- Convert hex to decimal -->
   <xsl:template name="HexToDec">
-    <xsl:param name="number"/>
-    <xsl:param name="step" select="0"/>
-    <xsl:param name="value" select="0"/>
-    <xsl:variable name="number1">
+    <!-- @Description: This is a recurive algorithm converting a hex to decimal -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="number"/>            <!-- (string|number) The hex number to convert -->
+    <xsl:param name="step" select="0"/>   <!-- (number) The exponent (only used during convertion)-->
+    <xsl:param name="value" select="0"/>  <!-- (number) The result from the previous digit's convertion (only used during convertion) -->
+    
+    <xsl:variable name="number1"> <!-- translates all letters to lower case -->
       <xsl:value-of select="translate($number,'ABCDEF','abcdef')"/>
     </xsl:variable>
+    
     <xsl:choose>
       <xsl:when test="string-length($number1) &gt; 0">
-        <xsl:variable name="one">
+        
+        <xsl:variable name="one"> <!-- The last digit in the hex number -->
           <xsl:choose>
             <xsl:when test="substring($number1,string-length($number1) ) = 'a'">
               <xsl:text>10</xsl:text>
@@ -453,7 +523,8 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="power">
+        
+        <xsl:variable name="power">   <!-- The result of the exponent calculation -->
           <xsl:call-template name="Power">
             <xsl:with-param name="base">16</xsl:with-param>
             <xsl:with-param name="exponent">
@@ -462,6 +533,7 @@
             <xsl:with-param name="value1">16</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
+        
         <xsl:choose>
           <xsl:when test="string-length($number1) = 1">
             <xsl:value-of select="($one * $power )+ number($value)"/>
@@ -484,10 +556,15 @@
     </xsl:choose>
   </xsl:template>
 
+  
   <xsl:template name="Power">
-    <xsl:param name="base"/>
-    <xsl:param name="exponent"/>
-    <xsl:param name="value1"/>
+    <!-- @Description: Calculates the power of a given number (i.e. x<sup>y</sup>) -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="base"/>     <!-- (number) The exponent base -->
+    <xsl:param name="exponent"/> <!-- (number) The exponent (e.g. y)-->
+    <xsl:param name="value1"/>   <!-- (number) The number on which the exponent should be applied (e.g. x)  -->
+    
     <xsl:choose>
       <xsl:when test="$exponent = 0">
         <xsl:text>1</xsl:text>
