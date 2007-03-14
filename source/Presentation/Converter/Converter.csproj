@@ -7,7 +7,7 @@
     <ProjectGuid>{D6E88E6E-B1B4-46B0-BC93-DDD4785865DF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CleverAge.OdfConverter.Presentation</RootNamespace>
+    <RootNamespace>Sonata.OdfConverter.Presentation</RootNamespace>
     <AssemblyName>PresentationConverter</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converter.cs" />
+    <Compile Include="PptxValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -41,10 +42,31 @@
       <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
       <Name>OdfConverterLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\OdfZipUtils\OdfZipUtils.csproj">
+      <Project>{E51CB999-A720-4165-9DF2-A3E49547A40B}</Project>
+      <Name>OdfZipUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="resources\odf2oox\" />
-    <Folder Include="resources\oox2odf\" />
+    <EmbeddedResource Include="resources\oox2odf\content.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\source.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\odf2oox.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\source.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\oox2odf\meta.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="resources\odf2oox\docprops.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
