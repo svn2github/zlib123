@@ -28,7 +28,7 @@ namespace OdfExcel2003Addin
 	/// </summary>
 	/// <seealso class='IDTExtensibility2' />
     [GuidAttribute("40676235-09CB-42E8-B207-EC354F84BC5F"), ProgId("OdfExcel2003Addin.Connect")]
-    public class Connect : Object, Extensibility.IDTExtensibility2
+    public class Connect : Object, Extensibility.IDTExtensibility2, IOdfConverter
     {
           private const int xlOpenXMLWorkbook = 51; // ".xslx" file format
         private string DialogBoxTitle;

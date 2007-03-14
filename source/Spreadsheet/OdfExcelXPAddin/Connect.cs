@@ -54,7 +54,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
 	/// </summary>
 	/// <seealso class='IDTExtensibility2' />
     [GuidAttribute("267FE118-B41F-491A-BFE8-9781766BF6F4"), ProgId("OdfExcelXPAddin.Connect")]
-    public class Connect : Object, Extensibility.IDTExtensibility2
+    public class Connect : Object, Extensibility.IDTExtensibility2, IOdfConverter
     {
         private const int xlOpenXMLWorkbook = 51; // ".xslx" file format
         private string DialogBoxTitle;
