@@ -178,7 +178,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 		private bool transformDirectionOverride = false; // whether conversion direction has been specified
         private Report report = null;
         private Word word = null;
-        private Presentation presenation = null; 
+        private Presentation presentation = null; 
         private OoxValidator ooxValidator = null;
         private OdfValidator odfValidator = null;
         private Direction batch = Direction.None;
@@ -258,19 +258,19 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     break;
                 case Direction.DocxToOdt:
                 case Direction.PptxToOdp:
-                    // instanciate word if needed
+                    // instanciate Presentation if needed
                     if (this.transformDirection == Direction.PptxToOdp && this.open)
                     {
-                        presenation = new Presentation();
-                        presenation.Visible = false;
+                        presentation = new Presentation();
+                        presentation.Visible = false;
                     }
 
                     this.ProceedSingleFile(this.input, this.output, this.transformDirection);
 
-                    // close word if needed
+                    // close Presentation if needed
                     if (this.open)
                     {
-                        presenation.Quit();
+                        presentation.Quit();
                     }
                     break;
                 case Direction.XlsxToOds:
@@ -304,6 +304,13 @@ namespace CleverAge.OdfConverter.CommandLineTool
             {
                 this.word = new Word();
                 this.word.Visible = false;
+            }
+
+            // instanciate Presentation if needed
+            if (this.open && (this.batch == Direction.OdpToPptx))
+            {
+                this.presentation = new Presentation();
+                this.presentation.Visible = false;
             }
 
             // instanciate validator if needed
@@ -585,6 +592,23 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     return false;
                 }
             }
+
+            if (transformDirection == Direction.OdpToPptx)
+            {
+                try
+                {
+                    string filename = Path.GetFullPath(output);
+                    presentation.Open(filename);
+                    this.report.AddLog(input, "Converted file opened successfully in PowerPoint", Report.INFO_LEVEL);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    this.report.AddLog(input, "Converted file (" + output + ") could not be opened in PowerPoint", Report.ERROR_LEVEL);
+                    this.report.AddLog(input, e.GetType().Name + ": " + e.Message + "(" + e.StackTrace + ")", Report.DEBUG_LEVEL);
+                    return false;
+                }
+            }
             return false;
         }
 
@@ -737,12 +761,10 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     case "/PPTX2ODP":
                         this.transformDirection = Direction.PptxToOdp;
                         this.transformDirectionOverride = true;
-                        // System.Console.WriteLine("Override to odt\n");
                         break;
                     case "/ODP2PPTX":
                         this.transformDirection = Direction.OdpToPptx;
                         this.transformDirectionOverride = true;
-                        // System.Console.WriteLine("Override to docx\n");
                         break;
 					case "/F":
 						this.replace = true;
@@ -924,11 +946,6 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     }
                     return wordInstance;
                 case Direction.PptxToOdp:
-                    if (presentationInstance == null)
-                    {
-                        presentationInstance = new Sonata.OdfConverter.Presentation.Converter();    
-                    }
-                    return presentationInstance;
                 case Direction.OdpToPptx:
                     if (presentationInstance == null)
                     {
