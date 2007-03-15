@@ -74,37 +74,57 @@
           </pxsi:sst>
         </xsl:for-each>
         
-        <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-          <table:table>
-
-            <!-- Insert Table (Sheet) Name -->
-
-            <xsl:attribute name="table:name">
-              <xsl:value-of select="@name"/>
-            </xsl:attribute>
-
-            <!-- Insert Table Style Name (style:table-properties) -->
-
-            <xsl:attribute name="table:style-name">
-              <xsl:value-of select="generate-id()"/>
-            </xsl:attribute>
-
-            <xsl:call-template name="InsertSheetContent">
-              <xsl:with-param name="sheet">
-                <xsl:call-template name="GetTarget">
-                  <xsl:with-param name="id">
-                    <xsl:value-of select="@r:id"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
-                </xsl:call-template>
-              </xsl:with-param>
-            </xsl:call-template>
-            
-          </table:table>
-        </xsl:for-each>
+        <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]">
+          <xsl:with-param name="number">1</xsl:with-param>
+        </xsl:apply-templates>
         
       </office:spreadsheet>
     </office:body>
+  </xsl:template>
+  
+  <xsl:template match="e:sheet">
+    <xsl:param name="number"/>
+    <table:table>
+      
+      <!-- Insert Table (Sheet) Name -->
+      
+      <xsl:attribute name="table:name">
+        <xsl:value-of select="@name"/>
+      </xsl:attribute>
+      
+      <!-- Insert Table Style Name (style:table-properties) -->
+      
+      <xsl:attribute name="table:style-name">
+        <xsl:value-of select="generate-id()"/>
+      </xsl:attribute>
+      
+      <xsl:call-template name="InsertSheetContent">
+        <xsl:with-param name="sheet">
+          <xsl:call-template name="GetTarget">
+            <xsl:with-param name="id">
+              <xsl:value-of select="@r:id"/>
+            </xsl:with-param>
+            <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+          </xsl:call-template>
+        </xsl:with-param>
+      </xsl:call-template>
+      
+    </table:table>
+    
+    <!-- Insert next Table -->
+    <xsl:choose>
+      <xsl:when test="$number &gt; 255">
+        <xsl:message terminate="no">translation.oox2odf.SheetNumber</xsl:message>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="following-sibling::e:sheet[1]">
+          <xsl:with-param name="number">
+            <xsl:value-of select="$number + 1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
 
   <!-- insert string -->
