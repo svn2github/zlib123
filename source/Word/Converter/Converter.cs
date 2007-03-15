@@ -63,10 +63,15 @@ namespace CleverAge.OdfConverter.Word
                 XmlReader reader = XmlReader.Create("META-INF/manifest.xml", settings);
                 doc.Load(reader);
             }
-            catch (Exception e)
+            catch (XmlException e)
             {
                 Debug.WriteLine(e.Message);
                 throw new NotAnOdfDocumentException(e.Message);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                throw e;
             }
 
             XmlNodeList nodes = doc.GetElementsByTagName("encryption-data", "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0");
