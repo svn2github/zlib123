@@ -107,6 +107,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private void DoConvert()
         {
             try {
+                converter.RemoveMessageListeners();
                 converter.AddProgressMessageListener(new AbstractConverter.MessageListener(ProgressMessageInterceptor));
                 converter.AddFeedbackMessageListener(new AbstractConverter.MessageListener(FeedbackMessageInterceptor));
                 converter.DirectTransform = this.isDirect;

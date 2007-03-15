@@ -394,5 +394,12 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         {
             feedbackMessageIntercepted += listener;
         }
+
+        public void RemoveMessageListeners()
+        {
+            progressMessageIntercepted = null;
+            feedbackMessageIntercepted = null;
+        }
+
     }
 }
