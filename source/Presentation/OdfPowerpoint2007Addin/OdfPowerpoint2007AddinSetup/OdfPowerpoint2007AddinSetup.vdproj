@@ -15,7 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_D3414B1D9AD2497EAF130C6AAC4EF84A"
+        "MsmKey" = "8:_26A9540C251F4EB79A58B0F72156D508"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -27,7 +27,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:OdfPowerpoint2007Addin\\OdfPowerpoint2007AddinSetup\\Debug\\OdfPowerpoint2007AddinSetup.msi"
+        "OutputFilename" = "8:Debug\\OdfPowerpoint2007AddinSetup.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -37,13 +37,24 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                }
+            }
         }
         "Release"
         {
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:OdfPowerpoint2007Addin\\OdfPowerpoint2007AddinSetup\\Release\\OdfPowerpoint2007AddinSetup.msi"
+        "OutputFilename" = "8:Release\\OdfPowerpoint2007AddinSetup.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -53,6 +64,17 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                }
+            }
         }
     }
     "Deployable"
@@ -82,9 +104,9 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D3414B1D9AD2497EAF130C6AAC4EF84A"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_26A9540C251F4EB79A58B0F72156D508"
             {
-            "SourcePath" = "8:..\\..\\..\\lib\\zlibwapi.dll"
+            "SourcePath" = "8:..\\..\\..\\..\\lib\\zlibwapi.dll"
             "TargetName" = "8:zlibwapi.dll"
             "Tag" = "8:"
             "Folder" = "8:_208AF6E99AEF478B96F1D12BF910A5B9"
