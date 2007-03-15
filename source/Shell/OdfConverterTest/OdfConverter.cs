@@ -36,7 +36,7 @@ using System.Threading;
 using CleverAge.OdfConverter.OdfZipUtils;
 using CleverAge.OdfConverter.OdfConverterLib;
 using CleverAge.OdfConverter.Word;
-using CleverAge.OdfConverter.Presentation;
+using Sonata.OdfConverter.Presentation;
 using CleverAge.OdfConverter.Spreadsheet;
 
 
@@ -109,6 +109,51 @@ namespace CleverAge.OdfConverter.CommandLineTool
         }
     }
 
+    class Presentation
+    {
+        Type _type;
+        object _instance;
+        Type _docsType;
+        object _documents;
+
+        public Presentation()
+        {
+            _type = Type.GetTypeFromProgID("POWERPNT.Application");
+            _instance = Activator.CreateInstance(_type);
+            _docsType = null;
+            _documents = null;
+        }
+
+        public bool Visible
+        {
+            set
+            {
+                object[] args = new object[] { value };
+                _type.InvokeMember("Visible", BindingFlags.SetProperty, null, _instance, args);
+            }
+        }
+
+        public void Quit()
+        {
+            object[] args = new object[] { Missing.Value,
+                                            Missing.Value,
+                                            Missing.Value };
+            _type.InvokeMember("Quit", BindingFlags.InvokeMethod, null, _instance, args);
+        }
+
+        public void Open(string document)
+        {
+            if (_documents == null)
+            {
+                _documents = _type.InvokeMember("Documents", BindingFlags.GetProperty, null, _instance, null);
+                _docsType = _documents.GetType();
+            }
+            object[] args = new object[] { document };
+            _docsType.InvokeMember("Open", BindingFlags.InvokeMethod, null, _documents, args);
+
+        }
+    }
+
     /// <summary>
     /// ODFConverterTest is a CommandLine Program to test the conversion
     /// of an OpenDocument file into an OpenXML file.
@@ -133,6 +178,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 		private bool transformDirectionOverride = false; // whether conversion direction has been specified
         private Report report = null;
         private Word word = null;
+        private Presentation presenation = null; 
         private OoxValidator ooxValidator = null;
         private OdfValidator odfValidator = null;
         private Direction batch = Direction.None;
@@ -212,6 +258,21 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     break;
                 case Direction.DocxToOdt:
                 case Direction.PptxToOdp:
+                    // instanciate word if needed
+                    if (this.transformDirection == Direction.PptxToOdp && this.open)
+                    {
+                        presenation = new Presentation();
+                        presenation.Visible = false;
+                    }
+
+                    this.ProceedSingleFile(this.input, this.output, this.transformDirection);
+
+                    // close word if needed
+                    if (this.open)
+                    {
+                        presenation.Quit();
+                    }
+                    break;
                 case Direction.XlsxToOds:
                     this.ProceedBatchOox();
                     break;
@@ -226,7 +287,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     this.ProceedSingleFile(this.input, this.output, this.transformDirection);
 
                     // close word if needed
-                    if (this.transformDirection == Direction.OdtToDocx && this.open)
+                    if (this.open)
                     {
                         word.Quit();
                     }
@@ -395,18 +456,18 @@ namespace CleverAge.OdfConverter.CommandLineTool
             else return NOT_VALIDATED_AND_NOT_OPENED;
         }
 
-        private bool ConvertFile(string input, string output, Direction direction)
+        private bool ConvertFile(string input, string output, Direction transformDirection)
         {
             try
             {
                 DateTime start = DateTime.Now;
-                AbstractConverter converter = ConverterFactory.Instance(direction);
+                AbstractConverter converter = ConverterFactory.Instance(this.transformDirection);
                 converter.ExternalResources = this.xslPath;
                 converter.SkipedPostProcessors = this.skipedPostProcessors;
-                converter.DirectTransform = 
-                    direction == Direction.OdtToDocx 
-                    || direction == Direction.OdpToPptx
-                    || direction == Direction.OdsToXlsx;
+                converter.DirectTransform =
+                    transformDirection == Direction.OdtToDocx
+                    || transformDirection == Direction.OdpToPptx
+                    || transformDirection == Direction.OdsToXlsx;
                 converter.Packaging = this.packaging;
                 converter.Transform(input, output);
                 TimeSpan duration = DateTime.Now - start;
@@ -863,10 +924,15 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     }
                     return wordInstance;
                 case Direction.PptxToOdp:
+                    if (presentationInstance == null)
+                    {
+                        presentationInstance = new Sonata.OdfConverter.Presentation.Converter();    
+                    }
+                    return presentationInstance;
                 case Direction.OdpToPptx:
                     if (presentationInstance == null)
                     {
-                        presentationInstance = new CleverAge.OdfConverter.Presentation.Converter();
+                        presentationInstance = new Sonata.OdfConverter.Presentation.Converter();
                     }
                     return presentationInstance;
                 case Direction.XlsxToOds:
