@@ -258,7 +258,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
+    
     <!-- if there were empty cells in a row before this one then insert empty cells-->
     <xsl:choose>
       <!-- when this cell is the first one in a row but not in column A -->
@@ -284,6 +284,11 @@
       <xsl:when test="$prevCellCol != ''">
         <xsl:variable name="prevCellColNum">
           <xsl:choose>
+            <!-- if previous column was specified by number -->
+            <xsl:when test="$prevCellCol > -1">
+              <xsl:value-of select="$prevCellCol"/>
+            </xsl:when>
+            <!-- if previous column was specified by prewious cell position (i.e. H4) -->
             <xsl:when test="$prevCellCol != ''">
               <xsl:call-template name="GetColNum">
                 <xsl:with-param name="cell">
@@ -291,6 +296,7 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:when>
+            <!-- if there wasn't previous cell-->
             <xsl:otherwise>-1</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
@@ -409,13 +415,13 @@
     </xsl:choose>
 
     <!-- Insert next coll -->
-
     <xsl:choose>
 
       <!-- Skips empty coll (in Merge Cell) -->
 
       <xsl:when test="$CheckIfMerge != 'false'">
         <xsl:choose>
+          <!-- if this cell is inside row of merged cells ($CheckIfMerged is true:number_of_cols_spaned) -->
           <xsl:when
             test="contains($CheckIfMerge,'true') and substring-after($CheckIfMerge, ':') &gt; 1">
             <xsl:if test="following-sibling::e:c[number(substring-after($CheckIfMerge, ':')) - 1]">
@@ -425,11 +431,12 @@
                   <xsl:text>true</xsl:text>
                 </xsl:with-param>
                 <xsl:with-param name="prevCellCol">
-                  <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
+                  <xsl:value-of select="$colNum + number(substring-after($CheckIfMerge, ':')) - 1"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
           </xsl:when>
+          <!-- if this cell starts row of merged cells ($CheckIfMerged has dimensions of merged cell) -->
           <xsl:otherwise>
             <xsl:if test="following-sibling::e:c[number(substring-after($CheckIfMerge, ':'))]">
               <xsl:apply-templates
@@ -438,14 +445,14 @@
                   <xsl:text>true</xsl:text>
                 </xsl:with-param>
                 <xsl:with-param name="prevCellCol">
-                  <xsl:value-of select="number(substring-after($CheckIfMerge, ':'))"/>
+                  <xsl:value-of select="$colNum + number(substring-after($CheckIfMerge, ':')) - 1"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
+      
       <xsl:otherwise>
         <xsl:if test="following-sibling::e:c">
           <xsl:apply-templates select="following-sibling::e:c[1]">
