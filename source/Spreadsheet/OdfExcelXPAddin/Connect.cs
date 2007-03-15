@@ -206,7 +206,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                 importButton.Caption = this.addinLib.GetString("OdfImportLabel");
                 importButton.Tag = this.addinLib.GetString("OdfImportLabel");
                 // set action
-                importButton.OnAction = "!<OdfExcel2003Addin.Connect>";
+                importButton.OnAction = "!<OdfExcelXPAddin.Connect>";
                 importButton.Visible = true;
                 if (addDelegate)
                 {
