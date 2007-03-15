@@ -245,7 +245,7 @@ namespace OdfPowerpoint2007Addin
                             PPT.Presentation newPres = this.applicationObject.Presentations.Open((string)newName, MsoTriState.msoFalse, MsoTriState.msoFalse, MsoTriState.msoFalse);
 
                             // generate openxml file from the duplicated file (under a temporary file)
-                            tmpFileName = Path.GetTempFileName();
+                            tmpFileName = this.addinLib.GetTempPath((string)initialName, ".pptx");
 
                             this.applicationObject.DisplayAlerts = PPT.PpAlertLevel.ppAlertsNone;
                             newPres.SaveAs((string)tmpFileName, PPT.PpSaveAsFileType.ppSaveAsOpenXMLPresentation, MsoTriState.msoFalse);
@@ -270,7 +270,7 @@ namespace OdfPowerpoint2007Addin
 
                     if (tmpFileName != null && File.Exists((string)tmpFileName))
                     {
-                        File.Delete((string)tmpFileName);
+                        this.addinLib.DeleteTempPath((string)tmpFileName);
                     }
                 }
             }

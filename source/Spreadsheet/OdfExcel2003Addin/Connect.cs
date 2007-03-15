@@ -347,10 +347,9 @@ namespace OdfExcel2003Addin
 
                             MSExcel.Workbook newWb = this.applicationObject.Workbooks.Open((string)newName, missing, readOnly, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
                             // generate xlsx file from the duplicated file (under a temporary file)
-                            tmpFileName = Path.GetTempFileName();
+                            tmpFileName = this.addinLib.GetTempPath((string)initialName, ".xlsx");
                             try
                             {
-                                this.applicationObject.DisplayAlerts = false;
                                 newWb.SaveAs((string)tmpFileName, xlOpenXMLWorkbook, missing, missing, missing, missing, MSExcel.XlSaveAsAccessMode.xlNoChange, missing, missing, missing, missing, missing);
                             }
                             catch (Exception e)
@@ -361,7 +360,6 @@ namespace OdfExcel2003Addin
                             }
                             finally
                             {
-                                this.applicationObject.DisplayAlerts = true;
                                 // close and remove the duplicated file
                                 newWb.Close(false, false, missing);
                                 try
@@ -382,7 +380,7 @@ namespace OdfExcel2003Addin
 
                         if (tmpFileName != null && File.Exists((string)tmpFileName))
                         {
-                            File.Delete((string)tmpFileName);
+                            this.addinLib.DeleteTempPath((string)tmpFileName);
                         }
                     }
                 }

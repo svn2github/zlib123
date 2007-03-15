@@ -283,7 +283,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                             odfFile += ext;
                         }
                         object initialName = wb.FullName;
-                        object tmpFileName = null;
+                        object ooxTempFileName = null;
                         string xlsxFile = (string)initialName;
 
                         //this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
@@ -291,8 +291,8 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                         if (wb.FileFormat != MSExcel.XlFileFormat.xlOpenXMLWorkbook)
                         {
                             // duplicate the file
-                            object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
-                            File.Copy((string)initialName, (string)newName);
+                            object wbCopyName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
+                            File.Copy((string) initialName, (string) wbCopyName);
 
                             // open the duplicated file
                             object addToRecentFiles = false;
@@ -300,20 +300,18 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                             object isVisible = false;
                             object missing = Missing.Value;
 
-                            MSExcel.Workbook newWb = this.applicationObject.Workbooks.Open((string)newName, missing, readOnly, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+                            MSExcel.Workbook wbCopy = this.applicationObject.Workbooks.Open((string) wbCopyName, missing, readOnly, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+                            
                             // generate xlsx file from the duplicated file (under a temporary file)
-                            tmpFileName = Path.GetTempFileName();
+                            ooxTempFileName = this.addinLib.GetTempPath((string) initialName, ".xlsx");
 
-                            // object format = MSExcel.WdSaveFormat.wdFormatXMLDocument
-                            this.applicationObject.DisplayAlerts = false;
-                            newWb.SaveAs((string)tmpFileName, MSExcel.XlFileFormat.xlOpenXMLWorkbook, missing, missing, missing, missing, MSExcel.XlSaveAsAccessMode.xlNoChange, missing, missing, missing, missing, missing);
-                            this.applicationObject.DisplayAlerts = true;
-
+                            wbCopy.SaveAs((string) ooxTempFileName, MSExcel.XlFileFormat.xlOpenXMLWorkbook, missing, missing, missing, missing, MSExcel.XlSaveAsAccessMode.xlNoChange, missing, missing, missing, missing, missing);
+                           
                             // close and remove the duplicated file
-                            newWb.Close(false, false, missing);
+                            wbCopy.Close(false, false, missing);
                             try
                             {
-                                File.Delete((string)newName);
+                                File.Delete((string) wbCopyName);
                             }
                             catch (IOException)
                             {
@@ -321,14 +319,14 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                                 // deletion failed : file currently used by another application.
                                 // do nothing
                             }
-                            xlsxFile = (string) tmpFileName;
+                            xlsxFile = (string) ooxTempFileName;
                         }
 
                         OoxToOdf(xlsxFile, odfFile, true);
 
-                        if (tmpFileName != null && File.Exists((string)tmpFileName))
+                        if (ooxTempFileName != null && File.Exists((string) ooxTempFileName))
                         {
-                            File.Delete((string)tmpFileName);
+                            this.addinLib.DeleteTempPath((string)ooxTempFileName);
                         }
                     }
                 }

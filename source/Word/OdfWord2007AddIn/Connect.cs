@@ -314,7 +314,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
 
                         MSword.Document newDoc = this.applicationObject.Documents.Open(ref newName, ref missing, ref readOnly, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref isVisible, ref missing, ref missing, ref missing, ref missing);
                         // generate docx file from the duplicated file (under a temporary file)
-                        tmpFileName = Path.GetTempFileName();
+                        tmpFileName = this.addinLib.GetTempPath((string)initialName, ".docx");
                         object format = MSword.WdSaveFormat.wdFormatXMLDocument;
                         newDoc.SaveAs(ref tmpFileName, ref format, ref missing, ref missing, ref addToRecentFiles, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing, ref missing);
 
@@ -340,7 +340,7 @@ namespace CleverAge.OdfConverter.OdfWord2007Addin
                     
                     if (tmpFileName != null && File.Exists((string)tmpFileName))
                     {
-                        File.Delete((string)tmpFileName);
+                        this.addinLib.DeleteTempPath((string)tmpFileName);
                     }
                 }
             }

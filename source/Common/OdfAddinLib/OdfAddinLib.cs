@@ -336,6 +336,36 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             return output;
         }
 
+      /// <summary>
+      /// Create a random temporary folder 
+      /// </summary>
+      /// <param name="fileName">The name of the file</param>
+      /// <param name="targetExtension">The target extension</param>
+      /// <returns></returns>
+        public string GetTempPath(string fileName, string targetExtension)
+        {
+            string folderName = null;
+            string path = null;
+            do
+            {
+                folderName = Path.GetRandomFileName();
+                path = Path.Combine(Path.GetTempPath(), folderName);
+            } 
+            while (Directory.Exists(path));
+
+            Directory.CreateDirectory(path);
+            return Path.Combine(path, Path.GetFileNameWithoutExtension(fileName)+targetExtension);
+        }
+
+        public void DeleteTempPath(string tempPath)
+        {
+            string directory = Path.GetDirectoryName(tempPath);
+            if (Directory.Exists(directory))
+            {
+                Directory.Delete(directory, true);
+            }
+        }
+
 
         sealed private class ConvertImage : System.Windows.Forms.AxHost
         {

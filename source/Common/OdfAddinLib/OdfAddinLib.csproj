@@ -48,7 +48,8 @@
     <Compile Include="InfoBox.Designer.cs">
       <DependentUpon>InfoBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="OdfAddinLib.cs" />
+    <Compile Include="OdfAddinLib.cs">
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ConverterForm.de-DE.resx">
       <DependentUpon>ConverterForm.cs</DependentUpon>
