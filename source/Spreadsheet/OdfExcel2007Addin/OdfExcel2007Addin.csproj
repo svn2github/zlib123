@@ -102,6 +102,9 @@
   <ItemGroup>
     <EmbeddedResource Include="resources\customUI.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="OdfExcel2007AddinSetup\OdfExcel2007AddinSetup.vdproj" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
     <PreBuildEvent>

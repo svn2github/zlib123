@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("Addin")]
+[assembly: AssemblyTitle("ExcelAddin")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Clever Age")]
-[assembly: AssemblyProduct("Addin")]
+[assembly: AssemblyProduct("ExcelAddin.Properties")]
 [assembly: AssemblyCopyright("Copyright © Clever Age 2007")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
