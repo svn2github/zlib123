@@ -22,7 +22,7 @@ namespace Sonata.OdfConverter.Presentation
         public PptxValidatorException(String msg) : base(msg) { }
     }
 
-    /// <summary>Check the validity of a docx file. Throw an OoxValidatorException if errors occurs</summary>
+    /// <summary>Check the validity of a pptx file. Throw an PptxValidatorException if errors occurs</summary>
     public class PptxValidator
     {
         private const string RESOURCES_LOCATION = "resources";
@@ -35,16 +35,9 @@ namespace Sonata.OdfConverter.Presentation
         private static string OOX_RELATIONSHIP_SCHEMA = "ooxschemas/opc-relationshipPart.xsd";
         private static string OOX_META_CORE_NS = "http://schemas.openxmlformats.org/package/2006/metadata/core-properties";
         private static string OOX_META_CORE_SCHEMA = "ooxschemas/opc-coreProperties.xsd";
-        //private static string OOX_META_APP_NS = "http://schemas.openxmlformats.org/officeDocument/2006/extended-properties";
-        //private static string OOX_META_APP_SCHEMA = "ooxschemas/shared-documentPropertiesExtended.xsd";
-        //private static string OOX_WORDML_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-        //private static string OOX_WORDML_SCHEMA = "ooxschemas/wml.xsd";
-        //private static string OOX_DML_NS = "http://schemas.openxmlformats.org/drawingml/2006/main";
-        //private static string OOX_DML_STYLE_SCHEMA = "ooxschemas/dml-stylesheet.xsd";
-        //private static string OOX_WPDRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
-        //private static string OOX_DML_WPDRAWING_SCHEMA = "ooxschemas/dml-wordprocessingDrawing.xsd";
-        //private static string OOX_PICTURE_NS = "http://schemas.openxmlformats.org/drawingml/2006/picture";
-        //private static string OOX_DML_PICTURE_SCHEMA = "ooxschemas/dml-picture.xsd";
+        private static string OOX_META_APP_NS = "http://schemas.openxmlformats.org/officeDocument/2006/extended-properties";
+        private static string OOX_META_APP_SCHEMA = "ooxschemas/shared-documentPropertiesExtended.xsd";
+         
         // OOX special files
         private static string OOX_CONTENT_TYPE_FILE = "[Content_Types].xml";
         private static string OOX_RELATIONSHIP_FILE = "_rels/.rels";
@@ -64,28 +57,32 @@ namespace Sonata.OdfConverter.Presentation
         /// </summary>
         public PptxValidator()
         {
+            try
+            {
             this.settings = new XmlReaderSettings();
             //this.report = report;
 
             // resolver
-            EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetExecutingAssembly(),
-                this.GetType().Namespace, ".resources.", true);
+            EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetEntryAssembly(),
+                "CleverAge.OdfConverter.CommandLineTool", ".resources.", true);
             this.settings.XmlResolver = resolver;
 
             // schemas
             this.settings.Schemas.XmlResolver = resolver;
-
-            //this.settings.Schemas.Add(OOX_RELATIONSHIP_NS, OOX_RELATIONSHIP_SCHEMA);
-            //this.settings.Schemas.Add(OOX_CONTENT_TYPE_NS, OOX_CONTENT_TYPE_SCHEMA);
+            
+            this.settings.Schemas.Add(OOX_RELATIONSHIP_NS, OOX_RELATIONSHIP_SCHEMA);
+            this.settings.Schemas.Add(OOX_CONTENT_TYPE_NS, OOX_CONTENT_TYPE_SCHEMA);
             //this.settings.Schemas.Add(OOX_META_CORE_NS, OOX_META_CORE_SCHEMA);
-            //this.settings.Schemas.Add(OOX_META_APP_NS, OOX_META_APP_SCHEMA);
-            //this.settings.Schemas.Add(OOX_WORDML_NS, OOX_WORDML_SCHEMA);
-            //this.settings.Schemas.Add(OOX_DML_NS, OOX_DML_STYLE_SCHEMA);
-            //this.settings.Schemas.Add(OOX_PICTURE_NS, OOX_DML_PICTURE_SCHEMA);
-            //this.settings.Schemas.Add(OOX_WPDRAWING_NS, OOX_DML_WPDRAWING_SCHEMA);
-
+            this.settings.Schemas.Add(OOX_META_APP_NS, OOX_META_APP_SCHEMA);
+                 
+            
             this.settings.ValidationType = ValidationType.Schema;
             this.settings.ValidationEventHandler += new ValidationEventHandler(ValidationHandler);
+        }
+        catch (Exception ex)
+        {
+            Console.Write(ex.Message);
+        }
         }
 
         /// <summary>
@@ -199,6 +196,43 @@ namespace Sonata.OdfConverter.Presentation
                 partRel = reader.GetEntry(partRelPath);
                 r = XmlReader.Create(partRel);
                 ValidateRels(partDir, r);
+
+                //retrieve all ids referenced in the document
+                Stream doc = reader.GetEntry(docTarget);
+                r = XmlReader.Create(doc);
+                ArrayList ids = new ArrayList();
+                while (r.Read())
+                {
+                    if (r.NodeType == XmlNodeType.Element && r.GetAttribute("id", OOX_DOC_REL_NS) != null)
+                    {
+                        ids.Add(r.GetAttribute("id", OOX_DOC_REL_NS));
+                    }
+                }
+
+                // check if each id exists in the partRel file
+                if (ids.Count != 0)
+                {
+                    if (!partRelExists)
+                    {
+                        throw new PptxValidatorException("Referenced id exist but no part relationship file found");
+                    }
+                    relationShips = reader.GetEntry(partRelPath);
+                    r = XmlReader.Create(relationShips);
+                    while (r.Read())
+                    {
+                        if (r.NodeType == XmlNodeType.Element && r.LocalName == "Relationship")
+                        {
+                            if (ids.Contains(r.GetAttribute("Id")))
+                            {
+                                ids.Remove(r.GetAttribute("Id"));
+                            }
+                        }
+                    }
+                    if (ids.Count != 0)
+                    {
+                        throw new PptxValidatorException("One or more relationship id have not been found in the partRelationship file : " + ids[0]);
+                    }
+                }
             }
 
             //6. For each item in /ppt/slideMasters/_rels/slideMasters.xml.rels
@@ -231,44 +265,7 @@ namespace Sonata.OdfConverter.Presentation
 
 
 
-            //retrieve all ids referenced in the document
-
-            //Stream doc = reader.GetEntry(docTarget);
-            //r = XmlReader.Create(doc);
-            //ArrayList ids = new ArrayList();
-            //while (r.Read())
-            //{
-            //    if (r.NodeType == XmlNodeType.Element && r.GetAttribute("id", OOX_DOC_REL_NS) != null)
-            //    {
-            //        ids.Add(r.GetAttribute("id", OOX_DOC_REL_NS));
-            //    }
-            //}
-
-            //// check if each id exists in the partRel file
-
-            //if (ids.Count != 0)
-            //{
-            //    if (!partRelExists)
-            //    {
-            //        throw new PptxValidatorException("Referenced id exist but no part relationship file found");
-            //    }
-            //    relationShips = reader.GetEntry(partRelPath);
-            //    r = XmlReader.Create(relationShips);
-            //    while (r.Read())
-            //    {
-            //        if (r.NodeType == XmlNodeType.Element && r.LocalName == "Relationship")
-            //        {
-            //            if (ids.Contains(r.GetAttribute("Id")))
-            //            {
-            //                ids.Remove(r.GetAttribute("Id"));
-            //            }
-            //        }
-            //    }
-            //    if (ids.Count != 0)
-            //    {
-            //        throw new PptxValidatorException("One or more relationship id have not been found in the partRelationship file : " + ids[0]);
-            //    }
-            //}
+            
         }
 
         // validate xml stream
@@ -282,7 +279,7 @@ namespace Sonata.OdfConverter.Presentation
         private String findContentType(ZipReader reader, String target)
         {
             String extension = null;
-            if (target.IndexOf(".") != -1)
+            if (target.IndexOf(".") != -1)  
             {
                 extension = target.Substring(target.IndexOf(".") + 1);
             }
@@ -336,14 +333,18 @@ namespace Sonata.OdfConverter.Presentation
 
                     if (fileExists)
                     {
-                        //// 5.1. A content type can be found in [Content_Types].xml file
-                        //String ct = this.findContentType(reader, "/" + target);
+                        
+                        // 5.1. A content type can be found in [Content_Types].xml file
+                        if (target.IndexOf("../") == -1)
+                        {
+                            String ct = this.findContentType(reader, "/" + target);
 
-                        //// 5.2. If it's an xml file, it has to be valid
-                        //if (ct.EndsWith("+xml"))
-                        //{
-                        //    this.validateXml(item);
-                        //}
+                            // 5.2. If it's an xml file, it has to be valid
+                            if (ct.EndsWith("+xml"))
+                            {
+                                this.validateXml(item);
+                            }
+                        }
                     }
                 }
                    
