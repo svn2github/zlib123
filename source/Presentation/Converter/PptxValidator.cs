@@ -63,8 +63,8 @@ namespace Sonata.OdfConverter.Presentation
             //this.report = report;
 
             // resolver
-            EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetEntryAssembly(),
-                "CleverAge.OdfConverter.CommandLineTool", ".resources.", true);
+            EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetExecutingAssembly(),
+                this.GetType().Namespace, ".resources.", true);
             this.settings.XmlResolver = resolver;
 
             // schemas
