@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="translation.oox2odf.ColNumber" xml:space="preserve">
+    <value>Open Office Calc supports only columns up to IV. Any columns above IV will be lost permanently</value>
+  </data>
   <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
     <value>Open Office Calc supports only 256 sheets. Any sheets above 256 will be lost permanently</value>
   </data>
