@@ -5,7 +5,7 @@ using System.Text;
 using CleverAge.OdfConverter.OdfConverterLib;
 using Sonata.OdfConverter.Presentation;  
 
-namespace Sonata.OdfConverter.Presentaion
+namespace Sonata.OdfConverter.Presentation
 {
     public class Addin : OdfAddinLib
     {

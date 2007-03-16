@@ -4,7 +4,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8198F6A8-2F70-472F-90F2-EDCB939F07C2}</ProjectGuid>
+    <ProjectGuid>{0EACD55D-3D67-4E42-9714-8142EAF8246A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PresentationAddin</RootNamespace>
