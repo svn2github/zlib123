@@ -33,12 +33,12 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" exclude-result-prefixes="svg">
 
   <xsl:import href="measures.xsl"/>
-  <xsl:import href="border.xsl"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
 
   <xsl:template name="styles">
@@ -66,9 +66,17 @@
       <xsl:choose>
         <xsl:when
           test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties">
-          <xsl:apply-templates
+          <font>
+            <xsl:for-each
+              select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties">
+              <xsl:call-template name="InsertTextProperties">
+                <xsl:with-param name="mode">default</xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+            <!--          <xsl:apply-templates
             select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties"
-            mode="fonts"/>
+            mode="fonts"/>-->
+          </font>
         </xsl:when>
         <!-- application default-->
         <xsl:otherwise>
@@ -234,30 +242,29 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
-          </xsl:if>          
+          </xsl:if>
           <!-- change default horizontal alignment-->
           <xsl:if test="not(style:paragraph-properties/@fo:text-align)">
             <xsl:choose>
-            <!-- change default horizontal alignment  of vertically stacked text to 'left' -->
-            <xsl:when
-              test="style:table-cell-properties/@style:direction='ttb' ">
-              <xsl:attribute name="horizontal">
-              <xsl:text>left</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-            <!-- change default horizontal alignment of angle oriented text when angle equals -90 degrees -->
-            <xsl:when
-              test="style:table-cell-properties/@style:rotation-angle = 270">
-              <xsl:attribute name="horizontal">
-                <xsl:text>right</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-            <!-- change default alignment of angle oriented text when angle equals (-90,0) degrees or (0,90) degrees -->                  
-            <xsl:when test="((style:table-cell-properties/@style:rotation-angle &lt; 90 and style:table-cell-properties/@style:rotation-angle &gt; 0) or style:table-cell-properties/@style:rotation-angle &gt; 270)">
-              <xsl:attribute name="horizontal">
-                <xsl:text>center</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
+              <!-- change default horizontal alignment  of vertically stacked text to 'left' -->
+              <xsl:when test="style:table-cell-properties/@style:direction='ttb' ">
+                <xsl:attribute name="horizontal">
+                  <xsl:text>left</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+              <!-- change default horizontal alignment of angle oriented text when angle equals -90 degrees -->
+              <xsl:when test="style:table-cell-properties/@style:rotation-angle = 270">
+                <xsl:attribute name="horizontal">
+                  <xsl:text>right</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
+              <!-- change default alignment of angle oriented text when angle equals (-90,0) degrees or (0,90) degrees -->
+              <xsl:when
+                test="((style:table-cell-properties/@style:rotation-angle &lt; 90 and style:table-cell-properties/@style:rotation-angle &gt; 0) or style:table-cell-properties/@style:rotation-angle &gt; 270)">
+                <xsl:attribute name="horizontal">
+                  <xsl:text>center</xsl:text>
+                </xsl:attribute>
+              </xsl:when>
             </xsl:choose>
           </xsl:if>
 
@@ -301,7 +308,7 @@
               </xsl:choose>
             </xsl:attribute>
           </xsl:if>
-          
+
           <!-- wraped text -->
           <xsl:if test="style:table-cell-properties/@fo:wrap-option='wrap'">
             <xsl:attribute name="wrapText">
@@ -343,53 +350,62 @@
     <xsl:param name="mode"/>
     <xsl:param name="parentCellStyleName"/>
     <xsl:param name="defaultCellStyleName"/>
-    
+
     <!-- font weight -->
-    <xsl:if test="@fo:font-weight='bold' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='bold' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='bold'">
+    <xsl:if
+      test="@fo:font-weight='bold' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='bold' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='bold'">
       <b/>
     </xsl:if>
-    <xsl:if test="@fo:font-style='italic' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='italic' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='italic'">
+    <xsl:if
+      test="@fo:font-style='italic' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='italic' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='italic'">
       <i/>
     </xsl:if>
-    
+
     <!-- underline -->
-    <xsl:if test="@style:text-underline-style or key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style or key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style">
+    <xsl:if
+      test="@style:text-underline-style or key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style or key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style">
       <xsl:choose>
         <xsl:when test="@style:text-underline-style">
-      <xsl:call-template name="InsertUnderline">
-        <xsl:with-param name="underlineStyle">
-          <xsl:value-of select="@style:text-underline-style"/>
-        </xsl:with-param>
-        <xsl:with-param name="underlineType">
-          <xsl:value-of select="@style:text-underline-type"/>
-        </xsl:with-param>
-      </xsl:call-template>
+          <xsl:call-template name="InsertUnderline">
+            <xsl:with-param name="underlineStyle">
+              <xsl:value-of select="@style:text-underline-style"/>
+            </xsl:with-param>
+            <xsl:with-param name="underlineType">
+              <xsl:value-of select="@style:text-underline-type"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:when>
         <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style">
           <xsl:call-template name="InsertUnderline">
             <xsl:with-param name="underlineStyle">
-              <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style"/>
+              <xsl:value-of
+                select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style"/>
             </xsl:with-param>
             <xsl:with-param name="underlineType">
-              <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-type"/>
+              <xsl:value-of
+                select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-type"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
         <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style">
           <xsl:call-template name="InsertUnderline">
             <xsl:with-param name="underlineStyle">
-              <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style"/>
+              <xsl:value-of
+                select="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style"
+              />
             </xsl:with-param>
             <xsl:with-param name="underlineType">
-              <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-type"/>
+              <xsl:value-of
+                select="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-type"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
       </xsl:choose>
     </xsl:if>
-    
+
     <!-- font size -->
-    <xsl:if test="@fo:font-size or key('style',$parentCellStyleName)/style:text-properties/@fo:font-size or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size">
+    <xsl:if
+      test="@fo:font-size or key('style',$parentCellStyleName)/style:text-properties/@fo:font-size or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size or $mode = 'default' ">
       <xsl:variable name="fontSize">
         <xsl:choose>
           <xsl:when test="@fo:font-size">
@@ -400,6 +416,9 @@
           </xsl:when>
           <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size">
             <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size"/>
+          </xsl:when>
+          <xsl:when test="$mode='default'">
+            <xsl:text>10</xsl:text>
           </xsl:when>
         </xsl:choose>
       </xsl:variable>
@@ -413,14 +432,16 @@
         </xsl:attribute>
       </sz>
     </xsl:if>
-    
+
     <!-- strikethrough -->
-    <xsl:if test="@style:text-line-through-style and @style:text-line-through-style != 'none'  or key('style',$parentCellStyleName)/style:text-properties[@style:text-line-through-style and @style:text-line-through-style != 'none'] or key('style',$defaultCellStyleName)/style:text-properties[@style:text-line-through-style and @style:text-line-through-style != 'none']">
+    <xsl:if
+      test="@style:text-line-through-style and @style:text-line-through-style != 'none'  or key('style',$parentCellStyleName)/style:text-properties[@style:text-line-through-style and @style:text-line-through-style != 'none'] or key('style',$defaultCellStyleName)/style:text-properties[@style:text-line-through-style and @style:text-line-through-style != 'none']">
       <strike/>
     </xsl:if>
-    
+
     <!-- font color -->
-    <xsl:if test="@fo:color or key('style',$parentCellStyleName)/style:text-properties/@fo:color or key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
+    <xsl:if
+      test="@fo:color or key('style',$parentCellStyleName)/style:text-properties/@fo:color or key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
       <xsl:variable name="fontColor">
         <xsl:choose>
           <xsl:when test="@fo:color">
@@ -436,47 +457,63 @@
       </xsl:variable>
       <color rgb="{concat('FF',substring-after($fontColor,'#'))}"/>
     </xsl:if>
-    
+
     <!-- font family -->
     <xsl:choose>
       <xsl:when test="$mode = 'textstyles'">
-        <xsl:if test="@style:font-name or key('style',$parentCellStyleName)/style:text-properties/@style:font-name or key('style',$defaultCellStyleName)/style:text-properties/@style:font-name">
+        <xsl:if
+          test="@style:font-name or key('style',$parentCellStyleName)/style:text-properties/@style:font-name or key('style',$defaultCellStyleName)/style:text-properties/@style:font-name">
           <xsl:variable name="fontFamily">
             <xsl:choose>
               <xsl:when test="@style:font-name">
-                <xsl:value-of select="translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"/>
+                <xsl:value-of
+                  select="translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
+                />
               </xsl:when>
               <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@style:font-name">
-                <xsl:value-of select="translate(key('font',key('style',$parentCellStyleName)/style:text-properties/@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"/>
+                <xsl:value-of
+                  select="translate(key('font',key('style',$parentCellStyleName)/style:text-properties/@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
+                />
               </xsl:when>
               <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@style:font-name">
-                <xsl:value-of select="translate(key('font',key('style',$defaultCellStyleName)/style:text-properties/@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"/>
+                <xsl:value-of
+                  select="translate(key('font',key('style',$defaultCellStyleName)/style:text-properties/@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
+                />
               </xsl:when>
             </xsl:choose>
           </xsl:variable>
           <rFont val="{$fontFamily}"/>
         </xsl:if>
       </xsl:when>
-      <xsl:when test="$mode = 'fonts'">
-        <xsl:if test="key('font',@style:font-name)/@svg:font-family">
-          <name>
-            <xsl:attribute name="val">
-              <xsl:choose>
-                <xsl:when
-                  test="not(translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;) = '' )">
-                  <xsl:value-of
-                    select="translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
-                  />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="key('font',@style:font-name)/@svg:font-family"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </name>
-        </xsl:if>
+      <xsl:when test="$mode = 'fonts' or $mode='default' ">
+        <xsl:choose>
+          <xsl:when test="key('font',@style:font-name)/@svg:font-family">
+            <name>
+              <xsl:attribute name="val">
+                <xsl:choose>
+                  <xsl:when
+                    test="not(translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;) = '' )">
+                    <xsl:value-of
+                      select="translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
+                    />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="key('font',@style:font-name)/@svg:font-family"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </name>
+          </xsl:when>
+          <xsl:when test="$mode = 'default' ">
+            <xsl:text>Arial</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template match="number:text" mode="fonts"/>
+  <xsl:template match="number:text" mode="cellFormats"/>
 
 </xsl:stylesheet>
