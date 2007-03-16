@@ -506,53 +506,31 @@
           <xsl:value-of select="concat($colChar,$rowNumber)"/>
         </xsl:attribute>
 
-        <!-- insert cell style number -->
+        <!-- insert cell style number-->
         <xsl:choose>
-          <!-- if it is a multiline cell -->
-          <xsl:when test="text:p[2]">
-            <xsl:variable name="cellFormats">
-              <xsl:value-of
-                select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
-              />
-            </xsl:variable>
-            <xsl:variable name="multilineNumber">
-              <xsl:for-each select="text:p[2]">
-                <xsl:number count="table:table-cell[text:p[2]]" level="any"/>
-              </xsl:for-each>
-            </xsl:variable>
-            <xsl:attribute name="s">
-              <xsl:value-of select="$cellFormats - 1 + $multilineNumber"/>
-            </xsl:attribute>
+          <xsl:when test="@table:style-name">
+            <xsl:for-each select="key('style',@table:style-name)">
+              <xsl:attribute name="s">
+                <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+              </xsl:attribute>
+            </xsl:for-each>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:choose>
-              <!-- when style is specified in cell -->
-              <xsl:when test="@table:style-name">
-                <xsl:for-each select="key('style',@table:style-name)">
-                  <xsl:attribute name="s">
-                    <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-                  </xsl:attribute>
-                </xsl:for-each>
-              </xsl:when>
-              <!-- when style is specified in column -->
-              <xsl:otherwise>
-                <xsl:variable name="columnCellStyle">
-                  <xsl:call-template name="GetColumnCellStyle">
-                    <xsl:with-param name="colNum">
-                      <xsl:value-of select="$colNumber + 1"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="TableColumnTagNum">
-                      <xsl:value-of select="$TableColumnTagNum"/>
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:variable>
-                <xsl:for-each select="key('style',$columnCellStyle)">
-                  <xsl:attribute name="s">
-                    <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-                  </xsl:attribute>
-                </xsl:for-each>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:variable name="columnCellStyle">
+              <xsl:call-template name="GetColumnCellStyle">
+                <xsl:with-param name="colNum">
+                  <xsl:value-of select="$colNumber + 1"/>
+                </xsl:with-param>
+                <xsl:with-param name="TableColumnTagNum">
+                  <xsl:value-of select="$TableColumnTagNum"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:for-each select="key('style',$columnCellStyle)">
+              <xsl:attribute name="s">
+                <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+              </xsl:attribute>
+            </xsl:for-each>
           </xsl:otherwise>
         </xsl:choose>
 
