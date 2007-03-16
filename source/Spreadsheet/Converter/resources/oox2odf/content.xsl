@@ -160,12 +160,17 @@
 
     <xsl:for-each select="document(concat('xl/',$sheet))">
 
-
-      <xsl:apply-templates select="e:worksheet/e:sheetData/e:row">
+      <xsl:apply-templates select="e:worksheet/e:sheetData/e:row[@r &lt; 65537]">
         <xsl:with-param name="BigMergeCell">
           <xsl:value-of select="$BigMergeCell"/>
         </xsl:with-param>
       </xsl:apply-templates>
+      
+      <!-- OpenOffice calc supports only 65536 rows -->  
+      <xsl:if test="e:worksheet/e:sheetData/e:row[@r &gt; 65536]">
+        <xsl:message terminate="no">translation.oox2odf.RowNumber</xsl:message>
+      </xsl:if>
+      
       <xsl:choose>
         <!-- when sheet is empty -->
         <xsl:when test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = ''">

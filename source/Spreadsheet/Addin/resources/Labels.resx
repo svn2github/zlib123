@@ -120,6 +120,9 @@
   <data name="translation.oox2odf.ColNumber" xml:space="preserve">
     <value>Open Office Calc supports only columns up to IV. Any columns above IV will be lost permanently</value>
   </data>
+  <data name="translation.oox2odf.RowNumber" xml:space="preserve">
+    <value>Open Office Calc supports only 65536 rows. Any rows above 65536 will be lost permanently</value>
+  </data>
   <data name="translation.oox2odf.SheetNumber" xml:space="preserve">
     <value>Open Office Calc supports only 256 sheets. Any sheets above 256 will be lost permanently</value>
   </data>
