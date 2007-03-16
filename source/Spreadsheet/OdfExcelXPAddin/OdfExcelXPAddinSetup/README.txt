@@ -34,7 +34,7 @@ If you don’t see the ODF entry, it could be due to the Macro Security Settings. 
 3.	Click the Trusted Sources tab in the Security Dialog.
 4.	Check the Option “Trust all installed add-ins and templates”.
 5.	Click “Ok” of the Security Dialog and also the Options Dialog.
-6.	Close and re-open Word to see the Open ODF… entry.
+6.	Close and re-open Excel to see the Open ODF… entry.
 
 Conversion currently supports :
 ----------------------------------------------	
