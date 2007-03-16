@@ -68,6 +68,20 @@
   <ItemGroup>
     <EmbeddedResource Include="resources\odf2oox\docprops.xsl" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\ooxschemas\opc-contentTypeItem.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="resources\ooxschemas\opc-coreProperties.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="resources\ooxschemas\opc-relationshipPart.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="resources\ooxschemas\shared-documentPropertiesExtended.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
