@@ -405,7 +405,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
 
                         if (tmpFileName != null && File.Exists((string)tmpFileName))
                         {
-                            File.Delete((string)tmpFileName);
+                            this.addinLib.DeleteTempPath((string)tmpFileName);
                         }
                     }
                 }
