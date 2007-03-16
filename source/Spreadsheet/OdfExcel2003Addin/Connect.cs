@@ -126,18 +126,48 @@ namespace OdfExcel2003Addin
         /// <seealso class='IDTExtensibility2' />
         public void OnStartupComplete(ref System.Array custom)
         {
-            bool addDelegate = true;
-            CommandBar cmdBar = applicationObject.CommandBars["Worksheet Menu Bar"];
-            if (cmdBar != null)
+            // Add menu item
+            // first retrieve "File" menu
+            CommandBar commandBar = applicationObject.CommandBars["File"];
+
+            // Add import button
+            try
             {
-                AddButtons(cmdBar, addDelegate);
-                addDelegate = false;
+                // if item already exists, use it (should never happen)
+                importButton = (CommandBarButton)commandBar.Controls[this.addinLib.GetString("OdfImportLabel")];
             }
-            cmdBar = applicationObject.CommandBars["Chart Menu Bar"];
-            if (cmdBar != null)
+            catch (Exception)
             {
-                AddButtons(cmdBar, addDelegate);
+                // otherwise, create a new one
+                importButton = (CommandBarButton)commandBar.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 3, true);
             }
+            // set item's label
+            importButton.Caption = this.addinLib.GetString("OdfImportLabel");
+            importButton.Tag = this.addinLib.GetString("OdfImportLabel");
+            // set action
+            importButton.OnAction = "!<OdfExcel2003Addin.Connect>";
+            importButton.Visible = true;
+            importButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.importButton_Click);
+
+            // Add export button
+            try
+            {
+                // if item already exists, use it (should never happen)
+                exportButton = (CommandBarButton)commandBar.Controls[this.addinLib.GetString("OdfExportLabel")];
+            }
+            catch (Exception)
+            {
+                // otherwise, create a new one
+                exportButton = (CommandBarButton)commandBar.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 4, true);
+            }
+            // set item's label
+            exportButton.Caption = this.addinLib.GetString("OdfExportLabel");
+            exportButton.Tag = this.addinLib.GetString("OdfExportLabel");
+            // set action
+            exportButton.OnAction = "!<OdfExcel2003Addin.Connect>";
+            exportButton.Visible = true;
+            exportButton.Enabled = true;
+            exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
         }
 
         /// <summary>
@@ -159,62 +189,7 @@ namespace OdfExcel2003Addin
         }
 
 
-        private void AddButtons(CommandBar commandBar, bool addDelegate)
-        {
-            try
-            {
-                // Find "file" menu
-                CommandBarPopup popup = (CommandBarPopup)commandBar.FindControl(MsoControlType.msoControlPopup, 30002, Missing.Value, Missing.Value, Missing.Value);
-                // Add import button
-                try
-                {
-                    // if item already exists, use it (should never happen)
-                    importButton = (CommandBarButton)popup.Controls[this.addinLib.GetString("OdfImportLabel")];
-                }
-                catch (Exception)
-                {
-                    // otherwise, create a new one
-                    importButton = (CommandBarButton)popup.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 3, true);
-                }
-                // set item's label
-                importButton.Caption = this.addinLib.GetString("OdfImportLabel");
-                importButton.Tag = this.addinLib.GetString("OdfImportLabel");
-                // set action
-                importButton.OnAction = "!<OdfExcel2003Addin.Connect>";
-                importButton.Visible = true;
-                if (addDelegate)
-                {
-                    importButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.importButton_Click);
-                }
-
-                // Add export button
-                try
-                {
-                    // if item already exists, use it (should never happen)
-                    exportButton = (CommandBarButton)popup.Controls[this.addinLib.GetString("OdfExportLabel")];
-                }
-                catch (Exception)
-                {
-                    // otherwise, create a new one
-                    exportButton = (CommandBarButton)popup.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 4, true);
-                }
-                // set item's label
-                exportButton.Caption = this.addinLib.GetString("OdfExportLabel");
-                exportButton.Tag = this.addinLib.GetString("OdfExportLabel");
-                // set action
-                exportButton.OnAction = "!<OdfExcel2003Addin.Connect>";
-                exportButton.Visible = true;
-                exportButton.Enabled = true;
-                if (addDelegate)
-                {
-                    exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
-                }
-            }
-            catch
-            {
-                // Fail silently
-            }
-        }
+ 
 
 
         /// <summary>
