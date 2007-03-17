@@ -1,13 +1,41 @@
 History of changes
 ------------------
+Release R1999 (M1) (2007-03-17)
+
+README added
+Partly fixed bug #1680659 (Crash/Recover dialog on several files(2))
+Fixed Rollback bug #1674676 MenuItems disappear
+Fixed bug #1679058 (Inaccessible content ( > 65535 rows))
+Fixed bug #1679634 (columns lost after conversion(more than 256 columns))
+Fixed bug #1677130 (Font size not correct converted)
+Fixed bug #1681261 (Batch conversion from ods to xlsx falls when cancelled)
+Fixed bug #1681476 (temp file shown on the conversion window)
+Fixed bug #1678982 (sheets lost after conversion(more than 256 sheets))
+Partly fixed bug #1676490 (Global merge causes read error)
+Fixed bug #1680483 (Merge cell position is not retained after conversion)
+Fixed bug #1679681 (Add in fails to convert ods file consisting paragraphs)
+Connect classes for Excel10 and Excel11 implement IOdfConverter interface
+
+Release R1916 (M1) (2007-03-13)
+
+Fixed bug: #1678831 Add-in crash -Hidden cells
+Fixed bug: #1677177 Content lt
+Fixed bug: #1676529 unexpected error when converting password protected file
+Fixed bug: #1673947 Crash/Recover dialog raises on several files
+Fixed bug: #1677008 Temporary file already existing
+Fixed bug: #1674023 Font color not retained
+Fixed bug: #1676993 Cell position not retained after conversion
+Fixed bug: #1674935 Performance(1BLF-04-5404TB2.CONFIDENTIAL.XLS
+Fixed bug #1676970 Improper error message when opening non .ods file
+Fixed bug #1676586 Concurrent file access crashes the addin
+Fixed bug #1676436 Improper Message while overwriting the existing ODS file
+
 Release R1883 (M1) (2007-03-08)
 
 Fixed bug: #1674896 Excel 2007 'accent colors' not correct converted
 Partly Fixed bug: #1672305 Converter crash (EU_ESTAT_LAU.EL..xlsx)
 Fixed bug: #1674001 Cell format not correct
 Fixed bug: #1674666 Crash when converting from xls to ods
-Fixed bug: #1673947 Crash/Recover dialog raises on several files
-
 
 Release R1866 (M1) (2007-03-05)
 
