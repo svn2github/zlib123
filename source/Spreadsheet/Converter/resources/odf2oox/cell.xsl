@@ -576,12 +576,12 @@
             </xsl:when>
             <!-- TO DO  date and time-->
             <xsl:when test="@office:value-type = 'date' or @office:value-type = 'time'"/>
-            <xsl:otherwise>
+            <xsl:when test="@office:value-type = 'string'">
               <xsl:attribute name="t">s</xsl:attribute>
               <v>
                 <xsl:value-of select="number($cellNumber)"/>
               </v>
-            </xsl:otherwise>
+            </xsl:when>
           </xsl:choose>
         </xsl:if>
       </c>
