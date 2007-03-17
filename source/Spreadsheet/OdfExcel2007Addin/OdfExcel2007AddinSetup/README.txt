@@ -43,3 +43,16 @@ Features/options lost in the ODF to OpenXML translation
 -------------------------------------------------------
 
 Please to refer to sourceForge (https://sourceforge.net/tracker/?group_id=169337&atid=932582) for a detailed list of unsupported features.
+
+Unresolved bugs in M1
+---------------------
+
+#1682304 Columns becomes wider (ODF->OOX)
+#1681953 Hardwraps / manual line breaks
+#1680659 Crash/recover dialog raises on several files(2)
+#1680462 Merged cell are not retained after round trip conversion
+#1676490 Global merge causes read error
+#1676481 Global merge not converted
+#1675771 Conversion increases file size
+#1674178 Menuitems disappear
+#1673978 Columns not wide enough
