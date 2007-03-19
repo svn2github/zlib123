@@ -79,7 +79,6 @@
           <xsl:value-of select="substring-after(substring-before($BigMergeCell, ';'), ':')"/>
         </xsl:variable>
         
-        
         <xsl:choose>
           <xsl:when test="$colNum = $StartBigMerge ">
             <xsl:value-of select="concat(concat($StartBigMerge, ':'), $EndBigMerge)"/>
@@ -108,16 +107,61 @@
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
-        
       </xsl:when>
-      
+      <xsl:otherwise>        
+        <xsl:value-of select="$Result"/>        
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="CheckIfBigMergeRow">
+    <xsl:param name="RowNum"/>
+    <xsl:param name="BigMergeCellRow"/>
+    <xsl:param name="Result"/>
+    
+    
+    <xsl:choose>
+      <xsl:when test="$BigMergeCellRow != ''">
+        
+        <!-- Checks if Merge Cells exist  in the document-->
+        <xsl:variable name="StartBigMerge">
+          <xsl:value-of select="substring-before($BigMergeCellRow, ':')"/>
+        </xsl:variable>
+        <xsl:variable name="EndBigMerge">
+          <xsl:value-of select="substring-after(substring-before($BigMergeCellRow, ';'), ':')"/>
+        </xsl:variable>
+        
+        <xsl:choose>
+          <xsl:when test="$RowNum = $StartBigMerge ">
+            <xsl:value-of select="concat(concat($StartBigMerge, ':'), $EndBigMerge)"/>
+          </xsl:when>         
+          <xsl:otherwise>
+            <xsl:call-template name="CheckIfBigMergeRow">
+                <xsl:with-param name="RowNum">
+                  <xsl:value-of select="$RowNum"/>
+                </xsl:with-param>
+              <xsl:with-param name="BigMergeCellRow">
+                <xsl:value-of select="substring-after($BigMergeCellRow, ';')"/>
+              </xsl:with-param>
+              <xsl:with-param name="Result">
+                <xsl:choose>
+                  <xsl:when test="$EndBigMerge &gt; $RowNum and $RowNum &gt; $StartBigMerge">
+                    <xsl:text>true</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$Result"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>        
+      </xsl:when>      
       <xsl:otherwise>        
         <xsl:value-of select="$Result"/>        
       </xsl:otherwise>
     </xsl:choose>
     
-
-      
   </xsl:template>
 
   <xsl:template match="e:mergeCell" mode="merge">
@@ -201,7 +245,7 @@
   
 
   
-  <xsl:template match="e:mergeCell" mode="BigMerge">
+  <xsl:template match="e:mergeCell" mode="BigMergeColl">
     <xsl:param name="sheet"/>
     <xsl:param name="RefValue"/>
     
@@ -245,7 +289,7 @@
       </xsl:call-template>
     </xsl:variable>
     
-    <xsl:choose>
+     <xsl:choose>
       <xsl:when test="following-sibling::e:mergeCell">
         <xsl:apply-templates select="following-sibling::e:mergeCell[1]" mode="BigMerge">
           <xsl:with-param name="sheet">
@@ -276,6 +320,82 @@
     </xsl:choose>
   </xsl:template>
   
+  
+  <xsl:template match="e:mergeCell" mode="BigMergeRow">
+    <xsl:param name="sheet"/>
+    <xsl:param name="RefValue"/>
+    
+    
+    <xsl:variable name="StartMergeCell">
+      <xsl:value-of select="substring-before(@ref, ':')"/>
+    </xsl:variable>
+    
+    <xsl:variable name="EndMergeCell">
+      <xsl:value-of select="substring-after(@ref, ':')"/>
+    </xsl:variable>
+    
+    <xsl:variable name="StartColNum">
+      <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$StartMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="EndColNum">
+      <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$EndMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>    
+    
+    <xsl:variable name="StartRowNum">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$StartMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="EndRowNum">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$EndMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="following-sibling::e:mergeCell">
+        <xsl:apply-templates select="following-sibling::e:mergeCell[1]" mode="BigMergeRow">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="RefValue">
+            <xsl:choose>
+              <xsl:when test="$StartColNum = 1 and $EndColNum = 16384">                
+                <xsl:value-of select="concat($RefValue, concat($StartRowNum, concat(':', concat($EndRowNum, ';'))))"/>    
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$RefValue"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>        
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$StartColNum = 1 and $EndColNum = 16384">
+            <xsl:value-of select="concat($RefValue, concat($StartRowNum, concat(':', concat($EndRowNum, ';'))))"/>
+          </xsl:when>
+          <xsl:otherwise>            
+            <xsl:value-of select="$RefValue"/>
+          </xsl:otherwise>
+        </xsl:choose>        
+      </xsl:otherwise>      
+    </xsl:choose>
+  </xsl:template>
   
   <xsl:template name="InsertColumnsBigMergeRow">
     <xsl:param name="RowNumber"/>
