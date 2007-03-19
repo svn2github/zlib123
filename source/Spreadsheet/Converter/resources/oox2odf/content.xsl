@@ -192,7 +192,7 @@
             <table:table-cell/>
           </table:table-row>
         </xsl:when>
-        <xsl:when test="$BigMergeRow != ''">
+        <xsl:when test="$BigMergeRow != '' and e:worksheet/e:sheetData/e:row/e:c">
           <table:table-row table:style-name="ro1">
             <table:covered-table-cell table:number-columns-repeated="256"/>
           </table:table-row>
