@@ -145,6 +145,16 @@
             />
           </xsl:variable>
 
+          <xsl:variable name="zoom">
+            <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']"/>
+          </xsl:variable>
+          
+          <xsl:if test="$zoom">
+            <xsl:attribute name="zoomScale">
+              <xsl:value-of select="$zoom"/>
+            </xsl:attribute>
+          </xsl:if>
+          
           <xsl:if test="$sheetId = $ActiveTableNumber">
             <xsl:attribute name="activeTab">
               <xsl:text>1</xsl:text>
