@@ -248,7 +248,7 @@
         <!-- when this row is not first one and there were empty rows after previous non-empty row -->
         <xsl:if test="preceding::e:row[1]/@r &lt;  @r - 1">
               <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
-                table:number-rows-repeated="{@r -1 - preceding::e:row[1]/@r1}">
+                table:number-rows-repeated="{@r -1 - preceding::e:row[1]/@r}">
                 <table:table-cell table:number-columns-repeated="256"/>
               </table:table-row>
         </xsl:if>
