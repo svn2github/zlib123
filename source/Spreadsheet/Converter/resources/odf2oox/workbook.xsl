@@ -33,7 +33,8 @@
     xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
     xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
-    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+   exclude-result-prefixes="office style table config text">
     
   <xsl:import href="worksheets.xsl"/>
   <xsl:import href="cell.xsl"/>
@@ -100,7 +101,7 @@
         <xsl:for-each select="table:table">
           <sheet>
             <xsl:attribute name="name">
-              <xsl:value-of select="@table:name"/>
+              <xsl:value-of select="substring(@table:name,1,31)"/>
             </xsl:attribute>
             <xsl:attribute name="sheetId">
               <xsl:value-of select="position()"/>
