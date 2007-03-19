@@ -1,5 +1,12 @@
 History of changes
 ------------------
+Release R2017 (M1) (2007-03-19)
+
+Fixed  #1683593 Column too small
+Fixed  #1676490 "Global merge causes read error" 
+Fixed  #1676481 "Global merge not converted"
+Fixed  #1680659 Crash/recover dialog raises on several(2)
+Added Excel's sheet name limit
 Release R1999 (M1) (2007-03-17)
 
 README added
