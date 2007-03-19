@@ -538,7 +538,7 @@
         <xsl:if test="child::text:p">
           <xsl:choose>
             <xsl:when
-              test="@office:value-type!='string' and @office:value-type != 'percentage' and @office:value-type != 'date' and @office:value-type != 'time'">
+              test="@office:value-type!='string' and @office:value-type != 'percentage' and @office:value-type != 'date' and @office:value-type != 'time' and @office:value-type!='boolean'">
               <xsl:variable name="Type">
                 <xsl:call-template name="ConvertTypes">
                   <xsl:with-param name="type">
@@ -576,7 +576,7 @@
             </xsl:when>
             <!-- TO DO  date and time-->
             <xsl:when test="@office:value-type = 'date' or @office:value-type = 'time'"/>
-            <xsl:when test="@office:value-type = 'string'">
+            <xsl:when test="@office:value-type = 'string' or @office:value-type = 'boolean'">
               <xsl:attribute name="t">s</xsl:attribute>
               <v>
                 <xsl:value-of select="number($cellNumber)"/>
