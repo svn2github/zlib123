@@ -28,14 +28,15 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" 
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
+  exclude-result-prefixes="table">
 
   <xsl:import href="measures.xsl"/>
   <xsl:import href="pixel-measure.xsl"/>
@@ -45,7 +46,7 @@
   <xsl:template match="table:table" mode="sheet">
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
-    
+
     <pzip:entry pzip:target="{concat(concat('xl/worksheets/sheet',$sheetId),'.xml')}">
       <xsl:call-template name="InsertWorksheet">
         <xsl:with-param name="cellNumber" select="$cellNumber"/>
@@ -57,8 +58,7 @@
     <xsl:apply-templates select="following-sibling::table:table[1]" mode="sheet">
       <xsl:with-param name="cellNumber">
         <xsl:value-of
-          select="$cellNumber + count(table:table-row/table:table-cell[text:p and @office:value-type='string'])"
-        />
+          select="$cellNumber + count(table:table-row/table:table-cell[text:p and @office:value-type='string'])"/>
       </xsl:with-param>
       <xsl:with-param name="sheetId">
         <xsl:value-of select="$sheetId + 1"/>
@@ -80,9 +80,7 @@
             <xsl:for-each select="table:table-row[@table:number-rows-repeated > 32768]">
               <xsl:call-template name="ConvertMeasure">
                 <xsl:with-param name="length">
-                  <xsl:value-of
-                    select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"
-                  />
+                  <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
                 </xsl:with-param>
                 <xsl:with-param name="unit">point</xsl:with-param>
               </xsl:call-template>
@@ -91,12 +89,15 @@
           <xsl:otherwise>13</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <!-- get default font size -->
       <xsl:variable name="baseFontSize">
         <xsl:choose>
-          <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
-            <xsl:value-of select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"/>
+          <xsl:when
+            test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
+            <xsl:value-of
+              select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"
+            />
           </xsl:when>
           <xsl:otherwise>10</xsl:otherwise>
         </xsl:choose>
@@ -111,7 +112,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <!-- compute default column width -->
       <xsl:variable name="defaultColWidth">
         <xsl:call-template name="ConvertToCharacters">
@@ -119,52 +120,72 @@
             <xsl:value-of select="concat('0.8925','in')"/>
           </xsl:with-param>
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
-        </xsl:call-template>    
+        </xsl:call-template>
       </xsl:variable>
 
       <!-- insert cursor position -->
       <sheetViews>
-        <sheetView  workbookViewId="0">
-          
+        <sheetView workbookViewId="0">
+
           <xsl:variable name="ActiveTable">
             <xsl:for-each select="document('settings.xml')">
               <xsl:value-of select="key('ConfigItem', 'ActiveTable')"/>
             </xsl:for-each>
           </xsl:variable>
-          
+
           <xsl:variable name="ActiveTableNumber">
             <xsl:for-each select="office:spreadsheet/table:table[@table:name=$ActiveTable]">
-              <xsl:value-of select="count(preceding-sibling::table:table)"/>        
+              <xsl:value-of select="count(preceding-sibling::table:table)"/>
             </xsl:for-each>
           </xsl:variable>
 
-          <xsl:if test="$sheetId = $ActiveTableNumber">
-            <xsl:attribute name="activeTab"><xsl:text>1</xsl:text></xsl:attribute>
-          </xsl:if>
-          
-          <selection>
-          <xsl:variable name="col">
-            <xsl:call-template name="NumbersToChars">
-              <xsl:with-param name="num">
-               <xsl:for-each select="document('settings.xml')">
-              <xsl:choose>
-                <xsl:when test="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']">
-                  <xsl:value-of select="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']"/>      
-                </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
-               </xsl:for-each>
-              </xsl:with-param>
-           </xsl:call-template>
+          <xsl:variable name="pageBreakView">
+            <xsl:value-of
+              select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ShowPageBreakPreview']"
+            />
           </xsl:variable>
+
+          <xsl:if test="$sheetId = $ActiveTableNumber">
+            <xsl:attribute name="activeTab">
+              <xsl:text>1</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
+          <xsl:if test="$pageBreakView = 'true'">
+            <xsl:attribute name="view">
+              <xsl:text>pageBreakPreview</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
+          <selection>
+            <xsl:variable name="col">
+              <xsl:call-template name="NumbersToChars">
+                <xsl:with-param name="num">
+                  <xsl:for-each select="document('settings.xml')">
+                    <xsl:choose>
+                      <xsl:when
+                        test="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']">
+                        <xsl:value-of
+                          select="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']"
+                        />
+                      </xsl:when>
+                      <xsl:otherwise>0</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:for-each>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
             <xsl:variable name="row">
               <xsl:for-each select="document('settings.xml')">
-              <xsl:choose>
-                <xsl:when test="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']">
-                  <xsl:value-of select="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']"/>    
-                </xsl:when>
-                <xsl:otherwise>0</xsl:otherwise>
-              </xsl:choose>
+                <xsl:choose>
+                  <xsl:when
+                    test="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']">
+                    <xsl:value-of
+                      select="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']"
+                    />
+                  </xsl:when>
+                  <xsl:otherwise>0</xsl:otherwise>
+                </xsl:choose>
               </xsl:for-each>
             </xsl:variable>
             <!-- activeCell row value cannot be 0 -->
@@ -186,9 +207,8 @@
           </selection>
         </sheetView>
       </sheetViews>
-      
-      <sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}"
-        customHeight="true"/>
+
+      <sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}" customHeight="true"/>
       <xsl:if test="table:table-column">
         <cols>
 
@@ -202,7 +222,7 @@
       </xsl:if>
       <sheetData>
 
-       <xsl:variable name="ColumnTagNum">
+        <xsl:variable name="ColumnTagNum">
           <xsl:apply-templates select="table:table-column[1]" mode="tag">
             <xsl:with-param name="colNumber">1</xsl:with-param>
             <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
@@ -228,5 +248,5 @@
 
   </xsl:template>
 
- 
+
 </xsl:stylesheet>

@@ -33,7 +33,7 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:ooo="http://openoffice.org/2004/office" office:version="1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r w">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="common.xsl"/>
@@ -62,6 +62,29 @@
                   </xsl:for-each>
                 </xsl:for-each>
               </config:config-item>
+
+              <config:config-item config:name="ShowPageBreakPreview" config:type="boolean">
+                <xsl:for-each select="document('xl/workbook.xml')">
+                  <xsl:variable name="ActiveTabNumber">
+                    <xsl:choose>
+                      <xsl:when test="e:workbook/e:bookViews/e:workbookView/@activeTab">
+                        <xsl:value-of select="e:workbook/e:bookViews/e:workbookView/@activeTab"/>
+                      </xsl:when>
+                      <xsl:otherwise>0</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+                  <xsl:for-each
+                    select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
+                    <xsl:choose>
+                      <xsl:when test="@view = 'pageBreakPreview' ">
+                        <xsl:text>true</xsl:text>
+                      </xsl:when>
+                      <xsl:otherwise>false</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:for-each>
+                </xsl:for-each>
+              </config:config-item>
+
               <config:config-item-map-named config:name="Tables">
                 <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
                   <xsl:call-template name="InsertCursorPosition">
@@ -88,15 +111,16 @@
     <config:config-item-map-entry config:name="{@name}">
       <config:config-item config:name="CursorPositionX" config:type="int">
         <xsl:choose>
-          <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
+          <xsl:when
+            test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
             <xsl:variable name="col">
-        <xsl:call-template name="GetColNum">
-          <xsl:with-param name="cell">
-            <xsl:value-of
-              select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
-            />
-          </xsl:with-param>
-        </xsl:call-template>
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of
+                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
+                  />
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:variable>
             <xsl:value-of select="$col - 1"/>
           </xsl:when>
@@ -107,15 +131,16 @@
       </config:config-item>
       <config:config-item config:name="CursorPositionY" config:type="int">
         <xsl:choose>
-          <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
+          <xsl:when
+            test="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell">
             <xsl:variable name="row">
-        <xsl:call-template name="GetRowNum">
-          <xsl:with-param name="cell">
-            <xsl:value-of
-              select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
-            />
-          </xsl:with-param>
-        </xsl:call-template>
+              <xsl:call-template name="GetRowNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of
+                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView/e:selection/@activeCell"
+                  />
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:variable>
             <xsl:value-of select="$row - 1"/>
           </xsl:when>
