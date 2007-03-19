@@ -522,7 +522,9 @@
             <table:covered-table-cell>              
               <xsl:attribute name="table:number-columns-repeated">
                 <xsl:choose>
-                  <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 256">256</xsl:when>
+                  <xsl:when test="$colNum + number(substring-after($CheckIfMerge, ':')) &gt; 256">
+                    <xsl:value-of select="256 - $colNum"/>
+                  </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>    
                   </xsl:otherwise>
@@ -553,7 +555,9 @@
             </xsl:attribute>
             <xsl:attribute name="table:number-columns-spanned">
               <xsl:choose>
-                <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 256">256</xsl:when>
+                <xsl:when test="$colNum + number(substring-after($CheckIfMerge, ':')) &gt; 256">
+                  <xsl:value-of select="256 - $colNum + 1"/>
+                </xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of select="substring-after($CheckIfMerge, ':')"/>    
                 </xsl:otherwise>
@@ -839,7 +843,7 @@
     <!-- if there were columns with default properties before this column then insert default columns-->
     <xsl:choose>
       <!-- when this column is the first non-default one but it's not the column A -->
-      <xsl:when test="position()=1 and @min>1">
+      <xsl:when test="$number=1 and @min>1">
         <table:table-column>
           
           <xsl:attribute name="table:style-name">

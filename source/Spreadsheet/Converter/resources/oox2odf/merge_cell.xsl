@@ -484,7 +484,7 @@
                   <xsl:if test="$ColumnsSpanned != 'NaN'">            
                     <table:table-cell>
                       <xsl:attribute name="table:number-rows-spanned">
-                        <xsl:value-of select="65535"/>
+                        <xsl:value-of select="65536"/>
                       </xsl:attribute>
                       <xsl:attribute name="table:number-columns-spanned">
                         <xsl:choose>
