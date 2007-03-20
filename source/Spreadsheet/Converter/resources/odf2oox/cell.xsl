@@ -571,15 +571,14 @@
             <xsl:when test="@office:value-type = 'percentage'">
               <xsl:attribute name="t">n</xsl:attribute>
               <v>
-                <xsl:value-of select="translate(substring-before(text:p, '%'), ',', '.')"/>
-              </v>
-            </xsl:when>
-            <!-- TO DO  date and time-->
-            <xsl:when test="@office:value-type = 'date' or @office:value-type = 'time'"/>
-            <xsl:when test="@office:value-type = 'string' or @office:value-type = 'boolean'">
-              <xsl:attribute name="t">s</xsl:attribute>
-              <v>
-                <xsl:value-of select="number($cellNumber)"/>
+                <xsl:choose>
+                  <xsl:when test="@office:value">
+                    <xsl:value-of select="@office:value"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="translate(substring-before(text:p, '%'), ',', '.')"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </v>
             </xsl:when>
           </xsl:choose>
