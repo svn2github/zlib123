@@ -224,7 +224,7 @@
             <xsl:value-of select="$height"/>
           </xsl:attribute>
           <xsl:if
-            test="not(key('style',@table:style-name)/style:table-row-properties/@style:use-optimal-row-height = 'true' )">
+            test="not(key('style',@table:style-name)/style:table-row-properties/@style:use-optimal-row-height = 'true' ) or table:covered-table-cell">
             <xsl:attribute name="customHeight">1</xsl:attribute>
           </xsl:if>
         </xsl:if>
