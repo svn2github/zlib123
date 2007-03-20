@@ -581,6 +581,14 @@
                 </xsl:choose>
               </v>
             </xsl:when>
+            <!-- TO DO  date and time-->
+            <xsl:when test="@office:value-type = 'date' or @office:value-type = 'time'"/>
+            <xsl:when test="@office:value-type = 'string' or @office:value-type = 'boolean'">
+              <xsl:attribute name="t">s</xsl:attribute>
+              <v>
+                <xsl:value-of select="number($cellNumber)"/>
+              </v>
+            </xsl:when>
           </xsl:choose>
         </xsl:if>
       </c>
