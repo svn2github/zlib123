@@ -44,7 +44,7 @@
     <sst>
       <xsl:variable name="Count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[child::text:p and (@office:value-type='string' or @office:value-type='boolean')])"
+          select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0)))])"
         />
       </xsl:variable>
       <xsl:attribute name="count">
@@ -60,7 +60,7 @@
   <!-- template which inserts a string into sharedstrings -->
   <xsl:template name="InsertString">
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[child::text:p and (@office:value-type='string' or @office:value-type='boolean')]">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0)))]">
       <si>
         <xsl:choose>
           <xsl:when test="text:span|text:p/text:span">
@@ -85,7 +85,7 @@
           <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
         </xsl:with-param>
       </xsl:apply-templates>
-      <t xml:space="preserve"><xsl:value-of select="."/></t>
+      <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
     </r>
   </xsl:template>
 
@@ -101,21 +101,26 @@
       <t xml:space="preserve"><xsl:value-of select="."/></t>
     </r>
   </xsl:template>
-
+  
   <xsl:template match="text()" mode="text">
     <xsl:value-of select="."/>
   </xsl:template>
-
+  
   <xsl:template match="text:s" mode="text">
     <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
-      <xsl:if test="@text:c">
-        <xsl:attribute name="pxs:c">
-          <xsl:value-of select="@text:c"/>
-        </xsl:attribute>
-      </xsl:if>
+      <xsl:attribute name="pxs:c">
+        <xsl:choose>
+          <xsl:when test="@text:c">
+            <xsl:value-of select="@text:c"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>1</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </pxs:s>
   </xsl:template>
-
+  
   <!-- when there are more than one line of text, enter must be added -->
   <xsl:template match="text:p[preceding-sibling::text:p]" mode="run">
     <r>
