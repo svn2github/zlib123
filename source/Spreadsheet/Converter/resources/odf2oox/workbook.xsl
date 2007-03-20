@@ -100,8 +100,9 @@
       <sheets>
         <xsl:for-each select="table:table">
           <sheet>
+            <!-- characters "*\/[];'?" can not occur in sheet name -->
             <xsl:attribute name="name">
-              <xsl:value-of select="substring(@table:name,1,31)"/>
+              <xsl:value-of select="substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"/>
             </xsl:attribute>
             <xsl:attribute name="sheetId">
               <xsl:value-of select="position()"/>
