@@ -146,7 +146,14 @@
           </xsl:variable>
 
           <xsl:variable name="zoom">
-            <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']"/>
+            <xsl:choose>
+              <xsl:when test="$pageBreakView = 'false' ">
+                <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'PageViewZoomValue']"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:variable>
           
           <xsl:if test="$zoom">

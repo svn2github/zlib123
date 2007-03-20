@@ -33,7 +33,8 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:ooo="http://openoffice.org/2004/office" office:version="1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r w">
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  exclude-result-prefixes="e r w">
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="common.xsl"/>
@@ -45,34 +46,54 @@
           <config:config-item-map-indexed config:name="Views">
             <config:config-item-map-entry>
 
-              <!-- Set default Active Table (Sheet) -->
-              <config:config-item config:name="ActiveTable" config:type="string">
-                <xsl:for-each select="document('xl/workbook.xml')">
-                  <xsl:variable name="ActiveTabNumber">
-                    <xsl:choose>
-                      <xsl:when test="e:workbook/e:bookViews/e:workbookView/@activeTab">
-                        <xsl:value-of select="e:workbook/e:bookViews/e:workbookView/@activeTab"/>
-                      </xsl:when>
-                      <xsl:otherwise>0</xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:variable>
+              <!-- settings based on default active table -->
+              <xsl:for-each select="document('xl/workbook.xml')">
+                <xsl:variable name="ActiveTabNumber">
+                  <xsl:choose>
+                    <xsl:when test="e:workbook/e:bookViews/e:workbookView/@activeTab">
+                      <xsl:value-of select="e:workbook/e:bookViews/e:workbookView/@activeTab"/>
+                    </xsl:when>
+                    <xsl:otherwise>0</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+
+                <!-- Set default Active Table (Sheet) -->
+                <config:config-item config:name="ActiveTable" config:type="string">
                   <xsl:for-each
                     select="e:workbook/e:sheets/e:sheet[position() = $ActiveTabNumber + 1]/@name">
                     <xsl:value-of select="."/>
                   </xsl:for-each>
-                </xsl:for-each>
-              </config:config-item>
+                </config:config-item>
 
-              <config:config-item config:name="ShowPageBreakPreview" config:type="boolean">
-                <xsl:for-each select="document('xl/workbook.xml')">
-                  <xsl:variable name="ActiveTabNumber">
+                <config:config-item config:name="ZoomValue" config:type="int">
+                  <xsl:for-each
+                    select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
                     <xsl:choose>
-                      <xsl:when test="e:workbook/e:bookViews/e:workbookView/@activeTab">
-                        <xsl:value-of select="e:workbook/e:bookViews/e:workbookView/@activeTab"/>
+                      <xsl:when test="not(@view = 'pageBreakPreview') and @zoomScale">
+                        <xsl:value-of select="@zoomScale"/>
                       </xsl:when>
-                      <xsl:otherwise>0</xsl:otherwise>
+                      <xsl:otherwise>
+                        <xsl:text>100</xsl:text>
+                      </xsl:otherwise>
                     </xsl:choose>
-                  </xsl:variable>
+                  </xsl:for-each>
+                </config:config-item>
+
+                <config:config-item config:name="PageViewZoomValue" config:type="int">
+                  <xsl:for-each
+                    select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
+                    <xsl:choose>
+                      <xsl:when test="@view = 'pageBreakPreview' and @zoomScale">
+                        <xsl:value-of select="@zoomScale"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:text>100</xsl:text>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:for-each>
+                </config:config-item>
+
+                <config:config-item config:name="ShowPageBreakPreview" config:type="boolean">
                   <xsl:for-each
                     select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
                     <xsl:choose>
@@ -82,8 +103,8 @@
                       <xsl:otherwise>false</xsl:otherwise>
                     </xsl:choose>
                   </xsl:for-each>
-                </xsl:for-each>
-              </config:config-item>
+                </config:config-item>
+              </xsl:for-each>
 
               <config:config-item-map-named config:name="Tables">
                 <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
