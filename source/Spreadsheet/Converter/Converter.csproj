@@ -57,7 +57,6 @@
     <EmbeddedResource Include="resources\odf2oox\merge_cell.xsl" />
     <EmbeddedResource Include="resources\odf2oox\common.xsl" />
     <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
-    <EmbeddedResource Include="resources\odf2oox\border.xsl" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
@@ -69,6 +68,7 @@
     <EmbeddedResource Include="resources\oox2odf\merge_cell.xsl" />
     <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
     <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\table_body.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

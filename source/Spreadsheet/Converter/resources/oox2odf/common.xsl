@@ -634,8 +634,7 @@
   </xsl:template>
   
   <xsl:template name="GetBuildInColor">
-    <xsl:param name="index"/>
-      
+    <xsl:param name="index"/>      
       <xsl:choose>
         <xsl:when test="$index=0"><xsl:text>000000</xsl:text></xsl:when>
         <xsl:when test="$index=1"><xsl:text>FFFFFF</xsl:text></xsl:when>
@@ -703,4 +702,41 @@
         <xsl:when test="$index=63"><xsl:text>424242</xsl:text></xsl:when>
       </xsl:choose>
   </xsl:template>
+  
+  <xsl:template name="ConvertFromCharacters">
+    <xsl:param name="value"/>
+    
+    <!-- strange but true: the best result is when you WON'T convert average digit width from pt to px-->
+    <xsl:variable name="defaultFontSize">
+      <xsl:for-each select="document('xl/styles.xml')">
+        <xsl:choose>
+          <xsl:when test="e:styleSheet/e:fonts/e:font">
+            <xsl:value-of select="e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>11</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <!-- for proportional fonts average digit width is 2/3 of font size-->
+    <xsl:variable name="avgDigitWidth">
+      <xsl:value-of select="round($defaultFontSize * 2 div 3)"/>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="$avgDigitWidth * $value = 0">
+        <xsl:text>0cm</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="ConvertToCentimeters">
+          <xsl:with-param name="length">
+            <xsl:value-of select="concat(($avgDigitWidth * $value),'px')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>
