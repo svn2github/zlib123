@@ -275,8 +275,9 @@
           </xsl:choose>
         </xsl:with-param>
         <xsl:with-param name="cellNumber">
+          <!-- last 'or' is for cells with error -->          
           <xsl:value-of
-            select="$cellNumber + count(child::table:table-cell[text:p and @office:value-type='string'])"
+            select="$cellNumber + count(child::table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))])"
           />
         </xsl:with-param>
         <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
@@ -374,8 +375,9 @@
           <!-- if this node was table:table-cell with string than increase cellNumber-->
           <xsl:with-param name="cellNumber">
             <xsl:choose>
+              <!-- include cells with errors -->              
               <xsl:when
-                test="name()='table:table-cell' and child::text:p and @office:value-type='string'">
+                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))">
                 <xsl:value-of select="$cellNumber + 1"/>
               </xsl:when>
               <xsl:otherwise>
@@ -398,8 +400,9 @@
           <!-- if this node was table:table-cell with string than increase cellNumber-->
           <xsl:with-param name="cellNumber">
             <xsl:choose>
+              <!-- include cells with errors -->
               <xsl:when
-                test="name()='table:table-cell' and child::text:p and @office:value-type='string'">
+                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))">
                 <xsl:value-of select="$cellNumber + 1"/>
               </xsl:when>
               <xsl:otherwise>
@@ -538,7 +541,7 @@
         <xsl:if test="child::text:p">
           <xsl:choose>
             <xsl:when
-              test="@office:value-type!='string' and @office:value-type != 'percentage' and @office:value-type != 'date' and @office:value-type != 'time' and @office:value-type!='boolean'">
+              test="@office:value-type!='string' and @office:value-type != 'percentage' and @office:value-type != 'date' and @office:value-type != 'time' and @office:value-type!='boolean' and (number(text:p) or text:p = 0)">
               <xsl:variable name="Type">
                 <xsl:call-template name="ConvertTypes">
                   <xsl:with-param name="type">
@@ -583,7 +586,8 @@
             </xsl:when>
             <!-- TO DO  date and time-->
             <xsl:when test="@office:value-type = 'date' or @office:value-type = 'time'"/>
-            <xsl:when test="@office:value-type = 'string' or @office:value-type = 'boolean'">
+            <!-- last or when number cell has error -->            
+            <xsl:when test="@office:value-type = 'string' or @office:value-type = 'boolean'  or not((number(text:p) or text:p = 0))">
               <xsl:attribute name="t">s</xsl:attribute>
               <v>
                 <xsl:value-of select="number($cellNumber)"/>

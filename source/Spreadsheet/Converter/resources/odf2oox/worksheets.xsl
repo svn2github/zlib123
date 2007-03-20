@@ -57,8 +57,9 @@
     <!-- convert next table -->
     <xsl:apply-templates select="following-sibling::table:table[1]" mode="sheet">
       <xsl:with-param name="cellNumber">
+        <!-- last 'or' for cells with error -->
         <xsl:value-of
-          select="$cellNumber + count(table:table-row/table:table-cell[text:p and @office:value-type='string'])"/>
+          select="$cellNumber + count(table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))])"/>
       </xsl:with-param>
       <xsl:with-param name="sheetId">
         <xsl:value-of select="$sheetId + 1"/>
