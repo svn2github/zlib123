@@ -104,8 +104,20 @@
                     </xsl:choose>
                   </xsl:for-each>
                 </config:config-item>
+                
+                <config:config-item config:name="HasColumnRowHeaders" config:type="boolean">
+                  <xsl:for-each
+                    select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet/e:sheetViews/e:sheetView">
+                    <xsl:choose>
+                      <xsl:when test="@showRowColHeaders = 0">
+                        <xsl:text>false</xsl:text>
+                      </xsl:when>
+                      <xsl:otherwise>true</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:for-each>
+                </config:config-item>
               </xsl:for-each>
-
+              
               <config:config-item-map-named config:name="Tables">
                 <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
                   <xsl:call-template name="InsertCursorPosition">
