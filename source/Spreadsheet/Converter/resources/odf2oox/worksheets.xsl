@@ -145,7 +145,19 @@
               select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ShowPageBreakPreview']"
             />
           </xsl:variable>
-
+          
+          <xsl:variable name="hasColumnRowHeaders">
+            <xsl:value-of
+              select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'HasColumnRowHeaders']"
+            />
+          </xsl:variable>
+          
+          <xsl:if test="$hasColumnRowHeaders='false'">
+            <xsl:attribute name="showRowColHeaders">
+              <xsl:text>0</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+          
           <xsl:variable name="zoom">
             <xsl:choose>
               <xsl:when test="$pageBreakView = 'false' ">
