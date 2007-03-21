@@ -259,7 +259,6 @@
             </xsl:attribute>
           </xsl:if>
 
-
           <!-- text orientation -->
           <xsl:if test="e:alignment/@textRotation">
             <xsl:choose>
@@ -440,7 +439,7 @@
     </xsl:attribute>
   </xsl:template>
 
-  <!-- insert text-line-through -->
+  <!-- insert strike-through -->
   <xsl:template match="e:strike" mode="style">
     <xsl:attribute name="style:text-line-through-style">
       <xsl:text>solid</xsl:text>
