@@ -106,12 +106,42 @@
           <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
         </xsl:with-param>
       </xsl:apply-templates>
-      <t xml:space="preserve"><xsl:value-of select="."/></t>
+      <xsl:variable name="value">
+        <xsl:value-of select="."/>
+      </xsl:variable>
+      <t xml:space="preserve">
+        <xsl:choose>
+          <xsl:when test="not(contains($value, '_x'))">
+            <xsl:value-of select="$value"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="HexaDecimalValue">
+              <xsl:with-param name="value">
+                <xsl:value-of select="$value"/>
+              </xsl:with-param>
+            </xsl:call-template> 
+          </xsl:otherwise>
+        </xsl:choose>
+      </t>
     </r>
   </xsl:template>
   
   <xsl:template match="text()" mode="text">
-    <xsl:value-of select="."/>
+    <xsl:variable name="value">
+      <xsl:value-of select="."/>
+    </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="not(contains($value, '_x'))">
+          <xsl:value-of select="$value"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="HexaDecimalValue">
+            <xsl:with-param name="value">
+              <xsl:value-of select="$value"/>
+            </xsl:with-param>
+          </xsl:call-template> 
+        </xsl:otherwise>
+        </xsl:choose>
   </xsl:template>
   
   <xsl:template match="text:s" mode="text">
@@ -153,6 +183,48 @@
   <xsl:template match="text:p[preceding-sibling::text:p]" mode="text">
     <xsl:value-of select="'&#xD;&#xA;'"/>
     <xsl:apply-templates mode="text"/>
+  </xsl:template>
+  
+  <!-- when there are HaxaDecimal value (_x...._), must be added _x005F -->
+  <xsl:template name="HexaDecimalValue">
+    <xsl:param name="value"/>
+    <xsl:param name="result"/>
+    <xsl:choose>
+      <xsl:when test="substring(substring-after($value, '_x'), 5, 1) = '_'">
+        <xsl:variable name="CheckIfHexadecimal">
+          <xsl:call-template name="CheckIfHexadecimal">
+            <xsl:with-param name="value">
+            <xsl:value-of select="substring-before(substring-after($value, '_x'), '_')"/>
+            </xsl:with-param>
+            </xsl:call-template>  
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="$CheckIfHexadecimal = 'true'">
+            <xsl:call-template name="HexaDecimalValue">
+              <xsl:with-param name="value">
+                <xsl:value-of select="substring-after(substring-after($value, '_x'), '_')"/>
+              </xsl:with-param>
+              <xsl:with-param name="result">
+                <xsl:value-of select="concat($result, concat(concat(concat(substring-before($value, '_x'), '_x005F_x'), substring-before(substring-after($value, '_x'), '_')), '_'))"/>           
+              </xsl:with-param>
+            </xsl:call-template>            
+          </xsl:when>
+          <xsl:otherwise>
+                <xsl:call-template name="HexaDecimalValue">
+                  <xsl:with-param name="value">
+                    <xsl:value-of select="substring-after(substring-after($value, '_x'), '_')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="result">
+                    <xsl:value-of select="concat($result, substring-before($value, substring-after(substring-after($value, '_x'), '_')))"/>           
+                  </xsl:with-param>
+                </xsl:call-template>
+          </xsl:otherwise>
+         </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat($result, $value)"/>
+      </xsl:otherwise>
+     </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

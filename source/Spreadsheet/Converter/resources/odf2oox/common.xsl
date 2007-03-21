@@ -104,4 +104,51 @@
     <xsl:value-of select="($pixelWidth) div round(2 div 3 * $defaultFontSize)"/>
   </xsl:template>
   
+  <!-- Template to check if value is hexadecimal -->
+  <xsl:template name="CheckIfHexadecimal">
+    <xsl:param name="value"/>
+    <xsl:param name="result"/>
+    
+    <xsl:variable name="char">
+      <xsl:value-of select="substring($value, 1, 1)"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$value != ''">        
+          <xsl:choose>
+            <xsl:when test="$char = '0' or number($char) or $char = 'A' or $char = 'a' or $char = 'B'  or $char = 'b' or $char = 'c' or $char = 'C' or $char = 'd' or $char = 'D' or $char = 'e' or $char = 'E' or $char = 'f' or $char = 'F'">
+              <xsl:call-template name="CheckIfHexadecimal">
+                <xsl:with-param name="value">
+                  <xsl:value-of select="substring($value, 2)"/>
+                </xsl:with-param>
+                <xsl:with-param name="result">
+                  <xsl:text>true</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="$result != ''">
+                  <xsl:value-of select="$result"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>false</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$result = 'true'">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+  
 </xsl:stylesheet>
