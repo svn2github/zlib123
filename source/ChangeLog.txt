@@ -1,12 +1,22 @@
 History of changes
 ------------------
-Release R2017 (M1) (2007-03-19)
+Release R2050 (M1) (2007-03-21)
+
+Fixed bug: #1683557 Ods formula with error becomes 0 in .xlsx
+Fixed bug: #1681534 Automatic height of rows with merged cells
+Fixed bug: #1680659 (crash/recover dialog raises on several(2))
+Fixed bug: #1684139 Add-in displays “office 2007 file converters are not found”
+Fixed bug: #1674676 Menuitems disappear
+Fixed bug: #1684125 Office.dll missing (add-in icon not displayed for office Xp)
+
+ChangeLog Release R2017 (M1) (2007-03-19)
 
 Fixed  #1683593 Column too small
-Fixed  #1676490 "Global merge causes read error" 
+Fixed  #1676490 "Global merge causes read error"
 Fixed  #1676481 "Global merge not converted"
 Fixed  #1680659 Crash/recover dialog raises on several(2)
-Added Excel's sheet name limit
+
+
 Release R1999 (M1) (2007-03-17)
 
 README added

@@ -59,6 +59,12 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
         private const int xlOpenXMLWorkbook = 51; // ".xslx" file format
         private string DialogBoxTitle;
 
+        [DllImport("Kernel32.dll")]
+        private extern static void OutputDebugString(string s);
+
+        private static void ODS(string s) {
+            OutputDebugString(s + "\n");
+        }
         /// <summary>
         ///		Implements the constructor for the Add-in object.
         ///		Place your initialization code within this method.
@@ -152,20 +158,35 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
         /// <seealso class='IDTExtensibility2' />
         public void OnStartupComplete(ref System.Array custom)
         {
-            // Add menu item
-            // first retrieve "File" menu
-            CommandBar commandBar = applicationObject.CommandBars["File"];
+            try {
+                // Add menu item
+                // first retrieve "File" menu
+                CommandBar commandBar = applicationObject.CommandBars["File"];
+                // Add Buttons with Click handlers
+                AddButtons(commandBar.Controls, true);
+                // Now same operation for Graph menu bar
+                commandBar = applicationObject.CommandBars["Chart Menu Bar"];
+                CommandBarPopup popup = (CommandBarPopup)commandBar.FindControl(MsoControlType.msoControlPopup, 30002, Missing.Value, Missing.Value, Missing.Value);
+                // Add Buttons without Click handlers
+                AddButtons(popup.Controls, false);
+            } catch (Exception ex) {
+                ODS("OnStartupCompleted, Exception " + ex.Message);
+                ODS(ex.StackTrace);
+            }
+        }
 
+        protected void AddButtons(CommandBarControls controls, bool addHandler) {
+            // Add menu item
             // Add import button
             try
             {
                 // if item already exists, use it (should never happen)
-                importButton = (CommandBarButton)commandBar.Controls[this.addinLib.GetString("OdfImportLabel")];
+                importButton = (CommandBarButton)controls[this.addinLib.GetString("OdfImportLabel")];
             }
             catch (Exception)
             {
                 // otherwise, create a new one
-                importButton = (CommandBarButton)commandBar.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 3, true);
+                importButton = (CommandBarButton)controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 3, true);
             }
             // set item's label
             importButton.Caption = this.addinLib.GetString("OdfImportLabel");
@@ -173,18 +194,20 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
             // set action
             importButton.OnAction = "!<OdfExcelXPAddin.Connect>";
             importButton.Visible = true;
-            importButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.importButton_Click);
+            if (addHandler) {
+                importButton.Click += importButton_Click;
+            }
 
             // Add export button
             try
             {
                 // if item already exists, use it (should never happen)
-                exportButton = (CommandBarButton)commandBar.Controls[this.addinLib.GetString("OdfExportLabel")];
+                exportButton = (CommandBarButton)controls[this.addinLib.GetString("OdfExportLabel")];
             }
             catch (Exception)
             {
                 // otherwise, create a new one
-                exportButton = (CommandBarButton)commandBar.Controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 4, true);
+                exportButton = (CommandBarButton)controls.Add(MsoControlType.msoControlButton, Type.Missing, Type.Missing, 4, true);
             }
             // set item's label
             exportButton.Caption = this.addinLib.GetString("OdfExportLabel");
@@ -193,7 +216,22 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
             exportButton.OnAction = "!<OdfExcelXPAddin.Connect>";
             exportButton.Visible = true;
             exportButton.Enabled = true;
-            exportButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.exportButton_Click);
+            if (addHandler) {
+                exportButton.Click += exportButton_Click;
+            }
+        }
+
+        /// <summary>
+        /// For some reason, delegates are unregistered after first call to ODF...
+        /// </summary>
+        private bool restoreButtons = true;
+
+        private void RestoreButtons() {
+            if (restoreButtons) {
+                importButton.Click += importButton_Click;
+                exportButton.Click += exportButton_Click;
+                restoreButtons = false;
+            }
         }
 
         /// <summary>
@@ -222,62 +260,68 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
         /// <param name="control">An IRibbonControl instance</param>
         private void importButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
         {
-            FileDialog fd = this.applicationObject.get_FileDialog(MsoFileDialogType.msoFileDialogFilePicker);
-            // allow multiple file opening
-            fd.AllowMultiSelect = true;
-            // add filter for ODS files
-            fd.Filters.Clear();
-            fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.ods", Type.Missing);
-            fd.Filters.Add(this.addinLib.GetString("AllFileType"), "*.*", Type.Missing);
-            // set title
-            fd.Title = this.addinLib.GetString("OdfImportLabel");
-            // display the dialog
-            fd.Show();
+            bool doRestore = false;
 
-            // process the chosen documents	
-            for (int i = 1; i <= fd.SelectedItems.Count; ++i)
-            {
-                // retrieve file name
-                String odfFile = fd.SelectedItems.Item(i);
+            try {
+                FileDialog fd = this.applicationObject.get_FileDialog(MsoFileDialogType.msoFileDialogFilePicker);
+                // allow multiple file opening
+                fd.AllowMultiSelect = true;
+                // add filter for ODS files
+                fd.Filters.Clear();
+                fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.ods", Type.Missing);
+                fd.Filters.Add(this.addinLib.GetString("AllFileType"), "*.*", Type.Missing);
+                // set title
+                fd.Title = this.addinLib.GetString("OdfImportLabel");
+                // display the dialog
+                fd.Show();
 
-                // create a temporary file
-                object fileName = this.addinLib.GetTempFileName(odfFile, ".xlsx");
+                // process the chosen documents	
+                if (fd.SelectedItems.Count > 0) {
+                    doRestore = true;
+                }
+                for (int i = 1; i <= fd.SelectedItems.Count; ++i) {
+                    // retrieve file name
+                    String odfFile = fd.SelectedItems.Item(i);
 
-               // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
-                OdfToOox(odfFile, (string)fileName, true);
-                // this.applicationObject.System.Cursor =  WdCursorType.wdCursorNormal;
+                    // create a temporary file
+                    object fileName = this.addinLib.GetTempFileName(odfFile, ".xlsx");
 
-                try
-                {
-                    // open the workbook
-                    object readOnly = true;
-                    object addToRecentFiles = false;
-                    object isVisible = true;
-                    object openAndRepair = false;
-                    object missing = Missing.Value;
+                    // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
+                    OdfToOox(odfFile, (string)fileName, true);
+                    // this.applicationObject.System.Cursor =  WdCursorType.wdCursorNormal;
 
-                    // conversion may have been cancelled and file deleted.
-                    if (File.Exists((string)fileName))
-                    {
-                        // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
-                        System.Globalization.CultureInfo ci;
-                        ci = System.Threading.Thread.CurrentThread.CurrentCulture;
-                        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-                   
-                        Microsoft.Office.Interop.Excel.Workbook wb =
-                            this.applicationObject.Workbooks.Open((string) fileName, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
-                        
-                        wb.Activate();
-                       
-                        System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+                    try {
+                        // open the workbook
+                        object readOnly = true;
+                        object addToRecentFiles = false;
+                        object isVisible = true;
+                        object openAndRepair = false;
+                        object missing = Missing.Value;
+
+                        // conversion may have been cancelled and file deleted.
+                        if (File.Exists((string)fileName)) {
+                            // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
+                            System.Globalization.CultureInfo ci;
+                            ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+                            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
+                            Microsoft.Office.Interop.Excel.Workbook wb =
+                                this.applicationObject.Workbooks.Open((string)fileName, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+
+                            wb.Activate();
+
+                            System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+                        }
+                    } catch (Exception ex) {
+                        // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorNormal;
+                        System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
+                        System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                        return;
                     }
                 }
-                catch (Exception ex)
-                {
-                    // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorNormal;
-                    System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
-                    System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                    return;
+            } finally {
+                if (doRestore) {
+                    RestoreButtons();
                 }
             }
         }
@@ -291,6 +335,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
             // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
             System.Globalization.CultureInfo ci;
             ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+            bool doRestore = false;
             try
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -330,9 +375,11 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                         object tmpFileName = null;
                         string xlsxFile = (string)initialName;
 
+                        doRestore = true;
+
                         //this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
 
-                        if (!"50".Equals(wb.FileFormat.ToString()))
+                        if (!xlOpenXMLWorkbook.ToString().Equals(wb.FileFormat.ToString()))
                         {
                             // duplicate the file
                             object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);
@@ -391,6 +438,9 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
             finally
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+                if (doRestore) {
+                    RestoreButtons();
+                }
             }
         }
 
