@@ -28,15 +28,14 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip" 
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
-  exclude-result-prefixes="table">
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
 
   <xsl:import href="measures.xsl"/>
   <xsl:import href="pixel-measure.xsl"/>
@@ -59,7 +58,8 @@
       <xsl:with-param name="cellNumber">
         <!-- last 'or' for cells with error -->
         <xsl:value-of
-          select="$cellNumber + count(table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))])"/>
+          select="$cellNumber + count(table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))])"
+        />
       </xsl:with-param>
       <xsl:with-param name="sheetId">
         <xsl:value-of select="$sheetId + 1"/>
@@ -81,7 +81,9 @@
             <xsl:for-each select="table:table-row[@table:number-rows-repeated > 32768]">
               <xsl:call-template name="ConvertMeasure">
                 <xsl:with-param name="length">
-                  <xsl:value-of select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
+                  <xsl:value-of
+                    select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"
+                  />
                 </xsl:with-param>
                 <xsl:with-param name="unit">point</xsl:with-param>
               </xsl:call-template>
@@ -141,40 +143,88 @@
           </xsl:variable>
 
           <xsl:variable name="pageBreakView">
-            <xsl:value-of
-              select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ShowPageBreakPreview']"
-            />
+            <xsl:choose>
+              <xsl:when
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ShowPageBreakPreview']">
+                <xsl:value-of
+                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ShowPageBreakPreview']"
+                />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>false</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+
           </xsl:variable>
-          
+
           <xsl:variable name="hasColumnRowHeaders">
-            <xsl:value-of
-              select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'HasColumnRowHeaders']"
-            />
+            <xsl:choose>
+              <xsl:when
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'HasColumnRowHeaders']">
+                <xsl:value-of
+                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'HasColumnRowHeaders']"
+                />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>true</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:variable>
-          
+
           <xsl:if test="$hasColumnRowHeaders='false'">
             <xsl:attribute name="showRowColHeaders">
               <xsl:text>0</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          
+
+          <!-- if it is normal view than take zoom from ZoomValue; if it's a PageBreakView then from PageViewZoomValue -->
           <xsl:variable name="zoom">
             <xsl:choose>
+              <!-- normal view-->
               <xsl:when test="$pageBreakView = 'false' ">
-                <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']"/>
+                <xsl:choose>
+                  <xsl:when
+                    test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']">
+                    <xsl:value-of
+                      select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']"
+                    />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>100</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:when>
+              <!-- PageBreakView -->
               <xsl:otherwise>
-                <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'PageViewZoomValue']"/>
+                <!-- take zoom value from PageViewZoomValue -->
+                <xsl:choose>
+                  <xsl:when
+                    test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'PageViewZoomValue']">
+                    <xsl:value-of
+                      select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'PageViewZoomValue']"
+                    />
+                  </xsl:when>
+                  <!-- if there isn't PageViewZoomValue take zoom value from ZoomValue -->
+                  <xsl:when
+                    test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']">
+                    <xsl:value-of
+                      select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']"
+                    />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>100</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          
+
           <xsl:if test="$zoom">
             <xsl:attribute name="zoomScale">
               <xsl:value-of select="$zoom"/>
             </xsl:attribute>
           </xsl:if>
-          
+
           <xsl:if test="$sheetId = $ActiveTableNumber">
             <xsl:attribute name="activeTab">
               <xsl:text>1</xsl:text>
@@ -238,7 +288,8 @@
         </sheetView>
       </sheetViews>
 
-      <sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}" customHeight="true"/>
+      <sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}"
+        customHeight="true"/>
       <xsl:if test="table:table-column">
         <cols>
 
