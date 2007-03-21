@@ -36,8 +36,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" 
-  exclude-result-prefixes="svg table r text style number fo">
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" exclude-result-prefixes="svg">
 
   <xsl:import href="measures.xsl"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
@@ -74,9 +73,6 @@
                 <xsl:with-param name="mode">default</xsl:with-param>
               </xsl:call-template>
             </xsl:for-each>
-            <!--          <xsl:apply-templates
-            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family='table-cell']/style:text-properties"
-            mode="fonts"/>-->
           </font>
         </xsl:when>
         <!-- application default-->
@@ -123,10 +119,29 @@
   </xsl:template>
 
   <xsl:template name="InsertCellFormats">
+
+    <!-- number of multiline cells in document -->
+    <xsl:variable name="multilines">
+      <xsl:choose>
+        <xsl:when
+          test="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p[2]]">
+          <xsl:for-each
+            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::text:p[last()]">
+            <xsl:number count="table:table-cell[text:p[2]]" level="any"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+
+    </xsl:variable>
+
     <cellXfs>
+
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines"
         />
       </xsl:attribute>
 
@@ -135,6 +150,10 @@
 
       <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles"
         mode="cellFormats"/>
+
+      <!-- add cell formats for multiline cells, which must have wrap property -->
+      <xsl:call-template name="InsertMultilineCellFormats"/>
+
     </cellXfs>
   </xsl:template>
 
@@ -189,136 +208,143 @@
 
   <xsl:template match="style:style[@style:family='table-cell']" mode="cellFormats">
     <xf numFmtId="0" fillId="0" borderId="0" xfId="0">
-      <!-- font -->
-      <xsl:if test="style:text-properties">
-        <xsl:attribute name="applyFont">
-          <xsl:text>1</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fontId">
-          <!-- change referencing node to style:text-properties and count-->
-          <xsl:for-each select="style:text-properties">
-            <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']" level="any"/>
-          </xsl:for-each>
-        </xsl:attribute>
-      </xsl:if>
 
-      <!-- text -alignment -->
-      <!-- 1st 'or' - horizontal alignment
+      <xsl:call-template name="SetFormatProperties"/>
+    </xf>
+  </xsl:template>
+
+  <xsl:template name="SetFormatProperties">
+    <xsl:param name="multiline" select="'false'"/>
+
+    <!-- font -->
+    <xsl:if test="style:text-properties">
+      <xsl:attribute name="applyFont">
+        <xsl:text>1</xsl:text>
+      </xsl:attribute>
+      <xsl:attribute name="fontId">
+        <!-- change referencing node to style:text-properties and count-->
+        <xsl:for-each select="style:text-properties">
+          <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']" level="any"/>
+        </xsl:for-each>
+      </xsl:attribute>
+    </xsl:if>
+
+    <!-- text -alignment -->
+    <!-- 1st 'or' - horizontal alignment
             2nd 'or' - horizontal alignment 'fill'
              3rd 'or' - vertical alignment 
              4th 'or' - angle oriented text
              5th 'or' - vertically stacked text 
              6th 'or' - wraped text -->
-      <xsl:if
-        test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true') or (style:table-cell-properties/@style:vertical-align) or (style:table-cell-properties/@style:rotation-angle) or (style:table-cell-properties/@style:direction='ttb') or (style:table-cell-properties/@fo:wrap-option='wrap')">
-        <xsl:attribute name="applyAlignment">
-          <xsl:text>1</xsl:text>
-        </xsl:attribute>
-        <alignment>
-          <!-- horizontal alignment -->
-          <!-- 1st 'or' - horizontal alignment 
+    <xsl:if
+      test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true') or (style:table-cell-properties/@style:vertical-align) or (style:table-cell-properties/@style:rotation-angle) or (style:table-cell-properties/@style:direction='ttb') or (style:table-cell-properties/@fo:wrap-option='wrap') or ($multiline='true')">
+      <xsl:attribute name="applyAlignment">
+        <xsl:text>1</xsl:text>
+      </xsl:attribute>
+      <alignment>
+        <!-- horizontal alignment -->
+        <!-- 1st 'or' - horizontal alignment 
                 2nd 'or' - horizontal alignment 'fill' 
           -->
-          <xsl:if
-            test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true')">
-            <xsl:attribute name="horizontal">
-              <xsl:choose>
-                <xsl:when test="style:table-cell-properties/@style:repeat-content = 'true' ">
-                  <xsl:text>fill</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:if test="style:paragraph-properties/@fo:text-align">
-                    <xsl:choose>
-                      <xsl:when test="style:paragraph-properties/@fo:text-align = 'start' ">
-                        <xsl:text>left</xsl:text>
-                      </xsl:when>
-                      <xsl:when test="style:paragraph-properties/@fo:text-align = 'end' ">
-                        <xsl:text>right</xsl:text>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="style:paragraph-properties/@fo:text-align"/>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:if>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:if>
-          <!-- change default horizontal alignment-->
-          <xsl:if test="not(style:paragraph-properties/@fo:text-align)">
+        <xsl:if
+          test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true')">
+          <xsl:attribute name="horizontal">
             <xsl:choose>
-              <!-- change default horizontal alignment  of vertically stacked text to 'left' -->
-              <xsl:when test="style:table-cell-properties/@style:direction='ttb' ">
-                <xsl:attribute name="horizontal">
-                  <xsl:text>left</xsl:text>
-                </xsl:attribute>
+              <xsl:when test="style:table-cell-properties/@style:repeat-content = 'true' ">
+                <xsl:text>fill</xsl:text>
               </xsl:when>
-              <!-- change default horizontal alignment of angle oriented text when angle equals -90 degrees -->
-              <xsl:when test="style:table-cell-properties/@style:rotation-angle = 270">
-                <xsl:attribute name="horizontal">
-                  <xsl:text>right</xsl:text>
-                </xsl:attribute>
-              </xsl:when>
-              <!-- change default alignment of angle oriented text when angle equals (-90,0) degrees or (0,90) degrees -->
-              <xsl:when
-                test="((style:table-cell-properties/@style:rotation-angle &lt; 90 and style:table-cell-properties/@style:rotation-angle &gt; 0) or style:table-cell-properties/@style:rotation-angle &gt; 270)">
-                <xsl:attribute name="horizontal">
-                  <xsl:text>center</xsl:text>
-                </xsl:attribute>
-              </xsl:when>
+              <xsl:otherwise>
+                <xsl:if test="style:paragraph-properties/@fo:text-align">
+                  <xsl:choose>
+                    <xsl:when test="style:paragraph-properties/@fo:text-align = 'start' ">
+                      <xsl:text>left</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="style:paragraph-properties/@fo:text-align = 'end' ">
+                      <xsl:text>right</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="style:paragraph-properties/@fo:text-align"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:if>
+              </xsl:otherwise>
             </xsl:choose>
-          </xsl:if>
+          </xsl:attribute>
+        </xsl:if>
+        <!-- change default horizontal alignment-->
+        <xsl:if test="not(style:paragraph-properties/@fo:text-align)">
+          <xsl:choose>
+            <!-- change default horizontal alignment  of vertically stacked text to 'left' -->
+            <xsl:when test="style:table-cell-properties/@style:direction='ttb' ">
+              <xsl:attribute name="horizontal">
+                <xsl:text>left</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            <!-- change default horizontal alignment of angle oriented text when angle equals -90 degrees -->
+            <xsl:when test="style:table-cell-properties/@style:rotation-angle = 270">
+              <xsl:attribute name="horizontal">
+                <xsl:text>right</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            <!-- change default alignment of angle oriented text when angle equals (-90,0) degrees or (0,90) degrees -->
+            <xsl:when
+              test="((style:table-cell-properties/@style:rotation-angle &lt; 90 and style:table-cell-properties/@style:rotation-angle &gt; 0) or style:table-cell-properties/@style:rotation-angle &gt; 270)">
+              <xsl:attribute name="horizontal">
+                <xsl:text>center</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:if>
 
-          <!-- vertical-alignment -->
-          <xsl:if test="style:table-cell-properties/@style:vertical-align">
-            <xsl:attribute name="vertical">
-              <xsl:choose>
-                <xsl:when test="style:table-cell-properties/@style:vertical-align = 'automatic' ">
-                  <xsl:text>bottom</xsl:text>
-                </xsl:when>
-                <xsl:when test="style:table-cell-properties/@style:vertical-align = 'middle' ">
-                  <xsl:text>center</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="style:table-cell-properties/@style:vertical-align"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:if>
+        <!-- vertical-alignment -->
+        <xsl:if test="style:table-cell-properties/@style:vertical-align">
+          <xsl:attribute name="vertical">
+            <xsl:choose>
+              <xsl:when test="style:table-cell-properties/@style:vertical-align = 'automatic' ">
+                <xsl:text>bottom</xsl:text>
+              </xsl:when>
+              <xsl:when test="style:table-cell-properties/@style:vertical-align = 'middle' ">
+                <xsl:text>center</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="style:table-cell-properties/@style:vertical-align"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
 
-          <!-- text rotation -->
-          <xsl:if
-            test="(style:table-cell-properties/@style:rotation-angle and style:table-cell-properties/@style:rotation-angle != '0') or style:table-cell-properties/@style:direction='ttb' ">
-            <xsl:attribute name="textRotation">
-              <xsl:choose>
-                <!-- ascending text angle -->
-                <xsl:when
-                  test="style:table-cell-properties/@style:rotation-angle &lt; 91 and not(style:table-cell-properties/@style:direction='ttb')">
-                  <xsl:value-of select="style:table-cell-properties/@style:rotation-angle"/>
-                </xsl:when>
-                <!-- descending text angle -->
-                <xsl:when test="style:table-cell-properties/@style:rotation-angle &gt; 269">
-                  <xsl:value-of select="450 - style:table-cell-properties/@style:rotation-angle"/>
-                </xsl:when>
-                <xsl:when test="style:table-cell-properties/@style:direction='ttb' ">
-                  <xsl:text>255</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>0</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:if>
+        <!-- text rotation -->
+        <xsl:if
+          test="(style:table-cell-properties/@style:rotation-angle and style:table-cell-properties/@style:rotation-angle != '0') or style:table-cell-properties/@style:direction='ttb' ">
+          <xsl:attribute name="textRotation">
+            <xsl:choose>
+              <!-- ascending text angle -->
+              <xsl:when
+                test="style:table-cell-properties/@style:rotation-angle &lt; 91 and not(style:table-cell-properties/@style:direction='ttb')">
+                <xsl:value-of select="style:table-cell-properties/@style:rotation-angle"/>
+              </xsl:when>
+              <!-- descending text angle -->
+              <xsl:when test="style:table-cell-properties/@style:rotation-angle &gt; 269">
+                <xsl:value-of select="450 - style:table-cell-properties/@style:rotation-angle"/>
+              </xsl:when>
+              <xsl:when test="style:table-cell-properties/@style:direction='ttb' ">
+                <xsl:text>255</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>0</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
 
-          <!-- wraped text -->
-          <xsl:if test="style:table-cell-properties/@fo:wrap-option='wrap'">
-            <xsl:attribute name="wrapText">
-              <xsl:text>1</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-        </alignment>
-      </xsl:if>
-    </xf>
+        <!-- wraped text -->
+        <xsl:if test="style:table-cell-properties/@fo:wrap-option='wrap' or $multiline = 'true' ">
+          <xsl:attribute name="wrapText">
+            <xsl:text>1</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      </alignment>
+    </xsl:if>
   </xsl:template>
 
   <!-- insert run properties -->
@@ -516,5 +542,36 @@
 
   <xsl:template match="number:text" mode="fonts"/>
   <xsl:template match="number:text" mode="cellFormats"/>
+
+  <xsl:template name="InsertMultilineCellFormats">
+
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p[2]]">
+      <xsl:variable name="formatNumber">
+        <xsl:for-each select="key('style',@table:style-name)">
+          <xsl:number count="style:style[@style:family='table-cell']"/>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0">
+        <xsl:choose>
+          <xsl:when test="$formatNumber != '' ">
+            <xsl:for-each
+              select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
+              <xsl:call-template name="SetFormatProperties">
+                <xsl:with-param name="multiline">
+                  <xsl:text>true</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <alignment wrapText="1"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xf>
+    </xsl:for-each>
+
+  </xsl:template>
 
 </xsl:stylesheet>

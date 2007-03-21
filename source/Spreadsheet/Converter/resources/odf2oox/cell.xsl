@@ -35,7 +35,7 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
 
   <!-- insert column properties into sheet -->
   <xsl:template match="table:table-column" mode="sheet">
@@ -275,7 +275,7 @@
           </xsl:choose>
         </xsl:with-param>
         <xsl:with-param name="cellNumber">
-          <!-- last 'or' is for cells with error -->          
+          <!-- last or is for cells with error -->
           <xsl:value-of
             select="$cellNumber + count(child::table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))])"
           />
@@ -375,7 +375,6 @@
           <!-- if this node was table:table-cell with string than increase cellNumber-->
           <xsl:with-param name="cellNumber">
             <xsl:choose>
-              <!-- include cells with errors -->              
               <xsl:when
                 test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))">
                 <xsl:value-of select="$cellNumber + 1"/>
@@ -400,7 +399,6 @@
           <!-- if this node was table:table-cell with string than increase cellNumber-->
           <xsl:with-param name="cellNumber">
             <xsl:choose>
-              <!-- include cells with errors -->
               <xsl:when
                 test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))">
                 <xsl:value-of select="$cellNumber + 1"/>
@@ -509,31 +507,53 @@
           <xsl:value-of select="concat($colChar,$rowNumber)"/>
         </xsl:attribute>
 
-        <!-- insert cell style number-->
+        <!-- insert cell style number -->
         <xsl:choose>
-          <xsl:when test="@table:style-name">
-            <xsl:for-each select="key('style',@table:style-name)">
-              <xsl:attribute name="s">
-                <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-              </xsl:attribute>
-            </xsl:for-each>
+          <!-- if it is a multiline cell -->
+          <xsl:when test="text:p[2]">
+            <xsl:variable name="cellFormats">
+              <xsl:value-of
+                select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
+              />
+            </xsl:variable>
+            <xsl:variable name="multilineNumber">
+              <xsl:for-each select="text:p[2]">
+                <xsl:number count="table:table-cell[text:p[2]]" level="any"/>
+              </xsl:for-each>
+            </xsl:variable>
+            <xsl:attribute name="s">
+              <xsl:value-of select="$cellFormats - 1 + $multilineNumber"/>
+            </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:variable name="columnCellStyle">
-              <xsl:call-template name="GetColumnCellStyle">
-                <xsl:with-param name="colNum">
-                  <xsl:value-of select="$colNumber + 1"/>
-                </xsl:with-param>
-                <xsl:with-param name="TableColumnTagNum">
-                  <xsl:value-of select="$TableColumnTagNum"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:for-each select="key('style',$columnCellStyle)">
-              <xsl:attribute name="s">
-                <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-              </xsl:attribute>
-            </xsl:for-each>
+            <xsl:choose>
+              <!-- when style is specified in cell -->
+              <xsl:when test="@table:style-name">
+                <xsl:for-each select="key('style',@table:style-name)">
+                  <xsl:attribute name="s">
+                    <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                  </xsl:attribute>
+                </xsl:for-each>
+              </xsl:when>
+              <!-- when style is specified in column -->
+              <xsl:otherwise>
+                <xsl:variable name="columnCellStyle">
+                  <xsl:call-template name="GetColumnCellStyle">
+                    <xsl:with-param name="colNum">
+                      <xsl:value-of select="$colNumber + 1"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="TableColumnTagNum">
+                      <xsl:value-of select="$TableColumnTagNum"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:for-each select="key('style',$columnCellStyle)">
+                  <xsl:attribute name="s">
+                    <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                  </xsl:attribute>
+                </xsl:for-each>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
 
@@ -586,8 +606,9 @@
             </xsl:when>
             <!-- TO DO  date and time-->
             <xsl:when test="@office:value-type = 'date' or @office:value-type = 'time'"/>
-            <!-- last or when number cell has error -->            
-            <xsl:when test="@office:value-type = 'string' or @office:value-type = 'boolean'  or not((number(text:p) or text:p = 0))">
+            <!-- last or when number cell has error -->
+            <xsl:when
+              test="@office:value-type = 'string' or @office:value-type = 'boolean' or not((number(text:p) or text:p = 0))">
               <xsl:attribute name="t">s</xsl:attribute>
               <v>
                 <xsl:value-of select="number($cellNumber)"/>
