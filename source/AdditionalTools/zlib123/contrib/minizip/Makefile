@@ -41,6 +41,9 @@ endif
 libzlibwapi.a : $(SOURCE) Makefile
 	$(CC) -c $(DEBUG) $(CFLAGS) $(SOURCE)
 	ar rc libzlibwapi.a zip.o unzip.o ioapi.o # FIXME - do better
+ifeq ($(OS),Darwin)
+	ranlib libzlibwapi.a
+endif
 
 clean-local:
 	rm -f *.o libzlibwapi.$(DLLEXT) libzlibwapi.a

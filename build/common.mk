@@ -2,6 +2,11 @@ all: do-all
 
 OS:=$(shell uname -o)
 
+# uname doesn't have a -o option on all platforms
+ifndef OS
+OS:=$(shell uname)
+endif
+
 CC=gcc
 LD=ld
 CSC=gmcs

@@ -13,7 +13,11 @@ ZIPOPEN=_zipOpen@8
 UNZOPEN=_unzOpen@4
 OTHERLIBS=-lole32 -loleaut32 -lws2_32 -lpsapi -luser32 -lkernel32
 else
+ifeq ($(OS),Darwin)
+MACHINE_CONFIG_FILE=
+else
 MACHINE_CONFIG_FILE=--machine-config "`pkg-config --variable=prefix mono`/etc/mono/2.0/machine.config"
+endif
 EXEEXT=
 PATHSEP=:
 EXPORTDYNAMIC=-Wl,--export-dynamic
@@ -52,7 +56,7 @@ ifeq ($(OS),Darwin)
 # Don't even try static linking to mono as we need to bundle glib and all of
 # its dependencies which are not included in a standard Mac OS X installation
 	$(CC) -o OdfConverter -Wall `pkg-config --cflags mono` main.c \
-		`pkg-config --libs-only-L mono` -bind_at_load \
+		`pkg-config --libs-only-L mono` -bind_at_load -all_load -lz \
 	    ../AdditionalTools/zlib123/contrib/minizip/libzlibwapi.a \
 		`pkg-config --libs-only-l mono` bundle.o
 else
