@@ -40,6 +40,7 @@
   <xsl:import href="measures.xsl"/>
   <xsl:import href="pixel-measure.xsl"/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
+  <xsl:key name="ConfigItem" match="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item" use="@config:name"/>
 
   <!-- table is converted into sheet -->
   <xsl:template match="table:table" mode="sheet">
@@ -95,15 +96,17 @@
 
       <!-- get default font size -->
       <xsl:variable name="baseFontSize">
+        <xsl:for-each select="document('styles.xml')">
         <xsl:choose>
           <xsl:when
-            test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
+            test="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
             <xsl:value-of
-              select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"
+              select="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"
             />
           </xsl:when>
           <xsl:otherwise>10</xsl:otherwise>
         </xsl:choose>
+        </xsl:for-each>
       </xsl:variable>
       <xsl:variable name="defaultFontSize">
         <xsl:choose>
@@ -141,28 +144,35 @@
               <xsl:value-of select="count(preceding-sibling::table:table)"/>
             </xsl:for-each>
           </xsl:variable>
-
+          
+         
+            
           <xsl:variable name="pageBreakView">
+            <xsl:for-each select="document('settings.xml')">
             <xsl:choose>
               <xsl:when
-                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ShowPageBreakPreview']">
+                test="key('ConfigItem', 'ShowPageBreakPreview')">
+
                 <xsl:value-of
-                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ShowPageBreakPreview']"
+                  select="key('ConfigItem', 'ShowPageBreakPreview')"
                 />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:text>false</xsl:text>
               </xsl:otherwise>
             </xsl:choose>
-
+            </xsl:for-each>
           </xsl:variable>
+          
+          <xsl:for-each select="document('settings.xml')">
 
           <xsl:variable name="hasColumnRowHeaders">
             <xsl:choose>
               <xsl:when
-                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'HasColumnRowHeaders']">
+                test="key('ConfigItem', 'HasColumnRowHeaders')">
+                
                 <xsl:value-of
-                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'HasColumnRowHeaders']"
+                  select="key('ConfigItem', 'HasColumnRowHeaders')"
                 />
               </xsl:when>
               <xsl:otherwise>
@@ -184,10 +194,9 @@
               <xsl:when test="$pageBreakView = 'false' ">
                 <xsl:choose>
                   <xsl:when
-                    test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']">
+                    test="key('ConfigItem', 'ZoomValue')">
                     <xsl:value-of
-                      select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']"
-                    />
+                      select="key('ConfigItem', 'ZoomValue')"/>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:text>100</xsl:text>
@@ -199,16 +208,16 @@
                 <!-- take zoom value from PageViewZoomValue -->
                 <xsl:choose>
                   <xsl:when
-                    test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'PageViewZoomValue']">
+                    test="key('ConfigItem', 'PageViewZoomValue')">                              
                     <xsl:value-of
-                      select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'PageViewZoomValue']"
+                      select="key('ConfigItem', 'PageViewZoomValue')"
                     />
                   </xsl:when>
                   <!-- if there isn't PageViewZoomValue take zoom value from ZoomValue -->
                   <xsl:when
-                    test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']">
+                    test="key('ConfigItem', 'ZoomValue')">                              
                     <xsl:value-of
-                      select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item[@config:name = 'ZoomValue']"
+                      select="key('ConfigItem', 'ZoomValue')"
                     />
                   </xsl:when>
                   <xsl:otherwise>
@@ -224,7 +233,9 @@
               <xsl:value-of select="$zoom"/>
             </xsl:attribute>
           </xsl:if>
-
+            
+          </xsl:for-each>
+          
           <xsl:if test="$sheetId = $ActiveTableNumber">
             <xsl:attribute name="activeTab">
               <xsl:text>1</xsl:text>
