@@ -379,7 +379,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
 
                         //this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
 
-                        if (!xlOpenXMLWorkbook.ToString().Equals(wb.FileFormat.ToString()))
+                        if (!"50".Equals(wb.FileFormat.ToString()))
                         {
                             // duplicate the file
                             object newName = Path.GetTempFileName() + Path.GetExtension((string)initialName);

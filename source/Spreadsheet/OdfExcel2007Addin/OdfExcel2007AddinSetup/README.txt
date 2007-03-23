@@ -1,7 +1,7 @@
 ODF Add-in for Excel2007
 ========================
 
-Thank you for downloading ODF Add-in for Excel XP. The purpose of the software is to enable users to open ODF Specification based documents in Excel XP and demonstrate the interoperability between OpenXML & ODF specifications. Since this is still a beta release, you may use and test it... at your own risk! Any feedback is welcome though! ;)
+Thank you for downloading ODF Add-in for Excel 2007. The purpose of the software is to enable users to open ODF Specification based documents in Excel 2007 and demonstrate the interoperability between OpenXML & ODF specifications. Since this is still a beta release, you may use and test it... at your own risk! Any feedback is welcome though! ;)
 
 Software Requirements
 ---------------------
@@ -23,7 +23,7 @@ Run the downloaded install program and follow the steps...
 
 If installation is successful, you should see a new "Open ODF" entry in the “File” menu in Excel. It allows you to either import an ODF spreadsheet file or export your current working document as an ODF spreadsheet file (note that during development process, those functionalities might be temporary unavailable).
 
-Important note: The ODF file opened by the add-in is imported in Microsoft Excel as a read-only DOCX file. If you want to save it back as ODF, you will have to first make a copy of the document ("Menu>Save As") and then use the "Export as ODF" menu.
+Important note: The ODF file opened by the add-in is imported in Microsoft Excel as a read-only XLSX file. If you want to save it back as ODF, you will have to first make a copy of the document ("Menu>Save As") and then use the "Export as ODF" menu.
 
 Troubleshooting Guide
 ---------------------
@@ -47,12 +47,10 @@ Please to refer to sourceForge (https://sourceforge.net/tracker/?group_id=169337
 Unresolved bugs in M1
 ---------------------
 
+#1685358 Roundtrip crash created ODS ECTSrechner2-06_Probex.ods
+#1684410 Excel displays "-", OOo displays "0"
+#1684407 Excel displays " ", OOo displays "0"
 #1682304 Columns becomes wider (ODF->OOX)
-#1681953 Hardwraps / manual line breaks
-#1680659 Crash/recover dialog raises on several files(2)
 #1680462 Merged cell are not retained after round trip conversion
-#1676490 Global merge causes read error
-#1676481 Global merge not converted
 #1675771 Conversion increases file size
-#1674178 Menuitems disappear
 #1673978 Columns not wide enough

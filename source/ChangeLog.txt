@@ -1,5 +1,9 @@
 History of changes
 ------------------
+Release R2053 (M1) (2007-03-22)
+Fixed bug: #1679681 (add-in fails to convert ods file consisting paragraphs)
+Added Readme files
+
 Release R2050 (M1) (2007-03-21)
 
 Fixed bug: #1683557 Ods formula with error becomes 0 in .xlsx

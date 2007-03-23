@@ -241,6 +241,11 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.OtkLoader.2.0"
+                    {
+                    "Name" = "8:Shared Add-in Support Update for Microsoft .NET Framework 2.0 (KB908002)"
+                    "ProductCode" = "8:Microsoft.OtkLoader.2.0"
+                    }
                 }
             }
         }
@@ -276,7 +281,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfAddinLib, Version=0.2.3.20639, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfAddinLib, Version=0.2.3.21302, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                 }
@@ -436,7 +441,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=1.0.0.20636, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfZipUtils, Version=1.0.0.21294, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                 }
@@ -462,7 +467,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=1.0.0.20637, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OdfConverterLib, Version=1.0.0.21297, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                 }
@@ -566,7 +571,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:OdfExcel2003AddinSetup"
         "ProductCode" = "8:{3897A2A9-45F4-4B3F-A733-C4E44E0FA65B}"
-        "PackageCode" = "8:{42EF2682-7E6F-40B7-B6A4-5E070E1A643A}"
+        "PackageCode" = "8:{6F3279BA-9BEE-485F-A87A-7D4E73F4E686}"
         "UpgradeCode" = "8:{DFCE836B-5D4E-447E-BAE9-B11695746899}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
