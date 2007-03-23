@@ -35,8 +35,7 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  exclude-result-prefixes="table">
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
 
   <!-- insert column properties into sheet -->
   <xsl:template match="table:table-column" mode="sheet">
@@ -629,6 +628,45 @@
     <xsl:value-of
       select="substring-before(substring-after($TableColumnTagNum, concat(concat('K', $colNum), ':')), ';')"
     />
+  </xsl:template>
+
+  <xsl:template name="GetColNumber">
+    <xsl:param name="position"/>
+    <xsl:param name="count" select="1"/>
+    <xsl:param name="value" select="1"/>
+
+    <xsl:choose>
+      <xsl:when test="$count &lt; $position">
+        <xsl:variable name="columns">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated">
+              <xsl:value-of select="@table:number-columns-repeated"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>1</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:for-each select="following-sibling::table:table-cell[1]">
+          <xsl:call-template name="GetColNumber">
+            <xsl:with-param name="position">
+              <xsl:value-of select="$position"/>
+            </xsl:with-param>
+            <xsl:with-param name="count">
+              <xsl:value-of select="$count + 1"/>
+            </xsl:with-param>
+            <xsl:with-param name="value">
+              <xsl:value-of select="$value + $columns"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+  </xsl:choose>
+
   </xsl:template>
 
 </xsl:stylesheet>

@@ -36,7 +36,7 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" 
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   exclude-result-prefixes="svg table r text style number fo">
 
   <xsl:import href="measures.xsl"/>
@@ -547,32 +547,100 @@
   <xsl:template name="InsertMultilineCellFormats">
 
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p[2]]">
-      <xsl:variable name="formatNumber">
-        <xsl:for-each select="key('style',@table:style-name)">
-          <xsl:number count="style:style[@style:family='table-cell']"/>
-        </xsl:for-each>
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+
+      <!-- string with listed columns and their styles -->
+      <xsl:variable name="ColumnTable">
+        <xsl:apply-templates select="table:table-column[1]" mode="tag">
+          <xsl:with-param name="colNumber">1</xsl:with-param>
+        </xsl:apply-templates>
       </xsl:variable>
 
-      <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0">
-        <xsl:choose>
-          <xsl:when test="$formatNumber != '' ">
-            <xsl:for-each
-              select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
-              <xsl:call-template name="SetFormatProperties">
-                <xsl:with-param name="multiline">
-                  <xsl:text>true</xsl:text>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:for-each>
-          </xsl:when>
-          <xsl:otherwise>
-            <alignment wrapText="1"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xf>
-    </xsl:for-each>
+      <xsl:for-each select="descendant::table:table-cell[text:p[2]]">
+        <xsl:variable name="formatNumber">
+          <xsl:for-each select="key('style',@table:style-name)">
+            <xsl:number count="style:style[@style:family='table-cell']"/>
+          </xsl:for-each>
+        </xsl:variable>
 
+        <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0">
+          <xsl:choose>
+            <!-- when style is set for cell -->
+            <xsl:when test="$formatNumber != '' ">
+              <xsl:attribute name="applyFont">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+
+              <xsl:attribute name="applyAlignment">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+
+              <xsl:for-each
+                select="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
+                <xsl:call-template name="SetFormatProperties">
+                  <xsl:with-param name="multiline">
+                    <xsl:text>true</xsl:text>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:for-each>
+            </xsl:when>
+              <!-- when style is set for column or there is none -->
+            <xsl:otherwise>
+
+              <!-- sequential number of this table:table-cell tag -->
+              <xsl:variable name="position">
+                <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
+              </xsl:variable>
+
+              <!-- real column number -->
+              <xsl:variable name="colNum">
+                  <xsl:for-each select="parent::node()/table:table-cell[1]">
+                    <xsl:call-template name="GetColNumber">
+                    <xsl:with-param name="position">
+                      <xsl:value-of select="$position"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  </xsl:for-each>
+              </xsl:variable>
+              
+              <!-- name of the style set for this column -->
+              <xsl:variable name="columnCellStyle">
+                <xsl:call-template name="GetColumnCellStyle">
+                  <xsl:with-param name="colNum">
+                    <xsl:value-of select="$colNum"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="TableColumnTagNum">
+                    <xsl:value-of select="$ColumnTable"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:variable>
+              
+              <xsl:attribute name="applyAlignment">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+
+              <xsl:choose>
+                <!-- when style was set for column -->
+                <xsl:when test="$columnCellStyle != '' ">
+                  <xsl:for-each
+                    select="key('style',$columnCellStyle)">
+                    <xsl:call-template name="SetFormatProperties">
+                      <xsl:with-param name="multiline">
+                        <xsl:text>true</xsl:text>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:for-each>
+                </xsl:when>
+                <!-- when there was no style -->
+                <xsl:otherwise>
+                  <alignment wrapText="1"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xf>
+      </xsl:for-each>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>
