@@ -33,7 +33,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-  exclude-result-prefixes="#default w r office style">
+  exclude-result-prefixes="#default w r office style table">
   
   <!-- content types -->
   <xsl:template name="ContentTypes">

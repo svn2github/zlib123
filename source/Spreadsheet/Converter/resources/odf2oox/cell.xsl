@@ -35,7 +35,8 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  exclude-result-prefixes="table">
 
   <!-- insert column properties into sheet -->
   <xsl:template match="table:table-column" mode="sheet">
