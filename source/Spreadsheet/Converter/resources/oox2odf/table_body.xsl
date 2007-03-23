@@ -35,17 +35,17 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
-  
-  
+
   <!-- Insert sheet without text -->
   <xsl:template name="InsertEmptySheet">
     <xsl:param name="sheet"/>
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
-    
+
     <xsl:choose>
       <!-- when sheet is empty  -->
-      <xsl:when test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = ''">
+      <xsl:when
+        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = ''">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="65536">
           <table:table-cell/>
@@ -58,14 +58,15 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- it is necessary when sheet has different default row height -->
-        <xsl:if test="65536 - e:worksheet/e:sheetData/e:row[last()]/@r &gt; 0 or $BigMergeCell != ''">           
+        <xsl:if
+          test="65536 - e:worksheet/e:sheetData/e:row[last()]/@r &gt; 0 or $BigMergeCell != ''">
           <xsl:choose>
             <xsl:when test="$BigMergeCell != ''">
               <xsl:call-template name="InsertColumnsBigMergeRow">
                 <xsl:with-param name="Repeat">
                   <xsl:choose>
                     <xsl:when test="e:worksheet/e:sheetData/e:row[last()]/@r">
-                      <xsl:value-of select="65536 - e:worksheet/e:sheetData/e:row[last()]/@r"/>    
+                      <xsl:value-of select="65536 - e:worksheet/e:sheetData/e:row[last()]/@r"/>
                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="65536"/>
@@ -90,25 +91,25 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertThisRow">
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
     <xsl:param name="lastCellColumnNumber"/>
     <xsl:param name="CheckIfBigMerge"/>
     <xsl:param name="this"/>
-    
+
     <xsl:choose>
-      
+
       <!-- Insert if this row is merged with another row -->
       <xsl:when test="contains($CheckIfBigMerge,'true')">
         <table:table-row table:style-name="ro1">
-          <table:covered-table-cell table:number-columns-repeated="256"/>      
+          <table:covered-table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <table:table-row>
           <xsl:attribute name="table:style-name">
@@ -121,14 +122,14 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
-          
+
           <xsl:if test="@hidden=1">
             <xsl:attribute name="table:visibility">
               <xsl:text>collapse</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          
-          
+
+
           <!-- Insert First Cell in Row  -->
           <xsl:if test="$CheckIfBigMerge = ''">
             <xsl:apply-templates select="e:c[1]">
@@ -137,8 +138,8 @@
               </xsl:with-param>
             </xsl:apply-templates>
           </xsl:if>
-          
-          
+
+
           <!-- complete row with empty cells if last cell number < 256 -->
           <xsl:choose>
             <xsl:when test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge = ''">
@@ -150,10 +151,11 @@
                       <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
                     </xsl:for-each>
                   </xsl:attribute>
-                </xsl:if>          
+                </xsl:if>
               </table:table-cell>
             </xsl:when>
-            <xsl:when test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != '' and not(e:c)">
+            <xsl:when
+              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != '' and not(e:c)">
               <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
@@ -167,22 +169,27 @@
                   <xsl:attribute name="table:number-rows-spanned">
                     <xsl:choose>
                       <xsl:when test="number(substring-after($CheckIfBigMerge, ':')) &gt; 65536">
-                        <xsl:value-of select="65536 - number(substring-before($CheckIfBigMerge, ':')) + 1"/>    
+                        <xsl:value-of
+                          select="65536 - number(substring-before($CheckIfBigMerge, ':')) + 1"/>
                       </xsl:when>
                       <xsl:otherwise>
                         <xsl:choose>
-                          <xsl:when test="number(substring-after($CheckIfBigMerge, ':')) &gt; 256">
-                            <xsl:value-of select="256 - number(substring-before($CheckIfBigMerge, ':'))"/>
+                          <xsl:when
+                            test="number(substring-after($CheckIfBigMerge, ':')) &gt; 256">
+                            <xsl:value-of
+                              select="256 - number(substring-before($CheckIfBigMerge, ':'))"/>
                           </xsl:when>
                           <xsl:otherwise>
-                            <xsl:value-of select="number(substring-after($CheckIfBigMerge, ':')) - number(substring-before($CheckIfBigMerge, ':')) + 1"/>
+                            <xsl:value-of
+                              select="number(substring-after($CheckIfBigMerge, ':')) - number(substring-before($CheckIfBigMerge, ':')) + 1"
+                            />
                           </xsl:otherwise>
                         </xsl:choose>
                       </xsl:otherwise>
                     </xsl:choose>
                   </xsl:attribute>
                   <xsl:attribute name="table:number-columns-spanned">256</xsl:attribute>
-                </xsl:if>            
+                </xsl:if>
               </table:table-cell>
             </xsl:when>
             <xsl:when test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != ''">
@@ -199,10 +206,10 @@
         </table:table-row>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
-  <xsl:template name="InsertEmptyCell">    
+
+  <xsl:template name="InsertEmptyCell">
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
     <xsl:param name="BigMergeCell"/>
@@ -210,7 +217,7 @@
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
-    
+
     <!-- if there were empty cells in a row before this one then insert empty cells-->
     <xsl:choose>
       <!-- when this cell is the first one in a row but not in column A -->
@@ -306,10 +313,10 @@
         </xsl:if>
       </xsl:when>
     </xsl:choose>
-    
+
   </xsl:template>
-  
-  <xsl:template name="InsertThisCell">    
+
+  <xsl:template name="InsertThisCell">
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
     <xsl:param name="BigMergeCell"/>
@@ -317,23 +324,24 @@
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
-    
+
     <xsl:choose>
       <!-- Insert covered cell if this is Merge Cell -->
       <xsl:when test="contains($CheckIfMerge,'true')">
         <xsl:choose>
           <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 1">
-            <table:covered-table-cell>              
+            <table:covered-table-cell>
               <xsl:attribute name="table:number-columns-repeated">
                 <xsl:choose>
-                  <xsl:when test="$colNum + number(substring-after($CheckIfMerge, ':')) &gt; 256">
+                  <xsl:when
+                    test="$colNum + number(substring-after($CheckIfMerge, ':')) &gt; 256">
                     <xsl:value-of select="256 - $colNum"/>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>    
+                    <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
                   </xsl:otherwise>
                 </xsl:choose>
-              </xsl:attribute>              
+              </xsl:attribute>
             </table:covered-table-cell>
           </xsl:when>
           <xsl:otherwise>
@@ -341,19 +349,19 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <xsl:otherwise>
-        
+
         <!-- insert this one cell-->
         <table:table-cell>
-          
+
           <!-- Insert "Merge Cell" if "Merge Cell" is starting in this cell -->
           <xsl:if test="$CheckIfMerge != 'false'">
             <xsl:attribute name="table:number-rows-spanned">
               <xsl:choose>
                 <xsl:when test="number(substring-before($CheckIfMerge, ':')) &gt; 65536">65536</xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="substring-before($CheckIfMerge, ':')"/>    
+                  <xsl:value-of select="substring-before($CheckIfMerge, ':')"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
@@ -363,7 +371,7 @@
                   <xsl:value-of select="256 - $colNum + 1"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="substring-after($CheckIfMerge, ':')"/>    
+                  <xsl:value-of select="substring-after($CheckIfMerge, ':')"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
@@ -380,7 +388,7 @@
           </xsl:if>
           <xsl:if test="e:v">
             <xsl:choose>
-              <xsl:when test="@t='s' or @t='str' ">
+              <xsl:when test="@t='s' ">
                 <xsl:attribute name="office:value-type">
                   <xsl:text>string</xsl:text>
                 </xsl:attribute>
@@ -388,17 +396,32 @@
                   <xsl:value-of select="e:v"/>
                 </xsl:variable>
                 <text:p>
-                  
+
                   <!-- a postprocessor puts here strings from sharedstrings -->
                   <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
                     <xsl:value-of select="e:v"/>
                   </pxsi:v>
-                  
+
                 </text:p>
               </xsl:when>
               <xsl:when test="@t = 'e' ">
                 <xsl:attribute name="office:value-type">
                   <xsl:text>string</xsl:text>
+                </xsl:attribute>
+                <text:p>
+                  <xsl:value-of select="e:v"/>
+                </text:p>
+              </xsl:when>
+              <xsl:when test="@t = 'str' ">
+                <xsl:attribute name="office:value-type">
+                  <xsl:choose>
+                    <xsl:when test="number(e:v)">
+                      <xsl:text>float</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>string</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:attribute>
                 <text:p>
                   <xsl:value-of select="e:v"/>
@@ -418,7 +441,7 @@
             </xsl:choose>
           </xsl:if>
         </table:table-cell>
-        
+
         <!-- Insert covered cell if Merge Cell is starting-->
         <xsl:if test="$CheckIfMerge != 'false' and substring-after($CheckIfMerge, ':') &gt; 1">
           <table:covered-table-cell>
@@ -426,17 +449,17 @@
               <xsl:choose>
                 <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 256">256</xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>    
+                  <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
                 </xsl:otherwise>
-              </xsl:choose>              
+              </xsl:choose>
             </xsl:attribute>
           </table:covered-table-cell>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertNextCell">
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
@@ -445,16 +468,16 @@
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
-    
+
     <xsl:choose>
-      
+
       <!-- calc supports only 256 columns -->
       <xsl:when test="$colNum &gt; 255">
         <xsl:message terminate="no">translation.oox2odf.ColNumber</xsl:message>
       </xsl:when>
-      
+
       <!-- Skips empty coll (in Merge Cell) -->
-      
+
       <xsl:when test="$CheckIfMerge != 'false'">
         <xsl:choose>
           <!-- if this cell is inside row of merged cells ($CheckIfMerged is true:number_of_cols_spaned) -->
@@ -488,7 +511,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:if test="following-sibling::e:c">
           <xsl:apply-templates select="following-sibling::e:c[1]">
@@ -498,11 +521,11 @@
           </xsl:apply-templates>
         </xsl:if>
       </xsl:otherwise>
-      
+
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <!--  convert multiple white spaces  -->
   <xsl:template name="InsertWhiteSpaces">
     <xsl:param name="string" select="."/>
@@ -563,7 +586,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!--  cut start spaces -->
   <xsl:template name="CutStartSpaces">
     <xsl:param name="cuted"/>
@@ -580,16 +603,16 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertColumns">
     <xsl:param name="sheet"/>
-    
+
     <xsl:variable name="DefaultCellStyleName">
       <xsl:for-each select="document('xl/styles.xml')">
         <xsl:value-of select="generate-id(key('Xf', '')[1])"/>
       </xsl:for-each>
     </xsl:variable>
-    
+
     <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:cols">
       <xsl:apply-templates select="e:col[1]">
         <xsl:with-param name="number">1</xsl:with-param>
@@ -597,7 +620,7 @@
         <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
       </xsl:apply-templates>
     </xsl:for-each>
-    
+
     <!-- apply default column style for last columns which style wasn't changed -->
     <xsl:for-each select="document(concat('xl/',$sheet))">
       <xsl:choose>
@@ -622,33 +645,33 @@
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
-  
+
   <xsl:template name="InsertColumnStyle">
     <xsl:param name="number"/>
     <xsl:param name="sheet"/>
     <xsl:param name="DefaultCellStyleName"/>
     <xsl:param name="this"/>
-    
+
     <!-- if there were columns with default properties before this column then insert default columns-->
     <xsl:choose>
       <!-- when this column is the first non-default one but it's not the column A -->
       <xsl:when test="$number=1 and @min>1">
         <table:table-column>
-          
+
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="document(concat('xl/',$sheet))">
               <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
             </xsl:for-each>
           </xsl:attribute>
-          
+
           <xsl:attribute name="table:default-cell-style-name">
             <xsl:value-of select="$DefaultCellStyleName"/>
           </xsl:attribute>
-          
+
           <xsl:attribute name="table:number-columns-repeated">
             <xsl:value-of select="@min - 1"/>
-          </xsl:attribute>          
-          
+          </xsl:attribute>
+
           <xsl:if test="@style">
             <xsl:variable name="position">
               <xsl:value-of select="$this/@style + 1"/>
@@ -660,30 +683,30 @@
             </xsl:attribute>
           </xsl:if>
         </table:table-column>
-        
+
       </xsl:when>
       <!-- when this column is not first non-default one and there were default columns after previous non-default column (if there was a gap between this and previous column)-->
       <xsl:when test="preceding::e:col[1]/@max &lt; @min - 1">
         <table:table-column>
-          
+
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="document(concat('xl/',$sheet))">
               <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
             </xsl:for-each>
           </xsl:attribute>
-          
+
           <xsl:attribute name="table:number-columns-repeated">
             <xsl:value-of select="@min - preceding::e:col[1]/@max - 1"/>
           </xsl:attribute>
-          
+
           <xsl:attribute name="table:default-cell-style-name">
             <xsl:value-of select="$DefaultCellStyleName"/>
           </xsl:attribute>
-          
+
         </table:table-column>
       </xsl:when>
     </xsl:choose>
-    
+
     <!-- insert this column -->
     <table:table-column table:style-name="{generate-id(.)}">
       <xsl:if test="not(@min = @max)">
@@ -710,15 +733,15 @@
         </xsl:attribute>
       </xsl:if>
     </table:table-column>
-    
+
     <!-- insert next column -->
     <xsl:choose>
-      
+
       <!-- calc supports only 256 columns -->
       <xsl:when test="$number &gt; 255">
         <xsl:message terminate="no">translation.oox2odf.ColNumber</xsl:message>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:apply-templates select="following-sibling::e:col[1]">
           <xsl:with-param name="number">
@@ -729,7 +752,7 @@
         </xsl:apply-templates>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
 </xsl:stylesheet>
