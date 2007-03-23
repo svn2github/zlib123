@@ -380,7 +380,7 @@
           </xsl:if>
           <xsl:if test="e:v">
             <xsl:choose>
-              <xsl:when test="@t='s'">
+              <xsl:when test="@t='s' or @t='str' ">
                 <xsl:attribute name="office:value-type">
                   <xsl:text>string</xsl:text>
                 </xsl:attribute>
