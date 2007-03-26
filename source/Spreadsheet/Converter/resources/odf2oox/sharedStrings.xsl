@@ -91,7 +91,7 @@
             </xsl:with-param>
           </xsl:apply-templates>
           <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
-        </r>    
+        </r>
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
@@ -109,41 +109,38 @@
       <xsl:variable name="value">
         <xsl:value-of select="."/>
       </xsl:variable>
-      <t xml:space="preserve">
-        <xsl:choose>
-          <xsl:when test="not(contains($value, '_x'))">
-            <xsl:value-of select="$value"/>
-          </xsl:when>
+      <!-- caution with 'Enters' because they can result with additional space in output text -->
+      <t xml:space="preserve"><xsl:choose>
+          <xsl:when test="not(contains($value, '_x'))"><xsl:value-of select="$value"/></xsl:when>
           <xsl:otherwise>
             <xsl:call-template name="HexaDecimalValue">
               <xsl:with-param name="value">
                 <xsl:value-of select="$value"/>
               </xsl:with-param>
-            </xsl:call-template> 
+            </xsl:call-template>
           </xsl:otherwise>
-        </xsl:choose>
-      </t>
+        </xsl:choose></t>
     </r>
   </xsl:template>
-  
+
   <xsl:template match="text()" mode="text">
     <xsl:variable name="value">
       <xsl:value-of select="."/>
     </xsl:variable>
-      <xsl:choose>
-        <xsl:when test="not(contains($value, '_x'))">
-          <xsl:value-of select="$value"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="HexaDecimalValue">
-            <xsl:with-param name="value">
-              <xsl:value-of select="$value"/>
-            </xsl:with-param>
-          </xsl:call-template> 
-        </xsl:otherwise>
-        </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="not(contains($value, '_x'))">
+        <xsl:value-of select="$value"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="HexaDecimalValue">
+          <xsl:with-param name="value">
+            <xsl:value-of select="$value"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template match="text:s" mode="text">
     <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
       <xsl:attribute name="pxs:c">
@@ -158,13 +155,13 @@
       </xsl:attribute>
     </pxs:s>
   </xsl:template>
-  
+
   <!-- when there are more than one line of text, enter must be added -->
   <xsl:template match="text:p[preceding-sibling::text:p]" mode="run">
     <r>
       <!-- set text formating of first span -->
-        <xsl:for-each select="text:span[1]">
-          <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
+      <xsl:for-each select="text:span[1]">
+        <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
           <xsl:with-param name="parentCellStyleName">
             <xsl:value-of select="ancestor::table:table-cell/@table:style-name"/>
           </xsl:with-param>
@@ -184,7 +181,7 @@
     <xsl:value-of select="'&#xD;&#xA;'"/>
     <xsl:apply-templates mode="text"/>
   </xsl:template>
-  
+
   <!-- when there are HaxaDecimal value (_x...._), must be added _x005F -->
   <xsl:template name="HexaDecimalValue">
     <xsl:param name="value"/>
@@ -194,9 +191,9 @@
         <xsl:variable name="CheckIfHexadecimal">
           <xsl:call-template name="CheckIfHexadecimal">
             <xsl:with-param name="value">
-            <xsl:value-of select="substring-before(substring-after($value, '_x'), '_')"/>
+              <xsl:value-of select="substring-before(substring-after($value, '_x'), '_')"/>
             </xsl:with-param>
-            </xsl:call-template>  
+          </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="$CheckIfHexadecimal = 'true'">
@@ -205,26 +202,30 @@
                 <xsl:value-of select="substring-after(substring-after($value, '_x'), '_')"/>
               </xsl:with-param>
               <xsl:with-param name="result">
-                <xsl:value-of select="concat($result, concat(concat(concat(substring-before($value, '_x'), '_x005F_x'), substring-before(substring-after($value, '_x'), '_')), '_'))"/>           
+                <xsl:value-of
+                  select="concat($result, concat(concat(concat(substring-before($value, '_x'), '_x005F_x'), substring-before(substring-after($value, '_x'), '_')), '_'))"
+                />
               </xsl:with-param>
-            </xsl:call-template>            
+            </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
-                <xsl:call-template name="HexaDecimalValue">
-                  <xsl:with-param name="value">
-                    <xsl:value-of select="substring-after(substring-after($value, '_x'), '_')"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="result">
-                    <xsl:value-of select="concat($result, substring-before($value, substring-after(substring-after($value, '_x'), '_')))"/>           
-                  </xsl:with-param>
-                </xsl:call-template>
+            <xsl:call-template name="HexaDecimalValue">
+              <xsl:with-param name="value">
+                <xsl:value-of select="substring-after(substring-after($value, '_x'), '_')"/>
+              </xsl:with-param>
+              <xsl:with-param name="result">
+                <xsl:value-of
+                  select="concat($result, substring-before($value, substring-after(substring-after($value, '_x'), '_')))"
+                />
+              </xsl:with-param>
+            </xsl:call-template>
           </xsl:otherwise>
-         </xsl:choose>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="concat($result, $value)"/>
       </xsl:otherwise>
-     </xsl:choose>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
