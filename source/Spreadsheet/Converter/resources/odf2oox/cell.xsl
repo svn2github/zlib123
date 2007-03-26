@@ -35,7 +35,7 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
 
   <!-- insert column properties into sheet -->
   <xsl:template match="table:table-column" mode="sheet">
@@ -547,11 +547,13 @@
                     </xsl:with-param>
                   </xsl:call-template>
                 </xsl:variable>
-                <xsl:for-each select="key('style',$columnCellStyle)">
-                  <xsl:attribute name="s">
-                    <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-                  </xsl:attribute>
-                </xsl:for-each>
+                <xsl:if test="$columnCellStyle != '' ">
+                  <xsl:for-each select="key('style',$columnCellStyle)">
+                    <xsl:attribute name="s">
+                      <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                </xsl:if>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:otherwise>
@@ -647,7 +649,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:for-each select="following-sibling::table:table-cell[1]">
           <xsl:call-template name="GetColNumber">
             <xsl:with-param name="position">
@@ -665,7 +667,7 @@
       <xsl:otherwise>
         <xsl:value-of select="$value"/>
       </xsl:otherwise>
-  </xsl:choose>
+    </xsl:choose>
 
   </xsl:template>
 
