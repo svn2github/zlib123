@@ -40,10 +40,12 @@
   exclude-result-prefixes="svg table r text style number fo">
 
   <xsl:import href="measures.xsl"/>
+  <xsl:key name="number" match="number:number-style" use="@style:name"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
 
   <xsl:template name="styles">
     <styleSheet>
+      <xsl:call-template name="InsertNumFormats"/>
       <xsl:call-template name="InsertFonts"/>
       <xsl:call-template name="InsertFills"/>
       <xsl:call-template name="InsertBorders"/>
@@ -55,6 +57,22 @@
     </styleSheet>
   </xsl:template>
 
+  <!-- insert all number formats -->
+  <xsl:template name="InsertNumFormats">
+    <numFmts>
+      <xsl:attribute name="count">
+        <xsl:value-of
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
+        />
+      </xsl:attribute>
+      
+      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/number:number-style[1]" mode="numFormat">
+        <xsl:with-param name="numId">1</xsl:with-param>
+      </xsl:apply-templates>
+    </numFmts>
+  </xsl:template>
+  
+  <!-- insert all fonts -->
   <xsl:template name="InsertFonts">
     <fonts>
       <xsl:attribute name="count">
@@ -89,7 +107,7 @@
         mode="fonts"/>
     </fonts>
   </xsl:template>
-
+  
   <xsl:template name="InsertFills">
     <fills count="2">
       <fill>
@@ -156,6 +174,7 @@
       <xsl:call-template name="InsertMultilineCellFormats"/>
 
     </cellXfs>
+    
   </xsl:template>
 
   <xsl:template name="InsertCellStyles">
@@ -208,8 +227,17 @@
   </xsl:template>
 
   <xsl:template match="style:style[@style:family='table-cell']" mode="cellFormats">
-    <xf numFmtId="0" fillId="0" borderId="0" xfId="0">
-
+    
+    <!-- number format id -->
+    <xsl:variable name="numFmtId">
+      <xsl:call-template name="GetNumFmtId">
+        <xsl:with-param name="numStyle">
+          <xsl:value-of select="@style:data-style-name"/>
+        </xsl:with-param>
+      </xsl:call-template>  
+    </xsl:variable>
+    
+    <xf numFmtId="{$numFmtId}" fillId="0" borderId="0" xfId="0">
       <xsl:call-template name="SetFormatProperties"/>
     </xf>
   </xsl:template>
@@ -556,6 +584,8 @@
         </xsl:apply-templates>
       </xsl:variable>
 
+      <xsl:variable name="style" select="key('style',@table:style-name)"/>
+      
       <xsl:for-each select="descendant::table:table-cell[text:p[2]]">
         <xsl:variable name="formatNumber">
           <xsl:for-each select="key('style',@table:style-name)">
@@ -563,7 +593,16 @@
           </xsl:for-each>
         </xsl:variable>
 
-        <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0">
+        <!-- number format id -->
+        <xsl:variable name="numFmtId">
+          <xsl:call-template name="GetNumFmtId">
+            <xsl:with-param name="numStyle">
+              <xsl:value-of select="$style"/>
+            </xsl:with-param>
+          </xsl:call-template>  
+        </xsl:variable>
+        
+        <xf numFmtId="{$numFmtId}" fontId="0" fillId="0" borderId="0" xfId="0">
           <xsl:choose>
             <!-- when style is set for cell -->
             <xsl:when test="$formatNumber != '' ">
@@ -641,6 +680,157 @@
         </xf>
       </xsl:for-each>
     </xsl:for-each>
+  </xsl:template>
+  
+  <!-- template to insert number formats -->
+  <xsl:template match="number:number-style" mode="numFormat">
+    <xsl:param name="numId"/>
+    <numFmt numFmtId="{$numId}">
+      <xsl:attribute name="formatCode">
+        <xsl:call-template name="GetFormatCode"/>
+      </xsl:attribute>
+    </numFmt>
+    <xsl:apply-templates select="following-sibling::number:number-style[1]" mode="numFormat">
+      <xsl:with-param name="numId">
+        <xsl:value-of select="$numId + 1"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <!-- get number code format -->
+  <xsl:template name="GetFormatCode">
+    <xsl:variable name="value">
+      <xsl:choose>
+        
+        <!-- add leading zeros if min-integer-digits > 0 -->
+        <xsl:when test="number:number/@number:min-integer-digits and number:number/@number:min-integer-digits &gt; 0">
+          <xsl:call-template name="AddLeadingZeros">
+            <xsl:with-param name="num">
+              <xsl:value-of select="number:number/@number:min-integer-digits"/>
+            </xsl:with-param>
+            <xsl:with-param name="val"/>
+          </xsl:call-template>
+        </xsl:when>
+        
+        <xsl:otherwise>#</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      
+      <!-- add decimal places -->
+      <xsl:when test="number:number/@number:decimal-places &gt; 0">
+        <xsl:call-template name="AddDecimalPlaces">
+          <xsl:with-param name="value">
+            <xsl:choose>
+              
+              <!-- add grouping -->
+              <xsl:when test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
+                <xsl:call-template name="AddGrouping">
+                  <xsl:with-param name="value">
+                    <xsl:value-of select="concat($value,'.')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numDigits">
+                    <xsl:choose>
+                      <xsl:when test="number:number/@number:min-integer-digits">
+                        <xsl:value-of select="3 - number:number/@number:min-integer-digits"/>
+                      </xsl:when>
+                      <xsl:otherwise>2</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              
+              <xsl:otherwise>
+                <xsl:value-of select="concat($value,'.')"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param> 
+          <xsl:with-param name="num"> 
+            <xsl:value-of select="number:number/@number:decimal-places"/>   
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template to add leading zeros -->
+  <xsl:template name="AddLeadingZeros">
+    <xsl:param name="num"/>
+    <xsl:param name="val"/>
+    <xsl:choose>
+      <xsl:when test="$num &gt; 0">
+        <xsl:call-template name="AddLeadingZeros">
+          <xsl:with-param name="num">
+            <xsl:value-of select="$num - 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="val">
+            <xsl:value-of select="concat('0',$val)"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$val"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template to add grouping -->
+  <xsl:template name="AddGrouping">
+    <xsl:param name="numDigits"/>
+    <xsl:param name="value"/>
+    <xsl:choose>
+      <xsl:when test="$numDigits &gt; 0">
+        <xsl:call-template name="AddGrouping">
+          <xsl:with-param name="numDigits">
+            <xsl:value-of select="$numDigits -1"/>
+          </xsl:with-param>
+          <xsl:with-param name="value">
+            <xsl:value-of select="concat('#',$value)"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat('#,',$value)"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template to add decimal places -->
+  <xsl:template name="AddDecimalPlaces">
+    <xsl:param name="value"/>
+    <xsl:param name="num"/>
+    <xsl:choose>
+    <xsl:when test="$num &gt; 0">
+      <xsl:call-template name="AddDecimalPlaces">
+        <xsl:with-param name="value">
+          <xsl:value-of select="concat($value,'0')"/>
+        </xsl:with-param>
+        <xsl:with-param name="num">
+          <xsl:value-of select="$num - 1"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template to get number format id -->
+  <xsl:template name="GetNumFmtId">
+    <xsl:param name="numStyle"/>
+    <xsl:choose>
+      <xsl:when test="key('number',$numStyle)">
+      <xsl:for-each select="key('number',$numStyle)">
+        <xsl:value-of select="count(preceding-sibling::number:number-style)+1"/>
+      </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
