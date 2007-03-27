@@ -44,6 +44,7 @@
   <xsl:import href="common.xsl"/>
   <xsl:import href="merge_cell.xsl"/>
   <xsl:import href="styles.xsl"/>
+  <xsl:import href="number.xsl"/>
 
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="text:p text:span number:text"/>
