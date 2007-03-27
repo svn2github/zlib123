@@ -55,6 +55,7 @@
       <office:automatic-styles>
         <xsl:call-template name="InsertColumnStyles"/>
         <xsl:call-template name="InsertRowStyles"/>
+        <xsl:call-template name="InsertNumberStyles"/>
         <xsl:call-template name="InsertCellStyles"/>
         <xsl:call-template name="InsertStyleTableProperties"/>
         <xsl:call-template name="InsertTextStyles"/>

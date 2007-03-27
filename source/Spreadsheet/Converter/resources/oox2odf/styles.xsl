@@ -34,10 +34,12 @@
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  exclude-result-prefixes="a e r">
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  exclude-result-prefixes="a e r number">
 
   <xsl:import href="relationships.xsl"/>
 
+  <xsl:key name="numFmtId" match="e:numFmt" use="@numFmtId"/>
   <xsl:template name="styles">
     <office:document-styles>
       <office:font-face-decls>
@@ -220,6 +222,12 @@
     </xsl:for-each>
   </xsl:template>
 
+  <!-- insert number styles-->
+  
+  <xsl:template name="InsertNumberStyles">
+    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:numFmts" mode="automaticstyles"/>
+  </xsl:template>
+  
   <xsl:template name="InsertCellStyles">
     <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs" mode="automaticstyles"/>
   </xsl:template>
@@ -227,6 +235,13 @@
   <!-- cell formats -->
   <xsl:template match="e:xf" mode="automaticstyles">
     <style:style style:name="{generate-id(.)}" style:family="table-cell">
+      
+  <xsl:if test="key('numFmtId',@numFmtId)">
+    <xsl:attribute name="style:data-style-name">
+      <xsl:value-of select="generate-id(key('numFmtId',@numFmtId))"/>
+    </xsl:attribute>
+  </xsl:if>
+      
       <xsl:if test="@applyAlignment = 1">
         <style:table-cell-properties>
           <!-- vertical-align -->
@@ -547,6 +562,100 @@
         </xsl:when>
       </xsl:choose>
     </xsl:attribute>
+  </xsl:template>
+  
+  <!-- insert  number format style -->
+  
+    <xsl:template match="e:numFmt" mode="automaticstyles">
+    <number:number-style style:name="{generate-id(.)}">
+      <xsl:call-template name="InsertNumberFormatting"/>
+    </number:number-style>
+  </xsl:template>
+
+  <!-- template to create number format -->
+  
+  <xsl:template name="InsertNumberFormatting">
+    <number:number>
+      
+      <!-- formatting for negative numbers is omitted -->
+      <xsl:variable name="formatCode">
+        <xsl:value-of select="substring-before(@formatCode,';')"/>
+      </xsl:variable>
+      
+      <!-- decimal places -->
+      <xsl:if test="contains($formatCode,'.')">
+        <xsl:attribute name="number:decimal-places">
+          <xsl:call-template name="InsertDecimalPlaces">
+            <xsl:with-param name="code">
+              <xsl:value-of select="substring-after($formatCode,'.')"/>
+            </xsl:with-param>
+            <xsl:with-param name="value">0</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute> 
+      </xsl:if>
+      
+      <!-- min integer digits -->
+      <xsl:if test="contains(substring-before($formatCode,'.'),'0')">
+        <xsl:attribute name="number:min-integer-digits">
+          <xsl:call-template name="InsertMinIntegerDigits">
+            <xsl:with-param name="code">
+              <xsl:value-of select="substring-before($formatCode,'.')"/>
+            </xsl:with-param>
+            <xsl:with-param name="value">0</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      
+      <!-- grouping -->
+      <xsl:if test="contains($formatCode,',')">
+        <xsl:attribute name="number:grouping">true</xsl:attribute>
+      </xsl:if>
+      
+    </number:number>
+  </xsl:template>
+  
+  <!-- template which inserts min integer digits -->
+  
+  <xsl:template name="InsertMinIntegerDigits">
+    <xsl:param name="code"/>
+    <xsl:param name="value"/>
+    <xsl:choose>
+      <xsl:when test="contains($code,'0')">
+        <xsl:call-template name="InsertMinIntegerDigits">
+          <xsl:with-param name="code">
+            <xsl:value-of select="substring($code,0,string-length($code)-1)"/>
+          </xsl:with-param>
+          <xsl:with-param name="value">
+            <xsl:value-of select="$value+1"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template which inserts decimal places -->
+  
+  <xsl:template name="InsertDecimalPlaces">
+    <xsl:param name="code"/>
+    <xsl:param name="value"/>
+    <xsl:choose>
+      <xsl:when test="contains($code,'0') or contains($code,'#')">
+        <xsl:call-template name="InsertDecimalPlaces">
+          <xsl:with-param name="code">
+            <xsl:value-of select="substring($code,2)"/>
+          </xsl:with-param>
+          <xsl:with-param name="value">
+            <xsl:value-of select="$value+1"/>
+          </xsl:with-param>
+        </xsl:call-template>        
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
