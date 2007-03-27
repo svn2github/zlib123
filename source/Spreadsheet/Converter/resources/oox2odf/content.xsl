@@ -197,6 +197,9 @@
         <xsl:with-param name="BigMergeRow">
           <xsl:value-of select="$BigMergeRow"/>
         </xsl:with-param>
+        <xsl:with-param name="RowNumber">
+          <xsl:value-of select="e:worksheet/e:sheetData/e:row[position() = last()]/@r"/>    
+        </xsl:with-param>
       </xsl:call-template>
       
     </xsl:for-each>
@@ -233,16 +236,34 @@
           <xsl:value-of select="$BigMergeRow"/>
         </xsl:with-param>        
       </xsl:call-template>
-    </xsl:variable>    
+    </xsl:variable>
 
-    <!-- if there were empty rows before this one then insert empty rows -->
+
+      <!-- if there were empty rows before this one then insert empty rows -->
     <xsl:choose>
-      <!-- when this row is the first non-empty one but not row 1 -->
-      <xsl:when test="position()=1 and @r>1">
+      <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll-->
+      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = ''">
             <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
               table:number-rows-repeated="{@r - 1}">
               <table:table-cell table:number-columns-repeated="256"/>
             </table:table-row>
+      </xsl:when>
+
+      <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll-->
+      <xsl:when test="position()=1 and @r>1 and $BigMergeCell != ''">
+       
+        <xsl:call-template name="InsertColumnsBigMergeRow">
+          <xsl:with-param name="RowNumber">
+            <xsl:value-of select="1"/>
+          </xsl:with-param>
+          <xsl:with-param name="Repeat">
+            <xsl:value-of select="@r - 1"/>
+          </xsl:with-param>     
+          <xsl:with-param name="BigMergeCell">
+            <xsl:value-of select="$BigMergeCell"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        
       </xsl:when>
       <xsl:otherwise>
         <!-- when this row is not first one and there were empty rows after previous non-empty row -->
@@ -254,7 +275,7 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-
+    
     <!-- insert this row -->
     <xsl:call-template name="InsertThisRow">
       <xsl:with-param name="BigMergeCell">
@@ -271,7 +292,7 @@
       </xsl:with-param>
       <xsl:with-param name="this" select="$this"/>
     </xsl:call-template>
-    
+
 </xsl:template>
   
   <xsl:template match="e:c">
@@ -305,6 +326,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    
     
    <!-- Insert Empty Cell -->
     <xsl:call-template name="InsertEmptyCell">
