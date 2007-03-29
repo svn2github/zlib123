@@ -34,6 +34,7 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
   <xsl:import href="relationships.xsl"/>
@@ -41,6 +42,7 @@
   <xsl:import href="styles.xsl"/>
   <xsl:import href="table_body.xsl"/>
 
+  <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="''"/>
   <xsl:key name="Sst" match="e:si" use="''"/>
   <xsl:key name="SheetFormatPr" match="e:sheetFormatPr" use="''"/>

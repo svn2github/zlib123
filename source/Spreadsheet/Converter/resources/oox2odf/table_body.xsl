@@ -394,7 +394,11 @@
 
         <!-- insert this one cell-->
      <table:table-cell>
-
+       
+       <xsl:variable name="position">
+         <xsl:value-of select="$this/@s + 1"/>
+       </xsl:variable>
+       
           <!-- Insert "Merge Cell" if "Merge Cell" is starting in this cell -->
           <xsl:if test="$CheckIfMerge != 'false'">
             <xsl:attribute name="table:number-rows-spanned">
@@ -417,9 +421,6 @@
             </xsl:attribute>
           </xsl:if>
           <xsl:if test="@s">
-            <xsl:variable name="position">
-              <xsl:value-of select="$this/@s + 1"/>
-            </xsl:variable>
             <xsl:attribute name="table:style-name">
               <xsl:for-each select="document('xl/styles.xml')">
                 <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
@@ -464,7 +465,43 @@
                   </xsl:choose>
                 </xsl:attribute>
                 <text:p>
+                  <xsl:choose>
+                    <xsl:when test="number(e:v)">
+                      <xsl:call-template name="FormatNumber">
+                        <xsl:with-param name="value">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="numStyle">
+                          <xsl:for-each select="document('xl/styles.xml')">
+                            <xsl:value-of select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"/>
+                          </xsl:for-each>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="e:v"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </text:p>
+              </xsl:when>
+              <xsl:when test="@t = 'n'">
+                <xsl:attribute name="office:value-type">
+                  <xsl:text>float</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="office:value">
                   <xsl:value-of select="e:v"/>
+                </xsl:attribute>
+                <text:p>
+                  <xsl:call-template name="FormatNumber">
+                    <xsl:with-param name="value">
+                      <xsl:value-of select="e:v"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="numStyle">
+                      <xsl:for-each select="document('xl/styles.xml')">
+                        <xsl:value-of select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"/>
+                      </xsl:for-each>
+                    </xsl:with-param>
+                  </xsl:call-template>
                 </text:p>
               </xsl:when>
               <xsl:otherwise>
@@ -475,7 +512,16 @@
                   <xsl:value-of select="e:v"/>
                 </xsl:attribute>
                 <text:p>
-                  <xsl:value-of select="e:v"/>
+                  <xsl:call-template name="FormatNumber">
+                    <xsl:with-param name="value">
+                      <xsl:value-of select="e:v"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="numStyle">
+                      <xsl:for-each select="document('xl/styles.xml')">
+                        <xsl:value-of select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"/>
+                      </xsl:for-each>
+                    </xsl:with-param>
+                  </xsl:call-template>
                 </text:p>
               </xsl:otherwise>
             </xsl:choose>
@@ -794,5 +840,57 @@
     </xsl:choose>
 
   </xsl:template>
+  
+  <!-- template which inserts number in a correct format -->
+  <xsl:template name="FormatNumber">
+    <xsl:param name="value"/>
+    <xsl:param name="numStyle"/>
+    <xsl:variable name="formatCode">
+      <xsl:choose>
+        <xsl:when test="contains($numStyle,';')">
+          <xsl:value-of select="substring-before($numStyle,';')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$numStyle"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="contains($value,'.')">
+        <xsl:call-template name="FormatAfterComma">
+          <xsl:with-param name="valueAfterComma">
+            <xsl:value-of select="substring-after($value,'.')"/>
+          </xsl:with-param>
+          <xsl:with-param name="valueBeforeComma">
+            <xsl:value-of select="substring-before($value,'.')"/>
+          </xsl:with-param>
+          <xsl:with-param name="format">
+            <xsl:choose>
+              <xsl:when test="contains($formatCode,'_')">
+                <xsl:value-of select="substring-before($formatCode,'_')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$formatCode"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 
+  <!-- formatting number after comma -->
+  <xsl:template name="FormatAfterComma">
+    <xsl:param name="valueAfterComma"/>
+    <xsl:param name="valueBeforeComma"/>
+    <xsl:param name="format"/>
+    <xsl:choose>
+      <xsl:when test="not(contains($format,'.'))">
+        <xsl:value-of select="$valueBeforeComma"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat($valueBeforeComma,format-number(concat('.',$valueAfterComma),concat('.',substring-after($format,'.'))))"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>
