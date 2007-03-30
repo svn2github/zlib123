@@ -35,15 +35,9 @@
   <ItemGroup>
     <Compile Include="Converter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Common\OdfConverterLib\OdfConverterLib.csproj">
-      <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
-      <Name>OdfConverterLib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+  	<EmbeddedResource Include="resources\odf2oox\border.xsl" />
     <EmbeddedResource Include="resources\odf2oox\contentTypes.xsl" />
+  	<EmbeddedResource Include="resources\odf2oox\number.xsl" />
     <EmbeddedResource Include="resources\odf2oox\odf2oox-compute-size.xsl" />
     <EmbeddedResource Include="resources\odf2oox\odf2oox.xsl" />
     <EmbeddedResource Include="resources\odf2oox\package_relationships.xsl" />
@@ -57,8 +51,6 @@
     <EmbeddedResource Include="resources\odf2oox\merge_cell.xsl" />
     <EmbeddedResource Include="resources\odf2oox\common.xsl" />
     <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
@@ -71,12 +63,12 @@
     <EmbeddedResource Include="resources\oox2odf\table_body.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\OdfConverterLib\OdfConverterLib.csproj">
+      <Project>{8CB777EB-36ED-45D8-84FF-BDD64AD5026E}</Project>
+      <Name>OdfConverterLib</Name>
+    </ProjectReference>
+    <Content Include="Converter.csproj" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
