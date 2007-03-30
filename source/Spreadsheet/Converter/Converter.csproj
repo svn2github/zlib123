@@ -41,7 +41,8 @@
     <EmbeddedResource Include="resources\odf2oox\odf2oox-compute-size.xsl" />
     <EmbeddedResource Include="resources\odf2oox\odf2oox.xsl" />
     <EmbeddedResource Include="resources\odf2oox\package_relationships.xsl" />
-    <EmbeddedResource Include="resources\odf2oox\part_relationships.xsl" />
+	<EmbeddedResource Include="resources\odf2oox\page.xsl" />
+  	<EmbeddedResource Include="resources\odf2oox\part_relationships.xsl" />
     <EmbeddedResource Include="resources\odf2oox\pixel-measure.xsl" />
     <EmbeddedResource Include="resources\odf2oox\sharedStrings.xsl" />
     <EmbeddedResource Include="resources\odf2oox\source.xml" />
