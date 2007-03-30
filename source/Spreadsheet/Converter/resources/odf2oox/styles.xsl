@@ -169,8 +169,16 @@
       <!-- default style -->
       <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
 
-      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles"
-        mode="cellFormats"/>
+      <xsl:variable name="numStyleCount">
+        <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"/>
+      </xsl:variable>
+     
+      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
+        mode="cellFormats">
+        <xsl:with-param name="numStyleCount">
+          <xsl:value-of select="$numStyleCount"/>
+        </xsl:with-param> 
+      </xsl:apply-templates>
 
       <!-- add cell formats for multiline cells, which must have wrap property -->
       <xsl:call-template name="InsertMultilineCellFormats"/>
@@ -229,6 +237,7 @@
   </xsl:template>
 
   <xsl:template match="style:style[@style:family='table-cell']" mode="cellFormats">
+    <xsl:param name="numStyleCount"/>
     
     <!-- number format id -->
     <xsl:variable name="numFmtId">
@@ -236,6 +245,7 @@
         <xsl:with-param name="numStyle">
           <xsl:value-of select="@style:data-style-name"/>
         </xsl:with-param>
+        <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
       </xsl:call-template>  
     </xsl:variable>
     
@@ -576,6 +586,10 @@
 
   <xsl:template name="InsertMultilineCellFormats">
 
+    <xsl:variable name="numStyleCount">
+      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"/>
+    </xsl:variable>
+    
     <xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
 
@@ -601,6 +615,7 @@
             <xsl:with-param name="numStyle">
               <xsl:value-of select="$style"/>
             </xsl:with-param>
+            <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
           </xsl:call-template>  
         </xsl:variable>
         

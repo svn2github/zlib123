@@ -28,8 +28,11 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  exclude-result-prefixes="number">
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  exclude-result-prefixes="number style fo">
   
   <!-- template to insert number formats -->
   
@@ -37,18 +40,50 @@
     <xsl:param name="numId"/>
     <numFmt numFmtId="{$numId}">
       <xsl:attribute name="formatCode">
-        <xsl:call-template name="GetFormatCode"/>
+        <xsl:choose>
+          
+          <!-- when negative number is red, positive and negative number are formatted separately --> 
+          <xsl:when test="style:text-properties/@fo:color">
+            <xsl:variable name="formatPositive">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">positive</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="formatNegative">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">negative</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat($formatPositive,concat(';',$formatNegative))"/>
+          </xsl:when>
+          
+          <xsl:otherwise>
+            <xsl:call-template name="GetFormatCode"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
     </numFmt>
-    <xsl:apply-templates select="following-sibling::number:number-style[1]" mode="numFormat">
-      <xsl:with-param name="numId">
-        <xsl:value-of select="$numId + 1"/>
-      </xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:choose>
+      <xsl:when test="following-sibling::number:number-style">
+        <xsl:apply-templates select="following-sibling::number:number-style[1]" mode="numFormat">
+          <xsl:with-param name="numId">
+            <xsl:value-of select="$numId + 1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:when test="parent::office:automatic-styles">
+        <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/number:number-style[1]" mode="numFormat">
+          <xsl:with-param name="numId">
+            <xsl:value-of select="$numId + 1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   
   <!-- get number code format -->
   <xsl:template name="GetFormatCode">
+    <xsl:param name="sign"/>
     <xsl:variable name="value">
       <xsl:choose>
         
@@ -65,6 +100,7 @@
         <xsl:otherwise>#</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:variable name="endValue">
     <xsl:choose>
       
       <!-- add decimal places -->
@@ -127,6 +163,18 @@
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
+    </xsl:variable>
+    
+    <!-- add color to negative number formatting when necessary -->
+    <xsl:choose>
+    <xsl:when test="$sign = 'negative' and style:text-properties/@fo:color">
+      <xsl:value-of select="concat('[Red]-',$endValue)"/>
+    </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$endValue"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
   
   <!-- template to add leading zeros -->
@@ -199,10 +247,16 @@
   
   <xsl:template name="GetNumFmtId">
     <xsl:param name="numStyle"/>
+    <xsl:param name="numStyleCount"/>
     <xsl:choose>
       <xsl:when test="key('number',$numStyle)">
         <xsl:for-each select="key('number',$numStyle)">
           <xsl:value-of select="count(preceding-sibling::number:number-style)+1"/>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]">
+        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]">
+          <xsl:value-of select="count(preceding-sibling::number:number-style)+1+$numStyleCount"/>
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>0</xsl:otherwise>
