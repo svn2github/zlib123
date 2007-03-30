@@ -39,6 +39,7 @@
 
   <xsl:import href="measures.xsl"/>
   <xsl:import href="pixel-measure.xsl"/>
+  <xsl:import href="page.xsl"/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
   <xsl:key name="ConfigItem" match="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item" use="@config:name"/>
 
@@ -336,6 +337,24 @@
       <!-- Insert Merge Cells -->
       <xsl:call-template name="CheckMergeCell"/>
 
+      <!-- Header and Footer -->
+      <xsl:if
+        test="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header/child::node() or
+        document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:footer/child::node()">
+        <headerFooter>
+          <xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header-left">
+            <xsl:if test="not(@style:display = 'false' )">
+              <xsl:attribute name="differentOddEven">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:for-each>
+          <xsl:for-each select="document('styles.xml')/office:document-styles">
+            <xsl:call-template name="OddHeaderFooter"/>
+            <xsl:call-template name="EvenHeaderFooter"/>
+          </xsl:for-each>
+        </headerFooter>
+      </xsl:if>
     </worksheet>
 
   </xsl:template>
