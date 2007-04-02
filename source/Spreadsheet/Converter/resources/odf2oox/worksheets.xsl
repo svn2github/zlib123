@@ -41,7 +41,9 @@
   <xsl:import href="pixel-measure.xsl"/>
   <xsl:import href="page.xsl"/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
-  <xsl:key name="ConfigItem" match="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item" use="@config:name"/>
+  <xsl:key name="ConfigItem"
+    match="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item"
+    use="@config:name"/>
 
   <!-- table is converted into sheet -->
   <xsl:template match="table:table" mode="sheet">
@@ -76,105 +78,64 @@
     <xsl:param name="sheetId"/>
     <worksheet>
 
-      <!-- compute default row height -->
-      <xsl:variable name="defaultRowHeight">
-        <xsl:choose>
-          <xsl:when test="table:table-row[@table:number-rows-repeated > 32768]">
-            <xsl:for-each select="table:table-row[@table:number-rows-repeated > 32768]">
-              <xsl:call-template name="ConvertMeasure">
-                <xsl:with-param name="length">
-                  <xsl:value-of
-                    select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"
-                  />
-                </xsl:with-param>
-                <xsl:with-param name="unit">point</xsl:with-param>
-              </xsl:call-template>
-            </xsl:for-each>
-          </xsl:when>
-          <xsl:otherwise>13</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
+      <xsl:call-template name="InsertViewSettings">
+        <xsl:with-param name="sheetId" select="$sheetId"/>
+      </xsl:call-template>
 
-      <!-- get default font size -->
-      <xsl:variable name="baseFontSize">
-        <xsl:for-each select="document('styles.xml')">
-        <xsl:choose>
-          <xsl:when
-            test="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
-            <xsl:value-of
-              select="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"
-            />
-          </xsl:when>
-          <xsl:otherwise>10</xsl:otherwise>
-        </xsl:choose>
-        </xsl:for-each>
-      </xsl:variable>
-      <xsl:variable name="defaultFontSize">
-        <xsl:choose>
-          <xsl:when test="contains($baseFontSize,'pt')">
-            <xsl:value-of select="substring-before($baseFontSize,'pt')"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$baseFontSize"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
+      <xsl:call-template name="InsertSheetContent">
+        <xsl:with-param name="sheetId" select="$sheetId"/>
+        <xsl:with-param name="cellNumber" select="$cellNumber"/>
+      </xsl:call-template>
 
-      <!-- compute default column width -->
-      <xsl:variable name="defaultColWidth">
-        <xsl:call-template name="ConvertToCharacters">
-          <xsl:with-param name="width">
-            <xsl:value-of select="concat('0.8925','in')"/>
-          </xsl:with-param>
-          <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
-        </xsl:call-template>
-      </xsl:variable>
+      <!-- Insert Merge Cells -->
+      <xsl:call-template name="CheckMergeCell"/>
 
-      <!-- insert cursor position -->
-      <sheetViews>
-        <sheetView workbookViewId="0">
+      <!-- Header and Footer -->
+      <xsl:call-template name="InsertHeaderFooter"/>
 
-          <xsl:variable name="ActiveTable">
-            <xsl:for-each select="document('settings.xml')">
-              <xsl:value-of select="key('ConfigItem', 'ActiveTable')"/>
-            </xsl:for-each>
-          </xsl:variable>
+    </worksheet>
 
-          <xsl:variable name="ActiveTableNumber">
-            <xsl:for-each select="office:spreadsheet/table:table[@table:name=$ActiveTable]">
-              <xsl:value-of select="count(preceding-sibling::table:table)"/>
-            </xsl:for-each>
-          </xsl:variable>
-          
-         
-            
-          <xsl:variable name="pageBreakView">
-            <xsl:for-each select="document('settings.xml')">
+  </xsl:template>
+
+  <xsl:template name="InsertViewSettings">
+    <xsl:param name="sheetId"/>
+
+    <sheetViews>
+      <sheetView workbookViewId="0">
+
+        <xsl:variable name="ActiveTable">
+          <xsl:for-each select="document('settings.xml')">
+            <xsl:value-of select="key('ConfigItem', 'ActiveTable')"/>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:variable name="ActiveTableNumber">
+          <xsl:for-each select="office:spreadsheet/table:table[@table:name=$ActiveTable]">
+            <xsl:value-of select="count(preceding-sibling::table:table)"/>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:variable name="pageBreakView">
+          <xsl:for-each select="document('settings.xml')">
             <xsl:choose>
-              <xsl:when
-                test="key('ConfigItem', 'ShowPageBreakPreview')">
+              <xsl:when test="key('ConfigItem', 'ShowPageBreakPreview')">
 
-                <xsl:value-of
-                  select="key('ConfigItem', 'ShowPageBreakPreview')"
-                />
+                <xsl:value-of select="key('ConfigItem', 'ShowPageBreakPreview')"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:text>false</xsl:text>
               </xsl:otherwise>
             </xsl:choose>
-            </xsl:for-each>
-          </xsl:variable>
-          
-          <xsl:for-each select="document('settings.xml')">
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:for-each select="document('settings.xml')">
 
           <xsl:variable name="hasColumnRowHeaders">
             <xsl:choose>
-              <xsl:when
-                test="key('ConfigItem', 'HasColumnRowHeaders')">
-                
-                <xsl:value-of
-                  select="key('ConfigItem', 'HasColumnRowHeaders')"
-                />
+              <xsl:when test="key('ConfigItem', 'HasColumnRowHeaders')">
+
+                <xsl:value-of select="key('ConfigItem', 'HasColumnRowHeaders')"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:text>true</xsl:text>
@@ -194,10 +155,8 @@
               <!-- normal view-->
               <xsl:when test="$pageBreakView = 'false' ">
                 <xsl:choose>
-                  <xsl:when
-                    test="key('ConfigItem', 'ZoomValue')">
-                    <xsl:value-of
-                      select="key('ConfigItem', 'ZoomValue')"/>
+                  <xsl:when test="key('ConfigItem', 'ZoomValue')">
+                    <xsl:value-of select="key('ConfigItem', 'ZoomValue')"/>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:text>100</xsl:text>
@@ -208,18 +167,12 @@
               <xsl:otherwise>
                 <!-- take zoom value from PageViewZoomValue -->
                 <xsl:choose>
-                  <xsl:when
-                    test="key('ConfigItem', 'PageViewZoomValue')">                              
-                    <xsl:value-of
-                      select="key('ConfigItem', 'PageViewZoomValue')"
-                    />
+                  <xsl:when test="key('ConfigItem', 'PageViewZoomValue')">
+                    <xsl:value-of select="key('ConfigItem', 'PageViewZoomValue')"/>
                   </xsl:when>
                   <!-- if there isn't PageViewZoomValue take zoom value from ZoomValue -->
-                  <xsl:when
-                    test="key('ConfigItem', 'ZoomValue')">                              
-                    <xsl:value-of
-                      select="key('ConfigItem', 'ZoomValue')"
-                    />
+                  <xsl:when test="key('ConfigItem', 'ZoomValue')">
+                    <xsl:value-of select="key('ConfigItem', 'ZoomValue')"/>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:text>100</xsl:text>
@@ -234,130 +187,185 @@
               <xsl:value-of select="$zoom"/>
             </xsl:attribute>
           </xsl:if>
-            
+
+        </xsl:for-each>
+
+        <xsl:if test="$sheetId = $ActiveTableNumber">
+          <xsl:attribute name="activeTab">
+            <xsl:text>1</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+
+        <xsl:if test="$pageBreakView = 'true'">
+          <xsl:attribute name="view">
+            <xsl:text>pageBreakPreview</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+
+        <selection>
+          <xsl:variable name="col">
+            <xsl:call-template name="NumbersToChars">
+              <xsl:with-param name="num">
+                <xsl:for-each select="document('settings.xml')">
+                  <xsl:choose>
+                    <xsl:when
+                      test="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']">
+                      <xsl:value-of
+                        select="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']"
+                      />
+                    </xsl:when>
+                    <xsl:otherwise>0</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="row">
+            <xsl:for-each select="document('settings.xml')">
+              <xsl:choose>
+                <xsl:when
+                  test="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']">
+                  <xsl:value-of
+                    select="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']"
+                  />
+                </xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:variable>
+          <!-- activeCell row value cannot be 0 -->
+          <xsl:variable name="checkedRow">
+            <xsl:choose>
+              <xsl:when test="$row = 0">1</xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$row + 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <xsl:attribute name="activeCell">
+            <xsl:value-of select="concat($col,$checkedRow)"/>
+          </xsl:attribute>
+          <xsl:attribute name="sqref">
+            <xsl:value-of select="concat($col,$checkedRow)"/>
+          </xsl:attribute>
+        </selection>
+      </sheetView>
+    </sheetViews>
+  </xsl:template>
+
+  <xsl:template name="InsertSheetContent">
+    <xsl:param name="sheetId"/>
+    <xsl:param name="cellNumber"/>
+
+    <!-- compute default row height -->
+    <xsl:variable name="defaultRowHeight">
+      <xsl:choose>
+        <xsl:when test="table:table-row[@table:number-rows-repeated > 32768]">
+          <xsl:for-each select="table:table-row[@table:number-rows-repeated > 32768]">
+            <xsl:call-template name="ConvertMeasure">
+              <xsl:with-param name="length">
+                <xsl:value-of
+                  select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"
+                />
+              </xsl:with-param>
+              <xsl:with-param name="unit">point</xsl:with-param>
+            </xsl:call-template>
           </xsl:for-each>
-          
-          <xsl:if test="$sheetId = $ActiveTableNumber">
-            <xsl:attribute name="activeTab">
+        </xsl:when>
+        <xsl:otherwise>13</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- get default font size -->
+    <xsl:variable name="baseFontSize">
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:choose>
+          <xsl:when
+            test="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
+            <xsl:value-of
+              select="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"
+            />
+          </xsl:when>
+          <xsl:otherwise>10</xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name="defaultFontSize">
+      <xsl:choose>
+        <xsl:when test="contains($baseFontSize,'pt')">
+          <xsl:value-of select="substring-before($baseFontSize,'pt')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$baseFontSize"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- compute default column width -->
+    <xsl:variable name="defaultColWidth">
+      <xsl:call-template name="ConvertToCharacters">
+        <xsl:with-param name="width">
+          <xsl:value-of select="concat('0.8925','in')"/>
+        </xsl:with-param>
+        <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}"
+      customHeight="true"/>
+    <xsl:if test="table:table-column">
+      <cols>
+
+        <!-- insert first column -->
+        <xsl:apply-templates select="table:table-column[1]" mode="sheet">
+          <xsl:with-param name="colNumber">1</xsl:with-param>
+          <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+        </xsl:apply-templates>
+
+      </cols>
+    </xsl:if>
+    <sheetData>
+
+      <xsl:variable name="ColumnTagNum">
+        <xsl:apply-templates select="table:table-column[1]" mode="tag">
+          <xsl:with-param name="colNumber">1</xsl:with-param>
+          <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+        </xsl:apply-templates>
+      </xsl:variable>
+
+      <!-- insert first row -->
+      <xsl:apply-templates select="table:table-row[1]" mode="sheet">
+        <xsl:with-param name="rowNumber">1</xsl:with-param>
+        <xsl:with-param name="cellNumber" select="$cellNumber"/>
+        <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+        <xsl:with-param name="TableColumnTagNum">
+          <xsl:value-of select="$ColumnTagNum"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+
+    </sheetData>
+  </xsl:template>
+
+  <xsl:template name="InsertHeaderFooter">
+    <xsl:if
+      test="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header/child::node() or
+    document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:footer/child::node()">
+      <headerFooter>
+        <xsl:for-each
+          select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header-left">
+          <xsl:if test="not(@style:display = 'false' )">
+            <xsl:attribute name="differentOddEven">
               <xsl:text>1</xsl:text>
             </xsl:attribute>
           </xsl:if>
-
-          <xsl:if test="$pageBreakView = 'true'">
-            <xsl:attribute name="view">
-              <xsl:text>pageBreakPreview</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-
-          <selection>
-            <xsl:variable name="col">
-              <xsl:call-template name="NumbersToChars">
-                <xsl:with-param name="num">
-                  <xsl:for-each select="document('settings.xml')">
-                    <xsl:choose>
-                      <xsl:when
-                        test="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']">
-                        <xsl:value-of
-                          select="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']"
-                        />
-                      </xsl:when>
-                      <xsl:otherwise>0</xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:for-each>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:variable name="row">
-              <xsl:for-each select="document('settings.xml')">
-                <xsl:choose>
-                  <xsl:when
-                    test="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']">
-                    <xsl:value-of
-                      select="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']"
-                    />
-                  </xsl:when>
-                  <xsl:otherwise>0</xsl:otherwise>
-                </xsl:choose>
-              </xsl:for-each>
-            </xsl:variable>
-            <!-- activeCell row value cannot be 0 -->
-            <xsl:variable name="checkedRow">
-              <xsl:choose>
-                <xsl:when test="$row = 0">1</xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$row + 1"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
-
-            <xsl:attribute name="activeCell">
-              <xsl:value-of select="concat($col,$checkedRow)"/>
-            </xsl:attribute>
-            <xsl:attribute name="sqref">
-              <xsl:value-of select="concat($col,$checkedRow)"/>
-            </xsl:attribute>
-          </selection>
-        </sheetView>
-      </sheetViews>
-
-      <sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}"
-        customHeight="true"/>
-      <xsl:if test="table:table-column">
-        <cols>
-
-          <!-- insert first column -->
-          <xsl:apply-templates select="table:table-column[1]" mode="sheet">
-            <xsl:with-param name="colNumber">1</xsl:with-param>
-            <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
-          </xsl:apply-templates>
-
-        </cols>
-      </xsl:if>
-      <sheetData>
-
-        <xsl:variable name="ColumnTagNum">
-          <xsl:apply-templates select="table:table-column[1]" mode="tag">
-            <xsl:with-param name="colNumber">1</xsl:with-param>
-            <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
-          </xsl:apply-templates>
-        </xsl:variable>
-
-        <!-- insert first row -->
-        <xsl:apply-templates select="table:table-row[1]" mode="sheet">
-          <xsl:with-param name="rowNumber">1</xsl:with-param>
-          <xsl:with-param name="cellNumber" select="$cellNumber"/>
-          <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
-          <xsl:with-param name="TableColumnTagNum">
-            <xsl:value-of select="$ColumnTagNum"/>
-          </xsl:with-param>
-        </xsl:apply-templates>
-
-      </sheetData>
-
-      <!-- Insert Merge Cells -->
-      <xsl:call-template name="CheckMergeCell"/>
-
-      <!-- Header and Footer -->
-      <xsl:if
-        test="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header/child::node() or
-        document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:footer/child::node()">
-        <headerFooter>
-          <xsl:for-each select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header-left">
-            <xsl:if test="not(@style:display = 'false' )">
-              <xsl:attribute name="differentOddEven">
-                <xsl:text>1</xsl:text>
-              </xsl:attribute>
-            </xsl:if>
-          </xsl:for-each>
-          <xsl:for-each select="document('styles.xml')/office:document-styles">
-            <xsl:call-template name="OddHeaderFooter"/>
-            <xsl:call-template name="EvenHeaderFooter"/>
-          </xsl:for-each>
-        </headerFooter>
-      </xsl:if>
-    </worksheet>
-
+        </xsl:for-each>
+        <xsl:for-each select="document('styles.xml')/office:document-styles">
+          <xsl:call-template name="OddHeaderFooter"/>
+          <xsl:call-template name="EvenHeaderFooter"/>
+        </xsl:for-each>
+      </headerFooter>
+    </xsl:if>
   </xsl:template>
-
 
 </xsl:stylesheet>

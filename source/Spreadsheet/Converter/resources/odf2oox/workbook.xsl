@@ -42,6 +42,7 @@
 
   <xsl:key name="ConfigItem" match="config:config-item" use="@config:name"/>
   <xsl:key name="style" match="style:style" use="@style:name"/>
+  <xsl:key name="pageStyle" match="style:page-layout" use="@style:name"/>
 
   <!-- main workbook template-->
   <xsl:template name="InsertWorkbook">
@@ -51,13 +52,13 @@
   <!-- workbook body template -->
   <xsl:template match="office:body">
     <workbook>
-      <xsl:call-template name="workbookView"/>
+      <xsl:call-template name="WorkbookView"/>
       <xsl:apply-templates select="office:spreadsheet"/>
     </workbook>
   </xsl:template>
 
   <!-- workbook  view template-->
-  <xsl:template name="workbookView">
+  <xsl:template name="WorkbookView">
     <bookViews>
       <workbookView>
 
