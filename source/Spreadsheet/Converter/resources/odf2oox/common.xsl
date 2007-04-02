@@ -33,8 +33,8 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
-  
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  exclude-result-prefixes="table">
   
   <!-- template to convert cell type -->
   <xsl:template name="ConvertTypes">
@@ -150,5 +150,18 @@
     </xsl:choose>
 
   </xsl:template>
-  
+  <xsl:template name="GetRowNum">
+    <xsl:param name="cell"/>
+    
+    <xsl:choose>
+      <xsl:when test="number($cell)">
+        <xsl:value-of select="$cell"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell" select="substring-after($cell,substring($cell,1,1))"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>
