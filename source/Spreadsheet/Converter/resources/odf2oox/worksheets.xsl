@@ -76,8 +76,8 @@
   <xsl:template name="InsertWorksheet">
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
-    <worksheet>
 
+    <worksheet>
       <xsl:call-template name="InsertViewSettings">
         <xsl:with-param name="sheetId" select="$sheetId"/>
       </xsl:call-template>
@@ -90,11 +90,9 @@
       <!-- Insert Merge Cells -->
       <xsl:call-template name="CheckMergeCell"/>
 
-      <!-- Header and Footer -->
+      <xsl:call-template name="InsertPageProperties"/>
       <xsl:call-template name="InsertHeaderFooter"/>
-
     </worksheet>
-
   </xsl:template>
 
   <xsl:template name="InsertViewSettings">
@@ -366,6 +364,179 @@
         </xsl:for-each>
       </headerFooter>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertPageProperties">
+
+    <!-- default pageStyle name-->
+    <xsl:variable name="pageStyle">
+      <xsl:value-of
+        select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default' ]/@style:page-layout-name"
+      />
+    </xsl:variable>
+
+    <xsl:for-each select="document('styles.xml')">
+      <xsl:for-each select="key('pageStyle',$pageStyle)">
+        <xsl:if test="style:page-layout-properties/@style:table-centering">
+          <printOptions>
+            <xsl:if
+              test="style:page-layout-properties/@style:table-centering = 'horizontal' or style:page-layout-properties/@style:table-centering = 'both' ">
+              <xsl:attribute name="horizontalCentered">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if
+              test="style:page-layout-properties/@style:table-centering = 'vertical' or style:page-layout-properties/@style:table-centering = 'both' ">
+              <xsl:attribute name="verticalCentered">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+          </printOptions>
+        </xsl:if>
+
+        <xsl:call-template name="InsertMargins">
+          <xsl:with-param name="pageStyle" select="$pageStyle"/>
+        </xsl:call-template>
+
+        <xsl:if test="style:page-layout-properties/@style:print-orientation">
+          <pageSetup>
+            <xsl:if test="style:page-layout-properties/@style:print-orientation">
+              <xsl:attribute name="orientation">
+                <xsl:value-of select="style:page-layout-properties/@style:print-orientation"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if
+              test="style:page-layout-properties/@fo:page-width and style:page-layout-properties/@fo:page-height">
+              <xsl:attribute name="paperSize">
+                <xsl:call-template name="TranslatePaperSize">
+                  <xsl:with-param name="width" select="style:page-layout-properties/@fo:page-width"/>
+                  <xsl:with-param name="height"
+                    select="style:page-layout-properties/@fo:page-height"/>
+                </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if>
+          </pageSetup>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertMargins">
+    <xsl:param name="pageStyle"/>
+
+    <xsl:if
+      test="style:page-layout-properties/@fo:margin-top or style:page-layout-properties/@fo:margin-bottom or 
+      style:page-layout-properties/@fo:margin-right or style:page-layout-properties/@fo:margin-left">
+
+      <pageMargins left="0.78740157480314965" right="0.70866141732283472" top="0.74803149606299213"
+        bottom="0.74803149606299213" header="0.31496062992125984" footer="0.31496062992125984">
+        <xsl:if test="style:page-layout-properties/@fo:margin-left">
+          <xsl:attribute name="left">
+            <!-- 1 inch = 1440 twips -->
+            <xsl:variable name="twips">
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="style:page-layout-properties/@fo:margin-left"/>
+                <xsl:with-param name="unit">
+                  <xsl:text>twips</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$twips div 1440"/>
+          </xsl:attribute>
+        </xsl:if>
+
+        <xsl:if test="style:page-layout-properties/@fo:margin-right">
+          <xsl:attribute name="right">
+            <!-- 1 inch = 1440 twips -->
+            <xsl:variable name="twips">
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="style:page-layout-properties/@fo:margin-right"/>
+                <xsl:with-param name="unit">
+                  <xsl:text>twips</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$twips div 1440"/>
+          </xsl:attribute>
+        </xsl:if>
+
+        <xsl:if test="style:page-layout-properties/@fo:margin-top">
+          <xsl:attribute name="top">
+            <!-- 1 inch = 1440 twips -->
+            <xsl:variable name="twips">
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="style:page-layout-properties/@fo:margin-top"/>
+                <xsl:with-param name="unit">
+                  <xsl:text>twips</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$twips div 1440"/>
+          </xsl:attribute>
+        </xsl:if>
+
+        <xsl:if test="style:page-layout-properties/@fo:margin-bottom">
+          <xsl:attribute name="bottom">
+            <!-- 1 inch = 1440 twips -->
+            <xsl:variable name="twips">
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length"
+                  select="style:page-layout-properties/@fo:margin-bottom"/>
+                <xsl:with-param name="unit">
+                  <xsl:text>twips</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$twips div 1440"/>
+          </xsl:attribute>
+        </xsl:if>
+      </pageMargins>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="TranslatePaperSize">
+    <xsl:param name="height"/>
+    <xsl:param name="width"/>
+
+    <xsl:choose>
+      <!-- A3 -->
+      <xsl:when test="$width='42cm' and $height='29.699cm' ">
+        <xsl:text>8</xsl:text>
+      </xsl:when>
+      <!-- A4 -->
+      <xsl:when test="$width='29.699cm' and $height='20.999cm' ">
+        <xsl:text>9</xsl:text>
+      </xsl:when>
+      <!-- A5 -->
+      <xsl:when test="$width='20.999cm' and $height='14.799cm' ">
+        <xsl:text>11</xsl:text>
+      </xsl:when>
+      <!-- B4 (JIS) -->
+      <xsl:when test="$width='36.4cm' and $height='25.7cm' ">
+        <xsl:text>12</xsl:text>
+      </xsl:when>
+      <!-- B5 (JIS) -->
+      <xsl:when test="$width='25.7cm' and $height='18.2cm' ">
+        <xsl:text>13</xsl:text>
+      </xsl:when>
+      <!-- Letter -->
+      <xsl:when test="$width='27.94cm' and $height='21.59cm' ">
+        <xsl:text>1</xsl:text>
+      </xsl:when>
+      <!-- Tabloid -->
+      <xsl:when test="$width='43.127cm' and $height='27.958cm' ">
+        <xsl:text>3</xsl:text>
+      </xsl:when>
+      <!-- Legal -->
+      <xsl:when test="$width='35.565cm' and $height='21.59cm' ">
+        <xsl:text>5</xsl:text>
+      </xsl:when>
+      <!-- A4 as default -->
+      <xsl:otherwise>
+        <xsl:text>9</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
 </xsl:stylesheet>
