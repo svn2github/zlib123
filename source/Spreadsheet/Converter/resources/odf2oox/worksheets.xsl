@@ -473,7 +473,7 @@
             <!-- 1 inch = 1440 twips -->
             <xsl:variable name="twips">
               <xsl:call-template name="ConvertMeasure">
-                <xsl:with-param name="length" select="substring-before(@fo:margin-top,'cm')"/>
+                <xsl:with-param name="length" select="@fo:margin-top"/>
                 <xsl:with-param name="unit">
                   <xsl:text>twips</xsl:text>
                 </xsl:with-param>
@@ -488,7 +488,7 @@
             <!-- 1 inch = 1440 twips -->
             <xsl:variable name="twips">
               <xsl:call-template name="ConvertMeasure">
-                <xsl:with-param name="length" select="substring-before(@fo:margin-bottom,'cm')"/>
+                <xsl:with-param name="length" select="@fo:margin-bottom"/>
                 <xsl:with-param name="unit">
                   <xsl:text>twips</xsl:text>
                 </xsl:with-param>
