@@ -54,7 +54,7 @@
         <xsl:value-of select="round(number(substring-before($length, 'in')) * 2.54 div 0.0264)"/>
       </xsl:when>
       <xsl:when test="contains($length, 'pt')">
-        <xsl:value-of select="round(number(substring-before($length, 'pt')) * 2.54 div 1.9008)"/>
+        <xsl:value-of select="round(number(substring-before($length, 'pt')) * 96 div 72)"/>
       </xsl:when>
       <xsl:when test="contains($length, 'pica')">
         <xsl:value-of select="round(number(substring-before($length, 'pica')) * 2.54 div 0.1584)"/>

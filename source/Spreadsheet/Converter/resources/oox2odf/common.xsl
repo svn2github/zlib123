@@ -720,11 +720,21 @@
       </xsl:for-each>
     </xsl:variable>
     
+    <xsl:variable name="fontSize">
+      <xsl:call-template name="ConvertPoints">
+        <xsl:with-param name="length">
+          <xsl:value-of select="$defaultFontSize"/>
+        </xsl:with-param>
+        <xsl:with-param name="unit">px</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="realFontSize">
+      <xsl:value-of select="(round(number(substring-before($fontSize,'px'))) div 96) * 72"/>
+    </xsl:variable>
     <!-- for proportional fonts average digit width is 2/3 of font size-->
     <xsl:variable name="avgDigitWidth">
-      <xsl:value-of select="round($defaultFontSize * 2 div 3)"/>
+      <xsl:value-of select="$realFontSize * 2 div 3"/>
     </xsl:variable>
-    
     <xsl:choose>
       <xsl:when test="$avgDigitWidth * $value = 0">
         <xsl:text>0cm</xsl:text>

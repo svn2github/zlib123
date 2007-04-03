@@ -101,7 +101,17 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:value-of select="($pixelWidth) div round(2 div 3 * $defaultFontSize)"/>
+    <xsl:variable name="fontSize">
+      <xsl:call-template name="pixel-measure">
+        <xsl:with-param name="length">
+          <xsl:value-of select="concat($defaultFontSize,'pt')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+   <xsl:variable name="realFontSize">
+     <xsl:value-of select="72 * $fontSize div 96"/>
+   </xsl:variable>
+    <xsl:value-of select="($pixelWidth) div (2 div 3 * $realFontSize)"/>
   </xsl:template>
   
   <!-- Template to check if value is hexadecimal -->
