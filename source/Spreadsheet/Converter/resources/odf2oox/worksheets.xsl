@@ -40,6 +40,7 @@
   <xsl:import href="measures.xsl"/>
   <xsl:import href="pixel-measure.xsl"/>
   <xsl:import href="page.xsl"/>
+  <xsl:import href="border.xsl"/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
   <xsl:key name="ConfigItem"
     match="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item"

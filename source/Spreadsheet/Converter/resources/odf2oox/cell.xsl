@@ -283,6 +283,7 @@
     </xsl:variable>
     <xsl:if
       test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or $height != $defaultRowHeight or table:covered-table-cell">
+      
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
@@ -320,9 +321,21 @@
           <xsl:with-param name="numberOfAllRowsRepeated">
             <xsl:value-of select="@table:number-rows-repeated"/>
           </xsl:with-param>
-          <xsl:with-param name="rowNumber" select="$rowNumber"/>
-          <xsl:with-param name="height" select="$height"/>
-          <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+          <xsl:with-param name="rowNumber">
+            <xsl:value-of select="$rowNumber + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="cellNumber">
+            <xsl:value-of select="$cellNumber"/>
+          </xsl:with-param>
+          <xsl:with-param name="height">
+            <xsl:value-of select="$height"/>
+          </xsl:with-param>
+          <xsl:with-param name="defaultRowHeight">
+            <xsl:value-of select="$defaultRowHeight"/>
+          </xsl:with-param>
+          <xsl:with-param name="TableColumnTagNum">
+            <xsl:value-of select="$TableColumnTagNum"/>
+          </xsl:with-param>
         </xsl:call-template>
       </xsl:if>
 
@@ -361,13 +374,18 @@
     <xsl:param name="numberRowsRepeated"/>
     <xsl:param name="numberOfAllRowsRepeated"/>
     <xsl:param name="rowNumber"/>
+    <xsl:param name="cellNumber"/>
     <xsl:param name="height"/>
     <xsl:param name="defaultRowHeight"/>
+    <xsl:param name="TableColumnTagNum"/>
+    
     <xsl:choose>
       <xsl:when test="$numberRowsRepeated &gt; 1">
-        <xsl:if
-          test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight)">
-          <row r="{$rowNumber + 1 + $numberOfAllRowsRepeated - $numberRowsRepeated}">
+        
+          <row>
+            <xsl:attribute name="r">
+              <xsl:value-of select="$rowNumber"/>
+            </xsl:attribute>
 
             <!-- insert row height -->
             <xsl:if test="$height">
@@ -380,19 +398,42 @@
             <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
               <xsl:attribute name="hidden">1</xsl:attribute>
             </xsl:if>
+            
+            <!-- insert first cell -->
+            <xsl:apply-templates select="node()[1]" mode="sheet">
+              <xsl:with-param name="colNumber">0</xsl:with-param>
+              <xsl:with-param name="rowNumber" select="$rowNumber"/>
+              <xsl:with-param name="cellNumber" select="$cellNumber"/>
+              <xsl:with-param name="TableColumnTagNum">
+                <xsl:value-of select="$TableColumnTagNum"/>
+              </xsl:with-param>
+            </xsl:apply-templates>
           </row>
-        </xsl:if>
-
-        <!-- insert repeated rows -->
+        
+        <!-- insert repeated rows -->        
         <xsl:if test="@table:number-rows-repeated">
           <xsl:call-template name="InsertRepeatedRows">
             <xsl:with-param name="numberRowsRepeated">
               <xsl:value-of select="$numberRowsRepeated - 1"/>
             </xsl:with-param>
-            <xsl:with-param name="numberOfAllRowsRepeated" select="$numberOfAllRowsRepeated"/>
-            <xsl:with-param name="rowNumber" select="$rowNumber"/>
-            <xsl:with-param name="height" select="$height"/>
-            <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+            <xsl:with-param name="numberOfAllRowsRepeated">
+              <xsl:value-of select="@table:number-rows-repeated"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowNumber">
+              <xsl:value-of select="$rowNumber + 1"/>
+            </xsl:with-param>
+            <xsl:with-param name="cellNumber">
+              <xsl:value-of select="$cellNumber"/>
+            </xsl:with-param>
+            <xsl:with-param name="height">
+              <xsl:value-of select="$height"/>
+            </xsl:with-param>
+            <xsl:with-param name="defaultRowHeight">
+              <xsl:value-of select="$defaultRowHeight"/>
+            </xsl:with-param>
+            <xsl:with-param name="TableColumnTagNum">
+              <xsl:value-of select="$TableColumnTagNum"/>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
 
@@ -563,7 +604,18 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="TableColumnTagNum"/>
 
-    <xsl:if test="child::text:p">
+    <xsl:variable name="columnCellStyle">
+      <xsl:call-template name="GetColumnCellStyle">
+        <xsl:with-param name="colNum">
+          <xsl:value-of select="$colNumber + 1"/>
+        </xsl:with-param>
+        <xsl:with-param name="TableColumnTagNum">
+          <xsl:value-of select="$TableColumnTagNum"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="child::text:p or $columnCellStyle != '' or @table:style-name != ''">
       <c>
         <xsl:attribute name="r">
           <xsl:variable name="colChar">
@@ -573,7 +625,7 @@
           </xsl:variable>
           <xsl:value-of select="concat($colChar,$rowNumber)"/>
         </xsl:attribute>
-
+        
         <!-- insert cell style number -->
         <xsl:choose>
           <!-- if it is a multiline cell -->
@@ -604,16 +656,6 @@
               </xsl:when>
               <!-- when style is specified in column -->
               <xsl:otherwise>
-                <xsl:variable name="columnCellStyle">
-                  <xsl:call-template name="GetColumnCellStyle">
-                    <xsl:with-param name="colNum">
-                      <xsl:value-of select="$colNumber + 1"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="TableColumnTagNum">
-                      <xsl:value-of select="$TableColumnTagNum"/>
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:variable>
                 <xsl:if test="$columnCellStyle != '' ">
                   <xsl:for-each select="key('style',$columnCellStyle)">
                     <xsl:attribute name="s">
@@ -625,6 +667,7 @@
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
+        
 
         <!-- convert cell type -->
         <xsl:if test="child::text:p">

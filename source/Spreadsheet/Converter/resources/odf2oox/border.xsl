@@ -57,7 +57,11 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:attribute>
-                <color indexed="64"/>
+                <xsl:call-template name="GetBorderColor">
+                  <xsl:with-param name="color">
+                    <xsl:value-of select="substring-after(@fo:border, '#')"/>                    
+                  </xsl:with-param>
+                </xsl:call-template>
           </xsl:if>
       </left>
 
@@ -78,7 +82,11 @@
               </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
-        <color indexed="64"/>
+          <xsl:call-template name="GetBorderColor">
+            <xsl:with-param name="color">
+              <xsl:value-of select="substring-after(@fo:border, '#')"/>                    
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:if>
       </right>
 
@@ -99,7 +107,11 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:attribute>
-        <color indexed="64"/>
+          <xsl:call-template name="GetBorderColor">
+            <xsl:with-param name="color">
+              <xsl:value-of select="substring-after(@fo:border, '#')"/>                    
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:if>
       </top>
 
@@ -120,11 +132,16 @@
               </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
-        <color indexed="64"/>
+          <xsl:call-template name="GetBorderColor">
+            <xsl:with-param name="color">
+              <xsl:value-of select="substring-after(@fo:border, '#')"/>                    
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:if>
       </bottom>
 
       <diagonal/>
+      
       </border>
     
   </xsl:template>
@@ -153,5 +170,23 @@
          </xsl:otherwise>
        </xsl:choose>
  </xsl:template>
+  
+  <xsl:template name="GetBorderColor">
+    <xsl:param name="color"/>
+    
+    <xsl:choose>
+      <xsl:when test="$color != '000000'">
+        <color>
+          <xsl:attribute name="rgb">
+            <xsl:value-of select="concat('FF', $color)"/>
+          </xsl:attribute>
+        </color>
+      </xsl:when>
+      <xsl:otherwise>
+        <color indexed="64"/>    
+      </xsl:otherwise>
+    </xsl:choose>
+    
+  </xsl:template>
   
 </xsl:stylesheet>

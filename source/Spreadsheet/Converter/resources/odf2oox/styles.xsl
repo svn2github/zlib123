@@ -122,7 +122,9 @@
   </xsl:template>
 
   <xsl:template name="InsertBorders">
-    <borders count="1">
+    
+    <borders>
+      <!-- default border -->
       <border>
         <left/>
         <right/>
@@ -130,6 +132,7 @@
         <bottom/>
         <diagonal/>
       </border>
+      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles" mode="border"/>
     </borders>
   </xsl:template>
 
@@ -266,6 +269,19 @@
         <!-- change referencing node to style:text-properties and count-->
         <xsl:for-each select="style:text-properties">
           <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']" level="any"/>
+        </xsl:for-each>
+      </xsl:attribute>
+    </xsl:if>
+    
+    <!-- border -->
+    <xsl:if test="style:table-cell-properties">
+      <xsl:attribute name="applyBorder">
+        <xsl:text>1</xsl:text>
+      </xsl:attribute>
+      <xsl:attribute name="borderId">
+        <!-- change referencing node to style:table-cell-properties and count-->
+        <xsl:for-each select="style:table-cell-properties">
+          <xsl:number count="style:table-cell-properties[parent::node()/@style:family='table-cell']" level="any"/>
         </xsl:for-each>
       </xsl:attribute>
     </xsl:if>
