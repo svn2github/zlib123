@@ -59,6 +59,7 @@
     <EmbeddedResource Include="resources\oox2odf\source.xml" />
     <EmbeddedResource Include="resources\oox2odf\common.xsl" />
     <EmbeddedResource Include="resources\oox2odf\merge_cell.xsl" />
+	<EmbeddedResource Include="resources\oox2odf\number.xsl" />
     <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
     <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
     <EmbeddedResource Include="resources\oox2odf\table_body.xsl" />
