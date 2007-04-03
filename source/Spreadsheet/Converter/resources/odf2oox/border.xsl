@@ -38,9 +38,23 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" exclude-result-prefixes="svg">
   
   <!-- Insert Borders -->
+  
   <xsl:template match="style:table-cell-properties" mode="border">
     
     <border>
+      
+      <xsl:if test="@style:diagonal-bl-tr != '' and @style:diagonal-bl-tr != 'none'">
+        <xsl:attribute name="diagonalUp">
+          <xsl:text>1</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+      
+      <xsl:if test="@style:diagonal-tl-br != '' and @style:diagonal-tl-br != 'none'">
+        <xsl:attribute name="diagonalDown">
+          <xsl:text>1</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+      
         <left>
           <xsl:if test="(@fo:border-left != '' and @fo:border-left != 'none') or (@fo:border != '' and @fo:border != 'none' )">
             <xsl:attribute name="style">
@@ -140,7 +154,52 @@
         </xsl:if>
       </bottom>
 
-      <diagonal/>
+      <diagonal>
+        <xsl:choose>
+          <xsl:when test="@style:diagonal-bl-tr != '' and @style:diagonal-bl-tr != 'none'">
+            <xsl:attribute name="style">
+              <xsl:call-template name="GetBorderStyle">
+                <xsl:with-param name="style">
+                  <xsl:choose>
+                    <xsl:when test="@fo:border-bottom">
+                      <xsl:value-of select="substring-before(@style:diagonal-bl-tr, '#')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="substring-before(@style:diagonal-bl-tr, '#')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>                  
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+            <xsl:call-template name="GetBorderColor">
+              <xsl:with-param name="color">
+                <xsl:value-of select="substring-after(@style:diagonal-bl-tr, '#')"/>                    
+              </xsl:with-param>
+            </xsl:call-template>    
+          </xsl:when>
+          <xsl:when test="@style:diagonal-tl-br != '' and @style:diagonal-tl-br != 'none'">
+            <xsl:attribute name="style">
+              <xsl:call-template name="GetBorderStyle">
+                <xsl:with-param name="style">
+                  <xsl:choose>
+                    <xsl:when test="@fo:border-bottom">
+                      <xsl:value-of select="substring-before(@style:diagonal-tl-br, '#')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="substring-before(@style:diagonal-tl-br, '#')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>                  
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+            <xsl:call-template name="GetBorderColor">
+              <xsl:with-param name="color">
+                <xsl:value-of select="substring-after(@style:diagonal-tl-br, '#')"/>                    
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </diagonal>
       
       </border>
     
