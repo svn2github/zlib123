@@ -47,13 +47,13 @@
       <!-- when sheet is empty  -->
       <xsl:when
         test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = ''">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="65536">
           <table:table-cell/>
         </table:table-row>
       </xsl:when>
       <xsl:when test="$BigMergeRow != '' and e:worksheet/e:sheetData/e:row/e:c">
-        <table:table-row table:style-name="ro1">
+         <table:table-row table:style-name="ro1">
           <table:covered-table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>
@@ -113,13 +113,13 @@
 
       <!-- Insert if this row is merged with another row -->
       <xsl:when test="contains($CheckIfBigMerge,'true')">
-        <table:table-row table:style-name="ro1">
+       <table:table-row table:style-name="ro1">
           <table:covered-table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>
 
       <xsl:otherwise>
-        <table:table-row>
+       <table:table-row>
           <xsl:attribute name="table:style-name">
             <xsl:choose>
               <xsl:when test="@ht">
@@ -146,11 +146,23 @@
               </xsl:with-param>
             </xsl:apply-templates>
           </xsl:if>
+       
+       <xsl:variable name="CheckIfBigMergeAfter">
+         <xsl:call-template name="CheckIfBigMergeAfter">
+           <xsl:with-param name="colNum">
+             <xsl:value-of select="$lastCellColumnNumber"/>
+           </xsl:with-param>
+           <xsl:with-param name="rowNum">1</xsl:with-param>
+           <xsl:with-param name="BigMergeCell">
+             <xsl:value-of select="$BigMergeCell"/>
+           </xsl:with-param>
+         </xsl:call-template>
+       </xsl:variable>
 
           <!-- complete row with empty cells if last cell number < 256 -->
           <xsl:choose>
-            <xsl:when test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge = ''">
-             <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
+            <xsl:when test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge = '' and $CheckIfBigMergeAfter != 'true'">
+            <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
                   <xsl:attribute name="table:style-name">
@@ -159,11 +171,11 @@
                     </xsl:for-each>
                   </xsl:attribute>
                 </xsl:if>
-              </table:table-cell>
+            </table:table-cell>
             </xsl:when>
             <xsl:when
               test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != '' and not(e:c)">              
-            <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
+           <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
                   <xsl:attribute name="table:style-name">
@@ -197,7 +209,7 @@
                   </xsl:attribute>
                   <xsl:attribute name="table:number-columns-spanned">256</xsl:attribute>                  
                 </xsl:if>
-              </table:table-cell>
+           </table:table-cell>
             </xsl:when>
             <xsl:when test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != ''">
               <xsl:apply-templates select="e:c[1]">
@@ -209,9 +221,8 @@
             <xsl:otherwise>
               <xsl:message terminate="no">translation.oox2odf.ColNumber</xsl:message>
             </xsl:otherwise>
-          </xsl:choose>
-          
-        </table:table-row>
+          </xsl:choose>          
+ </table:table-row>
       </xsl:otherwise>
     </xsl:choose>
 
@@ -226,8 +237,11 @@
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
 
-
+    <xsl:variable name="CheckIfBigMergeBefore">
       <xsl:call-template name="CheckIfBigMergeBefore">
+        <xsl:with-param name="prevCellCol">
+          <xsl:value-of select="$prevCellCol"/>
+        </xsl:with-param>
         <xsl:with-param name="colNum">
           <xsl:value-of select="$colNum"/>
         </xsl:with-param>
@@ -237,33 +251,13 @@
         <xsl:with-param name="BigMergeCell">
           <xsl:value-of select="$BigMergeCell"/>
         </xsl:with-param>
-      </xsl:call-template> 
+      </xsl:call-template>
+    </xsl:variable>
     
     <!-- if there were empty cells in a row before this one then insert empty cells-->
-    <xsl:choose>
+    <xsl:choose>      
       <!-- when this cell is the first one in a row but not in column A -->
-      <xsl:when test="$prevCellCol = '' and $colNum>1 and $BeforeMerge != 'true'">
-        <xsl:choose>
-          <xsl:when test="$BigMergeCell = ''">
-         <table:table-cell>
-              <xsl:attribute name="table:number-columns-repeated">
-                <xsl:value-of select="$colNum - 1"/>
-              </xsl:attribute>
-              <!-- if there is a default cell style for the row -->
-              <xsl:if test="parent::node()/@s">
-                <xsl:variable name="position">
-                  <xsl:value-of select="$this/parent::node()/@s + 1"/>
-                </xsl:variable>
-                <xsl:attribute name="table:style-name">
-                  <xsl:for-each select="document('xl/styles.xml')">
-                    <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-                  </xsl:for-each>
-                </xsl:attribute>
-              </xsl:if>
-            </table:table-cell>
-          </xsl:when>
-          <!--  when this cell is the first one in a row but not in column A  and there is Big Merge after text -->         
-          <xsl:when test="$prevCellCol = '' and substring-before($BigMergeCell, ':') &gt; $colNum">
+      <xsl:when test="$prevCellCol = '' and $colNum>1 and $BeforeMerge != 'true' and $CheckIfBigMergeBefore != 'true'">
             <table:table-cell>
               <xsl:attribute name="table:number-columns-repeated">
                 <xsl:value-of select="$colNum - 1"/>
@@ -279,25 +273,12 @@
                   </xsl:for-each>
                 </xsl:attribute>
               </xsl:if>
-              </table:table-cell>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="InsertColumnsBigMergeColl">
-              <xsl:with-param name="BigMergeCell">
-                <xsl:value-of select="$BigMergeCell"/>
-              </xsl:with-param>
-              <xsl:with-param name="CollNumber">
-                <xsl:value-of select="$colNum"/>
-              </xsl:with-param>
-              <xsl:with-param name="RowNumber">
-                <xsl:value-of select="$rowNum"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
+            </table:table-cell>
+      </xsl:when>      
+      
       <!-- when this cell is not first one in a row and there were empty cells after previous non-empty cell -->
-      <xsl:when test="$prevCellCol != ''">
+      <xsl:when test="$prevCellCol != '' ">
+        
         <xsl:variable name="prevCellColNum">
           <xsl:choose>
             <!-- if previous column was specified by number -->
@@ -316,10 +297,11 @@
             <xsl:otherwise>-1</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
+        
         <xsl:if test="$colNum>$prevCellColNum+1">
           <xsl:choose>
             <xsl:when test="$BigMergeCell = ''">
-           <table:table-cell>
+             <table:table-cell>
                 <xsl:attribute name="table:number-columns-repeated">
                   <xsl:value-of select="$colNum - $prevCellColNum - 1"/>
                 </xsl:attribute>
@@ -336,22 +318,62 @@
                 </xsl:if>
               </table:table-cell>
             </xsl:when>
-            <xsl:otherwise>
-            <xsl:call-template name="InsertColumnsBigMergeColl">
+            <xsl:when test="$CheckIfBigMergeBefore = 'true'">
+            <xsl:call-template name="InsertEmptyColumnsSheetNotEmpty">
                 <xsl:with-param name="BigMergeCell">
                   <xsl:value-of select="$BigMergeCell"/>
                 </xsl:with-param>
-                <xsl:with-param name="CollNumber">
+                <xsl:with-param name="prevCellCol">
+                      <xsl:value-of select="$prevCellCol"/>
+                </xsl:with-param>
+                <xsl:with-param name="colNum">
                   <xsl:value-of select="$colNum"/>
                 </xsl:with-param>
-                <xsl:with-param name="RowNumber">
-                  <xsl:value-of select="$rowNum"/>
-                </xsl:with-param>
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum"/>
+              </xsl:with-param>
               </xsl:call-template>
-            </xsl:otherwise>
+            </xsl:when>
+            <xsl:when test="$colNum - $prevCellCol -1 &gt; 0">
+              <table:table-cell>
+                <xsl:attribute name="table:number-columns-repeated">
+                  <xsl:value-of select="$colNum - $prevCellCol - 1"/>
+                </xsl:attribute>
+                <!-- if there is a default cell style for the row -->
+                <xsl:if test="parent::node()/@s">
+                  <xsl:variable name="position">
+                    <xsl:value-of select="$this/parent::node()/@s + 1"/>
+                  </xsl:variable>
+                  <xsl:attribute name="table:style-name">
+                    <xsl:for-each select="document('xl/styles.xml')">
+                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+                    </xsl:for-each>
+                  </xsl:attribute>
+                </xsl:if>
+              </table:table-cell>
+            </xsl:when>
           </xsl:choose>
         </xsl:if>
       </xsl:when>
+      <xsl:when test="$CheckIfBigMergeBefore = 'true'">
+        <xsl:call-template name="InsertEmptyColumnsSheetNotEmpty">
+          <xsl:with-param name="BigMergeCell">
+            <xsl:value-of select="$BigMergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="prevCellCol">
+                <xsl:value-of select="$prevCellCol"/>
+          </xsl:with-param>
+          <xsl:with-param name="colNum">
+            <xsl:value-of select="$colNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+
+      </xsl:otherwise>
     </xsl:choose>
 
   </xsl:template>
@@ -366,11 +388,12 @@
     <xsl:param name="CheckIfMerge"/>
 
     <xsl:choose>
+      
       <!-- Insert covered cell if this is Merge Cell -->
       <xsl:when test="contains($CheckIfMerge,'true')">
         <xsl:choose>
           <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 1">
-           <table:covered-table-cell>
+             <table:covered-table-cell>
               <xsl:attribute name="table:number-columns-repeated">
                 <xsl:choose>
                   <xsl:when
@@ -378,6 +401,7 @@
                     <xsl:value-of select="256 - $colNum"/>
                   </xsl:when>
                   <xsl:otherwise>
+                    <!--xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/-->
                     <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
                   </xsl:otherwise>
                 </xsl:choose>
@@ -391,14 +415,11 @@
       </xsl:when>
 
       <xsl:otherwise>
-
         <!-- insert this one cell-->
-     <table:table-cell>
-       
+      <table:table-cell>       
        <xsl:variable name="position">
          <xsl:value-of select="$this/@s + 1"/>
-       </xsl:variable>
-       
+       </xsl:variable>       
           <!-- Insert "Merge Cell" if "Merge Cell" is starting in this cell -->
           <xsl:if test="$CheckIfMerge != 'false'">
             <xsl:attribute name="table:number-rows-spanned">
@@ -437,12 +458,10 @@
                   <xsl:value-of select="e:v"/>
                 </xsl:variable>
                 <text:p>
-
                   <!-- a postprocessor puts here strings from sharedstrings -->
                   <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
                     <xsl:value-of select="e:v"/>
                   </pxsi:v>
-
                 </text:p>
               </xsl:when>
               <xsl:when test="@t = 'e' ">
@@ -530,7 +549,7 @@
 
         <!-- Insert covered cell if Merge Cell is starting-->
         <xsl:if test="$CheckIfMerge != 'false' and substring-after($CheckIfMerge, ':') &gt; 1">
-        <table:covered-table-cell>
+           <table:covered-table-cell>
             <xsl:attribute name="table:number-columns-repeated">
               <xsl:choose>
                 <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 256">256</xsl:when>
@@ -539,7 +558,7 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
-          </table:covered-table-cell>
+           </table:covered-table-cell>
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
@@ -555,6 +574,39 @@
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
 
+    
+    <xsl:variable name="CheckIfBigMergeBefore">
+      <xsl:call-template name="CheckIfBigMergeBefore">
+        <xsl:with-param name="prevCellCol">
+          <xsl:value-of select="$prevCellCol"/>
+        </xsl:with-param>
+        <xsl:with-param name="colNum">
+          <xsl:value-of select="$colNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="rowNum">
+          <xsl:value-of select="$rowNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="BigMergeCell">
+          <xsl:value-of select="$BigMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="CheckIfBigMergeAfter">
+      <xsl:call-template name="CheckIfBigMergeAfter">
+        <xsl:with-param name="colNum">
+          <xsl:value-of select="$colNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="rowNum">
+          <xsl:value-of select="$rowNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="BigMergeCell">
+          <xsl:value-of select="$BigMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+
     <xsl:choose>
 
       <!-- calc supports only 256 columns -->
@@ -564,8 +616,22 @@
 
       <!-- Skips empty coll (in Merge Cell) -->
 
-      <xsl:when test="$CheckIfMerge != 'false'">
+      <xsl:when test="$CheckIfMerge != 'false' and following-sibling::e:c">
         <xsl:choose>
+          <!-- if in this cell big merge coll is starting -->
+          <xsl:when test="$CheckIfBigMergeBefore = 'start' and following-sibling::e:c">
+            <xsl:apply-templates select="following-sibling::e:c[1]">
+              <xsl:with-param name="BeforeMerge">
+                <xsl:text>true</xsl:text>
+              </xsl:with-param>
+              <xsl:with-param name="prevCellCol">
+                <xsl:value-of select="$colNum + number(substring-after($CheckIfMerge, ':')) - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="BigMergeCell">
+                <xsl:value-of select="$BigMergeCell"/>
+              </xsl:with-param>
+            </xsl:apply-templates>
+          </xsl:when>
           <!-- if this cell is inside row of merged cells ($CheckIfMerged is true:number_of_cols_spaned) -->
           <xsl:when
             test="contains($CheckIfMerge,'true') and substring-after($CheckIfMerge, ':') &gt; 1">
@@ -578,11 +644,15 @@
                 <xsl:with-param name="prevCellCol">
                   <xsl:value-of select="$colNum + number(substring-after($CheckIfMerge, ':')) - 1"/>
                 </xsl:with-param>
+                <xsl:with-param name="BigMergeCell">
+                  <xsl:value-of select="$BigMergeCell"/>
+                </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
           </xsl:when>
           <!-- if this cell starts row of merged cells ($CheckIfMerged has dimensions of merged cell) -->
           <xsl:otherwise>
+             
             <xsl:if test="following-sibling::e:c[number(substring-after($CheckIfMerge, ':'))]">
               <xsl:apply-templates
                 select="following-sibling::e:c[number(substring-after($CheckIfMerge, ':'))]">
@@ -592,22 +662,45 @@
                 <xsl:with-param name="prevCellCol">
                   <xsl:value-of select="$colNum + number(substring-after($CheckIfMerge, ':')) - 1"/>
                 </xsl:with-param>
+                <xsl:with-param name="BigMergeCell">
+                  <xsl:value-of select="$BigMergeCell"/>
+                </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
-      <xsl:otherwise>
+      <!-- Insert Empty Big Merge Coll after this cell -->
+      <xsl:when test="not(following-sibling::e:c) and $CheckIfBigMergeAfter = 'true'">
+        <xsl:call-template name="InsertEmptyColumnsSheetNotEmpty">
+          <xsl:with-param name="BigMergeCell">
+            <xsl:value-of select="$BigMergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="prevCellCol">
+            <xsl:value-of select="$colNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="colNum">256</xsl:with-param>
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum"/>
+          </xsl:with-param>
+        </xsl:call-template>      
+      </xsl:when>
+      <xsl:otherwise>  
         <xsl:if test="following-sibling::e:c">
           <xsl:apply-templates select="following-sibling::e:c[1]">
             <xsl:with-param name="prevCellCol">
-              <xsl:value-of select="@r"/>
+              <xsl:call-template name="GetColNum">
+                <xsl:with-param name="cell">
+                  <xsl:value-of select="@r"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:with-param>
+            <xsl:with-param name="BigMergeCell">
+              <xsl:value-of select="$BigMergeCell"/>
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>
       </xsl:otherwise>
-
     </xsl:choose>
 
   </xsl:template>
