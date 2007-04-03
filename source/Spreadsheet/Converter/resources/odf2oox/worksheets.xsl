@@ -531,6 +531,10 @@
       <xsl:when test="$width='35.565cm' and $height='21.59cm' ">
         <xsl:text>5</xsl:text>
       </xsl:when>
+      <!-- Japanese Postcard -->
+      <xsl:when test="$width='14.8cm' and $height='10cm' ">
+        <xsl:text>43</xsl:text>
+      </xsl:when>
       <!-- A4 as default -->
       <xsl:otherwise>
         <xsl:text>9</xsl:text>

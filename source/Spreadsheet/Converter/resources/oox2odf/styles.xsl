@@ -47,6 +47,12 @@
       <office:styles>
         <xsl:call-template name="InsertDefaultTableCellStyle"/>
       </office:styles>
+      <office:automatic-styles>
+        <xsl:call-template name="InsertPageLayout"/>
+      </office:automatic-styles>
+      <office:master-styles>
+        <style:master-page style:name="Default" style:page-layout-name="pm1"/>
+      </office:master-styles>
     </office:document-styles>
   </xsl:template>
 
@@ -59,7 +65,8 @@
   <xsl:template name="InsertDefaultTableCellStyle">
     <style:style style:name="Default" style:family="table-cell">
       <style:text-properties>
-        <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]" mode="style"/>
+        <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]"
+          mode="style"/>
       </style:text-properties>
     </style:style>
   </xsl:template>
@@ -85,16 +92,19 @@
     <xsl:param name="sheet"/>
 
     <!-- default style -->
-    <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+    <style:style
+      style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
       style:family="table-column">
       <style:table-column-properties fo:break-before="auto">
         <xsl:attribute name="style:column-width">
           <xsl:choose>
-            <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
+            <xsl:when
+              test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth">
               <xsl:call-template name="ConvertFromCharacters">
                 <xsl:with-param name="value">
                   <xsl:value-of
-                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"/>
+                    select="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultColWidth"
+                  />
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:when>
@@ -109,7 +119,8 @@
       </style:table-column-properties>
     </style:style>
 
-    <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols" mode="automaticstyles"/>
+    <xsl:apply-templates select="document(concat('xl/',$sheet))/e:worksheet/e:cols"
+      mode="automaticstyles"/>
   </xsl:template>
 
   <xsl:template match="e:col" mode="automaticstyles">
@@ -147,12 +158,14 @@
     <xsl:param name="sheet"/>
 
     <!-- default style -->
-    <style:style style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
+    <style:style
+      style:name="{generate-id(document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr)}"
       style:family="table-row">
       <style:table-row-properties fo:break-before="auto">
         <xsl:attribute name="style:row-height">
           <xsl:choose>
-            <xsl:when test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
+            <xsl:when
+              test="document(concat('xl/',$sheet))/e:worksheet/e:sheetFormatPr/@defaultRowHeight">
               <xsl:call-template name="ConvertToCentimeters">
                 <xsl:with-param name="length">
                   <xsl:value-of
@@ -222,25 +235,27 @@
   </xsl:template>
 
   <!-- insert number styles-->
-  
+
   <xsl:template name="InsertNumberStyles">
-    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:numFmts" mode="automaticstyles"/>
+    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:numFmts"
+      mode="automaticstyles"/>
   </xsl:template>
-  
+
   <xsl:template name="InsertCellStyles">
-    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs" mode="automaticstyles"/>
+    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs"
+      mode="automaticstyles"/>
   </xsl:template>
 
   <!-- cell formats -->
   <xsl:template match="e:xf" mode="automaticstyles">
     <style:style style:name="{generate-id(.)}" style:family="table-cell">
-      
+
       <xsl:if test="key('numFmtId',@numFmtId)">
         <xsl:attribute name="style:data-style-name">
           <xsl:value-of select="generate-id(key('numFmtId',@numFmtId))"/>
         </xsl:attribute>
       </xsl:if>
-      
+
       <xsl:if test="@applyAlignment = 1">
         <style:table-cell-properties>
           <!-- vertical-align -->
@@ -262,7 +277,8 @@
               <xsl:text>true</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          <xsl:if test="e:alignment/@horizontal = 'distributed' or e:alignment/@vertical = 'distributed' ">
+          <xsl:if
+            test="e:alignment/@horizontal = 'distributed' or e:alignment/@vertical = 'distributed' ">
             <xsl:attribute name="fo:wrap-option">
               <xsl:text>wrap</xsl:text>
             </xsl:attribute>
@@ -284,7 +300,8 @@
               <xsl:otherwise>
                 <xsl:attribute name="style:rotation-angle">
                   <xsl:choose>
-                    <xsl:when test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 90">
+                    <xsl:when
+                      test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 90">
                       <xsl:value-of select="e:alignment/@textRotation"/>
                     </xsl:when>
                     <xsl:when test="e:alignment/@textRotation &gt; 90">
@@ -305,7 +322,8 @@
           <style:paragraph-properties>
             <xsl:attribute name="fo:text-align">
               <xsl:choose>
-                <xsl:when test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 180">
+                <xsl:when
+                  test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 180">
                   <xsl:text>start</xsl:text>
                 </xsl:when>
                 <xsl:when
@@ -349,7 +367,8 @@
       <xsl:if test="@applyFont = 1">
         <style:text-properties>
           <xsl:variable name="this" select="."/>
-          <xsl:apply-templates select="ancestor::e:styleSheet/e:fonts/e:font[position() = $this/@fontId + 1]"
+          <xsl:apply-templates
+            select="ancestor::e:styleSheet/e:fonts/e:font[position() = $this/@fontId + 1]"
             mode="style"/>
         </style:text-properties>
       </xsl:if>
@@ -391,7 +410,8 @@
   <!-- convert run properties into span style -->
   <xsl:template match="e:r" mode="automaticstyles">
     <style:style style:name="{generate-id(.)}" style:family="text">
-      <style:text-properties fo:font-weight="normal" fo:font-style="normal" style:text-underline-type="none">
+      <style:text-properties fo:font-weight="normal" fo:font-style="normal"
+        style:text-underline-type="none">
         <xsl:apply-templates select="e:rPr" mode="style"/>
       </style:text-properties>
     </style:style>
@@ -469,26 +489,27 @@
           <xsl:value-of select="concat('#',substring(@rgb,3,9))"/>
         </xsl:when>
         <xsl:when test="@indexed">
-            <xsl:choose>
-              <xsl:when test="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]">
-                <xsl:variable name="color">
-                  <xsl:value-of
+          <xsl:choose>
+            <xsl:when
+              test="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]">
+              <xsl:variable name="color">
+                <xsl:value-of
                   select="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]/@rgb"
-                  />
-                  </xsl:variable>
-                <xsl:value-of select="concat('#',substring($color,3,9))"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:variable name="color">
-                  <xsl:call-template name="GetBuildInColor">
+                />
+              </xsl:variable>
+              <xsl:value-of select="concat('#',substring($color,3,9))"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:variable name="color">
+                <xsl:call-template name="GetBuildInColor">
                   <xsl:with-param name="index">
                     <xsl:value-of select="@indexed"/>
                   </xsl:with-param>
-                  </xsl:call-template>
-                  </xsl:variable>
-                <xsl:value-of select="concat('#',$color)"/>
-              </xsl:otherwise>
-            </xsl:choose>            
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:value-of select="concat('#',$color)"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:when test="@theme">
           <xsl:variable name="theme">
@@ -562,9 +583,9 @@
       </xsl:choose>
     </xsl:attribute>
   </xsl:template>
-  
+
   <!-- insert  number format style -->
-  
+
   <xsl:template match="e:numFmt" mode="automaticstyles">
     <number:number-style style:name="{generate-id(.)}">
       <xsl:call-template name="InsertNumberFormatting"/>
@@ -572,22 +593,22 @@
   </xsl:template>
 
   <!-- template to create number format -->
-  
+
   <xsl:template name="InsertNumberFormatting">
     <number:number>
-      
+
       <!-- formatting for negative numbers is omitted -->
       <xsl:variable name="formatCode">
         <xsl:choose>
           <xsl:when test="contains(@formatCode,';')">
-        <xsl:value-of select="substring-before(@formatCode,';')"/>
+            <xsl:value-of select="substring-before(@formatCode,';')"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="@formatCode"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:variable name="formatCodeWithoutComma">
         <xsl:choose>
           <xsl:when test="contains($formatCode,'.')">
@@ -613,9 +634,9 @@
           <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      
+
       <!-- min integer digits -->
-      
+
       <xsl:if test="contains($formatCodeWithoutComma,'0')">
         <xsl:attribute name="number:min-integer-digits">
           <xsl:call-template name="InsertMinIntegerDigits">
@@ -636,7 +657,7 @@
   </xsl:template>
 
   <!-- template which inserts min integer digits -->
-  
+
   <xsl:template name="InsertMinIntegerDigits">
     <xsl:param name="code"/>
     <xsl:param name="value"/>
@@ -656,9 +677,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which inserts decimal places -->
-  
+
   <xsl:template name="InsertDecimalPlaces">
     <xsl:param name="code"/>
     <xsl:param name="value"/>
@@ -679,4 +700,202 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="InsertPageLayout">
+    <xsl:variable name="ActiveTabNumber">
+      <xsl:for-each select="document('xl/workbook.xml')">
+        <xsl:choose>
+          <xsl:when test="e:workbook/e:bookViews/e:workbookView/@activeTab">
+            <xsl:value-of select="e:workbook/e:bookViews/e:workbookView/@activeTab"/>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:for-each
+      select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet">
+      <style:page-layout style:name="pm1">
+        <style:page-layout-properties>
+          <xsl:for-each select="e:printOptions">
+            <xsl:attribute name="style:table-centering">
+              <xsl:choose>
+                <xsl:when test="@horizontalCentered = 1 and @verticalCentered = 1">
+                  <xsl:text>both</xsl:text>
+                </xsl:when>
+                <xsl:when test="@horizontalCentered = 1">
+                  <xsl:text>horizontal</xsl:text>
+                </xsl:when>
+                <xsl:when test="@verticalCentered = 1">
+                  <xsl:text>vertical</xsl:text>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:for-each>
+
+          <xsl:call-template name="InsertPageMargins"/>
+          
+          <xsl:for-each select="e:pageSetup">
+            <xsl:if test="@orientation">
+            <xsl:attribute name="style:print-orientation">
+              <xsl:value-of select="@orientation"/>
+            </xsl:attribute>
+            </xsl:if>
+            
+            <xsl:attribute name="zzzzzzz">
+              <xsl:value-of select="concat(name(),@paperSize)"/>
+            </xsl:attribute>
+            
+            <xsl:choose>
+              <xsl:when test="@paperSize">
+                <xsl:call-template name="InsertPaperSize">
+                  <xsl:with-param name="paperSize" select="@paperSize"/>
+                </xsl:call-template>
+              </xsl:when>
+              <!-- Letter -->
+              <xsl:otherwise>
+                <xsl:attribute name="fo:page-width">
+                  <xsl:text>27.94cm</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="fo:page-height">
+                  <xsl:text>21.59cm</xsl:text>
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+            
+          </xsl:for-each>
+
+        </style:page-layout-properties>
+      </style:page-layout>
+    </xsl:for-each>
+  </xsl:template>
+
+<xsl:template name="InsertPageMargins">
+  <xsl:for-each select="e:pageMargins">
+    <xsl:if test="@top">
+      <xsl:attribute name="fo:margin-top">
+        <xsl:call-template name="ConvertToCentimeters">
+          <xsl:with-param name="length" select="concat(@top,'in')"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="@bottom">
+      <xsl:attribute name="fo:margin-bottom">
+        <xsl:call-template name="ConvertToCentimeters">
+          <xsl:with-param name="length" select="concat(@bottom,'in')"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="@left">
+      <xsl:attribute name="fo:margin-left">
+        <xsl:call-template name="ConvertToCentimeters">
+          <xsl:with-param name="length" select="concat(@left,'in')"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="@right">
+      <xsl:attribute name="fo:margin-right">
+        <xsl:call-template name="ConvertToCentimeters">
+          <xsl:with-param name="length" select="concat(@right,'in')"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:for-each>  
+</xsl:template>
+  
+  <xsl:template name="InsertPaperSize">
+    <xsl:param name="paperSize"/>
+  
+    <xsl:choose>
+      <!-- A3 -->
+      <xsl:when test="$paperSize=8">
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>42cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>29.699cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- A4 -->
+      <xsl:when test="$paperSize=9">
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>29.699cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>20.999cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- A5 -->
+      <xsl:when test="$paperSize=11">
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>20.999cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>14.799cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- B4 (JIS) -->
+      <xsl:when test="$paperSize=12">
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>36.4cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>25.7cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- B5 (JIS) -->
+      <xsl:when test="$paperSize=13">
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>25.7cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>18.2cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- Letter -->
+      <xsl:when test="$paperSize=1">
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>27.94cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>21.59cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- Tabloid -->
+      <xsl:when test="$paperSize=3">
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>43.127cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>27.958cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- Legal -->
+      <xsl:when test="$paperSize=5">
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>35.565cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>21.59cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$paperSize=43">
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>14.8cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>10cm</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <!-- A4 as default -->
+      <xsl:otherwise>
+        <xsl:attribute name="fo:page-width">
+          <xsl:text>29.699cm</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="fo:page-height">
+          <xsl:text>20.999cm</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>    
+  </xsl:template>
+  
 </xsl:stylesheet>

@@ -523,6 +523,4 @@
   
   </xsl:template>
   
-
-  
 </xsl:stylesheet>
