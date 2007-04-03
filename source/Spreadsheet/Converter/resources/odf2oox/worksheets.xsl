@@ -79,6 +79,23 @@
     <xsl:param name="sheetId"/>
 
     <worksheet>
+
+      <xsl:variable name="pageStyle">
+        <xsl:value-of
+          select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default' ]/@style:page-layout-name"
+        />
+      </xsl:variable>
+
+      <!-- if property 'fit print range(s) to width/height' is being used -->
+      <xsl:for-each select="document('styles.xml')">
+        <xsl:if
+          test="key('pageStyle',$pageStyle)/style:page-layout-properties/@style:scale-to-X or key('pageStyle',$pageStyle)/style:page-layout-properties/@style:scale-to-Y">
+          <sheetPr>
+            <pageSetUpPr fitToPage="1"/>
+          </sheetPr>
+        </xsl:if>
+      </xsl:for-each>
+
       <xsl:call-template name="InsertViewSettings">
         <xsl:with-param name="sheetId" select="$sheetId"/>
       </xsl:call-template>
@@ -386,12 +403,28 @@
                 <xsl:text>1</xsl:text>
               </xsl:attribute>
             </xsl:if>
+
             <!-- table vertical alignment -->
             <xsl:if test="@style:table-centering = 'vertical' or @style:table-centering = 'both' ">
               <xsl:attribute name="verticalCentered">
                 <xsl:text>1</xsl:text>
               </xsl:attribute>
             </xsl:if>
+
+            <!-- headings -->
+            <xsl:if test="@style:print and contains(@style:print,'headers' )">
+              <xsl:attribute name="headings">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- headings -->
+            <xsl:if test="@style:print and contains(@style:print,'grid' )">
+              <xsl:attribute name="gridLines">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+
           </printOptions>
         </xsl:if>
 
@@ -401,15 +434,8 @@
         </xsl:call-template>
 
         <xsl:if
-          test="@style:print-orientation or @style:print-page-order or (@fo:page-width and @fo:page-height)">
+          test="(@fo:page-width and @fo:page-height) or @style:scale-to or @style:first-page-number or @style:scale-to-X or style:scale-to-Y or @style:print-page-order or @style:print-orientation or @style:print-page-order">
           <pageSetup>
-            <!-- paper orientation -->
-            <xsl:if test="@style:print-orientation">
-              <xsl:attribute name="orientation">
-                <xsl:value-of select="@style:print-orientation"/>
-              </xsl:attribute>
-            </xsl:if>
-            
             <!-- paper size -->
             <xsl:if test="@fo:page-width and @fo:page-height">
               <xsl:attribute name="paperSize">
@@ -423,6 +449,56 @@
                       select="format-number(substring-before(@fo:page-height,'cm'),'#.##')"/>
                   </xsl:with-param>
                 </xsl:call-template>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- scale by factor -->
+            <xsl:if test="@style:scale-to">
+              <xsl:attribute name="scale">
+                <xsl:value-of select="substring-before(@style:scale-to,'%')"/>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- first page number -->
+            <xsl:if test="@style:first-page-number">
+              <xsl:attribute name="firstPageNumber">
+                <xsl:value-of select="@style:first-page-number"/>
+              </xsl:attribute>
+              <xsl:attribute name="useFirstPageNumber">
+                <xsl:text>1</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- fit print range(s) to width/height -->
+            <xsl:if test="@style:scale-to-X">
+              <xsl:attribute name="fitToWidth">
+                <xsl:value-of select="@style:scale-to-X"/>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@style:scale-to-Y">
+              <xsl:attribute name="fitToHeight">
+                <xsl:value-of select="@style:scale-to-Y"/>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- page order-->
+            <xsl:if test="@style:print-page-order = 'ltr' ">
+              <xsl:attribute name="pageOrder">
+                <xsl:text>overThenDown</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- paper orientation -->
+            <xsl:if test="@style:print-orientation">
+              <xsl:attribute name="orientation">
+                <xsl:value-of select="@style:print-orientation"/>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- notes -->
+            <xsl:if test="@style:print and contains(@style:print,'annotations' )">
+              <xsl:attribute name="cellComments">
+                <xsl:text>atEnd</xsl:text>
               </xsl:attribute>
             </xsl:if>
           </pageSetup>
