@@ -83,6 +83,9 @@
       <Name>Addin %28Spreadsheet\Addin%29</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="OdfExcelXPAddinSetup\OdfExcelXPAddinSetup.vdproj" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
     <PreBuildEvent>
