@@ -460,7 +460,7 @@
             </xsl:if>
 
             <!-- first page number -->
-            <xsl:if test="@style:first-page-number">
+            <xsl:if test="@style:first-page-number and number(@style:first-page-number)">
               <xsl:attribute name="firstPageNumber">
                 <xsl:value-of select="@style:first-page-number"/>
               </xsl:attribute>
