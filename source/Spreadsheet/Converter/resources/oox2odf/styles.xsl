@@ -600,35 +600,9 @@
       select="document(concat('xl/worksheets/sheet', $ActiveTabNumber + 1,'.xml'))/e:worksheet">
       <style:page-layout style:name="pm1">
         <style:page-layout-properties>
-          <xsl:for-each select="e:printOptions">
-            <xsl:attribute name="style:table-centering">
-              <xsl:choose>
-                <xsl:when test="@horizontalCentered = 1 and @verticalCentered = 1">
-                  <xsl:text>both</xsl:text>
-                </xsl:when>
-                <xsl:when test="@horizontalCentered = 1">
-                  <xsl:text>horizontal</xsl:text>
-                </xsl:when>
-                <xsl:when test="@verticalCentered = 1">
-                  <xsl:text>vertical</xsl:text>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:for-each>
 
-          <xsl:call-template name="InsertPageMargins"/>
-          
+          <!-- paper size -->
           <xsl:for-each select="e:pageSetup">
-            <xsl:if test="@orientation">
-            <xsl:attribute name="style:print-orientation">
-              <xsl:value-of select="@orientation"/>
-            </xsl:attribute>
-            </xsl:if>
-            
-            <xsl:attribute name="zzzzzzz">
-              <xsl:value-of select="concat(name(),@paperSize)"/>
-            </xsl:attribute>
-            
             <xsl:choose>
               <xsl:when test="@paperSize">
                 <xsl:call-template name="InsertPaperSize">
@@ -645,7 +619,125 @@
                 </xsl:attribute>
               </xsl:otherwise>
             </xsl:choose>
+
+            <!-- paper orientation -->
+            <xsl:if test="@orientation">
+              <xsl:attribute name="style:print-orientation">
+                <xsl:value-of select="@orientation"/>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- page order -->
+            <xsl:if test="@pageOrder = 'overThenDown' ">
+              <xsl:attribute name="style:print-page-order">
+                <xsl:text>ltr</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- first page number -->
+            <xsl:if test="@useFirstPageNumber = 1 and @firstPageNumber">
+              <xsl:attribute name="style:first-page-number">
+                <xsl:value-of select="@firstPageNumber"/>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- fit on pages wide / pages tall -->
+            <xsl:if test="parent::node()/e:sheetPr/e:pageSetUpPr/@fitToPage = 1">
+              <xsl:attribute name="style:scale-to-X">
+                <xsl:choose>
+                  <xsl:when test="@fitToWidth">
+                    <xsl:value-of select="@fitToWidth"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>1</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+
+              <xsl:attribute name="style:scale-to-Y">
+                <xsl:choose>
+                  <xsl:when test="@fitToHeight">
+                    <xsl:value-of select="@fitToHeight"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>1</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </xsl:if>
             
+            <!-- scale printout -->
+            <xsl:if test="@scale">
+              <xsl:attribute name="style:scale-to">
+                <xsl:value-of select="@scale"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:for-each>
+
+          <xsl:call-template name="InsertPageMargins"/>
+
+          <xsl:for-each select="e:printOptions">
+            <!-- table alignment -->
+            <xsl:if test="@horizontalCentered = 1 or @verticalCentered = 1">
+              <xsl:attribute name="style:table-centering">
+                <xsl:choose>
+                  <xsl:when test="@horizontalCentered = 1 and @verticalCentered = 1">
+                    <xsl:text>both</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@horizontalCentered = 1">
+                    <xsl:text>horizontal</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="@verticalCentered = 1">
+                    <xsl:text>vertical</xsl:text>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:attribute>
+            </xsl:if>
+
+            <!-- print -->
+            <xsl:if
+              test="@headings = 1 or @gridLines = 1 or (parent::node()/e:pageSetup/@cellComments and parent::node()/e:pageSetup/@cellComments != 'none') ">
+              <!-- notes -->
+              <xsl:variable name="printNotes">
+                <xsl:choose>
+                  <xsl:when test="parent::node()/e:pageSetup/@cellComments != 'none' ">
+                    <xsl:text>annotations charts drawings objects zero-values</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>charts drawings objects zero-values</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <!-- gridlines-->
+              <xsl:variable name="printGrid">
+                <xsl:choose>
+                  <xsl:when test="@gridLines = 1">
+                    <xsl:value-of select="concat($printNotes,' grid')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$printNotes"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <!-- row and column headings -->
+              <xsl:variable name="printHeaders">
+                <xsl:choose>
+                  <xsl:when test="@headings = 1">
+                    <xsl:value-of select="concat($printGrid,' headers')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$printGrid"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+
+              <xsl:attribute name="style:print">
+                <xsl:value-of select="$printHeaders"/>
+              </xsl:attribute>
+            </xsl:if>
+
           </xsl:for-each>
 
         </style:page-layout-properties>
@@ -653,42 +745,42 @@
     </xsl:for-each>
   </xsl:template>
 
-<xsl:template name="InsertPageMargins">
-  <xsl:for-each select="e:pageMargins">
-    <xsl:if test="@top">
-      <xsl:attribute name="fo:margin-top">
-        <xsl:call-template name="ConvertToCentimeters">
-          <xsl:with-param name="length" select="concat(@top,'in')"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if test="@bottom">
-      <xsl:attribute name="fo:margin-bottom">
-        <xsl:call-template name="ConvertToCentimeters">
-          <xsl:with-param name="length" select="concat(@bottom,'in')"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if test="@left">
-      <xsl:attribute name="fo:margin-left">
-        <xsl:call-template name="ConvertToCentimeters">
-          <xsl:with-param name="length" select="concat(@left,'in')"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if test="@right">
-      <xsl:attribute name="fo:margin-right">
-        <xsl:call-template name="ConvertToCentimeters">
-          <xsl:with-param name="length" select="concat(@right,'in')"/>
-        </xsl:call-template>
-      </xsl:attribute>
-    </xsl:if>
-  </xsl:for-each>  
-</xsl:template>
-  
+  <xsl:template name="InsertPageMargins">
+    <xsl:for-each select="e:pageMargins">
+      <xsl:if test="@top">
+        <xsl:attribute name="fo:margin-top">
+          <xsl:call-template name="ConvertToCentimeters">
+            <xsl:with-param name="length" select="concat(@top,'in')"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@bottom">
+        <xsl:attribute name="fo:margin-bottom">
+          <xsl:call-template name="ConvertToCentimeters">
+            <xsl:with-param name="length" select="concat(@bottom,'in')"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@left">
+        <xsl:attribute name="fo:margin-left">
+          <xsl:call-template name="ConvertToCentimeters">
+            <xsl:with-param name="length" select="concat(@left,'in')"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@right">
+        <xsl:attribute name="fo:margin-right">
+          <xsl:call-template name="ConvertToCentimeters">
+            <xsl:with-param name="length" select="concat(@right,'in')"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+
   <xsl:template name="InsertPaperSize">
     <xsl:param name="paperSize"/>
-  
+
     <xsl:choose>
       <!-- A3 -->
       <xsl:when test="$paperSize=8">
@@ -779,7 +871,7 @@
           <xsl:text>20.999cm</xsl:text>
         </xsl:attribute>
       </xsl:otherwise>
-    </xsl:choose>    
+    </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>
