@@ -78,8 +78,13 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
 
+  
     <worksheet>
-
+      
+      <xsl:variable name="MergeCell">
+        <xsl:call-template name="WriteMergeCell"/>  
+      </xsl:variable>
+      
       <xsl:variable name="pageStyle">
         <xsl:value-of
           select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default' ]/@style:page-layout-name"
@@ -98,15 +103,25 @@
 
       <xsl:call-template name="InsertViewSettings">
         <xsl:with-param name="sheetId" select="$sheetId"/>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
       </xsl:call-template>
 
       <xsl:call-template name="InsertSheetContent">
         <xsl:with-param name="sheetId" select="$sheetId"/>
         <xsl:with-param name="cellNumber" select="$cellNumber"/>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
       </xsl:call-template>
 
       <!-- Insert Merge Cells -->
-      <xsl:call-template name="CheckMergeCell"/>
+      <xsl:call-template name="InsertMergeCells">
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
 
       <xsl:call-template name="InsertPageProperties"/>
       <xsl:call-template name="InsertHeaderFooter"/>
@@ -115,6 +130,7 @@
 
   <xsl:template name="InsertViewSettings">
     <xsl:param name="sheetId"/>
+    <xsl:param name="MergeCell"/>
 
     <sheetViews>
       <sheetView workbookViewId="0">
@@ -273,6 +289,7 @@
   <xsl:template name="InsertSheetContent">
     <xsl:param name="sheetId"/>
     <xsl:param name="cellNumber"/>
+    <xsl:param name="MergeCell"/>
 
     <!-- compute default row height -->
     <xsl:variable name="defaultRowHeight">
@@ -357,6 +374,9 @@
         <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
         <xsl:with-param name="TableColumnTagNum">
           <xsl:value-of select="$ColumnTagNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
         </xsl:with-param>
       </xsl:apply-templates>
 

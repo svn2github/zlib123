@@ -90,6 +90,112 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- calculates power function -->
+  <xsl:template name="Power">
+    <xsl:param name="base"/>
+    <xsl:param name="exponent"/>
+    <xsl:param name="value1" select="$base"/>
+    
+    <xsl:choose>
+      <xsl:when test="$exponent = 0">
+        <xsl:text>1</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$exponent &gt; 1">
+            <xsl:call-template name="Power">
+              <xsl:with-param name="base">
+                <xsl:value-of select="$base"/>
+              </xsl:with-param>
+              <xsl:with-param name="exponent">
+                <xsl:value-of select="$exponent -1"/>
+              </xsl:with-param>
+              <xsl:with-param name="value1">
+                <xsl:value-of select="$value1 * $base"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$value1"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- translates literal index to number -->
+  <xsl:template name="GetAlphabeticPosition">
+    <xsl:param name="literal"/>
+    <xsl:param name="number" select="0"/>
+    <xsl:param name="level" select="0"/>
+    
+    <xsl:variable name="lastCharacter">
+      <xsl:value-of select="substring($literal,string-length($literal),1)"/>
+    </xsl:variable>
+    
+    <xsl:variable name="lastCharacterPosition">
+      <xsl:call-template name="CharacterToPosition">
+        <xsl:with-param name="character" select="$lastCharacter"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="power">
+      <xsl:call-template name="Power">
+        <xsl:with-param name="base" select="26"/>
+        <xsl:with-param name="exponent" select="$level"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="string-length($literal)>1">
+        <xsl:call-template name="GetAlphabeticPosition">
+          <xsl:with-param name="literal" select="substring($literal,0,string-length($literal))"/>
+          <xsl:with-param name="level" select="$level+1"/>
+          <xsl:with-param name="number">
+            <xsl:value-of select="$lastCharacterPosition*$power + $number"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$lastCharacterPosition*$power + $number"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- returns position in alphabet of a single character-->
+  <xsl:template name="CharacterToPosition">
+    <xsl:param name="character"/>
+    
+    <xsl:choose>
+      <xsl:when test="$character='A'">1</xsl:when>
+      <xsl:when test="$character='B'">2</xsl:when>
+      <xsl:when test="$character='C'">3</xsl:when>
+      <xsl:when test="$character='D'">4</xsl:when>
+      <xsl:when test="$character='E'">5</xsl:when>
+      <xsl:when test="$character='F'">6</xsl:when>
+      <xsl:when test="$character='G'">7</xsl:when>
+      <xsl:when test="$character='H'">8</xsl:when>
+      <xsl:when test="$character='I'">9</xsl:when>
+      <xsl:when test="$character='J'">10</xsl:when>
+      <xsl:when test="$character='K'">11</xsl:when>
+      <xsl:when test="$character='L'">12</xsl:when>
+      <xsl:when test="$character='M'">13</xsl:when>
+      <xsl:when test="$character='N'">14</xsl:when>
+      <xsl:when test="$character='O'">15</xsl:when>
+      <xsl:when test="$character='P'">16</xsl:when>
+      <xsl:when test="$character='Q'">17</xsl:when>
+      <xsl:when test="$character='R'">18</xsl:when>
+      <xsl:when test="$character='S'">19</xsl:when>
+      <xsl:when test="$character='T'">20</xsl:when>
+      <xsl:when test="$character='U'">21</xsl:when>
+      <xsl:when test="$character='V'">22</xsl:when>
+      <xsl:when test="$character='W'">23</xsl:when>
+      <xsl:when test="$character='X'">24</xsl:when>
+      <xsl:when test="$character='Y'">25</xsl:when>
+      <xsl:when test="$character='Z'">26</xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
   <!-- template to convert column width -->
   <xsl:template name="ConvertToCharacters">
     <xsl:param name="width"/>
@@ -160,9 +266,9 @@
     </xsl:choose>
 
   </xsl:template>
+  
   <xsl:template name="GetRowNum">
-    <xsl:param name="cell"/>
-    
+    <xsl:param name="cell"/>    
     <xsl:choose>
       <xsl:when test="number($cell)">
         <xsl:value-of select="$cell"/>
@@ -174,4 +280,29 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  
+  <!-- gets a column number from cell coordinates -->
+  <xsl:template name="GetColNum">
+    <xsl:param name="cell"/>
+    <xsl:param name="columnId"/>
+    
+    <xsl:choose>
+      <!-- when whole literal column id has been extracted than convert alphabetic index to number -->
+      <xsl:when test="number($cell)">
+        <xsl:call-template name="GetAlphabeticPosition">
+          <xsl:with-param name="literal" select="$columnId"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!--  recursively extract literal column id (i.e if $cell='GH15' it will return 'GH') -->
+      <xsl:otherwise>
+        <xsl:call-template name="GetColNum">
+          <xsl:with-param name="cell" select="substring-after($cell,substring($cell,1,1))"/>
+          <xsl:with-param name="columnId" select="concat($columnId,substring($cell,1,1))"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
 </xsl:stylesheet>

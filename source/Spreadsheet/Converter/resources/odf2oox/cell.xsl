@@ -272,6 +272,8 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="defaultRowHeight"/>
     <xsl:param name="TableColumnTagNum"/>
+    <xsl:param name="MergeCell"/>
+    
     <xsl:variable name="height">
       <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
@@ -281,9 +283,10 @@
         <xsl:with-param name="unit">point</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    
     <xsl:if
       test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or $height != $defaultRowHeight or table:covered-table-cell">
-      
+     
       <row r="{$rowNumber}">
 
         <!-- insert row height -->
@@ -308,6 +311,9 @@
           <xsl:with-param name="cellNumber" select="$cellNumber"/>
           <xsl:with-param name="TableColumnTagNum">
             <xsl:value-of select="$TableColumnTagNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
           </xsl:with-param>
         </xsl:apply-templates>
       </row>
@@ -335,6 +341,9 @@
           </xsl:with-param>
           <xsl:with-param name="TableColumnTagNum">
             <xsl:value-of select="$TableColumnTagNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:if>
@@ -364,6 +373,9 @@
         <xsl:with-param name="TableColumnTagNum">
           <xsl:value-of select="$TableColumnTagNum"/>
         </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
       </xsl:apply-templates>
     </xsl:if>
 
@@ -378,10 +390,11 @@
     <xsl:param name="height"/>
     <xsl:param name="defaultRowHeight"/>
     <xsl:param name="TableColumnTagNum"/>
+    <xsl:param name="MergeCell"/>
     
     <xsl:choose>
       <xsl:when test="$numberRowsRepeated &gt; 1">
-        
+
           <row>
             <xsl:attribute name="r">
               <xsl:value-of select="$rowNumber"/>
@@ -406,6 +419,9 @@
               <xsl:with-param name="cellNumber" select="$cellNumber"/>
               <xsl:with-param name="TableColumnTagNum">
                 <xsl:value-of select="$TableColumnTagNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="MergeCell">
+                <xsl:value-of select="$MergeCell"/>
               </xsl:with-param>
             </xsl:apply-templates>
           </row>
@@ -434,6 +450,9 @@
             <xsl:with-param name="TableColumnTagNum">
               <xsl:value-of select="$TableColumnTagNum"/>
             </xsl:with-param>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
 
@@ -447,6 +466,7 @@
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
     <xsl:param name="TableColumnTagNum"/>
+    <xsl:param name="MergeCell"/>
 
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
@@ -462,6 +482,9 @@
       <xsl:with-param name="TableColumnTagNum">
         <xsl:value-of select="$TableColumnTagNum"/>
       </xsl:with-param>
+      <xsl:with-param name="MergeCell">
+        <xsl:value-of select="$MergeCell"/>
+      </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
 
@@ -471,6 +494,7 @@
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
     <xsl:param name="TableColumnTagNum"/>
+    <xsl:param name="MergeCell"/>
 
     <xsl:choose>
       <!-- Checks if  next index is table:table-cell-->
@@ -494,6 +518,9 @@
           </xsl:with-param>
           <xsl:with-param name="TableColumnTagNum">
             <xsl:value-of select="$TableColumnTagNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
@@ -520,6 +547,9 @@
           <xsl:with-param name="TableColumnTagNum">
             <xsl:value-of select="$TableColumnTagNum"/>
           </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -534,9 +564,10 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="ColumnRepeated"/>
     <xsl:param name="TableColumnTagNum"/>
+    <xsl:param name="MergeCell"/>
 
-    <!-- do not show covered cells content -->
-    <xsl:if test="name(.) = 'table:table-cell' ">
+    <!-- do not show covered cells content -->    
+    
       <xsl:call-template name="InsertCell">
         <xsl:with-param name="colNumber">
           <xsl:value-of select="$colNumber"/>
@@ -550,8 +581,12 @@
         <xsl:with-param name="TableColumnTagNum">
           <xsl:value-of select="$TableColumnTagNum"/>
         </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
       </xsl:call-template>
-    </xsl:if>
+    
+    
 
     <!-- Insert cells if "@table:number-columns-repeated"  > 1 -->
     <xsl:choose>
@@ -572,6 +607,9 @@
           <xsl:with-param name="TableColumnTagNum">
             <xsl:value-of select="$TableColumnTagNum"/>
           </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
         </xsl:call-template>
 
       </xsl:when>
@@ -591,6 +629,9 @@
           <xsl:with-param name="TableColumnTagNum">
             <xsl:value-of select="$TableColumnTagNum"/>
           </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
         </xsl:call-template>
 
       </xsl:otherwise>
@@ -603,6 +644,8 @@
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
     <xsl:param name="TableColumnTagNum"/>
+    <xsl:param name="MergeCell"/>
+    
 
     <xsl:variable name="columnCellStyle">
       <xsl:call-template name="GetColumnCellStyle">
@@ -615,7 +658,23 @@
       </xsl:call-template>
     </xsl:variable>
     
-    <xsl:if test="child::text:p or $columnCellStyle != '' or @table:style-name != ''">
+<xsl:variable name="CheckIfMerge">
+    <xsl:call-template name="CheckIfMergeColl">
+      <xsl:with-param name="MergeCell">
+        <xsl:value-of select="$MergeCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="colNumber">
+        <xsl:value-of select="$colNumber + 1"/>
+      </xsl:with-param>
+      <xsl:with-param name="rowNumber">
+        <xsl:value-of select="$rowNumber"/>
+      </xsl:with-param>
+    </xsl:call-template>
+</xsl:variable>
+    
+
+    <xsl:if test="child::text:p or $columnCellStyle != '' or @table:style-name != '' or $CheckIfMerge != 'false'">
+      
       <c>
         <xsl:attribute name="r">
           <xsl:variable name="colChar">
