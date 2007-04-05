@@ -463,7 +463,7 @@
   <!-- convert font size -->
   <xsl:template match="e:sz" mode="style">
     <xsl:attribute name="fo:font-size">
-      <xsl:value-of select="@val"/>
+      <xsl:value-of select="round(@val)"/>
     </xsl:attribute>
   </xsl:template>
 
