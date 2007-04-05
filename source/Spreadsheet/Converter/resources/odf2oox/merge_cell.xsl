@@ -97,94 +97,43 @@
   </xsl:template>
   
   
-  <!-- Check if this cell is in merge cells -->
+  <!-- Check if this cell is starting merge cells -->
   <xsl:template name="CheckIfMergeColl">
    <xsl:param name="MergeCell"/>     
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
 
-    <xsl:variable name="Merge">
-      <xsl:value-of select="substring-before($MergeCell, ';')"/>
-    </xsl:variable>
-    
-    <xsl:variable name="MergeStart">
-      <xsl:value-of select="substring-before($Merge, ':')"/>
-    </xsl:variable>
-    
-    <xsl:variable name="MergeEnd">
-      <xsl:value-of select="substring-after($Merge, ':')"/>
-    </xsl:variable>
-    
-  
-   <xsl:variable name="StartColl">
-    <xsl:if test="$MergeStart != ''">
-    <xsl:call-template name="GetColNum">
-      <xsl:with-param name="cell">
-          <xsl:value-of select="$MergeStart"/>
-      </xsl:with-param>
-    </xsl:call-template>
-    </xsl:if>
-   </xsl:variable>
-    
-    <xsl:variable name="EndColl">
-      <xsl:if test="$MergeEnd != ''">
-        <xsl:call-template name="GetColNum">
-          <xsl:with-param name="cell">
-            <xsl:value-of select="$MergeEnd"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:if>
-    </xsl:variable>
-    
-    <xsl:variable name="StartRow">
-      <xsl:if test="$MergeStart != ''">
-      <xsl:call-template name="GetRowNum">
-        <xsl:with-param name="cell">
-          <xsl:value-of select="$MergeStart"/>
-        </xsl:with-param>
-      </xsl:call-template>
-      </xsl:if>
-    </xsl:variable>
-    
-    <xsl:variable name="EndRow">
-      <xsl:if test="$MergeEnd != ''">
-      <xsl:call-template name="GetRowNum">
-        <xsl:with-param name="cell">
-          <xsl:value-of select="$MergeEnd"/>
-        </xsl:with-param>
-      </xsl:call-template>
-      </xsl:if>
-    </xsl:variable>
-    
     <xsl:choose>
-      <xsl:when test="$EndRow = '' or $StartRow = '' or $EndColl = '' or $StartColl = '' or $EndRow = 'NaN' or $StartRow = 'NaN' or $EndColl = 'NaN' or $StartColl = 'NaN'">
-        <xsl:text>false</xsl:text>
-      </xsl:when>
-      <xsl:when test="$EndColl &gt;= $colNumber and $colNumber = $StartColl and $EndRow &gt;= $rowNumber and $StartRow = $rowNumber">
-        <xsl:text>start</xsl:text>  
-      </xsl:when>
-      <xsl:when test="$EndColl &gt;= $colNumber and $colNumber &gt;= $StartColl and $EndRow &gt;= $rowNumber and  $rowNumber &gt;= $StartRow">
-        <xsl:text>true</xsl:text>
-      </xsl:when>
-      <xsl:when test="substring-after($MergeCell, ';') != ''">
-        <xsl:call-template name="CheckIfMergeColl">
-          <xsl:with-param name="MergeCell">
-            <xsl:value-of select="substring-after($MergeCell, ';')"/>
-          </xsl:with-param>
-          <xsl:with-param name="rowNumber">
-            <xsl:value-of select="$rowNumber"/>
-          </xsl:with-param>
-          <xsl:with-param name="colNumber">
-            <xsl:value-of select="$colNumber"/>
-          </xsl:with-param>
-        </xsl:call-template>
+      <xsl:when test="$MergeCell != ''">
+        
+        <xsl:variable name="Merge">
+          <xsl:value-of select="concat(';', $MergeCell)"/>
+        </xsl:variable>
+        
+        <xsl:variable name="CollChar">
+          <xsl:call-template name="NumbersToChars">
+            <xsl:with-param name="num">
+              <xsl:value-of select="$colNumber"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:variable name="Cell">
+          <xsl:value-of select="concat(';', concat(concat($CollChar, $rowNumber), ':'))"/>
+        </xsl:variable>
+
+        <xsl:choose>
+          <xsl:when test="contains($Merge, $Cell)">
+            <xsl:text>start</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>false</xsl:otherwise>
+        </xsl:choose>
+        
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>false</xsl:text>
       </xsl:otherwise>
-      </xsl:choose>
-    
-   
+    </xsl:choose>
     
   </xsl:template>
   

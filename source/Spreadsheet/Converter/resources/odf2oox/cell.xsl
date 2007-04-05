@@ -664,7 +664,7 @@
         <xsl:value-of select="$MergeCell"/>
       </xsl:with-param>
       <xsl:with-param name="colNumber">
-        <xsl:value-of select="$colNumber + 1"/>
+        <xsl:value-of select="$colNumber"/>
       </xsl:with-param>
       <xsl:with-param name="rowNumber">
         <xsl:value-of select="$rowNumber"/>
@@ -673,7 +673,7 @@
 </xsl:variable>
     
 
-    <xsl:if test="child::text:p or $columnCellStyle != '' or @table:style-name != '' or $CheckIfMerge != 'false'">
+    <xsl:if test="child::text:p or $columnCellStyle != '' or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start'">
       
       <c>
         <xsl:attribute name="r">
@@ -684,7 +684,7 @@
           </xsl:variable>
           <xsl:value-of select="concat($colChar,$rowNumber)"/>
         </xsl:attribute>
-        
+        <xsl:if test="name() != 'table:covered-table-cell' and $CheckIfMerge != 'start'">
         <!-- insert cell style number -->
         <xsl:choose>
           <!-- if it is a multiline cell -->
@@ -726,8 +726,7 @@
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
-        
-
+          </xsl:if>
         <!-- convert cell type -->
         <xsl:if test="child::text:p">
           <xsl:choose>
