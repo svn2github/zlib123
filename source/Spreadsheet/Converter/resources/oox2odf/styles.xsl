@@ -607,6 +607,16 @@
               <xsl:when test="@paperSize">
                 <xsl:call-template name="InsertPaperSize">
                   <xsl:with-param name="paperSize" select="@paperSize"/>
+                  <xsl:with-param name="orientation">
+                    <xsl:choose>
+                      <xsl:when test="@orientation = 'landscape' ">
+                        <xsl:text>landscape</xsl:text>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:text>portrait</xsl:text>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
                 </xsl:call-template>
               </xsl:when>
               <!-- Letter -->
@@ -665,7 +675,7 @@
                 </xsl:choose>
               </xsl:attribute>
             </xsl:if>
-            
+
             <!-- scale printout -->
             <xsl:if test="@scale">
               <xsl:attribute name="style:scale-to">
@@ -780,98 +790,198 @@
 
   <xsl:template name="InsertPaperSize">
     <xsl:param name="paperSize"/>
+    <xsl:param name="orientation"/>
 
     <xsl:choose>
-      <!-- A3 -->
-      <xsl:when test="$paperSize=8">
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>42cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>29.699cm</xsl:text>
-        </xsl:attribute>
+      <xsl:when test="$orientation='landscape' ">
+        <xsl:choose>
+          <!-- A3 -->
+          <xsl:when test="$paperSize=8">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>42cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A4 -->
+          <xsl:when test="$paperSize=9">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A5 -->
+          <xsl:when test="$paperSize=11">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>14.799cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- B4 (JIS) -->
+          <xsl:when test="$paperSize=12">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>36.4cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>25.7cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- B5 (JIS) -->
+          <xsl:when test="$paperSize=13">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>25.7cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>18.2cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Letter -->
+          <xsl:when test="$paperSize=1">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>27.94cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>21.59cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Tabloid -->
+          <xsl:when test="$paperSize=3">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>43.127cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>27.958cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Legal -->
+          <xsl:when test="$paperSize=5">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>35.565cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>21.59cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="$paperSize=43">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>14.8cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>10cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A4 as default -->
+          <xsl:otherwise>
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>        
       </xsl:when>
-      <!-- A4 -->
-      <xsl:when test="$paperSize=9">
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>29.699cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>20.999cm</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      <!-- A5 -->
-      <xsl:when test="$paperSize=11">
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>20.999cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>14.799cm</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      <!-- B4 (JIS) -->
-      <xsl:when test="$paperSize=12">
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>36.4cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>25.7cm</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      <!-- B5 (JIS) -->
-      <xsl:when test="$paperSize=13">
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>25.7cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>18.2cm</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      <!-- Letter -->
-      <xsl:when test="$paperSize=1">
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>27.94cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>21.59cm</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      <!-- Tabloid -->
-      <xsl:when test="$paperSize=3">
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>43.127cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>27.958cm</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      <!-- Legal -->
-      <xsl:when test="$paperSize=5">
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>35.565cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>21.59cm</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:when test="$paperSize=43">
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>14.8cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>10cm</xsl:text>
-        </xsl:attribute>
-      </xsl:when>
-      <!-- A4 as default -->
+      <!-- when orientation is 'portrait' -->
       <xsl:otherwise>
-        <xsl:attribute name="fo:page-width">
-          <xsl:text>29.699cm</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="fo:page-height">
-          <xsl:text>20.999cm</xsl:text>
-        </xsl:attribute>
+        <xsl:choose>
+          <!-- A3 -->
+          <xsl:when test="$paperSize=8">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>42cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A4 -->
+          <xsl:when test="$paperSize=9">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A5 -->
+          <xsl:when test="$paperSize=11">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>14.799cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- B4 (JIS) -->
+          <xsl:when test="$paperSize=12">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>25.7cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>36.4cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- B5 (JIS) -->
+          <xsl:when test="$paperSize=13">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>18.2cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>25.7cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Letter -->
+          <xsl:when test="$paperSize=1">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>21.59cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>27.94cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Tabloid -->
+          <xsl:when test="$paperSize=3">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>27.958cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>43.127cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Legal -->
+          <xsl:when test="$paperSize=5">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>21.59cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>35.565cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="$paperSize=43">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>10cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>14.8cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A4 as default -->
+          <xsl:otherwise>
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>        
       </xsl:otherwise>
     </xsl:choose>
+
   </xsl:template>
 
 </xsl:stylesheet>
