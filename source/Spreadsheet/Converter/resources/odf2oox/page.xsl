@@ -26,17 +26,24 @@
   * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="svg">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+  xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="svg">
 
   <xsl:template name="OddHeaderFooter">
-    <xsl:for-each select="office:master-styles/style:master-page[@style:name = 'Default']/style:header">
+    <xsl:for-each
+      select="office:master-styles/style:master-page[@style:name = 'Default']/style:header">
       <xsl:if test="not(@style:display = 'false' )">
         <oddHeader xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></oddHeader>
       </xsl:if>
     </xsl:for-each>
 
-    <xsl:for-each select="office:master-styles/style:master-page[@style:name = 'Default']/style:footer">
+    <xsl:for-each
+      select="office:master-styles/style:master-page[@style:name = 'Default']/style:footer">
       <xsl:if test="not(@style:display = 'false' )">
         <oddFooter xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></oddFooter>
       </xsl:if>
@@ -44,17 +51,50 @@
   </xsl:template>
 
   <xsl:template name="EvenHeaderFooter">
-    <xsl:for-each select="office:master-styles/style:master-page[@style:name = 'Default']/style:header-left">
-      <xsl:if test="not(@style:display = 'false' )">
-        <evenHeader xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenHeader>
-      </xsl:if>
-    </xsl:for-each>
+    <!-- if there is even header or footer -->
+    <xsl:if
+      test="office:master-styles/style:master-page[@style:name = 'Default']/style:header-left[not(@style:display = 'false' )] or office:master-styles/style:master-page[@style:name = 'Default']/style:footer-left[not(@style:display = 'false' )]">
 
-    <xsl:for-each select="office:master-styles/style:master-page[@style:name = 'Default']/style:footer-left">
-      <xsl:if test="not(@style:display = 'false' )">
-        <evenFooter xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenFooter>
-      </xsl:if>
-    </xsl:for-each>
+      <!-- print even header -->
+      <xsl:choose>
+        <!-- if even header has to be printed then print it -->
+        <xsl:when
+          test="office:master-styles/style:master-page[@style:name = 'Default']/style:header-left[not(@style:display = 'false' )]">
+          <xsl:for-each
+            select="office:master-styles/style:master-page[@style:name = 'Default']/style:header-left">
+            <evenHeader xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenHeader>
+          </xsl:for-each>
+        </xsl:when>
+        <!-- if not then if odd header has to be printed - print it also for even pages -->
+        <xsl:when
+          test="office:master-styles/style:master-page[@style:name = 'Default']/style:header[not(@style:display = 'false' )] and office:master-styles/style:master-page[@style:name = 'Default']/style:footer-left[not(@style:display = 'false' )]">
+          <xsl:for-each
+            select="office:master-styles/style:master-page[@style:name = 'Default']/style:header">
+            <evenHeader xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenHeader>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
+
+      <!-- print even footer -->
+      <xsl:choose>
+        <!-- if even footer has to be printed then print it -->
+        <xsl:when
+          test="office:master-styles/style:master-page[@style:name = 'Default']/style:footer-left[not(@style:display = 'false' )]">
+          <xsl:for-each
+            select="office:master-styles/style:master-page[@style:name = 'Default']/style:footer-left">
+            <evenFooter xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenFooter>
+          </xsl:for-each>
+        </xsl:when>
+        <!-- if not then if odd footer has to be printed - print it also for even pages -->
+        <xsl:when
+          test="office:master-styles/style:master-page[@style:name = 'Default']/style:footer[not(@style:display = 'false' )] and office:master-styles/style:master-page[@style:name = 'Default']/style:header-left[not(@style:display = 'false' )]">
+          <xsl:for-each
+            select="office:master-styles/style:master-page[@style:name = 'Default']/style:footer">
+            <evenFooter xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenFooter>
+          </xsl:for-each>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
 
   <!-- TO DO pictures in header and footer -->
@@ -116,7 +156,8 @@
 
     <xsl:choose>
       <!-- if this span has the same style as previous then don't duplicate tags -->
-      <xsl:when test="preceding-sibling::node()[1][name() = 'text:span' and @text:style-name = $style]"/>
+      <xsl:when
+        test="preceding-sibling::node()[1][name() = 'text:span' and @text:style-name = $style]"/>
       <xsl:otherwise>
         <xsl:for-each select="key('style',$style)/style:text-properties">
           <xsl:if test="@style:font-name or @fo:font-style or @fo:font-weight">
@@ -124,7 +165,9 @@
 
             <xsl:choose>
               <xsl:when test="@style:font-name">
-                <xsl:value-of select="translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"/>
+                <xsl:value-of
+                  select="translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
+                />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:text>Arial</xsl:text>
@@ -176,7 +219,8 @@
             </xsl:choose>
           </xsl:if>
 
-          <xsl:if test="@style:text-line-through-style and @style:text-line-through-style != 'none' ">
+          <xsl:if
+            test="@style:text-line-through-style and @style:text-line-through-style != 'none' ">
             <xsl:text>&amp;S</xsl:text>
           </xsl:if>
 
@@ -197,7 +241,8 @@
     <xsl:apply-templates mode="pageTag"/>
 
     <!-- if next text:span has different style switch-off formatings which require switching-off (underline, subscript, superscript)-->
-    <xsl:if test="not(following-sibling::node()[1][name() = 'text:span' and @text:style-name = $style])">
+    <xsl:if
+      test="not(following-sibling::node()[1][name() = 'text:span' and @text:style-name = $style])">
       <xsl:for-each select="key('style',$style)/style:text-properties">
         <xsl:if test="@style:text-underline-style and @style:text-underline-style != 'none' ">
           <xsl:choose>

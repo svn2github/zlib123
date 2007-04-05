@@ -385,12 +385,12 @@
 
   <xsl:template name="InsertHeaderFooter">
     <xsl:if
-      test="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header/child::node() or
-    document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:footer/child::node()">
+      test="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header[not(@style:display = 'false' )]/child::node() or
+      document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:footer[not(@style:display = 'false' )]/child::node()">
       <headerFooter>
         <xsl:for-each
-          select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header-left">
-          <xsl:if test="not(@style:display = 'false' )">
+          select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']">
+          <xsl:if test="not(style:header-left/@style:display = 'false' ) or not(style:footer-left/@style:display = 'false' )">
             <xsl:attribute name="differentOddEven">
               <xsl:text>1</xsl:text>
             </xsl:attribute>
