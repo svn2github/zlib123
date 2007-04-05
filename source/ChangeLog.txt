@@ -1,5 +1,45 @@
 History of changes
 ------------------
+Release R2101 (M2) (2007-04-04)
+
+Fixed bug: #1681269 Content Alignment
+Added Format > Page > Page
+Added Format > PrintRanges > Edit > PrintRange
+Added Big Merge Col(reverse conversion)
+Improved Column Width
+Added Format > Cells > Borders(direct conversion)
+Added Format > Page > Sheet
+Added Format > Cells > Numbers > Options
+
+Release R2101 (M1) (2007-04-04)
+
+Fixed bug: #1681269 Content Alignment
+Improved Column Width
+
+Release R2082 (M2) (2007-03-30)
+
+Added Format > Cells > Numbers > Options(direct)
+Added Format > Cells > Numbers > Format
+Added Edit > Headers & Footers(direct)
+Fixed bug: #1685964 Font not properly retained(empty cells)
+Partly Added "Big Merge Column"
+Fixed bug: #1686782 1 blank is converted to 3 blanks
+Fixed bug: #1686634 single space eliminated in round trip conversion
+Fixed bug: #1686766 RoundTrip Conversion Crash: Diagrammtypen.xlsx
+Fixed formula result text
+Improved multiline cells style
+Fixed bug: #1684407 Excel displays " ", OOo displays "0"
+Cleaned OpenOffice namespaces entries
+
+Release R2082 (M1) (2007-03-30)
+
+Fixed bug: #1685964 Font not properly retained(empty cells)
+Fixed bug: #1686782 1 blank is converted to 3 blanks
+Fixed bug: #1686634 single space eliminated in round trip conversion
+Fixed bug: #1686766 RoundTrip Conversion Crash: Diagrammtypen.xlsx
+Fixed bug: #1684407 Excel displays " ", OOo displays "0"
+Cleaned OpenOffice namespaces entries
+
 Release R2053 (M1) (2007-03-22)
 Fixed bug: #1679681 (add-in fails to convert ods file consisting paragraphs)
 Added Readme files
