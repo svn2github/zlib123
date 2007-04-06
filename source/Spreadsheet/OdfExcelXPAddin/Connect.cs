@@ -305,10 +305,17 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                             ci = System.Threading.Thread.CurrentThread.CurrentCulture;
                             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-                            Microsoft.Office.Interop.Excel.Workbook wb =
-                                this.applicationObject.Workbooks.Open((string)fileName, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+                            try
+                            {
+                                Microsoft.Office.Interop.Excel.Workbook wb =
+                                    this.applicationObject.Workbooks.Open((string)fileName, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
 
-                            wb.Activate();
+                                wb.Activate();
+                            }
+                            catch
+                            {
+                                return;
+                            }
 
                             System.Threading.Thread.CurrentThread.CurrentCulture = ci;
                         }
