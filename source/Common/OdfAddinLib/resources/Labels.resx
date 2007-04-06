@@ -156,7 +156,6 @@
   <data name="EncryptedDocumentLabel" xml:space="preserve">
     <value>This document is password protected.</value>
   </data>
-  <!-- 02/12/07 -->
   <data name="PossiblyEncryptedDocument" xml:space="preserve">
     <value>The zip archive could not be opened. Please check your document is not encrypted.</value>
   </data>
@@ -184,5 +183,7 @@
   <data name="UnableToCreateOutputLabel" xml:space="preserve">
     <value>Unable to create target file</value>
   </data>
-  
+  <data name="OdfConversionCanceled" xml:space="preserve">
+    <value>The conversion is canceled by the user</value>
+  </data>
 </root>

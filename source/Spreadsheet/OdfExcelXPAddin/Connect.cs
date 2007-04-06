@@ -314,6 +314,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                             }
                             catch
                             {
+                                System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfConversionCanceled"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
                                 return;
                             }
 
