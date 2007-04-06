@@ -324,6 +324,39 @@
         </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
+
+
+ <!-- Check if 256 column are hidden -->
+      <xsl:variable name="CheckCollHidden">
+        <xsl:apply-templates select="table:table-column[1]" mode="defaultColWidth">
+        <xsl:with-param name="colNumber">
+        <xsl:text>1</xsl:text>
+        </xsl:with-param>
+        <xsl:with-param name="result">
+        <xsl:text>false</xsl:text>
+        </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:variable>
+      
+      <!-- Check if 65536 rows are hidden -->
+
+      <xsl:variable name="CheckRowHidden">
+        <xsl:choose>
+          <xsl:when test="table:table-row[@table:visibility='collapse']">
+              <xsl:apply-templates select="table:table-row[1]" mode="zeroHeight">
+                <xsl:with-param name="rowNumber">
+                  <xsl:text>0</xsl:text>
+                </xsl:with-param>
+              </xsl:apply-templates>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+
+
     <xsl:variable name="defaultFontSize">
       <xsl:choose>
         <xsl:when test="contains($baseFontSize,'pt')">
@@ -337,16 +370,44 @@
 
     <!-- compute default column width -->
     <xsl:variable name="defaultColWidth">
-      <xsl:call-template name="ConvertToCharacters">
-        <xsl:with-param name="width">
-          <xsl:value-of select="concat('0.8925','in')"/>
-        </xsl:with-param>
-        <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
-      </xsl:call-template>
+       <xsl:choose>
+          <xsl:when test="$CheckCollHidden != 'true'">
+            <xsl:call-template name="ConvertToCharacters">          
+              <xsl:with-param name="width">
+                <xsl:value-of select="concat('0.8925','in')"/>
+              </xsl:with-param>
+              <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>          
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>      
     </xsl:variable>
 
-    <sheetFormatPr defaultColWidth="{$defaultColWidth}" defaultRowHeight="{$defaultRowHeight}"
-      customHeight="true"/>
+  <sheetFormatPr>
+        
+        <xsl:attribute name="defaultColWidth">
+          <xsl:value-of select="$defaultColWidth"/>
+        </xsl:attribute>
+        
+        <xsl:attribute name="defaultRowHeight">
+          <xsl:value-of select="$defaultRowHeight"/>
+        </xsl:attribute>
+        
+        <xsl:attribute name="customHeight">
+          <xsl:text>true</xsl:text>
+        </xsl:attribute>
+        
+        <xsl:if test="$CheckRowHidden = 'true'">
+          <xsl:attribute name="zeroHeight">
+            <xsl:text>1</xsl:text>
+          </xsl:attribute>  
+        </xsl:if>
+        
+        
+      </sheetFormatPr> 
+
     <xsl:if test="table:table-column">
       <cols>
 
@@ -378,6 +439,9 @@
         <xsl:with-param name="MergeCell">
           <xsl:value-of select="$MergeCell"/>
         </xsl:with-param>
+        <xsl:with-param name="CheckRowHidden">
+            <xsl:value-of select="$CheckRowHidden"/>
+          </xsl:with-param>
       </xsl:apply-templates>
 
     </sheetData>

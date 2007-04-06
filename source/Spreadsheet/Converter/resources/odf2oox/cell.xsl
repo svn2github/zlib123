@@ -47,17 +47,21 @@
       <xsl:value-of select="generate-id(ancestor::table:table)"/>
     </xsl:variable>
 
+  <xsl:variable name="max">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+          <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$colNumber"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+ <xsl:if test="not($max = '256' and @table:visibility = 'collapse')">
     <col min="{$colNumber}">
-      <xsl:attribute name="max">
-        <xsl:choose>
-          <xsl:when test="@table:number-columns-repeated">
-            <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$colNumber"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
+       <xsl:attribute name="max">
+          <xsl:value-of select="$max"/>
+        </xsl:attribute>
 
       <!-- insert column width -->
       <xsl:if
@@ -99,6 +103,7 @@
         </xsl:if>
       </xsl:if>
     </col>
+</xsl:if>
 
     <!-- insert next column -->
     <xsl:if test="following-sibling::table:table-column">
@@ -118,6 +123,58 @@
     </xsl:if>
 
   </xsl:template>
+
+<!-- Check if 256 column are hidden -->
+
+  <xsl:template match="table:table-column" mode="defaultColWidth">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="result"/>
+
+    <xsl:variable name="max">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+          <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$colNumber"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="not($max = '256' and @table:visibility = 'collapse')">
+        <!-- insert next column -->
+        <xsl:choose>
+          <xsl:when test="following-sibling::table:table-column">
+            <xsl:apply-templates select="following-sibling::table:table-column[1]"
+              mode="defaultColWidth">
+              <xsl:with-param name="colNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-columns-repeated">
+                    <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$colNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+              <xsl:with-param name="result">
+                <xsl:text>false</xsl:text>
+              </xsl:with-param>
+            </xsl:apply-templates>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$result"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>true</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
 
   <!-- Create Variable with "Default Style Name" -->
   <xsl:template name="CreateDefaultTag">
@@ -266,6 +323,147 @@
 
   </xsl:template>
 
+ <!-- Check if 65536 rows are hidden -->
+
+  <xsl:template match="table:table-row" mode="zeroHeight">
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="collapse"/>
+
+    <!--xsl:choose>
+      <xsl:when test="not(following-sibling::table:table-row) and @table:visibility='collapse'">
+        <xsl:variable name="CheckNumber">
+        <xsl:choose>
+          <xsl:when test="@table:number-rows-repeated">
+            <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$rowNumber+1"/>
+          </xsl:otherwise>
+        </xsl:choose>   
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="$CheckNumber = '65536'">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="following-sibling::table:table-row[@table:visibility='collapse']">
+        <xsl:choose>
+          <xsl:when test="following-sibling::node()[1][name() = table:table-header-rows]">
+            <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="zeroHeight">
+              <xsl:with-param name="rowNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-rows-repeated">
+                    <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$rowNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>      
+            </xsl:apply-templates>      
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="zeroHeight">
+              <xsl:with-param name="rowNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-rows-repeated">
+                    <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$rowNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>      
+            </xsl:apply-templates>          
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>false</xsl:text>
+      </xsl:otherwise>
+      </xsl:choose-->
+
+    <xsl:choose>
+      <xsl:when test="not(following-sibling::table:table-row or following-sibling::table:table-header-rows) and @table:visibility='collapse'">
+        <xsl:variable name="CheckNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-rows-repeated">
+              <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$rowNumber+1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="$CheckNumber = '65536'">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="following-sibling::table:table-row[@table:visibility='collapse'] or parent::node()/following-sibling::table:table-row[@table:visibility='collapse']">
+        <xsl:choose>
+          <xsl:when test="name(following-sibling::node()[1]) = 'table:table-row'">
+            <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="zeroHeight">
+              <xsl:with-param name="rowNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-rows-repeated">
+                    <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$rowNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+            </xsl:apply-templates>    
+          </xsl:when>
+          <xsl:when test="name(following-sibling::node()[1]) = 'table:table-header-rows'">
+            <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]" mode="zeroHeight">
+              <xsl:with-param name="rowNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-rows-repeated">
+                    <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$rowNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+            </xsl:apply-templates>    
+          </xsl:when>
+          <xsl:when test="name(parent::node()) = 'table:table-header-rows' and parent::node()/following-sibling::table:table-row">
+            <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]" mode="zeroHeight">
+              <xsl:with-param name="rowNumber">
+                <xsl:choose>
+                  <xsl:when test="@table:number-rows-repeated">
+                    <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$rowNumber+1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+            </xsl:apply-templates>    
+          </xsl:when>
+        </xsl:choose>
+        
+        
+         
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>false</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
   <!-- insert row into sheet -->
   <xsl:template match="table:table-row" mode="sheet">
     <xsl:param name="rowNumber"/>
@@ -273,6 +471,7 @@
     <xsl:param name="defaultRowHeight"/>
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
+   <xsl:param name="CheckRowHidden"/>
     
     <xsl:variable name="height">
       <xsl:call-template name="ConvertMeasure">
@@ -320,6 +519,8 @@
 
       <!-- insert repeated rows -->
       <xsl:if test="@table:number-rows-repeated">
+ <xsl:if
+          test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true'">
         <xsl:call-template name="InsertRepeatedRows">
           <xsl:with-param name="numberRowsRepeated">
             <xsl:value-of select="@table:number-rows-repeated"/>
@@ -346,6 +547,7 @@
             <xsl:value-of select="$MergeCell"/>
           </xsl:with-param>
         </xsl:call-template>
+        </xsl:if>
       </xsl:if>
 
     </xsl:if>
@@ -375,6 +577,9 @@
         </xsl:with-param>
         <xsl:with-param name="MergeCell">
           <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
+       <xsl:with-param name="CheckRowHidden">
+          <xsl:value-of select="$CheckRowHidden"/>
         </xsl:with-param>
       </xsl:apply-templates>
     </xsl:if>
