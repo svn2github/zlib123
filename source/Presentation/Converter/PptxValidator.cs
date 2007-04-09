@@ -63,8 +63,8 @@ namespace Sonata.OdfConverter.Presentation
             //this.report = report;
 
             // resolver
-            EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetExecutingAssembly(),
-                this.GetType().Namespace, ".resources.", true);
+            EmbeddedResourceResolver resolver = new EmbeddedResourceResolver(Assembly.GetEntryAssembly(),
+                "CleverAge.OdfConverter.CommandLineTool", ".resources.", true);
             this.settings.XmlResolver = resolver;
 
             // schemas
@@ -198,14 +198,22 @@ namespace Sonata.OdfConverter.Presentation
                 ValidateRels(partDir, r);
 
                 //retrieve all ids referenced in the document
+                r.Close(); 
                 Stream doc = reader.GetEntry(docTarget);
                 r = XmlReader.Create(doc);
                 ArrayList ids = new ArrayList();
                 while (r.Read())
                 {
-                    if (r.NodeType == XmlNodeType.Element && r.GetAttribute("id", OOX_DOC_REL_NS) != null)
+                    if (r.LocalName == "custShow")
                     {
-                        ids.Add(r.GetAttribute("id", OOX_DOC_REL_NS));
+                        r.Skip(); 
+                    }
+                    else
+                    {
+                        if (r.NodeType == XmlNodeType.Element && r.GetAttribute("id", OOX_DOC_REL_NS) != null)
+                        {
+                            ids.Add(r.GetAttribute("id", OOX_DOC_REL_NS));
+                        }
                     }
                 }
 
