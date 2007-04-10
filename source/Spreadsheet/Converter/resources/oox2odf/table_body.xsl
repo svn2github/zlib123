@@ -1063,6 +1063,9 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
