@@ -484,7 +484,7 @@
     </xsl:variable>
     
     <xsl:if
-      test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or $height != $defaultRowHeight or table:covered-table-cell">
+      test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or table:covered-table-cell">
      
       <row r="{$rowNumber}">
 
@@ -597,9 +597,11 @@
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
     
+    <xsl:if
+      test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span)">
+      
     <xsl:choose>
       <xsl:when test="$numberRowsRepeated &gt; 1">
-
           <row>
             <xsl:attribute name="r">
               <xsl:value-of select="$rowNumber"/>
@@ -660,9 +662,10 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
-
       </xsl:when>
     </xsl:choose>
+   </xsl:if>
+      
   </xsl:template>
 
   <!-- insert cell into row -->
