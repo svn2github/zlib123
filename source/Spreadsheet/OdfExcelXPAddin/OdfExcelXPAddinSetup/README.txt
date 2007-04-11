@@ -57,24 +57,25 @@ displays "0"')
 Unresolved bugs in M1
 ---------------------
 
-1685358		Roundtrip crash created ODS ECTSrechner2-06_Probex.ods
-1677008 	Temporary file already existing 
-1684407 	Excel displays " ", OOo displays "0" 
-1684410 	Excel displays "-", OOo displays "0" 
-1686735 	Excel displays "Maximal 30 Namen", OOo displays "0" 
-1686766 	Roundtrip Conversion Crash: Diagrammtypen.xlsx 
-1686634 	single space eliminated in round trip conversion 
-1686782 	1 blank is converted to 3 blanks 
-1685964 	Font not properly retained( empty cells). 
-1686676 	Excel displays "", OOo displays "0" 
-1675771 	Conversion increases file size 
-1680462 	Merged cell are not retained after round trip conversion
+#1686766 Roundtrip Conversion Crash: Diagrammtypen.xlsx
+#1673978 Columns not wide enough(OOX -> ODT)
 
-1681269 	Content alignment 
-1685902 	Crash when "file conversion in progress..." canceled. 
-1673978 	Columns not wide enough (OOX -> ODT) 
-1682304		Columns becomes wider (ODF->OOX)
-1686621 	Error msg shown when multiple office versions are
-installed 
-1688240 	Cmd Line Tool-Zip exception during conversion(corrupt
-xlsx) 
+unresolved bugs in M2
+---------------------
+
+#1698244 Add-in crash - corrupt ods file
+#1697444 Command line tool cannot convert xls files
+#1697386 Column widths
+#1696803 Converter not responding
+#1693493 Comments lost after conversion(large text content)
+#1693462 File converter failed to open the file
+#1693458 Total editing time not retained
+#1692861 Thousand separators (conversion not proper for 16000 as 16)
+#1692680 Add-in crashes when header contains large text
+#1692669 Progress status in progress bar is not shown for direct and
+#1692663 Text in cells lost after roundtrip conversion
+#1686746 Format percentage becomes number
+#1679589 Readme/help document
+#1677196 Content lost(fixed lines)
+#1677193 Content lost(first line)
+#1674178 Cell content is lost(2jahre_onpsx.ods)
