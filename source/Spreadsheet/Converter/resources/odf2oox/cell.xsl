@@ -933,7 +933,7 @@
         </xsl:choose>
           </xsl:if>
         <!-- convert cell type -->
-        <xsl:if test="child::text:p">
+        <xsl:if test="child::text:p and not(name() = 'table:covered-table-cell')">
           <xsl:choose>
             <xsl:when
               test="@office:value-type!='string' and @office:value-type != 'percentage' and @office:value-type != 'date' and @office:value-type != 'time' and @office:value-type!='boolean' and (number(text:p) or text:p = 0 or contains(text:p,','))">
