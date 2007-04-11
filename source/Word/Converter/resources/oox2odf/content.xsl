@@ -357,9 +357,13 @@
 
       <!--  check if the paragraf is list element (it can be a heading but only if it's style is NOT linked to a list level 
         - for linked heading styles there's oultine list style created and they can't be in list (see bug  #1619448)) -->
+      
       <xsl:when
         test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
-        and not(document('word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])">
+        and not($outlineLevel != '' and $numId != '' )">
+        <!--xsl:when
+          test="$numId != '' and $level &lt; 10 and document('word/numbering.xml')/w:numbering/w:num[@w:numId=$numId]/w:abstractNumId/@w:val != '' 
+          and not(document('word/styles.xml')/w:styles/w:style[@w:styleId = $styleId and child::w:pPr/w:outlineLvl and child::w:pPr/w:numPr/w:numId])"-->
         <xsl:apply-templates select="." mode="list">
           <xsl:with-param name="numId" select="$numId"/>
           <xsl:with-param name="level" select="$level"/>
