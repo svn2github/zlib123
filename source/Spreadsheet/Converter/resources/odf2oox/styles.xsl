@@ -58,7 +58,7 @@
   </xsl:template>
 
   <!-- insert all number formats -->
-  
+
   <xsl:template name="InsertNumFormats">
     <numFmts>
       <xsl:attribute name="count">
@@ -66,15 +66,17 @@
           select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
         />
       </xsl:attribute>
-      
-      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/number:number-style[1]" mode="numFormat">
+
+      <xsl:apply-templates
+        select="document('content.xml')/office:document-content/office:automatic-styles/number:number-style[1]"
+        mode="numFormat">
         <xsl:with-param name="numId">1</xsl:with-param>
       </xsl:apply-templates>
     </numFmts>
   </xsl:template>
-  
+
   <!-- insert all fonts -->
-  
+
   <xsl:template name="InsertFonts">
     <fonts>
       <xsl:attribute name="count">
@@ -105,11 +107,12 @@
         </xsl:otherwise>
       </xsl:choose>
 
-      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles"
+      <xsl:apply-templates
+        select="document('content.xml')/office:document-content/office:automatic-styles"
         mode="fonts"/>
     </fonts>
   </xsl:template>
-  
+
   <xsl:template name="InsertFills">
     <fills count="2">
       <fill>
@@ -122,7 +125,7 @@
   </xsl:template>
 
   <xsl:template name="InsertBorders">
-    
+
     <borders>
       <!-- default border -->
       <border>
@@ -132,7 +135,9 @@
         <bottom/>
         <diagonal/>
       </border>
-      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles" mode="border"/>
+      <xsl:apply-templates
+        select="document('content.xml')/office:document-content/office:automatic-styles"
+        mode="border"/>
     </borders>
   </xsl:template>
 
@@ -173,21 +178,24 @@
       <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
 
       <xsl:variable name="numStyleCount">
-        <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"/>
+        <xsl:value-of
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
+        />
       </xsl:variable>
-     
-      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
+
+      <xsl:apply-templates
+        select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
         mode="cellFormats">
         <xsl:with-param name="numStyleCount">
           <xsl:value-of select="$numStyleCount"/>
-        </xsl:with-param> 
+        </xsl:with-param>
       </xsl:apply-templates>
 
       <!-- add cell formats for multiline cells, which must have wrap property -->
       <xsl:call-template name="InsertMultilineCellFormats"/>
 
     </cellXfs>
-    
+
   </xsl:template>
 
   <xsl:template name="InsertCellStyles">
@@ -201,7 +209,8 @@
   </xsl:template>
 
   <xsl:template name="InsertTableStyles">
-    <tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/>
+    <tableStyles count="0" defaultTableStyle="TableStyleMedium9"
+      defaultPivotStyle="PivotStyleLight16"/>
   </xsl:template>
 
   <xsl:template
@@ -241,7 +250,7 @@
 
   <xsl:template match="style:style[@style:family='table-cell']" mode="cellFormats">
     <xsl:param name="numStyleCount"/>
-    
+
     <!-- number format id -->
     <xsl:variable name="numFmtId">
       <xsl:call-template name="GetNumFmtId">
@@ -249,9 +258,9 @@
           <xsl:value-of select="@style:data-style-name"/>
         </xsl:with-param>
         <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
-      </xsl:call-template>  
+      </xsl:call-template>
     </xsl:variable>
-    
+
     <xf numFmtId="{$numFmtId}" fillId="0" borderId="0" xfId="0">
       <xsl:call-template name="SetFormatProperties"/>
     </xf>
@@ -268,11 +277,12 @@
       <xsl:attribute name="fontId">
         <!-- change referencing node to style:text-properties and count-->
         <xsl:for-each select="style:text-properties">
-          <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']" level="any"/>
+          <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
+            level="any"/>
         </xsl:for-each>
       </xsl:attribute>
     </xsl:if>
-    
+
     <!-- border -->
     <xsl:if test="style:table-cell-properties">
       <xsl:attribute name="applyBorder">
@@ -281,7 +291,8 @@
       <xsl:attribute name="borderId">
         <!-- change referencing node to style:table-cell-properties and count-->
         <xsl:for-each select="style:table-cell-properties">
-          <xsl:number count="style:table-cell-properties[parent::node()/@style:family='table-cell']" level="any"/>
+          <xsl:number count="style:table-cell-properties[parent::node()/@style:family='table-cell']"
+            level="any"/>
         </xsl:for-each>
       </xsl:attribute>
     </xsl:if>
@@ -292,12 +303,23 @@
              3rd 'or' - vertical alignment 
              4th 'or' - angle oriented text
              5th 'or' - vertically stacked text 
-             6th 'or' - wraped text -->
+      6th 'or' - wraped text -->
+
+
+    <xsl:if
+      test="style:table-cell-properties/@style:cell-protect and style:table-cell-properties/@style:cell-protect != 'protected' ">
+      <xsl:attribute name="applyProtection">
+        <xsl:text>1</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+
     <xsl:if
       test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true') or (style:table-cell-properties/@style:vertical-align) or (style:table-cell-properties/@style:rotation-angle) or (style:table-cell-properties/@style:direction='ttb') or (style:table-cell-properties/@fo:wrap-option='wrap') or ($multiline='true')">
       <xsl:attribute name="applyAlignment">
         <xsl:text>1</xsl:text>
       </xsl:attribute>
+
+
       <alignment>
         <!-- horizontal alignment -->
         <!-- 1st 'or' - horizontal alignment 
@@ -402,6 +424,31 @@
         </xsl:if>
       </alignment>
     </xsl:if>
+
+    <xsl:if
+      test="style:table-cell-properties/@style:cell-protect and style:table-cell-properties/@style:cell-protect != 'protected' ">
+
+      <!-- cell protection -->
+      <protection>
+        <xsl:choose>
+          <xsl:when test="style:table-cell-properties/@style:cell-protect='formula-hidden' ">
+            <xsl:attribute name="locked">
+              <xsl:text>0</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="hidden">
+              <xsl:text>1</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when
+            test="style:table-cell-properties/@style:cell-protect='protected formula-hidden' or style:table-cell-properties/@style:cell-protect='hidden-and-protected' ">
+            <xsl:attribute name="hidden">
+              <xsl:text>1</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+        </xsl:choose>
+      </protection>
+    </xsl:if>
+
   </xsl:template>
 
   <!-- insert run properties -->
@@ -459,19 +506,23 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style">
+        <xsl:when
+          test="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style">
           <xsl:call-template name="InsertUnderline">
             <xsl:with-param name="underlineStyle">
               <xsl:value-of
-                select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style"/>
+                select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-style"
+              />
             </xsl:with-param>
             <xsl:with-param name="underlineType">
               <xsl:value-of
-                select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-type"/>
+                select="key('style',$parentCellStyleName)/style:text-properties/@style:text-underline-type"
+              />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style">
+        <xsl:when
+          test="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-style">
           <xsl:call-template name="InsertUnderline">
             <xsl:with-param name="underlineStyle">
               <xsl:value-of
@@ -480,7 +531,8 @@
             </xsl:with-param>
             <xsl:with-param name="underlineType">
               <xsl:value-of
-                select="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-type"/>
+                select="key('style',$defaultCellStyleName)/style:text-properties/@style:text-underline-type"
+              />
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
@@ -496,10 +548,12 @@
             <xsl:value-of select="@fo:font-size"/>
           </xsl:when>
           <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@fo:font-size">
-            <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@fo:font-size"/>
+            <xsl:value-of
+              select="key('style',$parentCellStyleName)/style:text-properties/@fo:font-size"/>
           </xsl:when>
           <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size">
-            <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size"/>
+            <xsl:value-of
+              select="key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size"/>
           </xsl:when>
           <xsl:when test="$mode='default'">
             <xsl:text>10</xsl:text>
@@ -532,10 +586,12 @@
             <xsl:value-of select="@fo:color"/>
           </xsl:when>
           <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@fo:color">
-            <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@fo:color"/>
+            <xsl:value-of select="key('style',$parentCellStyleName)/style:text-properties/@fo:color"
+            />
           </xsl:when>
           <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
-            <xsl:value-of select="key('style',$defaultCellStyleName)/style:text-properties/@fo:color"/>
+            <xsl:value-of
+              select="key('style',$defaultCellStyleName)/style:text-properties/@fo:color"/>
           </xsl:when>
         </xsl:choose>
       </xsl:variable>
@@ -554,12 +610,14 @@
                   select="translate(key('font',@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
                 />
               </xsl:when>
-              <xsl:when test="key('style',$parentCellStyleName)/style:text-properties/@style:font-name">
+              <xsl:when
+                test="key('style',$parentCellStyleName)/style:text-properties/@style:font-name">
                 <xsl:value-of
                   select="translate(key('font',key('style',$parentCellStyleName)/style:text-properties/@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
                 />
               </xsl:when>
-              <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@style:font-name">
+              <xsl:when
+                test="key('style',$defaultCellStyleName)/style:text-properties/@style:font-name">
                 <xsl:value-of
                   select="translate(key('font',key('style',$defaultCellStyleName)/style:text-properties/@style:font-name)/@svg:font-family,&quot;&apos;&quot;,&quot;&quot;)"
                 />
@@ -603,9 +661,11 @@
   <xsl:template name="InsertMultilineCellFormats">
 
     <xsl:variable name="numStyleCount">
-      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"/>
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
+      />
     </xsl:variable>
-    
+
     <xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
 
@@ -617,7 +677,7 @@
       </xsl:variable>
 
       <xsl:variable name="style" select="key('style',@table:style-name)"/>
-      
+
       <xsl:for-each select="descendant::table:table-cell[text:p[2]]">
         <xsl:variable name="formatNumber">
           <xsl:for-each select="key('style',@table:style-name)">
@@ -632,9 +692,9 @@
               <xsl:value-of select="$style"/>
             </xsl:with-param>
             <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
-          </xsl:call-template>  
+          </xsl:call-template>
         </xsl:variable>
-        
+
         <xf numFmtId="{$numFmtId}" fontId="0" fillId="0" borderId="0" xfId="0">
           <xsl:choose>
             <!-- when style is set for cell -->
@@ -656,7 +716,7 @@
                 </xsl:call-template>
               </xsl:for-each>
             </xsl:when>
-              <!-- when style is set for column or there is none -->
+            <!-- when style is set for column or there is none -->
             <xsl:otherwise>
 
               <!-- sequential number of this table:table-cell tag -->
@@ -666,15 +726,15 @@
 
               <!-- real column number -->
               <xsl:variable name="colNum">
-                  <xsl:for-each select="parent::node()/table:table-cell[1]">
-                    <xsl:call-template name="GetColNumber">
+                <xsl:for-each select="parent::node()/table:table-cell[1]">
+                  <xsl:call-template name="GetColNumber">
                     <xsl:with-param name="position">
                       <xsl:value-of select="$position"/>
                     </xsl:with-param>
                   </xsl:call-template>
-                  </xsl:for-each>
+                </xsl:for-each>
               </xsl:variable>
-              
+
               <!-- name of the style set for this column -->
               <xsl:variable name="columnCellStyle">
                 <xsl:call-template name="GetColumnCellStyle">
@@ -686,7 +746,7 @@
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
-              
+
               <xsl:attribute name="applyAlignment">
                 <xsl:text>1</xsl:text>
               </xsl:attribute>
@@ -694,8 +754,7 @@
               <xsl:choose>
                 <!-- when style was set for column -->
                 <xsl:when test="$columnCellStyle != '' ">
-                  <xsl:for-each
-                    select="key('style',$columnCellStyle)">
+                  <xsl:for-each select="key('style',$columnCellStyle)">
                     <xsl:call-template name="SetFormatProperties">
                       <xsl:with-param name="multiline">
                         <xsl:text>true</xsl:text>

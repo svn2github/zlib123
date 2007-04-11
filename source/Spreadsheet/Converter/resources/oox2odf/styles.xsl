@@ -258,7 +258,7 @@
         </xsl:attribute>
       </xsl:if>
 
-      <xsl:if test="@applyAlignment = 1 or @applyBorder = 1">
+      <xsl:if test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1)">
         <style:table-cell-properties>
           <xsl:if test="@applyAlignment = 1">
           <!-- vertical-align -->
@@ -320,9 +320,27 @@
             </xsl:attribute>
           </xsl:if>
           <xsl:if test="@applyBorder = 1">
-            <!-- sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss -->
+            <!-- sssssssssssss -->
             <xsl:call-template name="InsertBorder"/>
           </xsl:if>
+          
+          <xsl:if test="@applyProtection=1 and e:protection">
+            <xsl:attribute name="style:cell-protect">
+              <xsl:choose>
+                <xsl:when test="e:protection/@locked=0 and e:protection/@hidden=1">
+                  <xsl:text>formula-hidden</xsl:text>
+                </xsl:when>
+                <xsl:when test="e:protection/@hidden= 1">
+                  <xsl:text>protected formula-hidden</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>protected</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:if>
+          
+          
         </style:table-cell-properties>
 
         <!-- default horizontal alignment when text has angle orientation  -->
