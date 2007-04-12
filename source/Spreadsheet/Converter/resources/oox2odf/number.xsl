@@ -36,28 +36,73 @@
   <!-- insert  number format style -->
   
   <xsl:template match="e:numFmt" mode="automaticstyles">
+    
     <xsl:choose>
       
       <!-- when there are different formats for positive and negative numbers -->
       <xsl:when test="contains(@formatCode,';')">
-        <number:number-style style:name="{concat(generate-id(.),'P0')}">
-          <xsl:call-template name="InsertNumberFormatting">
-            <xsl:with-param name="formatCode">
-              <xsl:value-of select="substring-before(@formatCode,';')"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </number:number-style>
-        <number:number-style style:name="{generate-id(.)}">
-          <xsl:call-template name="InsertNumberFormatting">
-            <xsl:with-param name="formatCode">
-              <xsl:value-of select="substring-after(@formatCode,';')"/>
-            </xsl:with-param>
-          </xsl:call-template>
-          <style:map style:condition="value()&gt;=0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
-        </number:number-style>
+        <xsl:choose>
+          
+          <!--percentage style -->
+          <xsl:when test="contains(substring-before(@formatCode,';'),'%')">
+            <number:percentage-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <number:text>%</number:text>
+            </number:percentage-style>
+            <number:percentage-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-after(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <number:text>%</number:text>
+              <style:map style:condition="value()&gt;=0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+            </number:percentage-style>
+          </xsl:when>
+          
+          <!-- number style -->
+          <xsl:otherwise>
+            <number:number-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+            <number:number-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-after(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <style:map style:condition="value()&gt;=0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+            </number:number-style>
+          </xsl:otherwise>
+          
+        </xsl:choose>
       </xsl:when>
       
       <xsl:otherwise>
+        <xsl:choose>
+          
+          <!--percentage style -->
+          <xsl:when test="contains(@formatCode,'%')">
+            <number:percentage-style style:name="{generate-id(.)}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:with-param>
+              </xsl:call-template>
+              <number:text>%</number:text>
+            </number:percentage-style>
+          </xsl:when>
+          
+          <!-- number style -->
+          <xsl:otherwise>
         <number:number-style style:name="{generate-id(.)}">
           <xsl:call-template name="InsertNumberFormatting">
             <xsl:with-param name="formatCode">
@@ -65,9 +110,12 @@
             </xsl:with-param>
           </xsl:call-template>
         </number:number-style>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
       
     </xsl:choose>
+    
   </xsl:template>
   
   <!-- template to create number format -->
@@ -185,13 +233,31 @@
   
   <xsl:template match="e:xf" mode="fixedNumFormat">
     <xsl:if test="@numFmtId and @numFmtId &gt; 0 and not(key('numFmtId',@numFmtId))">
-      <number:number-style style:name="{concat('N',@numFmtId)}">
-        <xsl:call-template name="InsertFixedNumFormat">
-          <xsl:with-param name="ID">
-            <xsl:value-of select="@numFmtId"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </number:number-style>
+      <xsl:choose>
+        
+        <!-- percentage style -->
+        <xsl:when test="@numFmtId = 9 or @numFmtId = 10">
+          <number:percentage-style style:name="{concat('N',@numFmtId)}">
+            <xsl:call-template name="InsertFixedNumFormat">
+              <xsl:with-param name="ID">
+                <xsl:value-of select="@numFmtId"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </number:percentage-style>
+        </xsl:when>
+        
+        <!-- number style -->
+        <xsl:otherwise>
+          <number:number-style style:name="{concat('N',@numFmtId)}">
+            <xsl:call-template name="InsertFixedNumFormat">
+              <xsl:with-param name="ID">
+                <xsl:value-of select="@numFmtId"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </number:number-style>
+        </xsl:otherwise>
+        
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
   
@@ -202,14 +268,14 @@
     <number:number>
       <xsl:attribute name="number:decimal-places">
         <xsl:choose>
-          <xsl:when test="$ID = 1 or $ID = 3">0</xsl:when>
-          <xsl:when test="$ID = 2 or $ID = 4">2</xsl:when>
+          <xsl:when test="$ID = 1 or $ID = 3 or $ID = 9">0</xsl:when>
+          <xsl:when test="$ID = 2 or $ID = 4 or $ID = 10">2</xsl:when>
           <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
       <xsl:attribute name="number:min-integer-digits">
         <xsl:choose>
-          <xsl:when test="$ID = 1 or $ID = 2 or $ID = 3 or $ID = 4">1</xsl:when>
+          <xsl:when test="$ID = 1 or $ID = 2 or $ID = 3 or $ID = 4 or $ID = 9 or $ID = 10">1</xsl:when>
           <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
@@ -217,6 +283,9 @@
         <xsl:attribute name="number:grouping">true</xsl:attribute>
       </xsl:if>
     </number:number>
+    <xsl:if test="$ID = 9 or $ID = 10">
+      <number:text>%</number:text>
+    </xsl:if>
   </xsl:template>
   
 </xsl:stylesheet>

@@ -545,8 +545,29 @@
                 </text:p>
               </xsl:when>
               <xsl:otherwise>
+                <xsl:variable name="numStyle">
+                  <xsl:for-each select="document('xl/styles.xml')">
+                    <xsl:value-of
+                      select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"
+                    />
+                  </xsl:for-each>
+                </xsl:variable>
+                <xsl:variable name="numId">
+                  <xsl:for-each select="document('xl/styles.xml')">
+                    <xsl:value-of
+                      select="key('Xf','')[position()=$position]/@numFmtId"
+                    />
+                  </xsl:for-each>
+                </xsl:variable>
                 <xsl:attribute name="office:value-type">
+                  <xsl:choose>
+                    <xsl:when test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
+                      <xsl:text>percentage</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
                   <xsl:text>float</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:attribute>
                 <xsl:attribute name="office:value">
                   <xsl:value-of select="e:v"/>
@@ -557,11 +578,10 @@
                       <xsl:value-of select="e:v"/>
                     </xsl:with-param>
                     <xsl:with-param name="numStyle">
-                      <xsl:for-each select="document('xl/styles.xml')">
-                        <xsl:value-of
-                          select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"
-                        />
-                      </xsl:for-each>
+                      <xsl:value-of select="$numStyle"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="numId">
+                      <xsl:value-of select="$numId"/>
                     </xsl:with-param>
                   </xsl:call-template>
                 </text:p>
@@ -1032,6 +1052,7 @@
   <xsl:template name="FormatNumber">
     <xsl:param name="value"/>
     <xsl:param name="numStyle"/>
+    <xsl:param name="numId"/>
     <xsl:variable name="formatCode">
       <xsl:choose>
         <xsl:when test="contains($numStyle,';')">
@@ -1042,6 +1063,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:variable name="outputValue">
     <xsl:choose>
       <xsl:when test="contains($value,'.') and $numStyle and $numStyle!=''">
         <xsl:call-template name="FormatAfterComma">
@@ -1063,9 +1085,36 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
+      <xsl:when test="contains($value,'.') and $numId = 10">
+        <xsl:call-template name="FormatAfterComma">
+          <xsl:with-param name="valueAfterComma">
+            <xsl:value-of select="substring-after($value,'.')"/>
+          </xsl:with-param>
+          <xsl:with-param name="valueBeforeComma">
+            <xsl:value-of select="substring-before($value,'.')"/>
+          </xsl:with-param>
+          <xsl:with-param name="format">0.00%</xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$numId = 9">
+        <xsl:value-of select="format-number($value,'0%')"/>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$value"/>
       </xsl:otherwise>
+    </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      
+      <!-- add '%' if it's percentage format-->
+      <xsl:when test="contains($formatCode,'%') and not(contains($outputValue,'%'))">
+        <xsl:value-of select="concat($outputValue,'%')"/>
+      </xsl:when>
+      
+      <xsl:otherwise>
+        <xsl:value-of select="$outputValue"/>
+      </xsl:otherwise>
+      
     </xsl:choose>
   </xsl:template>
 
