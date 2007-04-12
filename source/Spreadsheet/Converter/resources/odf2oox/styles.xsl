@@ -41,6 +41,7 @@
 
   <xsl:import href="measures.xsl"/>
   <xsl:key name="number" match="number:number-style" use="@style:name"/>
+  <xsl:key name="percentage" match="number:percentage-style" use="@style:name"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
 
   <xsl:template name="styles">
@@ -61,17 +62,62 @@
 
   <xsl:template name="InsertNumFormats">
     <numFmts>
-      <xsl:attribute name="count">
+      
+      <!-- number of all number styles in content.xml -->
+      <xsl:variable name="countNumber">
+        <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"/>
+      </xsl:variable>
+      
+      <!-- number of all number styles in styles.xml -->
+      <xsl:variable name="countStyleNumber">
+        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:number-style)"/>
+      </xsl:variable>
+      
+      <!-- number of all percentage styles in content.xml -->
+      <xsl:variable name="countPercentage">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"
         />
+      </xsl:variable>
+      
+      <!-- number of all percentage styles in styles.xml -->
+      <xsl:variable name="countStylePercentage">
+        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:percentage-style)"/>
+      </xsl:variable>
+       
+      <xsl:attribute name="count">
+        <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage"/>
       </xsl:attribute>
 
+      <!-- apply number styles from content.xml -->
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles/number:number-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">1</xsl:with-param>
       </xsl:apply-templates>
+      
+      <!-- apply number styles from styles.xml -->
+      <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/number:number-style[1]" mode="numFormat">
+        <xsl:with-param name="numId">
+          <xsl:value-of select="$countNumber+1"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      
+      <!-- apply percentage styles from content.xml -->
+      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style[1]"
+        mode="numFormat">
+        <xsl:with-param name="numId">
+          <xsl:value-of select="$countNumber+$countStyleNumber+1"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      
+      <!-- apply percentage styles from styles.xml -->
+      <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/number:percentage-style[1]" mode="numFormat">
+        <xsl:with-param name="numId">
+          <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+1"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      
     </numFmts>
   </xsl:template>
 
@@ -175,19 +221,33 @@
       </xsl:attribute>
 
       <!-- default style -->
-      <xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0"/>
+      <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
 
       <xsl:variable name="numStyleCount">
         <xsl:value-of
           select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
         />
       </xsl:variable>
+      
+      <xsl:variable name="styleNumStyleCount">
+        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:number-style)"/>
+      </xsl:variable>
 
+      <xsl:variable name="percentStyleCount">
+        <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"/>  
+      </xsl:variable>
+      
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
         mode="cellFormats">
         <xsl:with-param name="numStyleCount">
           <xsl:value-of select="$numStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="styleNumStyleCount">
+          <xsl:value-of select="$styleNumStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="percentStyleCount">
+          <xsl:value-of select="$percentStyleCount"/>
         </xsl:with-param>
       </xsl:apply-templates>
 
@@ -250,6 +310,8 @@
 
   <xsl:template match="style:style[@style:family='table-cell']" mode="cellFormats">
     <xsl:param name="numStyleCount"/>
+    <xsl:param name="styleNumStyleCount"/>
+    <xsl:param name="percentStyleCount"/>
 
     <!-- number format id -->
     <xsl:variable name="numFmtId">
@@ -258,6 +320,8 @@
           <xsl:value-of select="@style:data-style-name"/>
         </xsl:with-param>
         <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
+        <xsl:with-param name="styleNumStyleCount" select="$styleNumStyleCount"/>
+        <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -666,6 +730,14 @@
       />
     </xsl:variable>
 
+    <xsl:variable name="styleNumStyleCount">
+      <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:number-style)"/>
+    </xsl:variable>
+    
+    <xsl:variable name="percentStyleCount">
+      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"/>  
+    </xsl:variable>
+    
     <xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
 
@@ -692,6 +764,8 @@
               <xsl:value-of select="$style"/>
             </xsl:with-param>
             <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
+            <xsl:with-param name="styleNumStyleCount" select="$styleNumStyleCount"/>
+            <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
           </xsl:call-template>
         </xsl:variable>
 

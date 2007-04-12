@@ -71,8 +71,44 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
-      <xsl:when test="parent::office:automatic-styles">
-        <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/number:number-style[1]" mode="numFormat">
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template to insert percentage formats -->
+  
+  <xsl:template match="number:percentage-style" mode="numFormat">
+    <xsl:param name="numId"/>
+    <numFmt numFmtId="{$numId}">
+      <xsl:attribute name="formatCode">
+        <xsl:choose>
+          
+          <!-- when negative number is red, positive and negative number are formatted separately --> 
+          <xsl:when test="style:text-properties/@fo:color">
+            <xsl:variable name="formatPositive">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">positive</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="formatNegative">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">negative</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat(concat($formatPositive,'%'),concat(concat(';',$formatNegative),'%'))"/>
+          </xsl:when>
+          
+          <xsl:otherwise>
+            <xsl:variable name="format">
+            <xsl:call-template name="GetFormatCode"/>
+            </xsl:variable>
+            <xsl:value-of select="concat($format,'%')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </numFmt>
+    <xsl:choose>
+      <xsl:when test="following-sibling::number:percentage-style">
+        <xsl:apply-templates select="following-sibling::number:percentage-style[1]" mode="numFormat">
           <xsl:with-param name="numId">
             <xsl:value-of select="$numId + 1"/>
           </xsl:with-param>
@@ -248,6 +284,8 @@
   <xsl:template name="GetNumFmtId">
     <xsl:param name="numStyle"/>
     <xsl:param name="numStyleCount"/>
+    <xsl:param name="styleNumStyleCount"/>
+    <xsl:param name="percentStyleCount"/>
     <xsl:choose>
       <xsl:when test="key('number',$numStyle)">
         <xsl:for-each select="key('number',$numStyle)">
@@ -257,6 +295,16 @@
       <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]">
         <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]">
           <xsl:value-of select="count(preceding-sibling::number:number-style)+1+$numStyleCount"/>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="key('percentage',$numStyle)">
+        <xsl:for-each select="key('percentage',$numStyle)">
+          <xsl:value-of select="count(preceding-sibling::number:percentage-style)+1+$numStyleCount+$styleNumStyleCount"/>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:percentage-style[@style:name=$numStyle]">
+        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:percentage-style[@style:name=$numStyle]">
+          <xsl:value-of select="count(preceding-sibling::number:percentage-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount"/>
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>0</xsl:otherwise>

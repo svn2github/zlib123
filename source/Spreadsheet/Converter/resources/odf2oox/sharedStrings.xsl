@@ -44,7 +44,7 @@
     <sst>
       <xsl:variable name="Count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0)))])"
+          select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))])"
         />
       </xsl:variable>
       <xsl:attribute name="count">
@@ -60,7 +60,7 @@
   <!-- template which inserts a string into sharedstrings -->
   <xsl:template name="InsertString">
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0)))]">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))]">
       <si>
         <xsl:choose>
           <xsl:when test="text:span|text:p/text:span">
