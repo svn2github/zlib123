@@ -239,6 +239,8 @@
   <!-- insert number styles-->
 
   <xsl:template name="InsertNumberStyles">
+    
+    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs" mode="fixedNumFormat"/>
     <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:numFmts"
       mode="automaticstyles"/>
   </xsl:template>
@@ -251,30 +253,40 @@
   <!-- cell formats -->
   <xsl:template match="e:xf" mode="automaticstyles">
     <style:style style:name="{generate-id(.)}" style:family="table-cell">
-
-      <xsl:if test="key('numFmtId',@numFmtId)">
-        <xsl:attribute name="style:data-style-name">
+      <xsl:choose>
+        
+        <!-- existing number format -->
+        <xsl:when test="key('numFmtId',@numFmtId)">
+          <xsl:attribute name="style:data-style-name">
           <xsl:value-of select="generate-id(key('numFmtId',@numFmtId))"/>
-        </xsl:attribute>
-      </xsl:if>
-
+          </xsl:attribute>
+        </xsl:when>
+        
+        <!-- fixed number format -->
+        <xsl:when test="@numFmtId &gt; 0">
+          <xsl:attribute name="style:data-style-name">
+            <xsl:value-of select="concat('N',@numFmtId)"/>
+          </xsl:attribute>
+        </xsl:when>
+        
+      </xsl:choose>
       <xsl:if test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1)">
         <style:table-cell-properties>
           <xsl:if test="@applyAlignment = 1">
-          <!-- vertical-align -->
-          <xsl:attribute name="style:vertical-align">
-            <xsl:choose>
-              <xsl:when test="e:alignment/@vertical = 'center' ">
-                <xsl:text>middle</xsl:text>
-              </xsl:when>
-              <xsl:when test="not(e:alignment/@vertical)">
-                <xsl:text>bottom</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="e:alignment/@vertical"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
+            <!-- vertical-align -->
+            <xsl:attribute name="style:vertical-align">
+              <xsl:choose>
+                <xsl:when test="e:alignment/@vertical = 'center' ">
+                  <xsl:text>middle</xsl:text>
+                </xsl:when>
+                <xsl:when test="not(e:alignment/@vertical)">
+                  <xsl:text>bottom</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="e:alignment/@vertical"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:attribute>
           </xsl:if>
           <xsl:if test="e:alignment/@horizontal = 'fill' ">
             <xsl:attribute name="style:repeat-content">

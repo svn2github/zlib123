@@ -175,7 +175,7 @@
       </xsl:attribute>
 
       <!-- default style -->
-      <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+      <xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0"/>
 
       <xsl:variable name="numStyleCount">
         <xsl:value-of
@@ -303,7 +303,7 @@
              3rd 'or' - vertical alignment 
              4th 'or' - angle oriented text
              5th 'or' - vertically stacked text 
-      6th 'or' - wraped text -->
+             6th 'or' - wraped text -->
 
 
     <xsl:if

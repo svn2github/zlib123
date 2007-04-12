@@ -1043,7 +1043,7 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="contains($value,'.')">
+      <xsl:when test="contains($value,'.') and $numStyle and $numStyle!=''">
         <xsl:call-template name="FormatAfterComma">
           <xsl:with-param name="valueAfterComma">
             <xsl:value-of select="substring-after($value,'.')"/>

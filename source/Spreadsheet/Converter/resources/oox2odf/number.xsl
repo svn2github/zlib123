@@ -115,16 +115,19 @@
       
       <!-- min integer digits -->
       
-      <xsl:if test="contains($formatCodeWithoutComma,'0')">
         <xsl:attribute name="number:min-integer-digits">
+          <xsl:choose>
+            <xsl:when test="contains($formatCodeWithoutComma,'0')">
           <xsl:call-template name="InsertMinIntegerDigits">
             <xsl:with-param name="code">
               <xsl:value-of select="substring-before($formatCodeWithoutComma,'0')"/>
             </xsl:with-param>
             <xsl:with-param name="value">1</xsl:with-param>
           </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
-      </xsl:if>
       
       <!-- grouping -->
       <xsl:if test="contains($formatCode,',')">
@@ -176,6 +179,44 @@
         <xsl:value-of select="$value"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <!-- adding number style with fixed number format -->
+  
+  <xsl:template match="e:xf" mode="fixedNumFormat">
+    <xsl:if test="@numFmtId and @numFmtId &gt; 0 and not(key('numFmtId',@numFmtId))">
+      <number:number-style style:name="{concat('N',@numFmtId)}">
+        <xsl:call-template name="InsertFixedNumFormat">
+          <xsl:with-param name="ID">
+            <xsl:value-of select="@numFmtId"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </number:number-style>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- template which inserts fixed number format -->
+  
+  <xsl:template name="InsertFixedNumFormat">
+    <xsl:param name="ID"/>
+    <number:number>
+      <xsl:attribute name="number:decimal-places">
+        <xsl:choose>
+          <xsl:when test="$ID = 1 or $ID = 3">0</xsl:when>
+          <xsl:when test="$ID = 2 or $ID = 4">2</xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:attribute name="number:min-integer-digits">
+        <xsl:choose>
+          <xsl:when test="$ID = 1 or $ID = 2 or $ID = 3 or $ID = 4">1</xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+      <xsl:if test="$ID = 3 or $ID = 4">
+        <xsl:attribute name="number:grouping">true</xsl:attribute>
+      </xsl:if>
+    </number:number>
   </xsl:template>
   
 </xsl:stylesheet>
