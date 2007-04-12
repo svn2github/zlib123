@@ -31,6 +31,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -39,22 +40,47 @@
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="border.xsl"/>
-  
+  <xsl:import href="headers.xsl"/>
+
   <xsl:key name="Border" match="e:borders" use="''"/>
 
   <xsl:template name="styles">
+
+    <xsl:variable name="activeTab">
+      <xsl:for-each select="document('xl/workbook.xml')">
+        <xsl:choose>
+          <xsl:when test="e:workbook/e:bookViews/e:workbookView/@activeTab">
+            <xsl:value-of select="e:workbook/e:bookViews/e:workbookView/@activeTab"/>
+          </xsl:when>
+          <xsl:otherwise>0</xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+
     <office:document-styles>
       <office:font-face-decls>
         <xsl:call-template name="InsertFonts"/>
+        <xsl:call-template name="InsertHeaderFooterFonts">
+          <xsl:with-param name="activeTab" select="$activeTab"/>
+        </xsl:call-template>
       </office:font-face-decls>
       <office:styles>
         <xsl:call-template name="InsertDefaultTableCellStyle"/>
       </office:styles>
       <office:automatic-styles>
-        <xsl:call-template name="InsertPageLayout"/>
+        <xsl:call-template name="InsertPageLayout">
+          <xsl:with-param name="activeTab" select="$activeTab"/>
+        </xsl:call-template>
+        <xsl:call-template name="InsertHeaderFooterStyles">
+          <xsl:with-param name="activeTab" select="$activeTab"/>
+        </xsl:call-template>
       </office:automatic-styles>
       <office:master-styles>
-        <style:master-page style:name="Default" style:page-layout-name="pm1"/>
+        <style:master-page style:name="Default" style:page-layout-name="pm1">
+          <xsl:call-template name="InsertHeaderFooter">
+            <xsl:with-param name="activeTab" select="$activeTab"/>
+          </xsl:call-template>
+        </style:master-page>
       </office:master-styles>
     </office:document-styles>
   </xsl:template>
@@ -692,6 +718,14 @@
           </xsl:for-each>
 
         </style:page-layout-properties>
+        <style:header-style>
+          <style:header-footer-properties fo:min-height="0.751cm" fo:margin-left="0cm"
+            fo:margin-right="0cm" fo:margin-bottom="0.25cm"/>
+        </style:header-style>
+        <style:footer-style>
+          <style:header-footer-properties fo:min-height="0.751cm" fo:margin-left="0cm"
+            fo:margin-right="0cm" fo:margin-top="0.25cm"/>
+        </style:footer-style>
       </style:page-layout>
     </xsl:for-each>
   </xsl:template>
