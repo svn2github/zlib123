@@ -63,6 +63,7 @@
     <EmbeddedResource Include="resources\oox2odf\settings.xsl" />
     <EmbeddedResource Include="resources\oox2odf\styles.xsl" />
     <EmbeddedResource Include="resources\oox2odf\table_body.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\border.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
   </ItemGroup>
   <ItemGroup>

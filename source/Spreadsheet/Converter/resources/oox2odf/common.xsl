@@ -34,6 +34,7 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
   <!-- gets a column number from cell coordinates -->
@@ -747,6 +748,305 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertColor">
+    
+    <xsl:variable name="this" select="."/>
+    <xsl:choose>
+      <xsl:when test="@rgb">
+        <xsl:value-of select="concat('#',substring(@rgb,3,9))"/>
+      </xsl:when>
+      <xsl:when test="@indexed">
+        <xsl:choose>
+          <xsl:when
+            test="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]">
+            <xsl:variable name="color">
+              <xsl:value-of
+                select="document('xl/styles.xml')/e:styleSheet/e:colors/e:indexedColors/e:rgbColor[$this/@indexed + 1]/@rgb"
+              />
+            </xsl:variable>
+            <xsl:value-of select="concat('#',substring($color,3,9))"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:variable name="color">
+              <xsl:call-template name="GetBuildInColor">
+                <xsl:with-param name="index">
+                  <xsl:value-of select="@indexed"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat('#',$color)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="@theme">
+        <xsl:variable name="theme">
+          <xsl:choose>
+            <xsl:when test="@theme = 0">
+              <xsl:text>1</xsl:text>
+            </xsl:when>
+            <xsl:when test="@theme = 1">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:when test="@theme = 2">
+              <xsl:text>3</xsl:text>
+            </xsl:when>
+            <xsl:when test="@theme = 3">
+              <xsl:text>2</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="@theme"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <!-- color from theme -->
+        <xsl:variable name="themeColor">
+          <xsl:choose>
+            <!-- if color is in 'sysClr' node -->
+            <xsl:when
+              test="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr">
+              <xsl:value-of
+                select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@lastClr"
+              />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of
+                select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme/child::node()[position() = $theme + 1]/child::node()/@val"
+              />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:variable name="color">
+          <xsl:choose>
+            <!-- if tinted color -->
+            <xsl:when test="@tint">
+              <xsl:call-template name="CalculateTintedColor">
+                <xsl:with-param name="color" select="$themeColor"/>
+                <xsl:with-param name="tint">
+                  <xsl:choose>
+                    <xsl:when test="contains(@tint,'E')">
+                      <xsl:call-template name="ConvertScientific">
+                        <xsl:with-param name="value">
+                          <xsl:value-of select="@tint"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="@tint"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$themeColor"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:value-of select="concat('#',$color)"/>
+      </xsl:when>
+    </xsl:choose>
+    
+  </xsl:template>
+  
+  <xsl:template name="InsertPaperSize">
+    <xsl:param name="paperSize"/>
+    <xsl:param name="orientation"/>
+    
+    <xsl:choose>
+      <xsl:when test="$orientation='landscape' ">
+        <xsl:choose>
+          <!-- A3 -->
+          <xsl:when test="$paperSize=8">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>42cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A4 -->
+          <xsl:when test="$paperSize=9">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A5 -->
+          <xsl:when test="$paperSize=11">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>14.799cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- B4 (JIS) -->
+          <xsl:when test="$paperSize=12">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>36.4cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>25.7cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- B5 (JIS) -->
+          <xsl:when test="$paperSize=13">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>25.7cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>18.2cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Letter -->
+          <xsl:when test="$paperSize=1">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>27.94cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>21.59cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Tabloid -->
+          <xsl:when test="$paperSize=3">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>43.127cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>27.958cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Legal -->
+          <xsl:when test="$paperSize=5">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>35.565cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>21.59cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="$paperSize=43">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>14.8cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>10cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A4 as default -->
+          <xsl:otherwise>
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>        
+      </xsl:when>
+      <!-- when orientation is 'portrait' -->
+      <xsl:otherwise>
+        <xsl:choose>
+          <!-- A3 -->
+          <xsl:when test="$paperSize=8">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>42cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A4 -->
+          <xsl:when test="$paperSize=9">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A5 -->
+          <xsl:when test="$paperSize=11">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>14.799cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- B4 (JIS) -->
+          <xsl:when test="$paperSize=12">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>25.7cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>36.4cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- B5 (JIS) -->
+          <xsl:when test="$paperSize=13">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>18.2cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>25.7cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Letter -->
+          <xsl:when test="$paperSize=1">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>21.59cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>27.94cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Tabloid -->
+          <xsl:when test="$paperSize=3">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>27.958cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>43.127cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- Legal -->
+          <xsl:when test="$paperSize=5">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>21.59cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>35.565cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:when test="$paperSize=43">
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>10cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>14.8cm</xsl:text>
+            </xsl:attribute>
+          </xsl:when>
+          <!-- A4 as default -->
+          <xsl:otherwise>
+            <xsl:attribute name="fo:page-width">
+              <xsl:text>20.999cm</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="fo:page-height">
+              <xsl:text>29.699cm</xsl:text>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>        
+      </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
   
 </xsl:stylesheet>
