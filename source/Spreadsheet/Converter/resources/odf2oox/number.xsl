@@ -137,19 +137,50 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="endValue">
-    <xsl:choose>
-      
-      <!-- add decimal places -->
-      <xsl:when test="number:number/@number:decimal-places &gt; 0">
-        <xsl:call-template name="AddDecimalPlaces">
-          <xsl:with-param name="value">
-            <xsl:choose>
-              
-              <!-- add grouping -->
-              <xsl:when test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
+      <xsl:choose>
+        
+        <!-- add decimal places -->
+        <xsl:when test="number:number/@number:decimal-places &gt; 0">
+          <xsl:call-template name="AddDecimalPlaces">
+            <xsl:with-param name="value">
+              <xsl:choose>
+                
+                <!-- add grouping -->
+                <xsl:when test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
+                  <xsl:call-template name="AddGrouping">
+                    <xsl:with-param name="value">
+                      <xsl:value-of select="concat($value,'.')"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="numDigits">
+                      <xsl:choose>
+                        <xsl:when test="number:number/@number:min-integer-digits">
+                          <xsl:value-of select="3 - number:number/@number:min-integer-digits"/>
+                        </xsl:when>
+                        <xsl:otherwise>2</xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:when>
+                
+                <xsl:otherwise>
+                  <xsl:value-of select="concat($value,'.')"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param> 
+            <xsl:with-param name="num"> 
+              <xsl:value-of select="number:number/@number:decimal-places"/>   
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        
+        <xsl:otherwise>
+          <xsl:choose>
+            
+            <!-- add grouping -->
+            <xsl:when test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
                 <xsl:call-template name="AddGrouping">
                   <xsl:with-param name="value">
-                    <xsl:value-of select="concat($value,'.')"/>
+                    <xsl:value-of select="$value"/>
                   </xsl:with-param>
                   <xsl:with-param name="numDigits">
                     <xsl:choose>
@@ -160,52 +191,35 @@
                     </xsl:choose>
                   </xsl:with-param>
                 </xsl:call-template>
-              </xsl:when>
-              
-              <xsl:otherwise>
-                <xsl:value-of select="concat($value,'.')"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:with-param> 
-          <xsl:with-param name="num"> 
-            <xsl:value-of select="number:number/@number:decimal-places"/>   
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      
-      <xsl:otherwise>
-        <xsl:choose>
-          
-          <!-- add grouping -->
-          <xsl:when test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
-            <xsl:call-template name="AddGrouping">
-              <xsl:with-param name="value">
-                <xsl:value-of select="$value"/>
-              </xsl:with-param>
-              <xsl:with-param name="numDigits">
-                <xsl:choose>
-                  <xsl:when test="number:number/@number:min-integer-digits">
-                    <xsl:value-of select="3 - number:number/@number:min-integer-digits"/>
-                  </xsl:when>
-                  <xsl:otherwise>2</xsl:otherwise>
-                </xsl:choose>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:when>
-          
-          <xsl:otherwise>
-            <xsl:value-of select="$value"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:otherwise>
-    </xsl:choose>
+            </xsl:when>
+            
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="number:number/@number:display-factor and number:number/@number:display-factor!=''">
+                  <xsl:call-template name="UseThousandDisplayFactor">
+                    <xsl:with-param name="displayFactor">
+                      <xsl:value-of select="number:number/@number:display-factor"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="value">
+                      <xsl:value-of select="$value"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$value"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     
     <!-- add color to negative number formatting when necessary -->
     <xsl:choose>
-    <xsl:when test="$sign = 'negative' and style:text-properties/@fo:color">
-      <xsl:value-of select="concat('[Red]-',$endValue)"/>
-    </xsl:when>
+      <xsl:when test="$sign = 'negative' and style:text-properties/@fo:color">
+        <xsl:value-of select="concat('[Red]-',$endValue)"/>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$endValue"/>
       </xsl:otherwise>
@@ -270,6 +284,28 @@
           </xsl:with-param>
           <xsl:with-param name="num">
             <xsl:value-of select="$num - 1"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template to divide number by display factor -->
+  
+  <xsl:template name="UseThousandDisplayFactor">
+    <xsl:param name="displayFactor"/>
+    <xsl:param name="value"/>
+    <xsl:choose>
+      <xsl:when test="string-length($displayFactor) &gt; 1">
+        <xsl:call-template name="UseThousandDisplayFactor">
+          <xsl:with-param name="displayFactor">
+            <xsl:value-of select="number($displayFactor) div 1000"/>
+          </xsl:with-param>
+          <xsl:with-param name="value">
+            <xsl:value-of select="concat($value,',')"/>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>

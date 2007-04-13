@@ -970,7 +970,6 @@
             </xsl:when>
             
             <xsl:when test="@office:value-type = 'percentage'">
-              <xsl:attribute name="t">n</xsl:attribute>
               <v>
                 <xsl:choose>
                   <xsl:when test="@office:value">

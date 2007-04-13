@@ -168,7 +168,7 @@
             <xsl:when test="contains($formatCodeWithoutComma,'0')">
           <xsl:call-template name="InsertMinIntegerDigits">
             <xsl:with-param name="code">
-              <xsl:value-of select="substring-before($formatCodeWithoutComma,'0')"/>
+              <xsl:value-of select="substring($formatCodeWithoutComma,0,string-length($formatCodeWithoutComma))"/>
             </xsl:with-param>
             <xsl:with-param name="value">1</xsl:with-param>
           </xsl:call-template>
@@ -179,10 +179,51 @@
       
       <!-- grouping -->
       <xsl:if test="contains($formatCode,',')">
-        <xsl:attribute name="number:grouping">true</xsl:attribute>
+        <xsl:choose>
+          <xsl:when test="contains(substring-after($formatCode,','),'0') or contains(substring-after($formatCode,','),'#')">
+          <xsl:attribute name="number:grouping">true</xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="number:display-factor">
+              <xsl:call-template name="UseDisplayFactor">
+                <xsl:with-param name="formatBeforeSeparator">
+                  <xsl:value-of select="substring-before($formatCode,',')"/>
+                </xsl:with-param>
+                <xsl:with-param name="formatAfterSeparator">
+                  <xsl:value-of select="substring-after($formatCode,',')"/>
+                </xsl:with-param>
+                <xsl:with-param name="value">1000</xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:if>
       
     </number:number>
+  </xsl:template>
+  
+  <!-- template which inserts display factor -->
+  
+  <xsl:template name="UseDisplayFactor">
+    <xsl:param name="formatBeforeSeparator"/>
+    <xsl:param name="formatAfterSeparator"/>
+    <xsl:param name="value"/>
+    <xsl:choose>
+      <xsl:when test="$formatAfterSeparator and $formatAfterSeparator!=''">
+        <xsl:call-template name="UseDisplayFactor">
+          <xsl:with-param name="formatBeforeSeparator" select="$formatBeforeSeparator"/>
+          <xsl:with-param name="formatAfterSeparator">
+            <xsl:value-of select="substring($formatAfterSeparator,2)"/>
+          </xsl:with-param>
+          <xsl:with-param name="value">
+            <xsl:value-of select="number($value)*1000"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <!-- template which inserts min integer digits -->
@@ -194,7 +235,7 @@
       <xsl:when test="contains($code,'0')">
         <xsl:call-template name="InsertMinIntegerDigits">
           <xsl:with-param name="code">
-            <xsl:value-of select="substring($code,0,string-length($code)-1)"/>
+            <xsl:value-of select="substring($code,0,string-length($code))"/>
           </xsl:with-param>
           <xsl:with-param name="value">
             <xsl:value-of select="$value+1"/>
