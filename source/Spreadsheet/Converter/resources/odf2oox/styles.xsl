@@ -641,6 +641,16 @@
       <strike/>
     </xsl:if>
 
+    <!-- superscript -->
+    <xsl:if test="contains(@style:text-position, 'super' )">
+      <vertAlign val="superscript"/>
+    </xsl:if>
+    
+    <!-- subscript -->
+    <xsl:if test="contains(@style:text-position, 'sub' )">
+      <vertAlign val="subscript"/>
+    </xsl:if>
+    
     <!-- font color -->
     <xsl:if
       test="@fo:color or key('style',$parentCellStyleName)/style:text-properties/@fo:color or key('style',$defaultCellStyleName)/style:text-properties/@fo:color">
