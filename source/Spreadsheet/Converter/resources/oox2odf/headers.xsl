@@ -38,39 +38,59 @@
   <xsl:template name="InsertHeaderFooterStyles">
     <xsl:param name="activeTab"/>
 
+    <xsl:variable name="defaultFontFace">
+      <xsl:value-of select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
+    </xsl:variable>
+
+    <xsl:variable name="defaultFontSize">
+      <xsl:value-of select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+    </xsl:variable>
+
     <xsl:for-each
       select="document(concat('xl/worksheets/sheet', $activeTab + 1,'.xml'))/e:worksheet/e:headerFooter">
       <!-- odd header styles -->
       <xsl:for-each select="e:oddHeader">
-        <xsl:call-template name="GetHeaderFooterStyles"/>
+        <xsl:call-template name="GetHeaderFooterStyles">
+          <xsl:with-param name="fontFace" select="$defaultFontFace"/>
+          <xsl:with-param name="fontSize" select="$defaultFontSize"/>
+        </xsl:call-template>
       </xsl:for-each>
 
       <!-- even header styles -->
       <xsl:for-each select="e:evenHeader">
-        <xsl:call-template name="GetHeaderFooterStyles"/>
+        <xsl:call-template name="GetHeaderFooterStyles">
+          <xsl:with-param name="fontFace" select="$defaultFontFace"/>
+          <xsl:with-param name="fontSize" select="$defaultFontSize"/>
+        </xsl:call-template>
       </xsl:for-each>
 
       <!-- odd footer styles -->
       <xsl:for-each select="e:oddFooter">
-        <xsl:call-template name="GetHeaderFooterStyles"/>
+        <xsl:call-template name="GetHeaderFooterStyles">
+          <xsl:with-param name="fontFace" select="$defaultFontFace"/>
+          <xsl:with-param name="fontSize" select="$defaultFontSize"/>
+        </xsl:call-template>
       </xsl:for-each>
 
       <!-- even footer styles -->
       <xsl:for-each select="e:evenFooter">
-        <xsl:call-template name="GetHeaderFooterStyles"/>
+        <xsl:call-template name="GetHeaderFooterStyles">
+          <xsl:with-param name="fontFace" select="$defaultFontFace"/>
+          <xsl:with-param name="fontSize" select="$defaultFontSize"/>
+        </xsl:call-template>
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="GetHeaderFooterStyles">
-    <xsl:param name="region" select=" 'L' "/>
+    <xsl:param name="region" select=" 'C' "/>
     <xsl:param name="paragraph" select="1"/>
     <xsl:param name="tags" select="text()"/>
     <xsl:param name="styleNum" select="1"/>
     <xsl:param name="changedStyle" select="1"/>
 
-    <xsl:param name="fontFace" select=" 'Calibri' "/>
-    <xsl:param name="fontSize" select="11"/>
+    <xsl:param name="fontFace"/>
+    <xsl:param name="fontSize"/>
     <xsl:param name="fontColor" select=" 'K000000' "/>
     <xsl:param name="underline" select=" 'none' "/>
     <xsl:param name="strikethrough" select="0"/>
@@ -91,6 +111,15 @@
               <xsl:with-param name="tags" select="substring($tags,3)"/>
               <xsl:with-param name="styleNum" select="1"/>
               <xsl:with-param name="changedStyle" select="1"/>
+              <!-- restore default properties -->
+              <xsl:with-param name="fontFace">
+                <xsl:value-of
+                  select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:name/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name="fontSize">
+                <xsl:value-of
+                  select="document('xl/styles.xml')/e:styleSheet/e:fonts/e:font[1]/e:sz/@val"/>
+              </xsl:with-param>
 
               <xsl:with-param name="underline" select=" 'none' "/>
               <xsl:with-param name="strikethrough" select="0"/>
@@ -570,7 +599,7 @@
 
   <!-- processes tags defining fields (page number, sheet name etc.) and plain text -->
   <xsl:template name="GetHeaderFooterFields">
-    <xsl:param name="region"/>
+    <xsl:param name="region" select="'C' "/>
     <xsl:param name="paragraph"/>
     <xsl:param name="tags"/>
     <xsl:param name="changedStyle" select="1"/>
@@ -949,6 +978,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:call-template name="InsertParagraphs">
+            <xsl:with-param name="region" select=" 'C' "/>
             <xsl:with-param name="string" select="$centerContent"/>
           </xsl:call-template>
         </xsl:otherwise>
@@ -1019,20 +1049,23 @@
     <!-- superscript/subscript -->
     <xsl:param name="position" select=" 'normal' "/>
 
-    <style:style style:family="text">
+    <style:style>
       <xsl:attribute name="style:name">
         <xsl:value-of select="concat(generate-id(),'_',$region,'P',$paragraph,'-',$styleNum)"/>
       </xsl:attribute>
+      <xsl:attribute name="style:family">
+        <xsl:text>text</xsl:text>
+      </xsl:attribute>
 
       <style:text-properties>
+        <xsl:attribute name="fo:color">
+          <xsl:value-of select="concat('#',substring($fontColor,2))"/>
+        </xsl:attribute>
         <xsl:attribute name="style:font-name">
           <xsl:value-of select="$fontFace"/>
         </xsl:attribute>
         <xsl:attribute name="fo:font-size">
           <xsl:value-of select="concat($fontSize,'pt')"/>
-        </xsl:attribute>
-        <xsl:attribute name="fo:color">
-          <xsl:value-of select="concat('#',substring($fontColor,2))"/>
         </xsl:attribute>
 
         <xsl:choose>
