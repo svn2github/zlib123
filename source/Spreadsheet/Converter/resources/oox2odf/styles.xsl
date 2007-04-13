@@ -465,6 +465,20 @@
     <xsl:call-template name="InsertUnderline"/>
   </xsl:template>
 
+  <!-- superscript/subscript-->
+  <xsl:template match="e:vertAlign" mode="style">
+    <xsl:attribute name="style:text-position">
+    <xsl:choose>
+      <xsl:when test="@val = 'superscript' ">
+        <xsl:text>super 58%</xsl:text>
+      </xsl:when>
+      <xsl:when test="@val = 'superscript' ">
+        <xsl:text>sub 58%</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+    </xsl:attribute>
+  </xsl:template>
+
   <!-- insert text styles -->
   <xsl:template name="InsertTextStyles">
     <xsl:apply-templates select="document('xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]"
@@ -475,7 +489,7 @@
   <xsl:template match="e:r" mode="automaticstyles">
     <style:style style:name="{generate-id(.)}" style:family="text">
       <style:text-properties fo:font-weight="normal" fo:font-style="normal"
-        style:text-underline-type="none">
+        style:text-underline-type="none" style:text-position="0% 100%">
         <xsl:apply-templates select="e:rPr" mode="style"/>
       </style:text-properties>
     </style:style>
