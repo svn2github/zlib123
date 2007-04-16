@@ -773,7 +773,7 @@
           <xsl:with-param name="cellNumber">
             <xsl:choose>
               <xsl:when
-                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))">
+                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency')))">
                 <xsl:value-of select="$cellNumber + 1"/>
               </xsl:when>
               <xsl:otherwise>
@@ -803,7 +803,7 @@
           <xsl:with-param name="cellNumber">
             <xsl:choose>
               <xsl:when
-                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))">
+                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency')))">
                 <xsl:value-of select="$cellNumber + 1"/>
               </xsl:when>
               <xsl:otherwise>
@@ -1046,7 +1046,7 @@
         <xsl:if test="child::text:p and not(name() = 'table:covered-table-cell')">
           <xsl:choose>
             <xsl:when
-              test="@office:value-type!='string' and @office:value-type != 'percentage' and @office:value-type != 'date' and @office:value-type != 'time' and @office:value-type!='boolean' and (number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))">
+              test="@office:value-type!='string' and @office:value-type != 'percentage' and @office:value-type != 'date' and @office:value-type != 'time' and @office:value-type!='boolean' and (number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency')">
               <xsl:variable name="Type">
                 <xsl:call-template name="ConvertTypes">
                   <xsl:with-param name="type">
@@ -1076,6 +1076,7 @@
               </v>
             </xsl:when>
             
+            <!-- percentage -->
             <xsl:when test="@office:value-type = 'percentage'">
               <v>
                 <xsl:choose>
@@ -1088,11 +1089,19 @@
                 </xsl:choose>
               </v>
             </xsl:when>
+            
+            <!-- currency -->
+            <xsl:when test="office:value-type = 'currency'">
+              <v>
+                <xsl:value-of select="@office:value"/>
+              </v>
+            </xsl:when>
+            
             <!-- TO DO  date and time-->
             <xsl:when test="@office:value-type = 'date' or @office:value-type = 'time'"/>
             <!-- last or when number cell has error -->
             <xsl:when
-              test="@office:value-type = 'string' or @office:value-type = 'boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%')))">
+              test="@office:value-type = 'string' or @office:value-type = 'boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency'))">
               <xsl:attribute name="t">s</xsl:attribute>
               <v>
                 <xsl:value-of select="number($cellNumber)"/>

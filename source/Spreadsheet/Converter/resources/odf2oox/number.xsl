@@ -117,9 +117,64 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- template to insert currency formats -->
+  
+  <xsl:template match="number:currency-style" mode="numFormat">
+    <xsl:param name="numId"/>
+    
+    <xsl:variable name="currencySymbol">
+      <xsl:call-template name="ConvertValueSymbol">
+        <xsl:with-param name="symbol">
+          <xsl:value-of select="number:currency-symbol"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <numFmt numFmtId="{$numId}">
+      <xsl:attribute name="formatCode">
+        <xsl:choose>
+          
+          <!-- when negative number is red, positive and negative number are formatted separately --> 
+          <xsl:when test="style:text-properties/@fo:color">
+            <xsl:variable name="formatPositive">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">positive</xsl:with-param>
+                <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="formatNegative">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">negative</xsl:with-param>
+                <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat($formatPositive,concat(';',$formatNegative))"/>
+          </xsl:when>
+          
+          <xsl:otherwise>
+            <xsl:call-template name="GetFormatCode">
+              <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </numFmt>
+    <xsl:choose>
+      <xsl:when test="following-sibling::number:currency-style">
+        <xsl:apply-templates select="following-sibling::number:currency-style[1]" mode="numFormat">
+          <xsl:with-param name="numId">
+            <xsl:value-of select="$numId + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
+        </xsl:apply-templates>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
   <!-- get number code format -->
   <xsl:template name="GetFormatCode">
     <xsl:param name="sign"/>
+    <xsl:param name="currencySymbol"/>
     <xsl:variable name="value">
       <xsl:choose>
         
@@ -216,6 +271,7 @@
     </xsl:variable>
     
     <!-- add color to negative number formatting when necessary -->
+    <xsl:variable name="finalValue">
     <xsl:choose>
       <xsl:when test="$sign = 'negative' and style:text-properties/@fo:color">
         <xsl:value-of select="concat('[Red]-',$endValue)"/>
@@ -224,7 +280,20 @@
         <xsl:value-of select="$endValue"/>
       </xsl:otherwise>
     </xsl:choose>
+    </xsl:variable>
     
+    <!-- add currency symbol -->
+    <xsl:choose>
+      <xsl:when test="$currencySymbol and $currencySymbol!='' and number:number/following-sibling::number:currency-symbol">
+        <xsl:value-of select="concat(concat($endValue,'\ '),$currencySymbol)"/>
+      </xsl:when>
+      <xsl:when test="$currencySymbol and $currencySymbol!='' and number:number/preceding-sibling::number:currency-symbol">
+        <xsl:value-of select="concat($currencySymbol,$endValue)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$endValue"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <!-- template to add leading zeros -->
@@ -322,6 +391,8 @@
     <xsl:param name="numStyleCount"/>
     <xsl:param name="styleNumStyleCount"/>
     <xsl:param name="percentStyleCount"/>
+    <xsl:param name="stylePercentStyleCount"/>
+    <xsl:param name="currencyStyleCount"/>
     <xsl:choose>
       <xsl:when test="key('number',$numStyle)">
         <xsl:for-each select="key('number',$numStyle)">
@@ -343,7 +414,36 @@
           <xsl:value-of select="count(preceding-sibling::number:percentage-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount"/>
         </xsl:for-each>
       </xsl:when>
+      <xsl:when test="key('currency',$numStyle)">
+        <xsl:for-each select="key('currency',$numStyle)">
+          <xsl:value-of select="count(preceding-sibling::number:currency-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount"/>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:currency-style[@style:name=$numStyle]">
+        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:currency-style[@style:name=$numStyle]">
+          <xsl:value-of select="count(preceding-sibling::number:currency-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount"/>
+        </xsl:for-each>
+      </xsl:when>
       <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="ConvertValueSymbol">
+    <xsl:param name="symbol"/>
+    <xsl:choose>
+      <xsl:when test="$symbol = '$'">[$$-409]</xsl:when>
+      <xsl:when test="$symbol = 'USD'">[$USD]</xsl:when>
+      <xsl:when test="$symbol = '£'">[$£-809]</xsl:when>
+      <xsl:when test="$symbol = 'GBP'">[$GBP]</xsl:when>
+      <xsl:when test="$symbol = 'zł'">&quot;zł&quot;</xsl:when>
+      <xsl:when test="$symbol = 'PLN'">[$PLN]</xsl:when>
+      <xsl:when test="$symbol = '€'">
+        <xsl:choose>
+          <xsl:when test="following-sibling::number:number">[$€-2]\ </xsl:when>
+          <xsl:otherwise>[$€-1]</xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="$symbol = 'EUR'">[$EUR]</xsl:when>
     </xsl:choose>
   </xsl:template>
   

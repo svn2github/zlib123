@@ -42,6 +42,7 @@
   <xsl:import href="measures.xsl"/>
   <xsl:key name="number" match="number:number-style" use="@style:name"/>
   <xsl:key name="percentage" match="number:percentage-style" use="@style:name"/>
+  <xsl:key name="currency" match="number:currency-style" use="@style:name"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
 
   <xsl:template name="styles">
@@ -85,8 +86,20 @@
         <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:percentage-style)"/>
       </xsl:variable>
        
+      <!-- number of all currency styles in content.xml -->
+      <xsl:variable name="countCurrency">
+        <xsl:value-of
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"
+        />
+      </xsl:variable>
+      
+      <!-- number of all currency styles in styles.xml -->
+      <xsl:variable name="countStyleCurrency">
+        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:currency-style)"/>
+      </xsl:variable>
+      
       <xsl:attribute name="count">
-        <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage"/>
+        <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency"/>
       </xsl:attribute>
 
       <!-- apply number styles from content.xml -->
@@ -115,6 +128,21 @@
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/number:percentage-style[1]" mode="numFormat">
         <xsl:with-param name="numId">
           <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+1"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      
+      <!-- apply currency styles from content.xml -->
+      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/number:currency-style[1]"
+        mode="numFormat">
+        <xsl:with-param name="numId">
+          <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+1"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      
+      <!-- apply currency styles from styles.xml -->
+      <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/number:currency-style[1]" mode="numFormat">
+        <xsl:with-param name="numId">
+          <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+1"/>
         </xsl:with-param>
       </xsl:apply-templates>
       
@@ -237,6 +265,14 @@
         <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"/>  
       </xsl:variable>
       
+      <xsl:variable name="stylePercentStyleCount">
+        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:percentage-style)"/>
+      </xsl:variable>
+      
+      <xsl:variable name="currencyStyleCount">
+        <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"/>
+      </xsl:variable>
+      
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
         mode="cellFormats">
@@ -248,6 +284,12 @@
         </xsl:with-param>
         <xsl:with-param name="percentStyleCount">
           <xsl:value-of select="$percentStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="stylePercentStyleCount">
+          <xsl:value-of select="$stylePercentStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="currencyStyleCount">
+          <xsl:value-of select="$currencyStyleCount"/>
         </xsl:with-param>
       </xsl:apply-templates>
 
@@ -312,6 +354,8 @@
     <xsl:param name="numStyleCount"/>
     <xsl:param name="styleNumStyleCount"/>
     <xsl:param name="percentStyleCount"/>
+    <xsl:param name="stylePercentStyleCount"/>
+    <xsl:param name="currencyStyleCount"/>
 
     <!-- number format id -->
     <xsl:variable name="numFmtId">
@@ -322,6 +366,8 @@
         <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
         <xsl:with-param name="styleNumStyleCount" select="$styleNumStyleCount"/>
         <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
+        <xsl:with-param name="stylePercentStyleCount" select="$stylePercentStyleCount"/>
+        <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -730,6 +776,7 @@
   </xsl:template>
 
   <xsl:template match="number:text" mode="fonts"/>
+  <xsl:template match="text()" mode="fonts"/>
   <xsl:template match="number:text" mode="cellFormats"/>
 
   <xsl:template name="InsertMultilineCellFormats">
@@ -746,6 +793,14 @@
     
     <xsl:variable name="percentStyleCount">
       <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"/>  
+    </xsl:variable>
+    
+    <xsl:variable name="stylePercentStyleCount">
+      <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:percentage-style)"/>
+    </xsl:variable>
+    
+    <xsl:variable name="currencyStyleCount">
+      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"/>  
     </xsl:variable>
     
     <xsl:for-each
@@ -776,6 +831,8 @@
             <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
             <xsl:with-param name="styleNumStyleCount" select="$styleNumStyleCount"/>
             <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
+            <xsl:with-param name="stylePercentStyleCount" select="$stylePercentStyleCount"/>
+            <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
           </xsl:call-template>
         </xsl:variable>
 

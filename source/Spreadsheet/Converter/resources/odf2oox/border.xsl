@@ -247,6 +247,7 @@
     
   </xsl:template>
   
+  <xsl:template match="text()" mode="border"/>
   
  <xsl:template name="GetBorderStyle">
     <xsl:param name="style"/>
