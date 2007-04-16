@@ -41,7 +41,7 @@
   <xsl:import href="pixel-measure.xsl"/>
   <xsl:import href="page.xsl"/>
   <xsl:import href="border.xsl"/>
-  
+
   <xsl:key name="table-row" match="table:table-row" use=" '' "/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
   <xsl:key name="ConfigItem"
@@ -81,15 +81,15 @@
   <xsl:template name="InsertWorksheet">
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
-  
+
     <worksheet>
-      
+
       <xsl:variable name="MergeCell">
-        <xsl:call-template name="WriteMergeCell"/>  
+        <xsl:call-template name="WriteMergeCell"/>
       </xsl:variable>
 
       <xsl:variable name="MergeCellStyle">
-      <xsl:call-template name="WriteMergeStyle"/>
+        <xsl:call-template name="WriteMergeStyle"/>
       </xsl:variable>
 
       <xsl:variable name="pageStyle">
@@ -344,39 +344,39 @@
     </xsl:variable>
 
 
- <!-- Check if 256 column are hidden -->
-      <xsl:variable name="CheckCollHidden">
-        <xsl:apply-templates select="table:table-column[1]" mode="defaultColWidth">
+    <!-- Check if 256 column are hidden -->
+    <xsl:variable name="CheckCollHidden">
+      <xsl:apply-templates select="table:table-column[1]" mode="defaultColWidth">
         <xsl:with-param name="colNumber">
-        <xsl:text>1</xsl:text>
+          <xsl:text>1</xsl:text>
         </xsl:with-param>
         <xsl:with-param name="result">
-        <xsl:text>false</xsl:text>
+          <xsl:text>false</xsl:text>
         </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:variable>
-    
+      </xsl:apply-templates>
+    </xsl:variable>
+
     <!-- Check if default border areexisted in default column-->
     <xsl:variable name="CheckIfDefaultBorder">
       <xsl:apply-templates select="table:table-column[1]" mode="DefaultBorder"/>
     </xsl:variable>
-    
-      
-      <!-- Check if 65536 rows are hidden -->
-      <xsl:variable name="CheckRowHidden">
-        <xsl:choose>
-          <xsl:when test="table:table-row[@table:visibility='collapse']">
-              <xsl:apply-templates select="table:table-row[1]" mode="zeroHeight">
-                <xsl:with-param name="rowNumber">
-                  <xsl:text>0</xsl:text>
-                </xsl:with-param>
-              </xsl:apply-templates>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>false</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
+
+
+    <!-- Check if 65536 rows are hidden -->
+    <xsl:variable name="CheckRowHidden">
+      <xsl:choose>
+        <xsl:when test="table:table-row[@table:visibility='collapse']">
+          <xsl:apply-templates select="table:table-row[1]" mode="zeroHeight">
+            <xsl:with-param name="rowNumber">
+              <xsl:text>0</xsl:text>
+            </xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
 
 
 
@@ -393,43 +393,43 @@
 
     <!-- compute default column width -->
     <xsl:variable name="defaultColWidth">
-       <xsl:choose>
-          <xsl:when test="$CheckCollHidden != 'true'">
-            <xsl:call-template name="ConvertToCharacters">          
-              <xsl:with-param name="width">
-                <xsl:value-of select="concat('0.8925','in')"/>
-              </xsl:with-param>
-              <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>          
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>0</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>      
+      <xsl:choose>
+        <xsl:when test="$CheckCollHidden != 'true'">
+          <xsl:call-template name="ConvertToCharacters">
+            <xsl:with-param name="width">
+              <xsl:value-of select="concat('0.8925','in')"/>
+            </xsl:with-param>
+            <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
-  <sheetFormatPr>
-        
-        <xsl:attribute name="defaultColWidth">
-          <xsl:value-of select="$defaultColWidth"/>
+    <sheetFormatPr>
+
+      <xsl:attribute name="defaultColWidth">
+        <xsl:value-of select="$defaultColWidth"/>
+      </xsl:attribute>
+
+      <xsl:attribute name="defaultRowHeight">
+        <xsl:value-of select="$defaultRowHeight"/>
+      </xsl:attribute>
+
+      <xsl:attribute name="customHeight">
+        <xsl:text>true</xsl:text>
+      </xsl:attribute>
+
+      <xsl:if test="$CheckRowHidden = 'true'">
+        <xsl:attribute name="zeroHeight">
+          <xsl:text>1</xsl:text>
         </xsl:attribute>
-        
-        <xsl:attribute name="defaultRowHeight">
-          <xsl:value-of select="$defaultRowHeight"/>
-        </xsl:attribute>
-        
-        <xsl:attribute name="customHeight">
-          <xsl:text>true</xsl:text>
-        </xsl:attribute>
-        
-        <xsl:if test="$CheckRowHidden = 'true'">
-          <xsl:attribute name="zeroHeight">
-            <xsl:text>1</xsl:text>
-          </xsl:attribute>  
-        </xsl:if>
-        
-        
-      </sheetFormatPr> 
+      </xsl:if>
+
+
+    </sheetFormatPr>
 
     <xsl:if test="table:table-column">
       <cols>
@@ -452,26 +452,57 @@
       </xsl:variable>
 
       <!-- insert first row -->
-      <xsl:apply-templates select="table:table-row[1]" mode="sheet">
-        <xsl:with-param name="rowNumber">1</xsl:with-param>
-        <xsl:with-param name="cellNumber" select="$cellNumber"/>
-        <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
-        <xsl:with-param name="TableColumnTagNum">
-          <xsl:value-of select="$ColumnTagNum"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCell">
-          <xsl:value-of select="$MergeCell"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCellStyle">
-          <xsl:value-of select="$MergeCellStyle"/>
-        </xsl:with-param>
-        <xsl:with-param name="CheckRowHidden">
-            <xsl:value-of select="$CheckRowHidden"/>
-        </xsl:with-param>
-        <xsl:with-param name="CheckIfDefaultBorder">
-          <xsl:value-of select="$CheckIfDefaultBorder"/>
-        </xsl:with-param>        
-      </xsl:apply-templates>
+      <xsl:choose>
+        <!-- when the first row is a simple row -->
+        <xsl:when
+          test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1][name() = 'table:table-row' ]">
+          <xsl:apply-templates select="table:table-row[1]" mode="sheet">
+            <xsl:with-param name="rowNumber">1</xsl:with-param>
+            <xsl:with-param name="cellNumber" select="$cellNumber"/>
+            <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+            <xsl:with-param name="TableColumnTagNum">
+              <xsl:value-of select="$ColumnTagNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="MergeCellStyle">
+              <xsl:value-of select="$MergeCellStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="CheckRowHidden">
+              <xsl:value-of select="$CheckRowHidden"/>
+            </xsl:with-param>
+            <xsl:with-param name="CheckIfDefaultBorder">
+              <xsl:value-of select="$CheckIfDefaultBorder"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:when>
+        <!-- when the first row is a header row -->
+        <xsl:when
+          test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1][name() = 'table:table-header-rows' ]">
+          <xsl:apply-templates select="table:table-header-rows/table:table-row[1]" mode="sheet">
+            <xsl:with-param name="rowNumber">1</xsl:with-param>
+            <xsl:with-param name="cellNumber" select="$cellNumber"/>
+            <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+            <xsl:with-param name="TableColumnTagNum">
+              <xsl:value-of select="$ColumnTagNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="MergeCell">
+              <xsl:value-of select="$MergeCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="MergeCellStyle">
+              <xsl:value-of select="$MergeCellStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="CheckRowHidden">
+              <xsl:value-of select="$CheckRowHidden"/>
+            </xsl:with-param>
+            <xsl:with-param name="CheckIfDefaultBorder">
+              <xsl:value-of select="$CheckIfDefaultBorder"/>
+            </xsl:with-param>
+          </xsl:apply-templates>
+        </xsl:when>
+      </xsl:choose>
+
 
     </sheetData>
   </xsl:template>
@@ -483,7 +514,8 @@
       <headerFooter>
         <xsl:for-each
           select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']">
-          <xsl:if test="not(style:header-left/@style:display = 'false' ) or not(style:footer-left/@style:display = 'false' )">
+          <xsl:if
+            test="not(style:header-left/@style:display = 'false' ) or not(style:footer-left/@style:display = 'false' )">
             <xsl:attribute name="differentOddEven">
               <xsl:text>1</xsl:text>
             </xsl:attribute>
@@ -738,23 +770,25 @@
     </xsl:choose>
 
   </xsl:template>
-  
+
   <xsl:template match="table:table-column" mode="DefaultBorder">
     <xsl:choose>
-      <xsl:when test="key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border">
+      <xsl:when
+        test="key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border">
         <xsl:text>true</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="following-sibling::table:table-column">
-            <xsl:apply-templates select="following-sibling::table:table-column[1]" mode="DefaultBorder"/>
+            <xsl:apply-templates select="following-sibling::table:table-column[1]"
+              mode="DefaultBorder"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>false</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
-    </xsl:choose>    
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
