@@ -504,43 +504,119 @@
     </xsl:if>
 
     <!-- insert next row -->
-    <xsl:if test="following-sibling::table:table-row">
-      <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="sheet">
-        <xsl:with-param name="rowNumber">
-          <xsl:choose>
-            <xsl:when test="@table:number-rows-repeated">
-              <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$rowNumber+1"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:with-param>
-        <xsl:with-param name="cellNumber">
-          <!-- last or is for cells with error -->
-          <xsl:value-of
-            select="$cellNumber + count(child::table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))])"
-          />
-        </xsl:with-param>
-        <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
-        <xsl:with-param name="TableColumnTagNum">
-          <xsl:value-of select="$TableColumnTagNum"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCell">
-          <xsl:value-of select="$MergeCell"/>
-        </xsl:with-param>
-        <xsl:with-param name="MergeCellStyle">
-          <xsl:value-of select="$MergeCellStyle"/>
-        </xsl:with-param>
-       <xsl:with-param name="CheckRowHidden">
-          <xsl:value-of select="$CheckRowHidden"/>
-       </xsl:with-param>
-        <xsl:with-param name="CheckIfDefaultBorder">
-          <xsl:value-of select="$CheckIfDefaultBorder"/>
-        </xsl:with-param>
-      </xsl:apply-templates>
-    </xsl:if>
-
+    <xsl:choose>
+      <!-- next row is a sibling -->
+      <xsl:when test="following-sibling::node()[1][name() = 'table:table-row' ]">
+        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="sheet">
+          <xsl:with-param name="rowNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-rows-repeated">
+                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$rowNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="cellNumber">
+            <!-- last or is for cells with error -->
+            <xsl:value-of
+              select="$cellNumber + count(child::table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))])"
+            />
+          </xsl:with-param>
+          <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+          <xsl:with-param name="TableColumnTagNum">
+            <xsl:value-of select="$TableColumnTagNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckRowHidden">
+            <xsl:value-of select="$CheckRowHidden"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfDefaultBorder">
+            <xsl:value-of select="$CheckIfDefaultBorder"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+      <!-- next row is inside header rows -->
+      <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ]">
+        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]" mode="sheet">
+          <xsl:with-param name="rowNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-rows-repeated">
+                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$rowNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="cellNumber">
+            <!-- last or is for cells with error -->
+            <xsl:value-of
+              select="$cellNumber + count(child::table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))])"
+            />
+          </xsl:with-param>
+          <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+          <xsl:with-param name="TableColumnTagNum">
+            <xsl:value-of select="$TableColumnTagNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckRowHidden">
+            <xsl:value-of select="$CheckRowHidden"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfDefaultBorder">
+            <xsl:value-of select="$CheckIfDefaultBorder"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+      <!-- this is last row inside header rows, next row is outside -->
+      <xsl:when test="parent::node()[name()='table:table-header-rows'] and not(following-sibling::node()[1][name() = 'table:table-row' ])">
+        <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]" mode="sheet">
+          <xsl:with-param name="rowNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-rows-repeated">
+                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$rowNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="cellNumber">
+            <!-- last or is for cells with error -->
+            <xsl:value-of
+              select="$cellNumber + count(child::table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))])"
+            />
+          </xsl:with-param>
+          <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+          <xsl:with-param name="TableColumnTagNum">
+            <xsl:value-of select="$TableColumnTagNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCell">
+            <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckRowHidden">
+            <xsl:value-of select="$CheckRowHidden"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfDefaultBorder">
+            <xsl:value-of select="$CheckIfDefaultBorder"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+    </xsl:choose>    
   </xsl:template>
 
   <!-- template which inserts repeated rows -->

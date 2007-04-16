@@ -41,6 +41,8 @@
   <xsl:import href="pixel-measure.xsl"/>
   <xsl:import href="page.xsl"/>
   <xsl:import href="border.xsl"/>
+  
+  <xsl:key name="table-row" match="table:table-row" use=" '' "/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
   <xsl:key name="ConfigItem"
     match="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item"
@@ -62,8 +64,10 @@
     <xsl:apply-templates select="following-sibling::table:table[1]" mode="sheet">
       <xsl:with-param name="cellNumber">
         <!-- last 'or' for cells with error -->
+        <!-- cellNumber + number string cells inside simple rows + number string cells inside header rows -->
         <xsl:value-of
-          select="$cellNumber + count(table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))])"
+          select="$cellNumber + count(table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))]) +
+          count(table:table-header-rows/table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))])"
         />
       </xsl:with-param>
       <xsl:with-param name="sheetId">
@@ -77,7 +81,6 @@
   <xsl:template name="InsertWorksheet">
     <xsl:param name="cellNumber"/>
     <xsl:param name="sheetId"/>
-
   
     <worksheet>
       
@@ -88,7 +91,6 @@
       <xsl:variable name="MergeCellStyle">
       <xsl:call-template name="WriteMergeStyle"/>
       </xsl:variable>
-
 
       <xsl:variable name="pageStyle">
         <xsl:value-of

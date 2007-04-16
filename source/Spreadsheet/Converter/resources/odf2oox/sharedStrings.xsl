@@ -39,28 +39,31 @@
 
   <xsl:import href="measures.xsl"/>
 
+  <xsl:key name="stringCell"
+    match="table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))]"
+    use="''"/>
   <!-- template which inserts sharedstringscontent -->
   <xsl:template name="InsertSharedStrings">
     <sst>
-      <xsl:variable name="Count">
-        <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))])"
-        />
-      </xsl:variable>
-      <xsl:attribute name="count">
-        <xsl:value-of select="$Count"/>
-      </xsl:attribute>
-      <xsl:attribute name="uniqueCount">
-        <xsl:value-of select="$Count"/>
-      </xsl:attribute>
-      <xsl:call-template name="InsertString"/>
+      <xsl:for-each select="document('content.xml')">
+        <xsl:variable name="Count">
+          <xsl:value-of select="count(key('stringCell',''))"/>
+        </xsl:variable>
+        <xsl:attribute name="count">
+          <xsl:value-of select="$Count"/>
+        </xsl:attribute>
+        <xsl:attribute name="uniqueCount">
+          <xsl:value-of select="$Count"/>
+        </xsl:attribute>
+        <xsl:call-template name="InsertString"/>
+      </xsl:for-each>
     </sst>
   </xsl:template>
 
   <!-- template which inserts a string into sharedstrings -->
   <xsl:template name="InsertString">
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))]">
+      select="key('stringCell','')">
       <si>
         <xsl:choose>
           <xsl:when test="text:span|text:p/text:span">
