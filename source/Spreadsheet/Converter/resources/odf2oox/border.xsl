@@ -73,10 +73,17 @@
             </xsl:attribute>
                 <xsl:call-template name="GetBorderColor">
                   <xsl:with-param name="color">
-                    <xsl:value-of select="substring-after(@fo:border, '#')"/>                    
+                    <xsl:choose>
+                      <xsl:when test="@fo:border-left">
+                        <xsl:value-of select="substring-after(@fo:border-left, '#')"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="substring-after(@fo:border, '#')"/>
+                      </xsl:otherwise>
+                    </xsl:choose>                              
                   </xsl:with-param>
                 </xsl:call-template>
-          </xsl:if>
+          </xsl:if> 
       </left>
 
       
@@ -98,7 +105,14 @@
           </xsl:attribute>
           <xsl:call-template name="GetBorderColor">
             <xsl:with-param name="color">
-              <xsl:value-of select="substring-after(@fo:border, '#')"/>                    
+              <xsl:choose>
+                <xsl:when test="@fo:border-right">
+                  <xsl:value-of select="substring-after(@fo:border-right, '#')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring-after(@fo:border, '#')"/>
+                </xsl:otherwise>
+              </xsl:choose>                    
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
@@ -123,7 +137,14 @@
         </xsl:attribute>
           <xsl:call-template name="GetBorderColor">
             <xsl:with-param name="color">
-              <xsl:value-of select="substring-after(@fo:border, '#')"/>                    
+              <xsl:choose>
+                <xsl:when test="@fo:border-top">
+                  <xsl:value-of select="substring-after(@fo:border-top, '#')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring-after(@fo:border, '#')"/>
+                </xsl:otherwise>
+              </xsl:choose>                         
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
@@ -148,7 +169,14 @@
           </xsl:attribute>
           <xsl:call-template name="GetBorderColor">
             <xsl:with-param name="color">
-              <xsl:value-of select="substring-after(@fo:border, '#')"/>                    
+              <xsl:choose>
+                <xsl:when test="@fo:border-bottom">
+                  <xsl:value-of select="substring-after(@fo:border-bottom, '#')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring-after(@fo:border, '#')"/>
+                </xsl:otherwise>
+              </xsl:choose>                                  
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
@@ -161,7 +189,7 @@
               <xsl:call-template name="GetBorderStyle">
                 <xsl:with-param name="style">
                   <xsl:choose>
-                    <xsl:when test="@fo:border-bottom">
+                    <xsl:when test="@style:diagonal-bl-tr">
                       <xsl:value-of select="substring-before(@style:diagonal-bl-tr, '#')"/>
                     </xsl:when>
                     <xsl:otherwise>
@@ -173,7 +201,14 @@
             </xsl:attribute>
             <xsl:call-template name="GetBorderColor">
               <xsl:with-param name="color">
-                <xsl:value-of select="substring-after(@style:diagonal-bl-tr, '#')"/>                    
+                <xsl:choose>
+                  <xsl:when test="@style:diagonal-bl-tr">
+                    <xsl:value-of select="substring-after(@style:diagonal-bl-tr, '#')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="substring-after(@fo:border, '#')"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:with-param>
             </xsl:call-template>    
           </xsl:when>
@@ -182,7 +217,7 @@
               <xsl:call-template name="GetBorderStyle">
                 <xsl:with-param name="style">
                   <xsl:choose>
-                    <xsl:when test="@fo:border-bottom">
+                    <xsl:when test="@style:diagonal-tl-br">
                       <xsl:value-of select="substring-before(@style:diagonal-tl-br, '#')"/>
                     </xsl:when>
                     <xsl:otherwise>
@@ -194,7 +229,14 @@
             </xsl:attribute>
             <xsl:call-template name="GetBorderColor">
               <xsl:with-param name="color">
-                <xsl:value-of select="substring-after(@style:diagonal-tl-br, '#')"/>                    
+                <xsl:choose>
+                  <xsl:when test="@style:diagonal-tl-br">
+                    <xsl:value-of select="substring-after(@style:diagonal-tl-br, '#')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="substring-after(@fo:border, '#')"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:when>
@@ -232,9 +274,8 @@
   
   <xsl:template name="GetBorderColor">
     <xsl:param name="color"/>
-    
     <xsl:choose>
-      <xsl:when test="$color != '000000'">
+      <xsl:when test="$color != '' and $color != '000000'">
         <color>
           <xsl:attribute name="rgb">
             <xsl:value-of select="concat('FF', $color)"/>
@@ -245,7 +286,7 @@
         <color indexed="64"/>    
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
   
 </xsl:stylesheet>

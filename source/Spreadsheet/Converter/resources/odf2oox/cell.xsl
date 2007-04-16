@@ -329,64 +329,6 @@
     <xsl:param name="rowNumber"/>
     <xsl:param name="collapse"/>
 
-    <!--xsl:choose>
-      <xsl:when test="not(following-sibling::table:table-row) and @table:visibility='collapse'">
-        <xsl:variable name="CheckNumber">
-        <xsl:choose>
-          <xsl:when test="@table:number-rows-repeated">
-            <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$rowNumber+1"/>
-          </xsl:otherwise>
-        </xsl:choose>   
-        </xsl:variable>
-        <xsl:choose>
-          <xsl:when test="$CheckNumber = '65536'">
-            <xsl:text>true</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>false</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:when test="following-sibling::table:table-row[@table:visibility='collapse']">
-        <xsl:choose>
-          <xsl:when test="following-sibling::node()[1][name() = table:table-header-rows]">
-            <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="zeroHeight">
-              <xsl:with-param name="rowNumber">
-                <xsl:choose>
-                  <xsl:when test="@table:number-rows-repeated">
-                    <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="$rowNumber+1"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:with-param>      
-            </xsl:apply-templates>      
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="zeroHeight">
-              <xsl:with-param name="rowNumber">
-                <xsl:choose>
-                  <xsl:when test="@table:number-rows-repeated">
-                    <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:value-of select="$rowNumber+1"/>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:with-param>      
-            </xsl:apply-templates>          
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:text>false</xsl:text>
-      </xsl:otherwise>
-      </xsl:choose-->
-
     <xsl:choose>
       <xsl:when test="not(following-sibling::table:table-row or following-sibling::table:table-header-rows) and @table:visibility='collapse'">
         <xsl:variable name="CheckNumber">
@@ -453,9 +395,6 @@
             </xsl:apply-templates>    
           </xsl:when>
         </xsl:choose>
-        
-        
-         
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>false</xsl:text>
@@ -471,8 +410,11 @@
     <xsl:param name="defaultRowHeight"/>
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
+    <xsl:param name="MergeCellStyle"/>
    <xsl:param name="CheckRowHidden"/>
-    
+    <xsl:param name="CheckIfDefaultBorder"/>
+
+
     <xsl:variable name="height">
       <xsl:call-template name="ConvertMeasure">
         <xsl:with-param name="length">
@@ -514,13 +456,16 @@
           <xsl:with-param name="MergeCell">
             <xsl:value-of select="$MergeCell"/>
           </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </row>
 
       <!-- insert repeated rows -->
       <xsl:if test="@table:number-rows-repeated">
  <xsl:if
-          test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true'">
+   test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true' or contains($CheckIfDefaultBorder, 'true')">
         <xsl:call-template name="InsertRepeatedRows">
           <xsl:with-param name="numberRowsRepeated">
             <xsl:value-of select="@table:number-rows-repeated"/>
@@ -545,6 +490,12 @@
           </xsl:with-param>
           <xsl:with-param name="MergeCell">
             <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfDefaultBorder">
+            <xsl:value-of select="$CheckIfDefaultBorder"/>
           </xsl:with-param>
         </xsl:call-template>
         </xsl:if>
@@ -578,8 +529,14 @@
         <xsl:with-param name="MergeCell">
           <xsl:value-of select="$MergeCell"/>
         </xsl:with-param>
+        <xsl:with-param name="MergeCellStyle">
+          <xsl:value-of select="$MergeCellStyle"/>
+        </xsl:with-param>
        <xsl:with-param name="CheckRowHidden">
           <xsl:value-of select="$CheckRowHidden"/>
+       </xsl:with-param>
+        <xsl:with-param name="CheckIfDefaultBorder">
+          <xsl:value-of select="$CheckIfDefaultBorder"/>
         </xsl:with-param>
       </xsl:apply-templates>
     </xsl:if>
@@ -596,9 +553,11 @@
     <xsl:param name="defaultRowHeight"/>
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
+    <xsl:param name="MergeCellStyle"/>
+    <xsl:param name="CheckIfDefaultBorder"/>
     
     <xsl:if
-      test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span)">
+      test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true')">
       
     <xsl:choose>
       <xsl:when test="$numberRowsRepeated &gt; 1">
@@ -630,14 +589,25 @@
               <xsl:with-param name="MergeCell">
                 <xsl:value-of select="$MergeCell"/>
               </xsl:with-param>
+              <xsl:with-param name="MergeCellStyle">
+                <xsl:value-of select="$MergeCellStyle"/>
+              </xsl:with-param>
             </xsl:apply-templates>
           </row>
+
         
         <!-- insert repeated rows -->        
         <xsl:if test="@table:number-rows-repeated">
           <xsl:call-template name="InsertRepeatedRows">
             <xsl:with-param name="numberRowsRepeated">
-              <xsl:value-of select="$numberRowsRepeated - 1"/>
+              <xsl:choose>
+                <xsl:when test="$numberRowsRepeated - 1 &gt; 180">
+                  <xsl:text>49</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$numberRowsRepeated - 1"/>                  
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="numberOfAllRowsRepeated">
               <xsl:value-of select="@table:number-rows-repeated"/>
@@ -660,6 +630,12 @@
             <xsl:with-param name="MergeCell">
               <xsl:value-of select="$MergeCell"/>
             </xsl:with-param>
+            <xsl:with-param name="MergeCellStyle">
+              <xsl:value-of select="$MergeCellStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="CheckIfDefaultBorder">
+              <xsl:value-of select="$CheckIfDefaultBorder"/>
+            </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
       </xsl:when>
@@ -675,6 +651,7 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
+    <xsl:param name="MergeCellStyle"/>
 
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
@@ -693,6 +670,9 @@
       <xsl:with-param name="MergeCell">
         <xsl:value-of select="$MergeCell"/>
       </xsl:with-param>
+      <xsl:with-param name="MergeCellStyle">
+        <xsl:value-of select="$MergeCellStyle"/>
+      </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
 
@@ -703,6 +683,7 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
+    <xsl:param name="MergeCellStyle"/>
 
     <xsl:choose>
       <!-- Checks if  next index is table:table-cell-->
@@ -729,6 +710,9 @@
           </xsl:with-param>
           <xsl:with-param name="MergeCell">
             <xsl:value-of select="$MergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
@@ -758,6 +742,9 @@
           <xsl:with-param name="MergeCell">
             <xsl:value-of select="$MergeCell"/>
           </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -773,6 +760,7 @@
     <xsl:param name="ColumnRepeated"/>
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
+    <xsl:param name="MergeCellStyle"/>
 
     <!-- do not show covered cells content -->    
     
@@ -791,6 +779,9 @@
         </xsl:with-param>
         <xsl:with-param name="MergeCell">
           <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCellStyle">
+          <xsl:value-of select="$MergeCellStyle"/>
         </xsl:with-param>
       </xsl:call-template>
     
@@ -818,6 +809,9 @@
           <xsl:with-param name="MergeCell">
               <xsl:value-of select="$MergeCell"/>
           </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
         </xsl:call-template>
 
       </xsl:when>
@@ -840,6 +834,9 @@
           <xsl:with-param name="MergeCell">
             <xsl:value-of select="$MergeCell"/>
           </xsl:with-param>
+          <xsl:with-param name="MergeCellStyle">
+            <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
         </xsl:call-template>
 
       </xsl:otherwise>
@@ -853,6 +850,7 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
+    <xsl:param name="MergeCellStyle"/>
     
 
     <xsl:variable name="columnCellStyle">
@@ -871,6 +869,9 @@
       <xsl:with-param name="MergeCell">
         <xsl:value-of select="$MergeCell"/>
       </xsl:with-param>
+      <xsl:with-param name="MergeCellStyle">
+        <xsl:value-of select="$MergeCellStyle"/>
+      </xsl:with-param>
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
       </xsl:with-param>
@@ -879,10 +880,32 @@
       </xsl:with-param>
     </xsl:call-template>
 </xsl:variable>
-    
-
-    <xsl:if test="child::text:p or $columnCellStyle != '' or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start'">
-      
+ 
+<xsl:variable name="MergeStart">
+  <xsl:choose>
+    <xsl:when test="name() = 'table:covered-table-cell'">
+      <xsl:call-template name="CheckIfInMerge">
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="colNumber">
+          <xsl:value-of select="$colNumber + 1"/>
+        </xsl:with-param>
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="$rowNumber"/>
+        </xsl:with-param>
+      </xsl:call-template>    
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:text>false</xsl:text>
+    </xsl:otherwise>
+  </xsl:choose>
+  
+  
+</xsl:variable>    
+  
+    <xsl:if test="child::text:p or $columnCellStyle != '' or name() = 'table:covered-table-cell' or $CheckIfMerge = 'start' or @table:style-name != ''">
+  
       <c>
         <xsl:attribute name="r">
           <xsl:variable name="colChar">
@@ -892,7 +915,7 @@
           </xsl:variable>
           <xsl:value-of select="concat($colChar,$rowNumber)"/>
         </xsl:attribute>
-        <xsl:if test="name() != 'table:covered-table-cell' and $CheckIfMerge != 'start'">
+ 
         <!-- insert cell style number -->
         <xsl:choose>
           <!-- if it is a multiline cell -->
@@ -912,9 +935,20 @@
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
+            
             <xsl:choose>
+              <xsl:when test="name() = 'table:covered-table-cell' and substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';') != ''">
+                <xsl:variable name="style">
+                  <xsl:value-of select="substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';')"/>
+                </xsl:variable>
+                <xsl:for-each select="key('style', $style)">  
+                  <xsl:attribute name="s">
+                    <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                  </xsl:attribute>
+                </xsl:for-each>                
+              </xsl:when>            
               <!-- when style is specified in cell -->
-              <xsl:when test="@table:style-name">
+              <xsl:when test="@table:style-name and not(table:covered-table-cell)">                
                 <xsl:for-each select="key('style',@table:style-name)">
                   <xsl:attribute name="s">
                     <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
@@ -922,19 +956,16 @@
                 </xsl:for-each>
               </xsl:when>
               <!-- when style is specified in column -->
-              <xsl:otherwise>
-                <xsl:if test="$columnCellStyle != '' ">
+                <xsl:when test="$columnCellStyle != '' ">
                   <xsl:for-each select="key('style',$columnCellStyle)">
                     <xsl:attribute name="s">
                       <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
                     </xsl:attribute>
                   </xsl:for-each>
-                </xsl:if>
-              </xsl:otherwise>
+                </xsl:when>
             </xsl:choose>
           </xsl:otherwise>
-        </xsl:choose>
-          </xsl:if>
+        </xsl:choose>    
         <!-- convert cell type -->
         <xsl:if test="child::text:p and not(name() = 'table:covered-table-cell')">
           <xsl:choose>
@@ -993,6 +1024,7 @@
             </xsl:when>
           </xsl:choose>
         </xsl:if>
+        
       </c>
     </xsl:if>
   </xsl:template>

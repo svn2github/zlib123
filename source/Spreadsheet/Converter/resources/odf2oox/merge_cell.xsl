@@ -36,6 +36,155 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
   
   
+  <!-- Variable with Merge Style-->
+  
+  <xsl:template name="WriteMergeStyle">
+    
+    <xsl:variable name="rowNumber">
+      <xsl:choose>
+        <xsl:when test="table:table-row[1]/@table:number-rows-repeated">
+          <xsl:value-of select="table:table-row[1]/@table:number-rows-repeated"/>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>  
+    </xsl:variable>
+    
+    <xsl:apply-templates select="table:table-row[1]" mode="mergestyle">
+      <xsl:with-param name="rowNumber">
+        <xsl:value-of select="$rowNumber"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+    
+  </xsl:template>
+  
+  <!-- Check if "Merge Cell" exist in row-->
+  <xsl:template match="table:table-row" mode="mergestyle">
+    <xsl:param name="rowNumber"/>
+    
+    <xsl:if test="table:table-cell[@table:number-columns-spanned]">   
+      
+      <xsl:choose>
+        <xsl:when test="node()[1][name()='table:covered-table-cell']">          
+          <xsl:for-each select="table:covered-table-cell[1]">
+            <xsl:call-template name="MergeRowStyle">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">1</xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>            
+        </xsl:when>          
+        <xsl:otherwise>
+          <xsl:for-each select="table:table-cell[1]">
+            <xsl:call-template name="MergeRowStyle">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">1</xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+      
+    </xsl:if>
+    
+    <!-- Check if next row exist -->
+    <xsl:if test="following-sibling::table:table-row">
+      <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="mergestyle">
+        <xsl:with-param name="rowNumber">
+          <xsl:choose>
+            <xsl:when test="following-sibling::table:table-row[1]/@table:number-rows-repeated">
+              <xsl:value-of select="$rowNumber + following-sibling::table:table-row[1]/@table:number-rows-repeated"/>    
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$rowNumber + 1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- to insert merge cell style -->
+  <xsl:template name="MergeRowStyle">
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="colNumber"/>
+    
+    
+    <!-- Merge Cell-->    
+    <xsl:choose>
+      <xsl:when test="@table:number-columns-spanned">
+        
+        <xsl:variable name="CollStartChar">
+          <xsl:call-template name="NumbersToChars">
+            <xsl:with-param name="num">
+              <xsl:value-of select="$colNumber - 1"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:variable name="CollEndChar">
+          <xsl:call-template name="NumbersToChars">
+            <xsl:with-param name="num">
+              <xsl:value-of select="@table:number-columns-spanned + $colNumber - 2"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>        
+        <xsl:value-of select="concat(concat(concat(concat($CollStartChar,$rowNumber),':'),  @table:style-name), ';')"/>        
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
+    
+    <!-- Check if next cell exist -->
+    
+    <xsl:if test="following-sibling::table:table-cell">
+      
+      <xsl:variable name="ColumnsRepeated">
+        <xsl:choose>
+          <xsl:when test="@table:number-columns-repeated">
+            <xsl:value-of select="$colNumber + @table:number-columns-repeated"/>
+          </xsl:when>        
+          <xsl:otherwise>
+            <xsl:value-of select="$colNumber + 1"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+      <xsl:choose>
+        <xsl:when test="following-sibling::node()[1][name()='table:covered-table-cell']">
+          <xsl:for-each select="following-sibling::table:covered-table-cell[1]">
+            <xsl:call-template name="MergeRowStyle">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">
+                <xsl:value-of select="$ColumnsRepeated"/>            
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>    
+        </xsl:when>
+        
+        <xsl:otherwise>
+          <xsl:for-each select="following-sibling::table:table-cell[1]">
+            <xsl:call-template name="MergeRowStyle">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">
+                <xsl:value-of select="$ColumnsRepeated"/>            
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>   
+      
+    </xsl:if>
+    
+  </xsl:template>
+  
+  
+  
+  
   <!-- Variable with Merge Cell -->
   
   <xsl:template name="WriteMergeCell">
@@ -135,6 +284,86 @@
       </xsl:otherwise>
     </xsl:choose>
     
+  </xsl:template>
+  
+  <!-- Check if this cell is in merge cells -->
+  <xsl:template name="CheckIfInMerge">
+    <xsl:param name="MergeCell"/>     
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    
+    <xsl:variable name="ref">
+      <xsl:value-of select="substring-before($MergeCell, ';')"/>
+    </xsl:variable>
+    
+    <xsl:variable name="StartMergeCell">
+        <xsl:value-of select="substring-before($ref, ':')"/>
+    </xsl:variable>
+    
+    <xsl:variable name="EndMergeCell">
+      <xsl:value-of select="substring-after($ref, ':')"/>
+    </xsl:variable>
+    
+    <xsl:variable name="StartColNum">
+      <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$StartMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="StartRowNum">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$StartMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="EndColNum">
+      <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$EndMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="EndRowNum">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="$EndMergeCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+      
+      <!-- Checks if this cell is in "Merge Cell" -->
+      <xsl:when
+        test="($colNumber &gt;= $StartColNum and $EndRowNum &gt;= $colNumber) and ($rowNumber &gt;= $StartRowNum and $EndRowNum &gt;= $rowNumber)">
+            <xsl:value-of select="$StartMergeCell"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="substring-after($MergeCell, ';') != ''">
+            <xsl:call-template name="CheckIfInMerge">
+              <xsl:with-param name="MergeCell">
+                <xsl:value-of select="substring-after($MergeCell, ';')"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNumber">
+                <xsl:value-of select="$colNumber"/>
+              </xsl:with-param>
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNumber"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   

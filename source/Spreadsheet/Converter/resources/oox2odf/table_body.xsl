@@ -49,7 +49,7 @@
         test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = ''">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="65536">
-          <table:table-cell/>
+          <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>
       <xsl:when test="$BigMergeRow != '' and e:worksheet/e:sheetData/e:row/e:c">
@@ -905,7 +905,6 @@
         <xsl:value-of select="generate-id(key('Xf', '')[1])"/>
       </xsl:for-each>
     </xsl:variable>
-
     <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:cols">
       <xsl:apply-templates select="e:col[1]">
         <xsl:with-param name="number">1</xsl:with-param>
@@ -949,8 +948,8 @@
     <xsl:choose>
       <!-- when this column is the first non-default one but it's not the column A -->
       <xsl:when test="$number=1 and @min>1">
-        <table:table-column>
 
+        <table:table-column>
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="document(concat('xl/',$sheet))">
               <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
@@ -965,16 +964,19 @@
             <xsl:value-of select="@min - 1"/>
           </xsl:attribute>
 
-          <xsl:if test="@style">
+          <!-- Possible are nesesary code -->
+          <!--xsl:if test="@style">            
             <xsl:variable name="position">
               <xsl:value-of select="$this/@style + 1"/>
             </xsl:variable>
+            
             <xsl:attribute name="table:default-cell-style-name">
               <xsl:for-each select="document('xl/styles.xml')">
                 <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
               </xsl:for-each>
             </xsl:attribute>
-          </xsl:if>
+            </xsl:if-->
+          
         </table:table-column>
 
       </xsl:when>

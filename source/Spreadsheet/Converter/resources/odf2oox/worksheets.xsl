@@ -84,7 +84,12 @@
       <xsl:variable name="MergeCell">
         <xsl:call-template name="WriteMergeCell"/>  
       </xsl:variable>
-      
+
+      <xsl:variable name="MergeCellStyle">
+      <xsl:call-template name="WriteMergeStyle"/>
+      </xsl:variable>
+
+
       <xsl:variable name="pageStyle">
         <xsl:value-of
           select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default' ]/@style:page-layout-name"
@@ -106,6 +111,9 @@
         <xsl:with-param name="MergeCell">
           <xsl:value-of select="$MergeCell"/>
         </xsl:with-param>
+        <xsl:with-param name="MergeCellStyle">
+          <xsl:value-of select="$MergeCellStyle"/>
+        </xsl:with-param>
       </xsl:call-template>
 
       <xsl:call-template name="InsertSheetContent">
@@ -114,12 +122,18 @@
         <xsl:with-param name="MergeCell">
           <xsl:value-of select="$MergeCell"/>
         </xsl:with-param>
+        <xsl:with-param name="MergeCellStyle">
+          <xsl:value-of select="$MergeCellStyle"/>
+        </xsl:with-param>
       </xsl:call-template>
 
       <!-- Insert Merge Cells -->
       <xsl:call-template name="InsertMergeCells">
         <xsl:with-param name="MergeCell">
           <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCellStyle">
+          <xsl:value-of select="$MergeCellStyle"/>
         </xsl:with-param>
       </xsl:call-template>
 
@@ -131,6 +145,7 @@
   <xsl:template name="InsertViewSettings">
     <xsl:param name="sheetId"/>
     <xsl:param name="MergeCell"/>
+    <xsl:param name="MergeCellStyle"/>
 
     <sheetViews>
       <sheetView workbookViewId="0">
@@ -290,6 +305,7 @@
     <xsl:param name="sheetId"/>
     <xsl:param name="cellNumber"/>
     <xsl:param name="MergeCell"/>
+    <xsl:param name="MergeCellStyle"/>
 
     <!-- compute default row height -->
     <xsl:variable name="defaultRowHeight">
@@ -337,9 +353,14 @@
         </xsl:with-param>
         </xsl:apply-templates>
       </xsl:variable>
+    
+    <!-- Check if default border areexisted in default column-->
+    <xsl:variable name="CheckIfDefaultBorder">
+      <xsl:apply-templates select="table:table-column[1]" mode="DefaultBorder"/>
+    </xsl:variable>
+    
       
       <!-- Check if 65536 rows are hidden -->
-
       <xsl:variable name="CheckRowHidden">
         <xsl:choose>
           <xsl:when test="table:table-row[@table:visibility='collapse']">
@@ -439,9 +460,15 @@
         <xsl:with-param name="MergeCell">
           <xsl:value-of select="$MergeCell"/>
         </xsl:with-param>
+        <xsl:with-param name="MergeCellStyle">
+          <xsl:value-of select="$MergeCellStyle"/>
+        </xsl:with-param>
         <xsl:with-param name="CheckRowHidden">
             <xsl:value-of select="$CheckRowHidden"/>
-          </xsl:with-param>
+        </xsl:with-param>
+        <xsl:with-param name="CheckIfDefaultBorder">
+          <xsl:value-of select="$CheckIfDefaultBorder"/>
+        </xsl:with-param>        
       </xsl:apply-templates>
 
     </sheetData>
@@ -708,6 +735,24 @@
       </xsl:otherwise>
     </xsl:choose>
 
+  </xsl:template>
+  
+  <xsl:template match="table:table-column" mode="DefaultBorder">
+    <xsl:choose>
+      <xsl:when test="key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border">
+        <xsl:text>true</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="following-sibling::table:table-column">
+            <xsl:apply-templates select="following-sibling::table:table-column[1]" mode="DefaultBorder"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>    
   </xsl:template>
 
 </xsl:stylesheet>
