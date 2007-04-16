@@ -135,41 +135,9 @@
       </xsl:for-each>
     </sheets>
     <definedNames>
-      <xsl:for-each select="table:table[@table:print-ranges]">
-        <definedName name="_xlnm.Print_Area">
-          <xsl:attribute name="localSheetId">
-            <xsl:value-of select="position() - 1"/>
-          </xsl:attribute>
-          <xsl:variable name="print-ranges"/>
-          <xsl:variable name="row1">
-            <xsl:call-template name="GetRowNum">
-              <xsl:with-param name="cell"
-                select="concat(substring-after(@table:print-ranges,'.'),substring-before(@table:print-ranges,':'))"
-              />
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="col1">
-            <xsl:value-of select="substring-before(substring-after(@table:print-ranges,'.'),$row1)"
-            />
-          </xsl:variable>
-          <xsl:variable name="row2">
-            <xsl:call-template name="GetRowNum">
-              <xsl:with-param name="cell"
-                select="substring-after(substring-after(@table:print-ranges,'.'),'.')"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="col2">
-            <xsl:value-of
-              select="substring-before(substring-after(substring-after(@table:print-ranges,'.'),'.'),$row2)"
-            />
-          </xsl:variable>
-          <xsl:value-of
-            select="concat(substring-after(@table:name,''),'!$',substring-before(substring-after(@table:print-ranges,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"
-          />
-        </definedName>
-      </xsl:for-each>
+      <xsl:call-template name="InsertPrintRanges"/>
     </definedNames>
-    
+
   </xsl:template>
 
   <!-- insert all sheets -->
@@ -209,6 +177,44 @@
         <xsl:value-of select="$name"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertPrintRanges">
+    <xsl:for-each select="table:table">
+      <xsl:if test="@table:print-ranges">
+        <definedName name="_xlnm.Print_Area">
+          <xsl:attribute name="localSheetId">
+            <xsl:value-of select="position() - 1"/>
+          </xsl:attribute>
+          <xsl:variable name="print-ranges"/>
+          <xsl:variable name="row1">
+            <xsl:call-template name="GetRowNum">
+              <xsl:with-param name="cell"
+                select="concat(substring-after(@table:print-ranges,'.'),substring-before(@table:print-ranges,':'))"
+              />
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="col1">
+            <xsl:value-of select="substring-before(substring-after(@table:print-ranges,'.'),$row1)"
+            />
+          </xsl:variable>
+          <xsl:variable name="row2">
+            <xsl:call-template name="GetRowNum">
+              <xsl:with-param name="cell"
+                select="substring-after(substring-after(@table:print-ranges,'.'),'.')"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="col2">
+            <xsl:value-of
+              select="substring-before(substring-after(substring-after(@table:print-ranges,'.'),'.'),$row2)"
+            />
+          </xsl:variable>
+          <xsl:value-of
+            select="concat(substring-after(@table:name,''),'!$',substring-before(substring-after(@table:print-ranges,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"
+          />
+        </definedName>
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>
