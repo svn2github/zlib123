@@ -136,6 +136,7 @@
     </sheets>
     <definedNames>
       <xsl:call-template name="InsertPrintRanges"/>
+      <xsl:call-template name="InsertHeaderRows"/>
     </definedNames>
 
   </xsl:template>
@@ -186,7 +187,7 @@
           <xsl:attribute name="localSheetId">
             <xsl:value-of select="position() - 1"/>
           </xsl:attribute>
-          <xsl:variable name="print-ranges"/>
+
           <xsl:variable name="row1">
             <xsl:call-template name="GetRowNum">
               <xsl:with-param name="cell"
@@ -194,21 +195,25 @@
               />
             </xsl:call-template>
           </xsl:variable>
+
           <xsl:variable name="col1">
             <xsl:value-of select="substring-before(substring-after(@table:print-ranges,'.'),$row1)"
             />
           </xsl:variable>
+
           <xsl:variable name="row2">
             <xsl:call-template name="GetRowNum">
               <xsl:with-param name="cell"
                 select="substring-after(substring-after(@table:print-ranges,'.'),'.')"/>
             </xsl:call-template>
           </xsl:variable>
+
           <xsl:variable name="col2">
             <xsl:value-of
               select="substring-before(substring-after(substring-after(@table:print-ranges,'.'),'.'),$row2)"
             />
           </xsl:variable>
+
           <xsl:value-of
             select="concat(substring-after(@table:name,''),'!$',substring-before(substring-after(@table:print-ranges,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"
           />
@@ -217,4 +222,58 @@
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template name="InsertHeaderRows">
+    <xsl:for-each select="table:table">
+      <xsl:if test="table:table-header-rows">
+        <definedName name="_xlnm.Print_Titles">
+          <xsl:attribute name="localSheetId">
+            <xsl:value-of select="position() - 1"/>
+          </xsl:attribute>
+
+          <xsl:variable name="headerRowStart">
+            <xsl:for-each select="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1]">
+              <xsl:call-template name="CountHeaderRowsStart"/>
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:variable name="headerRows">
+            <xsl:for-each select="table:table-header-rows/table:table-row[1]">
+              <xsl:call-template name="CountRows"/>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          <xsl:value-of select="concat(@table:name,'!$',$headerRowStart,':$',$headerRowStart + $headerRows  - 1)"/>
+        </definedName>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+
+<xsl:template name="CountHeaderRowsStart">
+  <xsl:param name="value" select="0"/>
+  
+  <xsl:variable name="rows">
+    <xsl:choose>
+      <xsl:when test="@table:number-rows-repeated">
+        <xsl:value-of select="@table:number-rows-repeated"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>1</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  
+  <xsl:choose>
+    <xsl:when test="name() = 'table:table-row' ">
+      <xsl:for-each select="following-sibling::node()[1]">
+        <xsl:call-template name="CountHeaderRowsStart">
+          <xsl:with-param name="value" select="$value + $rows"/>
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="$value + 1"/>
+    </xsl:otherwise>
+  </xsl:choose>  
+</xsl:template>
+  
 </xsl:stylesheet>

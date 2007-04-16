@@ -502,8 +502,6 @@
           </xsl:apply-templates>
         </xsl:when>
       </xsl:choose>
-
-
     </sheetData>
   </xsl:template>
 
@@ -787,6 +785,34 @@
             <xsl:text>false</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="CountRows">
+    <xsl:param name="value" select="1"/>
+
+    <xsl:variable name="rows">
+      <xsl:choose>
+        <xsl:when test="@table:number-rows-repeated">
+          <xsl:value-of select="@table:number-rows-repeated"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="following-sibling::table:table-row[1]">
+        <xsl:for-each select="following-sibling::table:table-row[1]">
+          <xsl:call-template name="CountRows">
+            <xsl:with-param name="value" select="number($value)+number($rows)"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
