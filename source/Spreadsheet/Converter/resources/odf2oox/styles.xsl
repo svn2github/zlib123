@@ -184,6 +184,11 @@
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles"
         mode="fonts"/>
+
+  <xsl:apply-templates
+        select="document('styles.xml')/office:document-styles/office:styles"
+        mode="fonts"/>
+
     </fonts>
   </xsl:template>
 
@@ -212,15 +217,14 @@
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles"
         mode="border"/>
-    </borders>
+   
+ <xsl:apply-templates
+        select="document('styles.xml')/office:document-styles/office:styles"
+        mode="border"/>
+ </borders>
   </xsl:template>
 
-  <xsl:template name="InsertFormatingRecords">
-    <cellStyleXfs count="1">
-      <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
-    </cellStyleXfs>
-  </xsl:template>
-
+  
   <xsl:template name="InsertCellFormats">
 
     <!-- number of multiline cells in document -->
@@ -240,6 +244,94 @@
 
     </xsl:variable>
 
+ <xsl:variable name="numStyleCount">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
+      />
+    </xsl:variable>
+    
+    <xsl:variable name="styleNumStyleCount">
+      <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:number-style)"/>
+    </xsl:variable>
+    
+    <xsl:variable name="percentStyleCount">
+      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"/>  
+    </xsl:variable>
+
+  <xsl:variable name="stylePercentStyleCount">
+        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:percentage-style)"/>
+      </xsl:variable>
+      
+<xsl:variable name="currencyStyleCount">
+        <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"/>
+</xsl:variable>
+
+
+<cellStyleXfs>
+        
+        <xsl:attribute name="count">
+          <xsl:value-of
+            select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines"
+          />
+        </xsl:attribute>
+        
+        <!-- default style -->
+        <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
+        
+        <xsl:apply-templates
+          select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
+          mode="cellFormats">
+          <xsl:with-param name="numStyleCount">
+            <xsl:value-of select="$numStyleCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleNumStyleCount">
+            <xsl:value-of select="$styleNumStyleCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="percentStyleCount">
+            <xsl:value-of select="$percentStyleCount"/>
+          </xsl:with-param>
+         <xsl:with-param name="stylePercentStyleCount">
+          <xsl:value-of select="$stylePercentStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="currencyStyleCount">
+          <xsl:value-of select="$currencyStyleCount"/>
+        </xsl:with-param>          
+        </xsl:apply-templates>    
+        
+        
+        <xsl:apply-templates
+          select="document('styles.xml')/office:document-styles/office:styles/style:style"
+          mode="cellFormats">
+          <xsl:with-param name="numStyleCount">
+            <xsl:value-of select="$numStyleCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="styleNumStyleCount">
+            <xsl:value-of select="$styleNumStyleCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="percentStyleCount">
+            <xsl:value-of select="$percentStyleCount"/>
+          </xsl:with-param>
+          <xsl:with-param name="stylePercentStyleCount">
+          <xsl:value-of select="$stylePercentStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="currencyStyleCount">
+          <xsl:value-of select="$currencyStyleCount"/>
+        </xsl:with-param>
+         <xsl:with-param name="FileName">
+            <xsl:text>styles</xsl:text>
+         </xsl:with-param>
+          <xsl:with-param name="AtributeName">
+            <xsl:text>cellStyleXfs</xsl:text>
+          </xsl:with-param>
+        </xsl:apply-templates>    
+        
+        
+        
+        <!-- add cell formats for multiline cells, which must have wrap property -->
+        <xsl:call-template name="InsertMultilineCellFormats"/>
+        
+     </cellStyleXfs>
+
     <cellXfs>
 
       <xsl:attribute name="count">
@@ -250,28 +342,6 @@
 
       <!-- default style -->
       <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
-
-      <xsl:variable name="numStyleCount">
-        <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
-        />
-      </xsl:variable>
-      
-      <xsl:variable name="styleNumStyleCount">
-        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:number-style)"/>
-      </xsl:variable>
-
-      <xsl:variable name="percentStyleCount">
-        <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:percentage-style)"/>  
-      </xsl:variable>
-      
-      <xsl:variable name="stylePercentStyleCount">
-        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:percentage-style)"/>
-      </xsl:variable>
-      
-      <xsl:variable name="currencyStyleCount">
-        <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"/>
-      </xsl:variable>
       
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
@@ -293,6 +363,29 @@
         </xsl:with-param>
       </xsl:apply-templates>
 
+	<xsl:apply-templates
+        select="document('styles.xml')/office:document-styles/office:styles/style:style"
+        mode="cellFormats">
+        <xsl:with-param name="numStyleCount">
+          <xsl:value-of select="$numStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="styleNumStyleCount">
+          <xsl:value-of select="$styleNumStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="percentStyleCount">
+          <xsl:value-of select="$percentStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="stylePercentStyleCount">
+          <xsl:value-of select="$stylePercentStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="currencyStyleCount">
+          <xsl:value-of select="$currencyStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="FileName">
+          <xsl:text>styles</xsl:text>
+        </xsl:with-param>
+      </xsl:apply-templates>    
+
       <!-- add cell formats for multiline cells, which must have wrap property -->
       <xsl:call-template name="InsertMultilineCellFormats"/>
 
@@ -301,9 +394,29 @@
   </xsl:template>
 
   <xsl:template name="InsertCellStyles">
-    <cellStyles count="1">
-      <cellStyle name="Normal" xfId="0" builtinId="0"/>
+    
+    
+    <cellStyles>
+    <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles">
+      <xsl:apply-templates select="style:style" mode="cellStyle"/>
+    </xsl:for-each>
     </cellStyles>
+  </xsl:template>
+  
+  <xsl:template match="style:style" mode="cellStyle">
+      <cellStyle xfId="{position()}">
+        <xsl:attribute name="name">
+          <xsl:value-of select="@style:name"/>
+        </xsl:attribute>        
+      </cellStyle>    
+  </xsl:template>
+  
+  <xsl:template name="InsertFormatingRecords">
+    <!--cellStyleXfs>
+      <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles">
+        <xsl:apply-templates select="style:style" mode="cellStyle"/>
+      </xsl:for-each>
+    </cellStyleXfs-->
   </xsl:template>
 
   <xsl:template name="InsertFormats">
@@ -356,6 +469,9 @@
     <xsl:param name="percentStyleCount"/>
     <xsl:param name="stylePercentStyleCount"/>
     <xsl:param name="currencyStyleCount"/>
+    <xsl:param name="FileName"/>
+    <xsl:param name="AtributeName"/>
+
 
     <!-- number format id -->
     <xsl:variable name="numFmtId">
@@ -370,10 +486,24 @@
         <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
       </xsl:call-template>
     </xsl:variable>
-
-    <xf numFmtId="{$numFmtId}" fillId="0" borderId="0" xfId="0">
+    
+    <xsl:if test="not($AtributeName = 'cellStyleXfs' and $FileName = '')">
+    <xf numFmtId="{$numFmtId}" fillId="0" borderId="0">
+      <xsl:if test="$AtributeName != 'cellStyleXfs'">
+      <xsl:attribute name="xfId">
+      <xsl:choose>
+        <xsl:when test="$FileName = 'styles'">
+            <xsl:value-of select="position()"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+      </xsl:attribute>    
+      </xsl:if>
       <xsl:call-template name="SetFormatProperties"/>
     </xf>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="SetFormatProperties">

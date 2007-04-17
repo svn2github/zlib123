@@ -426,7 +426,7 @@
     </xsl:variable>
     
     <xsl:if
-      test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or table:covered-table-cell">
+      test="table:table-cell or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or table:covered-table-cell or contains($CheckIfDefaultBorder, 'true')">
      
       <row r="{$rowNumber}">
 
@@ -728,7 +728,11 @@
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
-
+    
+    <xsl:variable name="CountStyleTableCell">     
+      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell'])"/>     
+    </xsl:variable>
+    
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
@@ -748,6 +752,9 @@
       </xsl:with-param>
       <xsl:with-param name="MergeCellStyle">
         <xsl:value-of select="$MergeCellStyle"/>
+      </xsl:with-param>
+      <xsl:with-param name="CountStyleTableCell">
+        <xsl:value-of select="$CountStyleTableCell"/>
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
@@ -837,7 +844,9 @@
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
-
+    <xsl:param name="CountStyleTableCell"/>
+    
+   
     <!-- do not show covered cells content -->    
     
       <xsl:call-template name="InsertCell">
@@ -858,6 +867,9 @@
         </xsl:with-param>
         <xsl:with-param name="MergeCellStyle">
           <xsl:value-of select="$MergeCellStyle"/>
+        </xsl:with-param>
+        <xsl:with-param name="CountStyleTableCell">
+          <xsl:value-of select="$CountStyleTableCell"/>
         </xsl:with-param>
       </xsl:call-template>
     
@@ -887,6 +899,9 @@
           </xsl:with-param>
           <xsl:with-param name="MergeCellStyle">
             <xsl:value-of select="$MergeCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="CountStyleTableCell">
+            <xsl:value-of select="$CountStyleTableCell"/>
           </xsl:with-param>
         </xsl:call-template>
 
@@ -927,6 +942,7 @@
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
+    <xsl:param name="CountStyleTableCell"/>
     
 
     <xsl:variable name="columnCellStyle">
@@ -940,7 +956,7 @@
       </xsl:call-template>
     </xsl:variable>
     
-<xsl:variable name="CheckIfMerge">
+   <xsl:variable name="CheckIfMerge">
     <xsl:call-template name="CheckIfMergeColl">
       <xsl:with-param name="MergeCell">
         <xsl:value-of select="$MergeCell"/>
@@ -1011,33 +1027,89 @@
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
-            
             <xsl:choose>
               <xsl:when test="name() = 'table:covered-table-cell' and substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';') != ''">
                 <xsl:variable name="style">
                   <xsl:value-of select="substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';')"/>
                 </xsl:variable>
-                <xsl:for-each select="key('style', $style)">  
-                  <xsl:attribute name="s">
-                    <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-                  </xsl:attribute>
-                </xsl:for-each>                
+                <xsl:choose>
+                  <xsl:when test="key('style', $style)">
+                    <xsl:for-each select="key('style', $style)">  
+                      <xsl:attribute name="s">
+                        <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                      </xsl:attribute>
+                    </xsl:for-each>    
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:variable name="TableStyleName">
+                      <xsl:value-of select="@table:style-name"/>
+                    </xsl:variable>
+                    <xsl:for-each select="document('styles.xml')">
+                      <xsl:for-each select="key('style',$TableStyleName)">
+                        <xsl:variable name="CountTableCell">
+                          <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                        </xsl:variable>
+                        <xsl:attribute name="s">
+                          <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
+                        </xsl:attribute>
+                      </xsl:for-each>
+                    </xsl:for-each>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:when>            
               <!-- when style is specified in cell -->
-              <xsl:when test="@table:style-name and not(table:covered-table-cell)">                
-                <xsl:for-each select="key('style',@table:style-name)">
-                  <xsl:attribute name="s">
-                    <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-                  </xsl:attribute>
-                </xsl:for-each>
+              <xsl:when test="@table:style-name and not(table:covered-table-cell)">
+                <xsl:choose>
+                  <xsl:when test="key('style',@table:style-name)">
+                    <xsl:for-each select="key('style',@table:style-name)">
+                      <xsl:attribute name="s">
+                        <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                      </xsl:attribute>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:variable name="TableStyleName">
+                      <xsl:value-of select="@table:style-name"/>
+                    </xsl:variable>
+                    <xsl:for-each select="document('styles.xml')">
+                      <xsl:for-each select="key('style',$TableStyleName)">
+                        <xsl:variable name="CountTableCell">
+                          <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                        </xsl:variable>
+                        <xsl:attribute name="s">
+                          <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
+                        </xsl:attribute>
+                      </xsl:for-each>
+                      </xsl:for-each>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:when>
               <!-- when style is specified in column -->
-                <xsl:when test="$columnCellStyle != '' ">
-                  <xsl:for-each select="key('style',$columnCellStyle)">
-                    <xsl:attribute name="s">
-                      <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-                    </xsl:attribute>
-                  </xsl:for-each>
+                <xsl:when test="$columnCellStyle != '' ">                 
+                  <xsl:choose>
+                    <xsl:when test="key('style',@table:style-name)">
+                      <xsl:for-each select="key('style',@table:style-name)">
+                        <xsl:attribute name="s">
+                          <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                        </xsl:attribute>
+                      </xsl:for-each>    
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:variable name="TableStyleName">
+                        <xsl:value-of select="@table:style-name"/>
+                      </xsl:variable>
+                      <xsl:for-each select="document('styles.xml')">
+                        <xsl:for-each select="key('style',$TableStyleName)">
+                          <xsl:variable name="CountTableCell">
+                            <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                          </xsl:variable>
+                          <xsl:attribute name="s">
+                            <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
+                          </xsl:attribute>
+                        </xsl:for-each>
+                      </xsl:for-each>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:when>
             </xsl:choose>
           </xsl:otherwise>
@@ -1109,7 +1181,6 @@
             </xsl:when>
           </xsl:choose>
         </xsl:if>
-        
       </c>
     </xsl:if>
   </xsl:template>
