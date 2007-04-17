@@ -43,6 +43,7 @@
   <xsl:import href="headers.xsl"/>
 
   <xsl:key name="Border" match="e:borders" use="''"/>
+  <xsl:key name="CellStylesId" match="e:cellStyle" use="@xfId"/>
 
   <xsl:template name="styles">
 
@@ -66,6 +67,7 @@
       </office:font-face-decls>
       <office:styles>
         <xsl:call-template name="InsertDefaultTableCellStyle"/>
+        <xsl:call-template name="InsertCellStyle"/>
       </office:styles>
       <office:automatic-styles>
         <xsl:call-template name="InsertPageLayout">
@@ -279,164 +281,172 @@
 
   <!-- cell formats -->
   <xsl:template match="e:xf" mode="automaticstyles">
+    
+    <xsl:if test="@xfId = '0'">
     <style:style style:name="{generate-id(.)}" style:family="table-cell">
-      <xsl:choose>
-        
-        <!-- existing number format -->
-        <xsl:when test="key('numFmtId',@numFmtId)">
-          <xsl:attribute name="style:data-style-name">
+     <xsl:call-template name="InsertCellFormat"/>
+    </style:style>
+    </xsl:if>
+      
+  </xsl:template>
+  
+  <xsl:template name="InsertCellFormat">
+    <xsl:choose>
+      
+      <!-- existing number format -->
+      <xsl:when test="key('numFmtId',@numFmtId)">
+        <xsl:attribute name="style:data-style-name">
           <xsl:value-of select="generate-id(key('numFmtId',@numFmtId))"/>
-          </xsl:attribute>
-        </xsl:when>
-        
-        <!-- fixed number format -->
-        <xsl:when test="@numFmtId &gt; 0">
-          <xsl:attribute name="style:data-style-name">
-            <xsl:value-of select="concat('N',@numFmtId)"/>
-          </xsl:attribute>
-        </xsl:when>
-        
-      </xsl:choose>
-      <xsl:if test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1)">
-        <style:table-cell-properties>
-          <xsl:if test="@applyAlignment = 1">
-            <!-- vertical-align -->
-            <xsl:attribute name="style:vertical-align">
-              <xsl:choose>
-                <xsl:when test="e:alignment/@vertical = 'center' ">
-                  <xsl:text>middle</xsl:text>
-                </xsl:when>
-                <xsl:when test="not(e:alignment/@vertical)">
-                  <xsl:text>bottom</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="e:alignment/@vertical"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="e:alignment/@horizontal = 'fill' ">
-            <xsl:attribute name="style:repeat-content">
-              <xsl:text>true</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if
-            test="e:alignment/@horizontal = 'distributed' or e:alignment/@vertical = 'distributed' ">
-            <xsl:attribute name="fo:wrap-option">
-              <xsl:text>wrap</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="e:alignment/@wrapText">
-            <xsl:attribute name="fo:wrap-option">
-              <xsl:text>wrap</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-
-          <!-- text orientation -->
-          <xsl:if test="e:alignment/@textRotation">
+        </xsl:attribute>
+      </xsl:when>
+      
+      <!-- fixed number format -->
+      <xsl:when test="@numFmtId &gt; 0">
+        <xsl:attribute name="style:data-style-name">
+          <xsl:value-of select="concat('N',@numFmtId)"/>
+        </xsl:attribute>
+      </xsl:when>
+      
+    </xsl:choose>
+    <xsl:if test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0'">
+      <style:table-cell-properties>
+        <xsl:if test="@applyAlignment = 1">
+          <!-- vertical-align -->
+          <xsl:attribute name="style:vertical-align">
             <xsl:choose>
-              <xsl:when test="e:alignment/@textRotation = 255">
-                <xsl:attribute name="style:direction">
-                  <xsl:text>ttb</xsl:text>
-                </xsl:attribute>
+              <xsl:when test="e:alignment/@vertical = 'center' ">
+                <xsl:text>middle</xsl:text>
+              </xsl:when>
+              <xsl:when test="not(e:alignment/@vertical)">
+                <xsl:text>bottom</xsl:text>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:attribute name="style:rotation-angle">
-                  <xsl:choose>
-                    <xsl:when
-                      test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 90">
-                      <xsl:value-of select="e:alignment/@textRotation"/>
-                    </xsl:when>
-                    <xsl:when test="e:alignment/@textRotation &gt; 90">
-                      <xsl:value-of select="450 - e:alignment/@textRotation"/>
-                    </xsl:when>
-                  </xsl:choose>
-                </xsl:attribute>
+                <xsl:value-of select="e:alignment/@vertical"/>
               </xsl:otherwise>
             </xsl:choose>
-            <xsl:attribute name="style:rotation-align">
-              <xsl:text>none</xsl:text>
-            </xsl:attribute>
-          </xsl:if>
-          <xsl:if test="@applyBorder = 1">
-            <xsl:call-template name="InsertBorder"/>
-          </xsl:if>
-          
-          <xsl:if test="@applyProtection=1 and e:protection">
-            <xsl:attribute name="style:cell-protect">
-              <xsl:choose>
-                <xsl:when test="e:protection/@locked=0 and e:protection/@hidden=1">
-                  <xsl:text>formula-hidden</xsl:text>
-                </xsl:when>
-                <xsl:when test="e:protection/@hidden= 1">
-                  <xsl:text>protected formula-hidden</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>protected</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </xsl:if>
-          
-          
-        </style:table-cell-properties>
-
-        <!-- default horizontal alignment when text has angle orientation  -->
-        <xsl:if test="not(e:alignment/@horizontal) and e:alignment/@textRotation">
-          <style:paragraph-properties>
-            <xsl:attribute name="fo:text-align">
-              <xsl:choose>
-                <xsl:when
-                  test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 180">
-                  <xsl:text>start</xsl:text>
-                </xsl:when>
-                <xsl:when
-                  test="e:alignment/@textRotation &gt; 89 and e:alignment/@textRotation &lt; 180">
-                  <xsl:text>end</xsl:text>
-                </xsl:when>
-                <xsl:when test="e:alignment/@textRotation = 255">
-                  <xsl:text>center</xsl:text>
-                </xsl:when>
-              </xsl:choose>
-            </xsl:attribute>
-          </style:paragraph-properties>
+          </xsl:attribute>
         </xsl:if>
-
-        <xsl:if test="e:alignment/@horizontal">
-          <style:paragraph-properties>
-            <!-- horizontal-align -->
-            <xsl:attribute name="fo:text-align">
-              <xsl:choose>
-                <xsl:when test="e:alignment/@horizontal = 'left' ">
-                  <xsl:text>start</xsl:text>
-                </xsl:when>
-                <xsl:when test="e:alignment/@horizontal = 'right' ">
-                  <xsl:text>end</xsl:text>
-                </xsl:when>
-                <xsl:when test="e:alignment/@horizontal = 'centerContinuous' ">
-                  <xsl:text>center</xsl:text>
-                </xsl:when>
-                <xsl:when test="e:alignment/@horizontal = 'distributed' ">
-                  <xsl:text>center</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="e:alignment/@horizontal"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-          </style:paragraph-properties>
+        <xsl:if test="e:alignment/@horizontal = 'fill' ">
+          <xsl:attribute name="style:repeat-content">
+            <xsl:text>true</xsl:text>
+          </xsl:attribute>
         </xsl:if>
+        <xsl:if
+          test="e:alignment/@horizontal = 'distributed' or e:alignment/@vertical = 'distributed' ">
+          <xsl:attribute name="fo:wrap-option">
+            <xsl:text>wrap</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="e:alignment/@wrapText">
+          <xsl:attribute name="fo:wrap-option">
+            <xsl:text>wrap</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <!-- text orientation -->
+        <xsl:if test="e:alignment/@textRotation">
+          <xsl:choose>
+            <xsl:when test="e:alignment/@textRotation = 255">
+              <xsl:attribute name="style:direction">
+                <xsl:text>ttb</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="style:rotation-angle">
+                <xsl:choose>
+                  <xsl:when
+                    test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 90">
+                    <xsl:value-of select="e:alignment/@textRotation"/>
+                  </xsl:when>
+                  <xsl:when test="e:alignment/@textRotation &gt; 90">
+                    <xsl:value-of select="450 - e:alignment/@textRotation"/>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:attribute name="style:rotation-align">
+            <xsl:text>none</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:if test="@applyBorder = 1 or  @borderId != '0'">
+          <xsl:call-template name="InsertBorder"/>
+        </xsl:if>
+        
+        <xsl:if test="@applyProtection=1 and e:protection">
+          <xsl:attribute name="style:cell-protect">
+            <xsl:choose>
+              <xsl:when test="e:protection/@locked=0 and e:protection/@hidden=1">
+                <xsl:text>formula-hidden</xsl:text>
+              </xsl:when>
+              <xsl:when test="e:protection/@hidden= 1">
+                <xsl:text>protected formula-hidden</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>protected</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
+        
+        
+      </style:table-cell-properties>
+      
+      <!-- default horizontal alignment when text has angle orientation  -->
+      <xsl:if test="not(e:alignment/@horizontal) and e:alignment/@textRotation">
+        <style:paragraph-properties>
+          <xsl:attribute name="fo:text-align">
+            <xsl:choose>
+              <xsl:when
+                test="e:alignment/@textRotation &lt; 90 or e:alignment/@textRotation = 180">
+                <xsl:text>start</xsl:text>
+              </xsl:when>
+              <xsl:when
+                test="e:alignment/@textRotation &gt; 89 and e:alignment/@textRotation &lt; 180">
+                <xsl:text>end</xsl:text>
+              </xsl:when>
+              <xsl:when test="e:alignment/@textRotation = 255">
+                <xsl:text>center</xsl:text>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:attribute>
+        </style:paragraph-properties>
       </xsl:if>
-
-      <xsl:if test="@applyFont = 1">
-        <style:text-properties>
-          <xsl:variable name="this" select="."/>
-          <xsl:apply-templates
-            select="ancestor::e:styleSheet/e:fonts/e:font[position() = $this/@fontId + 1]"
-            mode="style"/>
-        </style:text-properties>
+      
+      <xsl:if test="e:alignment/@horizontal">
+        <style:paragraph-properties>
+          <!-- horizontal-align -->
+          <xsl:attribute name="fo:text-align">
+            <xsl:choose>
+              <xsl:when test="e:alignment/@horizontal = 'left' ">
+                <xsl:text>start</xsl:text>
+              </xsl:when>
+              <xsl:when test="e:alignment/@horizontal = 'right' ">
+                <xsl:text>end</xsl:text>
+              </xsl:when>
+              <xsl:when test="e:alignment/@horizontal = 'centerContinuous' ">
+                <xsl:text>center</xsl:text>
+              </xsl:when>
+              <xsl:when test="e:alignment/@horizontal = 'distributed' ">
+                <xsl:text>center</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="e:alignment/@horizontal"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </style:paragraph-properties>
       </xsl:if>
-    </style:style>
+    </xsl:if>
+    
+    <xsl:if test="@applyFont = 1 or  @fontId != ''">
+      <style:text-properties>
+        <xsl:variable name="this" select="."/>
+        <xsl:apply-templates
+          select="ancestor::e:styleSheet/e:fonts/e:font[position() = $this/@fontId + 1]"
+          mode="style"/>
+      </style:text-properties>
+    </xsl:if>
   </xsl:template>
 
   <!-- convert font name-->
@@ -775,6 +785,27 @@
         </xsl:attribute>
       </xsl:if>
     </xsl:for-each>
+  </xsl:template>
+  
+ 
+  <xsl:template name="InsertCellStyle">
+    <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs">
+        <xsl:apply-templates select="e:xf" mode="stylesandformating"/>
+      </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template match="e:xf" mode="stylesandformating">
+    <xsl:if test="@xfId != '0'">
+      <style:style>
+        <xsl:attribute name="style:name">
+          <xsl:value-of select="key('CellStylesId', @xfId)/@name"/>
+        </xsl:attribute>
+        <xsl:attribute name="style:family">
+          <xsl:text>table-cell</xsl:text>
+        </xsl:attribute>
+        <xsl:call-template name="InsertCellFormat"/>
+      </style:style>
+    </xsl:if>
   </xsl:template>
   
 </xsl:stylesheet>
