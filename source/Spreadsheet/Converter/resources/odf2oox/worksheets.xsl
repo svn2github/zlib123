@@ -790,7 +790,7 @@
   </xsl:template>
 
   <xsl:template name="CountRows">
-    <xsl:param name="value" select="1"/>
+    <xsl:param name="value" select="0"/>
 
     <xsl:variable name="rows">
       <xsl:choose>
@@ -812,7 +812,7 @@
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$value"/>
+        <xsl:value-of select="$value + $rows"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
