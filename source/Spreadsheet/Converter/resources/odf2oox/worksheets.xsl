@@ -455,7 +455,7 @@
       <xsl:choose>
         <!-- when the first row is a simple row -->
         <xsl:when
-          test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1][name() = 'table:table-row' ]">
+          test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1][name() = 'table:table-row' ]">
           <xsl:apply-templates select="table:table-row[1]" mode="sheet">
             <xsl:with-param name="rowNumber">1</xsl:with-param>
             <xsl:with-param name="cellNumber" select="$cellNumber"/>
@@ -479,7 +479,7 @@
         </xsl:when>
         <!-- when the first row is a header row -->
         <xsl:when
-          test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1][name() = 'table:table-header-rows' ]">
+          test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms'][1][name() = 'table:table-header-rows' ]">
           <xsl:apply-templates select="table:table-header-rows/table:table-row[1]" mode="sheet">
             <xsl:with-param name="rowNumber">1</xsl:with-param>
             <xsl:with-param name="cellNumber" select="$cellNumber"/>
