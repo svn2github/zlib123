@@ -386,9 +386,9 @@
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
-
+    
     <xsl:choose>
-
+      
       <!-- Insert covered cell if this is Merge Cell -->
       <xsl:when test="contains($CheckIfMerge,'true')">
         <xsl:choose>
@@ -413,7 +413,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
+      
       <xsl:otherwise>
         <!-- insert this one cell-->
         <table:table-cell>
@@ -564,8 +564,11 @@
                     <xsl:when test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
                       <xsl:text>percentage</xsl:text>
                     </xsl:when>
+                    <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'[$')">
+                      <xsl:text>currency</xsl:text>
+                    </xsl:when>
                     <xsl:otherwise>
-                  <xsl:text>float</xsl:text>
+                      <xsl:text>float</xsl:text>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:attribute>
@@ -589,7 +592,7 @@
             </xsl:choose>
           </xsl:if>
         </table:table-cell>
-
+        
         <!-- Insert covered cell if Merge Cell is starting-->
         <xsl:choose>
           <xsl:when
@@ -636,7 +639,7 @@
         
       </xsl:otherwise>
     </xsl:choose>
-
+    
   </xsl:template>
 
   <xsl:template name="InsertNextCell">
@@ -1113,6 +1116,49 @@
         <xsl:value-of select="concat($outputValue,'%')"/>
       </xsl:when>
       
+      <!-- add currency symbol if there is one-->
+      <xsl:when test="contains($formatCode,'[$') or contains($formatCode,'zł')">
+        <xsl:variable name="currency">
+          <xsl:choose>
+            <xsl:when test="contains($formatCode,'zł')">zł</xsl:when>
+            <xsl:when test="contains($formatCode,'Red')">
+              <xsl:variable name="tempFormat">
+                <xsl:value-of select="substring-after(substring-before(substring-after($formatCode,'Red]'),']'),'[$')"/>
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when test="contains($tempFormat,'-')">
+                  <xsl:value-of select="substring-before($tempFormat,'-')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$tempFormat"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:variable name="tempFormat2">
+              <xsl:value-of select="substring-after(substring-before($formatCode,']'),'[$')"/>
+              </xsl:variable>
+              <xsl:choose>
+                <xsl:when test="contains($tempFormat2,'-')">
+                  <xsl:value-of select="substring-before($tempFormat2,'-')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$tempFormat2"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="contains(substring-before($formatCode,$currency),'0') or contains(substring-before($formatCode,$currency),'#')">
+            <xsl:value-of select="concat($outputValue,$currency)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($currency,$outputValue)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+        
       <xsl:otherwise>
         <xsl:value-of select="$outputValue"/>
       </xsl:otherwise>
@@ -1125,13 +1171,23 @@
     <xsl:param name="valueAfterComma"/>
     <xsl:param name="valueBeforeComma"/>
     <xsl:param name="format"/>
+    <xsl:variable name="plainFormat">
+      <xsl:choose>
+        <xsl:when test="contains(substring-after($format,'.'),'\')">
+          <xsl:value-of select="substring-before($format,'\')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$format"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:choose>
       <xsl:when test="not(contains($format,'.'))">
         <xsl:value-of select="$valueBeforeComma"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of
-          select="concat($valueBeforeComma,format-number(concat('.',$valueAfterComma),concat('.',substring-after($format,'.'))))"
+          select="concat($valueBeforeComma,format-number(concat('.',$valueAfterComma),concat('.',substring-after($plainFormat,'.'))))"
         />
       </xsl:otherwise>
     </xsl:choose>
