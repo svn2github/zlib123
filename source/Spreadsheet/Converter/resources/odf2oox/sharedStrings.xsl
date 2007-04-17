@@ -40,7 +40,7 @@
   <xsl:import href="measures.xsl"/>
 
   <xsl:key name="stringCell"
-    match="table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))]"
+    match="table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency')))]"
     use="''"/>
   <!-- template which inserts sharedstringscontent -->
   <xsl:template name="InsertSharedStrings">

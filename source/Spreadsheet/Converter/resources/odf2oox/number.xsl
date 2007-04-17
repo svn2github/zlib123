@@ -285,13 +285,13 @@
     <!-- add currency symbol -->
     <xsl:choose>
       <xsl:when test="$currencySymbol and $currencySymbol!='' and number:number/following-sibling::number:currency-symbol">
-        <xsl:value-of select="concat(concat($endValue,'\ '),$currencySymbol)"/>
+        <xsl:value-of select="concat(concat($finalValue,'\ '),$currencySymbol)"/>
       </xsl:when>
       <xsl:when test="$currencySymbol and $currencySymbol!='' and number:number/preceding-sibling::number:currency-symbol">
-        <xsl:value-of select="concat($currencySymbol,$endValue)"/>
+        <xsl:value-of select="concat($currencySymbol,$finalValue)"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$endValue"/>
+        <xsl:value-of select="$finalValue"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
