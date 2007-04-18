@@ -971,11 +971,11 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template name="InsertColumnStyle">
+  <xsl:template match="e:col">
     <xsl:param name="number"/>
     <xsl:param name="sheet"/>
     <xsl:param name="DefaultCellStyleName"/>
-    <xsl:param name="this"/>
+    <xsl:param name="this" select="."/>
 
     <!-- if there were columns with default properties before this column then insert default columns-->
     <xsl:choose>

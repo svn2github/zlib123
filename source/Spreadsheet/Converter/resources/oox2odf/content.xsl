@@ -790,26 +790,4 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="e:col">
-    <xsl:param name="number"/>
-    <xsl:param name="sheet"/>
-    <xsl:param name="DefaultCellStyleName"/>
-    <xsl:variable name="this" select="."/>
-
-    <!-- Insert Column Style   -->
-    <xsl:call-template name="InsertColumnStyle">
-      <xsl:with-param name="sheet">
-        <xsl:value-of select="$sheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="DefaultCellStyleName">
-        <xsl:value-of select="$DefaultCellStyleName"/>
-      </xsl:with-param>
-      <xsl:with-param name="number">
-        <xsl:value-of select="$number"/>
-      </xsl:with-param>
-      <xsl:with-param name="this" select="$this"/>
-    </xsl:call-template>
-
-  </xsl:template>
-
 </xsl:stylesheet>
