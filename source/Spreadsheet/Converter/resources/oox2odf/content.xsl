@@ -239,12 +239,12 @@
           <xsl:value-of select="substring-after(substring-after(text(),':'),'$')"/>
         </xsl:for-each>
       </xsl:variable>
-
+      
       <!-- Insert Row  -->
       <xsl:choose>
 
         <!-- if there are header rows -->
-        <xsl:when test="$headerRowsStart != '' ">
+        <xsl:when test="$headerRowsStart != '' and number($headerRowsStart)">
 
           <!-- insert rows before header rows -->
           <xsl:apply-templates
