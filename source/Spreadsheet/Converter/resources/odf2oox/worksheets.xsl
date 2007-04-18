@@ -825,4 +825,32 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="CountCols">
+    <xsl:param name="value" select="0"/>
+    
+    <xsl:variable name="cols">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+          <xsl:value-of select="@table:number-columns-repeated"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="following-sibling::table:table-column[1]">
+        <xsl:for-each select="following-sibling::table:table-column[1]">
+          <xsl:call-template name="CountCols">
+            <xsl:with-param name="value" select="number($value)+number($cols)"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value + $cols"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
 </xsl:stylesheet>
