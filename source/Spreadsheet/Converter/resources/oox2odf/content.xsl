@@ -239,7 +239,7 @@
           <xsl:value-of select="substring-after(substring-after(text(),':'),'$')"/>
         </xsl:for-each>
       </xsl:variable>
-      
+
       <!-- Insert Row  -->
       <xsl:choose>
 
@@ -365,6 +365,24 @@
               <xsl:value-of select="$BigMergeRow"/>
             </xsl:with-param>
           </xsl:apply-templates>
+
+          <xsl:if test="not(e:worksheet/e:sheetData/e:row/e:c/e:v)">
+            <!-- Insert sheet without text -->
+            <xsl:call-template name="InsertEmptySheet">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>
+              <xsl:with-param name="BigMergeCell">
+                <xsl:value-of select="$BigMergeCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="BigMergeRow">
+                <xsl:value-of select="$BigMergeRow"/>
+              </xsl:with-param>
+              <xsl:with-param name="RowNumber">
+                <xsl:value-of select="e:worksheet/e:sheetData/e:row[position() = last()]/@r"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
 
@@ -373,23 +391,6 @@
         <xsl:message terminate="no">translation.oox2odf.RowNumber</xsl:message>
       </xsl:if>
 
-      <xsl:if test="not(e:worksheet/e:sheetData/e:row/e:c/e:v)">
-        <!-- Insert sheet without text -->
-<!--        <xsl:call-template name="InsertEmptySheet">
-          <xsl:with-param name="sheet">
-            <xsl:value-of select="$sheet"/>
-          </xsl:with-param>
-          <xsl:with-param name="BigMergeCell">
-            <xsl:value-of select="$BigMergeCell"/>
-          </xsl:with-param>
-          <xsl:with-param name="BigMergeRow">
-            <xsl:value-of select="$BigMergeRow"/>
-          </xsl:with-param>
-          <xsl:with-param name="RowNumber">
-            <xsl:value-of select="e:worksheet/e:sheetData/e:row[position() = last()]/@r"/>
-          </xsl:with-param>
-        </xsl:call-template>-->
-      </xsl:if>
     </xsl:for-each>
 
   </xsl:template>
@@ -525,21 +526,6 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
-    <!--<zzzzz>
-      <xsl:attribute name="headerStart">
-      <xsl:value-of select="$headerRowsStart"/>
-      </xsl:attribute>
-      <xsl:attribute name="headerEnd">
-      <xsl:value-of select="$headerRowsEnd"/>
-      </xsl:attribute>
-      <xsl:attribute name="position">
-      <xsl:value-of select="position()"/>
-      </xsl:attribute>
-      <xsl:attribute name="row">
-      <xsl:value-of select="@r"/>
-      </xsl:attribute>
-      </zzzzz>-->
 
     <xsl:choose>
       <!-- when this row is the first non-empty one before header but not row 1 and there aren't Big Merge Coll -->
