@@ -229,14 +229,32 @@
       <xsl:variable name="headerRowsStart">
         <xsl:for-each
           select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and contains(text(),$sheetName)]">
-          <xsl:value-of select="substring-before(substring-after(text(),'$'),':')"/>
+          <xsl:choose>
+            <!-- when header columns are present -->
+            <xsl:when test="contains(text(),',')">
+              <xsl:value-of
+                select="substring-before(substring-after(substring-after(text(),','),'$'),':')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(substring-after(text(),'$'),':')"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:for-each>
       </xsl:variable>
 
       <xsl:variable name="headerRowsEnd">
         <xsl:for-each
           select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and contains(text(),$sheetName)]">
-          <xsl:value-of select="substring-after(substring-after(text(),':'),'$')"/>
+          <xsl:choose>
+            <!-- when header columns are present -->
+            <xsl:when test="contains(text(),',')">
+              <xsl:value-of
+                select="substring-after(substring-after(substring-after(text(),','),':'),'$')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(substring-after(text(),':'),'$')"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:for-each>
       </xsl:variable>
 
