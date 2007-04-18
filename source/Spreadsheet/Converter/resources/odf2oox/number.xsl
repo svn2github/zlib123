@@ -233,19 +233,19 @@
             
             <!-- add grouping -->
             <xsl:when test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
-                <xsl:call-template name="AddGrouping">
-                  <xsl:with-param name="value">
-                    <xsl:value-of select="$value"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="numDigits">
-                    <xsl:choose>
-                      <xsl:when test="number:number/@number:min-integer-digits">
-                        <xsl:value-of select="3 - number:number/@number:min-integer-digits"/>
-                      </xsl:when>
-                      <xsl:otherwise>2</xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:with-param>
-                </xsl:call-template>
+              <xsl:call-template name="AddGrouping">
+                <xsl:with-param name="value">
+                  <xsl:value-of select="$value"/>
+                </xsl:with-param>
+                <xsl:with-param name="numDigits">
+                  <xsl:choose>
+                    <xsl:when test="number:number/@number:min-integer-digits">
+                      <xsl:value-of select="3 - number:number/@number:min-integer-digits"/>
+                    </xsl:when>
+                    <xsl:otherwise>2</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:when>
             
             <xsl:otherwise>
@@ -272,23 +272,48 @@
     
     <!-- add color to negative number formatting when necessary -->
     <xsl:variable name="finalValue">
-    <xsl:choose>
-      <xsl:when test="$sign = 'negative' and style:text-properties/@fo:color">
-        <xsl:value-of select="concat('[Red]-',$endValue)"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$endValue"/>
-      </xsl:otherwise>
-    </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="$sign = 'negative' and style:text-properties/@fo:color">
+          <xsl:value-of select="concat('[Red]-',$endValue)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$endValue"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     
     <!-- add currency symbol -->
     <xsl:choose>
       <xsl:when test="$currencySymbol and $currencySymbol!='' and number:number/following-sibling::number:currency-symbol">
-        <xsl:value-of select="concat(concat($finalValue,'\ '),$currencySymbol)"/>
+        
+        <!-- add space before currency symbol -->
+        <xsl:variable name="currencyFormat">
+          <xsl:choose>
+            <xsl:when test="number:number/following-sibling::number:text = ' '">
+              <xsl:value-of select="concat('\ ',$currencySymbol)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$currencySymbol"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:value-of select="concat($finalValue,$currencyFormat)"/>
       </xsl:when>
       <xsl:when test="$currencySymbol and $currencySymbol!='' and number:number/preceding-sibling::number:currency-symbol">
-        <xsl:value-of select="concat($currencySymbol,$finalValue)"/>
+        
+        <!-- add space after currency symbol -->
+        <xsl:variable name="currencyFormat2">
+          <xsl:choose>
+            <xsl:when test="number:number/preceding-sibling::number:text = ' '">
+              <xsl:value-of select="concat($currencySymbol,'\ ')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$currencySymbol"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:value-of select="concat($currencyFormat2,$finalValue)"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$finalValue"/>
@@ -439,7 +464,7 @@
       <xsl:when test="$symbol = 'PLN'">[$PLN]</xsl:when>
       <xsl:when test="$symbol = '€'">
         <xsl:choose>
-          <xsl:when test="following-sibling::number:number">[$€-2]\ </xsl:when>
+          <xsl:when test="following-sibling::number:number">[$€-2]</xsl:when>
           <xsl:otherwise>[$€-1]</xsl:otherwise>
         </xsl:choose>
       </xsl:when>

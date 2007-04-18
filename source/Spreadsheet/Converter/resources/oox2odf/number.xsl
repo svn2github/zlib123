@@ -185,6 +185,14 @@
       <xsl:call-template name="InsertCurrencySymbol">
         <xsl:with-param name="value" select="$currencyFormat"/>
       </xsl:call-template>
+      
+      <!-- add space after currency symbol -->
+      <xsl:if test="contains(substring-after($formatCode,$currencyFormat),'\ ') and (contains(substring-after(substring-after($formatCode,$currencyFormat),'\ '),'0') or contains(substring-after(substring-after($formatCode,$currencyFormat),'\ '),'#'))">
+        <number:text>
+          <xsl:value-of xml:space="preserve" select="' '"/>
+        </number:text>
+      </xsl:if>
+      
     </xsl:if>
     
     <!-- add '-' at the beginning -->
@@ -262,6 +270,14 @@
     
     <!-- add currency symbol at the end -->
     <xsl:if test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($formatCode,$currencyFormat),'0') or contains(substring-before($formatCode,$currencyFormat),'#'))">
+      
+      <!-- add space before currency symbol -->
+      <xsl:if test="contains(substring-before($formatCode,$currencyFormat),'\ ')">
+        <number:text>
+          <xsl:value-of xml:space="preserve" select="' '"/>
+        </number:text>
+      </xsl:if>
+        
       <xsl:call-template name="InsertCurrencySymbol">
         <xsl:with-param name="value" select="$currencyFormat"/>
       </xsl:call-template>

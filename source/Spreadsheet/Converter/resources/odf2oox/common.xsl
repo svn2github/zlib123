@@ -41,7 +41,7 @@
     <xsl:param name="type"/>
     <!-- TO DO percentage -->
     <xsl:choose>     
-      <xsl:when test="$type = 'currency' or $type='float'">n</xsl:when>
+      <xsl:when test="$type='float'">n</xsl:when>
     </xsl:choose>
   </xsl:template>
   
