@@ -975,7 +975,6 @@
     <xsl:param name="number"/>
     <xsl:param name="sheet"/>
     <xsl:param name="DefaultCellStyleName"/>
-    <xsl:param name="this" select="."/>
 
     <!-- if there were columns with default properties before this column then insert default columns-->
     <xsl:choose>
@@ -1052,7 +1051,7 @@
       </xsl:if>
       <xsl:if test="@style">
         <xsl:variable name="position">
-          <xsl:value-of select="$this/@style + 1"/>
+          <xsl:value-of select="@style + 1"/>
         </xsl:variable>
         <xsl:attribute name="table:default-cell-style-name">
           <xsl:for-each select="document('xl/styles.xml')">
