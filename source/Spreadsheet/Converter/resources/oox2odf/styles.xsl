@@ -308,7 +308,7 @@
       </xsl:when>
       
     </xsl:choose>
-    <xsl:if test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0'">
+    <xsl:if test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0' or @applyFill= 1">
       <style:table-cell-properties>
         <xsl:if test="@applyAlignment = 1">
           <!-- vertical-align -->
@@ -389,7 +389,13 @@
           </xsl:attribute>
         </xsl:if>
         
-        
+        <xsl:if test="@applyFill=1">
+          <xsl:variable name="this" select="."/>
+          <xsl:apply-templates
+            select="ancestor::e:styleSheet/e:fills/e:fill[position() = $this/@fillId + 1]"
+            mode="style"/>
+        </xsl:if>
+                
       </style:table-cell-properties>
       
       <!-- default horizontal alignment when text has angle orientation  -->
@@ -568,6 +574,13 @@
     </xsl:attribute>
   </xsl:template>
 
+  <!-- cell color fill -->
+  <xsl:template match="e:fgColor" mode="style">
+    <xsl:attribute name="fo:background-color">
+      <xsl:call-template name="InsertColor"/>
+    </xsl:attribute>
+  </xsl:template>
+    
   <xsl:template match="e:color" mode="style">
 
     <xsl:attribute name="fo:color">

@@ -1058,7 +1058,7 @@
                 </xsl:choose>
               </xsl:when>            
               <!-- when style is specified in cell -->
-              <xsl:when test="@table:style-name and not(table:covered-table-cell)">
+              <xsl:when test="@table:style-name and not(table:covered-table-cell)">                
                 <xsl:choose>
                   <xsl:when test="key('style',@table:style-name)">
                     <xsl:for-each select="key('style',@table:style-name)">
@@ -1085,21 +1085,18 @@
                 </xsl:choose>
               </xsl:when>
               <!-- when style is specified in column -->
-                <xsl:when test="$columnCellStyle != '' ">                 
+                <xsl:when test="$columnCellStyle != '' ">
                   <xsl:choose>
-                    <xsl:when test="key('style',@table:style-name)">
-                      <xsl:for-each select="key('style',@table:style-name)">
+                    <xsl:when test="key('style',$columnCellStyle)">
+                      <xsl:for-each select="key('style',$columnCellStyle)">
                         <xsl:attribute name="s">
                           <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
                         </xsl:attribute>
                       </xsl:for-each>    
                     </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:variable name="TableStyleName">
-                        <xsl:value-of select="@table:style-name"/>
-                      </xsl:variable>
+                    <xsl:otherwise>                      
                       <xsl:for-each select="document('styles.xml')">
-                        <xsl:for-each select="key('style',$TableStyleName)">
+                        <xsl:for-each select="key('style',$columnCellStyle)">
                           <xsl:variable name="CountTableCell">
                             <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
                           </xsl:variable>
