@@ -1035,7 +1035,7 @@
 
       <!-- string with listed columns and their styles -->
       <xsl:variable name="ColumnTable">
-        <xsl:apply-templates select="table:table-column[1]" mode="tag">
+        <xsl:apply-templates select="descendant::table:table-column[1]" mode="tag">
           <xsl:with-param name="colNumber">1</xsl:with-param>
         </xsl:apply-templates>
       </xsl:variable>

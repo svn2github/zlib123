@@ -231,7 +231,7 @@
           </xsl:attribute>
 
           <xsl:variable name="headerRowStart">
-            <xsl:for-each select="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1]">
+            <xsl:for-each select="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1]">
               <xsl:call-template name="CountHeaderRowsStart"/>
             </xsl:for-each>
           </xsl:variable>

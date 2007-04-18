@@ -343,10 +343,9 @@
       </xsl:for-each>
     </xsl:variable>
 
-
     <!-- Check if 256 column are hidden -->
     <xsl:variable name="CheckCollHidden">
-      <xsl:apply-templates select="table:table-column[1]" mode="defaultColWidth">
+      <xsl:apply-templates select="descendant::table:table-column[1]" mode="defaultColWidth">
         <xsl:with-param name="colNumber">
           <xsl:text>1</xsl:text>
         </xsl:with-param>
@@ -358,9 +357,8 @@
 
     <!-- Check if default border areexisted in default column-->
     <xsl:variable name="CheckIfDefaultBorder">
-      <xsl:apply-templates select="table:table-column[1]" mode="DefaultBorder"/>
+      <xsl:apply-templates select="descendant::table:table-column[1]" mode="DefaultBorder"/>
     </xsl:variable>
-
 
     <!-- Check if 65536 rows are hidden -->
     <xsl:variable name="CheckRowHidden">
@@ -378,8 +376,6 @@
       </xsl:choose>
     </xsl:variable>
 
-
-
     <xsl:variable name="defaultFontSize">
       <xsl:choose>
         <xsl:when test="contains($baseFontSize,'pt')">
@@ -394,7 +390,7 @@
     <!-- compute default column width -->
     <xsl:variable name="defaultColWidth">
       <xsl:choose>
-        <xsl:when test="$CheckCollHidden != 'true'">
+        <xsl:when test="$CheckCollHidden != 'true' ">
           <xsl:call-template name="ConvertToCharacters">
             <xsl:with-param name="width">
               <xsl:value-of select="concat('0.8925','in')"/>
@@ -428,14 +424,13 @@
         </xsl:attribute>
       </xsl:if>
 
-
     </sheetFormatPr>
 
-    <xsl:if test="table:table-column">
+    <xsl:if test="descendant::table:table-column[1]">
       <cols>
 
         <!-- insert first column -->
-        <xsl:apply-templates select="table:table-column[1]" mode="sheet">
+        <xsl:apply-templates select="descendant::table:table-column[1]" mode="sheet">
           <xsl:with-param name="colNumber">1</xsl:with-param>
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
@@ -445,12 +440,12 @@
     <sheetData>
 
       <xsl:variable name="ColumnTagNum">
-        <xsl:apply-templates select="table:table-column[1]" mode="tag">
+        <xsl:apply-templates select="descendant::table:table-column[1]" mode="tag">
           <xsl:with-param name="colNumber">1</xsl:with-param>
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
       </xsl:variable>
-
+      
       <!-- insert first row -->
       <xsl:choose>
         <!-- when the first row is a simple row -->
@@ -772,13 +767,26 @@
   <xsl:template match="table:table-column" mode="DefaultBorder">
     <xsl:choose>
       <xsl:when
-        test="key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-bottom or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-left or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-right or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-top or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:background-color">
+        test="key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-top or
+        key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-bottom or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-left or
+        key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-right">
         <xsl:text>true</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="following-sibling::table:table-column">
+          <!-- next column is sibling of this one -->
+          <xsl:when test="following-sibling::node()[1][name() = 'table:table-column' ]">
             <xsl:apply-templates select="following-sibling::table:table-column[1]"
+              mode="DefaultBorder"/>
+          </xsl:when>
+          <!-- this is the last column before header  -->
+          <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-columns' ]">
+            <xsl:apply-templates select="following-sibling::node()[1]/table:table-column[1]"
+              mode="DefaultBorder"/>
+          </xsl:when>
+          <!-- this is the last column inside header  -->
+          <xsl:when test="not(following-sibling::node()[1][name() = 'table:table-column' ]) and parent::node()[name() = 'table:table-header-columns' ] and parent::node()/following-sibling::table:table-column[1]">
+            <xsl:apply-templates select="parent::node()/following-sibling::table:table-column[1]"
               mode="DefaultBorder"/>
           </xsl:when>
           <xsl:otherwise>

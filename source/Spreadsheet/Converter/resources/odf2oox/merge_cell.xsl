@@ -43,7 +43,7 @@
     
     <xsl:choose>
       <!-- when the first row is a simple row -->
-      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1][name() = 'table:table-row' ]">
+      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns'  and name() != 'office:forms' ][1][name() = 'table:table-row' ]">
         <xsl:variable name="rowNumber">
           <xsl:choose>
             <xsl:when test="table:table-row[1]/@table:number-rows-repeated">
@@ -60,7 +60,7 @@
         </xsl:apply-templates>
       </xsl:when>
       <!-- when the first row is a header row -->
-      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1][name() = 'table:table-header-rows' ]">
+      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1][name() = 'table:table-header-rows' ]">
         <xsl:variable name="rowNumber">
           <xsl:choose>
             <xsl:when test="table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
@@ -246,7 +246,7 @@
     
     <xsl:choose>
       <!-- when the first row is a simple row -->
-      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1][name() = 'table:table-row' ]">
+      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1][name() = 'table:table-row' ]">
         <xsl:variable name="rowNumber">
           <xsl:choose>
             <xsl:when test="table:table-row[1]/@table:number-rows-repeated">
@@ -263,7 +263,7 @@
         </xsl:apply-templates>
       </xsl:when>
       <!-- when the first row is a header row -->
-      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' ][1][name() = 'table:table-header-rows' ]">
+      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1][name() = 'table:table-header-rows' ]">
         <xsl:variable name="rowNumber">
           <xsl:choose>
             <xsl:when test="table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
