@@ -83,9 +83,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="resources\odf2oox\odf2oox-compute-size.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\common.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\layouts.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\odf2oox-compute-size.xsl" />
     <EmbeddedResource Include="resources\oox2odf\common.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\presentation.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\slideMasters.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\slides.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\theme.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\slideLayouts.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\shapes_direct.xsl">
+    </EmbeddedResource>
     <Content Include="resources\oox2odf\oox2odf-compute-size.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\shapes_reverse.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
