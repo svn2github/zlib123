@@ -94,7 +94,7 @@
     <EmbeddedResource Include="resources\odf2oox\slideLayouts.xsl" />
     <EmbeddedResource Include="resources\odf2oox\shapes_direct.xsl">
     </EmbeddedResource>
-    <Content Include="resources\oox2odf\oox2odf-compute-size.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
     <EmbeddedResource Include="resources\oox2odf\shapes_reverse.xsl" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
