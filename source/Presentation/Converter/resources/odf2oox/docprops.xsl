@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -6,21 +6,74 @@
   xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" exclude-result-prefixes="office meta">
 
   <xsl:template name="docprops-core">
-    <cp:coreProperties
+    <!--<cp:coreProperties
       xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
       xmlns:dcmitype="http://purl.org/dc/dcmitype/">
       <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta"
         mode="core"/>
 		
-    </cp:coreProperties>
+    </cp:coreProperties-->>	
+	  <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" 
+		  xmlns:dc="http://purl.org/dc/elements/1.1/" 
+		  xmlns:dcterms="http://purl.org/dc/terms/" 
+		  xmlns:dcmitype="http://purl.org/dc/dcmitype/" 
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		  <dc:title>Title</dc:title>
+		  <dc:creator></dc:creator>
+		  <cp:lastModifiedBy>pradeep.n</cp:lastModifiedBy>
+		  <cp:revision>1</cp:revision>
+		  <dcterms:created xsi:type="dcterms:W3CDTF">2006-08-16T00:00:00Z</dcterms:created>
+		  <dcterms:modified xsi:type="dcterms:W3CDTF">2007-04-05T10:53:16Z</dcterms:modified>
+	  </cp:coreProperties>
   </xsl:template>
 
   <xsl:template name="docprops-app">
-    <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
+    <!--<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
       xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
       <xsl:apply-templates select="document('meta.xml')/office:document-meta/office:meta" mode="app"
       />
-    </Properties>
+    </Properties>-->
+	  <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" 
+		  xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
+		  xmlns:dc="http://purl.org/dc/elements/1.1/">
+		  <TotalTime>0</TotalTime>
+		  <Words>3</Words>
+		  <Application>Microsoft Office PowerPoint</Application>
+		  <PresentationFormat>On-screen Show (4:3)</PresentationFormat>
+		  <Paragraphs>2</Paragraphs>
+		  <Slides>1</Slides>
+		  <Notes>0</Notes>
+		  <HiddenSlides>0</HiddenSlides>
+		  <MMClips>0</MMClips>
+		  <ScaleCrop>false</ScaleCrop>
+		  <HeadingPairs>
+			  <vt:vector size="4" baseType="variant">
+				  <vt:variant>
+					  <vt:lpstr>Theme</vt:lpstr>
+				  </vt:variant>
+				  <vt:variant>
+					  <vt:i4>1</vt:i4>
+				  </vt:variant>
+				  <vt:variant>
+					  <vt:lpstr>Slide Titles</vt:lpstr>
+				  </vt:variant>
+				  <vt:variant>
+					  <vt:i4>1</vt:i4>
+				  </vt:variant>
+			  </vt:vector>
+		  </HeadingPairs>
+		  <TitlesOfParts>
+			  <vt:vector size="2" baseType="lpstr">
+				  <vt:lpstr>Office Theme</vt:lpstr>
+				  <vt:lpstr>Title</vt:lpstr>
+			  </vt:vector>
+		  </TitlesOfParts>
+		  <Company></Company>
+		  <LinksUpToDate>false</LinksUpToDate>
+		  <SharedDoc>false</SharedDoc>
+		  <HyperlinksChanged>false</HyperlinksChanged>
+		  <AppVersion>12.0000</AppVersion>
+	  </Properties>
   </xsl:template>
 
   <xsl:template name="docprops-custom">
@@ -372,4 +425,52 @@
     </xsl:choose>
   </xsl:template>
 
+	<xsl:template name ="presProps">
+
+		<p:presentationPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
+			xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" 
+			xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"/>
+	</xsl:template>
+	<xsl:template name ="tabStyles">
+		<a:tblStyleLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" >
+			<xsl:attribute name ="def">
+				<xsl:value-of select ="'{5C22544A-7EE6-4342-B048-85BDC9FD1C3A}'"/>
+			</xsl:attribute>
+		</a:tblStyleLst >
+	</xsl:template>
+	<xsl:template name ="viewProps">		
+		<p:viewPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
+			xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" 
+			xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+			<p:normalViewPr showOutlineIcons="0">
+				<p:restoredLeft sz="15620"/>
+				<p:restoredTop sz="94660"/>
+			</p:normalViewPr>
+			<p:slideViewPr>
+				<p:cSldViewPr>
+					<p:cViewPr varScale="1">
+						<p:scale>
+							<a:sx n="66" d="100"/>
+							<a:sy n="66" d="100"/>
+						</p:scale>
+						<p:origin x="-600" y="-96"/>
+					</p:cViewPr>
+					<p:guideLst>
+						<p:guide orient="horz" pos="2160"/>
+						<p:guide pos="2880"/>
+					</p:guideLst>
+				</p:cSldViewPr>
+			</p:slideViewPr>
+			<p:notesTextViewPr>
+				<p:cViewPr>
+					<p:scale>
+						<a:sx n="100" d="100"/>
+						<a:sy n="100" d="100"/>
+					</p:scale>
+					<p:origin x="0" y="0"/>
+				</p:cViewPr>
+			</p:notesTextViewPr>
+			<p:gridSpacing cx="78028800" cy="78028800"/>
+		</p:viewPr>
+	</xsl:template>
 </xsl:stylesheet>
