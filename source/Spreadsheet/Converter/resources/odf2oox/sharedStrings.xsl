@@ -35,6 +35,7 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
   exclude-result-prefixes="table r text style fo">
 
   <xsl:import href="measures.xsl"/>
@@ -126,6 +127,10 @@
     </r>
   </xsl:template>
 
+  <xsl:template match="text()[parent::dc:date]" mode="text"/>
+  <xsl:template match="text:p[parent::office:annotation]" mode="text"/>
+  <xsl:template match="text:span[ancestor::office:annotation]" mode="text"/>
+  
   <xsl:template match="text()" mode="text">
     <xsl:variable name="value">
       <xsl:value-of select="."/>

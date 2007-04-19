@@ -62,7 +62,8 @@
         ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml"/>
       <Override PartName="/xl/styles.xml"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
-      
+      <Default Extension="vml" ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing"/>
+      <xsl:call-template name="InsertCommentContentTypes"/>
       <xsl:call-template name="InsertSheetContentTypes"/>
       
     </Types>
@@ -74,9 +75,14 @@
       <Override PartName="{concat(concat('/xl/worksheets/sheet', position()),'.xml')}"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
     </xsl:for-each>
-    
   </xsl:template>
   
-  
-  
-</xsl:stylesheet>
+  <xsl:template name="InsertCommentContentTypes">
+    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+      <xsl:if test="descendant::office:annotation">
+         <Override PartName="{concat(concat('/xl/comments', position()),'.xml')}"
+        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml"/>
+    </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  </xsl:stylesheet>

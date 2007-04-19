@@ -58,4 +58,11 @@
  </Relationships>
   </xsl:template>  
 
+  <xsl:template name="InsertWorksheetsRels">
+    <xsl:param name="sheetNum" />
+ 
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <Relationship Id="{concat('rId',$sheetNum+1)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="{concat('../comments',$sheetNum,'.xml')}"/>
+      <Relationship Id="{concat('rId',$sheetNum)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing" Target="{concat('../drawings/vmlDrawing',$sheetNum,'.vml')}"/></Relationships>
+  </xsl:template>
 </xsl:stylesheet>

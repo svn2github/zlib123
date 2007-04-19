@@ -869,8 +869,35 @@
         <xsl:value-of select="$CountStyleTableCell"/>
       </xsl:with-param>
     </xsl:call-template>
+    
+    <xsl:apply-templates mode="cell">
+      <xsl:with-param name="colNumber">
+        <xsl:value-of select="$colNumber"/>
+      </xsl:with-param>
+      <xsl:with-param name="rowNumber">
+        <xsl:value-of select="$rowNumber"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+    
   </xsl:template>
 
+  <xsl:template match="office:annotation" mode="cell">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:variable name="colChar">
+      <xsl:call-template name="NumbersToChars">
+        <xsl:with-param name="num" select="$colNumber"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <pxsi:commentmark xmlns:pxsi="urn:cleverage:xmlns:post-processings:comments" ref="{concat($colChar,$rowNumber)}" noteId="{count(preceding::office:annotation)+1}"/>
+    
+      <pxsi:commentDrawingMark xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:pxsi="urn:cleverage:xmlns:post-processings:drawings" noteId="{count(preceding::office:annotation)+1}">
+      <x:Row ><xsl:value-of select="$rowNumber - 1"/></x:Row>
+      <x:Column><xsl:value-of select="$colNumber"/></x:Column>
+     </pxsi:commentDrawingMark>
+    
+  </xsl:template>
+  
   <!-- insert cell -->
   <xsl:template name="InsertNextCell">
     <xsl:param name="colNumber"/>

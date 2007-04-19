@@ -141,6 +141,10 @@
 
       <xsl:call-template name="InsertPageProperties"/>
       <xsl:call-template name="InsertHeaderFooter"/>
+      
+      <xsl:if test="descendant::office:annotation">
+      <legacyDrawing r:id="{concat('rId',$sheetId)}"/>
+      </xsl:if>
     </worksheet>
   </xsl:template>
 
