@@ -18,6 +18,8 @@ xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
 xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships"
 exclude-result-prefixes="p a r xlink number">
 	<xsl:import href="common.xsl"/>
+	<xsl:import href="shapes_reverse.xsl"/>
+
 	<xsl:strip-space elements="*"/>
 
 	<!--main document-->
@@ -25,14 +27,16 @@ exclude-result-prefixes="p a r xlink number">
 		<office:document-content>
 			<office:automatic-styles>
 				<!-- automatic styles for document body -->
-				<xsl:call-template name="InsertStyles"/>				
+				<xsl:call-template name="InsertStyles"/>
+				<!-- Graphic properties for shapes -->
+				<xsl:call-template name ="InsertStylesForGraphicProperties"/>
 			</office:automatic-styles>
 			<office:body>
 				<office:presentation>
 					<xsl:call-template name="InsertPresentationFooter"/>
 					<xsl:call-template name="InsertDrawingPage"/>
-          <!-- Added by Lohith A R : Custom Slide Show -->
-          <xsl:call-template name="InsertPresentationSettings"/>          
+					<!-- Added by Lohith A R : Custom Slide Show -->
+					<xsl:call-template name="InsertPresentationSettings"/>
 				</office:presentation>
 			</office:body>
 		</office:document-content>
@@ -68,7 +72,7 @@ exclude-result-prefixes="p a r xlink number">
 					<xsl:attribute name ="presentation:display-footer" >
 						<xsl:value-of select ="'true'"/>
 					</xsl:attribute>
-					<xsl:attribute name ="presentation:display-page-number" >						
+					<xsl:attribute name ="presentation:display-page-number" >
 						<xsl:if test ="document($pageSlide)/p:sld/p:cSld/p:spTree/p:sp
 						/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'sldNum')]">
 							<xsl:value-of select ="'true'"/>
@@ -79,10 +83,9 @@ exclude-result-prefixes="p a r xlink number">
 					</xsl:attribute>
 				</style:drawing-page-properties>
 			</style:style>
-		</xsl:for-each >			
-		<!-- Graphic properties for shapes -->
-		<xsl:call-template name ="GetGraphicPropertiesFromSlide"/>
-		
+		</xsl:for-each >
+
+
 		<style:style style:name="pr1" style:family="presentation" style:parent-style-name="Default-notes">
 			<style:graphic-properties >
 				<xsl:attribute name ="draw:fill-color" >
@@ -95,10 +98,10 @@ exclude-result-prefixes="p a r xlink number">
 					<xsl:value-of select ="'12.573cm'"/>
 				</xsl:attribute>
 			</style:graphic-properties>
-		</style:style>		
+		</style:style>
 		<xsl:call-template name ="GetStylesFromSlide"/>
-	</xsl:template>	
-	<xsl:template name ="InsertPresentationFooter" >		
+	</xsl:template>
+	<xsl:template name ="InsertPresentationFooter" >
 		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
 			<xsl:variable name ="footerSlide">
 				<xsl:value-of select ="concat(concat('ppt/slides/slide',position()),'.xml')"/>
@@ -115,19 +118,19 @@ exclude-result-prefixes="p a r xlink number">
 					<xsl:when test ="not(p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt') or contains(.,'ftr')])">
 						<!-- Do nothing-->
 					</xsl:when>
-					<xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'ftr')]">					
+					<xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'ftr')]">
 						<presentation:footer-decl >
 							<xsl:attribute name ="presentation:name">
 								<xsl:value-of select ="$footerInd"/>
 							</xsl:attribute >
-							<xsl:value-of select ="p:txBody/a:p/a:r/a:t"/>						
-						</presentation:footer-decl>		
+							<xsl:value-of select ="p:txBody/a:p/a:r/a:t"/>
+						</presentation:footer-decl>
 					</xsl:when>
 					<xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt')]">
 						<presentation:date-time-decl style:data-style-name="D3">
 							<xsl:attribute name ="presentation:name">
 								<xsl:value-of select ="$dateInd"/>
-							</xsl:attribute>						
+							</xsl:attribute>
 							<xsl:attribute name ="presentation:source">
 								<xsl:for-each select =".">
 									<xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt')]" >
@@ -216,35 +219,13 @@ exclude-result-prefixes="p a r xlink number">
 						<xsl:variable  name ="GraphicId">
 							<xsl:value-of select ="concat('s',substring($SlideFile,6,string-length($SlideFile)-9) ,concat('gr',position()))"/>
 						</xsl:variable>
-						<xsl:choose>
-							<xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')]">
-								<draw:rect draw:layer="layout">
-									<xsl:call-template name ="CreateShape">
-										<xsl:with-param name="grID" select ="$GraphicId"/>
-										<xsl:with-param name ="prID" select="$ParaId" />
-									</xsl:call-template>
-								</draw:rect>
-							</xsl:when>
-							<xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')]">
-								<draw:frame draw:layer="layout">
-									<xsl:call-template name ="CreateShape">
-										<xsl:with-param name="grID" select ="$GraphicId"/>
-										<xsl:with-param name ="prID" select="$ParaId" />
-									</xsl:call-template>
-								</draw:frame>
-							</xsl:when>
-							<!--<xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'Oval')]">
-								<draw:ellipse draw:layer="layout">
-									<xsl:call-template name ="CreateShape">
-										<xsl:with-param name="grID" select ="$GraphicId"/>
-										<xsl:with-param name ="prID" select="$ParaId" />
-									</xsl:call-template>
-								</draw:ellipse>
-							</xsl:when>-->
-						</xsl:choose>
+						<xsl:call-template name ="shapes">
+							<xsl:with-param name="GraphicId" select ="$GraphicId"/>
+							<xsl:with-param name ="ParaId" select="$ParaId" />
+						</xsl:call-template>
 					</xsl:when>
 					<!-- Code for shapes end-->
-										
+
 					<xsl:when test ="p:spPr/a:xfrm/a:off" >
 						<draw:frame presentation:style-name="pr1" draw:layer="layout" 																
 						    presentation:user-transformed="true">
@@ -340,7 +321,7 @@ exclude-result-prefixes="p a r xlink number">
 							</xsl:for-each>
 						</xsl:variable>
 						<xsl:variable name ="LayoutFileNo">
-							<xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">								
+							<xsl:for-each select ="document($slideRel)//node()/@Target[contains(.,'slideLayouts')]">
 								<xsl:value-of select ="concat('ppt',substring(.,3))"/>
 							</xsl:for-each>
 						</xsl:variable>
@@ -523,6 +504,19 @@ exclude-result-prefixes="p a r xlink number">
 				</xsl:choose >
 			</xsl:for-each>
 			<!-- exit Slide loop Main Loop-->
+
+			<xsl:for-each select ="document(concat('ppt/',$slideNo))/p:sld/p:cSld/p:spTree/p:cxnSp">
+				<!-- Code for shapes start-->
+				<xsl:if test ="p:style">
+					<xsl:variable  name ="GraphicId">
+						<xsl:value-of select ="concat('s',substring($SlideFile,6,string-length($SlideFile)-9) ,concat('gr',position()))"/>
+					</xsl:variable>
+					<xsl:call-template name ="shapes">
+						<xsl:with-param name="GraphicId" select ="$GraphicId"/>
+					</xsl:call-template>
+				</xsl:if>
+				<!-- Code for shapes end-->
+			</xsl:for-each>
 		</xsl:for-each >
 	</xsl:template>
 	<xsl:template name ="FrameProperties" match ="p:spPr/a:xfrm">
@@ -573,220 +567,17 @@ exclude-result-prefixes="p a r xlink number">
 			</xsl:for-each>
 		</draw:text-box >
 	</xsl:template>
-	<xsl:template name ="GetGraphicPropertiesFromSlide"  >
-		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
-			<xsl:variable name ="SlideId">
-				<xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
-			</xsl:variable>
-			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp">
-				<!--Check for shape or texbox -->
-				<xsl:if test = "p:style or p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')]">
-					<!-- Generate graphic properties ID-->
-					<xsl:variable  name ="GraphicId">
-						<xsl:value-of select ="concat('s',substring($SlideId,6,string-length($SlideId)-9) ,concat('gr',position()))"/>
-					</xsl:variable>
-					
-					<style:style style:family="graphic">
-						<xsl:attribute name ="style:name">
-							<xsl:value-of select ="$GraphicId"/>
-						</xsl:attribute >
-						<style:graphic-properties>
-							
-							<xsl:for-each select ="p:spPr">
-								<!-- FILL -->
-								<xsl:choose>
-									<!-- No fill -->
-									<xsl:when test ="a:noFill">
-										<xsl:attribute name ="draw:fill">
-											<xsl:value-of select="'none'" />
-										</xsl:attribute>
-										<xsl:attribute name ="draw:fill-color">
-											<xsl:value-of select="'#ffffff'"/>
-										</xsl:attribute>
-									</xsl:when>
-									<!-- Solid fill-->
-									<xsl:when test ="a:solidFill">
-										<xsl:attribute name ="draw:fill">
-											<xsl:value-of select="'solid'" />
-										</xsl:attribute>
-										<!-- Standard color-->
-										<xsl:if test ="a:solidFill/a:srgbClr[@val]">
-											<xsl:attribute name ="draw:fill-color">
-												<xsl:value-of select="concat('#',a:solidFill/a:srgbClr/@val)"/>
-											</xsl:attribute>
-											<!-- Transparency percentage-->
-											<xsl:if test="a:solidFill/a:srgbClr/a:alpha/@val">
-												<xsl:variable name ="alpha">
-													<xsl:value-of select ="a:solidFill/a:srgbClr/a:alpha/@val"/>
-												</xsl:variable>
-												<xsl:if test="($alpha != '') or ($alpha != 0)">
-													<xsl:attribute name ="draw:opacity">
-														<xsl:value-of select="concat(substring($alpha,1,2), '%')"/>
-													</xsl:attribute>
-												</xsl:if>
-											</xsl:if>
-										</xsl:if>
 
-										<!--Theme color-->
-										<xsl:if test ="a:solidFill/a:schemeClr[@val]">
-											<xsl:attribute name ="draw:fill-color">
-												<xsl:call-template name ="getColorCode">
-													<xsl:with-param name ="color">
-														<xsl:value-of select="a:solidFill/a:schemeClr/@val"/>
-													</xsl:with-param>
-													<xsl:with-param name ="lumMod">
-														<xsl:value-of select="a:solidFill/a:schemeClr/a:lumMod/@val"/>
-													</xsl:with-param>
-													<xsl:with-param name ="lumOff">
-														<xsl:value-of select="a:solidFill/a:schemeClr/a:lumOff/@val"/>
-													</xsl:with-param>
-												</xsl:call-template>
-											</xsl:attribute>
-											<!-- Transparency percentage-->
-											<xsl:if test="a:solidFill/a:schemeClr/a:alpha/@val">
-												<xsl:variable name ="alpha">
-													<xsl:value-of select ="a:solidFill/a:schemeClr/a:alpha/@val"/>
-												</xsl:variable>
-												<xsl:if test="($alpha != '') or ($alpha != 0)">
-													<xsl:attribute name ="draw:opacity">
-														<xsl:value-of select="concat(substring($alpha,1,2), '%')"/>
-													</xsl:attribute>
-												</xsl:if>
-											</xsl:if>
-										</xsl:if>
-									</xsl:when>
-								</xsl:choose>
-								
-								<!-- LINE COLOR -->
-								<xsl:if test ="a:ln">
-								    <xsl:choose>
-									<!-- No line-->
-									<xsl:when test ="a:ln/a:noFill">
-										<xsl:attribute name ="draw:stroke">
-											<xsl:value-of select="'none'" />
-										</xsl:attribute>
-									</xsl:when>
-									<!-- Solid line color-->
-									<xsl:when test ="a:ln/a:solidFill">
-										<xsl:attribute name ="draw:stroke">
-											<xsl:value-of select="'solid'" />
-										</xsl:attribute>
-										<!-- Standard color for border-->
-										<xsl:if test ="a:ln/a:solidFill/a:srgbClr[@val]">
-											<xsl:attribute name ="svg:stroke-color">
-												<xsl:value-of select="concat('#',a:ln/a:solidFill/a:srgbClr/@val)"/>
-											</xsl:attribute>
-											<!-- Transparency percentage-->
-											<xsl:if test="a:solidFill/a:srgbClr/a:alpha/@val">
-												<xsl:variable name ="alpha">
-													<xsl:value-of select ="a:solidFill/a:srgbClr/a:alpha/@val"/>
-												</xsl:variable>
-												<xsl:if test="($alpha != '') or ($alpha != 0)">
-													<xsl:attribute name ="svg:stroke-opacity">
-														<xsl:value-of select="concat(substring($alpha,1,2), '%')"/>
-													</xsl:attribute>
-												</xsl:if>
-											</xsl:if>
-										</xsl:if>
-										<!-- Theme color for border-->
-										<xsl:if test ="a:ln/a:solidFill/a:schemeClr[@val]">
-											<xsl:attribute name ="svg:stroke-color">
-												<xsl:call-template name ="getColorCode">
-													<xsl:with-param name ="color">
-														<xsl:value-of select="a:ln/a:solidFill/a:schemeClr/@val"/>
-													</xsl:with-param>
-													<xsl:with-param name ="lumMod">
-														<xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:lumMod/@val"/>
-													</xsl:with-param>
-													<xsl:with-param name ="lumOff">
-														<xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:lumOff/@val"/>
-													</xsl:with-param>
-												</xsl:call-template>
-											</xsl:attribute>
-											<!-- Transparency percentage-->
-											<xsl:if test="a:ln/a:solidFill/a:schemeClr/a:alpha/@val">
-												<xsl:variable name ="alpha">
-													<xsl:value-of select ="a:ln/a:solidFill/a:schemeClr/a:alpha/@val"/>
-												</xsl:variable>
-												<xsl:if test="($alpha != '') or ($alpha != 0)">
-													<xsl:attribute name ="svg:stroke-opacity">
-														<xsl:value-of select="concat(substring($alpha,1,2), '%')"/>
-													</xsl:attribute>
-												</xsl:if>
-											</xsl:if>
-										</xsl:if>
-									</xsl:when>
-									</xsl:choose>
-								
-								<!-- LINE STYLE -->
-									<!-- Border width-->
-									<xsl:for-each select ="a:ln[@w]">
-										<xsl:attribute name ="svg:stroke-width">
-											<xsl:call-template name="ConvertEmu">
-												<xsl:with-param name="length" select="@w"/>
-												<xsl:with-param name="unit">cm</xsl:with-param>
-											</xsl:call-template>
-										</xsl:attribute>
-									</xsl:for-each>
-
-								</xsl:if>
-							</xsl:for-each>
-							
-							<!-- Text alignment for shapes -->
-							<xsl:for-each select="p:txBody">
-								<xsl:attribute name ="draw:textarea-horizontal-align">
-									<xsl:choose>
-										<!-- Center alignment-->
-										<xsl:when test ="a:p/a:pPr/@algn ='ctr' or a:bodyPr[@anchorCtr] = '1'">
-											<xsl:value-of select ="'center'"/>
-										</xsl:when>
-										<!-- Right alignment-->
-										<xsl:when test ="a:p/a:pPr/@algn ='r'">
-											<xsl:value-of select ="'right'"/>
-										</xsl:when>
-										<!--Justify alignment-->
-										<xsl:when test ="a:p/a:pPr/@algn ='just' or a:bodyPr[@anchorCtr] = '0'">
-											<xsl:value-of select ="'justify'"/>
-										</xsl:when>
-										<!-- Left alignment-->
-										<xsl:otherwise>
-											<xsl:value-of select ="'left'"/>
-										</xsl:otherwise>
-									</xsl:choose>
-								</xsl:attribute>
-								<xsl:attribute name ="draw:textarea-vertical-align">
-									<xsl:choose>
-										<!-- Middle alignment-->
-										<xsl:when test ="a:bodyPr/@anchor ='ctr'">
-											<xsl:value-of select ="'middle'"/>
-										</xsl:when>
-										<!-- Bottom alignment-->
-										<xsl:when test ="a:bodyPr/@anchor ='b'">
-											<xsl:value-of select ="'bottom'"/>
-										</xsl:when>
-										<!-- Top alignment -->
-										<xsl:otherwise>
-											<xsl:value-of select ="'top'"/>
-										</xsl:otherwise>
-									</xsl:choose>
-								</xsl:attribute>
-							</xsl:for-each>
-						</style:graphic-properties >
-					</style:style>
-				</xsl:if >
-			</xsl:for-each>
-		</xsl:for-each>
-	</xsl:template>
 	<xsl:template name ="GetStylesFromSlide" >
 		<!--@ Default Font Name from PPTX -->
 		<xsl:variable name ="DefFont">
 			<xsl:for-each select ="document('ppt/theme/theme1.xml')/a:theme/a:themeElements/a:fontScheme
 						/a:majorFont/a:latin/@typeface">
-				<xsl:value-of select ="."/>	
+				<xsl:value-of select ="."/>
 			</xsl:for-each>
 		</xsl:variable>
-		
-		<!--@Modified font Names -->		
+
+		<!--@Modified font Names -->
 		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
 			<xsl:variable name ="SlideNumber">
 				<xsl:value-of  select ="concat('slide',position())" />
@@ -797,7 +588,7 @@ exclude-result-prefixes="p a r xlink number">
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp/p:txBody">
 				<xsl:variable name ="ParaId">
 					<xsl:value-of select ="concat($SlideNumber,concat('PARA',position()))"/>
-				</xsl:variable>				
+				</xsl:variable>
 				<xsl:for-each select ="a:p">
 					<style:style style:family="paragraph">
 						<xsl:attribute name ="style:name">
@@ -821,14 +612,14 @@ exclude-result-prefixes="p a r xlink number">
 								</xsl:choose>
 							</xsl:attribute>
 							<!-- Convert Laeft margin of the paragraph-->
-							<xsl:attribute name ="fo:margin-left">								
-								<xsl:value-of select="concat(format-number(a:pPr/@marL div 360000, '#.##'), 'cm')"/>								
+							<xsl:attribute name ="fo:margin-left">
+								<xsl:value-of select="concat(format-number(a:pPr/@marL div 360000, '#.##'), 'cm')"/>
 							</xsl:attribute>
-							<xsl:attribute name ="fo:text-indent">								
+							<xsl:attribute name ="fo:text-indent">
 								<xsl:value-of select="concat(format-number(a:pPr/@indent div 360000, '#.##'), 'cm')"/>
 							</xsl:attribute>
 							<xsl:attribute name ="fo:margin-top">
-								<xsl:value-of select="concat(format-number(a:pPr/a:spcBef/a:spcPts/@val div 1000, '#.##'), 'cm')"/>															
+								<xsl:value-of select="concat(format-number(a:pPr/a:spcBef/a:spcPts/@val div 1000, '#.##'), 'cm')"/>
 							</xsl:attribute>
 							<xsl:attribute name ="fo:margin-bottom">
 								<xsl:value-of select="concat(format-number(a:pPr/a:spcAft/a:spcPts/@val div 1000, '#.##'), 'cm')"/>
@@ -849,8 +640,8 @@ exclude-result-prefixes="p a r xlink number">
 											<xsl:value-of select ="."/>
 										</xsl:for-each>
 									</xsl:if>
-									<xsl:if test ="not(a:rPr/a:latin/@typeface)">									
-										<xsl:value-of select ="$DefFont"/>										
+									<xsl:if test ="not(a:rPr/a:latin/@typeface)">
+										<xsl:value-of select ="$DefFont"/>
 									</xsl:if>
 								</xsl:attribute>
 								<xsl:attribute name ="style:font-family-generic"	>
@@ -868,12 +659,12 @@ exclude-result-prefixes="p a r xlink number">
 								</xsl:if>
 								<xsl:attribute name ="fo:font-weight">
 									<!-- Bold Property-->
-									<xsl:if test ="a:rPr/@b">										
+									<xsl:if test ="a:rPr/@b">
 										<xsl:value-of select ="'bold'"/>
 									</xsl:if >
 									<xsl:if test ="not(a:rPr/@b)">
 										<xsl:value-of select ="'normal'"/>
-									</xsl:if >									
+									</xsl:if >
 								</xsl:attribute>
 								<!-- Color -->
 								<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
@@ -889,12 +680,12 @@ exclude-result-prefixes="p a r xlink number">
 									</xsl:variable>
 									<xsl:attribute name ="fo:color">
 										<xsl:for-each  select ="document('ppt/theme/theme1.xml')
-														/a:theme/a:themeElements/a:clrScheme/node()[name()=$ThemeColor]" >																																											
-											<xsl:value-of select ="translate(concat('#',a:srgbClr/@val),$ucletters,$lcletters)"/>																
-										</xsl:for-each>										
+														/a:theme/a:themeElements/a:clrScheme/node()[name()=$ThemeColor]" >
+											<xsl:value-of select ="translate(concat('#',a:srgbClr/@val),$ucletters,$lcletters)"/>
+										</xsl:for-each>
 									</xsl:attribute>
 								</xsl:if>
-								<!-- Italic-->								
+								<!-- Italic-->
 								<xsl:if test ="a:rPr/@i">
 									<xsl:attribute name ="fo:font-style">
 										<xsl:value-of select ="'italic'"/>
@@ -914,8 +705,8 @@ exclude-result-prefixes="p a r xlink number">
 								<xsl:if test ="a:rPr/@strike">
 									<xsl:attribute name ="style:text-line-through-style">
 										<xsl:value-of select ="'solid'"/>
-									</xsl:attribute>									
-								</xsl:if>								
+									</xsl:attribute>
+								</xsl:if>
 								<!-- Charector Spacing fo:letter-spacing-->
 								<xsl:if test ="a:rPr/@spc">
 									<xsl:attribute name ="fo:letter-spacing">
@@ -953,96 +744,8 @@ exclude-result-prefixes="p a r xlink number">
 		</xsl:variable>
 		<xsl:value-of select="$positionInGroup"/>
 	</xsl:template>
-	<!--  converts emu to given unit-->
-	<xsl:template name="ConvertEmu">
-		<xsl:param name="length"/>
-		<xsl:param name="unit"/>
-		<xsl:choose>
-			<xsl:when
-			  test="$length = '' or not($length) or $length = 0 or format-number($length div 360000, '#.##') = ''">
-				<xsl:value-of select="concat(0,'cm')"/>
-			</xsl:when>
-			<xsl:when test="$unit = 'cm'">
-				<xsl:value-of select="concat(format-number($length div 360000, '#.##'), 'cm')"/>
-			</xsl:when>
-		</xsl:choose>
-	</xsl:template>
-	<!--  Draw Shape reading values from pptx spTree-->
-	<xsl:template name ="CreateShape">
-		<xsl:param name ="grID" />
-		<xsl:param name ="prID" />
-		
-		<xsl:attribute name ="draw:style-name">
-			<xsl:value-of select ="$grID"/>
-		</xsl:attribute>
-		<xsl:attribute name ="draw:text-style-name">
-			<xsl:value-of select ="$prID"/>
-		</xsl:attribute>
-		
-		<xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cx]">
-			<xsl:attribute name ="svg:width">
-				<xsl:call-template name="ConvertEmu">
-					<xsl:with-param name="length" select="@cx"/>
-					<xsl:with-param name="unit">cm</xsl:with-param>
-				</xsl:call-template>
-			</xsl:attribute>
-		</xsl:for-each>
-		<xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cy]">
-			<xsl:attribute name ="svg:height">
-				<xsl:call-template name="ConvertEmu">
-					<xsl:with-param name="length" select="@cy"/>
-					<xsl:with-param name="unit">cm</xsl:with-param>
-				</xsl:call-template>
-			</xsl:attribute>
-		</xsl:for-each>
-		<xsl:for-each select ="p:spPr/a:xfrm/a:off[@x]">
-			<xsl:attribute name ="svg:x">
-				<xsl:call-template name="ConvertEmu">
-					<xsl:with-param name="length" select="@x"/>
-					<xsl:with-param name="unit">cm</xsl:with-param>
-				</xsl:call-template>
-			</xsl:attribute>
-		</xsl:for-each>
-		<xsl:for-each select ="p:spPr/a:xfrm/a:off[@y]">
-			<xsl:attribute name ="svg:y">
-				<xsl:call-template name="ConvertEmu">
-					<xsl:with-param name="length" select="@y"/>
-					<xsl:with-param name="unit">cm</xsl:with-param>
-				</xsl:call-template>
-			</xsl:attribute>
-		</xsl:for-each>
-		<xsl:choose>
-			<xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')]">
-				<draw:text-box>
-					<xsl:call-template name ="AddShapeText">
-						<xsl:with-param name ="prID" select ="$prID" />
-					</xsl:call-template>
-				</draw:text-box>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:call-template name ="AddShapeText">
-					<xsl:with-param name ="prID" select ="$prID" />
-				</xsl:call-template>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-	<!--  Add text to the shape -->
-	<xsl:template name ="AddShapeText">
-		<xsl:param name ="prID" />
-		<xsl:for-each select ="p:txBody/a:p">
-			<text:p >
-				<xsl:attribute name ="text:style-name">
-					<xsl:value-of select ="concat($prID,position())"/>
-				</xsl:attribute>
-				<xsl:for-each select ="a:r">
-					<text:span text:style-name="{generate-id()}">
-						<xsl:value-of select ="a:t"/>
-					</text:span>
-				</xsl:for-each>
-			</text:p>
-		</xsl:for-each>
-	</xsl:template>
-	
+
+
 	<xsl:template name ="LayoutType">
 		<xsl:param name ="LayoutStyle"/>
 		<xsl:choose >
@@ -1064,40 +767,40 @@ exclude-result-prefixes="p a r xlink number">
 		</xsl:choose>
 	</xsl:template>
 
-  <!-- Added by Lohith A R : Custom Slide Show -->
-  <xsl:template name="InsertPresentationSettings">
-    <presentation:settings>
-      <xsl:attribute name ="presentation:show">
-        <xsl:value-of select="document('ppt/presentation.xml')/p:presentation/p:custShowLst/p:custShow/@name"/>
-      </xsl:attribute>
-      <xsl:for-each select="document('ppt/presentation.xml')/p:presentation/p:custShowLst/p:custShow">
-        <presentation:show>
-          <xsl:attribute name ="presentation:name"	>
-            <xsl:value-of select ="@name"/>
-          </xsl:attribute>
-          <xsl:attribute name ="presentation:pages"	>
-            <xsl:for-each select ="p:sldLst/p:sld">
-              <xsl:variable name="SlideIdVal">
-                <xsl:value-of select ="@r:id"/>
-              </xsl:variable>
-              <xsl:variable name="SlideVal">
-                <xsl:value-of select="document('ppt/_rels/presentation.xml.rels')/rels:Relationships/rels:Relationship[@Id=$SlideIdVal]/@Target"/>
-              </xsl:variable>
-              <xsl:variable name="CoustomSlideList">
-                <xsl:value-of select="concat('Page',substring-before(substring-after($SlideVal,'slides/slide'),'.xml'),',')"/>
-              </xsl:variable>
-              <!--<xsl:variable name="CoustomSlideListForOdp">
+	<!-- Added by Lohith A R : Custom Slide Show -->
+	<xsl:template name="InsertPresentationSettings">
+		<presentation:settings>
+			<xsl:attribute name ="presentation:show">
+				<xsl:value-of select="document('ppt/presentation.xml')/p:presentation/p:custShowLst/p:custShow/@name"/>
+			</xsl:attribute>
+			<xsl:for-each select="document('ppt/presentation.xml')/p:presentation/p:custShowLst/p:custShow">
+				<presentation:show>
+					<xsl:attribute name ="presentation:name"	>
+						<xsl:value-of select ="@name"/>
+					</xsl:attribute>
+					<xsl:attribute name ="presentation:pages"	>
+						<xsl:for-each select ="p:sldLst/p:sld">
+							<xsl:variable name="SlideIdVal">
+								<xsl:value-of select ="@r:id"/>
+							</xsl:variable>
+							<xsl:variable name="SlideVal">
+								<xsl:value-of select="document('ppt/_rels/presentation.xml.rels')/rels:Relationships/rels:Relationship[@Id=$SlideIdVal]/@Target"/>
+							</xsl:variable>
+							<xsl:variable name="CoustomSlideList">
+								<xsl:value-of select="concat('Page',substring-before(substring-after($SlideVal,'slides/slide'),'.xml'),',')"/>
+							</xsl:variable>
+							<!--<xsl:variable name="CoustomSlideListForOdp">
                   <xsl:value-of select="substring($CoustomSlideList,1,string-length($CoustomSlideList)-1)"/>
                 </xsl:variable>-->
-              <xsl:value-of select="$CoustomSlideList"/>
-            </xsl:for-each>
-          </xsl:attribute>
-        </presentation:show>
-      </xsl:for-each>
-    </presentation:settings>
-  </xsl:template>
-  <!-- Added by Lohith A R : Custom Slide Show -->
-  <xsl:template name="ConvertPoints">
+							<xsl:value-of select="$CoustomSlideList"/>
+						</xsl:for-each>
+					</xsl:attribute>
+				</presentation:show>
+			</xsl:for-each>
+		</presentation:settings>
+	</xsl:template>
+	<!-- Added by Lohith A R : Custom Slide Show -->
+	<xsl:template name="ConvertPoints">
 		<xsl:param name="length"/>
 		<xsl:param name="unit"/>
 		<xsl:variable name="lengthVal">
