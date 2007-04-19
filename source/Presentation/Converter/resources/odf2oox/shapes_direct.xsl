@@ -252,8 +252,14 @@
 						</xsl:attribute>
 						<xsl:if test ="@draw:opacity">
 							<a:alpha>
-								<xsl:attribute name ="val">
-									<xsl:value-of select ="concat(substring(@draw:opacity,1,2), '000')"/>
+                <xsl:variable name ="alpha" select ="substring-before(@draw:opacity,'%')" />
+                <xsl:attribute name ="val">
+                  <xsl:if test ="$alpha = 0">
+                    <xsl:value-of select ="0000"/>
+                  </xsl:if>
+                  <xsl:if test ="$alpha != 0">
+                    <xsl:value-of select ="$alpha * 1000"/>
+                  </xsl:if>
 								</xsl:attribute>
 							</a:alpha>
 						</xsl:if>
@@ -301,9 +307,16 @@
 						</xsl:attribute>
 						<xsl:if test ="@svg:stroke-opacity">
 							<a:alpha>
-								<xsl:attribute name ="val">
-									<xsl:value-of select ="concat(substring(@svg:stroke-opacity,1,2), '000')"/>
-								</xsl:attribute>
+                <xsl:variable name ="alpha" select ="substring-before(@svg:stroke-opacity,'%')" />
+                <xsl:attribute name ="val">
+                  <xsl:if test ="$alpha = 0">
+                    <xsl:value-of select ="0000"/>
+                  </xsl:if>
+                  <xsl:if test ="$alpha != 0">
+                    <xsl:value-of select ="$alpha * 1000"/>
+                  </xsl:if>
+                </xsl:attribute>
+								
 							</a:alpha>
 						</xsl:if>
 					</a:srgbClr>
@@ -356,10 +369,16 @@
 				<xsl:value-of select ="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$gr]/style:graphic-properties/@draw:shadow-opacity"/>
 			</xsl:variable>
  			<a:shade>
-				<xsl:attribute name ="val">
-					<xsl:value-of select ="concat(substring($shade,1,2), '000')"/>
-				</xsl:attribute>
-			</a:shade>
+        <xsl:variable name ="alpha" select ="substring-before($shade,'%')" />
+        <xsl:attribute name ="val">
+          <xsl:if test ="$alpha = 0">
+            <xsl:value-of select ="0000"/>
+          </xsl:if>
+          <xsl:if test ="$alpha != 0">
+            <xsl:value-of select ="$alpha * 1000"/>
+          </xsl:if>
+        </xsl:attribute>
+       </a:shade>
 		</xsl:if>
 	</xsl:template>
 	<!-- Get arrow type-->
@@ -541,15 +560,15 @@
 			<xsl:variable name ="marker" select ="document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$ArrowType]/@svg:d"/>
 
 			<xsl:choose>
-				<!-- Triangle-->
-				<xsl:when test ="$marker = 'm70 0 70 140h-140z'">
+				<!-- Arrow--><!--
+				<xsl:when test ="$marker = 'm0 2108v17 17l12 42 30 34 38 21 43 4 29-8 30-21 25-26 13-34 343-1532 339 1520 13 42 29 34 39 21 42 4 42-12 34-30 21-42v-39-12l-4 4-440-1998-9-42-25-39-38-25-43-8-42 8-38 25-26 39-8 42z'">
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'triangle'" />
-						<xsl:with-param name ="w" select ="'sm'" />
-						<xsl:with-param name ="len" select ="'sm'" />
+						<xsl:with-param name ="w" select ="'med'" />
+						<xsl:with-param name ="len" select ="'med'" />
 					</xsl:call-template>
-				</xsl:when>
-				<xsl:when test ="$marker = 'm70 0 70 210h-140z'">
+				</xsl:when>-->
+				<!--<xsl:when test ="$marker = 'm70 0 70 210h-140z'">
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'triangle'" />
 						<xsl:with-param name ="w" select ="'sm'" />
@@ -604,17 +623,17 @@
 						<xsl:with-param name ="w" select ="'lg'" />
 						<xsl:with-param name ="len" select ="'lg'" />
 					</xsl:call-template>
-				</xsl:when>
+				</xsl:when>-->
 
 				<!-- Arrow-->
-				<xsl:when test ="$marker = 'm122 0 123 222-37 23-86-157-86 157-36-23z'">
+				<xsl:when test ="$marker = 'm0 2108v17 17l12 42 30 34 38 21 43 4 29-8 30-21 25-26 13-34 343-1532 339 1520 13 42 29 34 39 21 42 4 42-12 34-30 21-42v-39-12l-4 4-440-1998-9-42-25-39-38-25-43-8-42 8-38 25-26 39-8 42z'">
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'arrow'" />
-						<xsl:with-param name ="w" select ="'sm'" />
-						<xsl:with-param name ="len" select ="'sm'" />
+						<xsl:with-param name ="w" select ="'med'" />
+						<xsl:with-param name ="len" select ="'med'" />
 					</xsl:call-template>
 				</xsl:when>
-				<xsl:when test ="$marker = 'm122 0 123 286-37 29-86-202-86 202-36-29z'">
+				<!--<xsl:when test ="$marker = 'm122 0 123 286-37 29-86-202-86 202-36-29z'">
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'arrow'" />
 						<xsl:with-param name ="w" select ="'sm'" />
@@ -669,17 +688,17 @@
 						<xsl:with-param name ="w" select ="'lg'" />
 						<xsl:with-param name ="len" select ="'lg'" />
 					</xsl:call-template>
-				</xsl:when>
+				</xsl:when>-->
 
 				<!-- Stealth-->
-				<xsl:when test ="$marker = 'm70 0 70 140-70-56-70 56z'">
+				<xsl:when test ="$marker = 'm1013 1491 118 89-567-1580-564 1580 114-85 136-68 148-46 161-17 161 13 153 46z'">
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'stealth'" />
-						<xsl:with-param name ="w" select ="'sm'" />
-						<xsl:with-param name ="len" select ="'sm'" />
+						<xsl:with-param name ="w" select ="'med'" />
+						<xsl:with-param name ="len" select ="'med'" />
 					</xsl:call-template>
 				</xsl:when>
-				<xsl:when test ="$marker = 'm70 0 70 210-70-84-70 84z'">
+				<!--<xsl:when test ="$marker = 'm70 0 70 210-70-84-70 84z'">
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'stealth'" />
 						<xsl:with-param name ="w" select ="'sm'" />
@@ -734,17 +753,17 @@
 						<xsl:with-param name ="w" select ="'lg'" />
 						<xsl:with-param name ="len" select ="'lg'" />
 					</xsl:call-template>
-				</xsl:when>
+				</xsl:when>-->
 
 				<!-- Oval-->
-				<xsl:when test ="$marker = 'm140 0c0-38-32-70-70-70-38 0-70 32-70 70 0 38 32 70 70 70 38 0 70-32 70-70z'">
+				<xsl:when test ="$marker = 'm462 1118-102-29-102-51-93-72-72-93-51-102-29-102-13-105 13-102 29-106 51-102 72-89 93-72 102-50 102-34 106-9 101 9 106 34 98 50 93 72 72 89 51 102 29 106 13 102-13 105-29 102-51 102-72 93-93 72-98 51-106 29-101 13z'">
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'oval'" />
-						<xsl:with-param name ="w" select ="'sm'" />
-						<xsl:with-param name ="len" select ="'sm'" />
+						<xsl:with-param name ="w" select ="'med'" />
+						<xsl:with-param name ="len" select ="'med'" />
 					</xsl:call-template>
 				</xsl:when>
-				<xsl:when test ="$marker = 'm140 0c0-57-32-105-70-105-38 0-70 48-70 105 0 57 32 105 70 105 38 0 70-48 70-105z'">
+				<!--<xsl:when test ="$marker = 'm140 0c0-57-32-105-70-105-38 0-70 48-70 105 0 57 32 105 70 105 38 0 70-48 70-105z'">
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'oval'" />
 						<xsl:with-param name ="w" select ="'sm'" />
@@ -799,17 +818,18 @@
 						<xsl:with-param name ="w" select ="'lg'" />
 						<xsl:with-param name ="len" select ="'lg'" />
 					</xsl:call-template>
-				</xsl:when>
+				</xsl:when>-->
 
 				<!-- Diamond-->
-				<xsl:when test ="$marker = 'm70 0 70 70-70 70-70-70z'">
-					<xsl:call-template name ="drawArrowType">
+				<xsl:when test ="$marker = 'm0 564 564 567 567-567-567-564z'">
+				
+				<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'diamond'" />
-						<xsl:with-param name ="w" select ="'sm'" />
-						<xsl:with-param name ="len" select ="'sm'" />
+						<xsl:with-param name ="w" select ="'med'" />
+						<xsl:with-param name ="len" select ="'med'" />
 					</xsl:call-template>
 				</xsl:when>
-				<xsl:when test ="$marker = 'm70 0 70 105-70 105-70-105z'">
+				<!--<xsl:when test ="$marker = 'm70 0 70 105-70 105-70-105z'">
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'diamond'" />
 						<xsl:with-param name ="w" select ="'sm'" />
@@ -864,7 +884,7 @@
 						<xsl:with-param name ="w" select ="'lg'" />
 						<xsl:with-param name ="len" select ="'lg'" />
 					</xsl:call-template>
-				</xsl:when>
+				</xsl:when>-->
 				<xsl:otherwise>
 					<xsl:call-template name ="drawArrowType">
 						<xsl:with-param name ="type" select ="'triangle'" />
