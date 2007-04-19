@@ -37,6 +37,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   	<EmbeddedResource Include="resources\odf2oox\border.xsl" />
     <EmbeddedResource Include="resources\odf2oox\contentTypes.xsl" />
+	<EmbeddedResource Include="resources\odf2oox\date.xsl" />
   	<EmbeddedResource Include="resources\odf2oox\number.xsl" />
     <EmbeddedResource Include="resources\odf2oox\odf2oox-compute-size.xsl" />
     <EmbeddedResource Include="resources\odf2oox\odf2oox.xsl" />

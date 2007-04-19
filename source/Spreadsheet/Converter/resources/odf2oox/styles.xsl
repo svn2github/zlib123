@@ -43,6 +43,7 @@
   <xsl:key name="number" match="number:number-style" use="@style:name"/>
   <xsl:key name="percentage" match="number:percentage-style" use="@style:name"/>
   <xsl:key name="currency" match="number:currency-style" use="@style:name"/>
+  <xsl:key name="date" match="number:date-style" use="@style:name"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
 
   <xsl:template name="styles">
@@ -106,10 +107,20 @@
         />
       </xsl:variable>
 
-      <xsl:attribute name="count">
+      <!-- number of all date styles in content.xml -->
+      <xsl:variable name="countDate">
         <xsl:value-of
-          select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:date-style)"
         />
+      </xsl:variable>
+      
+      <!-- number of all date styles in styles.xml -->
+      <xsl:variable name="countStyleDate">
+        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:date-style)"/>
+      </xsl:variable>
+      
+      <xsl:attribute name="count">
+        <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+$countDate+$countStyleDate"/>
       </xsl:attribute>
 
       <!-- apply number styles from content.xml -->
@@ -167,6 +178,20 @@
         </xsl:with-param>
       </xsl:apply-templates>
 
+      <!-- apply date styles from content.xml -->
+      <xsl:apply-templates select="document('content.xml')/office:document-content/office:automatic-styles/number:date-style[1]" mode="numFormat">
+        <xsl:with-param name="numId">
+          <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+1"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      
+      <!-- apply date styles from styles.xml -->
+      <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles/number:date-style[1]" mode="numFormat">
+        <xsl:with-param name="numId">
+          <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+$countDate+1"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      
     </numFmts>
   </xsl:template>
 
@@ -325,15 +350,19 @@
     </xsl:variable>
 
     <xsl:variable name="stylePercentStyleCount">
-      <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/number:percentage-style)"
-      />
+      <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:percentage-style)"/>
     </xsl:variable>
-
+    
     <xsl:variable name="currencyStyleCount">
-      <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"
-      />
+      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:currency-style)"/>
+    </xsl:variable>
+    
+    <xsl:variable name="styleCurrencyStyleCount">
+      <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:currency-style)"/>
+    </xsl:variable>
+    
+    <xsl:variable name="dateStyleCount">
+      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:date-style)"/>
     </xsl:variable>
 
 
@@ -366,7 +395,13 @@
         <xsl:with-param name="currencyStyleCount">
           <xsl:value-of select="$currencyStyleCount"/>
         </xsl:with-param>
-      </xsl:apply-templates>
+        <xsl:with-param name="styleCurrencyStyleCount">
+          <xsl:value-of select="$styleCurrencyStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="dateStyleCount">
+          <xsl:value-of select="$dateStyleCount"/>
+        </xsl:with-param>
+      </xsl:apply-templates>    
 
 
       <xsl:apply-templates
@@ -386,6 +421,12 @@
         </xsl:with-param>
         <xsl:with-param name="currencyStyleCount">
           <xsl:value-of select="$currencyStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="styleCurrencyStyleCount">
+          <xsl:value-of select="$styleCurrencyStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="dateStyleCount">
+          <xsl:value-of select="$dateStyleCount"/>
         </xsl:with-param>
         <xsl:with-param name="FileName">
           <xsl:text>styles</xsl:text>
@@ -431,6 +472,12 @@
         <xsl:with-param name="currencyStyleCount">
           <xsl:value-of select="$currencyStyleCount"/>
         </xsl:with-param>
+        <xsl:with-param name="styleCurrencyStyleCount">
+          <xsl:value-of select="$styleCurrencyStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="dateStyleCount">
+          <xsl:value-of select="$dateStyleCount"/>
+        </xsl:with-param>
       </xsl:apply-templates>
 
       <xsl:apply-templates
@@ -450,6 +497,12 @@
         </xsl:with-param>
         <xsl:with-param name="currencyStyleCount">
           <xsl:value-of select="$currencyStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="styleCurrencyStyleCount">
+          <xsl:value-of select="$styleCurrencyStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="dateStyleCount">
+          <xsl:value-of select="$dateStyleCount"/>
         </xsl:with-param>
         <xsl:with-param name="FileName">
           <xsl:text>styles</xsl:text>
@@ -539,6 +592,8 @@
     <xsl:param name="percentStyleCount"/>
     <xsl:param name="stylePercentStyleCount"/>
     <xsl:param name="currencyStyleCount"/>
+    <xsl:param name="styleCurrencyStyleCount"/>
+    <xsl:param name="dateStyleCount"/>
     <xsl:param name="FileName"/>
     <xsl:param name="AtributeName"/>
 
@@ -554,6 +609,8 @@
         <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
         <xsl:with-param name="stylePercentStyleCount" select="$stylePercentStyleCount"/>
         <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
+        <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
+        <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -1030,6 +1087,14 @@
       />
     </xsl:variable>
 
+    <xsl:variable name="styleCurrencyStyleCount">
+      <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/number:currency-style)"/>
+    </xsl:variable>
+    
+    <xsl:variable name="dateStyleCount">
+      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/number:date-style)"/>  
+    </xsl:variable>
+    
     <xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
 
@@ -1060,6 +1125,8 @@
             <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
             <xsl:with-param name="stylePercentStyleCount" select="$stylePercentStyleCount"/>
             <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
+            <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
+            <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
           </xsl:call-template>
         </xsl:variable>
 

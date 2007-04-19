@@ -418,6 +418,8 @@
     <xsl:param name="percentStyleCount"/>
     <xsl:param name="stylePercentStyleCount"/>
     <xsl:param name="currencyStyleCount"/>
+    <xsl:param name="styleCurrencyStyleCount"/>
+    <xsl:param name="dateStyleCount"/>
     <xsl:choose>
       <xsl:when test="key('number',$numStyle)">
         <xsl:for-each select="key('number',$numStyle)">
@@ -449,6 +451,16 @@
           <xsl:value-of select="count(preceding-sibling::number:currency-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount"/>
         </xsl:for-each>
       </xsl:when>
+      <xsl:when test="key('date',$numStyle)">
+        <xsl:for-each select="key('date',$numStyle)">
+          <xsl:value-of select="count(preceding-sibling::number:date-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount"/>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:date-style[@style:name=$numStyle]">
+        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:date-style[@style:name=$numStyle]">
+          <xsl:value-of select="count(preceding-sibling::number:currency-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount+$dateStyleCount"/>
+        </xsl:for-each>
+        </xsl:when>
       <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
   </xsl:template>

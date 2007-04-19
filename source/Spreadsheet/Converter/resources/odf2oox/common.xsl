@@ -304,4 +304,79 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- template which converts date to number -->
+  
+  <xsl:template name="DateToNumber">
+    <xsl:param name="value"/>
+    <xsl:variable name="year">
+      <xsl:value-of select="substring-before($value,'-')"/>
+    </xsl:variable>
+    <xsl:variable name="month">
+      <xsl:value-of select="substring-before(substring-after($value,'-'),'-')"/>
+    </xsl:variable>
+    <xsl:variable name="day">
+      <xsl:value-of select="substring-before(substring-after($value,concat($month,'-')),'T')"/>
+    </xsl:variable>
+    <xsl:variable name="hour">
+      <xsl:value-of select="substring-before(substring-after($value,'T'),':')"/>
+    </xsl:variable>
+    <xsl:variable name="minutes">
+      <xsl:value-of select="substring-before(substring-after($value,':'),':')"/>
+    </xsl:variable>
+    <xsl:variable name="seconds">
+      <xsl:value-of select="substring-after(substring-after($value,':'),':')"/>
+    </xsl:variable>
+    
+    <!-- number of leap years between given year and 1900 -->
+    <xsl:variable name="leapYears">
+      <xsl:value-of select="floor(($year -1900) div 4) - floor(($year - 1900) div 100) + floor(($year - 1600) div 400)"/>
+    </xsl:variable>
+    
+    <!-- get number of days before given month -->
+    <xsl:variable name = "daysOfMonths">
+      <xsl:call-template name="MonthsToDays">
+        <xsl:with-param name="month">
+          <xsl:value-of select="number($month)"/>
+        </xsl:with-param>
+        <xsl:with-param name="isYearLeap">
+          <xsl:choose>
+            <xsl:when test="(($year - 4 * floor($year div 4)) = 0 and ($year - 100 * floor($year div 100)) != 0) or ($year - 400 * floor($year div 400)) = 0">true</xsl:when>
+            <xsl:otherwise>false</xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="$day + $daysOfMonths + 365 * ($year - 1900) + $leapYears + 1 + $hour div 24 + $minutes div 1440 + $seconds div 86400"/>
+  </xsl:template>
+  
+  <xsl:template name="MonthsToDays">
+    <xsl:param name="month"/>
+    <xsl:param name="isYearLeap"/>
+    <xsl:variable name="extraDay">
+      <xsl:choose>
+        
+        <!-- if there's a leap year than add extra day after 2nd month -->
+      <xsl:when test="$isYearLeap = 'true' and $month &gt; 2">1</xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+        <xsl:variable name="numberOfDays">
+          <xsl:choose>
+            <xsl:when test="$month = 1">0</xsl:when>
+            <xsl:when test="$month = 2">31</xsl:when>
+            <xsl:when test="$month = 3">59</xsl:when>
+            <xsl:when test="$month = 4">90</xsl:when>
+            <xsl:when test="$month = 5">120</xsl:when>
+            <xsl:when test="$month = 6">151</xsl:when>
+            <xsl:when test="$month = 7">181</xsl:when>
+            <xsl:when test="$month = 8">212</xsl:when>
+            <xsl:when test="$month = 9">243</xsl:when>
+            <xsl:when test="$month = 10">273</xsl:when>
+            <xsl:when test="$month = 11">304</xsl:when>
+            <xsl:when test="$month = 12">334</xsl:when>
+          </xsl:choose>
+        </xsl:variable>
+    <xsl:value-of select="$numberOfDays + $extraDay"/>
+  </xsl:template>
+  
 </xsl:stylesheet>

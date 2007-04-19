@@ -1281,8 +1281,19 @@
               </v>
             </xsl:when>
             
-            <!-- TO DO  date and time-->
-            <xsl:when test="@office:value-type = 'date' or @office:value-type = 'time'"/>
+            <!-- date -->
+            <xsl:when test="@office:value-type='date'">
+              <v>
+                <xsl:call-template name="DateToNumber">
+                  <xsl:with-param name="value">
+                    <xsl:value-of select="@office:date-value"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </v>
+            </xsl:when>
+            
+            <!-- TO DO  time-->
+            <xsl:when test="@office:value-type = 'time'"/>
             <!-- last or when number cell has error -->
             <xsl:when
               test="@office:value-type = 'string' or @office:value-type = 'boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency'))">
