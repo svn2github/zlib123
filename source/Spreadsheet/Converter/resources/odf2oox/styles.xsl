@@ -666,13 +666,13 @@
     </xsl:if>
 
     <!--cell background color-->
-    <xsl:if test="style:table-cell-properties/@fo:background-color !='transparent'">
+    <!--xsl:if test="style:table-cell-properties/@fo:background-color !='transparent'">
       <xsl:attribute name="applyFill">
         <xsl:text>1</xsl:text>
       </xsl:attribute>
-      <xsl:attribute name="fillId">
+      <xsl:attribute name="fillId"-->
         <!-- change referencing node to style:table-cell-properties and count-->
-        <xsl:variable name="fill">
+        <!--xsl:variable name="fill">
           <xsl:for-each select="style:table-cell-properties">
             <xsl:number
               count="style:table-cell-properties[@fo:background-color !='transparent'][parent::node()/@style:family='table-cell']"
@@ -681,7 +681,7 @@
         </xsl:variable>
         <xsl:value-of select="$fill +1"/>
       </xsl:attribute>
-    </xsl:if>
+    </xsl:if-->
 
     <!-- text -alignment -->
     <!-- 1st 'or' - horizontal alignment
