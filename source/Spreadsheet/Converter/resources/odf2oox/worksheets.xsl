@@ -773,7 +773,7 @@
       <xsl:when
         test="key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-top or
         key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-bottom or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-left or
-        key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-right">
+        key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-right or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:background-color">
         <xsl:text>true</xsl:text>
       </xsl:when>
       <xsl:otherwise>

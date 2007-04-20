@@ -239,11 +239,6 @@
 
   <xsl:template name="InsertFills">
     <fills>
-      <xsl:attribute name="count">
-        <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:table-cell-properties[@fo:background-color !='transparent']) + 2"
-        />
-      </xsl:attribute>
       <fill>
         <patternFill patternType="none"/>
       </fill>
@@ -253,17 +248,27 @@
       <xsl:apply-templates
         select="document('content.xml')/office:document-content/office:automatic-styles"
         mode="background-color"/>
+      
+      <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
+        mode="background-color"/>
+      
     </fills>
   </xsl:template>
 
-  <xsl:template match="style:table-cell-properties[@fo:background-color !='transparent']"
-    mode="background-color">
+  <xsl:template match="style:table-cell-properties" mode="background-color">
     <fill>
-      <xsl:call-template name="GetCellColor">
-        <xsl:with-param name="color">
-          <xsl:value-of select="substring-after(@fo:background-color, '#')"/>
-        </xsl:with-param>
-      </xsl:call-template>
+    <xsl:choose>
+      <xsl:when test="@fo:background-color and @fo:background-color != 'transparent'">
+        <xsl:call-template name="GetCellColor">
+          <xsl:with-param name="color">
+            <xsl:value-of select="substring-after(@fo:background-color, '#')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <patternFill patternType="none"/>
+      </xsl:otherwise>
+    </xsl:choose>
     </fill>
   </xsl:template>
 
@@ -652,7 +657,7 @@
 
     <!-- border -->
     <xsl:if
-      test="(style:table-cell-properties/@fo:border)or(style:table-cell-properties/@fo:border-bottom)or(style:table-cell-properties/@fo:border-left)or(style:table-cell-properties/@fo:border-right)or(style:table-cell-properties/@fo:border-top)">
+      test="(style:table-cell-properties/@fo:border) or (style:table-cell-properties/@fo:border-bottom) or (style:table-cell-properties/@fo:border-left) or(style:table-cell-properties/@fo:border-right)or(style:table-cell-properties/@fo:border-top)">
       <xsl:attribute name="applyBorder">
         <xsl:text>1</xsl:text>
       </xsl:attribute>
@@ -666,22 +671,21 @@
     </xsl:if>
 
     <!--cell background color-->
-    <!--xsl:if test="style:table-cell-properties/@fo:background-color !='transparent'">
+    <xsl:if test="style:table-cell-properties/@fo:background-color and style:table-cell-properties/@fo:background-color != 'transparent'">
       <xsl:attribute name="applyFill">
         <xsl:text>1</xsl:text>
       </xsl:attribute>
-      <xsl:attribute name="fillId"-->
+      <xsl:attribute name="fillId">
         <!-- change referencing node to style:table-cell-properties and count-->
-        <!--xsl:variable name="fill">
+        <xsl:variable name="fill">
           <xsl:for-each select="style:table-cell-properties">
-            <xsl:number
-              count="style:table-cell-properties[@fo:background-color !='transparent'][parent::node()/@style:family='table-cell']"
+            <xsl:number count="style:table-cell-properties[parent::node()/@style:family='table-cell']"
               level="any"/>
           </xsl:for-each>
         </xsl:variable>
-        <xsl:value-of select="$fill +1"/>
+        <xsl:value-of select="$fill + 1"/>
       </xsl:attribute>
-    </xsl:if-->
+    </xsl:if>
 
     <!-- text -alignment -->
     <!-- 1st 'or' - horizontal alignment
@@ -1046,7 +1050,6 @@
             <xsl:text>Arial</xsl:text>
           </xsl:when>
         </xsl:choose>
-
       </xsl:when>
     </xsl:choose>
   </xsl:template>
