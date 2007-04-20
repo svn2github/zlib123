@@ -36,7 +36,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
-  exclude-result-prefixes="table r text style fo">
+  exclude-result-prefixes="table r text style fo dc">
 
   <xsl:import href="measures.xsl"/>
 
