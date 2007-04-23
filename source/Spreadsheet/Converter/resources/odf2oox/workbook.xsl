@@ -187,55 +187,81 @@
           <xsl:attribute name="localSheetId">
             <xsl:value-of select="position() - 1"/>
           </xsl:attribute>
-
-          <xsl:variable name="row1">
-            <xsl:call-template name="GetRowNum">
-              <xsl:with-param name="cell"
-                select="concat(substring-after(@table:print-ranges,'.'),substring-before(@table:print-ranges,':'))"
-              />
-            </xsl:call-template>
-          </xsl:variable>
-
-          <xsl:variable name="col1">
-            <xsl:value-of select="substring-before(substring-after(@table:print-ranges,'.'),$row1)"
-            />
-          </xsl:variable>
-
-          <xsl:variable name="row2">
-            <xsl:call-template name="GetRowNum">
-              <xsl:with-param name="cell"
-                select="substring-after(substring-after(@table:print-ranges,'.'),'.')"/>
-            </xsl:call-template>
-          </xsl:variable>
-
-          <xsl:variable name="col2">
-            <xsl:value-of
-              select="substring-before(substring-after(substring-after(@table:print-ranges,'.'),'.'),$row2)"
-            />
-          </xsl:variable>
-
-          <!-- if sheet name contains space then name has to be inside apostrophes -->
-          <xsl:variable name="sheetName">
-            <xsl:choose>
-              <xsl:when test="contains(@table:name,' ')">
-                <xsl:text>'</xsl:text>
-                <xsl:value-of select="@table:name"/>
-                <xsl:text>'</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="@table:name"/>
-              </xsl:otherwise>
-            </xsl:choose>            
-          </xsl:variable>
-          
-          <xsl:value-of
-            select="concat($sheetName,'!$',substring-before(substring-after(@table:print-ranges,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"
-          />
+          <xsl:call-template name="InsertRange">
+            <xsl:with-param name="range" select="@table:print-ranges"/>
+          </xsl:call-template>
         </definedName>
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template name="InsertRange">
+    <xsl:param name="range"/>
+    
+    <xsl:variable name="row1">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell"
+          select="concat(substring-after($range,'.'),substring-before($range,':'))"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="col1">
+      <xsl:value-of select="substring-before(substring-after($range,'.'),$row1)"/>
+    </xsl:variable>
+    
+    <xsl:variable name="row2">
+      <xsl:variable name="endCell">
+        <xsl:choose>
+          <!-- when there is next range there is a space before -->
+          <xsl:when test="contains(substring-after(substring-after($range,'.'),'.'),' ')">
+            <xsl:value-of
+              select="substring-before(substring-after(substring-after($range,'.'),'.'),' ')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-after(substring-after($range,'.'),'.')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell" select="$endCell"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="col2">
+      <xsl:value-of
+        select="substring-before(substring-after(substring-after($range,'.'),'.'),$row2)"/>
+    </xsl:variable>
+    
+    <!-- if sheet name contains space then name has to be inside apostrophes -->
+    <xsl:variable name="sheetName">
+      <xsl:choose>
+        <xsl:when test="contains(@table:name,' ')">
+          <xsl:text>'</xsl:text>
+          <xsl:value-of select="@table:name"/>
+          <xsl:text>'</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@table:name"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:value-of
+      select="concat($sheetName,'!$',substring-before(substring-after($range,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"/>
+    
+    <!-- if there is next range there is a space before -->
+    <xsl:if test="contains(substring-after(substring-after($range,'.'),'.'),' ')">
+      <xsl:text>,</xsl:text>
+      <xsl:call-template name="InsertRange">
+        <xsl:with-param name="range">
+          <xsl:value-of
+            select="substring-after(substring-after(substring-after($range,'.'),'.'),' ')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template name="InsertHeaders">
 
     <xsl:for-each select="table:table">
@@ -292,9 +318,9 @@
         <xsl:otherwise>
           <xsl:value-of select="@table:name"/>
         </xsl:otherwise>
-      </xsl:choose>            
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:value-of
       select="concat($sheetName,'!$',$headerRowStart,':$',$headerRowStart + $headerRows  - 1)"/>
 
@@ -336,9 +362,9 @@
         <xsl:otherwise>
           <xsl:value-of select="@table:name"/>
         </xsl:otherwise>
-      </xsl:choose>            
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:value-of select="concat($sheetName,'!$',$charHeaderColStart,':$',$charHeaderColEnd)"/>
 
   </xsl:template>
