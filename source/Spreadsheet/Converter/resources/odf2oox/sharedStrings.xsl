@@ -37,34 +37,31 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   exclude-result-prefixes="table r text style fo dc">
-
+  
   <xsl:import href="measures.xsl"/>
-
-  <xsl:key name="stringCell"
-    match="table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency')))]"
-    use="''"/>
+  
   <!-- template which inserts sharedstringscontent -->
   <xsl:template name="InsertSharedStrings">
     <sst>
-      <xsl:for-each select="document('content.xml')">
-        <xsl:variable name="Count">
-          <xsl:value-of select="count(key('stringCell',''))"/>
-        </xsl:variable>
-        <xsl:attribute name="count">
-          <xsl:value-of select="$Count"/>
-        </xsl:attribute>
-        <xsl:attribute name="uniqueCount">
-          <xsl:value-of select="$Count"/>
-        </xsl:attribute>
-        <xsl:call-template name="InsertString"/>
-      </xsl:for-each>
+      <xsl:variable name="Count">
+        <xsl:value-of
+          select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))])"
+        />
+      </xsl:variable>
+      <xsl:attribute name="count">
+        <xsl:value-of select="$Count"/>
+      </xsl:attribute>
+      <xsl:attribute name="uniqueCount">
+        <xsl:value-of select="$Count"/>
+      </xsl:attribute>
+      <xsl:call-template name="InsertString"/>
     </sst>
   </xsl:template>
-
+  
   <!-- template which inserts a string into sharedstrings -->
   <xsl:template name="InsertString">
     <xsl:for-each
-      select="key('stringCell','')">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%'))))]">
       <si>
         <xsl:choose>
           <xsl:when test="text:span|text:p/text:span">
@@ -77,7 +74,7 @@
       </si>
     </xsl:for-each>
   </xsl:template>
-
+  
   <!-- text:span conversion -->
   <xsl:template match="text:span" mode="run">
     <xsl:variable name="tekst">
@@ -100,7 +97,7 @@
       <xsl:otherwise/>
     </xsl:choose>
   </xsl:template>
-
+  
   <!-- when there is formatted text in a string, all texts must be in runs -->
   <xsl:template match="text()" mode="run">
     <r>
@@ -115,18 +112,18 @@
       </xsl:variable>
       <!-- caution with 'Enters' because they can result with additional space in output text -->
       <t xml:space="preserve"><xsl:choose>
-          <xsl:when test="not(contains($value, '_x'))"><xsl:value-of select="$value"/></xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="HexaDecimalValue">
-              <xsl:with-param name="value">
-                <xsl:value-of select="$value"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose></t>
+        <xsl:when test="not(contains($value, '_x'))"><xsl:value-of select="$value"/></xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="HexaDecimalValue">
+            <xsl:with-param name="value">
+              <xsl:value-of select="$value"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose></t>
     </r>
   </xsl:template>
-
+  
   <xsl:template match="text()[parent::dc:date]" mode="text"/>
   <xsl:template match="text:p[parent::office:annotation]" mode="text"/>
   <xsl:template match="text:span[ancestor::office:annotation]" mode="text"/>
@@ -148,7 +145,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
   <xsl:template match="text:s" mode="text">
     <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
       <xsl:attribute name="pxs:c">
@@ -163,7 +160,7 @@
       </xsl:attribute>
     </pxs:s>
   </xsl:template>
-
+  
   <!-- when there are more than one line of text, enter must be added -->
   <xsl:template match="text:p[preceding-sibling::text:p]" mode="run">
     <r>
@@ -184,12 +181,12 @@
       <xsl:apply-templates mode="run"/>
     </xsl:if>
   </xsl:template>
-
+  
   <xsl:template match="text:p[preceding-sibling::text:p]" mode="text">
     <xsl:value-of select="'&#xD;&#xA;'"/>
     <xsl:apply-templates mode="text"/>
   </xsl:template>
-
+  
   <!-- when there are HaxaDecimal value (_x...._), must be added _x005F -->
   <xsl:template name="HexaDecimalValue">
     <xsl:param name="value"/>
@@ -235,5 +232,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
 </xsl:stylesheet>
