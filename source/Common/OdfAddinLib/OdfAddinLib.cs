@@ -166,6 +166,11 @@ namespace CleverAge.OdfConverter.OdfConverterLib
                     InfoBox infoBox = new InfoBox("UnableToCreateOutputLabel", "UnableToCreateOutputDetail", this.resourceManager);
                     infoBox.ShowDialog();
                 }
+                catch (OdfZipUtils.ZipException)
+                {
+                    InfoBox infoBox = new InfoBox("CorruptedInputFileLabel", "CorruptedInputFileDetail", this.resourceManager);
+                    infoBox.ShowDialog();
+                }
                 catch (Exception e)
                 {
                     InfoBox infoBox = new InfoBox("OdfUnexpectedError", e.GetType() + ": " + e.Message + " (" + e.StackTrace + ")", this.resourceManager);
