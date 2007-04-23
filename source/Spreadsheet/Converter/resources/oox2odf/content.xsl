@@ -127,7 +127,7 @@
       </xsl:attribute>
 
       <xsl:apply-templates
-        select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName [1]"
+        select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1]"
         mode="PrintArea">
         <xsl:with-param name="name">
           <xsl:value-of select="@name"/>
@@ -178,7 +178,7 @@
         </xsl:variable>
         <xsl:attribute name="table:print-ranges">
           <xsl:value-of
-            select="concat(substring-before($printArea,'!'),'.',substring(substring-after($printArea,'!'),1,3),$name,'.',substring-after($printArea,':'))"
+            select="concat(substring-before($printArea,'!'),'.',substring(substring-after($printArea,'!'),1,3),substring-before($printArea,'!'),'.',substring-after($printArea,':'))"
           />
         </xsl:attribute>
       </xsl:when>
