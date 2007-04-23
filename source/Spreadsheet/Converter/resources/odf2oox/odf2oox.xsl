@@ -33,10 +33,8 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-  xmlns:v="urn:schemas-microsoft-com:vml"
-  xmlns:o="urn:schemas-microsoft-com:office:office"
-  xmlns:x="urn:schemas-microsoft-com:office:excel"
-  exclude-result-prefixes="odf style text number">
+  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel" exclude-result-prefixes="odf style text number">
 
   <xsl:import href="workbook.xsl"/>
   <xsl:import href="sharedStrings.xsl"/>
@@ -89,7 +87,7 @@
       <pzip:entry pzip:target="xl/workbook.xml">
         <xsl:call-template name="InsertWorkbook"/>
       </pzip:entry>
-    
+
       <!-- shared strings (ewentualny postprocessing)-->
       <pzip:entry pzip:target="xl/sharedStrings.xml">
         <xsl:call-template name="InsertSharedStrings"/>
@@ -97,50 +95,54 @@
       <!-- input: content.xml -->
       <!-- output: xl/sharedStrings.xml -->
 
-      
+
       <!-- insert sheets -->
       <xsl:call-template name="InsertSheets"/>
       <!-- input: content.xml -->
       <!-- output:  xl/worksheets/sheet_N_.xml -->
-      
+
       <!--insert comments-->
-      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+      <xsl:for-each
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
         <xsl:if test="descendant::office:annotation">
           <xsl:call-template name="InsertComments">
             <xsl:with-param name="sheetId" select="position()"/>
           </xsl:call-template>
-          
+
           <!-- package relationship item -->
           <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
-         
+
             <xsl:call-template name="InsertWorksheetsRels">
-                <xsl:with-param name="sheetNum" select="position()"/>
+              <xsl:with-param name="sheetNum" select="position()"/>
             </xsl:call-template>
           </pzip:entry>
-          
+
         </xsl:if>
-       </xsl:for-each>
-      
-      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+      </xsl:for-each>
+
+      <xsl:for-each
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
         <xsl:if test="descendant::office:annotation">
           <xsl:variable name="sheetId" select="position()"/>
           <pzip:entry pzip:target="{concat('xl/drawings/vmlDrawing',position(),'.vml')}">
-          <pxsi:dummyContainer  xmlns:pxsi="urn:cleverage:xmlns:post-processings:comments">
-            <o:shapelayout v:ext="edit">
-              <o:idmap v:ext="edit" data="1"/>
-            </o:shapelayout><v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202"
-              path="m,l,21600r21600,l21600,xe">
-              <v:stroke joinstyle="miter"/>
-              <v:path gradientshapeok="t" o:connecttype="rect"/>
-            </v:shapetype>
-            <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/table:table-row/table:table-cell/office:annotation">
-              <xsl:call-template name="InsertTextBox"/>
-            </xsl:for-each>
-          </pxsi:dummyContainer>
+            <pxsi:dummyContainer xmlns:pxsi="urn:cleverage:xmlns:post-processings:comments">
+              <o:shapelayout v:ext="edit">
+                <o:idmap v:ext="edit" data="1"/>
+              </o:shapelayout>
+              <v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202"
+                path="m,l,21600r21600,l21600,xe">
+                <v:stroke joinstyle="miter"/>
+                <v:path gradientshapeok="t" o:connecttype="rect"/>
+              </v:shapetype>
+              <xsl:for-each
+                select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/descendant::table:table-row/table:table-cell/office:annotation">
+                <xsl:call-template name="InsertTextBox"/>
+              </xsl:for-each>
+            </pxsi:dummyContainer>
           </pzip:entry>
         </xsl:if>
       </xsl:for-each>
-      
+
       <!-- insert drawings -->
       <!--<xsl:call-template name="InsertDrawings"/>-->
       <!-- input: content.xml 
@@ -220,25 +222,25 @@
       <pzip:entry pzip:target="_rels/.rels">
         <xsl:call-template name="package-relationships"/>
       </pzip:entry>
-      
+
     </pzip:archive>
   </xsl:template>
 
- <xsl:template name="docprops-app">
-   <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
-     xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
-     xmlns:dc="http://purl.org/dc/elements/1.1/">
-   <xsl:call-template name="GetDocSecurityExtendedProperty"/>
-   <xsl:call-template name="GetApplicationExtendedProperty"/>
-  </Properties>
-</xsl:template>
-  
+  <xsl:template name="docprops-app">
+    <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
+      xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
+      xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <xsl:call-template name="GetDocSecurityExtendedProperty"/>
+      <xsl:call-template name="GetApplicationExtendedProperty"/>
+    </Properties>
+  </xsl:template>
+
   <xsl:template name="InsertComments">
-  <xsl:param name="sheetId"/>
-    <pzip:entry pzip:target='{concat("xl/comments",$sheetId,".xml")}'>
+    <xsl:param name="sheetId"/>
+    <pzip:entry pzip:target="{concat(&quot;xl/comments&quot;,$sheetId,&quot;.xml&quot;)}">
       <xsl:call-template name="comments">
-          <xsl:with-param name="sheetNum" select="$sheetId"/>
+        <xsl:with-param name="sheetNum" select="$sheetId"/>
       </xsl:call-template>
     </pzip:entry>
-   </xsl:template>
+  </xsl:template>
 </xsl:stylesheet>

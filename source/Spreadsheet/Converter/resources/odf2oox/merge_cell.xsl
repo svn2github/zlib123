@@ -41,42 +41,20 @@
   
   <xsl:template name="WriteMergeStyle">
     
-    <xsl:choose>
-      <!-- when the first row is a simple row -->
-      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns'  and name() != 'office:forms' ][1][name() = 'table:table-row' ]">
         <xsl:variable name="rowNumber">
           <xsl:choose>
-            <xsl:when test="table:table-row[1]/@table:number-rows-repeated">
-              <xsl:value-of select="table:table-row[1]/@table:number-rows-repeated"/>
+            <xsl:when test="descendant::table:table-row[1]/@table:number-rows-repeated">
+              <xsl:value-of select="descendant::table:table-row[1]/@table:number-rows-repeated"/>
             </xsl:when>
             <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>  
         </xsl:variable>
         
-        <xsl:apply-templates select="table:table-row[1]" mode="mergestyle">
+        <xsl:apply-templates select="descendant::table:table-row[1]" mode="mergestyle">
           <xsl:with-param name="rowNumber">
             <xsl:value-of select="$rowNumber"/>
           </xsl:with-param>
         </xsl:apply-templates>
-      </xsl:when>
-      <!-- when the first row is a header row -->
-      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1][name() = 'table:table-header-rows' ]">
-        <xsl:variable name="rowNumber">
-          <xsl:choose>
-            <xsl:when test="table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
-              <xsl:value-of select="table:table-header-rows/table:table-row[1]/@table:number-rows-repeated"/>
-            </xsl:when>
-            <xsl:otherwise>1</xsl:otherwise>
-          </xsl:choose>  
-        </xsl:variable>
-        
-        <xsl:apply-templates select="table:table-header-rows/table:table-row[1]" mode="mergestyle">
-          <xsl:with-param name="rowNumber">
-            <xsl:value-of select="$rowNumber"/>
-          </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:when>
-    </xsl:choose>
     
   </xsl:template>
   
@@ -244,42 +222,20 @@
   
   <xsl:template name="WriteMergeCell">
     
-    <xsl:choose>
-      <!-- when the first row is a simple row -->
-      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1][name() = 'table:table-row' ]">
         <xsl:variable name="rowNumber">
           <xsl:choose>
-            <xsl:when test="table:table-row[1]/@table:number-rows-repeated">
-              <xsl:value-of select="table:table-row[1]/@table:number-rows-repeated"/>
+            <xsl:when test="descendant::table:table-row[1]/@table:number-rows-repeated">
+              <xsl:value-of select="descendant::table:table-row[1]/@table:number-rows-repeated"/>
             </xsl:when>
             <xsl:otherwise>1</xsl:otherwise>
           </xsl:choose>  
         </xsl:variable>
         
-        <xsl:apply-templates select="table:table-row[1]" mode="merge">
+        <xsl:apply-templates select="descendant::table:table-row[1]" mode="merge">
           <xsl:with-param name="rowNumber">
             <xsl:value-of select="$rowNumber"/>
           </xsl:with-param>
         </xsl:apply-templates>
-      </xsl:when>
-      <!-- when the first row is a header row -->
-      <xsl:when test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1][name() = 'table:table-header-rows' ]">
-        <xsl:variable name="rowNumber">
-          <xsl:choose>
-            <xsl:when test="table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
-              <xsl:value-of select="table:table-header-rows/table:table-row[1]/@table:number-rows-repeated"/>
-            </xsl:when>
-            <xsl:otherwise>1</xsl:otherwise>
-          </xsl:choose>  
-        </xsl:variable>
-        
-        <xsl:apply-templates select="table:table-header-rows/table:table-row[1]" mode="merge">
-          <xsl:with-param name="rowNumber">
-            <xsl:value-of select="$rowNumber"/>
-          </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:when>
-    </xsl:choose>
     
   </xsl:template>
   

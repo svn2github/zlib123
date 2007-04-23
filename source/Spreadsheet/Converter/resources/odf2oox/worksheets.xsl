@@ -316,8 +316,8 @@
     <!-- compute default row height -->
     <xsl:variable name="defaultRowHeight">
       <xsl:choose>
-        <xsl:when test="table:table-row[@table:number-rows-repeated > 32768]">
-          <xsl:for-each select="table:table-row[@table:number-rows-repeated > 32768]">
+        <xsl:when test="descendant::table:table-row[@table:number-rows-repeated > 32768]">
+          <xsl:for-each select="descendant::table:table-row[@table:number-rows-repeated > 32768]">
             <xsl:call-template name="ConvertMeasure">
               <xsl:with-param name="length">
                 <xsl:value-of
@@ -368,7 +368,7 @@
     <xsl:variable name="CheckRowHidden">
       <xsl:choose>
         <xsl:when test="table:table-row[@table:visibility='collapse']">
-          <xsl:apply-templates select="table:table-row[1]" mode="zeroHeight">
+          <xsl:apply-templates select="descendant::table:table-row[1]" mode="zeroHeight">
             <xsl:with-param name="rowNumber">
               <xsl:text>0</xsl:text>
             </xsl:with-param>
@@ -449,58 +449,29 @@
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
       </xsl:variable>
-      
+
       <!-- insert first row -->
-      <xsl:choose>
-        <!-- when the first row is a simple row -->
-        <xsl:when
-          test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1][name() = 'table:table-row' ]">
-          <xsl:apply-templates select="table:table-row[1]" mode="sheet">
-            <xsl:with-param name="rowNumber">1</xsl:with-param>
-            <xsl:with-param name="cellNumber" select="$cellNumber"/>
-            <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
-            <xsl:with-param name="TableColumnTagNum">
-              <xsl:value-of select="$ColumnTagNum"/>
-            </xsl:with-param>
-            <xsl:with-param name="MergeCell">
-              <xsl:value-of select="$MergeCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="MergeCellStyle">
-              <xsl:value-of select="$MergeCellStyle"/>
-            </xsl:with-param>
-            <xsl:with-param name="CheckRowHidden">
-              <xsl:value-of select="$CheckRowHidden"/>
-            </xsl:with-param>
-            <xsl:with-param name="CheckIfDefaultBorder">
-              <xsl:value-of select="$CheckIfDefaultBorder"/>
-            </xsl:with-param>
-          </xsl:apply-templates>
-        </xsl:when>
-        <!-- when the first row is a header row -->
-        <xsl:when
-          test="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms'][1][name() = 'table:table-header-rows' ]">
-          <xsl:apply-templates select="table:table-header-rows/table:table-row[1]" mode="sheet">
-            <xsl:with-param name="rowNumber">1</xsl:with-param>
-            <xsl:with-param name="cellNumber" select="$cellNumber"/>
-            <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
-            <xsl:with-param name="TableColumnTagNum">
-              <xsl:value-of select="$ColumnTagNum"/>
-            </xsl:with-param>
-            <xsl:with-param name="MergeCell">
-              <xsl:value-of select="$MergeCell"/>
-            </xsl:with-param>
-            <xsl:with-param name="MergeCellStyle">
-              <xsl:value-of select="$MergeCellStyle"/>
-            </xsl:with-param>
-            <xsl:with-param name="CheckRowHidden">
-              <xsl:value-of select="$CheckRowHidden"/>
-            </xsl:with-param>
-            <xsl:with-param name="CheckIfDefaultBorder">
-              <xsl:value-of select="$CheckIfDefaultBorder"/>
-            </xsl:with-param>
-          </xsl:apply-templates>
-        </xsl:when>
-      </xsl:choose>
+      <xsl:apply-templates select="descendant::table:table-row[1]" mode="sheet">
+        <xsl:with-param name="rowNumber">1</xsl:with-param>
+        <xsl:with-param name="cellNumber" select="$cellNumber"/>
+        <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
+        <xsl:with-param name="TableColumnTagNum">
+          <xsl:value-of select="$ColumnTagNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCell">
+          <xsl:value-of select="$MergeCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="MergeCellStyle">
+          <xsl:value-of select="$MergeCellStyle"/>
+        </xsl:with-param>
+        <xsl:with-param name="CheckRowHidden">
+          <xsl:value-of select="$CheckRowHidden"/>
+        </xsl:with-param>
+        <xsl:with-param name="CheckIfDefaultBorder">
+          <xsl:value-of select="$CheckIfDefaultBorder"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      
     </sheetData>
   </xsl:template>
 
@@ -773,7 +744,7 @@
       <xsl:when
         test="key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-top or
         key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-bottom or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-left or
-        key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-right or key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:background-color">
+        key('style', @table:default-cell-style-name)/style:table-cell-properties/@fo:border-right">
         <xsl:text>true</xsl:text>
       </xsl:when>
       <xsl:otherwise>
@@ -789,7 +760,8 @@
               mode="DefaultBorder"/>
           </xsl:when>
           <!-- this is the last column inside header  -->
-          <xsl:when test="not(following-sibling::node()[1][name() = 'table:table-column' ]) and parent::node()[name() = 'table:table-header-columns' ] and parent::node()/following-sibling::table:table-column[1]">
+          <xsl:when
+            test="not(following-sibling::node()[1][name() = 'table:table-column' ]) and parent::node()[name() = 'table:table-header-columns' ] and parent::node()/following-sibling::table:table-column[1]">
             <xsl:apply-templates select="parent::node()/following-sibling::table:table-column[1]"
               mode="DefaultBorder"/>
           </xsl:when>
@@ -831,7 +803,7 @@
 
   <xsl:template name="CountCols">
     <xsl:param name="value" select="0"/>
-    
+
     <xsl:variable name="cols">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
@@ -842,7 +814,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="following-sibling::table:table-column[1]">
         <xsl:for-each select="following-sibling::table:table-column[1]">

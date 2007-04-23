@@ -87,7 +87,7 @@
         <xsl:if test="@table:default-cell-style-name != 'Default' ">
           <!-- column style is when in all posible rows there is a cell in this column -->
           <xsl:variable name="checkColumnStyle">
-            <xsl:for-each select="parent::node()/table:table-row[1]">
+            <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
               <xsl:call-template name="CheckIfColumnStyle">
                 <xsl:with-param name="number" select="$colNumber"/>
                 <xsl:with-param name="table" select="$tableId"/>
@@ -126,7 +126,8 @@
       </xsl:when>
       <!-- this is the last column before header  -->
       <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-columns' ]">
-        <xsl:apply-templates select="following-sibling::node()[1]/table:table-column[1]" mode="sheet">
+        <xsl:apply-templates select="following-sibling::node()[1]/table:table-column[1]"
+          mode="sheet">
           <xsl:with-param name="colNumber">
             <xsl:choose>
               <xsl:when test="@table:number-columns-repeated">
@@ -840,11 +841,13 @@
     <xsl:param name="TableColumnTagNum"/>
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
-    
-    <xsl:variable name="CountStyleTableCell">     
-      <xsl:value-of select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell'])"/>     
+
+    <xsl:variable name="CountStyleTableCell">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell'])"
+      />
     </xsl:variable>
-    
+
     <xsl:call-template name="InsertConvertCell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
@@ -869,7 +872,7 @@
         <xsl:value-of select="$CountStyleTableCell"/>
       </xsl:with-param>
     </xsl:call-template>
-    
+
     <xsl:apply-templates mode="cell">
       <xsl:with-param name="colNumber">
         <xsl:value-of select="$colNumber"/>
@@ -878,7 +881,7 @@
         <xsl:value-of select="$rowNumber"/>
       </xsl:with-param>
     </xsl:apply-templates>
-    
+
   </xsl:template>
 
   <xsl:template match="office:annotation" mode="cell">
@@ -897,7 +900,7 @@
      </pxsi:commentDrawingMark>
     
   </xsl:template>
-  
+
   <!-- insert cell -->
   <xsl:template name="InsertNextCell">
     <xsl:param name="colNumber"/>
@@ -984,8 +987,7 @@
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CountStyleTableCell"/>
-    
-   
+
     <!-- do not show covered cells content -->
 
     <xsl:call-template name="InsertCell">
@@ -1006,9 +1008,9 @@
       </xsl:with-param>
       <xsl:with-param name="MergeCellStyle">
         <xsl:value-of select="$MergeCellStyle"/>
-        </xsl:with-param>
-        <xsl:with-param name="CountStyleTableCell">
-          <xsl:value-of select="$CountStyleTableCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="CountStyleTableCell">
+        <xsl:value-of select="$CountStyleTableCell"/>
       </xsl:with-param>
     </xsl:call-template>
 
@@ -1082,7 +1084,7 @@
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CountStyleTableCell"/>
-    
+
 
     <xsl:variable name="columnCellStyle">
       <xsl:call-template name="GetColumnCellStyle">
@@ -1168,17 +1170,20 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:choose>
-              <xsl:when test="name() = 'table:covered-table-cell' and substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';') != ''">
+              <xsl:when
+                test="name() = 'table:covered-table-cell' and substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';') != ''">
                 <xsl:variable name="style">
-                  <xsl:value-of select="substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';')"/>
+                  <xsl:value-of
+                    select="substring-before(substring-after($MergeCellStyle, concat($MergeStart, ':')), ';')"
+                  />
                 </xsl:variable>
                 <xsl:choose>
                   <xsl:when test="key('style', $style)">
-                    <xsl:for-each select="key('style', $style)">  
+                    <xsl:for-each select="key('style', $style)">
                       <xsl:attribute name="s">
                         <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
                       </xsl:attribute>
-                    </xsl:for-each>    
+                    </xsl:for-each>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:variable name="TableStyleName">
@@ -1196,9 +1201,9 @@
                     </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
-              </xsl:when>            
+              </xsl:when>
               <!-- when style is specified in cell -->
-              <xsl:when test="@table:style-name and not(table:covered-table-cell)">                
+              <xsl:when test="@table:style-name and not(table:covered-table-cell)">
                 <xsl:choose>
                   <xsl:when test="key('style',@table:style-name)">
                     <xsl:for-each select="key('style',@table:style-name)">
@@ -1220,37 +1225,37 @@
                           <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
                         </xsl:attribute>
                       </xsl:for-each>
-                      </xsl:for-each>
+                    </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:when>
               <!-- when style is specified in column -->
-                <xsl:when test="$columnCellStyle != '' ">
-                  <xsl:choose>
-                    <xsl:when test="key('style',$columnCellStyle)">
+              <xsl:when test="$columnCellStyle != '' ">
+                <xsl:choose>
+                  <xsl:when test="key('style',$columnCellStyle)">
+                    <xsl:for-each select="key('style',$columnCellStyle)">
+                      <xsl:attribute name="s">
+                        <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                      </xsl:attribute>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:for-each select="document('styles.xml')">
                       <xsl:for-each select="key('style',$columnCellStyle)">
-                        <xsl:attribute name="s">
+                        <xsl:variable name="CountTableCell">
                           <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                        </xsl:variable>
+                        <xsl:attribute name="s">
+                          <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
                         </xsl:attribute>
-                      </xsl:for-each>    
-                    </xsl:when>
-                    <xsl:otherwise>                      
-                      <xsl:for-each select="document('styles.xml')">
-                        <xsl:for-each select="key('style',$columnCellStyle)">
-                          <xsl:variable name="CountTableCell">
-                            <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
-                          </xsl:variable>
-                          <xsl:attribute name="s">
-                            <xsl:value-of select="$CountStyleTableCell+$CountTableCell"/>
-                          </xsl:attribute>
-                        </xsl:for-each>
                       </xsl:for-each>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:when>
+                    </xsl:for-each>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
             </xsl:choose>
           </xsl:otherwise>
-        </xsl:choose>    
+        </xsl:choose>
         <!-- convert cell type -->
         <xsl:if test="child::text:p and not(name() = 'table:covered-table-cell')">
           <xsl:choose>
@@ -1263,11 +1268,11 @@
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:variable>
-              
+
               <xsl:attribute name="t">
                 <xsl:value-of select="$Type"/>
               </xsl:attribute>
-            
+
               <v>
                 <xsl:choose>
                   <xsl:when test="$Type = 'n'">
@@ -1286,7 +1291,7 @@
                 </xsl:choose>
               </v>
             </xsl:when>
-            
+
             <!-- percentage -->
             <xsl:when test="@office:value-type = 'percentage'">
               <v>
@@ -1300,14 +1305,14 @@
                 </xsl:choose>
               </v>
             </xsl:when>
-            
+
             <!-- currency -->
             <xsl:when test="@office:value-type = 'currency'">
               <v>
                 <xsl:value-of select="@office:value"/>
               </v>
             </xsl:when>
-            
+
             <!-- date -->
             <xsl:when test="@office:value-type='date'">
               <v>
@@ -1318,7 +1323,7 @@
                 </xsl:call-template>
               </v>
             </xsl:when>
-            
+
             <!-- TO DO  time-->
             <xsl:when test="@office:value-type = 'time'"/>
             <!-- last or when number cell has error -->
