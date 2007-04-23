@@ -66,8 +66,8 @@
         <!-- last 'or' for cells with error -->
         <!-- cellNumber + number string cells inside simple rows + number string cells inside header rows -->
         <xsl:value-of
-          select="$cellNumber + count(table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))]) +
-          count(table:table-header-rows/table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0)))])"
+          select="$cellNumber + count(table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency')))]) +
+          count(table:table-header-rows/table:table-row/table:table-cell[text:p and (@office:value-type='string' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency')))])"
         />
       </xsl:with-param>
       <xsl:with-param name="sheetId">

@@ -33,18 +33,17 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  exclude-result-prefixes="table">
-  
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
+
   <!-- template to convert cell type -->
   <xsl:template name="ConvertTypes">
     <xsl:param name="type"/>
     <!-- TO DO percentage -->
-    <xsl:choose>     
+    <xsl:choose>
       <xsl:when test="$type='float'">n</xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- converting number of column to char name of column -->
   <xsl:template name="NumbersToChars">
     <xsl:param name="num"/>
@@ -89,13 +88,13 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- calculates power function -->
   <xsl:template name="Power">
     <xsl:param name="base"/>
     <xsl:param name="exponent"/>
     <xsl:param name="value1" select="$base"/>
-    
+
     <xsl:choose>
       <xsl:when test="$exponent = 0">
         <xsl:text>1</xsl:text>
@@ -122,30 +121,30 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- translates literal index to number -->
   <xsl:template name="GetAlphabeticPosition">
     <xsl:param name="literal"/>
     <xsl:param name="number" select="0"/>
     <xsl:param name="level" select="0"/>
-    
+
     <xsl:variable name="lastCharacter">
       <xsl:value-of select="substring($literal,string-length($literal),1)"/>
     </xsl:variable>
-    
+
     <xsl:variable name="lastCharacterPosition">
       <xsl:call-template name="CharacterToPosition">
         <xsl:with-param name="character" select="$lastCharacter"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="power">
       <xsl:call-template name="Power">
         <xsl:with-param name="base" select="26"/>
         <xsl:with-param name="exponent" select="$level"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="string-length($literal)>1">
         <xsl:call-template name="GetAlphabeticPosition">
@@ -161,11 +160,11 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- returns position in alphabet of a single character-->
   <xsl:template name="CharacterToPosition">
     <xsl:param name="character"/>
-    
+
     <xsl:choose>
       <xsl:when test="$character='A'">1</xsl:when>
       <xsl:when test="$character='B'">2</xsl:when>
@@ -195,7 +194,7 @@
       <xsl:when test="$character='Z'">26</xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template to convert column width -->
   <xsl:template name="ConvertToCharacters">
     <xsl:param name="width"/>
@@ -214,44 +213,45 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-   <xsl:variable name="realFontSize">
-     <xsl:value-of select="72 * $fontSize div 96"/>
-   </xsl:variable>
+    <xsl:variable name="realFontSize">
+      <xsl:value-of select="72 * $fontSize div 96"/>
+    </xsl:variable>
     <xsl:value-of select="($pixelWidth) div (2 div 3 * $realFontSize)"/>
   </xsl:template>
-  
+
   <!-- Template to check if value is hexadecimal -->
   <xsl:template name="CheckIfHexadecimal">
     <xsl:param name="value"/>
     <xsl:param name="result"/>
-    
+
     <xsl:variable name="char">
       <xsl:value-of select="substring($value, 1, 1)"/>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$value != ''">        
-          <xsl:choose>
-            <xsl:when test="$char = '0' or number($char) or $char = 'A' or $char = 'a' or $char = 'B'  or $char = 'b' or $char = 'c' or $char = 'C' or $char = 'd' or $char = 'D' or $char = 'e' or $char = 'E' or $char = 'f' or $char = 'F'">
-              <xsl:call-template name="CheckIfHexadecimal">
-                <xsl:with-param name="value">
-                  <xsl:value-of select="substring($value, 2)"/>
-                </xsl:with-param>
-                <xsl:with-param name="result">
-                  <xsl:text>true</xsl:text>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:choose>
-                <xsl:when test="$result != ''">
-                  <xsl:value-of select="$result"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:text>false</xsl:text>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:otherwise>
-          </xsl:choose>
+      <xsl:when test="$value != ''">
+        <xsl:choose>
+          <xsl:when
+            test="$char = '0' or number($char) or $char = 'A' or $char = 'a' or $char = 'B'  or $char = 'b' or $char = 'c' or $char = 'C' or $char = 'd' or $char = 'D' or $char = 'e' or $char = 'E' or $char = 'f' or $char = 'F'">
+            <xsl:call-template name="CheckIfHexadecimal">
+              <xsl:with-param name="value">
+                <xsl:value-of select="substring($value, 2)"/>
+              </xsl:with-param>
+              <xsl:with-param name="result">
+                <xsl:text>true</xsl:text>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="$result != ''">
+                <xsl:value-of select="$result"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>false</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
@@ -266,9 +266,9 @@
     </xsl:choose>
 
   </xsl:template>
-  
+
   <xsl:template name="GetRowNum">
-    <xsl:param name="cell"/>    
+    <xsl:param name="cell"/>
     <xsl:choose>
       <xsl:when test="number($cell)">
         <xsl:value-of select="$cell"/>
@@ -280,13 +280,13 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
-  
+
+
   <!-- gets a column number from cell coordinates -->
   <xsl:template name="GetColNum">
     <xsl:param name="cell"/>
     <xsl:param name="columnId"/>
-    
+
     <xsl:choose>
       <!-- when whole literal column id has been extracted than convert alphabetic index to number -->
       <xsl:when test="number($cell)">
@@ -303,9 +303,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which converts date to number -->
-  
+  <!-- date format can be yyyy-mm-dd or yyyy-mm-ddThh:mm:ss.uu -->
   <xsl:template name="DateToNumber">
     <xsl:param name="value"/>
     <xsl:variable name="year">
@@ -315,7 +315,15 @@
       <xsl:value-of select="substring-before(substring-after($value,'-'),'-')"/>
     </xsl:variable>
     <xsl:variable name="day">
-      <xsl:value-of select="substring-before(substring-after($value,concat($month,'-')),'T')"/>
+      <xsl:choose>
+        <xsl:when test="contains($value,'T')">
+          <xsl:value-of
+            select="substring-before(substring-after(substring-after($value,'-'),'-'),'T')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-after(substring-after($value,'-'),'-')"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="hour">
       <xsl:value-of select="substring-before(substring-after($value,'T'),':')"/>
@@ -326,57 +334,72 @@
     <xsl:variable name="seconds">
       <xsl:value-of select="substring-after(substring-after($value,':'),':')"/>
     </xsl:variable>
-    
+
     <!-- number of leap years between given year and 1900 -->
     <xsl:variable name="leapYears">
-      <xsl:value-of select="floor(($year -1900) div 4) - floor(($year - 1900) div 100) + floor(($year - 1600) div 400)"/>
+      <xsl:value-of
+        select="floor(($year -1900) div 4) - floor(($year - 1900) div 100) + floor(($year - 1600) div 400)"
+      />
     </xsl:variable>
-    
+
     <!-- get number of days before given month -->
-    <xsl:variable name = "daysOfMonths">
+    <xsl:variable name="daysOfMonths">
       <xsl:call-template name="MonthsToDays">
         <xsl:with-param name="month">
           <xsl:value-of select="number($month)"/>
         </xsl:with-param>
         <xsl:with-param name="isYearLeap">
           <xsl:choose>
-            <xsl:when test="(($year - 4 * floor($year div 4)) = 0 and ($year - 100 * floor($year div 100)) != 0) or ($year - 400 * floor($year div 400)) = 0">true</xsl:when>
+            <xsl:when
+              test="(($year - 4 * floor($year div 4)) = 0 and ($year - 100 * floor($year div 100)) != 0) or ($year - 400 * floor($year div 400)) = 0"
+              >true</xsl:when>
             <xsl:otherwise>false</xsl:otherwise>
           </xsl:choose>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:value-of select="$day + $daysOfMonths + 365 * ($year - 1900) + $leapYears + 1 + $hour div 24 + $minutes div 1440 + $seconds div 86400"/>
+
+    <xsl:choose>
+      <xsl:when test="contains($value,'T')">
+        <xsl:value-of
+          select="number($day) + $daysOfMonths + 365 * ($year - 1900) + $leapYears + 1 + $hour div 24 + $minutes div 1440 + $seconds div 86400"
+        />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="number($day) + $daysOfMonths + 365 * ($year - 1900) + $leapYears + 1"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
-  
+
   <xsl:template name="MonthsToDays">
     <xsl:param name="month"/>
     <xsl:param name="isYearLeap"/>
     <xsl:variable name="extraDay">
       <xsl:choose>
-        
+
         <!-- if there's a leap year than add extra day after 2nd month -->
-      <xsl:when test="$isYearLeap = 'true' and $month &gt; 2">1</xsl:when>
+        <xsl:when test="$isYearLeap = 'true' and $month &gt; 2">1</xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-        <xsl:variable name="numberOfDays">
-          <xsl:choose>
-            <xsl:when test="$month = 1">0</xsl:when>
-            <xsl:when test="$month = 2">31</xsl:when>
-            <xsl:when test="$month = 3">59</xsl:when>
-            <xsl:when test="$month = 4">90</xsl:when>
-            <xsl:when test="$month = 5">120</xsl:when>
-            <xsl:when test="$month = 6">151</xsl:when>
-            <xsl:when test="$month = 7">181</xsl:when>
-            <xsl:when test="$month = 8">212</xsl:when>
-            <xsl:when test="$month = 9">243</xsl:when>
-            <xsl:when test="$month = 10">273</xsl:when>
-            <xsl:when test="$month = 11">304</xsl:when>
-            <xsl:when test="$month = 12">334</xsl:when>
-          </xsl:choose>
-        </xsl:variable>
+    <xsl:variable name="numberOfDays">
+      <xsl:choose>
+        <xsl:when test="$month = 1">0</xsl:when>
+        <xsl:when test="$month = 2">31</xsl:when>
+        <xsl:when test="$month = 3">59</xsl:when>
+        <xsl:when test="$month = 4">90</xsl:when>
+        <xsl:when test="$month = 5">120</xsl:when>
+        <xsl:when test="$month = 6">151</xsl:when>
+        <xsl:when test="$month = 7">181</xsl:when>
+        <xsl:when test="$month = 8">212</xsl:when>
+        <xsl:when test="$month = 9">243</xsl:when>
+        <xsl:when test="$month = 10">273</xsl:when>
+        <xsl:when test="$month = 11">304</xsl:when>
+        <xsl:when test="$month = 12">334</xsl:when>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:value-of select="$numberOfDays + $extraDay"/>
   </xsl:template>
-  
+
 </xsl:stylesheet>
