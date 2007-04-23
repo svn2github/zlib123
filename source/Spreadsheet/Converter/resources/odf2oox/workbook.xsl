@@ -214,8 +214,22 @@
             />
           </xsl:variable>
 
+          <!-- if sheet name contains space then name has to be inside apostrophes -->
+          <xsl:variable name="sheetName">
+            <xsl:choose>
+              <xsl:when test="contains(@table:name,' ')">
+                <xsl:text>'</xsl:text>
+                <xsl:value-of select="@table:name"/>
+                <xsl:text>'</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="@table:name"/>
+              </xsl:otherwise>
+            </xsl:choose>            
+          </xsl:variable>
+          
           <xsl:value-of
-            select="concat(substring-after(@table:name,''),'!$',substring-before(substring-after(@table:print-ranges,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"
+            select="concat($sheetName,'!$',substring-before(substring-after(@table:print-ranges,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"
           />
         </definedName>
       </xsl:if>
@@ -268,8 +282,21 @@
       </xsl:for-each>
     </xsl:variable>
 
+    <xsl:variable name="sheetName">
+      <xsl:choose>
+        <xsl:when test="contains(@table:name,' ')">
+          <xsl:text>'</xsl:text>
+          <xsl:value-of select="@table:name"/>
+          <xsl:text>'</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@table:name"/>
+        </xsl:otherwise>
+      </xsl:choose>            
+    </xsl:variable>
+    
     <xsl:value-of
-      select="concat(@table:name,'!$',$headerRowStart,':$',$headerRowStart + $headerRows  - 1)"/>
+      select="concat($sheetName,'!$',$headerRowStart,':$',$headerRowStart + $headerRows  - 1)"/>
 
   </xsl:template>
 
@@ -299,7 +326,20 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:value-of select="concat(@table:name,'!$',$charHeaderColStart,':$',$charHeaderColEnd)"/>
+    <xsl:variable name="sheetName">
+      <xsl:choose>
+        <xsl:when test="contains(@table:name,' ')">
+          <xsl:text>'</xsl:text>
+          <xsl:value-of select="@table:name"/>
+          <xsl:text>'</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@table:name"/>
+        </xsl:otherwise>
+      </xsl:choose>            
+    </xsl:variable>
+    
+    <xsl:value-of select="concat($sheetName,'!$',$charHeaderColStart,':$',$charHeaderColEnd)"/>
 
   </xsl:template>
 
