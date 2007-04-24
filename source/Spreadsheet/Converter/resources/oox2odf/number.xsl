@@ -40,7 +40,7 @@
     <xsl:choose>
       
       <!-- date style -->
-      <xsl:when test="contains(@formatCode,'y') or contains(@formatCode,'m') or contains(@formatCode,'d') or contains(@formatCode,'h') or contains(@formatCode,'s')">
+      <xsl:when test="contains(@formatCode,'y') or contains(@formatCode,'m') or (contains(@formatCode,'d') and not(contains(@formatCode,'Red'))) or contains(@formatCode,'h') or contains(@formatCode,'s')">
         <number:date-style style:name="{generate-id(.)}">
         <xsl:call-template name="ProcessFormat">
           <xsl:with-param name="format">
@@ -294,6 +294,14 @@
         </xsl:choose>
       </xsl:if>
       
+      <xsl:if test="contains($formatCode,'\ ') and not(contains($formatCode,','))">
+        <xsl:choose>
+          <xsl:when test="contains(substring-after($formatCode,'\ '),'0') or contains(substring-after($formatCode,'\ '),'#')">
+            <xsl:attribute name="number:grouping">true</xsl:attribute>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+      
     </number:number>
     
     <!-- add currency symbol at the end -->
@@ -309,6 +317,14 @@
       <xsl:call-template name="InsertCurrencySymbol">
         <xsl:with-param name="value" select="$currencyFormat"/>
       </xsl:call-template>
+      
+    </xsl:if>
+    
+    <!-- add space at the end -->
+    <xsl:if test="(contains($formatCode,'\ ') and not($currencyFormat and $currencyFormat!='' and (contains(substring-before($formatCode,$currencyFormat),'0') or contains(substring-before($formatCode,$currencyFormat),'#'))) and not(contains(substring-after($formatCode,'\ '),'0') or contains(substring-after($formatCode,'\ '),'#'))) or (contains($formatCode,'_') and not($currencyFormat and $currencyFormat!='' and (contains(substring-before($formatCode,$currencyFormat),'0') or contains(substring-before($formatCode,$currencyFormat),'#'))) and not(contains(substring-after($formatCode,'_'),'0') or contains(substring-after($formatCode,'_'),'#')))">
+      <number:text>
+        <xsl:value-of xml:space="preserve" select="' '"/>
+      </number:text>
     </xsl:if>
     
   </xsl:template>

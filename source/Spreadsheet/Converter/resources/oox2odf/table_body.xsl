@@ -597,7 +597,7 @@
                     <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'[$')">
                       <xsl:text>currency</xsl:text>
                     </xsl:when>
-                    <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or contains($numStyle,'d') or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                    <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
                       <xsl:text>date</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
@@ -606,7 +606,7 @@
                   </xsl:choose>
                 </xsl:attribute>
                 <xsl:choose>
-                  <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or contains($numStyle,'d') or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                  <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
                     <xsl:attribute name="office:date-value">
                       <xsl:call-template name="NumberToDate">
                         <xsl:with-param name="value">
@@ -623,7 +623,7 @@
                 </xsl:choose>
                 <text:p>
                   <xsl:choose>
-                  <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or contains($numStyle,'d') or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                    <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
                     <xsl:call-template name="FormatDate">
                       <xsl:with-param name="value">
                         <xsl:call-template name="NumberToDate">
