@@ -575,7 +575,7 @@
       <!-- insert repeated rows -->
       <xsl:if test="@table:number-rows-repeated">
         <xsl:if
-          test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true' or contains($CheckIfDefaultBorder, 'true')">
+          test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true' or contains($CheckIfDefaultBorder, 'true') or table:table-cell/@table:style-name">
           <xsl:call-template name="InsertRepeatedRows">
             <xsl:with-param name="numberRowsRepeated">
               <xsl:value-of select="@table:number-rows-repeated"/>
@@ -744,9 +744,9 @@
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CheckIfDefaultBorder"/>
-
+  
     <xsl:if
-      test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true')">
+      test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') or table:table-cell/@table:style-name">
 
       <xsl:choose>
         <xsl:when test="$numberRowsRepeated &gt; 1">

@@ -361,7 +361,7 @@
 
     <!-- Check if default border areexisted in default column-->
     <xsl:variable name="CheckIfDefaultBorder">
-      <xsl:apply-templates select="descendant::table:table-column[1]" mode="DefaultBorder"/>
+      <xsl:apply-templates select="table:table-column[1]" mode="DefaultBorder"/>
     </xsl:variable>
 
     <!-- Check if 65536 rows are hidden -->
