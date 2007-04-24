@@ -597,15 +597,70 @@
                     <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'[$')">
                       <xsl:text>currency</xsl:text>
                     </xsl:when>
+                    <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or contains($numStyle,'d') or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                      <xsl:text>date</xsl:text>
+                    </xsl:when>
                     <xsl:otherwise>
                       <xsl:text>float</xsl:text>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:attribute>
-                <xsl:attribute name="office:value">
-                  <xsl:value-of select="e:v"/>
-                </xsl:attribute>
+                <xsl:choose>
+                  <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or contains($numStyle,'d') or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                    <xsl:attribute name="office:date-value">
+                      <xsl:call-template name="NumberToDate">
+                        <xsl:with-param name="value">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name="office:value">
+                      <xsl:value-of select="e:v"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
                 <text:p>
+                  <xsl:choose>
+                  <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or contains($numStyle,'d') or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                    <xsl:call-template name="FormatDate">
+                      <xsl:with-param name="value">
+                        <xsl:call-template name="NumberToDate">
+                          <xsl:with-param name="value">
+                            <xsl:value-of select="e:v"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:with-param>
+                      <xsl:with-param name="format">
+                        <xsl:choose>
+                          <xsl:when test="contains($numStyle,']')">
+                            <xsl:value-of select="substring-after($numStyle,']')"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="$numStyle"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:with-param>
+                      <xsl:with-param name="numId">
+                        <xsl:value-of select="$numId"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="processedFormat">
+                        <xsl:choose>
+                          <xsl:when test="contains($numStyle,']')">
+                            <xsl:value-of select="substring-after($numStyle,']')"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="$numStyle"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:with-param>
+                      <xsl:with-param name="numValue">
+                        <xsl:value-of select="e:v"/>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:when>
+                    <xsl:otherwise>
                   <xsl:call-template name="FormatNumber">
                     <xsl:with-param name="value">
                       <xsl:value-of select="e:v"/>
@@ -617,6 +672,8 @@
                       <xsl:value-of select="$numId"/>
                     </xsl:with-param>
                   </xsl:call-template>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </text:p>
               </xsl:otherwise>
             </xsl:choose>
@@ -1268,4 +1325,409 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- template which inserts date and time in a correct format -->
+  
+  <xsl:template name="FormatDate">
+    <xsl:param name="value"/>
+    <xsl:param name="format"/>
+    <xsl:param name="numId"/>
+    <xsl:param name="processedFormat"/>
+    <xsl:param name="outputValue"/>
+    <xsl:param name="numValue"/>
+    <xsl:choose>
+      
+      <!-- year -->
+      <xsl:when test="starts-with($processedFormat,'y')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'y'),'yyy')">
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'yyyy')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,substring-before($value,'-'))"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'yy')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,substring(substring-before($value,'-'),3))"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <xsl:when test="starts-with($processedFormat,'m')">
+        <xsl:choose>
+          
+          <!-- minutes -->
+          <xsl:when test="contains(substring-before($format,'m'),'h:')">
+            <xsl:choose>
+              <xsl:when test="starts-with(substring-after($processedFormat,'m'),'m')">
+                <xsl:call-template name="FormatDate">
+                  <xsl:with-param name="value" select="$value"/>
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="numId" select="$numId"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'mm')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="outputValue">
+                    <xsl:value-of select="concat($outputValue,substring-before(substring-after(substring-after($value,'T'),':'),':'))"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numValue" select="$numValue"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="FormatDate">
+                  <xsl:with-param name="value" select="$value"/>
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="numId" select="$numId"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'m')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="outputValue">
+                    <xsl:value-of select="concat($outputValue,number(substring-before(substring-after(substring-after($value,'T'),':'),':')))"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numValue" select="$numValue"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          
+          <!-- month -->
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="starts-with(substring-after($processedFormat,'m'),'mmm')">
+                <xsl:call-template name="FormatDate">
+                  <xsl:with-param name="value" select="$value"/>
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="numId" select="$numId"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'mmmm')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="outputValue">
+                    <xsl:variable name="monthName">
+                      <xsl:call-template name="ConvertMonthToName">
+                        <xsl:with-param name="month">
+                          <xsl:value-of select="substring-before(substring-after($value,'-'),'-')"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:value-of select="concat($outputValue,$monthName)"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numValue" select="$numValue"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="starts-with(substring-after($processedFormat,'m'),'mm')">
+                <xsl:call-template name="FormatDate">
+                  <xsl:with-param name="value" select="$value"/>
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="numId" select="$numId"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'mmm')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="outputValue">
+                    <xsl:variable name="monthName">
+                      <xsl:call-template name="ConvertMonthToShortName">
+                        <xsl:with-param name="month">
+                          <xsl:value-of select="substring-before(substring-after($value,'-'),'-')"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:value-of select="concat($outputValue,$monthName)"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numValue" select="$numValue"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="starts-with(substring-after($processedFormat,'m'),'m')">
+                <xsl:call-template name="FormatDate">
+                  <xsl:with-param name="value" select="$value"/>
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="numId" select="$numId"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'mm')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="outputValue">
+                    <xsl:value-of select="concat($outputValue,substring-before(substring-after($value,'-'),'-'))"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numValue" select="$numValue"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="FormatDate">
+                  <xsl:with-param name="value" select="$value"/>
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="numId" select="$numId"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'m')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="outputValue">
+                    <xsl:value-of select="concat($outputValue,number(substring-before(substring-after($value,'-'),'-')))"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numValue" select="$numValue"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <!-- day -->
+      <xsl:when test="starts-with($processedFormat,'d')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'d'),'ddd')">
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'dddd')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:variable name="dayOfWeek">
+                  <xsl:call-template name="ConvertDayToName">
+                    <xsl:with-param name="day">
+                      <xsl:value-of select="$numValue"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="concat($outputValue,$dayOfWeek)"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="starts-with(substring-after($processedFormat,'d'),'dd')">
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'dddd')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:variable name="dayOfWeek">
+                  <xsl:call-template name="ConvertDayToShortName">
+                    <xsl:with-param name="day">
+                      <xsl:value-of select="$numValue"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:variable>
+                <xsl:value-of select="concat($outputValue,$dayOfWeek)"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="starts-with(substring-after($processedFormat,'d'),'d')">
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'dd')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,substring-before(substring-after(substring-after($value,'-'),'-'),'T'))"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'d')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,number(substring-before(substring-after(substring-after($value,'-'),'-'),'T')))"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <!-- hours -->
+      <xsl:when test="starts-with($processedFormat,'h')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'h'),'h')">
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'hh')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,substring-before(substring-after($value,'T'),':'))"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'h')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,number(substring-before(substring-after($value,'T'),':')))"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <!-- seconds -->
+      <xsl:when test="starts-with($processedFormat,'s')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'s'),'s')">
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'ss')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,substring-after(substring-after(substring-after($value,'T'),':'),':'))"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="FormatDate">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'s')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,number(substring-after(substring-after(substring-after($value,'T'),':'),':')))"/>
+              </xsl:with-param>
+              <xsl:with-param name="numValue" select="$numValue"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <xsl:when test="starts-with($processedFormat,'\') or starts-with($processedFormat,'@') or starts-with($processedFormat,';')">
+        <xsl:call-template name="FormatDate">
+          <xsl:with-param name="value" select="$value"/>
+          <xsl:with-param name="format" select="$format"/>
+          <xsl:with-param name="numId" select="$numId"/>
+          <xsl:with-param name="processedFormat">
+            <xsl:value-of select="substring($processedFormat,2)"/>
+          </xsl:with-param>
+          <xsl:with-param name="outputValue" select="$outputValue"/>
+        </xsl:call-template>
+      </xsl:when>        
+      <xsl:when test="string-length($processedFormat) = 0">
+        <xsl:value-of select="$outputValue"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="FormatDate">
+          <xsl:with-param name="value" select="$value"/>
+          <xsl:with-param name="format" select="$format"/>
+          <xsl:with-param name="numId" select="$numId"/>
+          <xsl:with-param name="processedFormat">
+            <xsl:value-of select="substring($processedFormat,2)"/>
+          </xsl:with-param>
+          <xsl:with-param name="outputValue">
+            <xsl:value-of select="concat($outputValue,substring($processedFormat,0,2))"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>    
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- get month name -->
+  
+  <xsl:template name="ConvertMonthToName">
+    <xsl:param name="month"/>
+    <xsl:choose>
+      <xsl:when test="number($month) = 1">January</xsl:when>
+      <xsl:when test="number($month) = 2">February</xsl:when>
+      <xsl:when test="number($month) = 3">March</xsl:when>
+      <xsl:when test="number($month) = 4">April</xsl:when>
+      <xsl:when test="number($month) = 5">May</xsl:when>
+      <xsl:when test="number($month) = 6">June</xsl:when>
+      <xsl:when test="number($month) = 7">July</xsl:when>
+      <xsl:when test="number($month) = 8">August</xsl:when>
+      <xsl:when test="number($month) = 9">September</xsl:when>
+      <xsl:when test="number($month) = 10">October</xsl:when>
+      <xsl:when test="number($month) = 11">November</xsl:when>
+      <xsl:when test="number($month) = 12">December</xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="ConvertMonthToShortName">
+    <xsl:param name="month"/>
+    <xsl:choose>
+      <xsl:when test="number($month) = 1">Jan</xsl:when>
+      <xsl:when test="number($month) = 2">Feb</xsl:when>
+      <xsl:when test="number($month) = 3">Mar</xsl:when>
+      <xsl:when test="number($month) = 4">Apr</xsl:when>
+      <xsl:when test="number($month) = 5">May</xsl:when>
+      <xsl:when test="number($month) = 6">Jun</xsl:when>
+      <xsl:when test="number($month) = 7">Jul</xsl:when>
+      <xsl:when test="number($month) = 8">Aug</xsl:when>
+      <xsl:when test="number($month) = 9">Sep</xsl:when>
+      <xsl:when test="number($month) = 10">Oct</xsl:when>
+      <xsl:when test="number($month) = 11">Nov</xsl:when>
+      <xsl:when test="number($month) = 12">Dec</xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- get day of the week name -->
+  
+  <xsl:template name="ConvertDayToName">
+    <xsl:param name="day"/>
+    <xsl:variable name="dayOfWeek">
+      <xsl:value-of select="$day - 7 * floor($day div 7)"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$dayOfWeek = 0">Monday</xsl:when>
+      <xsl:when test="$dayOfWeek = 1">Tuesday</xsl:when>
+      <xsl:when test="$dayOfWeek = 2">Wednesday</xsl:when>
+      <xsl:when test="$dayOfWeek = 3">Thursday</xsl:when>
+      <xsl:when test="$dayOfWeek = 4">Friday</xsl:when>
+      <xsl:when test="$dayOfWeek = 5">Saturday</xsl:when>
+      <xsl:when test="$dayOfWeek = 6">Sunday</xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="ConvertDayToShortName">
+    <xsl:param name="day"/>
+    <xsl:variable name="dayOfWeek">
+      <xsl:value-of select="$day - 7 * floor($day div 7)"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$dayOfWeek = 0">Mon</xsl:when>
+      <xsl:when test="$dayOfWeek = 1">Tue</xsl:when>
+      <xsl:when test="$dayOfWeek = 2">Wed</xsl:when>
+      <xsl:when test="$dayOfWeek = 3">Thu</xsl:when>
+      <xsl:when test="$dayOfWeek = 4">Fri</xsl:when>
+      <xsl:when test="$dayOfWeek = 5">Sat</xsl:when>
+      <xsl:when test="$dayOfWeek = 6">Sun</xsl:when>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>

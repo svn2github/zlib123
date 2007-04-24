@@ -39,6 +39,34 @@
     
     <xsl:choose>
       
+      <!-- date style -->
+      <xsl:when test="contains(@formatCode,'y') or contains(@formatCode,'m') or contains(@formatCode,'d') or contains(@formatCode,'h') or contains(@formatCode,'s')">
+        <number:date-style style:name="{generate-id(.)}">
+        <xsl:call-template name="ProcessFormat">
+          <xsl:with-param name="format">
+            <xsl:choose>
+              <xsl:when test="contains(@formatCode,']')">
+                <xsl:value-of select="substring-after(@formatCode,']')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="@formatCode"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="processedFormat">
+            <xsl:choose>
+              <xsl:when test="contains(@formatCode,']')">
+                <xsl:value-of select="substring-after(@formatCode,']')"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="@formatCode"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:call-template>
+        </number:date-style>
+      </xsl:when>
+      
       <!-- when there are different formats for positive and negative numbers -->
       <xsl:when test="contains(@formatCode,';')">
         <xsl:choose>
@@ -359,6 +387,17 @@
     <xsl:if test="@numFmtId and @numFmtId &gt; 0 and not(key('numFmtId',@numFmtId))">
       <xsl:choose>
         
+        <!-- date style -->
+        <xsl:when test="(@numFmtId &gt; 13 and @numFmtId &lt; 18) or @numFmtId = 22">
+          <number:date-style style:name="{concat('N',@numFmtId)}">
+            <xsl:call-template name="InsertFixedDateFormat">
+              <xsl:with-param name="ID">
+                <xsl:value-of select="@numFmtId"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </number:date-style>
+        </xsl:when>
+        
         <!-- percentage style -->
         <xsl:when test="@numFmtId = 9 or @numFmtId = 10">
           <number:percentage-style style:name="{concat('N',@numFmtId)}">
@@ -441,6 +480,267 @@
     <xsl:if test="$ID = 9 or $ID = 10">
       <number:text>%</number:text>
     </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="ProcessFormat">
+    <xsl:param name="format"/>
+    <xsl:param name="processedFormat"/>
+    <xsl:choose>
+      
+      <!-- year -->
+      <xsl:when test="starts-with($processedFormat,'y')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'y'),'yyy')">
+            <number:year number:style="long"/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'yyyy')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <number:year/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'yy')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <xsl:when test="starts-with($processedFormat,'m')">
+        <xsl:choose>
+          
+          <!-- minutes -->
+          <xsl:when test="contains(substring-before($format,'m'),'h:')">
+            <xsl:choose>
+              <xsl:when test="starts-with(substring-after($processedFormat,'m'),'m')">
+                <number:minutes number:style="long"/>
+                <xsl:call-template name="ProcessFormat">
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'mm')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:minutes/>
+                <xsl:call-template name="ProcessFormat">
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'m')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          
+          <!-- month -->
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="starts-with(substring-after($processedFormat,'m'),'mmm')">
+                <number:month number:style="long" number:textual="true"/>
+                <xsl:call-template name="ProcessFormat">
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'mmmm')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="starts-with(substring-after($processedFormat,'m'),'mm')">
+                <number:month number:textual="true"/>
+                <xsl:call-template name="ProcessFormat">
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'mmm')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="starts-with(substring-after($processedFormat,'m'),'m')">
+                <number:month number:style="long"/>
+                <xsl:call-template name="ProcessFormat">
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'mm')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:month/>
+                <xsl:call-template name="ProcessFormat">
+                  <xsl:with-param name="format" select="$format"/>
+                  <xsl:with-param name="processedFormat">
+                    <xsl:value-of select="substring-after($processedFormat,'m')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <!-- day -->
+      <xsl:when test="starts-with($processedFormat,'d')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'d'),'ddd')">
+            <number:day-of-week number:style="long"/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'dddd')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="starts-with(substring-after($processedFormat,'d'),'dd')">
+            <number:day-of-week/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'ddd')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="starts-with(substring-after($processedFormat,'d'),'d')">
+            <number:day number:style="long"/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'dd')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <number:day/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'d')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <!-- hours -->
+      <xsl:when test="starts-with($processedFormat,'h')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'h'),'h')">
+            <number:hours number:style="long"/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'hh')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <number:hours/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'h')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <!-- seconds -->
+      <xsl:when test="starts-with($processedFormat,'s')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'s'),'s')">
+            <number:seconds number:style="long"/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'ss')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <number:seconds/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'s')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      
+      <xsl:when test="starts-with($processedFormat,'AM/PM')">
+        <number:am-pm/>
+        <xsl:call-template name="ProcessFormat">
+          <xsl:with-param name="format" select="$format"/>
+          <xsl:with-param name="processedFormat">
+            <xsl:value-of select="substring-after($processedFormat,'AM/PM')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="starts-with($processedFormat,'\') or starts-with($processedFormat,'@') or starts-with($processedFormat,';')">
+        <xsl:call-template name="ProcessFormat">
+          <xsl:with-param name="format" select="$format"/>
+          <xsl:with-param name="processedFormat">
+            <xsl:value-of select="substring($processedFormat,2)"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="string-length($processedFormat) = 0"/>
+      <xsl:otherwise>
+        <number:text>
+          <xsl:value-of xml:space="preserve" select="substring($processedFormat,0,2)"/>
+        </number:text>
+        <xsl:call-template name="ProcessFormat">
+          <xsl:with-param name="format" select="$format"/>
+          <xsl:with-param name="processedFormat">
+            <xsl:value-of select="substring($processedFormat,2)"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- template which inserts fixed date format -->
+  
+  <xsl:template name="InsertFixedDateFormat">
+    <xsl:param name="ID"/>
+    <xsl:choose>
+      <xsl:when test="$ID = 14">
+        <number:month number:style="long"/>
+        <number:text>-</number:text>
+        <number:day number:style="long"/>
+        <number:text>-</number:text>
+        <number:year/>
+      </xsl:when>
+      <xsl:when test="$ID = 15">
+        <number:day/>
+        <number:text>-</number:text>
+        <number:month number:textual="true"/>
+        <number:text>-</number:text>
+        <number:year/>
+      </xsl:when>
+      <xsl:when test="$ID = 16">
+        <number:day/>
+        <number:text>-</number:text>
+        <number:month number:textual="true"/>
+      </xsl:when>
+      <xsl:when test="$ID = 17">
+        <number:month number:textual="true"/>
+        <number:text>-</number:text>
+        <number:year/>
+      </xsl:when>
+      <xsl:when test="$ID = 22">
+        <number:month/>
+        <number:text>/</number:text>
+        <number:day/>
+        <number:text>/</number:text>
+        <number:year/>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   
 </xsl:stylesheet>

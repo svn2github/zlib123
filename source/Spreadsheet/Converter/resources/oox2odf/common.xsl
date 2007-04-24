@@ -1051,4 +1051,128 @@
     
   </xsl:template>
   
+  <!--  template which counts date from number of days -->
+  
+  <xsl:template name="NumberToDate">
+    <xsl:param name="value"/>
+    <xsl:variable name="time">
+      <xsl:value-of select="concat('0.',substring-after($value,'.'))"/>
+    </xsl:variable>
+    <xsl:variable name="timeInHours">
+      <xsl:value-of select="24 * $time"/>
+    </xsl:variable>
+    <xsl:variable name="hours">
+      <xsl:value-of select="floor($timeInHours)"/>
+    </xsl:variable>
+    <xsl:variable name="timeInMins">
+      <xsl:value-of select="($timeInHours - $hours) * 60"/>
+    </xsl:variable>
+    <xsl:variable name="mins">
+      <xsl:value-of select="floor($timeInMins)"/>
+    </xsl:variable>
+    
+    <!-- seconds -->
+    <xsl:variable name="seconds">
+      <xsl:value-of select="($timeInMins - $mins) *  60"/>
+    </xsl:variable>
+    <xsl:variable name="secondsBeforeComma">
+      <xsl:choose>
+        <xsl:when test="contains($seconds,'.')">
+          <xsl:value-of select="format-number(substring-before($seconds,'.'),'00')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="format-number($seconds,'00')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="secondsAfterComma">
+      <xsl:choose>
+        <xsl:when test="contains($seconds,'.')">
+          <xsl:value-of select="concat('.',substring-after($seconds,'.'))"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:variable name="date">
+      <xsl:choose>
+        <xsl:when test="contains($value,'.')">
+      <xsl:value-of select="number(substring-before($value,'.'))-1"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$value -1"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="dateInYears">
+      <xsl:value-of select="$date div 365.2425"/>
+    </xsl:variable>
+    
+    <!-- year -->
+    <xsl:variable name="years">
+      <xsl:value-of select="floor($dateInYears)"/>
+    </xsl:variable>
+    <xsl:variable name="dateInLastYear">
+      <xsl:value-of select="$date - floor($years * 365.2425)"/>
+    </xsl:variable>
+    
+    <!-- month and day -->
+    <xsl:variable name="monthsAndDays">
+      <xsl:call-template name="DaysToMonthsAndDays">
+        <xsl:with-param name="days">
+          <xsl:value-of select="$dateInLastYear -1"/>
+        </xsl:with-param>
+        <xsl:with-param name="ExtraDay">
+          <xsl:choose>
+            <xsl:when test="((1900 + $years - 4 * floor((1900 + $years) div 4)) = 0 and (1900 + $years - 100 * floor((1900 + $years) div 100) != 0)) or (1900 + $years - 400 * floor((1900 + $years) div 400)) = 0">1</xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:value-of select="concat(concat(concat(concat(concat(concat(concat(concat((1900+$years),'-'),$monthsAndDays),'T'),format-number($hours,'00')),':'),format-number($mins,'00')),':'),concat($secondsBeforeComma,$secondsAfterComma))"/>
+  </xsl:template>
+  
+  <xsl:template name="DaysToMonthsAndDays">
+    <xsl:param name="days"/>
+    <xsl:param name="ExtraDay"/>
+    <xsl:choose>
+      <xsl:when test="$days &lt; 32">
+        <xsl:value-of select="concat('01-',format-number($days,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 60">
+        <xsl:value-of select="concat('02-',format-number($days - 31,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 91">
+        <xsl:value-of select="concat('03-',format-number($days - $ExtraDay - 59,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 121">
+        <xsl:value-of select="concat('04-',format-number($days - $ExtraDay - 90,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 152">
+        <xsl:value-of select="concat('05-',format-number($days - $ExtraDay - 120,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 182">
+        <xsl:value-of select="concat('06-',format-number($days - $ExtraDay - 151,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 213">
+        <xsl:value-of select="concat('07-',format-number($days - $ExtraDay - 181,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 244">
+        <xsl:value-of select="concat('08-',format-number($days - $ExtraDay - 212,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 274">
+        <xsl:value-of select="concat('09-',format-number($days - $ExtraDay - 243,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 305">
+        <xsl:value-of select="concat('10-',format-number($days - $ExtraDay - 273,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 335">
+        <xsl:value-of select="concat('11-',format-number($days - $ExtraDay - 304,'00'))"/>
+      </xsl:when>
+      <xsl:when test="$days - $ExtraDay &lt; 366">
+        <xsl:value-of select="concat('12-',format-number($days - $ExtraDay - 334,'00'))"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>
