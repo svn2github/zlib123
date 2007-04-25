@@ -184,7 +184,6 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
             // add filter for ODS files
             fd.Filters.Clear();
             fd.Filters.Add(this.addinLib.GetString(ODF_FILE_TYPE), IMPORT_ODF_FILE_FILTER, Type.Missing);
-            fd.Filters.Add(this.addinLib.GetString(ALL_FILE_TYPE), IMPORT_ALL_FILE_FILTER, Type.Missing);
             // set title
             fd.Title = this.addinLib.GetString(IMPORT_LABEL);
             // display the dialog

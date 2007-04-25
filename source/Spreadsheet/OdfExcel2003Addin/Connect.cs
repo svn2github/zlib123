@@ -244,7 +244,6 @@ namespace OdfExcel2003Addin
                 // add filter for ODS files
                 fd.Filters.Clear();
                 fd.Filters.Add(this.addinLib.GetString("OdfFileType"), "*.ods", Type.Missing);
-                fd.Filters.Add(this.addinLib.GetString("AllFileType"), "*.*", Type.Missing);
                 // set title
                 fd.Title = this.addinLib.GetString("OdfImportLabel");
                 // display the dialog
