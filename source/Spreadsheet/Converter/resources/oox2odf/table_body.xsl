@@ -1260,7 +1260,7 @@
     <xsl:variable name="plainFormat">
       <xsl:choose>
         <xsl:when test="contains(substring-after($format,'.'),'\')">
-          <xsl:value-of select="substring-before($format,'\')"/>
+          <xsl:value-of select="concat(concat(substring-before($format,'.'),'.'),substring-before(substring-after($format,'.'),'\'))"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$format"/>
