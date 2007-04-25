@@ -176,10 +176,12 @@
         <xsl:variable name="printArea">
           <xsl:value-of select="translate(text(),'$','')"/>
         </xsl:variable>
+
         <xsl:attribute name="table:print-ranges">
-          <xsl:value-of
-            select="concat(substring-before($printArea,'!'),'.',substring(substring-after($printArea,'!'),1,3),substring-before($printArea,'!'),'.',substring-after($printArea,':'))"
-          />
+          <xsl:call-template name="InsertRanges">
+            <xsl:with-param name="ranges" select="$printArea"/>
+            <xsl:with-param name="mode" select="substring-after($printArea,',')"/>
+          </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
 
@@ -198,6 +200,31 @@
             </xsl:attribute>
           </xsl:otherwise>
         </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertRanges">
+    <xsl:param name="ranges"/>
+    <xsl:param name="mode"/>
+
+    <xsl:choose>
+      <!-- when there are more than one range -->
+      <xsl:when test="$mode != '' ">
+        <xsl:value-of
+          select="concat(substring-before($ranges,'!'),'.',substring(substring-after($ranges,'!'),1,3),substring-before($ranges,'!'),'.',substring-before(substring-after($ranges,':'),','))"/>
+        <xsl:text> </xsl:text>
+        
+        <xsl:call-template name="InsertRanges">
+          <xsl:with-param name="ranges" select="substring-after($ranges,',')"/>
+          <xsl:with-param name="mode" select="substring-after(substring-after($ranges,','),',')"/>
+        </xsl:call-template>
+      </xsl:when>
+      
+      <xsl:otherwise>
+        <xsl:value-of
+          select="concat(substring-before($ranges,'!'),'.',substring(substring-after($ranges,'!'),1,3),substring-before($ranges,'!'),'.',substring-after($ranges,':'))"
+        />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
