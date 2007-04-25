@@ -568,7 +568,14 @@
             <!-- scale by factor -->
             <xsl:if test="@style:scale-to">
               <xsl:attribute name="scale">
-                <xsl:value-of select="substring-before(@style:scale-to,'%')"/>
+                <xsl:choose>
+                  <xsl:when test="contains(@style:scale-to,'%')">
+                    <xsl:value-of select="substring-before(@style:scale-to,'%')"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="@style:scale-to"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:attribute>
             </xsl:if>
 
