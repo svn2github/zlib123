@@ -808,7 +808,10 @@
   </xsl:template>
   
   <xsl:template match="e:xf" mode="stylesandformating">
-    <xsl:if test="@xfId != '0'">
+    <xsl:variable name="Xfid">
+      <xsl:value-of select="@xfId"/>
+    </xsl:variable>
+    <xsl:if test="$Xfid != '0' and not(preceding-sibling::e:xf/@xfId = $Xfid)">
       <style:style>
         <xsl:attribute name="style:name">
           <xsl:value-of select="key('CellStylesId', @xfId)/@name"/>
