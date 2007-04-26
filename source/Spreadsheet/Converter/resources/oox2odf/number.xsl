@@ -72,7 +72,7 @@
         <xsl:choose>
           
           <!-- currency style -->
-          <xsl:when test="contains(substring-before(@formatCode,';'),'[$') or contains(substring-before(@formatCode,';'),'zł')">
+          <xsl:when test="contains(substring-before(@formatCode,';'),'$') or contains(substring-before(@formatCode,';'),'zł') or contains(substring-before(@formatCode,';'),'€') or contains(substring-before(@formatCode,';'),'£')">
             <number:currency-style style:name="{concat(generate-id(.),'P0')}">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">
@@ -137,7 +137,7 @@
         <xsl:choose>
           
           <!-- currency style -->
-          <xsl:when test="contains(@formatCode,'[$') or contains(@formatCode,'zł')">
+          <xsl:when test="contains(@formatCode,'$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£')">
             <number:currency-style style:name="{generate-id(.)}">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">
@@ -192,9 +192,12 @@
         <xsl:when test="contains($formatCode,'Red')">
           <xsl:value-of select="substring-after(substring-before(substring-after($formatCode,'Red]'),']'),'[')"/>
         </xsl:when>
-        <xsl:otherwise>
+        <xsl:when test="contains($formatCode,'[$')">
           <xsl:value-of select="substring-after(substring-before($formatCode,']'),'[')"/>
-        </xsl:otherwise>
+        </xsl:when>
+        <xsl:when test="contains($formatCode,'$')">$</xsl:when>
+        <xsl:when test="contains($formatCode,'€')">€</xsl:when>
+        <xsl:when test="contains($formatCode,'£')">£</xsl:when>
       </xsl:choose>
     </xsl:variable>
     
@@ -444,19 +447,19 @@
   <xsl:template name="InsertCurrencySymbol">
     <xsl:param name="value"/>
     <xsl:choose>
-      <xsl:when test="$value = '$$-409'">
+      <xsl:when test="$value = '$$-409' or $value = '$'">
         <number:currency-symbol number:language="en" number:country="US">$</number:currency-symbol>
       </xsl:when>
       <xsl:when test="$value = '$USD'">
         <number:currency-symbol number:language="en" number:country="US">USD</number:currency-symbol>
       </xsl:when>
-      <xsl:when test="$value = '$£-809'">
+      <xsl:when test="$value = '$£-809' or $value = '£'">
         <number:currency-symbol number:language="en" number:country="GB">£</number:currency-symbol>
       </xsl:when>
       <xsl:when test="$value = '$GBP'">
         <number:currency-symbol number:language="en" number:country="GB">GBP</number:currency-symbol>
       </xsl:when>
-      <xsl:when test="$value = '$€-1' or $value = '$€-2'">
+      <xsl:when test="$value = '$€-1' or $value = '$€-2' or $value = '€'">
         <number:currency-symbol>€</number:currency-symbol>
       </xsl:when>
       <xsl:when test="$value = '$EUR'">

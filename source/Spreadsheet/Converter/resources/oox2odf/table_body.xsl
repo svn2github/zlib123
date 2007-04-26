@@ -594,7 +594,7 @@
                     <xsl:when test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
                       <xsl:text>percentage</xsl:text>
                     </xsl:when>
-                    <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'[$')">
+                    <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
                       <xsl:text>currency</xsl:text>
                     </xsl:when>
                     <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
