@@ -702,6 +702,7 @@
         <xsl:when test="$index=62"><xsl:text>333399</xsl:text></xsl:when>
         <xsl:when test="$index=63"><xsl:text>424242</xsl:text></xsl:when>
         <xsl:when test="$index=64"><xsl:text>000000</xsl:text></xsl:when>
+        <xsl:when test="$index=65"><xsl:text>FFFFFF</xsl:text></xsl:when>
         <xsl:otherwise>000000</xsl:otherwise>
       </xsl:choose>
   </xsl:template>
