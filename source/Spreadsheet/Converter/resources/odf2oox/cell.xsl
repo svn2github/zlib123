@@ -575,7 +575,7 @@
       <!-- insert repeated rows -->
       <xsl:if test="@table:number-rows-repeated">
         <xsl:if
-          test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true' or contains($CheckIfDefaultBorder, 'true') or table:table-cell/@table:style-name">
+          test="not(@table:visibility='collapse') or not(following-sibling::table:table-row[@table:visibility = 'collapse']) or following-sibling::table:table-row/table:table-cell/text:p or $CheckRowHidden != 'true' or contains($CheckIfDefaultBorder, 'true')">
           <xsl:call-template name="InsertRepeatedRows">
             <xsl:with-param name="numberRowsRepeated">
               <xsl:value-of select="@table:number-rows-repeated"/>
@@ -744,9 +744,9 @@
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CheckIfDefaultBorder"/>
-  
+
     <xsl:if
-      test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') or table:table-cell/@table:style-name">
+      test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true')">
 
       <xsl:choose>
         <xsl:when test="$numberRowsRepeated &gt; 1">
@@ -892,13 +892,20 @@
         <xsl:with-param name="num" select="$colNumber"/>
       </xsl:call-template>
     </xsl:variable>
-    <pxsi:commentmark xmlns:pxsi="urn:cleverage:xmlns:post-processings:comments" ref="{concat($colChar,$rowNumber)}" noteId="{count(preceding::office:annotation)+1}"/>
-    
-      <pxsi:commentDrawingMark xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:pxsi="urn:cleverage:xmlns:post-processings:drawings" noteId="{count(preceding::office:annotation)+1}">
-      <x:Row ><xsl:value-of select="$rowNumber - 1"/></x:Row>
-      <x:Column><xsl:value-of select="$colNumber"/></x:Column>
-     </pxsi:commentDrawingMark>
-    
+    <pxsi:commentmark xmlns:pxsi="urn:cleverage:xmlns:post-processings:comments"
+      ref="{concat($colChar,$rowNumber)}" noteId="{count(preceding::office:annotation)+1}"/>
+
+    <pxsi:commentDrawingMark xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns:pxsi="urn:cleverage:xmlns:post-processings:drawings"
+      noteId="{count(preceding::office:annotation)+1}">
+      <x:Row>
+        <xsl:value-of select="$rowNumber - 1"/>
+      </x:Row>
+      <x:Column>
+        <xsl:value-of select="$colNumber"/>
+      </x:Column>
+    </pxsi:commentDrawingMark>
+
   </xsl:template>
 
   <!-- insert cell -->
@@ -1023,10 +1030,10 @@
                   If column has got changed default-cell-style-name then in $TableColumnTagNum string there is entry 'K' col_number ':' default-cell-style-name ';' if not there is no 'K'. 
                   So if inside cell range defined by table:table-cell with repeated columns attribute there is column that has changed default-cell-style-name then before ';'col_number 
                   in $TableColumnTagNum there should be 'K' ($TableColumnTagNum contains listed default-cell-style-name from backward) -->
-      <xsl:when test="@table:number-columns-repeated and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p) and not(@table:table-style) and 
-        not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') or contains($TableColumnTagNum,concat('K',$colNumber)))">
-      </xsl:when>
-      
+      <xsl:when
+        test="@table:number-columns-repeated and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p) and not(@table:table-style) and 
+        not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') or contains($TableColumnTagNum,concat('K',$colNumber)))"> </xsl:when>
+
       <xsl:when
         test="@table:number-columns-repeated and number(@table:number-columns-repeated) &gt; $ColumnRepeated">
 
@@ -1163,18 +1170,27 @@
         <xsl:choose>
           <!-- if it is a multiline cell -->
           <xsl:when test="text:p[2]">
+
             <xsl:variable name="cellFormats">
               <xsl:value-of
                 select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
               />
             </xsl:variable>
+
+            <xsl:variable name="cellStyles">
+              <xsl:value-of
+                select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'])"
+              />
+            </xsl:variable>
+
             <xsl:variable name="multilineNumber">
               <xsl:for-each select="text:p[2]">
                 <xsl:number count="table:table-cell[text:p[2]]" level="any"/>
               </xsl:for-each>
             </xsl:variable>
+
             <xsl:attribute name="s">
-              <xsl:value-of select="$cellFormats - 1 + $multilineNumber"/>
+              <xsl:value-of select="$cellFormats + $cellStyles + $multilineNumber - 1"/>
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
