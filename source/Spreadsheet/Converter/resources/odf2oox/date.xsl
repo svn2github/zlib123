@@ -125,7 +125,17 @@
   <!-- add all formatting characters -->
   
   <xsl:template match="number:text" mode="date">
-    <xsl:value-of select="."/>
+    <xsl:variable name="text">
+      <xsl:value-of select="."/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="contains($text,'$') or contains($text,'+') or contains($text,'(') or contains($text,':') or contains($text,'^') or contains($text,'{') or contains($text,'&lt;') or contains($text,'&gt;') or contains($text,'=') or contains($text,'-') or contains($text,'/') or contains($text,'\') or contains($text,')') or contains($text,'!') or contains($text,'&amp;') or contains($text,'~') or contains($text,'}') or $text=' '">
+        <xsl:value-of select="$text"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat(concat('&quot;',$text),'&quot;')"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
 </xsl:stylesheet>
