@@ -186,7 +186,7 @@
     </xsl:if>
   </xsl:template>
   
-  <xsl:template match="text:p[preceding-sibling::text:p]" mode="text">
+  <xsl:template match="text:p[preceding-sibling::text:p and parent::table:table-cell]" mode="text">
     <xsl:value-of select="'&#xD;&#xA;'"/>
     <xsl:apply-templates mode="text"/>
   </xsl:template>
