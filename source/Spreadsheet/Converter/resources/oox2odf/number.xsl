@@ -68,7 +68,7 @@
       </xsl:when>
       
       <!-- when there are different formats for positive and negative numbers -->
-      <xsl:when test="contains(@formatCode,';')">
+      <xsl:when test="contains(@formatCode,';') and not(contains(substring-after(@formatCode,';'),';'))">
         <xsl:choose>
           
           <!-- currency style -->
@@ -131,6 +131,160 @@
           </xsl:otherwise>
           
         </xsl:choose>
+      </xsl:when>
+      
+      <!-- when there are separate formats for positive numbers, negative numbers and zeros -->
+      <xsl:when test="contains(@formatCode,';') and contains(substring-after(@formatCode,';'),';')">
+        <xsl:choose>
+          
+          <!-- currency style -->
+          <xsl:when test="contains(substring-before(@formatCode,';'),'$') or contains(substring-before(@formatCode,';'),'zł') or contains(substring-before(@formatCode,';'),'€') or contains(substring-before(@formatCode,';'),'£')">
+            <number:currency-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+            <number:currency-style style:name="{concat(generate-id(.),'P1')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(substring-after(@formatCode,';'),';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:currency-style>
+            
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
+                <number:currency-style style:name="{concat(generate-id(.),'P2')}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </number:currency-style>
+                <number:text-style style:name="{generate-id(.)}">
+                  <number:text>
+                    <xsl:value-of select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                  </number:text>     
+                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0" style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                </number:text-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:currency-style style:name="{generate-id(.)}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-after(substring-after(@formatCode,';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                </number:currency-style>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          
+          <!-- percentage style -->
+          <xsl:when test="contains(substring-before(@formatCode,';'),'%')">
+            <number:percentage-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:percentage-style>
+            <number:percentage-style style:name="{concat(generate-id(.),'P1')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(substring-after(@formatCode,';'),';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:percentage-style>
+            
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
+                <number:percentage-style style:name="{concat(generate-id(.),'P2')}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </number:percentage-style>
+                <number:text-style style:name="{generate-id(.)}">
+                  <number:text>
+                    <xsl:value-of select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                  </number:text>     
+                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0" style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                </number:text-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:percentage-style style:name="{generate-id(.)}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-after(substring-after(@formatCode,';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                </number:percentage-style>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          
+          <!-- number style -->
+          <xsl:otherwise>
+            <number:number-style style:name="{concat(generate-id(.),'P0')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(@formatCode,';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+            <number:number-style style:name="{concat(generate-id(.),'P1')}">
+              <xsl:call-template name="InsertNumberFormatting">
+                <xsl:with-param name="formatCode">
+                  <xsl:value-of select="substring-before(substring-after(@formatCode,';'),';')"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </number:number-style>
+            
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
+                <number:number-style style:name="{concat(generate-id(.),'P2')}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </number:number-style>
+                <number:text-style style:name="{generate-id(.)}">
+                  <number:text>
+                    <xsl:value-of select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                  </number:text>     
+                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0" style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                </number:text-style>
+              </xsl:when>
+              <xsl:otherwise>
+                <number:number-style style:name="{generate-id(.)}">
+                  <xsl:call-template name="InsertNumberFormatting">
+                    <xsl:with-param name="formatCode">
+                      <xsl:value-of select="substring-after(substring-after(@formatCode,';'),';')"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                </number:number-style>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:otherwise>
+        </xsl:choose>
+        
       </xsl:when>
       
       <xsl:otherwise>
@@ -200,6 +354,27 @@
         <xsl:when test="contains($formatCode,'£')">£</xsl:when>
       </xsl:choose>
     </xsl:variable>
+    
+    <!-- add space at the beginning -->
+    <xsl:if test="starts-with($formatCode,'_') and not(contains($formatCode,'(-') or contains($formatCode,'(#') or contains($formatCode,'(0'))">
+      <number:text>
+        <xsl:value-of xml:space="preserve" select="' '"/>
+      </number:text>
+    </xsl:if>
+    
+    <!-- add brackets -->
+    <xsl:if test="contains($formatCode,'(-') or contains($formatCode,'(#') or contains($formatCode,'(0')">
+      <xsl:choose>
+        <xsl:when test="starts-with($formatCode,'_')">
+          <number:text>
+            <xsl:value-of xml:space="preserve" select="' ('"/>
+          </number:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <number:text>(</number:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
     
     <!-- add '-' at the beginning -->
     <xsl:if test="contains($formatCode,'-') and not($currencyFormat and $currencyFormat!='')">
@@ -321,6 +496,11 @@
         <xsl:with-param name="value" select="$currencyFormat"/>
       </xsl:call-template>
       
+    </xsl:if>
+    
+    <!-- add brackets -->
+    <xsl:if test="contains($formatCode,'(-') or contains($formatCode,'(#') or contains($formatCode,'(0')">
+      <number:text>)</number:text>
     </xsl:if>
     
     <!-- add space at the end -->
