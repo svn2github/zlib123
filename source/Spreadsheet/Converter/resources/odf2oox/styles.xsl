@@ -1041,12 +1041,14 @@
     </xsl:if>
 
     <!-- superscript -->
-    <xsl:if test="contains(@style:text-position, 'super' )">
+    <!-- in ODS it can be "super 58%" or "38% 58%" -->
+    <xsl:if test="contains(@style:text-position, 'super' ) or number(substring-before(@style:text-position, '%' ) &gt; 0)">
       <vertAlign val="superscript"/>
     </xsl:if>
 
     <!-- subscript -->
-    <xsl:if test="contains(@style:text-position, 'sub' )">
+    <!-- in ODS it can be "sub 58%" or "-38% 58%" -->
+    <xsl:if test="contains(@style:text-position, 'sub' ) or number(substring-before(@style:text-position, '%' ) &lt; 0)">
       <vertAlign val="subscript"/>
     </xsl:if>
 
