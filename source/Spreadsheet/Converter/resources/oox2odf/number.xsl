@@ -335,6 +335,18 @@
   <xsl:template name="InsertNumberFormatting">
     <xsl:param name="formatCode"/>
     
+    <!-- '*' is not converted -->
+    <xsl:variable name="realFormatCode">
+      <xsl:choose>
+        <xsl:when test="contains($formatCode,'*')">
+          <xsl:value-of select="substring-after($formatCode,'*')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$formatCode"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
     <!-- handle red negative numbers -->
     <xsl:if test="contains($formatCode,'Red')">
       <style:text-properties fo:color="#ff0000"/>
@@ -342,28 +354,28 @@
     
     <xsl:variable name="currencyFormat">
       <xsl:choose>
-        <xsl:when test="contains($formatCode,'zł')">zł</xsl:when>
-        <xsl:when test="contains($formatCode,'Red')">
-          <xsl:value-of select="substring-after(substring-before(substring-after($formatCode,'Red]'),']'),'[')"/>
+        <xsl:when test="contains($realFormatCode,'zł')">zł</xsl:when>
+        <xsl:when test="contains($realFormatCode,'Red')">
+          <xsl:value-of select="substring-after(substring-before(substring-after($realFormatCode,'Red]'),']'),'[')"/>
         </xsl:when>
-        <xsl:when test="contains($formatCode,'[$')">
-          <xsl:value-of select="substring-after(substring-before($formatCode,']'),'[')"/>
+        <xsl:when test="contains($realFormatCode,'[$')">
+          <xsl:value-of select="substring-after(substring-before($realFormatCode,']'),'[')"/>
         </xsl:when>
-        <xsl:when test="contains($formatCode,'$')">$</xsl:when>
-        <xsl:when test="contains($formatCode,'€')">€</xsl:when>
-        <xsl:when test="contains($formatCode,'£')">£</xsl:when>
+        <xsl:when test="contains($realFormatCode,'$')">$</xsl:when>
+        <xsl:when test="contains($realFormatCode,'€')">€</xsl:when>
+        <xsl:when test="contains($realFormatCode,'£')">£</xsl:when>
       </xsl:choose>
     </xsl:variable>
     
     <!-- add space at the beginning -->
-    <xsl:if test="starts-with($formatCode,'_') and not(contains($formatCode,'(-') or contains($formatCode,'(#') or contains($formatCode,'(0'))">
+    <xsl:if test="starts-with($realFormatCode,'_') and not(contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0'))">
       <number:text>
         <xsl:value-of xml:space="preserve" select="' '"/>
       </number:text>
     </xsl:if>
     
     <!-- add brackets -->
-    <xsl:if test="contains($formatCode,'(-') or contains($formatCode,'(#') or contains($formatCode,'(0')">
+    <xsl:if test="contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0')">
       <xsl:choose>
         <xsl:when test="starts-with($formatCode,'_')">
           <number:text>
@@ -377,15 +389,15 @@
     </xsl:if>
     
     <!-- add '-' at the beginning -->
-    <xsl:if test="contains($formatCode,'-') and not($currencyFormat and $currencyFormat!='')">
+    <xsl:if test="contains($realFormatCode,'-') and not($currencyFormat and $currencyFormat!='')">
       <number:text>-</number:text>
     </xsl:if>
     
     <!-- add currency symbol at the beginning -->
-    <xsl:if test="$currencyFormat and $currencyFormat!='' and not(contains(substring-before($formatCode,$currencyFormat),'0') or contains(substring-before($formatCode,$currencyFormat),'#'))">
+    <xsl:if test="$currencyFormat and $currencyFormat!='' and not(contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))">
       
       <!-- add '-' at the beginning -->
-      <xsl:if test="contains(substring-after($formatCode,$currencyFormat),'-')">
+      <xsl:if test="contains(substring-after($realFormatCode,$currencyFormat),'-')">
         <number:text>-</number:text>
       </xsl:if>
       <xsl:call-template name="InsertCurrencySymbol">
@@ -393,7 +405,7 @@
       </xsl:call-template>
       
       <!-- add space after currency symbol -->
-      <xsl:if test="contains(substring-after($formatCode,$currencyFormat),'\ ') and (contains(substring-after(substring-after($formatCode,$currencyFormat),'\ '),'0') or contains(substring-after(substring-after($formatCode,$currencyFormat),'\ '),'#'))">
+      <xsl:if test="contains(substring-after($realFormatCode,$currencyFormat),'\ ') and (contains(substring-after(substring-after($realFormatCode,$currencyFormat),'\ '),'0') or contains(substring-after(substring-after($realFormatCode,$currencyFormat),'\ '),'#'))">
         <number:text>
           <xsl:value-of xml:space="preserve" select="' '"/>
         </number:text>
@@ -402,7 +414,7 @@
     </xsl:if>
     
     <!-- add '-' at the beginning -->
-    <xsl:if test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($formatCode,$currencyFormat),'0') or contains(substring-before($formatCode,$currencyFormat),'#')) and contains(substring-before($formatCode,$currencyFormat),'-')">
+    <xsl:if test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#')) and contains(substring-before($realFormatCode,$currencyFormat),'-')">
       <number:text>-</number:text>
     </xsl:if>
     
@@ -410,11 +422,11 @@
       
       <xsl:variable name="formatCodeWithoutComma">
         <xsl:choose>
-          <xsl:when test="contains($formatCode,'.')">
-            <xsl:value-of select="substring-before($formatCode,'.')"/>
+          <xsl:when test="contains($realFormatCode,'.')">
+            <xsl:value-of select="substring-before($realFormatCode,'.')"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$formatCode"/>
+            <xsl:value-of select="$realFormatCode"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
@@ -422,10 +434,10 @@
       <!-- decimal places -->
       <xsl:attribute name="number:decimal-places">
         <xsl:choose>
-          <xsl:when test="contains($formatCode,'.')">
+          <xsl:when test="contains($realFormatCode,'.')">
             <xsl:call-template name="InsertDecimalPlaces">
               <xsl:with-param name="code">
-                <xsl:value-of select="substring-after($formatCode,'.')"/>
+                <xsl:value-of select="substring-after($realFormatCode,'.')"/>
               </xsl:with-param>
               <xsl:with-param name="value">0</xsl:with-param>
             </xsl:call-template>
@@ -451,19 +463,19 @@
       </xsl:attribute>
       
       <!-- grouping -->
-      <xsl:if test="contains($formatCode,',')">
+      <xsl:if test="contains($realFormatCode,',')">
         <xsl:choose>
-          <xsl:when test="contains(substring-after($formatCode,','),'0') or contains(substring-after($formatCode,','),'#')">
+          <xsl:when test="contains(substring-after($realFormatCode,','),'0') or contains(substring-after($realFormatCode,','),'#')">
             <xsl:attribute name="number:grouping">true</xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
             <xsl:attribute name="number:display-factor">
               <xsl:call-template name="UseDisplayFactor">
                 <xsl:with-param name="formatBeforeSeparator">
-                  <xsl:value-of select="substring-before($formatCode,',')"/>
+                  <xsl:value-of select="substring-before($realFormatCode,',')"/>
                 </xsl:with-param>
                 <xsl:with-param name="formatAfterSeparator">
-                  <xsl:value-of select="substring-after($formatCode,',')"/>
+                  <xsl:value-of select="substring-after($realFormatCode,',')"/>
                 </xsl:with-param>
                 <xsl:with-param name="value">1000</xsl:with-param>
               </xsl:call-template>
@@ -472,9 +484,9 @@
         </xsl:choose>
       </xsl:if>
       
-      <xsl:if test="contains($formatCode,'\ ') and not(contains($formatCode,','))">
+      <xsl:if test="contains($realFormatCode,'\ ') and not(contains($realFormatCode,','))">
         <xsl:choose>
-          <xsl:when test="contains(substring-after($formatCode,'\ '),'0') or contains(substring-after($formatCode,'\ '),'#')">
+          <xsl:when test="contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#')">
             <xsl:attribute name="number:grouping">true</xsl:attribute>
           </xsl:when>
         </xsl:choose>
@@ -483,10 +495,10 @@
     </number:number>
     
     <!-- add currency symbol at the end -->
-    <xsl:if test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($formatCode,$currencyFormat),'0') or contains(substring-before($formatCode,$currencyFormat),'#'))">
+    <xsl:if test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))">
       
       <!-- add space before currency symbol -->
-      <xsl:if test="contains(substring-before($formatCode,$currencyFormat),'\ ')">
+      <xsl:if test="contains(substring-before($realFormatCode,$currencyFormat),'\ ')">
         <number:text>
           <xsl:value-of xml:space="preserve" select="' '"/>
         </number:text>
@@ -499,12 +511,12 @@
     </xsl:if>
     
     <!-- add brackets -->
-    <xsl:if test="contains($formatCode,'(-') or contains($formatCode,'(#') or contains($formatCode,'(0')">
+    <xsl:if test="contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0')">
       <number:text>)</number:text>
     </xsl:if>
     
     <!-- add space at the end -->
-    <xsl:if test="(contains($formatCode,'\ ') and not($currencyFormat and $currencyFormat!='' and (contains(substring-before($formatCode,$currencyFormat),'0') or contains(substring-before($formatCode,$currencyFormat),'#'))) and not(contains(substring-after($formatCode,'\ '),'0') or contains(substring-after($formatCode,'\ '),'#'))) or (contains($formatCode,'_') and not($currencyFormat and $currencyFormat!='' and (contains(substring-before($formatCode,$currencyFormat),'0') or contains(substring-before($formatCode,$currencyFormat),'#'))) and not(contains(substring-after($formatCode,'_'),'0') or contains(substring-after($formatCode,'_'),'#')))">
+    <xsl:if test="(contains($realFormatCode,'\ ') and not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#'))) or (contains($realFormatCode,'_') and not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'_'),'0') or contains(substring-after($realFormatCode,'_'),'#')))">
       <number:text>
         <xsl:value-of xml:space="preserve" select="' '"/>
       </number:text>
