@@ -600,6 +600,9 @@
                     <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
                       <xsl:text>currency</xsl:text>
                     </xsl:when>
+                    <xsl:when test="$numId = 49">
+                      <xsl:text>string</xsl:text>
+                    </xsl:when>
                     <xsl:otherwise>
                       <xsl:text>float</xsl:text>
                     </xsl:otherwise>
