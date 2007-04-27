@@ -652,7 +652,6 @@
   <xsl:template name="SetFormatProperties">
     <xsl:param name="multiline" select="'false'"/>
 
-
     <!-- font -->
     <xsl:call-template name="FontId"/>
 
@@ -752,6 +751,12 @@
                 <xsl:text>left</xsl:text>
               </xsl:attribute>
             </xsl:when>
+            <!-- change default horizontal alignment of angle oriented text when angle equals 90 degrees -->
+            <xsl:when test="style:table-cell-properties/@style:rotation-angle = 90">
+              <xsl:attribute name="horizontal">
+                <xsl:text>left</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
             <!-- change default horizontal alignment of angle oriented text when angle equals -90 degrees -->
             <xsl:when test="style:table-cell-properties/@style:rotation-angle = 270">
               <xsl:attribute name="horizontal">
@@ -844,7 +849,7 @@
 
   </xsl:template>
 
-  <!-- Insert Font Style -->
+ <!-- Insert Font Style -->
 
   <xsl:template name="FontId">
     <xsl:choose>
@@ -1225,7 +1230,7 @@
           <xsl:choose>
             <!-- when style is set for cell -->
             <xsl:when test="$formatNumber != '' ">
-
+              
               <xsl:attribute name="applyFont">
                 <xsl:text>1</xsl:text>
               </xsl:attribute>
@@ -1249,7 +1254,7 @@
                 <!-- when style is in styles.xml -->
                 <xsl:otherwise>
                   <xsl:attribute name="xfId">
-                    <xsl:value-of select="$formatNumber"/>
+                    <xsl:value-of select="$formatNumber"/>                    
                   </xsl:attribute>
                   <xsl:for-each
                     select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
@@ -1317,18 +1322,17 @@
                     <xsl:otherwise>
                       <xsl:for-each select="document('styles.xml')">
                         <xsl:for-each select="key('style',$columnCellStyle)">
-
+                          
                           <xsl:attribute name="xfId">
-                            <xsl:number count="style:style[@style:family='table-cell']" level="any"
-                            />
+                            <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
                           </xsl:attribute>
-
+                          
                           <xsl:call-template name="SetFormatProperties">
                             <xsl:with-param name="multiline">
                               <xsl:text>true</xsl:text>
                             </xsl:with-param>
                           </xsl:call-template>
-
+                          
                         </xsl:for-each>
                       </xsl:for-each>
                     </xsl:otherwise>
