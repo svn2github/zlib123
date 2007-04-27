@@ -678,13 +678,13 @@
         <xsl:when test="$index=38"><xsl:text>008080</xsl:text></xsl:when>
         <xsl:when test="$index=39"><xsl:text>0000FF</xsl:text></xsl:when>
         <xsl:when test="$index=40"><xsl:text>00CCFF</xsl:text></xsl:when>
-        <xsl:when test="$index=41"><xsl:text>69FFFF</xsl:text></xsl:when>
+        <xsl:when test="$index=41"><xsl:text>CCFFFF</xsl:text></xsl:when>
         <xsl:when test="$index=42"><xsl:text>CCFFCC</xsl:text></xsl:when>
         <xsl:when test="$index=43"><xsl:text>FFFF99</xsl:text></xsl:when>
         <xsl:when test="$index=44"><xsl:text>A6CAF0</xsl:text></xsl:when>
         <xsl:when test="$index=45"><xsl:text>CC9CCC</xsl:text></xsl:when>
         <xsl:when test="$index=46"><xsl:text>CC99FF</xsl:text></xsl:when>
-        <xsl:when test="$index=47"><xsl:text>E3E3E3</xsl:text></xsl:when>
+        <xsl:when test="$index=47"><xsl:text>FFCC99</xsl:text></xsl:when>
         <xsl:when test="$index=48"><xsl:text>3366FF</xsl:text></xsl:when>
         <xsl:when test="$index=49"><xsl:text>33CCCC</xsl:text></xsl:when>
         <xsl:when test="$index=50"><xsl:text>339933</xsl:text></xsl:when>
@@ -754,7 +754,7 @@
   </xsl:template>
   
   <xsl:template name="InsertColor">
-    
+
     <xsl:variable name="this" select="."/>
     <xsl:choose>
       <xsl:when test="@rgb">
