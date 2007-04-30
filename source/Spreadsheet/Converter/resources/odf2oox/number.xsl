@@ -478,7 +478,7 @@
       </xsl:when>
       <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:date-style[@style:name=$numStyle]">
         <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:date-style[@style:name=$numStyle]">
-          <xsl:value-of select="count(preceding-sibling::number:currency-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount+$dateStyleCount"/>
+          <xsl:value-of select="count(preceding-sibling::number:date-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount+$dateStyleCount"/>
         </xsl:for-each>
         </xsl:when>
       <xsl:otherwise>0</xsl:otherwise>
