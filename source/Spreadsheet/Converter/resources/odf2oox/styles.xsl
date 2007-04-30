@@ -549,7 +549,7 @@
   <xsl:template
     match="style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']]"
     mode="fonts">
-    <font>
+	<font>
       <xsl:call-template name="InsertTextProperties">
         <xsl:with-param name="mode">fonts</xsl:with-param>
       </xsl:call-template>
@@ -870,7 +870,7 @@
         </xsl:attribute>
       </xsl:when>
 
-      <xsl:when test="@style:parent-style-name != ''">
+      <xsl:when test="@style:parent-style-name != '' and @style:parent-style-name != 'Default'">
         <xsl:variable name="StyleParentStyleName">
           <xsl:value-of select="@style:parent-style-name"/>
         </xsl:variable>
@@ -896,7 +896,11 @@
         </xsl:choose>
 
       </xsl:when>
-      <xsl:otherwise> </xsl:otherwise>
+      <xsl:otherwise>
+       <xsl:attribute name="fontId">
+        <xsl:text>0</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
