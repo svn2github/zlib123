@@ -1,5 +1,109 @@
 History of changes
 ------------------
+Release R2286 (M2) (2007-04-30)
+
+Fixed bug #1675894 Text formatting not properly retained
+Fixed bug #1705899 Number categories not retained
+Fixed bug #1702116 Custom format not properly retained(text and number)
+Fixed bug #1708654 Superscript formatting is lost
+Fixed bug #1708598 Default horizontal alignment not retained
+Fixed bug #1707095 Heading style not retained after conversion(align left/right)
+Fixed bug #1707313 XLSX: background color of cells is not converted properly
+Fixed bug #1708021 Roundtrip: Problem with protected sheets
+Fixed bug #1708075 Crash: Business_planner.ods
+Fixed bug #1707398 XLSX: background color and border not converted
+Fixed bug #1702070 Number format "custom" is converted to "number"
+Fixed bug #1706127 empty lines are inserted in filter row
+Fixed bug #1705917 Cell styles partially retained
+Fixed bug #1707249 Text conversion not proper (Ctrl + Return)
+Fixed bug #1707914 XLSX: PAttern is converted to black background color
+Fixed bug #1706352 Print Range- Not Proper(Reverse)
+Fixed bug #1707197 Roundtrip conversion problem: FM_Shapes.FR.CONFIDENTIAL.xlsx
+Fixed bug #1707124 Add-in Crashes when openingnon-ods files
+Fixed bug #1704329 Conversion failed: biplangereihe.xlsx
+Performance improved: #1702986 Conversion of DataIntake.ods is hanging
+Fixed bug #1679589 Readme/help document
+Fixed bug #1702037 numbered format "Custom" ignores blanks
+Fixed bug #1705851 Crash/Unreadable Content: misc. files
+Fixed bug #1705912 Print ranges are not retained
+Fixed bug #1698244 Add-in crash- corrupt.ods file
+
+
+Release R2210 (M2) (2007-04-24)
+
+1699822  PPTX: Font decoration doesn\'t work at all  
+1699819  PPTX: Font color doesn\'t work at all  
+1699811  PPTX: Font weight doesn\'t work properly  
+1699810  PPTX: Font size doesn\'t work properly  
+1699177  Text boxes in Layouts are not properly retained (CMD line)  
+1699134  Underline style not retained after conversion(CMD line tool - Not present in ODP
+1699083  Upper case text is not retained after conversion (CMD line) - Not present in ODP
+1697455  Strikethrough Double not retained after conversion (CMD line  - Not present in ODP
+1697340  Font size not properly retained(PowerPoint CMD line tool).  
+1698243  Text Box Fill color not retained after conversion (CMD Line)  
+1697431  Transparency is not retained after conversion (PowerPoint CM  
+1697373  Border color not retained after conversion (PowerPoint CMD
+1698131  Crash - renaming odp extension to pptx (Command line)  
+1699147  Crash- invalid output files extension (CMD line tool)  - Generic message from a common code
+
+
+Release R2205 (M2) (2007-04-23)
+
+Add Insert > Note (direct conv)
+Fixed bug #1693462 File converter failed to open the file
+Fixed bug #1677196 Content lost (fixed lines)
+Fixed bug #1705621 Add-in Crash-Print Range
+Fixed bug #1702981 Conversion result cannot be opened with Excel.
+
+Release R2150 (M2) (2007-04-19)
+
+Presentation:
+M2 Milestone drop for PPTX2ODP and vice-versa
+
+Release R2134 (M2) (2007-04-11)
+
+Add Format > Cells > Protection > Hide all
+Add partly Format > Cell > Borders
+Fixed bug #1675771 Conversion increases file size
+Fixed bug #1696792 Add-in crash(merged cells)
+Fixed bug #1691486 Text of Eurolook NumPar paragraphs is lost 
+
+Release R2134 (M1) (2007-04-11)
+
+Fixed bug #1675771 Conversion increases file size
+Fixed bug #1696792 Add-in crash(merged cells)
+
+Release R2123 (M2) (2007-04-09)
+
+Presentation:
+Added the following items for conversion from PPTX2ODP:
+ODP Framework Structure having Slide Master, Slide Layouts and Slides
+Custom Slide show
+Footer
+Shapes (Rectangle, and Textbox) with Edit text, Fill (No fill, Solid Fill, Color, Transparency), Line Fill (No line, Solid line, Color, Transparency), and Line Style (Width)
+Text Font Formatting
+Additionally, included an word document 'ODFConverter-TesterDoc-MS-PPTX.doc' in Command Line Tool zip, where it guides as what are the open facts not covered for this release.
+
+Release R2122 (M2) (2007-04-06)
+
+Fixed bug #1680462 "Merged cell are not retained after round trip conversion"
+Fixed bug #1688240 (Cmd Line Tool Zip Exception during conversion(corrupt xlsx))
+Fixed bug #1681269 Content alignment. 
+Fixed bug #1685902 Crash when “file conversion in progress...” canceled
+Fixed Bug #1675771 Conversion increases file size (merged with 
+Improved Format -> Page -> Page
+Improved Format > Cells > Font > Size
+Added Format -> Page -> Header (direct). 
+Added Format -> Page -> Footer (direct)
+
+Release R2122 (M1) (2007-04-06)
+
+Fixed bug #1680462 "Merged cell are not retained after round trip conversion"
+Fixed bug #1688240 (Cmd Line Tool Zip Exception during conversion(corrupt xlsx))
+Fixed bug #1681269 Content alignment. 
+Fixed bug #1685902 Crash when “file conversion in progress...” canceled
+Fixed Bug #1675771 Conversion increases file size (merged with 
+
 Release R2101 (M2) (2007-04-04)
 
 Fixed bug: #1681269 Content Alignment
