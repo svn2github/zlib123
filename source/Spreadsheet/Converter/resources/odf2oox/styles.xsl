@@ -389,44 +389,22 @@
       />
     </xsl:variable>
 
+    <xsl:variable name="contentFontsCount">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
+      />
+    </xsl:variable>
 
     <cellStyleXfs>
 
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines"
+          select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell']) + 1"
         />
       </xsl:attribute>
 
       <!-- default style -->
       <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
-
-      <xsl:apply-templates
-        select="document('content.xml')/office:document-content/office:automatic-styles/style:style"
-        mode="cellFormats">
-        <xsl:with-param name="numStyleCount">
-          <xsl:value-of select="$numStyleCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="styleNumStyleCount">
-          <xsl:value-of select="$styleNumStyleCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="percentStyleCount">
-          <xsl:value-of select="$percentStyleCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="stylePercentStyleCount">
-          <xsl:value-of select="$stylePercentStyleCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="currencyStyleCount">
-          <xsl:value-of select="$currencyStyleCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="styleCurrencyStyleCount">
-          <xsl:value-of select="$styleCurrencyStyleCount"/>
-        </xsl:with-param>
-        <xsl:with-param name="dateStyleCount">
-          <xsl:value-of select="$dateStyleCount"/>
-        </xsl:with-param>
-      </xsl:apply-templates>
-
 
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/style:style"
@@ -458,12 +436,10 @@
         <xsl:with-param name="AtributeName">
           <xsl:text>cellStyleXfs</xsl:text>
         </xsl:with-param>
+        <xsl:with-param name="contentFontsCount">
+          <xsl:value-of select="$contentFontsCount"/>
+        </xsl:with-param>
       </xsl:apply-templates>
-
-
-
-      <!-- add cell formats for multiline cells, which must have wrap property -->
-      <xsl:call-template name="InsertMultilineCellFormats"/>
 
     </cellStyleXfs>
 
@@ -531,6 +507,9 @@
         <xsl:with-param name="FileName">
           <xsl:text>styles</xsl:text>
         </xsl:with-param>
+        <xsl:with-param name="contentFontsCount">
+          <xsl:value-of select="$contentFontsCount"/>
+        </xsl:with-param>        
       </xsl:apply-templates>
 
       <!-- add cell formats for multiline cells, which must have wrap property -->
@@ -612,6 +591,7 @@
     <xsl:param name="dateStyleCount"/>
     <xsl:param name="FileName"/>
     <xsl:param name="AtributeName"/>
+    <xsl:param name="contentFontsCount"/>
 
 
     <!-- number format id -->
@@ -644,16 +624,24 @@
             </xsl:choose>
           </xsl:attribute>
         </xsl:if>
-        <xsl:call-template name="SetFormatProperties"/>
+        <xsl:call-template name="SetFormatProperties">
+          <xsl:with-param name="FileName" select="$FileName"/>
+          <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+        </xsl:call-template>
       </xf>
     </xsl:if>
   </xsl:template>
 
   <xsl:template name="SetFormatProperties">
     <xsl:param name="multiline" select="'false'"/>
+    <xsl:param name="FileName"/>
+    <xsl:param name="contentFontsCount"/>
 
     <!-- font -->
-    <xsl:call-template name="FontId"/>
+    <xsl:call-template name="FontId">
+      <xsl:with-param name="FileName" select="$FileName"/>
+      <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+    </xsl:call-template>
 
     <!-- border -->
     <xsl:if
@@ -849,39 +837,64 @@
 
   </xsl:template>
 
- <!-- Insert Font Style -->
+  <!-- Insert Font Style -->
 
   <xsl:template name="FontId">
+    <xsl:param name="FileName"/>
+    <xsl:param name="contentFontsCount"/>
+
     <xsl:choose>
       <xsl:when test="style:text-properties">
         <xsl:attribute name="applyFont">
           <xsl:text>1</xsl:text>
         </xsl:attribute>
+
         <xsl:attribute name="fontId">
           <!-- change referencing node to style:text-properties and count-->
           <xsl:for-each select="style:text-properties">
-            <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
-              level="any"/>
+            <xsl:variable name="fontNum">
+              <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
+                level="any"/>
+            </xsl:variable>
+
+            <xsl:choose>
+              <xsl:when test="$FileName = 'styles' ">
+                <xsl:value-of select="$contentFontsCount + $fontNum"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$fontNum"/>
+              </xsl:otherwise>
+            </xsl:choose>
+
           </xsl:for-each>
         </xsl:attribute>
       </xsl:when>
+
       <xsl:when test="@style:parent-style-name != ''">
         <xsl:variable name="StyleParentStyleName">
           <xsl:value-of select="@style:parent-style-name"/>
         </xsl:variable>
+
         <xsl:choose>
           <xsl:when test="key('style',@style:parent-style-name)/style:text-properties">
             <xsl:for-each select="key('style',$StyleParentStyleName)">
-              <xsl:call-template name="FontId"/>
+              <xsl:call-template name="FontId">
+                <xsl:with-param name="FileName" select="$FileName"/>
+                <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+              </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
           <xsl:otherwise>
             <xsl:for-each
               select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
-              <xsl:call-template name="FontId"/>
+              <xsl:call-template name="FontId">
+                <xsl:with-param name="FileName" select="$FileName"/>
+                <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+              </xsl:call-template>
             </xsl:for-each>
           </xsl:otherwise>
         </xsl:choose>
+
       </xsl:when>
       <xsl:otherwise> </xsl:otherwise>
     </xsl:choose>
@@ -1042,13 +1055,15 @@
 
     <!-- superscript -->
     <!-- in ODS it can be "super 58%" or "38% 58%" -->
-    <xsl:if test="contains(@style:text-position, 'super' ) or number(substring-before(@style:text-position, '%' ) &gt; 0)">
+    <xsl:if
+      test="contains(@style:text-position, 'super' ) or number(substring-before(@style:text-position, '%' ) &gt; 0)">
       <vertAlign val="superscript"/>
     </xsl:if>
 
     <!-- subscript -->
     <!-- in ODS it can be "sub 58%" or "-38% 58%" -->
-    <xsl:if test="contains(@style:text-position, 'sub' ) or number(substring-before(@style:text-position, '%' ) &lt; 0)">
+    <xsl:if
+      test="contains(@style:text-position, 'sub' ) or number(substring-before(@style:text-position, '%' ) &lt; 0)">
       <vertAlign val="subscript"/>
     </xsl:if>
 
@@ -1232,7 +1247,7 @@
           <xsl:choose>
             <!-- when style is set for cell -->
             <xsl:when test="$formatNumber != '' ">
-              
+
               <xsl:attribute name="applyFont">
                 <xsl:text>1</xsl:text>
               </xsl:attribute>
@@ -1256,7 +1271,7 @@
                 <!-- when style is in styles.xml -->
                 <xsl:otherwise>
                   <xsl:attribute name="xfId">
-                    <xsl:value-of select="$formatNumber"/>                    
+                    <xsl:value-of select="$formatNumber"/>
                   </xsl:attribute>
                   <xsl:for-each
                     select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
@@ -1324,17 +1339,18 @@
                     <xsl:otherwise>
                       <xsl:for-each select="document('styles.xml')">
                         <xsl:for-each select="key('style',$columnCellStyle)">
-                          
+
                           <xsl:attribute name="xfId">
-                            <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                            <xsl:number count="style:style[@style:family='table-cell']" level="any"
+                            />
                           </xsl:attribute>
-                          
+
                           <xsl:call-template name="SetFormatProperties">
                             <xsl:with-param name="multiline">
                               <xsl:text>true</xsl:text>
                             </xsl:with-param>
                           </xsl:call-template>
-                          
+
                         </xsl:for-each>
                       </xsl:for-each>
                     </xsl:otherwise>
