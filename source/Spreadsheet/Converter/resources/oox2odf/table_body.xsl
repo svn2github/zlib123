@@ -167,18 +167,8 @@
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
                   <xsl:attribute name="table:style-name">
-                    <xsl:for-each select="document('xl/styles.xml')">
-                      <xsl:choose>
-                        <xsl:when test="key('Xf', '')[position() = $this/@s + 1]/@xfId = '0' or not (key('Xf', '')[position() = $this/@s + 1]/@xfId)">
+                    <xsl:for-each select="document('xl/styles.xml')">                      
                           <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:variable name="xfId">
-                            <xsl:value-of select="key('Xf', '')[position() = $this/@s + 1]/@xfId"/>
-                          </xsl:variable>
-                          <xsl:value-of select="key('CellStylesId', $xfId)/@name"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
                     </xsl:for-each>                    
                   </xsl:attribute>
                 </xsl:if>
@@ -191,17 +181,7 @@
                 <xsl:if test="@s">
                   <xsl:attribute name="table:style-name">
                     <xsl:for-each select="document('xl/styles.xml')">
-                      <xsl:choose>
-                        <xsl:when test="key('Xf', '')[position() = $this/@s + 1]/@xfId = '0' or not (key('Xf', '')[position() = $this/@s + 1]/@xfId)">
-                          <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:variable name="xfId">
-                            <xsl:value-of select="key('Xf', '')[position() = $this/@s + 1]/@xfId"/>
-                          </xsl:variable>
-                          <xsl:value-of select="key('CellStylesId', $xfId)/@name"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
+                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
                     </xsl:for-each>
                   </xsl:attribute>
                 </xsl:if>
@@ -463,18 +443,8 @@
           </xsl:if>
           <xsl:if test="@s">
             <xsl:attribute name="table:style-name">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:choose>
-                  <xsl:when test="key('Xf', '')[position() = $position]/@xfId = '0' or not(key('Xf', '')[position() = $position]/@xfId)">
-                    <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <xsl:variable name="xfId">
-                      <xsl:value-of select="key('Xf', '')[position() = $position]/@xfId"/>
-                    </xsl:variable>
-                    <xsl:value-of select="key('CellStylesId', $xfId)/@name"/>
-                  </xsl:otherwise>
-                </xsl:choose>
+             <xsl:for-each select="document('xl/styles.xml')">
+                <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
               </xsl:for-each>
             </xsl:attribute>
             <xsl:variable name="horizontal">

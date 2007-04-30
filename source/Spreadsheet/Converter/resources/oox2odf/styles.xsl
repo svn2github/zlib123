@@ -281,12 +281,10 @@
 
   <!-- cell formats -->
   <xsl:template match="e:xf" mode="automaticstyles">
-    
-    <xsl:if test="@xfId = '0'">
+
     <style:style style:name="{generate-id(.)}" style:family="table-cell">
      <xsl:call-template name="InsertCellFormat"/>
     </style:style>
-    </xsl:if>
       
   </xsl:template>
   
@@ -305,9 +303,23 @@
         <xsl:attribute name="style:data-style-name">
           <xsl:value-of select="concat('N',@numFmtId)"/>
         </xsl:attribute>
-      </xsl:when>
-      
+      </xsl:when>      
     </xsl:choose>
+
+    <xsl:attribute name="style:parent-style-name">
+      <xsl:choose>
+        <xsl:when test="@xfId = '0' or not(@xfId)">
+          <xsl:text>Default</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="xfId">
+            <xsl:value-of select="@xfId"/>
+          </xsl:variable>
+          <xsl:value-of select="key('CellStylesId', $xfId)/@name"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+
     <xsl:if test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or @fillId != '0' or  @borderId != '0' or @applyFill= 1">
       <style:table-cell-properties>
         <xsl:if test="@applyAlignment = 1">
