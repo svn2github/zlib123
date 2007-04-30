@@ -823,7 +823,7 @@
     <xsl:variable name="Xfid">
       <xsl:value-of select="@xfId"/>
     </xsl:variable>
-    <xsl:if test="$Xfid != '0' and not(preceding-sibling::e:xf/@xfId = $Xfid)">
+    <xsl:if test="$Xfid != '0' and not(preceding-sibling::e:xf/@xfId = $Xfid) and key('CellStylesId', @xfId)/@name != 'Default'">
       <style:style>
         <xsl:attribute name="style:name">
           <xsl:value-of select="key('CellStylesId', @xfId)/@name"/>
