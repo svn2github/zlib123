@@ -44,6 +44,7 @@
 
   <xsl:key name="table-row" match="table:table-row" use=" '' "/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
+  <xsl:key name="tableMasterPage" match="style:style[@style:family='table']" use="@style:name"/>
   <xsl:key name="ConfigItem"
     match="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item"
     use="@config:name"/>
@@ -92,12 +93,16 @@
         <xsl:call-template name="WriteMergeStyle"/>
       </xsl:variable>
 
+      <xsl:variable name="masterPage">
+        <xsl:value-of select="key('tableMasterPage',@table:style-name)/@style:master-page-name"/>
+      </xsl:variable>
+      
       <xsl:variable name="pageStyle">
         <xsl:value-of
-          select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default' ]/@style:page-layout-name"
+          select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name =  $masterPage]/@style:page-layout-name"
         />
       </xsl:variable>
-
+      
       <!-- if property 'fit print range(s) to width/height' is being used -->
       <xsl:for-each select="document('styles.xml')">
         <xsl:if
@@ -139,7 +144,10 @@
         </xsl:with-param>
       </xsl:call-template>
 
-      <xsl:call-template name="InsertPageProperties"/>
+      <xsl:call-template name="InsertPageProperties">
+        <xsl:with-param name="pageStyle" select="$pageStyle"/>
+      </xsl:call-template>
+      
       <xsl:call-template name="InsertHeaderFooter"/>
       
       <xsl:if test="descendant::office:annotation">
@@ -498,13 +506,7 @@
   </xsl:template>
 
   <xsl:template name="InsertPageProperties">
-
-    <!-- default pageStyle name-->
-    <xsl:variable name="pageStyle">
-      <xsl:value-of
-        select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default' ]/@style:page-layout-name"
-      />
-    </xsl:variable>
+    <xsl:param name="pageStyle"/>
 
     <xsl:for-each select="document('styles.xml')">
       <xsl:for-each select="key('pageStyle',$pageStyle)/style:page-layout-properties">
