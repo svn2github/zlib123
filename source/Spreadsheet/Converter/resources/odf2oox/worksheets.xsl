@@ -496,6 +496,9 @@
               <xsl:text>1</xsl:text>
             </xsl:attribute>
           </xsl:if>
+          <xsl:if test="not(style:header-left/@style:display = 'false') or style:header-left/child::node[1]/text() != '' or not(style:footer-left/@style:display = 'false') or style:footer-left/child::node[1]/text() != '' or not(style:header/@style:display = 'false') or style:header/child::node[1]/text() != '' or not(style:footer/@style:display = 'false') or style:footer/child::node[1]/text() != '' ">
+            <xsl:message terminate="no">translation.odf2oox.HeaderFooterCharNumber</xsl:message>
+          </xsl:if>
         </xsl:for-each>
         <xsl:for-each select="document('styles.xml')/office:document-styles">
           <xsl:call-template name="OddHeaderFooter"/>
