@@ -26,7 +26,8 @@ namespace CleverAge.OdfConverter.Spreadsheet
                 return new string []  {
         	       "CleverAge.OdfConverter.OdfConverterLib.OoxSpacesPostProcessor",
                    "CleverAge.OdfConverter.Spreadsheet.OoxCommentsPostProcessor,"+fullname,
-                   "CleverAge.OdfConverter.Spreadsheet.OoxDrawingsPostProcessor,"+fullname
+                   "CleverAge.OdfConverter.Spreadsheet.OoxDrawingsPostProcessor,"+fullname,
+                   "CleverAge.OdfConverter.Spreadsheet.OoxHeaderFooterPostProcessor,"+fullname
                 };
             }
         }

@@ -70,6 +70,7 @@
     <EmbeddedResource Include="resources\oox2odf\border.xsl" />
     <EmbeddedResource Include="resources\oox2odf\headers.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
+    <Compile Include="OoxHeaderFooterPostProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\OdfConverterLib\OdfConverterLib.csproj">
