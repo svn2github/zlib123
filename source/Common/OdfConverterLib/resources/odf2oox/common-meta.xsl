@@ -4,7 +4,7 @@
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
-    exclude-result-prefixes="office meta">
+    exclude-result-prefixes="office meta dc">
 
     <!-- @Filename: common-meta.xsl -->
     <!-- @Description: This stylesheet is used to perform direct conversion on document metadata -->

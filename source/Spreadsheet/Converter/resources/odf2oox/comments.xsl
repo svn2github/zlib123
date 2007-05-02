@@ -95,7 +95,7 @@
         <x:ClientData ObjectType="Note">
           <x:SizeWithCells/>
           <x:Anchor>
-            3, 28, 0, 0, 4, 57, 1, 9</x:Anchor>
+            9, 28, 2, 18, 10, 57, 5, 2</x:Anchor>
           <x:Locked>False</x:Locked>
           <x:PrintObject>False</x:PrintObject>
           <x:AutoFill>False</x:AutoFill>
