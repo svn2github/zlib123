@@ -394,6 +394,12 @@
         select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
       />
     </xsl:variable>
+    
+    <xsl:variable name="contentFillCount">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:table-cell-properties)"
+      />
+    </xsl:variable>
 
     <cellStyleXfs>
 
@@ -439,6 +445,9 @@
         <xsl:with-param name="contentFontsCount">
           <xsl:value-of select="$contentFontsCount"/>
         </xsl:with-param>
+        <xsl:with-param name="contentFillCount">
+          <xsl:value-of select="$contentFillCount"/>
+        </xsl:with-param>
       </xsl:apply-templates>
 
     </cellStyleXfs>
@@ -478,6 +487,12 @@
         <xsl:with-param name="dateStyleCount">
           <xsl:value-of select="$dateStyleCount"/>
         </xsl:with-param>
+        <xsl:with-param name="contentFontsCount">
+          <xsl:value-of select="$contentFontsCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="contentFillCount">
+          <xsl:value-of select="$contentFillCount"/>
+        </xsl:with-param>
       </xsl:apply-templates>
 
       <xsl:apply-templates
@@ -509,7 +524,10 @@
         </xsl:with-param>
         <xsl:with-param name="contentFontsCount">
           <xsl:value-of select="$contentFontsCount"/>
-        </xsl:with-param>        
+        </xsl:with-param> 
+        <xsl:with-param name="contentFillCount">
+          <xsl:value-of select="$contentFillCount"/>
+        </xsl:with-param>
       </xsl:apply-templates>
 
       <!-- add cell formats for multiline cells, which must have wrap property -->
@@ -549,7 +567,7 @@
   <xsl:template
     match="style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']]"
     mode="fonts">
-	<font>
+    <font>
       <xsl:call-template name="InsertTextProperties">
         <xsl:with-param name="mode">fonts</xsl:with-param>
       </xsl:call-template>
@@ -592,6 +610,7 @@
     <xsl:param name="FileName"/>
     <xsl:param name="AtributeName"/>
     <xsl:param name="contentFontsCount"/>
+    <xsl:param name="contentFillCount"/>
 
 
     <!-- number format id -->
@@ -627,6 +646,7 @@
         <xsl:call-template name="SetFormatProperties">
           <xsl:with-param name="FileName" select="$FileName"/>
           <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+          <xsl:with-param name="contentFillCount" select="$contentFillCount"/>
         </xsl:call-template>
       </xf>
     </xsl:if>
@@ -636,6 +656,7 @@
     <xsl:param name="multiline" select="'false'"/>
     <xsl:param name="FileName"/>
     <xsl:param name="contentFontsCount"/>
+    <xsl:param name="contentFillCount"/>
 
     <!-- font -->
     <xsl:call-template name="FontId">
@@ -659,24 +680,12 @@
     </xsl:if>
 
     <!--cell background color-->
-    <xsl:if
-      test="style:table-cell-properties/@fo:background-color and style:table-cell-properties/@fo:background-color != 'transparent'">
-      <xsl:attribute name="applyFill">
-        <xsl:text>1</xsl:text>
-      </xsl:attribute>
-      <xsl:attribute name="fillId">
-        <!-- change referencing node to style:table-cell-properties and count-->
-        <xsl:variable name="fill">
-          <xsl:for-each select="style:table-cell-properties">
-            <xsl:number
-              count="style:table-cell-properties[parent::node()/@style:family='table-cell']"
-              level="any"/>
-          </xsl:for-each>
-        </xsl:variable>
-        <xsl:value-of select="$fill + 1"/>
-      </xsl:attribute>
-    </xsl:if>
-
+    
+    <xsl:call-template name="BackgroundId">
+      <xsl:with-param name="FileName" select="$FileName"/>
+      <xsl:with-param name="contentFillCount" select="$contentFillCount"/>
+    </xsl:call-template>
+    
     <!-- text -alignment -->
     <!-- 1st 'or' - horizontal alignment
             2nd 'or' - horizontal alignment 'fill'
@@ -692,9 +701,26 @@
         <xsl:text>1</xsl:text>
       </xsl:attribute>
     </xsl:if>
+    
+    <xsl:variable name="StyleParentStyleName">
+      <xsl:value-of select="@style:parent-style-name"/>
+    </xsl:variable>
+    
+    
+    <xsl:variable name="TextAlign">
+      <xsl:choose>
+        <xsl:when test="style:paragraph-properties/@fo:text-align">
+          <xsl:value-of select="style:paragraph-properties/@fo:text-align"/>
+        </xsl:when>
+        <xsl:when test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]/style:paragraph-properties/@fo:text-align">
+          <xsl:value-of select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]/style:paragraph-properties/@fo:text-align"/>
+        </xsl:when>
+      </xsl:choose>          
+    </xsl:variable>
+    
 
     <xsl:if
-      test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true') or (style:table-cell-properties/@style:vertical-align) or (style:table-cell-properties/@style:rotation-angle) or (style:table-cell-properties/@style:direction='ttb') or (style:table-cell-properties/@fo:wrap-option='wrap') or ($multiline='true')">
+      test="($TextAlign != '') or (style:table-cell-properties/@style:repeat-content = 'true') or (style:table-cell-properties/@style:vertical-align) or (style:table-cell-properties/@style:rotation-angle) or (style:table-cell-properties/@style:direction='ttb') or (style:table-cell-properties/@fo:wrap-option='wrap') or ($multiline='true')">
       <xsl:attribute name="applyAlignment">
         <xsl:text>1</xsl:text>
       </xsl:attribute>
@@ -704,25 +730,26 @@
         <!-- horizontal alignment -->
         <!-- 1st 'or' - horizontal alignment 
                 2nd 'or' - horizontal alignment 'fill' 
-          -->
+        -->
+
         <xsl:if
-          test="(style:paragraph-properties/@fo:text-align) or (style:table-cell-properties/@style:repeat-content = 'true')">
+          test="($TextAlign != '') or (style:table-cell-properties/@style:repeat-content = 'true')">
           <xsl:attribute name="horizontal">
             <xsl:choose>
               <xsl:when test="style:table-cell-properties/@style:repeat-content = 'true' ">
                 <xsl:text>fill</xsl:text>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:if test="style:paragraph-properties/@fo:text-align">
+                <xsl:if test="$TextAlign">
                   <xsl:choose>
-                    <xsl:when test="style:paragraph-properties/@fo:text-align = 'start' ">
+                    <xsl:when test="$TextAlign = 'start' ">
                       <xsl:text>left</xsl:text>
                     </xsl:when>
-                    <xsl:when test="style:paragraph-properties/@fo:text-align = 'end' ">
+                    <xsl:when test="$TextAlign = 'end' ">
                       <xsl:text>right</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:value-of select="style:paragraph-properties/@fo:text-align"/>
+                      <xsl:value-of select="$TextAlign"/>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:if>
@@ -809,6 +836,7 @@
           </xsl:attribute>
         </xsl:if>
       </alignment>
+      
     </xsl:if>
 
     <xsl:if
@@ -842,9 +870,9 @@
   <xsl:template name="FontId">
     <xsl:param name="FileName"/>
     <xsl:param name="contentFontsCount"/>
-
-    <xsl:choose>
-      <xsl:when test="style:text-properties">
+    
+     <xsl:choose>
+       <xsl:when test="style:text-properties">
         <xsl:attribute name="applyFont">
           <xsl:text>1</xsl:text>
         </xsl:attribute>
@@ -856,7 +884,6 @@
               <xsl:number count="style:text-properties[parent::node()/@style:family='table-cell']"
                 level="any"/>
             </xsl:variable>
-
             <xsl:choose>
               <xsl:when test="$FileName = 'styles' ">
                 <xsl:value-of select="$contentFontsCount + $fontNum"/>
@@ -865,22 +892,21 @@
                 <xsl:value-of select="$fontNum"/>
               </xsl:otherwise>
             </xsl:choose>
-
           </xsl:for-each>
         </xsl:attribute>
       </xsl:when>
-
       <xsl:when test="@style:parent-style-name != '' and @style:parent-style-name != 'Default'">
         <xsl:variable name="StyleParentStyleName">
           <xsl:value-of select="@style:parent-style-name"/>
         </xsl:variable>
-
         <xsl:choose>
           <xsl:when test="key('style',@style:parent-style-name)/style:text-properties">
             <xsl:for-each select="key('style',$StyleParentStyleName)">
               <xsl:call-template name="FontId">
                 <xsl:with-param name="FileName" select="$FileName"/>
-                <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+                <xsl:with-param name="contentFontsCount">
+                  <xsl:value-of select="$contentFontsCount"/>
+                </xsl:with-param>
               </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
@@ -888,17 +914,89 @@
             <xsl:for-each
               select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
               <xsl:call-template name="FontId">
-                <xsl:with-param name="FileName" select="$FileName"/>
-                <xsl:with-param name="contentFontsCount" select="$contentFontsCount"/>
+                <xsl:with-param name="FileName">
+	              <xsl:text>styles</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="contentFontsCount">
+                  <xsl:value-of select="$contentFontsCount"/>
+                </xsl:with-param>
               </xsl:call-template>
             </xsl:for-each>
           </xsl:otherwise>
         </xsl:choose>
-
       </xsl:when>
       <xsl:otherwise>
        <xsl:attribute name="fontId">
         <xsl:text>0</xsl:text>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="BackgroundId">
+    <xsl:param name="FileName"/>
+    <xsl:param name="contentFillCount"/>
+
+  
+    <xsl:choose>
+      <xsl:when test="style:table-cell-properties/@fo:background-color and style:table-cell-properties/@fo:background-color != 'transparent'">
+        <xsl:attribute name="applyFill">
+          <xsl:text>1</xsl:text>
+        </xsl:attribute> 
+        <xsl:attribute name="fillId">
+          <!-- change referencing node to style:table-cell-properties and count-->
+          <xsl:variable name="fill">
+            <xsl:for-each select="style:table-cell-properties">
+            <xsl:number
+            count="style:table-cell-properties[parent::node()/@style:family='table-cell']"
+            level="any"/>
+            </xsl:for-each>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="$FileName = 'styles' ">
+              <xsl:value-of select="$contentFillCount + $fill + 1"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$fill + 1"/>
+            </xsl:otherwise>
+            </xsl:choose>
+            </xsl:attribute>
+      </xsl:when>
+      
+      <xsl:when test="@style:parent-style-name != '' and @style:parent-style-name != 'Default'">
+        <xsl:variable name="StyleParentStyleName">
+          <xsl:value-of select="@style:parent-style-name"/>
+        </xsl:variable>
+        
+        <xsl:choose>
+          <xsl:when test="key('style',@style:parent-style-name)/style:table-cell-properties/@fo:background-color and key('style',@style:parent-style-name)/style:table-cell-properties/@fo:background-color != 'transparent'">
+            <xsl:for-each select="key('style',$StyleParentStyleName)">
+              <xsl:call-template name="BackgroundId">
+                <xsl:with-param name="FileName" select="$FileName"/>
+                <xsl:with-param name="contentFillCount">
+                  <xsl:value-of select="$contentFillCount"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each
+              select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
+              <xsl:call-template name="BackgroundId">
+                <xsl:with-param name="FileName">
+                  <xsl:text>styles</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="contentFillCount">
+                  <xsl:value-of select="$contentFillCount"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>        
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="fillId">
+          <xsl:text>0</xsl:text>
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
@@ -964,7 +1062,7 @@
 
     <!-- font weight -->
     <xsl:if
-      test="@fo:font-weight='bold' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='bold' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='bold'">
+      test="@fo:font-weight='bold' or key('style',$parentCellStyleName)/style:text-properties/@fo:font-weight='bold' or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-weight='bold' or @style:font-weight-complex = 'bold'">
       <b/>
     </xsl:if>
     <xsl:if
@@ -1021,7 +1119,7 @@
 
     <!-- font size -->
     <xsl:if
-      test="@fo:font-size or key('style',$parentCellStyleName)/style:text-properties/@fo:font-size or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size or $mode = 'default' ">
+      test="@fo:font-size or key('style',$parentCellStyleName)/style:text-properties/@fo:font-size or key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size or $mode = 'default'  or @style:font-size-complex or @style:font-size-asian">
       <xsl:variable name="fontSize">
         <xsl:choose>
           <xsl:when test="@fo:font-size">
@@ -1034,6 +1132,12 @@
           <xsl:when test="key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size">
             <xsl:value-of
               select="key('style',$defaultCellStyleName)/style:text-properties/@fo:font-size"/>
+          </xsl:when>
+          <xsl:when test="@style:font-size-complex">
+            <xsl:value-of select="@style:font-size-complex"/>
+          </xsl:when>
+          <xsl:when test="@style:font-size-asian">">
+            <xsl:value-of select="@style:font-size-asian"/>
           </xsl:when>
           <xsl:when test="$mode='default'">
             <xsl:text>10</xsl:text>
