@@ -509,8 +509,17 @@
             </xsl:call-template>
           </xsl:variable>
          
-          <xsl:value-of select="concat(concat(concat(concat($CollStartChar,$rowNumber),':'), concat($CollEndChar, $rowNumber + @table:number-rows-spanned - 1)), ';')"/>
-       
+        <xsl:variable name="rowsSpanned">
+          <xsl:choose>
+            <xsl:when test="@table:number-rows-spanned">
+              <xsl:value-of select="@table:number-rows-spanned"/>
+            </xsl:when>
+            <xsl:otherwise>1</xsl:otherwise>
+          </xsl:choose>          
+        </xsl:variable>
+        
+        <xsl:value-of select="concat(concat(concat(concat($CollStartChar,$rowNumber),':'), concat($CollEndChar, $rowNumber + $rowsSpanned - 1)), ';')"/>
+        
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
