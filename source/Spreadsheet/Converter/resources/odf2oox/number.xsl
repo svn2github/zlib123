@@ -41,7 +41,6 @@
     <numFmt numFmtId="{$numId}">
       <xsl:attribute name="formatCode">
         <xsl:choose>
-          
           <!-- when negative number is red, positive and negative number are formatted separately --> 
           <xsl:when test="style:text-properties/@fo:color">
             <xsl:variable name="formatPositive">
@@ -56,7 +55,6 @@
             </xsl:variable>
             <xsl:value-of select="concat($formatPositive,concat(';',$formatNegative))"/>
           </xsl:when>
-          
           <xsl:otherwise>
             <xsl:call-template name="GetFormatCode"/>
           </xsl:otherwise>
@@ -321,16 +319,53 @@
       </xsl:otherwise>
     </xsl:choose>
     </xsl:variable>
+    
+    <xsl:variable name="Condition">
+      <xsl:value-of select="style:map/@style:condition"/>
+    </xsl:variable>
+    
+    <xsl:variable name="ConditionNumber">      
+      <xsl:choose>
+        <xsl:when test="contains(style:map/@style:condition, '=')">
+          <xsl:value-of select="substring-after(style:map[1]/@style:condition,'=')"/>
+        </xsl:when>
+        <xsl:when test="contains(style:map/@style:condition, '&gt;')">
+          <xsl:value-of select="substring-after(style:map[1]/@style:condition,'>')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:variable name="GrowText">      
+      <xsl:choose>
+        <xsl:when test="key('number', concat(@style:name, 'P0'))/number:text">
+          <xsl:value-of select="key('number', concat(@style:name, 'P0'))/number:text"/>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:variable name="LowText">
+      <xsl:choose>
+        <xsl:when test="key('number', concat(@style:name, 'P1'))/number:text">
+          <xsl:value-of select="key('number', concat(@style:name, 'P1'))/number:text"/>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:variable name="text">
       <xsl:value-of select="number:text[not(preceding-sibling::node())]"/>
     </xsl:variable>
-    <xsl:choose>
-      
+
+    
+      <xsl:choose>      
       <!-- handle text in number format -->
       <xsl:when test="$text and $text!='' and $text != ' ' and $text != '-'">
-        <xsl:value-of select="concat(concat(concat('&quot;',$text),'&quot;'),$valueWithCurrency)"/>
-      </xsl:when>
-      
+        <xsl:value-of select="concat(concat(concat(concat(concat('&quot;', $GrowText), '&quot;'), concat($valueWithCurrency, ';')), concat(concat(concat('&quot;', $LowText), '&quot;'), concat($valueWithCurrency, ';'))), concat(concat(concat('&quot;',$text),'&quot;'),$valueWithCurrency))"/>
+      </xsl:when>      
       <xsl:otherwise>
         <xsl:value-of select="$valueWithCurrency"/>
       </xsl:otherwise>
