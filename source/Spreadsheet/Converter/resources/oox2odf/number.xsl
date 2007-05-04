@@ -541,14 +541,6 @@
         </xsl:choose>
       </xsl:if>
       
-      <xsl:if test="contains($realFormatCode,'\ ') and not(contains($realFormatCode,','))">
-        <xsl:choose>
-          <xsl:when test="contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#')">
-            <xsl:attribute name="number:grouping">true</xsl:attribute>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:if>
-      
       <!-- '-' embedded in number format -->
       <xsl:if test="contains(substring-after(substring-before($formatCode,'.'),'#'),'-') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-')) or contains(substring-after(substring-before($formatCode,'.'),'0'),'-')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-'))">
         <xsl:call-template name="FindTextNumberFormat">
@@ -567,6 +559,32 @@
                 <xsl:value-of select="concat('0',substring-after($formatCode,'0'))"/>
               </xsl:when>
             </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="embeddedText">-</xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
+      
+      <!-- '\ ' embedded in number format -->
+      <xsl:if test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ')) or contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ '))">
+        <xsl:call-template name="FindTextNumberFormat">
+          <xsl:with-param name="format">
+            <xsl:choose>
+              <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ')">
+                <xsl:value-of select="concat('#',substring-after(substring-before($formatCode,'.'),'#'))"/>
+              </xsl:when>
+              <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')">
+                <xsl:value-of select="concat('0',substring-after(substring-before($formatCode,'.'),'0'))"/>
+              </xsl:when>
+              <xsl:when test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ')">
+                <xsl:value-of select="concat('#',substring-after($formatCode,'#'))"/>
+              </xsl:when>
+              <xsl:when test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ')">
+                <xsl:value-of select="concat('0',substring-after($formatCode,'0'))"/>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="embeddedText">
+            <xsl:value-of xml:space="preserve" select="'\ '"/>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:if>
@@ -1056,22 +1074,36 @@
     </xsl:choose>
   </xsl:template>
   
-  <!-- template which adds embedded '-' in number format -->
+  <!-- template which adds embedded text in number format -->
   
   <xsl:template name="FindTextNumberFormat">
     <xsl:param name="format"/>
-      <xsl:choose>
-        <xsl:when test="string-length($format) &gt; 0">
-          <xsl:if test="starts-with($format,'-')">
-            <number:embedded-text number:position="{string-length($format)-1}">-</number:embedded-text>
-          </xsl:if>
-          <xsl:call-template name="FindTextNumberFormat">
-            <xsl:with-param name="format">
-              <xsl:value-of select="substring($format,2)"/>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:when>
-      </xsl:choose>
+    <xsl:param name="embeddedText"/>
+    <xsl:choose>
+      <xsl:when test="string-length($format) &gt; 0">
+        <xsl:choose>
+          <xsl:when test="starts-with($format,$embeddedText)">
+            <number:embedded-text number:position="{string-length(translate(substring($format,1+string-length($embeddedText)),$embeddedText,''))}">
+              <xsl:value-of xml:space="preserve" select="translate($embeddedText,'\ ',' ')"/>
+            </number:embedded-text>
+            <xsl:call-template name="FindTextNumberFormat">
+              <xsl:with-param name="format">
+                <xsl:value-of select="substring($format,1+string-length($embeddedText))"/>
+              </xsl:with-param>
+              <xsl:with-param xml:space="preserve" name="embeddedText" select="$embeddedText"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="FindTextNumberFormat">
+              <xsl:with-param name="format">
+                <xsl:value-of select="substring($format,2)"/>
+              </xsl:with-param>
+              <xsl:with-param xml:space="preserve" name="embeddedText" select="$embeddedText"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
   
 </xsl:stylesheet>
