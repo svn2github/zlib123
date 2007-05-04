@@ -542,12 +542,15 @@
 
     <cellStyles>
       <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles">
-        <xsl:apply-templates select="style:style" mode="cellStyle"/>
+        <xsl:apply-templates select="style:style[@style:family = 'table-cell']" mode="cellStyle"/>
       </xsl:for-each>
+      <xsl:if test="not(style:style[@style:family = 'table-cell'])">
+        <cellStyle name="Normal" xfId="0" builtinId="0"/>
+      </xsl:if>
     </cellStyles>
   </xsl:template>
 
-  <xsl:template match="style:style" mode="cellStyle">
+  <xsl:template match="style:style[@style:family = 'table-cell']" mode="cellStyle">
     <cellStyle xfId="{position()}">
       <xsl:attribute name="name">
         <xsl:value-of select="@style:name"/>
@@ -1009,6 +1012,7 @@
           <xsl:value-of select="@style:parent-style-name"/>
         </xsl:variable>
         <xsl:choose>
+          <!-- search parent style in styles.xml -->
           <xsl:when
             test="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
             <xsl:for-each
@@ -1016,10 +1020,15 @@
               <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
             </xsl:for-each>
           </xsl:when>
-          <xsl:otherwise>
+          <!-- search parent style in content.xml -->
+          <xsl:when test="key('style',$StyleParentStyleName)">
             <xsl:for-each select="key('style',$StyleParentStyleName)">
               <xsl:call-template name="XfId"/>
             </xsl:for-each>
+          </xsl:when>
+          <!-- when parent style is specified but it doesn't exist -->
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -1028,7 +1037,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
   <!-- insert run properties -->
   <xsl:template match="style:style" mode="textstyles">
     <xsl:param name="parentCellStyleName"/>
