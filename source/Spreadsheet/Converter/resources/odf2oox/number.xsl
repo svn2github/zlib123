@@ -322,19 +322,15 @@
     </xsl:choose>
     </xsl:variable>
     <xsl:variable name="text">
-      <xsl:value-of select="number:text[not(preceding-sibling)]"/>
+      <xsl:value-of select="number:text[not(preceding-sibling::node())]"/>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$text != ' ' and $text != '-'">
-        <xsl:choose>
-          <xsl:when test="$text='$' or contains($text,'$-') or contains($text,',') or contains($text,'+') or contains($text,'(') or contains($text,':') or contains($text,'^') or contains($text,'{') or contains($text,'&lt;') or contains($text,'&gt;') or contains($text,'=') or contains($text,'/') or contains($text,'\') or contains($text,')') or contains($text,'!') or contains($text,'&amp;') or contains($text,'~') or contains($text,'}') or $text=' '">
-            <xsl:value-of select="concat($text,$valueWithCurrency)"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="concat(concat(concat('&quot;',$text),'&quot;'),$valueWithCurrency)"/>
-          </xsl:otherwise>
-        </xsl:choose>
+      
+      <!-- handle text in number format -->
+      <xsl:when test="$text and $text!='' and $text != ' ' and $text != '-'">
+        <xsl:value-of select="concat(concat(concat('&quot;',$text),'&quot;'),$valueWithCurrency)"/>
       </xsl:when>
+      
       <xsl:otherwise>
         <xsl:value-of select="$valueWithCurrency"/>
       </xsl:otherwise>
