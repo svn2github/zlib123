@@ -712,19 +712,19 @@
     <xsl:variable name="horizontalAlign">
       <xsl:call-template name="InheritHorizontalAlign"/>
     </xsl:variable>
-    
+
     <xsl:variable name="verticalAlign">
       <xsl:call-template name="InheritVerticalAlign"/>
     </xsl:variable>
-    
+
     <xsl:variable name="repeatContent">
       <xsl:call-template name="InheritRepeatContent"/>
     </xsl:variable>
-    
+
     <xsl:variable name="rotation">
       <xsl:call-template name="InheritRotation"/>
     </xsl:variable>
-    
+
     <xsl:variable name="verticalText">
       <xsl:call-template name="InheritVerticalText"/>
     </xsl:variable>
@@ -732,7 +732,7 @@
     <xsl:variable name="wordWrap">
       <xsl:call-template name="InheritWordWrap"/>
     </xsl:variable>
-    
+
     <xsl:if
       test="($horizontalAlign != '' ) or ($repeatContent = 'true' ) or ($verticalAlign != '' ) or ($rotation != '' ) or ($verticalText = 'ttb' ) or ($wordWrap = 'wrap' ) or ($multiline = 'true' )">
       <xsl:attribute name="applyAlignment">
@@ -745,8 +745,7 @@
                 2nd 'or' - horizontal alignment 'fill' 
         -->
 
-        <xsl:if
-          test="($horizontalAlign != '' ) or ($repeatContent = 'true' )">
+        <xsl:if test="($horizontalAlign != '' ) or ($repeatContent = 'true' )">
           <xsl:attribute name="horizontal">
             <xsl:choose>
               <xsl:when test="$repeatContent = 'true' ">
@@ -774,22 +773,19 @@
         <xsl:if test="$horizontalAlign = '' ">
           <xsl:choose>
             <!-- change default horizontal alignment  of vertically stacked text to 'left' -->
-            <xsl:when
-              test="$verticalText = 'ttb' ">
+            <xsl:when test="$verticalText = 'ttb' ">
               <xsl:attribute name="horizontal">
                 <xsl:text>left</xsl:text>
               </xsl:attribute>
             </xsl:when>
             <!-- change default horizontal alignment of angle oriented text when angle equals 90 degrees -->
-            <xsl:when
-              test="$rotation = 90">
+            <xsl:when test="$rotation = 90">
               <xsl:attribute name="horizontal">
                 <xsl:text>right</xsl:text>
               </xsl:attribute>
             </xsl:when>
             <!-- change default horizontal alignment of angle oriented text when angle equals -90 degrees -->
-            <xsl:when
-              test="$rotation = 270">
+            <xsl:when test="$rotation = 270">
               <xsl:attribute name="horizontal">
                 <xsl:text>right</xsl:text>
               </xsl:attribute>
@@ -822,13 +818,11 @@
         </xsl:if>
 
         <!-- text rotation -->
-        <xsl:if
-          test="($rotation != '' and $rotation != '0') or $verticalText = 'ttb' ">
+        <xsl:if test="($rotation != '' and $rotation != '0') or $verticalText = 'ttb' ">
           <xsl:attribute name="textRotation">
             <xsl:choose>
               <!-- ascending text angle -->
-              <xsl:when
-                test="$rotation &lt; 91 and not($verticalText = 'ttb' )">
+              <xsl:when test="$rotation &lt; 91 and not($verticalText = 'ttb' )">
                 <xsl:value-of select="$rotation"/>
               </xsl:when>
               <!-- descending text angle -->
@@ -1323,6 +1317,18 @@
       />
     </xsl:variable>
 
+    <xsl:variable name="contentFontsCount">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
+      />
+    </xsl:variable>
+
+    <xsl:variable name="contentFillCount">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:table-cell-properties)"
+      />
+    </xsl:variable>
+
     <xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
 
@@ -1387,6 +1393,12 @@
                 <xsl:text>1</xsl:text>
               </xsl:attribute>
 
+              <xsl:attribute name="xfId">
+                <xsl:for-each select="key('style',@table:style-name)">
+                  <xsl:call-template name="XfId"/>
+                </xsl:for-each>
+              </xsl:attribute>
+              
               <xsl:choose>
                 <!-- when style is in content.xml -->
                 <xsl:when test="key('style',@table:style-name)">
@@ -1396,19 +1408,28 @@
                       <xsl:with-param name="multiline">
                         <xsl:text>true</xsl:text>
                       </xsl:with-param>
+                      <xsl:with-param name="contentFontsCount">
+                        <xsl:value-of select="$contentFontsCount"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="contentFillCount">
+                        <xsl:value-of select="$contentFillCount"/>
+                      </xsl:with-param>
                     </xsl:call-template>
                   </xsl:for-each>
                 </xsl:when>
                 <!-- when style is in styles.xml -->
                 <xsl:otherwise>
-                  <xsl:attribute name="xfId">
-                    <xsl:value-of select="$formatNumber"/>
-                  </xsl:attribute>
                   <xsl:for-each
                     select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'][position() = $formatNumber]">
                     <xsl:call-template name="SetFormatProperties">
                       <xsl:with-param name="multiline">
                         <xsl:text>true</xsl:text>
+                      </xsl:with-param>
+                      <xsl:with-param name="contentFontsCount">
+                        <xsl:value-of select="$contentFontsCount"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="contentFillCount">
+                        <xsl:value-of select="$contentFillCount"/>
                       </xsl:with-param>
                     </xsl:call-template>
                   </xsl:for-each>
@@ -1526,7 +1547,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InheritRepeatContent">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@style:repeat-content">
@@ -1581,32 +1602,32 @@
     </xsl:choose>
   </xsl:template>
 
-<xsl:template name="InheritRotation">
-  <xsl:choose>
-    <xsl:when test="style:table-cell-properties/@style:rotation-angle">
-      <xsl:value-of select="style:table-cell-properties/@style:rotation-angle"/>
-    </xsl:when>
-    <xsl:when test="@style:parent-style-name != '' and @style:parent-style-name != 'Default'">
-      <xsl:variable name="StyleParentStyleName">
-        <xsl:value-of select="@style:parent-style-name"/>
-      </xsl:variable>
-      <xsl:choose>
-        <xsl:when
-          test="key('style',@style:parent-style-name)/style:table-cell-properties/@style:rotation-angle">
-          <xsl:for-each select="key('style',$StyleParentStyleName)">
-            <xsl:call-template name="InheritRotation"/>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:for-each
-            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
-            <xsl:call-template name="InheritRotation"/>
-          </xsl:for-each>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:when>
-  </xsl:choose>
-</xsl:template>
+  <xsl:template name="InheritRotation">
+    <xsl:choose>
+      <xsl:when test="style:table-cell-properties/@style:rotation-angle">
+        <xsl:value-of select="style:table-cell-properties/@style:rotation-angle"/>
+      </xsl:when>
+      <xsl:when test="@style:parent-style-name != '' and @style:parent-style-name != 'Default'">
+        <xsl:variable name="StyleParentStyleName">
+          <xsl:value-of select="@style:parent-style-name"/>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when
+            test="key('style',@style:parent-style-name)/style:table-cell-properties/@style:rotation-angle">
+            <xsl:for-each select="key('style',$StyleParentStyleName)">
+              <xsl:call-template name="InheritRotation"/>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each
+              select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
+              <xsl:call-template name="InheritRotation"/>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 
   <xsl:template name="InheritVerticalText">
     <xsl:choose>
