@@ -1108,7 +1108,17 @@
     <xsl:variable name="YearAndDay">
       <xsl:call-template name="CalculateYearAndDay">
         <xsl:with-param name="days">
-          <xsl:value-of select="$date"/>
+          <xsl:choose>
+            
+            <!-- modification due to Excel Date Bug(leap year 1900) -->
+            <xsl:when test="$date &gt; 59">
+              <xsl:value-of select="$date - 1"/>
+            </xsl:when>
+            
+            <xsl:otherwise>
+              <xsl:value-of select="$date"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:with-param>
         <xsl:with-param name="currentYear">1900</xsl:with-param>
       </xsl:call-template>
