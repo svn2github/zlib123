@@ -268,8 +268,9 @@
   <!-- insert number styles-->
 
   <xsl:template name="InsertNumberStyles">
-    
-    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs" mode="fixedNumFormat"/>
+
+    <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:cellXfs"
+      mode="fixedNumFormat"/>
     <xsl:apply-templates select="document('xl/styles.xml')/e:styleSheet/e:numFmts"
       mode="automaticstyles"/>
   </xsl:template>
@@ -283,44 +284,36 @@
   <xsl:template match="e:xf" mode="automaticstyles">
 
     <style:style style:name="{generate-id(.)}" style:family="table-cell">
-     <xsl:call-template name="InsertCellFormat"/>
+      <xsl:call-template name="InsertCellFormat"/>
     </style:style>
-      
+
   </xsl:template>
-  
+
   <xsl:template name="InsertCellFormat">
     <xsl:choose>
-      
+
       <!-- existing number format -->
       <xsl:when test="key('numFmtId',@numFmtId)">
         <xsl:attribute name="style:data-style-name">
           <xsl:value-of select="generate-id(key('numFmtId',@numFmtId))"/>
         </xsl:attribute>
       </xsl:when>
-      
+
       <!-- fixed number format -->
       <xsl:when test="@numFmtId &gt; 0">
         <xsl:attribute name="style:data-style-name">
           <xsl:value-of select="concat('N',@numFmtId)"/>
         </xsl:attribute>
-      </xsl:when>      
+      </xsl:when>
+
     </xsl:choose>
 
     <xsl:attribute name="style:parent-style-name">
-      <xsl:choose>
-        <xsl:when test="@xfId = '0' or not(@xfId)">
-          <xsl:text>Default</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:variable name="xfId">
-            <xsl:value-of select="@xfId"/>
-          </xsl:variable>
-          <xsl:value-of select="key('CellStylesId', $xfId)/@name"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:text>Default</xsl:text>
     </xsl:attribute>
 
-    <xsl:if test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or @fillId != '0' or  @borderId != '0' or @applyFill= 1">
+    <xsl:if
+      test="@applyAlignment = 1 or @applyBorder = 1 or (@applyProtection=1) or  @borderId != '0' or @fillId!='0' or @applyFill= 1">
       <style:table-cell-properties>
         <xsl:if test="@applyAlignment = 1">
           <!-- vertical-align -->
@@ -354,7 +347,7 @@
             <xsl:text>wrap</xsl:text>
           </xsl:attribute>
         </xsl:if>
-        
+
         <!-- text orientation -->
         <xsl:if test="e:alignment/@textRotation">
           <xsl:choose>
@@ -384,7 +377,7 @@
         <xsl:if test="@applyBorder = 1 or  @borderId != '0'">
           <xsl:call-template name="InsertBorder"/>
         </xsl:if>
-        
+
         <xsl:if test="@applyProtection=1 and e:protection">
           <xsl:attribute name="style:cell-protect">
             <xsl:choose>
@@ -400,16 +393,16 @@
             </xsl:choose>
           </xsl:attribute>
         </xsl:if>
-        
-        <xsl:if test="@applyFill=1 or @fillId != '0'">
+
+        <xsl:if test="@applyFill=1 or @fillId!='0'">
           <xsl:variable name="this" select="."/>
           <xsl:apply-templates
             select="ancestor::e:styleSheet/e:fills/e:fill[position() = $this/@fillId + 1]"
             mode="style"/>
         </xsl:if>
-                
+
       </style:table-cell-properties>
-      
+
       <!-- default horizontal alignment when text has angle orientation  -->
       <xsl:if test="not(e:alignment/@horizontal) and e:alignment/@textRotation">
         <style:paragraph-properties>
@@ -430,7 +423,7 @@
           </xsl:attribute>
         </style:paragraph-properties>
       </xsl:if>
-      
+
       <xsl:if test="e:alignment/@horizontal">
         <style:paragraph-properties>
           <!-- horizontal-align -->
@@ -456,7 +449,7 @@
         </style:paragraph-properties>
       </xsl:if>
     </xsl:if>
-    
+
     <xsl:if test="@applyFont = 1 or  @fontId != ''">
       <style:text-properties>
         <xsl:variable name="this" select="."/>
@@ -496,14 +489,14 @@
   <!-- superscript/subscript-->
   <xsl:template match="e:vertAlign" mode="style">
     <xsl:attribute name="style:text-position">
-    <xsl:choose>
-      <xsl:when test="@val = 'superscript' ">
-        <xsl:text>super 58%</xsl:text>
-      </xsl:when>
-      <xsl:when test="@val = 'superscript' ">
-        <xsl:text>sub 58%</xsl:text>
-      </xsl:when>
-    </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="@val = 'superscript' ">
+          <xsl:text>super 58%</xsl:text>
+        </xsl:when>
+        <xsl:when test="@val = 'superscript' ">
+          <xsl:text>sub 58%</xsl:text>
+        </xsl:when>
+      </xsl:choose>
     </xsl:attribute>
   </xsl:template>
 
@@ -592,7 +585,7 @@
       <xsl:call-template name="InsertColor"/>
     </xsl:attribute>
   </xsl:template>
-    
+
   <xsl:template match="e:color" mode="style">
 
     <xsl:attribute name="fo:color">
@@ -811,19 +804,20 @@
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
-  
- 
+
+
   <xsl:template name="InsertCellStyle">
     <xsl:for-each select="document('xl/styles.xml')/e:styleSheet/e:cellXfs">
-        <xsl:apply-templates select="e:xf" mode="stylesandformating"/>
-      </xsl:for-each>
+      <xsl:apply-templates select="e:xf" mode="stylesandformating"/>
+    </xsl:for-each>
   </xsl:template>
-  
+
   <xsl:template match="e:xf" mode="stylesandformating">
     <xsl:variable name="Xfid">
       <xsl:value-of select="@xfId"/>
     </xsl:variable>
-    <xsl:if test="$Xfid != '0' and not(preceding-sibling::e:xf/@xfId = $Xfid) and key('CellStylesId', @xfId)/@name != 'Default'">
+    <xsl:if
+      test="$Xfid != '0' and not(preceding-sibling::e:xf/@xfId = $Xfid) and key('CellStylesId', @xfId)/@name != 'Default'">
       <style:style>
         <xsl:attribute name="style:name">
           <xsl:value-of select="key('CellStylesId', @xfId)/@name"/>
@@ -835,5 +829,5 @@
       </style:style>
     </xsl:if>
   </xsl:template>
-  
+
 </xsl:stylesheet>
