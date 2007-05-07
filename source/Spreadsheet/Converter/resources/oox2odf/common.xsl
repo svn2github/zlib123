@@ -1097,30 +1097,37 @@
     <xsl:variable name="date">
       <xsl:choose>
         <xsl:when test="contains($value,'.')">
-      <xsl:value-of select="number(substring-before($value,'.'))-1"/>
+          <xsl:value-of select="number(substring-before($value,'.'))"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="$value -1"/>
+          <xsl:value-of select="$value"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="dateInYears">
-      <xsl:value-of select="$date div 365.2425"/>
+    
+    <xsl:variable name="YearAndDay">
+      <xsl:call-template name="CalculateYearAndDay">
+        <xsl:with-param name="days">
+          <xsl:value-of select="$date"/>
+        </xsl:with-param>
+        <xsl:with-param name="currentYear">1900</xsl:with-param>
+      </xsl:call-template>
     </xsl:variable>
     
     <!-- year -->
     <xsl:variable name="years">
-      <xsl:value-of select="floor($dateInYears)"/>
+      <xsl:value-of select="substring-before($YearAndDay,':') - 1900"/>
     </xsl:variable>
+    
     <xsl:variable name="dateInLastYear">
-      <xsl:value-of select="$date - floor($years * 365.2425)"/>
+      <xsl:value-of select="substring-after($YearAndDay,':')"/>
     </xsl:variable>
     
     <!-- month and day -->
     <xsl:variable name="monthsAndDays">
       <xsl:call-template name="DaysToMonthsAndDays">
         <xsl:with-param name="days">
-          <xsl:value-of select="$dateInLastYear -1"/>
+          <xsl:value-of select="$dateInLastYear"/>
         </xsl:with-param>
         <xsl:with-param name="ExtraDay">
           <xsl:choose>
@@ -1176,4 +1183,48 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+  
+  <!-- calcualte year and number of days left from number of days -->
+  
+  <xsl:template name="CalculateYearAndDay">
+    <xsl:param name="days"/>
+    <xsl:param name="currentYear"/>
+    <xsl:choose>
+      <xsl:when test="(($currentYear - 4 * floor(($currentYear) div 4)) = 0 and ($currentYear - 100 * floor(($currentYear) div 100) != 0)) or ($currentYear - 400 * floor(($currentYear) div 400)) = 0">
+        <xsl:choose>
+          <xsl:when test="$days &gt; 366">
+            <xsl:call-template name="CalculateYearAndDay">
+              <xsl:with-param name="days">
+                <xsl:value-of select="$days -366"/>
+              </xsl:with-param>
+              <xsl:with-param name="currentYear">
+                <xsl:value-of select="$currentYear+1"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($currentYear,':',$days)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$days &gt; 365">
+            <xsl:call-template name="CalculateYearAndDay">
+              <xsl:with-param name="days">
+                <xsl:value-of select="$days -365"/>
+              </xsl:with-param>
+              <xsl:with-param name="currentYear">
+                <xsl:value-of select="$currentYear+1"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($currentYear,':',$days)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>
