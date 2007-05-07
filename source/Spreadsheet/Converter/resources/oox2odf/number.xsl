@@ -1012,7 +1012,7 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="starts-with($processedFormat,'\') or starts-with($processedFormat,'@') or starts-with($processedFormat,';')">
+      <xsl:when test="starts-with($processedFormat,'\') or starts-with($processedFormat,'@') or starts-with($processedFormat,';') or starts-with($processedFormat,'&quot;')">
         <xsl:call-template name="ProcessFormat">
           <xsl:with-param name="format" select="$format"/>
           <xsl:with-param name="processedFormat">
