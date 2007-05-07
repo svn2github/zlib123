@@ -1394,11 +1394,25 @@
               </xsl:attribute>
 
               <xsl:attribute name="xfId">
-                <xsl:for-each select="key('style',@table:style-name)">
-                  <xsl:call-template name="XfId"/>
-                </xsl:for-each>
+                <xsl:choose>
+                  <xsl:when test="key('style',@table:style-name)">
+                    <xsl:for-each select="key('style',@table:style-name)">
+                      <xsl:call-template name="XfId"/>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:variable name="cellStyleName">
+                      <xsl:value-of select="@table:style-name"/>
+                    </xsl:variable>
+                    <xsl:for-each select="document('styles.xml')">
+                      <xsl:for-each select="key('style',$cellStyleName)">
+                        <xsl:call-template name="XfId"/>
+                      </xsl:for-each>
+                    </xsl:for-each>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:attribute>
-              
+
               <xsl:choose>
                 <!-- when style is in content.xml -->
                 <xsl:when test="key('style',@table:style-name)">
