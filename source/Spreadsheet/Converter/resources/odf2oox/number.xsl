@@ -80,7 +80,7 @@
       <xsl:attribute name="formatCode">
         <xsl:choose>
 
-          <!-- when negative number is red, positive and negative number are formatted separately -->
+          <!-- when negative number is red, positive and negative number are formatted separately --> 
           <xsl:when test="style:text-properties/@fo:color">
             <xsl:variable name="formatPositive">
               <xsl:call-template name="GetFormatCode">
@@ -133,7 +133,7 @@
       <xsl:attribute name="formatCode">
         <xsl:choose>
 
-          <!-- when negative number is red, positive and negative number are formatted separately -->
+          <!-- when negative number is red, positive and negative number are formatted separately --> 
           <xsl:when test="style:text-properties/@fo:color">
             <xsl:variable name="formatPositive">
               <xsl:call-template name="GetFormatCode">
@@ -222,9 +222,15 @@
                   <xsl:value-of select="concat($value,'.')"/>
                 </xsl:otherwise>
               </xsl:choose>
+            </xsl:with-param> 
+            <xsl:with-param name="num"> 
+              <xsl:value-of select="number:number/@number:decimal-places"/>   
             </xsl:with-param>
-            <xsl:with-param name="num">
-              <xsl:value-of select="number:number/@number:decimal-places"/>
+            <xsl:with-param name="decimalReplacement">
+              <xsl:choose>
+                <xsl:when test="number:number/@number:decimal-replacement=''">#</xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
@@ -273,7 +279,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <!-- add color to negative number formatting when necessary-->
+    <!-- add color to negative number formatting when necessary -->
     <xsl:variable name="finalValue">
       <xsl:choose>
         <xsl:when test="$sign = 'negative' and style:text-properties/@fo:color">
@@ -436,15 +442,17 @@
   <xsl:template name="AddDecimalPlaces">
     <xsl:param name="value"/>
     <xsl:param name="num"/>
+    <xsl:param name="decimalReplacement"/>
     <xsl:choose>
       <xsl:when test="$num &gt; 0">
         <xsl:call-template name="AddDecimalPlaces">
           <xsl:with-param name="value">
-            <xsl:value-of select="concat($value,'0')"/>
+            <xsl:value-of select="concat($value,$decimalReplacement)"/>
           </xsl:with-param>
           <xsl:with-param name="num">
             <xsl:value-of select="$num - 1"/>
           </xsl:with-param>
+          <xsl:with-param name="decimalReplacement" select="$decimalReplacement"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
