@@ -211,20 +211,70 @@
     <xsl:choose>
       <!-- when there are more than one range -->
       <xsl:when test="$mode != '' ">
+
+        <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
+        <xsl:variable name="startRange">
+          <xsl:choose>
+            <xsl:when test="contains(substring-before(substring-after($ranges, '!' ),','), ':' )">
+              <xsl:value-of select="substring-before(substring-after($ranges,'!'),':' )"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(substring-after($ranges,'!'),',' )"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
+        <xsl:variable name="endRange">
+          <xsl:choose>
+            <xsl:when test="contains(substring-before(substring-after($ranges, '!' ),','), ':' )">
+              <xsl:value-of select="substring-before(substring-after($ranges,':'),',' )"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(substring-after($ranges,'!'),',' )"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
         <xsl:value-of
-          select="concat(substring-before($ranges,'!'),'.',substring(substring-after($ranges,'!'),1,3),substring-before($ranges,'!'),'.',substring-before(substring-after($ranges,':'),','))"/>
+          select="concat(substring-before($ranges,'!'),'.',$startRange,':',substring-before($ranges,'!'),'.',$endRange)"/>
         <xsl:text> </xsl:text>
-        
+
         <xsl:call-template name="InsertRanges">
           <xsl:with-param name="ranges" select="substring-after($ranges,',')"/>
           <xsl:with-param name="mode" select="substring-after(substring-after($ranges,','),',')"/>
         </xsl:call-template>
       </xsl:when>
-      
+
+      <!-- this is the last range -->
       <xsl:otherwise>
+        <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
+        <xsl:variable name="startRange">
+          <xsl:choose>
+            <xsl:when test="contains(substring-after($ranges, '!' ), ':' )">
+              <xsl:value-of select="substring-before(substring-after($ranges,'!'),':' )"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after($ranges,'!')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
+        <xsl:variable name="endRange">
+          <xsl:choose>
+            <xsl:when test="contains(substring-after($ranges, '!' ), ':' )">
+              <xsl:value-of select="substring-after($ranges,':')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after($ranges,'!')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
         <xsl:value-of
-          select="concat(substring-before($ranges,'!'),'.',substring(substring-after($ranges,'!'),1,3),substring-before($ranges,'!'),'.',substring-after($ranges,':'))"
-        />
+          select="concat(substring-before($ranges,'!'),'.',$startRange,':',substring-before($ranges,'!'),'.',$endRange)"/>
+        
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
