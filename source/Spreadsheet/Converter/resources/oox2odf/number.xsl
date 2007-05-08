@@ -542,7 +542,7 @@
       </xsl:if>
       
       <!-- '-' embedded in number format -->
-      <xsl:if test="contains(substring-after(substring-before($formatCode,'.'),'#'),'-') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-')) or contains(substring-after(substring-before($formatCode,'.'),'0'),'-')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-'))">
+      <xsl:if test="contains(substring-after(substring-before($formatCode,'.'),'#'),'-') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-') and string-length(translate(substring-after(substring-after($formatCode,'#'),'-'),'-','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'-')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-') and string-length(translate(substring-after(substring-after($formatCode,'0'),'-'),'-','')) &gt; 0)">
         <xsl:call-template name="FindTextNumberFormat">
           <xsl:with-param name="format">
             <xsl:choose>
@@ -565,7 +565,7 @@
       </xsl:if>
       
       <!-- '\ ' embedded in number format -->
-      <xsl:if test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ')) or contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ '))">
+      <xsl:if test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'#'),'\ '),'\ ','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'0'),'\ '),'\ ','')) &gt; 0)">
         <xsl:call-template name="FindTextNumberFormat">
           <xsl:with-param name="format">
             <xsl:choose>
@@ -613,9 +613,16 @@
     </xsl:if>
     
     <!-- add space at the end -->
-    <xsl:if test="(contains($realFormatCode,'\ ') and not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#'))) or (contains($realFormatCode,'_') and not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'_'),'0') or contains(substring-after($realFormatCode,'_'),'#')))">
+    <xsl:if test="(contains($realFormatCode,'\ ') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#'))) or contains(substring-after($realFormatCode,$currencyFormat),'\ ')) or (contains($realFormatCode,'_') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'_'),'0') or contains(substring-after($realFormatCode,'_'),'#'))) or contains(substring-after($realFormatCode,$currencyFormat),'_'))">
       <number:text>
-        <xsl:value-of xml:space="preserve" select="' '"/>
+        <xsl:choose>
+          <xsl:when test="contains($realFormatCode,'\ \')">
+            <xsl:value-of xml:space="preserve" select="translate(concat('\',substring-after($realFormatCode,'\ \')),'\ ',' ')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of xml:space="preserve" select="' '"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </number:text>
     </xsl:if>
     
