@@ -368,13 +368,13 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
+    
     <xsl:choose>
       
       <!-- Checks if this cell is in "Merge Cell" -->
       <xsl:when
-        test="($colNumber &gt;= $StartColNum and $EndRowNum &gt;= $colNumber) and ($rowNumber &gt;= $StartRowNum and $EndRowNum &gt;= $rowNumber)">
-            <xsl:value-of select="$StartMergeCell"/>
+        test="($colNumber &gt;= $StartColNum and $colNumber &lt;= $EndColNum) and ($rowNumber &gt;= $StartRowNum and $rowNumber &lt;= $EndRowNum)">
+        <xsl:value-of select="$StartMergeCell"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>

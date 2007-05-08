@@ -1228,7 +1228,7 @@
                 </xsl:choose>
               </xsl:when>
               <!-- when style is specified in cell -->
-              <xsl:when test="@table:style-name and not(table:covered-table-cell)">
+              <xsl:when test="@table:style-name and not(name() ='table:covered-table-cell')">
                 <xsl:choose>
                   <xsl:when test="key('style',@table:style-name)">
                     <xsl:for-each select="key('style',@table:style-name)">
