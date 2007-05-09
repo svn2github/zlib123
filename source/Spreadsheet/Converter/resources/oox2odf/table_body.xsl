@@ -167,9 +167,9 @@
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
                   <xsl:attribute name="table:style-name">
-                    <xsl:for-each select="document('xl/styles.xml')">                      
-                          <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
-                    </xsl:for-each>                    
+                    <xsl:for-each select="document('xl/styles.xml')">
+                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $this/@s + 1])"/>
+                    </xsl:for-each>
                   </xsl:attribute>
                 </xsl:if>
               </table:table-cell>
@@ -443,7 +443,7 @@
           </xsl:if>
           <xsl:if test="@s">
             <xsl:attribute name="table:style-name">
-             <xsl:for-each select="document('xl/styles.xml')">
+              <xsl:for-each select="document('xl/styles.xml')">
                 <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
               </xsl:for-each>
             </xsl:attribute>
@@ -564,7 +564,8 @@
                     <xsl:when test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
                       <xsl:text>percentage</xsl:text>
                     </xsl:when>
-                    <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                    <!--'and' at the end is for Latvian currency -->
+                    <xsl:when test="(contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22) and not(contains($numStyle,'[$Ls-426]'))">
                       <xsl:text>date</xsl:text>
                     </xsl:when>
                     <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
@@ -579,7 +580,8 @@
                   </xsl:choose>
                 </xsl:attribute>
                 <xsl:choose>
-                  <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                  <!--'and' at the end is for Latvian currency -->
+                  <xsl:when test="(contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22) and not(contains($numStyle,'[$Ls-426]'))">
                     <xsl:attribute name="office:date-value">
                       <xsl:call-template name="NumberToDate">
                         <xsl:with-param name="value">

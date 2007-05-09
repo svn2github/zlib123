@@ -30,49 +30,52 @@
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  exclude-result-prefixes="e">
-  
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" exclude-result-prefixes="e">
+
   <!-- insert  number format style -->
-  
+
   <xsl:template match="e:numFmt" mode="automaticstyles">
-    
+
     <xsl:choose>
-      
+
       <!-- date style -->
-      <xsl:when test="contains(@formatCode,'y') or contains(@formatCode,'m') or (contains(@formatCode,'d') and not(contains(@formatCode,'Red'))) or contains(@formatCode,'h') or contains(@formatCode,'s')">
+      <!-- 'and' at the end is for latvian currency -->
+      <xsl:when
+        test="(contains(@formatCode,'y') or contains(@formatCode,'m') or (contains(@formatCode,'d') and not(contains(@formatCode,'Red'))) or contains(@formatCode,'h') or contains(@formatCode,'s')) and not(contains(@formatCode, '$Ls-426' ))">
         <number:date-style style:name="{generate-id(.)}">
-        <xsl:call-template name="ProcessFormat">
-          <xsl:with-param name="format">
-            <xsl:choose>
-              <xsl:when test="contains(@formatCode,']')">
-                <xsl:value-of select="substring-after(@formatCode,']')"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="@formatCode"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:with-param>
-          <xsl:with-param name="processedFormat">
-            <xsl:choose>
-              <xsl:when test="contains(@formatCode,']')">
-                <xsl:value-of select="substring-after(@formatCode,']')"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="@formatCode"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:with-param>
-        </xsl:call-template>
+          <xsl:call-template name="ProcessFormat">
+            <xsl:with-param name="format">
+              <xsl:choose>
+                <xsl:when test="contains(@formatCode,']')">
+                  <xsl:value-of select="substring-after(@formatCode,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="processedFormat">
+              <xsl:choose>
+                <xsl:when test="contains(@formatCode,']')">
+                  <xsl:value-of select="substring-after(@formatCode,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
         </number:date-style>
       </xsl:when>
-      
+
       <!-- when there are different formats for positive and negative numbers -->
-      <xsl:when test="contains(@formatCode,';') and not(contains(substring-after(@formatCode,';'),';'))">
+      <xsl:when
+        test="contains(@formatCode,';') and not(contains(substring-after(@formatCode,';'),';'))">
         <xsl:choose>
-          
+
           <!-- currency style -->
-          <xsl:when test="contains(substring-before(@formatCode,';'),'$') or contains(substring-before(@formatCode,';'),'zł') or contains(substring-before(@formatCode,';'),'€') or contains(substring-before(@formatCode,';'),'£')">
+          <xsl:when
+            test="contains(substring-before(@formatCode,';'),'$') or contains(substring-before(@formatCode,';'),'zł') or contains(substring-before(@formatCode,';'),'€') or contains(substring-before(@formatCode,';'),'£')">
             <number:currency-style style:name="{concat(generate-id(.),'P0')}">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">
@@ -86,10 +89,11 @@
                   <xsl:value-of select="substring-after(@formatCode,';')"/>
                 </xsl:with-param>
               </xsl:call-template>
-              <style:map style:condition="value()&gt;=0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+              <style:map style:condition="value()&gt;=0"
+                style:apply-style-name="{concat(generate-id(.),'P0')}"/>
             </number:currency-style>
           </xsl:when>
-          
+
           <!--percentage style -->
           <xsl:when test="contains(substring-before(@formatCode,';'),'%')">
             <number:percentage-style style:name="{concat(generate-id(.),'P0')}">
@@ -107,10 +111,11 @@
                 </xsl:with-param>
               </xsl:call-template>
               <number:text>%</number:text>
-              <style:map style:condition="value()&gt;=0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+              <style:map style:condition="value()&gt;=0"
+                style:apply-style-name="{concat(generate-id(.),'P0')}"/>
             </number:percentage-style>
           </xsl:when>
-          
+
           <!-- number style -->
           <xsl:otherwise>
             <number:number-style style:name="{concat(generate-id(.),'P0')}">
@@ -126,19 +131,21 @@
                   <xsl:value-of select="substring-after(@formatCode,';')"/>
                 </xsl:with-param>
               </xsl:call-template>
-              <style:map style:condition="value()&gt;=0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+              <style:map style:condition="value()&gt;=0"
+                style:apply-style-name="{concat(generate-id(.),'P0')}"/>
             </number:number-style>
           </xsl:otherwise>
-          
+
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- when there are separate formats for positive numbers, negative numbers and zeros -->
       <xsl:when test="contains(@formatCode,';') and contains(substring-after(@formatCode,';'),';')">
         <xsl:choose>
-          
+
           <!-- currency style -->
-          <xsl:when test="contains(substring-before(@formatCode,';'),'$') or contains(substring-before(@formatCode,';'),'zł') or contains(substring-before(@formatCode,';'),'€') or contains(substring-before(@formatCode,';'),'£')">
+          <xsl:when
+            test="contains(substring-before(@formatCode,';'),'$') or contains(substring-before(@formatCode,';'),'zł') or contains(substring-before(@formatCode,';'),'€') or contains(substring-before(@formatCode,';'),'£')">
             <number:currency-style style:name="{concat(generate-id(.),'P0')}">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">
@@ -153,26 +160,30 @@
                 </xsl:with-param>
               </xsl:call-template>
             </number:currency-style>
-            
+
             <xsl:choose>
               <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
                 <number:currency-style style:name="{concat(generate-id(.),'P2')}">
                   <xsl:call-template name="InsertNumberFormatting">
                     <xsl:with-param name="formatCode">
-                      <xsl:value-of select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                      <xsl:value-of
+                        select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"
+                      />
                     </xsl:with-param>
                   </xsl:call-template>
                 </number:currency-style>
                 <number:text-style style:name="{generate-id(.)}">
                   <xsl:variable name="text">
-                    <xsl:value-of select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                    <xsl:value-of
+                      select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"
+                    />
                   </xsl:variable>
                   <xsl:choose>
-                    
+
                     <!-- text content -->
                     <xsl:when test="contains($text,'@')">
                       <number:text>
-                       <xsl:value-of select="translate(substring-before($text,'@'),'_-',' ')"/>
+                        <xsl:value-of select="translate(substring-before($text,'@'),'_-',' ')"/>
                       </number:text>
                       <number:text-content/>
                       <number:text>
@@ -182,10 +193,13 @@
                     <xsl:otherwise>
                       <xsl:value-of select="translate($text,'_-',' ')"/>
                     </xsl:otherwise>
-                    </xsl:choose>
-                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
-                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
-                  <style:map style:condition="value()=0" style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                  </xsl:choose>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0"
+                    style:apply-style-name="{concat(generate-id(.),'P2')}"/>
                 </number:text-style>
               </xsl:when>
               <xsl:otherwise>
@@ -195,13 +209,15 @@
                       <xsl:value-of select="substring-after(substring-after(@formatCode,';'),';')"/>
                     </xsl:with-param>
                   </xsl:call-template>
-                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
-                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
                 </number:currency-style>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-          
+
           <!-- percentage style -->
           <xsl:when test="contains(substring-before(@formatCode,';'),'%')">
             <number:percentage-style style:name="{concat(generate-id(.),'P0')}">
@@ -218,22 +234,26 @@
                 </xsl:with-param>
               </xsl:call-template>
             </number:percentage-style>
-            
+
             <xsl:choose>
               <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
                 <number:percentage-style style:name="{concat(generate-id(.),'P2')}">
                   <xsl:call-template name="InsertNumberFormatting">
                     <xsl:with-param name="formatCode">
-                      <xsl:value-of select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                      <xsl:value-of
+                        select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"
+                      />
                     </xsl:with-param>
                   </xsl:call-template>
                 </number:percentage-style>
                 <number:text-style style:name="{generate-id(.)}">
                   <xsl:variable name="text">
-                    <xsl:value-of select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                    <xsl:value-of
+                      select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"
+                    />
                   </xsl:variable>
                   <xsl:choose>
-                    
+
                     <!-- text content -->
                     <xsl:when test="contains($text,'@')">
                       <number:text>
@@ -248,9 +268,12 @@
                       <xsl:value-of select="translate($text,'_-',' ')"/>
                     </xsl:otherwise>
                   </xsl:choose>
-                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
-                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
-                  <style:map style:condition="value()=0" style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0"
+                    style:apply-style-name="{concat(generate-id(.),'P2')}"/>
                 </number:text-style>
               </xsl:when>
               <xsl:otherwise>
@@ -260,13 +283,15 @@
                       <xsl:value-of select="substring-after(substring-after(@formatCode,';'),';')"/>
                     </xsl:with-param>
                   </xsl:call-template>
-                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
-                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
                 </number:percentage-style>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-          
+
           <!-- number style -->
           <xsl:otherwise>
             <number:number-style style:name="{concat(generate-id(.),'P0')}">
@@ -283,22 +308,26 @@
                 </xsl:with-param>
               </xsl:call-template>
             </number:number-style>
-            
+
             <xsl:choose>
               <xsl:when test="contains(substring-after(substring-after(@formatCode,';'),';'),';')">
                 <number:number-style style:name="{concat(generate-id(.),'P2')}">
                   <xsl:call-template name="InsertNumberFormatting">
                     <xsl:with-param name="formatCode">
-                      <xsl:value-of select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                      <xsl:value-of
+                        select="substring-before(substring-after(substring-after(@formatCode,';'),';'),';')"
+                      />
                     </xsl:with-param>
                   </xsl:call-template>
                 </number:number-style>
                 <number:text-style style:name="{generate-id(.)}">
                   <xsl:variable name="text">
-                    <xsl:value-of select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"/>
+                    <xsl:value-of
+                      select="substring-after(substring-after(substring-after(@formatCode,';'),';'),';')"
+                    />
                   </xsl:variable>
                   <xsl:choose>
-                    
+
                     <!-- text content -->
                     <xsl:when test="contains($text,'@')">
                       <number:text>
@@ -313,9 +342,12 @@
                       <xsl:value-of select="translate($text,'_-',' ')"/>
                     </xsl:otherwise>
                   </xsl:choose>
-                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
-                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
-                  <style:map style:condition="value()=0" style:apply-style-name="{concat(generate-id(.),'P2')}"/>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()=0"
+                    style:apply-style-name="{concat(generate-id(.),'P2')}"/>
                 </number:text-style>
               </xsl:when>
               <xsl:otherwise>
@@ -325,21 +357,24 @@
                       <xsl:value-of select="substring-after(substring-after(@formatCode,';'),';')"/>
                     </xsl:with-param>
                   </xsl:call-template>
-                  <style:map style:condition="value()&gt;0" style:apply-style-name="{concat(generate-id(.),'P0')}"/>
-                  <style:map style:condition="value()&lt;0" style:apply-style-name="{concat(generate-id(.),'P1')}"/>
+                  <style:map style:condition="value()&gt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P0')}"/>
+                  <style:map style:condition="value()&lt;0"
+                    style:apply-style-name="{concat(generate-id(.),'P1')}"/>
                 </number:number-style>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
-        
+
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:choose>
-          
+
           <!-- currency style -->
-          <xsl:when test="contains(@formatCode,'$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£')">
+          <xsl:when
+            test="contains(@formatCode,'$') or contains(@formatCode,'zł') or contains(@formatCode,'€') or contains(@formatCode,'£')">
             <number:currency-style style:name="{generate-id(.)}">
               <xsl:call-template name="InsertNumberFormatting">
                 <xsl:with-param name="formatCode">
@@ -348,7 +383,7 @@
               </xsl:call-template>
             </number:currency-style>
           </xsl:when>
-          
+
           <!--percentage style -->
           <xsl:when test="contains(@formatCode,'%')">
             <number:percentage-style style:name="{generate-id(.)}">
@@ -360,7 +395,7 @@
               <number:text>%</number:text>
             </number:percentage-style>
           </xsl:when>
-          
+
           <!-- number style -->
           <xsl:otherwise>
             <number:number-style style:name="{generate-id(.)}">
@@ -373,16 +408,16 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
-      
+
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <!-- template to create number format -->
-  
+
   <xsl:template name="InsertNumberFormatting">
     <xsl:param name="formatCode"/>
-    
+
     <!-- '*' is not converted -->
     <xsl:variable name="realFormatCode">
       <xsl:choose>
@@ -394,7 +429,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!-- adding text -->
     <xsl:if test="starts-with($realFormatCode,'\') and not(starts-with($realFormatCode,'\ '))">
       <xsl:call-template name="AddNumberText">
@@ -402,18 +437,20 @@
           <xsl:value-of select="$realFormatCode"/>
         </xsl:with-param>
       </xsl:call-template>
-    </xsl:if> 
-    
+    </xsl:if>
+
     <!-- handle red negative numbers -->
     <xsl:if test="contains($formatCode,'Red')">
       <style:text-properties fo:color="#ff0000"/>
     </xsl:if>
-    
+
     <xsl:variable name="currencyFormat">
       <xsl:choose>
         <xsl:when test="contains($realFormatCode,'zł')">zł</xsl:when>
         <xsl:when test="contains($realFormatCode,'Red')">
-          <xsl:value-of select="substring-after(substring-before(substring-after($realFormatCode,'Red]'),']'),'[')"/>
+          <xsl:value-of
+            select="substring-after(substring-before(substring-after($realFormatCode,'Red]'),']'),'[')"
+          />
         </xsl:when>
         <xsl:when test="contains($realFormatCode,'[$')">
           <xsl:value-of select="substring-after(substring-before($realFormatCode,']'),'[')"/>
@@ -423,16 +460,18 @@
         <xsl:when test="contains($realFormatCode,'£')">£</xsl:when>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!-- add space at the beginning -->
-    <xsl:if test="starts-with($realFormatCode,'_') and not(contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0'))">
+    <xsl:if
+      test="starts-with($realFormatCode,'_') and not(contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0'))">
       <number:text>
         <xsl:value-of xml:space="preserve" select="' '"/>
       </number:text>
     </xsl:if>
-    
+
     <!-- add brackets -->
-    <xsl:if test="contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0')">
+    <xsl:if
+      test="contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0')">
       <xsl:choose>
         <xsl:when test="starts-with($formatCode,'_')">
           <number:text>
@@ -444,39 +483,45 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:if>
-    
+
     <!-- add '-' at the beginning -->
-    <xsl:if test="contains($realFormatCode,'-') and not($currencyFormat and $currencyFormat!='') and not(contains(substring-after($realFormatCode,'#'),'-') or contains(substring-after($realFormatCode,'0'),'-'))">
+    <xsl:if
+      test="contains($realFormatCode,'-') and not($currencyFormat and $currencyFormat!='') and not(contains(substring-after($realFormatCode,'#'),'-') or contains(substring-after($realFormatCode,'0'),'-'))">
       <number:text>-</number:text>
     </xsl:if>
-    
+
     <!-- add currency symbol at the beginning -->
-    <xsl:if test="$currencyFormat and $currencyFormat!='' and not(contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))">
-      
+    <xsl:if
+      test="$currencyFormat and $currencyFormat!='' and not(contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))">
+
       <!-- add '-' at the beginning -->
-      <xsl:if test="contains(substring-after($realFormatCode,$currencyFormat),'-')">
+      <!-- last 'and' test if at the end is '_-' -->
+      <xsl:if
+        test="contains(substring-after($realFormatCode,$currencyFormat),'-') and not( substring(substring-after($realFormatCode,$currencyFormat), string-length(substring-after($realFormatCode,$currencyFormat)) - 1) = '_-' )">
         <number:text>-</number:text>
       </xsl:if>
       <xsl:call-template name="InsertCurrencySymbol">
         <xsl:with-param name="value" select="$currencyFormat"/>
       </xsl:call-template>
-      
+
       <!-- add space after currency symbol -->
-      <xsl:if test="contains(substring-after($realFormatCode,$currencyFormat),'\ ') and (contains(substring-after(substring-after($realFormatCode,$currencyFormat),'\ '),'0') or contains(substring-after(substring-after($realFormatCode,$currencyFormat),'\ '),'#'))">
+      <xsl:if
+        test="contains(substring-after($realFormatCode,$currencyFormat),'\ ') and (contains(substring-after(substring-after($realFormatCode,$currencyFormat),'\ '),'0') or contains(substring-after(substring-after($realFormatCode,$currencyFormat),'\ '),'#'))">
         <number:text>
           <xsl:value-of xml:space="preserve" select="' '"/>
         </number:text>
       </xsl:if>
-      
+
     </xsl:if>
-    
+
     <!-- add '-' at the beginning -->
-    <xsl:if test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#')) and contains(substring-before($realFormatCode,$currencyFormat),'-')">
+    <xsl:if
+      test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#')) and contains(substring-before($realFormatCode,$currencyFormat),'-')">
       <number:text>-</number:text>
     </xsl:if>
-    
+
     <number:number>
-      
+
       <xsl:variable name="formatCodeWithoutComma">
         <xsl:choose>
           <xsl:when test="contains($realFormatCode,'.')">
@@ -487,10 +532,19 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <!-- decimal places -->
       <xsl:attribute name="number:decimal-places">
         <xsl:choose>
+          <!-- when currency format contains '.' and there is another '.' after -->
+          <xsl:when test="contains(substring-after($realFormatCode,$currencyFormat),'.' ) and contains($currencyFormat,'.' )">
+            <xsl:call-template name="InsertDecimalPlaces">
+              <xsl:with-param name="code">
+                <xsl:value-of select="substring-after(substring-after($realFormatCode,'.'),'.' )"/>
+              </xsl:with-param>
+              <xsl:with-param name="value">0</xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
           <xsl:when test="contains($realFormatCode,'.')">
             <xsl:call-template name="InsertDecimalPlaces">
               <xsl:with-param name="code">
@@ -502,12 +556,11 @@
           <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      
+
       <!-- min integer digits -->
-      
       <xsl:attribute name="number:min-integer-digits">
         <xsl:choose>
-          <xsl:when test="contains($formatCodeWithoutComma,'0')">
+          <xsl:when test="number(substring-after($formatCodeWithoutComma,'0')) = 0">
             <xsl:call-template name="InsertMinIntegerDigits">
               <xsl:with-param name="code">
                 <xsl:value-of select="substring-after($formatCodeWithoutComma,'0')"/>
@@ -518,11 +571,12 @@
           <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      
+
       <!-- grouping -->
       <xsl:if test="contains($realFormatCode,',')">
         <xsl:choose>
-          <xsl:when test="contains(substring-after($realFormatCode,','),'0') or contains(substring-after($realFormatCode,','),'#')">
+          <xsl:when
+            test="contains(substring-after($realFormatCode,','),'0') or contains(substring-after($realFormatCode,','),'#')">
             <xsl:attribute name="number:grouping">true</xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
@@ -540,22 +594,27 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:if>
-      
+
       <!-- '-' embedded in number format -->
-      <xsl:if test="contains(substring-after(substring-before($formatCode,'.'),'#'),'-') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-') and string-length(translate(substring-after(substring-after($formatCode,'#'),'-'),'-','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'-')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-') and string-length(translate(substring-after(substring-after($formatCode,'0'),'-'),'-','')) &gt; 0)">
+      <xsl:if
+        test="contains(substring-after(substring-before($formatCode,'.'),'#'),'-') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-') and string-length(translate(substring-after(substring-after($formatCode,'#'),'-'),'-','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'-')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-') and string-length(translate(substring-after(substring-after($formatCode,'0'),'-'),'-','')) &gt; 0)">
         <xsl:call-template name="FindTextNumberFormat">
           <xsl:with-param name="format">
             <xsl:choose>
               <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'#'),'-')">
-            <xsl:value-of select="concat('#',substring-after(substring-before($formatCode,'.'),'#'))"/>
+                <xsl:value-of
+                  select="concat('#',substring-after(substring-before($formatCode,'.'),'#'))"/>
               </xsl:when>
               <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'0'),'-')">
-                <xsl:value-of select="concat('0',substring-after(substring-before($formatCode,'.'),'0'))"/>
+                <xsl:value-of
+                  select="concat('0',substring-after(substring-before($formatCode,'.'),'0'))"/>
               </xsl:when>
-              <xsl:when test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-')">
+              <xsl:when
+                test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-')">
                 <xsl:value-of select="concat('#',substring-after($formatCode,'#'))"/>
               </xsl:when>
-              <xsl:when test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-')">
+              <xsl:when
+                test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-')">
                 <xsl:value-of select="concat('0',substring-after($formatCode,'0'))"/>
               </xsl:when>
             </xsl:choose>
@@ -563,22 +622,27 @@
           <xsl:with-param name="embeddedText">-</xsl:with-param>
         </xsl:call-template>
       </xsl:if>
-      
+
       <!-- '\ ' embedded in number format -->
-      <xsl:if test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'#'),'\ '),'\ ','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'0'),'\ '),'\ ','')) &gt; 0)">
+      <xsl:if
+        test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'#'),'\ '),'\ ','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'0'),'\ '),'\ ','')) &gt; 0)">
         <xsl:call-template name="FindTextNumberFormat">
           <xsl:with-param name="format">
             <xsl:choose>
               <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ')">
-                <xsl:value-of select="concat('#',substring-after(substring-before($formatCode,'.'),'#'))"/>
+                <xsl:value-of
+                  select="concat('#',substring-after(substring-before($formatCode,'.'),'#'))"/>
               </xsl:when>
               <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')">
-                <xsl:value-of select="concat('0',substring-after(substring-before($formatCode,'.'),'0'))"/>
+                <xsl:value-of
+                  select="concat('0',substring-after(substring-before($formatCode,'.'),'0'))"/>
               </xsl:when>
-              <xsl:when test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ')">
+              <xsl:when
+                test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ')">
                 <xsl:value-of select="concat('#',substring-after($formatCode,'#'))"/>
               </xsl:when>
-              <xsl:when test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ')">
+              <xsl:when
+                test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ')">
                 <xsl:value-of select="concat('0',substring-after($formatCode,'0'))"/>
               </xsl:when>
             </xsl:choose>
@@ -588,32 +652,35 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:if>
-      
+
     </number:number>
-    
+
     <!-- add currency symbol at the end -->
-    <xsl:if test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))">
-      
+    <xsl:if
+      test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))">
+
       <!-- add space before currency symbol -->
       <xsl:if test="contains(substring-before($realFormatCode,$currencyFormat),'\ ')">
         <number:text>
           <xsl:value-of xml:space="preserve" select="' '"/>
         </number:text>
       </xsl:if>
-        
+
       <xsl:call-template name="InsertCurrencySymbol">
         <xsl:with-param name="value" select="$currencyFormat"/>
       </xsl:call-template>
-      
+
     </xsl:if>
-    
+
     <!-- add brackets -->
-    <xsl:if test="contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0')">
+    <xsl:if
+      test="contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0')">
       <number:text>)</number:text>
     </xsl:if>
-    
+
     <!-- add space at the end -->
-    <xsl:if test="(contains($realFormatCode,'\ ') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#'))) or contains(substring-after($realFormatCode,$currencyFormat),'\ ')) or (contains($realFormatCode,'_') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'_'),'0') or contains(substring-after($realFormatCode,'_'),'#'))) or contains(substring-after($realFormatCode,$currencyFormat),'_'))">
+    <xsl:if
+      test="(contains($realFormatCode,'\ ') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#'))) or contains(substring-after($realFormatCode,$currencyFormat),'\ ')) or (contains($realFormatCode,'_') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'_'),'0') or contains(substring-after($realFormatCode,'_'),'#'))) or contains(substring-after($realFormatCode,$currencyFormat),'_'))">
       <number:text>
         <xsl:choose>
           <xsl:when test="contains($realFormatCode,'\ \')">
@@ -625,11 +692,11 @@
         </xsl:choose>
       </number:text>
     </xsl:if>
-    
+
   </xsl:template>
-  
+
   <!-- template which inserts display factor -->
-  
+
   <xsl:template name="UseDisplayFactor">
     <xsl:param name="formatBeforeSeparator"/>
     <xsl:param name="formatAfterSeparator"/>
@@ -651,14 +718,14 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which inserts min integer digits -->
-  
+
   <xsl:template name="InsertMinIntegerDigits">
     <xsl:param name="code"/>
     <xsl:param name="value"/>
     <xsl:choose>
-      <xsl:when test="contains($code,'0')">
+      <xsl:when test="substring($code,string-length($code)) = '0' ">
         <xsl:call-template name="InsertMinIntegerDigits">
           <xsl:with-param name="code">
             <xsl:value-of select="substring($code,0,string-length($code))"/>
@@ -673,14 +740,14 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which inserts decimal places -->
-  
+
   <xsl:template name="InsertDecimalPlaces">
     <xsl:param name="code"/>
     <xsl:param name="value"/>
     <xsl:choose>
-      <xsl:when test="contains($code,'0') or contains($code,'#')">
+      <xsl:when test="substring($code,1,1) = '0' or substring($code,1,1) = '#' ">
         <xsl:call-template name="InsertDecimalPlaces">
           <xsl:with-param name="code">
             <xsl:value-of select="substring($code,2)"/>
@@ -695,22 +762,22 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which adds number text -->
-  
+
   <xsl:template name="AddNumberText">
     <xsl:param name="format"/>
     <xsl:choose>
-    <xsl:when test="starts-with($format,'\') and not(starts-with($format,'\ '))">
-      <number:text>
-        <xsl:value-of select="substring($format,2,1)"/>
-      </number:text>
-      <xsl:call-template name="AddNumberText">
-        <xsl:with-param name="format">
-          <xsl:value-of select="substring($format,3)"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:when>
+      <xsl:when test="starts-with($format,'\') and not(starts-with($format,'\ '))">
+        <number:text>
+          <xsl:value-of select="substring($format,2,1)"/>
+        </number:text>
+        <xsl:call-template name="AddNumberText">
+          <xsl:with-param name="format">
+            <xsl:value-of select="substring($format,3)"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
       <xsl:when test="starts-with($format,'\ ')">
         <number:text>
           <xsl:value-of xml:space="preserve" select="' '"/>
@@ -718,13 +785,13 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- adding number style with fixed number format -->
-  
+
   <xsl:template match="e:xf" mode="fixedNumFormat">
     <xsl:if test="@numFmtId and @numFmtId &gt; 0 and not(key('numFmtId',@numFmtId))">
       <xsl:choose>
-        
+
         <!-- date style -->
         <xsl:when test="(@numFmtId &gt; 13 and @numFmtId &lt; 18) or @numFmtId = 22">
           <number:date-style style:name="{concat('N',@numFmtId)}">
@@ -735,7 +802,7 @@
             </xsl:call-template>
           </number:date-style>
         </xsl:when>
-        
+
         <!-- percentage style -->
         <xsl:when test="@numFmtId = 9 or @numFmtId = 10">
           <number:percentage-style style:name="{concat('N',@numFmtId)}">
@@ -746,7 +813,7 @@
             </xsl:call-template>
           </number:percentage-style>
         </xsl:when>
-        
+
         <!-- number style -->
         <xsl:otherwise>
           <number:number-style style:name="{concat('N',@numFmtId)}">
@@ -757,44 +824,185 @@
             </xsl:call-template>
           </number:number-style>
         </xsl:otherwise>
-        
+
       </xsl:choose>
     </xsl:if>
   </xsl:template>
-  
+
   <!-- insert currency symbol element -->
   <xsl:template name="InsertCurrencySymbol">
     <xsl:param name="value"/>
     <xsl:choose>
-      <xsl:when test="$value = '$$-409' or $value = '$'">
+      <xsl:when test="$value = '$$-C09' ">
+        <number:currency-symbol number:language="en" number:country="AU">$</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$$-1009' ">
+        <number:currency-symbol number:language="en" number:country="CA">$</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$$-1409' ">
+        <number:currency-symbol number:language="en" number:country="NZ">$</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$$-409' or $value = '$' ">
         <number:currency-symbol number:language="en" number:country="US">$</number:currency-symbol>
       </xsl:when>
-      <xsl:when test="$value = '$USD'">
-        <number:currency-symbol number:language="en" number:country="US">USD</number:currency-symbol>
+      <xsl:when test="$value = '$USD' ">
+        <number:currency-symbol number:language="en" number:country="US"
+        >USD</number:currency-symbol>
       </xsl:when>
-      <xsl:when test="$value = '$£-809' or $value = '£'">
+      <xsl:when test="$value = '$£-452' ">
+        <number:currency-symbol number:language="cy" number:country="GB">£</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$£-809' or $value = '£' ">
         <number:currency-symbol number:language="en" number:country="GB">£</number:currency-symbol>
       </xsl:when>
-      <xsl:when test="$value = '$GBP'">
-        <number:currency-symbol number:language="en" number:country="GB">GBP</number:currency-symbol>
+      <xsl:when test="$value = '$GBP' ">
+        <number:currency-symbol number:language="en" number:country="GB"
+        >GBP</number:currency-symbol>
       </xsl:when>
-      <xsl:when test="$value = '$€-1' or $value = '$€-2' or $value = '€'">
+      <xsl:when test="$value = '$€-1809' ">
+        <number:currency-symbol number:language="ga" number:country="IE">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-816' ">
+        <number:currency-symbol number:language="pt" number:country="PT">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-413' ">
+        <number:currency-symbol number:language="nl" number:country="NL">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-813' ">
+        <number:currency-symbol number:language="nl" number:country="BE">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-40B' ">
+        <number:currency-symbol number:language="fi" number:country="FI">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-408' ">
+        <number:currency-symbol number:language="el" number:country="GR">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-81D' ">
+        <number:currency-symbol number:language="sv" number:country="FI">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-410' ">
+        <number:currency-symbol number:language="it" number:country="IT">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-180C' ">
+        <number:currency-symbol number:language="fr" number:country="MC">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-140C' ">
+        <number:currency-symbol number:language="fr" number:country="LU">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-80C' ">
+        <number:currency-symbol number:language="fr" number:country="BE">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-40C' ">
+        <number:currency-symbol number:language="fr" number:country="FR">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-1007' ">
+        <number:currency-symbol number:language="de" number:country="LU">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-C07' ">
+        <number:currency-symbol number:language="de" number:country="AT">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-407' ">
+        <number:currency-symbol number:language="de" number:country="DE">€</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$€-1' or $value = '$€-2' or $value = '€' ">
         <number:currency-symbol>€</number:currency-symbol>
       </xsl:when>
       <xsl:when test="$value = '$EUR'">
         <number:currency-symbol>EUR</number:currency-symbol>
       </xsl:when>
+      <xsl:when test="$value = '$kr-41D' ">
+        <number:currency-symbol number:language="sv" number:country="SE">kr</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$kr-406' ">
+        <number:currency-symbol number:language="da" number:country="DK">kr</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$kr-414' ">
+        <number:currency-symbol number:language="no" number:country="NO">kr</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$kr-814' ">
+        <number:currency-symbol number:language="nn" number:country="NO">kr</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$kr-425' ">
+        <number:currency-symbol number:language="et" number:country="EE">kr</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$kr.-40F' ">
+        <number:currency-symbol number:language="is" number:country="IS"
+        >kr.</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$SFr.-807' ">
+        <number:currency-symbol number:language="de" number:country="CH"
+        >SFr.</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$SFr.-810' ">
+        <number:currency-symbol number:language="it" number:country="CH"
+        >SFr.</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$SIT-424' ">
+        <number:currency-symbol number:language="sl" number:country="SI"
+        >SIT</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$Kč-405' ">
+        <number:currency-symbol number:language="cs" number:country="CZ">Kč</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$Sk-41B' ">
+        <number:currency-symbol number:language="sk" number:country="SK">Sk</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$Lt-427' ">
+        <number:currency-symbol number:language="lt" number:country="LT">Lt</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$Ls-426' ">
+        <number:currency-symbol number:language="lv" number:country="LV">Ls</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$lei-418' ">
+        <number:currency-symbol number:language="ro" number:country="RO"
+        >lei</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$Din.-81A' ">
+        <number:currency-symbol number:language="sh" number:country="YU"
+        >Din</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$Дин.-C1A' ">
+        <number:currency-symbol number:language="sr" number:country="YU"
+        >ДИН</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$лв-402' ">
+        <number:currency-symbol number:language="bg" number:country="BG">лв</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$KM-141A' ">
+        <number:currency-symbol number:language="bs" number:country="BA">KM</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$Ft-40E' ">
+        <number:currency-symbol number:language="hu" number:country="HU">Ft</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$HK$-C04' ">
+        <number:currency-symbol number:language="zh" number:country="HK"
+        >HK$</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$NT$-404' ">
+        <number:currency-symbol number:language="zh" number:country="TW"
+        >NT$</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$￥-804' ">
+        <number:currency-symbol number:language="zh" number:country="CN">￥</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$¥-411' ">
+        <number:currency-symbol number:language="ja" number:country="JP">￥</number:currency-symbol>
+      </xsl:when>
+      <xsl:when test="$value = '$₩-412' ">
+        <number:currency-symbol number:language="ko" number:country="KR">￦</number:currency-symbol>
+      </xsl:when>
       <xsl:when test="$value = 'zł'">
         <number:currency-symbol number:language="pl" number:country="PL">zł</number:currency-symbol>
       </xsl:when>
       <xsl:when test="$value = '$PLN'">
-        <number:currency-symbol number:language="pl" number:country="PL">PLN</number:currency-symbol>
+        <number:currency-symbol number:language="pl" number:country="PL"
+        >PLN</number:currency-symbol>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which inserts fixed number format -->
-  
+
   <xsl:template name="InsertFixedNumFormat">
     <xsl:param name="ID"/>
     <number:number>
@@ -819,12 +1027,12 @@
       <number:text>%</number:text>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="ProcessFormat">
     <xsl:param name="format"/>
     <xsl:param name="processedFormat"/>
     <xsl:choose>
-      
+
       <!-- year -->
       <xsl:when test="starts-with($processedFormat,'y')">
         <xsl:choose>
@@ -848,10 +1056,10 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <xsl:when test="starts-with($processedFormat,'m')">
         <xsl:choose>
-          
+
           <!-- minutes -->
           <xsl:when test="contains(substring-before($format,'m'),'h:')">
             <xsl:choose>
@@ -875,7 +1083,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-          
+
           <!-- month -->
           <xsl:otherwise>
             <xsl:choose>
@@ -919,7 +1127,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- day -->
       <xsl:when test="starts-with($processedFormat,'d')">
         <xsl:choose>
@@ -961,7 +1169,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- hours -->
       <xsl:when test="starts-with($processedFormat,'h')">
         <xsl:choose>
@@ -985,7 +1193,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- seconds -->
       <xsl:when test="starts-with($processedFormat,'s')">
         <xsl:choose>
@@ -1009,7 +1217,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <xsl:when test="starts-with($processedFormat,'AM/PM')">
         <number:am-pm/>
         <xsl:call-template name="ProcessFormat">
@@ -1019,7 +1227,8 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="starts-with($processedFormat,'\') or starts-with($processedFormat,'@') or starts-with($processedFormat,';') or starts-with($processedFormat,'&quot;')">
+      <xsl:when
+        test="starts-with($processedFormat,'\') or starts-with($processedFormat,'@') or starts-with($processedFormat,';') or starts-with($processedFormat,'&quot;')">
         <xsl:call-template name="ProcessFormat">
           <xsl:with-param name="format" select="$format"/>
           <xsl:with-param name="processedFormat">
@@ -1041,9 +1250,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which inserts fixed date format -->
-  
+
   <xsl:template name="InsertFixedDateFormat">
     <xsl:param name="ID"/>
     <xsl:choose>
@@ -1080,9 +1289,9 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which adds embedded text in number format -->
-  
+
   <xsl:template name="FindTextNumberFormat">
     <xsl:param name="format"/>
     <xsl:param name="embeddedText"/>
@@ -1090,7 +1299,8 @@
       <xsl:when test="string-length($format) &gt; 0">
         <xsl:choose>
           <xsl:when test="starts-with($format,$embeddedText)">
-            <number:embedded-text number:position="{string-length(translate(substring($format,1+string-length($embeddedText)),$embeddedText,''))}">
+            <number:embedded-text
+              number:position="{string-length(translate(substring($format,1+string-length($embeddedText)),$embeddedText,''))}">
               <xsl:value-of xml:space="preserve" select="translate($embeddedText,'\ ',' ')"/>
             </number:embedded-text>
             <xsl:call-template name="FindTextNumberFormat">
@@ -1112,5 +1322,5 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>
