@@ -131,6 +131,7 @@
         select="document('content.xml')/office:document-content/office:automatic-styles/number:number-style[1]"
         mode="numFormat">
         <xsl:with-param name="numId">1</xsl:with-param>
+        <xsl:with-param name="format"/>
       </xsl:apply-templates>
 
       <!-- apply number styles from styles.xml -->
@@ -140,6 +141,7 @@
         <xsl:with-param name="numId">
           <xsl:value-of select="$countNumber+1"/>
         </xsl:with-param>
+        <xsl:with-param name="format"/>
       </xsl:apply-templates>
 
       <!-- apply percentage styles from content.xml -->
@@ -149,6 +151,7 @@
         <xsl:with-param name="numId">
           <xsl:value-of select="$countNumber+$countStyleNumber+1"/>
         </xsl:with-param>
+        <xsl:with-param name="format"/>
       </xsl:apply-templates>
 
       <!-- apply percentage styles from styles.xml -->
@@ -158,6 +161,7 @@
         <xsl:with-param name="numId">
           <xsl:value-of select="$countNumber+$countStyleNumber+$countPercentage+1"/>
         </xsl:with-param>
+        <xsl:with-param name="format"/>
       </xsl:apply-templates>
 
       <!-- apply currency styles from content.xml -->
@@ -168,6 +172,7 @@
           <xsl:value-of
             select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+1"/>
         </xsl:with-param>
+        <xsl:with-param name="format"/>
       </xsl:apply-templates>
 
       <!-- apply currency styles from styles.xml -->
@@ -179,6 +184,7 @@
             select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+1"
           />
         </xsl:with-param>
+        <xsl:with-param name="format"/>
       </xsl:apply-templates>
 
       <!-- apply date styles from content.xml -->
@@ -190,6 +196,7 @@
             select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+1"
           />
         </xsl:with-param>
+        <xsl:with-param name="format"/>
       </xsl:apply-templates>
 
       <!-- apply date styles from styles.xml -->
@@ -201,6 +208,7 @@
             select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+$countDate+1"
           />
         </xsl:with-param>
+        <xsl:with-param name="format"/>
       </xsl:apply-templates>
 
     </numFmts>
