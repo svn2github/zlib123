@@ -314,7 +314,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                             catch
                             {
                                 System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfConversionCanceled"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
-                                return;
+                                // return;
                             }
 
                             System.Threading.Thread.CurrentThread.CurrentCulture = ci;
@@ -323,7 +323,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                         // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorNormal;
                         System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
                         System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                        return;
+                        // return;
                     }
                 }
             } finally {
