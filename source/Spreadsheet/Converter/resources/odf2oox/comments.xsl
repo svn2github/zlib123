@@ -44,6 +44,8 @@
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   exclude-result-prefixes="svg table r text style number fo">
   
+  <xsl:import href="sharedStrings.xsl"/>
+  
   <xsl:template name="comments">
     <xsl:param name="sheetNum"/>
     <comments xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -74,7 +76,7 @@
                 <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
               </xsl:with-param>
           </xsl:apply-templates>
-          <t> <xsl:apply-templates /> </t>
+          <xsl:call-template name="InsertCommentText"/>
          </r>
       </text>
     </comment>
@@ -108,5 +110,16 @@
   </xsl:template>
   
   <xsl:template match="dc:date" />
+  
+<xsl:template name="InsertCommentText">
+  <xsl:choose>
+    <xsl:when test="text:span|text:p/text:span">
+      <xsl:apply-templates mode="run"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
+    </xsl:otherwise>
+  </xsl:choose>  
+</xsl:template>
   
 </xsl:stylesheet>

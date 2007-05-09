@@ -129,8 +129,7 @@
   </xsl:template>
   
   <xsl:template match="text()[parent::dc:date]" mode="text"/>
-  <xsl:template match="text:p[parent::office:annotation]" mode="text"/>
-  <xsl:template match="text:span[ancestor::office:annotation]" mode="text"/>
+  <xsl:template match="office:annotation" mode="text"/>
   
   <xsl:template match="text()" mode="text">
     <xsl:variable name="value">
