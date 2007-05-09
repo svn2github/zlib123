@@ -361,8 +361,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                     // sfd.SupportMultiDottedExtensions = true;
                     sfd.AddExtension = true;
                     sfd.DefaultExt = "ods";
-                    sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.ods)|*.ods|"
-                            + this.addinLib.GetString("AllFileType") + " (*.*)|*.*";
+                    sfd.Filter = this.addinLib.GetString("OdfFileType") + " (*.ods)|*.ods";
                     sfd.InitialDirectory = wb.Path;
                     sfd.OverwritePrompt = true;
                     sfd.Title = this.addinLib.GetString("OdfExportLabel");

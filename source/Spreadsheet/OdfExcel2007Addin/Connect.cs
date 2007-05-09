@@ -62,8 +62,8 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
         private const string IMPORT_ODF_FILE_FILTER = "*.ods";
         private const string IMPORT_ALL_FILE_FILTER = "*.*";
         private const string IMPORT_LABEL = "OdfImportLabel";
-        private const string EXPORT_ODF_FILE_FILTER = " (*.ods)|*.ods|";
-        private const string EXPORT_ALL_FILE_FILTER = " (*.*)|*.*";
+        private const string EXPORT_ODF_FILE_FILTER = " (*.ods)|*.ods";
+        //private const string EXPORT_ALL_FILE_FILTER = " (*.*)|*.*";
         private const string EXPORT_LABEL = "OdfExportLabel";
         private string DialogBoxTitle = "ODF Converter";
 
@@ -264,8 +264,8 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                     // sfd.SupportMultiDottedExtensions = true;
                     sfd.AddExtension = true;
                     sfd.DefaultExt = "ods";
-                    sfd.Filter = this.addinLib.GetString(ODF_FILE_TYPE) + EXPORT_ODF_FILE_FILTER
-                                 + this.addinLib.GetString(ALL_FILE_TYPE) + EXPORT_ALL_FILE_FILTER;
+                    sfd.Filter = this.addinLib.GetString(ODF_FILE_TYPE) + EXPORT_ODF_FILE_FILTER;
+                                // + this.addinLib.GetString(ALL_FILE_TYPE) + EXPORT_ALL_FILE_FILTER;
                     sfd.InitialDirectory = wb.Path;
                     sfd.OverwritePrompt = true;
                     sfd.Title = this.addinLib.GetString(EXPORT_LABEL);
