@@ -868,9 +868,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                         extension = ".ods";
                         break;
                     default:
-                        this.transformDirection = Direction.OdtToDocx;
-                        extension = ".docx";
-                        break;
+                        throw new OdfCommandLineException("Input file extension ["+inputExtension+"] is not supported.");
                 }
             }
             if (!this.packaging)
