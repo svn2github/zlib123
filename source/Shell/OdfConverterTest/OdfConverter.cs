@@ -881,9 +881,6 @@ namespace CleverAge.OdfConverter.CommandLineTool
             if (!transformDirectionOverride && 
                 !File.Exists(this.output) && (this.output == null) )
             {
-
-                Console.WriteLine("------ into the test");
-
                 string outputPath = this.output;
                 if (outputPath == null)
                 {
