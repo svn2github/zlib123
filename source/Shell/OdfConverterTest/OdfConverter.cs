@@ -258,21 +258,6 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     break;
                 case Direction.DocxToOdt:
                 case Direction.PptxToOdp:
-                    // instanciate Presentation if needed
-                    if (this.transformDirection == Direction.PptxToOdp && this.open)
-                    {
-                        presentation = new Presentation();
-                        presentation.Visible = false;
-                    }
-
-                    this.ProceedSingleFile(this.input, this.output, this.transformDirection);
-
-                    // close Presentation if needed
-                    if (this.open)
-                    {
-                        presentation.Quit();
-                    }
-                    break;
                 case Direction.XlsxToOds:
                     this.ProceedBatchOox();
                     break;
@@ -476,6 +461,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     || transformDirection == Direction.OdpToPptx
                     || transformDirection == Direction.OdsToXlsx;
                 converter.Packaging = this.packaging;
+
                 converter.Transform(input, output);
                 TimeSpan duration = DateTime.Now - start;
                 this.report.AddLog(input, "Conversion succeeded", Report.INFO_LEVEL);
