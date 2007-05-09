@@ -879,8 +879,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
             }
 
             if (!transformDirectionOverride && 
-                !File.Exists(this.output) && (this.output == null || !extension.Equals(Path.GetExtension(this.output).ToLowerInvariant())))
+                !File.Exists(this.output) && (this.output == null) )
             {
+
+                Console.WriteLine("------ into the test");
+
                 string outputPath = this.output;
                 if (outputPath == null)
                 {
@@ -888,6 +891,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     outputPath = Path.GetDirectoryName(this.input);
                 }
                 this.output = GenerateOutputName(outputPath, this.input, extension, this.replace);
+
             }
         }
 
