@@ -380,10 +380,12 @@ namespace OdfExcel2003Addin
                                 newWb.Close(false, false, missing);
                                 try {
                                     File.Delete((string)newName);
-                                } catch (IOException) {
+                                } catch (Exception) {
                                     // bug #1610099
                                     // deletion failed : file currently used by another application.
                                     // do nothing
+                                    // bug #1707349 
+                                    // add-in tries to delete a temporary file  which is created when converting first the .xls file to .xlsx
                                 }
                             }
                             xlsxFile = (string)tmpFileName;
