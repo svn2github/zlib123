@@ -617,11 +617,9 @@
 
 
     <!-- number format id -->
-    <xsl:variable name="numFmtId">
-      <xsl:call-template name="GetNumFmtId">
-        <xsl:with-param name="numStyle">
-          <xsl:value-of select="@style:data-style-name"/>
-        </xsl:with-param>
+    <xsl:variable name="numFormat">
+      <xsl:call-template name="NumFmtId">
+        <xsl:with-param name="FileName" select="$FileName"/>
         <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
         <xsl:with-param name="styleNumStyleCount" select="$styleNumStyleCount"/>
         <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
@@ -633,7 +631,7 @@
     </xsl:variable>
 
     <xsl:if test="not($AtributeName = 'cellStyleXfs' and $FileName = '')">
-      <xf numFmtId="{$numFmtId}" fillId="0" borderId="0">
+      <xf numFmtId="{$numFormat}" fillId="0" borderId="0">
         <xsl:if test="$AtributeName != 'cellStyleXfs'">
           <xsl:attribute name="xfId">
             <xsl:choose>
@@ -1491,7 +1489,7 @@
                   </xsl:for-each>
                 </xsl:otherwise>
               </xsl:choose>
-              
+
             </xsl:when>
 
             <!-- when style is set for column or there is none -->
@@ -2025,4 +2023,72 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="NumFmtId">
+    <xsl:param name="FileName"/>
+    <xsl:param name="numStyleCount"/>
+    <xsl:param name="styleNumStyleCount"/>
+    <xsl:param name="percentStyleCount"/>
+    <xsl:param name="stylePercentStyleCount"/>
+    <xsl:param name="currencyStyleCount"/>
+    <xsl:param name="styleCurrencyStyleCount"/>
+    <xsl:param name="dateStyleCount"/>
+
+    <xsl:choose>
+      <xsl:when test="@style:data-style-name">
+        <xsl:call-template name="GetNumFmtId">
+          <xsl:with-param name="numStyle">
+            <xsl:value-of select="@style:data-style-name"/>
+          </xsl:with-param>
+          <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
+          <xsl:with-param name="styleNumStyleCount" select="$styleNumStyleCount"/>
+          <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
+          <xsl:with-param name="stylePercentStyleCount" select="$stylePercentStyleCount"/>
+          <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
+          <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
+          <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="@style:parent-style-name != '' and @style:parent-style-name != 'Default'">
+        <xsl:variable name="StyleParentStyleName">
+          <xsl:value-of select="@style:parent-style-name"/>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="key('style',@style:parent-style-name)">
+            <xsl:for-each select="key('style',$StyleParentStyleName)">
+              <xsl:call-template name="NumFmtId">
+                <xsl:with-param name="FileName" select="$FileName"/>
+                <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
+                <xsl:with-param name="styleNumStyleCount" select="$styleNumStyleCount"/>
+                <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
+                <xsl:with-param name="stylePercentStyleCount" select="$stylePercentStyleCount"/>
+                <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
+                <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
+                <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each
+              select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $StyleParentStyleName]">
+              <xsl:call-template name="NumFmtId">
+                <xsl:with-param name="FileName">
+                  <xsl:text>styles</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="numStyleCount" select="$numStyleCount"/>
+                <xsl:with-param name="styleNumStyleCount" select="$styleNumStyleCount"/>
+                <xsl:with-param name="percentStyleCount" select="$percentStyleCount"/>
+                <xsl:with-param name="stylePercentStyleCount" select="$stylePercentStyleCount"/>
+                <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
+                <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
+                <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+          <xsl:text>0</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 </xsl:stylesheet>
