@@ -67,8 +67,8 @@
         <!-- last 'or' for cells with error -->
         <!-- cellNumber + number string cells inside simple rows + number string cells inside header rows -->
         <xsl:value-of
-          select="$cellNumber + count(table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))]) +
-          count(table:table-header-rows/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
+          select="$cellNumber + count(table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))]) +
+          count(table:table-header-rows/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
         />
       </xsl:with-param>
       <xsl:with-param name="sheetId">

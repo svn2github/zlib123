@@ -631,7 +631,7 @@
           <xsl:with-param name="cellNumber">
             <!-- last or is for cells with error -->
             <xsl:value-of
-              select="$cellNumber + count(child::table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
+              select="$cellNumber + count(child::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
             />
           </xsl:with-param>
           <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
@@ -669,7 +669,7 @@
           <xsl:with-param name="cellNumber">
             <!-- last or is for cells with error -->
             <xsl:value-of
-              select="$cellNumber + count(child::table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
+              select="$cellNumber + count(child::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
             />
           </xsl:with-param>
           <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
@@ -708,7 +708,7 @@
           <xsl:with-param name="cellNumber">
             <!-- last or is for cells with error -->
             <xsl:value-of
-              select="$cellNumber + count(child::table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
+              select="$cellNumber + count(child::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
             />
           </xsl:with-param>
           <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>

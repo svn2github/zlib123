@@ -46,8 +46,9 @@
       <xsl:variable name="Count">
         <!-- string can be in a simple row or a header row -->
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))] |
-          document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-header-rows/table:table-row/table:table-cell[text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
+          select="count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))] |
+          document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-header-rows/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
+
         />
       </xsl:variable>
       <xsl:attribute name="count">
@@ -129,7 +130,8 @@
   </xsl:template>
   
   <xsl:template match="text()[parent::dc:date]" mode="text"/>
-  <xsl:template match="office:annotation" mode="text"/>
+  <xsl:template match="text:p[parent::office:annotation]" mode="text"/>
+  <xsl:template match="text:span[ancestor::office:annotation]" mode="text"/>
   
   <xsl:template match="text()" mode="text">
     <xsl:variable name="value">
