@@ -36,12 +36,19 @@
 
   <xsl:template match="e:numFmt" mode="automaticstyles">
 
+    <!-- formatCode without text inside &quot;.....&quot; -->
+    <xsl:variable name="formatingMarks">
+      <xsl:call-template name="StripText">
+        <xsl:with-param name="formatCode" select="@formatCode"/>
+      </xsl:call-template>
+    </xsl:variable>
+
     <xsl:choose>
 
       <!-- date style -->
       <!-- 'and' at the end is for latvian currency -->
       <xsl:when
-        test="(contains(@formatCode,'y') or contains(@formatCode,'m') or (contains(@formatCode,'d') and not(contains(@formatCode,'Red'))) or contains(@formatCode,'h') or contains(@formatCode,'s')) and not(contains(@formatCode, '$Ls-426' ))">
+        test="(contains($formatingMarks,'y') or contains($formatingMarks,'m') or (contains($formatingMarks,'d') and not(contains($formatingMarks,'Red'))) or contains($formatingMarks,'h') or contains($formatingMarks,'s')) and not(contains($formatingMarks, '$Ls-426' ))">
         <number:date-style style:name="{generate-id(.)}">
           <xsl:call-template name="ProcessFormat">
             <xsl:with-param name="format">
@@ -537,7 +544,8 @@
       <xsl:attribute name="number:decimal-places">
         <xsl:choose>
           <!-- when currency format contains '.' and there is another '.' after -->
-          <xsl:when test="contains(substring-after($realFormatCode,$currencyFormat),'.' ) and contains($currencyFormat,'.' )">
+          <xsl:when
+            test="contains(substring-after($realFormatCode,$currencyFormat),'.' ) and contains($currencyFormat,'.' )">
             <xsl:call-template name="InsertDecimalPlaces">
               <xsl:with-param name="code">
                 <xsl:value-of select="substring-after(substring-after($realFormatCode,'.'),'.' )"/>
@@ -961,10 +969,6 @@
         <number:currency-symbol number:language="sh" number:country="YU"
         >Din</number:currency-symbol>
       </xsl:when>
-      <xsl:when test="$value = '$Дин.-C1A' ">
-        <number:currency-symbol number:language="sr" number:country="YU"
-        >ДИН</number:currency-symbol>
-      </xsl:when>
       <xsl:when test="$value = '$лв-402' ">
         <number:currency-symbol number:language="bg" number:country="BG">лв</number:currency-symbol>
       </xsl:when>
@@ -1321,6 +1325,32 @@
         </xsl:choose>
       </xsl:when>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="StripText">
+    <xsl:param name="formatCode"/>
+
+    <xsl:choose>
+      <xsl:when test="contains($formatCode,'&quot;')">
+        <xsl:variable name="beforeText">
+          <xsl:value-of select="substring-before($formatCode,'&quot;')"/>
+        </xsl:variable>
+
+        <xsl:variable name="afterText">
+          <xsl:value-of
+            select="substring-after(substring-after($formatCode,'&quot;'),'&quot;')"/>
+        </xsl:variable>
+
+        <xsl:call-template name="StripText">
+          <xsl:with-param name="formatCode" select="concat($beforeText,$afterText)"/>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <xsl:value-of select="$formatCode"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
 </xsl:stylesheet>
