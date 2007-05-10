@@ -579,6 +579,11 @@
           <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
+      
+        <xsl:if test="not(contains(substring-after(@formatCode, '.'), '0'))">
+          <xsl:attribute name="number:decimal-replacement"/>
+        </xsl:if>
+
 
       <!-- grouping -->
       <xsl:if test="contains($realFormatCode,',')">
