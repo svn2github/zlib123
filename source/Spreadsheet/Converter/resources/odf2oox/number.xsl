@@ -38,111 +38,87 @@
   
   <xsl:template match="number:number-style" mode="numFormat">
     <xsl:param name="numId"/>
-    <xsl:param name="format"/>
-    
-    <xsl:choose>
-      
-      <!-- if it's not a partly format, than put it in numFmts -->
-    <xsl:when test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
-      <numFmt numFmtId="{$numId}">
-        <xsl:attribute name="formatCode">
-          <xsl:variable name="thisFormat">
-          <xsl:call-template name="GetFormatCode"/>
-          </xsl:variable>
-          <xsl:value-of select="concat($format,$thisFormat)"/>
-        </xsl:attribute>
-      </numFmt>
-      <xsl:choose>
-        <xsl:when test="following-sibling::number:number-style">
-          <xsl:apply-templates select="following-sibling::number:number-style[1]" mode="numFormat">
-            <xsl:with-param name="numId">
-              <xsl:value-of select="$numId + 1"/>
-            </xsl:with-param>
-            <xsl:with-param name="format"/>
-          </xsl:apply-templates>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:when>
-      
-      <!-- if it is, put it into format param and later concat with next part of format -->
-      <xsl:otherwise>
-        <xsl:variable name="thisFormat">
-          <xsl:call-template name="GetFormatCode"/>
-        </xsl:variable>
+    <numFmt numFmtId="{$numId}">
+      <xsl:attribute name="formatCode">
         <xsl:choose>
-          <xsl:when test="following-sibling::number:number-style">
-            <xsl:apply-templates select="following-sibling::number:number-style[1]" mode="numFormat">
-              <xsl:with-param name="numId">
-                <xsl:value-of select="$numId + 1"/>
-              </xsl:with-param>
-              <xsl:with-param name="format">
-                <xsl:value-of select="concat($format,$thisFormat,';')"/>
-              </xsl:with-param>
-            </xsl:apply-templates>
+          <!-- when negative number is red, positive and negative number are formatted separately --> 
+          <xsl:when test="style:text-properties/@fo:color">
+            <xsl:variable name="formatPositive">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">positive</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="formatNegative">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">negative</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat($formatPositive,concat(';',$formatNegative))"/>
           </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="GetFormatCode"/>
+          </xsl:otherwise>
         </xsl:choose>
-      </xsl:otherwise>
+      </xsl:attribute>
+    </numFmt>
+    <xsl:choose>
+      <xsl:when test="following-sibling::number:number-style">
+        <xsl:apply-templates select="following-sibling::number:number-style[1]" mode="numFormat">
+          <xsl:with-param name="numId">
+            <xsl:value-of select="$numId + 1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
     </xsl:choose>
- 
   </xsl:template>
   
   <!-- template to insert percentage formats -->
   
   <xsl:template match="number:percentage-style" mode="numFormat">
     <xsl:param name="numId"/>
-    <xsl:param name="format"/>
-    
-    <xsl:choose>
-      
-      <!-- if it's not a partly format, than put it in numFmts -->
-      <xsl:when test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
-        <numFmt numFmtId="{$numId}">
-          <xsl:attribute name="formatCode">
-            <xsl:variable name="thisFormat">
-              <xsl:call-template name="GetFormatCode"/>
+    <numFmt numFmtId="{$numId}">
+      <xsl:attribute name="formatCode">
+        <xsl:choose>
+          
+          <!-- when negative number is red, positive and negative number are formatted separately --> 
+          <xsl:when test="style:text-properties/@fo:color">
+            <xsl:variable name="formatPositive">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">positive</xsl:with-param>
+              </xsl:call-template>
             </xsl:variable>
-            <xsl:value-of select="concat($format,$thisFormat,'%')"/>
-          </xsl:attribute>
-        </numFmt>
-        <xsl:choose>
-          <xsl:when test="following-sibling::number:percentage-style">
-            <xsl:apply-templates select="following-sibling::number:percentage-style[1]" mode="numFormat">
-              <xsl:with-param name="numId">
-                <xsl:value-of select="$numId + 1"/>
-              </xsl:with-param>
-              <xsl:with-param name="format"/>
-            </xsl:apply-templates>
+            <xsl:variable name="formatNegative">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">negative</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat(concat($formatPositive,'%'),concat(concat(';',$formatNegative),'%'))"/>
           </xsl:when>
+          
+          <xsl:otherwise>
+            <xsl:variable name="format">
+            <xsl:call-template name="GetFormatCode"/>
+            </xsl:variable>
+            <xsl:value-of select="concat($format,'%')"/>
+          </xsl:otherwise>
         </xsl:choose>
+      </xsl:attribute>
+    </numFmt>
+    <xsl:choose>
+      <xsl:when test="following-sibling::number:percentage-style">
+        <xsl:apply-templates select="following-sibling::number:percentage-style[1]" mode="numFormat">
+          <xsl:with-param name="numId">
+            <xsl:value-of select="$numId + 1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
       </xsl:when>
-      
-      <!-- if it is, put it into format param and later concat with next part of format -->
-      <xsl:otherwise>
-        <xsl:variable name="thisFormat">
-          <xsl:call-template name="GetFormatCode"/>
-        </xsl:variable>
-        <xsl:choose>
-          <xsl:when test="following-sibling::number:percentage-style">
-            <xsl:apply-templates select="following-sibling::number:percentage-style[1]" mode="numFormat">
-              <xsl:with-param name="numId">
-                <xsl:value-of select="$numId + 1"/>
-              </xsl:with-param>
-              <xsl:with-param name="format">
-                <xsl:value-of select="concat($format,$thisFormat,'%;')"/>
-              </xsl:with-param>
-            </xsl:apply-templates>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:otherwise>
     </xsl:choose>
-    
   </xsl:template>
   
   <!-- template to insert currency formats -->
   
   <xsl:template match="number:currency-style" mode="numFormat">
     <xsl:param name="numId"/>
-    <xsl:param name="format"/>
     
     <xsl:variable name="currencySymbol">
       <xsl:call-template name="ConvertValueSymbol">
@@ -154,58 +130,50 @@
       </xsl:call-template>
     </xsl:variable>
     
-    <xsl:choose>
-      
-      <!-- if it's not a partly format, than put it in numFmts -->
-      <xsl:when test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
-        <numFmt numFmtId="{$numId}">
-          <xsl:attribute name="formatCode">
-            <xsl:variable name="thisFormat">
+    <numFmt numFmtId="{$numId}">
+      <xsl:attribute name="formatCode">
+        <xsl:choose>
+          
+          <!-- when negative number is red, positive and negative number are formatted separately --> 
+          <xsl:when test="style:text-properties/@fo:color">
+            <xsl:variable name="formatPositive">
               <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">positive</xsl:with-param>
                 <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
               </xsl:call-template>
             </xsl:variable>
-            <xsl:value-of select="concat($format,$thisFormat)"/>
-          </xsl:attribute>
-        </numFmt>
-        <xsl:choose>
-          <xsl:when test="following-sibling::number:currency-style">
-            <xsl:apply-templates select="following-sibling::number:currency-style[1]" mode="numFormat">
-              <xsl:with-param name="numId">
-                <xsl:value-of select="$numId + 1"/>
-              </xsl:with-param>
-              <xsl:with-param name="format"/>
-            </xsl:apply-templates>
+            <xsl:variable name="formatNegative">
+              <xsl:call-template name="GetFormatCode">
+                <xsl:with-param name="sign">negative</xsl:with-param>
+                <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="concat($formatPositive,concat(';',$formatNegative))"/>
           </xsl:when>
+          
+          <xsl:otherwise>
+            <xsl:call-template name="GetFormatCode">
+              <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
+            </xsl:call-template>
+          </xsl:otherwise>
         </xsl:choose>
+      </xsl:attribute>
+    </numFmt>
+    <xsl:choose>
+      <xsl:when test="following-sibling::number:currency-style">
+        <xsl:apply-templates select="following-sibling::number:currency-style[1]" mode="numFormat">
+          <xsl:with-param name="numId">
+            <xsl:value-of select="$numId + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
+        </xsl:apply-templates>
       </xsl:when>
-      
-      <!-- if it is, put it into format param and later concat with next part of format -->
-      <xsl:otherwise>
-        <xsl:variable name="thisFormat">
-          <xsl:call-template name="GetFormatCode">
-            <xsl:with-param name="currencySymbol" select="$currencySymbol"/>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:choose>
-          <xsl:when test="following-sibling::number:currency-style">
-            <xsl:apply-templates select="following-sibling::number:currency-style[1]" mode="numFormat">
-              <xsl:with-param name="numId">
-                <xsl:value-of select="$numId + 1"/>
-              </xsl:with-param>
-              <xsl:with-param name="format">
-                <xsl:value-of select="concat($format,$thisFormat,';')"/>
-              </xsl:with-param>
-            </xsl:apply-templates>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:otherwise>
     </xsl:choose>
-    
   </xsl:template>
   
   <!-- get number code format -->
   <xsl:template name="GetFormatCode">
+    <xsl:param name="sign"/>
     <xsl:param name="currencySymbol"/>
     <xsl:variable name="value">
       <xsl:choose>
@@ -311,15 +279,8 @@
     <!-- add color to negative number formatting when necessary -->
     <xsl:variable name="finalValue">
       <xsl:choose>
-        <xsl:when test="style:text-properties/@fo:color='#ff0000'">
-          <xsl:choose>
-            <xsl:when test="style:text-properties/following-sibling::number:text ='-'">
-              <xsl:value-of select="concat('[Red]-',$endValue)"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="concat('[Red]',$endValue)"/>
-            </xsl:otherwise>
-          </xsl:choose>
+        <xsl:when test="$sign = 'negative' and style:text-properties/@fo:color">
+          <xsl:value-of select="concat('[Red]-',$endValue)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$endValue"/>
@@ -367,6 +328,24 @@
       </xsl:choose>
     </xsl:variable>
     
+    <xsl:variable name="GrowText">
+      <xsl:choose>
+        <xsl:when test="key('number', concat(@style:name, 'P0'))/number:text">
+          <xsl:value-of select="key('number', concat(@style:name, 'P0'))/number:text"/>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:variable name="LowText">
+      <xsl:choose>
+        <xsl:when test="key('number', concat(@style:name, 'P1'))/number:text">
+          <xsl:value-of select="key('number', concat(@style:name, 'P1'))/number:text"/>
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
+    </xsl:variable>
+    
     <xsl:variable name="text">
       <xsl:value-of select="number:text[not(preceding-sibling::node())]"/>
     </xsl:variable>
@@ -374,7 +353,8 @@
     <xsl:choose>      
       <!-- handle text in number format -->
       <xsl:when test="$text and $text!='' and $text != ' ' and $text != '-'">
-        <xsl:value-of select="concat('&quot;',$text,'&quot;',$valueWithCurrency)"/> 
+        <xsl:value-of select="concat(concat(concat(concat(concat('&quot;', $GrowText), '&quot;'), concat($valueWithCurrency, ';')), concat(concat(concat('&quot;', $LowText), '&quot;'), concat($valueWithCurrency, ';'))), concat(concat(concat('&quot;',$text),'&quot;'),$valueWithCurrency))"/>
+        
       </xsl:when>
       
       <xsl:otherwise>
