@@ -42,7 +42,7 @@
       <xsl:attribute name="formatCode">
         <xsl:choose>
           <!-- when negative number is red, positive and negative number are formatted separately --> 
-          <xsl:when test="style:text-properties/@fo:color">
+          <xsl:when test="style:text-properties/@fo:color and style:map">
             <xsl:variable name="formatPositive">
               <xsl:call-template name="GetFormatCode">
                 <xsl:with-param name="sign">positive</xsl:with-param>
@@ -81,7 +81,7 @@
         <xsl:choose>
           
           <!-- when negative number is red, positive and negative number are formatted separately --> 
-          <xsl:when test="style:text-properties/@fo:color">
+          <xsl:when test="style:text-properties/@fo:color and style:map">
             <xsl:variable name="formatPositive">
               <xsl:call-template name="GetFormatCode">
                 <xsl:with-param name="sign">positive</xsl:with-param>
@@ -135,7 +135,7 @@
         <xsl:choose>
           
           <!-- when negative number is red, positive and negative number are formatted separately --> 
-          <xsl:when test="style:text-properties/@fo:color">
+          <xsl:when test="style:text-properties/@fo:color and style:map">
             <xsl:variable name="formatPositive">
               <xsl:call-template name="GetFormatCode">
                 <xsl:with-param name="sign">positive</xsl:with-param>
@@ -282,6 +282,25 @@
         <xsl:when test="$sign = 'negative' and style:text-properties/@fo:color">
           <xsl:value-of select="concat('[Red]-',$endValue)"/>
         </xsl:when>
+        <xsl:when test="$sign='positive'">
+          <xsl:value-of select="$endValue"/>
+        </xsl:when>
+        <xsl:when test="style:text-properties/@fo:color='#ff0000'">
+          <xsl:value-of select="concat('[Red]',$endValue)"/>
+        </xsl:when>
+        <xsl:when test="style:text-properties/@fo:color='#00ffff'">
+          <xsl:value-of select="concat('[Cyan]',$endValue)"/>
+        </xsl:when>
+        <xsl:when test="style:text-properties/@fo:color='#0000ff'">
+          <xsl:value-of select="concat('[Blue]',$endValue)"/>
+        </xsl:when>
+        <xsl:when test="style:text-properties/@fo:color='#00ff00'">
+          <xsl:value-of select="concat('[Green]',$endValue)"/>
+        </xsl:when>
+        <xsl:when test="style:text-properties/@fo:color='#ffff00'">
+          <xsl:value-of select="concat('[Yellow]',$endValue)"/>
+        </xsl:when>
+        
         <xsl:otherwise>
           <xsl:value-of select="$endValue"/>
         </xsl:otherwise>
