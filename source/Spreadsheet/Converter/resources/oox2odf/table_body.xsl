@@ -387,6 +387,7 @@
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
     
+    <xsl:message terminate="no">progress:c</xsl:message>
     <xsl:choose>
       
       <!-- Insert covered cell if this is Merge Cell -->
