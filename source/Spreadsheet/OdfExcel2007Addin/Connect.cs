@@ -316,11 +316,12 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                             {
                                 File.Delete((string) wbCopyName);
                             }
-                            catch (IOException)
+                            catch (Exception)
                             {
                                 // bug #1610099
                                 // deletion failed : file currently used by another application.
                                 // do nothing
+                                // bug #1707349 
                             }
                             xlsxFile = (string) ooxTempFileName;
                         }
