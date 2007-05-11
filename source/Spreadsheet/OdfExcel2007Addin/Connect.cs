@@ -101,6 +101,10 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
         public void OnConnection(object application, Extensibility.ext_ConnectMode connectMode, object addInInst, ref System.Array custom)
         {
             this.applicationObject = (MSExcel.Application)application;
+            CommandBars bars = applicationObject.CommandBars;
+            bars.OnUpdate += new _CommandBarsEvents_OnUpdateEventHandler(bars_OnUpdate);
+            m_bEnabled = bars.GetEnabledMso("FileOpen");
+
             // set culture to match current application culture or user's choice
             int culture = 0;
             string languageVal = Microsoft.Win32.Registry
@@ -408,6 +412,28 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
         }
 
         #endregion
-    
-	}
+
+        IRibbonUI m_Ribbon;
+        bool m_bEnabled;
+
+        public void onLoad(IRibbonUI ribbon)
+        {
+            m_Ribbon = ribbon;
+        }
+        public bool getEnabled(IRibbonControl control)
+        {
+            return m_bEnabled;
+        }
+        void bars_OnUpdate()
+        {
+            bool newValue = applicationObject.CommandBars.GetEnabledMso("FileOpen");
+            if (m_bEnabled != newValue)
+            {
+                m_bEnabled = newValue;
+                m_Ribbon.InvalidateControl("OdfImport");
+                m_Ribbon.InvalidateControl("OdfExport");
+            }
+
+        }
+    }
 }
