@@ -315,7 +315,6 @@
                 <xsl:otherwise>0</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:if test="number($hours) and number($minutes) and number($seconds)">
             <TotalTime
                 xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
                 <xsl:choose>
@@ -327,7 +326,6 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </TotalTime>
-        </xsl:if>
     </xsl:template>
 
 

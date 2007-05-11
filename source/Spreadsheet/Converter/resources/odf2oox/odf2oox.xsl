@@ -32,6 +32,7 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:x="urn:schemas-microsoft-com:office:excel" exclude-result-prefixes="odf style text number">
@@ -232,9 +233,12 @@
       xmlns:dc="http://purl.org/dc/elements/1.1/">
       <xsl:call-template name="GetDocSecurityExtendedProperty"/>
       <xsl:call-template name="GetApplicationExtendedProperty"/>
+      <xsl:for-each select="document('meta.xml')/office:document-meta/office:meta">        
+        <xsl:apply-templates select="meta:editing-duration"/>
+      </xsl:for-each>      
     </Properties>
   </xsl:template>
-
+ 
   <xsl:template name="InsertComments">
     <xsl:param name="sheetId"/>
     <pzip:entry pzip:target="{concat(&quot;xl/comments&quot;,$sheetId,&quot;.xml&quot;)}">
