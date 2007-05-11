@@ -46,6 +46,7 @@ namespace CleverAge.OdfConverter.Spreadsheet
 		
 		public OoxHeaderFooterPostProcessor(XmlWriter nextWriter):base(nextWriter)
 		{
+            this.wholeString = "";
 			this.cutString = false;
 			this.HeaderFooterStrings = new ArrayList();
 			this.attribute = false;
