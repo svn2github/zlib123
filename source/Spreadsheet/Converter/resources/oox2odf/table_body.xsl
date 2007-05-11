@@ -39,18 +39,35 @@
   <!-- Insert sheet without text -->
   <xsl:template name="InsertEmptySheet">
     <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
     <xsl:param name="RowNumber"/>
+    <xsl:param name="PictureCell"/>
 
     <xsl:choose>
       <!-- when sheet is empty  -->
       <xsl:when
-        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = ''">
+        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell = ''">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="65536">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
+      </xsl:when>
+ <!-- when there are only picture in sheet  -->
+      <xsl:when
+        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell != ''">     
+        <xsl:call-template name="InsertEmptySheetWithPicture">
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:when>
       <xsl:when test="$BigMergeRow != '' and e:worksheet/e:sheetData/e:row/e:c">
         <table:table-row table:style-name="ro1">

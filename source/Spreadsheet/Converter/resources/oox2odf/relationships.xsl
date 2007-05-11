@@ -32,6 +32,7 @@
   xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   exclude-result-prefixes="e a pic r w">
 
@@ -62,4 +63,79 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  <xsl:template name="CopyPictures">
+    <xsl:param name="document"/>
+    <xsl:param name="rId"/>
+    <xsl:param name="targetName"/>
+    <xsl:param name="destFolder" select="'Pictures'"/>
+    
+    <!--  Copy Pictures Files to the picture catalog -->
+    <xsl:variable name="id">
+      <xsl:choose>
+        <xsl:when test="$rId != ''">  
+          <xsl:value-of select="$rId"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="xdr:pic/xdr:blipFill/a:blip/@r:embed"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="document(concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship']">
+      <xsl:for-each
+        select="document(concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship']">
+          <xsl:variable name="targetmode">
+            <xsl:value-of select="./@TargetMode"/>
+          </xsl:variable>
+          <xsl:variable name="pzipsource">
+            <xsl:value-of select="./@Target"/>
+          </xsl:variable>
+          <xsl:variable name="pziptarget">
+            <xsl:choose>
+              <xsl:when test="$targetName != ''">
+                <xsl:value-of select="$targetName"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-after($pzipsource,'/')"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>        
+          <xsl:choose>
+            <xsl:when test="$targetmode='External'"/>
+            <xsl:when test="$destFolder = '.'">
+              <pzip:copy pzip:source="{concat('xl/',$pzipsource)}" pzip:target="{$pziptarget}"/>
+            </xsl:when>            
+            <xsl:otherwise>
+              <pzip:copy pzip:source="{concat('xl/',substring-after($pzipsource, '/'))}" pzip:target="{concat($destFolder,'/',substring-after(substring-after($pzipsource, '/'), '/'))}"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+        </xsl:if>
+
+  </xsl:template>
+  
+  <!--  gets document name where image is placed (header, footer, document)-->
+  <xsl:template name="GetDocumentName">
+    <xsl:param name="rootId"/>
+    
+    <xsl:choose>
+      <xsl:when test="ancestor::w:document ">
+        <xsl:text>document.xml</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each
+          select="document('word/_rels/document.xml.rels')//node()[name() = 'Relationship'][substring-after(@Target,'.') = 'xml']">
+          <xsl:variable name="target">
+            <xsl:value-of select="./@Target"/>
+          </xsl:variable>
+          <xsl:if test="generate-id(document(concat('word/',$target))//node()) = $rootId">
+            <xsl:value-of select="$target"/>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
+  
 </xsl:stylesheet>

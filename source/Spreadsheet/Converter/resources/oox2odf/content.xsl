@@ -41,6 +41,7 @@
   <xsl:import href="measures.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="table_body.xsl"/>
+  <xsl:import href="picture.xsl"/>
   <xsl:import href="number.xsl"/>
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
@@ -143,6 +144,9 @@
         </xsl:with-param>
         <xsl:with-param name="BigMergeRow">
           <xsl:value-of select="$BigMergeRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="NameSheet">
+          <xsl:value-of select="@name"/>
         </xsl:with-param>
       </xsl:call-template>
 
@@ -289,6 +293,7 @@
 
   <xsl:template name="InsertSheetContent">
     <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
 
@@ -333,6 +338,15 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:for-each>
+      </xsl:variable>
+
+ <!-- Check If Picture are in this sheet  -->
+      <xsl:variable name="PictureCell">
+        <xsl:call-template name="PictureCell">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="substring-after($sheet, '/')"/>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:variable>
 
       <!-- Insert Row  -->
@@ -411,6 +425,12 @@
                   <xsl:with-param name="RowNumber">
                     <xsl:value-of select="e:worksheet/e:sheetData/e:row[position() = last()]/@r"/>
                   </xsl:with-param>
+                  <xsl:with-param name="PictureCell">
+                    <xsl:value-of select="$PictureCell"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="NameSheet">
+                    <xsl:value-of select="$sheetName"/>
+                  </xsl:with-param>
                 </xsl:call-template>
               </xsl:when>
 
@@ -476,6 +496,12 @@
               <xsl:with-param name="RowNumber">
                 <xsl:value-of select="e:worksheet/e:sheetData/e:row[position() = last()]/@r"/>
               </xsl:with-param>
+              <xsl:with-param name="PictureCell">
+                <xsl:value-of select="$PictureCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$sheetName"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:if>
         </xsl:otherwise>
@@ -493,6 +519,7 @@
   <xsl:template match="e:row">
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
+    <xsl:param name="PictureCell"/>
 
     <xsl:variable name="this" select="."/>
 
