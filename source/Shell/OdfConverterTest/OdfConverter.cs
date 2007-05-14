@@ -841,34 +841,81 @@ namespace CleverAge.OdfConverter.CommandLineTool
             {
                 extension = ".docx";
                 string inputExtension = Path.GetExtension(this.input).ToLowerInvariant();
+                string outputExtension = "";
+                if (this.output != null)
+                {
+                    outputExtension = this.output.Substring(this.output.IndexOf("."));
+                }
                 switch (inputExtension)
                 {
                     case ".odt":
-                        this.transformDirection = Direction.OdtToDocx;
-                        extension = ".docx";
+                        if (outputExtension.Equals(".docx") || outputExtension.Equals(""))
+                        {
+                            this.transformDirection = Direction.OdtToDocx;
+                            extension = ".docx";
+                        }
+                        else
+                        {
+                            throw new OdfCommandLineException("Output file extension is invalid");
+                        }
                         break;
                     case ".docx":
-                        this.transformDirection = Direction.DocxToOdt;
-                        extension = ".odt";
+                        if (outputExtension.Equals(".odt") || outputExtension.Equals(""))
+                        {
+                            this.transformDirection = Direction.DocxToOdt;
+                            extension = ".odt";
+                        }
+                        else
+                        {
+                            throw new OdfCommandLineException("Output file extension is invalid");
+                        }
                         break;
                     case ".odp":
-                        this.transformDirection = Direction.OdpToPptx;
-                        extension = ".pptx";
+                        if (outputExtension.Equals(".pptx") || outputExtension.Equals(""))
+                        {
+                            this.transformDirection = Direction.OdpToPptx;
+                            extension = ".pptx";
+                        }
+                        else
+                        {
+                            throw new OdfCommandLineException("Output file extension is invalid");
+                        }
                         break;
                     case ".pptx":
-                        this.transformDirection = Direction.PptxToOdp;
-                        extension = ".odp";
+                        if (outputExtension.Equals(".odp") || outputExtension.Equals(""))
+                        {
+                            this.transformDirection = Direction.PptxToOdp;
+                            extension = ".odp";
+                        }
+                        else
+                        {
+                            throw new OdfCommandLineException("Output file extension is invalid");
+                        }
                         break;
                     case ".ods":
-                        this.transformDirection = Direction.OdsToXlsx;
-                        extension = ".xlsx";
+                        if (outputExtension.Equals(".xlsx") || outputExtension.Equals(""))
+                        {
+                            this.transformDirection = Direction.OdsToXlsx;
+                            extension = ".xlsx";
+                        }
+                        else
+                        {
+                            throw new OdfCommandLineException("Output file extension is invalid");
+                        }
                         break;
                     case ".xlsx":
-                        this.transformDirection = Direction.XlsxToOds;
-                        extension = ".ods";
+                        if (outputExtension.Equals(".ods") || outputExtension.Equals(""))
+                        {
+                            this.transformDirection = Direction.XlsxToOds;
+                            extension = ".ods";
+                        }
+                        else
+                        {
+                            throw new OdfCommandLineException("Output file extension is invalid");
+                        }
                         break;
                     default:
-                        throw new OdfCommandLineException("Input file extension ["+inputExtension+"] is not supported.");
+                        throw new OdfCommandLineException("Input file extension [" + inputExtension + "] is not supported.");
                 }
             }
             if (!this.packaging)
@@ -886,7 +933,6 @@ namespace CleverAge.OdfConverter.CommandLineTool
                     outputPath = Path.GetDirectoryName(this.input);
                 }
                 this.output = GenerateOutputName(outputPath, this.input, extension, this.replace);
-
             }
         }
 
