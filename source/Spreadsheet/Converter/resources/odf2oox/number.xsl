@@ -310,7 +310,7 @@
       <xsl:choose>
         
         <!-- add decimal places -->
-        <xsl:when test="number:number/@number:decimal-places &gt; 0">
+        <xsl:when test="number:number/@number:decimal-places &gt; 0 or (not(number:number/@number:decimal-places) and document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places &gt; 0)">
           <xsl:call-template name="AddDecimalPlaces">
             <xsl:with-param name="value">
               <xsl:choose>
@@ -338,7 +338,14 @@
               </xsl:choose>
             </xsl:with-param> 
             <xsl:with-param name="num"> 
-              <xsl:value-of select="number:number/@number:decimal-places"/>   
+              <xsl:choose>
+                <xsl:when test="number:number/@number:decimal-places &gt; 0">
+                  <xsl:value-of select="number:number/@number:decimal-places"/>
+                </xsl:when>
+                <xsl:when test="not(number:number/@number:decimal-places)">
+                  <xsl:value-of select="document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places"/>
+                </xsl:when>
+              </xsl:choose>
             </xsl:with-param>
             <xsl:with-param name="decimalReplacement">
               <xsl:choose>
@@ -608,13 +615,7 @@
     <xsl:param name="currencyStyleCount"/>
     <xsl:param name="styleCurrencyStyleCount"/>
     <xsl:param name="dateStyleCount"/>
-    <xsl:choose>
-      <xsl:when test="not(key('number',$numStyle)/number:text) and key('number',$numStyle)/number:number/@number:min-integer-digits='1' and (key('number',$numStyle)/number:number/@number:decimal-places='0' or not(key('number',$numStyle)/number:number/@number:decimal-places))">
-        <xsl:text>0</xsl:text>
-      </xsl:when>
-      <xsl:when test="not(document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/style:text-properties) and not(document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:text) and document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:number/@number:min-integer-digits='1' and (document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:number/@number:decimal-places='0' or not(document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:number/@number:decimal-places))">
-        <xsl:text>0</xsl:text>
-      </xsl:when>
+    <xsl:choose>     
       <xsl:when test="key('number',$numStyle)">
         <xsl:for-each select="key('number',$numStyle)">
           <xsl:value-of select="count(preceding-sibling::number:number-style)+1"/>
