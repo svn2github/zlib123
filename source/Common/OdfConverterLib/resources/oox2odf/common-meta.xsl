@@ -9,6 +9,7 @@
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
     xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
+    xmlns:ex="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
     xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
     exclude-result-prefixes="vt cust-p cp">
 
@@ -65,9 +66,13 @@
                 <!-- language -->
                 <xsl:apply-templates
                     select="document('docProps/core.xml')/cp:coreProperties/dc:language" mode="meta"/>
-
                 <!-- document statistics -->
                 <xsl:call-template name="GetDocumentStatistics"/>
+              <!-- Total editing time (Spreadsheet)-->
+              <xsl:for-each select="document('docProps/app.xml')/ex:Properties">
+              <xsl:apply-templates
+                select="ex:TotalTime" mode="meta"/>               
+              </xsl:for-each>
             </office:meta>
         </office:document-meta>
     </xsl:template>
@@ -158,7 +163,7 @@
         </dc:subject>
     </xsl:template>
 
-    <xsl:template match="TotalTime" mode="meta">
+    <xsl:template match="TotalTime|ex:TotalTime" mode="meta">
         <!-- @Description: Generates the &lt;meta:editing-duration&gt; element -->
         <!-- @Context: Any &lt;TotalTime&gt; element-->
         <!-- @Private -->
