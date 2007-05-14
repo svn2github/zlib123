@@ -67,17 +67,7 @@
     <xsl:param name="noteId"/>
     <comment authorId="0" noteId="{count(preceding::office:annotation)+1}">
       <text>
-        <r>
-          <xsl:apply-templates select="key('style',@draw:text-style-name)" mode="textstyles">
-              <xsl:with-param name="parentCellStyleName">
-                <xsl:value-of select="ancestor::table:table-cell/@table:style-name"/>
-              </xsl:with-param>
-              <xsl:with-param name="defaultCellStyleName">
-                <xsl:value-of select="ancestor::table:table-column/@table:default-cell-style-name"/>
-              </xsl:with-param>
-          </xsl:apply-templates>
           <xsl:call-template name="InsertCommentText"/>
-         </r>
       </text>
     </comment>
   </xsl:template>
