@@ -612,8 +612,8 @@
       <xsl:when test="not(key('number',$numStyle)/number:text) and key('number',$numStyle)/number:number/@number:min-integer-digits='1' and (key('number',$numStyle)/number:number/@number:decimal-places='0' or not(key('number',$numStyle)/number:number/@number:decimal-places))">
         <xsl:text>0</xsl:text>
       </xsl:when>
-      <xsl:when test="not(document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:text) and document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:number/@number:min-integer-digits='1' and (document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:number/@number:decimal-places='0' or not(document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:number/@number:decimal-places))">
-        <xsl:text>0</xsl:text>        
+      <xsl:when test="not(document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/style:text-properties) and not(document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:text) and document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:number/@number:min-integer-digits='1' and (document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:number/@number:decimal-places='0' or not(document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]/number:number/@number:decimal-places))">
+        <xsl:text>0</xsl:text>
       </xsl:when>
       <xsl:when test="key('number',$numStyle)">
         <xsl:for-each select="key('number',$numStyle)">
