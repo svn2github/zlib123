@@ -526,12 +526,12 @@
 
 
     <xsl:variable name="height">
-      <xsl:call-template name="ConvertMeasure">
+      <xsl:call-template name="point-measure">
         <xsl:with-param name="length">
           <xsl:value-of
             select="key('style',@table:style-name)/style:table-row-properties/@style:row-height"/>
         </xsl:with-param>
-        <xsl:with-param name="unit">point</xsl:with-param>
+        <xsl:with-param name="round">false</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
 

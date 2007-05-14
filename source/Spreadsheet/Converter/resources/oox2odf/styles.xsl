@@ -234,6 +234,12 @@
               <xsl:when test="@customHeight">
                 <xsl:text>false</xsl:text>
               </xsl:when>
+              <xsl:when test="@thickTop">
+                <xsl:text>false</xsl:text>
+              </xsl:when>
+              <xsl:when test="@thickBot">
+                <xsl:text>false</xsl:text>
+              </xsl:when>
               <xsl:otherwise>
                 <xsl:text>true</xsl:text>
               </xsl:otherwise>
