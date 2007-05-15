@@ -154,7 +154,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         	}
         	else if (InT())
         	{
-    	   		WriteTString(text);
+                WriteTString(text.Replace("\n","\n "));
 	      	}
             else
             {
