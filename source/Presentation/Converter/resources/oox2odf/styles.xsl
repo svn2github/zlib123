@@ -41,15 +41,32 @@
 			</office:font-face-decls>
 			<xsl:text>document styles</xsl:text>
 			<office:styles>
+				<xsl:call-template name ="InsertDefaultStyles" />
 				<xsl:call-template name="InsertShapeStyles"/>
 			</office:styles>
+			
+			
 			<xsl:text>automatic styles</xsl:text>
 			<office:automatic-styles>
-				<xsl:call-template name="InsertSlideSize"/>
+				<xsl:call-template name="InsertSlideSize"/><!-- Change By Vijayeta-->
 				<xsl:call-template name="InsertNotesSize"/>
 				<style:style style:name="pr1" style:family="presentation" style:parent-style-name="Default-backgroundobjects">
 					<style:graphic-properties draw:stroke="none" draw:fill="none" draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="1.449cm"/>
 				</style:style>
+        <!-- Change by Vijayeta-->
+        <style:style style:name="P1" style:family="paragraph">
+          <style:paragraph-properties fo:text-align="start" />
+          <style:text-properties fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt" />
+        </style:style>
+        <style:style style:name="P2" style:family="paragraph">
+          <style:paragraph-properties fo:text-align="center" />
+          <style:text-properties fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt" />
+        </style:style>
+        <style:style style:name="P3" style:family="paragraph">
+          <style:paragraph-properties fo:text-align="end" />
+          <style:text-properties fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt" />
+        </style:style>
+        <!-- Change by Vijayeta-->
 			</office:automatic-styles>
 			<xsl:text>master styles</xsl:text>
 			<office:master-styles>
@@ -58,6 +75,26 @@
 		</office:document-styles>
 
 	</xsl:template>
+
+	<xsl:template name ="InsertDefaultStyles">
+		<style:style style:name="standard" style:family="graphic">
+			<style:graphic-properties draw:stroke="solid" svg:stroke-color="#385d8a" svg:stroke-width=".07cm" draw:marker-start-width="0.3cm" draw:marker-start-center="false" draw:marker-end-width="0.3cm" draw:marker-end-center="false" draw:fill="solid" draw:fill-color="#4F81BD" fo:padding-top="0.125cm" fo:padding-bottom="0.125cm" fo:padding-left="0.25cm" fo:padding-right="0.25cm" />
+		</style:style>
+	<!--<style:default-style>
+			<xsl:attribute name ="style:family">
+				<xsl:value-of select ="'graphic'"/>
+			</xsl:attribute>
+		</style:default-style>
+		<style:style>
+			<xsl:attribute name ="style:name">
+				<xsl:value-of select ="standard"/>
+			</xsl:attribute>
+			<xsl:attribute name ="style:family">
+				<xsl:value-of select ="graphic"/>
+			</xsl:attribute>
+		</style:style>-->
+	</xsl:template>
+	
 	<xsl:template name="InsertShapeStyles">
 
 		<xsl:variable name ="triangle" select ="1" />
@@ -69,17 +106,17 @@
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:cxnSp/p:spPr/a:ln">
 				
 				<!--Dash types-->
+				<xsl:if test ="a:prstDash/@val">
 				<xsl:call-template name ="getDashType">
 					<xsl:with-param name ="val" select ="a:prstDash/@val" />
 					<xsl:with-param name ="cap" select ="@cap" />
 				</xsl:call-template>
+				</xsl:if>
 				
 				<!-- Head End-->
 				<xsl:if test ="a:headEnd">
 					<xsl:call-template name ="getArrowType">
 						<xsl:with-param name ="type" select ="a:headEnd/@type" />
-						<xsl:with-param name="w" select ="a:headEnd/@w" />
-						<xsl:with-param name ="len" select ="a:headEnd/@len" />
 					</xsl:call-template>
 				</xsl:if>
 
@@ -87,18 +124,18 @@
 				<xsl:if test ="a:tailEnd">
 					<xsl:call-template name ="getArrowType">
 						<xsl:with-param name ="type" select ="a:tailEnd/@type" />
-						<xsl:with-param name="w" select ="a:tailEnd/@w" />
-						<xsl:with-param name ="len" select ="a:tailEnd/@len" />
 					</xsl:call-template>
 				</xsl:if>
 			</xsl:for-each >
 
 			<!--Dash types-->
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp/p:spPr/a:ln">
-				<xsl:call-template name ="getDashType">
-					<xsl:with-param name ="val" select ="a:prstDash/@val" />
-					<xsl:with-param name ="cap" select ="@cap" />
-				</xsl:call-template>
+				<xsl:if test ="a:prstDash/@val">
+					<xsl:call-template name ="getDashType">
+						<xsl:with-param name ="val" select ="a:prstDash/@val" />
+						<xsl:with-param name ="cap" select ="@cap" />
+					</xsl:call-template>
+				</xsl:if>
 			</xsl:for-each>
 
 			 
@@ -108,176 +145,33 @@
 
 	<xsl:template name ="getArrowType">
 		<xsl:param name ="type" />
-		<xsl:param name ="w" />
-		<xsl:param name="len" />
-
 		<xsl:choose>
 
 			<!--Triangle-->
 			<xsl:when test ="($type='triangle')">
-				<xsl:choose>
-					<xsl:when test ="($w='sm') and ($len='sm')">
-						<draw:marker draw:name="msArrowEnd1" draw:display-name="msArrowEnd 1" svg:viewBox="0 0 140 140" svg:d="m70 0 70 140h-140z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='med')">
-						<draw:marker draw:name="msArrowEnd2" draw:display-name="msArrowEnd 2" svg:viewBox="0 0 140 210" svg:d="m70 0 70 210h-140z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='lg')">
-						<draw:marker draw:name="msArrowEnd3" draw:display-name="msArrowEnd 3" svg:viewBox="0 0 140 350" svg:d="m70 0 70 350h-140z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='sm')">
-						<draw:marker draw:name="msArrowEnd4" draw:display-name="msArrowEnd 4" svg:viewBox="0 0 210 140" svg:d="m105 0 105 140h-210z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='lg')">
-						<draw:marker draw:name="msArrowEnd6" draw:display-name="msArrowEnd 6" svg:viewBox="0 0 210 350" svg:d="m105 0 105 350h-210z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='sm')">
-						<draw:marker draw:name="msArrowEnd7" draw:display-name="msArrowEnd 7" svg:viewBox="0 0 350 140" svg:d="m175 0 175 140h-350z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='med')">
-						<draw:marker draw:name="msArrowEnd8" draw:display-name="msArrowEnd 8" svg:viewBox="0 0 350 210" svg:d="m175 0 175 210h-350z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='lg')">
-						<draw:marker draw:name="msArrowEnd9" draw:display-name="msArrowEnd 9" svg:viewBox="0 0 350 350" svg:d="m175 0 175 350h-350z"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<draw:marker draw:name="msArrowEnd5" draw:display-name="msArrowEnd 5" svg:viewBox="0 0 210 210" svg:d="m105 0 105 210h-210z"/>
-					</xsl:otherwise>
-				</xsl:choose>
+				<draw:marker draw:name="triangle" draw:display-name="Arrow" svg:viewBox="0 0 20 30" svg:d="m10 0-10 30h20z"/>
 			</xsl:when>
 
 			<!--Arrow-->
 			<xsl:when test ="($type='arrow')">
-				<xsl:choose>
-					<xsl:when test ="($w='sm') and ($len='sm')">
-						<draw:marker draw:name="msArrowOpenEnd1" draw:display-name="msArrowOpenEnd 1" svg:viewBox="0 0 245 245" svg:d="m122 0 123 222-37 23-86-157-86 157-36-23z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='med')">
-						<draw:marker draw:name="msArrowOpenEnd2" draw:display-name="msArrowOpenEnd 2" svg:viewBox="0 0 245 315" svg:d="m122 0 123 286-37 29-86-202-86 202-36-29z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='lg')">
-						<draw:marker draw:name="msArrowOpenEnd3" draw:display-name="msArrowOpenEnd 3" svg:viewBox="0 0 245 420" svg:d="m122 0 123 382-37 38-86-269-86 269-36-38z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='sm')">
-						<draw:marker draw:name="msArrowOpenEnd4" draw:display-name="msArrowOpenEnd 4" svg:viewBox="0 0 315 245" svg:d="m157 0 158 222-48 23-110-157-110 157-47-23z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='lg')">
-						<draw:marker draw:name="msArrowOpenEnd6" draw:display-name="msArrowOpenEnd 6" svg:viewBox="0 0 315 420" svg:d="m157 0 158 382-48 38-110-269-110 269-47-38z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='sm')">
-						<draw:marker draw:name="msArrowOpenEnd7" draw:display-name="msArrowOpenEnd 7" svg:viewBox="0 0 420 245" svg:d="m210 0 210 222-63 23-147-157-147 157-63-23z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='med')">
-						<draw:marker draw:name="msArrowOpenEnd8" draw:display-name="msArrowOpenEnd 8" svg:viewBox="0 0 420 315" svg:d="m210 0 210 286-63 29-147-202-147 202-63-29z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='lg')">
-						<draw:marker draw:name="msArrowOpenEnd9" draw:display-name="msArrowOpenEnd 9" svg:viewBox="0 0 420 420" svg:d="m210 0 210 382-63 38-147-269-147 269-63-38z"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<draw:marker draw:name="msArrowOpenEnd5" draw:display-name="msArrowOpenEnd 5" svg:viewBox="0 0 315 315" svg:d="m157 0 158 286-48 29-110-202-110 202-47-29z"/>
-					</xsl:otherwise>
-				</xsl:choose>
+				<draw:marker draw:name="arrow" draw:display-name="Line Arrow" svg:viewBox="0 0 1122 2243" svg:d="m0 2108v17 17l12 42 30 34 38 21 43 4 29-8 30-21 25-26 13-34 343-1532 339 1520 13 42 29 34 39 21 42 4 42-12 34-30 21-42v-39-12l-4 4-440-1998-9-42-25-39-38-25-43-8-42 8-38 25-26 39-8 42z"/>
 			</xsl:when>
 
 			<!--Stealth-->
 			<xsl:when test ="($type='stealth')">
-				<xsl:choose>
-					<xsl:when test ="($w='sm') and ($len='sm')">
-						<draw:marker draw:name="msArrowStealthEnd1" draw:display-name="msArrowStealthEnd 1" svg:viewBox="0 0 140 140" svg:d="m70 0 70 140-70-56-70 56z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='med')">
-						<draw:marker draw:name="msArrowStealthEnd2" draw:display-name="msArrowStealthEnd 2" svg:viewBox="0 0 140 210" svg:d="m70 0 70 210-70-84-70 84z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='lg')">
-						<draw:marker draw:name="msArrowStealthEnd3" draw:display-name="msArrowStealthEnd 3" svg:viewBox="0 0 140 350" svg:d="m70 0 70 350-70-140-70 140z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='sm')">
-						<draw:marker draw:name="msArrowStealthEnd4" draw:display-name="msArrowStealthEnd 4" svg:viewBox="0 0 210 140" svg:d="m105 0 105 140-105-56-105 56z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='lg')">
-						<draw:marker draw:name="msArrowStealthEnd6" draw:display-name="msArrowStealthEnd 6" svg:viewBox="0 0 210 350" svg:d="m105 0 105 350-105-140-105 140z"/>
-					</xsl:when>
-					<xsl:when test="($w='lg') and ($len='sm')">
-						<draw:marker draw:name="msArrowStealthEnd7" draw:display-name="msArrowStealthEnd 7" svg:viewBox="0 0 350 140" svg:d="m175 0 175 140-175-56-175 56z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='med')">
-						<draw:marker draw:name="msArrowStealthEnd8" draw:display-name="msArrowStealthEnd 8" svg:viewBox="0 0 350 210" svg:d="m175 0 175 210-175-84-175 84z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='lg')">
-						<draw:marker draw:name="msArrowStealthEnd9" draw:display-name="msArrowStealthEnd 9" svg:viewBox="0 0 350 350" svg:d="m175 0 175 350-175-140-175 140z"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<draw:marker draw:name="msArrowStealthEnd5" draw:display-name="msArrowStealthEnd 5" svg:viewBox="0 0 210 210" svg:d="m105 0 105 210-105-84-105 84z"/>
-					</xsl:otherwise> 
-				</xsl:choose>
+				<draw:marker draw:name="stealth" draw:display-name="Arrow concave" svg:viewBox="0 0 1131 1580" svg:d="m1013 1491 118 89-567-1580-564 1580 114-85 136-68 148-46 161-17 161 13 153 46z"/>
 			</xsl:when>
 
 			<!--Oval-->
 			<xsl:when test ="($type='oval')">
-				<xsl:choose>
-					<xsl:when test ="($w='sm') and ($len='sm')">
-						<draw:marker draw:name="msArrowOvalEnd1" draw:display-name="msArrowOvalEnd 1" svg:viewBox="0 0 140 140" svg:d="m140 0c0-38-32-70-70-70-38 0-70 32-70 70 0 38 32 70 70 70 38 0 70-32 70-70z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='med')">
-						<draw:marker draw:name="msArrowOvalEnd2" draw:display-name="msArrowOvalEnd 2" svg:viewBox="0 0 140 210" svg:d="m140 0c0-57-32-105-70-105-38 0-70 48-70 105 0 57 32 105 70 105 38 0 70-48 70-105z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='lg')">
-						<draw:marker draw:name="msArrowOvalEnd3" draw:display-name="msArrowOvalEnd 3" svg:viewBox="0 0 140 350" svg:d="m140 0c0-96-32-175-70-175-38 0-70 79-70 175 0 96 32 175 70 175 38 0 70-79 70-175z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='sm')">
-						<draw:marker draw:name="msArrowOvalEnd4" draw:display-name="msArrowOvalEnd 4" svg:viewBox="0 0 210 140" svg:d="m210 0c0-38-48-70-105-70-57 0-105 32-105 70 0 38 48 70 105 70 57 0 105-32 105-70z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='lg')">
-						<draw:marker draw:name="msArrowOvalEnd6" draw:display-name="msArrowOvalEnd 6" svg:viewBox="0 0 210 350" svg:d="m210 0c0-96-48-175-105-175-57 0-105 79-105 175 0 96 48 175 105 175 57 0 105-79 105-175z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='sm')">
-						<draw:marker draw:name="msArrowOvalEnd7" draw:display-name="msArrowOvalEnd 7" svg:viewBox="0 0 350 140" svg:d="m350 0c0-38-79-70-175-70-96 0-175 32-175 70 0 38 79 70 175 70 96 0 175-32 175-70z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='med')">
-						<draw:marker draw:name="msArrowOvalEnd8" draw:display-name="msArrowOvalEnd 8" svg:viewBox="0 0 350 210" svg:d="m350 0c0-57-79-105-175-105-96 0-175 48-175 105 0 57 79 105 175 105 96 0 175-48 175-105z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='lg')">
-						<draw:marker draw:name="msArrowOvalEnd9" draw:display-name="msArrowOvalEnd 9" svg:viewBox="0 0 350 350" svg:d="m350 0c0-96-79-175-175-175-96 0-175 79-175 175 0 96 79 175 175 175 96 0 175-79 175-175z"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<draw:marker draw:name="msArrowOvalEnd5" draw:display-name="msArrowOvalEnd 5" svg:viewBox="0 0 210 210" svg:d="m210 0c0-57-48-105-105-105-57 0-105 48-105 105 0 57 48 105 105 105 57 0 105-48 105-105z"/>
-					</xsl:otherwise>
-				</xsl:choose>
+				<draw:marker draw:name="oval" draw:display-name="Oval" svg:viewBox="0 0 1131 1131" svg:d="m462 1118-102-29-102-51-93-72-72-93-51-102-29-102-13-105 13-102 29-106 51-102 72-89 93-72 102-50 102-34 106-9 101 9 106 34 98 50 93 72 72 89 51 102 29 106 13 102-13 105-29 102-51 102-72 93-93 72-98 51-106 29-101 13z"/>
 			</xsl:when>
 
 			<!--Diamond-->
 			<xsl:when test ="($type='diamond')">
-				<xsl:choose>
-					<xsl:when test ="($w='sm') and ($len='sm')">
-						<draw:marker draw:name="msArrowDiamondEnd1" draw:display-name="msArrowDiamondEnd 1" svg:viewBox="0 0 140 140" svg:d="m70 0 70 70-70 70-70-70z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='med')">
-						<draw:marker draw:name="msArrowDiamondEnd2" draw:display-name="msArrowDiamondEnd 2" svg:viewBox="0 0 140 210" svg:d="m70 0 70 105-70 105-70-105z"/>
-					</xsl:when>
-					<xsl:when test ="($w='sm') and ($len='lg')">
-						<draw:marker draw:name="msArrowDiamondEnd3" draw:display-name="msArrowDiamondEnd 3" svg:viewBox="0 0 140 350" svg:d="m70 0 70 175-70 175-70-175z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='sm')">
-						<draw:marker draw:name="msArrowDiamondEnd4" draw:display-name="msArrowDiamondEnd 4" svg:viewBox="0 0 210 140" svg:d="m105 0 105 70-105 70-105-70z"/>
-					</xsl:when>
-					<xsl:when test ="($w='med') and ($len='lg')">
-						<draw:marker draw:name="msArrowDiamondEnd6" draw:display-name="msArrowDiamondEnd 6" svg:viewBox="0 0 210 350" svg:d="m105 0 105 175-105 175-105-175z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='sm')">
-						<draw:marker draw:name="msArrowDiamondEnd7" draw:display-name="msArrowDiamondEnd 7" svg:viewBox="0 0 350 140" svg:d="m175 0 175 70-175 70-175-70z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='med')">
-						<draw:marker draw:name="msArrowDiamondEnd8" draw:display-name="msArrowDiamondEnd 8" svg:viewBox="0 0 350 210" svg:d="m175 0 175 105-175 105-175-105z"/>
-					</xsl:when>
-					<xsl:when test ="($w='lg') and ($len='lg')">
-						<draw:marker draw:name="msArrowDiamondEnd9" draw:display-name="msArrowDiamondEnd 9" svg:viewBox="0 0 350 350" svg:d="m175 0 175 175-175 175-175-175z"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<draw:marker draw:name="msArrowDiamondEnd5" draw:display-name="msArrowDiamondEnd 5" svg:viewBox="0 0 210 210" svg:d="m105 0 105 105-105 105-105-105z"/>
-					</xsl:otherwise>
-				</xsl:choose>
+				<draw:marker draw:name="diamond" draw:display-name="Square" svg:viewBox="0 0 1131 1131" svg:d="m0 564 564 567 567-567-567-564z"/>
 			</xsl:when >
-
+			
 		</xsl:choose>
 	</xsl:template>
 
@@ -286,62 +180,133 @@
 		<xsl:param name ="cap" />
 		<xsl:choose>
 			<xsl:when test ="($val='sysDot')">
-				<xsl:if test ="($cap='rnd')">
-					<draw:stroke-dash draw:name="sysDotRound" draw:display-name="Dash 2" draw:style="round" draw:dots1="1" draw:dots1-length="0.07cm" draw:distance="0.07cm"/>
-				</xsl:if>
-				<xsl:if test ="($cap!='rnd') or not($cap)">
-					<draw:stroke-dash draw:name="sysDot" draw:display-name="Dash 2" draw:style="rect" draw:dots1="1" draw:dots1-length="0.07cm" draw:distance="0.07cm"/>
-				</xsl:if>
+				<xsl:call-template name ="AddDashType">
+					<xsl:with-param name ="name" select ="'sysDot'" />
+					<xsl:with-param name ="cap" select ="$cap" />
+					<xsl:with-param name ="dot1" select ="'1'" />
+					<xsl:with-param name ="dot1-length" select = "'0.07'" />
+					<xsl:with-param name ="distance" select ="0.07" />
+				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='sysDash')">
-				<xsl:if test ="($cap='rnd')">
-					<draw:stroke-dash draw:name="sysDashRound" draw:display-name="Dash 2" draw:style="round" draw:dots1="1" draw:dots1-length="0.07cm" draw:distance="0.07cm"/>
-				</xsl:if>
-				<xsl:if test ="($cap!='rnd') or not($cap)">
-					<draw:stroke-dash draw:name="sysDash" draw:display-name="Dash 2" draw:style="rect" draw:dots1="1" draw:dots1-length="0.07cm" draw:distance="0.07cm"/>
-				</xsl:if>
+				<xsl:call-template name ="AddDashType">
+					<xsl:with-param name ="name" select ="'sysDash'" />
+					<xsl:with-param name ="cap" select ="$cap" />
+					<xsl:with-param name ="dot1" select ="'1'" />
+					<xsl:with-param name ="dot1-length" select = "'0.07'" />
+					<xsl:with-param name ="distance" select ="0.07" />
+				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='dash')">
-				<xsl:if test ="($cap='rnd')">
-					<draw:stroke-dash draw:name="dashRound" draw:display-name="Dash 3" draw:style="round" draw:dots2="1" draw:dots2-length="0.282cm" draw:distance="0.211cm"/>
-				</xsl:if>
-				<xsl:if test ="($cap!='rnd') or not($cap)">
-					<draw:stroke-dash draw:name="dash" draw:display-name="Dash 3" draw:style="rect" draw:dots2="1" draw:dots2-length="0.282cm" draw:distance="0.211cm"/>
-				</xsl:if>
+				<xsl:call-template name ="AddDashType">
+					<xsl:with-param name ="name" select ="'dash'" />
+					<xsl:with-param name ="cap" select ="$cap" />
+					<xsl:with-param name ="dot2" select ="'1'" />
+					<xsl:with-param name ="dot2-length" select = "'0.282'" />
+					<xsl:with-param name ="distance" select ="0.211" />
+				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='dashDot')">
-				<xsl:if test ="($cap='rnd')">
-					<draw:stroke-dash draw:name="dashDotRound" draw:display-name="Dash 4" draw:style="round" draw:dots1="1" draw:dots1-length="0.07cm" draw:dots2="1" draw:dots2-length="0.282cm" draw:distance="0.211cm"/>
-				</xsl:if>
-				<xsl:if test ="($cap!='rnd') or not($cap)">
-					<draw:stroke-dash draw:name="dashDot" draw:display-name="Dash 4" draw:style="rect" draw:dots1="1" draw:dots1-length="0.07cm" draw:dots2="1" draw:dots2-length="0.282cm" draw:distance="0.211cm"/>
-				</xsl:if>
+				<xsl:call-template name ="AddDashType">
+					<xsl:with-param name ="name" select ="'dash'" />
+					<xsl:with-param name ="cap" select ="$cap" />
+					<xsl:with-param name ="dot1" select ="'1'" />
+					<xsl:with-param name ="dot1-length" select = "'0.07'" />
+					<xsl:with-param name ="dot2" select ="'1'" />
+					<xsl:with-param name ="dot2-length" select = "'0.282'" />
+					<xsl:with-param name ="distance" select ="0.211" />
+				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='lgDash')">
-				<xsl:if test ="($cap='rnd')">
-					<draw:stroke-dash draw:name="lgDashRound" draw:display-name="Dash 5" draw:style="round" draw:dots2="1" draw:dots2-length="0.564cm" draw:distance="0.211cm"/>
-				</xsl:if>
-				<xsl:if test ="($cap!='rnd') or not($cap)">
-					<draw:stroke-dash draw:name="lgDash" draw:display-name="Dash 5" draw:style="rect" draw:dots2="1" draw:dots2-length="0.564cm" draw:distance="0.211cm"/>
-				</xsl:if>
+				<xsl:call-template name ="AddDashType">
+					<xsl:with-param name ="name" select ="'dash'" />
+					<xsl:with-param name ="cap" select ="$cap" />
+					<xsl:with-param name ="dot2" select ="'1'" />
+					<xsl:with-param name ="dot2-length" select = "'0.564'" />
+					<xsl:with-param name ="distance" select ="0.211" />
+				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='lgDashDot')">
-				<xsl:if test ="($cap='rnd')">
-					<draw:stroke-dash draw:name="lgDashDotRound" draw:display-name="Dash 7" draw:style="round" draw:dots1="1" draw:dots1-length="0.07cm" draw:dots2="1" draw:dots2-length="0.564cm" draw:distance="0.211cm"/>
-				</xsl:if>
-				<xsl:if test ="($cap!='rnd') or not($cap)">
-					<draw:stroke-dash draw:name="lgDashDot" draw:display-name="Dash 7" draw:style="rect" draw:dots1="1" draw:dots1-length="0.07cm" draw:dots2="1" draw:dots2-length="0.564cm" draw:distance="0.211cm"/>
-				</xsl:if>
+				<xsl:call-template name ="AddDashType">
+					<xsl:with-param name ="name" select ="'dash'" />
+					<xsl:with-param name ="cap" select ="$cap" />
+					<xsl:with-param name ="dot1" select ="'1'" />
+					<xsl:with-param name ="dot1-length" select = "'0.07'" />
+					<xsl:with-param name ="dot2" select ="'1'" />
+					<xsl:with-param name ="dot2-length" select = "'0.564'" />
+					<xsl:with-param name ="distance" select ="0.211" />
+				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='lgDashDotDot')">
-				<xsl:if test ="($cap='rnd')">
-					<draw:stroke-dash draw:name="lgDashDotDotRound" draw:display-name="Dash 8" draw:style="round" draw:dots1="2" draw:dots1-length="0.07cm" draw:dots2="1" draw:dots2-length="0.564cm" draw:distance="0.211cm"/>
-				</xsl:if>
-				<xsl:if test ="($cap!='rnd') or not($cap)">
-					<draw:stroke-dash draw:name="lgDashDotDot" draw:display-name="Dash 8" draw:style="rect" draw:dots1="2" draw:dots1-length="0.07cm" draw:dots2="1" draw:dots2-length="0.564cm" draw:distance="0.211cm"/>
-				</xsl:if>
+				<xsl:call-template name ="AddDashType">
+					<xsl:with-param name ="name" select ="'dash'" />
+					<xsl:with-param name ="cap" select ="$cap" />
+					<xsl:with-param name ="dot1" select ="'2'" />
+					<xsl:with-param name ="dot1-length" select = "'0.07'" />
+					<xsl:with-param name ="dot2" select ="'1'" />
+					<xsl:with-param name ="dot2-length" select = "'0.564'" />
+					<xsl:with-param name ="distance" select ="0.211" />
+				</xsl:call-template>
 			</xsl:when>
+			
 		</xsl:choose>
+	</xsl:template>
+	<xsl:template name ="AddDashType">
+		<xsl:param name ="name" />
+		<xsl:param name ="cap" />
+		<xsl:param name ="dot1" />
+		<xsl:param name ="dot1-length" />
+		<xsl:param name ="dot2" />
+		<xsl:param name ="dot2-length" />
+		<xsl:param name ="distance" />
+
+		<draw:stroke-dash>
+			<xsl:if test ="$cap='rnd'">
+				<xsl:attribute name ="draw:name">
+					<xsl:value-of select ="concat($name,'Round')"/>
+				</xsl:attribute>
+				<xsl:attribute name ="draw:style">
+					<xsl:value-of select ="'round'"/>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test ="not($cap) or ($cap!='rnd')">
+				<xsl:attribute name ="draw:name">
+					<xsl:value-of select ="$name"/>
+				</xsl:attribute>
+				<xsl:attribute name ="draw:style">
+					<xsl:value-of select ="'rect'"/>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:attribute name ="draw:display-name">
+				<xsl:value-of select ="$name"/>
+			</xsl:attribute>
+			<xsl:if test ="(string-length($dot1) != 0)">
+				<xsl:attribute name ="draw:dots1">
+					<xsl:value-of select ="$dot1" />
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test ="(string-length($dot1-length) != 0)">
+				<xsl:attribute name ="draw:dots1-length">
+					<xsl:value-of select ="concat($dot1-length,'cm')" />
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test ="(string-length($dot2) != 0)">
+				<xsl:attribute name ="draw:dots2">
+					<xsl:value-of select ="$dot2" />
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test ="(string-length($dot2-length) != 0)">
+				<xsl:attribute name ="draw:dots2-length">
+					<xsl:value-of select ="concat($dot2-length,'cm')" />
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test ="(string-length($distance) != 0)">
+				<xsl:attribute name ="draw:distance">
+					<xsl:value-of select ="concat($distance,'cm')"/>
+				</xsl:attribute>
+			</xsl:if>
+		</draw:stroke-dash>
+		
 	</xsl:template>
 	<!-- Changes made by Vijayeta-->
 	<!-- Slide Size-->
@@ -522,14 +487,22 @@
 				<xsl:with-param name ="PresentationClass">
 					<xsl:value-of select ="'date-time'"/>
 				</xsl:with-param>
-			</xsl:call-template>
-			<xsl:call-template name ="SetDateFooterPageNumberPosition">
-				<xsl:with-param name ="PlaceHolder">
-					<xsl:value-of select ="'ftr'"/>
-				</xsl:with-param>
-				<xsl:with-param name ="PresentationClass">
-					<xsl:value-of select ="'footer'"/>
-				</xsl:with-param>
+        <!--Change made by Vijayeta,adding another parameter -->
+        <xsl:with-param name ="TextStyleName">
+          <xsl:value-of select ="'P1'"/>
+        </xsl:with-param>
+      </xsl:call-template>
+      <xsl:call-template name ="SetDateFooterPageNumberPosition">
+        <xsl:with-param name ="PlaceHolder">
+          <xsl:value-of select ="'ftr'"/>
+        </xsl:with-param>
+        <xsl:with-param name ="PresentationClass">
+          <xsl:value-of select ="'footer'"/>
+        </xsl:with-param>
+        <!--Change made by Vijayeta,adding another parameter-->
+        <xsl:with-param name ="TextStyleName">
+          <xsl:value-of select ="'P2'"/>
+        </xsl:with-param>
 			</xsl:call-template>
 			<xsl:call-template name ="SetDateFooterPageNumberPosition">
 				<xsl:with-param name ="PlaceHolder">
@@ -538,13 +511,17 @@
 				<xsl:with-param name ="PresentationClass">
 					<xsl:value-of select ="'page-number'"/>
 				</xsl:with-param>
-			</xsl:call-template>
-			<presentation:notes style:page-layout-name="PM2">
-				<xsl:call-template name="InsertSlideNumber" />
-			</presentation:notes>
-		</style:master-page>
-	</xsl:template>
-	<!--checks cx/cy ratio,for orientation-->
+        <!--Change made by Vijayeta,adding another parameter -->
+        <xsl:with-param name ="TextStyleName">
+          <xsl:value-of select ="'P3'"/>
+        </xsl:with-param>
+      </xsl:call-template>
+      <presentation:notes style:page-layout-name="PM2">
+        <xsl:call-template name="InsertSlideNumber" />
+      </presentation:notes>
+    </style:master-page>
+  </xsl:template>
+  <!--checks cx/cy ratio,for orientation-->
 	<xsl:template name ="CheckOrientation">
 		<xsl:param name="cx"/>
 		<xsl:param name="cy"/>
@@ -578,6 +555,7 @@
 	<xsl:template name ="SetDateFooterPageNumberPosition">
 		<xsl:param name ="PlaceHolder"/>
 		<xsl:param name ="PresentationClass"/>
+    <xsl:param name ="TextStyleName"/>
 		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
 			<!-- for each slide-->
 			<xsl:variable name ="currentpos">
@@ -623,175 +601,190 @@
 				</xsl:for-each>
 				<!--END, for each Shape in layout-->
 			</xsl:variable>
-			<xsl:choose >
-				<xsl:when test ="$Flag = 'slide'">
-					<xsl:for-each select ="document($footerSlide)/p:sld/p:cSld/p:spTree/p:sp">
-						<xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$PlaceHolder)]">
-							<draw:frame draw:layer="backgroundobjects" presentation:style-name="pr1">
-								<xsl:for-each select ="p:spPr/a:xfrm/a:off[@x]">
-									<xsl:attribute name ="presentation:class">
-										<xsl:value-of select ="$PresentationClass"/>
-									</xsl:attribute>
-									<xsl:attribute name ="svg:x">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@x"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:off[@y]">
-									<xsl:attribute name ="svg:y">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@y"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cx]">
-									<xsl:attribute name ="svg:width">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@cx"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cy]">
-									<xsl:attribute name ="svg:height">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@cy"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-										<xsl:value-of select ="SlideHeight"/>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:if test ="$PresentationClass = 'date-time'">
-									<xsl:call-template name ="date-time"/>
-								</xsl:if>
-								<xsl:if test ="$PresentationClass = 'footer'">
-									<xsl:call-template name ="footer"/>
-								</xsl:if>
-								<xsl:if test ="$PresentationClass = 'page-number'">
-									<xsl:call-template name ="page-number"/>
-								</xsl:if>
-							</draw:frame>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:when>
-				<xsl:when test ="$Flag = 'layout'">
-					<xsl:variable name ="SlideLayout">
-						<xsl:for-each select ="document(concat(concat(('ppt/slides/_rels/slide'),$currentpos),'.xml.rels'))//rels:Relationships/rels:Relationship[@Target]">
-							<xsl:value-of select ="substring(@Target,17)"/>
-						</xsl:for-each>
-					</xsl:variable>
-					<!--<xsl:for-each select ="document(concat(('ppt/slideLayouts/'),($SlideLayout)))//p:sldLayout/p:cSld/p:spTree/p:sp">-->
-					<xsl:for-each select ="document(concat(('ppt/slideLayouts/'),($SlideLayout)))//p:sldLayout/p:cSld/p:spTree/p:sp">
-						<xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$PlaceHolder)]">
-							<draw:frame draw:layer="backgroundobjects" presentation:style-name="pr1">
-								<xsl:for-each select ="p:spPr/a:xfrm/a:off[@x]">
-									<xsl:attribute name ="presentation:class">
-										<xsl:value-of select ="$PresentationClass"/>
-									</xsl:attribute>
-									<xsl:attribute name ="svg:x">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@x"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:off[@y]">
-									<xsl:attribute name ="svg:y">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@y"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cx]">
-									<xsl:attribute name ="svg:width">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@cx"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cy]">
-									<xsl:attribute name ="svg:height">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@cy"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-										<xsl:value-of select ="SlideHeight"/>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:if test ="$PresentationClass = 'date-time'">
-									<xsl:call-template name ="date-time"/>
-								</xsl:if>
-								<xsl:if test ="$PresentationClass = 'footer'">
-									<xsl:call-template name ="footer"/>
-								</xsl:if>
-								<xsl:if test ="$PresentationClass = 'page-number'">
-									<xsl:call-template name ="page-number"/>
-								</xsl:if>
-							</draw:frame>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:when>
-				<xsl:otherwise>
-					<!-- SlideMaster-->
-					<xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:cSld/p:spTree/p:sp">
-						<xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$PlaceHolder)]">
-							<draw:frame draw:layer="backgroundobjects" presentation:style-name="pr1">
-								<xsl:attribute name ="presentation:class">
-									<xsl:value-of select ="$PresentationClass"/>
-								</xsl:attribute>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:off[@x]">
-									<xsl:attribute name ="svg:x">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@x"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:off[@y]">
-									<xsl:attribute name ="svg:y">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@y"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cx]">
-									<xsl:attribute name ="svg:width">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@cx"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cy]">
-									<xsl:attribute name ="svg:height">
-										<xsl:call-template name="ConvertEmu">
-											<xsl:with-param name="length" select="@cy"/>
-											<xsl:with-param name="unit">cm</xsl:with-param>
-										</xsl:call-template>
-										<xsl:value-of select ="SlideHeight"/>
-									</xsl:attribute>
-								</xsl:for-each>
-								<xsl:if test ="$PresentationClass = 'date-time'">
-									<xsl:call-template name ="date-time"/>
-								</xsl:if>
-								<xsl:if test ="$PresentationClass = 'footer'">
-									<xsl:call-template name ="footer"/>
-								</xsl:if>
-								<xsl:if test ="$PresentationClass = 'page-number'">
-									<xsl:call-template name ="page-number"/>
-								</xsl:if>
-							</draw:frame>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:otherwise>
-				<!-- END,SlideMaster-->
-			</xsl:choose>
+      <!-- Change made by Vijayeta-->
+      <xsl:if test ="$currentpos =1"> 
+        <xsl:choose>
+          <xsl:when test ="$Flag = 'slide'">
+            <xsl:for-each select ="document($footerSlide)/p:sld/p:cSld/p:spTree/p:sp">
+              <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$PlaceHolder)]">
+                <draw:frame draw:layer="backgroundobjects" presentation:style-name="pr1">
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:off[@x]">
+                    <xsl:attribute name ="presentation:class">
+                      <xsl:value-of select ="$PresentationClass"/>
+                    </xsl:attribute>
+                    <!-- Change made by Vijayeta,Text style included to align Footer,Date-Time and Page Number-->
+                    <xsl:attribute name ="draw:text-style-name">
+                      <xsl:value-of select ="$TextStyleName"/>
+                    </xsl:attribute>
+                    <xsl:attribute name ="svg:x">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@x"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:off[@y]">
+                    <xsl:attribute name ="svg:y">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@y"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cx]">
+                    <xsl:attribute name ="svg:width">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@cx"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cy]">
+                    <xsl:attribute name ="svg:height">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@cy"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                      <xsl:value-of select ="SlideHeight"/>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:if test ="$PresentationClass = 'date-time'">
+                    <xsl:call-template name ="date-time"/>
+                  </xsl:if>
+                  <xsl:if test ="$PresentationClass = 'footer'">
+                    <xsl:call-template name ="footer"/>
+                  </xsl:if>
+                  <xsl:if test ="$PresentationClass = 'page-number'">
+                    <xsl:call-template name ="page-number"/>
+                  </xsl:if>
+                </draw:frame>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:when test ="$Flag = 'layout'">
+            <xsl:variable name ="SlideLayout">
+              <xsl:for-each select ="document(concat(concat(('ppt/slides/_rels/slide'),$currentpos),'.xml.rels'))//rels:Relationships/rels:Relationship[@Target]">
+                <xsl:value-of select ="substring(@Target,17)"/>
+              </xsl:for-each>
+            </xsl:variable>
+            <!--<xsl:for-each select ="document(concat(('ppt/slideLayouts/'),($SlideLayout)))//p:sldLayout/p:cSld/p:spTree/p:sp">-->
+            <xsl:for-each select ="document(concat(('ppt/slideLayouts/'),($SlideLayout)))//p:sldLayout/p:cSld/p:spTree/p:sp">
+              <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$PlaceHolder)]">
+                <draw:frame draw:layer="backgroundobjects" presentation:style-name="pr1">
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:off[@x]">
+                    <xsl:attribute name ="presentation:class">
+                      <xsl:value-of select ="$PresentationClass"/>
+                    </xsl:attribute>
+                    <!-- Change made by Vijayeta,Text style included to align Footer,Date-Time and Page Number-->
+                    <xsl:attribute name ="draw:text-style-name">
+                      <xsl:value-of select ="$TextStyleName"/>
+                    </xsl:attribute>
+                    <xsl:attribute name ="svg:x">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@x"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:off[@y]">
+                    <xsl:attribute name ="svg:y">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@y"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cx]">
+                    <xsl:attribute name ="svg:width">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@cx"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cy]">
+                    <xsl:attribute name ="svg:height">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@cy"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                      <xsl:value-of select ="SlideHeight"/>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:if test ="$PresentationClass = 'date-time'">
+                    <xsl:call-template name ="date-time"/>
+                  </xsl:if>
+                  <xsl:if test ="$PresentationClass = 'footer'">
+                    <xsl:call-template name ="footer"/>
+                  </xsl:if>
+                  <xsl:if test ="$PresentationClass = 'page-number'">
+                    <xsl:call-template name ="page-number"/>
+                  </xsl:if>
+                </draw:frame>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- SlideMaster-->
+            <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:cSld/p:spTree/p:sp">
+              <xsl:if test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,$PlaceHolder)]">
+                <draw:frame draw:layer="backgroundobjects" presentation:style-name="pr1">
+                  <xsl:attribute name ="presentation:class">
+                    <xsl:value-of select ="$PresentationClass"/>
+                  </xsl:attribute>
+                  <!-- Change made by Vijayeta,Text style included to align Footer,Date-Time and Page Number-->
+                  <xsl:attribute name ="draw:text-style-name">
+                    <xsl:value-of select ="$TextStyleName"/>
+                  </xsl:attribute>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:off[@x]">
+                    <xsl:attribute name ="svg:x">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@x"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:off[@y]">
+                    <xsl:attribute name ="svg:y">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@y"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cx]">
+                    <xsl:attribute name ="svg:width">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@cx"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:for-each select ="p:spPr/a:xfrm/a:ext[@cy]">
+                    <xsl:attribute name ="svg:height">
+                      <xsl:call-template name="ConvertEmu">
+                        <xsl:with-param name="length" select="@cy"/>
+                        <xsl:with-param name="unit">cm</xsl:with-param>
+                      </xsl:call-template>
+                      <xsl:value-of select ="SlideHeight"/>
+                    </xsl:attribute>
+                  </xsl:for-each>
+                  <xsl:if test ="$PresentationClass = 'date-time'">
+                    <xsl:call-template name ="date-time"/>
+                  </xsl:if>
+                  <xsl:if test ="$PresentationClass = 'footer'">
+                    <xsl:call-template name ="footer"/>
+                  </xsl:if>
+                  <xsl:if test ="$PresentationClass = 'page-number'">
+                    <xsl:call-template name ="page-number"/>
+                  </xsl:if>
+                </draw:frame>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:otherwise>
+          <!-- END,SlideMaster-->
+        </xsl:choose>
+      </xsl:if >
 		</xsl:for-each>
 		<!-- END,for each slide-->
 

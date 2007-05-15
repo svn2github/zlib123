@@ -3,12 +3,13 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   exclude-result-prefixes="style svg fo">
 	<xsl:template name="getColorCode">
 		<xsl:param name="color"/>
 		<xsl:param name ="lumMod"/>
-		<xsl:param name ="lumOff"/> 
+		<xsl:param name ="lumOff"/>
 		<xsl:choose>
 			<!--White, Background1-->
 			<xsl:when test ="($color = 'bg1' or contains($color,'bg1')) and $lumMod='' and $lumOff=''">
@@ -102,10 +103,10 @@
 			</xsl:when>
 			<xsl:when test ="($color = 'accent1' or contains($color,'accent1')) and $lumMod='60000' and $lumOff='40000'">
 				<xsl:value-of select ="'#95B3D7'"/>
-		    </xsl:when>
+			</xsl:when>
 			<xsl:when test ="($color = 'accent1' or contains($color,'accent1')) and $lumMod='75000' and $lumOff=''">
 				<xsl:value-of select ="'#376092'"/>
-		    </xsl:when>
+			</xsl:when>
 			<xsl:when test ="($color = 'accent1' or contains($color,'accent1')) and $lumMod='50000' and $lumOff=''">
 				<xsl:value-of select ="'#254061'"/>
 			</xsl:when>
@@ -217,7 +218,7 @@
 	<xsl:template name="ConvertEmu">
 		<xsl:param name="length" />
 		<xsl:param name="unit" />
-		 <xsl:choose>
+		<xsl:choose>
 			<xsl:when test="$length = '' or not($length) or $length = 0 or format-number($length div 360000, '#.##') = ''">
 				<xsl:value-of select="concat(0,'cm')" />
 			</xsl:when>
@@ -226,5 +227,78 @@
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
-
+	<xsl:template name="InsertWhiteSpaces">
+		<xsl:param name="string" select="."/>
+		<xsl:param name="length" select="string-length(.)"/>
+		<!-- string which doesn't contain whitespaces-->
+		<xsl:choose>
+			<xsl:when test="not(contains($string,' '))">
+				<xsl:value-of select="$string"/>
+			</xsl:when>
+			<!-- convert white spaces  -->
+			<xsl:otherwise>
+				<xsl:variable name="before">
+					<xsl:value-of select="substring-before($string,' ')"/>
+				</xsl:variable>
+				<xsl:variable name="after">
+					<xsl:call-template name="CutStartSpaces">
+						<xsl:with-param name="cuted">
+							<xsl:value-of select="substring-after($string,' ')"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:if test="$before != '' ">
+					<xsl:value-of select="concat($before,' ')"/>
+				</xsl:if>
+				<!--add remaining whitespaces as text:s if there are any-->
+				<xsl:if test="string-length(concat($before,' ', $after)) &lt; $length ">
+					<xsl:choose>
+						<xsl:when test="($length - string-length(concat($before, $after))) = 1">
+							<text:s/>
+						</xsl:when>
+						<xsl:otherwise>
+							<text:s>
+								<xsl:attribute name="text:c">
+									<xsl:choose>
+										<xsl:when test="$before = ''">
+											<xsl:value-of select="$length - string-length($after)"/>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:value-of select="$length - string-length(concat($before,' ', $after))"/>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:attribute>
+							</text:s>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:if>
+				<!--repeat it for substring which has whitespaces-->
+				<xsl:if test="contains($string,' ') and $length &gt; 0">
+					<xsl:call-template name="InsertWhiteSpaces">
+						<xsl:with-param name="string">
+							<xsl:value-of select="$after"/>
+						</xsl:with-param>
+						<xsl:with-param name="length">
+							<xsl:value-of select="string-length($after)"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template name="CutStartSpaces">
+		<xsl:param name="cuted"/>
+		<xsl:choose>
+			<xsl:when test="starts-with($cuted,' ')">
+				<xsl:call-template name="CutStartSpaces">
+					<xsl:with-param name="cuted">
+						<xsl:value-of select="substring-after($cuted,' ')"/>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$cuted"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 </xsl:stylesheet>

@@ -22,7 +22,7 @@
 			<!-- Manifest -->
 			<pzip:entry pzip:target="META-INF/manifest.xml">
 				<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
-					<manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text"
+					<manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.presentation"
 					  manifest:full-path="/"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/statusbar/"/>
 					<manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/accelerator/current.xml"/>
