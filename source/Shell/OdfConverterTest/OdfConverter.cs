@@ -109,6 +109,51 @@ namespace CleverAge.OdfConverter.CommandLineTool
         }
     }
 
+    class Excel
+    {
+        Type _type;
+        object _instance;
+        Type _docsType;
+        object _documents;
+
+        public Excel()
+        {
+            _type = Type.GetTypeFromProgID("Excel.Application");
+            _instance = Activator.CreateInstance(_type);
+            _docsType = null;
+            _documents = null;
+        }
+
+        public bool Visible
+        {
+            set
+            {
+                object[] args = new object[] { value };
+                _type.InvokeMember("Visible", BindingFlags.SetProperty, null, _instance, args);
+            }
+        }
+
+        public void Quit()
+        {
+            object[] args = new object[] { Missing.Value,
+                                            Missing.Value,
+                                            Missing.Value };
+            _type.InvokeMember("Quit", BindingFlags.InvokeMethod, null, _instance, args);
+        }
+
+        public void Open(string document)
+        {
+            if (_documents == null)
+            {
+                _documents = _type.InvokeMember("Documents", BindingFlags.GetProperty, null, _instance, null);
+                _docsType = _documents.GetType();
+            }
+            object[] args = new object[] { document };
+            _docsType.InvokeMember("Open", BindingFlags.InvokeMethod, null, _documents, args);
+
+        }
+    }
+
     class Presentation
     {
         Type _type;
@@ -178,6 +223,7 @@ namespace CleverAge.OdfConverter.CommandLineTool
 		private bool transformDirectionOverride = false; // whether conversion direction has been specified
         private Report report = null;
         private Word word = null;
+        private Excel excel = null;
         private Presentation presentation = null; 
         private OoxValidator ooxValidator = null;
         private OdfValidator odfValidator = null;
@@ -290,7 +336,15 @@ namespace CleverAge.OdfConverter.CommandLineTool
                 this.word = new Word();
                 this.word.Visible = false;
             }
-
+            
+            // instanciate excel if needed
+            if (this.open && (this.batch == Direction.OdsToXlsx))
+            {
+                
+                this.excel = new Excel();
+                this.excel.Visible = false;
+            }
+           
             // instanciate Presentation if needed
             if (this.open && (this.batch == Direction.OdpToPptx))
             {
@@ -450,10 +504,11 @@ namespace CleverAge.OdfConverter.CommandLineTool
 
         private bool ConvertFile(string input, string output, Direction transformDirection)
         {
+           
             try
             {
                 DateTime start = DateTime.Now;
-                AbstractConverter converter = ConverterFactory.Instance(this.transformDirection);
+                AbstractConverter converter = ConverterFactory.Instance(transformDirection);
                 converter.ExternalResources = this.xslPath;
                 converter.SkipedPostProcessors = this.skipedPostProcessors;
                 converter.DirectTransform =
