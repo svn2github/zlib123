@@ -33,53 +33,54 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   exclude-result-prefixes="number style fo">
-  
+
   <!-- template to insert number formats -->
-  
+
   <xsl:template match="number:number-style" mode="numFormat">
     <xsl:param name="numId"/>
     <xsl:param name="format"/>
     <xsl:param name="styleName"/>
-    
+
     <xsl:choose>
-      
+
       <!-- separate format or last part of partly format -->
-    <xsl:when test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
-      <numFmt numFmtId="{$numId}">
-        <xsl:attribute name="formatCode">
-          <xsl:variable name="thisFormat">
-          <xsl:call-template name="GetFormatCode"/>
-          </xsl:variable>
-          <xsl:choose>
-          <xsl:when test="@style:name = $styleName">
-            <xsl:value-of select="concat($format,$thisFormat)"/>
+      <xsl:when
+        test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
+        <numFmt numFmtId="{$numId}">
+          <xsl:attribute name="formatCode">
+            <xsl:variable name="thisFormat">
+              <xsl:call-template name="GetFormatCode"/>
+            </xsl:variable>
+            <xsl:choose>
+              <xsl:when test="@style:name = $styleName">
+                <xsl:value-of select="concat($format,$thisFormat)"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$thisFormat"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </numFmt>
+        <xsl:choose>
+          <xsl:when test="following-sibling::number:number-style">
+            <xsl:apply-templates select="following-sibling::number:number-style[1]" mode="numFormat">
+              <xsl:with-param name="numId">
+                <xsl:value-of select="$numId + 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="format">
+                <xsl:choose>
+                  <xsl:when test="@style:name = $styleName"/>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$format"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+              <xsl:with-param name="styleName"/>
+            </xsl:apply-templates>
           </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$thisFormat"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </numFmt>
-      <xsl:choose>
-        <xsl:when test="following-sibling::number:number-style">
-          <xsl:apply-templates select="following-sibling::number:number-style[1]" mode="numFormat">
-            <xsl:with-param name="numId">
-              <xsl:value-of select="$numId + 1"/>
-            </xsl:with-param>
-            <xsl:with-param name="format">
-              <xsl:choose>
-                <xsl:when test="@style:name = $styleName"/>
-                <xsl:otherwise>
-                  <xsl:value-of select="$format"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-            <xsl:with-param name="styleName"/>
-          </xsl:apply-templates>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:when>
-      
+        </xsl:choose>
+      </xsl:when>
+
       <!-- partly format -->
       <xsl:otherwise>
         <xsl:variable name="thisFormat">
@@ -94,7 +95,7 @@
               <xsl:with-param name="format">
                 <xsl:choose>
                   <xsl:when test="substring(@style:name,1,string-length(@style:name)-2)=$styleName">
-                <xsl:value-of select="concat($format,$thisFormat,';')"/>
+                    <xsl:value-of select="concat($format,$thisFormat,';')"/>
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:value-of select="concat($thisFormat,';')"/>
@@ -110,20 +111,21 @@
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
- 
+
   </xsl:template>
-  
+
   <!-- template to insert percentage formats -->
-  
+
   <xsl:template match="number:percentage-style" mode="numFormat">
     <xsl:param name="numId"/>
     <xsl:param name="format"/>
     <xsl:param name="styleName"/>
-    
+
     <xsl:choose>
-      
+
       <!-- separate format or last part of partly format -->
-      <xsl:when test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
+      <xsl:when
+        test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
         <numFmt numFmtId="{$numId}">
           <xsl:attribute name="formatCode">
             <xsl:variable name="thisFormat">
@@ -142,24 +144,25 @@
         </numFmt>
         <xsl:choose>
           <xsl:when test="following-sibling::number:percentage-style">
-            <xsl:apply-templates select="following-sibling::number:percentage-style[1]" mode="numFormat">
+            <xsl:apply-templates select="following-sibling::number:percentage-style[1]"
+              mode="numFormat">
               <xsl:with-param name="numId">
                 <xsl:value-of select="$numId + 1"/>
               </xsl:with-param>
               <xsl:with-param name="format">
-              <xsl:choose>
-                <xsl:when test="@style:name = $styleName"/>
-                <xsl:otherwise>
-                  <xsl:value-of select="$format"/>
-                </xsl:otherwise>
-              </xsl:choose>
+                <xsl:choose>
+                  <xsl:when test="@style:name = $styleName"/>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$format"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:with-param>
               <xsl:with-param name="styleName"/>
             </xsl:apply-templates>
           </xsl:when>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- partly format -->
       <xsl:otherwise>
         <xsl:variable name="thisFormat">
@@ -167,7 +170,8 @@
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="following-sibling::number:percentage-style">
-            <xsl:apply-templates select="following-sibling::number:percentage-style[1]" mode="numFormat">
+            <xsl:apply-templates select="following-sibling::number:percentage-style[1]"
+              mode="numFormat">
               <xsl:with-param name="numId">
                 <xsl:value-of select="$numId + 1"/>
               </xsl:with-param>
@@ -188,18 +192,18 @@
           </xsl:when>
         </xsl:choose>
       </xsl:otherwise>
-      
+
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <!-- template to insert currency formats -->
-  
+
   <xsl:template match="number:currency-style" mode="numFormat">
     <xsl:param name="numId"/>
     <xsl:param name="format"/>
     <xsl:param name="styleName"/>
-    
+
     <xsl:variable name="currencySymbol">
       <xsl:call-template name="ConvertValueSymbol">
         <xsl:with-param name="symbol">
@@ -211,9 +215,10 @@
     </xsl:variable>
 
     <xsl:choose>
-      
+
       <!-- separate format or last part of partly format -->
-      <xsl:when test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
+      <xsl:when
+        test="not(substring(@style:name,string-length(@style:name)-1) = 'P0' or substring(@style:name,string-length(@style:name)-1) = 'P1' or substring(@style:name,string-length(@style:name)-1) = 'P2')">
         <numFmt numFmtId="{$numId}">
           <xsl:attribute name="formatCode">
             <xsl:variable name="thisFormat">
@@ -234,7 +239,8 @@
         </numFmt>
         <xsl:choose>
           <xsl:when test="following-sibling::number:currency-style">
-            <xsl:apply-templates select="following-sibling::number:currency-style[1]" mode="numFormat">
+            <xsl:apply-templates select="following-sibling::number:currency-style[1]"
+              mode="numFormat">
               <xsl:with-param name="numId">
                 <xsl:value-of select="$numId + 1"/>
               </xsl:with-param>
@@ -251,7 +257,7 @@
           </xsl:when>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- partly format -->
       <xsl:otherwise>
         <xsl:variable name="thisFormat">
@@ -261,7 +267,8 @@
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="following-sibling::number:currency-style">
-            <xsl:apply-templates select="following-sibling::number:currency-style[1]" mode="numFormat">
+            <xsl:apply-templates select="following-sibling::number:currency-style[1]"
+              mode="numFormat">
               <xsl:with-param name="numId">
                 <xsl:value-of select="$numId + 1"/>
               </xsl:with-param>
@@ -282,19 +289,20 @@
           </xsl:when>
         </xsl:choose>
       </xsl:otherwise>
-      
+
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <!-- get number code format -->
   <xsl:template name="GetFormatCode">
     <xsl:param name="currencySymbol"/>
     <xsl:variable name="value">
       <xsl:choose>
-        
+
         <!-- add leading zeros if min-integer-digits > 0 -->
-        <xsl:when test="number:number/@number:min-integer-digits and number:number/@number:min-integer-digits &gt; 0">
+        <xsl:when
+          test="number:number/@number:min-integer-digits and number:number/@number:min-integer-digits &gt; 0">
           <xsl:call-template name="AddLeadingZeros">
             <xsl:with-param name="num">
               <xsl:value-of select="number:number/@number:min-integer-digits"/>
@@ -302,21 +310,23 @@
             <xsl:with-param name="val"/>
           </xsl:call-template>
         </xsl:when>
-        
+
         <xsl:otherwise>#</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="endValue">
       <xsl:choose>
-        
+
         <!-- add decimal places -->
-        <xsl:when test="number:number/@number:decimal-places &gt; 0 or (not(number:number/@number:decimal-places) and document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places &gt; 0)">
+        <xsl:when
+          test="number:number/@number:decimal-places &gt; 0 or (not(number:number/@number:decimal-places) and document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places &gt; 0)">
           <xsl:call-template name="AddDecimalPlaces">
             <xsl:with-param name="value">
               <xsl:choose>
-                
+
                 <!-- add grouping -->
-                <xsl:when test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
+                <xsl:when
+                  test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
                   <xsl:call-template name="AddGrouping">
                     <xsl:with-param name="value">
                       <xsl:value-of select="concat($value,'.')"/>
@@ -331,19 +341,21 @@
                     </xsl:with-param>
                   </xsl:call-template>
                 </xsl:when>
-                
+
                 <xsl:otherwise>
                   <xsl:value-of select="concat($value,'.')"/>
                 </xsl:otherwise>
               </xsl:choose>
-            </xsl:with-param> 
-            <xsl:with-param name="num"> 
+            </xsl:with-param>
+            <xsl:with-param name="num">
               <xsl:choose>
                 <xsl:when test="number:number/@number:decimal-places &gt; 0">
                   <xsl:value-of select="number:number/@number:decimal-places"/>
                 </xsl:when>
                 <xsl:when test="not(number:number/@number:decimal-places)">
-                  <xsl:value-of select="document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places"/>
+                  <xsl:value-of
+                    select="document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places"
+                  />
                 </xsl:when>
               </xsl:choose>
             </xsl:with-param>
@@ -354,13 +366,27 @@
               </xsl:choose>
             </xsl:with-param>
           </xsl:call-template>
+          
+          <xsl:if
+            test="number:number/@number:display-factor and number:number/@number:display-factor != '' ">
+            <xsl:call-template name="UseThousandDisplayFactor">
+              <xsl:with-param name="displayFactor">
+                <xsl:value-of select="number:number/@number:display-factor"/>
+              </xsl:with-param>
+              <xsl:with-param name="value">
+                <xsl:value-of select="''"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
+
         </xsl:when>
-        
+
         <xsl:otherwise>
           <xsl:choose>
-            
+
             <!-- add grouping -->
-            <xsl:when test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
+            <xsl:when
+              test="number:number/@number:grouping and number:number/@number:grouping = 'true'">
               <xsl:call-template name="AddGrouping">
                 <xsl:with-param name="value">
                   <xsl:value-of select="$value"/>
@@ -375,10 +401,11 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:when>
-            
+
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="number:number/@number:display-factor and number:number/@number:display-factor!=''">
+                <xsl:when
+                  test="number:number/@number:display-factor and number:number/@number:display-factor!=''">
                   <xsl:call-template name="UseThousandDisplayFactor">
                     <xsl:with-param name="displayFactor">
                       <xsl:value-of select="number:number/@number:display-factor"/>
@@ -397,7 +424,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!-- add color to negative number formatting when necessary -->
     <xsl:variable name="finalValue">
       <xsl:choose>
@@ -451,18 +478,19 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        
+
         <xsl:otherwise>
           <xsl:value-of select="$endValue"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!-- add currency symbol -->
     <xsl:variable name="valueWithCurrency">
       <xsl:choose>
-        <xsl:when test="$currencySymbol and $currencySymbol!='' and number:number/following-sibling::number:currency-symbol">
-          
+        <xsl:when
+          test="$currencySymbol and $currencySymbol!='' and number:number/following-sibling::number:currency-symbol">
+
           <!-- add space before currency symbol -->
           <xsl:variable name="currencyFormat">
             <xsl:choose>
@@ -474,11 +502,12 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          
+
           <xsl:value-of select="concat($finalValue,$currencyFormat)"/>
         </xsl:when>
-        <xsl:when test="$currencySymbol and $currencySymbol!='' and number:number/preceding-sibling::number:currency-symbol">
-          
+        <xsl:when
+          test="$currencySymbol and $currencySymbol!='' and number:number/preceding-sibling::number:currency-symbol">
+
           <!-- add space after currency symbol -->
           <xsl:variable name="currencyFormat2">
             <xsl:choose>
@@ -497,25 +526,52 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
-    <xsl:variable name="text">
-      <xsl:value-of select="number:text[not(preceding-sibling::node())]"/>
+
+    <xsl:variable name="startText">
+      <xsl:choose>
+        <xsl:when
+          test="number:text[not(preceding-sibling::node())] != ' ' and number:text[not(preceding-sibling::node())] != '-'">
+          <xsl:value-of select="number:text[not(preceding-sibling::node())]"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="''"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
-    
-    <xsl:choose>      
-      <!-- handle text in number format -->
-      <xsl:when test="$text and $text!='' and $text != ' ' and $text != '-'">
-        <xsl:value-of select="concat('&quot;',$text,'&quot;',$valueWithCurrency)"/> 
+
+    <xsl:variable name="endText">
+      <xsl:choose>
+        <xsl:when
+          test="number:text[not(following-sibling::node())] != ' ' and number:text[not(following-sibling::node())] != '-'">
+          <xsl:value-of select="number:text[not(following-sibling::node())]"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="''"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- handle text in number format -->
+    <xsl:choose>
+      <xsl:when test="$startText != '' and $endText != '' ">
+        <xsl:value-of
+          select="concat('&quot;',$startText,'&quot;',$valueWithCurrency,'&quot;',$endText,'&quot;')"
+        />
       </xsl:when>
-      
+      <xsl:when test="$startText != '' ">
+        <xsl:value-of select="concat('&quot;',$startText,'&quot;',$valueWithCurrency)"/>
+      </xsl:when>
+      <xsl:when test="$endText != '' ">
+        <xsl:value-of select="concat($valueWithCurrency,'&quot;',$endText,'&quot;')"/>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$valueWithCurrency"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template to add leading zeros -->
-  
+
   <xsl:template name="AddLeadingZeros">
     <xsl:param name="num"/>
     <xsl:param name="val"/>
@@ -535,9 +591,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template to add grouping -->
-  
+
   <xsl:template name="AddGrouping">
     <xsl:param name="numDigits"/>
     <xsl:param name="value"/>
@@ -557,9 +613,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template to add decimal places -->
-  
+
   <xsl:template name="AddDecimalPlaces">
     <xsl:param name="value"/>
     <xsl:param name="num"/>
@@ -581,9 +637,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template to divide number by display factor -->
-  
+
   <xsl:template name="UseThousandDisplayFactor">
     <xsl:param name="displayFactor"/>
     <xsl:param name="value"/>
@@ -603,9 +659,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template to get number format id -->
-  
+
   <xsl:template name="GetNumFmtId">
     <xsl:param name="numStyle"/>
     <xsl:param name="numStyleCount"/>
@@ -615,51 +671,71 @@
     <xsl:param name="currencyStyleCount"/>
     <xsl:param name="styleCurrencyStyleCount"/>
     <xsl:param name="dateStyleCount"/>
-    <xsl:choose>     
+    <xsl:choose>
       <xsl:when test="key('number',$numStyle)">
         <xsl:for-each select="key('number',$numStyle)">
           <xsl:value-of select="count(preceding-sibling::number:number-style)+1"/>
         </xsl:for-each>
       </xsl:when>
-      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]">
-        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]">
+      <xsl:when
+        test="document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]">
+        <xsl:for-each
+          select="document('styles.xml')/office:document-styles/office:styles/number:number-style[@style:name=$numStyle]">
           <xsl:value-of select="count(preceding-sibling::number:number-style)+1+$numStyleCount"/>
         </xsl:for-each>
       </xsl:when>
       <xsl:when test="key('percentage',$numStyle)">
         <xsl:for-each select="key('percentage',$numStyle)">
-          <xsl:value-of select="count(preceding-sibling::number:percentage-style)+1+$numStyleCount+$styleNumStyleCount"/>
+          <xsl:value-of
+            select="count(preceding-sibling::number:percentage-style)+1+$numStyleCount+$styleNumStyleCount"
+          />
         </xsl:for-each>
       </xsl:when>
-      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:percentage-style[@style:name=$numStyle]">
-        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:percentage-style[@style:name=$numStyle]">
-          <xsl:value-of select="count(preceding-sibling::number:percentage-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount"/>
+      <xsl:when
+        test="document('styles.xml')/office:document-styles/office:styles/number:percentage-style[@style:name=$numStyle]">
+        <xsl:for-each
+          select="document('styles.xml')/office:document-styles/office:styles/number:percentage-style[@style:name=$numStyle]">
+          <xsl:value-of
+            select="count(preceding-sibling::number:percentage-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount"
+          />
         </xsl:for-each>
       </xsl:when>
       <xsl:when test="key('currency',$numStyle)">
         <xsl:for-each select="key('currency',$numStyle)">
-          <xsl:value-of select="count(preceding-sibling::number:currency-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount"/>
+          <xsl:value-of
+            select="count(preceding-sibling::number:currency-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount"
+          />
         </xsl:for-each>
       </xsl:when>
-      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:currency-style[@style:name=$numStyle]">
-        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:currency-style[@style:name=$numStyle]">
-          <xsl:value-of select="count(preceding-sibling::number:currency-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount"/>
+      <xsl:when
+        test="document('styles.xml')/office:document-styles/office:styles/number:currency-style[@style:name=$numStyle]">
+        <xsl:for-each
+          select="document('styles.xml')/office:document-styles/office:styles/number:currency-style[@style:name=$numStyle]">
+          <xsl:value-of
+            select="count(preceding-sibling::number:currency-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount"
+          />
         </xsl:for-each>
       </xsl:when>
       <xsl:when test="key('date',$numStyle)">
         <xsl:for-each select="key('date',$numStyle)">
-          <xsl:value-of select="count(preceding-sibling::number:date-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount"/>
+          <xsl:value-of
+            select="count(preceding-sibling::number:date-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount"
+          />
         </xsl:for-each>
       </xsl:when>
-      <xsl:when test="document('styles.xml')/office:document-styles/office:styles/number:date-style[@style:name=$numStyle]">
-        <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/number:date-style[@style:name=$numStyle]">
-          <xsl:value-of select="count(preceding-sibling::number:date-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount+$dateStyleCount"/>
+      <xsl:when
+        test="document('styles.xml')/office:document-styles/office:styles/number:date-style[@style:name=$numStyle]">
+        <xsl:for-each
+          select="document('styles.xml')/office:document-styles/office:styles/number:date-style[@style:name=$numStyle]">
+          <xsl:value-of
+            select="count(preceding-sibling::number:date-style)+1+$numStyleCount+$styleNumStyleCount+$percentStyleCount+$stylePercentStyleCount+$currencyStyleCount+$styleCurrencyStyleCount+$dateStyleCount"
+          />
         </xsl:for-each>
-        </xsl:when>
+      </xsl:when>
       <xsl:otherwise>0</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="ConvertValueSymbol">
     <xsl:param name="symbol"/>
     <xsl:param name="country"/>
@@ -680,11 +756,11 @@
       <xsl:when test="$symbol = 'kr.' ">[$kr.-40F]</xsl:when>
       <xsl:when test="$symbol = 'Kč' ">[$Kč-405]</xsl:when>
       <xsl:when test="$symbol = 'Sk' ">[$Sk-41B]</xsl:when>
-      <xsl:when test="$symbol = 'Lt' ">[$Lt-427]</xsl:when>      
-      <xsl:when test="$symbol = 'Ls' ">[$Ls-426]</xsl:when>      
+      <xsl:when test="$symbol = 'Lt' ">[$Lt-427]</xsl:when>
+      <xsl:when test="$symbol = 'Ls' ">[$Ls-426]</xsl:when>
       <xsl:when test="$symbol = 'lei' ">[$lei-418]</xsl:when>
-      <xsl:when test="$symbol = 'Din' ">[$Din.-81A]</xsl:when> 
-      <xsl:when test="$symbol = 'KM' ">[$KM-141A]</xsl:when> 
+      <xsl:when test="$symbol = 'Din' ">[$Din.-81A]</xsl:when>
+      <xsl:when test="$symbol = 'KM' ">[$KM-141A]</xsl:when>
       <xsl:when test="$symbol = 'HK$' ">[$HK$-C04]</xsl:when>
       <xsl:when test="$symbol = 'NT$' ">[$NT$-404]</xsl:when>
       <xsl:when test="$symbol = 'Ft' ">[$Ft-40E]</xsl:when>
@@ -723,5 +799,5 @@
       <xsl:when test="$symbol = 'EUR' ">[$EUR]</xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>
