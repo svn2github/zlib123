@@ -959,7 +959,7 @@
           <xsl:with-param name="cellNumber">
             <xsl:choose>
               <xsl:when
-                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))">
+                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))">
                 <xsl:value-of select="$cellNumber + 1"/>
               </xsl:when>
               <xsl:otherwise>
@@ -1349,8 +1349,17 @@
               </v>
             </xsl:when>
 
-            <!-- TO DO  time-->
-            <xsl:when test="@office:value-type = 'time'"/>
+            <!-- time-->
+            <xsl:when test="@office:value-type = 'time'">
+              <v>
+                <xsl:call-template name="TimeToNumber">
+                  <xsl:with-param name="value">
+                    <xsl:value-of select="@office:time-value"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </v>
+            </xsl:when>
+            
             <!-- last or when number cell has error -->
             <xsl:when
               test="not(@office:value-type='float') and @office:value-type = 'string' or @office:value-type = 'boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency'))">

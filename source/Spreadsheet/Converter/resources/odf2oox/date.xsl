@@ -54,6 +54,24 @@
     </xsl:choose>
   </xsl:template>
   
+  <xsl:template match="number:time-style" mode="numFormat">
+    <xsl:param name="numId"/>
+    <numFmt numFmtId="{$numId}">
+      <xsl:attribute name="formatCode">
+        <xsl:apply-templates mode="date"/>
+      </xsl:attribute>
+    </numFmt>
+    <xsl:choose>
+      <xsl:when test="following-sibling::number:time-style">
+        <xsl:apply-templates select="following-sibling::number:time-style[1]" mode="numFormat">
+          <xsl:with-param name="numId">
+            <xsl:value-of select="$numId + 1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
   <!-- insert year format -->
   
   <xsl:template match="number:year" mode="date">
@@ -94,10 +112,12 @@
   <!-- insert hour format -->
   
   <xsl:template match="number:hours" mode="date">
+    <xsl:if test="parent::node()/@number:truncate-on-overflow='false'">[</xsl:if>
     <xsl:choose>
       <xsl:when test="@number:style='long'">hh</xsl:when>
       <xsl:otherwise>h</xsl:otherwise>
     </xsl:choose>
+    <xsl:if test="parent::node()/@number:truncate-on-overflow='false'">]</xsl:if>
   </xsl:template>
   
   <!-- insert minute format -->
@@ -120,6 +140,20 @@
       <xsl:when test="@number:style='long'">ss</xsl:when>
       <xsl:otherwise>s</xsl:otherwise>
     </xsl:choose>
+    <xsl:if test="@number:decimal-places and @number:decimal-places != ''">
+      <xsl:call-template name="AddDecimalPlaces">
+        <xsl:with-param name="value">.</xsl:with-param>
+        <xsl:with-param name="num">
+          <xsl:value-of select="@number:decimal-places"/>
+        </xsl:with-param>
+        <xsl:with-param name="decimalReplacement">
+          <xsl:choose>
+            <xsl:when test="@number:decimal-replacement=''">#</xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
   
   <!-- add all formatting characters -->

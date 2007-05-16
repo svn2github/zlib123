@@ -44,6 +44,7 @@
   <xsl:key name="percentage" match="number:percentage-style" use="@style:name"/>
   <xsl:key name="currency" match="number:currency-style" use="@style:name"/>
   <xsl:key name="date" match="number:date-style" use="@style:name"/>
+  <xsl:key name="time" match="number:time-style" use="@style:name"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
 
   <xsl:template name="styles">
@@ -120,9 +121,23 @@
         />
       </xsl:variable>
 
+      <!-- number of all time styles in content.xml -->
+      <xsl:variable name="countTime">
+        <xsl:value-of
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
+        />
+      </xsl:variable>
+      
+      <!-- number of all time styles in styles.xml -->
+      <xsl:variable name="countStyleTime">
+        <xsl:value-of
+          select="count(document('styles.xml')/office:document-styles/office:styles/number:time-style)"
+        />
+      </xsl:variable>
+      
       <xsl:attribute name="count">
         <xsl:value-of
-          select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+$countDate+$countStyleDate"
+          select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+$countDate+$countStyleDate+$countTime+$countStyleTime"
         />
       </xsl:attribute>
 
@@ -211,6 +226,30 @@
         <xsl:with-param name="styleName"/>
       </xsl:apply-templates>
 
+      <!-- apply time styles from content.xml -->
+      <xsl:apply-templates
+        select="document('content.xml')/office:document-content/office:automatic-styles/number:time-style[1]"
+        mode="numFormat">
+        <xsl:with-param name="numId">
+          <xsl:value-of
+            select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+$countDate+$countStyleDate+1"
+          />
+        </xsl:with-param>
+        <xsl:with-param name="styleName"/>
+      </xsl:apply-templates>
+      
+      <!-- apply time styles from styles.xml -->
+      <xsl:apply-templates
+        select="document('styles.xml')/office:document-styles/office:styles/number:time-style[1]"
+        mode="numFormat">
+        <xsl:with-param name="numId">
+          <xsl:value-of
+            select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+$countDate+$countStyleDate+$countTime+1"
+          />
+        </xsl:with-param>
+        <xsl:with-param name="styleName"/>
+      </xsl:apply-templates>
+      
     </numFmts>
   </xsl:template>
 
@@ -397,6 +436,18 @@
       />
     </xsl:variable>
 
+    <xsl:variable name="styleDateStyleCount">
+      <xsl:value-of
+        select="count(document('styles.xml')/office:document-styles/office:styles/number:date-style)"
+      />
+    </xsl:variable>
+    
+    <xsl:variable name="timeStyleCount">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
+      />
+    </xsl:variable>
+    
     <xsl:variable name="contentFontsCount">
       <xsl:value-of
         select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
@@ -443,6 +494,12 @@
         </xsl:with-param>
         <xsl:with-param name="dateStyleCount">
           <xsl:value-of select="$dateStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="styleDateStyleCount">
+          <xsl:value-of select="$styleDateStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="timeStyleCount">
+          <xsl:value-of select="$timeStyleCount"/>
         </xsl:with-param>
         <xsl:with-param name="FileName">
           <xsl:text>styles</xsl:text>
@@ -495,6 +552,12 @@
         <xsl:with-param name="dateStyleCount">
           <xsl:value-of select="$dateStyleCount"/>
         </xsl:with-param>
+        <xsl:with-param name="styleDateStyleCount">
+          <xsl:value-of select="$styleDateStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="timeStyleCount">
+          <xsl:value-of select="$timeStyleCount"/>
+        </xsl:with-param>
         <xsl:with-param name="contentFontsCount">
           <xsl:value-of select="$contentFontsCount"/>
         </xsl:with-param>
@@ -526,6 +589,12 @@
         </xsl:with-param>
         <xsl:with-param name="dateStyleCount">
           <xsl:value-of select="$dateStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="styleDateStyleCount">
+          <xsl:value-of select="$styleDateStyleCount"/>
+        </xsl:with-param>
+        <xsl:with-param name="timeStyleCount">
+          <xsl:value-of select="$timeStyleCount"/>
         </xsl:with-param>
         <xsl:with-param name="FileName">
           <xsl:text>styles</xsl:text>
@@ -618,6 +687,8 @@
     <xsl:param name="currencyStyleCount"/>
     <xsl:param name="styleCurrencyStyleCount"/>
     <xsl:param name="dateStyleCount"/>
+    <xsl:param name="styleDateStyleCount"/>
+    <xsl:param name="timeStyleCount"/>
     <xsl:param name="FileName"/>
     <xsl:param name="AtributeName"/>
     <xsl:param name="contentFontsCount"/>
@@ -635,6 +706,8 @@
         <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
         <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
         <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
+        <xsl:with-param name="styleDateStyleCount" select="$styleDateStyleCount"/>
+        <xsl:with-param name="timeStyleCount" select="$timeStyleCount"/>
       </xsl:call-template>
     </xsl:variable>
 
@@ -1364,6 +1437,18 @@
       />
     </xsl:variable>
 
+    <xsl:variable name="styleDateStyleCount">
+      <xsl:value-of
+        select="count(document('styles.xml')/office:document-styles/office:styles/number:date-style)"
+      />
+    </xsl:variable>
+    
+    <xsl:variable name="timeStyleCount">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
+      />
+    </xsl:variable>
+    
     <xsl:variable name="contentFontsCount">
       <xsl:value-of
         select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
@@ -1423,6 +1508,8 @@
             <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
             <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
             <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
+            <xsl:with-param name="styleDateStyleCount" select="$styleDateStyleCount"/>
+            <xsl:with-param name="timeStyleCount" select="$timeStyleCount"/>
           </xsl:call-template>
         </xsl:variable>
 
@@ -1583,7 +1670,9 @@
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template name="InheritHorizontalAlign">
+  <!-- template to get horizontal align inherited from parent style-->
+ 
+    <xsl:template name="InheritHorizontalAlign">
     <xsl:choose>
       <xsl:when test="style:paragraph-properties/@fo:text-align">
         <xsl:value-of select="style:paragraph-properties/@fo:text-align"/>
@@ -1610,6 +1699,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get repeat content inherited from parent style -->
+  
   <xsl:template name="InheritRepeatContent">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@style:repeat-content">
@@ -1637,6 +1728,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get vertical align inherited from parent style -->
+  
   <xsl:template name="InheritVerticalAlign">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@style:vertical-align">
@@ -1664,6 +1757,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get rotation inherited from parent style -->
+  
   <xsl:template name="InheritRotation">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@style:rotation-angle">
@@ -1691,6 +1786,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get vertical text inherited from parent style -->
+  
   <xsl:template name="InheritVerticalText">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@style:direction">
@@ -1718,6 +1815,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get word wrap inherited from parent style -->
+  
   <xsl:template name="InheritWordWrap">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@fo:wrap-option">
@@ -1745,6 +1844,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get font weight inherited from parent style -->
+  
   <xsl:template name="InheritFontWeight">
     <xsl:choose>
       <xsl:when test="style:text-properties/@fo:font-weight">
@@ -1771,6 +1872,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get font weight complex inherited from parent style -->
+  
   <xsl:template name="InheritFontWeightComplex">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:font-weight-complex">
@@ -1797,6 +1900,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get font size inherited from parent style -->
+  
   <xsl:template name="InheritFontStyle">
     <xsl:choose>
       <xsl:when test="style:text-properties/@fo:font-style">
@@ -1823,6 +1928,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get underline style inherited from parent style -->
+  
   <xsl:template name="InheritFontUnderlineStyle">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:text-underline-style">
@@ -1849,6 +1956,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get underline type inherited from parent style -->
+  
   <xsl:template name="InheritFontUnderlineType">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:text-underline-type">
@@ -1875,6 +1984,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get font size inherited from parent style -->
+  
   <xsl:template name="InheritFontSize">
     <xsl:choose>
       <xsl:when test="style:text-properties/@fo:font-size">
@@ -1901,6 +2012,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get complex font size inherited from parent style -->
+  
   <xsl:template name="InheritFontSizeComplex">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:font-size-complex">
@@ -1927,6 +2040,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get asian font size inherited from parent style -->
+  
   <xsl:template name="InheritFontSizeAsian">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:font-size-asian">
@@ -1953,6 +2068,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get font strikethrough inherited from parent style -->
+  
   <xsl:template name="InheritFontStrikethrough">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:text-line-through-style">
@@ -1979,6 +2096,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get font color inherited from parent style -->
+  
   <xsl:template name="InheritFontColor">
     <xsl:choose>
       <xsl:when test="style:text-properties/@fo:color">
@@ -2005,6 +2124,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get font family inherited from parent style -->
+  
   <xsl:template name="InheritFontFamily">
     <xsl:choose>
       <xsl:when test="key('font',style:text-properties/@style:font-name)/@svg:font-family">
@@ -2031,6 +2152,8 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- template to get number format inherited from parent style -->
+  
   <xsl:template name="NumFmtId">
     <xsl:param name="FileName"/>
     <xsl:param name="numStyleCount"/>
@@ -2040,6 +2163,8 @@
     <xsl:param name="currencyStyleCount"/>
     <xsl:param name="styleCurrencyStyleCount"/>
     <xsl:param name="dateStyleCount"/>
+    <xsl:param name="styleDateStyleCount"/>
+    <xsl:param name="timeStyleCount"/>
 
     <xsl:choose>
       <xsl:when test="@style:data-style-name">
@@ -2054,6 +2179,8 @@
           <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
           <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
           <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
+          <xsl:with-param name="styleDateStyleCount" select="$styleDateStyleCount"/>
+          <xsl:with-param name="timeStyleCount" select="$timeStyleCount"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="@style:parent-style-name != '' and @style:parent-style-name != 'Default'">
@@ -2072,6 +2199,8 @@
                 <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
                 <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
                 <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
+                <xsl:with-param name="styleDateStyleCount" select="$styleDateStyleCount"/>
+                <xsl:with-param name="timeStyleCount" select="$timeStyleCount"/>
               </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
@@ -2089,6 +2218,8 @@
                 <xsl:with-param name="currencyStyleCount" select="$currencyStyleCount"/>
                 <xsl:with-param name="styleCurrencyStyleCount" select="$styleCurrencyStyleCount"/>
                 <xsl:with-param name="dateStyleCount" select="$dateStyleCount"/>
+                <xsl:with-param name="styleDateStyleCount" select="$styleDateStyleCount"/>
+                <xsl:with-param name="timeStyleCount" select="$timeStyleCount"/>
               </xsl:call-template>
             </xsl:for-each>
           </xsl:otherwise>

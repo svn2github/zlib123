@@ -384,6 +384,24 @@
     
   </xsl:template>
 
+  <!-- template which converts time to number -->
+  
+  <xsl:template name="TimeToNumber">
+    <xsl:param name="value"/>
+    <xsl:variable name="hour">
+      <xsl:value-of select="substring-after(substring-before($value,'H'),'T')"/>
+    </xsl:variable>
+    <xsl:variable name="minutes">
+      <xsl:value-of select="substring-before(substring-after($value,'H'),'M')"/>
+    </xsl:variable>
+    <xsl:variable name="seconds">
+      <xsl:value-of select="substring-before(substring-after($value,'M'),'S')"/>
+    </xsl:variable>
+    <xsl:value-of
+      select="$hour div 24 + $minutes div 1440 + $seconds div 8640"
+    />
+  </xsl:template>
+  
   <xsl:template name="MonthsToDays">
     <xsl:param name="month"/>
     <xsl:param name="isYearLeap"/>
