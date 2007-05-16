@@ -54,9 +54,9 @@
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>
- <!-- when there are only picture in sheet  -->
+      <!-- when there are only picture in sheet  -->
       <xsl:when
-        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell != ''">     
+        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell != ''">
         <xsl:call-template name="InsertEmptySheetWithPicture">
           <xsl:with-param name="PictureCell">
             <xsl:value-of select="$PictureCell"/>
@@ -246,6 +246,80 @@
 
   </xsl:template>
 
+  <xsl:template name="InsertThisColumn">
+    <xsl:param name="DefaultCellStyleName"/>
+    <xsl:param name="headerColsStart"/>
+    <xsl:param name="headerColsEnd"/>
+    <xsl:param name="beforeHeader" select="'false'"/>
+    <xsl:param name="afterHeader" select="'false'"/>
+
+    <table:table-column table:style-name="{generate-id(.)}">
+
+      <xsl:choose>
+        <!-- when this is the rest of a column range after header -->
+        <xsl:when test="$afterHeader = 'true' ">
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:value-of select="@max - $headerColsEnd"/>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- when this is the part of a column range before header -->
+        <xsl:when test="$beforeHeader = 'true'">
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:value-of select="$headerColsStart - @min"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@min = $headerColsEnd"/>
+        <!-- when this column range starts before header and ends after -->
+        <xsl:when
+          test="$headerColsStart != '' and (@min &lt; $headerColsStart and @max &gt; $headerColsEnd)">
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:value-of select="$headerColsEnd - $headerColsStart + 1"/>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- when this column range starts before header and ends inside -->
+        <xsl:when
+          test="$headerColsStart != '' and @min &lt; $headerColsStart and @max &gt;= $headerColsStart">
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:value-of select="@max - $headerColsStart + 1"/>
+          </xsl:attribute>
+        </xsl:when>
+        <!-- when this column range starts inside header and ends outside -->
+        <xsl:when
+          test="$headerColsEnd != '' and @min &lt; $headerColsEnd and @max &gt; $headerColsEnd">
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:value-of select="$headerColsEnd - @min + 1"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="not(@min = @max)">
+            <xsl:attribute name="table:number-columns-repeated">
+              <xsl:value-of select="@max - @min + 1"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+
+      <xsl:attribute name="table:default-cell-style-name">
+        <xsl:value-of select="$DefaultCellStyleName"/>
+      </xsl:attribute>
+      <xsl:if test="@hidden=1">
+        <xsl:attribute name="table:visibility">
+          <xsl:text>collapse</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test="@style">
+        <xsl:variable name="position">
+          <xsl:value-of select="@style + 1"/>
+        </xsl:variable>
+        <xsl:attribute name="table:default-cell-style-name">
+          <xsl:for-each select="document('xl/styles.xml')">
+            <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+          </xsl:for-each>
+        </xsl:attribute>
+      </xsl:if>
+    </table:table-column>
+  </xsl:template>
+
   <xsl:template name="InsertEmptyCell">
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
@@ -403,10 +477,10 @@
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
-    
+
     <xsl:message terminate="no">progress:c</xsl:message>
     <xsl:choose>
-      
+
       <!-- Insert covered cell if this is Merge Cell -->
       <xsl:when test="contains($CheckIfMerge,'true')">
         <xsl:choose>
@@ -431,7 +505,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <!-- insert this one cell-->
         <table:table-cell>
@@ -572,21 +646,22 @@
                 </xsl:variable>
                 <xsl:variable name="numId">
                   <xsl:for-each select="document('xl/styles.xml')">
-                    <xsl:value-of
-                      select="key('Xf','')[position()=$position]/@numFmtId"
-                    />
+                    <xsl:value-of select="key('Xf','')[position()=$position]/@numFmtId"/>
                   </xsl:for-each>
                 </xsl:variable>
                 <xsl:attribute name="office:value-type">
                   <xsl:choose>
-                    <xsl:when test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
+                    <xsl:when
+                      test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
                       <xsl:text>percentage</xsl:text>
                     </xsl:when>
                     <!--'and' at the end is for Latvian currency -->
-                    <xsl:when test="(contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22) and not(contains($numStyle,'[$Ls-426]'))">
+                    <xsl:when
+                      test="(contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22) and not(contains($numStyle,'[$Ls-426]'))">
                       <xsl:text>date</xsl:text>
                     </xsl:when>
-                    <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
+                    <xsl:when
+                      test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
                       <xsl:text>currency</xsl:text>
                     </xsl:when>
                     <xsl:when test="$numId = 49">
@@ -599,7 +674,8 @@
                 </xsl:attribute>
                 <xsl:choose>
                   <!--'and' at the end is for Latvian currency -->
-                  <xsl:when test="(contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22) and not(contains($numStyle,'[$Ls-426]'))">
+                  <xsl:when
+                    test="(contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22) and not(contains($numStyle,'[$Ls-426]'))">
                     <xsl:attribute name="office:date-value">
                       <xsl:call-template name="NumberToDate">
                         <xsl:with-param name="value">
@@ -616,55 +692,56 @@
                 </xsl:choose>
                 <text:p>
                   <xsl:choose>
-                    <xsl:when test="contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
-                    <xsl:call-template name="FormatDate">
-                      <xsl:with-param name="value">
-                        <xsl:call-template name="NumberToDate">
-                          <xsl:with-param name="value">
-                            <xsl:value-of select="e:v"/>
-                          </xsl:with-param>
-                        </xsl:call-template>
-                      </xsl:with-param>
-                      <xsl:with-param name="format">
-                        <xsl:choose>
-                          <xsl:when test="contains($numStyle,']')">
-                            <xsl:value-of select="substring-after($numStyle,']')"/>
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:value-of select="$numStyle"/>
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:with-param>
-                      <xsl:with-param name="numId">
-                        <xsl:value-of select="$numId"/>
-                      </xsl:with-param>
-                      <xsl:with-param name="processedFormat">
-                        <xsl:choose>
-                          <xsl:when test="contains($numStyle,']')">
-                            <xsl:value-of select="substring-after($numStyle,']')"/>
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:value-of select="$numStyle"/>
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:with-param>
-                      <xsl:with-param name="numValue">
-                        <xsl:value-of select="e:v"/>
-                      </xsl:with-param>
-                    </xsl:call-template>
-                  </xsl:when>
+                    <xsl:when
+                      test="contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                      <xsl:call-template name="FormatDate">
+                        <xsl:with-param name="value">
+                          <xsl:call-template name="NumberToDate">
+                            <xsl:with-param name="value">
+                              <xsl:value-of select="e:v"/>
+                            </xsl:with-param>
+                          </xsl:call-template>
+                        </xsl:with-param>
+                        <xsl:with-param name="format">
+                          <xsl:choose>
+                            <xsl:when test="contains($numStyle,']')">
+                              <xsl:value-of select="substring-after($numStyle,']')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="$numStyle"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:with-param>
+                        <xsl:with-param name="numId">
+                          <xsl:value-of select="$numId"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="processedFormat">
+                          <xsl:choose>
+                            <xsl:when test="contains($numStyle,']')">
+                              <xsl:value-of select="substring-after($numStyle,']')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="$numStyle"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:with-param>
+                        <xsl:with-param name="numValue">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:when>
                     <xsl:otherwise>
-                  <xsl:call-template name="FormatNumber">
-                    <xsl:with-param name="value">
-                      <xsl:value-of select="e:v"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="numStyle">
-                      <xsl:value-of select="$numStyle"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="numId">
-                      <xsl:value-of select="$numId"/>
-                    </xsl:with-param>
-                  </xsl:call-template>
+                      <xsl:call-template name="FormatNumber">
+                        <xsl:with-param name="value">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="numStyle">
+                          <xsl:value-of select="$numStyle"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="numId">
+                          <xsl:value-of select="$numId"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
                     </xsl:otherwise>
                   </xsl:choose>
                 </text:p>
@@ -672,7 +749,7 @@
             </xsl:choose>
           </xsl:if>
         </table:table-cell>
-        
+
         <!-- Insert covered cell if Merge Cell is starting-->
         <xsl:choose>
           <xsl:when
@@ -716,10 +793,10 @@
             </xsl:if>
           </xsl:when>
         </xsl:choose>
-        
+
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
 
   <xsl:template name="InsertNextCell">
@@ -775,7 +852,7 @@
               <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
             </xsl:for-each>
           </xsl:variable>
-          
+
           <xsl:choose>
             <xsl:when test="$horizontal = 'centerContinuous' ">
               <xsl:call-template name="CountContinuous"/>
@@ -790,7 +867,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
 
       <!-- calc supports only 256 columns -->
@@ -988,17 +1065,106 @@
         <xsl:value-of select="generate-id(key('Xf', '')[1])"/>
       </xsl:for-each>
     </xsl:variable>
-    <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:cols">
-      <xsl:apply-templates select="e:col[1]">
+
+    <xsl:variable name="sheetName">
+      <xsl:value-of select="@name"/>
+    </xsl:variable>
+
+    <xsl:variable name="charHeaderColsStart">
+      <xsl:for-each
+        select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and contains(text(),$sheetName)]">
+        <xsl:choose>
+          <!-- when header columns are present -->
+          <xsl:when test="contains(text(),',')">
+            <xsl:value-of
+              select="substring-before(substring-after(substring-before(text(),','),'$'),':')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-before(substring-after(text(),'$'),':')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="charHeaderColsEnd">
+      <xsl:for-each
+        select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and contains(text(),$sheetName)]">
+        <xsl:choose>
+          <!-- when header columns are present -->
+          <xsl:when test="contains(text(),',')">
+            <xsl:value-of
+              select="substring-after(substring-after(substring-before(text(),','),':'),'$')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="substring-after(substring-after(text(),':'),'$')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="headerColsStart">
+      <xsl:if test="$charHeaderColsStart != '' and not(number($charHeaderColsStart))">
+        <xsl:call-template name="GetAlphabeticPosition">
+          <xsl:with-param name="literal" select="$charHeaderColsStart"/>
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:variable name="headerColsEnd">
+      <xsl:if test="$charHeaderColsEnd != '' and not(number($charHeaderColsEnd))">
+        <xsl:call-template name="GetAlphabeticPosition">
+          <xsl:with-param name="literal" select="$charHeaderColsEnd"/>
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet">
+
+      <xsl:apply-templates select="e:cols/e:col[1]">
         <xsl:with-param name="number">1</xsl:with-param>
         <xsl:with-param name="sheet" select="$sheet"/>
         <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+        <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
+        <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
       </xsl:apply-templates>
+
+      <!-- if all columns are default (there aren't any e:col tags) and there is a header -->
+      <xsl:if test="not(e:cols/e:col) and $headerColsStart != '' ">
+
+        <!-- insert columns before header -->
+        <xsl:if test="$headerColsStart &gt; 1">
+          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+            table:number-columns-repeated="{$headerColsStart - 1}">
+            <xsl:attribute name="table:default-cell-style-name">
+              <xsl:value-of select="$DefaultCellStyleName"/>
+            </xsl:attribute>
+          </table:table-column>
+        </xsl:if>
+
+        <!-- insert header columns -->
+        <table:table-header-columns>
+          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+            table:number-columns-repeated="{$headerColsEnd - $headerColsStart + 1}">
+            <xsl:attribute name="table:default-cell-style-name">
+              <xsl:value-of select="$DefaultCellStyleName"/>
+            </xsl:attribute>
+          </table:table-column>
+        </table:table-header-columns>
+      </xsl:if>
     </xsl:for-each>
 
     <!-- apply default column style for last columns which style wasn't changed -->
     <xsl:for-each select="document(concat('xl/',$sheet))">
       <xsl:choose>
+        <xsl:when
+          test="$headerColsStart != '' and not(key('Col', '')[@max &gt; $headerColsEnd])">
+          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+            table:number-columns-repeated="{256 - $headerColsEnd}">
+            <xsl:attribute name="table:default-cell-style-name">
+              <xsl:value-of select="$DefaultCellStyleName"/>
+            </xsl:attribute>
+          </table:table-column>
+        </xsl:when>
         <xsl:when test="not(key('Col', ''))">
           <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}"
             table:number-columns-repeated="256">
@@ -1025,12 +1191,14 @@
     <xsl:param name="number"/>
     <xsl:param name="sheet"/>
     <xsl:param name="DefaultCellStyleName"/>
+    <xsl:param name="headerColsStart"/>
+    <xsl:param name="headerColsEnd"/>
 
     <!-- if there were columns with default properties before this column then insert default columns-->
     <xsl:choose>
       <!-- when this column is the first non-default one but it's not the column A -->
-      <xsl:when test="$number=1 and @min>1">
-
+      <xsl:when
+        test="$number = 1 and @min &gt; 1 and ($headerColsStart= '' or $headerColsStart &gt; 1)">
         <table:table-column>
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="document(concat('xl/',$sheet))">
@@ -1043,29 +1211,456 @@
           </xsl:attribute>
 
           <xsl:attribute name="table:number-columns-repeated">
-            <xsl:value-of select="@min - 1"/>
+            <xsl:choose>
+              <!-- when there is a header -->
+              <xsl:when test="$headerColsStart != '' ">
+                <xsl:choose>
+                  <xsl:when test="@min &lt; $headerColsStart">
+                    <xsl:value-of select="@min - 1"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$headerColsStart - 1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
+
+              <xsl:otherwise>
+                <xsl:value-of select="@min - 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
 
           <!-- Possible are nesesary code -->
           <!--xsl:if test="@style">            
             <xsl:variable name="position">
-              <xsl:value-of select="$this/@style + 1"/>
+            <xsl:value-of select="$this/@style + 1"/>
             </xsl:variable>
             
             <xsl:attribute name="table:default-cell-style-name">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-              </xsl:for-each>
+            <xsl:for-each select="document('xl/styles.xml')">
+            <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+            </xsl:for-each>
             </xsl:attribute>
             </xsl:if-->
-          
+
         </table:table-column>
 
       </xsl:when>
       <!-- when this column is not first non-default one and there were default columns after previous non-default column (if there was a gap between this and previous column)-->
-      <xsl:when test="preceding::e:col[1]/@max &lt; @min - 1">
-        <table:table-column>
+      <xsl:when test="preceding-sibling::e:col[1]/@max &lt; @min - 1">
+        <xsl:choose>
+          <!-- when there is a header -->
+          <xsl:when test="$headerColsStart != '' ">
+            <xsl:choose>
+              <xsl:when test="preceding-sibling::e:col/@max + 1 = $headerColsStart"/>
+              <!-- insert empty columns before header -->
+              <xsl:when
+                test="@min &gt; $headerColsStart and preceding-sibling::e:col[1]/@max &lt; $headerColsStart">
+                <table:table-column>
+                  <xsl:attribute name="table:style-name">
+                    <xsl:for-each select="document(concat('xl/',$sheet))">
+                      <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+                    </xsl:for-each>
+                  </xsl:attribute>
 
+                  <xsl:attribute name="table:default-cell-style-name">
+                    <xsl:value-of select="$DefaultCellStyleName"/>
+                  </xsl:attribute>
+
+                  <xsl:if test="$headerColsStart - preceding::e:col[1]/@max - 1 &gt; 1">
+                    <xsl:attribute name="table:number-columns-repeated">
+                      <xsl:value-of select="$headerColsStart - preceding::e:col[1]/@max - 1"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                </table:table-column>
+              </xsl:when>
+              <xsl:when test="@min = $headerColsEnd + 1"/>
+              <!-- insert empty columns after header -->
+              <xsl:when
+                test="@min &gt; $headerColsEnd and preceding-sibling::e:col[1]/@max &lt; $headerColsEnd">
+                <table:table-column>
+                  <xsl:attribute name="table:style-name">
+                    <xsl:for-each select="document(concat('xl/',$sheet))">
+                      <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+                    </xsl:for-each>
+                  </xsl:attribute>
+
+                  <xsl:attribute name="table:default-cell-style-name">
+                    <xsl:value-of select="$DefaultCellStyleName"/>
+                  </xsl:attribute>
+
+                  <xsl:if test="@min - $headerColsEnd - 1 &gt; 1">
+                    <xsl:attribute name="table:number-columns-repeated">
+                      <xsl:value-of select="@min - $headerColsEnd - 1"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                </table:table-column>
+              </xsl:when>
+              <!-- insert simple empty rows -->
+              <xsl:otherwise>
+                <table:table-column>
+                  <xsl:attribute name="table:style-name">
+                    <xsl:for-each select="document(concat('xl/',$sheet))">
+                      <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+                    </xsl:for-each>
+                  </xsl:attribute>
+
+                  <xsl:attribute name="table:default-cell-style-name">
+                    <xsl:value-of select="$DefaultCellStyleName"/>
+                  </xsl:attribute>
+
+                  <xsl:if test="@min - preceding::e:col[1]/@max - 1 &gt; 1">
+                    <xsl:attribute name="table:number-columns-repeated">
+                      <xsl:value-of select="@min - preceding::e:col[1]/@max - 1"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                </table:table-column>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+
+          <xsl:otherwise>
+            <table:table-column>
+              <xsl:attribute name="table:style-name">
+                <xsl:for-each select="document(concat('xl/',$sheet))">
+                  <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+                </xsl:for-each>
+              </xsl:attribute>
+
+              <xsl:attribute name="table:number-columns-repeated">
+                <xsl:value-of select="@min - preceding::e:col[1]/@max - 1"/>
+              </xsl:attribute>
+
+              <xsl:attribute name="table:default-cell-style-name">
+                <xsl:value-of select="$DefaultCellStyleName"/>
+              </xsl:attribute>
+            </table:table-column>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </xsl:when>
+    </xsl:choose>
+
+    <!-- insert this column -->
+    <xsl:choose>
+      <!-- if this is the first column after beginning of the header -->
+      <xsl:when
+        test="$headerColsStart != '' and (@max &gt;= $headerColsStart and not(preceding-sibling::e:col[1]/@max &gt;= $headerColsStart))">
+
+        <!-- insert part of a column range (range: @max > @min) before header-->
+        <xsl:if test="@min &lt; $headerColsStart and @max &gt;= $headerColsStart">
+          <xsl:call-template name="InsertThisColumn">
+            <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+            <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
+            <xsl:with-param name="beforeHeader" select="'true'"/>
+          </xsl:call-template>
+        </xsl:if>
+
+        <table:table-header-columns>
+
+          <!-- insert column settings at the beginning of the header -->
+          <xsl:choose>
+            <!-- insert previous column settings -->
+            <xsl:when test="preceding-sibling::e:col[1][@max &gt;= $headerColsStart]">
+              <xsl:variable name="preceding">
+                <xsl:value-of select="preceding-sibling::node()[1]"/>
+              </xsl:variable>
+
+              <table:table-column table:style-name="{generate-id(preceding-sibling::node()[1])}">
+                <xsl:attribute name="table:number-columns-repeated">
+                  <xsl:value-of select="preceding-sibling::node()[1]/@max - $headerColsStart - 1"/>
+                </xsl:attribute>
+
+                <xsl:attribute name="table:default-cell-style-name">
+                  <xsl:value-of select="$DefaultCellStyleName"/>
+                </xsl:attribute>
+
+                <xsl:if test="preceding-sibling::e:col[1]/@hidden=1">
+                  <xsl:attribute name="table:visibility">
+                    <xsl:text>collapse</xsl:text>
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:if test="preceding-sibling::e:col[1]/@style">
+                  <xsl:variable name="position">
+                    <xsl:value-of select="preceding-sibling::e:col[1]/@style + 1"/>
+                  </xsl:variable>
+                  <xsl:attribute name="table:default-cell-style-name">
+                    <xsl:for-each select="document('xl/styles.xml')">
+                      <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+                    </xsl:for-each>
+                  </xsl:attribute>
+                </xsl:if>
+              </table:table-column>
+            </xsl:when>
+            <xsl:when test="@min &gt; $headerColsStart">
+              <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}">
+                <xsl:if test="@min - $headerColsStart &gt; 0">
+                  <xsl:attribute name="table:number-columns-repeated">
+                    <xsl:choose>
+                      <xsl:when test="@min &lt;= $headerColsEnd">
+                        <xsl:value-of select="@min - $headerColsStart"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$headerColsEnd - $headerColsStart + 1"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:attribute>
+                </xsl:if>
+
+                <xsl:attribute name="table:default-cell-style-name">
+                  <xsl:value-of select="$DefaultCellStyleName"/>
+                </xsl:attribute>
+              </table:table-column>
+            </xsl:when>
+          </xsl:choose>
+
+          <xsl:if test="@min &lt;= $headerColsEnd">
+            <xsl:call-template name="InsertThisColumn">
+              <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+              <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
+              <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+            </xsl:call-template>
+          </xsl:if>
+
+          <!-- insert next header-column -->
+          <xsl:if
+            test="following-sibling::e:col[@min &lt;= $headerColsEnd and @min &lt; 256][1]">
+            <xsl:apply-templates
+              select="following-sibling::e:col[@min &lt;= $headerColsEnd and @min &lt; 256][1]"
+              mode="header">
+              <xsl:with-param name="number" select="@max + 1"/>
+              <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+              <xsl:with-param name="sheet" select="$sheet"/>
+              <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
+              <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+            </xsl:apply-templates>
+          </xsl:if>
+
+          <!-- insert empty columns at the end of the header -->
+          <xsl:for-each
+            select="parent::node()/e:col[@min &lt;= 256 and @max &gt;= $headerColsStart and @min &lt;= $headerColsEnd][last()]">
+            <xsl:if test="@max &lt; $headerColsEnd">
+              <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}">
+
+                <xsl:attribute name="table:number-columns-repeated">
+                  <xsl:value-of select="$headerColsEnd - @max"/>
+                </xsl:attribute>
+
+                <xsl:attribute name="table:default-cell-style-name">
+                  <xsl:value-of select="$DefaultCellStyleName"/>
+                </xsl:attribute>
+              </table:table-column>
+            </xsl:if>
+          </xsl:for-each>
+
+        </table:table-header-columns>
+
+        <!-- if this column range starts inside header, but ends outside write rest of the columns outside header -->
+        <xsl:if test="@min &lt;= $headerColsEnd and @max &gt; $headerColsEnd">
+          <xsl:call-template name="InsertThisColumn">
+            <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+            <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+            <xsl:with-param name="afterHeader" select="'true'"/>
+          </xsl:call-template>
+        </xsl:if>
+
+        <!-- if further there is column range starts inside header, but ends outside write rest of the columns outside header -->
+        <xsl:for-each
+          select="following-sibling::e:col[@min &lt;= $headerColsEnd and @max &gt; $headerColsEnd]">
+          <xsl:call-template name="InsertThisColumn">
+            <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+            <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+            <xsl:with-param name="afterHeader" select="'true'"/>
+          </xsl:call-template>
+        </xsl:for-each>
+
+        <!-- if header is empty -->
+        <xsl:if test="@min &gt; $headerColsEnd">
+
+          <xsl:choose>
+            <!-- first row after start of the header is right after end of the header -->
+            <xsl:when test="@min = $headerColsEnd + 1">
+              <xsl:call-template name="InsertThisColumn">
+                <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- insert default columns between header and column -->
+              <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}">
+
+                <xsl:if test="@min &gt; $headerColsEnd + 2">
+                  <xsl:attribute name="table:number-columns-repeated">
+                    <xsl:value-of select="@min - $headerColsEnd - 1"/>
+                  </xsl:attribute>
+                </xsl:if>
+
+                <xsl:attribute name="table:default-cell-style-name">
+                  <xsl:value-of select="$DefaultCellStyleName"/>
+                </xsl:attribute>
+              </table:table-column>
+
+              <xsl:call-template name="InsertThisColumn">
+                <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+
+      </xsl:when>
+      <!-- if header is after the last column -->
+      <xsl:when test="not(following-sibling::e:col) and @max &lt; $headerColsStart">
+
+        <xsl:call-template name="InsertThisColumn">
+          <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+        </xsl:call-template>
+
+        <!-- insert default columns before header -->
+        <xsl:if test="$headerColsStart &gt; @max + 1">
+          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}">
+
+            <xsl:if test="$headerColsStart &gt; @max + 2">
+              <xsl:attribute name="table:number-columns-repeated">
+                <xsl:value-of select="$headerColsStart - @max - 1"/>
+              </xsl:attribute>
+            </xsl:if>
+
+            <xsl:attribute name="table:default-cell-style-name">
+              <xsl:value-of select="$DefaultCellStyleName"/>
+            </xsl:attribute>
+          </table:table-column>
+        </xsl:if>
+
+        <table:table-header-columns>
+          <table:table-column table:style-name="{generate-id(key('SheetFormatPr', ''))}">
+
+            <xsl:if test="$headerColsEnd  - $headerColsStart &gt; 1">
+              <xsl:attribute name="table:number-columns-repeated">
+                <xsl:value-of select="$headerColsEnd  - $headerColsStart + 1"/>
+              </xsl:attribute>
+            </xsl:if>
+
+            <xsl:attribute name="table:default-cell-style-name">
+              <xsl:value-of select="$DefaultCellStyleName"/>
+            </xsl:attribute>
+          </table:table-column>
+        </table:table-header-columns>
+
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="InsertThisColumn">
+          <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+
+    <!-- insert next column -->
+    <xsl:choose>
+
+      <!-- calc supports only 256 columns -->
+      <xsl:when test="$number &gt; 255">
+        <xsl:message terminate="no">translation.oox2odf.ColNumber</xsl:message>
+      </xsl:when>
+
+      <xsl:when test="$headerColsStart = '' ">
+        <xsl:apply-templates select="following-sibling::e:col[1]">
+          <xsl:with-param name="number" select="@max + 1"/>
+          <xsl:with-param name="sheet" select="$sheet"/>
+          <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+          <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
+          <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+        </xsl:apply-templates>
+      </xsl:when>
+
+      <!-- if next is the first header column -->
+      <xsl:when
+        test="@max &lt; $headerColsStart and following-sibling::e:col[1][@min &lt;= $headerColsEnd and @max &gt;= $headerColsStart]">
+        <xsl:apply-templates select="following-sibling::e:col[1]">
+          <xsl:with-param name="number" select="@max + 1"/>
+          <xsl:with-param name="sheet" select="$sheet"/>
+          <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+          <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
+          <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+        </xsl:apply-templates>
+      </xsl:when>
+
+      <!-- jump over the header -->
+      <xsl:when
+        test="following-sibling::e:col[@min &lt; $headerColsStart or @min &gt; $headerColsEnd]">
+        <xsl:apply-templates
+          select="following-sibling::e:col[@min &lt; $headerColsStart or @min &gt; $headerColsEnd][1]">
+          <xsl:with-param name="number" select="@max + 1"/>
+          <xsl:with-param name="sheet" select="$sheet"/>
+          <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+          <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
+          <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+        </xsl:apply-templates>
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template match="e:col" mode="header">
+    <xsl:param name="number"/>
+    <xsl:param name="sheet"/>
+    <xsl:param name="DefaultCellStyleName"/>
+    <xsl:param name="headerColsStart"/>
+    <xsl:param name="headerColsEnd"/>
+
+    <!-- if there were columns with default properties before this column then insert default columns-->
+    <xsl:choose>
+      <!-- when this column is the first non-default one but it's not the column A -->
+      <xsl:when
+        test="$number = 1 and @min &gt; 1 and ($headerColsStart= '' or $headerColsStart &gt; 1)">
+        <table:table-column>
+          <xsl:attribute name="table:style-name">
+            <xsl:for-each select="document(concat('xl/',$sheet))">
+              <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
+            </xsl:for-each>
+          </xsl:attribute>
+
+          <xsl:attribute name="table:default-cell-style-name">
+            <xsl:value-of select="$DefaultCellStyleName"/>
+          </xsl:attribute>
+
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:choose>
+              <!-- when there is a header -->
+              <xsl:when test="$headerColsStart != '' ">
+                <xsl:choose>
+                  <xsl:when test="@min &lt; $headerColsStart">
+                    <xsl:value-of select="@min - 1"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$headerColsStart - 1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
+
+              <xsl:otherwise>
+                <xsl:value-of select="@min - 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+
+          <!-- Possible are nesesary code -->
+          <!--xsl:if test="@style">            
+            <xsl:variable name="position">
+            <xsl:value-of select="$this/@style + 1"/>
+            </xsl:variable>
+            
+            <xsl:attribute name="table:default-cell-style-name">
+            <xsl:for-each select="document('xl/styles.xml')">
+            <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+            </xsl:for-each>
+            </xsl:attribute>
+            </xsl:if-->
+
+        </table:table-column>
+
+      </xsl:when>
+      <!-- when this column is not first non-default one and there were default columns after previous non-default column (if there was a gap between this and previous column)-->
+      <xsl:when test="preceding-sibling::e:col[1]/@max &lt; @min - 1 ">
+        <table:table-column>
           <xsl:attribute name="table:style-name">
             <xsl:for-each select="document(concat('xl/',$sheet))">
               <xsl:value-of select="generate-id(key('SheetFormatPr', ''))"/>
@@ -1073,7 +1668,30 @@
           </xsl:attribute>
 
           <xsl:attribute name="table:number-columns-repeated">
-            <xsl:value-of select="@min - preceding::e:col[1]/@max - 1"/>
+            <xsl:choose>
+              <!-- when there is a header -->
+              <xsl:when test="$headerColsStart != '' ">
+                <xsl:choose>
+                  <!-- insert empty columns before header -->
+                  <xsl:when
+                    test="@min &gt; $headerColsStart and preceding-sibling::e:col[1]/@max &lt; $headerColsStart">
+                    <xsl:value-of select="$headerColsStart - preceding::e:col[1]/@max - 1"/>
+                  </xsl:when>
+                  <!-- insert empty columns after header -->
+                  <xsl:when
+                    test="@min &gt; $headerColsEnd and preceding-sibling::e:col[1]/@max &lt; $headerColsEnd">
+                    <xsl:value-of select="@max - $headerColsEnd - 1"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="@min - preceding::e:col[1]/@max - 1"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
+
+              <xsl:otherwise>
+                <xsl:value-of select="@min - preceding::e:col[1]/@max - 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
 
           <xsl:attribute name="table:default-cell-style-name">
@@ -1085,53 +1703,32 @@
     </xsl:choose>
 
     <!-- insert this column -->
-    <table:table-column table:style-name="{generate-id(.)}">
-      <xsl:if test="not(@min = @max)">
-        <xsl:attribute name="table:number-columns-repeated">
-          <xsl:value-of select="@max - @min + 1"/>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:attribute name="table:default-cell-style-name">
-        <xsl:value-of select="$DefaultCellStyleName"/>
-      </xsl:attribute>
-      <xsl:if test="@hidden=1">
-        <xsl:attribute name="table:visibility">
-          <xsl:text>collapse</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
-      <xsl:if test="@style">
-        <xsl:variable name="position">
-          <xsl:value-of select="@style + 1"/>
-        </xsl:variable>
-        <xsl:attribute name="table:default-cell-style-name">
-          <xsl:for-each select="document('xl/styles.xml')">
-            <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-          </xsl:for-each>
-        </xsl:attribute>
-      </xsl:if>
-    </table:table-column>
+    <xsl:call-template name="InsertThisColumn">
+      <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+      <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
+    </xsl:call-template>
 
     <!-- insert next column -->
     <xsl:choose>
-
       <!-- calc supports only 256 columns -->
       <xsl:when test="$number &gt; 255">
         <xsl:message terminate="no">translation.oox2odf.ColNumber</xsl:message>
       </xsl:when>
 
-      <xsl:otherwise>
-        <xsl:apply-templates select="following-sibling::e:col[1]">
-          <xsl:with-param name="number">
-            <xsl:value-of select="@max + 1"/>
-          </xsl:with-param>
-          <xsl:with-param name="sheet" select="$sheet"/>
+      <xsl:when
+        test="following-sibling::e:col[1][@min &lt;= $headerColsEnd and @min &lt; 256]">
+        <xsl:apply-templates select="following-sibling::e:col[1]" mode="header">
+          <xsl:with-param name="number" select="@max + 1"/>
           <xsl:with-param name="DefaultCellStyleName" select="$DefaultCellStyleName"/>
+          <xsl:with-param name="sheet" select="$sheet"/>
+          <xsl:with-param name="headerColsStart" select="$headerColsStart"/>
+          <xsl:with-param name="headerColsEnd" select="$headerColsEnd"/>
         </xsl:apply-templates>
-      </xsl:otherwise>
+      </xsl:when>
+
     </xsl:choose>
 
   </xsl:template>
-
   <!-- template which inserts number in a correct format -->
   <xsl:template name="FormatNumber">
     <xsl:param name="value"/>
@@ -1148,53 +1745,53 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:variable name="outputValue">
-    <xsl:choose>
-      <xsl:when test="contains($value,'.') and $numStyle and $numStyle!=''">
-        <xsl:call-template name="FormatAfterComma">
-          <xsl:with-param name="valueAfterComma">
-            <xsl:value-of select="substring-after($value,'.')"/>
-          </xsl:with-param>
-          <xsl:with-param name="valueBeforeComma">
-            <xsl:value-of select="substring-before($value,'.')"/>
-          </xsl:with-param>
-          <xsl:with-param name="format">
-            <xsl:choose>
-              <xsl:when test="contains($formatCode,'_')">
-                <xsl:value-of select="substring-before($formatCode,'_')"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$formatCode"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="contains($value,'.') and $numId = 10">
-        <xsl:call-template name="FormatAfterComma">
-          <xsl:with-param name="valueAfterComma">
-            <xsl:value-of select="substring-after($value,'.')"/>
-          </xsl:with-param>
-          <xsl:with-param name="valueBeforeComma">
-            <xsl:value-of select="substring-before($value,'.')"/>
-          </xsl:with-param>
-          <xsl:with-param name="format">0.00%</xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="$numId = 9">
-        <xsl:value-of select="format-number($value,'0%')"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$value"/>
-      </xsl:otherwise>
-    </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="contains($value,'.') and $numStyle and $numStyle!=''">
+          <xsl:call-template name="FormatAfterComma">
+            <xsl:with-param name="valueAfterComma">
+              <xsl:value-of select="substring-after($value,'.')"/>
+            </xsl:with-param>
+            <xsl:with-param name="valueBeforeComma">
+              <xsl:value-of select="substring-before($value,'.')"/>
+            </xsl:with-param>
+            <xsl:with-param name="format">
+              <xsl:choose>
+                <xsl:when test="contains($formatCode,'_')">
+                  <xsl:value-of select="substring-before($formatCode,'_')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$formatCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="contains($value,'.') and $numId = 10">
+          <xsl:call-template name="FormatAfterComma">
+            <xsl:with-param name="valueAfterComma">
+              <xsl:value-of select="substring-after($value,'.')"/>
+            </xsl:with-param>
+            <xsl:with-param name="valueBeforeComma">
+              <xsl:value-of select="substring-before($value,'.')"/>
+            </xsl:with-param>
+            <xsl:with-param name="format">0.00%</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="$numId = 9">
+          <xsl:value-of select="format-number($value,'0%')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$value"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
     <xsl:choose>
-      
+
       <!-- add '%' if it's percentage format-->
       <xsl:when test="contains($formatCode,'%') and not(contains($outputValue,'%'))">
         <xsl:value-of select="concat($outputValue,'%')"/>
       </xsl:when>
-      
+
       <!-- add currency symbol if there is one-->
       <xsl:when test="contains($formatCode,'[$') or contains($formatCode,'zł')">
         <xsl:variable name="currency">
@@ -1202,7 +1799,9 @@
             <xsl:when test="contains($formatCode,'zł')">zł</xsl:when>
             <xsl:when test="contains($formatCode,'Red')">
               <xsl:variable name="tempFormat">
-                <xsl:value-of select="substring-after(substring-before(substring-after($formatCode,'Red]'),']'),'[$')"/>
+                <xsl:value-of
+                  select="substring-after(substring-before(substring-after($formatCode,'Red]'),']'),'[$')"
+                />
               </xsl:variable>
               <xsl:choose>
                 <xsl:when test="contains($tempFormat,'-')">
@@ -1215,7 +1814,7 @@
             </xsl:when>
             <xsl:otherwise>
               <xsl:variable name="tempFormat2">
-              <xsl:value-of select="substring-after(substring-before($formatCode,']'),'[$')"/>
+                <xsl:value-of select="substring-after(substring-before($formatCode,']'),'[$')"/>
               </xsl:variable>
               <xsl:choose>
                 <xsl:when test="contains($tempFormat2,'-')">
@@ -1229,7 +1828,8 @@
           </xsl:choose>
         </xsl:variable>
         <xsl:choose>
-          <xsl:when test="contains(substring-before($formatCode,$currency),'0') or contains(substring-before($formatCode,$currency),'#')">
+          <xsl:when
+            test="contains(substring-before($formatCode,$currency),'0') or contains(substring-before($formatCode,$currency),'#')">
             <xsl:value-of select="concat($outputValue,$currency)"/>
           </xsl:when>
           <xsl:otherwise>
@@ -1237,11 +1837,11 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-        
+
       <xsl:otherwise>
         <xsl:value-of select="$outputValue"/>
       </xsl:otherwise>
-      
+
     </xsl:choose>
   </xsl:template>
 
@@ -1253,7 +1853,9 @@
     <xsl:variable name="plainFormat">
       <xsl:choose>
         <xsl:when test="contains(substring-after($format,'.'),'\')">
-          <xsl:value-of select="concat(concat(substring-before($format,'.'),'.'),substring-before(substring-after($format,'.'),'\'))"/>
+          <xsl:value-of
+            select="concat(concat(substring-before($format,'.'),'.'),substring-before(substring-after($format,'.'),'\'))"
+          />
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$format"/>
@@ -1271,10 +1873,10 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="CountContinuous">
     <xsl:param name="count" select="0"/>
-    
+
     <xsl:variable name="carryOn">
       <xsl:choose>
         <xsl:when test="following-sibling::e:c[1]/@s and not(following-sibling::e:c[1]/e:v)">
@@ -1286,7 +1888,7 @@
               <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
             </xsl:for-each>
           </xsl:variable>
-          
+
           <xsl:choose>
             <xsl:when test="$horizontal = 'centerContinuous' ">
               <xsl:text>true</xsl:text>
@@ -1295,14 +1897,14 @@
               <xsl:text>false</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
-          
+
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>false</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="$carryOn = 'true'">
         <xsl:for-each select="following-sibling::e:c[1]">
@@ -1317,9 +1919,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which inserts date and time in a correct format -->
-  
+
   <xsl:template name="FormatDate">
     <xsl:param name="value"/>
     <xsl:param name="format"/>
@@ -1328,7 +1930,7 @@
     <xsl:param name="outputValue"/>
     <xsl:param name="numValue"/>
     <xsl:choose>
-      
+
       <!-- year -->
       <xsl:when test="starts-with($processedFormat,'y')">
         <xsl:choose>
@@ -1355,17 +1957,18 @@
                 <xsl:value-of select="substring-after($processedFormat,'yy')"/>
               </xsl:with-param>
               <xsl:with-param name="outputValue">
-                <xsl:value-of select="concat($outputValue,substring(substring-before($value,'-'),3))"/>
+                <xsl:value-of
+                  select="concat($outputValue,substring(substring-before($value,'-'),3))"/>
               </xsl:with-param>
               <xsl:with-param name="numValue" select="$numValue"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <xsl:when test="starts-with($processedFormat,'m')">
         <xsl:choose>
-          
+
           <!-- minutes -->
           <xsl:when test="contains(substring-before($format,'m'),'h:')">
             <xsl:choose>
@@ -1378,7 +1981,9 @@
                     <xsl:value-of select="substring-after($processedFormat,'mm')"/>
                   </xsl:with-param>
                   <xsl:with-param name="outputValue">
-                    <xsl:value-of select="concat($outputValue,substring-before(substring-after(substring-after($value,'T'),':'),':'))"/>
+                    <xsl:value-of
+                      select="concat($outputValue,substring-before(substring-after(substring-after($value,'T'),':'),':'))"
+                    />
                   </xsl:with-param>
                   <xsl:with-param name="numValue" select="$numValue"/>
                 </xsl:call-template>
@@ -1392,14 +1997,16 @@
                     <xsl:value-of select="substring-after($processedFormat,'m')"/>
                   </xsl:with-param>
                   <xsl:with-param name="outputValue">
-                    <xsl:value-of select="concat($outputValue,number(substring-before(substring-after(substring-after($value,'T'),':'),':')))"/>
+                    <xsl:value-of
+                      select="concat($outputValue,number(substring-before(substring-after(substring-after($value,'T'),':'),':')))"
+                    />
                   </xsl:with-param>
                   <xsl:with-param name="numValue" select="$numValue"/>
                 </xsl:call-template>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-          
+
           <!-- month -->
           <xsl:otherwise>
             <xsl:choose>
@@ -1454,7 +2061,9 @@
                     <xsl:value-of select="substring-after($processedFormat,'mm')"/>
                   </xsl:with-param>
                   <xsl:with-param name="outputValue">
-                    <xsl:value-of select="concat($outputValue,substring-before(substring-after($value,'-'),'-'))"/>
+                    <xsl:value-of
+                      select="concat($outputValue,substring-before(substring-after($value,'-'),'-'))"
+                    />
                   </xsl:with-param>
                   <xsl:with-param name="numValue" select="$numValue"/>
                 </xsl:call-template>
@@ -1468,7 +2077,9 @@
                     <xsl:value-of select="substring-after($processedFormat,'m')"/>
                   </xsl:with-param>
                   <xsl:with-param name="outputValue">
-                    <xsl:value-of select="concat($outputValue,number(substring-before(substring-after($value,'-'),'-')))"/>
+                    <xsl:value-of
+                      select="concat($outputValue,number(substring-before(substring-after($value,'-'),'-')))"
+                    />
                   </xsl:with-param>
                   <xsl:with-param name="numValue" select="$numValue"/>
                 </xsl:call-template>
@@ -1477,7 +2088,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- day -->
       <xsl:when test="starts-with($processedFormat,'d')">
         <xsl:choose>
@@ -1532,7 +2143,9 @@
                 <xsl:value-of select="substring-after($processedFormat,'dd')"/>
               </xsl:with-param>
               <xsl:with-param name="outputValue">
-                <xsl:value-of select="concat($outputValue,substring-before(substring-after(substring-after($value,'-'),'-'),'T'))"/>
+                <xsl:value-of
+                  select="concat($outputValue,substring-before(substring-after(substring-after($value,'-'),'-'),'T'))"
+                />
               </xsl:with-param>
               <xsl:with-param name="numValue" select="$numValue"/>
             </xsl:call-template>
@@ -1546,14 +2159,16 @@
                 <xsl:value-of select="substring-after($processedFormat,'d')"/>
               </xsl:with-param>
               <xsl:with-param name="outputValue">
-                <xsl:value-of select="concat($outputValue,number(substring-before(substring-after(substring-after($value,'-'),'-'),'T')))"/>
+                <xsl:value-of
+                  select="concat($outputValue,number(substring-before(substring-after(substring-after($value,'-'),'-'),'T')))"
+                />
               </xsl:with-param>
               <xsl:with-param name="numValue" select="$numValue"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- hours -->
       <xsl:when test="starts-with($processedFormat,'h')">
         <xsl:choose>
@@ -1566,7 +2181,8 @@
                 <xsl:value-of select="substring-after($processedFormat,'hh')"/>
               </xsl:with-param>
               <xsl:with-param name="outputValue">
-                <xsl:value-of select="concat($outputValue,substring-before(substring-after($value,'T'),':'))"/>
+                <xsl:value-of
+                  select="concat($outputValue,substring-before(substring-after($value,'T'),':'))"/>
               </xsl:with-param>
               <xsl:with-param name="numValue" select="$numValue"/>
             </xsl:call-template>
@@ -1580,14 +2196,16 @@
                 <xsl:value-of select="substring-after($processedFormat,'h')"/>
               </xsl:with-param>
               <xsl:with-param name="outputValue">
-                <xsl:value-of select="concat($outputValue,number(substring-before(substring-after($value,'T'),':')))"/>
+                <xsl:value-of
+                  select="concat($outputValue,number(substring-before(substring-after($value,'T'),':')))"
+                />
               </xsl:with-param>
               <xsl:with-param name="numValue" select="$numValue"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- seconds -->
       <xsl:when test="starts-with($processedFormat,'s')">
         <xsl:choose>
@@ -1600,7 +2218,9 @@
                 <xsl:value-of select="substring-after($processedFormat,'ss')"/>
               </xsl:with-param>
               <xsl:with-param name="outputValue">
-                <xsl:value-of select="concat($outputValue,substring-after(substring-after(substring-after($value,'T'),':'),':'))"/>
+                <xsl:value-of
+                  select="concat($outputValue,substring-after(substring-after(substring-after($value,'T'),':'),':'))"
+                />
               </xsl:with-param>
               <xsl:with-param name="numValue" select="$numValue"/>
             </xsl:call-template>
@@ -1614,15 +2234,18 @@
                 <xsl:value-of select="substring-after($processedFormat,'s')"/>
               </xsl:with-param>
               <xsl:with-param name="outputValue">
-                <xsl:value-of select="concat($outputValue,number(substring-after(substring-after(substring-after($value,'T'),':'),':')))"/>
+                <xsl:value-of
+                  select="concat($outputValue,number(substring-after(substring-after(substring-after($value,'T'),':'),':')))"
+                />
               </xsl:with-param>
               <xsl:with-param name="numValue" select="$numValue"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
-      <xsl:when test="starts-with($processedFormat,'\') or starts-with($processedFormat,'@') or starts-with($processedFormat,';')">
+
+      <xsl:when
+        test="starts-with($processedFormat,'\') or starts-with($processedFormat,'@') or starts-with($processedFormat,';')">
         <xsl:call-template name="FormatDate">
           <xsl:with-param name="value" select="$value"/>
           <xsl:with-param name="format" select="$format"/>
@@ -1632,7 +2255,7 @@
           </xsl:with-param>
           <xsl:with-param name="outputValue" select="$outputValue"/>
         </xsl:call-template>
-      </xsl:when>        
+      </xsl:when>
       <xsl:when test="string-length($processedFormat) = 0">
         <xsl:value-of select="$outputValue"/>
       </xsl:when>
@@ -1648,12 +2271,12 @@
             <xsl:value-of select="concat($outputValue,substring($processedFormat,0,2))"/>
           </xsl:with-param>
         </xsl:call-template>
-      </xsl:otherwise>    
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- get month name -->
-  
+
   <xsl:template name="ConvertMonthToName">
     <xsl:param name="month"/>
     <xsl:choose>
@@ -1671,7 +2294,7 @@
       <xsl:when test="number($month) = 12">December</xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="ConvertMonthToShortName">
     <xsl:param name="month"/>
     <xsl:choose>
@@ -1689,9 +2312,9 @@
       <xsl:when test="number($month) = 12">Dec</xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- get day of the week name -->
-  
+
   <xsl:template name="ConvertDayToName">
     <xsl:param name="day"/>
     <xsl:variable name="dayOfWeek">
@@ -1707,7 +2330,7 @@
       <xsl:when test="$dayOfWeek = 6">Sunday</xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="ConvertDayToShortName">
     <xsl:param name="day"/>
     <xsl:variable name="dayOfWeek">
