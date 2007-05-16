@@ -13,30 +13,36 @@ namespace OdfExcel2003Addin
     using CleverAge.OdfConverter.OdfExcelAddinLib;
 
 
-	#region Read me for Add-in installation and setup information.
-	// When run, the Add-in wizard prepared the registry for the Add-in.
-	// At a later time, if the Add-in becomes unavailable for reasons such as:
-	//   1) You moved this project to a computer other than which is was originally created on.
-	//   2) You chose 'Yes' when presented with a message asking if you wish to remove the Add-in.
-	//   3) Registry corruption.
-	// you will need to re-register the Add-in by building the OdfExcel2003AddinSetup project, 
-	// right click the project in the Solution Explorer, then choose install.
-	#endregion
-	
-	/// <summary>
-	///   The object for implementing an Add-in.
-	/// </summary>
-	/// <seealso class='IDTExtensibility2' />
+    #region Read me for Add-in installation and setup information.
+    // When run, the Add-in wizard prepared the registry for the Add-in.
+    // At a later time, if the Add-in becomes unavailable for reasons such as:
+    //   1) You moved this project to a computer other than which is was originally created on.
+    //   2) You chose 'Yes' when presented with a message asking if you wish to remove the Add-in.
+    //   3) Registry corruption.
+    // you will need to re-register the Add-in by building the OdfExcel2003AddinSetup project, 
+    // right click the project in the Solution Explorer, then choose install.
+    #endregion
+
+    /// <summary>
+    ///   The object for implementing an Add-in.
+    /// </summary>
+    /// <seealso class='IDTExtensibility2' />
     [GuidAttribute("40676235-09CB-42E8-B207-EC354F84BC5F"), ProgId("OdfExcel2003Addin.Connect")]
     public class Connect : Object, Extensibility.IDTExtensibility2, IOdfConverter
     {
-          private const int xlOpenXMLWorkbook = 51; // ".xslx" file format
+        private const int xlOpenXMLWorkbook = 51; // ".xslx" file format
 
         [DllImport("Kernel32.dll")]
         private extern static void OutputDebugString(string s);
 
-        private static void ODS(string s) {
+        private static void ODS(string s)
+        {
             OutputDebugString(s + "\n");
+        }
+
+        private static void TraceObject(string objectName, object o)
+        {
+            ODS(objectName + ((o == null) ? "null" : "OK"));
         }
 
         private string DialogBoxTitle;
@@ -124,6 +130,8 @@ namespace OdfExcel2003Addin
         {
         }
 
+
+
         /// <summary>
         ///      Implements the OnStartupComplete method of the IDTExtensibility2 interface.
         ///      Receives notification that the host application has completed loading.
@@ -134,10 +142,13 @@ namespace OdfExcel2003Addin
         /// <seealso class='IDTExtensibility2' />
         public void OnStartupComplete(ref System.Array custom)
         {
-            try {
+            try
+            {
                 // Add menu item
                 // first retrieve "File" menu
                 CommandBar commandBar = applicationObject.CommandBars["File"];
+                // Store OpenButton to mimic its state when CommandBars updated
+                _openButton = commandBar.FindControl(MsoControlType.msoControlButton, 23, null, null, null) as CommandBarButton;
                 // Add Buttons with Click handlers
                 AddButtons(commandBar.Controls, true);
                 // Now same operation for Graph menu bar
@@ -145,14 +156,56 @@ namespace OdfExcel2003Addin
                 CommandBarPopup popup = (CommandBarPopup)commandBar.FindControl(MsoControlType.msoControlPopup, 30002, Missing.Value, Missing.Value, Missing.Value);
                 // Add Buttons without Click handlers
                 AddButtons(popup.Controls, false);
-            } catch (Exception ex) {
+                if (_openButton != null)
+                {
+                    _CommandBars cbs = applicationObject.CommandBars;
+                    if (cbs != null)
+                    {
+                        _CommandBarsEvents_Event cbee = cbs as _CommandBarsEvents_Event;
+                        if (cbee != null)
+                        {
+                            cbee.OnUpdate += new _CommandBarsEvents_OnUpdateEventHandler(cbee_OnUpdate);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
                 ODS("OnStartupCompleted, Exception " + ex.Message);
                 ODS(ex.StackTrace);
             }
         }
 
-        protected void AddButtons(CommandBarControls controls, bool addHandler) {
+        CommandBarButton _openButton;
+
+        void cbee_OnUpdate()
+        {
+            try
+            {
+                if (_openButton != null)
+                {
+                    bool enabled = _openButton.Enabled;
+                    importButton1.Enabled = enabled;
+                    exportButton1.Enabled = enabled;
+                    importButton2.Enabled = enabled;
+                    exportButton2.Enabled = enabled;
+                }
+                else
+                {
+                    ODS("cbee_OnUpdate : no Open Button");
+                }
+            }
+            catch (Exception ex)
+            {
+                ODS("*** Exception " + ex.Message);
+            }
+        }
+
+        protected void AddButtons(CommandBarControls controls, bool addHandler)
+        {
             // Add import button
+            CommandBarButton importButton;
+            CommandBarButton exportButton;
             try
             {
                 // if item already exists, use it (should never happen)
@@ -169,7 +222,8 @@ namespace OdfExcel2003Addin
             // set action
             importButton.OnAction = "!<OdfExcel2003Addin.Connect>";
             importButton.Visible = true;
-            if (addHandler) {
+            if (addHandler)
+            {
                 importButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(this.importButton_Click);
             }
             // Add export button
@@ -190,22 +244,41 @@ namespace OdfExcel2003Addin
             exportButton.OnAction = "!<OdfExcel2003Addin.Connect>";
             exportButton.Visible = true;
             exportButton.Enabled = true;
-            if (addHandler) {
+            if (addHandler)
+            {
                 exportButton.Click += exportButton_Click;
+            }
+            if (addHandler)
+            {
+                importButton1 = importButton;
+                exportButton1 = exportButton;
+            }
+            else
+            {
+                importButton2 = importButton;
+                exportButton2 = exportButton;
             }
         }
 
         /// <summary>
-        /// For some reason, delegates are unregistered after first call to ODF...
+        /// For some unknown (yet) reason, some delegates are unregistered after call to ODF...
         /// </summary>
         private bool restoreButtons = true;
 
         private void RestoreButtons()
         {
-            if (restoreButtons) {
-                importButton.Click += importButton_Click;
-                exportButton.Click += exportButton_Click;
-                restoreButtons = false;
+            if (restoreButtons)
+            {
+                _CommandBars cbs = applicationObject.CommandBars;
+                if (cbs != null)
+                {
+                    _CommandBarsEvents_Event cbee = cbs as _CommandBarsEvents_Event;
+                    if (cbee != null)
+                    {
+                        cbee.OnUpdate += new _CommandBarsEvents_OnUpdateEventHandler(cbee_OnUpdate);
+                    }
+                }
+                //restoreButtons = false;
             }
         }
 
@@ -235,9 +308,11 @@ namespace OdfExcel2003Addin
         /// Read an ODF file
         /// </summary>
         /// <param name="control">An IRibbonControl instance</param>
-        private void importButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault) {
+        private void importButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
+        {
             bool restorebuttons = false;
-            try {
+            try
+            {
                 FileDialog fd = this.applicationObject.get_FileDialog(MsoFileDialogType.msoFileDialogFilePicker);
                 // allow multiple file opening
                 fd.AllowMultiSelect = true;
@@ -249,11 +324,13 @@ namespace OdfExcel2003Addin
                 // display the dialog
                 fd.Show();
 
-                if (fd.SelectedItems.Count > 0) {
+                if (fd.SelectedItems.Count > 0)
+                {
                     restorebuttons = true;
                 }
                 // process the chosen documents	
-                for (int i = 1; i <= fd.SelectedItems.Count; ++i) {
+                for (int i = 1; i <= fd.SelectedItems.Count; ++i)
+                {
                     // retrieve file name
                     String odfFile = fd.SelectedItems.Item(i);
 
@@ -264,7 +341,8 @@ namespace OdfExcel2003Addin
                     OdfToOox(odfFile, (string)fileName, true);
                     // this.applicationObject.System.Cursor =  WdCursorType.wdCursorNormal;
 
-                    try {
+                    try
+                    {
                         // open the workbook
                         object readOnly = true;
                         object addToRecentFiles = false;
@@ -273,7 +351,8 @@ namespace OdfExcel2003Addin
                         object missing = Missing.Value;
 
                         // conversion may have been cancelled and file deleted.
-                        if (File.Exists((string)fileName)) {
+                        if (File.Exists((string)fileName))
+                        {
                             // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
                             System.Globalization.CultureInfo ci;
                             ci = System.Threading.Thread.CurrentThread.CurrentCulture;
@@ -293,15 +372,24 @@ namespace OdfExcel2003Addin
                             }
                             System.Threading.Thread.CurrentThread.CurrentCulture = ci;
                         }
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorNormal;
                         System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
                         System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
                         // return;
                     }
                 }
-            } finally {
-                if (restorebuttons) {
+            }
+            catch (Exception ex)
+            {
+                ODS("*** Exception : " + ex.Message);
+            }
+            finally
+            {
+                if (restorebuttons)
+                {
                     RestoreButtons();
                 }
             }
@@ -313,21 +401,26 @@ namespace OdfExcel2003Addin
         /// Save as ODF.
         /// </summary>
         /// <param name="control">An IRibbonControl instance</param>
-        private void exportButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault) {
+        private void exportButton_Click(CommandBarButton Ctrl, ref Boolean CancelDefault)
+        {
             bool doRestore = false;
             // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
             System.Globalization.CultureInfo ci;
             ci = System.Threading.Thread.CurrentThread.CurrentCulture;
-            try {
+            try
+            {
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
                 MSExcel.Workbook wb = this.applicationObject.ActiveWorkbook;
 
                 // the second test deals with blank workbooks
                 // (which are in a 'saved' state and have no extension yet(?))
-                if (!wb.Saved || wb.FullName.IndexOf('.') < 0) {
+                if (!wb.Saved || wb.FullName.IndexOf('.') < 0)
+                {
                     System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfSaveDocumentBeforeExport"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                } else {
+                }
+                else
+                {
                     System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
                     // sfd.SupportMultiDottedExtensions = true;
                     sfd.AddExtension = true;
@@ -340,12 +433,14 @@ namespace OdfExcel2003Addin
                     sfd.FileName = wb.FullName.Substring(0, wb.FullName.LastIndexOf('.')) + ext;
 
                     // process the chosen workbooks	
-                    if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog()) {
+                    if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
+                    {
                         doRestore = true;
 
                         // retrieve file name
                         string odfFile = sfd.FileName;
-                        if (!odfFile.EndsWith(ext)) { // multi dotted extension support
+                        if (!odfFile.EndsWith(ext))
+                        { // multi dotted extension support
                             odfFile += ext;
                         }
                         object initialName = wb.FullName;
@@ -369,18 +464,26 @@ namespace OdfExcel2003Addin
                             MSExcel.Workbook newWb = this.applicationObject.Workbooks.Open((string)newName, missing, readOnly, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
                             // generate xlsx file from the duplicated file (under a temporary file)
                             tmpFileName = this.addinLib.GetTempPath((string)initialName, ".xlsx");
-                            try {
+                            try
+                            {
                                 newWb.SaveAs((string)tmpFileName, xlOpenXMLWorkbook, missing, missing, missing, missing, MSExcel.XlSaveAsAccessMode.xlNoChange, missing, missing, missing, missing, missing);
-                            } catch (Exception e) {
+                            }
+                            catch (Exception e)
+                            {
                                 // xlOpenXMLWorkbook file format not supported. Compatibility pack not installed.
                                 System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfConverterNotInstalled"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
                                 return;
-                            } finally {
+                            }
+                            finally
+                            {
                                 // close and remove the duplicated file
                                 newWb.Close(false, false, missing);
-                                try {
+                                try
+                                {
                                     File.Delete((string)newName);
-                                } catch (Exception) {
+                                }
+                                catch (Exception)
+                                {
                                     // bug #1610099
                                     // deletion failed : file currently used by another application.
                                     // do nothing
@@ -393,23 +496,30 @@ namespace OdfExcel2003Addin
 
                         OoxToOdf(xlsxFile, odfFile, true);
 
-                        if (tmpFileName != null && File.Exists((string)tmpFileName)) {
+                        if (tmpFileName != null && File.Exists((string)tmpFileName))
+                        {
                             this.addinLib.DeleteTempPath((string)tmpFileName);
                         }
                     }
                 }
-            } catch (Exception e) {
-                // Need to catch a file format exception here.
-            } finally {
+            }
+            catch (Exception ex)
+            {
+                // Need to catch a file format exception here ?
+                ODS("*** Exception : " + ex.Message);
+            }
+            finally
+            {
                 System.Threading.Thread.CurrentThread.CurrentCulture = ci;
-                if (doRestore) {
+                if (doRestore)
+                {
                     RestoreButtons();
                 }
             }
         }
 
 
-        private CommandBarButton importButton, exportButton;
+        private CommandBarButton importButton1, exportButton1, importButton2, exportButton2;
         private MSExcel.Application applicationObject;
         private OdfAddinLib addinLib;
 
