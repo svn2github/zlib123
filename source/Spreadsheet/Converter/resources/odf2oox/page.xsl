@@ -297,5 +297,9 @@
   <xsl:template match="text:time" mode="pageTag">
     <xsl:text>&amp;T</xsl:text>
   </xsl:template>
+    
+  <xsl:template match="text:file-name" mode="pageTag">
+    <xsl:text>file:///&amp;Z&amp;F</xsl:text>
+  </xsl:template>
 
 </xsl:stylesheet>

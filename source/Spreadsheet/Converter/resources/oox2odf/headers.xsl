@@ -606,7 +606,7 @@
     <xsl:param name="styleNum" select="1"/>
 
     <xsl:choose>
-      <xsl:when test="substring-before($tags,'&amp;') = '' ">
+      <xsl:when test="substring-before($tags,'&amp;') = '' or substring-before($tags,'file:///&amp;Z&amp;F' ) = '' ">
         <xsl:choose>
           <!-- page number -->
           <xsl:when
@@ -693,16 +693,27 @@
             </xsl:call-template>
           </xsl:when>
 
-          <!-- skip path -->
+          <!-- file path -->
           <xsl:when
-            test="contains($tags,'&amp;Z' ) and substring-before($tags,'&amp;Z' ) = '' ">
+            test="(contains($tags,'&amp;Z&amp;F' ) and substring-before($tags,'&amp;Z&amp;F' ) = '' ) or 
+            (contains($tags,'file:///&amp;Z&amp;F' ) and substring-before($tags,'file:///&amp;Z&amp;F' ) = '' )">
+            
+            <text:span>
+              <xsl:attribute name="text:style-name">
+                <xsl:value-of
+                  select="concat(generate-id(),'_',$region,'P',$paragraph,'-',$styleNum)"/>
+              </xsl:attribute>
+              <text:file-name text:display="full">???</text:file-name>
+            </text:span>
+            
             <xsl:call-template name="GetHeaderFooterFields">
-              <xsl:with-param name="tags" select="substring-after($tags,'&amp;Z' )"/>
+              <xsl:with-param name="tags" select="substring-after($tags,'&amp;F' )"/>
 
               <xsl:with-param name="region" select="$region"/>
               <xsl:with-param name="paragraph" select="$paragraph"/>
               <xsl:with-param name="styleNum" select="$styleNum"/>
             </xsl:call-template>
+
           </xsl:when>
 
           <!-- file name -->
