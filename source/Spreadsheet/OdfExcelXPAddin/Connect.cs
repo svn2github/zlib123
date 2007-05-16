@@ -65,6 +65,11 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
         private static void ODS(string s) {
             OutputDebugString(s + "\n");
         }
+
+        private static void TraceObject(string objectName, object o) {
+            ODS(objectName + ((o == null) ? "null" : "OK"));
+        }
+
         /// <summary>
         ///		Implements the constructor for the Add-in object.
         ///		Place your initialization code within this method.
@@ -156,12 +161,13 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
         ///      Array of parameters that are host application specific.
         /// </param>
         /// <seealso class='IDTExtensibility2' />
-        public void OnStartupComplete(ref System.Array custom)
-        {
+        public void OnStartupComplete(ref System.Array custom) {
             try {
                 // Add menu item
                 // first retrieve "File" menu
                 CommandBar commandBar = applicationObject.CommandBars["File"];
+                // Store OpenButton to mimic its state when CommandBars updated
+                _openButton = commandBar.FindControl(MsoControlType.msoControlButton, 23, null, null, null) as CommandBarButton;
                 // Add Buttons with Click handlers
                 AddButtons(commandBar.Controls, true);
                 // Now same operation for Graph menu bar
@@ -169,15 +175,43 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
                 CommandBarPopup popup = (CommandBarPopup)commandBar.FindControl(MsoControlType.msoControlPopup, 30002, Missing.Value, Missing.Value, Missing.Value);
                 // Add Buttons without Click handlers
                 AddButtons(popup.Controls, false);
+                if (_openButton != null) {
+                    _CommandBars cbs = applicationObject.CommandBars;
+                    if (cbs != null) {
+                        _CommandBarsEvents_Event cbee = cbs as _CommandBarsEvents_Event;
+                        if (cbee != null) {
+                            cbee.OnUpdate += new _CommandBarsEvents_OnUpdateEventHandler(cbee_OnUpdate);
+                        }
+                    }
+                }
             } catch (Exception ex) {
                 ODS("OnStartupCompleted, Exception " + ex.Message);
                 ODS(ex.StackTrace);
             }
         }
 
+        CommandBarButton _openButton;
+
+        void cbee_OnUpdate() {
+            try {
+                if (_openButton != null) {
+                    bool enabled = _openButton.Enabled;
+                    importButton1.Enabled = enabled;
+                    exportButton1.Enabled = enabled;
+                    importButton2.Enabled = enabled;
+                    exportButton2.Enabled = enabled;
+                } else {
+                    ODS("cbee_OnUpdate : no Open Button");
+                }
+            } catch (Exception ex) {
+                ODS("*** Exception " + ex.Message);
+            }
+        }
+
         protected void AddButtons(CommandBarControls controls, bool addHandler) {
-            // Add menu item
             // Add import button
+            CommandBarButton importButton;
+            CommandBarButton exportButton;
             try
             {
                 // if item already exists, use it (should never happen)
@@ -219,6 +253,13 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
             if (addHandler) {
                 exportButton.Click += exportButton_Click;
             }
+            if (addHandler) {
+                importButton1 = importButton;
+                exportButton1 = exportButton;
+            } else {
+                importButton2 = importButton;
+                exportButton2 = exportButton;
+            }
         }
 
         /// <summary>
@@ -228,9 +269,14 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
 
         private void RestoreButtons() {
             if (restoreButtons) {
-                importButton.Click += importButton_Click;
-                exportButton.Click += exportButton_Click;
-                restoreButtons = false;
+                _CommandBars cbs = applicationObject.CommandBars;
+                if (cbs != null) {
+                    _CommandBarsEvents_Event cbee = cbs as _CommandBarsEvents_Event;
+                    if (cbee != null) {
+                        cbee.OnUpdate += new _CommandBarsEvents_OnUpdateEventHandler(cbee_OnUpdate);
+                    }
+                }
+                //restoreButtons = false;
             }
         }
 
@@ -455,7 +501,7 @@ namespace CleverAge.OdfConverter.OdfExcelXPAddin
 
         private MSExcel.Application applicationObject;
         private OdfAddinLib addinLib;
-        private CommandBarButton importButton, exportButton;
+        private CommandBarButton importButton1, exportButton1, importButton2, exportButton2;
 
         #region IOdfConverter Members
 
