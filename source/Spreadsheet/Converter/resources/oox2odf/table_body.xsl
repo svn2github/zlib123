@@ -477,10 +477,10 @@
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
-
+    
     <xsl:message terminate="no">progress:c</xsl:message>
     <xsl:choose>
-
+      
       <!-- Insert covered cell if this is Merge Cell -->
       <xsl:when test="contains($CheckIfMerge,'true')">
         <xsl:choose>
@@ -505,7 +505,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
+      
       <xsl:otherwise>
         <!-- insert this one cell-->
         <table:table-cell>
@@ -649,19 +649,17 @@
                     <xsl:value-of select="key('Xf','')[position()=$position]/@numFmtId"/>
                   </xsl:for-each>
                 </xsl:variable>
+            
                 <xsl:attribute name="office:value-type">
                   <xsl:choose>
-                    <xsl:when
-                      test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
+                    <xsl:when test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
                       <xsl:text>percentage</xsl:text>
                     </xsl:when>
                     <!--'and' at the end is for Latvian currency -->
-                    <xsl:when
-                      test="(contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22) and not(contains($numStyle,'[$Ls-426]'))">
+                    <xsl:when test="((contains($numStyle,'y') and not(contains(substring-before($numStyle,'y'),'&quot;') and contains(substring-after($numStyle,'y'),'&quot;'))) or (contains($numStyle,'m') and not(contains(substring-before($numStyle,'m'),'&quot;') and contains(substring-after($numStyle,'m'),'&quot;'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))  and not(contains(substring-before($numStyle,'d'),'&quot;') and contains(substring-after($numStyle,'d'),'&quot;'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
                       <xsl:text>date</xsl:text>
                     </xsl:when>
-                    <xsl:when
-                      test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
+                    <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
                       <xsl:text>currency</xsl:text>
                     </xsl:when>
                     <xsl:when test="$numId = 49">
@@ -674,8 +672,7 @@
                 </xsl:attribute>
                 <xsl:choose>
                   <!--'and' at the end is for Latvian currency -->
-                  <xsl:when
-                    test="(contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22) and not(contains($numStyle,'[$Ls-426]'))">
+                  <xsl:when test="((contains($numStyle,'y') and not(contains(substring-before($numStyle,'y'),'&quot;') and contains(substring-after($numStyle,'y'),'&quot;'))) or (contains($numStyle,'m') and not(contains(substring-before($numStyle,'m'),'&quot;') and contains(substring-after($numStyle,'m'),'&quot;'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))  and not(contains(substring-before($numStyle,'d'),'&quot;') and contains(substring-after($numStyle,'d'),'&quot;'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
                     <xsl:attribute name="office:date-value">
                       <xsl:call-template name="NumberToDate">
                         <xsl:with-param name="value">
@@ -692,8 +689,7 @@
                 </xsl:choose>
                 <text:p>
                   <xsl:choose>
-                    <xsl:when
-                      test="contains($numStyle,'y') or contains($numStyle,'m') or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or contains($numStyle,'h') or contains($numStyle,'s') or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22">
+                    <xsl:when test="((contains($numStyle,'y') and not(contains(substring-before($numStyle,'y'),'&quot;') and contains(substring-after($numStyle,'y'),'&quot;'))) or (contains($numStyle,'m') and not(contains(substring-before($numStyle,'m'),'&quot;') and contains(substring-after($numStyle,'m'),'&quot;'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))  and not(contains(substring-before($numStyle,'d'),'&quot;') and contains(substring-after($numStyle,'d'),'&quot;')))  or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
                       <xsl:call-template name="FormatDate">
                         <xsl:with-param name="value">
                           <xsl:call-template name="NumberToDate">
@@ -749,7 +745,7 @@
             </xsl:choose>
           </xsl:if>
         </table:table-cell>
-
+        
         <!-- Insert covered cell if Merge Cell is starting-->
         <xsl:choose>
           <xsl:when
@@ -793,10 +789,10 @@
             </xsl:if>
           </xsl:when>
         </xsl:choose>
-
+        
       </xsl:otherwise>
     </xsl:choose>
-
+    
   </xsl:template>
 
   <xsl:template name="InsertNextCell">
@@ -852,7 +848,7 @@
               <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
             </xsl:for-each>
           </xsl:variable>
-
+          
           <xsl:choose>
             <xsl:when test="$horizontal = 'centerContinuous' ">
               <xsl:call-template name="CountContinuous"/>
@@ -867,7 +863,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+    
     <xsl:choose>
 
       <!-- calc supports only 256 columns -->
@@ -1237,12 +1233,12 @@
             </xsl:variable>
             
             <xsl:attribute name="table:default-cell-style-name">
-            <xsl:for-each select="document('xl/styles.xml')">
-            <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-            </xsl:for-each>
+              <xsl:for-each select="document('xl/styles.xml')">
+                <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+              </xsl:for-each>
             </xsl:attribute>
             </xsl:if-->
-
+          
         </table:table-column>
 
       </xsl:when>
@@ -1873,10 +1869,10 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
   <xsl:template name="CountContinuous">
     <xsl:param name="count" select="0"/>
-
+    
     <xsl:variable name="carryOn">
       <xsl:choose>
         <xsl:when test="following-sibling::e:c[1]/@s and not(following-sibling::e:c[1]/e:v)">
@@ -1888,7 +1884,7 @@
               <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
             </xsl:for-each>
           </xsl:variable>
-
+          
           <xsl:choose>
             <xsl:when test="$horizontal = 'centerContinuous' ">
               <xsl:text>true</xsl:text>
@@ -1897,14 +1893,14 @@
               <xsl:text>false</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
-
+          
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>false</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+    
     <xsl:choose>
       <xsl:when test="$carryOn = 'true'">
         <xsl:for-each select="following-sibling::e:c[1]">
@@ -1919,9 +1915,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
+  
   <!-- template which inserts date and time in a correct format -->
-
+  
   <xsl:template name="FormatDate">
     <xsl:param name="value"/>
     <xsl:param name="format"/>
@@ -1930,7 +1926,7 @@
     <xsl:param name="outputValue"/>
     <xsl:param name="numValue"/>
     <xsl:choose>
-
+      
       <!-- year -->
       <xsl:when test="starts-with($processedFormat,'y')">
         <xsl:choose>
@@ -1965,10 +1961,10 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
+      
       <xsl:when test="starts-with($processedFormat,'m')">
         <xsl:choose>
-
+          
           <!-- minutes -->
           <xsl:when test="contains(substring-before($format,'m'),'h:')">
             <xsl:choose>
@@ -2006,7 +2002,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-
+          
           <!-- month -->
           <xsl:otherwise>
             <xsl:choose>
@@ -2088,7 +2084,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
+      
       <!-- day -->
       <xsl:when test="starts-with($processedFormat,'d')">
         <xsl:choose>
@@ -2168,7 +2164,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-
+      
       <!-- hours -->
       <xsl:when test="starts-with($processedFormat,'h')">
         <xsl:choose>
@@ -2330,7 +2326,7 @@
       <xsl:when test="$dayOfWeek = 6">Sunday</xsl:when>
     </xsl:choose>
   </xsl:template>
-
+  
   <xsl:template name="ConvertDayToShortName">
     <xsl:param name="day"/>
     <xsl:variable name="dayOfWeek">
