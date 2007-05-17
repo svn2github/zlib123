@@ -436,8 +436,8 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
-    <!-- adding text -->
+    
+    <!-- adding '\' -->
     <xsl:if test="starts-with($realFormatCode,'\') and not(starts-with($realFormatCode,'\ '))">
       <xsl:call-template name="AddNumberText">
         <xsl:with-param name="format">
@@ -468,6 +468,16 @@
       </xsl:choose>
     </xsl:variable>
 
+    <!-- add text at the beginning -->
+    <xsl:if
+      test="contains(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;') and not($currencyFormat and $currencyFormat != '' and contains(substring-before(substring-after(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;'),$currencyFormat))">
+      <number:text>
+        <xsl:value-of
+          select="substring-before(substring-after(substring-before(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;')"
+        />
+      </number:text>
+    </xsl:if>
+    
     <!-- add space at the beginning -->
     <xsl:if
       test="starts-with($realFormatCode,'_') and not(contains($realFormatCode,'(-') or contains($realFormatCode,'(#') or contains($realFormatCode,'(0'))">
@@ -568,10 +578,13 @@
       <!-- min integer digits -->
       <xsl:attribute name="number:min-integer-digits">
         <xsl:choose>
-          <xsl:when test="substring($formatCodeWithoutComma,string-length($formatCodeWithoutComma))='0'">
+          <xsl:when
+            test="substring($formatCodeWithoutComma,string-length($formatCodeWithoutComma))='0'">
             <xsl:call-template name="InsertMinIntegerDigits">
               <xsl:with-param name="code">
-                <xsl:value-of select="substring($formatCodeWithoutComma,0,string-length($formatCodeWithoutComma))"/>
+                <xsl:value-of
+                  select="substring($formatCodeWithoutComma,0,string-length($formatCodeWithoutComma))"
+                />
               </xsl:with-param>
               <xsl:with-param name="value">1</xsl:with-param>
             </xsl:call-template>
@@ -579,10 +592,10 @@
           <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      
-        <xsl:if test="not(contains(substring-after(@formatCode, '.'), '0'))">
-          <xsl:attribute name="number:decimal-replacement"/>
-        </xsl:if>
+
+      <xsl:if test="not(contains(substring-after(@formatCode, '.'), '0'))">
+        <xsl:attribute name="number:decimal-replacement"/>
+      </xsl:if>
 
 
       <!-- grouping -->
@@ -707,10 +720,13 @@
     </xsl:if>
 
     <!-- add text at the end -->
-    <xsl:if test="contains(substring-after(translate($realFormatCode,'0','#'),'#'),'&quot;') and not($currencyFormat and $currencyFormat != '' and contains(substring-before(substring-after(substring-after(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;'),$currencyFormat))">
-    <number:text>
-      <xsl:value-of select="substring-before(substring-after(substring-after(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;')"/>
-    </number:text>
+    <xsl:if
+      test="contains(substring-after(translate($realFormatCode,'0','#'),'#'),'&quot;') and not($currencyFormat and $currencyFormat != '' and contains(substring-before(substring-after(substring-after(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;'),$currencyFormat))">
+      <number:text>
+        <xsl:value-of
+          select="substring-before(substring-after(substring-after(translate($realFormatCode,'0','#'),'#'),'&quot;'),'&quot;')"
+        />
+      </number:text>
     </xsl:if>
   </xsl:template>
 
