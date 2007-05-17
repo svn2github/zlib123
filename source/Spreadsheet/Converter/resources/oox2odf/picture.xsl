@@ -41,11 +41,13 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
   
+  <xsl:import href="relationships.xsl"/>
+  
   <xsl:key name="drawing" match="e:drawing" use="''"/>
   
   <!-- We check cell when the picture is starting and ending -->
   <xsl:template name="PictureCell">
-    <xsl:param name="sheet"/>    
+    <xsl:param name="sheet"/>
     <xsl:apply-templates select="e:worksheet/e:drawing">
      <xsl:with-param name="sheet">
        <xsl:value-of select="$sheet"/>
@@ -77,6 +79,7 @@
   <xsl:template match="e:drawing">
     <xsl:param name="sheet"/>
     
+  <xsl:variable name="Target">
   <xsl:call-template name="GetTargetPicture">
     <xsl:with-param name="sheet">
       <xsl:value-of select="$sheet"/>
@@ -85,7 +88,14 @@
       <xsl:value-of select="@r:id"/>
     </xsl:with-param>
   </xsl:call-template>
+  </xsl:variable>
     
+    <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+      <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
+        <xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]"/>
+      </xsl:if>
+    </xsl:for-each>
+
   </xsl:template>
   
   <!-- We check drawing's file -->
@@ -96,11 +106,7 @@
       <xsl:for-each
         select="document(concat(concat('xl/worksheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
         <xsl:if test="./@Id=$id">
-          <xsl:for-each select="document(concat('xl/', substring-after(@Target, '/')))">
-            <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
-              <xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]"/>
-            </xsl:if>
-          </xsl:for-each>
+            <xsl:value-of select="@Target"/>        
         </xsl:if>
       </xsl:for-each>
     </xsl:if>
@@ -157,7 +163,7 @@
   
   <!-- Insert picture -->
   
-  <xsl:template name="InsertPicture">
+  <xsl:template name="InsertPictureEmptySheet">
     <xsl:param name="rowNum"/>
     <xsl:param name="collNum"/>
     <xsl:param name="PictureCell"/>
@@ -170,15 +176,13 @@
     
     <xsl:variable name="CollStart">
       <xsl:value-of select="number(xdr:from/xdr:col) - 1"/>
-    </xsl:variable>   
-    
+    </xsl:variable>
     
     <xsl:variable name="id">
       <xsl:for-each select="document(substring-after($sheet, '/'))">
       <xsl:value-of select="key('drawing', '')/@r:id"/>
       </xsl:for-each>
     </xsl:variable>
-
     
     <xsl:if test="$collNum != number(substring-before($CollsWithPicture, ';'))">
     <xsl:call-template name="InsertEmptyColls">
@@ -187,9 +191,7 @@
       </xsl:with-param>
     </xsl:call-template>
     </xsl:if>
-
-    <table:table-cell>
-      
+    <table:table-cell>      
       <xsl:for-each
         select="document(concat(concat('xl/worksheets/_rels/', substring-after($sheet, '/')), '.rels'))//node()[name()='Relationship']">        
           <xsl:call-template name="CopyPictures">            
@@ -204,51 +206,26 @@
       
       <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
         <xsl:if test="xdr:from/xdr:col = number(substring-before($CollsWithPicture, ';')) and xdr:from/xdr:row = $rowNum">
-          <draw:frame draw:z-index="0" draw:name="Graphics 1" draw:style-name="gr1"
-            draw:text-style-name="P1" svg:width="4.907cm" svg:height="4.622cm" >
-            <!--size-->
-            <!--xsl:call-template name="SetSize"/-->
-            
-            <xsl:call-template name="SetPosition">
-              <xsl:with-param name="sheet">
-                <xsl:value-of select="$sheet"/>
-              </xsl:with-param>
-              <xsl:with-param name="NameSheet">
-                <xsl:value-of select="$NameSheet"/>
-              </xsl:with-param>
-            </xsl:call-template>
-            
-            <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-              <xsl:call-template name="InsertImageHref">
-                <xsl:with-param name="document">
-                  <xsl:value-of select="concat($Drawing, '.rels')"/>
-                </xsl:with-param>
-              </xsl:call-template>
-              
-              <text:p/>
-            </draw:image>
-          </draw:frame>
-          
-          
+          <xsl:call-template name="InsertPicture">
+            <xsl:with-param name="NameSheet">
+              <xsl:value-of select="$NameSheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheet">
+              <xsl:value-of select="$sheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="Drawing">
+              <xsl:value-of select="$Drawing"/>
+            </xsl:with-param>
+          </xsl:call-template>
         </xsl:if>
-      </xsl:for-each>
-    <!--draw:frame table:end-cell-address="Sheet1.N65" table:end-x="0.287cm"
-      table:end-y="0.281cm" draw:z-index="1" draw:name="Graphics 2" draw:style-name="gr1"
-      draw:text-style-name="P1" svg:width="2.166cm" svg:height="3.874cm" svg:x="0"
-      svg:y="0">
-      <draw:image xlink:href="Pictures/100000000000032000000258B0234CE5.jpg"
-        xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-        <text:p/>
-      </draw:image>
-    </draw:frame-->
-      
+      </xsl:for-each>   
       
     </table:table-cell>    
  
     <!-- Insert Next Picture in this row (if exist) -->
     
     <xsl:if test="substring-after($CollsWithPicture, ';') != '' and $CollsWithPicture != ''">
-      <xsl:call-template name="InsertPicture">
+      <xsl:call-template name="InsertPictureEmptySheet">
         <xsl:with-param name="rowNum">
           <xsl:value-of select="$rowNum"/>
         </xsl:with-param>
@@ -273,6 +250,49 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:if>  
+    
+  </xsl:template>
+  
+  <xsl:template name="InsertPicture">
+    <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
+    <xsl:param name="Drawing"/>
+    
+    <draw:frame draw:z-index="0" draw:name="Graphics 1"
+      draw:text-style-name="P1">
+      <!--style name-->
+      <xsl:attribute name="draw:style-name">
+        <xsl:value-of select="generate-id(.)"/>
+      </xsl:attribute>
+      
+      <!-- position -->
+      <xsl:call-template name="SetPosition">
+        <xsl:with-param name="sheet">
+          <xsl:value-of select="$sheet"/>
+        </xsl:with-param>
+        <xsl:with-param name="NameSheet">
+          <xsl:value-of select="$NameSheet"/>
+        </xsl:with-param>
+      </xsl:call-template>
+      
+      <xsl:call-template name="InsertImageFlip">
+        <xsl:with-param name="atribute">
+          <xsl:text>draw</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
+      
+      <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+
+        <xsl:call-template name="InsertImageHref">
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat($Drawing, '.rels')"/>
+          </xsl:with-param>
+        </xsl:call-template>              
+
+        <text:p/>
+      </draw:image>
+
+    </draw:frame>
   </xsl:template>
  
   
@@ -280,44 +300,101 @@
   <xsl:template name="GetMinRowWithPicture">
     <xsl:param name="min"/>
     <xsl:param name="PictureRow"/>
+    <xsl:param name="AfterRow"/>
     
     <xsl:variable name="numRow">
       <xsl:value-of select="substring-before($PictureRow, ';')"/>
     </xsl:variable>
     
     <xsl:choose>
-      <xsl:when test="$PictureRow = ''">
-        <xsl:value-of select="$min"/>
-      </xsl:when>
-      <xsl:when test="$min = ''">
-        <xsl:call-template name="GetMinRowWithPicture">
-          <xsl:with-param name="min">
-            <xsl:value-of select="substring-before($PictureRow, ';')"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureRow">
-            <xsl:value-of select="substring-after($PictureRow, ';')"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="$min &gt; substring-before($PictureRow, ';')">
-        <xsl:call-template name="GetMinRowWithPicture">
-          <xsl:with-param name="min">
-            <xsl:value-of select="substring-before($PictureRow, ';')"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureRow">
-            <xsl:value-of select="substring-after($PictureRow, ';')"/>
-          </xsl:with-param>
-        </xsl:call-template>
+      <xsl:when test="$AfterRow != ''">
+        
+        <xsl:choose>
+          <xsl:when test="$PictureRow = ''">
+            <xsl:value-of select="$min"/>
+          </xsl:when>
+          <xsl:when test="$min = ''">
+            <xsl:call-template name="GetMinRowWithPicture">
+              <xsl:with-param name="min">
+                <xsl:if test="$AfterRow &lt;= substring-before($PictureRow, ';')">
+                  <xsl:value-of select="substring-before($PictureRow, ';')"/>  
+                </xsl:if>
+              </xsl:with-param>
+              <xsl:with-param name="PictureRow">
+                <xsl:value-of select="substring-after($PictureRow, ';')"/>
+              </xsl:with-param>
+              <xsl:with-param name="AfterRow">
+                <xsl:value-of select="$AfterRow"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$min &gt; substring-before($PictureRow, ';') and $AfterRow &lt;= substring-before($PictureRow, ';')">
+            <xsl:call-template name="GetMinRowWithPicture">
+              <xsl:with-param name="min">
+                <xsl:value-of select="substring-before($PictureRow, ';')"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureRow">
+                <xsl:value-of select="substring-after($PictureRow, ';')"/>
+              </xsl:with-param>
+              <xsl:with-param name="AfterRow">
+                <xsl:value-of select="$AfterRow"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="GetMinRowWithPicture">
+              <xsl:with-param name="min">
+                <xsl:value-of select="$min"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureRow">
+                <xsl:value-of select="substring-after($PictureRow, ';')"/>
+              </xsl:with-param>
+              <xsl:with-param name="AfterRow">
+                <xsl:value-of select="$AfterRow"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+        
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name="GetMinRowWithPicture">
-          <xsl:with-param name="min">
+        
+        <xsl:choose>
+          <xsl:when test="$PictureRow = ''">
             <xsl:value-of select="$min"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureRow">
-            <xsl:value-of select="substring-after($PictureRow, ';')"/>
-          </xsl:with-param>
-        </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$min = ''">
+            <xsl:call-template name="GetMinRowWithPicture">
+              <xsl:with-param name="min">
+                <xsl:value-of select="substring-before($PictureRow, ';')"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureRow">
+                <xsl:value-of select="substring-after($PictureRow, ';')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$min &gt; substring-before($PictureRow, ';')">
+            <xsl:call-template name="GetMinRowWithPicture">
+              <xsl:with-param name="min">
+                <xsl:value-of select="substring-before($PictureRow, ';')"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureRow">
+                <xsl:value-of select="substring-after($PictureRow, ';')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="GetMinRowWithPicture">
+              <xsl:with-param name="min">
+                <xsl:value-of select="$min"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureRow">
+                <xsl:value-of select="substring-after($PictureRow, ';')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+        
       </xsl:otherwise>
     </xsl:choose>
     
@@ -344,19 +421,6 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-      <!--xsl:when test="contains($PictureCell, concat(concat(';',$rowNumber),':'))">
-        <xsl:call-template name="GetCollsWithPicture">
-          <xsl:with-param name="rowNumber">
-            <xsl:value-of select="$rowNumber"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureColl">
-            <xsl:value-of select="concat($PictureColl, concat(substring-before(substring-after($PictureCell, concat(';', concat($rowNumber, ':'))),';'), ';'))"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureCell">
-            <xsl:value-of select="concat($PictureCell, concat(';', substring-after(substring-after($PictureCell, concat(';', concat($rowNumber, ':'))),';')))"/>
-          </xsl:with-param>
-          </xsl:call-template>        
-      </xsl:when-->
       <xsl:otherwise>
         <xsl:value-of select="$PictureColl"/>
       </xsl:otherwise>
@@ -412,7 +476,7 @@
 
       <!-- Insert Empty Row with picture (pictures) -->
     <table:table-row table:style-name="{$TableStyleName}">
-      <xsl:call-template name="InsertPicture">
+      <xsl:call-template name="InsertPictureEmptySheet">
        <xsl:with-param name="collNum">
           <xsl:text>0</xsl:text>
        </xsl:with-param>
@@ -441,7 +505,7 @@
       <xsl:if test="concat(substring-after($PictureRow, concat($GetMinRowWithPicture,';')), substring-before($PictureRow, concat($GetMinRowWithPicture,';'))) != ''">
         <xsl:call-template name="TwoCellAnchor">
           <xsl:with-param name="prevRow">
-            <xsl:value-of select="$GetMinRowWithPicture"/>
+            <xsl:value-of select="$GetMinRowWithPicture + 1"/>
           </xsl:with-param>
           <xsl:with-param name="PictureRow">
             <xsl:call-template name="DeleteRow">
@@ -491,13 +555,7 @@
       <xsl:otherwise>
         <xsl:value-of select="$PictureRow"/>
       </xsl:otherwise>
-      
-    
-    </xsl:choose>
-    
-    
-      
-    
+    </xsl:choose>    
   </xsl:template>
   
   
@@ -519,6 +577,7 @@
     <xsl:variable name="id">
       <xsl:value-of select="key('drawing', '')/@r:id"/>        
     </xsl:variable>
+    
     <xsl:for-each
       select="document(concat(concat('xl/worksheets/_rels/', substring-after($sheet, '/')), '.rels'))//node()[name()='Relationship']">
       <xsl:variable name="Drawing">
@@ -602,58 +661,7 @@
       </xsl:for-each>    
   </xsl:template>
   
-  <xsl:template name="SetSize">
-    <!--xsl:choose>
-      <xsl:when test="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln">
-        <xsl:variable name="border">
-          <xsl:call-template name="ConvertEmu3">
-            <xsl:with-param name="length">
-              <xsl:value-of select="a:graphic/a:graphicData/pic:pic/pic:spPr/a:ln/@w"/>
-            </xsl:with-param>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="height">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="wp:extent/@cy"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:variable name="width">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="wp:extent/@cx"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-        </xsl:variable>
-        <xsl:attribute name="svg:height">
-          <xsl:value-of
-            select="concat(substring-before($height,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"
-          />
-        </xsl:attribute>
-        <xsl:attribute name="svg:width">
-          <xsl:value-of
-            select="concat(substring-before($width,'cm')+substring-before($border,'cm')+substring-before($border,'cm'),'cm')"
-          />
-        </xsl:attribute>
-      </xsl:when>
-      <xsl:otherwise-->
-        <!--xsl:attribute name="svg:height">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="xdr:from/xdr:colOff"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-          </xsl:call-template>
-          </xsl:attribute-->
-   
-        <!--xsl:attribute name="svg:width">
-          <xsl:call-template name="ConvertEmu">
-            <xsl:with-param name="length" select="xdr:from/xdr:rowOff"/>
-            <xsl:with-param name="unit">cm</xsl:with-param>
-            </xsl:call-template>
-        </xsl:attribute-->
-      <!--/xsl:otherwise>
-    </xsl:choose-->
-  </xsl:template>
-  
+  <!-- Set Position -->
   <xsl:template name="SetPosition">
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
@@ -666,7 +674,7 @@
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="RowEnd">
-        <xsl:value-of select="xdr:to/xdr:row"/>
+        <xsl:value-of select="xdr:to/xdr:row + 1"/>
       </xsl:variable>
       <xsl:value-of select="concat($NameSheet, '.', $ColEnd, $RowEnd)"/>
     </xsl:attribute>
@@ -696,5 +704,417 @@
     </xsl:attribute>
   </xsl:template>
   
+   <xsl:template name="InsertPictureProperties">
+    
+    <style:style style:name="{generate-id(.)}" style:family="graphic">
+      
+      <!--in Word there are no parent style for image - make default Graphics in OO -->
+      <xsl:attribute name="style:parent-style-name">
+        <xsl:text>Graphics</xsl:text>
+        <!--xsl:value-of select="w:tblStyle/@w:val"/-->
+      </xsl:attribute>      
+      <style:graphic-properties>
+        <!--xsl:call-template name="InsertImagePosH"/>
+          <xsl:call-template name="InsertImagePosV"/-->          
+          <!--xsl:call-template name="InsertImageCrop"/>
+          <xsl:call-template name="InsertImageWrap"/>
+          <xsl:call-template name="InsertImageMargins"/>
+            <xsl:call-template name="InsertImageFlowWithtText"/-->
+        <xsl:call-template name="InsertImageFlip">
+          <xsl:with-param name="atribute">
+            <xsl:text>style</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+        <xsl:call-template name="InsertImageBorder"/>
+      </style:graphic-properties>
+    </style:style>
+    
+  </xsl:template>
+  
+  <xsl:template match="e:sheet" mode="PictureStyle">
+    <xsl:param name="number"/>    
+    
+    <xsl:variable name="Id">
+      <xsl:call-template name="GetTarget">
+        <xsl:with-param name="id">
+          <xsl:value-of select="@r:id"/>
+        </xsl:with-param>
+        <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="sheetName">
+      <xsl:value-of select="@name"/>
+    </xsl:variable>
+
+    <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:apply-templates select="e:worksheet/e:drawing" mode="PictureStyle">
+        <xsl:with-param name="sheet">
+          <xsl:value-of select="$Id"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+   </xsl:for-each>
+
+    <!-- Insert next Table -->
+    
+        <xsl:apply-templates select="following-sibling::e:sheet[1]" mode="PictureStyle">
+          <xsl:with-param name="number">
+            <xsl:value-of select="$number + 1"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+
+  </xsl:template>
+  
+  <xsl:template match="e:drawing" mode="PictureStyle">
+    <xsl:param name="sheet"/>    
+    <xsl:variable name="Target">
+    <xsl:call-template name="GetTargetPicture">
+      <xsl:with-param name="sheet">
+        <xsl:value-of select="substring-after($sheet, '/')"/>
+      </xsl:with-param>
+      <xsl:with-param name="id">
+        <xsl:value-of select="@r:id"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+      <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
+        <xsl:apply-templates select="xdr:wsDr/xdr:twoCellAnchor[1]" mode="PictureStyle"/>
+      </xsl:if>
+    </xsl:for-each>
+
+  </xsl:template>  
+  
+  <xsl:template match="xdr:twoCellAnchor" mode="PictureStyle">
+    <xsl:param name="PictureCell"/>
+    
+    <xsl:variable name="PictureColStart">
+      <xsl:value-of select="xdr:from/xdr:col"/>
+    </xsl:variable>
+    
+    <xsl:variable name="PictureRowStart">
+      <xsl:value-of select="xdr:from/xdr:row"/>
+    </xsl:variable>
+    
+    <xsl:call-template name="InsertPictureProperties"/>
+    
+     <xsl:apply-templates select="following-sibling::xdr:twoCellAnchor[1]" mode="PictureStyle">
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="concat(concat(concat(concat($PictureCell, $PictureRowStart), ':'), $PictureColStart), ';')"/>
+          </xsl:with-param>
+     </xsl:apply-templates>   
+    
+  </xsl:template>
+  
+  <!-- To do insert border -->
+  
+  <xsl:template name="InsertImageBorder">
+    <!--xsl:if
+      test="xdr:pic/xdr:spPr/a:ln[not(a:noFill)]">
+
+      <xsl:variable name="width">
+        <xsl:call-template name="ConvertEmu3">
+          <xsl:with-param name="length">
+            <xsl:value-of
+              select="xdr:pic/xdr:spPr/a:ln/@w"
+            />
+          </xsl:with-param>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="type">
+        <xsl:choose>
+          <xsl:when
+            test="xdr:pic/xdr:spPr/a:ln/a:prstDash/@val = 'solid'">
+            <xsl:text>solid</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>solid</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="color">
+        <xsl:choose>
+          <xsl:when
+            test="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr">
+            <xsl:value-of
+              select="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr/@val"
+            />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>000000</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:attribute name="fo:border">
+        <xsl:value-of select="concat($width,' ',$type,' #',$color)"/>
+      </xsl:attribute>
+    </xsl:if-->
+  </xsl:template>
+  
+  <!-- Insert Flip properties -->
+  <xsl:template name="InsertImageFlip">
+    <xsl:param name="atribute"/>
+    <!--  picture flip (vertical, horizontal)-->
+    <xsl:if test="xdr:pic/xdr:spPr/a:xfrm/attribute::node()">        
+          <xsl:choose>
+            <!-- to do flip vertical and flip vertical-horizontal -->
+            <!--xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1' and xdr:pic/xdr:spPr/a:xfrm/@flipH = '1' and $atribute != 'style'">
+             <xsl:attribute name="draw:transform">
+              <xsl:text>rotate (3.1415926535892) translate (2.253cm 0.217cm)</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1' and $atribute != 'style'">
+              <xsl:attribute name="draw:transform">
+              <xsl:text>rotate (3.1415926535892) translate (2.256cm 0.108cm)</xsl:text>
+              </xsl:attribute>
+            </xsl:when-->
+            <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipH = '1'  and $atribute = 'style'">
+              <xsl:attribute name="style:mirror">
+              <xsl:text>horizontal</xsl:text>
+              </xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- Insert all picture betwen two rows -->
+  <xsl:template name="InsertPictureBetwenTwoRows">
+    <xsl:param name="StartRow"/>
+    <xsl:param name="EndRow"/>
+    <xsl:param name="PictureRow"/>
+    <xsl:param name="PictureCell"/>
+    <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
+
+      <xsl:variable name="GetMinRowWithPicture">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$PictureRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="$StartRow"/>
+        </xsl:with-param>
+      </xsl:call-template>      
+      </xsl:variable>
+    
+    <xsl:choose>
+      <!-- Insert empty rows before -->
+      <xsl:when test="$GetMinRowWithPicture != '' and $GetMinRowWithPicture &gt;= $StartRow and $GetMinRowWithPicture &lt; $EndRow">
+        <xsl:if test="$GetMinRowWithPicture - $StartRow &gt; 0">
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+          table:number-rows-repeated="{$GetMinRowWithPicture - $StartRow}">
+          <table:table-cell table:number-columns-repeated="256"/>
+        </table:table-row>
+        </xsl:if>
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
+          
+          <xsl:variable name="PictureColl">
+          <xsl:call-template name="GetCollsWithPicture">
+            <xsl:with-param name="rowNumber">
+              <xsl:value-of select="$GetMinRowWithPicture"/>
+            </xsl:with-param>
+            <xsl:with-param name="PictureCell">
+              <xsl:value-of select="concat(';', $PictureCell)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+          </xsl:variable>
+          
+          <xsl:call-template name="InsertPictureBetwenTwoColl">
+            <xsl:with-param name="sheet">
+              <xsl:value-of select="$sheet"/>
+            </xsl:with-param>           
+            <xsl:with-param name="NameSheet">
+              <xsl:value-of select="$NameSheet"/>
+            </xsl:with-param>          
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$GetMinRowWithPicture"/>
+            </xsl:with-param>
+            <xsl:with-param name="PictureColl">
+              <xsl:value-of select="$PictureColl"/>
+            </xsl:with-param>
+            <xsl:with-param name="StartColl">
+              <xsl:text>0</xsl:text>
+            </xsl:with-param>
+            <xsl:with-param name="EndColl">
+              <xsl:text>256</xsl:text>
+            </xsl:with-param>
+          </xsl:call-template>
+
+        </table:table-row>
+        
+        <xsl:call-template name="InsertPictureBetwenTwoRows">
+          <xsl:with-param name="StartRow">
+            <xsl:value-of select="$GetMinRowWithPicture + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="EndRow">
+            <xsl:value-of select="$EndRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureRow">
+            <xsl:value-of select="$PictureRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        
+      </xsl:when>
+      <xsl:otherwise>
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+          table:number-rows-repeated="{$EndRow - $StartRow - 1}">
+          <table:table-cell table:number-columns-repeated="256"/>
+        </table:table-row>      
+      </xsl:otherwise>
+    </xsl:choose>    
+    
+  </xsl:template>
+  
+  <!-- Insert all picture betwen two cell -->
+  <xsl:template name="InsertPictureBetwenTwoColl">
+    <xsl:param name="StartColl"/>
+    <xsl:param name="EndColl"/>
+    <xsl:param name="sheet"/>      
+    <xsl:param name="NameSheet"/>
+    <xsl:param name="rowNum"/>
+    <xsl:param name="PictureColl"/>
+    
+    
+    <xsl:variable name="GetMinCollWithPicture">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$PictureColl"/>
+        </xsl:with-param>  
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="$StartColl - 1"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <!-- Insert empty rows before -->
+      <xsl:when test="$GetMinCollWithPicture != '' and $GetMinCollWithPicture &gt;= $StartColl and $GetMinCollWithPicture &lt; $EndColl">
+      
+        <xsl:if test="$GetMinCollWithPicture - $StartColl &gt; 0">
+          <table:table-cell table:number-columns-repeated="{$GetMinCollWithPicture - $StartColl}"/>
+        </xsl:if>
+        
+        <xsl:for-each select="ancestor::e:worksheet/e:drawing">
+          <xsl:call-template name="InsertPictureInThisCell">
+            <xsl:with-param name="sheet">
+              <xsl:value-of select="$sheet"/>
+            </xsl:with-param>           
+            <xsl:with-param name="NameSheet">
+              <xsl:value-of select="$NameSheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="collNum">
+              <xsl:value-of select="$GetMinCollWithPicture"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+        <xsl:call-template name="InsertPictureBetwenTwoColl">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>           
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>          
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureColl">
+            <xsl:value-of select="$PictureColl"/>
+          </xsl:with-param>
+          <xsl:with-param name="StartColl">
+            <xsl:value-of select="$GetMinCollWithPicture + 2"/>
+          </xsl:with-param>
+          <xsl:with-param name="EndColl">
+              <xsl:value-of select="$EndColl"/>
+          </xsl:with-param>        
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$StartColl = 0">
+            <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl}"/>    
+          </xsl:when>
+          <xsl:otherwise>
+            <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl - 1}"/>    
+          </xsl:otherwise>
+          
+        </xsl:choose>
+        
+        
+      </xsl:otherwise>
+    </xsl:choose>    
+  </xsl:template>
+  
+  <!-- Insert cell with picture -->
+  <xsl:template name="InsertPictureInThisCell">
+    <xsl:param name="rowNum"/>
+    <xsl:param name="collNum"/>
+    <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
+    
+    <xsl:variable name="Target">
+      <xsl:call-template name="GetTargetPicture">
+        <xsl:with-param name="sheet">
+          <xsl:value-of select="substring-after($sheet, '/')"/>
+        </xsl:with-param>
+        <xsl:with-param name="id">
+          <xsl:value-of select="@r:id"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+      
+      <table:table-cell>
+    <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+      
+      <xsl:for-each
+        select="document(concat(concat('xl/worksheets/_rels/', substring-after($sheet, '/')), '.rels'))//node()[name()='Relationship']">        
+        <xsl:call-template name="CopyPictures">            
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat(substring-after(substring-after($Target, '/'), '/'), '.rels')"/>
+          </xsl:with-param>
+          <xsl:with-param name="targetName">
+            <xsl:text>Pictures</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:for-each>
+      
+      <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
+       
+        <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
+          <xsl:if test="xdr:from/xdr:col = $collNum and xdr:from/xdr:row = $rowNum">
+            <xsl:call-template name="InsertPicture">
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$NameSheet"/>
+              </xsl:with-param>
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>
+              <xsl:with-param name="Drawing">
+                <xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:for-each>   
+        
+      </xsl:if>
+      
+    </xsl:for-each>    
+ </table:table-cell>
+
+  </xsl:template>
   
 </xsl:stylesheet>

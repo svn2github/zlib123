@@ -41,8 +41,8 @@
   <xsl:import href="measures.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="table_body.xsl"/>
-  <xsl:import href="picture.xsl"/>
   <xsl:import href="number.xsl"/>
+  <xsl:import href="picture.xsl"/>
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="''"/>
@@ -63,6 +63,10 @@
         <xsl:call-template name="InsertCellStyles"/>
         <xsl:call-template name="InsertStyleTableProperties"/>
         <xsl:call-template name="InsertTextStyles"/>
+        <!-- Insert Picture properties -->
+        <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]" mode="PictureStyle">
+          <xsl:with-param name="number">1</xsl:with-param>
+        </xsl:apply-templates>
       </office:automatic-styles>
       <xsl:call-template name="InsertSheets"/>
     </office:document-content>
@@ -348,6 +352,14 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
+      
+      <xsl:variable name="PictureRow">
+        <xsl:call-template name="PictureRow">
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
 
       <!-- Insert Row  -->
       <xsl:choose>
@@ -479,6 +491,18 @@
             <xsl:with-param name="BigMergeRow">
               <xsl:value-of select="$BigMergeRow"/>
             </xsl:with-param>
+            <xsl:with-param name="PictureCell">
+              <xsl:value-of select="$PictureCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="PictureRow">
+              <xsl:value-of select="$PictureRow"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheet">
+              <xsl:value-of select="$sheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="NameSheet">
+              <xsl:value-of select="$NameSheet"/>
+            </xsl:with-param>
           </xsl:apply-templates>
 
           <xsl:if test="not(e:worksheet/e:sheetData/e:row/e:c/e:v)">
@@ -520,6 +544,9 @@
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
     <xsl:param name="PictureCell"/>
+    <xsl:param name="PictureRow"/>
+    <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -546,21 +573,57 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
+    
+    <xsl:variable name="GetMinRowWithPicture">
+    <xsl:call-template name="GetMinRowWithPicture">
+      <xsl:with-param name="PictureRow">
+        <xsl:value-of select="$PictureRow"/>
+      </xsl:with-param>
+      <xsl:with-param name="AfterRow">
+        <xsl:value-of select="$lastCellColumnNumber"/>
+      </xsl:with-param>
+    </xsl:call-template>
+    </xsl:variable>
 
     <!-- if there were empty rows before this one then insert empty rows -->
     <xsl:choose>
-      <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll-->
-      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = ''">
+      <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll and Pictures-->
+      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = '' and $PictureCell = ''">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="{@r - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>
+      
+      <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll, and there are Pictures before this row-->
+      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = '' and $PictureRow != '' and $GetMinRowWithPicture &lt; @r">   
+
+        <xsl:call-template name="InsertPictureBetwenTwoRows">
+            <xsl:with-param name="StartRow">
+              <xsl:text>0</xsl:text>
+            </xsl:with-param>
+            <xsl:with-param name="EndRow">
+              <xsl:value-of select="@r"/>
+            </xsl:with-param>
+            <xsl:with-param name="PictureRow">
+              <xsl:value-of select="$PictureRow"/>
+            </xsl:with-param>
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>
+          </xsl:call-template>
+      </xsl:when>
 
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll-->
 
       <xsl:when test="position()=1 and @r>1 and $BigMergeCell != ''">
+        
         <xsl:call-template name="InsertBigMergeFirstRowEmpty">
           <xsl:with-param name="RowNumber">
             <xsl:value-of select="1"/>
@@ -622,6 +685,7 @@
     <xsl:param name="BigMergeRow"/>
     <xsl:param name="headerRowsStart"/>
     <xsl:param name="headerRowsEnd"/>
+    <xsl:param name="PictureRow"/>
 
     <xsl:variable name="this" select="."/>
 
