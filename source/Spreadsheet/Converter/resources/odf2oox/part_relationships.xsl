@@ -87,11 +87,23 @@
       </xsl:if>
 
       <!-- drawing.xml file -->
-<!--      <xsl:if test="contains($chart,'true')">
+      <xsl:if test="contains($chart,'true')">
         <Relationship Id="rId1"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"
-          Target="../drawings/drawing1.xml"/>
-      </xsl:if>-->
+          Target="{concat('../drawings/drawing',$sheetNum,'.xml')}"/>
+      </xsl:if>
+    </Relationships>
+  </xsl:template>
+
+  <xsl:template name="InsertDrawingRels">
+    <xsl:param name="sheetNum"/>
+
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+      <!-- chart rels -->
+      <xsl:for-each
+        select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]"> </xsl:for-each>
+
+      <!-- TO DO: picture rels -->
     </Relationships>
   </xsl:template>
 </xsl:stylesheet>

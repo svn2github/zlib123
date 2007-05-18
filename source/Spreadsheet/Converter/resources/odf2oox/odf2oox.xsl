@@ -30,10 +30,12 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:math="http://www.w3.org/1998/Math/MathML"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -45,7 +47,7 @@
   <xsl:import href="odf2oox-compute-size.xsl"/>
   <xsl:import href="contentTypes.xsl"/>
   <xsl:import href="package_relationships.xsl"/>
- <xsl:import href="common-meta.xsl"/>
+  <xsl:import href="common-meta.xsl"/>
   <xsl:import href="part_relationships.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="merge_cell.xsl"/>
@@ -168,13 +170,17 @@
           <!-- create VmlDrawing.xml file -->
           <xsl:call-template name="CreateVmlDrawing"/>
         </xsl:if>
-        
+
+        <!-- <xsl:if test="$picture = 'true' or contains($chart,'true')"> -->
+
 <!--        <xsl:if test="contains($chart,'true')">
           <xsl:call-template name="CreateDrawing"/>
-        </xsl:if>         
--->
+          <xsl:call-template name="CreateDrawingRelationships">
+          </xsl:call-template>
+        </xsl:if>-->
+
         <!-- insert relationships -->
-        <xsl:call-template name="CreateRelationships">
+        <xsl:call-template name="CreateSheetRelationships">
           <xsl:with-param name="sheetNum" select="position()"/>
           <xsl:with-param name="comment" select="$comment"/>
 <!--          <xsl:with-param name="chart" select="$chart"/>
@@ -283,7 +289,7 @@
     </pzip:entry>
   </xsl:template>
 
-  <xsl:template name="CreateRelationships">
+  <xsl:template name="CreateSheetRelationships">
     <xsl:param name="comment"/>
     <xsl:param name="picture"/>
     <xsl:param name="hyperlink"/>
@@ -306,6 +312,15 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template name="CreateDrawingRelationships">
+    <!-- package relationship item -->
+    <pzip:entry pzip:target="{concat('xl/drawings/_rels/drawing',position(),'.xml.rels')}">
+      <xsl:call-template name="InsertDrawingRels">
+        <xsl:with-param name="sheetNum" select="position()"/>
+      </xsl:call-template>
+    </pzip:entry>
+  </xsl:template>
+  
   <xsl:template name="CreateVmlDrawing">
 
     <xsl:variable name="sheetId" select="position()"/>
@@ -326,9 +341,49 @@
       </pxsi:dummyContainer>
     </pzip:entry>
   </xsl:template>
-  
+
   <xsl:template name="CreateDrawing">
     <pzip:entry pzip:target="{concat('xl/drawings/drawing',position(),'.xml')}">
+      <xdr:wsDr>
+        <!-- file pointed by draw:frame/draw:object/@xlink:href must contain office:chart -->
+        <xsl:for-each
+          select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
+          <xdr:twoCellAnchor>
+            <xdr:from>
+              <xdr:col>0</xdr:col>
+              <xdr:colOff>714375</xdr:colOff>
+              <xdr:row>6</xdr:row>
+              <xdr:rowOff>104775</xdr:rowOff>
+            </xdr:from>
+            <xdr:to>
+              <xdr:col>8</xdr:col>
+              <xdr:colOff>447675</xdr:colOff>
+              <xdr:row>27</xdr:row>
+              <xdr:rowOff>104775</xdr:rowOff>
+            </xdr:to>
+            <xdr:graphicFrame macro="">
+              <xdr:nvGraphicFramePr>
+                <xdr:cNvPr id="1025" name="Chart 1"/>
+                <xdr:cNvGraphicFramePr>
+                  <a:graphicFrameLocks/>
+                </xdr:cNvGraphicFramePr>
+              </xdr:nvGraphicFramePr>
+              <xdr:xfrm>
+                <a:off x="0" y="0"/>
+                <a:ext cx="0" cy="0"/>
+              </xdr:xfrm>
+              <a:graphic>
+                <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">
+                  <c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
+                    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+                    r:id="rId1"/>
+                </a:graphicData>
+              </a:graphic>
+            </xdr:graphicFrame>
+            <xdr:clientData/>
+          </xdr:twoCellAnchor>
+        </xsl:for-each>
+      </xdr:wsDr>
     </pzip:entry>
   </xsl:template>
 
