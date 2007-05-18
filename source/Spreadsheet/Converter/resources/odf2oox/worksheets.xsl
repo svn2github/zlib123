@@ -32,6 +32,8 @@
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
@@ -96,13 +98,13 @@
       <xsl:variable name="masterPage">
         <xsl:value-of select="key('tableMasterPage',@table:style-name)/@style:master-page-name"/>
       </xsl:variable>
-      
+
       <xsl:variable name="pageStyle">
         <xsl:value-of
           select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name =  $masterPage]/@style:page-layout-name"
         />
       </xsl:variable>
-      
+
       <!-- if property 'fit print range(s) to width/height' is being used -->
       <xsl:for-each select="document('styles.xml')">
         <xsl:if
@@ -147,12 +149,31 @@
       <xsl:call-template name="InsertPageProperties">
         <xsl:with-param name="pageStyle" select="$pageStyle"/>
       </xsl:call-template>
-      
+
       <xsl:call-template name="InsertHeaderFooter"/>
-      
+
       <xsl:if test="descendant::office:annotation">
-      <legacyDrawing r:id="{concat('rId',$sheetId)}"/>
+        <legacyDrawing r:id="{concat('v_rId',$sheetId)}"/>
       </xsl:if>
+      
+<!--      <xsl:variable name="chart">
+        <xsl:for-each select="descendant::draw:frame/draw:object">
+          <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+            <xsl:choose>
+              <xsl:when test="office:document-content/office:body/office:chart">
+                <xsl:text>true</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>false</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:variable>
+      
+      <xsl:if test="contains($chart,'true')">
+        <drawing r:id="{concat('rId',$sheetId)}"/>
+      </xsl:if>-->      
     </worksheet>
   </xsl:template>
 
@@ -264,13 +285,16 @@
         </xsl:if>
 
         <selection>
-          
+
           <xsl:variable name="col">
             <xsl:call-template name="NumbersToChars">
               <xsl:with-param name="num">
                 <xsl:choose>
-                  <xsl:when test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']">
-                    <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']"/>                                    
+                  <xsl:when
+                    test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']">
+                    <xsl:value-of
+                      select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionX']"
+                    />
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:text>1</xsl:text>
@@ -281,8 +305,11 @@
           </xsl:variable>
           <xsl:variable name="row">
             <xsl:choose>
-              <xsl:when test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']">
-                <xsl:value-of select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']"/>               
+              <xsl:when
+                test="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']">
+                <xsl:value-of
+                  select="document('settings.xml')/office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item-map-named[@config:name='Tables']/config:config-item-map-entry[position() = $sheetId]/config:config-item[@config:name='CursorPositionY']"
+                />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:text>1</xsl:text>
@@ -474,7 +501,7 @@
           <xsl:value-of select="$CheckIfDefaultBorder"/>
         </xsl:with-param>
       </xsl:apply-templates>
-      
+
     </sheetData>
   </xsl:template>
 
@@ -491,7 +518,8 @@
               <xsl:text>1</xsl:text>
             </xsl:attribute>
           </xsl:if>
-          <xsl:if test="not(style:header-left/@style:display = 'false') or style:header-left/child::node[1]/text() != '' or not(style:footer-left/@style:display = 'false') or style:footer-left/child::node[1]/text() != '' or not(style:header/@style:display = 'false') or style:header/child::node[1]/text() != '' or not(style:footer/@style:display = 'false') or style:footer/child::node[1]/text() != '' ">
+          <xsl:if
+            test="not(style:header-left/@style:display = 'false') or style:header-left/child::node[1]/text() != '' or not(style:footer-left/@style:display = 'false') or style:footer-left/child::node[1]/text() != '' or not(style:header/@style:display = 'false') or style:header/child::node[1]/text() != '' or not(style:footer/@style:display = 'false') or style:footer/child::node[1]/text() != '' ">
             <xsl:message terminate="no">translation.odf2oox.HeaderFooterCharNumber</xsl:message>
           </xsl:if>
         </xsl:for-each>

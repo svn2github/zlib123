@@ -28,13 +28,16 @@
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odf="urn:odf"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:math="http://www.w3.org/1998/Math/MathML"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:x="urn:schemas-microsoft-com:office:excel" exclude-result-prefixes="odf style text number">
 
   <xsl:import href="workbook.xsl"/>
@@ -42,7 +45,7 @@
   <xsl:import href="odf2oox-compute-size.xsl"/>
   <xsl:import href="contentTypes.xsl"/>
   <xsl:import href="package_relationships.xsl"/>
-  <xsl:import href="common-meta.xsl"/>
+ <xsl:import href="common-meta.xsl"/>
   <xsl:import href="part_relationships.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="merge_cell.xsl"/>
@@ -67,6 +70,8 @@
     select="count(document('meta.xml')/office:document-meta/office:meta/meta:user-defined)"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"/>
+
+  <xsl:key name="chart" match="office:chart" use="''"/>
 
   <xsl:template match="/odf:source">
     <xsl:processing-instruction name="mso-application">progid="Word.Document"</xsl:processing-instruction>
@@ -102,58 +107,81 @@
       <!-- input: content.xml -->
       <!-- output:  xl/worksheets/sheet_N_.xml -->
 
-      <!--insert comments-->
       <xsl:for-each
         select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
-        <xsl:if test="descendant::office:annotation">
+
+        <xsl:variable name="comment">
+          <xsl:choose>
+            <xsl:when test="descendant::office:annotation">
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <!--        <xsl:variable name="picture">
+          <xsl:choose>
+            <xsl:when test="key('picture', '' )">         insert different condition
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="hyperlink">
+          <xsl:choose>
+            <xsl:when test="key('hyperlink', '' )">    insert different condition
+              <xsl:text>true</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>false</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+          <xsl:variable name="chart">
+          <xsl:for-each select="descendant::draw:frame/draw:object">
+            <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+              <xsl:choose>
+                <xsl:when test="office:document-content/office:body/office:chart">
+                  <xsl:text>true</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:text>false</xsl:text>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:for-each>
+        </xsl:variable>
+        -->
+        
+        <!-- insert comments -->
+        <xsl:if test="$comment = 'true' ">
           <xsl:call-template name="InsertComments">
             <xsl:with-param name="sheetId" select="position()"/>
           </xsl:call-template>
 
-          <!-- package relationship item -->
-          <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
-
-            <xsl:call-template name="InsertWorksheetsRels">
-              <xsl:with-param name="sheetNum" select="position()"/>
-            </xsl:call-template>
-          </pzip:entry>
-
+          <!-- create VmlDrawing.xml file -->
+          <xsl:call-template name="CreateVmlDrawing"/>
         </xsl:if>
+        
+<!--        <xsl:if test="contains($chart,'true')">
+          <xsl:call-template name="CreateDrawing"/>
+        </xsl:if>         
+-->
+        <!-- insert relationships -->
+        <xsl:call-template name="CreateRelationships">
+          <xsl:with-param name="sheetNum" select="position()"/>
+          <xsl:with-param name="comment" select="$comment"/>
+<!--          <xsl:with-param name="chart" select="$chart"/>
+                    <xsl:with-param name="picture" select="$picture"/>
+          <xsl:with-param name="hyperlink" select="$hyperlink"/>-->
+        </xsl:call-template>
       </xsl:for-each>
-
-      <xsl:for-each
-        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
-        <xsl:if test="descendant::office:annotation">
-          <xsl:variable name="sheetId" select="position()"/>
-          <pzip:entry pzip:target="{concat('xl/drawings/vmlDrawing',position(),'.vml')}">
-            <pxsi:dummyContainer xmlns:pxsi="urn:cleverage:xmlns:post-processings:comments">
-              <o:shapelayout v:ext="edit">
-                <o:idmap v:ext="edit" data="1"/>
-              </o:shapelayout>
-              <v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202"
-                path="m,l,21600r21600,l21600,xe">
-                <v:stroke joinstyle="miter"/>
-                <v:path gradientshapeok="t" o:connecttype="rect"/>
-              </v:shapetype>
-              <xsl:for-each
-                select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/descendant::table:table-row/table:table-cell/office:annotation">
-                <xsl:call-template name="InsertTextBox"/>
-              </xsl:for-each>
-            </pxsi:dummyContainer>
-          </pzip:entry>
-        </xsl:if>
-      </xsl:for-each>
-
-      <!-- insert drawings -->
-      <!--<xsl:call-template name="InsertDrawings"/>-->
-      <!-- input: content.xml 
-                              Object_N_/content.xml
-                              Pictures/_imageFile_
-            -->
-      <!-- output:  xl/drawings/drawing_N_.xml
-                                 xl/drawings/_rels/drawing_N_.xml.rels
-                                 xl/charts/chart_N_.xml 
-                                 xl/media/_imageFile_ -->
 
       <!-- insert pivotTables -->
       <!-- <xsl:call-template name="InsertPivotTables"/> -->
@@ -191,10 +219,16 @@
             </pzip:entry>-->
       <!-- input: content.xml -->
 
-      <!-- part relationship item -->
-      <!--<pzip:entry pzip:target="xl/_rels/document.xml.rels">
-                <xsl:call-template name="InsertPartRelationships"/>
-            </pzip:entry> -->
+      <!-- insert drawings -->
+      <!-- input: content.xml 
+        Object_N_/content.xml
+        Pictures/_imageFile_
+      -->
+      <!-- output:  xl/drawings/drawing_N_.xml
+        xl/drawings/_rels/drawing_N_.xml.rels
+        xl/charts/chart_N_.xml 
+        xl/media/_imageFile_ -->
+
       <!-- /CHANGE -->
 
       <!-- part relationship item -->
@@ -233,18 +267,69 @@
       xmlns:dc="http://purl.org/dc/elements/1.1/">
       <xsl:call-template name="GetDocSecurityExtendedProperty"/>
       <xsl:call-template name="GetApplicationExtendedProperty"/>
-      <xsl:for-each select="document('meta.xml')/office:document-meta/office:meta">        
+      <xsl:for-each select="document('meta.xml')/office:document-meta/office:meta">
         <xsl:apply-templates select="meta:editing-duration"/>
-      </xsl:for-each>      
+      </xsl:for-each>
     </Properties>
   </xsl:template>
- 
+
   <xsl:template name="InsertComments">
     <xsl:param name="sheetId"/>
-    <pzip:entry pzip:target="{concat(&quot;xl/comments&quot;,$sheetId,&quot;.xml&quot;)}">
+    <pzip:entry
+      pzip:target="{concat(&quot;xl/comments&quot;,$sheetId,&quot;.xml&quot;)}">
       <xsl:call-template name="comments">
         <xsl:with-param name="sheetNum" select="$sheetId"/>
       </xsl:call-template>
     </pzip:entry>
   </xsl:template>
+
+  <xsl:template name="CreateRelationships">
+    <xsl:param name="comment"/>
+    <xsl:param name="picture"/>
+    <xsl:param name="hyperlink"/>
+    <xsl:param name="chart"/>
+
+    <!--      <xsl:if
+        test="$comment = 'true' or $picture != 'true' or $hyperlink = 'true' or contains($chart,'true')">-->
+    <xsl:if test="$comment = 'true' ">
+      <!-- package relationship item -->
+      <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
+        <xsl:call-template name="InsertWorksheetsRels">
+          <xsl:with-param name="sheetNum" select="position()"/>
+          <xsl:with-param name="comment" select="$comment"/>
+          <xsl:with-param name="picture" select="$picture"/>
+          <xsl:with-param name="hyperlink" select="$hyperlink"/>
+          <xsl:with-param name="chart" select="$chart"/>
+        </xsl:call-template>
+      </pzip:entry>
+
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="CreateVmlDrawing">
+
+    <xsl:variable name="sheetId" select="position()"/>
+    <pzip:entry pzip:target="{concat('xl/drawings/vmlDrawing',position(),'.vml')}">
+      <pxsi:dummyContainer xmlns:pxsi="urn:cleverage:xmlns:post-processings:comments">
+        <o:shapelayout v:ext="edit">
+          <o:idmap v:ext="edit" data="1"/>
+        </o:shapelayout>
+        <v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202"
+          path="m,l,21600r21600,l21600,xe">
+          <v:stroke joinstyle="miter"/>
+          <v:path gradientshapeok="t" o:connecttype="rect"/>
+        </v:shapetype>
+        <xsl:for-each
+          select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table[$sheetId]/descendant::table:table-row/table:table-cell/office:annotation">
+          <xsl:call-template name="InsertTextBox"/>
+        </xsl:for-each>
+      </pxsi:dummyContainer>
+    </pzip:entry>
+  </xsl:template>
+  
+  <xsl:template name="CreateDrawing">
+    <pzip:entry pzip:target="{concat('xl/drawings/drawing',position(),'.xml')}">
+    </pzip:entry>
+  </xsl:template>
+
 </xsl:stylesheet>

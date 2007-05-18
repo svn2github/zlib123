@@ -38,31 +38,60 @@
   exclude-result-prefixes="w r xlink office draw text style">
 
   <xsl:template name="InsertPartRelationships">
-    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">      
-   
- <!-- Sheet relationship -->
-    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
-      <Relationship Id="{generate-id(.)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet">
-        <xsl:variable name="NumberSheet">
-          <xsl:value-of select="position()"/>    
-        </xsl:variable>    
-        <xsl:attribute name="Target">          
-          <xsl:value-of select="concat(concat('worksheets/sheet', $NumberSheet), '.xml')"/>
-        </xsl:attribute>        
-      </Relationship>
-    </xsl:for-each>
-      
- <!--  Static relationships -->
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml" />
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml" /> 
- </Relationships>
-  </xsl:template>  
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+
+      <!-- Sheet relationship -->
+      <xsl:for-each
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+        <Relationship Id="{generate-id(.)}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet">
+          <xsl:variable name="NumberSheet">
+            <xsl:value-of select="position()"/>
+          </xsl:variable>
+          <xsl:attribute name="Target">
+            <xsl:value-of select="concat(concat('worksheets/sheet', $NumberSheet), '.xml')"/>
+          </xsl:attribute>
+        </Relationship>
+      </xsl:for-each>
+
+      <!--  Static relationships -->
+      <Relationship Id="rId1"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"
+        Target="styles.xml"/>
+      <Relationship Id="rId2"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings"
+        Target="sharedStrings.xml"/>
+    </Relationships>
+  </xsl:template>
 
   <xsl:template name="InsertWorksheetsRels">
-    <xsl:param name="sheetNum" />
- 
+    <xsl:param name="sheetNum"/>
+    <xsl:param name="comment"/>
+    <xsl:param name="picture"/>
+    <xsl:param name="hyperlink"/>
+    <xsl:param name="chart"/>
+
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-      <Relationship Id="{concat('rId',$sheetNum+1)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="{concat('../comments',$sheetNum,'.xml')}"/>
-      <Relationship Id="{concat('rId',$sheetNum)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing" Target="{concat('../drawings/vmlDrawing',$sheetNum,'.vml')}"/></Relationships>
+      <!-- comments.xml file -->
+      <xsl:if test="$comment = 'true' ">
+        <Relationship Id="{concat('rId',$sheetNum+1)}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments"
+          Target="{concat('../comments',$sheetNum,'.xml')}"/>
+      </xsl:if>
+
+      <!-- vmlDrawing.vml file -->
+      <xsl:if test="$comment = 'true' ">
+        <Relationship Id="{concat('v_rId',$sheetNum)}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing"
+          Target="{concat('../drawings/vmlDrawing',$sheetNum,'.vml')}"/>
+      </xsl:if>
+
+      <!-- drawing.xml file -->
+<!--      <xsl:if test="contains($chart,'true')">
+        <Relationship Id="rId1"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"
+          Target="../drawings/drawing1.xml"/>
+      </xsl:if>-->
+    </Relationships>
   </xsl:template>
 </xsl:stylesheet>
