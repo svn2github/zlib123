@@ -584,11 +584,11 @@
       </xsl:with-param>
     </xsl:call-template>
     </xsl:variable>
-
-    <!-- if there were empty rows before this one then insert empty rows -->
+    
+     <!-- if there were empty rows before this one then insert empty rows -->
     <xsl:choose>
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll and Pictures-->
-      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = '' and $PictureCell = ''">
+      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = '' and ($PictureCell = '' or ($GetMinRowWithPicture + 1) &gt;= @r)">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="{@r - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
@@ -596,7 +596,7 @@
       </xsl:when>
       
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll, and there are Pictures before this row-->
-      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = '' and $PictureRow != '' and $GetMinRowWithPicture &lt; @r">   
+      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = '' and $PictureRow != '' and ($GetMinRowWithPicture + 1) &lt; @r">   
 
         <xsl:call-template name="InsertPictureBetwenTwoRows">
             <xsl:with-param name="StartRow">
@@ -617,7 +617,8 @@
           <xsl:with-param name="NameSheet">
             <xsl:value-of select="$NameSheet"/>
           </xsl:with-param>
-          </xsl:call-template>
+        </xsl:call-template>
+        
       </xsl:when>
 
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll-->
@@ -649,7 +650,32 @@
 
       </xsl:when>
 
-
+      <!-- when this row is not first one and there were pictures rows after previous non-empty row-->      
+      <xsl:when test="preceding::e:row[1]/@r &lt;  @r - 1 and ($GetMinRowWithPicture + 1) &gt; preceding::e:row[1]/@r and ($GetMinRowWithPicture + 1) &lt; @r - 1">
+        
+        <xsl:call-template name="InsertPictureBetwenTwoRows">
+          <xsl:with-param name="StartRow">
+            <xsl:value-of select="preceding::e:row[1]/@r"/>
+          </xsl:with-param>
+          <xsl:with-param name="EndRow">
+            <xsl:value-of select="@r"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureRow">
+            <xsl:value-of select="$PictureRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        
+      </xsl:when>
+      
       <xsl:otherwise>
         <!-- when this row is not first one and there were empty rows after previous non-empty row -->
         <xsl:if test="preceding::e:row[1]/@r &lt;  @r - 1">
@@ -676,8 +702,43 @@
         <xsl:value-of select="$CheckIfBigMerge"/>
       </xsl:with-param>
       <xsl:with-param name="this" select="$this"/>
+      <xsl:with-param name="PictureRow">
+        <xsl:value-of select="$PictureRow"/>
+      </xsl:with-param>
+      <xsl:with-param name="PictureCell">
+        <xsl:value-of select="$PictureCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="sheet">
+        <xsl:value-of select="$sheet"/>
+      </xsl:with-param>
+      <xsl:with-param name="NameSheet">
+        <xsl:value-of select="$NameSheet"/>
+      </xsl:with-param>
     </xsl:call-template>
-
+    
+    <xsl:if test="not(following-sibling::e:row) and $PictureRow != ''">
+      <xsl:call-template name="InsertPictureBetwenTwoRows">
+        <xsl:with-param name="StartRow">
+          <xsl:value-of select="@r"/>
+        </xsl:with-param>
+        <xsl:with-param name="EndRow">
+          <xsl:value-of select="65536"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$PictureRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureCell">
+          <xsl:value-of select="$PictureCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="sheet">
+          <xsl:value-of select="$sheet"/>
+        </xsl:with-param>
+        <xsl:with-param name="NameSheet">
+          <xsl:value-of select="$NameSheet"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    
   </xsl:template>
 
   <xsl:template match="e:row" mode="headers">
@@ -834,6 +895,10 @@
     <xsl:param name="BeforeMerge"/>
     <xsl:param name="prevCellCol"/>
     <xsl:param name="BigMergeCell"/>
+    <xsl:param name="PictureCell"/>
+    <xsl:param name="PictureRow"/>
+    <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -887,7 +952,8 @@
         <xsl:value-of select="$CheckIfMerge"/>
       </xsl:with-param>
     </xsl:call-template>
-
+  
+    
     <!-- Insert this cell or covered cell if this one is Merge Cell -->
     <xsl:call-template name="InsertThisCell">
       <xsl:with-param name="BeforeMerge">
@@ -908,6 +974,18 @@
       </xsl:with-param>
       <xsl:with-param name="CheckIfMerge">
         <xsl:value-of select="$CheckIfMerge"/>
+      </xsl:with-param>
+      <xsl:with-param name="PictureRow">
+        <xsl:value-of select="$PictureRow"/>
+      </xsl:with-param>
+      <xsl:with-param name="PictureCell">
+        <xsl:value-of select="$PictureCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="sheet">
+        <xsl:value-of select="$sheet"/>
+      </xsl:with-param>
+      <xsl:with-param name="NameSheet">
+        <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
     </xsl:call-template>
 
@@ -932,6 +1010,18 @@
       </xsl:with-param>
       <xsl:with-param name="CheckIfMerge">
         <xsl:value-of select="$CheckIfMerge"/>
+      </xsl:with-param>
+      <xsl:with-param name="PictureRow">
+        <xsl:value-of select="$PictureRow"/>
+      </xsl:with-param>
+      <xsl:with-param name="PictureCell">
+        <xsl:value-of select="$PictureCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="sheet">
+        <xsl:value-of select="$sheet"/>
+      </xsl:with-param>
+      <xsl:with-param name="NameSheet">
+        <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
     </xsl:call-template>
 

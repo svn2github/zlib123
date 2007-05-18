@@ -964,13 +964,15 @@
             <xsl:value-of select="$NameSheet"/>
           </xsl:with-param>
         </xsl:call-template>
-        
       </xsl:when>
+      
       <xsl:otherwise>
+        <xsl:if test="$EndRow - $StartRow - 1 &gt; 0">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="{$EndRow - $StartRow - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>      
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>    
     
@@ -1006,6 +1008,21 @@
         </xsl:if>
         
         <xsl:for-each select="ancestor::e:worksheet/e:drawing">
+          
+          <xsl:variable name="Target">
+            <xsl:call-template name="GetTargetPicture">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="substring-after($sheet, '/')"/>
+              </xsl:with-param>
+              <xsl:with-param name="id">
+                <xsl:value-of select="@r:id"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          
+          <table:table-cell>
+            
+         
           <xsl:call-template name="InsertPictureInThisCell">
             <xsl:with-param name="sheet">
               <xsl:value-of select="$sheet"/>
@@ -1019,8 +1036,14 @@
             <xsl:with-param name="rowNum">
               <xsl:value-of select="$rowNum"/>
             </xsl:with-param>
+            <xsl:with-param name="Target">
+              <xsl:value-of select="$Target"/>
+            </xsl:with-param>
           </xsl:call-template>
-        </xsl:for-each>
+          </table:table-cell>
+          
+          </xsl:for-each>
+          
         <xsl:call-template name="InsertPictureBetwenTwoColl">
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>
@@ -1041,7 +1064,9 @@
               <xsl:value-of select="$EndColl"/>
           </xsl:with-param>        
         </xsl:call-template>
+        
       </xsl:when>
+      
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="$StartColl = 0">
@@ -1064,21 +1089,10 @@
     <xsl:param name="collNum"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
+    <xsl:param name="Target"/>
     
-    <xsl:variable name="Target">
-      <xsl:call-template name="GetTargetPicture">
-        <xsl:with-param name="sheet">
-          <xsl:value-of select="substring-after($sheet, '/')"/>
-        </xsl:with-param>
-        <xsl:with-param name="id">
-          <xsl:value-of select="@r:id"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-
-      
-      <table:table-cell>
     <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+    <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
       
       <xsl:for-each
         select="document(concat(concat('xl/worksheets/_rels/', substring-after($sheet, '/')), '.rels'))//node()[name()='Relationship']">        
@@ -1091,8 +1105,6 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:for-each>
-      
-      <xsl:if test="xdr:wsDr/xdr:twoCellAnchor">
        
         <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
           <xsl:if test="xdr:from/xdr:col = $collNum and xdr:from/xdr:row = $rowNum">
@@ -1110,10 +1122,8 @@
           </xsl:if>
         </xsl:for-each>   
         
-      </xsl:if>
-      
-    </xsl:for-each>    
- </table:table-cell>
+    </xsl:if>
+    </xsl:for-each>
 
   </xsl:template>
   
