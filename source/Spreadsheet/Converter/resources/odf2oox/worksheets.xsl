@@ -151,10 +151,6 @@
       </xsl:call-template>
 
       <xsl:call-template name="InsertHeaderFooter"/>
-
-      <xsl:if test="descendant::office:annotation">
-        <legacyDrawing r:id="{concat('v_rId',$sheetId)}"/>
-      </xsl:if>
       
       <xsl:variable name="chart">
         <xsl:for-each select="descendant::draw:frame/draw:object">
@@ -174,6 +170,11 @@
       <xsl:if test="contains($chart,'true')">
         <drawing r:id="{concat('d_rId',$sheetId)}"/>
       </xsl:if>      
+      
+      <xsl:if test="descendant::office:annotation">
+        <legacyDrawing r:id="{concat('v_rId',$sheetId)}"/>
+      </xsl:if>
+      
     </worksheet>
   </xsl:template>
 
