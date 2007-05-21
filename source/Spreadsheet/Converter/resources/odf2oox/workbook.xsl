@@ -297,7 +297,7 @@
 
     <xsl:variable name="headerRowStart">
       <xsl:for-each
-        select="child::node()[name() != 'table:table-column' and name() != 'table:table-header-columns' and name() != 'office:forms' ][1]">
+        select="descendant::table:table-row[1]">
         <xsl:call-template name="CountHeaderRowsStart"/>
       </xsl:for-each>
     </xsl:variable>
