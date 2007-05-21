@@ -55,7 +55,8 @@
   <xsl:import href="number.xsl"/>
   <xsl:import href="comments.xsl"/>
   <xsl:import href="date.xsl"/>
-
+  <xsl:import href="chart.xsl"/>
+  
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="text:p text:span number:text"/>
 
@@ -144,8 +145,8 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-
-          <xsl:variable name="chart">
+-->
+        <xsl:variable name="chart">
           <xsl:for-each select="descendant::draw:frame/draw:object">
             <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
               <xsl:choose>
@@ -159,8 +160,7 @@
             </xsl:for-each>
           </xsl:for-each>
         </xsl:variable>
-        -->
-        
+
         <!-- insert comments -->
         <xsl:if test="$comment = 'true' ">
           <xsl:call-template name="InsertComments">
@@ -172,19 +172,20 @@
         </xsl:if>
 
         <!-- <xsl:if test="$picture = 'true' or contains($chart,'true')"> -->
-
-<!--        <xsl:if test="contains($chart,'true')">
+        <xsl:if test="contains($chart,'true')">
           <xsl:call-template name="CreateDrawing"/>
-          <xsl:call-template name="CreateDrawingRelationships">
-          </xsl:call-template>
-        </xsl:if>-->
+          <xsl:call-template name="CreateDrawingRelationships"/>
+          <xsl:call-template name="CreateChartFile">
+            <xsl:with-param name="sheetNum" select="position()"/>            
+          </xsl:call-template>          
+        </xsl:if>
 
         <!-- insert relationships -->
         <xsl:call-template name="CreateSheetRelationships">
           <xsl:with-param name="sheetNum" select="position()"/>
           <xsl:with-param name="comment" select="$comment"/>
-<!--          <xsl:with-param name="chart" select="$chart"/>
-                    <xsl:with-param name="picture" select="$picture"/>
+          <xsl:with-param name="chart" select="$chart"/>
+          <!--          <xsl:with-param name="picture" select="$picture"/>
           <xsl:with-param name="hyperlink" select="$hyperlink"/>-->
         </xsl:call-template>
       </xsl:for-each>
@@ -297,7 +298,7 @@
 
     <!--      <xsl:if
         test="$comment = 'true' or $picture != 'true' or $hyperlink = 'true' or contains($chart,'true')">-->
-    <xsl:if test="$comment = 'true' ">
+    <xsl:if test="$comment = 'true' or contains($chart,'true')">
       <!-- package relationship item -->
       <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
         <xsl:call-template name="InsertWorksheetsRels">
@@ -363,7 +364,7 @@
             </xdr:to>
             <xdr:graphicFrame macro="">
               <xdr:nvGraphicFramePr>
-                <xdr:cNvPr id="1025" name="Chart 1"/>
+                <xdr:cNvPr id="{position()}" name="{concat('Chart ',position())}"/>                
                 <xdr:cNvGraphicFramePr>
                   <a:graphicFrameLocks/>
                 </xdr:cNvGraphicFramePr>
@@ -376,7 +377,7 @@
                 <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">
                   <c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
                     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-                    r:id="rId1"/>
+                    r:id="{generate-id(.)}"/>
                 </a:graphicData>
               </a:graphic>
             </xdr:graphicFrame>

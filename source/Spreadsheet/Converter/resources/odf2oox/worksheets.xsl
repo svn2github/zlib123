@@ -156,7 +156,7 @@
         <legacyDrawing r:id="{concat('v_rId',$sheetId)}"/>
       </xsl:if>
       
-<!--      <xsl:variable name="chart">
+      <xsl:variable name="chart">
         <xsl:for-each select="descendant::draw:frame/draw:object">
           <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
             <xsl:choose>
@@ -172,8 +172,8 @@
       </xsl:variable>
       
       <xsl:if test="contains($chart,'true')">
-        <drawing r:id="{concat('rId',$sheetId)}"/>
-      </xsl:if>-->      
+        <drawing r:id="{concat('d_rId',$sheetId)}"/>
+      </xsl:if>      
     </worksheet>
   </xsl:template>
 

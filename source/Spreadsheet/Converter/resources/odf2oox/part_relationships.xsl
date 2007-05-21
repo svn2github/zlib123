@@ -88,7 +88,7 @@
 
       <!-- drawing.xml file -->
       <xsl:if test="contains($chart,'true')">
-        <Relationship Id="rId1"
+        <Relationship Id="{concat('d_rId',$sheetNum)}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"
           Target="{concat('../drawings/drawing',$sheetNum,'.xml')}"/>
       </xsl:if>
@@ -101,7 +101,9 @@
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <!-- chart rels -->
       <xsl:for-each
-        select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]"> </xsl:for-each>
+        select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
+        <Relationship Id="{generate-id(.)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="{concat('../charts/chart',$sheetNum,'_',position(),'.xml')}" />
+      </xsl:for-each>
 
       <!-- TO DO: picture rels -->
     </Relationships>
