@@ -30,11 +30,13 @@
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns="http://schemas.openxmlformats.org/package/2006/content-types"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   exclude-result-prefixes="#default w r office style table">
-  
+
   <!-- content types -->
   <xsl:template name="ContentTypes">
     <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
@@ -62,27 +64,73 @@
         ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml"/>
       <Override PartName="/xl/styles.xml"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
-      <Default Extension="vml" ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing"/>
+      <Default Extension="vml"
+        ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing"/>
       <xsl:call-template name="InsertCommentContentTypes"/>
+      <xsl:call-template name="InsertDrawingContentTypes"/>
       <xsl:call-template name="InsertSheetContentTypes"/>
-      
+
     </Types>
   </xsl:template>
-  
+
   <!-- Sheet content types -->
   <xsl:template name="InsertSheetContentTypes">
-    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
       <Override PartName="{concat(concat('/xl/worksheets/sheet', position()),'.xml')}"
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
     </xsl:for-each>
   </xsl:template>
-  
+
   <xsl:template name="InsertCommentContentTypes">
-    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
       <xsl:if test="descendant::office:annotation">
-         <Override PartName="{concat(concat('/xl/comments', position()),'.xml')}"
-        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml"/>
-    </xsl:if>
+        <Override PartName="{concat(concat('/xl/comments', position()),'.xml')}"
+          ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml"/>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
-  </xsl:stylesheet>
+
+  <xsl:template name="InsertDrawingContentTypes">
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
+
+      <xsl:variable name="chart">
+        <xsl:for-each select="descendant::draw:frame/draw:object">
+          <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
+            <xsl:choose>
+              <xsl:when test="office:document-content/office:body/office:chart">
+                <xsl:text>true</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>false</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <!-- TO DO for pictures-->      
+      <xsl:if test="contains($chart,'true')">
+        <Override PartName="{concat('/xl/drawings/drawing',position(),'.xml')}"
+          ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>        
+        
+        <xsl:call-template name="InsertChartContentTypes">
+          <xsl:with-param name="sheetNum" select="position()"></xsl:with-param>
+        </xsl:call-template>         
+        
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  
+    <xsl:template name="InsertChartContentTypes">
+      <xsl:param name="sheetNum"/>
+      <xsl:for-each
+        select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart][1]">
+        <Override PartName="{concat('/xl/charts/chart',$sheetNum,'_',position(),'.xml')}"
+          ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>        
+        </xsl:for-each>
+    </xsl:template>
+  
+</xsl:stylesheet>
