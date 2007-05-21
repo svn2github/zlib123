@@ -986,8 +986,10 @@
     <xsl:param name="NameSheet"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="PictureColl"/>
+    <xsl:param name="document"/>
     
-    
+ 
+   
     <xsl:variable name="GetMinCollWithPicture">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
@@ -999,16 +1001,17 @@
       </xsl:call-template>
     </xsl:variable>
     
+   
     <xsl:choose>
       <!-- Insert empty rows before -->
       <xsl:when test="$GetMinCollWithPicture != '' and $GetMinCollWithPicture &gt;= $StartColl and $GetMinCollWithPicture &lt; $EndColl">
-      
+   
         <xsl:if test="$GetMinCollWithPicture - $StartColl &gt; 0">
           <table:table-cell table:number-columns-repeated="{$GetMinCollWithPicture - $StartColl}"/>
         </xsl:if>
         
         <xsl:for-each select="ancestor::e:worksheet/e:drawing">
-          
+
           <xsl:variable name="Target">
             <xsl:call-template name="GetTargetPicture">
               <xsl:with-param name="sheet">
@@ -1058,11 +1061,21 @@
             <xsl:value-of select="$PictureColl"/>
           </xsl:with-param>
           <xsl:with-param name="StartColl">
-            <xsl:value-of select="$GetMinCollWithPicture + 2"/>
+            <xsl:choose>
+              <xsl:when test="$document = 'worksheet'">
+                <xsl:value-of select="$GetMinCollWithPicture + 1"/>    
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$GetMinCollWithPicture + 2"/>    
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:with-param>
           <xsl:with-param name="EndColl">
               <xsl:value-of select="$EndColl"/>
-          </xsl:with-param>        
+          </xsl:with-param>
+          <xsl:with-param name="document">
+            <xsl:value-of select="$document"/>
+          </xsl:with-param>
         </xsl:call-template>
         
       </xsl:when>

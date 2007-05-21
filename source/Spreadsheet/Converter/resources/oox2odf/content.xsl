@@ -585,10 +585,11 @@
     </xsl:call-template>
     </xsl:variable>
     
+
      <!-- if there were empty rows before this one then insert empty rows -->
-    <xsl:choose>
+    <xsl:choose>      
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll and Pictures-->
-      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = '' and ($PictureCell = '' or ($GetMinRowWithPicture + 1) &gt;= @r)">
+      <xsl:when test="position()=1 and @r>1 and $BigMergeCell = '' and ($GetMinRowWithPicture = '' or ($GetMinRowWithPicture + 1) &gt;= @r)">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="{@r - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
@@ -928,7 +929,35 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    
+    <xsl:variable name="PictureColl">
+      <xsl:call-template name="GetCollsWithPicture">
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="$rowNum - 1"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureCell">
+          <xsl:value-of select="concat(';', $PictureCell)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>    
 
+    <xsl:variable name="GetMinCollWithPicture">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$PictureColl"/>
+        </xsl:with-param>  
+        <xsl:with-param name="AfterRow">
+          <xsl:choose>
+            <xsl:when test="$prevCellCol = ''">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$prevCellCol - 1"/>
+            </xsl:otherwise>
+          </xsl:choose>  
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
 
     <!-- Insert Empty Cell -->
     <xsl:call-template name="InsertEmptyCell">
@@ -950,6 +979,24 @@
       </xsl:with-param>
       <xsl:with-param name="CheckIfMerge">
         <xsl:value-of select="$CheckIfMerge"/>
+      </xsl:with-param>
+      <xsl:with-param name="PictureRow">
+        <xsl:value-of select="$PictureRow"/>
+      </xsl:with-param>
+      <xsl:with-param name="PictureCell">
+        <xsl:value-of select="$PictureCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="sheet">
+        <xsl:value-of select="$sheet"/>
+      </xsl:with-param>
+      <xsl:with-param name="NameSheet">
+        <xsl:value-of select="$NameSheet"/>
+      </xsl:with-param>
+      <xsl:with-param name="PictureColl">
+        <xsl:value-of select="$PictureColl"/>
+      </xsl:with-param>
+      <xsl:with-param name="GetMinCollWithPicture">
+        <xsl:value-of select="$GetMinCollWithPicture"/>
       </xsl:with-param>
     </xsl:call-template>
   
