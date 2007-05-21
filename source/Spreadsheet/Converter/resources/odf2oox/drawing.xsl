@@ -31,8 +31,11 @@
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
-  
+
+  <xsl:import href="cell.xsl"/>
+
   <xsl:template name="InsertDrawing">
     <xdr:wsDr>
       <!-- for charts, file pointed by draw:frame/draw:object/@xlink:href must contain office:chart -->
@@ -40,9 +43,13 @@
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
         <xdr:twoCellAnchor>
           <xdr:from>
-            <xdr:col>0</xdr:col>
+            <xdr:col>
+              <xsl:call-template name="InsertStartColumn"/>
+            </xdr:col>
             <xdr:colOff>714375</xdr:colOff>
-            <xdr:row>6</xdr:row>
+            <xdr:row>
+              <xsl:call-template name="InsertStartRow"/>
+            </xdr:row>
             <xdr:rowOff>104775</xdr:rowOff>
           </xdr:from>
           <xdr:to>
@@ -53,7 +60,7 @@
           </xdr:to>
           <xdr:graphicFrame macro="">
             <xdr:nvGraphicFramePr>
-              <xdr:cNvPr id="{position()}" name="{concat('Chart ',position())}"/>                
+              <xdr:cNvPr id="{position()}" name="{concat('Chart ',position())}"/>
               <xdr:cNvGraphicFramePr>
                 <a:graphicFrameLocks/>
               </xdr:cNvGraphicFramePr>
@@ -73,7 +80,52 @@
           <xdr:clientData/>
         </xdr:twoCellAnchor>
       </xsl:for-each>
-    </xdr:wsDr>    
+    </xdr:wsDr>
   </xsl:template>
-  
-  </xsl:stylesheet>
+
+  <xsl:template name="InsertStartColumn">
+    <xsl:choose>
+      <!-- when anchor is to cell -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+        <xsl:for-each select="parent::node()/parent::node()">
+          <xsl:variable name="number">
+            <xsl:call-template name="GetColNumber">
+              <xsl:with-param name="position" select="count(preceding-sibling::table:table-cell)"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$number - 1"/>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- when anchor is to page -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+        <xsl:text>1</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="InsertStartRow">
+    <xsl:choose>
+      <!-- when anchor is to cell -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+        <!-- get parent table:table-row id -->
+        <xsl:variable name="rowId">
+          <xsl:value-of select="generate-id(ancestor::table:table-row)"/>
+        </xsl:variable>
+        <!-- go to first table:table-row-->
+        <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
+          <xsl:variable name="number">
+            <xsl:call-template name="GetRowNumber">
+              <xsl:with-param name="rowId" select="$rowId"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$number - 1"/>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- when anchor is to page -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+        <xsl:text>14</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>

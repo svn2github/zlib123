@@ -1359,7 +1359,7 @@
                 </xsl:call-template>
               </v>
             </xsl:when>
-            
+
             <!-- last or when number cell has error -->
             <xsl:when
               test="not(@office:value-type='float') and @office:value-type = 'string' or @office:value-type = 'boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency'))">
@@ -1421,6 +1421,67 @@
       </xsl:otherwise>
     </xsl:choose>
 
+  </xsl:template>
+
+  <xsl:template name="GetRowNumber">
+    <xsl:param name="rowId"/>
+    <xsl:param name="value" select="1"/>
+
+    <xsl:choose>
+      <xsl:when test="generate-id(.) != $rowId">
+        <xsl:variable name="rows">
+          <xsl:choose>
+            <xsl:when test="@table:number-rows-repeated">
+              <xsl:value-of select="@table:number-rows-repeated"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>1</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:choose>
+          <xsl:when test="following-sibling::node()[1][name() = 'table:table-row'] ">
+            <xsl:for-each select="following-sibling::node()[1]">
+              <xsl:call-template name="GetRowNumber">
+                <xsl:with-param name="rowId" select="$rowId"/>
+                <xsl:with-param name="value">
+                  <xsl:value-of select="$value + $rows"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+          <!-- get in to the header -->
+          <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows'] ">
+            <xsl:for-each select="following-sibling::table:table-header-rows/table:table-row[1]">
+              <xsl:call-template name="GetRowNumber">
+                <xsl:with-param name="rowId" select="$rowId"/>
+                <xsl:with-param name="value">
+                  <xsl:value-of select="$value + $rows"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+          <!-- get out of the header -->
+          <xsl:when
+            test="parent::node()[name() = 'table:table-header-rows'] and parent::node()/following-sibling::table:table-row">
+            <xsl:for-each select="parent::node()/following-sibling::table:table-row[1]">
+              <xsl:call-template name="GetRowNumber">
+                <xsl:with-param name="rowId" select="$rowId"/>
+                <xsl:with-param name="value">
+                  <xsl:value-of select="$value + $rows"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
+
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <!--<xsl:value-of select="$rows"/>-->
   </xsl:template>
 
   <xsl:template name="CheckIfColumnStyle">
