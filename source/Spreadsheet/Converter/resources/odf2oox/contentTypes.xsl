@@ -127,7 +127,7 @@
     <xsl:template name="InsertChartContentTypes">
       <xsl:param name="sheetNum"/>
       <xsl:for-each
-        select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart][1]">
+        select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
         <Override PartName="{concat('/xl/charts/chart',$sheetNum,'_',position(),'.xml')}"
           ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>        
         </xsl:for-each>
