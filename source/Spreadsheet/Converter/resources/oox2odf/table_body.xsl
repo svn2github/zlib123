@@ -56,7 +56,7 @@
       </xsl:when>
       <!-- when there are only picture in sheet  -->
       <xsl:when
-        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell != ''">
+        test="not(e:worksheet/e:sheetData/e:row/e:c) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell != ''">
         <xsl:call-template name="InsertEmptySheetWithPicture">
           <xsl:with-param name="PictureCell">
             <xsl:value-of select="$PictureCell"/>
@@ -70,7 +70,7 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$BigMergeRow != '' and e:worksheet/e:sheetData/e:row/e:c">
-        <table:table-row table:style-name="ro1">
+         <table:table-row table:style-name="ro1">
           <table:covered-table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>
@@ -107,7 +107,7 @@
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-              <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+             <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
                 table:number-rows-repeated="{65536 - e:worksheet/e:sheetData/e:row[last()]/@r}">
                 <table:table-cell table:number-columns-repeated="256"/>
               </table:table-row>
@@ -140,7 +140,8 @@
       </xsl:when>
 
       <xsl:otherwise>
-        <table:table-row>
+        
+      <table:table-row>
           <xsl:attribute name="table:style-name">
             <xsl:choose>
               <xsl:when test="@ht">
@@ -1202,7 +1203,7 @@
             <xsl:value-of select="$colNum"/>            
           </xsl:with-param>
           <xsl:with-param name="EndColl">
-            <xsl:text>65536</xsl:text>
+            <xsl:text>256</xsl:text>
           </xsl:with-param>
           <xsl:with-param name="document">
             <xsl:text>worksheet</xsl:text>

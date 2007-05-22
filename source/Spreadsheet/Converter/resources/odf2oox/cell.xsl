@@ -1442,7 +1442,7 @@
 
         <xsl:choose>
           <xsl:when test="following-sibling::node()[1][name() = 'table:table-row'] ">
-            <xsl:for-each select="following-sibling::node()[1]">
+            <xsl:for-each select="following-sibling::node()[1][name() = 'table:table-row']">
               <xsl:call-template name="GetRowNumber">
                 <xsl:with-param name="rowId" select="$rowId"/>
                 <xsl:with-param name="value">
