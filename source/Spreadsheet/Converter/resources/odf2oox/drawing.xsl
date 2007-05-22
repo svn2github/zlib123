@@ -30,6 +30,7 @@
   xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
@@ -47,21 +48,29 @@
             <xdr:col>
               <xsl:call-template name="InsertStartColumn"/>
             </xdr:col>
-            <xdr:colOff>714375</xdr:colOff>
+            <xdr:colOff>
+              <xsl:call-template name="InsertStartColumnOffset"/>
+            </xdr:colOff>
             <xdr:row>
               <xsl:call-template name="InsertStartRow"/>
             </xdr:row>
-            <xdr:rowOff>104775</xdr:rowOff>
+            <xdr:rowOff>
+            <xsl:call-template name="InsertStartRowOffset"/>
+            </xdr:rowOff>
           </xdr:from>
           <xdr:to>
             <xdr:col>
               <xsl:call-template name="InsertEndColumn"/>
             </xdr:col>
-            <xdr:colOff>447675</xdr:colOff>
+            <xdr:colOff>
+              <xsl:call-template name="InsertEndColumnOffset"/>
+            </xdr:colOff>
             <xdr:row>
               <xsl:call-template name="InsertEndRow"/>
             </xdr:row>
-            <xdr:rowOff>104775</xdr:rowOff>
+            <xdr:rowOff>
+              <xsl:call-template name="InsertEndRowOffset"/>
+            </xdr:rowOff>
           </xdr:to>
           <xdr:graphicFrame macro="">
             <xdr:nvGraphicFramePr>
@@ -249,6 +258,74 @@
       <!-- when anchor is to page -->
       <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
         <xsl:text>46</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertStartColumnOffset">
+    <xsl:choose>
+      <!-- when anchor is to cell -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+        <xsl:for-each select="parent::node()">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length" select="@svg:x"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- when anchor is to page -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+        <xsl:text>714375</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertStartRowOffset">
+    <xsl:choose>
+      <!-- when anchor is to cell -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+        <xsl:for-each select="parent::node()">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length" select="@svg:y"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- when anchor is to page -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+        <xsl:text>104775</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertEndColumnOffset">
+    <xsl:choose>
+      <!-- when anchor is to cell -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+        <xsl:for-each select="parent::node()">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length" select="@ table:end-x"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- when anchor is to page -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+        <xsl:text>447675</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertEndRowOffset">
+    <xsl:choose>
+      <!-- when anchor is to cell -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+        <xsl:for-each select="parent::node()">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length" select="@ table:end-y"/>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- when anchor is to page -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+        <xsl:text>104775</xsl:text>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
