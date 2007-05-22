@@ -81,9 +81,9 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:if test="document(concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship']">
+    <xsl:if test="document(concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship' and contains(@Type,'image')]">
       <xsl:for-each
-        select="document(concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship']">
+        select="document(concat('xl/drawings/_rels/', $document))//node()[name() = 'Relationship' and contains(@Type,'image')]">
           <xsl:variable name="targetmode">
             <xsl:value-of select="./@TargetMode"/>
           </xsl:variable>

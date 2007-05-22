@@ -30,7 +30,13 @@
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  exclude-result-prefixes="oox e r">
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"  
+  xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
+  xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
+  xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+  exclude-result-prefixes="oox e r xdr c">
 
   <xsl:import href="content.xsl"/>
   <xsl:import href="common-meta.xsl"/>
@@ -39,6 +45,7 @@
   <xsl:import href="common.xsl"/>
   <xsl:import href="styles.xsl"/>
   <xsl:import href="merge_cell.xsl"/>
+  <xsl:import href="chart.xsl"/>
 
   <xsl:param name="outputFile"/>
   <xsl:output method="xml" encoding="UTF-8"/>
@@ -58,6 +65,7 @@
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="styles.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="meta.xml"/>
           <manifest:file-entry manifest:media-type="text/xml" manifest:full-path="settings.xml"/>
+          <xsl:call-template name="InsertChartEntries"/>
         </manifest:manifest>
       </pzip:entry>
 
@@ -80,8 +88,54 @@
       <pzip:entry pzip:target="settings.xml">
         <xsl:call-template name="InsertSettings"/>
       </pzip:entry>
+      
+      <!-- charts -->
+      <xsl:call-template name="CreateCharts"/>
 
     </pzip:archive>
   </xsl:template>
-
+  
+<xsl:template name="InsertChartEntries">
+  <!-- get all sheet Id's -->
+  <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+    
+    <xsl:variable name="sheet">
+      <xsl:call-template name="GetTarget">
+        <xsl:with-param name="id">
+          <xsl:value-of select="@r:id"/>
+        </xsl:with-param>
+        <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <!--i.e. $sheet = worksheets/sheet1.xml -->
+    
+    <xsl:variable name="sheetNum">
+      <xsl:value-of select="position()"/>
+    </xsl:variable>
+    
+    <!-- go to sheet file and search for drawing -->
+    <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:drawing">
+      
+      <xsl:variable name="drawing">
+        <xsl:call-template name="GetTarget">
+          <xsl:with-param name="id">
+            <xsl:value-of select="@r:id"/>
+          </xsl:with-param>
+          <xsl:with-param name="document">
+            <xsl:value-of select="concat('xl/',$sheet)"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <!-- i.e. $drawing = ../drawings/drawing2.xml -->
+      
+      <!-- finally insert entry for each chart -->
+      <xsl:for-each
+        select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+        
+        <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.chart" manifest:full-path="{concat('Object ',generate-id(.),'/')}"/>
+        
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:for-each>  
+</xsl:template>
 </xsl:stylesheet>
