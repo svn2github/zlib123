@@ -35,6 +35,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
 
   <xsl:import href="cell.xsl"/>
+  <xsl:import href="common.xsl"/>
 
   <xsl:template name="InsertDrawing">
     <xdr:wsDr>
@@ -53,9 +54,13 @@
             <xdr:rowOff>104775</xdr:rowOff>
           </xdr:from>
           <xdr:to>
-            <xdr:col>8</xdr:col>
+            <xdr:col>
+              <xsl:call-template name="InsertEndColumn"/>
+            </xdr:col>
             <xdr:colOff>447675</xdr:colOff>
-            <xdr:row>27</xdr:row>
+            <xdr:row>
+              <xsl:call-template name="InsertEndRow"/>
+            </xdr:row>
             <xdr:rowOff>104775</xdr:rowOff>
           </xdr:to>
           <xdr:graphicFrame macro="">
@@ -129,8 +134,49 @@
       </xsl:when>
       <!-- when anchor is to page -->
       <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
-        <xsl:text>14</xsl:text>
+        <xsl:text>31</xsl:text>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template name="InsertEndColumn">
+    <xsl:choose>
+      <!-- when anchor is to cell -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+        <xsl:for-each select="parent::node()">
+          <xsl:variable name="number">
+            <xsl:call-template name="GetColNum">
+              <xsl:with-param name="cell" select="substring-after(@table:end-cell-address,'.')"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$number - 1"/>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- when anchor is to page -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+        <xsl:text>5</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertEndRow">
+    <xsl:choose>
+      <!-- when anchor is to cell -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+        <xsl:for-each select="parent::node()">
+          <xsl:variable name="number">
+            <xsl:call-template name="GetRowNum">
+              <xsl:with-param name="cell" select="substring-after(@table:end-cell-address,'.')"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:value-of select="$number - 1"/>
+        </xsl:for-each>
+      </xsl:when>
+      <!-- when anchor is to page -->
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+        <xsl:text>46</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
 </xsl:stylesheet>
