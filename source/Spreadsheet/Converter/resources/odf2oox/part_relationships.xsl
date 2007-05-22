@@ -64,6 +64,34 @@
     </Relationships>
   </xsl:template>
 
+  <!-- change space to  '%20' after conversion-->
+  <xsl:template name="SpaceTo20Percent">
+    <xsl:param name="string"/>
+    <xsl:param name="slash"/>
+    <xsl:choose>
+      <xsl:when test="contains($string,' ')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,' ') =''">
+            <xsl:call-template name="SpaceTo20Percent">
+              <xsl:with-param name="string" select="concat('%20',substring-after($string,' '))"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="substring-before($string,' ') !=''">
+            <xsl:call-template name="SpaceTo20Percent">
+              <xsl:with-param name="string"
+                select="concat(substring-before($string,' '),'%20',substring-after($string,' '))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$string"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
+
   <xsl:template name="InsertWorksheetsRels">
     <xsl:param name="sheetNum"/>
     <xsl:param name="comment"/>
@@ -86,6 +114,25 @@
           Target="{concat('../drawings/vmlDrawing',$sheetNum,'.vml')}"/>
       </xsl:if>
 
+      <!--hyperlink-->
+      <xsl:if test="$hyperlink = 'true' ">
+        <xsl:for-each select="descendant::text:a">
+
+          <Relationship Id="{generate-id(.)}"
+            Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+            TargetMode="External">
+
+            <xsl:attribute name="Target">
+              <xsl:if test="@xlink:href">
+                <xsl:call-template name="SpaceTo20Percent">
+                  <xsl:with-param name="string" select="@xlink:href"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:attribute>
+          </Relationship>
+        </xsl:for-each>
+      </xsl:if>
+
       <!-- drawing.xml file -->
       <xsl:if test="contains($chart,'true') or $picture = 'true'">
         <Relationship Id="{concat('d_rId',$sheetNum)}"
@@ -94,6 +141,7 @@
       </xsl:if>
     </Relationships>
   </xsl:template>
+
 
   <xsl:template name="InsertDrawingRels">
     <xsl:param name="sheetNum"/>

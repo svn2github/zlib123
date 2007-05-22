@@ -151,7 +151,7 @@
       </xsl:call-template>
 
       <xsl:call-template name="InsertHeaderFooter"/>
-      
+
       <xsl:variable name="picture">
         <xsl:choose>
           <xsl:when test="table:table-row/table:table-cell/draw:frame/draw:image">
@@ -162,7 +162,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:variable name="chart">
         <xsl:for-each select="descendant::draw:frame/draw:object">
           <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
@@ -177,15 +177,15 @@
           </xsl:for-each>
         </xsl:for-each>
       </xsl:variable>
-      
+
       <xsl:if test="contains($chart,'true') or $picture = 'true'">
         <drawing r:id="{concat('d_rId',$sheetId)}"/>
-      </xsl:if>      
-      
+      </xsl:if>
+
       <xsl:if test="descendant::office:annotation">
         <legacyDrawing r:id="{concat('v_rId',$sheetId)}"/>
       </xsl:if>
-      
+
     </worksheet>
   </xsl:template>
 
@@ -351,6 +351,7 @@
 
   <xsl:template name="InsertSheetContent">
     <xsl:param name="sheetId"/>
+    <xsl:param name="sheetNum"/>
     <xsl:param name="cellNumber"/>
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
@@ -515,6 +516,59 @@
       </xsl:apply-templates>
 
     </sheetData>
+
+    <!--Insert Hyperlinks-->
+
+    <xsl:if test="descendant::text:a">
+      <hyperlinks>
+        <xsl:for-each select="descendant::text:a">
+          <xsl:variable name="ViewHyperlinks">
+            <xsl:value-of select="."/>
+          </xsl:variable>
+
+          <xsl:variable name="colPosition">
+            <xsl:for-each select="parent::node()/parent::node()">
+              <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:variable name="rowPosition">
+            <xsl:value-of select="generate-id(ancestor::table:table-row)"/>
+          </xsl:variable>
+
+
+          <!-- real column number -->
+          <xsl:variable name="colNum">
+            <xsl:for-each select="parent::node()/parent::node()/parent::node()/table:table-cell[1]">
+              <xsl:call-template name="GetColNumber">
+                <xsl:with-param name="position">
+                  <xsl:value-of select="$colPosition"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:variable name="rows">
+            <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
+
+              <xsl:call-template name="GetRowNumber">
+                <xsl:with-param name="rowId" select="$rowPosition"/>
+              </xsl:call-template>
+
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:variable name="colChar">
+            <xsl:call-template name="NumbersToChars">
+              <xsl:with-param name="num" select="$colNum -1"/>
+            </xsl:call-template>
+          </xsl:variable>
+
+          <hyperlink ref="{concat($colChar,$rows)}" r:id="{generate-id (.)}"/>
+        </xsl:for-each>
+      </hyperlinks>
+    </xsl:if>
+
   </xsl:template>
 
   <xsl:template name="InsertHeaderFooter">

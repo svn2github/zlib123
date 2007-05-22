@@ -35,7 +35,7 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table r">
 
   <!-- insert column properties into sheet -->
   <xsl:template match="table:table-column" mode="sheet">
@@ -1482,6 +1482,32 @@
       </xsl:otherwise>
     </xsl:choose>
     <!--<xsl:value-of select="$rows"/>-->
+  </xsl:template>
+
+<xsl:template name="GetLinkNumber">
+    <xsl:param name="position"/>
+    <xsl:param name="count" select="1"/>
+    <xsl:param name="value" select="1"/>
+    <xsl:choose>
+      <xsl:when test="$count &lt; $position">
+        <xsl:variable name="linkNum"/>
+
+        <xsl:for-each select="following-sibling::text:a[1]">
+          <xsl:call-template name="GetLinkNumber">
+            <xsl:with-param name="position">
+              <xsl:value-of select="$position"/>
+            </xsl:with-param>
+            <xsl:with-param name="count">
+              <xsl:value-of select="$count + 1"/>
+            </xsl:with-param>
+            <xsl:with-param name="value">
+              <xsl:value-of select="$value + $linkNum"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
+
   </xsl:template>
 
   <xsl:template name="CheckIfColumnStyle">

@@ -134,11 +134,11 @@
               <xsl:text>false</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:variable>
-        <!--        
+         </xsl:variable>
+        
         <xsl:variable name="hyperlink">
           <xsl:choose>
-            <xsl:when test="key('hyperlink', '' )">    insert different condition
+            <xsl:when test="descendant::text:a">  
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -146,7 +146,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
--->
+        
         <xsl:variable name="chart">
           <xsl:for-each select="descendant::draw:frame/draw:object">
             <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
@@ -189,7 +189,7 @@
           <xsl:with-param name="comment" select="$comment"/>
           <xsl:with-param name="chart" select="$chart"/>
            <xsl:with-param name="picture" select="$picture"/>
-          <!--          <xsl:with-param name="hyperlink" select="$hyperlink"/>-->
+          <xsl:with-param name="hyperlink" select="$hyperlink"/>
         </xsl:call-template>
       </xsl:for-each>
 
@@ -301,7 +301,7 @@
 
     <!--      <xsl:if
         test="$comment = 'true' or $picture != 'true' or $hyperlink = 'true' or contains($chart,'true')">-->
-    <xsl:if test="$comment = 'true' or contains($chart,'true') or $picture = 'true'">
+    <xsl:if test="$comment = 'true' or $hyperlink='true' or contains($chart,'true') or $picture = 'true'">
       <!-- package relationship item -->
       <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
         <xsl:call-template name="InsertWorksheetsRels">
