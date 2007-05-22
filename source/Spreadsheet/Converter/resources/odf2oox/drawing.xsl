@@ -88,10 +88,15 @@
       <!-- when anchor is to cell -->
       <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
         <xsl:for-each select="parent::node()/parent::node()">
+          <xsl:variable name="position">
+            <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
+          </xsl:variable>
           <xsl:variable name="number">
-            <xsl:call-template name="GetColNumber">
-              <xsl:with-param name="position" select="count(preceding-sibling::table:table-cell)"/>
-            </xsl:call-template>
+            <xsl:for-each select="parent::node()/table:table-cell[1]">
+              <xsl:call-template name="GetColNumber">
+                <xsl:with-param name="position" select="$position"/>
+              </xsl:call-template>
+            </xsl:for-each>
           </xsl:variable>
           <xsl:value-of select="$number - 1"/>
         </xsl:for-each>
