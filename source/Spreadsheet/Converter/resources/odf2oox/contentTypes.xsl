@@ -110,9 +110,21 @@
           </xsl:for-each>
         </xsl:for-each>
       </xsl:variable>
+      
+            
+      <xsl:variable name="picture">
+            <xsl:choose>
+              <xsl:when test="descendant::draw:frame/draw:image[contains(@xlink:href, 'Pictures')]">
+                <xsl:text>true</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>false</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+      </xsl:variable>
 
       <!-- TO DO for pictures-->      
-      <xsl:if test="contains($chart,'true')">
+      <xsl:if test="contains($chart,'true') or $picture = 'true'">
         <Override PartName="{concat('/xl/drawings/drawing',position(),'.xml')}"
           ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>        
         

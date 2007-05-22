@@ -85,7 +85,82 @@
           <xdr:clientData/>
         </xdr:twoCellAnchor>
       </xsl:for-each>
+      
+      <xsl:for-each
+        select="descendant::draw:frame/draw:image[contains(@xlink:href, 'Pictures')]">
+
+        <xdr:twoCellAnchor editAs="oneCell">
+          
+          
+          <xdr:from>
+            <xdr:col>
+              <xsl:call-template name="InsertStartColumn"/>
+            </xdr:col>
+            <xdr:colOff>0</xdr:colOff>
+            <xdr:row>
+              <xsl:call-template name="InsertStartRow"/>
+            </xdr:row>
+            <xdr:rowOff>0</xdr:rowOff>
+          </xdr:from>
+          
+          
+          
+          <xdr:to>
+            <xdr:col>13</xdr:col>
+            <xdr:colOff>0</xdr:colOff>
+            <xdr:row>33</xdr:row>
+            <xdr:rowOff>114300</xdr:rowOff>
+          </xdr:to>
+          
+          
+          <xdr:pic>
+            <xdr:nvPicPr>
+              <xdr:cNvPr>
+                <xsl:attribute name="id">
+                  <xsl:value-of select="position()"/>
+                </xsl:attribute>
+              <xsl:attribute name="name">
+                <xsl:value-of select="parent::draw:frame/@draw:name"/>
+              </xsl:attribute>
+                <xsl:attribute name="descr">
+                  <xsl:value-of select="parent::draw:frame/@draw:name"/>
+                </xsl:attribute>
+              </xdr:cNvPr>
+              <xdr:cNvPicPr>
+                <a:picLocks noChangeAspect="1"/>
+              </xdr:cNvPicPr>
+            </xdr:nvPicPr>
+            
+            <xdr:blipFill>
+              <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+                <xsl:attribute name="r:embed">
+                  <xsl:value-of select="generate-id()"/>
+                </xsl:attribute>
+              </a:blip>
+              <a:stretch>
+                <a:fillRect/>
+              </a:stretch>
+            </xdr:blipFill>
+            
+            <xdr:spPr>
+              <a:xfrm>
+                <a:off x="5486400" y="4572000"/>
+                <a:ext cx="2438400" cy="1828800"/>
+              </a:xfrm>
+              <a:prstGeom prst="rect">
+                <a:avLst/>
+              </a:prstGeom>
+            </xdr:spPr>
+            
+          </xdr:pic>
+          <xdr:clientData/>
+        </xdr:twoCellAnchor>
+        
+        
+        </xsl:for-each>
+
     </xdr:wsDr>
+    
   </xsl:template>
 
   <xsl:template name="InsertStartColumn">
@@ -110,8 +185,7 @@
       <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
         <xsl:text>1</xsl:text>
       </xsl:when>
-    </xsl:choose>
-
+    </xsl:choose>    
   </xsl:template>
 
   <xsl:template name="InsertStartRow">

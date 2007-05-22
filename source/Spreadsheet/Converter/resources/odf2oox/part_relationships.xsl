@@ -87,7 +87,7 @@
       </xsl:if>
 
       <!-- drawing.xml file -->
-      <xsl:if test="contains($chart,'true')">
+      <xsl:if test="contains($chart,'true') or $picture = 'true'">
         <Relationship Id="{concat('d_rId',$sheetNum)}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"
           Target="{concat('../drawings/drawing',$sheetNum,'.xml')}"/>
@@ -106,6 +106,56 @@
       </xsl:for-each>
 
       <!-- TO DO: picture rels -->
-    </Relationships>
+      
+      
+      <xsl:for-each
+        select="descendant::draw:frame/draw:image[contains(@xlink:href, 'Pictures')]">
+        
+    <xsl:variable name="imageName"
+        select="substring-after(@xlink:href, 'Pictures/')"/>
+      <pzip:copy pzip:source="{@xlink:href}" pzip:target="xl/media/{$imageName}"/>
+      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+        Id="{generate-id(.)}"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+        Target="../media/{$imageName}"/>
+
+        <!--Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+          Id="{generate-id(ancestor::draw:a)}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
+          TargetMode="External">
+          <xsl:attribute name="Target">
+      <xsl:choose-->
+              
+              <!-- converting relative path -->
+      <!--       <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '../')">
+                <xsl:call-template name="HandlingSpaces">
+                  <xsl:with-param name="path">
+                    <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'../')"
+                    />
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              
+              <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '/')">
+                <xsl:call-template name="HandlingSpaces">
+                  <xsl:with-param name="path">
+                    <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'/')"
+                    />
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              
+              <xsl:otherwise>
+                <xsl:call-template name="HandlingSpaces">
+                  <xsl:with-param name="path">
+                    <xsl:value-of select="ancestor::draw:a/@xlink:href"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </Relationship> -->
+        </xsl:for-each>
+        </Relationships>
   </xsl:template>
 </xsl:stylesheet>

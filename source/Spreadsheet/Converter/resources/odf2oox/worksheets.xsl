@@ -152,6 +152,17 @@
 
       <xsl:call-template name="InsertHeaderFooter"/>
       
+      <xsl:variable name="picture">
+        <xsl:choose>
+          <xsl:when test="table:table-row/table:table-cell/draw:frame/draw:image">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
       <xsl:variable name="chart">
         <xsl:for-each select="descendant::draw:frame/draw:object">
           <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
@@ -167,7 +178,7 @@
         </xsl:for-each>
       </xsl:variable>
       
-      <xsl:if test="contains($chart,'true')">
+      <xsl:if test="contains($chart,'true') or $picture = 'true'">
         <drawing r:id="{concat('d_rId',$sheetId)}"/>
       </xsl:if>      
       

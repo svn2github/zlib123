@@ -125,9 +125,9 @@
           </xsl:choose>
         </xsl:variable>
 
-        <!--        <xsl:variable name="picture">
+         <xsl:variable name="picture">
           <xsl:choose>
-            <xsl:when test="key('picture', '' )">         insert different condition
+            <xsl:when test="table:table-row/table:table-cell/draw:frame/draw:image">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -135,7 +135,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-
+        <!--        
         <xsl:variable name="hyperlink">
           <xsl:choose>
             <xsl:when test="key('hyperlink', '' )">    insert different condition
@@ -173,12 +173,14 @@
         </xsl:if>
 
         <!-- <xsl:if test="$picture = 'true' or contains($chart,'true')"> -->
-        <xsl:if test="contains($chart,'true')">
+        <xsl:if test="contains($chart,'true') or $picture='true'">
           <xsl:call-template name="CreateDrawing"/>
           <xsl:call-template name="CreateDrawingRelationships"/>
+          <xsl:if test="contains($chart,'true')">
           <xsl:call-template name="CreateChartFile">
             <xsl:with-param name="sheetNum" select="position()"/>            
-          </xsl:call-template>          
+          </xsl:call-template>
+          </xsl:if>
         </xsl:if>
 
         <!-- insert relationships -->
@@ -186,8 +188,8 @@
           <xsl:with-param name="sheetNum" select="position()"/>
           <xsl:with-param name="comment" select="$comment"/>
           <xsl:with-param name="chart" select="$chart"/>
-          <!--          <xsl:with-param name="picture" select="$picture"/>
-          <xsl:with-param name="hyperlink" select="$hyperlink"/>-->
+           <xsl:with-param name="picture" select="$picture"/>
+          <!--          <xsl:with-param name="hyperlink" select="$hyperlink"/>-->
         </xsl:call-template>
       </xsl:for-each>
 
@@ -299,7 +301,7 @@
 
     <!--      <xsl:if
         test="$comment = 'true' or $picture != 'true' or $hyperlink = 'true' or contains($chart,'true')">-->
-    <xsl:if test="$comment = 'true' or contains($chart,'true')">
+    <xsl:if test="$comment = 'true' or contains($chart,'true') or $picture = 'true'">
       <!-- package relationship item -->
       <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
         <xsl:call-template name="InsertWorksheetsRels">
