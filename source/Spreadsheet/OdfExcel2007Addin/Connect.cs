@@ -101,9 +101,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
         public void OnConnection(object application, Extensibility.ext_ConnectMode connectMode, object addInInst, ref System.Array custom)
         {
             this.applicationObject = (MSExcel.Application)application;
-            CommandBars bars = applicationObject.CommandBars;
-            bars.OnUpdate += new _CommandBarsEvents_OnUpdateEventHandler(bars_OnUpdate);
-            m_bEnabled = bars.GetEnabledMso("FileOpen");
+            RegisterBarsEventHandler();
 
             // set culture to match current application culture or user's choice
             int culture = 0;
@@ -193,50 +191,53 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
             // display the dialog
             fd.Show();
 
-            // process the chosen documents	
-            for (int i = 1; i <= fd.SelectedItems.Count; ++i)
-            {
-                // retrieve file name
-                String odfFile = fd.SelectedItems.Item(i);
+            // For unknown (yet ;-) ) reason, we have to restore some event handlers...
+            bool restoreHandlers = (fd.SelectedItems.Count > 0);
+            try {
+                // process the chosen documents	
+                for (int i = 1; i <= fd.SelectedItems.Count; ++i) {
+                    // retrieve file name
+                    String odfFile = fd.SelectedItems.Item(i);
 
-                // create a temporary file
-                object fileName = this.addinLib.GetTempFileName(odfFile, ".xlsx");
+                    // create a temporary file
+                    object fileName = this.addinLib.GetTempFileName(odfFile, ".xlsx");
 
-               // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
-                OdfToOox(odfFile, (string)fileName, true);
-                // this.applicationObject.System.Cursor =  WdCursorType.wdCursorNormal;
+                    // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorWait;
+                    OdfToOox(odfFile, (string)fileName, true);
+                    // this.applicationObject.System.Cursor =  WdCursorType.wdCursorNormal;
 
-                try
-                {
-                    // open the workbook
-                    object readOnly = true;
-                    object addToRecentFiles = false;
-                    object isVisible = true;
-                    object openAndRepair = false;
-                    object missing = Missing.Value;
+                    try {
+                        // open the workbook
+                        object readOnly = true;
+                        object addToRecentFiles = false;
+                        object isVisible = true;
+                        object openAndRepair = false;
+                        object missing = Missing.Value;
 
-                    // conversion may have been cancelled and file deleted.
-                    if (File.Exists((string)fileName))
-                    {
-                        // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
-                        System.Globalization.CultureInfo ci;
-                        ci = System.Threading.Thread.CurrentThread.CurrentCulture;
-                        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-                   
-                        Microsoft.Office.Interop.Excel.Workbook wb =
-                            this.applicationObject.Workbooks.Open((string) fileName, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
-                        
-                        wb.Activate();
-                       
-                        System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+                        // conversion may have been cancelled and file deleted.
+                        if (File.Exists((string)fileName)) {
+                            // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
+                            System.Globalization.CultureInfo ci;
+                            ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+                            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
+                            Microsoft.Office.Interop.Excel.Workbook wb =
+                                this.applicationObject.Workbooks.Open((string)fileName, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing);
+
+                            wb.Activate();
+
+                            System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+                        }
+                    } catch (Exception ex) {
+                        // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorNormal;
+                        System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
+                        System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
+                        return;
                     }
                 }
-                catch (Exception ex)
-                {
-                    // this.applicationObject.System.Cursor = MSExcel.WdCursorType.wdCursorNormal;
-                    System.Diagnostics.Debug.WriteLine("*** Exception : " + ex.Message);
-                    System.Windows.Forms.MessageBox.Show(addinLib.GetString("OdfUnexpectedError"), DialogBoxTitle, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Stop);
-                    return;
+            } finally {
+                if (restoreHandlers) {
+                    RegisterBarsEventHandler();
                 }
             }
         }
@@ -250,6 +251,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
             // Workaround to excel bug. "Old format or invalid type library. (Exception from HRESULT: 0x80028018 (TYPE_E_INVDATAREAD))" 
             System.Globalization.CultureInfo ci;
             ci = System.Threading.Thread.CurrentThread.CurrentCulture;
+            bool restoreHandlers = false;
             try
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -276,9 +278,10 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                     string ext = '.' + sfd.DefaultExt;
                     sfd.FileName = wb.FullName.Substring(0, wb.FullName.LastIndexOf('.')) + ext;
 
-                    // process the chosen workbooks	
+                    // process the chosen workbooks
                     if (System.Windows.Forms.DialogResult.OK == sfd.ShowDialog())
                     {
+                        restoreHandlers = true;
                         // retrieve file name
                         string odfFile = sfd.FileName;
                         if (!odfFile.EndsWith(ext))
@@ -338,6 +341,9 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
             finally
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+                if (restoreHandlers) {
+                    RegisterBarsEventHandler();
+                }
             }
         }
 
@@ -428,6 +434,7 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
         void bars_OnUpdate()
         {
             bool newValue = applicationObject.CommandBars.GetEnabledMso("FileOpen");
+            //ODS("bars_OnUpdate : " + newValue);
             if (m_bEnabled != newValue)
             {
                 m_bEnabled = newValue;
@@ -435,6 +442,12 @@ namespace CleverAge.OdfConverter.OdfExcel2007Addin
                 m_Ribbon.InvalidateControl("OdfExport");
             }
 
+        }
+
+        void RegisterBarsEventHandler() {
+            CommandBars bars = applicationObject.CommandBars;
+            bars.OnUpdate += new _CommandBarsEvents_OnUpdateEventHandler(bars_OnUpdate);
+            m_bEnabled = bars.GetEnabledMso("FileOpen");
         }
     }
 }
