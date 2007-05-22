@@ -38,40 +38,14 @@
   <xsl:import href="cell.xsl"/>
   <xsl:import href="common.xsl"/>
 
+  <!-- Insert Drawing (picture, chart)  -->
   <xsl:template name="InsertDrawing">
     <xdr:wsDr>
-      <!-- for charts, file pointed by draw:frame/draw:object/@xlink:href must contain office:chart -->
+      <!--Insert Chart -->
       <xsl:for-each
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
         <xdr:twoCellAnchor>
-          <xdr:from>
-            <xdr:col>
-              <xsl:call-template name="InsertStartColumn"/>
-            </xdr:col>
-            <xdr:colOff>
-              <xsl:call-template name="InsertStartColumnOffset"/>
-            </xdr:colOff>
-            <xdr:row>
-              <xsl:call-template name="InsertStartRow"/>
-            </xdr:row>
-            <xdr:rowOff>
-            <xsl:call-template name="InsertStartRowOffset"/>
-            </xdr:rowOff>
-          </xdr:from>
-          <xdr:to>
-            <xdr:col>
-              <xsl:call-template name="InsertEndColumn"/>
-            </xdr:col>
-            <xdr:colOff>
-              <xsl:call-template name="InsertEndColumnOffset"/>
-            </xdr:colOff>
-            <xdr:row>
-              <xsl:call-template name="InsertEndRow"/>
-            </xdr:row>
-            <xdr:rowOff>
-              <xsl:call-template name="InsertEndRowOffset"/>
-            </xdr:rowOff>
-          </xdr:to>
+         <xsl:call-template name="SetPosition"/>
           <xdr:graphicFrame macro="">
             <xdr:nvGraphicFramePr>
               <xdr:cNvPr id="{position()}" name="{concat('Chart ',position())}"/>
@@ -95,33 +69,12 @@
         </xdr:twoCellAnchor>
       </xsl:for-each>
       
+      <!--Insert Picture -->
       <xsl:for-each
         select="descendant::draw:frame/draw:image[contains(@xlink:href, 'Pictures')]">
 
-        <xdr:twoCellAnchor editAs="oneCell">
-          
-          
-          <xdr:from>
-            <xdr:col>
-              <xsl:call-template name="InsertStartColumn"/>
-            </xdr:col>
-            <xdr:colOff>0</xdr:colOff>
-            <xdr:row>
-              <xsl:call-template name="InsertStartRow"/>
-            </xdr:row>
-            <xdr:rowOff>0</xdr:rowOff>
-          </xdr:from>
-          
-          
-          
-          <xdr:to>
-            <xdr:col>13</xdr:col>
-            <xdr:colOff>0</xdr:colOff>
-            <xdr:row>33</xdr:row>
-            <xdr:rowOff>114300</xdr:rowOff>
-          </xdr:to>
-          
-          
+        <xdr:twoCellAnchor>
+          <xsl:call-template name="SetPosition"/>
           <xdr:pic>
             <xdr:nvPicPr>
               <xdr:cNvPr>
@@ -171,7 +124,40 @@
     </xdr:wsDr>
     
   </xsl:template>
+  
+  <!-- Insert Position of Drawing -->
+  <xsl:template name="SetPosition">
+    <xdr:from>
+      <xdr:col>
+        <xsl:call-template name="InsertStartColumn"/>
+      </xdr:col>
+      <xdr:colOff>
+        <xsl:call-template name="InsertStartColumnOffset"/>
+      </xdr:colOff>
+      <xdr:row>
+        <xsl:call-template name="InsertStartRow"/>
+      </xdr:row>
+      <xdr:rowOff>
+        <xsl:call-template name="InsertStartRowOffset"/>
+      </xdr:rowOff>
+    </xdr:from>
+    <xdr:to>
+      <xdr:col>
+        <xsl:call-template name="InsertEndColumn"/>
+      </xdr:col>
+      <xdr:colOff>
+        <xsl:call-template name="InsertEndColumnOffset"/>
+      </xdr:colOff>
+      <xdr:row>
+        <xsl:call-template name="InsertEndRow"/>
+      </xdr:row>
+      <xdr:rowOff>
+        <xsl:call-template name="InsertEndRowOffset"/>
+      </xdr:rowOff>
+    </xdr:to>
+  </xsl:template>
 
+  <!-- Insert top left corner col number -->
   <xsl:template name="InsertStartColumn">
     <xsl:choose>
       <!-- when anchor is to cell -->
@@ -197,6 +183,7 @@
     </xsl:choose>    
   </xsl:template>
 
+  <!-- Insert top left corner row number -->
   <xsl:template name="InsertStartRow">
     <xsl:choose>
       <!-- when anchor is to cell -->
@@ -222,6 +209,7 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Insert bottom right corner col number -->
   <xsl:template name="InsertEndColumn">
     <xsl:choose>
       <!-- when anchor is to cell -->
@@ -242,6 +230,7 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- Insert bottom corner row number -->
   <xsl:template name="InsertEndRow">
     <xsl:choose>
       <!-- when anchor is to cell -->
@@ -262,6 +251,7 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Horizontal offset of top left corner -->
   <xsl:template name="InsertStartColumnOffset">
     <xsl:choose>
       <!-- when anchor is to cell -->
@@ -279,6 +269,7 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Vertical offset of top left corner -->
   <xsl:template name="InsertStartRowOffset">
     <xsl:choose>
       <!-- when anchor is to cell -->
@@ -296,6 +287,7 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- Horizontal offset of  bottom right corner -->
   <xsl:template name="InsertEndColumnOffset">
     <xsl:choose>
       <!-- when anchor is to cell -->
@@ -313,6 +305,7 @@
     </xsl:choose>
   </xsl:template>
   
+  <!-- Vertical offset of  bottom right corner -->
   <xsl:template name="InsertEndRowOffset">
     <xsl:choose>
       <!-- when anchor is to cell -->
