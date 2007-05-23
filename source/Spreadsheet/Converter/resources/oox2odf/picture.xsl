@@ -908,17 +908,13 @@
     <!--  picture flip (vertical, horizontal)-->
     <xsl:if test="xdr:pic/xdr:spPr/a:xfrm/attribute::node()">
       <xsl:choose>
-        <!-- to do flip vertical and flip vertical-horizontal -->
-        <!--xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1' and xdr:pic/xdr:spPr/a:xfrm/@flipH = '1' and $atribute != 'style'">
-             <xsl:attribute name="draw:transform">
-              <xsl:text>rotate (3.1415926535892) translate (2.253cm 0.217cm)</xsl:text>
-              </xsl:attribute>
-            </xsl:when>
-            <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1' and $atribute != 'style'">
-              <xsl:attribute name="draw:transform">
-              <xsl:text>rotate (3.1415926535892) translate (2.256cm 0.108cm)</xsl:text>
-              </xsl:attribute>
-            </xsl:when-->
+       <!-- TO DO Vertical  -->
+         <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1' and $atribute != 'style'">
+            <xsl:attribute name="draw:transform">
+              <xsl:text>rotate (3.1415926535892) translate (2.064cm 0.425cm)</xsl:text>
+            </xsl:attribute>
+         </xsl:when>
+        <!-- horizontal -->
         <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipH = '1'  and $atribute = 'style'">
           <xsl:attribute name="style:mirror">
             <xsl:text>horizontal</xsl:text>
