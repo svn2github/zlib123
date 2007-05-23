@@ -587,13 +587,15 @@
     
 
      <!-- if there were empty rows before this one then insert empty rows -->
-    <xsl:choose>      
+    <xsl:choose>
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll and Pictures-->
       <xsl:when test="position()=1 and @r>1 and $BigMergeCell = '' and ($GetMinRowWithPicture = '' or ($GetMinRowWithPicture + 1) &gt;= @r)">
+
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="{@r - 1}">
           <table:table-cell table:number-columns-repeated="256"/>
         </table:table-row>
+        
       </xsl:when>
       
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll, and there are Pictures before this row-->
@@ -625,7 +627,7 @@
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll-->
 
       <xsl:when test="position()=1 and @r>1 and $BigMergeCell != ''">
-        
+
         <xsl:call-template name="InsertBigMergeFirstRowEmpty">
           <xsl:with-param name="RowNumber">
             <xsl:value-of select="1"/>
@@ -653,7 +655,7 @@
 
       <!-- when this row is not first one and there were pictures rows after previous non-empty row-->      
       <xsl:when test="preceding::e:row[1]/@r &lt;  @r - 1 and ($GetMinRowWithPicture + 1) &gt; preceding::e:row[1]/@r and ($GetMinRowWithPicture + 1) &lt; @r - 1">
-        
+
         <xsl:call-template name="InsertPictureBetwenTwoRows">
           <xsl:with-param name="StartRow">
             <xsl:value-of select="preceding::e:row[1]/@r"/>
@@ -678,6 +680,7 @@
       </xsl:when>
       
       <xsl:otherwise>
+
         <!-- when this row is not first one and there were empty rows after previous non-empty row -->
         <xsl:if test="preceding::e:row[1]/@r &lt;  @r - 1">
           <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
@@ -716,7 +719,7 @@
         <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
     </xsl:call-template>
-    
+
     <xsl:if test="not(following-sibling::e:row) and $PictureRow != ''">
       <xsl:call-template name="InsertPictureBetwenTwoRows">
         <xsl:with-param name="StartRow">

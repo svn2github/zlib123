@@ -56,7 +56,8 @@
       </xsl:when>
       <!-- when there are only picture in sheet  -->
       <xsl:when
-        test="not(e:worksheet/e:sheetData/e:row/e:c) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell != ''">
+        test="not(e:worksheet/e:sheetData/e:row) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell != ''">
+  
         <xsl:call-template name="InsertEmptySheetWithPicture">
           <xsl:with-param name="PictureCell">
             <xsl:value-of select="$PictureCell"/>
@@ -129,18 +130,42 @@
     <xsl:param name="PictureRow"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
+    
+    <xsl:variable name="GetMinRowWithPicture">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$PictureRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="$lastCellColumnNumber"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="PictureColl">
+      <xsl:call-template name="GetCollsWithPicture">
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="@r - 1"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureCell">
+          <xsl:value-of select="concat(';', $PictureCell)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>    
 
     <xsl:choose>
 
       <!-- Insert if this row is merged with another row -->
       <xsl:when test="contains($CheckIfBigMerge,'true')">
+
         <table:table-row table:style-name="ro1">
           <table:covered-table-cell table:number-columns-repeated="256"/>
         </table:table-row>
+        
       </xsl:when>
 
       <xsl:otherwise>
-        
+
       <table:table-row>
           <xsl:attribute name="table:style-name">
             <xsl:choose>
@@ -194,9 +219,10 @@
           </xsl:variable>
 
           <!-- complete row with empty cells if last cell number < 256 -->
+
           <xsl:choose>
             <xsl:when
-              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge = '' and $CheckIfBigMergeAfter != 'true'">
+              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge = '' and $CheckIfBigMergeAfter != 'true' and $PictureCell = ''">
               <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
@@ -209,7 +235,7 @@
               </table:table-cell>
             </xsl:when>
             <xsl:when
-              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != '' and not(e:c)">
+              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != '' and not(e:c) and $PictureCell = ''">
               <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
@@ -245,6 +271,31 @@
                   <xsl:attribute name="table:number-columns-spanned">256</xsl:attribute>
                 </xsl:if>
               </table:table-cell>
+            </xsl:when>    
+            <xsl:when test="$PictureCell != '' and ($GetMinRowWithPicture+1)=@r and not(e:c)">
+              <xsl:call-template name="InsertPictureBetwenTwoColl">
+                <xsl:with-param name="sheet">
+                  <xsl:value-of select="$sheet"/>
+                </xsl:with-param>           
+                <xsl:with-param name="NameSheet">
+                  <xsl:value-of select="$NameSheet"/>
+                </xsl:with-param>          
+                <xsl:with-param name="rowNum">
+                  <xsl:value-of select="@r - 1"/>
+                </xsl:with-param>
+                <xsl:with-param name="PictureColl">
+                  <xsl:value-of select="$PictureColl"/>
+                </xsl:with-param>
+                <xsl:with-param name="StartColl">
+                  <xsl:text>0</xsl:text>            
+                </xsl:with-param>
+                <xsl:with-param name="EndColl">
+                  <xsl:text>256</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="document">
+                  <xsl:text>worksheet</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>  
             </xsl:when>
             <xsl:when test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != ''">
               <xsl:apply-templates select="e:c[1]">
