@@ -751,22 +751,11 @@
     </xsl:attribute>
   </xsl:template>
 
+  <!-- Insert Picture Style -->
+  
   <xsl:template name="InsertPictureProperties">
-
-    <style:style style:name="{generate-id(.)}" style:family="graphic">
-
-      <!--in Word there are no parent style for image - make default Graphics in OO -->
-      <xsl:attribute name="style:parent-style-name">
-        <xsl:text>Graphics</xsl:text>
-        <!--xsl:value-of select="w:tblStyle/@w:val"/-->
-      </xsl:attribute>
-      <style:graphic-properties>
-        <!--xsl:call-template name="InsertImagePosH"/>
-          <xsl:call-template name="InsertImagePosV"/-->
-        <!--xsl:call-template name="InsertImageCrop"/>
-          <xsl:call-template name="InsertImageWrap"/>
-          <xsl:call-template name="InsertImageMargins"/>
-            <xsl:call-template name="InsertImageFlowWithtText"/-->
+    <style:style style:name="{generate-id(.)}" style:family="graphic">      
+      <style:graphic-properties>      
         <xsl:call-template name="InsertImageFlip">
           <xsl:with-param name="atribute">
             <xsl:text>style</xsl:text>
@@ -775,7 +764,6 @@
         <xsl:call-template name="InsertImageBorder"/>
       </style:graphic-properties>
     </style:style>
-
   </xsl:template>
 
   <xsl:template match="e:sheet" mode="PictureStyle">
@@ -859,7 +847,7 @@
   <!-- To do insert border -->
 
   <xsl:template name="InsertImageBorder">
-    <!--xsl:if
+    <xsl:if
       test="xdr:pic/xdr:spPr/a:ln[not(a:noFill)]">
 
       <xsl:variable name="width">
@@ -872,6 +860,7 @@
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
+      
       <xsl:variable name="type">
         <xsl:choose>
           <xsl:when
@@ -883,10 +872,11 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+      
       <xsl:variable name="color">
         <xsl:choose>
           <xsl:when
-            test="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr">
+            test="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr/@val != ''">
             <xsl:value-of
               select="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr/@val"
             />
@@ -896,10 +886,24 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:attribute name="fo:border">
-        <xsl:value-of select="concat($width,' ',$type,' #',$color)"/>
+     
+      <xsl:attribute name="draw:stroke">
+          <xsl:value-of select="$type"/>        
       </xsl:attribute>
-    </xsl:if-->
+      
+      <xsl:attribute name="draw:stroke-dash">
+        <xsl:text>Line_20_with_20_Fine_20_Dots</xsl:text>        
+      </xsl:attribute>
+      
+      <xsl:attribute name="svg:stroke-width">
+        <xsl:value-of select="$width"/>
+      </xsl:attribute>
+      
+      <xsl:attribute name="svg:stroke-color">
+        <xsl:value-of select="concat('#', $color)"/>
+      </xsl:attribute>
+      
+    </xsl:if>
   </xsl:template>
 
   <!-- Insert Flip properties -->
@@ -1033,8 +1037,6 @@
     <xsl:param name="rowNum"/>
     <xsl:param name="PictureColl"/>
     <xsl:param name="document"/>
-
-
 
     <xsl:variable name="GetMinCollWithPicture">
       <xsl:call-template name="GetMinRowWithPicture">
