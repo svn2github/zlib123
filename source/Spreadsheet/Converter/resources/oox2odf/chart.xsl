@@ -45,6 +45,10 @@
 
   <xsl:import href="relationships.xsl"/>
 
+  <xsl:key name="dataSeries" match="c:ser" use="''"/>
+  <xsl:key name="numPoints" match="c:numCache/c:ptCount" use="''"/>
+  <xsl:key name="numCategories" match="c:strLit/c:ptCount" use="''"/>
+  
   <xsl:template name="CreateCharts">
 
     <!-- get all sheet Id's -->
@@ -101,11 +105,11 @@
 
           <!-- finally go to a chart file -->
           <xsl:for-each select="document(concat('xl/',substring-after($chart,'/')))">
-            
+
             <xsl:call-template name="InsertChart">
               <xsl:with-param name="chartId" select="$chartId"/>
             </xsl:call-template>
-            
+
           </xsl:for-each>
         </xsl:for-each>
       </xsl:for-each>
@@ -129,25 +133,7 @@
     <xsl:param name="chartId"/>
 
     <pzip:entry pzip:target="{concat('Object ',$chartId,'/content.xml')}">
-      <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-        xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-        xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-        xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-        xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-        xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-        xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
-        xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
-        xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-        xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-        xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
-        xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0"
-        xmlns:math="http://www.w3.org/1998/Math/MathML"
-        xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
-        xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
-        xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer"
-        xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events"
-        xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" office:version="1.0">
+      <office:document-content xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
         <office:automatic-styles>
           <number:number-style style:name="N0">
             <number:number number:min-integer-digits="1"/>
@@ -177,20 +163,20 @@
               style:font-size-complex="6pt"/>
           </style:style>
           <style:style style:name="ch4" style:family="chart">
-            <style:chart-properties chart:japanese-candle-stick="false" chart:stock-with-volume="false"
-              chart:three-dimensional="false" chart:deep="false" chart:lines="false"
-              chart:interpolation="none" chart:symbol-type="none" chart:vertical="false"
-              chart:lines-used="0" chart:connect-bars="false" chart:series-source="columns"
-              chart:mean-value="false" chart:error-margin="0" chart:error-lower-limit="0"
-              chart:error-upper-limit="0" chart:error-category="none" chart:error-percentage="0"
-              chart:regression-type="none" chart:data-label-number="none" chart:data-label-text="false"
-              chart:data-label-symbol="false"/>
+            <style:chart-properties chart:japanese-candle-stick="false"
+              chart:stock-with-volume="false" chart:three-dimensional="false" chart:deep="false"
+              chart:lines="false" chart:interpolation="none" chart:symbol-type="none"
+              chart:vertical="false" chart:lines-used="0" chart:connect-bars="false"
+              chart:series-source="columns" chart:mean-value="false" chart:error-margin="0"
+              chart:error-lower-limit="0" chart:error-upper-limit="0" chart:error-category="none"
+              chart:error-percentage="0" chart:regression-type="none" chart:data-label-number="none"
+              chart:data-label-text="false" chart:data-label-symbol="false"/>
           </style:style>
           <style:style style:name="ch5" style:family="chart" style:data-style-name="N0">
             <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
-              chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:text-overlap="false"
-              text:line-break="true" chart:label-arrangement="side-by-side" chart:visible="true"
-              style:direction="ltr"/>
+              chart:tick-marks-major-outer="true" chart:logarithmic="false"
+              chart:text-overlap="false" text:line-break="true"
+              chart:label-arrangement="side-by-side" chart:visible="true" style:direction="ltr"/>
             <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
               svg:stroke-color="#000000"/>
             <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
@@ -204,8 +190,9 @@
           <style:style style:name="ch6" style:family="chart" style:data-style-name="N0">
             <style:chart-properties chart:display-label="true" chart:tick-marks-major-inner="false"
               chart:tick-marks-major-outer="true" chart:logarithmic="false" chart:origin="0"
-              chart:gap-width="100" chart:overlap="0" chart:text-overlap="false" text:line-break="false"
-              chart:label-arrangement="side-by-side" chart:visible="true" style:direction="ltr"/>
+              chart:gap-width="100" chart:overlap="0" chart:text-overlap="false"
+              text:line-break="false" chart:label-arrangement="side-by-side" chart:visible="true"
+              style:direction="ltr"/>
             <style:graphic-properties draw:stroke="solid" svg:stroke-width="0cm"
               svg:stroke-color="#000000"/>
             <style:text-properties fo:font-family="Arial" style:font-family-generic="swiss"
@@ -255,78 +242,35 @@
         </office:automatic-styles>
         <office:body>
           <office:chart>
-            <chart:chart svg:width="8cm" svg:height="7cm" chart:class="chart:bar" chart:style-name="ch1">
-              <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="ch2">
-                <text:p>Main Title</text:p>
-              </chart:title>
-              <chart:legend chart:legend-position="end" svg:x="6.459cm" svg:y="3.005cm"
-                chart:style-name="ch3"/>
+            <chart:chart svg:width="8cm" svg:height="7cm" chart:class="chart:bar"
+              chart:style-name="ch1">
+
+              <xsl:call-template name="InsertTitle"/>
+              <xsl:call-template name="InsertLegend"/>
+
               <chart:plot-area chart:style-name="ch4" table:cell-range-address="Sheet1.$D$3:.$F$3"
                 chart:table-number-list="0" svg:x="0.16cm" svg:y="0.937cm" svg:width="5.98cm"
                 svg:height="5.923cm">
-                <chart:axis chart:dimension="x" chart:name="primary-x" chart:style-name="ch5">
-                  <chart:categories table:cell-range-address="local-table.A2:.A2"/>
-                </chart:axis>
+                
+                <xsl:call-template name="InsertXAxis"/>
+                
                 <chart:axis chart:dimension="y" chart:name="primary-y" chart:style-name="ch6">
                   <chart:grid chart:class="major"/>
                 </chart:axis>
-                <chart:series chart:style-name="ch7">
-                  <chart:data-point/>
-                </chart:series>
-                <chart:series chart:style-name="ch8">
-                  <chart:data-point/>
-                </chart:series>
-                <chart:series chart:style-name="ch9">
-                  <chart:data-point/>
-                </chart:series>
+
+                <xsl:call-template name="InsertDataSeries"/>
+
                 <chart:wall chart:style-name="ch10"/>
                 <chart:floor chart:style-name="ch11"/>
               </chart:plot-area>
-              <table:table table:name="local-table">
-                <table:table-header-columns>
-                  <table:table-column/>
-                </table:table-header-columns>
-                <table:table-columns>
-                  <table:table-column table:number-columns-repeated="3"/>
-                </table:table-columns>
-                <table:table-header-rows>
-                  <table:table-row>
-                    <table:table-cell>
-                      <text:p/>
-                    </table:table-cell>
-                    <table:table-cell office:value-type="string">
-                      <text:p>Column D</text:p>
-                    </table:table-cell>
-                    <table:table-cell office:value-type="string">
-                      <text:p>Column E</text:p>
-                    </table:table-cell>
-                    <table:table-cell office:value-type="string">
-                      <text:p>Column F</text:p>
-                    </table:table-cell>
-                  </table:table-row>
-                </table:table-header-rows>
-                <table:table-rows>
-                  <table:table-row>
-                    <table:table-cell office:value-type="string">
-                      <text:p>Row 3</text:p>
-                    </table:table-cell>
-                    <table:table-cell office:value-type="float" office:value="3">
-                      <text:p>3</text:p>
-                    </table:table-cell>
-                    <table:table-cell office:value-type="float" office:value="6">
-                      <text:p>6</text:p>
-                    </table:table-cell>
-                    <table:table-cell office:value-type="float" office:value="4">
-                      <text:p>4</text:p>
-                    </table:table-cell>
-                  </table:table-row>
-                </table:table-rows>
-              </table:table>
+
+              <xsl:call-template name="InsertChartTable"/>
+
             </chart:chart>
           </office:chart>
         </office:body>
       </office:document-content>
-      
+
     </pzip:entry>
   </xsl:template>
 
@@ -335,11 +279,153 @@
 
     <pzip:entry pzip:target="{concat('Object ',$chartId,'/styles.xml')}">
       <office:document-styles>
-        <xsl:attribute name="zzzzz">
-          <xsl:value-of select="$chartId"/>
-        </xsl:attribute>
         <office:styles/>
       </office:document-styles>
     </pzip:entry>
   </xsl:template>
+
+  <xsl:template name="InsertDataSeries">
+    <xsl:for-each select="key('dataSeries','')">
+      <!-- TO DO chart:style-name -->
+      <chart:series chart:style-name="{concat('ch',6+position())}">
+        <chart:data-point>
+          <xsl:attribute name="chart:repeated">
+            <xsl:value-of select="key('numPoints','')/@val"/>
+          </xsl:attribute>
+        </chart:data-point>
+      </chart:series>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertChartTable">
+    <table:table table:name="local-table">
+      <table:table-header-columns>
+        <table:table-column/>
+      </table:table-header-columns>
+      <table:table-columns>
+        <table:table-column table:number-columns-repeated="3"/>
+      </table:table-columns>
+
+      <table:table-header-rows>
+        <xsl:call-template name="InsertHeaderRows"/>
+      </table:table-header-rows>
+      <table:table-rows>
+        <xsl:call-template name="InsertDataRows">
+          <xsl:with-param name="points" select="key('numPoints','')/@val"/>
+          <xsl:with-param name="categories" select="key('numCategories','')/@val"/>
+        </xsl:call-template>
+      </table:table-rows>
+
+    </table:table>
+  </xsl:template>
+
+  <xsl:template name="InsertHeaderRows">
+    <table:table-row>
+      <table:table-cell>
+        <text:p/>
+      </table:table-cell>
+      <xsl:for-each select="key('dataSeries','')">
+        <table:table-cell office:value-type="string">
+          <text:p>
+            <xsl:choose>
+              <xsl:when test="c:tx/c:v">
+                <xsl:value-of select="c:tx/c:v"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat('Series',position())"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </text:p>
+        </table:table-cell>
+      </xsl:for-each>
+    </table:table-row>
+  </xsl:template>
+
+  <xsl:template name="InsertDataRows">
+    <xsl:param name="points"/>
+    <xsl:param name="categories"/>
+    <xsl:param name="count" select="0"/>
+
+    <xsl:choose>
+      <xsl:when test="$count &lt; $points">
+        <table:table-row>
+          <!-- category name -->
+          <table:table-cell office:value-type="string">
+            <text:p>
+             <xsl:choose>
+                <xsl:when test="not($categories)">
+                  <xsl:value-of select="$count + 1"/>    
+                </xsl:when>
+               <xsl:when test="$count &lt; $categories">
+                 <xsl:value-of select="key('numCategories','')/parent::node()/c:pt[@idx= $count]"/>
+               </xsl:when>
+              </xsl:choose>              
+            </text:p>
+          </table:table-cell>
+          
+          <!-- category values -->
+          <xsl:call-template name="InsertValues">
+            <xsl:with-param name="point" select="$count"/>
+          </xsl:call-template>
+        </table:table-row>
+        
+        <xsl:call-template name="InsertDataRows">
+          <xsl:with-param name="points" select="$points"/>
+          <xsl:with-param name="categories" select="$categories"/>
+          <xsl:with-param name="count" select="$count + 1"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="InsertValues">
+    <xsl:param name="point"/>
+
+    <xsl:for-each select="key('dataSeries','')">
+      <xsl:choose>
+        <xsl:when test="c:val/c:numRef/c:numCache/c:pt[@idx = $point]">
+          <table:table-cell office:value-type="float"
+            office:value="{c:val/c:numRef/c:numCache/c:pt[@idx = $point]/c:v}">
+            <text:p>
+              <xsl:value-of select="c:val/c:numRef/c:numCache/c:pt[@idx = $point]/c:v"/>
+            </text:p>
+          </table:table-cell>
+        </xsl:when>
+        <xsl:otherwise>
+          <table:table-cell office:value-type="float" office:value="1.#NAN">
+            <text:p>1.#NAN</text:p>
+          </table:table-cell>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertTitle">
+    <xsl:for-each select="c:chartSpace/c:chart/c:title">
+      <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="ch2">
+        <!-- TO DO: paragraph and run interpretation -->
+        <text:p>
+          <xsl:value-of select="c:tx/c:rich/a:p/a:r/a:t"/>
+        </text:p>
+      </chart:title>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertLegend">
+    <xsl:for-each select="c:chartSpace/c:chart/c:legend">
+      <chart:legend chart:legend-position="end" svg:x="6.459cm" svg:y="3.005cm"
+        chart:style-name="ch3"/>
+    </xsl:for-each>
+  </xsl:template>
+
+<xsl:template name="InsertXAxis">
+  <chart:axis chart:dimension="x" chart:name="primary-x" chart:style-name="ch5">
+    <chart:categories>
+      <xsl:attribute name="table:cell-range-address">
+        <xsl:value-of select="concat('local-table.A2:.A',1 + key('numPoints','')/@val)"/>
+      </xsl:attribute>
+    </chart:categories>    
+  </chart:axis>  
+</xsl:template>
 </xsl:stylesheet>
