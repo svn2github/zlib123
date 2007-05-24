@@ -51,7 +51,7 @@
 
   <xsl:key name="dataSeries" match="c:ser" use="''"/>
   <xsl:key name="numPoints" match="c:numCache/c:ptCount" use="''"/>
-  <xsl:key name="numCategories" match="c:strLit/c:ptCount" use="''"/>
+  <xsl:key name="categories" match="c:cat" use="''"/>
   
   <xsl:template name="CreateCharts">
     <!-- @Description: Searches for all charts within workbook and starts conversion. -->  
@@ -330,7 +330,7 @@
       <table:table-rows>
         <xsl:call-template name="InsertDataRows">
           <xsl:with-param name="points" select="key('numPoints','')/@val"/>
-          <xsl:with-param name="categories" select="key('numCategories','')/@val"/>
+          <xsl:with-param name="categories" select="key('categories','')/descendant::c:ptCount/@val"/>
         </xsl:call-template>
       </table:table-rows>
 
@@ -349,8 +349,8 @@
         <table:table-cell office:value-type="string">
           <text:p>
             <xsl:choose>
-              <xsl:when test="c:tx/c:v">
-                <xsl:value-of select="c:tx/c:v"/>
+              <xsl:when test="c:tx/descendant::c:v">
+                <xsl:value-of select="c:tx/descendant::c:v"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="concat('Series',position())"/>
@@ -381,7 +381,7 @@
                   <xsl:value-of select="$count + 1"/>    
                 </xsl:when>
                <xsl:when test="$count &lt; $categories">
-                 <xsl:value-of select="key('numCategories','')/parent::node()/c:pt[@idx= $count]"/>
+                 <xsl:value-of select="key('categories','')/descendant::c:pt[@idx= $count]"/>
                </xsl:when>
               </xsl:choose>              
             </text:p>
