@@ -124,11 +124,25 @@
     <xsl:param name="PictureCell"/>
 
     <xsl:variable name="PictureColStart">
-      <xsl:value-of select="xdr:from/xdr:col"/>
+      <xsl:choose>
+        <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+          <xsl:value-of select="xdr:to/xdr:col"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="xdr:from/xdr:col"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:variable name="PictureRowStart">
-      <xsl:value-of select="xdr:from/xdr:row"/>
+     <xsl:choose>
+        <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+          <xsl:value-of select="xdr:to/xdr:row"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="xdr:from/xdr:row"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:choose>
@@ -214,20 +228,41 @@
         </xsl:for-each>
 
         <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
-          <xsl:if
-            test="xdr:from/xdr:col = number(substring-before($CollsWithPicture, ';')) and xdr:from/xdr:row = $rowNum">
-            <xsl:call-template name="InsertPicture">
-              <xsl:with-param name="NameSheet">
-                <xsl:value-of select="$NameSheet"/>
-              </xsl:with-param>
-              <xsl:with-param name="sheet">
-                <xsl:value-of select="$sheet"/>
-              </xsl:with-param>
-              <xsl:with-param name="Drawing">
-                <xsl:value-of select="$Drawing"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:if>
+           <xsl:choose>
+            <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1'">
+              <xsl:if
+                test="xdr:to/xdr:col = number(substring-before($CollsWithPicture, ';')) and xdr:to/xdr:row = $rowNum">
+                <xsl:call-template name="InsertPicture">
+                  <xsl:with-param name="NameSheet">
+                    <xsl:value-of select="$NameSheet"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="sheet">
+                    <xsl:value-of select="$sheet"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="Drawing">
+                    <xsl:value-of select="$Drawing"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+
+              <xsl:if
+                test="xdr:from/xdr:col = number(substring-before($CollsWithPicture, ';')) and xdr:from/xdr:row = $rowNum">
+                <xsl:call-template name="InsertPicture">
+                  <xsl:with-param name="NameSheet">
+                    <xsl:value-of select="$NameSheet"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="sheet">
+                    <xsl:value-of select="$sheet"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="Drawing">
+                    <xsl:value-of select="$Drawing"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:for-each>
 
       </table:table-cell>
@@ -713,23 +748,47 @@
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:attribute name="table:end-cell-address">
-      <xsl:variable name="ColEnd">
+     <xsl:variable name="ColEnd">
         <xsl:call-template name="NumbersToChars">
           <xsl:with-param name="num">
-            <xsl:value-of select="xdr:to/xdr:col"/>
+            <xsl:choose>
+              <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+                <xsl:value-of select="xdr:to/xdr:col + (xdr:to/xdr:col - xdr:from/xdr:col) - 1"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="xdr:to/xdr:col"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
       <xsl:variable name="RowEnd">
-        <xsl:value-of select="xdr:to/xdr:row + 1"/>
+        <xsl:choose>
+          <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+            <xsl:value-of select="xdr:to/xdr:row + (xdr:to/xdr:row - xdr:from/xdr:row) + 1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="xdr:to/xdr:row + 1"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:variable>
       <xsl:value-of select="concat($NameSheet, '.', $ColEnd, $RowEnd)"/>
     </xsl:attribute>
     <xsl:attribute name="svg:x">
-      <xsl:call-template name="ConvertEmu">
-        <xsl:with-param name="length" select="xdr:from/xdr:colOff"/>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
+        <xsl:choose>
+          <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+            <xsl:call-template name="ConvertEmu">
+        		<xsl:with-param name="length" select="xdr:to/xdr:colOff"/>
+        		<xsl:with-param name="unit">cm</xsl:with-param>
+      		</xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="ConvertEmu">
+        		<xsl:with-param name="length" select="xdr:from/xdr:colOff"/>
+        		<xsl:with-param name="unit">cm</xsl:with-param>
+      		</xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
     </xsl:attribute>
     <xsl:attribute name="svg:y">
       <xsl:call-template name="ConvertEmu">
@@ -738,10 +797,20 @@
       </xsl:call-template>
     </xsl:attribute>
     <xsl:attribute name="table:end-x">
-      <xsl:call-template name="ConvertEmu">
-        <xsl:with-param name="length" select="xdr:to/xdr:colOff"/>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="xdr:from/xdr:colOff"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="xdr:to/xdr:colOff"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>     
     </xsl:attribute>
     <xsl:attribute name="table:end-y">
       <xsl:call-template name="ConvertEmu">
@@ -988,6 +1057,7 @@
               <xsl:text>0</xsl:text>
             </xsl:with-param>
             <xsl:with-param name="EndColl">
+              
               <xsl:text>256</xsl:text>
             </xsl:with-param>
           </xsl:call-template>
@@ -1169,20 +1239,44 @@
           </xsl:call-template>
         </xsl:for-each>
 
-        <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
-          <xsl:if test="xdr:from/xdr:col = $collNum and xdr:from/xdr:row = $rowNum">
-            <xsl:call-template name="InsertPicture">
-              <xsl:with-param name="NameSheet">
-                <xsl:value-of select="$NameSheet"/>
-              </xsl:with-param>
-              <xsl:with-param name="sheet">
-                <xsl:value-of select="$sheet"/>
-              </xsl:with-param>
-              <xsl:with-param name="Drawing">
-                <xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:if>
+      <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
+
+          <xsl:choose>
+            <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+              <xsl:if test="xdr:to/xdr:col = $collNum and xdr:to/xdr:row = $rowNum">
+                <xsl:call-template name="InsertPicture">
+                  <xsl:with-param name="NameSheet">
+                    <xsl:value-of select="$NameSheet"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="sheet">
+                    <xsl:value-of select="$sheet"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="Drawing">
+                    <xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="xdr:from/xdr:col = $collNum and xdr:from/xdr:row = $rowNum">
+                <xsl:call-template name="InsertPicture">
+                  <xsl:with-param name="NameSheet">
+                    <xsl:value-of select="$NameSheet"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="sheet">
+                    <xsl:value-of select="$sheet"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="Drawing">
+                    <xsl:value-of select="substring-after(substring-after($Target, '/'), '/')"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+
+
+
+
         </xsl:for-each>
 
       </xsl:if>
