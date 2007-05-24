@@ -579,9 +579,6 @@
       <xsl:with-param name="PictureRow">
         <xsl:value-of select="$PictureRow"/>
       </xsl:with-param>
-      <xsl:with-param name="AfterRow">
-        <xsl:value-of select="$lastCellColumnNumber"/>
-      </xsl:with-param>
     </xsl:call-template>
     </xsl:variable>
     
