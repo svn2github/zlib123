@@ -29,257 +29,230 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
+
+  <xsl:key name="rows" match="table:table-rows" use="''"/>
+  <xsl:key name="header" match="table:table-header-rows" use="''"/>
+  <xsl:key name="series" match="chart:series" use="''"/>
+  <xsl:key name="style" match="style:style" use="@style:name"/>
 
   <xsl:template name="CreateChartFile">
     <xsl:param name="sheetNum"/>
 
     <xsl:for-each
-      select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart][1]">
+      select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
       <pzip:entry pzip:target="{concat('xl/charts/chart',$sheetNum,'_',position(),'.xml')}">
 
         <!-- example chart file-->
+        <xsl:for-each
+          select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart">
+          <c:chartSpace>
+            <c:lang val="pl-PL"/>
+            <c:chart>
+              <c:title>
+                <c:tx>
+                  <c:rich>
+                    <a:bodyPr/>
+                    <a:lstStyle/>
+                    <a:p>
+                      <a:pPr>
+                        <a:defRPr sz="1300" b="0" i="0" u="none" strike="noStrike" baseline="0">
+                          <a:solidFill>
+                            <a:srgbClr val="000000"/>
+                          </a:solidFill>
+                          <a:latin typeface="Arial"/>
+                          <a:ea typeface="Arial"/>
+                          <a:cs typeface="Arial"/>
+                        </a:defRPr>
+                      </a:pPr>
+                      <a:r>
+                        <a:rPr lang="pl-PL"/>
+                        <a:t>Main Title</a:t>
+                      </a:r>
+                    </a:p>
+                  </c:rich>
+                </c:tx>
+                <c:layout>
+                  <c:manualLayout>
+                    <c:xMode val="edge"/>
+                    <c:yMode val="edge"/>
+                    <c:x val="0.37282229965156838"/>
+                    <c:y val="3.8022813688212961E-2"/>
+                  </c:manualLayout>
+                </c:layout>
+                <c:spPr>
+                  <a:noFill/>
+                  <a:ln w="25400">
+                    <a:noFill/>
+                  </a:ln>
+                </c:spPr>
+              </c:title>
+              <c:plotArea>
+                <c:layout>
+                  <c:manualLayout>
+                    <c:layoutTarget val="inner"/>
+                    <c:xMode val="edge"/>
+                    <c:yMode val="edge"/>
+                    <c:x val="0.10452961672473868"/>
+                    <c:y val="0.24334600760456274"/>
+                    <c:w val="0.68641114982578355"/>
+                    <c:h val="0.60836501901140683"/>
+                  </c:manualLayout>
+                </c:layout>
+                <c:barChart>
+                  <c:barDir val="col"/>
+                  <c:grouping val="clustered"/>
 
-        <c:chartSpace>
-          <c:lang val="pl-PL"/>
-          <c:chart>
-            <c:title>
-              <c:tx>
-                <c:rich>
+                  <xsl:variable name="numSeries">
+                    <xsl:value-of
+                      select="count(key('rows','')/table:table-row[1]/table:table-cell) - 1"/>
+                  </xsl:variable>
+
+                  <xsl:variable name="numPoints">
+                    <xsl:value-of select="count(key('rows','')/table:table-row)"/>
+                  </xsl:variable>
+
+                  <xsl:for-each select="key('rows','')">
+                    <xsl:call-template name="InsertSeries">
+                      <xsl:with-param name="numSeries" select="$numSeries"/>
+                      <xsl:with-param name="numPoints" select="$numPoints"/>
+                    </xsl:call-template>
+                  </xsl:for-each>
+
+                  <c:gapWidth val="100"/>
+                  <c:axId val="110226048"/>
+                  <c:axId val="110498176"/>
+                </c:barChart>
+                <c:catAx>
+                  <c:axId val="110226048"/>
+                  <c:scaling>
+                    <c:orientation val="minMax"/>
+                  </c:scaling>
+                  <c:axPos val="b"/>
+                  <c:numFmt formatCode="General" sourceLinked="1"/>
+                  <c:tickLblPos val="low"/>
+                  <c:spPr>
+                    <a:ln w="3175">
+                      <a:solidFill>
+                        <a:srgbClr val="000000"/>
+                      </a:solidFill>
+                      <a:prstDash val="solid"/>
+                    </a:ln>
+                  </c:spPr>
+                  <c:txPr>
+                    <a:bodyPr rot="0" vert="horz"/>
+                    <a:lstStyle/>
+                    <a:p>
+                      <a:pPr>
+                        <a:defRPr sz="700" b="0" i="0" u="none" strike="noStrike" baseline="0">
+                          <a:solidFill>
+                            <a:srgbClr val="000000"/>
+                          </a:solidFill>
+                          <a:latin typeface="Arial"/>
+                          <a:ea typeface="Arial"/>
+                          <a:cs typeface="Arial"/>
+                        </a:defRPr>
+                      </a:pPr>
+                      <a:endParaRPr lang="pl-PL"/>
+                    </a:p>
+                  </c:txPr>
+                  <c:crossAx val="110498176"/>
+                  <c:crossesAt val="0"/>
+                  <c:auto val="1"/>
+                  <c:lblAlgn val="ctr"/>
+                  <c:lblOffset val="100"/>
+                  <c:tickLblSkip val="1"/>
+                  <c:tickMarkSkip val="1"/>
+                </c:catAx>
+                <c:valAx>
+                  <c:axId val="110498176"/>
+                  <c:scaling>
+                    <c:orientation val="minMax"/>
+                  </c:scaling>
+                  <c:axPos val="l"/>
+                  <c:majorGridlines>
+                    <c:spPr>
+                      <a:ln w="3175">
+                        <a:solidFill>
+                          <a:srgbClr val="000000"/>
+                        </a:solidFill>
+                        <a:prstDash val="solid"/>
+                      </a:ln>
+                    </c:spPr>
+                  </c:majorGridlines>
+                  <c:numFmt formatCode="General" sourceLinked="0"/>
+                  <c:tickLblPos val="low"/>
+                  <c:spPr>
+                    <a:ln w="3175">
+                      <a:solidFill>
+                        <a:srgbClr val="000000"/>
+                      </a:solidFill>
+                      <a:prstDash val="solid"/>
+                    </a:ln>
+                  </c:spPr>
+                  <c:txPr>
+                    <a:bodyPr rot="0" vert="horz"/>
+                    <a:lstStyle/>
+                    <a:p>
+                      <a:pPr>
+                        <a:defRPr sz="700" b="0" i="0" u="none" strike="noStrike" baseline="0">
+                          <a:solidFill>
+                            <a:srgbClr val="000000"/>
+                          </a:solidFill>
+                          <a:latin typeface="Arial"/>
+                          <a:ea typeface="Arial"/>
+                          <a:cs typeface="Arial"/>
+                        </a:defRPr>
+                      </a:pPr>
+                      <a:endParaRPr lang="pl-PL"/>
+                    </a:p>
+                  </c:txPr>
+                  <c:crossAx val="110226048"/>
+                  <c:crosses val="autoZero"/>
+                  <c:crossBetween val="between"/>
+                </c:valAx>
+                <c:spPr>
+                  <a:noFill/>
+                  <a:ln w="25400">
+                    <a:noFill/>
+                  </a:ln>
+                </c:spPr>
+              </c:plotArea>
+              <c:legend>
+                <c:legendPos val="r"/>
+                <c:layout>
+                  <c:manualLayout>
+                    <c:xMode val="edge"/>
+                    <c:yMode val="edge"/>
+                    <c:x val="0.82926829268292679"/>
+                    <c:y val="0.47148288973384095"/>
+                    <c:w val="0.14285714285714299"/>
+                    <c:h val="0.15209125475285182"/>
+                  </c:manualLayout>
+                </c:layout>
+                <c:spPr>
+                  <a:noFill/>
+                  <a:ln w="3175">
+                    <a:solidFill>
+                      <a:srgbClr val="000000"/>
+                    </a:solidFill>
+                    <a:prstDash val="solid"/>
+                  </a:ln>
+                </c:spPr>
+                <c:txPr>
                   <a:bodyPr/>
                   <a:lstStyle/>
                   <a:p>
                     <a:pPr>
-                      <a:defRPr sz="1760" b="0" i="0" u="none" strike="noStrike" baseline="0">
-                        <a:solidFill>
-                          <a:srgbClr val="000000"/>
-                        </a:solidFill>
-                        <a:latin typeface="Arial"/>
-                        <a:ea typeface="Arial"/>
-                        <a:cs typeface="Arial"/>
-                      </a:defRPr>
-                    </a:pPr>
-                    <a:r>
-                      <a:rPr lang="pl-PL"/>
-                      <a:t>Main Title</a:t>
-                    </a:r>
-                  </a:p>
-                </c:rich>
-              </c:tx>
-              <c:layout>
-                <c:manualLayout>
-                  <c:xMode val="edge"/>
-                  <c:yMode val="edge"/>
-                  <c:x val="0.4150333420032648"/>
-                  <c:y val="3.0952452921440013E-2"/>
-                </c:manualLayout>
-              </c:layout>
-              <c:spPr>
-                <a:noFill/>
-                <a:ln w="25400">
-                  <a:noFill/>
-                </a:ln>
-              </c:spPr>
-            </c:title>
-            <c:plotArea>
-              <c:layout>
-                <c:manualLayout>
-                  <c:layoutTarget val="inner"/>
-                  <c:xMode val="edge"/>
-                  <c:yMode val="edge"/>
-                  <c:x val="0.11111128841032286"/>
-                  <c:y val="0.19285759127974164"/>
-                  <c:w val="0.72712534327343636"/>
-                  <c:h val="0.63571576384803719"/>
-                </c:manualLayout>
-              </c:layout>
-              <c:lineChart>
-                <c:grouping val="standard"/>
-                <c:ser>
-                  <c:idx val="0"/>
-                  <c:order val="0"/>
-                  <c:spPr>
-                    <a:ln w="3175">
-                      <a:solidFill>
-                        <a:srgbClr val="9999FF"/>
-                      </a:solidFill>
-                      <a:prstDash val="solid"/>
-                    </a:ln>
-                  </c:spPr>
-                  <c:marker>
-                    <c:symbol val="diamond"/>
-                    <c:size val="6"/>
-                    <c:spPr>
-                      <a:solidFill>
-                        <a:srgbClr val="9999FF"/>
-                      </a:solidFill>
-                      <a:ln>
-                        <a:solidFill>
-                          <a:srgbClr val="000000"/>
-                        </a:solidFill>
-                        <a:prstDash val="solid"/>
-                      </a:ln>
-                    </c:spPr>
-                  </c:marker>
-                  <c:val>
-                    <c:numRef>
-                      <c:f>
-                        <xsl:text>Sheet</xsl:text>
-                        <xsl:value-of select="$sheetNum"/>
-                        <xsl:text>!$C$2:$G$2</xsl:text>
-                      </c:f>
-                      <c:numCache>
-                        <c:formatCode>General</c:formatCode>
-                        <c:ptCount val="5"/>
-                        <c:pt idx="0">
-                          <c:v>1</c:v>
-                        </c:pt>
-                        <c:pt idx="1">
-                          <c:v>2</c:v>
-                        </c:pt>
-                        <c:pt idx="2">
-                          <c:v>3</c:v>
-                        </c:pt>
-                        <c:pt idx="3">
-                          <c:v>4</c:v>
-                        </c:pt>
-                        <c:pt idx="4">
-                          <c:v>5</c:v>
-                        </c:pt>
-                      </c:numCache>
-                    </c:numRef>
-                  </c:val>
-                </c:ser>
-                <c:ser>
-                  <c:idx val="1"/>
-                  <c:order val="1"/>
-                  <c:spPr>
-                    <a:ln w="3175">
-                      <a:solidFill>
-                        <a:srgbClr val="993366"/>
-                      </a:solidFill>
-                      <a:prstDash val="solid"/>
-                    </a:ln>
-                  </c:spPr>
-                  <c:marker>
-                    <c:symbol val="square"/>
-                    <c:size val="6"/>
-                    <c:spPr>
-                      <a:solidFill>
-                        <a:srgbClr val="993366"/>
-                      </a:solidFill>
-                      <a:ln>
-                        <a:solidFill>
-                          <a:srgbClr val="000000"/>
-                        </a:solidFill>
-                        <a:prstDash val="solid"/>
-                      </a:ln>
-                    </c:spPr>
-                  </c:marker>
-                  <c:val>
-                    <c:numRef>
-                      <c:f>
-                        <xsl:text>Sheet</xsl:text>
-                        <xsl:value-of select="$sheetNum"/>
-                        <xsl:text>!$C$2:$G$2</xsl:text>                        
-                      </c:f>
-                      <c:numCache>
-                        <c:formatCode>General</c:formatCode>
-                        <c:ptCount val="5"/>
-                        <c:pt idx="0">
-                          <c:v>13</c:v>
-                        </c:pt>
-                        <c:pt idx="1">
-                          <c:v>21</c:v>
-                        </c:pt>
-                        <c:pt idx="2">
-                          <c:v>22</c:v>
-                        </c:pt>
-                        <c:pt idx="3">
-                          <c:v>21</c:v>
-                        </c:pt>
-                        <c:pt idx="4">
-                          <c:v>11</c:v>
-                        </c:pt>
-                      </c:numCache>
-                    </c:numRef>
-                  </c:val>
-                </c:ser>
-                <c:marker val="1"/>
-                <c:axId val="121059200"/>
-                <c:axId val="121065856"/>
-              </c:lineChart>
-              <c:catAx>
-                <c:axId val="121059200"/>
-                <c:scaling>
-                  <c:orientation val="minMax"/>
-                </c:scaling>
-                <c:axPos val="b"/>
-                <c:majorGridlines>
-                  <c:spPr>
-                    <a:ln w="3175">
-                      <a:solidFill>
-                        <a:srgbClr val="000000"/>
-                      </a:solidFill>
-                      <a:prstDash val="solid"/>
-                    </a:ln>
-                  </c:spPr>
-                </c:majorGridlines>
-                <c:title>
-                  <c:tx>
-                    <c:rich>
-                      <a:bodyPr/>
-                      <a:lstStyle/>
-                      <a:p>
-                        <a:pPr>
-                          <a:defRPr sz="1215" b="0" i="0" u="none" strike="noStrike" baseline="0">
-                            <a:solidFill>
-                              <a:srgbClr val="000000"/>
-                            </a:solidFill>
-                            <a:latin typeface="Arial"/>
-                            <a:ea typeface="Arial"/>
-                            <a:cs typeface="Arial"/>
-                          </a:defRPr>
-                        </a:pPr>
-                        <a:r>
-                          <a:rPr lang="pl-PL"/>
-                          <a:t>X axis title</a:t>
-                        </a:r>
-                      </a:p>
-                    </c:rich>
-                  </c:tx>
-                  <c:layout>
-                    <c:manualLayout>
-                      <c:xMode val="edge"/>
-                      <c:yMode val="edge"/>
-                      <c:x val="0.41176536293237292"/>
-                      <c:y val="0.90238305055582813"/>
-                    </c:manualLayout>
-                  </c:layout>
-                  <c:spPr>
-                    <a:noFill/>
-                    <a:ln w="25400">
-                      <a:noFill/>
-                    </a:ln>
-                  </c:spPr>
-                </c:title>
-                <c:numFmt formatCode="General" sourceLinked="1"/>
-                <c:tickLblPos val="low"/>
-                <c:spPr>
-                  <a:ln w="9525">
-                    <a:noFill/>
-                  </a:ln>
-                </c:spPr>
-                <c:txPr>
-                  <a:bodyPr rot="0" vert="horz"/>
-                  <a:lstStyle/>
-                  <a:p>
-                    <a:pPr>
-                      <a:defRPr sz="940" b="0" i="0" u="none" strike="noStrike" baseline="0">
+                      <a:defRPr sz="550" b="0" i="0" u="none" strike="noStrike" baseline="0">
                         <a:solidFill>
                           <a:srgbClr val="000000"/>
                         </a:solidFill>
@@ -291,152 +264,80 @@
                     <a:endParaRPr lang="pl-PL"/>
                   </a:p>
                 </c:txPr>
-                <c:crossAx val="121065856"/>
-                <c:crossesAt val="0"/>
-                <c:auto val="1"/>
-                <c:lblAlgn val="ctr"/>
-                <c:lblOffset val="100"/>
-                <c:tickLblSkip val="1"/>
-                <c:tickMarkSkip val="1"/>
-              </c:catAx>
-              <c:valAx>
-                <c:axId val="121065856"/>
-                <c:scaling>
-                  <c:orientation val="minMax"/>
-                </c:scaling>
-                <c:axPos val="l"/>
-                <c:majorGridlines>
-                  <c:spPr>
-                    <a:ln w="3175">
-                      <a:solidFill>
-                        <a:srgbClr val="000000"/>
-                      </a:solidFill>
-                      <a:prstDash val="solid"/>
-                    </a:ln>
-                  </c:spPr>
-                </c:majorGridlines>
-                <c:title>
-                  <c:tx>
-                    <c:rich>
-                      <a:bodyPr/>
-                      <a:lstStyle/>
-                      <a:p>
-                        <a:pPr>
-                          <a:defRPr sz="1215" b="0" i="0" u="none" strike="noStrike" baseline="0">
-                            <a:solidFill>
-                              <a:srgbClr val="000000"/>
-                            </a:solidFill>
-                            <a:latin typeface="Arial"/>
-                            <a:ea typeface="Arial"/>
-                            <a:cs typeface="Arial"/>
-                          </a:defRPr>
-                        </a:pPr>
-                        <a:r>
-                          <a:rPr lang="pl-PL"/>
-                          <a:t>Y axis title</a:t>
-                        </a:r>
-                      </a:p>
-                    </c:rich>
-                  </c:tx>
-                  <c:layout>
-                    <c:manualLayout>
-                      <c:xMode val="edge"/>
-                      <c:yMode val="edge"/>
-                      <c:x val="2.6143832567134789E-2"/>
-                      <c:y val="0.42142955131499099"/>
-                    </c:manualLayout>
-                  </c:layout>
-                  <c:spPr>
-                    <a:noFill/>
-                    <a:ln w="25400">
-                      <a:noFill/>
-                    </a:ln>
-                  </c:spPr>
-                </c:title>
-                <c:numFmt formatCode="General" sourceLinked="0"/>
-                <c:tickLblPos val="low"/>
-                <c:spPr>
-                  <a:ln w="9525">
-                    <a:noFill/>
-                  </a:ln>
-                </c:spPr>
-                <c:txPr>
-                  <a:bodyPr rot="0" vert="horz"/>
-                  <a:lstStyle/>
-                  <a:p>
-                    <a:pPr>
-                      <a:defRPr sz="940" b="0" i="0" u="none" strike="noStrike" baseline="0">
-                        <a:solidFill>
-                          <a:srgbClr val="000000"/>
-                        </a:solidFill>
-                        <a:latin typeface="Arial"/>
-                        <a:ea typeface="Arial"/>
-                        <a:cs typeface="Arial"/>
-                      </a:defRPr>
-                    </a:pPr>
-                    <a:endParaRPr lang="pl-PL"/>
-                  </a:p>
-                </c:txPr>
-                <c:crossAx val="121059200"/>
-                <c:crosses val="autoZero"/>
-                <c:crossBetween val="midCat"/>
-              </c:valAx>
-              <c:spPr>
+              </c:legend>
+              <c:dispBlanksAs val="gap"/>
+            </c:chart>
+            <c:spPr>
+              <a:solidFill>
+                <a:srgbClr val="FFFFFF"/>
+              </a:solidFill>
+              <a:ln w="9525">
                 <a:noFill/>
-                <a:ln w="3175">
-                  <a:solidFill>
-                    <a:srgbClr val="000000"/>
-                  </a:solidFill>
-                  <a:prstDash val="lgDashDot"/>
-                </a:ln>
-              </c:spPr>
-            </c:plotArea>
-            <c:legend>
-              <c:legendPos val="r"/>
-              <c:layout>
-                <c:manualLayout>
-                  <c:xMode val="edge"/>
-                  <c:yMode val="edge"/>
-                  <c:x val="0.86438046425089399"/>
-                  <c:y val="0.46428679382160021"/>
-                  <c:w val="0.12254921515844433"/>
-                  <c:h val="9.2857358764320039E-2"/>
-                </c:manualLayout>
-              </c:layout>
-              <c:spPr>
-                <a:solidFill>
-                  <a:srgbClr val="D9D9D9"/>
-                </a:solidFill>
-                <a:ln w="3175">
-                  <a:solidFill>
-                    <a:srgbClr val="000000"/>
-                  </a:solidFill>
-                  <a:prstDash val="solid"/>
-                </a:ln>
-              </c:spPr>
-              <c:txPr>
-                <a:bodyPr/>
-                <a:lstStyle/>
-                <a:p>
-                  <a:pPr>
-                    <a:defRPr sz="740" b="0" i="0" u="none" strike="noStrike" baseline="0">
-                      <a:solidFill>
-                        <a:srgbClr val="000000"/>
-                      </a:solidFill>
-                      <a:latin typeface="Arial"/>
-                      <a:ea typeface="Arial"/>
-                      <a:cs typeface="Arial"/>
-                    </a:defRPr>
-                  </a:pPr>
-                  <a:endParaRPr lang="pl-PL"/>
-                </a:p>
-              </c:txPr>
-            </c:legend>
-            <c:dispBlanksAs val="gap"/>
-          </c:chart>
+              </a:ln>
+            </c:spPr>
+            <c:txPr>
+              <a:bodyPr/>
+              <a:lstStyle/>
+              <a:p>
+                <a:pPr>
+                  <a:defRPr sz="1000" b="0" i="0" u="none" strike="noStrike" baseline="0">
+                    <a:solidFill>
+                      <a:srgbClr val="000000"/>
+                    </a:solidFill>
+                    <a:latin typeface="Arial"/>
+                    <a:ea typeface="Arial"/>
+                    <a:cs typeface="Arial"/>
+                  </a:defRPr>
+                </a:pPr>
+                <a:endParaRPr lang="pl-PL"/>
+              </a:p>
+            </c:txPr>
+            <c:printSettings>
+              <c:headerFooter alignWithMargins="0"/>
+              <c:pageMargins b="1" l="0.75000000000000044" r="0.75000000000000044" t="1"
+                header="0.49212598450000022" footer="0.49212598450000022"/>
+              <c:pageSetup/>
+            </c:printSettings>
+          </c:chartSpace>
+        </xsl:for-each>
+      </pzip:entry>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertSeries">
+    <xsl:param name="numSeries"/>
+    <xsl:param name="numPoints"/>
+    <xsl:param name="count" select="0"/>
+
+    <xsl:choose>
+      <xsl:when test="$count &lt; $numSeries">
+        <c:ser>
+          <c:idx val="{$count}"/>
+          <c:order val="{$count}"/>
+
+          <!-- series name -->
+          <c:tx>
+            <c:v>
+              <xsl:value-of select="key('header','')/table:table-row/table:table-cell[$count + 2]"/>
+            </c:v>
+          </c:tx>
+
+          <xsl:call-template name="InsertCategories">
+            <xsl:with-param name="numCategories" select="$numPoints"/>
+          </xsl:call-template>
+
           <c:spPr>
             <a:solidFill>
-              <a:srgbClr val="FFFFFF"/>
+              <a:srgbClr val="9999FF">
+                <xsl:variable name="styleName">
+                  <xsl:value-of select="key('series','')[$count + 1]/@chart:style-name"/>
+                </xsl:variable>
+                <xsl:attribute name="val">
+                  <xsl:value-of
+                    select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
+                  />
+                </xsl:attribute>
+              </a:srgbClr>
             </a:solidFill>
             <a:ln w="3175">
               <a:solidFill>
@@ -445,32 +346,68 @@
               <a:prstDash val="solid"/>
             </a:ln>
           </c:spPr>
-          <c:txPr>
-            <a:bodyPr/>
-            <a:lstStyle/>
-            <a:p>
-              <a:pPr>
-                <a:defRPr sz="1100" b="0" i="0" u="none" strike="noStrike" baseline="0">
-                  <a:solidFill>
-                    <a:srgbClr val="000000"/>
-                  </a:solidFill>
-                  <a:latin typeface="Calibri"/>
-                  <a:ea typeface="Calibri"/>
-                  <a:cs typeface="Calibri"/>
-                </a:defRPr>
-              </a:pPr>
-              <a:endParaRPr lang="pl-PL"/>
-            </a:p>
-          </c:txPr>
-          <c:printSettings>
-            <c:headerFooter alignWithMargins="0"/>
-            <c:pageMargins b="1" l="0.75" r="0.75" t="1" header="0.4921259845" footer="0.4921259845"/>
-            <c:pageSetup/>
-          </c:printSettings>
-        </c:chartSpace>
+          <c:val>
+            <c:numRef>
+              <!-- TO DO: reference to sheet cell -->
+              <!-- i.e. <c:f>Sheet1!$D$3:$D$4</c:f> -->
+              <c:numCache>
+                <c:formatCode>General</c:formatCode>
+                <c:ptCount val="{$numPoints}"/>
 
-      </pzip:entry>
+                <xsl:call-template name="InsertPoints">
+                  <xsl:with-param name="series" select="$count"/>
+                </xsl:call-template>
+
+              </c:numCache>
+            </c:numRef>
+          </c:val>
+        </c:ser>
+
+        <xsl:call-template name="InsertSeries">
+          <xsl:with-param name="numSeries" select="$numSeries"/>
+          <xsl:with-param name="numPoints" select="$numPoints"/>
+          <xsl:with-param name="count" select="$count + 1"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="InsertPoints">
+    <xsl:param name="series"/>
+
+    <xsl:for-each select="table:table-row">
+      <xsl:if test="table:table-cell[$series + 2]/text:p != '1.#NAN' ">
+        <c:pt idx="{position() - 1}">
+          <c:v>
+            <!-- $ series + 2 because position starts with 1 and we skip first cell -->
+            <xsl:value-of select="table:table-cell[$series + 2]/text:p"/>
+          </c:v>
+        </c:pt>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
+
+  <xsl:template name="InsertCategories">
+    <xsl:param name="numCategories"/>
+
+    <!-- categories names -->
+    <c:cat>
+      <c:strLit>
+        <c:ptCount val="{$numCategories}"/>
+
+        <xsl:for-each select="key('rows','')/table:table-row">
+          <c:pt idx="{position() - 1}">
+            <c:v>
+              <xsl:value-of select="table:table-cell[1]/text:p"/>
+            </c:v>
+          </c:pt>
+        </xsl:for-each>
+
+      </c:strLit>
+    </c:cat>
+  </xsl:template>
+
+  <xsl:template name="InsertTitle"> </xsl:template>
 
 </xsl:stylesheet>
