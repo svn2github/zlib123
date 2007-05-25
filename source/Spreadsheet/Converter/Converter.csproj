@@ -56,6 +56,9 @@
     <EmbeddedResource Include="resources\odf2oox\common.xsl" />
     <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
     <EmbeddedResource Include="resources\odf2oox\comments.xsl" />
+	<EmbeddedResource Include="resources\odf2oox\drawing.xsl" />
+	<EmbeddedResource Include="resources\odf2oox\chart.xsl" />
+	<EmbeddedResource Include="resources\odf2oox\conditional.xsl" />
     <EmbeddedResource Include="resources\oox2odf\content.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf-compute-size.xsl" />
     <EmbeddedResource Include="resources\oox2odf\oox2odf.xsl" />
@@ -70,6 +73,7 @@
     <EmbeddedResource Include="resources\oox2odf\border.xsl" />
     <EmbeddedResource Include="resources\oox2odf\headers.xsl" />
     <EmbeddedResource Include="resources\oox2odf\picture.xsl" />
+	<EmbeddedResource Include="resources\oox2odf\chart.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
     <Compile Include="OoxHeaderFooterPostProcessor.cs" />
   </ItemGroup>
