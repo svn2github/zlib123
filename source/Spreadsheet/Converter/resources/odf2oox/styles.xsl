@@ -55,7 +55,7 @@
       <xsl:call-template name="InsertBorders"/>
       <xsl:call-template name="InsertCellFormats"/>
       <xsl:call-template name="InsertCellStyles"/>
-      <xsl:call-template name="InsertFormats"/>
+      <xsl:call-template name="InsertConditionalFormat"/>
       <xsl:call-template name="InsertTableStyles"/>
     </styleSheet>
   </xsl:template>
@@ -314,12 +314,17 @@
   </xsl:template>
 
   <xsl:template match="style:table-cell-properties" mode="background-color">
+    <xsl:param name="Object"/>
+    
     <fill>
       <xsl:choose>
         <xsl:when test="@fo:background-color and @fo:background-color != 'transparent'">
           <xsl:call-template name="GetCellColor">
-            <xsl:with-param name="color">
+            <xsl:with-param name="color">              
               <xsl:value-of select="substring-after(@fo:background-color, '#')"/>
+            </xsl:with-param>
+            <xsl:with-param name="Object">
+              <xsl:value-of select="$Object"/>
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
@@ -328,30 +333,54 @@
         </xsl:otherwise>
       </xsl:choose>
     </fill>
+    
   </xsl:template>
 
 
   <xsl:template name="GetCellColor">
     <xsl:param name="color"/>
+    <xsl:param name="Object"/>
     <xsl:choose>
-      <xsl:when test="$color">
-        <patternFill>
-          <xsl:attribute name="patternType">
-            <xsl:text>solid</xsl:text>
-          </xsl:attribute>
-          <fgColor>
-            <xsl:attribute name="rgb">
-              <xsl:value-of select="concat('FF', $color)"/>
-            </xsl:attribute>
-          </fgColor>
-          <bgColor>
-            <xsl:attribute name="indexed">
-              <xsl:text>64</xsl:text>
-            </xsl:attribute>
-          </bgColor>
-        </patternFill>
+      <xsl:when test="$Object = 'conditional'">
+        <xsl:choose>
+          <xsl:when test="$color">
+            <patternFill>
+              <xsl:attribute name="patternType">
+                <xsl:text>solid</xsl:text>
+              </xsl:attribute>
+              <bgColor>
+                <xsl:attribute name="rgb">
+                  <xsl:value-of select="concat('FF', $color)"/>
+                </xsl:attribute>
+              </bgColor>
+            </patternFill>
+          </xsl:when>
+        </xsl:choose>
       </xsl:when>
+      <xsl:otherwise>
+        <xsl:choose>
+          <xsl:when test="$color">
+            <patternFill>
+              <xsl:attribute name="patternType">
+                <xsl:text>solid</xsl:text>
+              </xsl:attribute>
+              <fgColor>
+                <xsl:attribute name="rgb">
+                  <xsl:value-of select="concat('FF', $color)"/>
+                </xsl:attribute>
+              </fgColor>
+              <bgColor>
+                <xsl:attribute name="indexed">
+                  <xsl:text>64</xsl:text>
+                </xsl:attribute>
+              </bgColor>
+            </patternFill>
+          </xsl:when>
+        </xsl:choose>    
+      </xsl:otherwise>
     </xsl:choose>
+    
+    
   </xsl:template>
 
   <xsl:template name="InsertBorders">
@@ -635,9 +664,7 @@
     </cellStyle>
   </xsl:template>
 
-  <xsl:template name="InsertFormats">
-    <dxfs count="0"/>
-  </xsl:template>
+  
 
   <xsl:template name="InsertTableStyles">
     <tableStyles count="0" defaultTableStyle="TableStyleMedium9"

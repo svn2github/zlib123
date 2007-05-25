@@ -43,6 +43,7 @@
   <xsl:import href="pixel-measure.xsl"/>
   <xsl:import href="page.xsl"/>
   <xsl:import href="border.xsl"/>
+  <xsl:import href="conditional.xsl"/>
 
   <xsl:key name="table-row" match="table:table-row" use=" '' "/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
@@ -149,6 +150,17 @@
       <xsl:call-template name="InsertPageProperties">
         <xsl:with-param name="pageStyle" select="$pageStyle"/>
       </xsl:call-template>
+      
+      <xsl:if test="ancestor::office:document-content/office:automatic-styles/style:style/style:map/@style:condition != ''">
+        <xsl:apply-templates select="table:table-row[1]" mode="conditional">
+          <xsl:with-param name="rowNumber">
+            <xsl:text>1</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="cellNumber">
+            <xsl:text>1</xsl:text>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:if>
 
       <xsl:call-template name="InsertHeaderFooter"/>
 
