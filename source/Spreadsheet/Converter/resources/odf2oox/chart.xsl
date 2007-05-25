@@ -39,13 +39,20 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
 
+  <!-- @Filename: chart.xsl -->
+  <!-- @Description: This stylesheet is used for charts conversion -->
+  <!-- @Created: 2007-05-24 -->    
+  
   <xsl:key name="rows" match="table:table-rows" use="''"/>
   <xsl:key name="header" match="table:table-header-rows" use="''"/>
   <xsl:key name="series" match="chart:series" use="''"/>
   <xsl:key name="style" match="style:style" use="@style:name"/>
 
   <xsl:template name="CreateChartFile">
-    <xsl:param name="sheetNum"/>
+    <!-- @Description: Searches for all charts within sheet and creates output chart files. -->  
+    <!-- @Context: table:table -->
+    
+    <xsl:param name="sheetNum"/><!-- (number) sheet number -->
 
     <xsl:for-each
       select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
@@ -111,12 +118,12 @@
                   <c:barDir val="col"/>
                   <c:grouping val="clustered"/>
 
-                  <xsl:variable name="numSeries">
+                  <xsl:variable name="numSeries"> <!-- (number) number of series inside chart -->
                     <xsl:value-of
                       select="count(key('rows','')/table:table-row[1]/table:table-cell) - 1"/>
                   </xsl:variable>
 
-                  <xsl:variable name="numPoints">
+                  <xsl:variable name="numPoints"> <!-- (number) maximum number of data point -->
                     <xsl:value-of select="count(key('rows','')/table:table-row)"/>
                   </xsl:variable>
 
@@ -305,9 +312,12 @@
   </xsl:template>
 
   <xsl:template name="InsertSeries">
-    <xsl:param name="numSeries"/>
-    <xsl:param name="numPoints"/>
-    <xsl:param name="count" select="0"/>
+    <!-- @Description: Outputs chart series and their values -->  
+    <!-- @Context: table:table-rows -->
+    
+    <xsl:param name="numSeries"/> <!-- (number) number of series inside chart -->
+    <xsl:param name="numPoints"/> <!-- (number) maximum number of data point -->
+    <xsl:param name="count" select="0"/> <!-- (number) loop counter -->
 
     <xsl:choose>
       <xsl:when test="$count &lt; $numSeries">
@@ -329,7 +339,7 @@
           <c:spPr>
             <a:solidFill>
               <a:srgbClr val="9999FF">
-                <xsl:variable name="styleName">
+                <xsl:variable name="styleName"> <!-- (string) series style name -->
                   <xsl:value-of select="key('series','')[$count + 1]/@chart:style-name"/>
                 </xsl:variable>
                 <xsl:attribute name="val">
@@ -374,6 +384,9 @@
   </xsl:template>
 
   <xsl:template name="InsertPoints">
+    <!-- @Description: Outputs series data points -->  
+    <!-- @Context: table:table-rows -->
+    
     <xsl:param name="series"/>
 
     <xsl:for-each select="table:table-row">
@@ -389,6 +402,9 @@
   </xsl:template>
 
   <xsl:template name="InsertCategories">
+    <!-- @Description: Outputs categories names-->  
+    <!-- @Context: table:table-rows -->
+    
     <xsl:param name="numCategories"/>
 
     <!-- categories names -->
@@ -396,7 +412,7 @@
       <c:strLit>
         <c:ptCount val="{$numCategories}"/>
 
-        <xsl:for-each select="key('rows','')/table:table-row">
+        <xsl:for-each select="table:table-row">
           <c:pt idx="{position() - 1}">
             <c:v>
               <xsl:value-of select="table:table-cell[1]/text:p"/>
@@ -407,7 +423,5 @@
       </c:strLit>
     </c:cat>
   </xsl:template>
-
-  <xsl:template name="InsertTitle"> </xsl:template>
 
 </xsl:stylesheet>
