@@ -45,38 +45,42 @@
 
   <!-- @Filename: chart.xsl -->
   <!-- @Description: This stylesheet is used for charts conversion -->
-  <!-- @Created: 2007-05-24 -->    
-  
+  <!-- @Created: 2007-05-24 -->
+
   <xsl:import href="relationships.xsl"/>
 
   <xsl:key name="dataSeries" match="c:ser" use="''"/>
   <xsl:key name="numPoints" match="c:numCache/c:ptCount" use="''"/>
   <xsl:key name="categories" match="c:cat" use="''"/>
-  
+  <xsl:key name="plotArea" match="c:plotArea" use="''"/>
+
   <xsl:template name="CreateCharts">
-    <!-- @Description: Searches for all charts within workbook and starts conversion. -->  
+    <!-- @Description: Searches for all charts within workbook and starts conversion. -->
     <!-- @Context: None -->
-    
+
     <!-- get all sheet Id's -->
     <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
 
-      <xsl:variable name="sheet">    <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
+      <xsl:variable name="sheet">
+        <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
         <xsl:call-template name="GetTarget">
           <xsl:with-param name="id">
             <xsl:value-of select="@r:id"/>
           </xsl:with-param>
           <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
         </xsl:call-template>
-      </xsl:variable>      
+      </xsl:variable>
 
-      <xsl:variable name="sheetNum">  <!-- sheet number -->
+      <xsl:variable name="sheetNum">
+        <!-- sheet number -->
         <xsl:value-of select="position()"/>
       </xsl:variable>
 
       <!-- go to sheet file and search for drawing -->
       <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:drawing">
 
-        <xsl:variable name="drawing">  <!-- path to drawing file from xl/ catalog (i.e. $drawing = ../drawings/drawing2.xml) -->
+        <xsl:variable name="drawing">
+          <!-- path to drawing file from xl/ catalog (i.e. $drawing = ../drawings/drawing2.xml) -->
           <xsl:call-template name="GetTarget">
             <xsl:with-param name="id">
               <xsl:value-of select="@r:id"/>
@@ -86,12 +90,13 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
-        
+
         <!-- go to sheet drawing file and search for charts -->
         <xsl:for-each
           select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
 
-          <xsl:variable name="chart">   <!-- path to chart file from xl/ catalog (i.e. $chart = ../charts/chart1.xml) -->
+          <xsl:variable name="chart">
+            <!-- path to chart file from xl/ catalog (i.e. $chart = ../charts/chart1.xml) -->
             <xsl:call-template name="GetTarget">
               <xsl:with-param name="id">
                 <xsl:value-of select="@r:id"/>
@@ -101,8 +106,9 @@
               </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
-          
-          <xsl:variable name="chartId">  <!-- unique chart identifier -->
+
+          <xsl:variable name="chartId">
+            <!-- unique chart identifier -->
             <xsl:value-of select="generate-id(.)"/>
           </xsl:variable>
 
@@ -121,10 +127,11 @@
   </xsl:template>
 
   <xsl:template name="InsertChart">
-    <!-- @Description: Creates output chart files -->  
-    <!-- @Context: None -->
-    
-    <xsl:param name="chartId"/> <!-- (string) unique chart identifier -->
+    <!-- @Description: Creates output chart files -->
+    <!-- @Context: Input chart file root -->
+
+    <xsl:param name="chartId"/>
+    <!-- (string) unique chart identifier -->
 
     <xsl:call-template name="InsertChartContent">
       <xsl:with-param name="chartId" select="$chartId"/>
@@ -136,10 +143,11 @@
   </xsl:template>
 
   <xsl:template name="InsertChartContent">
-    <!-- @Description: Creates output chart content file -->  
-    <!-- @Context: None -->
-    
-    <xsl:param name="chartId"/>  <!-- (string) unique chart identifier -->
+    <!-- @Description: Creates output chart content file -->
+    <!-- @Context: Input chart file root -->
+
+    <xsl:param name="chartId"/>
+    <!-- (string) unique chart identifier -->
 
     <pzip:entry pzip:target="{concat('Object ',$chartId,'/content.xml')}">
       <office:document-content xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
@@ -251,31 +259,7 @@
         </office:automatic-styles>
         <office:body>
           <office:chart>
-            <chart:chart svg:width="8cm" svg:height="7cm" chart:class="chart:bar"
-              chart:style-name="ch1">
-
-              <xsl:call-template name="InsertTitle"/>
-              <xsl:call-template name="InsertLegend"/>
-
-              <chart:plot-area chart:style-name="ch4" table:cell-range-address="Sheet1.$D$3:.$F$3"
-                chart:table-number-list="0" svg:x="0.16cm" svg:y="0.937cm" svg:width="5.98cm"
-                svg:height="5.923cm">
-                
-                <xsl:call-template name="InsertXAxis"/>
-                
-                <chart:axis chart:dimension="y" chart:name="primary-y" chart:style-name="ch6">
-                  <chart:grid chart:class="major"/>
-                </chart:axis>
-
-                <xsl:call-template name="InsertDataSeries"/>
-
-                <chart:wall chart:style-name="ch10"/>
-                <chart:floor chart:style-name="ch11"/>
-              </chart:plot-area>
-
-              <xsl:call-template name="InsertChartTable"/>
-
-            </chart:chart>
+            <xsl:call-template name="InsertChartType"/>
           </office:chart>
         </office:body>
       </office:document-content>
@@ -284,10 +268,11 @@
   </xsl:template>
 
   <xsl:template name="InsertChartStyles">
-    <!-- @Description: Creates output chart styles file -->  
-    <!-- @Context: None -->
-    
-    <xsl:param name="chartId"/> <!-- unique chart identifier -->
+    <!-- @Description: Creates output chart styles file -->
+    <!-- @Context: Input chart file root -->
+
+    <xsl:param name="chartId"/>
+    <!-- unique chart identifier -->
 
     <pzip:entry pzip:target="{concat('Object ',$chartId,'/styles.xml')}">
       <office:document-styles>
@@ -297,9 +282,9 @@
   </xsl:template>
 
   <xsl:template name="InsertDataSeries">
-    <!-- @Description: Outputs chart data series  -->  
+    <!-- @Description: Outputs chart data series  -->
     <!-- @Context: inside input chart file -->
-    
+
     <xsl:for-each select="key('dataSeries','')">
       <!-- TO DO chart:style-name -->
       <chart:series chart:style-name="{concat('ch',6+position())}">
@@ -313,9 +298,9 @@
   </xsl:template>
 
   <xsl:template name="InsertChartTable">
-    <!-- @Description: Outputs chart data table containing visualized values  -->  
+    <!-- @Description: Outputs chart data table containing visualized values  -->
     <!-- @Context: inside input chart file -->
-    
+
     <table:table table:name="local-table">
       <table:table-header-columns>
         <table:table-column/>
@@ -330,7 +315,8 @@
       <table:table-rows>
         <xsl:call-template name="InsertDataRows">
           <xsl:with-param name="points" select="key('numPoints','')/@val"/>
-          <xsl:with-param name="categories" select="key('categories','')/descendant::c:ptCount/@val"/>
+          <xsl:with-param name="categories" select="key('categories','')/descendant::c:ptCount/@val"
+          />
         </xsl:call-template>
       </table:table-rows>
 
@@ -338,9 +324,9 @@
   </xsl:template>
 
   <xsl:template name="InsertHeaderRows">
-    <!-- @Description: Outputs series names -->  
+    <!-- @Description: Outputs series names -->
     <!-- @Context: inside input chart file -->
-    
+
     <table:table-row>
       <table:table-cell>
         <text:p/>
@@ -363,12 +349,15 @@
   </xsl:template>
 
   <xsl:template name="InsertDataRows">
-    <!-- @Description: Outputs chart data values -->  
+    <!-- @Description: Outputs chart data values -->
     <!-- @Context: inside input chart file -->
-    
-    <xsl:param name="points"/> <!-- (number) maximum number of data points in series -->
-    <xsl:param name="categories"/><!-- (number) number of categories -->
-    <xsl:param name="count" select="0"/><!-- (number) loop counter -->
+
+    <xsl:param name="points"/>
+    <!-- (number) maximum number of data points in series -->
+    <xsl:param name="categories"/>
+    <!-- (number) number of categories -->
+    <xsl:param name="count" select="0"/>
+    <!-- (number) loop counter -->
 
     <xsl:choose>
       <xsl:when test="$count &lt; $points">
@@ -376,23 +365,23 @@
           <!-- category name -->
           <table:table-cell office:value-type="string">
             <text:p>
-             <xsl:choose>
+              <xsl:choose>
                 <xsl:when test="not($categories)">
-                  <xsl:value-of select="$count + 1"/>    
+                  <xsl:value-of select="$count + 1"/>
                 </xsl:when>
-               <xsl:when test="$count &lt; $categories">
-                 <xsl:value-of select="key('categories','')/descendant::c:pt[@idx= $count]"/>
-               </xsl:when>
-              </xsl:choose>              
+                <xsl:when test="$count &lt; $categories">
+                  <xsl:value-of select="key('categories','')/descendant::c:pt[@idx= $count]"/>
+                </xsl:when>
+              </xsl:choose>
             </text:p>
           </table:table-cell>
-          
+
           <!-- category values -->
           <xsl:call-template name="InsertValues">
             <xsl:with-param name="point" select="$count"/>
           </xsl:call-template>
         </table:table-row>
-        
+
         <xsl:call-template name="InsertDataRows">
           <xsl:with-param name="points" select="$points"/>
           <xsl:with-param name="categories" select="$categories"/>
@@ -404,10 +393,11 @@
   </xsl:template>
 
   <xsl:template name="InsertValues">
-    <!-- @Description: Outputs chart data values for selected series -->  
+    <!-- @Description: Outputs chart data values for selected series -->
     <!-- @Context: inside input chart file -->
-    
-    <xsl:param name="point"/><!-- (number) series number -->
+
+    <xsl:param name="point"/>
+    <!-- (number) series number -->
 
     <xsl:for-each select="key('dataSeries','')">
       <xsl:choose>
@@ -429,9 +419,9 @@
   </xsl:template>
 
   <xsl:template name="InsertTitle">
-    <!-- @Description: Outputs chart title -->  
+    <!-- @Description: Outputs chart title -->
     <!-- @Context: input chart file root -->
-    
+
     <xsl:for-each select="c:chartSpace/c:chart/c:title">
       <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="ch2">
         <!-- TO DO: paragraph and run interpretation -->
@@ -443,25 +433,97 @@
   </xsl:template>
 
   <xsl:template name="InsertLegend">
-    <!-- @Description: Outputs chart legend -->  
+    <!-- @Description: Outputs chart legend -->
     <!-- @Context: input chart file root -->
-    
+
     <xsl:for-each select="c:chartSpace/c:chart/c:legend">
       <chart:legend chart:legend-position="end" svg:x="6.459cm" svg:y="3.005cm"
         chart:style-name="ch3"/>
     </xsl:for-each>
   </xsl:template>
 
-<xsl:template name="InsertXAxis">
-  <!-- @Description: Outputs chart X Axis -->  
-  <!-- @Context: inside input chart file -->
-  
-  <chart:axis chart:dimension="x" chart:name="primary-x" chart:style-name="ch5">
-    <chart:categories>
-      <xsl:attribute name="table:cell-range-address">
-        <xsl:value-of select="concat('local-table.A2:.A',1 + key('numPoints','')/@val)"/>
+  <xsl:template name="InsertXAxis">
+    <!-- @Description: Outputs chart X Axis -->
+    <!-- @Context: inside input chart file -->
+
+    <chart:axis chart:dimension="x" chart:name="primary-x" chart:style-name="ch5">
+      <chart:categories>
+        <xsl:attribute name="table:cell-range-address">
+          <xsl:value-of select="concat('local-table.A2:.A',1 + key('numPoints','')/@val)"/>
+        </xsl:attribute>
+      </chart:categories>
+    </chart:axis>
+  </xsl:template>
+
+  <xsl:template name="InsertChartType">
+    <!-- @Description: Inserts desired type of chart -->
+    <!-- @Context: input chart file root -->
+
+    <chart:chart svg:width="8cm" svg:height="7cm" chart:class="chart:bar" chart:style-name="ch1">
+
+      <xsl:attribute name="chart:class">
+        <xsl:choose>
+          <xsl:when test="key('plotArea','')/c:barChart or key('plotArea','')/c:bar3DChart">
+            <xsl:text>chart:bar</xsl:text>
+          </xsl:when>
+
+          <xsl:when test="key('plotArea','')/c:lineChart or key('plotArea','')/c:line3DChart">
+            <xsl:text>chart:line</xsl:text>
+          </xsl:when>
+
+          <xsl:when test="key('plotArea','')/c:areaChart or key('plotArea','')/c:area3DChart">
+            <xsl:text>chart:area</xsl:text>
+          </xsl:when>
+
+          <!--  or key('plotArea','')/c:ofPieChart or key('plotArea','')/c:doughnutChart -->
+          <xsl:when test="key('plotArea','')/c:pieChart or key('plotArea','')/c:pie3DChart">
+            <xsl:text>chart:circle</xsl:text>
+          </xsl:when>
+
+          <!-- making problems at his time -->
+          <!--
+            <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
+              <xsl:text>chart:scatter<xsl:text>
+            </xsl:when>
+        
+            <xsl:when test="key('plotArea','')/c:radarChart">
+            <xsl:text>chart:radar<xsl:text>
+            </xsl:when>
+            
+            <xsl:when test="key('plotArea','')/c:stockChart">
+            <xsl:text>chart:stock<xsl:text>
+            </xsl:when>
+            
+            SURFACE ???
+-->            
+          <xsl:otherwise>
+            <xsl:text>chart:bar</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
-    </chart:categories>    
-  </chart:axis>  
-</xsl:template>
+
+      <xsl:call-template name="InsertTitle"/>
+      <xsl:call-template name="InsertLegend"/>
+
+      <chart:plot-area chart:style-name="ch4" table:cell-range-address="Sheet1.$D$3:.$F$3"
+        chart:table-number-list="0" svg:x="0.16cm" svg:y="0.937cm" svg:width="5.98cm"
+        svg:height="5.923cm">
+
+        <xsl:call-template name="InsertXAxis"/>
+
+        <chart:axis chart:dimension="y" chart:name="primary-y" chart:style-name="ch6">
+          <chart:grid chart:class="major"/>
+        </chart:axis>
+
+        <xsl:call-template name="InsertDataSeries"/>
+
+        <chart:wall chart:style-name="ch10"/>
+        <chart:floor chart:style-name="ch11"/>
+      </chart:plot-area>
+
+      <xsl:call-template name="InsertChartTable"/>
+
+    </chart:chart>
+  </xsl:template>
+
 </xsl:stylesheet>
