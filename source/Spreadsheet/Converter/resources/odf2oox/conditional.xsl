@@ -38,7 +38,7 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table r">
 
 
-  <!-- insert row into sheet -->
+  <!-- search coditional -->
   <xsl:template match="table:table-row" mode="conditional">
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>    
@@ -113,7 +113,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- insert cell into row -->
+  <!-- insert coditional -->
   <xsl:template match="table:table-cell|table:covered-table-cell" mode="conditional">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
@@ -137,11 +137,34 @@
           </xsl:for-each>
         </xsl:attribute>
         <xsl:attribute name="operator">
-          <xsl:text>equal</xsl:text>
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '&lt;=')">
+              <xsl:text>lessThanOrEqual</xsl:text>
+            </xsl:when>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '&lt;')">
+              <xsl:text>lessThan</xsl:text>
+            </xsl:when>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '&gt;=')">
+              <xsl:text>greaterThanOrEqual</xsl:text>
+            </xsl:when>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '&gt;')">
+              <xsl:text>greaterThan</xsl:text>
+            </xsl:when>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '!=')">
+              <xsl:text>notEqual</xsl:text>
+            </xsl:when>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, 'cell-content-is-between')">
+              <xsl:text>between</xsl:text>
+            </xsl:when>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, 'cell-content-is-not-between')">
+              <xsl:text>notBetween</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>equal</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
-        <formula>
-          <xsl:value-of select="substring-after(key('style', @table:style-name)/style:map/@style:condition, '=')"/>
-        </formula>
+       <xsl:call-template name="InsertCoditionalFormula"/>
       </cfRule>
     </conditionalFormatting>
     </xsl:if>
@@ -166,6 +189,8 @@
     
   </xsl:template>
   
+  <!-- Coditional Format -->
+  
   <xsl:template name="InsertConditionalFormat">
     <dxfs count="3">
       <dxf>
@@ -181,10 +206,7 @@
         </fill>
       </dxf>
       <xsl:for-each
-        select="document('content.xml')/office:document-content/office:automatic-styles/style:style[style:map/@style:condition]">
-        <!--xsl:call-template name="InsertTextProperties">
-          <xsl:with-param name="mode">default</xsl:with-param>
-          </xsl:call-template-->
+        select="document('content.xml')/office:document-content/office:automatic-styles/style:style[style:map/@style:condition]">     
         <xsl:variable name="StyleApplyStyleName">
           <xsl:value-of select="style:map/@style:apply-style-name"/>
         </xsl:variable>
@@ -212,6 +234,129 @@
       </xsl:for-each>
    
     </dxfs>
+  </xsl:template>
+  
+  <!-- Insert Formula of Coditional -->
+  
+  <xsl:template name="InsertCoditionalFormula">
+    <xsl:choose>
+      <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '&lt;=')">
+        <formula>  
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(key('style', @table:style-name)/style:map/@style:condition, '=')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </formula>
+      </xsl:when>
+      <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '&lt;')">
+        <formula>              
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(key('style', @table:style-name)/style:map/@style:condition, '&lt;')"/>
+            </xsl:otherwise>
+          </xsl:choose>          
+        </formula>
+      </xsl:when>
+      <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '&gt;=')">
+        <formula>              
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(key('style', @table:style-name)/style:map/@style:condition, '=')"/>              
+            </xsl:otherwise>
+          </xsl:choose>          
+        </formula>            
+      </xsl:when>
+      <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '&gt;')">
+        <formula>       
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(key('style', @table:style-name)/style:map/@style:condition, '&gt;')"/>              
+            </xsl:otherwise>
+          </xsl:choose>
+        </formula>            
+      </xsl:when>
+      <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '!=')">
+        <formula>              
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(key('style', @table:style-name)/style:map/@style:condition, '=')"/>              
+            </xsl:otherwise>
+          </xsl:choose>          
+        </formula>            
+      </xsl:when>
+      <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, 'cell-content-is-between')">
+        <formula>       
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '('), ',')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </formula>   
+        <formula>           
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, ','), ')')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </formula>            
+      </xsl:when>
+      <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, 'cell-content-is-not-between')">
+        <formula>    
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '('), ',')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </formula>   
+        <formula>              
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, ','), ')')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </formula>  
+      </xsl:when>
+      <xsl:otherwise>
+        <formula> 
+          <xsl:choose>
+            <xsl:when test="contains(key('style', @table:style-name)/style:map/@style:condition, '[')">
+              <xsl:value-of select="substring-after(substring-before(substring-after(key('style', @table:style-name)/style:map/@style:condition, '['), ']'), '.')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(key('style', @table:style-name)/style:map/@style:condition, '=')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </formula>
+      </xsl:otherwise>
+    </xsl:choose>        
   </xsl:template>
 
   
