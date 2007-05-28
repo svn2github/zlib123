@@ -242,6 +242,7 @@
   </xsl:template>
 
   <xsl:template name="InsertAdditionalProperties">
+
     <c:dispBlanksAs val="gap"/>
   </xsl:template>
 
@@ -252,9 +253,29 @@
     <xsl:choose>
       <xsl:when test="@chart:class='chart:bar' ">
         <c:barChart>
-          <c:barDir val="col"/>
-          <c:grouping val="clustered"/>
+
+          <!-- bar or column chart -->
+          <xsl:choose>
+            <xsl:when
+              test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'false' ">
+              <c:barDir val="col"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <c:barDir val="bar"/>
+            </xsl:otherwise>
+          </xsl:choose>
+
+          <xsl:call-template name="SetDataGrouping"/>
           <xsl:call-template name="InsertChartContent"/>
+
+          <!-- set overlap for stecked data charts -->
+          <xsl:for-each
+            select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
+            <xsl:if test="@chart:stacked = 'true' or @chart:percentage = 'true' ">
+              <c:overlap val="100"/>
+            </xsl:if>
+          </xsl:for-each>
+
         </c:barChart>
       </xsl:when>
 
@@ -327,12 +348,43 @@
       <xsl:value-of select="count(key('rows','')/table:table-row)"/>
     </xsl:variable>
 
+    <xsl:variable name="reverseCategories">
+      <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
+        <xsl:choose>
+          <xsl:when
+            test="@chart:vertical = 'true' ">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>text</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="reverseSeries">
+      <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
+        <xsl:choose>
+          <xsl:when
+            test="@chart:vertical = 'true' and not(@chart:stacked = 'true' or @chart:percentage = 'true' )">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>text</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:variable>
+
     <xsl:for-each select="key('rows','')">
       <xsl:call-template name="InsertSeries">
         <xsl:with-param name="numSeries" select="$numSeries"/>
         <xsl:with-param name="numPoints" select="$numPoints"/>
+        <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
+        <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
       </xsl:call-template>
     </xsl:for-each>
+
 
     <c:axId val="110226048"/>
     <c:axId val="110498176"/>
@@ -449,6 +501,9 @@
     <!-- (number) maximum number of data point -->
     <xsl:param name="count" select="0"/>
     <!-- (number) loop counter -->
+    <xsl:param name="reverseSeries"/>
+    <!-- (string) is chart vertically aligned -->
+    <xsl:param name="reverseCategories"/>
 
     <xsl:choose>
       <xsl:when test="$count &lt; $numSeries">
@@ -459,7 +514,17 @@
           <!-- series name -->
           <c:tx>
             <c:v>
-              <xsl:value-of select="key('header','')/table:table-row/table:table-cell[$count + 2]"/>
+              <xsl:choose>
+                <xsl:when test="$reverseSeries = 'true' ">
+                  <xsl:value-of
+                    select="key('header','')/table:table-row/table:table-cell[$numSeries + 1 - $count]"
+                  />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of
+                    select="key('header','')/table:table-row/table:table-cell[$count + 2]"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </c:v>
           </c:tx>
 
@@ -477,7 +542,15 @@
                   <a:srgbClr val="9999FF">
                     <xsl:variable name="styleName">
                       <!-- (string) series style name -->
-                      <xsl:value-of select="key('series','')[$count + 1]/@chart:style-name"/>
+                      <xsl:choose>
+                        <xsl:when test="$reverseSeries = 'true' ">
+                          <xsl:value-of
+                            select="key('series','')[$numSeries - $count ]/@chart:style-name"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="key('series','')[$count + 1]/@chart:style-name"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:variable>
                     <xsl:attribute name="val">
                       <xsl:value-of
@@ -496,9 +569,29 @@
             </xsl:choose>
           </c:spPr>
 
-          <xsl:call-template name="InsertCategories">
-            <xsl:with-param name="numCategories" select="$numPoints"/>
-          </xsl:call-template>
+          <!-- insert data categories -->
+          <c:cat>
+            <c:strLit>
+              <c:ptCount val="{$numPoints}"/>
+              <xsl:choose>
+                <xsl:when test="$reverseCategories = 'true' ">
+                  <xsl:for-each select="key('rows','')">
+                    <xsl:call-template name="InsertCategoriesReverse">
+                      <xsl:with-param name="numCategories" select="$numPoints"/>
+                    </xsl:call-template>
+                  </xsl:for-each>
+                </xsl:when>
+
+                <xsl:otherwise>
+                  <xsl:for-each select="key('rows','')">
+                    <xsl:call-template name="InsertCategories">
+                      <xsl:with-param name="numCategories" select="$numPoints"/>
+                    </xsl:call-template>
+                  </xsl:for-each>
+                </xsl:otherwise>
+              </xsl:choose>
+            </c:strLit>
+          </c:cat>
 
           <!-- series values -->
           <c:val>
@@ -509,10 +602,39 @@
                 <c:formatCode>General</c:formatCode>
                 <c:ptCount val="{$numPoints}"/>
 
-                <xsl:call-template name="InsertPoints">
-                  <xsl:with-param name="series" select="$count"/>
-                </xsl:call-template>
+                <!-- number of this series -->
+                <xsl:variable name = "thisSeries">
+                  <xsl:choose>
+                    <!-- when $reverseSeries = 'true' then count backwards -->
+                    <xsl:when test="$reverseSeries = 'true' ">
+                      <xsl:value-of select="$numSeries - 1 - $count"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$count"/>
+                    </xsl:otherwise>
+                  </xsl:choose>                  
+                </xsl:variable>
+                
+                <xsl:for-each select="ancestor::chart:chart">
+                  <xsl:choose>
+                    <xsl:when test="$reverseCategories = 'true' ">
+                      <xsl:for-each select="key('rows','')">
+                        <xsl:call-template name="InsertPointsReverse">
+                          <xsl:with-param name="series" select="$thisSeries"/>
+                          <xsl:with-param name="numCategories" select="$numPoints"/>
+                        </xsl:call-template>
+                      </xsl:for-each>
+                    </xsl:when>
 
+                    <xsl:otherwise>
+                      <xsl:for-each select="key('rows','')">
+                        <xsl:call-template name="InsertPoints">
+                          <xsl:with-param name="series" select="$count"/>
+                        </xsl:call-template>
+                      </xsl:for-each>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:for-each>
               </c:numCache>
             </c:numRef>
           </c:val>
@@ -522,6 +644,8 @@
           <xsl:with-param name="numSeries" select="$numSeries"/>
           <xsl:with-param name="numPoints" select="$numPoints"/>
           <xsl:with-param name="count" select="$count + 1"/>
+          <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
+          <xsl:with-param name="reverseCategories" select="$reverseCategories"/>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
@@ -546,6 +670,37 @@
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template name="InsertPointsReverse">
+    <!-- @Description: Outputs series data points -->
+    <!-- @Context: table:table-rows -->
+
+    <xsl:param name="series"/>
+    <xsl:param name="numCategories"/>
+    <xsl:param name="count" select="0"/>
+
+    <xsl:choose>
+      <xsl:when test="$count &lt; $numCategories">
+        <xsl:for-each select="table:table-row[$numCategories - $count]">
+          <xsl:if test="table:table-cell[$series + 2]/text:p != '1.#NAN' ">
+            <c:pt idx="{$count}">
+              <c:v>
+                <!-- $ series + 2 because position starts with 1 and we skip first cell -->
+                <xsl:value-of select="table:table-cell[$series + 2]/text:p"/>
+              </c:v>
+            </c:pt>
+          </xsl:if>
+        </xsl:for-each>
+
+        <xsl:call-template name="InsertPointsReverse">
+          <xsl:with-param name="series" select="$series"/>
+          <xsl:with-param name="numCategories" select="$numCategories"/>
+          <xsl:with-param name="count" select="$count + 1"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+
   <xsl:template name="InsertCategories">
     <!-- @Description: Outputs categories names-->
     <!-- @Context: table:table-rows -->
@@ -553,20 +708,59 @@
     <xsl:param name="numCategories"/>
 
     <!-- categories names -->
-    <c:cat>
-      <c:strLit>
-        <c:ptCount val="{$numCategories}"/>
+    <xsl:for-each select="table:table-row">
+      <c:pt idx="{position() - 1}">
+        <c:v>
+          <xsl:value-of select="table:table-cell[1]/text:p"/>
+        </c:v>
+      </c:pt>
+    </xsl:for-each>
+  </xsl:template>
 
-        <xsl:for-each select="table:table-row">
-          <c:pt idx="{position() - 1}">
+  <xsl:template name="InsertCategoriesReverse">
+    <!-- @Description: Outputs categories names-->
+    <!-- @Context: table:table-rows -->
+
+    <xsl:param name="numCategories"/>
+    <xsl:param name="count" select="0"/>
+
+    <!-- categories names -->
+    <xsl:choose>
+      <xsl:when test="$count &lt; $numCategories">
+        <xsl:for-each select="table:table-row[$numCategories - $count]">
+          <c:pt idx="{$count}">
             <c:v>
               <xsl:value-of select="table:table-cell[1]/text:p"/>
             </c:v>
           </c:pt>
         </xsl:for-each>
 
-      </c:strLit>
-    </c:cat>
+        <xsl:call-template name="InsertCategoriesReverse">
+          <xsl:with-param name="numCategories" select="$numCategories"/>
+          <xsl:with-param name="count" select="$count + 1"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="SetDataGrouping">
+    <!-- @Description: Sets data grouping type -->
+    <!-- @Context: chart:chart -->
+
+    <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
+      <xsl:choose>
+        <xsl:when test="@chart:stacked = 'true' ">
+          <c:grouping val="stacked"/>
+        </xsl:when>
+        <xsl:when test="@chart:percentage = 'true' ">
+          <c:grouping val="percentStacked"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <c:grouping val="clustered"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>
