@@ -36,6 +36,7 @@
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0">
 
@@ -267,11 +268,11 @@
 
           <c:grouping val="clustered">
             <xsl:call-template name="SetDataGroupingAtribute"/>
-          </c:grouping>          
-          
+          </c:grouping>
+
           <xsl:call-template name="InsertChartContent"/>
 
-          <!-- set overlap for stecked data charts -->
+          <!-- set overlap for stacked data charts -->
           <xsl:for-each
             select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
             <xsl:if test="@chart:stacked = 'true' or @chart:percentage = 'true' ">
@@ -284,7 +285,11 @@
 
       <xsl:when test="@chart:class='chart:line' ">
         <c:lineChart>
-          <c:grouping val="standard"/>
+
+          <c:grouping val="standard">
+            <xsl:call-template name="SetDataGroupingAtribute"/>
+          </c:grouping>
+
           <xsl:call-template name="InsertChartContent"/>
         </c:lineChart>
       </xsl:when>
@@ -294,8 +299,8 @@
 
           <c:grouping val="standard">
             <xsl:call-template name="SetDataGroupingAtribute"/>
-          </c:grouping>          
-          
+          </c:grouping>
+
           <xsl:call-template name="InsertChartContent"/>
         </c:areaChart>
       </xsl:when>
@@ -497,7 +502,8 @@
 
       <!-- cross type -->
       <xsl:choose>
-        <xsl:when test="key('chart','')/@chart:class='chart:area' ">
+        <xsl:when
+          test="key('chart','')/@chart:class='chart:area' or key('chart','')/@chart:class='chart:line' ">
           <c:crossBetween val="midCat"/>
         </xsl:when>
         <xsl:otherwise>
@@ -546,46 +552,11 @@
             </c:v>
           </c:tx>
 
-          <!-- series shape property -->
-          <c:spPr>
-            <xsl:choose>
-              <xsl:when test="key('chart','' )/@chart:class = 'chart:circle' ">
-                <a:ln w="28575">
-                  <a:noFill/>
-                </a:ln>
-              </xsl:when>
-
-              <xsl:otherwise>
-                <a:solidFill>
-                  <a:srgbClr val="9999FF">
-                    <xsl:variable name="styleName">
-                      <!-- (string) series style name -->
-                      <xsl:choose>
-                        <xsl:when test="$reverseSeries = 'true' ">
-                          <xsl:value-of
-                            select="key('series','')[$numSeries - $count ]/@chart:style-name"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of select="key('series','')[$count + 1]/@chart:style-name"/>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:variable>
-                    <xsl:attribute name="val">
-                      <xsl:value-of
-                        select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
-                      />
-                    </xsl:attribute>
-                  </a:srgbClr>
-                </a:solidFill>
-                <a:ln w="3175">
-                  <a:solidFill>
-                    <a:srgbClr val="000000"/>
-                  </a:solidFill>
-                  <a:prstDash val="solid"/>
-                </a:ln>
-              </xsl:otherwise>
-            </xsl:choose>
-          </c:spPr>
+          <xsl:call-template name="InsertSeriesShapeProperty">
+            <xsl:with-param name="totalSeries" select="$numSeries"/>
+            <xsl:with-param name="count" select="$count"/>
+            <xsl:with-param name="reverseSeries" select="$reverseSeries"/>
+          </xsl:call-template>
 
           <!-- insert data categories -->
           <c:cat>
@@ -621,7 +592,7 @@
                 <c:ptCount val="{$numPoints}"/>
 
                 <!-- number of this series -->
-                <xsl:variable name = "thisSeries">
+                <xsl:variable name="thisSeries">
                   <xsl:choose>
                     <!-- when $reverseSeries = 'true' then count backwards -->
                     <xsl:when test="$reverseSeries = 'true' ">
@@ -656,6 +627,17 @@
               </c:numCache>
             </c:numRef>
           </c:val>
+          
+          <!-- smooth line -->
+          <xsl:for-each select="ancestor::chart:chart">
+            <xsl:if test="@chart:class = 'chart:line' ">
+              <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
+                <xsl:if test="@chart:interpolation != 'none' ">
+                  <c:smooth val="1"/>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:if>
+            </xsl:for-each>
         </c:ser>
 
         <xsl:call-template name="InsertSeries">
@@ -774,6 +756,7 @@
             <xsl:text>stacked</xsl:text>
           </xsl:attribute>
         </xsl:when>
+
         <xsl:when test="@chart:percentage = 'true' ">
           <xsl:attribute name="val">
             <xsl:text>percentStacked</xsl:text>
@@ -781,7 +764,85 @@
         </xsl:when>
       </xsl:choose>
     </xsl:for-each>
+  </xsl:template>
 
+  <xsl:template name="InsertSeriesShapeProperty">
+    <xsl:param name="totalSeries"/>
+    <xsl:param name="count"/>
+    <xsl:param name="reverseSeries"/>
+
+    <!-- count series from backwards if reverseSeries is = "true" -->
+    <xsl:variable name="number">
+      <xsl:choose>
+        <xsl:when test="$reverseSeries = 'true' ">
+          <xsl:value-of select="$totalSeries - $count"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$count + 1"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- series shape property -->
+    <c:spPr>
+      <xsl:choose>
+        <xsl:when test="key('chart','' )/@chart:class = 'chart:circle' ">
+          <a:ln w="28575">
+            <a:noFill/>
+          </a:ln>
+        </xsl:when>
+
+        <xsl:otherwise>
+          <!-- fill color -->
+          <a:solidFill>
+            <a:srgbClr val="9999FF">
+              <xsl:variable name="styleName">
+                <!-- (string) series style name -->
+                <xsl:value-of select="key('series','')[position() = $number]/@chart:style-name"/>
+              </xsl:variable>
+              <xsl:attribute name="val">
+                <xsl:value-of
+                  select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
+                />
+              </xsl:attribute>
+            </a:srgbClr>
+          </a:solidFill>
+
+          <!-- line color -->
+          <a:ln w="3175">
+            <a:solidFill>
+              <a:srgbClr val="000000">
+                <xsl:variable name="styleName">
+                  <!-- (string) series style name -->
+                  <xsl:value-of
+                    select="key('series','')[position() = $number]/@chart:style-name"/>
+                </xsl:variable>
+                <xsl:attribute name="val">
+                  <xsl:value-of
+                    select="substring(key('style',$styleName)/style:graphic-properties/@svg:stroke-color,2)"
+                  />
+                </xsl:attribute>
+              </a:srgbClr>
+            </a:solidFill>
+            <a:prstDash val="solid"/>
+          </a:ln>
+        </xsl:otherwise>
+      </xsl:choose>
+    </c:spPr>
+
+    <!-- marker type -->
+    <xsl:if test="key('chart','' )/@chart:class = 'chart:line' ">
+      <xsl:for-each select="ancestor::chart:chart/chart:plot-area/chart:series[position() = $number]">
+        <xsl:choose>
+          <xsl:when
+            test="key('style',@chart:style-name )/style:chart-properties/@chart:symbol-type = 'none' ">
+            <c:marker>
+              <c:symbol val="none"/>
+            </c:marker>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>
