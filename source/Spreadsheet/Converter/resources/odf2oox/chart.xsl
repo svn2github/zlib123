@@ -265,7 +265,10 @@
             </xsl:otherwise>
           </xsl:choose>
 
-          <xsl:call-template name="SetDataGrouping"/>
+          <c:grouping val="clustered">
+            <xsl:call-template name="SetDataGroupingAtribute"/>
+          </c:grouping>          
+          
           <xsl:call-template name="InsertChartContent"/>
 
           <!-- set overlap for stecked data charts -->
@@ -288,7 +291,11 @@
 
       <xsl:when test="@chart:class='chart:area' ">
         <c:areaChart>
-          <c:grouping val="standard"/>
+
+          <c:grouping val="standard">
+            <xsl:call-template name="SetDataGroupingAtribute"/>
+          </c:grouping>          
+          
           <xsl:call-template name="InsertChartContent"/>
         </c:areaChart>
       </xsl:when>
@@ -351,12 +358,11 @@
     <xsl:variable name="reverseCategories">
       <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
         <xsl:choose>
-          <xsl:when
-            test="@chart:vertical = 'true' ">
+          <xsl:when test="@chart:vertical = 'true' ">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:text>text</xsl:text>
+            <xsl:text>false</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
@@ -366,11 +372,12 @@
       <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
         <xsl:choose>
           <xsl:when
-            test="@chart:vertical = 'true' and not(@chart:stacked = 'true' or @chart:percentage = 'true' )">
+            test="(@chart:vertical = 'true' and not(@chart:stacked = 'true' or @chart:percentage = 'true' )) or 
+            (key('chart','')/@chart:class = 'chart:area' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ))">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:text>text</xsl:text>
+            <xsl:text>false</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
@@ -487,7 +494,18 @@
       </c:txPr>
       <c:crossAx val="110226048"/>
       <c:crosses val="autoZero"/>
-      <c:crossBetween val="between"/>
+
+      <!-- cross type -->
+      <xsl:choose>
+        <xsl:when test="key('chart','')/@chart:class='chart:area' ">
+          <c:crossBetween val="midCat"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <c:crossBetween val="between"/>
+        </xsl:otherwise>
+      </xsl:choose>
+
+
     </c:valAx>
   </xsl:template>
 
@@ -612,9 +630,9 @@
                     <xsl:otherwise>
                       <xsl:value-of select="$count"/>
                     </xsl:otherwise>
-                  </xsl:choose>                  
+                  </xsl:choose>
                 </xsl:variable>
-                
+
                 <xsl:for-each select="ancestor::chart:chart">
                   <xsl:choose>
                     <xsl:when test="$reverseCategories = 'true' ">
@@ -629,7 +647,7 @@
                     <xsl:otherwise>
                       <xsl:for-each select="key('rows','')">
                         <xsl:call-template name="InsertPoints">
-                          <xsl:with-param name="series" select="$count"/>
+                          <xsl:with-param name="series" select="$thisSeries"/>
                         </xsl:call-template>
                       </xsl:for-each>
                     </xsl:otherwise>
@@ -744,23 +762,26 @@
 
   </xsl:template>
 
-  <xsl:template name="SetDataGrouping">
+  <xsl:template name="SetDataGroupingAtribute">
     <!-- @Description: Sets data grouping type -->
     <!-- @Context: chart:chart -->
 
+    <!-- choose data grouping -->
     <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
       <xsl:choose>
         <xsl:when test="@chart:stacked = 'true' ">
-          <c:grouping val="stacked"/>
+          <xsl:attribute name="val">
+            <xsl:text>stacked</xsl:text>
+          </xsl:attribute>
         </xsl:when>
         <xsl:when test="@chart:percentage = 'true' ">
-          <c:grouping val="percentStacked"/>
+          <xsl:attribute name="val">
+            <xsl:text>percentStacked</xsl:text>
+          </xsl:attribute>
         </xsl:when>
-        <xsl:otherwise>
-          <c:grouping val="clustered"/>
-        </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
+
   </xsl:template>
 
 </xsl:stylesheet>
