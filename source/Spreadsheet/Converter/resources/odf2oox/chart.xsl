@@ -183,6 +183,10 @@
 
       <xsl:call-template name="InsertChartType"/>
 
+      <xsl:if test="key('series','')[@chart:class]">
+        <xsl:call-template name="InsertSecondaryLineChart"/>
+      </xsl:if>
+
       <xsl:if test="not(@chart:class= 'chart:circle' )">
         <xsl:call-template name="InsertAxisX"/>
         <xsl:call-template name="InsertAxisY"/>
@@ -352,7 +356,7 @@
 
     <xsl:variable name="numSeries">
       <!-- (number) number of series inside chart -->
-      <xsl:value-of select="count(key('rows','')/table:table-row[1]/table:table-cell) - 1"/>
+      <xsl:value-of select="count(key('series','')[not(@chart:class='chart:line')])"/>
     </xsl:variable>
 
     <xsl:variable name="numPoints">
@@ -627,17 +631,18 @@
               </c:numCache>
             </c:numRef>
           </c:val>
-          
+
           <!-- smooth line -->
           <xsl:for-each select="ancestor::chart:chart">
             <xsl:if test="@chart:class = 'chart:line' ">
-              <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
+              <xsl:for-each
+                select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
                 <xsl:if test="@chart:interpolation != 'none' ">
                   <c:smooth val="1"/>
                 </xsl:if>
               </xsl:for-each>
             </xsl:if>
-            </xsl:for-each>
+          </xsl:for-each>
         </c:ser>
 
         <xsl:call-template name="InsertSeries">
@@ -814,8 +819,7 @@
               <a:srgbClr val="000000">
                 <xsl:variable name="styleName">
                   <!-- (string) series style name -->
-                  <xsl:value-of
-                    select="key('series','')[position() = $number]/@chart:style-name"/>
+                  <xsl:value-of select="key('series','')[position() = $number]/@chart:style-name"/>
                 </xsl:variable>
                 <xsl:attribute name="val">
                   <xsl:value-of
@@ -832,7 +836,8 @@
 
     <!-- marker type -->
     <xsl:if test="key('chart','' )/@chart:class = 'chart:line' ">
-      <xsl:for-each select="ancestor::chart:chart/chart:plot-area/chart:series[position() = $number]">
+      <xsl:for-each
+        select="ancestor::chart:chart/chart:plot-area/chart:series[position() = $number]">
         <xsl:choose>
           <xsl:when
             test="key('style',@chart:style-name )/style:chart-properties/@chart:symbol-type = 'none' ">
@@ -843,6 +848,139 @@
         </xsl:choose>
       </xsl:for-each>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertSecondaryLineChart">
+    <c:lineChart>
+      <c:grouping val="standard"/>
+
+      <xsl:call-template name="InsertSecondaryChartContent"/>
+
+    </c:lineChart>
+  </xsl:template>
+
+  <xsl:template name="InsertSecondaryChartContent">
+    <!-- @Description: Inserts chart content -->
+    <!-- @Context: chart:chart -->
+
+    <xsl:variable name="numSeries">
+      <!-- (number) number of series inside chart -->
+      <xsl:value-of select="count(key('series','')[@chart:class='chart:line'])"/>
+    </xsl:variable>
+
+    <xsl:variable name="numPoints">
+      <!-- (number) maximum number of data point -->
+      <xsl:value-of select="count(key('rows','')/table:table-row)"/>
+    </xsl:variable>
+
+    <xsl:variable name="primarySeries">
+      <xsl:value-of select="count(key('series','')[not(@chart:class='chart:line')])"/>
+    </xsl:variable>
+
+    <xsl:for-each select="key('rows','')">
+      <xsl:call-template name="InsertSecondaryChartSeries">
+        <xsl:with-param name="numSeries" select="$numSeries"/>
+        <xsl:with-param name="numPoints" select="$numPoints"/>
+        <xsl:with-param name="primarySeries" select="$primarySeries"/>
+      </xsl:call-template>
+    </xsl:for-each>
+
+    <c:axId val="110226048"/>
+    <c:axId val="110498176"/>
+
+  </xsl:template>
+
+  <xsl:template name="InsertSecondaryChartSeries">
+    <!-- @Description: Outputs chart series and their values -->
+    <!-- @Context: table:table-rows -->
+
+    <xsl:param name="numSeries"/>
+    <!-- (number) number of series inside chart -->
+    <xsl:param name="numPoints"/>
+    <!-- (number) maximum number of data point -->
+    <xsl:param name="primarySeries"/>
+    <xsl:param name="count" select="0"/>
+    <!-- (number) loop counter -->
+
+    <xsl:choose>
+      <xsl:when test="$count &lt; $numSeries">
+        <c:ser>
+          <c:idx val="{$primarySeries + $count}"/>
+          <c:order val="{$primarySeries + $count}"/>
+
+          <!-- series name -->
+          <c:tx>
+            <c:v>
+              <xsl:value-of
+                select="key('header','')/table:table-row/table:table-cell[$primarySeries + $count + 2]"
+              />
+            </c:v>
+          </c:tx>
+
+          <xsl:call-template name="InsertSeriesShapeProperty">
+            <xsl:with-param name="totalSeries" select="$numSeries"/>
+            <xsl:with-param name="count" select="$primarySeries + $count"/>
+          </xsl:call-template>
+
+          <!-- insert data categories -->
+          <c:cat>
+            <c:strLit>
+              <c:ptCount val="{$numPoints}"/>
+              <xsl:for-each select="key('rows','')">
+                <xsl:call-template name="InsertCategories">
+                  <xsl:with-param name="numCategories" select="$numPoints"/>
+                </xsl:call-template>
+              </xsl:for-each>
+            </c:strLit>
+          </c:cat>
+
+          <!-- series values -->
+          <c:val>
+            <c:numRef>
+              <!-- TO DO: reference to sheet cell -->
+              <!-- i.e. <c:f>Sheet1!$D$3:$D$4</c:f> -->
+              <c:numCache>
+                <c:formatCode>General</c:formatCode>
+                <c:ptCount val="{$numPoints}"/>
+
+                <!-- number of this series -->
+                <xsl:variable name="thisSeries">
+                  <xsl:value-of select="$primarySeries + $count"/>
+                </xsl:variable>
+
+                <xsl:for-each select="ancestor::chart:chart">
+                  <xsl:for-each select="key('rows','')">
+                    <xsl:call-template name="InsertPoints">
+                      <xsl:with-param name="series" select="$thisSeries"/>
+                    </xsl:call-template>
+                  </xsl:for-each>
+                </xsl:for-each>
+              </c:numCache>
+            </c:numRef>
+          </c:val>
+
+          <!-- smooth line -->
+          <xsl:for-each select="ancestor::chart:chart">
+            <xsl:if test="@chart:class = 'chart:line' ">
+              <xsl:for-each
+                select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
+                <xsl:if test="@chart:interpolation != 'none' ">
+                  <c:smooth val="1"/>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:if>
+          </xsl:for-each>
+        </c:ser>
+
+        <xsl:call-template name="InsertSecondaryChartSeries">
+          <xsl:with-param name="numSeries" select="$numSeries"/>
+          <xsl:with-param name="numPoints" select="$numPoints"/>
+          <xsl:with-param name="primarySeries" select="$primarySeries"/>
+          <xsl:with-param name="count" select="$count + 1"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+
   </xsl:template>
 
 </xsl:stylesheet>
