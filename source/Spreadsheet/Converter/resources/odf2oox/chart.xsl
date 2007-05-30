@@ -900,7 +900,7 @@
     </c:spPr>
 
     <!-- marker type -->
-    <xsl:if test="key('chart','' )/@chart:class = 'chart:line' ">
+    <xsl:if test="key('chart','' )/@chart:class = 'chart:line' or ancestor::chart:chart/chart:plot-area/chart:series[position() = $number]/@chart:class = 'chart:line'">
       <xsl:for-each
         select="ancestor::chart:chart/chart:plot-area/chart:series[position() = $number]">
         <xsl:choose>
