@@ -256,6 +256,43 @@
     <!-- @Context: chart:chart -->
 
     <xsl:choose>
+
+      <xsl:when
+        test="@chart:class='chart:bar' and key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:three-dimensional = 'true' ">
+        <c:bar3DChart>
+
+          <!-- bar or column chart -->
+          <xsl:choose>
+            <xsl:when
+              test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:vertical = 'false' ">
+              <c:barDir val="col"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <c:barDir val="bar"/>
+            </xsl:otherwise>
+          </xsl:choose>
+
+          <c:grouping val="clustered">
+            <xsl:call-template name="SetDataGroupingAtribute"/>
+          </c:grouping>
+
+          <xsl:call-template name="InsertChartContent"/>
+
+          <!-- set shape -->
+          <c:shape val="box">
+            <xsl:if
+              test="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:solid-type != 'cuboid' ">
+              <xsl:attribute name="val">
+                <xsl:value-of
+                  select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:solid-type"
+                />
+              </xsl:attribute>
+            </xsl:if>
+          </c:shape>
+
+        </c:bar3DChart>
+      </xsl:when>
+
       <xsl:when test="@chart:class='chart:bar' ">
         <c:barChart>
 
@@ -385,11 +422,11 @@
       <xsl:value-of select="count(key('rows','')/table:table-row)"/>
     </xsl:variable>
 
-    <!-- reverse categories for bar charts -->
+    <!-- reverse categories for 2D bar charts -->
     <xsl:variable name="reverseCategories">
       <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
         <xsl:choose>
-          <xsl:when test="@chart:vertical = 'true' ">
+          <xsl:when test="@chart:vertical = 'true' and @chart:three-dimentional = 'false' ">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -402,9 +439,9 @@
     <xsl:variable name="reverseSeries">
       <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
         <xsl:choose>
-          <!-- reverse series for: (normal bar chart) or (2D normal area chart) -->
+          <!-- reverse series for: (2D normal bar chart) or (2D normal area chart) -->
           <xsl:when
-            test="(@chart:vertical = 'true' and not(@chart:stacked = 'true' or @chart:percentage = 'true' )) or 
+            test="(@chart:vertical = 'true' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ) and @chart:three-dimensional = 'false' ) or 
             (key('chart','')/@chart:class = 'chart:area' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ) and @chart:three-dimensional = 'false' )">
             <xsl:text>true</xsl:text>
           </xsl:when>
@@ -788,6 +825,12 @@
         <xsl:when test="@chart:percentage = 'true' ">
           <xsl:attribute name="val">
             <xsl:text>percentStacked</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
+
+        <xsl:when test="@chart:deep = 'true' ">
+          <xsl:attribute name="val">
+            <xsl:text>standard</xsl:text>
           </xsl:attribute>
         </xsl:when>
       </xsl:choose>
