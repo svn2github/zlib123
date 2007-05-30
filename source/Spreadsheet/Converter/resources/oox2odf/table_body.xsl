@@ -71,7 +71,7 @@
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="$BigMergeRow != '' and e:worksheet/e:sheetData/e:row/e:c">
-         <table:table-row table:style-name="ro1">
+        <table:table-row table:style-name="ro1">
           <table:covered-table-cell table:number-columns-repeated="256"/>
         </table:table-row>
       </xsl:when>
@@ -301,18 +301,6 @@
               <xsl:apply-templates select="e:c[1]">
                 <xsl:with-param name="BigMergeCell">
                   <xsl:value-of select="$BigMergeCell"/>
-                </xsl:with-param>
-                <xsl:with-param name="PictureRow">
-                  <xsl:value-of select="$PictureRow"/>
-                </xsl:with-param>
-                <xsl:with-param name="PictureCell">
-                  <xsl:value-of select="$PictureCell"/>
-                </xsl:with-param>
-                <xsl:with-param name="sheet">
-                  <xsl:value-of select="$sheet"/>
-                </xsl:with-param>
-                <xsl:with-param name="NameSheet">
-                  <xsl:value-of select="$NameSheet"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:when>
@@ -637,10 +625,10 @@
     <xsl:param name="NameSheet"/>
 
 
-     <xsl:message terminate="no">progress:c</xsl:message>
+    <xsl:message terminate="no">progress:c</xsl:message>
     
     <xsl:choose>
-      
+
       <!-- Insert covered cell if this is Merge Cell -->
       <xsl:when test="contains($CheckIfMerge,'true')">
         <xsl:choose>
@@ -665,7 +653,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <!-- insert this one cell-->
 
@@ -728,7 +716,6 @@
               </xsl:attribute>
             </xsl:if>
           </xsl:if>
-          
           <xsl:if test="e:v">
 
             <xsl:call-template name="InsertText">
@@ -828,191 +815,252 @@
   <xsl:template name="InsertText">
     <xsl:param name="position"/>
     
-    <xsl:choose>
-      <xsl:when test="@t='s' ">
-        <xsl:attribute name="office:value-type">
-          <xsl:text>string</xsl:text>
-        </xsl:attribute>
-        <xsl:variable name="id">
-          <xsl:value-of select="e:v"/>
-        </xsl:variable>
-        <text:p>
-          <!-- a postprocessor puts here strings from sharedstrings -->
-          <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
-            <xsl:value-of select="e:v"/>
-          </pxsi:v>
-        </text:p>
-      </xsl:when>
-      <xsl:when test="@t = 'e' ">
-        <xsl:attribute name="office:value-type">
-          <xsl:text>string</xsl:text>
-        </xsl:attribute>
-        <text:p>
-          <xsl:value-of select="e:v"/>
-        </text:p>
-      </xsl:when>
-      <xsl:when test="@t = 'str' ">
-        <xsl:attribute name="office:value-type">
-          <xsl:choose>
-            <xsl:when test="number(e:v)">
-              <xsl:text>float</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>string</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <text:p>
-          <xsl:choose>
-            <xsl:when test="number(e:v)">
-              <xsl:call-template name="FormatNumber">
-                <xsl:with-param name="value">
+            <xsl:choose>
+              <xsl:when test="@t='s' ">
+                <xsl:attribute name="office:value-type">
+                  <xsl:text>string</xsl:text>
+                </xsl:attribute>
+                <xsl:variable name="id">
                   <xsl:value-of select="e:v"/>
-                </xsl:with-param>
-                <xsl:with-param name="numStyle">
+                </xsl:variable>
+                <text:p>
+                  <!-- a postprocessor puts here strings from sharedstrings -->
+                  <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
+                    <xsl:value-of select="e:v"/>
+                  </pxsi:v>
+                </text:p>
+              </xsl:when>
+              <xsl:when test="@t = 'e' ">
+                <xsl:attribute name="office:value-type">
+                  <xsl:text>string</xsl:text>
+                </xsl:attribute>
+                <text:p>
+                  <xsl:value-of select="e:v"/>
+                </text:p>
+              </xsl:when>
+              <xsl:when test="@t = 'str' ">
+                <xsl:attribute name="office:value-type">
+                  <xsl:choose>
+                    <xsl:when test="number(e:v)">
+                      <xsl:text>float</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>string</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <text:p>
+                  <xsl:choose>
+                    <xsl:when test="number(e:v)">
+                      <xsl:call-template name="FormatNumber">
+                        <xsl:with-param name="value">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="numStyle">
+                          <xsl:for-each select="document('xl/styles.xml')">
+                            <xsl:value-of
+                              select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"
+                            />
+                          </xsl:for-each>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="e:v"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </text:p>
+              </xsl:when>
+              <xsl:when test="@t = 'n'">
+                <xsl:attribute name="office:value-type">
+                  <xsl:text>float</xsl:text>
+                </xsl:attribute>
+                <xsl:attribute name="office:value">
+                  <xsl:value-of select="e:v"/>
+                </xsl:attribute>
+                <text:p>
+                  <xsl:call-template name="FormatNumber">
+                    <xsl:with-param name="value">
+                      <xsl:value-of select="e:v"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="numStyle">
+                      <xsl:for-each select="document('xl/styles.xml')">
+                        <xsl:value-of
+                          select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"
+                        />
+                      </xsl:for-each>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </text:p>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:variable name="numStyle">
                   <xsl:for-each select="document('xl/styles.xml')">
                     <xsl:value-of
                       select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"
                     />
                   </xsl:for-each>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="e:v"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </text:p>
-      </xsl:when>
-      <xsl:when test="@t = 'n'">
-        <xsl:attribute name="office:value-type">
-          <xsl:text>float</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="office:value">
-          <xsl:value-of select="e:v"/>
-        </xsl:attribute>
-        <text:p>
-          <xsl:call-template name="FormatNumber">
-            <xsl:with-param name="value">
-              <xsl:value-of select="e:v"/>
-            </xsl:with-param>
-            <xsl:with-param name="numStyle">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of
-                  select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"
-                />
-              </xsl:for-each>
-            </xsl:with-param>
-          </xsl:call-template>
-        </text:p>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:variable name="numStyle">
-          <xsl:for-each select="document('xl/styles.xml')">
-            <xsl:value-of
-              select="key('numFmtId',key('Xf','')[position()=$position]/@numFmtId)/@formatCode"
-            />
-          </xsl:for-each>
-        </xsl:variable>
-        <xsl:variable name="numId">
-          <xsl:for-each select="document('xl/styles.xml')">
-            <xsl:value-of select="key('Xf','')[position()=$position]/@numFmtId"/>
-          </xsl:for-each>
-        </xsl:variable>
-        
-        <xsl:attribute name="office:value-type">
-          <xsl:choose>
-            <xsl:when test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
-              <xsl:text>percentage</xsl:text>
-            </xsl:when>
-            <!--'and' at the end is for Latvian currency -->
-            <xsl:when test="((contains($numStyle,'y') and not(contains(substring-before($numStyle,'y'),'&quot;') and contains(substring-after($numStyle,'y'),'&quot;'))) or (contains($numStyle,'m') and not(contains(substring-before($numStyle,'m'),'&quot;') and contains(substring-after($numStyle,'m'),'&quot;'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))  and not(contains(substring-before($numStyle,'d'),'&quot;') and contains(substring-after($numStyle,'d'),'&quot;'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
-              <xsl:text>date</xsl:text>
-            </xsl:when>
-            <xsl:when test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
-              <xsl:text>currency</xsl:text>
-            </xsl:when>
-            <xsl:when test="$numId = 49">
-              <xsl:text>string</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>float</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        <xsl:choose>
-          <!--'and' at the end is for Latvian currency -->
-          <xsl:when test="((contains($numStyle,'y') and not(contains(substring-before($numStyle,'y'),'&quot;') and contains(substring-after($numStyle,'y'),'&quot;'))) or (contains($numStyle,'m') and not(contains(substring-before($numStyle,'m'),'&quot;') and contains(substring-after($numStyle,'m'),'&quot;'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))  and not(contains(substring-before($numStyle,'d'),'&quot;') and contains(substring-after($numStyle,'d'),'&quot;'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
-            <xsl:attribute name="office:date-value">
-              <xsl:call-template name="NumberToDate">
-                <xsl:with-param name="value">
-                  <xsl:value-of select="e:v"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="office:value">
-              <xsl:value-of select="e:v"/>
-            </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
-        <text:p>
-          <xsl:choose>
-            <xsl:when test="((contains($numStyle,'y') and not(contains(substring-before($numStyle,'y'),'&quot;') and contains(substring-after($numStyle,'y'),'&quot;'))) or (contains($numStyle,'m') and not(contains(substring-before($numStyle,'m'),'&quot;') and contains(substring-after($numStyle,'m'),'&quot;'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))  and not(contains(substring-before($numStyle,'d'),'&quot;') and contains(substring-after($numStyle,'d'),'&quot;')))  or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
-              <xsl:call-template name="FormatDate">
-                <xsl:with-param name="value">
-                  <xsl:call-template name="NumberToDate">
-                    <xsl:with-param name="value">
+                </xsl:variable>
+                <xsl:variable name="numId">
+                  <xsl:for-each select="document('xl/styles.xml')">
+                    <xsl:value-of select="key('Xf','')[position()=$position]/@numFmtId"/>
+                  </xsl:for-each>
+                </xsl:variable>
+                <xsl:attribute name="office:value-type">
+                  <xsl:choose>
+                    <xsl:when
+                      test="contains($numStyle,'%') or ((not($numStyle) or $numStyle = '')  and ($numId = 9 or $numId = 10))">
+                      <xsl:text>percentage</xsl:text>
+                    </xsl:when>
+                    <xsl:when
+                      test="(contains($numStyle,'y') or (contains($numStyle,'m') and not(contains($numStyle,'h') or contains($numStyle,'s'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
+                      <xsl:text>date</xsl:text>
+                    </xsl:when>
+                    
+                    <!--'and' at the end is for Latvian currency -->
+                    <xsl:when test="contains($numStyle,'h') or contains($numStyle,'s') and not(contains($numStyle,'[$Ls-426]'))">
+                      <xsl:text>time</xsl:text>
+                    </xsl:when>
+                    
+                    <xsl:when
+                      test="contains($numStyle,'zł') or contains($numStyle,'$') or contains($numStyle,'£') or contains($numStyle,'€')">
+                      <xsl:text>currency</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="$numId = 49">
+                      <xsl:text>string</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>float</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <xsl:choose>
+                  
+                  <xsl:when
+                    test="(contains($numStyle,'y') or (contains($numStyle,'m') and not(contains($numStyle,'h') or contains($numStyle,'s'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
+                    <xsl:attribute name="office:date-value">
+                      <xsl:call-template name="NumberToDate">
+                        <xsl:with-param name="value">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:when>
+                  
+                  <!--'and' at the end is for Latvian currency -->
+                  <xsl:when test="contains($numStyle,'h') or contains($numStyle,'s') and not(contains($numStyle,'[$Ls-426]'))">
+                    <xsl:attribute name="office:time-value">
+                      <xsl:call-template name="NumberToTime">
+                        <xsl:with-param name="value">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name="office:value">
                       <xsl:value-of select="e:v"/>
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </xsl:with-param>
-                <xsl:with-param name="format">
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
+                <text:p>
                   <xsl:choose>
-                    <xsl:when test="contains($numStyle,']')">
-                      <xsl:value-of select="substring-after($numStyle,']')"/>
+                    
+                    <xsl:when
+                      test="(contains($numStyle,'y') or (contains($numStyle,'m') and not(contains($numStyle,'h') or contains($numStyle,'s'))) or (contains($numStyle,'d') and not(contains($numStyle,'Red'))) or ($numId &gt; 13 and $numId &lt; 18) or $numId = 22)">
+                      <xsl:call-template name="FormatDate">
+                        <xsl:with-param name="value">
+                          <xsl:call-template name="NumberToDate">
+                            <xsl:with-param name="value">
+                              <xsl:value-of select="e:v"/>
+                            </xsl:with-param>
+                          </xsl:call-template>
+                        </xsl:with-param>
+                        <xsl:with-param name="format">
+                          <xsl:choose>
+                            <xsl:when test="contains($numStyle,']')">
+                              <xsl:value-of select="substring-after($numStyle,']')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="$numStyle"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:with-param>
+                        <xsl:with-param name="numId">
+                          <xsl:value-of select="$numId"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="processedFormat">
+                          <xsl:choose>
+                            <xsl:when test="contains($numStyle,']')">
+                              <xsl:value-of select="substring-after($numStyle,']')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="$numStyle"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:with-param>
+                        <xsl:with-param name="numValue">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
                     </xsl:when>
+                    
+                    <!--'and' at the end is for Latvian currency -->
+                    <xsl:when test="contains($numStyle,'h') or contains($numStyle,'s') and not(contains($numStyle,'[$Ls-426]'))">
+                      <xsl:call-template name="FormatTime">
+                        <xsl:with-param name="value">
+                          <xsl:call-template name="NumberToTime">
+                            <xsl:with-param name="value">
+                              <xsl:value-of select="e:v"/>
+                            </xsl:with-param>
+                          </xsl:call-template>
+                        </xsl:with-param>
+                        <xsl:with-param name="format">
+                          <xsl:choose>
+                            <xsl:when test="contains($numStyle,']') and not(contains($numStyle,'[h]'))">
+                              <xsl:value-of select="substring-after($numStyle,']')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="$numStyle"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:with-param>
+                        <xsl:with-param name="numId">
+                          <xsl:value-of select="$numId"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="processedFormat">
+                          <xsl:choose>
+                            <xsl:when test="contains($numStyle,']') and not(contains($numStyle,'[h]'))">
+                              <xsl:value-of select="substring-after($numStyle,']')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="$numStyle"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:with-param>
+                        <xsl:with-param name="numValue">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:when>
+                    
                     <xsl:otherwise>
-                      <xsl:value-of select="$numStyle"/>
+                      <xsl:call-template name="FormatNumber">
+                        <xsl:with-param name="value">
+                          <xsl:value-of select="e:v"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="numStyle">
+                          <xsl:value-of select="$numStyle"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="numId">
+                          <xsl:value-of select="$numId"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
                     </xsl:otherwise>
                   </xsl:choose>
-                </xsl:with-param>
-                <xsl:with-param name="numId">
-                  <xsl:value-of select="$numId"/>
-                </xsl:with-param>
-                <xsl:with-param name="processedFormat">
-                  <xsl:choose>
-                    <xsl:when test="contains($numStyle,']')">
-                      <xsl:value-of select="substring-after($numStyle,']')"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="$numStyle"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:with-param>
-                <xsl:with-param name="numValue">
-                  <xsl:value-of select="e:v"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="FormatNumber">
-                <xsl:with-param name="value">
-                  <xsl:value-of select="e:v"/>
-                </xsl:with-param>
-                <xsl:with-param name="numStyle">
-                  <xsl:value-of select="$numStyle"/>
-                </xsl:with-param>
-                <xsl:with-param name="numId">
-                  <xsl:value-of select="$numId"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:otherwise>
-          </xsl:choose>
-        </text:p>
-      </xsl:otherwise>
-    </xsl:choose>
+                </text:p>
+              </xsl:otherwise>
+            </xsl:choose>
   </xsl:template>
 
   <xsl:template name="InsertNextCell">
@@ -1072,7 +1120,7 @@
               <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
             </xsl:for-each>
           </xsl:variable>
-          
+
           <xsl:choose>
             <xsl:when test="$horizontal = 'centerContinuous' ">
               <xsl:call-template name="CountContinuous"/>
@@ -1087,7 +1135,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
 
       <!-- calc supports only 256 columns -->
@@ -1557,7 +1605,7 @@
               </xsl:for-each>
             </xsl:attribute>
             </xsl:if-->
-          
+
         </table:table-column>
 
       </xsl:when>
@@ -2188,10 +2236,10 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="CountContinuous">
     <xsl:param name="count" select="0"/>
-    
+
     <xsl:variable name="carryOn">
       <xsl:choose>
         <xsl:when test="following-sibling::e:c[1]/@s and not(following-sibling::e:c[1]/e:v)">
@@ -2203,7 +2251,7 @@
               <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
             </xsl:for-each>
           </xsl:variable>
-          
+
           <xsl:choose>
             <xsl:when test="$horizontal = 'centerContinuous' ">
               <xsl:text>true</xsl:text>
@@ -2212,14 +2260,14 @@
               <xsl:text>false</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
-          
+
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>false</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="$carryOn = 'true'">
         <xsl:for-each select="following-sibling::e:c[1]">
@@ -2234,9 +2282,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- template which inserts date and time in a correct format -->
-  
+
   <xsl:template name="FormatDate">
     <xsl:param name="value"/>
     <xsl:param name="format"/>
@@ -2245,7 +2293,7 @@
     <xsl:param name="outputValue"/>
     <xsl:param name="numValue"/>
     <xsl:choose>
-      
+
       <!-- year -->
       <xsl:when test="starts-with($processedFormat,'y')">
         <xsl:choose>
@@ -2280,10 +2328,10 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <xsl:when test="starts-with($processedFormat,'m')">
         <xsl:choose>
-          
+
           <!-- minutes -->
           <xsl:when test="contains(substring-before($format,'m'),'h:')">
             <xsl:choose>
@@ -2321,7 +2369,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:when>
-          
+
           <!-- month -->
           <xsl:otherwise>
             <xsl:choose>
@@ -2403,7 +2451,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- day -->
       <xsl:when test="starts-with($processedFormat,'d')">
         <xsl:choose>
@@ -2483,7 +2531,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
-      
+
       <!-- hours -->
       <xsl:when test="starts-with($processedFormat,'h')">
         <xsl:choose>
@@ -2590,6 +2638,133 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="FormatTime">
+    <xsl:param name="value"/>
+    <xsl:param name="format"/>
+    <xsl:param name="numId"/>
+    <xsl:param name="processedFormat"/>
+    <xsl:param name="outputValue"/>
+    <xsl:choose>
+      <xsl:when test="starts-with($processedFormat,'h')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'h'),'h')">
+            <xsl:call-template name="FormatTime">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'hh')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,substring-before(substring-after($value,'PT'),'H'))"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="FormatTime">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'h')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,number(substring-before(substring-after($value,'PT'),'H')))"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="starts-with($processedFormat,'m')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'m'),'m')">
+            <xsl:call-template name="FormatTime">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'mm')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,substring-before(substring-after($value,'H'),'M'))"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="FormatTime">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'m')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,number(substring-before(substring-after($value,'H'),'M')))"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="starts-with($processedFormat,'s')">
+        <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'s'),'s')">
+            <xsl:call-template name="FormatTime">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'ss')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,substring-before(substring-after($value,'M'),'S'))"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="FormatTime">
+              <xsl:with-param name="value" select="$value"/>
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="numId" select="$numId"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring-after($processedFormat,'s')"/>
+              </xsl:with-param>
+              <xsl:with-param name="outputValue">
+                <xsl:value-of select="concat($outputValue,number(substring-before(substring-after($value,'M'),'S')))"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when
+        test="starts-with($processedFormat,'\') or starts-with($processedFormat,'@') or starts-with($processedFormat,';') or starts-with($processedFormat,'[') or starts-with($processedFormat,']')">
+        <xsl:call-template name="FormatTime">
+          <xsl:with-param name="value" select="$value"/>
+          <xsl:with-param name="format" select="$format"/>
+          <xsl:with-param name="numId" select="$numId"/>
+          <xsl:with-param name="processedFormat">
+            <xsl:value-of select="substring($processedFormat,2)"/>
+          </xsl:with-param>
+          <xsl:with-param name="outputValue" select="$outputValue"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="string-length($processedFormat) = 0">
+        <xsl:value-of select="$outputValue"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="FormatTime">
+          <xsl:with-param name="value" select="$value"/>
+          <xsl:with-param name="format" select="$format"/>
+          <xsl:with-param name="numId" select="$numId"/>
+          <xsl:with-param name="processedFormat">
+            <xsl:value-of select="substring($processedFormat,2)"/>
+          </xsl:with-param>
+          <xsl:with-param name="outputValue">
+            <xsl:value-of select="concat($outputValue,substring($processedFormat,0,2))"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   <!-- get month name -->
 
   <xsl:template name="ConvertMonthToName">

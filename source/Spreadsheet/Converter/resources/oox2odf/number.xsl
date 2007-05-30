@@ -44,11 +44,10 @@
     </xsl:variable>
 
     <xsl:choose>
-
+      
       <!-- date style -->
-      <!-- 'and' at the end is for latvian currency -->
       <xsl:when
-        test="((contains($formatingMarks,'y') and not(contains(substring-before($formatingMarks,'y'),'&quot;') and contains(substring-after($formatingMarks,'y'),'&quot;'))) or (contains($formatingMarks,'m') and not(contains(substring-before($formatingMarks,'m'),'&quot;') and contains(substring-after($formatingMarks,'m'),'&quot;'))) or (contains($formatingMarks,'d') and not(contains($formatingMarks,'Red')) and not(contains(substring-before($formatingMarks,'d'),'&quot;') and contains(substring-after($formatingMarks,'d'),'&quot;'))))">
+        test="(contains($formatingMarks,'y') or (contains($formatingMarks,'m') and not(contains($formatingMarks,'h') or contains($formatingMarks,'s')))or (contains($formatingMarks,'d') and not(contains($formatingMarks,'Red'))))">
         <number:date-style style:name="{generate-id(.)}">
           <xsl:call-template name="ProcessFormat">
             <xsl:with-param name="format">
@@ -74,7 +73,47 @@
           </xsl:call-template>
         </number:date-style>
       </xsl:when>
-
+      
+      <!-- time style -->
+      <!-- 'and' at the end is for latvian currency -->
+      <xsl:when test="contains($formatingMarks,'h') or contains($formatingMarks,'s') and not(contains($formatingMarks, '$Ls-426' ))">
+        <number:time-style style:name="{generate-id(.)}">
+          <xsl:if test="contains($formatingMarks,'[h]')">
+            <xsl:attribute name="number:truncate-on-overflow">false</xsl:attribute>
+          </xsl:if>
+          <xsl:call-template name="ProcessFormat">
+            <xsl:with-param name="format">
+              <xsl:choose>
+                <xsl:when test="contains(@formatCode,'[h]')">
+                  <xsl:value-of select="translate(@formatCode,'[h]','h')"/>
+                </xsl:when>
+                <xsl:when test="contains(@formatCode,']')">
+                  <xsl:value-of select="substring-after(@formatCode,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="processedFormat">
+              <xsl:choose>
+                <xsl:when test="contains(@formatCode,'[h]')">
+                  <xsl:value-of select="translate(@formatCode,'[h]','h')"/>
+                </xsl:when>
+                <xsl:when test="contains(@formatCode,']')">
+                  <xsl:value-of select="substring-after(@formatCode,']')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@formatCode"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </number:time-style>
+      </xsl:when>
+      
+      
+      
       <!-- when there are different formats for positive and negative numbers -->
       <xsl:when
         test="contains(@formatCode,';') and not(contains(substring-after(@formatCode,';'),';'))">
@@ -436,7 +475,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!-- adding '\' -->
     <xsl:if test="starts-with($realFormatCode,'\') and not(starts-with($realFormatCode,'\ '))">
       <xsl:call-template name="AddNumberText">
@@ -706,7 +745,7 @@
 
     <!-- add space at the end -->
     <xsl:if
-      test="(contains($realFormatCode,'\ ') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#'))) or contains(substring-after(substring-after(translate($realFormatCode,'0','#'),'#'),$currencyFormat),'\ ')) or (contains($realFormatCode,'_') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'_'),'0') or contains(substring-after($realFormatCode,'_'),'#'))) or contains(substring-after(substring-after(translate($realFormatCode,'0','#'),'#'),$currencyFormat),'_'))">
+      test="(contains($realFormatCode,'\ ') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#'))) or (contains(substring-after($realFormatCode,$currencyFormat),'\ '))and not(contains(substring-after($realFormatCode,'\ '),'0') or contains(substring-after($realFormatCode,'\ '),'#'))) or (contains($realFormatCode,'_') and (not($currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))) and not(contains(substring-after($realFormatCode,'_'),'0') or contains(substring-after($realFormatCode,'_'),'#'))) or (contains(substring-after($realFormatCode,$currencyFormat),'_')and not(contains(substring-after($realFormatCode,'_'),'0') or contains(substring-after($realFormatCode,'_'),'#'))))">
       <number:text>
         <xsl:choose>
           <xsl:when test="contains($realFormatCode,'\ \')">
@@ -827,6 +866,17 @@
     <xsl:if test="@numFmtId and @numFmtId &gt; 0 and not(key('numFmtId',@numFmtId))">
       <xsl:choose>
 
+        <!-- time style -->
+        <xsl:when test="(@numFmtId &gt; 17 and @numFmtId &lt; 22) or (@numFmtId &gt; 44 and @numFmtId &lt; 48)">
+          <number:time-style style:name="{concat('N',@numFmtId)}">
+            <xsl:call-template name="InsertFixedTimeFormat">
+              <xsl:with-param name="ID">
+                <xsl:value-of select="@numFmtId"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </number:time-style>
+        </xsl:when>
+        
         <!-- date style -->
         <xsl:when test="(@numFmtId &gt; 13 and @numFmtId &lt; 18) or @numFmtId = 22">
           <number:date-style style:name="{concat('N',@numFmtId)}">
@@ -1092,7 +1142,7 @@
         <xsl:choose>
 
           <!-- minutes -->
-          <xsl:when test="contains(substring-before($format,'m'),'h:')">
+          <xsl:when test="contains(substring-before($format,'m'),'h')">
             <xsl:choose>
               <xsl:when test="starts-with(substring-after($processedFormat,'m'),'m')">
                 <number:minutes number:style="long"/>
@@ -1317,10 +1367,56 @@
         <number:day/>
         <number:text>/</number:text>
         <number:year/>
+        <number:text>
+          <xsl:value-of xml:space="preserve" select="' '"/>
+        </number:text>
+        <number:hours/>
+        <number:text>:</number:text>
+        <number:minutes number:style="long"/>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
 
+  <!-- template which inserts fixed time format -->
+  
+  <xsl:template name="InsertFixedTimeFormat">
+    <xsl:param name="ID"/>
+      <xsl:choose>
+        <xsl:when test="$ID = 18">
+          <number:hours/>
+         <number:text>:</number:text>
+          <number:minutes number:style="long"/>
+          <number:text>
+            <xsl:value-of xml:space="preserve" select="' '"/>
+          </number:text>
+          <number:am-pm/>
+        </xsl:when>
+        <xsl:when test="$ID = 19">
+          <number:hours/>
+          <number:text>:</number:text>
+          <number:minutes number:style="long"/>
+          <number:text>:</number:text>
+          <number:seconds number:style="long"/>
+          <number:text>
+            <xsl:value-of xml:space="preserve" select="' '"/>
+          </number:text>
+          <number:am-pm/>
+        </xsl:when>
+        <xsl:when test="$ID = 20">
+          <number:hours/>
+          <number:text>:</number:text>
+          <number:minutes number:style="long"/>
+        </xsl:when>
+        <xsl:when test="$ID = 21">
+          <number:hours/>
+          <number:text>:</number:text>
+          <number:minutes number:style="long"/>
+          <number:text>:</number:text>
+          <number:seconds number:style="long"/>
+        </xsl:when>
+      </xsl:choose>
+  </xsl:template>
+  
   <!-- template which adds embedded text in number format -->
 
   <xsl:template name="FindTextNumberFormat">

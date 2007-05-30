@@ -1196,6 +1196,20 @@
     <xsl:value-of select="concat(concat(concat(concat(concat(concat(concat(concat((1900+$years),'-'),$monthsAndDays),'T'),format-number($hours,'00')),':'),format-number($mins,'00')),':'),concat($secondsBeforeComma,$secondsAfterComma))"/>
   </xsl:template>
   
+  <xsl:template name="NumberToTime">
+    <xsl:param name="value"/>
+    <xsl:variable name="hours">
+      <xsl:value-of select="floor($value * 24)"/>
+    </xsl:variable>
+    <xsl:variable name="minutes">
+      <xsl:value-of select="floor(($value * 24 - $hours) * 60)"/>
+    </xsl:variable>
+    <xsl:variable name="seconds">
+      <xsl:value-of select="$value * 86400 - $minutes * 60 - $hours * 3600"/>
+    </xsl:variable>
+    <xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>
+  </xsl:template>
+  
   <xsl:template name="DaysToMonthsAndDays">
     <xsl:param name="days"/>
     <xsl:param name="ExtraDay"/>
