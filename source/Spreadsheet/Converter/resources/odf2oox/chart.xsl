@@ -853,6 +853,11 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
+    <xsl:variable name="styleName">
+      <!-- (string) series style name -->
+      <xsl:value-of select="key('series','')[position() = $number]/@chart:style-name"/>      
+    </xsl:variable>
 
     <!-- series shape property -->
     <c:spPr>
@@ -867,10 +872,6 @@
           <!-- fill color -->
           <a:solidFill>
             <a:srgbClr val="9999FF">
-              <xsl:variable name="styleName">
-                <!-- (string) series style name -->
-                <xsl:value-of select="key('series','')[position() = $number]/@chart:style-name"/>
-              </xsl:variable>
               <xsl:attribute name="val">
                 <xsl:value-of
                   select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
@@ -880,22 +881,20 @@
           </a:solidFill>
 
           <!-- line color -->
-          <a:ln w="3175">
-            <a:solidFill>
-              <a:srgbClr val="000000">
-                <xsl:variable name="styleName">
-                  <!-- (string) series style name -->
-                  <xsl:value-of select="key('series','')[position() = $number]/@chart:style-name"/>
-                </xsl:variable>
-                <xsl:attribute name="val">
-                  <xsl:value-of
-                    select="substring(key('style',$styleName)/style:graphic-properties/@svg:stroke-color,2)"
-                  />
-                </xsl:attribute>
-              </a:srgbClr>
-            </a:solidFill>
-            <a:prstDash val="solid"/>
-          </a:ln>
+          <xsl:if test="not(key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none')">
+            <a:ln w="3175">
+              <a:solidFill>
+                <a:srgbClr val="000000">
+                  <xsl:attribute name="val">
+                    <xsl:value-of
+                      select="substring(key('style',$styleName)/style:graphic-properties/@svg:stroke-color,2)"
+                    />
+                  </xsl:attribute>
+                </a:srgbClr>
+              </a:solidFill>
+              <a:prstDash val="solid"/>
+            </a:ln>
+          </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
     </c:spPr>
