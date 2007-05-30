@@ -287,6 +287,15 @@
         </c:barChart>
       </xsl:when>
 
+      <xsl:when
+        test="@chart:class='chart:line' and key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:three-dimensional = 'true' ">
+        <c:line3DChart>
+          <c:grouping val="standard"/>
+
+          <xsl:call-template name="InsertChartContent"/>
+        </c:line3DChart>
+      </xsl:when>
+
       <xsl:when test="@chart:class='chart:line' ">
         <c:lineChart>
 
