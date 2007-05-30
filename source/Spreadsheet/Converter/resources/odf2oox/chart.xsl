@@ -307,6 +307,18 @@
         </c:lineChart>
       </xsl:when>
 
+      <xsl:when
+        test="@chart:class='chart:area' and key('style',chart:plot-area/@chart:style-name)/style:chart-properties/@chart:three-dimensional = 'true' ">
+        <c:area3DChart>
+
+          <c:grouping val="standard">
+            <xsl:call-template name="SetDataGroupingAtribute"/>
+          </c:grouping>
+
+          <xsl:call-template name="InsertChartContent"/>
+        </c:area3DChart>
+      </xsl:when>
+
       <xsl:when test="@chart:class='chart:area' ">
         <c:areaChart>
 
@@ -373,6 +385,7 @@
       <xsl:value-of select="count(key('rows','')/table:table-row)"/>
     </xsl:variable>
 
+    <!-- reverse categories for bar charts -->
     <xsl:variable name="reverseCategories">
       <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
         <xsl:choose>
@@ -389,9 +402,10 @@
     <xsl:variable name="reverseSeries">
       <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
         <xsl:choose>
+          <!-- reverse series for: (normal bar chart) or (2D normal area chart) -->
           <xsl:when
             test="(@chart:vertical = 'true' and not(@chart:stacked = 'true' or @chart:percentage = 'true' )) or 
-            (key('chart','')/@chart:class = 'chart:area' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ))">
+            (key('chart','')/@chart:class = 'chart:area' and not(@chart:stacked = 'true' or @chart:percentage = 'true' ) and @chart:three-dimensional = 'false' )">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
