@@ -91,6 +91,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 return new Uri(ASSEMBLY_URI_SCHEME + "://" + ASSEMBLY_URI_HOST + "/" + relativeUri);
             }
+            else if (relativeUri.Contains("DTD"))
+            {
+                return new Uri(ASSEMBLY_URI_SCHEME + "://" + ASSEMBLY_URI_HOST + "/dummy.dtd");
+            }
             else
             {
                 return base.ResolveUri(baseUri, relativeUri);
