@@ -31,12 +31,12 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" exclude-result-prefixes="e">
-
-  <!-- insert  number format style -->
-
+  
   <xsl:template match="e:numFmt" mode="automaticstyles">
-
-    <!-- formatCode without text inside &quot;.....&quot; -->
+    
+    <!-- @Descripition: inserts number format style -->
+    <!-- @Context: None -->
+    
     <xsl:variable name="formatingMarks">
       <xsl:call-template name="StripText">
         <xsl:with-param name="formatCode" select="@formatCode"/>
@@ -111,8 +111,6 @@
           </xsl:call-template>
         </number:time-style>
       </xsl:when>
-      
-      
       
       <!-- when there are different formats for positive and negative numbers -->
       <xsl:when
@@ -458,11 +456,13 @@
     </xsl:choose>
 
   </xsl:template>
-
-  <!-- template to create number format -->
-
+  
   <xsl:template name="InsertNumberFormatting">
-    <xsl:param name="formatCode"/>
+    
+    <!-- @Descripition: creates number format  -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="formatCode"/><!-- (string) The format code which is converted  -->
 
     <!-- '*' is not converted -->
     <xsl:variable name="realFormatCode">
@@ -769,12 +769,14 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- template which inserts display factor -->
-
   <xsl:template name="UseDisplayFactor">
-    <xsl:param name="formatBeforeSeparator"/>
-    <xsl:param name="formatAfterSeparator"/>
-    <xsl:param name="value"/>
+    
+    <!-- @Descripition: inserts display factor -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="formatBeforeSeparator"/><!-- (string) format code before ',' separator -->
+    <xsl:param name="formatAfterSeparator"/><!-- (string) format code after ',' separator -->
+    <xsl:param name="value"/><!-- (int) display factor to return -->
     <xsl:choose>
       <xsl:when test="$formatAfterSeparator and starts-with($formatAfterSeparator,',')">
         <xsl:call-template name="UseDisplayFactor">
@@ -793,11 +795,13 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- template which inserts min integer digits -->
-
   <xsl:template name="InsertMinIntegerDigits">
-    <xsl:param name="code"/>
-    <xsl:param name="value"/>
+    
+    <!-- @Descripition: inserts min integer digits -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="code"/><!-- (string) processed format code -->
+    <xsl:param name="value"/><!-- (int) number of min integer digits to return -->
     <xsl:choose>
       <xsl:when test="substring($code,string-length($code)) = '0' ">
         <xsl:call-template name="InsertMinIntegerDigits">
@@ -815,11 +819,13 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- template which inserts decimal places -->
-
   <xsl:template name="InsertDecimalPlaces">
-    <xsl:param name="code"/>
-    <xsl:param name="value"/>
+    
+    <!-- @Descripition: inserts decimal places -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="code"/><!-- (string) processed format code -->
+    <xsl:param name="value"/><!-- (int) number of min decimal places to return -->
     <xsl:choose>
       <xsl:when test="substring($code,1,1) = '0' or substring($code,1,1) = '#' ">
         <xsl:call-template name="InsertDecimalPlaces">
@@ -840,7 +846,11 @@
   <!-- template which adds number text -->
 
   <xsl:template name="AddNumberText">
-    <xsl:param name="format"/>
+    
+    <!-- @Descripition: adds number text -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="format"/><!-- (string) format code -->
     <xsl:choose>
       <xsl:when test="starts-with($format,'\') and not(starts-with($format,'\ '))">
         <number:text>
@@ -860,9 +870,11 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- adding number style with fixed number format -->
-
   <xsl:template match="e:xf" mode="fixedNumFormat">
+    
+    <!-- @Descripition: adds number style with fixed number format -->
+    <!-- @Context: None -->
+    
     <xsl:if test="@numFmtId and @numFmtId &gt; 0 and not(key('numFmtId',@numFmtId))">
       <xsl:choose>
 
@@ -913,10 +925,12 @@
       </xsl:choose>
     </xsl:if>
   </xsl:template>
-
-  <!-- insert currency symbol element -->
-  <xsl:template name="InsertCurrencySymbol">
-    <xsl:param name="value"/>
+ 
+   <xsl:template name="InsertCurrencySymbol">
+    
+    <!-- @Descripition: inserts currency symbol element -->
+    <!-- @Context: None -->
+    <xsl:param name="value"/><!--(string) converted currency symbol -->
     <xsl:choose>
       <xsl:when test="$value = '$$-C09' ">
         <number:currency-symbol number:language="en" number:country="AU">$</number:currency-symbol>
@@ -1082,10 +1096,12 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- template which inserts fixed number format -->
-
   <xsl:template name="InsertFixedNumFormat">
-    <xsl:param name="ID"/>
+    
+    <!-- @Descripition: inserts fixed number format -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="ID"/><!-- (int) number format ID -->
     <number:number>
       <xsl:attribute name="number:decimal-places">
         <xsl:choose>
@@ -1110,8 +1126,12 @@
   </xsl:template>
 
   <xsl:template name="ProcessFormat">
-    <xsl:param name="format"/>
-    <xsl:param name="processedFormat"/>
+    
+    <!-- @Descripition: processes date or time format -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="format"/><!-- (string) whole format code -->
+    <xsl:param name="processedFormat"/><!-- (string) part of format code which is being processed -->
     <xsl:choose>
 
       <!-- year -->
@@ -1332,10 +1352,12 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- template which inserts fixed date format -->
-
   <xsl:template name="InsertFixedDateFormat">
-    <xsl:param name="ID"/>
+    
+    <!-- @Descripition: inserts fixed date format -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="ID"/><!-- (int) number format ID -->
     <xsl:choose>
       <xsl:when test="$ID = 14">
         <number:month number:style="long"/>
@@ -1376,11 +1398,13 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-
-  <!-- template which inserts fixed time format -->
   
   <xsl:template name="InsertFixedTimeFormat">
-    <xsl:param name="ID"/>
+    
+    <!-- @Descripition: inserts fixed date format -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="ID"/><!-- (int) number format ID -->
       <xsl:choose>
         <xsl:when test="$ID = 18">
           <number:hours/>
@@ -1417,11 +1441,13 @@
       </xsl:choose>
   </xsl:template>
   
-  <!-- template which adds embedded text in number format -->
-
   <xsl:template name="FindTextNumberFormat">
-    <xsl:param name="format"/>
-    <xsl:param name="embeddedText"/>
+    
+    <!-- @Descripition: adds embedded text in number format -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="format"/><!-- (string) format code -->
+    <xsl:param name="embeddedText"/><!-- (string) text to be embedded -->
     <xsl:choose>
       <xsl:when test="string-length($format) &gt; 0">
         <xsl:choose>

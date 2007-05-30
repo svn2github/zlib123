@@ -2092,11 +2092,15 @@
     </xsl:choose>
 
   </xsl:template>
-  <!-- template which inserts number in a correct format -->
+  
   <xsl:template name="FormatNumber">
-    <xsl:param name="value"/>
-    <xsl:param name="numStyle"/>
-    <xsl:param name="numId"/>
+    
+    <!-- @Descripition: inserts number to cell in a correct format -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="value"/> <!-- (float) number value -->
+    <xsl:param name="numStyle"/><!-- (string) number format -->
+    <xsl:param name="numId"/><!-- (int) number format ID -->
     <xsl:variable name="formatCode">
       <xsl:choose>
         <xsl:when test="contains($numStyle,';')">
@@ -2208,11 +2212,14 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- formatting number after comma -->
   <xsl:template name="FormatAfterComma">
-    <xsl:param name="valueAfterComma"/>
-    <xsl:param name="valueBeforeComma"/>
-    <xsl:param name="format"/>
+    
+    <!-- @Descripition: formats number after comma -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="valueAfterComma"/><!-- (int) number value after comma -->
+    <xsl:param name="valueBeforeComma"/><!-- (int) number value before comma -->
+    <xsl:param name="format"/><!-- (string) format code -->
     <xsl:variable name="plainFormat">
       <xsl:choose>
         <xsl:when test="contains(substring-after($format,'.'),'\')">
@@ -2283,15 +2290,17 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- template which inserts date and time in a correct format -->
-
   <xsl:template name="FormatDate">
-    <xsl:param name="value"/>
-    <xsl:param name="format"/>
-    <xsl:param name="numId"/>
-    <xsl:param name="processedFormat"/>
-    <xsl:param name="outputValue"/>
-    <xsl:param name="numValue"/>
+    
+    <!-- @Descripition: inserts date to cell in a correct format -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="value"/><!-- (dateTime) input date value -->
+    <xsl:param name="format"/><!-- (string) format code -->
+    <xsl:param name="numId"/><!-- (int) format ID -->
+    <xsl:param name="processedFormat"/><!-- (string) part of format code which is being processed -->
+    <xsl:param name="outputValue"/><!-- (dateTime) output date value -->
+    <xsl:param name="numValue"/><!-- (float) date value as a number  -->
     <xsl:choose>
 
       <!-- year -->
@@ -2639,11 +2648,15 @@
   </xsl:template>
 
   <xsl:template name="FormatTime">
-    <xsl:param name="value"/>
-    <xsl:param name="format"/>
-    <xsl:param name="numId"/>
-    <xsl:param name="processedFormat"/>
-    <xsl:param name="outputValue"/>
+    
+    <!-- @Descripition: inserts timee to cell in a correct format -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="value"/><!-- (time) input time value -->
+    <xsl:param name="format"/><!-- (string) format code -->
+    <xsl:param name="numId"/><!-- (int) format ID -->
+    <xsl:param name="processedFormat"/><!-- (string) part of format code which is being processed -->
+    <xsl:param name="outputValue"/><!-- (time) output time value -->
     <xsl:choose>
       <xsl:when test="starts-with($processedFormat,'h')">
         <xsl:choose>
@@ -2765,10 +2778,13 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  <!-- get month name -->
-
+  
   <xsl:template name="ConvertMonthToName">
-    <xsl:param name="month"/>
+    
+    <!-- @Descripition: gets month name from its number -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="month"/><!-- (int) month number -->
     <xsl:choose>
       <xsl:when test="number($month) = 1">January</xsl:when>
       <xsl:when test="number($month) = 2">February</xsl:when>
@@ -2786,7 +2802,11 @@
   </xsl:template>
 
   <xsl:template name="ConvertMonthToShortName">
-    <xsl:param name="month"/>
+    
+    <!-- @Descripition: gets shortcut of month name from its number -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="month"/><!-- (int) month number -->
     <xsl:choose>
       <xsl:when test="number($month) = 1">Jan</xsl:when>
       <xsl:when test="number($month) = 2">Feb</xsl:when>
@@ -2803,10 +2823,12 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- get day of the week name -->
-
   <xsl:template name="ConvertDayToName">
-    <xsl:param name="day"/>
+    
+    <!-- @Descripition: gets day of week name from number of days after 1.01.1900 -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="day"/><!-- (int) number of days -->
     <xsl:variable name="dayOfWeek">
       <xsl:value-of select="$day - 7 * floor($day div 7)"/>
     </xsl:variable>
@@ -2822,7 +2844,11 @@
   </xsl:template>
   
   <xsl:template name="ConvertDayToShortName">
-    <xsl:param name="day"/>
+    
+    <!-- @Descripition: gets shortcut of day of week name from number of days after 1.01.1900 -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="day"/><!-- (int) number of days -->
     <xsl:variable name="dayOfWeek">
       <xsl:value-of select="$day - 7 * floor($day div 7)"/>
     </xsl:variable>

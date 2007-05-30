@@ -1097,10 +1097,12 @@
     
   </xsl:template>
   
-  <!--  template which counts date from number of days -->
-  
   <xsl:template name="NumberToDate">
-    <xsl:param name="value"/>
+    
+    <!-- @Descripition: converts number value to date value -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="value"/><!-- (float) number value -->
     <xsl:variable name="time">
       <xsl:value-of select="concat('0.',substring-after($value,'.'))"/>
     </xsl:variable>
@@ -1197,7 +1199,11 @@
   </xsl:template>
   
   <xsl:template name="NumberToTime">
-    <xsl:param name="value"/>
+    
+    <!-- @Descripition: converts number value to time value -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="value"/><!-- (float) number value -->
     <xsl:variable name="hours">
       <xsl:value-of select="floor($value * 24)"/>
     </xsl:variable>
@@ -1211,8 +1217,12 @@
   </xsl:template>
   
   <xsl:template name="DaysToMonthsAndDays">
-    <xsl:param name="days"/>
-    <xsl:param name="ExtraDay"/>
+    
+    <!-- @Descripition: converts day of a year to month and day of the year -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="days"/><!-- (int) day of year -->
+    <xsl:param name="ExtraDay"/><!-- (int) extra day if it's a leap year -->
     <xsl:choose>
       <xsl:when test="$days &lt; 32">
         <xsl:value-of select="concat('01-',format-number($days,'00'))"/>
@@ -1256,8 +1266,12 @@
   <!-- calcualte year and number of days left from number of days -->
   
   <xsl:template name="CalculateYearAndDay">
-    <xsl:param name="days"/>
-    <xsl:param name="currentYear"/>
+    
+    <!-- @Descripition: calcualte year and number of days left from number of days after 1.01.1900 -->
+    <!-- @Context: None -->
+    
+    <xsl:param name="days"/><!-- (int) number of days -->
+    <xsl:param name="currentYear"/><!-- (int) current year -->
     <xsl:choose>
       <xsl:when test="(($currentYear - 4 * floor(($currentYear) div 4)) = 0 and ($currentYear - 100 * floor(($currentYear) div 100) != 0)) or ($currentYear - 400 * floor(($currentYear) div 400)) = 0">
         <xsl:choose>
