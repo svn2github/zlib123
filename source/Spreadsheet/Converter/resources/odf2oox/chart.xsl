@@ -653,6 +653,7 @@
             <xsl:when test="$reverseCategories = 'true' ">
               <xsl:for-each select="key('series','')[position() = $number]/child::node()[last()]">
                 <xsl:call-template name="InsertDataPointsShapeProperties">
+                  <xsl:with-param name="parentStyleName" select="$styleName"/>
                   <xsl:with-param name="reverse" select=" 'true' "/>
                 </xsl:call-template>
               </xsl:for-each>
@@ -660,7 +661,9 @@
 
             <xsl:otherwise>
               <xsl:for-each select="key('series','')[position() = $number]/child::node()[1]">
-                <xsl:call-template name="InsertDataPointsShapeProperties"/>
+                <xsl:call-template name="InsertDataPointsShapeProperties">
+                  <xsl:with-param name="parentStyleName" select="$styleName"/>
+                </xsl:call-template>
               </xsl:for-each>
             </xsl:otherwise>
           </xsl:choose>
@@ -898,50 +901,62 @@
 
   <xsl:template name="InsertShapeProperties">
     <xsl:param name="styleName"/>
+    <xsl:param name="parentStyleName"/>
 
     <!-- series shape property -->
     <c:spPr>
-      <!--      <xsl:choose>
-        <xsl:when test="key('chart','' )/@chart:class = 'chart:circle' ">
-          <a:ln w="28575">
-            <a:noFill/>
-          </a:ln>
-        </xsl:when>
 
-        <xsl:otherwise>-->
       <!-- fill color -->
-      <a:solidFill>
-        <a:srgbClr val="9999FF">
-          <xsl:attribute name="val">
-            <xsl:value-of
-              select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
-            />
-          </xsl:attribute>
-        </a:srgbClr>
-      </a:solidFill>
+        <a:solidFill>
+          <a:srgbClr val="9999FF">
+            <xsl:attribute name="val">
+              <xsl:choose>
+                <xsl:when test="key('style',$styleName)/style:graphic-properties/@draw:fill-color">
+                  <xsl:value-of
+                    select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
+                  />
+                </xsl:when>
+                <xsl:when test="key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color">
+                  <xsl:value-of
+                    select="substring(key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color,2)"
+                  />
+                </xsl:when>
+              </xsl:choose>
+            </xsl:attribute>
+          </a:srgbClr>
+        </a:solidFill>
 
       <!-- line color -->
-      <xsl:if test="not(key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none')">
+      <xsl:if
+        test="not(key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none')">
         <a:ln w="3175">
           <a:solidFill>
             <a:srgbClr val="000000">
               <xsl:attribute name="val">
-                <xsl:value-of
-                  select="substring(key('style',$styleName)/style:graphic-properties/@svg:stroke-color,2)"
-                />
+                <xsl:choose>
+                  <xsl:when test="key('style',$styleName)/style:graphic-properties/@svg:stroke-color">
+                    <xsl:value-of
+                      select="substring(key('style',$styleName)/style:graphic-properties/@svg:stroke-color,2)"
+                    />
+                  </xsl:when>
+                  <xsl:when test="key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color">
+                    <xsl:value-of
+                      select="substring(key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color,2)"
+                    />                    
+                  </xsl:when>
+                </xsl:choose>                
               </xsl:attribute>
             </a:srgbClr>
           </a:solidFill>
           <a:prstDash val="solid"/>
         </a:ln>
       </xsl:if>
-      <!--        </xsl:otherwise>
-      </xsl:choose>-->
     </c:spPr>
 
   </xsl:template>
 
   <xsl:template name="InsertDataPointsShapeProperties">
+    <xsl:param name="parentStyleName"/>
     <xsl:param name="reverse"/>
     <xsl:param name="count" select="0"/>
 
@@ -956,20 +971,14 @@
       </xsl:choose>
     </xsl:variable>
 
+    <!-- only fill and stroke color for now -->
     <xsl:if test="@chart:style-name">
       <c:dPt>
         <c:idx val="{$count}"/>
         <xsl:call-template name="InsertShapeProperties">
+          <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
           <xsl:with-param name="styleName" select="@chart:style-name"/>
         </xsl:call-template>
-        <!--        <c:spPr>
-          <a:solidFill>
-            <a:srgbClr val="F79646"/>
-          </a:solidFill>
-          <a:ln w="28575">
-            <a:noFill/>
-          </a:ln>
-        </c:spPr>-->
       </c:dPt>
     </xsl:if>
 
@@ -980,6 +989,7 @@
         <xsl:if test="preceding-sibling::node()[1]">
           <xsl:for-each select="preceding-sibling::node()[1]">
             <xsl:call-template name="InsertDataPointsShapeProperties">
+              <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
               <xsl:with-param name="reverse" select="$reverse"/>
               <xsl:with-param name="count" select="$count + $points"/>
             </xsl:call-template>
@@ -991,6 +1001,7 @@
         <xsl:if test="following-sibling::node()[1]">
           <xsl:for-each select="following-sibling::node()[1]">
             <xsl:call-template name="InsertDataPointsShapeProperties">
+              <xsl:with-param name="parentStyleName" select="$parentStyleName"/>
               <xsl:with-param name="count" select="$count + $points"/>
             </xsl:call-template>
           </xsl:for-each>
@@ -1078,6 +1089,22 @@
             <xsl:with-param name="styleName" select="$styleName"/>
           </xsl:call-template>
 
+          <!-- marker type -->
+          <xsl:if
+            test="key('chart','' )/@chart:class = 'chart:line' or ancestor::chart:chart/chart:plot-area/chart:series[position() = $primarySeries + 1 + $count]/@chart:class = 'chart:line'">
+            <xsl:for-each
+              select="ancestor::chart:chart/chart:plot-area/chart:series[position() = $primarySeries + 1 + $count]">
+              <xsl:choose>
+                <xsl:when
+                  test="key('style',@chart:style-name )/style:chart-properties/@chart:symbol-type = 'none' ">
+                  <c:marker>
+                    <c:symbol val="none"/>
+                  </c:marker>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:if>
+          
           <!-- insert data categories -->
           <c:cat>
             <c:strLit>
