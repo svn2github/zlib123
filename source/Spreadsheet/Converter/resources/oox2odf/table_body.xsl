@@ -1017,7 +1017,7 @@
                         </xsl:with-param>
                         <xsl:with-param name="format">
                           <xsl:choose>
-                            <xsl:when test="contains($numStyle,']') and not(contains($numStyle,'[h]'))">
+                            <xsl:when test="contains($numStyle,']') and not(contains($numStyle,'[h'))">
                               <xsl:value-of select="substring-after($numStyle,']')"/>
                             </xsl:when>
                             <xsl:otherwise>
@@ -1030,7 +1030,7 @@
                         </xsl:with-param>
                         <xsl:with-param name="processedFormat">
                           <xsl:choose>
-                            <xsl:when test="contains($numStyle,']') and not(contains($numStyle,'[h]'))">
+                            <xsl:when test="contains($numStyle,']') and not(contains($numStyle,'[h'))">
                               <xsl:value-of select="substring-after($numStyle,']')"/>
                             </xsl:when>
                             <xsl:otherwise>
@@ -2649,7 +2649,7 @@
 
   <xsl:template name="FormatTime">
     
-    <!-- @Descripition: inserts timee to cell in a correct format -->
+    <!-- @Descripition: inserts time to cell in a correct format -->
     <!-- @Context: None -->
     
     <xsl:param name="value"/><!-- (time) input time value -->

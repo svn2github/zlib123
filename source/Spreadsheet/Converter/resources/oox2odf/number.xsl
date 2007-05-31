@@ -78,14 +78,14 @@
       <!-- 'and' at the end is for latvian currency -->
       <xsl:when test="contains($formatingMarks,'h') or contains($formatingMarks,'s') and not(contains($formatingMarks, '$Ls-426' ))">
         <number:time-style style:name="{generate-id(.)}">
-          <xsl:if test="contains($formatingMarks,'[h]')">
+          <xsl:if test="contains($formatingMarks,'[h')">
             <xsl:attribute name="number:truncate-on-overflow">false</xsl:attribute>
           </xsl:if>
           <xsl:call-template name="ProcessFormat">
             <xsl:with-param name="format">
               <xsl:choose>
-                <xsl:when test="contains(@formatCode,'[h]')">
-                  <xsl:value-of select="translate(@formatCode,'[h]','h')"/>
+                <xsl:when test="contains(@formatCode,'[h')">
+                  <xsl:value-of select="translate(translate(@formatCode,'[h','h'),']','')"/>
                 </xsl:when>
                 <xsl:when test="contains(@formatCode,']')">
                   <xsl:value-of select="substring-after(@formatCode,']')"/>
@@ -97,8 +97,8 @@
             </xsl:with-param>
             <xsl:with-param name="processedFormat">
               <xsl:choose>
-                <xsl:when test="contains(@formatCode,'[h]')">
-                  <xsl:value-of select="translate(@formatCode,'[h]','h')"/>
+                <xsl:when test="contains(@formatCode,'[h')">
+                  <xsl:value-of select="translate(translate(@formatCode,'[h','h'),']','')"/>
                 </xsl:when>
                 <xsl:when test="contains(@formatCode,']')">
                   <xsl:value-of select="substring-after(@formatCode,']')"/>
@@ -1298,6 +1298,40 @@
       <!-- seconds -->
       <xsl:when test="starts-with($processedFormat,'s')">
         <xsl:choose>
+          <xsl:when test="starts-with(substring-after($processedFormat,'s'),'s.')">
+            <xsl:variable name="decimalPlaces">
+              <xsl:call-template name="InsertDecimalPlaces">
+                <xsl:with-param name="code">
+                  <xsl:value-of select="substring-after($processedFormat,'s.')"/>
+                </xsl:with-param>
+                <xsl:with-param name="value">0</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <number:seconds number:style="long" number:decimal-places="{$decimalPlaces}"/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring(substring-after($processedFormat,'ss.'),$decimalPlaces+1)"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="starts-with(substring-after($processedFormat,'s'),'.')">
+            <xsl:variable name="decimalPlaces">
+              <xsl:call-template name="InsertDecimalPlaces">
+                <xsl:with-param name="code">
+                  <xsl:value-of select="substring-after($processedFormat,'s.')"/>
+                </xsl:with-param>
+                <xsl:with-param name="value">0</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <number:seconds number:style="long" number:decimal-places="{$decimalPlaces}"/>
+            <xsl:call-template name="ProcessFormat">
+              <xsl:with-param name="format" select="$format"/>
+              <xsl:with-param name="processedFormat">
+                <xsl:value-of select="substring(substring-after($processedFormat,'s.'),$decimalPlaces+1)"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
           <xsl:when test="starts-with(substring-after($processedFormat,'s'),'s')">
             <number:seconds number:style="long"/>
             <xsl:call-template name="ProcessFormat">
