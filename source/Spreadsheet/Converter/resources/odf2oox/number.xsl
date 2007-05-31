@@ -34,12 +34,14 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   exclude-result-prefixes="number style fo">
 
-  <!-- template to insert number formats -->
-
   <xsl:template match="number:number-style" mode="numFormat">
-    <xsl:param name="numId"/>
-    <xsl:param name="format"/>
-    <xsl:param name="styleName"/>
+    
+    <!-- @Description: inserts number format -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="numId"/><!--(int) number format id -->
+    <xsl:param name="format"/><!--(string) format code -->
+    <xsl:param name="styleName"/><!--(string) style name -->
 
     <xsl:choose>
 
@@ -114,12 +116,14 @@
 
   </xsl:template>
 
-  <!-- template to insert percentage formats -->
-
   <xsl:template match="number:percentage-style" mode="numFormat">
-    <xsl:param name="numId"/>
-    <xsl:param name="format"/>
-    <xsl:param name="styleName"/>
+    
+    <!-- @Description: inserts percentage formats -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="numId"/><!--(int) number format id -->
+    <xsl:param name="format"/><!--(string) format code -->
+    <xsl:param name="styleName"/><!--(string) style name -->
 
     <xsl:choose>
 
@@ -197,12 +201,14 @@
 
   </xsl:template>
 
-  <!-- template to insert currency formats -->
-
   <xsl:template match="number:currency-style" mode="numFormat">
-    <xsl:param name="numId"/>
-    <xsl:param name="format"/>
-    <xsl:param name="styleName"/>
+    
+    <!-- @Description: inserts currency formats -->
+    <!--  @Context: none -->
+    
+    <xsl:param name="numId"/><!--(int) number format id-->
+    <xsl:param name="format"/><!-- (string) format code -->
+    <xsl:param name="styleName"/><!-- (string) style name -->
 
     <xsl:variable name="currencySymbol">
       <xsl:call-template name="ConvertValueSymbol">
@@ -294,9 +300,13 @@
 
   </xsl:template>
 
-  <!-- get number code format -->
-  <xsl:template name="GetFormatCode">
-    <xsl:param name="currencySymbol"/>
+   <xsl:template name="GetFormatCode">
+    
+    <!-- @Description: gets number code format -->
+     <!-- @Context: none -->
+     
+    <xsl:param name="currencySymbol"/><!--(string) currency symbol if it's currency format -->
+    
     <xsl:variable name="value">
       <xsl:choose>
 
@@ -310,7 +320,21 @@
             <xsl:with-param name="val"/>
           </xsl:call-template>
         </xsl:when>
+        
+        <xsl:when test="number:fraction/@number:min-integer-digits and number:fraction/@number:min-integer-digits &gt; 0">
+          <xsl:call-template name="AddLeadingZeros">
+            <xsl:with-param name="num">
+              <xsl:value-of select="number:fraction/@number:min-integer-digits"/>
+            </xsl:with-param>
+            <xsl:with-param name="val"/>
+          </xsl:call-template>
+        </xsl:when>
 
+        <xsl:when test="number:fraction/@number:min-integer-digits = 0">#</xsl:when>
+        
+        <!-- plain fraction format -->
+        <xsl:when test="number:fraction"/>
+        
         <xsl:otherwise>#</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -319,7 +343,7 @@
 
         <!-- add decimal places -->
         <xsl:when
-          test="number:number/@number:decimal-places &gt; 0 or (not(number:number/@number:decimal-places) and document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places &gt; 0)">
+          test="number:number/@number:decimal-places &gt; 0 or (not(number:number/@number:decimal-places) and not(number:fraction) and document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places &gt; 0)">
           <xsl:call-template name="AddDecimalPlaces">
             <xsl:with-param name="value">
               <xsl:choose>
@@ -381,6 +405,44 @@
 
         </xsl:when>
 
+        <!-- add fraction -->
+        <xsl:when test="number:fraction">
+        <xsl:call-template name="AddFraction">
+          <xsl:with-param name="value">
+            <xsl:choose>
+              
+              <!-- add grouping -->
+              <xsl:when
+                test="number:fraction/@number:grouping and number:fraction/@number:grouping = 'true'">
+                <xsl:call-template name="AddGrouping">
+                  <xsl:with-param name="value">
+                    <xsl:value-of select="concat($value,'.')"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numDigits">
+                    <xsl:choose>
+                      <xsl:when test="number:fraction/@number:min-integer-digits">
+                        <xsl:value-of select="3 - number:fraction/@number:min-integer-digits"/>
+                      </xsl:when>
+                      <xsl:otherwise>2</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              
+              <xsl:otherwise>
+                <xsl:value-of select="concat($value,'.')"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="numerator">
+            <xsl:value-of select="number:fraction/@number:min-numerator-digits"/>
+          </xsl:with-param>
+          <xsl:with-param name="denominator">
+            <xsl:value-of select="number:fraction/@number:min-denominator-digits"/>
+          </xsl:with-param>
+        </xsl:call-template>  
+        </xsl:when>
+        
         <xsl:otherwise>
           <xsl:choose>
 
@@ -568,13 +630,16 @@
         <xsl:value-of select="$valueWithCurrency"/>
       </xsl:otherwise>
     </xsl:choose>
+        
   </xsl:template>
 
-  <!-- template to add leading zeros -->
-
   <xsl:template name="AddLeadingZeros">
-    <xsl:param name="num"/>
-    <xsl:param name="val"/>
+    
+    <!-- @Description: adds leading zeros -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="num"/><!--(int) number of leading zeros-->
+    <xsl:param name="val"/><!--(string) output format value -->
     <xsl:choose>
       <xsl:when test="$num &gt; 0">
         <xsl:call-template name="AddLeadingZeros">
@@ -592,11 +657,13 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- template to add grouping -->
-
   <xsl:template name="AddGrouping">
-    <xsl:param name="numDigits"/>
-    <xsl:param name="value"/>
+    
+    <!-- @Description: adds grouping -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="numDigits"/><!--(int) number of digits -->
+    <xsl:param name="value"/><!-- (string) output format value -->
     <xsl:choose>
       <xsl:when test="$numDigits &gt; 0">
         <xsl:call-template name="AddGrouping">
@@ -614,12 +681,14 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- template to add decimal places -->
-
   <xsl:template name="AddDecimalPlaces">
-    <xsl:param name="value"/>
-    <xsl:param name="num"/>
-    <xsl:param name="decimalReplacement"/>
+    
+    <!-- @Description: adds decimal places -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="value"/><!--(string) format value -->
+    <xsl:param name="num"/><!-- (int) decimal places -->
+    <xsl:param name="decimalReplacement"/><!--(string) decimal replacement -->
     <xsl:choose>
       <xsl:when test="$num &gt; 0">
         <xsl:call-template name="AddDecimalPlaces">
@@ -637,12 +706,69 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  <xsl:template name="AddFraction">
+    
+    <!-- @Description: adds fraction format -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="value"/><!-- (string) output fraction format -->
+    <xsl:param name="numerator"/><!-- (int) number of digits in numerator -->
+    <xsl:param name="denominator"/><!-- (int) number of digits in denominator -->
+    <xsl:variable name="fraction">
+      <xsl:call-template name="ConvertNumeratorDenominator">
+        <xsl:with-param name="numerator" select="$numerator"/>
+        <xsl:with-param name="denominator" select="$denominator"/>
+        <xsl:with-param name="value">/</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="concat(translate($value,'.',''),'&quot; &quot;',$fraction)"/>
+  </xsl:template>
 
-  <!-- template to divide number by display factor -->
-
+  <xsl:template name="ConvertNumeratorDenominator">
+    
+    <!-- @Description: converts number of digits in numerator and denominator into plain fraction format -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="numerator"/><!-- (int) number of digits in numerator -->
+    <xsl:param name="denominator"/><!-- (int) number of digits in denominator -->
+    <xsl:param name="value"/><!-- (string) output fraction format -->
+    <xsl:choose>
+      <xsl:when test="$numerator &gt; 0">
+        <xsl:call-template name="ConvertNumeratorDenominator">
+          <xsl:with-param name="numerator">
+            <xsl:value-of select="$numerator - 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="denominator" select="$denominator"/>
+          <xsl:with-param name="value">
+            <xsl:value-of select="concat('?',$value)"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$denominator &gt; 0">
+        <xsl:call-template name="ConvertNumeratorDenominator">
+          <xsl:with-param name="numerator" select="$numerator"/>
+          <xsl:with-param name="denominator">
+            <xsl:value-of select="$denominator - 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="value">
+            <xsl:value-of select="concat($value,'?')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$value"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <xsl:template name="UseThousandDisplayFactor">
-    <xsl:param name="displayFactor"/>
-    <xsl:param name="value"/>
+    
+    <!-- @Description: inserts display factor -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="displayFactor"/><!--(int) display factor -->
+    <xsl:param name="value"/><!--(string) output format value -->
     <xsl:choose>
       <xsl:when test="string-length($displayFactor) &gt; 1">
         <xsl:call-template name="UseThousandDisplayFactor">
