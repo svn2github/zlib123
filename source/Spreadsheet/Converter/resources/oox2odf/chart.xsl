@@ -796,6 +796,11 @@
             <xsl:text>true</xsl:text>
           </xsl:attribute>
         </xsl:when>
+        <xsl:when test="key('grouping','')[1]/@val = 'standard' ">
+          <xsl:attribute name="chart:deep">
+            <xsl:text>true</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
       </xsl:choose>
 
       <!-- 3D chart -->
