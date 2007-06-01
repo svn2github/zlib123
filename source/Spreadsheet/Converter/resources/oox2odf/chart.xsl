@@ -226,7 +226,7 @@
     <xsl:variable name="reverseCategories">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="c:barChart/c:barDir/@val = 'bar' ">
+          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:pieChart">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -470,17 +470,17 @@
     <xsl:choose>
       <!-- title is set by user -->
       <xsl:when test="c:chartSpace/c:chart/c:title/c:tx">
-        <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="chart_title">          
+        <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="chart_title">
           <text:p>
             <xsl:for-each select="c:chartSpace/c:chart/c:title/c:tx/c:rich/a:p/a:r">
-                
-                <!-- [ENTER] -->
-                <xsl:if test="preceding-sibling::node()[1][name() = 'a:br']">
-                  <xsl:value-of select="'&#xD;&#xA;'"/>
-                </xsl:if>
-                
-                <xsl:value-of select="a:t"/>
-              </xsl:for-each>
+
+              <!-- [ENTER] -->
+              <xsl:if test="preceding-sibling::node()[1][name() = 'a:br']">
+                <xsl:value-of select="'&#xD;&#xA;'"/>
+              </xsl:if>
+
+              <xsl:value-of select="a:t"/>
+            </xsl:for-each>
           </text:p>
         </chart:title>
       </xsl:when>
@@ -566,7 +566,7 @@
             <xsl:text>chart:circle</xsl:text>
           </xsl:when>
 
-          <!-- making problems at his time -->
+          <!-- making problems at this time -->
           <!--
             <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
               <xsl:text>chart:scatter<xsl:text>
@@ -603,7 +603,7 @@
 
         <xsl:call-template name="InsertDataSeries"/>
 
-        <chart:wall chart:style-name="ch10"/>
+        <chart:wall chart:style-name="wall"/>
         <chart:floor chart:style-name="floor"/>
       </chart:plot-area>
 
@@ -713,7 +713,7 @@
     <xsl:variable name="reverse">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="c:barChart/c:barDir/@val = 'bar' ">
+          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:pieChart ">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -761,7 +761,9 @@
   <xsl:template name="InsertFloorProperties">
     <!-- c:chartSpace/c:chart/c:floor -->
     <style:style style:name="floor" style:family="chart">
-      <style:graphic-properties draw:stroke="none" draw:fill-color="#999999"/>
+      <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.03cm"
+        draw:marker-start-width="0.25cm" draw:marker-end-width="0.25cm" draw:fill="none"
+        draw:fill-color="#999999"/>      
     </style:style>
   </xsl:template>
 
@@ -798,23 +800,25 @@
 
       <!-- 3D chart -->
       <xsl:choose>
-        <xsl:when test="c:bar3DChart">
+        <xsl:when test="c:bar3DChart or c:line3DChart">
           <xsl:attribute name="chart:three-dimensional">
             <xsl:text>true</xsl:text>
           </xsl:attribute>
 
           <!-- 3D shape -->
-          <xsl:choose>
-            <xsl:when test="descendant:: c:shape/@val != '' ">
-              <xsl:for-each select="descendant::c:shape[1]">
-                <xsl:if test="@val != 'box' ">
-                  <xsl:attribute name="chart:solid-type">
-                    <xsl:value-of select="@val"/>
-                  </xsl:attribute>
-                </xsl:if>
-              </xsl:for-each>
-            </xsl:when>
-          </xsl:choose>
+          <xsl:if test="c:bar3DChart">
+            <xsl:choose>
+              <xsl:when test="descendant:: c:shape/@val != '' ">
+                <xsl:for-each select="descendant::c:shape[1]">
+                  <xsl:if test="@val != 'box' ">
+                    <xsl:attribute name="chart:solid-type">
+                      <xsl:value-of select="@val"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                </xsl:for-each>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:if>
 
         </xsl:when>
       </xsl:choose>
