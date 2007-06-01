@@ -213,7 +213,7 @@
     <xsl:variable name="reverseSeries">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="c:barChart/c:barDir/@val = 'bar'  or c:areaChart/c:grouping/@val = 'standard' ">
+          <xsl:when test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' )  or c:areaChart/c:grouping/@val = 'standard' ">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -713,7 +713,7 @@
     <xsl:variable name="reverse">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:areaChart/c:grouping/@val = 'standard' ">
+          <xsl:when test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' ) or c:areaChart/c:grouping/@val = 'standard' ">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
