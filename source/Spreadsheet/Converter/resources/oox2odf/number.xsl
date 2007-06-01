@@ -556,9 +556,10 @@
         test="contains(substring-after($realFormatCode,$currencyFormat),'-') and not( substring(substring-after($realFormatCode,$currencyFormat), string-length(substring-after($realFormatCode,$currencyFormat)) - 1) = '_-' )">
         <number:text>-</number:text>
       </xsl:if>
-      <xsl:call-template name="InsertCurrencySymbol">
-        <xsl:with-param name="value" select="$currencyFormat"/>
-      </xsl:call-template>
+      
+        <xsl:call-template name="InsertCurrencySymbol">
+          <xsl:with-param name="value" select="$currencyFormat"/>
+        </xsl:call-template>
 
       <!-- add space after currency symbol -->
       <xsl:if
@@ -576,150 +577,29 @@
       <number:text>-</number:text>
     </xsl:if>
 
-    <number:number>
-
-      <xsl:variable name="formatCodeWithoutComma">
-        <xsl:choose>
-          <xsl:when test="contains($realFormatCode,'.')">
-            <xsl:value-of select="substring-before($realFormatCode,'.')"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$realFormatCode"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-
-      <!-- decimal places -->
-      <xsl:attribute name="number:decimal-places">
-        <xsl:choose>
-          <!-- when currency format contains '.' and there is another '.' after -->
-          <xsl:when
-            test="contains(substring-after($realFormatCode,$currencyFormat),'.' ) and contains($currencyFormat,'.' )">
-            <xsl:call-template name="InsertDecimalPlaces">
-              <xsl:with-param name="code">
-                <xsl:value-of select="substring-after(substring-after($realFormatCode,'.'),'.' )"/>
-              </xsl:with-param>
-              <xsl:with-param name="value">0</xsl:with-param>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:when test="contains($realFormatCode,'.')">
-            <xsl:call-template name="InsertDecimalPlaces">
-              <xsl:with-param name="code">
-                <xsl:value-of select="substring-after($realFormatCode,'.')"/>
-              </xsl:with-param>
-              <xsl:with-param name="value">0</xsl:with-param>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-
-      <!-- min integer digits -->
-      <xsl:attribute name="number:min-integer-digits">
-        <xsl:choose>
-          <xsl:when
-            test="substring($formatCodeWithoutComma,string-length($formatCodeWithoutComma))='0'">
-            <xsl:call-template name="InsertMinIntegerDigits">
-              <xsl:with-param name="code">
-                <xsl:value-of
-                  select="substring($formatCodeWithoutComma,0,string-length($formatCodeWithoutComma))"
-                />
-              </xsl:with-param>
-              <xsl:with-param name="value">1</xsl:with-param>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>0</xsl:otherwise>
-        </xsl:choose>
-      </xsl:attribute>
-
-      <xsl:if test="not(contains(substring-after(@formatCode, '.'), '0'))">
-        <xsl:attribute name="number:decimal-replacement"/>
-      </xsl:if>
-
-
-      <!-- grouping -->
-      <xsl:if test="contains($realFormatCode,',')">
-        <xsl:choose>
-          <xsl:when
-            test="contains(substring-after($realFormatCode,','),'0') or contains(substring-after($realFormatCode,','),'#')">
-            <xsl:attribute name="number:grouping">true</xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="number:display-factor">
-              <xsl:call-template name="UseDisplayFactor">
-                <xsl:with-param name="formatBeforeSeparator">
-                  <xsl:value-of select="substring-before($realFormatCode,',')"/>
-                </xsl:with-param>
-                <xsl:with-param name="formatAfterSeparator">
-                  <xsl:value-of select="substring-after($realFormatCode,',')"/>
-                </xsl:with-param>
-                <xsl:with-param name="value">1000</xsl:with-param>
-              </xsl:call-template>
-            </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:if>
-
-      <!-- '-' embedded in number format -->
-      <xsl:if
-        test="contains(substring-after(substring-before($formatCode,'.'),'#'),'-') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-') and string-length(translate(substring-after(substring-after($formatCode,'#'),'-'),'-','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'-')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-') and string-length(translate(substring-after(substring-after($formatCode,'0'),'-'),'-','')) &gt; 0)">
-        <xsl:call-template name="FindTextNumberFormat">
-          <xsl:with-param name="format">
-            <xsl:choose>
-              <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'#'),'-')">
-                <xsl:value-of
-                  select="concat('#',substring-after(substring-before($formatCode,'.'),'#'))"/>
-              </xsl:when>
-              <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'0'),'-')">
-                <xsl:value-of
-                  select="concat('0',substring-after(substring-before($formatCode,'.'),'0'))"/>
-              </xsl:when>
-              <xsl:when
-                test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-')">
-                <xsl:value-of select="concat('#',substring-after($formatCode,'#'))"/>
-              </xsl:when>
-              <xsl:when
-                test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-')">
-                <xsl:value-of select="concat('0',substring-after($formatCode,'0'))"/>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:with-param>
-          <xsl:with-param name="embeddedText">-</xsl:with-param>
-        </xsl:call-template>
-      </xsl:if>
-
-      <!-- '\ ' embedded in number format -->
-      <xsl:if
-        test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'#'),'\ '),'\ ','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'0'),'\ '),'\ ','')) &gt; 0)">
-        <xsl:call-template name="FindTextNumberFormat">
-          <xsl:with-param name="format">
-            <xsl:choose>
-              <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ')">
-                <xsl:value-of
-                  select="concat('#',substring-after(substring-before($formatCode,'.'),'#'))"/>
-              </xsl:when>
-              <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')">
-                <xsl:value-of
-                  select="concat('0',substring-after(substring-before($formatCode,'.'),'0'))"/>
-              </xsl:when>
-              <xsl:when
-                test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ')">
-                <xsl:value-of select="concat('#',substring-after($formatCode,'#'))"/>
-              </xsl:when>
-              <xsl:when
-                test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ')">
-                <xsl:value-of select="concat('0',substring-after($formatCode,'0'))"/>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:with-param>
-          <xsl:with-param name="embeddedText">
-            <xsl:value-of xml:space="preserve" select="'\ '"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:if>
-
-    </number:number>
-
+    <xsl:choose>
+      <xsl:when test="contains($realFormatCode,'?/')">
+        <number:fraction>
+          <xsl:call-template name="InsertNumberFormattingContent">
+            <xsl:with-param name="formatCode" select="$formatCode"/>
+            <xsl:with-param name="realFormatCode" select="$realFormatCode"/>
+            <xsl:with-param name="currencyFormat" select="$currencyFormat"/>
+            <xsl:with-param name="isFraction">true</xsl:with-param>
+          </xsl:call-template>
+        </number:fraction>
+      </xsl:when>
+      <xsl:otherwise>
+        <number:number>
+          <xsl:call-template name="InsertNumberFormattingContent">
+            <xsl:with-param name="formatCode" select="$formatCode"/>
+            <xsl:with-param name="realFormatCode" select="$realFormatCode"/>
+            <xsl:with-param name="currencyFormat" select="$currencyFormat"/>
+            <xsl:with-param name="isFraction">false</xsl:with-param>
+          </xsl:call-template>
+        </number:number>
+      </xsl:otherwise>
+    </xsl:choose>
+    
     <!-- add currency symbol at the end -->
     <xsl:if
       test="$currencyFormat and $currencyFormat!='' and (contains(substring-before($realFormatCode,$currencyFormat),'0') or contains(substring-before($realFormatCode,$currencyFormat),'#'))">
@@ -730,11 +610,11 @@
           <xsl:value-of xml:space="preserve" select="' '"/>
         </number:text>
       </xsl:if>
-
-      <xsl:call-template name="InsertCurrencySymbol">
-        <xsl:with-param name="value" select="$currencyFormat"/>
-      </xsl:call-template>
-
+      
+        <xsl:call-template name="InsertCurrencySymbol">
+          <xsl:with-param name="value" select="$currencyFormat"/>
+        </xsl:call-template>
+      
     </xsl:if>
 
     <!-- add brackets -->
@@ -769,6 +649,202 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template name="InsertNumberFormattingContent">
+    
+    <!-- @Description: inserts content of number formatting -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="formatCode"/><!-- (string) input format code -->
+    <xsl:param name="realFormatCode"/><!-- (string) format code modified for conversion --> 
+    <xsl:param name="currencyFormat"/><!-- (string) currency format -->
+    <xsl:param name="isFraction"/><!-- (bool) check if it's a fraction format -->
+    
+    <xsl:variable name="formatCodeWithoutComma">
+      <xsl:choose>
+        <xsl:when test="contains($realFormatCode,'.')">
+          <xsl:value-of select="substring-before($realFormatCode,'.')"/>
+        </xsl:when>
+        <xsl:when test="contains($realFormatCode,'&quot; &quot;?')">
+          <xsl:value-of select="substring-before($realFormatCode,'&quot; &quot;?')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$realFormatCode"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:choose>
+      
+    <!-- decimal places -->
+    <xsl:when test="$isFraction = 'false'">
+    <xsl:attribute name="number:decimal-places">
+      <xsl:choose>
+        <!-- when currency format contains '.' and there is another '.' after -->
+        <xsl:when
+          test="contains(substring-after($realFormatCode,$currencyFormat),'.' ) and contains($currencyFormat,'.' )">
+          <xsl:call-template name="InsertDecimalPlaces">
+            <xsl:with-param name="code">
+              <xsl:value-of select="substring-after(substring-after($realFormatCode,'.'),'.' )"/>
+            </xsl:with-param>
+            <xsl:with-param name="value">0</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="contains($realFormatCode,'.')">
+          <xsl:call-template name="InsertDecimalPlaces">
+            <xsl:with-param name="code">
+              <xsl:value-of select="substring-after($realFormatCode,'.')"/>
+            </xsl:with-param>
+            <xsl:with-param name="value">0</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    </xsl:when>
+      
+      <!-- fraction format -->
+      <xsl:otherwise>
+        
+        <xsl:variable name="plainFormat">
+          <xsl:call-template name="StripText">
+            <xsl:with-param name="formatCode" select="$realFormatCode"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="fractionFormat">
+          <xsl:choose>
+            <xsl:when test="contains(substring-after(translate($plainFormat,'[','\ '),'?'),'\ ')">
+              <xsl:value-of select="concat('?',substring-before(substring-after(translate($plainFormat,'[','\ '),'?'),'\ '))"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat('?',substring-after($plainFormat,'?'))"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:attribute name="number:min-numerator-digits">
+          <xsl:value-of select="string-length(substring-before($fractionFormat,'/'))"/>
+        </xsl:attribute>
+        <xsl:attribute name="number:min-denominator-digits">
+          <xsl:value-of select="string-length(substring-after($fractionFormat,'/'))"/>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+      
+    <!-- min integer digits -->
+    
+      <xsl:choose>
+        <xsl:when
+          test="substring($formatCodeWithoutComma,string-length($formatCodeWithoutComma))='0'">
+          <xsl:attribute name="number:min-integer-digits">
+          <xsl:call-template name="InsertMinIntegerDigits">
+            <xsl:with-param name="code">
+              <xsl:value-of
+                select="substring($formatCodeWithoutComma,0,string-length($formatCodeWithoutComma))"
+              />
+            </xsl:with-param>
+            <xsl:with-param name="value">1</xsl:with-param>
+          </xsl:call-template>
+            </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$isFraction = 'false'">
+              <xsl:attribute name="number:min-integer-digits">0</xsl:attribute>
+            </xsl:when>
+            <xsl:when test="substring($formatCodeWithoutComma,string-length($formatCodeWithoutComma))='#'">
+              <xsl:attribute name="number:min-integer-digits">0</xsl:attribute>
+            </xsl:when>
+          </xsl:choose>
+          </xsl:otherwise>
+      </xsl:choose>
+    
+    <xsl:if test="not(contains(substring-after(@formatCode, '.'), '0')) and $isFraction = 'false'">
+      <xsl:attribute name="number:decimal-replacement"/>
+    </xsl:if>
+    
+    
+    <!-- grouping -->
+    <xsl:if test="contains($realFormatCode,',')">
+      <xsl:choose>
+        <xsl:when
+          test="contains(substring-after($realFormatCode,','),'0') or contains(substring-after($realFormatCode,','),'#')">
+          <xsl:attribute name="number:grouping">true</xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="number:display-factor">
+            <xsl:call-template name="UseDisplayFactor">
+              <xsl:with-param name="formatBeforeSeparator">
+                <xsl:value-of select="substring-before($realFormatCode,',')"/>
+              </xsl:with-param>
+              <xsl:with-param name="formatAfterSeparator">
+                <xsl:value-of select="substring-after($realFormatCode,',')"/>
+              </xsl:with-param>
+              <xsl:with-param name="value">1000</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+    
+    
+    <!-- '-' embedded in number format -->
+    <xsl:if
+      test="($isFraction = 'false') and (contains(substring-after(substring-before($formatCode,'.'),'#'),'-') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-') and string-length(translate(substring-after(substring-after($formatCode,'#'),'-'),'-','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'-')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-') and string-length(translate(substring-after(substring-after($formatCode,'0'),'-'),'-','')) &gt; 0))">
+      <xsl:call-template name="FindTextNumberFormat">
+        <xsl:with-param name="format">
+          <xsl:choose>
+            <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'#'),'-')">
+              <xsl:value-of
+                select="concat('#',substring-after(substring-before($formatCode,'.'),'#'))"/>
+            </xsl:when>
+            <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'0'),'-')">
+              <xsl:value-of
+                select="concat('0',substring-after(substring-before($formatCode,'.'),'0'))"/>
+            </xsl:when>
+            <xsl:when
+              test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'-')">
+              <xsl:value-of select="concat('#',substring-after($formatCode,'#'))"/>
+            </xsl:when>
+            <xsl:when
+              test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'-')">
+              <xsl:value-of select="concat('0',substring-after($formatCode,'0'))"/>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="embeddedText">-</xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    
+    <!-- '\ ' embedded in number format -->
+    <xsl:if
+      test="($isFraction = 'false') and (contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ') or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'#'),'\ '),'\ ','')) &gt; 0) or contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')  or (not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ') and string-length(translate(substring-after(substring-after($formatCode,'0'),'\ '),'\ ','')) &gt; 0))">
+      <xsl:call-template name="FindTextNumberFormat">
+        <xsl:with-param name="format">
+          <xsl:choose>
+            <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'#'),'\ ')">
+              <xsl:value-of
+                select="concat('#',substring-after(substring-before($formatCode,'.'),'#'))"/>
+            </xsl:when>
+            <xsl:when test="contains(substring-after(substring-before($formatCode,'.'),'0'),'\ ')">
+              <xsl:value-of
+                select="concat('0',substring-after(substring-before($formatCode,'.'),'0'))"/>
+            </xsl:when>
+            <xsl:when
+              test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'#'),'\ ')">
+              <xsl:value-of select="concat('#',substring-after($formatCode,'#'))"/>
+            </xsl:when>
+            <xsl:when
+              test="not(contains($formatCode,'.')) and contains(substring-after($formatCode,'0'),'\ ')">
+              <xsl:value-of select="concat('0',substring-after($formatCode,'0'))"/>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="embeddedText">
+          <xsl:value-of xml:space="preserve" select="'\ '"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template name="UseDisplayFactor">
     
     <!-- @Descripition: inserts display factor -->
@@ -1102,6 +1178,28 @@
     <!-- @Context: None -->
     
     <xsl:param name="ID"/><!-- (int) number format ID -->
+    
+    <xsl:choose>
+      <xsl:when test="$ID = 12 or $ID = 13">
+        
+        <!--fraction format -->
+        <number:fraction number:min-integer-digits="0">
+          <xsl:attribute name="number:min-numerator-digits">
+            <xsl:choose>
+              <xsl:when test="$ID = 12">1</xsl:when>
+              <xsl:when test="$ID = 13">2</xsl:when>
+            </xsl:choose>
+          </xsl:attribute>
+          <xsl:attribute name="number:min-denominator-digits">
+            <xsl:choose>
+              <xsl:when test="$ID = 12">1</xsl:when>
+              <xsl:when test="$ID = 13">2</xsl:when>
+            </xsl:choose>
+          </xsl:attribute>
+        </number:fraction>
+      </xsl:when>
+      
+      <xsl:otherwise>
     <number:number>
       <xsl:attribute name="number:decimal-places">
         <xsl:choose>
@@ -1123,6 +1221,8 @@
     <xsl:if test="$ID = 9 or $ID = 10">
       <number:text>%</number:text>
     </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="ProcessFormat">
