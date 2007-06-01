@@ -800,7 +800,7 @@
 
       <!-- 3D chart -->
       <xsl:choose>
-        <xsl:when test="c:bar3DChart or c:line3DChart">
+        <xsl:when test="c:bar3DChart or c:line3DChart or c:area3DChart">
           <xsl:attribute name="chart:three-dimensional">
             <xsl:text>true</xsl:text>
           </xsl:attribute>
