@@ -226,7 +226,7 @@
     <xsl:variable name="reverseCategories">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:pieChart">
+          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -485,7 +485,7 @@
         </chart:title>
       </xsl:when>
       <!-- default pie chart title is first series name -->
-      <xsl:when test="c:chartSpace/c:chart/c:title and c:chartSpace/c:chart/c:plotArea/c:pieChart">
+      <xsl:when test="c:chartSpace/c:chart/c:title and (c:chartSpace/c:chart/c:plotArea/c:pieChart or c:chartSpace/c:chart/c:plotArea/c:pie3DChart)">
         <xsl:for-each select="key('dataSeries','')[1]/c:tx/descendant::c:v[1]">
           <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="chart_title">
             <text:p>
@@ -713,7 +713,7 @@
     <xsl:variable name="reverse">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:pieChart ">
+          <xsl:when test="c:barChart/c:barDir/@val = 'bar' or c:pieChart or c:pie3DChart">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -805,7 +805,7 @@
 
       <!-- 3D chart -->
       <xsl:choose>
-        <xsl:when test="c:bar3DChart or c:line3DChart or c:area3DChart">
+        <xsl:when test="c:bar3DChart or c:line3DChart or c:area3DChart or c:pie3DChart">
           <xsl:attribute name="chart:three-dimensional">
             <xsl:text>true</xsl:text>
           </xsl:attribute>
