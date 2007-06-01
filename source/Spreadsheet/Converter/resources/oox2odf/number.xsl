@@ -578,7 +578,7 @@
     </xsl:if>
 
     <xsl:choose>
-      <xsl:when test="contains($realFormatCode,'?/')">
+      <xsl:when test="contains($realFormatCode,'?/') or contains($realFormatCode,'/?') or contains($realFormatCode,'0/') or contains($realFormatCode,'/0') or contains($realFormatCode,'1/') or contains($realFormatCode,'/1') or contains($realFormatCode,'2/') or contains($realFormatCode,'/2') or contains($realFormatCode,'3/') or contains($realFormatCode,'/3') or contains($realFormatCode,'4/') or contains($realFormatCode,'/4') or contains($realFormatCode,'5/') or contains($realFormatCode,'/5') or contains($realFormatCode,'6/') or contains($realFormatCode,'/6') or contains($realFormatCode,'7/') or contains($realFormatCode,'/7') or contains($realFormatCode,'8/') or contains($realFormatCode,'/8') or contains($realFormatCode,'9/') or contains($realFormatCode,'9/')">
         <number:fraction>
           <xsl:call-template name="InsertNumberFormattingContent">
             <xsl:with-param name="formatCode" select="$formatCode"/>
@@ -664,15 +664,14 @@
         <xsl:when test="contains($realFormatCode,'.')">
           <xsl:value-of select="substring-before($realFormatCode,'.')"/>
         </xsl:when>
-        <xsl:when test="contains($realFormatCode,'&quot; &quot;?')">
-          <xsl:value-of select="substring-before($realFormatCode,'&quot; &quot;?')"/>
+        <xsl:when test="contains(translate($realFormatCode,'\','?'),'&quot; &quot;?')">
+          <xsl:value-of select="substring-before($realFormatCode,'&quot; &quot;')"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$realFormatCode"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
     <xsl:choose>
       
     <!-- decimal places -->
@@ -706,14 +705,27 @@
       <xsl:otherwise>
         
         <xsl:variable name="plainFormat">
+          <xsl:choose>
+            <xsl:when test="not(contains($realFormatCode,'?/'))">
+              <xsl:call-template name="StripText">
+                <xsl:with-param name="formatCode">
+                  <xsl:call-template name="HandleFixedFractionFormat">
+                    <xsl:with-param name="formatCode" select="$realFormatCode"/>
+                  </xsl:call-template>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
           <xsl:call-template name="StripText">
             <xsl:with-param name="formatCode" select="$realFormatCode"/>
           </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:variable>
         <xsl:variable name="fractionFormat">
           <xsl:choose>
-            <xsl:when test="contains(substring-after(translate($plainFormat,'[','\ '),'?'),'\ ')">
-              <xsl:value-of select="concat('?',substring-before(substring-after(translate($plainFormat,'[','\ '),'?'),'\ '))"/>
+            <xsl:when test="contains(substring-after(translate($plainFormat,'\ ','['),'?'),'[')">
+              <xsl:value-of select="concat('?',substring-before(substring-after(translate($plainFormat,'\ ','['),'?'),'['))"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="concat('?',substring-after($plainFormat,'?'))"/>
@@ -724,7 +736,7 @@
           <xsl:value-of select="string-length(substring-before($fractionFormat,'/'))"/>
         </xsl:attribute>
         <xsl:attribute name="number:min-denominator-digits">
-          <xsl:value-of select="string-length(substring-after($fractionFormat,'/'))"/>
+          <xsl:value-of select="string-length(substring-after(translate($fractionFormat,'%',''),'/'))"/>
         </xsl:attribute>
       </xsl:otherwise>
     </xsl:choose>
@@ -1636,4 +1648,12 @@
 
   </xsl:template>
 
+  <xsl:template name="HandleFixedFractionFormat">
+    
+    <!-- @Description: handles a fixed fraction format by converting it to normal format -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="formatCode"/>
+    <xsl:value-of select="translate(translate(translate(translate(translate(translate(translate(translate(translate(translate(substring-after($formatCode,'&quot; &quot;'),'0','?'),'1','?'),'2','?'),'3','?'),'4','?'),'5','?'),'6','?'),'7','?'),'8','?'),'9','?')"/>
+  </xsl:template>
 </xsl:stylesheet>
