@@ -213,7 +213,8 @@
     <xsl:variable name="reverseSeries">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' )  or c:areaChart/c:grouping/@val = 'standard' ">
+          <xsl:when
+            test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' )  or c:areaChart/c:grouping/@val = 'standard' ">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -485,7 +486,8 @@
         </chart:title>
       </xsl:when>
       <!-- default pie chart title is first series name -->
-      <xsl:when test="c:chartSpace/c:chart/c:title and (c:chartSpace/c:chart/c:plotArea/c:pieChart or c:chartSpace/c:chart/c:plotArea/c:pie3DChart)">
+      <xsl:when
+        test="c:chartSpace/c:chart/c:title and (c:chartSpace/c:chart/c:plotArea/c:pieChart or c:chartSpace/c:chart/c:plotArea/c:pie3DChart)">
         <xsl:for-each select="key('dataSeries','')[1]/c:tx/descendant::c:v[1]">
           <chart:title svg:x="3cm" svg:y="0.14cm" chart:style-name="chart_title">
             <text:p>
@@ -713,7 +715,8 @@
     <xsl:variable name="reverse">
       <xsl:for-each select="c:chartSpace/c:chart/c:plotArea">
         <xsl:choose>
-          <xsl:when test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' ) or c:areaChart/c:grouping/@val = 'standard' ">
+          <xsl:when
+            test="(c:barChart/c:barDir/@val = 'bar' and c:barChart/c:grouping/@val = 'clustered' ) or c:areaChart/c:grouping/@val = 'standard' ">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -737,6 +740,16 @@
       </xsl:variable>
 
       <style:style style:name="{concat('series',$seriesNumber)}" style:family="chart">
+
+        <style:chart-properties>
+          <!-- symbols -->
+          <xsl:if test="c:marker/c:symbol/@val = 'none' ">
+            <xsl:attribute name="chart:symbol-type">
+              <xsl:text>none</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+        </style:chart-properties>
+
         <style:graphic-properties>
           <xsl:call-template name="InsertStyleGraphicProperties"/>
         </style:graphic-properties>
@@ -763,7 +776,7 @@
     <style:style style:name="floor" style:family="chart">
       <style:graphic-properties draw:stroke="solid" svg:stroke-width="0.03cm"
         draw:marker-start-width="0.25cm" draw:marker-end-width="0.25cm" draw:fill="none"
-        draw:fill-color="#999999"/>      
+        draw:fill-color="#999999"/>
     </style:style>
   </xsl:template>
 
@@ -839,6 +852,20 @@
       <xsl:if test="c:bar3DChart/c:barDir/@val = 'bar' ">
         <xsl:attribute name="chart:vertical">
           <xsl:text>true</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+
+      <!-- interpolation line charts -->
+      <xsl:if test="key('plotArea','')/c:lineChart/c:ser/c:smooth/@val = 1">
+        <xsl:attribute name="chart:interpolation">
+          <xsl:text>cubic-spline</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+
+      <!-- line charts with symbols -->
+      <xsl:if test="key('plotArea','')/c:lineChart/c:marker/@val = 1">
+        <xsl:attribute name="chart:symbol-type">
+          <xsl:text>automatic</xsl:text>
         </xsl:attribute>
       </xsl:if>
 
