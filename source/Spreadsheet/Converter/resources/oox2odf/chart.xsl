@@ -856,14 +856,14 @@
       </xsl:if>
 
       <!-- interpolation line charts -->
-      <xsl:if test="key('plotArea','')/c:lineChart/c:ser/c:smooth/@val = 1">
+      <xsl:if test="key('plotArea','')/c:lineChart/c:ser/c:smooth/@val = 1 and key('plotArea','')/c:lineChart/c:grouping/@val = 'standard' ">
         <xsl:attribute name="chart:interpolation">
           <xsl:text>cubic-spline</xsl:text>
         </xsl:attribute>
       </xsl:if>
 
       <!-- line charts with symbols -->
-      <xsl:if test="key('plotArea','')/c:lineChart/c:marker/@val = 1">
+      <xsl:if test="key('plotArea','')/c:lineChart/c:marker/@val = 1 and key('plotArea','')/c:lineChart/c:ser[not(c:marker/c:symbol/@val = 'none') ]">
         <xsl:attribute name="chart:symbol-type">
           <xsl:text>automatic</xsl:text>
         </xsl:attribute>
