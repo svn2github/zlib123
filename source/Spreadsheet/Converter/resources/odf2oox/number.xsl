@@ -321,6 +321,15 @@
           </xsl:call-template>
         </xsl:when>
         
+        <xsl:when test="number:scientific-number/@number:min-integer-digits and number:scientific-number/@number:min-integer-digits &gt; 0">
+          <xsl:call-template name="AddLeadingZeros">
+            <xsl:with-param name="num">
+              <xsl:value-of select="number:scientific-number/@number:min-integer-digits"/>
+            </xsl:with-param>
+            <xsl:with-param name="val"/>
+          </xsl:call-template>
+        </xsl:when>
+        
         <xsl:when test="number:fraction/@number:min-integer-digits and number:fraction/@number:min-integer-digits &gt; 0">
           <xsl:call-template name="AddLeadingZeros">
             <xsl:with-param name="num">
@@ -343,7 +352,7 @@
 
         <!-- add decimal places -->
         <xsl:when
-          test="number:number/@number:decimal-places &gt; 0 or (not(number:number/@number:decimal-places) and not(number:fraction) and document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places &gt; 0)">
+          test="number:number/@number:decimal-places &gt; 0 or (number:number and not(number:number/@number:decimal-places) and not(number:fraction) and document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places &gt; 0)">
           <xsl:call-template name="AddDecimalPlaces">
             <xsl:with-param name="value">
               <xsl:choose>
@@ -403,6 +412,76 @@
             </xsl:call-template>
           </xsl:if>
 
+        </xsl:when>
+        
+        <!-- add decimal places to scientific format -->
+        <xsl:when
+          test="number:scientific-number/@number:decimal-places &gt; 0 or (number:scientific-number and not(number:scientific-number/@number:decimal-places) and not(number:fraction) and document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places &gt; 0)">
+          <xsl:variable name="scientificFormat">
+          <xsl:call-template name="AddDecimalPlaces">
+            <xsl:with-param name="value">
+              <xsl:choose>
+               
+                <!-- add grouping -->
+                <xsl:when
+                  test="number:scientific-number/@number:grouping and number:scientific-number/@number:grouping = 'true'">
+                  <xsl:call-template name="AddGrouping">
+                    <xsl:with-param name="value">
+                      <xsl:value-of select="concat($value,'.')"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="numDigits">
+                      <xsl:choose>
+                        <xsl:when test="number:scientific-number/@number:min-integer-digits">
+                          <xsl:value-of select="3 - number:scientific-number/@number:min-integer-digits"/>
+                        </xsl:when>
+                        <xsl:otherwise>2</xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:when>
+                
+                <xsl:otherwise>
+                  <xsl:value-of select="concat($value,'.')"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="num">
+              <xsl:choose>
+                <xsl:when test="number:scientific-number/@number:decimal-places &gt; 0">
+                  <xsl:value-of select="number:scientific-number/@number:decimal-places"/>
+                </xsl:when>
+                <xsl:when test="not(number:scientific-number/@number:decimal-places)">
+                  <xsl:value-of
+                    select="document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places"
+                  />
+                </xsl:when>
+              </xsl:choose>
+            </xsl:with-param>
+            <xsl:with-param name="decimalReplacement">
+              <xsl:choose>
+                <xsl:when test="number:scientific-number/@number:decimal-replacement=''">#</xsl:when>
+                <xsl:otherwise>0</xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+          <xsl:if
+            test="number:scientific-number/@number:display-factor and number:scientific-number/@number:display-factor != '' ">
+            <xsl:call-template name="UseThousandDisplayFactor">
+              <xsl:with-param name="displayFactor">
+                <xsl:value-of select="number:number/@number:display-factor"/>
+              </xsl:with-param>
+              <xsl:with-param name="value">
+                <xsl:value-of select="''"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
+          </xsl:variable>
+          <xsl:call-template name="AddMinExponentDigits">
+            <xsl:with-param name="number">
+              <xsl:value-of select="number:scientific-number/@number:min-exponent-digits"/>
+            </xsl:with-param>
+            <xsl:with-param name="scientificFormat" select="concat($scientificFormat,'E+')"/>
+          </xsl:call-template>
         </xsl:when>
 
         <!-- add fraction -->
@@ -657,6 +736,30 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="AddMinExponentDigits">
+    
+    <!-- @Description: adds minimum exponent-digits -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="number"/><!-- (int) number of minimum exponent digits -->
+    <xsl:param name="scientificFormat"/><!-- (string) whole scientific format -->
+    <xsl:choose>
+      <xsl:when test="$number &gt; 0">
+        <xsl:call-template name="AddMinExponentDigits">
+          <xsl:with-param name="number">
+            <xsl:value-of select="$number -1"/>
+          </xsl:with-param>
+          <xsl:with-param name="scientificFormat">
+            <xsl:value-of select="concat($scientificFormat,'0')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$scientificFormat"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
   <xsl:template name="AddGrouping">
     
     <!-- @Description: adds grouping -->
