@@ -578,6 +578,16 @@
     </xsl:if>
 
     <xsl:choose>
+      <xsl:when test="contains($realFormatCode,'E+0')">
+        <number:scientific-number>
+          <xsl:call-template name="InsertNumberFormattingContent">
+            <xsl:with-param name="formatCode" select="$formatCode"/>
+            <xsl:with-param name="realFormatCode" select="$realFormatCode"/>
+            <xsl:with-param name="currencyFormat" select="$currencyFormat"/>
+            <xsl:with-param name="isFraction">false</xsl:with-param>
+          </xsl:call-template>
+        </number:scientific-number>
+      </xsl:when>
       <xsl:when test="contains($realFormatCode,'?/') or contains($realFormatCode,'/?') or contains($realFormatCode,'0/') or contains($realFormatCode,'/0') or contains($realFormatCode,'1/') or contains($realFormatCode,'/1') or contains($realFormatCode,'2/') or contains($realFormatCode,'/2') or contains($realFormatCode,'3/') or contains($realFormatCode,'/3') or contains($realFormatCode,'4/') or contains($realFormatCode,'/4') or contains($realFormatCode,'5/') or contains($realFormatCode,'/5') or contains($realFormatCode,'6/') or contains($realFormatCode,'/6') or contains($realFormatCode,'7/') or contains($realFormatCode,'/7') or contains($realFormatCode,'8/') or contains($realFormatCode,'/8') or contains($realFormatCode,'9/') or contains($realFormatCode,'9/')">
         <number:fraction>
           <xsl:call-template name="InsertNumberFormattingContent">
@@ -797,6 +807,18 @@
       </xsl:choose>
     </xsl:if>
     
+    <!-- add scientific format -->
+    
+    <xsl:if test="contains($realFormatCode,'E+0')">
+      <xsl:attribute name="number:min-exponent-digits">
+        <xsl:call-template name="AddMinExponentDigits">
+          <xsl:with-param name="format">
+            <xsl:value-of select="substring-after($realFormatCode,'E+')"/>
+          </xsl:with-param>
+          <xsl:with-param name="number">0</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
     
     <!-- '-' embedded in number format -->
     <xsl:if
@@ -1210,7 +1232,12 @@
           </xsl:attribute>
         </number:fraction>
       </xsl:when>
-      
+      <xsl:when test="$ID = 11">
+        
+      <!-- scientific format -->
+        <number:scientific-number number:decimal-places="2" number:min-integer-digits="1" number:min-exponent-digits="2"/>
+         
+      </xsl:when>
       <xsl:otherwise>
     <number:number>
       <xsl:attribute name="number:decimal-places">
@@ -1646,6 +1673,30 @@
       </xsl:otherwise>
     </xsl:choose>
 
+  </xsl:template>
+  
+  <xsl:template name="AddMinExponentDigits">
+    
+    <!--@Description: Adds min-exponent-digits argument -->
+    <!--@Context: none -->
+    
+    <xsl:param name="format"/><!-- (string) input number format -->
+    <xsl:param name="number"/><!-- (int) output min-exponent-digits value --> 
+    <xsl:choose>
+      <xsl:when test="starts-with($format,'0')">
+        <xsl:call-template name="AddMinExponentDigits">
+          <xsl:with-param name="format">
+            <xsl:value-of select="substring($format,2)"/>
+          </xsl:with-param>
+          <xsl:with-param name="number">
+            <xsl:value-of select="$number+1"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$number"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="HandleFixedFractionFormat">
