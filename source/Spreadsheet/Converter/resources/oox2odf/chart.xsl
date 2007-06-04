@@ -568,16 +568,16 @@
             <xsl:text>chart:circle</xsl:text>
           </xsl:when>
 
+          <xsl:when test="key('plotArea','')/c:radarChart">
+            <xsl:text>chart:radar</xsl:text>
+          </xsl:when>
+
           <!-- making problems at this time -->
           <!--
             <xsl:when test="key('plotArea','')/c:scatterChart or key('plotArea','')/c:bubbleChart">
               <xsl:text>chart:scatter<xsl:text>
             </xsl:when>
         
-            <xsl:when test="key('plotArea','')/c:radarChart">
-            <xsl:text>chart:radar<xsl:text>
-            </xsl:when>
-            
             <xsl:when test="key('plotArea','')/c:stockChart">
             <xsl:text>chart:stock<xsl:text>
             </xsl:when>
@@ -748,6 +748,15 @@
               <xsl:text>none</xsl:text>
             </xsl:attribute>
           </xsl:if>
+
+          <!-- radar chart symbols -->
+          <xsl:if
+            test="key('plotArea','')/c:radarChart/c:radarStyle/@val = 'marker' and not(c:marker/c:symbol/@val = 'none')">
+            <xsl:attribute name="chart:symbol-type">
+              <xsl:text>automatic</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
         </style:chart-properties>
 
         <style:graphic-properties>
@@ -783,10 +792,17 @@
   <xsl:template name="InsertStyleGraphicProperties">
     <xsl:for-each select="c:spPr">
 
-      <!-- fill color-->
+      <!-- fill color -->
       <xsl:if test="a:solidFill/a:srgbClr/@val != '' ">
         <xsl:attribute name="draw:fill-color">
           <xsl:value-of select="concat('#',a:solidFill/a:srgbClr/@val)"/>
+        </xsl:attribute>
+      </xsl:if>
+
+      <!-- line color -->
+      <xsl:if test="a:ln/a:solidFill/a:srgbClr/@val != '' ">
+        <xsl:attribute name="svg:stroke-color">
+          <xsl:value-of select="concat('#',a:ln/a:solidFill/a:srgbClr/@val)"/>
         </xsl:attribute>
       </xsl:if>
 
@@ -856,14 +872,17 @@
       </xsl:if>
 
       <!-- interpolation line charts -->
-      <xsl:if test="key('plotArea','')/c:lineChart/c:ser/c:smooth/@val = 1 and key('plotArea','')/c:lineChart/c:grouping/@val = 'standard' ">
+      <xsl:if
+        test="c:lineChart/c:ser/c:smooth/@val = 1 and c:lineChart/c:grouping/@val = 'standard' ">
         <xsl:attribute name="chart:interpolation">
           <xsl:text>cubic-spline</xsl:text>
         </xsl:attribute>
       </xsl:if>
 
-      <!-- line charts with symbols -->
-      <xsl:if test="key('plotArea','')/c:lineChart/c:marker/@val = 1 and key('plotArea','')/c:lineChart/c:ser[not(c:marker/c:symbol/@val = 'none') ]">
+      <!-- line charts or radar charts with symbols -->
+      <xsl:if
+        test="(c:lineChart/c:marker/@val = 1 and c:lineChart/c:ser[not(c:marker/c:symbol/@val = 'none')]) or 
+        (c:radarChart/c:radarStyle/@val = 'marker' and c:radarChart/c:ser[not(c:marker/c:symbol/@val = 'none')])">
         <xsl:attribute name="chart:symbol-type">
           <xsl:text>automatic</xsl:text>
         </xsl:attribute>
