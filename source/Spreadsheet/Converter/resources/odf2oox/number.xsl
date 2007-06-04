@@ -522,6 +522,57 @@
         </xsl:call-template>  
         </xsl:when>
         
+        <!-- add scientific number format -->
+        <xsl:when test="number:scientific-number">
+          <xsl:variable name="scientificFormat">
+            <xsl:choose>
+              
+              <!-- add grouping -->
+              <xsl:when
+                test="number:scientific-number/@number:grouping and number:scientific-number/@number:grouping = 'true'">
+                <xsl:call-template name="AddGrouping">
+                  <xsl:with-param name="value">
+                    <xsl:value-of select="$value"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="numDigits">
+                    <xsl:choose>
+                      <xsl:when test="number:scientific-number/@number:min-integer-digits">
+                        <xsl:value-of select="3 - number:scientific-number/@number:min-integer-digits"/>
+                      </xsl:when>
+                      <xsl:otherwise>2</xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:when>
+              
+              <xsl:otherwise>
+                <xsl:choose>
+                  <xsl:when
+                    test="number:scientific-number/@number:display-factor and number:scientific-number/@number:display-factor!=''">
+                    <xsl:call-template name="UseThousandDisplayFactor">
+                      <xsl:with-param name="displayFactor">
+                        <xsl:value-of select="number:scientific-number/@number:display-factor"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="value">
+                        <xsl:value-of select="$value"/>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$value"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <xsl:call-template name="AddMinExponentDigits">
+            <xsl:with-param name="number">
+              <xsl:value-of select="number:scientific-number/@number:min-exponent-digits"/>
+            </xsl:with-param>
+            <xsl:with-param name="scientificFormat" select="concat($scientificFormat,'.E+')"/>
+          </xsl:call-template>
+        </xsl:when>
+        
         <xsl:otherwise>
           <xsl:choose>
 
@@ -671,7 +722,7 @@
     <xsl:variable name="startText">
       <xsl:choose>
         <xsl:when
-          test="number:text[not(preceding-sibling::node())] != ' ' and number:text[not(preceding-sibling::node())] != '-'">
+          test="number:text[not(preceding-sibling::node())] != ' ' and number:text[not(preceding-sibling::node())] != '-' and number:text[not(preceding-sibling::node())] != '.'">
           <xsl:value-of select="number:text[not(preceding-sibling::node())]"/>
         </xsl:when>
         <xsl:otherwise>
@@ -683,7 +734,7 @@
     <xsl:variable name="endText">
       <xsl:choose>
         <xsl:when
-          test="number:text[not(following-sibling::node())] != ' ' and number:text[not(following-sibling::node())] != '-'">
+          test="number:text[not(following-sibling::node())] != ' ' and number:text[not(following-sibling::node())] != '-' and number:text[not(preceding-sibling::node())] != '.'">
           <xsl:value-of select="number:text[not(following-sibling::node())]"/>
         </xsl:when>
         <xsl:otherwise>
