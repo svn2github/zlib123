@@ -392,19 +392,19 @@
         </c:doughnutChart>
       </xsl:when>
 
-      <!-- making problems at his time -->
-      <!--<xsl:when test="@chart:class='chart:scatter' ">
-        <c:scatterChart>
-          <c:scatterStyle val="lineMarker"/>
-          <xsl:call-template name="InsertChartContent"/>
-        </c:scatterChart>
-      </xsl:when>
-      
       <xsl:when test="@chart:class='chart:radar' ">
         <c:radarChart>
           <c:radarStyle val="marker"/>
           <xsl:call-template name="InsertChartContent"/>
         </c:radarChart>
+      </xsl:when>
+      
+      <!-- making problems at this time -->
+      <!--<xsl:when test="@chart:class='chart:scatter' ">
+        <c:scatterChart>
+          <c:scatterStyle val="lineMarker"/>
+          <xsl:call-template name="InsertChartContent"/>
+        </c:scatterChart>
       </xsl:when>
       
       <xsl:when test="@chart:class='chart:stock' ">
@@ -694,8 +694,9 @@
           </xsl:choose>
 
           <!-- marker type -->
+          <!-- if line chart or radar chart or bar chart with lines -->
           <xsl:if
-            test="$chartType = 'chart:line' or ancestor::chart:chart/chart:plot-area/chart:series[position() = $number]/@chart:class = 'chart:line'">
+            test="$chartType = 'chart:line' or $chartType = 'chart:radar' or ancestor::chart:chart/chart:plot-area/chart:series[position() = $number]/@chart:class = 'chart:line'">
             <xsl:for-each
               select="ancestor::chart:chart/chart:plot-area/chart:series[position() = $number]">
               <xsl:choose>
