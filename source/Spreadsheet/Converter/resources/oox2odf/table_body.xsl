@@ -27,6 +27,7 @@
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
@@ -35,6 +36,11 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+
+ <xsl:import href="relationships.xsl"/>
+
+  <xsl:key name="hyperlinkPosition" match="e:c" use="'@r'"/>
+  <xsl:key name="ref" match="e:hyperlink" use="@ref"/>
 
   <!-- Insert sheet without text -->
   <xsl:template name="InsertEmptySheet">
@@ -811,7 +817,85 @@
     </xsl:choose>
     
   </xsl:template>
-  
+
+  <!-- change  '%20' to space  after conversion-->
+  <xsl:template name="Change20PercentToSpace">
+    <xsl:param name="string"/>
+    
+    <xsl:choose>
+      <xsl:when test="contains($string,'%20')">
+                <xsl:choose>
+          <xsl:when test="substring-before($string,'%20') =''">
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="string" select="concat(' ',substring-after($string,'%20'))"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="substring-before($string,'%20') !=''">
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="string"
+                select="concat(substring-before($string,'%20'),' ',substring-after($string,'%20'))"
+              />
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+      <!--xsl:when test="contains($slash,'..\..\..\')">
+        <xsl:choose>
+          <xsl:when test="substring-before($slash,'..\..\..\') =''">
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="slash"
+                select="concat('../../../',substring-after($slash,'..\..\..\'))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when-->
+
+      <xsl:when test="contains($string,'..\..\')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,'..\..\') =''">
+            
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="string"
+                select="concat('../../../',substring-after($string,'..\..\'))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+      <xsl:when test="contains($string,'..\')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,'..\') =''">
+            
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="string"
+                select="concat('../../',substring-after($string,'..\'))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      
+      
+      <xsl:when test="not(contains($string,'../')) and not(contains($string,'..\..\'))">
+       
+          <xsl:value-of select="concat('../',$string)">
+            <!--xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="slash" select="concat('..\',substring-after($string,''))"/>
+            </xsl:call-template-->
+          </xsl:value-of>
+       
+      </xsl:when>
+
+      <xsl:otherwise>
+        <xsl:value-of select="$string"/>
+        <!--xsl:value-of select="translate($string,'\','/')"/-->
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
+
+
   <xsl:template name="InsertText">
     <xsl:param name="position"/>
     
@@ -823,12 +907,53 @@
                 <xsl:variable name="id">
                   <xsl:value-of select="e:v"/>
                 </xsl:variable>
-                <text:p>
-                  <!-- a postprocessor puts here strings from sharedstrings -->
-                  <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
-                    <xsl:value-of select="e:v"/>
-                  </pxsi:v>
-                </text:p>
+                 <text:p>
+          <xsl:choose>
+            <xsl:when test="key('ref',@r)">
+              <text:a>
+                <xsl:attribute name="xlink:href">
+                  <xsl:variable name="target">
+                    <!-- path to sheet file from xl/ catalog (i.e. $sheet = worksheets/sheet1.xml) -->
+                    <xsl:for-each select="key('ref',@r)">
+                      <xsl:call-template name="GetTarget">
+                        <xsl:with-param name="id">
+                          <xsl:value-of select="@r:id"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="document">xl/worksheets/sheet1.xml</xsl:with-param>
+                      </xsl:call-template>
+                    </xsl:for-each>
+                  </xsl:variable>
+                  <!--xsl:value-of select="$target"/-->
+                  <xsl:choose>
+                    <!--when hyperlink leads to www or mailto -->
+                    <xsl:when test="contains($target,':')">
+                      <xsl:value-of select="$target"/>
+                    </xsl:when>
+                    <!--when hyperlink leads to a document -->
+                    <xsl:otherwise>
+                      <xsl:call-template name="Change20PercentToSpace">
+                        <xsl:with-param name="string" select="$target"/>
+                      </xsl:call-template>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+
+                <!-- a postprocessor puts here strings from sharedstrings -->
+                <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
+                  <xsl:value-of select="e:v"/>
+                </pxsi:v>
+
+              </text:a>
+            </xsl:when>
+
+            <xsl:otherwise>
+              <!-- a postprocessor puts here strings from sharedstrings -->
+              <pxsi:v xmlns:pxsi="urn:cleverage:xmlns:post-processings:shared-strings">
+                <xsl:value-of select="e:v"/>
+              </pxsi:v>
+            </xsl:otherwise>
+          </xsl:choose>
+        </text:p>
               </xsl:when>
               <xsl:when test="@t = 'e' ">
                 <xsl:attribute name="office:value-type">
