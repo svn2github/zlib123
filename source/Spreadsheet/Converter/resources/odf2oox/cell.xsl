@@ -27,6 +27,7 @@
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
@@ -1149,8 +1150,18 @@
           <xsl:text>false</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:variable>
 
+    <xsl:variable name="cellFormats">
+      <xsl:value-of
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
+      />
+    </xsl:variable>
 
+    <xsl:variable name="cellStyles">
+      <xsl:value-of
+        select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'])"
+      />
     </xsl:variable>
 
     <xsl:if
@@ -1171,18 +1182,6 @@
           <!-- if it is a multiline cell -->
           <xsl:when test="text:p[2]">
 
-            <xsl:variable name="cellFormats">
-              <xsl:value-of
-                select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1"
-              />
-            </xsl:variable>
-
-            <xsl:variable name="cellStyles">
-              <xsl:value-of
-                select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family='table-cell'])"
-              />
-            </xsl:variable>
-
             <xsl:variable name="multilineNumber">
               <xsl:for-each select="text:p[2]">
                 <xsl:number count="table:table-cell[text:p[2]]" level="any"/>
@@ -1193,6 +1192,7 @@
               <xsl:value-of select="$cellFormats + $cellStyles + $multilineNumber - 1"/>
             </xsl:attribute>
           </xsl:when>
+
           <xsl:otherwise>
             <xsl:choose>
               <xsl:when
@@ -1278,6 +1278,22 @@
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:when>
+
+              <!-- if it is a hyperlink  in the cell-->
+              <xsl:when
+                test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+                <xsl:variable name="multilineNumber">
+                  <xsl:for-each
+                    select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
+                    <xsl:value-of select="count(descendant::text:a[2])"/>
+                  </xsl:for-each>
+                </xsl:variable>
+
+                <xsl:attribute name="s">
+                   <xsl:value-of select="$cellFormats + $cellStyles + $multilineNumber - 1"/>
+                </xsl:attribute>
+              </xsl:when>
+
             </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
@@ -1484,7 +1500,7 @@
     <!--<xsl:value-of select="$rows"/>-->
   </xsl:template>
 
-<xsl:template name="GetLinkNumber">
+  <xsl:template name="GetLinkNumber">
     <xsl:param name="position"/>
     <xsl:param name="count" select="1"/>
     <xsl:param name="value" select="1"/>

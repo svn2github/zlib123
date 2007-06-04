@@ -84,8 +84,42 @@
           </xsl:when>
         </xsl:choose>
       </xsl:when>
+
+      <xsl:when test="contains($slash,'../../../')">
+        <xsl:choose>
+          <xsl:when test="substring-before($slash,'../../../') =''">
+            <xsl:call-template name="SpaceTo20Percent">
+              <xsl:with-param name="slash"
+                select="concat('..\..\',substring-after($slash,'../../../'))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+      <xsl:when test="contains($slash,'../../')">
+        <xsl:choose>
+          <xsl:when test="substring-before($slash,'../../') =''">
+            <xsl:call-template name="SpaceTo20Percent">
+              <xsl:with-param name="slash"
+                select="concat('..\',substring-after($slash,'../../'))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+      <xsl:when test="contains($slash,'../')">
+        <xsl:choose>
+          <xsl:when test="substring-before($slash,'../') =''">
+            <xsl:call-template name="SpaceTo20Percent">
+              <xsl:with-param name="slash" select="concat('',substring-after($slash,'../'))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
       <xsl:otherwise>
         <xsl:value-of select="$string"/>
+        <xsl:value-of select="translate($slash,'/','\')"/>
       </xsl:otherwise>
     </xsl:choose>
 
@@ -124,9 +158,19 @@
 
             <xsl:attribute name="Target">
               <xsl:if test="@xlink:href">
+                <xsl:choose>
+                  <!-- when hyperlink to a site or mailto-->
+                  <xsl:when test="contains(@xlink:href,':')">
+                    <xsl:value-of select="@xlink:href"/>
+                  </xsl:when>
+                  <!-- when hyperlink to an document-->
+                  <xsl:otherwise>
                 <xsl:call-template name="SpaceTo20Percent">
                   <xsl:with-param name="string" select="@xlink:href"/>
+                  <xsl:with-param name="slash" select="@xlink:href"/>
                 </xsl:call-template>
+                  </xsl:otherwise>
+                </xsl:choose>
               </xsl:if>
             </xsl:attribute>
           </Relationship>
@@ -150,22 +194,22 @@
       <!-- chart rels -->
       <xsl:for-each
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
-        <Relationship Id="{generate-id(.)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="{concat('../charts/chart',$sheetNum,'_',position(),'.xml')}" />
+        <Relationship Id="{generate-id(.)}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"
+          Target="{concat('../charts/chart',$sheetNum,'_',position(),'.xml')}"/>
       </xsl:for-each>
 
       <!-- TO DO: picture rels -->
-      
-      
-      <xsl:for-each
-        select="descendant::draw:frame/draw:image[contains(@xlink:href, 'Pictures')]">
-        
-    <xsl:variable name="imageName"
-        select="substring-after(@xlink:href, 'Pictures/')"/>
-      <pzip:copy pzip:source="{@xlink:href}" pzip:target="xl/media/{$imageName}"/>
-      <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-        Id="{generate-id(.)}"
-        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
-        Target="../media/{$imageName}"/>
+
+
+      <xsl:for-each select="descendant::draw:frame/draw:image[contains(@xlink:href, 'Pictures')]">
+
+        <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/>
+        <pzip:copy pzip:source="{@xlink:href}" pzip:target="xl/media/{$imageName}"/>
+        <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
+          Id="{generate-id(.)}"
+          Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+          Target="../media/{$imageName}"/>
 
         <!--Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
           Id="{generate-id(ancestor::draw:a)}"
@@ -173,9 +217,9 @@
           TargetMode="External">
           <xsl:attribute name="Target">
       <xsl:choose-->
-              
-              <!-- converting relative path -->
-      <!--       <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '../')">
+
+        <!-- converting relative path -->
+        <!--       <xsl:when test="starts-with(ancestor::draw:a/@xlink:href, '../')">
                 <xsl:call-template name="HandlingSpaces">
                   <xsl:with-param name="path">
                     <xsl:value-of select="substring-after(ancestor::draw:a/@xlink:href,'../')"
@@ -203,7 +247,7 @@
             </xsl:choose>
           </xsl:attribute>
         </Relationship> -->
-        </xsl:for-each>
-        </Relationships>
+      </xsl:for-each>
+    </Relationships>
   </xsl:template>
 </xsl:stylesheet>

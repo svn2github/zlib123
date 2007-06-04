@@ -27,6 +27,7 @@
     * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
@@ -46,7 +47,8 @@
   <xsl:key name="date" match="number:date-style" use="@style:name"/>
   <xsl:key name="time" match="number:time-style" use="@style:name"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
-
+  <xsl:key name="hyperlink" match="text:a" use="@xlink:href"/>
+  
   <xsl:template name="styles">
     <styleSheet>
       <xsl:call-template name="InsertNumFormats"/>
@@ -127,14 +129,14 @@
           select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
         />
       </xsl:variable>
-      
+
       <!-- number of all time styles in styles.xml -->
       <xsl:variable name="countStyleTime">
         <xsl:value-of
           select="count(document('styles.xml')/office:document-styles/office:styles/number:time-style)"
         />
       </xsl:variable>
-      
+
       <xsl:attribute name="count">
         <xsl:value-of
           select="$countNumber+$countStyleNumber+$countPercentage+$countStylePercentage+$countCurrency+$countStyleCurrency+$countDate+$countStyleDate+$countTime+$countStyleTime"
@@ -237,7 +239,7 @@
         </xsl:with-param>
         <xsl:with-param name="styleName"/>
       </xsl:apply-templates>
-      
+
       <!-- apply time styles from styles.xml -->
       <xsl:apply-templates
         select="document('styles.xml')/office:document-styles/office:styles/number:time-style[1]"
@@ -249,7 +251,7 @@
         </xsl:with-param>
         <xsl:with-param name="styleName"/>
       </xsl:apply-templates>
-      
+
     </numFmts>
   </xsl:template>
 
@@ -259,7 +261,7 @@
     <fonts>
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a)"
         />
       </xsl:attribute>
 
@@ -276,6 +278,7 @@
             </xsl:for-each>
           </font>
         </xsl:when>
+
         <!-- application default-->
         <xsl:otherwise>
           <font>
@@ -291,6 +294,20 @@
 
       <xsl:apply-templates select="document('styles.xml')/office:document-styles/office:styles"
         mode="fonts"/>
+
+
+      <!--hyperlink font properties-->
+      <xsl:choose>
+        <xsl:when
+          test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a[1]">
+
+          <xsl:for-each
+            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+            <xsl:call-template name="InsertHyperlinkProperties"/>
+          </xsl:for-each>
+
+        </xsl:when>
+      </xsl:choose>
 
     </fonts>
   </xsl:template>
@@ -315,12 +332,12 @@
 
   <xsl:template match="style:table-cell-properties" mode="background-color">
     <xsl:param name="Object"/>
-    
+
     <fill>
       <xsl:choose>
         <xsl:when test="@fo:background-color and @fo:background-color != 'transparent'">
           <xsl:call-template name="GetCellColor">
-            <xsl:with-param name="color">              
+            <xsl:with-param name="color">
               <xsl:value-of select="substring-after(@fo:background-color, '#')"/>
             </xsl:with-param>
             <xsl:with-param name="Object">
@@ -333,7 +350,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </fill>
-    
+
   </xsl:template>
 
 
@@ -376,11 +393,11 @@
               </bgColor>
             </patternFill>
           </xsl:when>
-        </xsl:choose>    
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
-    
-    
+
+
   </xsl:template>
 
   <xsl:template name="InsertBorders">
@@ -422,7 +439,8 @@
       </xsl:choose>
 
     </xsl:variable>
-
+    
+     
     <xsl:variable name="numStyleCount">
       <xsl:value-of
         select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
@@ -470,13 +488,13 @@
         select="count(document('styles.xml')/office:document-styles/office:styles/number:date-style)"
       />
     </xsl:variable>
-    
+
     <xsl:variable name="timeStyleCount">
       <xsl:value-of
         select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
       />
     </xsl:variable>
-    
+
     <xsl:variable name="contentFontsCount">
       <xsl:value-of
         select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
@@ -544,13 +562,16 @@
         </xsl:with-param>
       </xsl:apply-templates>
 
+      <!-- add cell formats for hyperlinks-->
+      <xsl:call-template name="InsertHyperlinksProperties"/>
+            
     </cellStyleXfs>
 
     <cellXfs>
 
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a[@xlink:href])"
         />
       </xsl:attribute>
 
@@ -639,6 +660,9 @@
       <!-- add cell formats for multiline cells, which must have wrap property -->
       <xsl:call-template name="InsertMultilineCellFormats"/>
 
+      <!-- add cell formats for hyperlinks-->
+      <xsl:call-template name="InsertHyperlinksProperties"/>
+
     </cellXfs>
 
   </xsl:template>
@@ -650,6 +674,14 @@
       <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles">
         <xsl:apply-templates select="style:style[@style:family = 'table-cell']" mode="cellStyle"/>
       </xsl:for-each>
+
+      <xsl:if
+        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+        <cellStyle
+          xfId="{count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1}"
+          name="Hyperlink"/>
+      </xsl:if>
+
       <xsl:if test="not(style:style[@style:family = 'table-cell'])">
         <cellStyle name="Normal" xfId="0" builtinId="0"/>
       </xsl:if>
@@ -664,7 +696,7 @@
     </cellStyle>
   </xsl:template>
 
-  
+
 
   <xsl:template name="InsertTableStyles">
     <tableStyles count="0" defaultTableStyle="TableStyleMedium9"
@@ -1416,6 +1448,17 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- InsertHyperlinkProperties-->
+  <xsl:template name="InsertHyperlinkProperties">
+    <font>
+      <u val="single"/>
+      <sz val="11"/>
+      <color theme="10"/>
+      <name val="Calibri"/>
+      <family val="2"/>
+    </font>
+  </xsl:template>
+
   <xsl:template match="number:text" mode="fonts"/>
   <xsl:template match="text()" mode="fonts"/>
   <xsl:template match="number:text" mode="cellFormats"/>
@@ -1469,13 +1512,13 @@
         select="count(document('styles.xml')/office:document-styles/office:styles/number:date-style)"
       />
     </xsl:variable>
-    
+
     <xsl:variable name="timeStyleCount">
       <xsl:value-of
         select="count(document('content.xml')/office:document-content/office:automatic-styles/number:time-style)"
       />
     </xsl:variable>
-    
+
     <xsl:variable name="contentFontsCount">
       <xsl:value-of
         select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell' or @style:family='text']/style:text-properties)"
@@ -1611,7 +1654,7 @@
                   </xsl:for-each>
                 </xsl:otherwise>
               </xsl:choose>
-              
+
             </xsl:when>
 
             <!-- when style is set for column or there is none -->
@@ -1697,9 +1740,10 @@
     </xsl:for-each>
   </xsl:template>
 
+
   <!-- template to get horizontal align inherited from parent style-->
- 
-    <xsl:template name="InheritHorizontalAlign">
+
+  <xsl:template name="InheritHorizontalAlign">
     <xsl:choose>
       <xsl:when test="style:paragraph-properties/@fo:text-align">
         <xsl:value-of select="style:paragraph-properties/@fo:text-align"/>
@@ -1727,7 +1771,7 @@
   </xsl:template>
 
   <!-- template to get repeat content inherited from parent style -->
-  
+
   <xsl:template name="InheritRepeatContent">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@style:repeat-content">
@@ -1756,7 +1800,7 @@
   </xsl:template>
 
   <!-- template to get vertical align inherited from parent style -->
-  
+
   <xsl:template name="InheritVerticalAlign">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@style:vertical-align">
@@ -1785,7 +1829,7 @@
   </xsl:template>
 
   <!-- template to get rotation inherited from parent style -->
-  
+
   <xsl:template name="InheritRotation">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@style:rotation-angle">
@@ -1814,7 +1858,7 @@
   </xsl:template>
 
   <!-- template to get vertical text inherited from parent style -->
-  
+
   <xsl:template name="InheritVerticalText">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@style:direction">
@@ -1843,7 +1887,7 @@
   </xsl:template>
 
   <!-- template to get word wrap inherited from parent style -->
-  
+
   <xsl:template name="InheritWordWrap">
     <xsl:choose>
       <xsl:when test="style:table-cell-properties/@fo:wrap-option">
@@ -1872,7 +1916,7 @@
   </xsl:template>
 
   <!-- template to get font weight inherited from parent style -->
-  
+
   <xsl:template name="InheritFontWeight">
     <xsl:choose>
       <xsl:when test="style:text-properties/@fo:font-weight">
@@ -1900,7 +1944,7 @@
   </xsl:template>
 
   <!-- template to get font weight complex inherited from parent style -->
-  
+
   <xsl:template name="InheritFontWeightComplex">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:font-weight-complex">
@@ -1928,7 +1972,7 @@
   </xsl:template>
 
   <!-- template to get font size inherited from parent style -->
-  
+
   <xsl:template name="InheritFontStyle">
     <xsl:choose>
       <xsl:when test="style:text-properties/@fo:font-style">
@@ -1956,7 +2000,7 @@
   </xsl:template>
 
   <!-- template to get underline style inherited from parent style -->
-  
+
   <xsl:template name="InheritFontUnderlineStyle">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:text-underline-style">
@@ -1984,7 +2028,7 @@
   </xsl:template>
 
   <!-- template to get underline type inherited from parent style -->
-  
+
   <xsl:template name="InheritFontUnderlineType">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:text-underline-type">
@@ -2012,7 +2056,7 @@
   </xsl:template>
 
   <!-- template to get font size inherited from parent style -->
-  
+
   <xsl:template name="InheritFontSize">
     <xsl:choose>
       <xsl:when test="style:text-properties/@fo:font-size">
@@ -2040,7 +2084,7 @@
   </xsl:template>
 
   <!-- template to get complex font size inherited from parent style -->
-  
+
   <xsl:template name="InheritFontSizeComplex">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:font-size-complex">
@@ -2068,7 +2112,7 @@
   </xsl:template>
 
   <!-- template to get asian font size inherited from parent style -->
-  
+
   <xsl:template name="InheritFontSizeAsian">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:font-size-asian">
@@ -2096,7 +2140,7 @@
   </xsl:template>
 
   <!-- template to get font strikethrough inherited from parent style -->
-  
+
   <xsl:template name="InheritFontStrikethrough">
     <xsl:choose>
       <xsl:when test="style:text-properties/@style:text-line-through-style">
@@ -2124,7 +2168,7 @@
   </xsl:template>
 
   <!-- template to get font color inherited from parent style -->
-  
+
   <xsl:template name="InheritFontColor">
     <xsl:choose>
       <xsl:when test="style:text-properties/@fo:color">
@@ -2152,7 +2196,7 @@
   </xsl:template>
 
   <!-- template to get font family inherited from parent style -->
-  
+
   <xsl:template name="InheritFontFamily">
     <xsl:choose>
       <xsl:when test="key('font',style:text-properties/@style:font-name)/@svg:font-family">
@@ -2178,9 +2222,28 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+  
+  
+  <xsl:template name="InsertHyperlinksProperties">
+    
+    <!--xsl:variable name="xfId">
+      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+      <xsl:value-of
+      select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
+      />
+      </xsl:if>
+      </xsl:variable-->
+    <!--xsl:variable name="fontId">
+      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) +1"/>    
+      </xsl:if>
+    </xsl:variable-->
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="6"/>
+    
+  </xsl:template>
 
   <!-- template to get number format inherited from parent style -->
-  
+
   <xsl:template name="NumFmtId">
     <xsl:param name="FileName"/>
     <xsl:param name="numStyleCount"/>
@@ -2253,7 +2316,7 @@
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-          <xsl:text>0</xsl:text>
+        <xsl:text>0</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
