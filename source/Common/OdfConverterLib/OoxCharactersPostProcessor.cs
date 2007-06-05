@@ -28,6 +28,7 @@
 
 using System.Xml;
 using System.Collections;
+using System;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -159,6 +160,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 StoreString(text);
             }
+            else if (text.Contains("cxnSp"))
+            {
+               this.nextWriter.WriteString(EvalExpression(text));
+            }    
             else
             {
                 this.nextWriter.WriteString(text);
@@ -168,8 +173,116 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
         /*
          * General methods
+         * Private method to evaluate an expression with trignametric functions.
          */
+        private string EvalExpression(string text)
+        {
+            string[] arrVal = new string[6];
+            arrVal = text.Split(':');
+            string attVal = "";
+            if (arrVal.Length == 6)
+            {
+                double x1 = double.Parse(arrVal[2]);
+                double x2 = double.Parse(arrVal[3]);
+                double y1 = double.Parse(arrVal[4]);
+                double y2 = double.Parse(arrVal[5]);
 
+                double xCenter = (x1 + x2) * 360000 / 2;
+                double yCenter = (y1 + y2) * 360000 / 2;
+
+                double angle, x, y;
+                int flipH = 0;
+                int flipV = 0;
+
+                angle = Math.Atan2((y2 - y1), (x2 - x1));
+
+                double angleRd = angle / Math.PI * 180;
+
+                if (angleRd < 0)
+                {
+                    angleRd += 360;
+                }
+
+                int sector = (int)(angleRd / 45) + 1;
+
+                if ((sector == 1) || (sector == 8))
+                {
+                    angle = 0;
+                }
+                else if ((sector == 2) || (sector == 6))
+                {
+                    angle = 270;
+                }
+                else if ((sector == 3) || (sector == 7))
+                {
+                    angle = 90;
+                }
+                else if ((sector == 4) || (sector == 5))
+                {
+                    angle = 180;
+                }
+
+                if (arrVal[1] == "rot")
+                {
+
+                    attVal = (angle * 60000).ToString();
+                }
+
+                if ((sector == 2) || (sector == 7))
+                {
+                    flipH = 1;
+                }
+
+                if ((sector == 4) || (sector == 6) || (sector == 7) || (sector == 8))
+                {
+                    flipV = 1;
+                }
+
+                if (arrVal[1] == "flipH")
+                {
+                    attVal = flipH.ToString();
+                }
+                if (arrVal[1] == "flipV")
+                {
+                    attVal = flipV.ToString();
+                }
+
+                angleRd = angle / 180 * Math.PI;
+
+                double cxby2 = (Math.Cos(angleRd) * (x2 - x1) + Math.Sin(angleRd) * (y2 - y1)) / 2 * 360000;
+                double cyby2 = (Math.Sin(angleRd) * (x1 - x2) + Math.Cos(angleRd) * (y2 - y1)) / 2 * 360000;
+                double cx = 2 * Math.Round(cxby2);
+                double cy = 2 * Math.Round(cyby2);
+                if (flipH == 1)
+                {
+                    cx = -1 * cx;
+                }
+                if (flipV == 1)
+                {
+                    cy = -1 * cy;
+                }
+                if (arrVal[1] == "cx")
+                {
+                    attVal = cx.ToString();
+                }
+                if (arrVal[1] == "cy")
+                {
+                    attVal = cy.ToString();
+                }
+                if (arrVal[1] == "x")
+                {
+                    x = Math.Round(xCenter - cx / 2);
+                    attVal = x.ToString();
+                }
+                if (arrVal[1] == "y")
+                {
+                    y = Math.Round(yCenter - cy / 2);
+                    attVal = y.ToString();
+
+                }
+            }
+            return attVal;
+        }
         public void WriteStoredRun()
         {
             Element e = (Element)this.store.Peek();

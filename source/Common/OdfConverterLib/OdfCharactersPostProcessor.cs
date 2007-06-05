@@ -28,6 +28,7 @@
 
 using System.Xml;
 using System.Collections;
+using System;
 
 namespace CleverAge.OdfConverter.OdfConverterLib
 {
@@ -129,16 +130,55 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             {
                 StoreString(text);
             }
+            else if (text.Contains("svg-x") || text.Contains("svg-y"))
+            {
+
+                this.nextWriter.WriteString(EvalExpression(text));
+
+            }
             else
             {
                 this.nextWriter.WriteString(text);
             }
         }
-
-
         /*
-         * General methods
-         */
+         * General methods */
+        private string EvalExpression(string text)
+        {
+            string[] arrVal = new string[4];
+            arrVal = text.Split(':');
+            Double x = 0;
+            if (arrVal.Length == 5)
+            {
+                if (arrVal[0].Contains("svg-x1"))
+                {
+                    x = Math.Round(((Double.Parse(arrVal[1]) -
+                        Math.Cos(Double.Parse(arrVal[4])) * Double.Parse(arrVal[2]) +
+                        Math.Sin(Double.Parse(arrVal[4])) * Double.Parse(arrVal[3])) / 360000), 2);
+                }
+                else if (arrVal[0].Contains("svg-y1"))
+                {
+                    x = Math.Round(((Double.Parse(arrVal[1].ToString()) -
+                        Math.Sin(Double.Parse(arrVal[4])) * Double.Parse(arrVal[2]) -
+                        Math.Cos(Double.Parse(arrVal[4])) * Double.Parse(arrVal[3])) / 360000), 2);
+                }
+                else if (arrVal[0].Contains("svg-x2"))
+                {
+                    x = Math.Round(((Double.Parse(arrVal[1]) +
+                        Math.Cos(Double.Parse(arrVal[4])) * Double.Parse(arrVal[2].ToString()) -
+                        Math.Sin(Double.Parse(arrVal[4])) * Double.Parse(arrVal[3])) / 360000), 2);
+                }
+                else if (arrVal[0].Contains("svg-y2"))
+                {
+                    x = Math.Round(((Double.Parse(arrVal[1]) +
+                        Math.Sin(Double.Parse(arrVal[4])) * Double.Parse(arrVal[2]) +
+                        Math.Cos(Double.Parse(arrVal[4])) * Double.Parse(arrVal[3])) / 360000), 2);
+                }
+            }
+
+            return x.ToString() + "cm";
+        }
+         
 
         public void WriteStoredSpan()
         {
@@ -210,22 +250,43 @@ namespace CleverAge.OdfConverter.OdfConverterLib
 
             if (node is Element)
             {
-                Element element = (Element)this.store.Peek();
-                element.AddChild(text);
+                /* This condition is to check tab carector in a string and 
+                replace with text:tab node */
+                if (text.Contains("\t"))
+                {
+                    char[] a = new char[] { '\t' };
+                    string[] p = text.Split(a);
+
+                    for (int i = 0; i < p.Length; i++)
+                    {
+                        Element element = (Element)this.store.Peek();
+                        element.AddChild(p[i].ToString());
+                        if (i < p.Length-1)
+                        {                            
+                            WriteStartElement("text","tab" ,element.Ns);
+                            WriteEndElement();                            
+                        }
+                    }
+                }                
+                else
+                {
+                    Element element = (Element)this.store.Peek();
+
+                    element.AddChild(text);
+                }
+
             }
             else
             {
                 Attribute attr = (Attribute)store.Peek();
                 attr.Value += text;
             }
-        }
-
+        }       
 
         private void EndStoreAttribute()
         {
             this.store.Pop();
         }
-
 
         private bool IsSpan()
         {
