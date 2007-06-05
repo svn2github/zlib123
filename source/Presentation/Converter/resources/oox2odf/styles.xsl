@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-   Pradeep Nemadi
+Copyright (c) 2007, Sonata Software Limited
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of Sonata Software Limited nor the names of its contributors
+*       may be used to endorse or promote products derived from this software
+*       without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
@@ -35,6 +59,20 @@
   <xsl:key name="default-styles"
     match="w:style[@w:default = 1 or @w:default = 'true' or @w:default = 'on']" use="@w:type"/>-->
 
+	<!-- Shape constants-->
+	<xsl:variable name ="dot">
+		<xsl:value-of select ="'0.07'"/>
+	</xsl:variable>
+	<xsl:variable name ="dash">
+		<xsl:value-of select ="'0.282'"/>
+	</xsl:variable>
+	<xsl:variable name ="longDash">
+		<xsl:value-of select ="'0.564'"/>
+	</xsl:variable>
+	<xsl:variable name ="distance">
+		<xsl:value-of select ="'0.211'"/>
+	</xsl:variable>
+	
 	<xsl:template name="styles">
 		<office:document-styles>
 			<office:font-face-decls>
@@ -43,6 +81,7 @@
 			<office:styles>
 				<xsl:call-template name ="InsertDefaultStyles" />
 				<xsl:call-template name="InsertShapeStyles"/>
+				<xsl:call-template name ="InsertLayoutStyle"/>
 			</office:styles>
 			
 			
@@ -97,7 +136,6 @@
 	
 	<xsl:template name="InsertShapeStyles">
 
-		<xsl:variable name ="triangle" select ="1" />
 		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
 			
 			<xsl:variable name ="SlideId">
@@ -128,12 +166,27 @@
 				</xsl:if>
 			</xsl:for-each >
 
-			<!--Dash types-->
+			
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp/p:spPr/a:ln">
+				<!--Dash types-->
 				<xsl:if test ="a:prstDash/@val">
 					<xsl:call-template name ="getDashType">
 						<xsl:with-param name ="val" select ="a:prstDash/@val" />
 						<xsl:with-param name ="cap" select ="@cap" />
+					</xsl:call-template>
+				</xsl:if>
+
+				<!-- Head End-->
+				<xsl:if test ="a:headEnd">
+					<xsl:call-template name ="getArrowType">
+						<xsl:with-param name ="type" select ="a:headEnd/@type" />
+					</xsl:call-template>
+				</xsl:if>
+
+				<!-- Tail End-->
+				<xsl:if test ="a:tailEnd">
+					<xsl:call-template name ="getArrowType">
+						<xsl:with-param name ="type" select ="a:tailEnd/@type" />
 					</xsl:call-template>
 				</xsl:if>
 			</xsl:for-each>
@@ -184,8 +237,8 @@
 					<xsl:with-param name ="name" select ="'sysDot'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'1'" />
-					<xsl:with-param name ="dot1-length" select = "'0.07'" />
-					<xsl:with-param name ="distance" select ="0.07" />
+					<xsl:with-param name ="dot1-length" select = "$dot" />
+					<xsl:with-param name ="distance" select ="$dot" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='sysDash')">
@@ -193,8 +246,8 @@
 					<xsl:with-param name ="name" select ="'sysDash'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'1'" />
-					<xsl:with-param name ="dot1-length" select = "'0.07'" />
-					<xsl:with-param name ="distance" select ="0.07" />
+					<xsl:with-param name ="dot1-length" select = "$dot" />
+					<xsl:with-param name ="distance" select ="$dot" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='dash')">
@@ -202,50 +255,50 @@
 					<xsl:with-param name ="name" select ="'dash'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "'0.282'" />
-					<xsl:with-param name ="distance" select ="0.211" />
+					<xsl:with-param name ="dot2-length" select = "$dash" />
+					<xsl:with-param name ="distance" select ="$distance" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='dashDot')">
 				<xsl:call-template name ="AddDashType">
-					<xsl:with-param name ="name" select ="'dash'" />
+					<xsl:with-param name ="name" select ="'dashDot'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'1'" />
-					<xsl:with-param name ="dot1-length" select = "'0.07'" />
+					<xsl:with-param name ="dot1-length" select = "$dot" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "'0.282'" />
-					<xsl:with-param name ="distance" select ="0.211" />
+					<xsl:with-param name ="dot2-length" select = "$dash" />
+					<xsl:with-param name ="distance" select ="$distance" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='lgDash')">
 				<xsl:call-template name ="AddDashType">
-					<xsl:with-param name ="name" select ="'dash'" />
+					<xsl:with-param name ="name" select ="'lgDash'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "'0.564'" />
-					<xsl:with-param name ="distance" select ="0.211" />
+					<xsl:with-param name ="dot2-length" select = "$longDash" />
+					<xsl:with-param name ="distance" select ="$distance" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='lgDashDot')">
 				<xsl:call-template name ="AddDashType">
-					<xsl:with-param name ="name" select ="'dash'" />
+					<xsl:with-param name ="name" select ="'lgDashDot'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'1'" />
-					<xsl:with-param name ="dot1-length" select = "'0.07'" />
+					<xsl:with-param name ="dot1-length" select = "$dot" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "'0.564'" />
-					<xsl:with-param name ="distance" select ="0.211" />
+					<xsl:with-param name ="dot2-length" select = "$longDash" />
+					<xsl:with-param name ="distance" select ="$distance" />
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test ="($val='lgDashDotDot')">
 				<xsl:call-template name ="AddDashType">
-					<xsl:with-param name ="name" select ="'dash'" />
+					<xsl:with-param name ="name" select ="'lgDashDotDot'" />
 					<xsl:with-param name ="cap" select ="$cap" />
 					<xsl:with-param name ="dot1" select ="'2'" />
-					<xsl:with-param name ="dot1-length" select = "'0.07'" />
+					<xsl:with-param name ="dot1-length" select = "$dot" />
 					<xsl:with-param name ="dot2" select ="'1'" />
-					<xsl:with-param name ="dot2-length" select = "'0.564'" />
-					<xsl:with-param name ="distance" select ="0.211" />
+					<xsl:with-param name ="dot2-length" select = "$longDash" />
+					<xsl:with-param name ="distance" select ="$distance" />
 				</xsl:call-template>
 			</xsl:when>
 			
@@ -809,6 +862,33 @@
 				<text:page-number> &lt;number&gt;</text:page-number>
 			</text:p>
 		</draw:text-box>
+	</xsl:template>
+	<xsl:template name ="InsertLayoutStyle">
+		<!--@@title and subtitle layout  -->
+		<style:presentation-page-layout style:name="AL1T0">
+			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+			<presentation:placeholder presentation:object="subtitle" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm" />
+		</style:presentation-page-layout>
+		<!-- @@Title and sub content layout -->
+		<style:presentation-page-layout style:name="AL2T1">
+			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+			<presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm" />
+		</style:presentation-page-layout>
+		<!-- @@Title and two content layout -->
+		<style:presentation-page-layout style:name="AL3T3">
+			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+			<presentation:placeholder presentation:object="outline" svg:x="2.058cm" svg:y="5.838cm" svg:width="11.67cm" svg:height="13.23cm" />
+			<presentation:placeholder presentation:object="outline" svg:x="14.311cm" svg:y="5.838cm" svg:width="-0.585cm" svg:height="13.23cm" />
+		</style:presentation-page-layout>
+		<!-- @@Title only layout -->
+		<style:presentation-page-layout style:name="AL1T19">
+			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+		</style:presentation-page-layout>
+		<!-- @@Title and object-->
+		<style:presentation-page-layout style:name="AL5T11">
+			<presentation:placeholder presentation:object="title" svg:x="2.058cm" svg:y="1.743cm" svg:width="23.912cm" svg:height="3.507cm" />
+			<presentation:placeholder presentation:object="object" svg:x="2.058cm" svg:y="5.838cm" svg:width="23.912cm" svg:height="13.23cm" />
+		</style:presentation-page-layout>
 	</xsl:template>
 </xsl:stylesheet>
 
