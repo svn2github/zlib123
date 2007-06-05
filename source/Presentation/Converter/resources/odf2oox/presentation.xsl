@@ -246,39 +246,38 @@
         </p:custShow>
       </xsl:for-each>
     </p:custShowLst>
-  </xsl:template>   
+  </xsl:template>    
   <xsl:template name="GetSlideList">
-    <xsl:param name="pages"/>    
+    <xsl:param name="pages"/>
     <xsl:variable name="varshowList" select="$pages"/>
     <xsl:variable name="first" select='substring-before($pages,",")'/>
-    <xsl:variable name='rest' select='substring-after($pages,",")'/>    
+    <xsl:variable name='rest' select='substring-after($pages,",")'/>
     <xsl:if test='$first'>
-      <p:sld>
-        <xsl:attribute name ="r:id">
-          <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:presentation/draw:page">
-            <xsl:if test="@draw:name = $first">
+      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:presentation/draw:page">
+        <xsl:if test="@draw:name = $first">
+          <p:sld>
+            <xsl:attribute name ="r:id">
               <xsl:value-of select ="concat('sId',position())"/>
-            </xsl:if>            
-          </xsl:for-each>
-        </xsl:attribute>
-      </p:sld>
-    </xsl:if>    
+            </xsl:attribute>
+          </p:sld>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:if>
     <xsl:if test='$rest'>
       <xsl:call-template name='GetSlideList'>
         <xsl:with-param name='pages' select='$rest'/>
       </xsl:call-template>
     </xsl:if>
     <xsl:if test='not($rest)'>
-      <p:sld>
-        <xsl:attribute name ="r:id">
-          <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:presentation/draw:page">
-            <xsl:if test="@draw:name = $pages">
+      <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:presentation/draw:page">
+        <xsl:if test="@draw:name = $pages">
+          <p:sld>
+            <xsl:attribute name ="r:id">
               <xsl:value-of select ="concat('sId',position())"/>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:attribute>
-      </p:sld>
+            </xsl:attribute>
+          </p:sld>
+        </xsl:if>
+      </xsl:for-each>
     </xsl:if>
   </xsl:template>
-
 </xsl:stylesheet>
