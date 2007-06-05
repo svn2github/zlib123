@@ -179,7 +179,8 @@ namespace OdfPPT2003Addin
                 String odfFile = fd.SelectedItems.Item(i);
 
                 // create a temporary file
-                object fileName = this.addinLib.GetTempFileName(odfFile, ".pptx");
+               object fileName = this.addinLib.GetTempFileName(odfFile, ".pptx");
+                //object fileName = this.addinLib.GetTempFileName(odfFile, ".ppt");
 
                 // setting defaultformat value in registry
                 int oldFormat = SetPPTXasDefault();
@@ -262,26 +263,34 @@ namespace OdfPPT2003Addin
                         }
                         object initialName = pres.FullName;
                         object tmpFileName = null;
-                        //string pptxFile = (string)initialName;
+                        string pptxFile = (string)initialName;
 
                         // open the duplicated file
                         object addToRecentFiles = false;
                         object readOnly = false;
                         object isVisible = false;
                         object missing = Missing.Value;
-
-                        // tmpFileName = this.addinLib.GetTempFileName((string)initialName,".ppt");
-                        tmpFileName = this.addinLib.GetTempFileName((string)initialName, ".pptx");
-
+                        
                         // setting defaultformat value in registry
                         int oldFormat = SetPPTXasDefault();
-                        pres.SaveAs((string)tmpFileName, PowerPoint.PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoCTrue);
+
+                        //Bug Fixed-Added by Sateesh-Bug#:1719852 PPTX:Addin 2003 crash.
+                        
+                        tmpFileName = this.addinLib.GetTempFileName((string)initialName, ".ppt");
+                        applicationObject.ActivePresentation.SaveCopyAs((string)tmpFileName, Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsTemplate, MsoTriState.msoTrue);
+                        PowerPoint.Presentation newP = applicationObject.Presentations.Open((string)tmpFileName, MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoFalse);
+                        newP.SaveAs((string)tmpFileName, Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoTrue);
+                        newP.Close();
+                        pptxFile = (string)tmpFileName;
+
+                        //End
 
                         // removing defaultformat value in registry
                         RestoreDefault(oldFormat);
 
-                        OoxToOdf((string)tmpFileName, odfFile, true);
+                        OoxToOdf(pptxFile, odfFile, true);
 
+                        System.IO.File.Delete((string)tmpFileName);
 
                         if (tmpFileName != null && File.Exists((string)tmpFileName))
                         {
