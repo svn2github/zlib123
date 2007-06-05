@@ -506,12 +506,32 @@
     </xsl:attribute>
   </xsl:template>
 
-  <!-- insert text styles -->
   <xsl:template name="InsertTextStyles">
+    
+    <!-- @Description: inserts text styles -->
+    <!-- @Context: none -->
+    
     <xsl:apply-templates select="document('xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]"
       mode="automaticstyles"/>
+    <xsl:apply-templates select="document('xl/comments1.xml')/e:comments">
+      <xsl:with-param name="number">1</xsl:with-param>
+    </xsl:apply-templates>
   </xsl:template>
-
+  
+  <xsl:template match="e:comments">
+    
+    <!-- @Description: inserts text styles in notes -->
+    <!-- @Context: none -->
+    
+    <xsl:param name="number"/><!--(int) number of sheet/comments file -->
+    <xsl:apply-templates select="e:commentList/e:comment/e:text/e:r[e:rPr]" mode="automaticstyles"/>
+    <xsl:apply-templates select="document(concat('xl/comments',$number + 1,'.xml'))">
+      <xsl:with-param name="number">
+        <xsl:value-of select="$number+1"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+  </xsl:template>
+  
   <!-- convert run properties into span style -->
   <xsl:template match="e:r" mode="automaticstyles">
     <style:style style:name="{generate-id(.)}" style:family="text">

@@ -152,6 +152,9 @@
         <xsl:with-param name="NameSheet">
           <xsl:value-of select="@name"/>
         </xsl:with-param>
+        <xsl:with-param name="sheetNr">
+          <xsl:value-of select="$number"/>
+        </xsl:with-param>
       </xsl:call-template>
 
     </table:table>
@@ -300,7 +303,7 @@
     <xsl:param name="NameSheet"/>
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
-
+    <xsl:param name="sheetNr"/>
 
     <xsl:call-template name="InsertColumns">
       <xsl:with-param name="sheet" select="$sheet"/>
@@ -379,6 +382,7 @@
             </xsl:with-param>
             <xsl:with-param name="headerRowsStart" select="$headerRowsStart"/>
             <xsl:with-param name="headerRowsEnd" select="$headerRowsEnd"/>
+            <xsl:with-param name="sheetNr" select="$sheetNr"/>
           </xsl:apply-templates>
 
           <!-- insert empty rows before header -->
@@ -419,6 +423,7 @@
               </xsl:with-param>
               <xsl:with-param name="headerRowsStart" select="$headerRowsStart"/>
               <xsl:with-param name="headerRowsEnd" select="$headerRowsEnd"/>
+              <xsl:with-param name="sheetNr" select="$sheetNr"/>
             </xsl:apply-templates>
 
             <!-- if header is empty -->
@@ -503,6 +508,7 @@
             <xsl:with-param name="NameSheet">
               <xsl:value-of select="$NameSheet"/>
             </xsl:with-param>
+            <xsl:with-param name="sheetNr" select="$sheetNr"/>
           </xsl:apply-templates>
 
           <xsl:if test="not(e:worksheet/e:sheetData/e:row/e:c/e:v)">
@@ -547,6 +553,7 @@
     <xsl:param name="PictureRow"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
+    <xsl:param name="sheetNr"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -715,6 +722,7 @@
       <xsl:with-param name="NameSheet">
         <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
+      <xsl:with-param name="sheetNr" select="$sheetNr"/>
     </xsl:call-template>
 
     <xsl:if test="not(following-sibling::e:row) and $PictureRow != ''">
@@ -748,6 +756,7 @@
     <xsl:param name="headerRowsStart"/>
     <xsl:param name="headerRowsEnd"/>
     <xsl:param name="PictureRow"/>
+    <xsl:param name="sheetNr"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -888,6 +897,7 @@
       </xsl:with-param>
       <xsl:with-param name="this" select="$this"/>
       <xsl:with-param name="headerRowsStart" select="$headerRowsStart"/>
+      <xsl:with-param name="sheetNr" select="$sheetNr"/>
     </xsl:call-template>
 
   </xsl:template>
@@ -900,6 +910,7 @@
     <xsl:param name="PictureRow"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
+    <xsl:param name="sheetNr"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -998,6 +1009,7 @@
       <xsl:with-param name="GetMinCollWithPicture">
         <xsl:value-of select="$GetMinCollWithPicture"/>
       </xsl:with-param>
+      <xsl:with-param name="sheetNr" select="$sheetNr"/>
     </xsl:call-template>
   
     
@@ -1034,6 +1046,7 @@
       <xsl:with-param name="NameSheet">
         <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
+      <xsl:with-param name="sheetNr" select="$sheetNr"/>
     </xsl:call-template>
 
 
@@ -1070,6 +1083,7 @@
       <xsl:with-param name="NameSheet">
         <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
+      <xsl:with-param name="sheetNr" select="$sheetNr"/>
     </xsl:call-template>
 
   </xsl:template>
