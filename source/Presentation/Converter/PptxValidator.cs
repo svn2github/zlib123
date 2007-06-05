@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2007, Sonata Software Limited
+ * Copyright (c) 2006, Sonata Software Limited
  * All rights reserved.
  * 
  
@@ -111,7 +111,9 @@ namespace Sonata.OdfConverter.Presentation
             }
             catch (Exception)
             {
-                throw new PptxValidatorException("The pptx package must have a \"/[Content_Types].xml\" file");
+                //modified by lohith - to display user friendly message
+                throw new NotAnOoxDocumentException("The pptx package must have a \"/[Content_Types].xml\" file");
+                //throw new PptxValidatorException("The pptx package must have a \"/[Content_Types].xml\" file");
             }
             this.validateXml(contentTypes);
 
@@ -123,7 +125,10 @@ namespace Sonata.OdfConverter.Presentation
             }
             catch (Exception)
             {
-                throw new PptxValidatorException("The pptx package must have a \"/_rels/.rels\" file");
+                //modified by lohith - to display user friendly message
+                throw new NotAnOoxDocumentException("The pptx package must have a a \"/_rels/.rels\" file");
+                
+                //throw new PptxValidatorException("The pptx package must have a \"/_rels/.rels\" file");
             }
             this.validateXml(relationShips);
 
@@ -140,7 +145,10 @@ namespace Sonata.OdfConverter.Presentation
             }
             if (docTarget == null)
             {
-                throw new PptxValidatorException("openDocument relation not found in \"/_rels/.rels\"");
+                //modified by lohith - to display user friendly message
+                throw new NotAnOoxDocumentException("openDocument relation not found in \"/_rels/.rels\"");
+
+                //throw new PptxValidatorException("openDocument relation not found in \"/_rels/.rels\"");
             }
         
 
@@ -161,7 +169,10 @@ namespace Sonata.OdfConverter.Presentation
                     }
                     catch (Exception)
                     {
-                        throw new PptxValidatorException("The file \"" + target + "\" is described in the \"/_rels/.rels\" file but does not exist in the package.");
+                        //modified by lohith - to display user friendly message
+                        throw new NotAnOoxDocumentException("The file \"" + target + "\" is described in the \"/_rels/.rels\" file but does not exist in the package.");
+
+                        //throw new PptxValidatorException("The file \"" + target + "\" is described in the \"/_rels/.rels\" file but does not exist in the package.");
                     }
 
                     // 4.2. A content type can be found in [Content_Types].xml file
@@ -222,7 +233,10 @@ namespace Sonata.OdfConverter.Presentation
                 {
                     if (!partRelExists)
                     {
-                        throw new PptxValidatorException("Referenced id exist but no part relationship file found");
+                        //modified by lohith - to display user friendly message
+                        throw new NotAnOoxDocumentException("Referenced id exist but no part relationship file found");
+
+                        //throw new PptxValidatorException("Referenced id exist but no part relationship file found");
                     }
                     relationShips = reader.GetEntry(partRelPath);
                     r = XmlReader.Create(relationShips);
@@ -238,7 +252,10 @@ namespace Sonata.OdfConverter.Presentation
                     }
                     if (ids.Count != 0)
                     {
-                        throw new PptxValidatorException("One or more relationship id have not been found in the partRelationship file : " + ids[0]);
+                        //modified by lohith - to display user friendly message
+                        throw new NotAnOoxDocumentException("One or more relationship id have not been found in the partRelationship file : " + ids[0]);
+
+                        //throw new PptxValidatorException("One or more relationship id have not been found in the partRelationship file : " + ids[0]);
                     }
                 }
             }
@@ -312,7 +329,8 @@ namespace Sonata.OdfConverter.Presentation
             }
             if (contentType == null)
             {
-                throw new PptxValidatorException("Content type not found for " + target);
+                throw new NotAnOoxDocumentException("Content type not found for " + target);
+                //throw new PptxValidatorException("Content type not found for " + target);
             }
             return contentType;
         }
@@ -326,6 +344,9 @@ namespace Sonata.OdfConverter.Presentation
                 {
                     String target = partDir + "/" + r.GetAttribute("Target");
 
+                    // Added by lohith - if a file is external no need to have it within package
+                    if (!(r.GetAttribute("TargetMode") == "External"))
+                    {
                     // Is the target item exist in the package ?
                     Stream item = null;
                     bool fileExists = true;
@@ -335,7 +356,8 @@ namespace Sonata.OdfConverter.Presentation
                     }
                     catch (Exception)
                     {
-                        throw new PptxValidatorException("The file \"" + target + "\" is described in the \"/ppt/_rels/presentation.xml.rels\" file but does not exist in the package.");
+                        throw new NotAnOoxDocumentException("The file \"" + target + "\" is described in the \"/ppt/_rels/presentation.xml.rels\" file but does not exist in the package.");
+                        //throw new PptxValidatorException("The file \"" + target + "\" is described in the \"/ppt/_rels/presentation.xml.rels\" file but does not exist in the package.");
                         fileExists = false;
                     }
 
@@ -354,6 +376,9 @@ namespace Sonata.OdfConverter.Presentation
                             }
                         }
                     }
+
+                    }
+                    
                 }
                    
             }
@@ -363,7 +388,8 @@ namespace Sonata.OdfConverter.Presentation
 
         public void ValidationHandler(object sender, ValidationEventArgs args)
         {
-            throw new PptxValidatorException("XML Schema Validation error : " + args.Message);
+            throw new NotAnOoxDocumentException("XML Schema Validation error : " + args.Message);
+            //throw new PptxValidatorException("XML Schema Validation error : " + args.Message);
         }
     }
 }

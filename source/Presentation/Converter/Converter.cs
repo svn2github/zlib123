@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2007, Sonata Software Limited
+ * Copyright (c) 2006, Sonata Software Limited
  * All rights reserved.
  * 
  
