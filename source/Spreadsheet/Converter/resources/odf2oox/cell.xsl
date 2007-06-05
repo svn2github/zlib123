@@ -525,7 +525,6 @@
     <xsl:param name="CheckRowHidden"/>
     <xsl:param name="CheckIfDefaultBorder"/>
 
-
     <xsl:variable name="height">
       <xsl:call-template name="point-measure">
         <xsl:with-param name="length">
@@ -632,7 +631,7 @@
           <xsl:with-param name="cellNumber">
             <!-- last or is for cells with error -->
             <xsl:value-of
-              select="$cellNumber + count(child::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
+              select="$cellNumber + count(child::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))])"
             />
           </xsl:with-param>
           <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
@@ -670,7 +669,7 @@
           <xsl:with-param name="cellNumber">
             <!-- last or is for cells with error -->
             <xsl:value-of
-              select="$cellNumber + count(child::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
+              select="$cellNumber + count(child::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date'  or @office:value-type='time')))])"
             />
           </xsl:with-param>
           <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
@@ -709,7 +708,7 @@
           <xsl:with-param name="cellNumber">
             <!-- last or is for cells with error -->
             <xsl:value-of
-              select="$cellNumber + count(child::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))])"
+              select="$cellNumber + count(child::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))])"
             />
           </xsl:with-param>
           <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
@@ -930,7 +929,7 @@
           <xsl:with-param name="cellNumber">
             <xsl:choose>
               <xsl:when
-                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date')))">
+                test="name()='table:table-cell' and child::text:p and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))">
                 <xsl:value-of select="$cellNumber + 1"/>
               </xsl:when>
               <xsl:otherwise>
@@ -1101,7 +1100,6 @@
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CountStyleTableCell"/>
-
 
     <xsl:variable name="columnCellStyle">
       <xsl:call-template name="GetColumnCellStyle">
