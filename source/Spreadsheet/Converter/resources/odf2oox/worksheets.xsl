@@ -531,15 +531,16 @@
 
     <!--Insert Hyperlinks-->
 
-    <xsl:if test="descendant::text:a">
+    <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
+    <xsl:if test="descendant::text:a[not(ancestor::table:table-row-group)]">
       <hyperlinks>
-        <xsl:for-each select="descendant::text:a">
+        <xsl:for-each select="descendant::text:a[not(ancestor::table:table-row-group)]">
           <xsl:variable name="ViewHyperlinks">
             <xsl:value-of select="."/>
           </xsl:variable>
 
           <xsl:variable name="colPosition">
-            <xsl:for-each select="parent::node()/parent::node()">
+            <xsl:for-each select="ancestor::table:table-cell">
               <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
             </xsl:for-each>
           </xsl:variable>
@@ -551,7 +552,7 @@
 
           <!-- real column number -->
           <xsl:variable name="colNum">
-            <xsl:for-each select="parent::node()/parent::node()/parent::node()/table:table-cell[1]">
+            <xsl:for-each select="ancestor::table:table-row/table:table-cell[1]">
               <xsl:call-template name="GetColNumber">
                 <xsl:with-param name="position">
                   <xsl:value-of select="$colPosition"/>
@@ -565,6 +566,7 @@
 
               <xsl:call-template name="GetRowNumber">
                 <xsl:with-param name="rowId" select="$rowPosition"/>
+                <xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
               </xsl:call-template>
 
             </xsl:for-each>

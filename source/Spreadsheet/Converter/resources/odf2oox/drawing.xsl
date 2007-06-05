@@ -243,6 +243,7 @@
           <xsl:variable name="number">
             <xsl:call-template name="GetRowNumber">
               <xsl:with-param name="rowId" select="$rowId"/>
+              <xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
             </xsl:call-template>
           </xsl:variable>
           <xsl:value-of select="$number - 1"/>

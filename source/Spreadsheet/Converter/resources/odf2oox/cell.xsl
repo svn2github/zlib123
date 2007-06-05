@@ -1439,6 +1439,7 @@
 
   <xsl:template name="GetRowNumber">
     <xsl:param name="rowId"/>
+    <xsl:param name="tableId"/>
     <xsl:param name="value" select="1"/>
 
     <xsl:choose>
@@ -1454,41 +1455,15 @@
           </xsl:choose>
         </xsl:variable>
 
-        <xsl:choose>
-          <xsl:when test="following-sibling::node()[1][name() = 'table:table-row'] ">
-            <xsl:for-each select="following-sibling::node()[1][name() = 'table:table-row']">
-              <xsl:call-template name="GetRowNumber">
-                <xsl:with-param name="rowId" select="$rowId"/>
-                <xsl:with-param name="value">
-                  <xsl:value-of select="$value + $rows"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:for-each>
-          </xsl:when>
-          <!-- get in to the header -->
-          <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows'] ">
-            <xsl:for-each select="following-sibling::table:table-header-rows/table:table-row[1]">
-              <xsl:call-template name="GetRowNumber">
-                <xsl:with-param name="rowId" select="$rowId"/>
-                <xsl:with-param name="value">
-                  <xsl:value-of select="$value + $rows"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:for-each>
-          </xsl:when>
-          <!-- get out of the header -->
-          <xsl:when
-            test="parent::node()[name() = 'table:table-header-rows'] and parent::node()/following-sibling::table:table-row">
-            <xsl:for-each select="parent::node()/following-sibling::table:table-row[1]">
-              <xsl:call-template name="GetRowNumber">
-                <xsl:with-param name="rowId" select="$rowId"/>
-                <xsl:with-param name="value">
-                  <xsl:value-of select="$value + $rows"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:for-each>
-          </xsl:when>
-        </xsl:choose>
+        <xsl:for-each select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]">
+          <xsl:call-template name="GetRowNumber">
+            <xsl:with-param name="rowId" select="$rowId"/>
+            <xsl:with-param name="tableId" select="$tableId"/>
+            <xsl:with-param name="value">
+              <xsl:value-of select="$value + $rows"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
 
       </xsl:when>
       <xsl:otherwise>
