@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--
+Copyright (c) 2007, Sonata Software Limited
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of Sonata Software Limited nor the names of its contributors
+*       may be used to endorse or promote products derived from this software
+*       without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
+-->
 <xsl:stylesheet version="1.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"   
@@ -15,24 +42,59 @@
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" 
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
-  exclude-result-prefixes="odf style text number draw page">
+  xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  exclude-result-prefixes="odf style text number draw page r">
 	<xsl:import href="common.xsl"/>
 
-	<!-- Shapes in presentation-->
+	<!-- Shape constants-->
+	<xsl:variable name ="dot">
+		<xsl:value-of select ="'0.07'"/>
+	</xsl:variable>
+	<xsl:variable name ="dash">
+		<xsl:value-of select ="'0.282'"/>
+	</xsl:variable>
+	<xsl:variable name ="longDash">
+		<xsl:value-of select ="'0.564'"/>
+	</xsl:variable>
+	<xsl:variable name ="distance">
+		<xsl:value-of select ="'0.211'"/>
+	</xsl:variable>
+	<xsl:variable name="sm-sm">
+		<xsl:value-of select ="'0.15'"/>
+	</xsl:variable>
+	<xsl:variable name="sm-med">
+		<xsl:value-of select ="'0.18'"/>
+	</xsl:variable>
+	<xsl:variable name="sm-lg">
+		<xsl:value-of select ="'0.2'"/>
+	</xsl:variable>
+	<xsl:variable name="med-sm">
+		<xsl:value-of select ="'0.21'" />
+	</xsl:variable>
+	<xsl:variable name="med-med">
+		<xsl:value-of select ="'0.25'"/>
+	</xsl:variable>
+	<xsl:variable name="med-lg">
+		<xsl:value-of select ="'0.3'" />
+	</xsl:variable>
+	<xsl:variable name="lg-sm">
+		<xsl:value-of select ="'0.31'" />
+	</xsl:variable>
+	<xsl:variable name="lg-med">
+		<xsl:value-of select ="'0.35'" />
+	</xsl:variable>
+	<xsl:variable name="lg-lg">
+		<xsl:value-of select ="'0.4'" />
+	</xsl:variable>
+
+	<!-- Template for Shapes in direct conversion -->
 	<xsl:template name ="shapes">
 		<!-- Rectangle -->
 		<xsl:for-each select ="draw:rect">
 			<xsl:call-template name ="CreateShape">
 				<xsl:with-param name ="shapeName" select="'Rectangle '" />
 			</xsl:call-template>
-		</xsl:for-each>
-		<!-- Rectangle - Custom shape -->
-		<xsl:for-each select ="draw:custom-shape">
-			<xsl:if test ="(draw:enhanced-geometry/@draw:type='rectangle') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
-				<xsl:call-template name ="CreateShape">
-					<xsl:with-param name ="shapeName" select="'Rectangle Custom '" />
-				</xsl:call-template>
-			</xsl:if>
 		</xsl:for-each>
 
 		<!-- Text box-->
@@ -43,19 +105,251 @@
 				</xsl:call-template>
 			</xsl:if>
 		</xsl:for-each>
-		<!-- Text box - Custom shape-->
-		<xsl:for-each select ="draw:custom-shape">
-			<xsl:if test ="(draw:enhanced-geometry/@draw:type='mso-spt202') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
-				<xsl:call-template name ="CreateShape">
-					<xsl:with-param name ="shapeName" select="'TextBox Custom '" />
-				</xsl:call-template>
-			</xsl:if>
-		</xsl:for-each>
 
+		<!-- Custom shapes -->
+		<xsl:for-each select ="draw:custom-shape">
+			<xsl:variable name ="shapeName">
+				<xsl:choose>
+					<!-- Text Box -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt202') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
+						<xsl:value-of select ="'TextBox Custom '"/>
+					</xsl:when>
+					<!-- Oval -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='ellipse')">
+						<xsl:value-of select ="'Oval '"/>
+					</xsl:when>
+					<!-- Isosceles Triangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='isosceles-triangle')">
+						<xsl:value-of select ="'Isosceles Triangle '"/>
+					</xsl:when>
+					<!-- Right Triangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='right-triangle')">
+						<xsl:value-of select ="'Right Triangle '"/>
+					</xsl:when>
+					<!-- Parallelogram -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='parallelogram')">
+						<xsl:value-of select ="'Parallelogram '"/>
+					</xsl:when>
+					<!-- Trapezoid -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 0 914400 L 228600 0 L 685800 0 L 914400 914400 Z N')">
+						<xsl:value-of select ="'Trapezoid '"/>
+					</xsl:when>
+					<!-- Diamond -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='diamond')and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 10800 0 L 21600 10800 10800 21600 0 10800 10800 0 Z N')">
+						<xsl:value-of select ="'Diamond '"/>
+					</xsl:when>
+					<!-- Regular Pentagon -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='pentagon') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 10800 0 L 0 8260 4230 21600 17370 21600 21600 8260 10800 0 Z N')">
+						<xsl:value-of select ="'Regular Pentagon '"/>
+					</xsl:when>
+					<!-- Hexagon -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='hexagon')">
+						<xsl:value-of select ="'Hexagon '"/>
+					</xsl:when>
+					<!-- Octagon -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='octagon')">
+						<xsl:value-of select ="'Octagon '"/>
+					</xsl:when>
+					<!-- Cube -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='cube')">
+						<xsl:value-of select ="'Cube '"/>
+					</xsl:when>
+					<!-- Can -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='can')">
+						<xsl:value-of select ="'Can '"/>
+					</xsl:when>
+					<!-- Rectangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='rectangle') and (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N')">
+						<xsl:value-of select ="'Rectangle Custom '"/>
+					</xsl:when>
+					<!-- Rounded Rectangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='round-rectangle')">
+						<xsl:value-of select ="'Rounded  Rectangle '"/>
+					</xsl:when>
+					<!-- Snip Single Corner Rectangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 761997 0 L 914400 152403 L 914400 1219200 L 0 1219200 Z N')">
+						<xsl:value-of select ="'Snip Single Corner Rectangle '"/>
+					</xsl:when>
+					<!-- Snip Same Side Corner Rectangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and 
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 50801 0 L 863599 0 L 914400 50801 L 914400 304800 L 914400 304800 L 0 304800 L 0 304800 L 0 50801 Z N')">
+						<xsl:value-of select ="'Snip Same Side Corner Rectangle '"/>
+					</xsl:when>
+					<!-- Snip Diagonal Corner Rectangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 876299 0 L 914400 38101 L 914400 228600 L 914400 228600 L 38101 228600 L 0 190499 L 0 0 Z N')">
+						<xsl:value-of select ="'Snip Diagonal Corner Rectangle '"/>
+					</xsl:when>
+					<!-- Snip and Round Single Corner Rectangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 38101 0 L 876299 0 L 914400 38101 L 914400 228600 L 0 228600 L 0 38101 W 0 0 76202 76202 0 38101 38101 0 Z N')">
+						<xsl:value-of select ="'Snip and Round Single Corner Rectangle '"/>
+					</xsl:when>
+					<!-- Round Single Corner Rectangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 0 0 L 876299 0 W 838198 0 914400 76202 876299 0 914400 38101 L 914400 228600 L 0 228600 Z N')">
+						<xsl:value-of select ="'Round Single Corner Rectangle '"/>
+					</xsl:when>
+					<!-- Round Same Side Corner Rectangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 152403 0 L 761997 0 W 609594 0 914400 304806 761997 0 914400 152403 L 914400 914400 L 0 914400 L 0 152403 W 0 0 304806 304806 0 152403 152403 0 Z N')">
+						<xsl:value-of select ="'Round Same Side Corner Rectangle '"/>
+					</xsl:when>
+					<!-- Round Diagonal Corner Rectangle -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='mso-spt100') and
+									 (draw:enhanced-geometry/@draw:enhanced-path='M 254005 0 L 2286000 0 L 2286000 1269995 W 1777990 1015990 2286000 1524000 2286000 1269995 2031995 1524000 L 0 1524000 L 0 254005 W 0 0 508010 508010 0 254005 254005 0 Z N')">
+						<xsl:value-of select ="'Round Diagonal Corner Rectangle '"/>
+					</xsl:when>
+					
+					<!-- Flow Chart: Process -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-process')">
+						<xsl:value-of select ="'Flowchart: Process '"/>
+					</xsl:when>
+					<!-- Flow Chart: Alternate Process -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-alternate-process')">
+						<xsl:value-of select ="'Flowchart: Alternate Process '"/>
+					</xsl:when>
+					<!-- Flow Chart: Decision -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-decision')">
+						<xsl:value-of select ="'Flowchart: Decision '"/>
+					</xsl:when>
+					<!-- Flow Chart: Data -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-data')">
+						<xsl:value-of select ="'Flowchart: Data '"/>
+					</xsl:when>
+					<!-- Flow Chart: Predefined-process -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-predefined-process')">
+						<xsl:value-of select ="'Flowchart: Predefined Process '"/>
+					</xsl:when>
+					<!-- Flow Chart: Internal-storage -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-internal-storage')">
+						<xsl:value-of select ="'Flowchart: Internal Storage '"/>
+					</xsl:when>
+					<!-- Flow Chart: Document -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-document')">
+						<xsl:value-of select ="'Flowchart: Document '"/>
+					</xsl:when>
+					<!-- Flow Chart: Multidocument -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-multidocument')">
+						<xsl:value-of select ="'Flowchart: Multi document '"/>
+					</xsl:when>
+					<!-- Flow Chart: Terminator -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-terminator')">
+						<xsl:value-of select ="'Flowchart: Terminator '"/>
+					</xsl:when>
+					<!-- Flow Chart: Preparation -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-preparation')">
+						<xsl:value-of select ="'Flowchart: Preparation '"/>
+					</xsl:when>
+					<!-- Flow Chart: Manual-input -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-manual-input')">
+						<xsl:value-of select ="'Flowchart: Manual Input '"/>
+					</xsl:when>
+					<!-- Flow Chart: Manual-operation -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-manual-operation')">
+						<xsl:value-of select ="'Flowchart: Manual Operation '"/>
+					</xsl:when>
+					<!-- Flow Chart: Connector -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-connector')">
+						<xsl:value-of select ="'Flowchart: Connector '"/>
+					</xsl:when>
+					<!-- Flow Chart: Off-page-connector -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-off-page-connector')">
+						<xsl:value-of select ="'Flowchart: Off-page Connector '"/>
+					</xsl:when>
+					<!-- Flow Chart: Card -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-card')">
+						<xsl:value-of select ="'Flowchart: Card '"/>
+					</xsl:when>
+					<!-- Flow Chart: Punched-tape -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-punched-tape')">
+						<xsl:value-of select ="'Flowchart: Punched Tape '"/>
+					</xsl:when>
+					<!-- Flow Chart: Summing-junction -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-summing-junction')">
+						<xsl:value-of select ="'Flowchart: Summing Junction '"/>
+					</xsl:when>
+					<!-- Flow Chart: Or -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-or')">
+						<xsl:value-of select ="'Flowchart: Or '"/>
+					</xsl:when>
+					<!-- Flow Chart: Collate -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-collate')">
+						<xsl:value-of select ="'Flowchart: Collate '"/>
+					</xsl:when>
+					<!-- Flow Chart: Sort -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-sort')">
+						<xsl:value-of select ="'Flowchart: Sort '"/>
+					</xsl:when>
+					<!-- Flow Chart: Extract -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-extract')">
+						<xsl:value-of select ="'Flowchart: Extract '"/>
+					</xsl:when>
+					<!-- Flow Chart: Merge -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-merge')">
+						<xsl:value-of select ="'Flowchart: Merge '"/>
+					</xsl:when>
+					<!-- Flow Chart: Stored-data -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-stored-data')">
+						<xsl:value-of select ="'Flowchart: Stored Data '"/>
+					</xsl:when>
+					<!-- Flow Chart: Delay-->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-delay')">
+						<xsl:value-of select ="'Flowchart: Delay '"/>
+					</xsl:when>
+					<!-- Flow Chart: Sequential-access -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-sequential-access')">
+						<xsl:value-of select ="'Flowchart: Sequential Access Storage '"/>
+					</xsl:when>
+					<!-- Flow Chart: Direct-access-storage -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-direct-access-storage')">
+						<xsl:value-of select ="'Flowchart: Direct Access Storage'"/>
+					</xsl:when>
+					<!-- Flow Chart: Magnetic-disk -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-magnetic-disk')">
+						<xsl:value-of select ="'Flowchart: Magnetic Disk '"/>
+					</xsl:when>
+					<!-- Flow Chart: Display -->
+					<xsl:when test ="(draw:enhanced-geometry/@draw:type='flowchart-display')">
+						<xsl:value-of select ="'Flowchart: Display '"/>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:call-template name ="CreateShape">
+					<xsl:with-param name ="shapeName" select="$shapeName" />
+				</xsl:call-template>
+		</xsl:for-each>
+ 
 		<!-- Line -->
-		<!--<xsl:for-each select ="draw:line">
-			<xsl:call-template name ="drawLine" />
-		</xsl:for-each>-->
+		<xsl:for-each select ="draw:line">
+			<xsl:call-template name ="drawLine">
+				<xsl:with-param name ="connectorType" select ="'Straight Connector '" />
+			</xsl:call-template>
+		</xsl:for-each>
+		
+		<!-- Connectors -->
+		<xsl:for-each select ="draw:connector">
+			<xsl:variable name ="type">
+				<xsl:choose>
+					<xsl:when test ="@draw:type='line'">
+						<xsl:value-of select ="'Straight Arrow Connector '"/>
+					</xsl:when>
+					<xsl:when test ="@draw:type='curve'">
+						<xsl:value-of select ="'Curved Connector '"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select ="'Elbow Connector '"/>
+					</xsl:otherwise> 
+				</xsl:choose>
+			</xsl:variable>
+			<xsl:call-template name ="drawLine">
+				<xsl:with-param name ="connectorType" select ="$type" />
+			</xsl:call-template>
+		</xsl:for-each>
 	</xsl:template>
 	<!-- Create p:sp node for shape -->
 	<xsl:template name ="CreateShape">
@@ -69,6 +363,142 @@
 					<xsl:attribute name ="name">
 						<xsl:value-of select ="concat($shapeName, position())"/>
 					</xsl:attribute>
+					  <!-- ADDED BY LOHITH - HYPER LINKS FOR SHAPES-->
+					  <xsl:variable name="PostionCount">
+						<xsl:value-of select="position()"/>
+					  </xsl:variable>
+					  <xsl:variable name="ShapeType">
+						<xsl:if test="contains(.,'rect')">
+						  <xsl:value-of select="'RectAtachFileId'"/>  
+						</xsl:if>
+						<xsl:if test="not(contains(.,'rect')) and not(contains($shapeName,'Text'))">
+						  <xsl:value-of select="'ShapeFileId'"/>
+						</xsl:if>
+						<xsl:if test="contains($shapeName,'Text')">
+							<xsl:if test="not(contains($shapeName,'Custom'))">
+								<xsl:value-of select="'TxtBoxAtchFileId'"/>
+							</xsl:if>
+							<xsl:if test="contains($shapeName,'Custom')">
+								<xsl:value-of select="'ShapeFileId'"/>
+							</xsl:if>							
+						</xsl:if>
+					  </xsl:variable>
+					  <xsl:if test="office:event-listeners">
+						<xsl:for-each select ="office:event-listeners/presentation:event-listener">
+						  <xsl:if test="@script:event-name[contains(.,'dom:click')]">
+							<a:hlinkClick>
+							  <xsl:choose>
+								 <!--Go to previous slide-->
+								<xsl:when test="@presentation:action[ contains(.,'previous-page')]">
+								  <xsl:attribute name="action">
+									<xsl:value-of select="'ppaction://hlinkshowjump?jump=previousslide'"/>
+								  </xsl:attribute>
+								</xsl:when>
+								 <!--Go to Next slide-->
+								<xsl:when test="@presentation:action[ contains(.,'next-page')]">
+								  <xsl:attribute name="action">
+									<xsl:value-of select="'ppaction://hlinkshowjump?jump=nextslide'"/>
+								  </xsl:attribute>
+								</xsl:when>
+								 <!--Go to First slide-->
+								<xsl:when test="@presentation:action[ contains(.,'first-page')]">
+								  <xsl:attribute name="action">
+									<xsl:value-of select="'ppaction://hlinkshowjump?jump=firstslide'"/>
+								  </xsl:attribute>
+								</xsl:when>
+								 <!--Go to Last slide-->
+								<xsl:when test="@presentation:action[ contains(.,'last-page')]">
+								  <xsl:attribute name="action">
+									<xsl:value-of select="'ppaction://hlinkshowjump?jump=lastslide'"/>
+								  </xsl:attribute>
+								</xsl:when>
+								 <!--End Presentation--> 
+								<xsl:when test="@presentation:action[ contains(.,'stop')]">
+								  <xsl:attribute name="action">
+									<xsl:value-of select="'ppaction://hlinkshowjump?jump=endshow'"/>
+								  </xsl:attribute>
+								</xsl:when>
+								 <!--Run program-->
+								<xsl:when test="@xlink:href and @presentation:action[ contains(.,'execute')]">
+								  <xsl:attribute name="action">
+									<xsl:value-of select="'ppaction://program'"/>
+								  </xsl:attribute>
+								</xsl:when>
+								 <!--Go to slide--> 
+								<xsl:when test="@xlink:href[ contains(.,'#page')]">
+								  <xsl:attribute name="action">
+									<xsl:value-of select="'ppaction://hlinksldjump'"/>
+								  </xsl:attribute>
+								</xsl:when>
+								 <!--Go to document--> 
+								<xsl:when test="@xlink:href and @presentation:action[ contains(.,'show')] ">
+								  <xsl:if test="not(@xlink:href[ contains(.,'#page')])">
+									<xsl:attribute name="action">
+									  <xsl:value-of select="'ppaction://hlinkfile'"/>
+									</xsl:attribute>
+								  </xsl:if>
+								</xsl:when>
+							  </xsl:choose>
+							   <!--set value for attribute r:id-->
+							  <xsl:choose>
+								 <!--For jump to next,previous,first,last-->
+								<xsl:when test="@presentation:action[ contains(.,'page') or contains(.,'stop')]">
+								  <xsl:attribute name="r:id">
+									<xsl:value-of select="''"/>
+								  </xsl:attribute>
+								</xsl:when>                    
+								 <!--For Run program & got to slide-->
+								<xsl:when test="@xlink:href[contains(.,'#page')]">
+								  <xsl:attribute name="r:id">
+									<xsl:value-of select="concat($ShapeType,$PostionCount)"/>
+								  </xsl:attribute>
+								</xsl:when>
+								 <!--For Go to document--> 
+								<xsl:when test="@xlink:href and @presentation:action[ contains(.,'show')] ">
+								  <xsl:if test="not(@xlink:href[ contains(.,'#page')])">
+									<xsl:attribute name="r:id">
+									  <xsl:value-of select="concat($ShapeType,$PostionCount)"/>
+									</xsl:attribute>
+								  </xsl:if>
+								</xsl:when>
+								 <!--For Go to Run Programs--> 
+								<xsl:when test="@xlink:href and @presentation:action[ contains(.,'execute')]">
+								  <xsl:attribute name="r:id">
+									<xsl:value-of select="concat($ShapeType,$PostionCount)"/>
+								  </xsl:attribute>
+								</xsl:when>
+							  </xsl:choose>
+                  <!-- Play Sound -->
+                  <xsl:if test="@presentation:action[ contains(.,'sound')]">
+                    <a:snd>
+                      <xsl:variable name="varMediaFilePath">
+                        <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                          <xsl:value-of select="presentation:sound/@xlink:href" />
+                        </xsl:if>
+                        <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                          <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                        </xsl:if>
+                      </xsl:variable>
+                      <xsl:variable name="varFileRelId">
+                        <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                      </xsl:variable>
+                      <xsl:attribute name="r:embed">
+                        <xsl:value-of select="$varFileRelId"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="name">
+                        <xsl:value-of select="concat('SoundFileForShape',$PostionCount)"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="builtIn">
+                        <xsl:value-of select='1'/>
+                      </xsl:attribute>
+                      <pzip:extract pzip:source="{$varMediaFilePath}" pzip:target="{concat('ppt/media/',$varFileRelId,'.wav')}" />
+                    </a:snd>
+                  </xsl:if>
+							</a:hlinkClick>
+						  </xsl:if>
+						</xsl:for-each>
+					  </xsl:if>
+					  <!-- ADDED BY LOHITH - HYPER LINKS FOR SHAPES-->          
 				</p:cNvPr >
 				<p:cNvSpPr />
 				<p:nvPr />
@@ -123,7 +553,6 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</p:txBody>
-
 		</p:sp>
 	</xsl:template>
 	<!-- Draw shape -->
@@ -161,6 +590,7 @@
 	</xsl:template>
 	<!-- Draw line-->
 	<xsl:template name ="drawLine">
+		<xsl:param name ="connectorType" />
 		<p:cxnSp>
 			<p:nvCxnSpPr>
 				<p:cNvPr>
@@ -168,60 +598,187 @@
 						<xsl:value-of select ="position()"/>
 					</xsl:attribute>
 					<xsl:attribute name ="name">
-						<xsl:value-of select ="concat('Straight Connector ', position())" />
+						<xsl:value-of select ="concat($connectorType, position())" />
 					</xsl:attribute>
+          <!-- ADDED BY LOHITH - HYPER LINKS FOR SHAPES-->
+          <xsl:variable name="PostionCount">
+            <xsl:value-of select="position()"/>
+          </xsl:variable>
+          <xsl:if test="office:event-listeners">
+            <xsl:for-each select ="office:event-listeners/presentation:event-listener">
+              <xsl:if test="@script:event-name[contains(.,'dom:click')]">
+                <a:hlinkClick>
+                  <xsl:choose>
+                    <!-- Go to previous slide-->
+                    <xsl:when test="@presentation:action[ contains(.,'previous-page')]">
+                      <xsl:attribute name="action">
+                        <xsl:value-of select="'ppaction://hlinkshowjump?jump=previousslide'"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <!-- Go to Next slide-->
+                    <xsl:when test="@presentation:action[ contains(.,'next-page')]">
+                      <xsl:attribute name="action">
+                        <xsl:value-of select="'ppaction://hlinkshowjump?jump=nextslide'"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <!-- Go to First slide-->
+                    <xsl:when test="@presentation:action[ contains(.,'first-page')]">
+                      <xsl:attribute name="action">
+                        <xsl:value-of select="'ppaction://hlinkshowjump?jump=firstslide'"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <!-- Go to Last slide-->
+                    <xsl:when test="@presentation:action[ contains(.,'last-page')]">
+                      <xsl:attribute name="action">
+                        <xsl:value-of select="'ppaction://hlinkshowjump?jump=lastslide'"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <!-- End Presentation -->
+                    <xsl:when test="@presentation:action[ contains(.,'stop')]">
+                      <xsl:attribute name="action">
+                        <xsl:value-of select="'ppaction://hlinkshowjump?jump=endshow'"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <!-- Run program-->
+                    <xsl:when test="@xlink:href and @presentation:action[ contains(.,'execute')]">
+                      <xsl:attribute name="action">
+                        <xsl:value-of select="'ppaction://program'"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <!-- Go to slide -->
+                    <xsl:when test="@xlink:href[ contains(.,'#page')]">
+                      <xsl:attribute name="action">
+                        <xsl:value-of select="'ppaction://hlinksldjump'"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <!-- Go to document -->
+                    <xsl:when test="@xlink:href and @presentation:action[ contains(.,'show')] ">
+                      <xsl:if test="not(@xlink:href[ contains(.,'#page')])">
+                        <xsl:attribute name="action">
+                          <xsl:value-of select="'ppaction://hlinkfile'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                    </xsl:when>
+                  </xsl:choose>
+                  <!-- set value for attribute r:id-->
+                  <xsl:choose>
+                    <!-- For jump to next,previous,first,last-->
+                    <xsl:when test="@presentation:action[ contains(.,'page') or contains(.,'stop')]">
+                      <xsl:attribute name="r:id">
+                        <xsl:value-of select="''"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <!-- For Run program & got to slide-->
+                    <xsl:when test="@xlink:href[contains(.,'#page')]">
+                      <xsl:attribute name="r:id">
+                        <xsl:value-of select="concat('LineFileId',$PostionCount)"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <!-- For Go to document -->
+                    <xsl:when test="@xlink:href and @presentation:action[ contains(.,'show')] ">
+                      <xsl:if test="not(@xlink:href[ contains(.,'#page')])">
+                        <xsl:attribute name="r:id">
+                          <xsl:value-of select="concat('LineFileId',$PostionCount)"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                    </xsl:when>
+                    <!-- For Go to Run Programs -->
+                    <xsl:when test="@xlink:href and @presentation:action[ contains(.,'execute')]">
+                      <xsl:attribute name="r:id">
+                        <xsl:value-of select="concat('LineFileId',$PostionCount)"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                  </xsl:choose>
+                  <!-- Play Sound -->
+                  <xsl:if test="@presentation:action[ contains(.,'sound')]">
+                    <a:snd>
+                      <xsl:variable name="varMediaFilePath">
+                        <xsl:if test="presentation:sound/@xlink:href [ contains(.,'../')]">
+                          <xsl:value-of select="presentation:sound/@xlink:href" />
+                        </xsl:if>
+                        <xsl:if test="not(presentation:sound/@xlink:href [ contains(.,'../')])">
+                          <xsl:value-of select="substring-after(presentation:sound/@xlink:href,'/')" />
+                        </xsl:if>
+                      </xsl:variable>
+                      <xsl:variable name="varFileRelId">
+                        <xsl:value-of select="translate(translate(translate(translate(translate($varMediaFilePath,'/','_'),'..','_'),'.','_'),':','_'),'%20D','_')"/>
+                      </xsl:variable>
+                      <xsl:attribute name="r:embed">
+                        <xsl:value-of select="$varFileRelId"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="name">
+                        <xsl:value-of select="concat('SoundFileForShapeLine',$PostionCount)"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="builtIn">
+                        <xsl:value-of select='1'/>
+                      </xsl:attribute>
+                      <pzip:extract pzip:source="{$varMediaFilePath}" pzip:target="{concat('ppt/media/',$varFileRelId,'.wav')}" />
+                    </a:snd>
+                  </xsl:if>
+                </a:hlinkClick>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+          <!-- ADDED BY LOHITH - HYPER LINKS FOR SHAPES-->
 				</p:cNvPr>
 				<p:cNvCxnSpPr/>
 				<p:nvPr/>
 			</p:nvCxnSpPr>
 			<p:spPr>
 
-				<xsl:variable name ="x1">
-					<xsl:call-template name ="convertToPoints">
-						<xsl:with-param name ="unit" select ="'cm'"/>
-						<xsl:with-param name ="length" select ="@svg:x1"/>
-					</xsl:call-template>
-				</xsl:variable>
-				<xsl:variable name ="x2">
-					<xsl:call-template name ="convertToPoints">
-						<xsl:with-param name ="unit" select ="'cm'"/>
-						<xsl:with-param name ="length" select ="@svg:x2"/>
-					</xsl:call-template>
-				</xsl:variable>
-				<xsl:variable name ="y1">
-					<xsl:call-template name ="convertToPoints">
-						<xsl:with-param name ="unit" select ="'cm'"/>
-						<xsl:with-param name ="length" select ="@svg:y1"/>
-					</xsl:call-template>
-				</xsl:variable>
-				<xsl:variable name ="y2">
-					<xsl:call-template name ="convertToPoints">
-						<xsl:with-param name ="unit" select ="'cm'"/>
-						<xsl:with-param name ="length" select ="@svg:y2"/>
-					</xsl:call-template>
-				</xsl:variable>
-
 				<a:xfrm>
+					<xsl:attribute name ="rot">
+						<xsl:value-of select ="concat('cxnSp:rot:',substring-before(@svg:x1,'cm'), ':',
+																   substring-before(@svg:x2,'cm'), ':', 
+																   substring-before(@svg:y1,'cm'), ':', 
+																   substring-before(@svg:y2,'cm'))"/>
+					</xsl:attribute>
+					<xsl:attribute name ="flipH">
+						<xsl:value-of select ="concat('cxnSp:flipH:',substring-before(@svg:x1,'cm'), ':',
+																   substring-before(@svg:x2,'cm'), ':', 
+																   substring-before(@svg:y1,'cm'), ':', 
+																   substring-before(@svg:y2,'cm'))"/>
+					</xsl:attribute>
+					<xsl:attribute name ="flipV">
+						<xsl:value-of select ="concat('cxnSp:flipV:',substring-before(@svg:x1,'cm'), ':',
+																   substring-before(@svg:x2,'cm'), ':', 
+																   substring-before(@svg:y1,'cm'), ':', 
+																   substring-before(@svg:y2,'cm'))"/>
+					</xsl:attribute>
 					<a:off >
 						<xsl:attribute name ="x">
-							<xsl:value-of select ="$x1"/>
+
+							<xsl:value-of select ="concat('cxnSp:x:',substring-before(@svg:x1,'cm'), ':',
+																   substring-before(@svg:x2,'cm'), ':', 
+																   substring-before(@svg:y1,'cm'), ':', 
+																   substring-before(@svg:y2,'cm'))"/>
 						</xsl:attribute>
 						<xsl:attribute name ="y">
-							<xsl:value-of select ="$y1"/>
+							<xsl:value-of select ="concat('cxnSp:y:',substring-before(@svg:x1,'cm'), ':',
+																   substring-before(@svg:x2,'cm'), ':', 
+																   substring-before(@svg:y1,'cm'), ':', 
+																   substring-before(@svg:y2,'cm'))"/>
 						</xsl:attribute>
 					</a:off>
 					<a:ext>
 						<xsl:attribute name ="cx">
-							<xsl:value-of select ="$x2 - $x1"/>
+							<xsl:value-of select ="concat('cxnSp:cx:',substring-before(@svg:x1,'cm'), ':',
+																   substring-before(@svg:x2,'cm'), ':', 
+																   substring-before(@svg:y1,'cm'), ':', 
+																   substring-before(@svg:y2,'cm'))"/>
 						</xsl:attribute>
 						<xsl:attribute name ="cy">
-							<xsl:value-of select ="$y2 - $y1"/>
+							<xsl:value-of select ="concat('cxnSp:cy:',substring-before(@svg:x1,'cm'), ':',
+																   substring-before(@svg:x2,'cm'), ':', 
+																   substring-before(@svg:y1,'cm'), ':', 
+																   substring-before(@svg:y2,'cm'))"/>
 						</xsl:attribute>
+
 					</a:ext>
 				</a:xfrm>
 
 				<xsl:call-template name ="getPresetGeom">
-					<xsl:with-param name ="prstGeom" select ="'Straight Connector'" />
+					<xsl:with-param name ="prstGeom" select ="$connectorType" />
 				</xsl:call-template>
 
 				<xsl:call-template name ="getGraphicProperties">
@@ -267,19 +824,332 @@
 			
 		</xsl:for-each>
 
-		
 	</xsl:template>
 	<!-- Get preset geometry-->
 	<xsl:template name ="getPresetGeom">
 		<xsl:param name ="prstGeom" />
 		<xsl:choose>
+
+			<!-- Oval -->
+			<xsl:when test ="contains($prstGeom, 'Oval')">
+				<a:prstGeom prst="ellipse">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Isosceles Triangle -->
+			<xsl:when test ="contains($prstGeom, 'Isosceles Triangle')">
+				<a:prstGeom prst="triangle">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Right Triangle -->
+			<xsl:when test ="contains($prstGeom, 'Right Triangle')">
+				<a:prstGeom prst="rtTriangle">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Parallelogram -->
+			<xsl:when test ="contains($prstGeom, 'Parallelogram')">
+				<a:prstGeom prst="parallelogram">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Trapezoid -->
+			<xsl:when test ="contains($prstGeom, 'Trapezoid')">
+				<a:prstGeom prst="trapezoid">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Diamond -->
+			<xsl:when test ="contains($prstGeom, 'Diamond')">
+				<a:prstGeom prst="diamond">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Regular Pentagon -->
+			<xsl:when test ="contains($prstGeom, 'Regular Pentagon')">
+				<a:prstGeom prst="pentagon">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Hexagon -->
+			<xsl:when test ="contains($prstGeom, 'Hexagon')">
+				<a:prstGeom prst="hexagon">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Octagon -->
+			<xsl:when test ="contains($prstGeom, 'Octagon')">
+				<a:prstGeom prst="octagon">
+					<a:avLst>
+						<a:gd name="adj" fmla="val 32414"/>
+					</a:avLst>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Cube -->
+			<xsl:when test ="contains($prstGeom, 'Cube')">
+				<a:prstGeom prst="cube">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Can -->
+			<xsl:when test ="contains($prstGeom, 'Can')">
+				<a:prstGeom prst="can">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			
+			<!-- Rounded Rectangle -->
+			<xsl:when test ="contains($prstGeom, 'Rounded Rectangle')">
+				<a:prstGeom prst="roundRect">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Snip Single Corner Rectangle -->
+			<xsl:when test ="contains($prstGeom, 'Snip Single Corner Rectangle')">
+				<a:prstGeom prst="snip1Rect">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Snip Same Side Corner -->
+			<xsl:when test ="contains($prstGeom, 'Snip Same Side Corner Rectangle')">
+				<a:prstGeom prst="snip2SameRect">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Snip Diagonal Corner -->
+			<xsl:when test ="contains($prstGeom, 'Snip Diagonal Corner Rectangle')">
+				<a:prstGeom prst="snip2DiagRect">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- and Round Single Corner -->
+			<xsl:when test ="contains($prstGeom, 'Snip and Round Single Corner Rectangle')">
+				<a:prstGeom prst="snipRoundRect">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Round Single Corner -->
+			<xsl:when test ="contains($prstGeom, 'Round Single Corner Rectangle')">
+				<a:prstGeom prst="round1Rect">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Round Same Side Corner -->
+			<xsl:when test ="contains($prstGeom, 'Round Same Side Corner Rectangle')">
+				<a:prstGeom prst="round2SameRect">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Round Diagonal Corner -->
+			<xsl:when test ="contains($prstGeom, 'Round Diagonal Corner Rectangle')">
+				<a:prstGeom prst="round2DiagRect">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Rectangles -->
 			<xsl:when test ="(contains($prstGeom, 'Rectangle')) or (contains($prstGeom, 'TextBox'))">
 				<a:prstGeom prst="rect">
 					<a:avLst/>
 				</a:prstGeom>
 			</xsl:when>
+			
+			<!-- Connectors-->
+			<!-- Straight line-->
 			<xsl:when test ="contains($prstGeom, 'Straight Connector')">
 				<a:prstGeom prst="line">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Straight Arrow Connector -->
+			<xsl:when test ="contains($prstGeom, 'Straight Arrow Connector')">
+				<a:prstGeom prst="straightConnector1">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Elbow Connector -->
+			<xsl:when test ="contains($prstGeom, 'Elbow Connector')">
+				<a:prstGeom prst="bentConnector3">
+					<a:avLst>
+						<a:gd name="adj1" fmla="val 50000"/>
+					</a:avLst>
+				</a:prstGeom>
+
+			</xsl:when>
+			<!-- Curved Connector -->
+			<xsl:when test ="contains($prstGeom, 'Curved Connector')">
+				<a:prstGeom prst="curvedConnector3">
+					<a:avLst>
+						<a:gd name="adj1" fmla="val 60417"/>
+					</a:avLst>
+				</a:prstGeom>
+			</xsl:when>
+			
+			<!-- Flow Chart: Process -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Process')">
+				<a:prstGeom prst="flowChartProcess">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Alternate Process -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Alternate Process')">
+				<a:prstGeom prst="flowChartAlternateProcess">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Decision -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Decision')">
+				<a:prstGeom prst="flowChartDecision">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Data -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Data')">
+				<a:prstGeom prst="flowChartInputOutput">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Predefined-process -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Predefined Process')">
+				<a:prstGeom prst="flowChartPredefinedProcess">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Internal-storage -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Internal Storage')">
+				<a:prstGeom prst="flowChartInternalStorage">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Document -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Document')">
+				<a:prstGeom prst="flowChartDocument">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Multidocument -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Multi document')">
+				<a:prstGeom prst="flowChartMultidocument">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Terminator -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Terminator')">
+				<a:prstGeom prst="flowChartTerminator">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Preparation -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Preparation')">
+				<a:prstGeom prst="flowChartPreparation">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Manual-input -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Manual Input')">
+				<a:prstGeom prst="flowChartManualInput">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Manual-operation -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Manual Operation')">
+				<a:prstGeom prst="flowChartManualOperation">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Connector -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Connector')">
+				<a:prstGeom prst="flowChartConnector">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Off-page-connector -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Off-page Connector')">
+				<a:prstGeom prst="flowChartOffpageConnector">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Card -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Card')">
+				<a:prstGeom prst="flowChartPunchedCard">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Punched-tape -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Punched Tape')">
+				<a:prstGeom prst="flowChartPunchedTape">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Summing-junction -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Summing Junction')">
+				<a:prstGeom prst="flowChartSummingJunction">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Or -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Or')">
+				<a:prstGeom prst="flowChartOr">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Collate -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Collate')">
+				<a:prstGeom prst="flowChartCollate">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Sort -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Sort')">
+				<a:prstGeom prst="flowChartSort">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Extract -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Extract')">
+				<a:prstGeom prst="flowChartExtract">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Merge -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Merge')">
+				<a:prstGeom prst="flowChartMerge">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Stored-data -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Stored Data')">
+				<a:prstGeom prst="flowChartOnlineStorage">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Delay-->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Delay')">
+				<a:prstGeom prst="flowChartDelay">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Sequential-access -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Sequential Access Storage')">
+				<a:prstGeom prst="flowChartMagneticTape">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Direct-access-storage -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Direct Access Storage')">
+				<a:prstGeom prst="flowChartMagneticDrum">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Magnetic-disk -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Magnetic Disk')">
+				<a:prstGeom prst="flowChartMagneticDisk">
+					<a:avLst/>
+				</a:prstGeom>
+			</xsl:when>
+			<!-- Flow Chart: Display -->
+			<xsl:when test ="contains($prstGeom, 'Flowchart: Display')">
+				<a:prstGeom prst="flowChartDisplay">
 					<a:avLst/>
 				</a:prstGeom>
 			</xsl:when>
@@ -318,7 +1188,6 @@
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
-
 	<!-- Get line color and style-->
 	<xsl:template name ="getLineStyle">
 		<xsl:param name ="parentStyle" />
@@ -442,30 +1311,32 @@
 			</xsl:if>
 		</a:ln>
 	</xsl:template>
-
+    <!-- Get color code -->
 	<xsl:template name ="getFillColor">
 		<xsl:param name ="fill-color" />
 		<xsl:param name ="opacity" />
-		<a:solidFill>
-			<a:srgbClr>
-				<xsl:attribute name ="val">
-					<xsl:value-of select ="substring-after($fill-color,'#')"/>
-				</xsl:attribute>
-				<xsl:if test ="$opacity != ''">
-					<a:alpha>
-						<xsl:variable name ="alpha" select ="substring-before($opacity,'%')" />
-						<xsl:attribute name ="val">
-							<xsl:if test ="$alpha = 0">
-								<xsl:value-of select ="0000"/>
-							</xsl:if>
-							<xsl:if test ="$alpha != 0">
-								<xsl:value-of select ="$alpha * 1000"/>
-							</xsl:if>
-						</xsl:attribute>
-					</a:alpha>
-				</xsl:if>
-			</a:srgbClr>
-		</a:solidFill>
+		<xsl:if test ="$fill-color != ''">
+			<a:solidFill>
+				<a:srgbClr>
+					<xsl:attribute name ="val">
+						<xsl:value-of select ="substring-after($fill-color,'#')"/>
+					</xsl:attribute>
+					<xsl:if test ="$opacity != ''">
+						<a:alpha>
+							<xsl:variable name ="alpha" select ="substring-before($opacity,'%')" />
+							<xsl:attribute name ="val">
+								<xsl:if test ="$alpha = 0">
+									<xsl:value-of select ="0000"/>
+								</xsl:if>
+								<xsl:if test ="$alpha != 0">
+									<xsl:value-of select ="$alpha * 1000"/>
+								</xsl:if>
+							</xsl:attribute>
+						</a:alpha>
+					</xsl:if>
+				</a:srgbClr>
+			</a:solidFill>
+		</xsl:if>
 	</xsl:template>
 	<!-- Get shade for fill reference-->
 	<xsl:template name ="getShade">
@@ -487,13 +1358,11 @@
 			</a:shade>
 		</xsl:if>
 	</xsl:template>
-
 	<!-- Get arrow type-->
 	<xsl:template name ="setArrowSize">
 		<xsl:param name ="size" />
-
 		<xsl:choose>
-			<xsl:when test ="($size &lt; 0.15)">
+			<xsl:when test ="($size &lt;= $sm-sm)">
 				<xsl:attribute name ="w">
 					<xsl:value-of select ="'sm'"/>
 				</xsl:attribute>
@@ -501,7 +1370,7 @@
 					<xsl:value-of select ="'sm'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test ="($size &gt; 0.15) and ($size &lt;= 0.18)">
+			<xsl:when test ="($size &gt; $sm-sm) and ($size &lt;= $sm-med)">
 				<xsl:attribute name ="w">
 					<xsl:value-of select ="'sm'"/>
 				</xsl:attribute>
@@ -509,7 +1378,7 @@
 					<xsl:value-of select ="'med'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test ="($size &gt; 0.18) and ($size &lt;= 0.2)">
+			<xsl:when test ="($size &gt; $sm-med) and ($size &lt;= $sm-lg)">
 				<xsl:attribute name ="w">
 					<xsl:value-of select ="'sm'"/>
 				</xsl:attribute>
@@ -517,7 +1386,7 @@
 					<xsl:value-of select ="'lg'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test ="($size &gt; 0.2) and ($size &lt;= 0.25)">
+			<xsl:when test ="($size &gt; $sm-lg) and ($size &lt;= $med-sm)">
 				<xsl:attribute name ="w">
 					<xsl:value-of select ="'med'"/>
 				</xsl:attribute>
@@ -525,7 +1394,7 @@
 					<xsl:value-of select ="'sm'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test ="($size &gt; 0.25) and ($size &lt;= 0.3)">
+			<xsl:when test ="($size &gt; $med-med) and ($size &lt;= $med-lg)">
 				<xsl:attribute name ="w">
 					<xsl:value-of select ="'med'"/>
 				</xsl:attribute>
@@ -533,7 +1402,7 @@
 					<xsl:value-of select ="'lg'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test ="($size &gt; 0.3) and ($size &lt;= 0.35)">
+			<xsl:when test ="($size &gt; $med-lg) and ($size &lt;= $lg-sm)">
 				<xsl:attribute name ="w">
 					<xsl:value-of select ="'lg'"/>
 				</xsl:attribute>
@@ -541,7 +1410,7 @@
 					<xsl:value-of select ="'sm'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test ="($size &gt; 0.35) and ($size &lt;= 0.4)">
+			<xsl:when test ="($size &gt; $lg-sm) and ($size &lt;= $lg-med)">
 				<xsl:attribute name ="w">
 					<xsl:value-of select ="'lg'"/>
 				</xsl:attribute>
@@ -549,7 +1418,7 @@
 					<xsl:value-of select ="'med'"/>
 				</xsl:attribute>
 			</xsl:when>
-			<xsl:when test ="($size &gt; 0.4) and ($size &lt;= 0.45)">
+			<xsl:when test ="($size &gt; $lg-med) and ($size &lt;= $lg-lg)">
 				<xsl:attribute name ="w">
 					<xsl:value-of select ="'lg'"/>
 				</xsl:attribute>
@@ -568,7 +1437,6 @@
 		</xsl:choose>
 
 	</xsl:template>
-
 	<!-- Get line join type-->
 	<xsl:template name ="getJoinType">
 		<xsl:param name ="stroke-linejoin" />
@@ -584,44 +1452,90 @@
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
-
 	<!-- Get dash type-->
 	<xsl:template name ="getDashType">
 		<xsl:param name ="stroke-dash" />
-		<xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
-			<xsl:variable name ="dots1" select="@draw:dots1"/>
-			<xsl:variable name ="dots1-length" select ="substring-before(@draw:dots1-length, 'cm')" />
-			<xsl:variable name ="dots2" select="@draw:dots2"/>
-			<xsl:variable name ="dots2-length" select ="substring-before(@draw:dots2-length, 'cm')"/>
-			<xsl:variable name ="distance" select ="substring-before(@draw:distance, 'cm')" />
+		<xsl:if test ="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]">
+			<xsl:variable name ="dots1" select="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:dots1"/>
+			<xsl:variable name ="dots1-length" select ="substring-before(document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:dots1-length, 'cm')" />
+			<xsl:variable name ="dots2" select="document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:dots2"/>
+			<xsl:variable name ="dots2-length" select ="substring-before(document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:dots2-length, 'cm')"/>
+			<xsl:variable name ="distance" select ="substring-before(document('styles.xml')/office:document-styles/office:styles/draw:stroke-dash[@draw:name=$stroke-dash]/@draw:distance, 'cm')" />
+			
 			<xsl:choose>
-				<xsl:when test ="(($dots1='1') and ($dots1-length &lt;= 0.1) and ($dots2='1') and ($dots2-length &lt;= 0.1) and ($distance &lt;= 0.1)) or
-								  (($dots1='1') and ($dots1-length &lt;= 0.1) and ($distance &lt;= 0.1)) or
-								  (($dots2='1') and ($dots2-length &lt;= 0.1) and ($distance &lt;= 0.1))">
-					<xsl:value-of select ="'sysDot'" />
+				<xsl:when test ="($dots1=1) and ($dots2=1)">
+					<xsl:choose>
+						<xsl:when test ="($dots1-length &lt;= $dot) and ($dots2-length &lt;= $dot)">
+							<xsl:value-of select ="'sysDot'" />
+						</xsl:when>
+						<xsl:when test ="(($dots1-length &lt;= $dot) and ($dots2-length &lt;= $dash)) or
+										 (($dots1-length &lt;= $dash) and ($dots2-length &lt;= $dot)) ">
+							<xsl:value-of select ="'dashDot'" />
+						</xsl:when>
+						<xsl:when test ="($dots1-length &lt;= $dash) and ($dots2-length &lt;= $dash)">
+							<xsl:value-of select ="'dash'" />
+						</xsl:when>
+						<xsl:when test ="(($dots1-length &lt;= $dot) and (($dots2-length &gt;= $dash) and ($dots2-length &lt;= $longDash))) or
+										 (($dots2-length &lt;= $dot) and (($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash))) ">
+							<xsl:value-of select ="'lgDashDot'" />
+						</xsl:when>
+						<xsl:when test ="(($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash)) or 
+										 (($dots2-length &gt;= $dash) and ($dots2-length &lt;= $longDash))">
+							<xsl:value-of select ="'lgDash'" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="'sysDash'" />
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:when>
-				<xsl:when test ="(($dots1='1') and ($dots1-length &lt;= 0.1) and ($dots2='1') and ($dots2-length &lt;= 0.3) and ($distance &lt;= 0.3)) ">
-					<xsl:value-of select ="'dashDot'" />
+				<xsl:when test ="($dots1=2) and ($dots2=1)">
+					<xsl:if test ="(($dots1-length &lt;= $dot) and ($dots2-length &gt;= $dash) and ($dots2-length &lt;= $longDash))">
+						<xsl:value-of select ="'lgDashDotDot'" />
+					</xsl:if>
 				</xsl:when>
-				<xsl:when test ="(($dots2='1') and ($dots2-length &gt;= 0.1) and ($dots2-length &lt;= 0.3) and ($distance &lt;= 0.3))">
-					<xsl:value-of select ="'dash'" />
+				<xsl:when test ="($dots1=1) and ($dots2=2)">
+					<xsl:if test ="(($dots2-length &lt;= $dot) and ($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash))">
+						<xsl:value-of select ="'lgDashDotDot'" />
+					</xsl:if>
 				</xsl:when>
-				<xsl:when test ="(($dots1='1') and ($dots1-length &lt;= 0.1) and ($dots2='1') and ($dots2-length &gt;= 0.3) and ($dots2-length &lt;=0.6) and ($distance &lt;= 0.3)) ">
-					<xsl:value-of select ="'lgDashDot'" />
+				<xsl:when test ="(($dots1 &gt;= 1) and not($dots2))">
+					<xsl:choose>
+						<xsl:when test ="($dots1-length &lt;= $dot)">
+							<xsl:value-of select ="'sysDash'" />
+						</xsl:when>
+						<xsl:when test ="($dots1-length &gt;= $dot) and ($dots1-length &lt;= $dash)">
+							<xsl:value-of select ="'dash'" />
+						</xsl:when>
+						<xsl:when test ="($dots1-length &gt;= $dash) and ($dots1-length &lt;= $longDash)">
+							<xsl:value-of select ="'lgDash'" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="'sysDash'" />
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:when>
-				<xsl:when test ="(($dots1='2') and ($dots1-length &lt;= 0.1) and ($dots2='1') and ($dots2-length &gt;= 0.3) and ($dots2-length &lt;= 0.6) and ($distance &lt;=0.3))">
-					<xsl:value-of select ="'lgDashDotDot'" />
-				</xsl:when>
-				<xsl:when test ="(($dots2='1') and ($dots2-length &gt;= 0.3) and ($dots2-length &lt;= 0.6) and ($distance &lt;= 0.3))">
-					<xsl:value-of select ="'lgDash'" />
+				<xsl:when test ="(($dots2 &gt;= 1) and not($dots1))">
+					<xsl:choose>
+						<xsl:when test ="($dots2-length &lt;= $dot)">
+							<xsl:value-of select ="'sysDash'" />
+						</xsl:when>
+						<xsl:when test ="($dots2-length &gt;= $dot) and ($dots2-length &lt;= $dash)">
+							<xsl:value-of select ="'dash'" />
+						</xsl:when>
+						<xsl:when test ="($dots2-length &gt;= $dash) and ($dots2-length &lt;= $longDash)">
+							<xsl:value-of select ="'lgDash'" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select ="'sysDash'" />
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select ="'sysDash'" />
 				</xsl:otherwise>
 			</xsl:choose>
-		</xsl:for-each >
+		</xsl:if >
 	</xsl:template>
-
 	<!-- Get text layout for shape-->
 	<xsl:template name ="getParagraphProperties">
 		<xsl:param name ="gr" />
@@ -830,7 +1744,7 @@
 		</a:bodyPr>
 
 	</xsl:template>
-	<!-- Get arriw type-->
+	<!-- Get arrow type-->
 	<xsl:template name ="getArrowType">
 		<xsl:param name ="ArrowType" />
 
@@ -888,7 +1802,7 @@
 									<xsl:variable name ="textId">
 										<xsl:value-of select ="@text:style-name"/>
 									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
+									<xsl:if test ="not($textId ='') or not($parentStyle = '')">
 										<xsl:call-template name ="fontStyles">
 											<xsl:with-param name ="Tid" select ="$textId" />
 											<xsl:with-param name ="prClassName" select ="$parentStyle" />
@@ -896,12 +1810,7 @@
 									</xsl:if>
 								</a:rPr >
 								<a:t>
-									<xsl:if test =".=''">
-										<xsl:value-of select ="' '"/>
-									</xsl:if>
-									<xsl:if test ="not(.='')">
-										<xsl:value-of select ="."/>
-									</xsl:if>
+									<xsl:call-template name ="insertTab" />
 								</a:t>
 							</a:r>
 							<xsl:if test ="text:line-break">
@@ -930,7 +1839,7 @@
 												<xsl:variable name ="textId">
 													<xsl:value-of select ="@text:style-name"/>
 												</xsl:variable>
-												<xsl:if test ="not($textId ='')">
+												<xsl:if test ="not($textId ='') or not($parentStyle = '')">
 													<xsl:call-template name ="fontStyles">
 														<xsl:with-param name ="Tid" select ="$textId" />
 														<xsl:with-param name ="prClassName" select ="$parentStyle" />
@@ -938,12 +1847,7 @@
 												</xsl:if>
 											</a:rPr >
 											<a:t>
-												<xsl:if test =".=''">
-													<xsl:value-of select ="' '"/>
-												</xsl:if>
-												<xsl:if test ="not(.='')">
-													<xsl:value-of select ="."/>
-												</xsl:if>
+												<xsl:call-template name ="insertTab" />
 											</a:t>
 										</a:r>
 									</xsl:when >
@@ -954,7 +1858,7 @@
 												<xsl:variable name ="textId">
 													<xsl:value-of select ="@text:style-name"/>
 												</xsl:variable>
-												<xsl:if test ="not($textId ='')">
+												<xsl:if test ="not($textId ='') or not($parentStyle = '')">
 													<xsl:call-template name ="fontStyles">
 														<xsl:with-param name ="Tid" select ="$textId" />
 														<xsl:with-param name ="prClassName" select ="$parentStyle" />
@@ -962,12 +1866,7 @@
 												</xsl:if>
 											</a:rPr >
 											<a:t>
-												<xsl:if test =".=''">
-													<xsl:value-of select ="' '"/>
-												</xsl:if>
-												<xsl:if test ="not(.='')">
-													<xsl:value-of select ="."/>
-												</xsl:if>
+												<xsl:call-template name ="insertTab" />
 											</a:t>
 										</a:r>
 									</xsl:when >
@@ -988,12 +1887,7 @@
 								<a:rPr lang="en-US" smtClean="0">
 								</a:rPr >
 								<a:t>
-									<xsl:if test =".=''">
-										<xsl:value-of select ="' '"/>
-									</xsl:if>
-									<xsl:if test ="not(.='')">
-										<xsl:value-of select ="."/>
-									</xsl:if>
+									<xsl:call-template name ="insertTab" />
 								</a:t>
 							</a:r>
 						</a:p>
@@ -1014,7 +1908,7 @@
 								<xsl:variable name ="textId">
 									<xsl:value-of select ="@text:style-name"/>
 								</xsl:variable>
-								<xsl:if test ="not($textId ='')">
+								<xsl:if test ="not($textId ='') or not($parentStyle = '')">
 									<xsl:call-template name ="fontStyles">
 										<xsl:with-param name ="Tid" select ="$textId" />
 										<xsl:with-param name ="prClassName" select ="$parentStyle" />
@@ -1022,12 +1916,7 @@
 								</xsl:if>
 							</a:rPr >
 							<a:t>
-								<xsl:if test =".=''">
-									<xsl:value-of select ="' '"/>
-								</xsl:if>
-								<xsl:if test ="not(.='')">
-									<xsl:value-of select ="."/>
-								</xsl:if>
+								<xsl:call-template name ="insertTab" />
 							</a:t>
 						</a:r>
 						<xsl:if test ="text:line-break">
@@ -1040,8 +1929,8 @@
 			</xsl:choose>
 
 		</xsl:for-each >
-
 	</xsl:template>
+	<!-- Blank lines in text-->
 	<xsl:template name ="processBR">
 		<xsl:param name ="T" />
 		<a:br>
@@ -1056,7 +1945,7 @@
 
 		</a:br>
 	</xsl:template>
-
+	<!-- Get graphic properties from styles.xml -->
 	<xsl:template name ="getDefaultStyle">
 		<xsl:param name ="parentStyle" />
 		<xsl:param name ="attributeName" />
@@ -1089,4 +1978,7 @@
 			</xsl:choose> 
 		</xsl:for-each>
 	</xsl:template>
+
+	
+
 </xsl:stylesheet >

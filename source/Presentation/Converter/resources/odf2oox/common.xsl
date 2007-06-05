@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+Copyright (c) 2007, Sonata Software Limited
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of Sonata Software Limited nor the names of its contributors
+*       may be used to endorse or promote products derived from this software
+*       without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
+-->
 <xsl:stylesheet version="1.0" 
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  
@@ -6,7 +33,8 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-  exclude-result-prefixes="style draw fo">
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  exclude-result-prefixes="style draw fo text">
 
 	<xsl:template name ="convertToPoints">
 		<xsl:param name ="unit"/>
@@ -29,7 +57,7 @@
 				<xsl:value-of select="0"/>
 			</xsl:when>
 			<xsl:when test="$unit = 'cm'">
-				<xsl:value-of select="concat(format-number($lengthVal * 360000,'#.###'),'')"/>
+				<xsl:value-of select="concat(format-number($lengthVal * 360000,'#'),'')"/>
 			</xsl:when>
 			<xsl:when test="$unit = 'mm'">
 				<xsl:value-of select="concat(format-number($lengthVal * 25.4 div 72,'#.###'),'mm')"/>
@@ -258,6 +286,18 @@
 					</a:srgbClr >
 				</a:solidFill>
 			</xsl:if>
+
+			<!-- Text Shadow fix -->
+			<xsl:if test ="style:text-properties/@fo:text-shadow">
+				<a:effectLst>
+					<a:outerShdw blurRad="38100" dist="38100" dir="2700000" >
+						<a:srgbClr val="000000">
+							<a:alpha val="43137" />
+						</a:srgbClr>
+					</a:outerShdw>
+				</a:effectLst>
+			</xsl:if>
+
 			<xsl:if test ="style:text-properties/@fo:font-family">
 				<a:latin charset="0" >
 					<xsl:attribute name ="typeface" >
@@ -329,14 +369,52 @@
 							<xsl:with-param name ="unit" select ="'cm'"/>
 						</xsl:call-template>
 					</xsl:attribute>
-				</xsl:if >
+				</xsl:if >				
+        <!--Code inserted by Vijayeta For Line Spacing,
+            If the line spacing is in terms of Percentage, multiply the value with 1000-->
+				<xsl:if test ="style:paragraph-properties/@fo:line-height and 
+					substring-before(style:paragraph-properties/@fo:line-height,'%') &gt; 0 and 
+					not(substring-before(style:paragraph-properties/@fo:line-height,'%') = 100)">
+					<a:lnSpc>
+						<a:spcPct>
+							<xsl:attribute name ="val">
+								<xsl:value-of select ="format-number(substring-before(style:paragraph-properties/@fo:line-height,'%')* 1000,'#.##') "/>
+							</xsl:attribute>
+						</a:spcPct>
+					</a:lnSpc>
+				</xsl:if>
+				<!--If the line spacing is in terms of Points,multiply the value with 2835-->
+				<xsl:if test ="style:paragraph-properties/@style:line-spacing and 
+					substring-before(style:paragraph-properties/@style:line-spacing,'cm') &gt; 0">
+					<a:lnSpc>
+						<a:spcPts>
+							<xsl:attribute name ="val">
+								<xsl:value-of select ="round(substring-before(style:paragraph-properties/@style:line-spacing,'cm')* 2835) "/>
+							</xsl:attribute>
+						</a:spcPts>
+					</a:lnSpc>
+				</xsl:if>
+				<xsl:if test ="style:paragraph-properties/@style:line-height-at-least and 
+					substring-before(style:paragraph-properties/@style:line-height-at-least,'cm') &gt; 0 ">
+					<a:lnSpc>
+						<a:spcPts>
+							<xsl:attribute name ="val">
+								<xsl:value-of select ="round(substring-before(style:paragraph-properties/@style:line-height-at-least,'cm')* 2835) "/>
+							</xsl:attribute>
+						</a:spcPts>
+					</a:lnSpc>
+				</xsl:if>
+        <!--End of Code inserted by Vijayeta For Line Spacing -->
+	    <!-- Code Added by Vijayeta,for Paragraph Spacing, Before and After
+             Multiply the value in cm with 2835
+			 date: on 01-06-07-->
 				<xsl:if test ="style:paragraph-properties/@fo:margin-top and 
-						substring-before(style:paragraph-properties/@fo:margin-top,'cm') &gt; 0">
+						substring-before(style:paragraph-properties/@fo:margin-top,'cm') &gt; 0 ">
 					<a:spcBef>
 						<a:spcPts>
 							<xsl:attribute name ="val">
 								<!--fo:margin-top-->
-								<xsl:value-of select ="format-number(substring-before(style:paragraph-properties/@fo:margin-top,'cm')* 1000,'#.##') "/>
+								<xsl:value-of select ="round(substring-before(style:paragraph-properties/@fo:margin-top,'cm')* 2835) "/>
 							</xsl:attribute>
 						</a:spcPts>
 					</a:spcBef >
@@ -347,22 +425,13 @@
 						<a:spcPts>
 							<xsl:attribute name ="val">
 								<!--fo:margin-bottom-->
-								<xsl:value-of select ="format-number(substring-before(style:paragraph-properties/@fo:margin-bottom,'cm')* 1000,'#.##') "/>
+								<xsl:value-of select ="round(substring-before(style:paragraph-properties/@fo:margin-bottom,'cm')* 2835) "/>
 							</xsl:attribute>
 						</a:spcPts>
 					</a:spcAft>
 				</xsl:if >
-				<xsl:if test ="style:paragraph-properties/@fo:line-height and 
-					substring-before(style:paragraph-properties/@fo:line-heigh,'cm') &gt; 0">
-					<a:lnSpc>
-						<a:spcPts>
-							<xsl:attribute name ="val">
-								<!--fo:line-height-->
-								<xsl:value-of select ="format-number(substring-before(style:paragraph-properties/@fo:line-height,'%')* 1000,'#.##') "/>
-							</xsl:attribute>
-						</a:spcPts>
-					</a:lnSpc>
-				</xsl:if>
+				<!-- Code Added by Vijayeta,for Paragraph Spacing, Before and After-->
+				<a:buNone/>
 			</a:pPr>
 		</xsl:for-each >
 	</xsl:template>
@@ -413,17 +482,20 @@
 			<xsl:when test ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:paragraph-properties/@fo:font-family">
 				<xsl:value-of select ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:paragraph-properties/@fo:font-family"/>
 			</xsl:when>
-      <!-- Added by lohith - to access default Font family-->
-      <xsl:when test ="$defaultClsName='standard'">
-        <xsl:variable name ="shapeFontName">
-          <xsl:value-of select ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:text-properties/@fo:font-family"/>
-        </xsl:variable>
-        <xsl:value-of select ="translate($shapeFontName, &quot;'&quot;,'')" />
-      </xsl:when>
+			<xsl:when test ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:text-properties/@fo:font-family">
+				<xsl:value-of select ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:text-properties/@fo:font-family"/>
+			</xsl:when>
+			<!-- Added by lohith - to access default Font family-->
+			<xsl:when test ="$defaultClsName='standard'">
+				<xsl:variable name ="shapeFontName">
+					<xsl:value-of select ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:text-properties/@fo:font-family"/>
+				</xsl:variable>
+				<xsl:value-of select ="translate($shapeFontName, &quot;'&quot;,'')" />
+			</xsl:when>
 			<xsl:otherwise >
 				<xsl:value-of select ="'Arial'"/>
 			</xsl:otherwise>
-		</xsl:choose>		
+		</xsl:choose>
 	</xsl:template>
   <xsl:template name ="getDefaultFontSize">
     <xsl:param name ="className"/>
@@ -584,4 +656,90 @@
 		</xsl:for-each>
 		
 	</xsl:template>
+	<xsl:template name ="insertTab">
+		<xsl:for-each select ="node()">
+			<xsl:choose >							
+				<xsl:when test ="name()=''">
+					<xsl:value-of select ="."/>
+				</xsl:when>
+				<xsl:when test ="name()='text:tab'">
+					<xsl:value-of select ="'&#09;'"/>
+				</xsl:when >				
+				<xsl:when test ="name()='text:s'">
+					<xsl:choose>
+						<xsl:when test ="@text:c=1">
+							<xsl:value-of  select ="'&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=2">
+							<xsl:value-of  select ="'&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=3">
+							<xsl:value-of  select ="'&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=4">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=5">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=6">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=7">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=8">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=9">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=10">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=12">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=13">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=14">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=15">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=16">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=17">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=18">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=19">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=20">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:when test ="@text:c=21">
+							<xsl:value-of  select ="'&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;'"/>
+						</xsl:when>
+						<xsl:otherwise >
+							<xsl:value-of  select ="'&#32;'"/>
+						</xsl:otherwise>
+					</xsl:choose>					
+				</xsl:when >
+				<xsl:when test =".='' and child::node()">
+					<xsl:value-of select ="' '"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select ="."/>
+				</xsl:otherwise>
+			</xsl:choose> 
+		</xsl:for-each>
+	</xsl:template>
+
 </xsl:stylesheet>
