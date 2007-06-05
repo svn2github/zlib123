@@ -38,6 +38,15 @@
 					</xsl:call-template>
 				</draw:rect>
 			</xsl:when>
+			<xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox Custom')]">
+				<draw:custom-shape draw:layer="layout">
+					<xsl:call-template name ="CreateShape">
+						<xsl:with-param name="grID" select ="$GraphicId"/>
+						<xsl:with-param name ="prID" select="$ParaId" />
+					</xsl:call-template>
+					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="mso-spt202" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+				</draw:custom-shape>
+			</xsl:when>
 			<xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]">
 				<draw:frame draw:layer="layout">
 					<xsl:call-template name ="CreateShape">
@@ -98,7 +107,7 @@
 			</xsl:attribute>
 		</xsl:for-each>
 		<xsl:choose>
-			<xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]">
+			<xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox Custom')])">
 				<draw:text-box>
 					<xsl:call-template name ="AddShapeText">
 						<xsl:with-param name ="prID" select ="$prID" />
@@ -822,7 +831,7 @@
 			</xsl:attribute>
 
 			<!--fo:padding-->
-			<xsl:if test ="a:bodyPr/@lIns or (a:bodyPr/@wrap='square')">
+			<xsl:if test ="a:bodyPr/@lIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
 				<xsl:attribute name ="fo:padding-left">
 					<xsl:call-template name="getPadding">
 						<xsl:with-param name="length" select="a:bodyPr/@lIns"/>
@@ -830,7 +839,7 @@
 				</xsl:attribute>
 			</xsl:if>
 
-			<xsl:if test ="a:bodyPr/@tIns or (a:bodyPr/@wrap='square')">
+			<xsl:if test ="a:bodyPr/@tIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
 				<xsl:attribute name ="fo:padding-top">
 					<xsl:call-template name="getPadding">
 						<xsl:with-param name="length" select="a:bodyPr/@tIns"/>
@@ -838,7 +847,7 @@
 				</xsl:attribute>
 			</xsl:if>
 
-			<xsl:if test ="a:bodyPr/@rIns or (a:bodyPr/@wrap='square')">
+			<xsl:if test ="a:bodyPr/@rIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
 				<xsl:attribute name ="fo:padding-right">
 					<xsl:call-template name="getPadding">
 						<xsl:with-param name="length" select="a:bodyPr/@rIns"/>
@@ -846,7 +855,7 @@
 				</xsl:attribute>
 			</xsl:if>
 
-			<xsl:if test ="a:bodyPr/@bIns or (a:bodyPr/@wrap='square')">
+			<xsl:if test ="a:bodyPr/@bIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
 				<xsl:attribute name ="fo:padding-bottom">
 					<xsl:call-template name="getPadding">
 						<xsl:with-param name="length" select="a:bodyPr/@bIns"/>
@@ -856,12 +865,12 @@
 
 			<!--Wrap text in shape -->
 			<xsl:choose>
-				<xsl:when test="a:bodyPr/@wrap='none'">
+				<xsl:when test="(a:bodyPr/@wrap='none')">
 					<xsl:attribute name ="fo:wrap-option">
 						<xsl:value-of select ="'wrap'"/>
 					</xsl:attribute>
 				</xsl:when>
-				<xsl:when test="a:bodyPr/@wrap='square'">
+				<xsl:when test="(a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
 					<xsl:attribute name ="fo:wrap-option">
 						<xsl:value-of select ="'no-wrap'"/>
 					</xsl:attribute>
@@ -888,7 +897,7 @@
 	<xsl:template name ="getPadding">
 		<xsl:param name ="length" />
 		<xsl:choose>
-			<xsl:when test ="($length != '0') and ($length != '')">
+			<xsl:when test ="($length != '')">
 				<xsl:call-template name="ConvertEmu">
 					<xsl:with-param name="length" select="$length"/>
 					<xsl:with-param name="unit">cm</xsl:with-param>
