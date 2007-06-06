@@ -1191,6 +1191,22 @@
             </xsl:attribute>
           </xsl:when>
 
+<!-- if it is a hyperlink  in the cell-->
+          <xsl:when test="descendant::text:a">
+
+            <xsl:variable name="multilines">
+              <xsl:for-each
+                select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
+                <xsl:value-of select="count(descendant::text:p[2])"/>
+              </xsl:for-each>
+            </xsl:variable>
+
+            <xsl:attribute name="s">
+              <xsl:value-of
+                select="$cellFormats + $cellStyles + $multilines - 1"/>
+            </xsl:attribute>
+          </xsl:when>
+
           <xsl:otherwise>
             <xsl:choose>
               <xsl:when
@@ -1275,21 +1291,6 @@
                     </xsl:for-each>
                   </xsl:otherwise>
                 </xsl:choose>
-              </xsl:when>
-
-              <!-- if it is a hyperlink  in the cell-->
-              <xsl:when
-                test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
-                <xsl:variable name="multilineNumber">
-                  <xsl:for-each
-                    select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
-                    <xsl:value-of select="count(descendant::text:a[2])"/>
-                  </xsl:for-each>
-                </xsl:variable>
-
-                <xsl:attribute name="s">
-                   <xsl:value-of select="$cellFormats + $cellStyles + $multilineNumber - 1"/>
-                </xsl:attribute>
               </xsl:when>
 
             </xsl:choose>

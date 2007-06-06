@@ -300,11 +300,13 @@
       <xsl:choose>
         <xsl:when
           test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a[1]">
-
-          <xsl:for-each
-            select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
-            <xsl:call-template name="InsertHyperlinkProperties"/>
-          </xsl:for-each>
+<font>
+              <u val="single"/>
+              <sz val="11"/>
+              <color theme="10"/>
+              <name val="Calibri"/>
+              <family val="2"/>
+            </font>
 
         </xsl:when>
       </xsl:choose>
@@ -1452,17 +1454,6 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- InsertHyperlinkProperties-->
-  <xsl:template name="InsertHyperlinkProperties">
-    <font>
-      <u val="single"/>
-      <sz val="11"/>
-      <color theme="10"/>
-      <name val="Calibri"/>
-      <family val="2"/>
-    </font>
-  </xsl:template>
-
   <xsl:template match="number:text" mode="fonts"/>
   <xsl:template match="text()" mode="fonts"/>
   <xsl:template match="number:text" mode="cellFormats"/>
@@ -2228,22 +2219,40 @@
   </xsl:template>
 
 
-  <xsl:template name="InsertHyperlinksProperties">
+ <xsl:template name="InsertHyperlinksProperties">
+    <xsl:if  test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+    <xsl:variable name="xfId">
+      <xsl:if
+        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+        <xsl:value-of
+          select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
+        />
+      </xsl:if>
+    </xsl:variable>
 
-    <!--xsl:variable name="xfId">
-      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+    <xsl:variable name="contentFontCount">
       <xsl:value-of
-      select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
+        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties)"
       />
-      </xsl:if>
-      </xsl:variable-->
-    <!--xsl:variable name="fontId">
-      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
-        <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) +1"/>    
-      </xsl:if>
-    </xsl:variable-->
-    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="6"/>
-
+    </xsl:variable>
+    
+    <xsl:variable name="styleFontCount">
+      <xsl:value-of
+        select="count(document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties)"
+      />
+    </xsl:variable>
+   
+    <xf 
+      numFmtId="0" 
+      fillId="0" 
+      borderId="0"
+      xfId="{$xfId}">
+    
+      <xsl:attribute name="fontId">
+        <xsl:value-of select="$contentFontCount + $styleFontCount +2"/>
+      </xsl:attribute>  
+    </xf>
+    </xsl:if>
   </xsl:template>
 
   <!-- template to get number format inherited from parent style -->
