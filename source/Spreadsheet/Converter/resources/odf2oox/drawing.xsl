@@ -72,7 +72,7 @@
       
       <!--Insert Picture -->
       <xsl:for-each
-        select="descendant::draw:frame/draw:image[contains(@xlink:href, 'Pictures')]">
+        select="descendant::draw:frame/draw:image[contains(@xlink:href, 'Pictures') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
 
         <xdr:twoCellAnchor>
           <xsl:call-template name="SetPosition"/>
