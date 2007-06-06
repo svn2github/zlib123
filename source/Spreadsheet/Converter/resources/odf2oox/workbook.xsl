@@ -197,18 +197,18 @@
 
   <xsl:template name="InsertRange">
     <xsl:param name="range"/>
-    
+
     <xsl:variable name="row1">
       <xsl:call-template name="GetRowNum">
         <xsl:with-param name="cell"
           select="concat(substring-after($range,'.'),substring-before($range,':'))"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="col1">
       <xsl:value-of select="substring-before(substring-after($range,'.'),$row1)"/>
     </xsl:variable>
-    
+
     <xsl:variable name="row2">
       <xsl:variable name="endCell">
         <xsl:choose>
@@ -222,34 +222,27 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:call-template name="GetRowNum">
         <xsl:with-param name="cell" select="$endCell"/>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="col2">
       <xsl:value-of
         select="substring-before(substring-after(substring-after($range,'.'),'.'),$row2)"/>
     </xsl:variable>
-    
+
     <!-- if sheet name contains space then name has to be inside apostrophes -->
     <xsl:variable name="sheetName">
-      <xsl:choose>
-        <xsl:when test="contains(@table:name,' ')">
-          <xsl:text>'</xsl:text>
-          <xsl:value-of select="@table:name"/>
-          <xsl:text>'</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="@table:name"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:text>'</xsl:text>
+      <xsl:value-of select="@table:name"/>
+      <xsl:text>'</xsl:text>
     </xsl:variable>
-    
+
     <xsl:value-of
       select="concat($sheetName,'!$',substring-before(substring-after($range,'.'),$row1),'$', $row1,':','$',$col2,'$', $row2)"/>
-    
+
     <!-- if there is next range there is a space before -->
     <xsl:if test="contains(substring-after(substring-after($range,'.'),'.'),' ')">
       <xsl:text>,</xsl:text>
@@ -261,7 +254,7 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertHeaders">
 
     <xsl:for-each select="table:table">
@@ -296,8 +289,7 @@
   <xsl:template name="InsertHeaderRows">
 
     <xsl:variable name="headerRowStart">
-      <xsl:for-each
-        select="descendant::table:table-row[1]">
+      <xsl:for-each select="descendant::table:table-row[1]">
         <xsl:call-template name="CountHeaderRowsStart"/>
       </xsl:for-each>
     </xsl:variable>
