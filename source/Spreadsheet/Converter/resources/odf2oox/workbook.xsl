@@ -289,9 +289,20 @@
   <xsl:template name="InsertHeaderRows">
 
     <xsl:variable name="headerRowStart">
-      <xsl:for-each select="descendant::table:table-row[1]">
-        <xsl:call-template name="CountHeaderRowsStart"/>
-      </xsl:for-each>
+      <xsl:variable name="count">
+        <xsl:for-each select="descendant::table:table-row[1]">
+          <xsl:call-template name="CountHeaderRowsStart"/>
+        </xsl:for-each>
+      </xsl:variable>
+      
+      <xsl:choose>
+        <xsl:when test="$count = '' ">
+          <xsl:text>1</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$count"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:variable name="headerRows">
