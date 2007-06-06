@@ -147,10 +147,6 @@
         </xsl:with-param>
       </xsl:call-template>
 
-      <xsl:call-template name="InsertPageProperties">
-        <xsl:with-param name="pageStyle" select="$pageStyle"/>
-      </xsl:call-template>
-      
       <xsl:if test="ancestor::office:document-content/office:automatic-styles/style:style/style:map/@style:condition != ''">
         <xsl:apply-templates select="table:table-row[1]" mode="conditional">
           <xsl:with-param name="rowNumber">
@@ -161,7 +157,11 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:if>
-
+      
+      <xsl:call-template name="InsertPageProperties">
+        <xsl:with-param name="pageStyle" select="$pageStyle"/>
+      </xsl:call-template>
+      
       <xsl:call-template name="InsertHeaderFooter"/>
 
       <xsl:variable name="picture">

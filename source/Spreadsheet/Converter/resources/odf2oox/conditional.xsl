@@ -41,15 +41,15 @@
   <!-- search coditional -->
   <xsl:template match="table:table-row" mode="conditional">
     <xsl:param name="rowNumber"/>
-    <xsl:param name="cellNumber"/>    
-  
-  
-      <xsl:apply-templates select="table:table-cell[1]" mode="conditional">
-          <xsl:with-param name="colNumber">
-            <xsl:text>0</xsl:text>
-          </xsl:with-param>
-          <xsl:with-param name="rowNumber" select="$rowNumber"/>         
-        </xsl:apply-templates>
+    <xsl:param name="cellNumber"/>
+
+
+    <xsl:apply-templates select="table:table-cell[1]" mode="conditional">
+      <xsl:with-param name="colNumber">
+        <xsl:text>0</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="rowNumber" select="$rowNumber"/>
+    </xsl:apply-templates>
 
     <!-- check next row -->
     <xsl:choose>
@@ -67,8 +67,8 @@
             </xsl:choose>
           </xsl:with-param>
           <xsl:with-param name="cellNumber">
-           <xsl:text>0</xsl:text>
-          </xsl:with-param>        
+            <xsl:text>0</xsl:text>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
@@ -86,7 +86,7 @@
             </xsl:choose>
           </xsl:with-param>
           <xsl:with-param name="cellNumber">
-           <xsl:text>0</xsl:text>
+            <xsl:text>0</xsl:text>
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
@@ -106,8 +106,8 @@
             </xsl:choose>
           </xsl:with-param>
           <xsl:with-param name="cellNumber">
-           <xsl:text>0</xsl:text>
-          </xsl:with-param>       
+            <xsl:text>0</xsl:text>
+          </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -117,80 +117,89 @@
   <xsl:template match="table:table-cell|table:covered-table-cell" mode="conditional">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
-       
-    <xsl:if test="key('style', @table:style-name)/style:map/@style:condition != ''">
-    <conditionalFormatting>
-      <xsl:variable name="ColChar">
-        <xsl:call-template name="NumbersToChars">
-          <xsl:with-param name="num">
-            <xsl:value-of select="$colNumber"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:attribute name="sqref">
-        <xsl:value-of select="concat($ColChar, $rowNumber)"/>
-      </xsl:attribute>    
-      <xsl:for-each select="key('style', @table:style-name)/style:map">
-      <cfRule type="cellIs" priority="2">
-        <xsl:attribute name="dxfId">          
-          <xsl:value-of select="count(preceding::style:map) + 1"/>
+
+    <xsl:if test="key('style',@table:style-name)/style:map/@style:condition != '' ">
+      <conditionalFormatting>
+        <xsl:variable name="ColChar">
+          <xsl:call-template name="NumbersToChars">
+            <xsl:with-param name="num">
+              <xsl:value-of select="$colNumber"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:attribute name="sqref">
+          <xsl:value-of select="concat($ColChar, $rowNumber)"/>
         </xsl:attribute>
-        <xsl:attribute name="operator">
+        <xsl:for-each select="key('style', @table:style-name)/style:map">
+          <cfRule type="cellIs" priority="2">
+            <xsl:if test="contains(@style:condition,'is-true-formula')">
+              <xsl:attribute name="type">
+                <xsl:text>expression</xsl:text>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="dxfId">
+              <xsl:value-of select="count(preceding::style:map) + 1"/>
+            </xsl:attribute>
+            <xsl:if test="not(contains(@style:condition,'is-true-formula'))">
+              <xsl:attribute name="operator">
+                <xsl:choose>
+                  <xsl:when test="contains(@style:condition, '&lt;=')">
+                    <xsl:text>lessThanOrEqual</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="contains(@style:condition, '&lt;')">
+                    <xsl:text>lessThan</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="contains(@style:condition, '&gt;=')">
+                    <xsl:text>greaterThanOrEqual</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="contains(@style:condition, '&gt;')">
+                    <xsl:text>greaterThan</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="contains(@style:condition, '!=')">
+                    <xsl:text>notEqual</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="contains(@style:condition, 'cell-content-is-between')">
+                    <xsl:text>between</xsl:text>
+                  </xsl:when>
+                  <xsl:when test="contains(@style:condition, 'cell-content-is-not-between')">
+                    <xsl:text>notBetween</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>equal</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+            </xsl:if>
+            <xsl:call-template name="InsertCoditionalFormula"/>
+          </cfRule>
+        </xsl:for-each>
+      </conditionalFormatting>
+    </xsl:if>
+
+    <xsl:if test="following-sibling::table:table-cell">
+      <xsl:apply-templates
+        select="following-sibling::table:table-cell[1]|following-sibling::table:covered-table-cell[1]"
+        mode="conditional">
+        <xsl:with-param name="colNumber">
           <xsl:choose>
-            <xsl:when test="contains(@style:condition, '&lt;=')">
-              <xsl:text>lessThanOrEqual</xsl:text>
-            </xsl:when>
-            <xsl:when test="contains(@style:condition, '&lt;')">
-              <xsl:text>lessThan</xsl:text>
-            </xsl:when>
-            <xsl:when test="contains(@style:condition, '&gt;=')">
-              <xsl:text>greaterThanOrEqual</xsl:text>
-            </xsl:when>
-            <xsl:when test="contains(@style:condition, '&gt;')">
-              <xsl:text>greaterThan</xsl:text>
-            </xsl:when>
-            <xsl:when test="contains(@style:condition, '!=')">
-              <xsl:text>notEqual</xsl:text>
-            </xsl:when>
-            <xsl:when test="contains(@style:condition, 'cell-content-is-between')">
-              <xsl:text>between</xsl:text>
-            </xsl:when>
-            <xsl:when test="contains(@style:condition, 'cell-content-is-not-between')">
-              <xsl:text>notBetween</xsl:text>
+            <xsl:when test="@table:number-columns-repeated != ''">
+              <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:text>equal</xsl:text>
+              <xsl:value-of select="$colNumber + 1"/>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:attribute>
-       <xsl:call-template name="InsertCoditionalFormula"/>
-      </cfRule>
-      </xsl:for-each>
-    </conditionalFormatting>
+        </xsl:with-param>
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="$rowNumber"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
     </xsl:if>
-    
-    <xsl:if test="following-sibling::table:table-cell">
-    <xsl:apply-templates select="following-sibling::table:table-cell[1]|following-sibling::table:covered-table-cell[1]" mode="conditional">
-      <xsl:with-param name="colNumber">
-        <xsl:choose>
-          <xsl:when test="@table:number-columns-repeated != ''">
-            <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$colNumber + 1"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:with-param>
-      <xsl:with-param name="rowNumber">
-        <xsl:value-of select="$rowNumber"/>
-      </xsl:with-param>
-    </xsl:apply-templates>
-    </xsl:if>
-    
+
   </xsl:template>
-  
+
   <!-- Coditional Format -->
-  
+
   <xsl:template name="InsertConditionalFormat">
     <dxfs count="3">
       <dxf>
@@ -206,7 +215,7 @@
         </fill>
       </dxf>
       <xsl:for-each
-        select="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">     
+        select="document('content.xml')/office:document-content/office:automatic-styles/style:style/style:map[@style:condition != '']">
         <xsl:variable name="StyleApplyStyleName">
           <xsl:value-of select="@style:apply-style-name"/>
         </xsl:variable>
@@ -217,7 +226,7 @@
               <xsl:call-template name="InsertTextProperties">
                 <xsl:with-param name="mode">default</xsl:with-param>
               </xsl:call-template>
-            </font>            
+            </font>
           </xsl:for-each>
           <!-- style:table-cell-properties fo:background-color       -->
           <xsl:for-each
@@ -229,19 +238,19 @@
             </xsl:apply-templates>
             <xsl:apply-templates select="style:table-cell-properties" mode="border"/>
           </xsl:for-each>
-          
+
         </dxf>
       </xsl:for-each>
-   
+
     </dxfs>
   </xsl:template>
-  
+
   <!-- Insert Formula of Coditional -->
-  
+
   <xsl:template name="InsertCoditionalFormula">
     <xsl:choose>
       <xsl:when test="contains(@style:condition, '&lt;=')">
-        <formula>  
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
@@ -253,7 +262,7 @@
         </formula>
       </xsl:when>
       <xsl:when test="contains(@style:condition, '&lt;')">
-        <formula>              
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
@@ -261,47 +270,47 @@
             <xsl:otherwise>
               <xsl:value-of select="substring-after(@style:condition, '&lt;')"/>
             </xsl:otherwise>
-          </xsl:choose>          
+          </xsl:choose>
         </formula>
       </xsl:when>
       <xsl:when test="contains(@style:condition, '&gt;=')">
-        <formula>              
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="substring-after(@style:condition, '=')"/>              
+              <xsl:value-of select="substring-after(@style:condition, '=')"/>
             </xsl:otherwise>
-          </xsl:choose>          
-        </formula>            
+          </xsl:choose>
+        </formula>
       </xsl:when>
       <xsl:when test="contains(@style:condition, '&gt;')">
-        <formula>       
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="substring-after(@style:condition, '&gt;')"/>              
+              <xsl:value-of select="substring-after(@style:condition, '&gt;')"/>
             </xsl:otherwise>
           </xsl:choose>
-        </formula>            
+        </formula>
       </xsl:when>
       <xsl:when test="contains(@style:condition, '!=')">
-        <formula>              
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="substring-after(@style:condition, '=')"/>              
+              <xsl:value-of select="substring-after(@style:condition, '=')"/>
             </xsl:otherwise>
-          </xsl:choose>          
-        </formula>            
+          </xsl:choose>
+        </formula>
       </xsl:when>
       <xsl:when test="contains(@style:condition, 'cell-content-is-between')">
-        <formula>       
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
@@ -310,8 +319,8 @@
               <xsl:value-of select="substring-before(substring-after(@style:condition, '('), ',')"/>
             </xsl:otherwise>
           </xsl:choose>
-        </formula>   
-        <formula>           
+        </formula>
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
@@ -320,10 +329,10 @@
               <xsl:value-of select="substring-before(substring-after(@style:condition, ','), ')')"/>
             </xsl:otherwise>
           </xsl:choose>
-        </formula>            
+        </formula>
       </xsl:when>
       <xsl:when test="contains(@style:condition, 'cell-content-is-not-between')">
-        <formula>    
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
@@ -332,8 +341,8 @@
               <xsl:value-of select="substring-before(substring-after(@style:condition, '('), ',')"/>
             </xsl:otherwise>
           </xsl:choose>
-        </formula>   
-        <formula>              
+        </formula>
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
@@ -342,13 +351,37 @@
               <xsl:value-of select="substring-before(substring-after(@style:condition, ','), ')')"/>
             </xsl:otherwise>
           </xsl:choose>
-        </formula>  
+        </formula>
       </xsl:when>
-      <xsl:otherwise>
-        <formula> 
+      <xsl:when test="contains(@style:condition, '=')">
+        <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-after(@style:condition, '=')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </formula>
+      </xsl:when>
+      <xsl:when test="contains(@style:condition, 'is-true-formula')">
+        <formula>
+          <!-- string inside is-true-formula(...) -->
+          <xsl:value-of
+            select="substring-after(substring(@style:condition,1,string-length(@style:condition) -1), 'is-true-formula(' )"
+          />
+        </formula>
+      </xsl:when>
+      <xsl:otherwise>
+        <formula>
+          <xsl:choose>
+            <xsl:when test="contains(@style:condition, '[')">
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-after(@style:condition, '=')"/>
@@ -356,8 +389,8 @@
           </xsl:choose>
         </formula>
       </xsl:otherwise>
-    </xsl:choose>        
+    </xsl:choose>
   </xsl:template>
 
-  
+
 </xsl:stylesheet>
