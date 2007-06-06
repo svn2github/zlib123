@@ -105,7 +105,40 @@
           select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name =  $masterPage]/@style:page-layout-name"
         />
       </xsl:variable>
-
+      
+      <!-- get default font size -->
+      <xsl:variable name="baseFontSize">
+        <xsl:for-each select="document('styles.xml')">
+          <xsl:choose>
+            <xsl:when
+              test="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
+              <xsl:value-of
+                select="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"
+              />
+            </xsl:when>
+            <xsl:otherwise>10</xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:variable>
+      
+      <xsl:variable name="defaultFontSize">
+        <xsl:choose>
+          <xsl:when test="contains($baseFontSize,'pt')">
+            <xsl:value-of select="substring-before($baseFontSize,'pt')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$baseFontSize"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+            
+      <xsl:variable name="ColumnTagNum">
+        <xsl:apply-templates select="descendant::table:table-column[1]" mode="tag">
+          <xsl:with-param name="colNumber">1</xsl:with-param>
+          <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
+        </xsl:apply-templates>
+      </xsl:variable>
+      
       <!-- if property 'fit print range(s) to width/height' is being used -->
       <xsl:for-each select="document('styles.xml')">
         <xsl:if
@@ -135,6 +168,12 @@
         <xsl:with-param name="MergeCellStyle">
           <xsl:value-of select="$MergeCellStyle"/>
         </xsl:with-param>
+        <xsl:with-param name="ColumnTagNum">
+          <xsl:value-of select="$ColumnTagNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="defaultFontSize">
+          <xsl:value-of select="$defaultFontSize"/>
+        </xsl:with-param>
       </xsl:call-template>
 
       <!-- Insert Merge Cells -->
@@ -155,6 +194,7 @@
           <xsl:with-param name="cellNumber">
             <xsl:text>1</xsl:text>
           </xsl:with-param>
+          <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
         </xsl:apply-templates>
       </xsl:if>
       
@@ -367,6 +407,9 @@
     <xsl:param name="cellNumber"/>
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
+    <xsl:param name="ColumnTagNum"/>
+    <xsl:param name="defaultFontSize"/>    
+    <!-- baseFontSize -->
 
     <!-- compute default row height -->
     <xsl:variable name="defaultRowHeight">
@@ -385,21 +428,6 @@
         </xsl:when>
         <xsl:otherwise>13</xsl:otherwise>
       </xsl:choose>
-    </xsl:variable>
-
-    <!-- get default font size -->
-    <xsl:variable name="baseFontSize">
-      <xsl:for-each select="document('styles.xml')">
-        <xsl:choose>
-          <xsl:when
-            test="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size">
-            <xsl:value-of
-              select="office:document-styles/office:styles/style:style[@style:name='Default' and @style:family = 'table-cell']/style:text-properties/@fo:font-size"
-            />
-          </xsl:when>
-          <xsl:otherwise>10</xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
     </xsl:variable>
 
     <!-- Check if 256 column are hidden -->
@@ -431,17 +459,6 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>false</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
-    <xsl:variable name="defaultFontSize">
-      <xsl:choose>
-        <xsl:when test="contains($baseFontSize,'pt')">
-          <xsl:value-of select="substring-before($baseFontSize,'pt')"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$baseFontSize"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -497,13 +514,6 @@
       </cols>
     </xsl:if>
     <sheetData>
-
-      <xsl:variable name="ColumnTagNum">
-        <xsl:apply-templates select="descendant::table:table-column[1]" mode="tag">
-          <xsl:with-param name="colNumber">1</xsl:with-param>
-          <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
-        </xsl:apply-templates>
-      </xsl:variable>
 
       <!-- insert first row -->
       <xsl:apply-templates select="descendant::table:table-row[1]" mode="sheet">
