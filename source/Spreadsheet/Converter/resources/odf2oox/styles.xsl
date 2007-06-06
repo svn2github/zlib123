@@ -300,13 +300,13 @@
       <xsl:choose>
         <xsl:when
           test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a[1]">
-<font>
-              <u val="single"/>
-              <sz val="11"/>
-              <color theme="10"/>
-              <name val="Calibri"/>
-              <family val="2"/>
-            </font>
+          <font>
+            <u val="single"/>
+            <sz val="11"/>
+            <color theme="10"/>
+            <name val="Calibri"/>
+            <family val="2"/>
+          </font>
 
         </xsl:when>
       </xsl:choose>
@@ -1220,14 +1220,28 @@
 
     <!-- font weight -->
     <xsl:variable name="fontWeight">
-      <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
-        <xsl:call-template name="InheritFontWeight"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontWeight"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontWeight"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="fontWeightComplex">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontWeightComplex"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontWeightComplex"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontWeightComplex"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:if test="$fontWeight = 'bold' or $fontWeightComplex = 'bold' ">
@@ -1236,9 +1250,16 @@
 
     <!-- italic -->
     <xsl:variable name="fontStyle">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontStyle"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontStyle"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontStyle"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:if test="$fontWeight = 'italic' or $fontStyle = 'italic' ">
@@ -1247,14 +1268,28 @@
 
     <!-- underline -->
     <xsl:variable name="fontUnderlineStyle">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontUnderlineStyle"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontUnderlineStyle"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontUnderlineStyle"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="fontUnderlineType">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontUnderlineType"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontUnderlineType"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontUnderlineType"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:if
@@ -1290,19 +1325,40 @@
 
     <!-- font size -->
     <xsl:variable name="fontSize">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontSize"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontSize"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontSize"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="fontSizeComplex">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontSizeComplex"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontSizeComplex"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontSizeComplex"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
     <xsl:variable name="fontSizeAsian">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontSizeAsian"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontSizeAsian"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontSizeAsian"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:if
@@ -1340,9 +1396,16 @@
 
     <!-- strikethrough -->
     <xsl:variable name="fontStrikethrough">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontStrikethrough"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontStrikethrough"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontStrikethrough"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:if
@@ -1367,9 +1430,16 @@
 
     <!-- font color -->
     <xsl:variable name="fontColor">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontColor"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontColor"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontColor"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:if
@@ -1390,9 +1460,16 @@
 
     <!-- font family -->
     <xsl:variable name="fontFamily">
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InheritFontFamily"/>
-      </xsl:for-each>
+      <xsl:choose>
+        <xsl:when test="name() = 'style:text-properties' ">
+          <xsl:for-each select="parent::node()[name(.) = 'style:style' ]">
+            <xsl:call-template name="InheritFontFamily"/>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:when test="name() = 'style:style' ">
+          <xsl:call-template name="InheritFontFamily"/>
+        </xsl:when>
+      </xsl:choose>
     </xsl:variable>
 
     <xsl:choose>
@@ -2219,39 +2296,36 @@
   </xsl:template>
 
 
- <xsl:template name="InsertHyperlinksProperties">
-    <xsl:if  test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
-    <xsl:variable name="xfId">
-      <xsl:if
-        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
-        <xsl:value-of
-          select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
-        />
-      </xsl:if>
-    </xsl:variable>
+  <xsl:template name="InsertHyperlinksProperties">
+    <xsl:if
+      test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+      <xsl:variable name="xfId">
+        <xsl:if
+          test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+          <xsl:value-of
+            select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
+          />
+        </xsl:if>
+      </xsl:variable>
 
-    <xsl:variable name="contentFontCount">
-      <xsl:value-of
-        select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties)"
-      />
-    </xsl:variable>
-    
-    <xsl:variable name="styleFontCount">
-      <xsl:value-of
-        select="count(document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties)"
-      />
-    </xsl:variable>
-   
-    <xf 
-      numFmtId="0" 
-      fillId="0" 
-      borderId="0"
-      xfId="{$xfId}">
-    
-      <xsl:attribute name="fontId">
-        <xsl:value-of select="$contentFontCount + $styleFontCount +2"/>
-      </xsl:attribute>  
-    </xf>
+      <xsl:variable name="contentFontCount">
+        <xsl:value-of
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties)"
+        />
+      </xsl:variable>
+
+      <xsl:variable name="styleFontCount">
+        <xsl:value-of
+          select="count(document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties)"
+        />
+      </xsl:variable>
+
+      <xf numFmtId="0" fillId="0" borderId="0" xfId="{$xfId}">
+
+        <xsl:attribute name="fontId">
+          <xsl:value-of select="$contentFontCount + $styleFontCount +2"/>
+        </xsl:attribute>
+      </xf>
     </xsl:if>
   </xsl:template>
 

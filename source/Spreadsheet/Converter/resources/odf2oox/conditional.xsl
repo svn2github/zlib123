@@ -250,7 +250,7 @@
         </xsl:variable>
         <dxf>
           <xsl:for-each
-            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleApplyStyleName]/style:text-properties">
+            select="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name=$StyleApplyStyleName]">
             <font>
               <xsl:call-template name="InsertTextProperties">
                 <xsl:with-param name="mode">default</xsl:with-param>
