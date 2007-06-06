@@ -48,7 +48,7 @@
   <xsl:key name="time" match="number:time-style" use="@style:name"/>
   <xsl:key name="font" match="style:font-face" use="@style:name"/>
   <xsl:key name="hyperlink" match="text:a" use="@xlink:href"/>
-  
+
   <xsl:template name="styles">
     <styleSheet>
       <xsl:call-template name="InsertNumFormats"/>
@@ -439,8 +439,8 @@
       </xsl:choose>
 
     </xsl:variable>
-    
-     
+
+
     <xsl:variable name="numStyleCount">
       <xsl:value-of
         select="count(document('content.xml')/office:document-content/office:automatic-styles/number:number-style)"
@@ -564,7 +564,7 @@
 
       <!-- add cell formats for hyperlinks-->
       <xsl:call-template name="InsertHyperlinksProperties"/>
-            
+
     </cellStyleXfs>
 
     <cellXfs>
@@ -1441,7 +1441,11 @@
             </name>
           </xsl:when>
           <xsl:when test="$mode = 'default' ">
-            <xsl:text>Arial</xsl:text>
+            <name>
+              <xsl:attribute name="val">
+                <xsl:text>Arial</xsl:text>
+              </xsl:attribute>
+            </name>
           </xsl:when>
         </xsl:choose>
       </xsl:when>
@@ -2222,10 +2226,10 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
-  
+
+
   <xsl:template name="InsertHyperlinksProperties">
-    
+
     <!--xsl:variable name="xfId">
       <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
       <xsl:value-of
@@ -2239,7 +2243,7 @@
       </xsl:if>
     </xsl:variable-->
     <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="6"/>
-    
+
   </xsl:template>
 
   <!-- template to get number format inherited from parent style -->
