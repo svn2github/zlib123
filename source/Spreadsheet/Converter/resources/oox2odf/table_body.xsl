@@ -886,17 +886,6 @@
         </xsl:choose>
       </xsl:when>
 
-      <!--xsl:when test="contains($slash,'..\..\..\')">
-        <xsl:choose>
-          <xsl:when test="substring-before($slash,'..\..\..\') =''">
-            <xsl:call-template name="Change20PercentToSpace">
-              <xsl:with-param name="slash"
-                select="concat('../../../',substring-after($slash,'..\..\..\'))"/>
-            </xsl:call-template>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:when-->
-
       <xsl:when test="contains($string,'..\..\')">
         <xsl:choose>
           <xsl:when test="substring-before($string,'..\..\') =''">
@@ -925,16 +914,13 @@
       <xsl:when test="not(contains($string,'../')) and not(contains($string,'..\..\'))">
        
           <xsl:value-of select="concat('../',$string)">
-            <!--xsl:call-template name="Change20PercentToSpace">
-              <xsl:with-param name="slash" select="concat('..\',substring-after($string,''))"/>
-            </xsl:call-template-->
+            
           </xsl:value-of>
        
       </xsl:when>
 
       <xsl:otherwise>
-        <xsl:value-of select="$string"/>
-        <!--xsl:value-of select="translate($string,'\','/')"/-->
+        <xsl:value-of select="translate($string,'\','/')"/>
       </xsl:otherwise>
     </xsl:choose>
 
