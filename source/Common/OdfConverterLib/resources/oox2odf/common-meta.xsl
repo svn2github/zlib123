@@ -4,8 +4,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
     xmlns:cust-p="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
-    xmlns:dc="http://purl.org/dc/elements/1.1/" 
-    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
     xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
@@ -16,13 +15,14 @@
     <!-- @Filename: common-meta.xsl -->
     <!-- @Description: This stylesheet is used to perform reverse conversion on document metadata -->
     <!-- @Created: 2006-12-12 -->
-    
+
     <xsl:template name="meta">
         <!-- @Description: Generates the openOffice element containing the document metadata. -->
         <!-- @Context: Any -->
-        
-        <xsl:param name="app-version"/> <!-- The application version -->
-        
+
+        <xsl:param name="app-version"/>
+        <!-- The application version -->
+
         <office:document-meta>
             <office:meta>
                 <!-- generator -->
@@ -33,33 +33,40 @@
                     select="document('docProps/core.xml')/cp:coreProperties/dc:title" mode="meta"/>
                 <!-- description -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dc:description" mode="meta"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dc:description"
+                    mode="meta"/>
                 <!-- creator -->
                 <xsl:apply-templates
                     select="document('docProps/core.xml')/cp:coreProperties/dc:creator" mode="meta"/>
                 <!-- creation date -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dcterms:created" mode="meta"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dcterms:created"
+                    mode="meta"/>
                 <!-- last modifier -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/cp:lastModifiedBy" mode="meta"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/cp:lastModifiedBy"
+                    mode="meta"/>
                 <!-- last modification date -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/dcterms:modified" mode="meta"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/dcterms:modified"
+                    mode="meta"/>
                 <!-- last print date -->
                 <xsl:apply-templates
-                    select="document('docProps/core.xml')/cp:coreProperties/cp:lastPrinted" mode="meta"/>
+                    select="document('docProps/core.xml')/cp:coreProperties/cp:lastPrinted"
+                    mode="meta"/>
                 <!-- subject -->
                 <xsl:apply-templates
                     select="document('docProps/core.xml')/cp:coreProperties/dc:subject" mode="meta"/>
                 <!-- editing time -->
-                <xsl:apply-templates select="document('docProps/core.xml')/Properties/TotalTime" mode="meta"/>
+                <xsl:apply-templates select="document('docProps/core.xml')/Properties/TotalTime"
+                    mode="meta"/>
                 <!-- revision number -->
                 <xsl:apply-templates
                     select="document('docProps/core.xml')/cp:coreProperties/cp:revision" mode="meta"/>
                 <!-- custom properties-->
                 <xsl:apply-templates
-                    select="document('docProps/custom.xml')/cust-p:Properties/cust-p:property" mode="meta"/>
+                    select="document('docProps/custom.xml')/cust-p:Properties/cust-p:property"
+                    mode="meta"/>
                 <!-- keywords -->
                 <xsl:apply-templates
                     select="document('docProps/core.xml')/cp:coreProperties/cp:keywords" mode="meta"/>
@@ -68,11 +75,10 @@
                     select="document('docProps/core.xml')/cp:coreProperties/dc:language" mode="meta"/>
                 <!-- document statistics -->
                 <xsl:call-template name="GetDocumentStatistics"/>
-              <!-- Total editing time (Spreadsheet)-->
-              <xsl:for-each select="document('docProps/app.xml')/ex:Properties">
-              <xsl:apply-templates
-                select="ex:TotalTime" mode="meta"/>               
-              </xsl:for-each>
+                <!-- Total editing time (Spreadsheet)-->
+                <xsl:for-each select="document('docProps/app.xml')/ex:Properties">
+                    <xsl:apply-templates select="ex:TotalTime" mode="meta"/>
+                </xsl:for-each>
             </office:meta>
         </office:document-meta>
     </xsl:template>
@@ -82,9 +88,12 @@
         <!-- @Description: Generates the &lt;dc:title&gt; element (last modification date) -->
         <!-- @Context: Any &lt;dc:title&gt; element -->
         <!-- @Private -->
-        
+
         <dc:title>
-            <xsl:value-of select="."/>
+            <xsl:variable name="titl">
+                <xsl:value-of select="."/>
+            </xsl:variable>
+            <xsl:value-of select="substring($titl ,1 ,65533)"/>
         </dc:title>
     </xsl:template>
 
@@ -93,9 +102,12 @@
         <!-- @Description: Generates the &lt;dc:description&gt; element (last modification date) -->
         <!-- @Context: Any &lt;dc:description&gt; element -->
         <!-- @Private -->
-        
+
         <dc:description>
-            <xsl:value-of select="."/>
+            <xsl:variable name="descript">
+                <xsl:value-of select="."/>
+            </xsl:variable>
+            <xsl:value-of select="substring($descript ,1 ,65533)"/>
         </dc:description>
     </xsl:template>
 
@@ -104,7 +116,7 @@
         <!-- @Description: Generates the &lt;meta:initial-creator&gt; element (last modification date) -->
         <!-- @Context: Any &lt;dc:creator&gt; element -->
         <!-- @Private -->
-        
+
         <meta:initial-creator>
             <xsl:value-of select="."/>
         </meta:initial-creator>
@@ -115,7 +127,7 @@
         <!-- @Description: Generates the &lt;meta:creation-date&gt; element (last modification date) -->
         <!-- @Context: Any &lt;dcterms:created&gt; element -->
         <!-- @Private -->
-        
+
         <meta:creation-date>
             <xsl:value-of select="."/>
         </meta:creation-date>
@@ -126,7 +138,7 @@
         <!-- @Description: Generates the &lt;dc:creator&gt; element (last modification date) -->
         <!-- @Context: Any &lt;cp:lastModifiedBy&gt; element -->
         <!-- @Private -->
-        
+
         <dc:creator>
             <xsl:value-of select="."/>
         </dc:creator>
@@ -137,7 +149,7 @@
         <!-- @Description: Generates the &lt;dc:date&gt; element (last modification date) -->
         <!-- @Context: Any &lt;dcterms:modified&gt; element -->
         <!-- @Private -->
-        
+
         <dc:date>
             <xsl:value-of select="."/>
         </dc:date>
@@ -147,7 +159,7 @@
         <!-- @Description: Generates the &lt;meta:print-date&gt; element -->
         <!-- @Context: Any &lt;cp:lastPrinted&gt; element -->
         <!-- @Private -->
-        
+
         <meta:print-date>
             <xsl:value-of select="."/>
         </meta:print-date>
@@ -157,9 +169,12 @@
         <!-- @Description: Generates the &lt;dc:subject&gt; element -->
         <!-- @Context: Any  &lt;dc:subject&gt; element -->
         <!-- @Private -->
-        
+
         <dc:subject>
-            <xsl:value-of select="."/>
+            <xsl:variable name="subj">
+                <xsl:value-of select="."/>
+            </xsl:variable>
+            <xsl:value-of select="substring($subj ,1 ,65533)"/>
         </dc:subject>
     </xsl:template>
 
@@ -167,7 +182,7 @@
         <!-- @Description: Generates the &lt;meta:editing-duration&gt; element -->
         <!-- @Context: Any &lt;TotalTime&gt; element-->
         <!-- @Private -->
-        
+
         <meta:editing-duration>
             <xsl:choose>
                 <xsl:when test=". &gt; 60">
@@ -196,18 +211,18 @@
         <!-- @Description: Generates the &lt;meta:editing-cycles&gt; element -->
         <!-- @Context: Any &lt;cp:revision&gt; element -->
         <!-- @Private -->
-                
+
         <meta:editing-cycles>
             <xsl:value-of select="."/>
         </meta:editing-cycles>
     </xsl:template>
 
-    
+
     <xsl:template match="cust-p:property" mode="meta">
         <!-- @Description: Generates the &lt;meta:user-defined&gt; element(s) -->
         <!-- @Context: Any &lt;cust-p:property&gt; -->
         <!-- @Private -->
-        
+
         <xsl:for-each select=".">
             <meta:user-defined meta:name="{@name}">
                 <xsl:attribute name="meta:type">
@@ -233,9 +248,12 @@
         <!-- @Description: Generates the &lt;meta:keyword&gt; element(s) -->
         <!-- @Context: Any &lt;cp:keywords&gt; element-->
         <!-- @Private -->
-        
+
         <meta:keyword>
-            <xsl:value-of select="."/>
+            <xsl:variable name="keyw">
+                <xsl:value-of select="."/>
+            </xsl:variable>
+            <xsl:value-of select="substring($keyw ,1 ,65533)"/>
         </meta:keyword>
     </xsl:template>
 
@@ -243,7 +261,7 @@
         <!-- @Description: Generates the &lt;dc:language&gt; element -->
         <!-- @Context: Any &lt;dc:language&gt; element-->
         <!-- @Private -->
-        
+
         <dc:language>
             <xsl:value-of select="."/>
         </dc:language>
@@ -253,7 +271,7 @@
         <!-- @Description: Generates the &lt;meta:document-statistic&gt; element -->
         <!-- @Context: Any -->
         <!-- @Private -->
-        
+
         <meta:document-statistic>
             <xsl:for-each select="document('docProps/app.xml')/Properties">
                 <!-- word count -->
@@ -289,7 +307,7 @@
             </xsl:for-each>
         </meta:document-statistic>
     </xsl:template>
-    
+
     <!-- other properties to fit :
         core : category, contentStatus, contentType
         app : Application, AppVersion, Company, DigSig, DocSecurity, HeadingPairs, HiddenSlides, HLinks, HyperlinkBase, HyperlinksChanged,
