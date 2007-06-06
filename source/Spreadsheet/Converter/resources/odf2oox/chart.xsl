@@ -125,44 +125,48 @@
   <xsl:template name="InsertTitle">
     <!-- @Description: Inserts chart title -->
     <!-- @Context: chart:chart -->
-    <c:title>
-      <c:tx>
-        <c:rich>
-          <a:bodyPr/>
-          <a:lstStyle/>
-          <a:p>
-            <a:pPr>
-              <a:defRPr sz="1300" b="0" i="0" u="none" strike="noStrike" baseline="0">
-                <a:solidFill>
-                  <a:srgbClr val="000000"/>
-                </a:solidFill>
-                <a:latin typeface="Arial"/>
-                <a:ea typeface="Arial"/>
-                <a:cs typeface="Arial"/>
-              </a:defRPr>
-            </a:pPr>
-            <a:r>
-              <a:rPr lang="pl-PL"/>
-              <a:t>Main Title</a:t>
-            </a:r>
-          </a:p>
-        </c:rich>
-      </c:tx>
-      <c:layout>
-        <c:manualLayout>
-          <c:xMode val="edge"/>
-          <c:yMode val="edge"/>
-          <c:x val="0.37282229965156838"/>
-          <c:y val="3.8022813688212961E-2"/>
-        </c:manualLayout>
-      </c:layout>
-      <c:spPr>
-        <a:noFill/>
-        <a:ln w="25400">
+    <xsl:for-each select="chart:title">
+      <c:title>
+        <c:tx>
+          <c:rich>
+            <a:bodyPr/>
+            <a:lstStyle/>
+            <a:p>
+              <a:pPr>
+                <a:defRPr sz="1300" b="0" i="0" u="none" strike="noStrike" baseline="0">
+                  <a:solidFill>
+                    <a:srgbClr val="000000"/>
+                  </a:solidFill>
+                  <a:latin typeface="Arial"/>
+                  <a:ea typeface="Arial"/>
+                  <a:cs typeface="Arial"/>
+                </a:defRPr>
+              </a:pPr>
+              <a:r>
+                <a:rPr lang="pl-PL"/>
+                <a:t>
+                  <xsl:value-of select="text:p"/>
+                </a:t>
+              </a:r>
+            </a:p>
+          </c:rich>
+        </c:tx>
+        <c:layout>
+          <c:manualLayout>
+            <c:xMode val="edge"/>
+            <c:yMode val="edge"/>
+            <c:x val="0.37282229965156838"/>
+            <c:y val="3.8022813688212961E-2"/>
+          </c:manualLayout>
+        </c:layout>
+        <c:spPr>
           <a:noFill/>
-        </a:ln>
-      </c:spPr>
-    </c:title>
+          <a:ln w="25400">
+            <a:noFill/>
+          </a:ln>
+        </c:spPr>
+      </c:title>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertPlotArea">
@@ -398,7 +402,7 @@
           <xsl:call-template name="InsertChartContent"/>
         </c:radarChart>
       </xsl:when>
-      
+
       <!-- making problems at this time -->
       <!--<xsl:when test="@chart:class='chart:scatter' ">
         <c:scatterChart>
