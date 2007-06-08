@@ -73,6 +73,7 @@
     <EmbeddedResource Include="resources\oox2odf\border.xsl" />
     <EmbeddedResource Include="resources\oox2odf\headers.xsl" />
     <EmbeddedResource Include="resources\oox2odf\picture.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\note.xsl" />
 	<EmbeddedResource Include="resources\oox2odf\chart.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
     <Compile Include="OoxHeaderFooterPostProcessor.cs" />

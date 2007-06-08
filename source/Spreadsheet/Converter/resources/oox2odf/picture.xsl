@@ -48,7 +48,7 @@
   
   <xsl:key name="drawing" match="e:drawing" use="''"/>
 
-  <!-- We check cell when the picture is starting and ending -->
+  <!-- Get cell with picture -->
   <xsl:template name="PictureCell">
     <xsl:param name="sheet"/>
     <xsl:apply-templates select="e:worksheet/e:drawing">

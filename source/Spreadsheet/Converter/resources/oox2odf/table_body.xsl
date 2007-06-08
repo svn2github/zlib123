@@ -52,7 +52,8 @@
     <xsl:param name="BigMergeRow"/>
     <xsl:param name="RowNumber"/>
     <xsl:param name="PictureCell"/>
-
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="PictureAndNoteCell"/>
     <xsl:choose>
       <!-- when sheet is empty  -->
       <xsl:when
@@ -69,6 +70,12 @@
         <xsl:call-template name="InsertEmptySheetWithPicture">
           <xsl:with-param name="PictureCell">
             <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteCell">
+            <xsl:value-of select="$NoteCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureAndNoteCell">
+            <xsl:value-of select="$PictureAndNoteCell"/>
           </xsl:with-param>
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>
@@ -136,14 +143,18 @@
     <xsl:param name="this"/>
     <xsl:param name="PictureCell"/>
     <xsl:param name="PictureRow"/>
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="NoteRow"/>
+    <xsl:param name="PictureAndNoteCell"/>
+    <xsl:param name="PictureAndNoteRow"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="sheetNr"/>
     
     <xsl:variable name="GetMinRowWithPicture">
       <xsl:call-template name="GetMinRowWithPicture">
-        <xsl:with-param name="PictureRow">
-          <xsl:value-of select="$PictureRow"/>
+        <xsl:with-param name="PictureAndNoteRow">
+          <xsl:value-of select="$PictureAndNoteRow"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
           <xsl:value-of select="$lastCellColumnNumber"/>
@@ -162,6 +173,16 @@
       </xsl:call-template>
     </xsl:variable>    
 
+    <xsl:variable name="NoteColl">
+      <xsl:call-template name="GetCollsWithPicture">
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="@r - 1"/>
+        </xsl:with-param>
+        <xsl:with-param name="NoteCell">
+          <xsl:value-of select="concat(';', $NoteCell)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
     <xsl:choose>
 
       <!-- Insert if this row is merged with another row -->
@@ -205,6 +226,18 @@
               </xsl:with-param>
               <xsl:with-param name="PictureCell">
                 <xsl:value-of select="$PictureCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="NoteRow">
+                <xsl:value-of select="$NoteRow"/>
+              </xsl:with-param>
+              <xsl:with-param name="NoteCell">
+                <xsl:value-of select="$NoteCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureAndNoteRow">
+                <xsl:value-of select="$PictureAndNoteRow"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureAndNoteCell">
+                <xsl:value-of select="$PictureAndNoteCell"/>
               </xsl:with-param>
               <xsl:with-param name="sheet">
                 <xsl:value-of select="$sheet"/>
@@ -282,6 +315,34 @@
                 </xsl:if>
               </table:table-cell>
             </xsl:when>    
+            <xsl:when test="$PictureCell != '' and $NoteCell != '' and ($GetMinRowWithPicture+1)=@r and not(e:c)">
+              <xsl:call-template name="InsertPictureAndNoteBetwenTwoColl">
+                <xsl:with-param name="sheet">
+                  <xsl:value-of select="$sheet"/>
+                </xsl:with-param>           
+                <xsl:with-param name="NameSheet">
+                  <xsl:value-of select="$NameSheet"/>
+                </xsl:with-param>          
+                <xsl:with-param name="rowNum">
+                  <xsl:value-of select="@r - 1"/>
+                </xsl:with-param>
+                <xsl:with-param name="PictureColl">
+                  <xsl:value-of select="$PictureColl"/>
+                </xsl:with-param>
+                <xsl:with-param name="NoteColl">
+                  <xsl:value-of select="$NoteColl"/>
+                </xsl:with-param>
+                <xsl:with-param name="StartColl">
+                  <xsl:text>0</xsl:text>            
+                </xsl:with-param>
+                <xsl:with-param name="EndColl">
+                  <xsl:text>256</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="document">
+                  <xsl:text>worksheet</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>  
+            </xsl:when>
             <xsl:when test="$PictureCell != '' and ($GetMinRowWithPicture+1)=@r and not(e:c)">
               <xsl:call-template name="InsertPictureBetwenTwoColl">
                 <xsl:with-param name="sheet">
@@ -295,6 +356,34 @@
                 </xsl:with-param>
                 <xsl:with-param name="PictureColl">
                   <xsl:value-of select="$PictureColl"/>
+                </xsl:with-param>
+                <xsl:with-param name="NoteColl">
+                  <xsl:value-of select="$NoteColl"/>
+                </xsl:with-param>
+                <xsl:with-param name="StartColl">
+                  <xsl:text>0</xsl:text>            
+                </xsl:with-param>
+                <xsl:with-param name="EndColl">
+                  <xsl:text>256</xsl:text>
+                </xsl:with-param>
+                <xsl:with-param name="document">
+                  <xsl:text>worksheet</xsl:text>
+                </xsl:with-param>
+              </xsl:call-template>  
+            </xsl:when>
+            <xsl:when test="$NoteCell != '' and ($GetMinRowWithPicture+1)=@r and not(e:c)">
+              <xsl:call-template name="InsertNoteBetwenTwoColl">
+                <xsl:with-param name="sheet">
+                  <xsl:value-of select="$sheet"/>
+                </xsl:with-param>           
+                <xsl:with-param name="NameSheet">
+                  <xsl:value-of select="$NameSheet"/>
+                </xsl:with-param>          
+                <xsl:with-param name="rowNum">
+                  <xsl:value-of select="@r - 1"/>
+                </xsl:with-param>
+                <xsl:with-param name="NoteColl">
+                  <xsl:value-of select="$NoteColl"/>
                 </xsl:with-param>
                 <xsl:with-param name="StartColl">
                   <xsl:text>0</xsl:text>            
@@ -408,7 +497,12 @@
     <xsl:param name="CheckIfMerge"/>
     <xsl:param name="PictureCell"/>
     <xsl:param name="PictureRow"/>
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="NoteRow"/>
+    <xsl:param name="PictureAndNoteCell"/>
+    <xsl:param name="PictureAndNoteRow"/>
     <xsl:param name="PictureColl"/>
+    <xsl:param name="NoteColl"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="GetMinCollWithPicture"/>
@@ -469,70 +563,206 @@
       
       <xsl:when
         test="$prevCellCol = '' and $colNum>1 and $BeforeMerge != 'true' and $CheckIfBigMergeBefore != 'true' and (($GetMinCollWithPicture != '' and ($GetMinCollWithPicture + 1) &lt; $colNum))">        
-        <xsl:call-template name="InsertPictureBetwenTwoColl">
-          <xsl:with-param name="sheet">
-            <xsl:value-of select="$sheet"/>
-          </xsl:with-param>           
-          <xsl:with-param name="NameSheet">
-            <xsl:value-of select="$NameSheet"/>
-          </xsl:with-param>          
-          <xsl:with-param name="rowNum">
-            <xsl:value-of select="$rowNum - 1"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureColl">
-            <xsl:value-of select="$PictureColl"/>
-          </xsl:with-param>
-          <xsl:with-param name="StartColl">
-            <xsl:choose>
-              <xsl:when test="$prevCellCol = ''">
-                <xsl:text>0</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$prevCellCol"/>
-              </xsl:otherwise>
-            </xsl:choose>            
-          </xsl:with-param>
-          <xsl:with-param name="EndColl">
-            <xsl:value-of select="$colNum"/>
-          </xsl:with-param>
-          <xsl:with-param name="document">
-            <xsl:text>worksheet</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>           
+        <xsl:choose>
+          <xsl:when test="$PictureCell != '' and $NoteCell != ''">
+            <xsl:call-template name="InsertPictureAndNoteBetwenTwoColl">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>           
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$NameSheet"/>
+              </xsl:with-param>          
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureColl">
+                <xsl:value-of select="$PictureColl"/>
+              </xsl:with-param>
+              <xsl:with-param name="StartColl">
+                <xsl:choose>
+                  <xsl:when test="$prevCellCol = ''">
+                    <xsl:text>0</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$prevCellCol"/>
+                  </xsl:otherwise>
+                </xsl:choose>            
+              </xsl:with-param>
+              <xsl:with-param name="EndColl">
+                <xsl:value-of select="$colNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="document">
+                <xsl:text>worksheet</xsl:text>
+              </xsl:with-param>
+            </xsl:call-template>           
+          </xsl:when>
+          <xsl:when test="$PictureCell != ''">
+            <xsl:call-template name="InsertPictureBetwenTwoColl">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>           
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$NameSheet"/>
+              </xsl:with-param>          
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureColl">
+                <xsl:value-of select="$PictureColl"/>
+              </xsl:with-param>
+              <xsl:with-param name="StartColl">
+                <xsl:choose>
+                  <xsl:when test="$prevCellCol = ''">
+                    <xsl:text>0</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$prevCellCol"/>
+                  </xsl:otherwise>
+                </xsl:choose>            
+              </xsl:with-param>
+              <xsl:with-param name="EndColl">
+                <xsl:value-of select="$colNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="document">
+                <xsl:text>worksheet</xsl:text>
+              </xsl:with-param>
+            </xsl:call-template>           
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertNoteBetwenTwoColl">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>           
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$NameSheet"/>
+              </xsl:with-param>          
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureColl">
+                <xsl:value-of select="$PictureColl"/>
+              </xsl:with-param>
+              <xsl:with-param name="StartColl">
+                <xsl:choose>
+                  <xsl:when test="$prevCellCol = ''">
+                    <xsl:text>0</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$prevCellCol"/>
+                  </xsl:otherwise>
+                </xsl:choose>            
+              </xsl:with-param>
+              <xsl:with-param name="EndColl">
+                <xsl:value-of select="$colNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="document">
+                <xsl:text>worksheet</xsl:text>
+              </xsl:with-param>
+              <xsl:with-param name="sheetNr" select="$sheetNr"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
-      
       <xsl:when
         test="$colNum>1 and $BeforeMerge != 'true' and $CheckIfBigMergeBefore != 'true' and (($GetMinCollWithPicture != '' and ($GetMinCollWithPicture + 1) &gt; $prevCellCol and ($GetMinCollWithPicture + 1) &lt; $colNum))">
-        <xsl:call-template name="InsertPictureBetwenTwoColl">
-          <xsl:with-param name="sheet">
-            <xsl:value-of select="$sheet"/>
-          </xsl:with-param>           
-          <xsl:with-param name="NameSheet">
-            <xsl:value-of select="$NameSheet"/>
-          </xsl:with-param>          
-          <xsl:with-param name="rowNum">
-            <xsl:value-of select="$rowNum - 1"/>
-          </xsl:with-param>
-          <xsl:with-param name="PictureColl">
-            <xsl:value-of select="$PictureColl"/>
-          </xsl:with-param>
-          <xsl:with-param name="StartColl">
-              <xsl:choose>
-                <xsl:when test="$prevCellCol = ''">
-                  <xsl:text>0</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$prevCellCol"/>
-                </xsl:otherwise>
-              </xsl:choose>            
-          </xsl:with-param>
-          <xsl:with-param name="EndColl">
-              <xsl:value-of select="$colNum"/>
-          </xsl:with-param>
-          <xsl:with-param name="document">
-            <xsl:text>worksheet</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>        
+        <xsl:choose>
+          <xsl:when test="$PictureCell != '' and $NoteCell != ''">
+            <xsl:call-template name="InsertPictureAndNoteBetwenTwoColl">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>           
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$NameSheet"/>
+              </xsl:with-param>          
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureColl">
+                <xsl:value-of select="$PictureColl"/>
+              </xsl:with-param>
+              <xsl:with-param name="StartColl">
+                <xsl:choose>
+                  <xsl:when test="$prevCellCol = ''">
+                    <xsl:text>0</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$prevCellCol"/>
+                  </xsl:otherwise>
+                </xsl:choose>            
+              </xsl:with-param>
+              <xsl:with-param name="EndColl">
+                <xsl:value-of select="$colNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="document">
+                <xsl:text>worksheet</xsl:text>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$PictureCell != ''">
+            <xsl:call-template name="InsertPictureBetwenTwoColl">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>           
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$NameSheet"/>
+              </xsl:with-param>          
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureColl">
+                <xsl:value-of select="$PictureColl"/>
+              </xsl:with-param>
+              <xsl:with-param name="StartColl">
+                <xsl:choose>
+                  <xsl:when test="$prevCellCol = ''">
+                    <xsl:text>0</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$prevCellCol"/>
+                  </xsl:otherwise>
+                </xsl:choose>            
+              </xsl:with-param>
+              <xsl:with-param name="EndColl">
+                <xsl:value-of select="$colNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="document">
+                <xsl:text>worksheet</xsl:text>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="InsertNoteBetwenTwoColl">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>           
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$NameSheet"/>
+              </xsl:with-param>          
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="NoteColl">
+                <xsl:value-of select="$NoteColl"/>
+              </xsl:with-param>
+              <xsl:with-param name="StartColl">
+                <xsl:choose>
+                  <xsl:when test="$prevCellCol = ''">
+                    <xsl:text>0</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="$prevCellCol"/>
+                  </xsl:otherwise>
+                </xsl:choose>            
+              </xsl:with-param>
+              <xsl:with-param name="EndColl">
+                <xsl:value-of select="$colNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="document">
+                <xsl:text>worksheet</xsl:text>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
 
       <!-- when this cell is not first one in a row and there were empty cells after previous non-empty cell -->
@@ -671,9 +901,11 @@
     <xsl:param name="CheckIfMerge"/>
     <xsl:param name="PictureCell"/>
     <xsl:param name="PictureRow"/>
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="NoteRow"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
-	<xsl:param name="sheetNr"/>
+    <xsl:param name="sheetNr"/>
 
     <xsl:message terminate="no">progress:c</xsl:message>
     
@@ -886,6 +1118,17 @@
         </xsl:choose>
       </xsl:when>
 
+      <!--xsl:when test="contains($slash,'..\..\..\')">
+        <xsl:choose>
+          <xsl:when test="substring-before($slash,'..\..\..\') =''">
+            <xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="slash"
+                select="concat('../../../',substring-after($slash,'..\..\..\'))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when-->
+
       <xsl:when test="contains($string,'..\..\')">
         <xsl:choose>
           <xsl:when test="substring-before($string,'..\..\') =''">
@@ -914,13 +1157,16 @@
       <xsl:when test="not(contains($string,'../')) and not(contains($string,'..\..\'))">
        
           <xsl:value-of select="concat('../',$string)">
-            
+            <!--xsl:call-template name="Change20PercentToSpace">
+              <xsl:with-param name="slash" select="concat('..\',substring-after($string,''))"/>
+            </xsl:call-template-->
           </xsl:value-of>
        
       </xsl:when>
 
       <xsl:otherwise>
-        <xsl:value-of select="translate($string,'\','/')"/>
+        <xsl:value-of select="$string"/>
+        <!--xsl:value-of select="translate($string,'\','/')"/-->
       </xsl:otherwise>
     </xsl:choose>
 
@@ -1243,6 +1489,10 @@
     <xsl:param name="CheckIfMerge"/>
     <xsl:param name="PictureCell"/>
     <xsl:param name="PictureRow"/>
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="NoteRow"/>
+    <xsl:param name="PictureAndNoteCell"/>
+    <xsl:param name="PictureAndNoteRow"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="sheetNr"/>
@@ -1336,6 +1586,18 @@
               <xsl:with-param name="PictureCell">
                 <xsl:value-of select="$PictureCell"/>
               </xsl:with-param>
+              <xsl:with-param name="NoteCell">
+                <xsl:value-of select="$NoteCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="NoteRow">
+                <xsl:value-of select="$NoteRow"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureAndNoteCell">
+                <xsl:value-of select="$PictureAndNoteCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureAndNoteRow">
+                <xsl:value-of select="$PictureAndNoteRow"/>
+              </xsl:with-param>
               <xsl:with-param name="sheet">
                 <xsl:value-of select="$sheet"/>
               </xsl:with-param>
@@ -1365,6 +1627,18 @@
                 </xsl:with-param>
                 <xsl:with-param name="PictureCell">
                   <xsl:value-of select="$PictureCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="NoteRow">
+                  <xsl:value-of select="$NoteRow"/>
+                </xsl:with-param>
+                <xsl:with-param name="NoteCell">
+                  <xsl:value-of select="$NoteCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="PictureAndNoteRow">
+                  <xsl:value-of select="$PictureAndNoteRow"/>
+                </xsl:with-param>
+                <xsl:with-param name="PictureAndNoteCell">
+                  <xsl:value-of select="$PictureAndNoteCell"/>
                 </xsl:with-param>
                 <xsl:with-param name="sheet">
                   <xsl:value-of select="$sheet"/>
@@ -1397,6 +1671,18 @@
                 </xsl:with-param>
                 <xsl:with-param name="PictureCell">
                   <xsl:value-of select="$PictureCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="NoteRow">
+                  <xsl:value-of select="$NoteRow"/>
+                </xsl:with-param>
+                <xsl:with-param name="NoteCell">
+                  <xsl:value-of select="$NoteCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="PictureAndNoteRow">
+                  <xsl:value-of select="$PictureAndNoteRow"/>
+                </xsl:with-param>
+                <xsl:with-param name="PictureAndNoteCell">
+                  <xsl:value-of select="$PictureAndNoteCell"/>
                 </xsl:with-param>
                 <xsl:with-param name="sheet">
                   <xsl:value-of select="$sheet"/>
@@ -1441,6 +1727,12 @@
             <xsl:with-param name="PictureCell">
               <xsl:value-of select="$PictureCell"/>
             </xsl:with-param>
+            <xsl:with-param name="NoteRow">
+              <xsl:value-of select="$NoteRow"/>
+            </xsl:with-param>
+            <xsl:with-param name="NoteCell">
+              <xsl:value-of select="$NoteCell"/>
+            </xsl:with-param>
             <xsl:with-param name="sheet">
               <xsl:value-of select="$sheet"/>
             </xsl:with-param>
@@ -1450,6 +1742,40 @@
             <xsl:with-param name="sheetNr" select="$sheetNr"/>
           </xsl:apply-templates>
         </xsl:if>
+      </xsl:when>
+      <xsl:when test="not(following-sibling::e:c) and $PictureCell != '' and $NoteCell != ''">
+        
+        <xsl:call-template name="InsertPictureAndNoteBetwenTwoColl">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>           
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>          
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum - 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureColl">
+            <xsl:call-template name="GetCollsWithPicture">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNum - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="PictureCell">
+                <xsl:value-of select="concat(';', $PictureCell)"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:with-param>
+          <xsl:with-param name="StartColl">
+            <xsl:value-of select="$colNum"/>            
+          </xsl:with-param>
+          <xsl:with-param name="EndColl">
+            <xsl:text>256</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="document">
+            <xsl:text>worksheet</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+        
       </xsl:when>
       <xsl:when test="not(following-sibling::e:c) and $PictureCell != '' ">
 
@@ -1485,6 +1811,40 @@
         </xsl:call-template>
         
       </xsl:when>
+      <xsl:when test="not(following-sibling::e:c) and $NoteCell != '' ">
+        
+        <xsl:call-template name="InsertNoteBetwenTwoColl">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>           
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>          
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum - 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteColl">
+            <xsl:call-template name="GetCollsWithPicture">
+              <xsl:with-param name="rowNumber">
+                <xsl:value-of select="$rowNum - 1"/>
+              </xsl:with-param>
+              <xsl:with-param name="NoteCell">
+                <xsl:value-of select="concat(';', $NoteCell)"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:with-param>
+          <xsl:with-param name="StartColl">
+            <xsl:value-of select="$colNum"/>            
+          </xsl:with-param>
+          <xsl:with-param name="EndColl">
+            <xsl:text>256</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="document">
+            <xsl:text>worksheet</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+ 
+      </xsl:when>
       <xsl:otherwise>
         <xsl:if test="following-sibling::e:c">
           <xsl:apply-templates select="following-sibling::e:c[1]">
@@ -1503,6 +1863,18 @@
             </xsl:with-param>
             <xsl:with-param name="PictureCell">
               <xsl:value-of select="$PictureCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="NoteRow">
+              <xsl:value-of select="$NoteRow"/>
+            </xsl:with-param>
+            <xsl:with-param name="NoteCell">
+              <xsl:value-of select="$NoteCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="PictureAndNoteRow">
+              <xsl:value-of select="$PictureAndNoteRow"/>
+            </xsl:with-param>
+            <xsl:with-param name="PictureAndNoteCell">
+              <xsl:value-of select="$PictureAndNoteCell"/>
             </xsl:with-param>
             <xsl:with-param name="sheet">
               <xsl:value-of select="$sheet"/>
@@ -3105,4 +3477,36 @@
     <xsl:attribute name="draw:caption-point-y">0in</xsl:attribute>
   </xsl:template>
   
+  <!-- Get cell with note -->
+  
+  <xsl:template name="NoteCell">
+    <xsl:param name="sheetNr"/>
+    <xsl:apply-templates select="document(concat('xl/comments',$sheetNr,'.xml'))/e:comments" mode="note-cell"/>
+  </xsl:template>
+  
+  <xsl:template match="e:comments" mode="note-cell">
+  <xsl:apply-templates select="e:commentList/e:comment" mode="note-cell"/>
+  </xsl:template>
+  
+  <xsl:template match="e:comment" mode="note-cell">
+    
+    <xsl:variable name="numCol">
+      <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="@ref"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="numRow">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="@ref"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="concat($numCol,':',$numRow,';')"/>
+  </xsl:template>
+  
+ 
 </xsl:stylesheet>
