@@ -1197,7 +1197,7 @@
             <xsl:variable name="multilines">
               <xsl:for-each
                 select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
-                <xsl:value-of select="count(descendant::text:a[2])"/>
+                <xsl:value-of select="count(descendant::table:table-cell/text:p[2])"/>
               </xsl:for-each>
             </xsl:variable>
 
