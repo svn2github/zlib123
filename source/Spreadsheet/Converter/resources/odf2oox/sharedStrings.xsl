@@ -35,11 +35,10 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:dc="http://purl.org/dc/elements/1.1/"
-  exclude-result-prefixes="table r text style fo dc">
-  
+  xmlns:dc="http://purl.org/dc/elements/1.1/" exclude-result-prefixes="table r text style fo dc">
+
   <xsl:import href="measures.xsl"/>
-  
+
   <!-- template which inserts sharedstringscontent -->
   <xsl:template name="InsertSharedStrings">
     <sst>
@@ -59,7 +58,7 @@
       <xsl:call-template name="InsertString"/>
     </sst>
   </xsl:template>
-  
+
   <!-- template which inserts a string into sharedstrings -->
   <xsl:template name="InsertString">
     <!-- string can be in a simple row or a header row -->
@@ -78,14 +77,14 @@
       </si>
     </xsl:for-each>
   </xsl:template>
-  
+
   <!-- text:span conversion -->
   <xsl:template match="text:span" mode="run">
     <xsl:variable name="tekst">
       <xsl:value-of select="."/>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$tekst != ''">
+      <xsl:when test="$tekst != '' or text:s">
         <r>
           <xsl:apply-templates select="key('style',@text:style-name)" mode="textstyles">
             <xsl:with-param name="parentCellStyleName">
@@ -101,7 +100,7 @@
       <xsl:otherwise/>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- when there is formatted text in a string, all texts must be in runs -->
   <xsl:template match="text()" mode="run">
     <r>
@@ -127,12 +126,12 @@
       </xsl:choose></t>
     </r>
   </xsl:template>
-  
+
   <xsl:template match="text()[parent::dc:date]" mode="text"/>
   <xsl:template match="text()[parent::dc:date]" mode="run"/>
   <xsl:template match="text:p[parent::office:annotation]" mode="text"/>
   <xsl:template match="text:span[ancestor::office:annotation]" mode="text"/>
-  
+
   <xsl:template match="text()" mode="text">
     <xsl:variable name="value">
       <xsl:value-of select="."/>
@@ -150,7 +149,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template match="text:s" mode="text">
     <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
       <xsl:attribute name="pxs:c">
@@ -165,7 +164,7 @@
       </xsl:attribute>
     </pxs:s>
   </xsl:template>
-  
+
   <!-- when there are more than one line of text, enter must be added -->
   <xsl:template match="text:p[preceding-sibling::text:p]" mode="run">
     <r>
@@ -186,12 +185,12 @@
       <xsl:apply-templates mode="run"/>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="text:p[preceding-sibling::text:p and parent::table:table-cell]" mode="text">
     <xsl:value-of select="'&#xD;&#xA;'"/>
     <xsl:apply-templates mode="text"/>
   </xsl:template>
-  
+
   <!-- when there are HaxaDecimal value (_x...._), must be added _x005F -->
   <xsl:template name="HexaDecimalValue">
     <xsl:param name="value"/>
@@ -237,5 +236,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>
