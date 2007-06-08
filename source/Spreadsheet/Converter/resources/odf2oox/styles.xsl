@@ -2311,13 +2311,13 @@
 
       <xsl:variable name="contentFontCount">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties)"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
         />
       </xsl:variable>
 
       <xsl:variable name="styleFontCount">
         <xsl:value-of
-          select="count(document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties)"
+          select="count(document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
         />
       </xsl:variable>
 
