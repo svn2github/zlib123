@@ -1191,8 +1191,9 @@
             </xsl:attribute>
           </xsl:when>
 
-<!-- if it is a hyperlink  in the cell-->
-          <xsl:when test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+          <!-- if it is a hyperlink  in the cell-->
+          <xsl:when
+            test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
 
             <xsl:variable name="multilines">
               <xsl:for-each
@@ -1202,8 +1203,24 @@
             </xsl:variable>
 
             <xsl:attribute name="s">
-              <xsl:value-of
-                select="$cellFormats + $cellStyles + $multilines"/>
+              <xsl:choose>
+                <!-- if there is no 'Hyperlink' style -->
+                <xsl:when
+                  test="not(document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' ])">
+                  <xsl:value-of select="$cellFormats + $cellStyles + $multilines"/>
+                </xsl:when>
+                
+                <xsl:otherwise>
+                  <xsl:variable name="hyperlinkStyle">
+                    <xsl:for-each select="document('styles.xml')">
+                      <xsl:for-each select="key('style','Hyperlink')">
+                        <xsl:number count="style:style[@style:family='table-cell']" level="any"/>
+                      </xsl:for-each>
+                    </xsl:for-each>
+                  </xsl:variable>
+                  <xsl:value-of select="$CountStyleTableCell + $hyperlinkStyle"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
           </xsl:when>
 
@@ -1456,7 +1473,8 @@
           </xsl:choose>
         </xsl:variable>
 
-        <xsl:for-each select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]">
+        <xsl:for-each
+          select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]">
           <xsl:call-template name="GetRowNumber">
             <xsl:with-param name="rowId" select="$rowId"/>
             <xsl:with-param name="tableId" select="$tableId"/>

@@ -565,7 +565,10 @@
       </xsl:apply-templates>
 
       <!-- add cell formats for hyperlinks-->
-      <xsl:call-template name="InsertHyperlinksProperties"/>
+      <xsl:if
+        test="not(document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' and @style:family = 'table-cell'])">
+        <xsl:call-template name="InsertHyperlinksProperties"/>
+      </xsl:if>
 
     </cellStyleXfs>
 
@@ -663,7 +666,10 @@
       <xsl:call-template name="InsertMultilineCellFormats"/>
 
       <!-- add cell formats for hyperlinks-->
-      <xsl:call-template name="InsertHyperlinksProperties"/>
+      <xsl:if
+        test="not(document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' and @style:family = 'table-cell'])">
+        <xsl:call-template name="InsertHyperlinksProperties"/>
+      </xsl:if>
 
     </cellXfs>
 
@@ -677,13 +683,14 @@
       </xsl:for-each>
 
       <xsl:if
-        test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+        test="not(document('styles.xml')/office:document-styles/office:styles/style:style/@style:name = 'Hyperlink') and document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
         <cellStyle
           xfId="{count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1}"
           name="Hyperlink"/>
       </xsl:if>
 
-      <xsl:if test="not(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell'])">
+      <xsl:if
+        test="not(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell'])">
         <cellStyle name="Normal" xfId="0" builtinId="0"/>
       </xsl:if>
     </cellStyles>
@@ -696,8 +703,6 @@
       </xsl:attribute>
     </cellStyle>
   </xsl:template>
-
-
 
   <xsl:template name="InsertTableStyles">
     <tableStyles count="0" defaultTableStyle="TableStyleMedium9"
@@ -2299,9 +2304,9 @@
     <xsl:if
       test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
       <xsl:variable name="xfId">
-          <xsl:value-of
-            select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
-          />
+        <xsl:value-of
+          select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
+        />
       </xsl:variable>
 
       <xsl:variable name="contentFontCount">
