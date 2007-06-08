@@ -67,10 +67,11 @@
                 </xsl:with-param>
             </xsl:call-template>
         </xsl:variable>
-        <xsl:value-of select="concat($numCol,':',$numRow,';')"/>
+        <xsl:value-of select="concat($numRow,':',$numCol,';')"/>
     </xsl:template>
-    
-     <xsl:template name="NoteRow">
+   
+    <!-- Get Row with Note -->
+   <xsl:template name="NoteRow">
     <xsl:param name="NoteCell"/>
     <xsl:param name="Result"/>
     <xsl:choose>
@@ -530,5 +531,53 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+    
+    <!-- Insert Note in This Cell -->
+    <xsl:template name="InsertNoteInThisCell">
+        <xsl:param name="rowNum"/>
+        <xsl:param name="colNum"/>
+        <xsl:param name="sheetNr"/>
+        
+        <xsl:variable name="thisCellCol">
+            <xsl:call-template name="NumbersToChars">
+                <xsl:with-param name="num">
+                    <xsl:value-of select="$colNum -1"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:variable name="thisCell">
+            <xsl:value-of select="concat($thisCellCol,$rowNum)"/>
+        </xsl:variable>
+        
+        <xsl:apply-templates select="document(concat('xl/comments',$sheetNr,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
+            <xsl:with-param name="number" select="$sheetNr"/>
+        </xsl:apply-templates>
+    
+    </xsl:template>
+    
+    
+    <!-- Insert Comment -->
+    <xsl:template match="e:comment">
+        
+        <!--@Description: adds a note -->
+        <!--@context: none -->
+        
+        <xsl:param name="number"/>
+        
+        <!--(int) number of comments file -->
+        <xsl:variable name="numberOfComment">
+            <xsl:value-of select="count(preceding-sibling::e:comment)+1"/>
+        </xsl:variable>
+        
+        <office:annotation>
+            <xsl:apply-templates select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[position()=$numberOfComment]" mode="drawing">
+                <xsl:with-param name="text" select="e:text"/>
+            </xsl:apply-templates>
+            <text:p text:style-name="{generate-id(e:text)}">
+                <xsl:apply-templates select="e:text/e:r"/>
+            </text:p>
+        </office:annotation>
+    </xsl:template>
     
 </xsl:stylesheet>
