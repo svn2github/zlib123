@@ -282,14 +282,14 @@
         <xsl:when test="contains($fieldCode,'COMMENTS') or contains($fieldCode,'Comments') ">
           <xsl:call-template name="InsertComments"/>
         </xsl:when>
-        <!--document subject SUBJECT, DOCPROPERTY Subject-->
-        <xsl:when
-          test="contains($fieldCode,'SUBJECT') or contains($fieldCode,'Subject') or contains($fieldCode,'subject')">
-          <xsl:call-template name="InsertSubject"/>
-        </xsl:when>
         <!--document title TITLE, DOCPROPERTY Title-->
         <xsl:when
           test="contains($fieldCode,'TITLE') or contains($fieldCode,'Title') or contains($fieldCode,'title')">
+          <xsl:call-template name="InsertTitle"/>
+        </xsl:when>
+        <!--document subject SUBJECT, DOCPROPERTY Subject-->
+        <xsl:when
+          test="contains($fieldCode,'SUBJECT') or contains($fieldCode,'Subject') or contains($fieldCode,'subject')">
           <xsl:call-template name="InsertSubject"/>
         </xsl:when>
         <!--bibliography citation-->
@@ -610,9 +610,7 @@
   <!--document title TITLE, DOCPROPERTY Title-->
   <xsl:template match="w:fldSimple[contains(@w:instr,'TITLE') or contains(@w:instr, 'Title')]"
     mode="fields">
-    <text:title>
-      <xsl:apply-templates select="w:r/child::node()"/>
-    </text:title>
+    <xsl:call-template name="InsertTitle"/>
   </xsl:template>
 
   <xsl:template match="w:fldSimple[contains(@w:instr,'USERNAME')]" mode="fields">
@@ -698,6 +696,12 @@
     </text:subject>
   </xsl:template>
 
+  <xsl:template name="InsertTitle">
+    <text:title>
+      <xsl:apply-templates select="w:r/child::node()"/>
+    </text:title>
+  </xsl:template>
+  
   <xsl:template match="w:fldSimple">
     <text:span text:style-name="{generate-id(w:r)}">
       <xsl:apply-templates select="." mode="fields"/>
