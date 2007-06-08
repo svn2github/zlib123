@@ -39,7 +39,7 @@
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="table">
 
-  <xsl:import href="measures.xsl"/>
+  <!--<xsl:import href="measures.xsl"/>-->
   <xsl:import href="pixel-measure.xsl"/>
   <xsl:import href="page.xsl"/>
   <xsl:import href="border.xsl"/>
@@ -184,6 +184,10 @@
         <xsl:with-param name="MergeCellStyle">
           <xsl:value-of select="$MergeCellStyle"/>
         </xsl:with-param>
+      </xsl:call-template>
+      
+      <xsl:call-template name="InsertHyperlinks">
+
       </xsl:call-template>
 
       <xsl:if test="ancestor::office:document-content/office:automatic-styles/style:style/style:map/@style:condition != ''">
@@ -538,60 +542,6 @@
       </xsl:apply-templates>
 
     </sheetData>
-
-    <!--Insert Hyperlinks-->
-
-    <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
-    <xsl:if test="descendant::text:a[not(ancestor::table:table-row-group)]">
-      <hyperlinks>
-        <xsl:for-each select="descendant::text:a[not(ancestor::table:table-row-group)]">
-          <xsl:variable name="ViewHyperlinks">
-            <xsl:value-of select="."/>
-          </xsl:variable>
-
-          <xsl:variable name="colPosition">
-            <xsl:for-each select="ancestor::table:table-cell">
-              <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
-            </xsl:for-each>
-          </xsl:variable>
-
-          <xsl:variable name="rowPosition">
-            <xsl:value-of select="generate-id(ancestor::table:table-row)"/>
-          </xsl:variable>
-
-
-          <!-- real column number -->
-          <xsl:variable name="colNum">
-            <xsl:for-each select="ancestor::table:table-row/table:table-cell[1]">
-              <xsl:call-template name="GetColNumber">
-                <xsl:with-param name="position">
-                  <xsl:value-of select="$colPosition"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:for-each>
-          </xsl:variable>
-
-          <xsl:variable name="rows">
-            <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
-
-              <xsl:call-template name="GetRowNumber">
-                <xsl:with-param name="rowId" select="$rowPosition"/>
-                <xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
-              </xsl:call-template>
-
-            </xsl:for-each>
-          </xsl:variable>
-
-          <xsl:variable name="colChar">
-            <xsl:call-template name="NumbersToChars">
-              <xsl:with-param name="num" select="$colNum -1"/>
-            </xsl:call-template>
-          </xsl:variable>
-
-          <hyperlink ref="{concat($colChar,$rows)}" r:id="{generate-id (.)}"/>
-        </xsl:for-each>
-      </hyperlinks>
-    </xsl:if>
 
   </xsl:template>
 
@@ -954,4 +904,60 @@
     </xsl:choose>
   </xsl:template>
 
+<xsl:template name="InsertHyperlinks">
+
+  <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
+  <xsl:if test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+    <hyperlinks>
+      <xsl:for-each select="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+        <xsl:variable name="ViewHyperlinks">
+          <xsl:value-of select="."/>
+        </xsl:variable>
+        
+        <xsl:variable name="colPosition">
+          <xsl:for-each select="ancestor::table:table-cell">
+            <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
+          </xsl:for-each>
+        </xsl:variable>
+        
+        <xsl:variable name="rowPosition">
+          <xsl:value-of select="generate-id(ancestor::table:table-row)"/>
+        </xsl:variable>
+        
+        
+        <!-- real column number -->
+        <xsl:variable name="colNum">
+          <xsl:for-each select="ancestor::table:table-row/table:table-cell[1]">
+            <xsl:call-template name="GetColNumber">
+              <xsl:with-param name="position">
+                <xsl:value-of select="$colPosition"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:variable>
+        
+        <xsl:variable name="rows">
+          <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
+            
+            <xsl:call-template name="GetRowNumber">
+              <xsl:with-param name="rowId" select="$rowPosition"/>
+              <xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
+            </xsl:call-template>
+            
+          </xsl:for-each>
+        </xsl:variable>
+        
+        <xsl:variable name="colChar">
+          <xsl:call-template name="NumbersToChars">
+            <xsl:with-param name="num" select="$colNum -1"/>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <hyperlink ref="{concat($colChar,$rows)}" r:id="{generate-id (.)}"/>
+      </xsl:for-each>
+    </hyperlinks>
+  </xsl:if>
+  
+</xsl:template>
+  
 </xsl:stylesheet>

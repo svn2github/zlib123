@@ -138,7 +138,7 @@
         
         <xsl:variable name="hyperlink">
           <xsl:choose>
-            <xsl:when test="descendant::text:a">  
+            <xsl:when test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">  
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>

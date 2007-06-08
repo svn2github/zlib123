@@ -1192,7 +1192,7 @@
           </xsl:when>
 
 <!-- if it is a hyperlink  in the cell-->
-          <xsl:when test="descendant::text:a">
+          <xsl:when test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
 
             <xsl:variable name="multilines">
               <xsl:for-each

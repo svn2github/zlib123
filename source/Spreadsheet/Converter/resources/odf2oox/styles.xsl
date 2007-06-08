@@ -261,7 +261,7 @@
     <fonts>
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a)"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)])"
         />
       </xsl:attribute>
 
@@ -299,7 +299,7 @@
       <!--hyperlink font properties-->
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a[1]">
+          test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
           <font>
             <u val="single"/>
             <sz val="11"/>
@@ -573,7 +573,7 @@
 
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a[@xlink:href])"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(document('content.xml')/descendant::text:a[@xlink:href and not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)])"
         />
       </xsl:attribute>
 
@@ -671,20 +671,19 @@
 
   <xsl:template name="InsertCellStyles">
 
-
     <cellStyles>
       <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles">
         <xsl:apply-templates select="style:style[@style:family = 'table-cell']" mode="cellStyle"/>
       </xsl:for-each>
 
       <xsl:if
-        test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+        test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
         <cellStyle
           xfId="{count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1}"
           name="Hyperlink"/>
       </xsl:if>
 
-      <xsl:if test="not(style:style[@style:family = 'table-cell'])">
+      <xsl:if test="not(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell'])">
         <cellStyle name="Normal" xfId="0" builtinId="0"/>
       </xsl:if>
     </cellStyles>
@@ -2298,14 +2297,11 @@
 
   <xsl:template name="InsertHyperlinksProperties">
     <xsl:if
-      test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
+      test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
       <xsl:variable name="xfId">
-        <xsl:if
-          test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/text:p/text:a">
           <xsl:value-of
             select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
           />
-        </xsl:if>
       </xsl:variable>
 
       <xsl:variable name="contentFontCount">
