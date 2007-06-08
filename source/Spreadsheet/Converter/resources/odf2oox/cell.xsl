@@ -1197,13 +1197,13 @@
             <xsl:variable name="multilines">
               <xsl:for-each
                 select="document('content.xml')/office:document-content/office:body/office:spreadsheet">
-                <xsl:value-of select="count(descendant::text:p[2])"/>
+                <xsl:value-of select="count(descendant::text:a[2])"/>
               </xsl:for-each>
             </xsl:variable>
 
             <xsl:attribute name="s">
               <xsl:value-of
-                select="$cellFormats + $cellStyles + $multilines - 1"/>
+                select="$cellFormats + $cellStyles + $multilines"/>
             </xsl:attribute>
           </xsl:when>
 
