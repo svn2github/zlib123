@@ -1698,14 +1698,44 @@
   <xsl:template name="InsertField">
     <xsl:choose>
       <!-- default scenario - catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
-      <xsl:when test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] ">
+      <xsl:when test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] and not(contains(w:instrText[1],'AUTOTEXT'))">
         <xsl:apply-templates select="w:instrText[1]"/>
+      </xsl:when>
+      <!-- autotext fields should be processed like normal text, because there is no autotext field in OO -->
+      <xsl:when test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] and contains(w:instrText[1],'AUTOTEXT')">
+        <xsl:choose>
+          <xsl:when test="w:rPr[not(count(child::node())=1 and child::w:noProof)]">
+            <text:span text:style-name="{generate-id(self::node())}">
+              <xsl:apply-templates/>
+            </text:span>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
         <!--  the same hyperlink can be in more then one paragraph so print as seperate text:a for each run which is in hyperlink field (between w:fldChar begin - end)-->
-        <xsl:apply-templates select="preceding::w:instrText[1][contains(.,'HYPERLINK')]">
-          <xsl:with-param name="parentRunNode" select="."/>
-        </xsl:apply-templates>
+        <xsl:choose>
+          <!-- autotext fields should be processed like normal text, because there is no autotext field in OO -->
+          <xsl:when test="preceding::w:instrText[1][contains(.,'AUTOTEXT')]">
+            <xsl:choose>
+              <xsl:when test="w:rPr[not(count(child::node())=1 and child::w:noProof)]">
+                <text:span text:style-name="{generate-id(self::node())}">
+                  <xsl:apply-templates/>
+                </text:span>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="preceding::w:instrText[1][contains(.,'HYPERLINK')]">
+              <xsl:with-param name="parentRunNode" select="."/>
+            </xsl:apply-templates>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
