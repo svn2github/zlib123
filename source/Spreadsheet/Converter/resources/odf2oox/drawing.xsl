@@ -46,7 +46,7 @@
       <xsl:for-each
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
         <xdr:twoCellAnchor>
-         <xsl:call-template name="SetPosition"/>
+          <xsl:call-template name="SetPosition"/>
           <xdr:graphicFrame macro="">
             <xdr:nvGraphicFramePr>
               <xdr:cNvPr id="{position()}" name="{concat('Chart ',position())}"/>
@@ -69,10 +69,10 @@
           <xdr:clientData/>
         </xdr:twoCellAnchor>
       </xsl:for-each>
-      
+
       <!--Insert Picture -->
       <xsl:for-each
-        select="descendant::draw:frame/draw:image[contains(@xlink:href, 'Pictures') and not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        select="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
 
         <xdr:twoCellAnchor>
           <xsl:call-template name="SetPosition"/>
@@ -82,9 +82,9 @@
                 <xsl:attribute name="id">
                   <xsl:value-of select="position()"/>
                 </xsl:attribute>
-              <xsl:attribute name="name">
-                <xsl:value-of select="parent::draw:frame/@draw:name"/>
-              </xsl:attribute>
+                <xsl:attribute name="name">
+                  <xsl:value-of select="parent::draw:frame/@draw:name"/>
+                </xsl:attribute>
                 <xsl:attribute name="descr">
                   <xsl:value-of select="parent::draw:frame/@draw:name"/>
                 </xsl:attribute>
@@ -93,31 +93,42 @@
                 <a:picLocks noChangeAspect="1"/>
               </xdr:cNvPicPr>
             </xdr:nvPicPr>
-            
+
             <xdr:blipFill>
               <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-                <xsl:attribute name="r:embed">
-                  <xsl:value-of select="generate-id()"/>
-                </xsl:attribute>
+                <xsl:choose>
+                  <!-- embeded picture -->
+                  <xsl:when test="starts-with(@xlink:href, 'Pictures/')">
+                    <xsl:attribute name="r:embed">
+                      <xsl:value-of select="generate-id()"/>
+                    </xsl:attribute>
+                  </xsl:when>
+                  <!-- linked picture -->
+                  <xsl:otherwise>
+                    <xsl:attribute name="r:link">
+                      <xsl:value-of select="generate-id()"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
               </a:blip>
               <a:stretch>
                 <a:fillRect/>
               </a:stretch>
             </xdr:blipFill>
-            
-           <xsl:call-template name="InsertImageBorders"/>
-            
+
+            <xsl:call-template name="InsertImageBorders"/>
+
           </xdr:pic>
           <xdr:clientData/>
         </xdr:twoCellAnchor>
-        
-        
-        </xsl:for-each>
+
+
+      </xsl:for-each>
 
     </xdr:wsDr>
-    
+
   </xsl:template>
-  
+
   <!-- Insert Position of Drawing -->
   <xsl:template name="SetPosition">
     <xsl:variable name="InsertStartColumn">
@@ -144,15 +155,16 @@
     <xsl:variable name="InsertEndRowOffset">
       <xsl:call-template name="InsertEndRowOffset"/>
     </xsl:variable>
-    
+
     <xdr:from>
       <xdr:col>
         <xsl:choose>
-          <xsl:when test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
-            <xsl:value-of select="$InsertStartColumn - ($InsertEndColumn - $InsertStartColumn) "/>    
+          <xsl:when
+            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+            <xsl:value-of select="$InsertStartColumn - ($InsertEndColumn - $InsertStartColumn) "/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$InsertStartColumn"/>    
+            <xsl:value-of select="$InsertStartColumn"/>
           </xsl:otherwise>
         </xsl:choose>
       </xdr:col>
@@ -161,13 +173,14 @@
       </xdr:colOff>
       <xdr:row>
         <xsl:choose>
-          <xsl:when test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+          <xsl:when
+            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
             <xsl:value-of select="$InsertStartRow - ($InsertEndRow - $InsertStartRow)"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$InsertStartRow"/>
           </xsl:otherwise>
-        </xsl:choose>        
+        </xsl:choose>
       </xdr:row>
       <xdr:rowOff>
         <xsl:value-of select="$InsertStartColumnOffset"/>
@@ -176,26 +189,28 @@
     <xdr:to>
       <xdr:col>
         <xsl:choose>
-          <xsl:when test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+          <xsl:when
+            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
             <xsl:value-of select="$InsertStartColumn"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="$InsertEndColumn"/>
           </xsl:otherwise>
-        </xsl:choose>        
+        </xsl:choose>
       </xdr:col>
       <xdr:colOff>
         <xsl:value-of select="$InsertEndColumnOffset"/>
       </xdr:colOff>
       <xdr:row>
         <xsl:choose>
-        <xsl:when test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
-          <xsl:value-of select="$InsertStartRow"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$InsertEndRow"/>
-        </xsl:otherwise>
-      </xsl:choose>
+          <xsl:when
+            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+            <xsl:value-of select="$InsertStartRow"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$InsertEndRow"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xdr:row>
       <xdr:rowOff>
         <xsl:value-of select="$InsertEndRowOffset"/>
@@ -226,7 +241,7 @@
       <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
         <xsl:text>1</xsl:text>
       </xsl:when>
-    </xsl:choose>    
+    </xsl:choose>
   </xsl:template>
 
   <!-- Insert top left corner row number -->
@@ -276,7 +291,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- Insert bottom corner row number -->
   <xsl:template name="InsertEndRow">
     <xsl:choose>
@@ -333,7 +348,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- Horizontal offset of  bottom right corner -->
   <xsl:template name="InsertEndColumnOffset">
     <xsl:choose>
@@ -351,7 +366,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- Vertical offset of  bottom right corner -->
   <xsl:template name="InsertEndRowOffset">
     <xsl:choose>
@@ -369,63 +384,72 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!--image border width and line style-->
   <xsl:template name="InsertImageBorders">
-    
+
     <xdr:spPr>
-      
+
       <a:xfrm>
-        <xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+        <xsl:if
+          test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
           <xsl:attribute name="flipV">
             <xsl:text>1</xsl:text>
           </xsl:attribute>
         </xsl:if>
-        <xsl:if test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:mirror='horizontal'">
-        <xsl:attribute name="flipH">
-          <xsl:text>1</xsl:text>
-        </xsl:attribute>
+        <xsl:if
+          test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:mirror='horizontal'">
+          <xsl:attribute name="flipH">
+            <xsl:text>1</xsl:text>
+          </xsl:attribute>
         </xsl:if>
       </a:xfrm>
-      
+
       <a:prstGeom prst="rect">
         <a:avLst/>
       </a:prstGeom>
-      
-      <xsl:variable name="BorderColor">
-        <xsl:choose>
-          <xsl:when test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@svg:stroke-color != ''">
-            <xsl:value-of select="substring-after(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@svg:stroke-color, '#')"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text>000000</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      
-      <xsl:variable name="strokeWeight">        
-         <xsl:call-template name="emu-measure">
-           <xsl:with-param name="length" select="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@svg:stroke-width"/>          
-          <xsl:with-param name="unit">emu</xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-      
-      <a:ln> 
-        <xsl:attribute name="w">
-          <xsl:value-of select="$strokeWeight"/>
-        </xsl:attribute>
-        <a:solidFill>
-          <a:srgbClr>
-            <xsl:attribute name="val">
-            <xsl:value-of select="$BorderColor"/>
+
+      <xsl:if
+        test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:stroke != 'none' ">
+        
+        <xsl:variable name="strokeWeight">
+          <xsl:call-template name="emu-measure">
+            <xsl:with-param name="length"
+              select="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@svg:stroke-width"/>
+            <xsl:with-param name="unit">emu</xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:variable name="BorderColor">
+          <xsl:choose>
+            <xsl:when
+              test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@svg:stroke-color != ''">
+              <xsl:value-of
+                select="substring-after(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@svg:stroke-color, '#')"
+              />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>000000</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <a:ln>
+          <xsl:attribute name="w">
+            <xsl:value-of select="$strokeWeight"/>
           </xsl:attribute>
-          </a:srgbClr>
-        </a:solidFill>
-      </a:ln>
-      
-    
+          <a:solidFill>
+            <a:srgbClr>
+              <xsl:attribute name="val">
+                <xsl:value-of select="$BorderColor"/>
+              </xsl:attribute>
+            </a:srgbClr>
+          </a:solidFill>
+        </a:ln>
+      </xsl:if>
+
     </xdr:spPr>
-    
+
   </xsl:template>
 
 </xsl:stylesheet>

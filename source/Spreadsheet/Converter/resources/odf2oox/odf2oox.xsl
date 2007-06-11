@@ -127,7 +127,7 @@
 
          <xsl:variable name="picture">
           <xsl:choose>
-            <xsl:when test="table:table-row/table:table-cell/draw:frame/draw:image">
+            <xsl:when test="table:table-row/table:table-cell/draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -173,14 +173,16 @@
         </xsl:if>
 
         <!-- <xsl:if test="$picture = 'true' or contains($chart,'true')"> -->
-        <xsl:if test="contains($chart,'true') or $picture='true'">
+        <xsl:if test="contains($chart,'true') or $picture='true' ">
           <xsl:call-template name="CreateDrawing"/>
           <xsl:call-template name="CreateDrawingRelationships"/>
+          
           <xsl:if test="contains($chart,'true')">
           <xsl:call-template name="CreateChartFile">
             <xsl:with-param name="sheetNum" select="position()"/>            
           </xsl:call-template>
           </xsl:if>
+          
         </xsl:if>
 
         <!-- insert relationships -->
