@@ -450,7 +450,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+   
     
     <xsl:choose>
       <!-- Insert empty rows before -->
@@ -458,31 +458,24 @@
         test="$GetMinCollWithNote != '' and $GetMinCollWithNote &gt;= $StartColl and $GetMinCollWithNote &lt; $EndColl">
         
         <xsl:if test="$GetMinCollWithNote - $StartColl &gt; 0">
-          <table:table-cell table:number-columns-repeated="{$GetMinCollWithNote - $StartColl}"/>
+          <table:table-cell table:number-columns-repeated="{$GetMinCollWithNote - $StartColl - 1}"/>
         </xsl:if>
-        
         
           
           <table:table-cell>
-            <xsl:variable name="thisCellCol">
-              <xsl:call-template name="NumbersToChars">
-                <xsl:with-param name="num">
-                  <xsl:value-of select="$NoteColl -1"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:variable name="thisCell">
-              <xsl:value-of select="concat($thisCellCol,$rowNum)"/>
-            </xsl:variable>
-            <xsl:apply-templates select="document(concat('xl/comments',$sheetNr,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
-              <xsl:with-param name="number" select="$sheetNr"/>
-            </xsl:apply-templates>
-            
-            
+           <xsl:call-template name="InsertNoteInThisCell">
+               <xsl:with-param name="sheetNr">
+                   <xsl:value-of select="$sheetNr"/>
+               </xsl:with-param>
+               <xsl:with-param name="colNum">
+                   <xsl:value-of select="$GetMinCollWithNote"/>
+               </xsl:with-param>
+               <xsl:with-param name="rowNum">
+                   <xsl:value-of select="$rowNum"/>
+               </xsl:with-param>
+           </xsl:call-template>
           </table:table-cell>
-          
-        
-        
+
         <xsl:call-template name="InsertNoteBetwenTwoColl">
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>
@@ -497,14 +490,7 @@
             <xsl:value-of select="$NoteColl"/>
           </xsl:with-param>
           <xsl:with-param name="StartColl">
-            <xsl:choose>
-              <xsl:when test="$document = 'worksheet'">
-                <xsl:value-of select="$GetMinCollWithNote + 1"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$GetMinCollWithNote + 2"/>
-              </xsl:otherwise>
-            </xsl:choose>
+           <xsl:value-of select="$GetMinCollWithNote"/>
           </xsl:with-param>
           <xsl:with-param name="EndColl">
             <xsl:value-of select="$EndColl"/>
@@ -512,6 +498,9 @@
           <xsl:with-param name="document">
             <xsl:value-of select="$document"/>
           </xsl:with-param>
+            <xsl:with-param name="sheetNr">
+                <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
         </xsl:call-template>
         
       </xsl:when>

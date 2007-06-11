@@ -641,8 +641,8 @@
 
     <xsl:variable name="GetMinRowWithPicture">
       <xsl:call-template name="GetMinRowWithPicture">
-        <xsl:with-param name="PictureAndNoteRow">
-          <xsl:value-of select="$PictureAndNoteRow"/>
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$PictureRow"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1033,9 +1033,9 @@
     <xsl:variable name="NoteColl">
       <xsl:call-template name="GetCollsWithPicture">
         <xsl:with-param name="rowNumber">
-          <xsl:value-of select="$rowNum - 1"/>
+          <xsl:value-of select="$rowNum"/>
         </xsl:with-param>
-        <xsl:with-param name="NoteCell">
+        <xsl:with-param name="PictureCell">
           <xsl:value-of select="concat(';', $NoteCell)"/>
         </xsl:with-param>
       </xsl:call-template>
@@ -1044,7 +1044,7 @@
     <xsl:variable name="GetMinCollWithPicture">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
-          <xsl:value-of select="$PictureColl"/>
+          <xsl:value-of select="concat($PictureColl, $NoteColl)"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
           <xsl:choose>
