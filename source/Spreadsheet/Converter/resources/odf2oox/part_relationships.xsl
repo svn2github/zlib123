@@ -67,7 +67,7 @@
   <!-- change space to  '%20' after conversion-->
   <xsl:template name="SpaceTo20Percent">
     <xsl:param name="string"/>
-    <xsl:param name="slash"/>
+
     <xsl:choose>
       <xsl:when test="contains($string,' ')">
         <xsl:choose>
@@ -85,41 +85,8 @@
         </xsl:choose>
       </xsl:when>
 
-      <xsl:when test="contains($slash,'../../../')">
-        <xsl:choose>
-          <xsl:when test="substring-before($slash,'../../../') =''">
-            <xsl:call-template name="SpaceTo20Percent">
-              <xsl:with-param name="slash"
-                select="concat('..\..\',substring-after($slash,'../../../'))"/>
-            </xsl:call-template>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:when>
-
-      <xsl:when test="contains($slash,'../../')">
-        <xsl:choose>
-          <xsl:when test="substring-before($slash,'../../') =''">
-            <xsl:call-template name="SpaceTo20Percent">
-              <xsl:with-param name="slash"
-                select="concat('..\',substring-after($slash,'../../'))"/>
-            </xsl:call-template>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:when>
-
-      <xsl:when test="contains($slash,'../')">
-        <xsl:choose>
-          <xsl:when test="substring-before($slash,'../') =''">
-            <xsl:call-template name="SpaceTo20Percent">
-              <xsl:with-param name="slash" select="concat('',substring-after($slash,'../'))"/>
-            </xsl:call-template>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:when>
-
       <xsl:otherwise>
         <xsl:value-of select="$string"/>
-        <xsl:value-of select="translate($slash,'/','\')"/>
       </xsl:otherwise>
     </xsl:choose>
 
@@ -150,7 +117,8 @@
 
       <!--hyperlink-->
       <xsl:if test="$hyperlink = 'true' ">
-        <xsl:for-each select="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+        <xsl:for-each
+          select="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
 
           <Relationship Id="{generate-id(.)}"
             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"
@@ -160,15 +128,32 @@
               <xsl:if test="@xlink:href">
                 <xsl:choose>
                   <!-- when hyperlink to a site or mailto-->
-                  <xsl:when test="contains(@xlink:href,':')">
+                  <xsl:when test="contains(@xlink:href,':') and not(starts-with(@xlink:href,'/'))">
                     <xsl:value-of select="@xlink:href"/>
                   </xsl:when>
                   <!-- when hyperlink to an document-->
                   <xsl:otherwise>
-                <xsl:call-template name="SpaceTo20Percent">
-                  <xsl:with-param name="string" select="@xlink:href"/>
-                  <xsl:with-param name="slash" select="@xlink:href"/>
-                </xsl:call-template>
+
+                    <xsl:variable name="convertedSpaces">
+                      <xsl:call-template name="SpaceTo20Percent">
+                        <xsl:with-param name="string" select="@xlink:href"/>
+                      </xsl:call-template>
+                    </xsl:variable>
+                                        
+                    <xsl:choose>
+                      <!-- when starts with up folder sign -->
+                      <xsl:when test="starts-with($convertedSpaces,'../' )">
+                        <xsl:value-of select="translate(substring-after($convertedSpaces,'../'),'/','\')"/>
+                      </xsl:when>
+                      <!-- when file is in another disk -->
+                      <xsl:when test="starts-with($convertedSpaces,'/')">
+                        <xsl:value-of select="concat('file:///',translate(substring-after($convertedSpaces,'/'),'/','\'))"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="translate($convertedSpaces,'/','\')"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                    
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:if>
