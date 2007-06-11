@@ -127,7 +127,7 @@
 
          <xsl:variable name="picture">
           <xsl:choose>
-            <xsl:when test="table:table-row/table:table-cell/draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
+            <xsl:when test="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
               <xsl:text>true</xsl:text>
             </xsl:when>
             <xsl:otherwise>

@@ -1434,7 +1434,7 @@
           </xsl:choose>
         </xsl:variable>
 
-        <xsl:for-each select="following-sibling::table:table-cell[1]">
+        <xsl:for-each select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]">
           <xsl:call-template name="GetColNumber">
             <xsl:with-param name="position">
               <xsl:value-of select="$position"/>

@@ -222,13 +222,13 @@
   <xsl:template name="InsertStartColumn">
     <xsl:choose>
       <!-- when anchor is to cell -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
         <xsl:for-each select="parent::node()/parent::node()">
           <xsl:variable name="position">
-            <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
+            <xsl:value-of select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1"/>
           </xsl:variable>
           <xsl:variable name="number">
-            <xsl:for-each select="parent::node()/table:table-cell[1]">
+            <xsl:for-each select="parent::node()/child::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]">
               <xsl:call-template name="GetColNumber">
                 <xsl:with-param name="position" select="$position"/>
               </xsl:call-template>
@@ -248,7 +248,7 @@
   <xsl:template name="InsertStartRow">
     <xsl:choose>
       <!-- when anchor is to cell -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
         <!-- get parent table:table-row id -->
         <xsl:variable name="rowId">
           <xsl:value-of select="generate-id(ancestor::table:table-row)"/>
@@ -275,7 +275,7 @@
   <xsl:template name="InsertEndColumn">
     <xsl:choose>
       <!-- when anchor is to cell -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
         <xsl:for-each select="parent::node()">
           <xsl:variable name="number">
             <xsl:call-template name="GetColNum">
@@ -296,7 +296,7 @@
   <xsl:template name="InsertEndRow">
     <xsl:choose>
       <!-- when anchor is to cell -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
         <xsl:for-each select="parent::node()">
           <xsl:variable name="number">
             <xsl:call-template name="GetRowNum">
@@ -317,7 +317,7 @@
   <xsl:template name="InsertStartColumnOffset">
     <xsl:choose>
       <!-- when anchor is to cell -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
         <xsl:for-each select="parent::node()">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@svg:x"/>
@@ -335,7 +335,7 @@
   <xsl:template name="InsertStartRowOffset">
     <xsl:choose>
       <!-- when anchor is to cell -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
         <xsl:for-each select="parent::node()">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@svg:y"/>
@@ -353,7 +353,7 @@
   <xsl:template name="InsertEndColumnOffset">
     <xsl:choose>
       <!-- when anchor is to cell -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
         <xsl:for-each select="parent::node()">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@ table:end-x"/>
@@ -371,7 +371,7 @@
   <xsl:template name="InsertEndRowOffset">
     <xsl:choose>
       <!-- when anchor is to cell -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell']">
+      <xsl:when test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
         <xsl:for-each select="parent::node()">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@ table:end-y"/>

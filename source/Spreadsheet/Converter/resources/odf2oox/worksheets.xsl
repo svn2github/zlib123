@@ -208,7 +208,7 @@
 
       <xsl:variable name="picture">
         <xsl:choose>
-          <xsl:when test="table:table-row/table:table-cell/draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
+          <xsl:when test="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -216,7 +216,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-
+      
       <xsl:variable name="chart">
         <xsl:for-each select="descendant::draw:frame/draw:object">
           <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
