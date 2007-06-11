@@ -1158,9 +1158,11 @@
       <xsl:with-param name="NameSheet">
         <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
+      <xsl:with-param name="GetMinCollWithPicture">
+        <xsl:value-of select="$GetMinCollWithPicture"/>
+      </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
     </xsl:call-template>
-
 
     <!-- Insert next coll -->
     <xsl:call-template name="InsertNextCell">
@@ -1200,6 +1202,9 @@
       </xsl:with-param>
       <xsl:with-param name="NameSheet">
         <xsl:value-of select="$NameSheet"/>
+      </xsl:with-param>
+      <xsl:with-param name="GetMinCollWithPicture">
+        <xsl:value-of select="$GetMinCollWithPicture"/>
       </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
     </xsl:call-template>

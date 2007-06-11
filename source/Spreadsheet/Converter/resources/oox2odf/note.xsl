@@ -438,7 +438,7 @@
 
 
 
-  <!-- Insert all picture betwen two cell -->
+  <!-- Insert all note betwen two cell -->
   <xsl:template name="InsertNoteBetwenTwoColl">
     <xsl:param name="StartColl"/>
     <xsl:param name="EndColl"/>
@@ -459,7 +459,6 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-
 
     <xsl:choose>
       <!-- Insert empty rows before -->
