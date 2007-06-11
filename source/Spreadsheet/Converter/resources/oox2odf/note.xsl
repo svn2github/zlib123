@@ -27,51 +27,60 @@
     * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:v="urn:schemas-microsoft-com:vml"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-    xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-    xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
-    
-    <!-- Get cell with note -->
-    
-    <xsl:template name="NoteCell">
-        <xsl:param name="sheetNr"/>
-        <xsl:apply-templates select="document(concat('xl/comments',$sheetNr,'.xml'))/e:comments" mode="note-cell"/>
-    </xsl:template>
-    
-    <xsl:template match="e:comments" mode="note-cell">
-        <xsl:apply-templates select="e:commentList/e:comment" mode="note-cell"/>
-    </xsl:template>
-    
-    <xsl:template match="e:comment" mode="note-cell">
-        
-        <xsl:variable name="numCol">
-            <xsl:call-template name="GetColNum">
-                <xsl:with-param name="cell">
-                    <xsl:value-of select="@ref"/>
-                </xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable>
-        
-        <xsl:variable name="numRow">
-            <xsl:call-template name="GetRowNum">
-                <xsl:with-param name="cell">
-                    <xsl:value-of select="@ref"/>
-                </xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable>
-        <xsl:value-of select="concat($numRow,':',$numCol,';')"/>
-    </xsl:template>
-   
-    <!-- Get Row with Note -->
-   <xsl:template name="NoteRow">
+  xmlns:v="urn:schemas-microsoft-com:vml" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+
+  <!-- Get cell with note -->
+
+  <xsl:template name="NoteCell">
+    <xsl:param name="sheetNr"/>
+
+    <xsl:variable name="targetFile">
+      <xsl:value-of
+        select="document(concat('xl/worksheets/_rels/sheet',$sheetNr,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'comments' )]/@Target"
+      />
+    </xsl:variable>
+
+    <xsl:apply-templates
+      select="document(concat('xl/',substring-after($targetFile,'../')))/e:comments"
+      mode="note-cell"/>
+
+  </xsl:template>
+
+  <xsl:template match="e:comments" mode="note-cell">
+    <xsl:apply-templates select="e:commentList/e:comment" mode="note-cell"/>
+  </xsl:template>
+
+  <xsl:template match="e:comment" mode="note-cell">
+
+    <xsl:variable name="numCol">
+      <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="@ref"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="numRow">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="@ref"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="concat($numRow,':',$numCol,';')"/>
+  </xsl:template>
+
+  <!-- Get Row with Note -->
+  <xsl:template name="NoteRow">
     <xsl:param name="NoteCell"/>
     <xsl:param name="Result"/>
     <xsl:choose>
@@ -81,8 +90,7 @@
             <xsl:value-of select="substring-after($NoteCell, ';')"/>
           </xsl:with-param>
           <xsl:with-param name="Result">
-            <xsl:value-of
-              select="concat($Result,  concat(substring-before($NoteCell, ':'), ';'))"/>
+            <xsl:value-of select="concat($Result,  concat(substring-before($NoteCell, ':'), ';'))"/>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
@@ -91,17 +99,17 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- Insert all picture betwen two rows -->
   <xsl:template name="InsertPictureAndNoteBetwenTwoRows">
     <xsl:param name="StartRow"/>
     <xsl:param name="EndRow"/>
     <xsl:param name="PictureRow"/>
     <xsl:param name="PictureCell"/>
-    <xsl:param name="NoteCell"></xsl:param>
+    <xsl:param name="NoteCell"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
-    
+
     <xsl:variable name="GetMinRowWithPicture">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureOrNoteRow">
@@ -112,7 +120,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:choose>
       <!-- Insert empty rows before -->
       <xsl:when
@@ -124,7 +132,7 @@
           </table:table-row>
         </xsl:if>
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
-          
+
           <xsl:variable name="PictureColl">
             <xsl:call-template name="GetCollsWithPicture">
               <xsl:with-param name="rowNumber">
@@ -135,7 +143,7 @@
               </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
-          
+
           <xsl:call-template name="InsertPictureAndNoteBetwenTwoColl">
             <xsl:with-param name="sheet">
               <xsl:value-of select="$sheet"/>
@@ -153,13 +161,13 @@
               <xsl:text>0</xsl:text>
             </xsl:with-param>
             <xsl:with-param name="EndColl">
-              
+
               <xsl:text>256</xsl:text>
             </xsl:with-param>
           </xsl:call-template>
-          
+
         </table:table-row>
-        
+
         <xsl:call-template name="InsertPictureAndNoteBetwenTwoRows">
           <xsl:with-param name="StartRow">
             <xsl:value-of select="$GetMinRowWithPicture + 1"/>
@@ -181,7 +189,7 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:if test="$EndRow - $StartRow - 1 &gt; 0">
           <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
@@ -191,9 +199,9 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <!-- Insert all picture betwen two cell -->
   <xsl:template name="InsertPictureAndNoteBetwenTwoColl">
     <xsl:param name="StartColl"/>
@@ -204,7 +212,7 @@
     <xsl:param name="PictureColl"/>
     <xsl:param name="document"/>
     <xsl:param name="sheetNr"/>
-    
+
     <xsl:variable name="GetMinCollWithPicture">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
@@ -215,17 +223,17 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
-    
+
+
     <xsl:choose>
       <!-- Insert empty rows before -->
       <xsl:when
         test="$GetMinCollWithPicture != '' and $GetMinCollWithPicture &gt;= $StartColl and $GetMinCollWithPicture &lt; $EndColl">
-        
+
         <xsl:if test="$GetMinCollWithPicture - $StartColl &gt; 0">
           <table:table-cell table:number-columns-repeated="{$GetMinCollWithPicture - $StartColl}"/>
         </xsl:if>
-        
+
         <xsl:for-each select="ancestor::e:worksheet/e:drawing">
           <xsl:variable name="thisCellCol">
             <xsl:call-template name="NumbersToChars">
@@ -237,7 +245,8 @@
           <xsl:variable name="thisCell">
             <xsl:value-of select="concat($thisCellCol,$rowNum)"/>
           </xsl:variable>
-          <xsl:apply-templates select="document(concat('xl/comments',$sheetNr,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
+          <xsl:apply-templates
+            select="document(concat('xl/comments',$sheetNr,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
             <xsl:with-param name="number" select="$sheetNr"/>
           </xsl:apply-templates>
           <xsl:variable name="Target">
@@ -250,10 +259,10 @@
               </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
-          
+
           <table:table-cell>
-            
-            
+
+
             <xsl:call-template name="InsertPictureInThisCell">
               <xsl:with-param name="sheet">
                 <xsl:value-of select="$sheet"/>
@@ -272,9 +281,9 @@
               </xsl:with-param>
             </xsl:call-template>
           </table:table-cell>
-          
+
         </xsl:for-each>
-        
+
         <xsl:call-template name="InsertPictureAndNoteBetwenTwoColl">
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>
@@ -305,9 +314,9 @@
             <xsl:value-of select="$document"/>
           </xsl:with-param>
         </xsl:call-template>
-        
+
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="$StartColl = 0">
@@ -316,14 +325,14 @@
           <xsl:otherwise>
             <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl - 1}"/>
           </xsl:otherwise>
-          
+
         </xsl:choose>
-        
-        
+
+
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- Insert all note betwen two rows -->
   <xsl:template name="InsertNoteBetwenTwoRows">
     <xsl:param name="StartRow"/>
@@ -333,7 +342,7 @@
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="sheetNr"/>
-    
+
     <xsl:variable name="GetMinRowWithNote">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureOrNoteRow">
@@ -344,7 +353,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:choose>
       <!-- Insert empty rows before -->
       <xsl:when
@@ -356,7 +365,7 @@
           </table:table-row>
         </xsl:if>
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
-          
+
           <xsl:variable name="NoteColl">
             <xsl:call-template name="GetCollsWithPicture">
               <xsl:with-param name="rowNumber">
@@ -367,7 +376,7 @@
               </xsl:with-param>
             </xsl:call-template>
           </xsl:variable>
-          
+
           <xsl:call-template name="InsertNoteBetwenTwoColl">
             <xsl:with-param name="sheet">
               <xsl:value-of select="$sheet"/>
@@ -389,9 +398,9 @@
             </xsl:with-param>
             <xsl:with-param name="sheetNr" select="$sheetNr"/>
           </xsl:call-template>
-          
+
         </table:table-row>
-        
+
         <xsl:call-template name="InsertNoteBetwenTwoRows">
           <xsl:with-param name="StartRow">
             <xsl:value-of select="$GetMinRowWithNote + 1"/>
@@ -414,7 +423,7 @@
           <xsl:with-param name="sheetNr" select="$sheetNr"/>
         </xsl:call-template>
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:if test="$EndRow - $StartRow - 1 &gt; 0">
           <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
@@ -424,11 +433,11 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
- 
-  
+
+
+
   <!-- Insert all picture betwen two cell -->
   <xsl:template name="InsertNoteBetwenTwoColl">
     <xsl:param name="StartColl"/>
@@ -439,7 +448,7 @@
     <xsl:param name="NoteColl"/>
     <xsl:param name="document"/>
     <xsl:param name="sheetNr"/>
-    
+
     <xsl:variable name="GetMinCollWithNote">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
@@ -450,31 +459,31 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-   
-    
+
+
     <xsl:choose>
       <!-- Insert empty rows before -->
       <xsl:when
         test="$GetMinCollWithNote != '' and $GetMinCollWithNote &gt;= $StartColl and $GetMinCollWithNote &lt; $EndColl">
-        
+
         <xsl:if test="$GetMinCollWithNote - $StartColl &gt; 0">
           <table:table-cell table:number-columns-repeated="{$GetMinCollWithNote - $StartColl - 1}"/>
         </xsl:if>
-        
-          
-          <table:table-cell>
-           <xsl:call-template name="InsertNoteInThisCell">
-               <xsl:with-param name="sheetNr">
-                   <xsl:value-of select="$sheetNr"/>
-               </xsl:with-param>
-               <xsl:with-param name="colNum">
-                   <xsl:value-of select="$GetMinCollWithNote"/>
-               </xsl:with-param>
-               <xsl:with-param name="rowNum">
-                   <xsl:value-of select="$rowNum"/>
-               </xsl:with-param>
-           </xsl:call-template>
-          </table:table-cell>
+
+
+        <table:table-cell>
+          <xsl:call-template name="InsertNoteInThisCell">
+            <xsl:with-param name="sheetNr">
+              <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$GetMinCollWithNote"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </table:table-cell>
 
         <xsl:call-template name="InsertNoteBetwenTwoColl">
           <xsl:with-param name="sheet">
@@ -490,7 +499,7 @@
             <xsl:value-of select="$NoteColl"/>
           </xsl:with-param>
           <xsl:with-param name="StartColl">
-           <xsl:value-of select="$GetMinCollWithNote"/>
+            <xsl:value-of select="$GetMinCollWithNote"/>
           </xsl:with-param>
           <xsl:with-param name="EndColl">
             <xsl:value-of select="$EndColl"/>
@@ -498,13 +507,13 @@
           <xsl:with-param name="document">
             <xsl:value-of select="$document"/>
           </xsl:with-param>
-            <xsl:with-param name="sheetNr">
-                <xsl:value-of select="$sheetNr"/>
-            </xsl:with-param>
+          <xsl:with-param name="sheetNr">
+            <xsl:value-of select="$sheetNr"/>
+          </xsl:with-param>
         </xsl:call-template>
-        
+
       </xsl:when>
-      
+
       <xsl:otherwise>
         <xsl:choose>
           <xsl:when test="$StartColl = 0">
@@ -513,60 +522,73 @@
           <xsl:otherwise>
             <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl - 1}"/>
           </xsl:otherwise>
-          
+
         </xsl:choose>
-        
-        
+
+
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-    
-    <!-- Insert Note in This Cell -->
-    <xsl:template name="InsertNoteInThisCell">
-        <xsl:param name="rowNum"/>
-        <xsl:param name="colNum"/>
-        <xsl:param name="sheetNr"/>
-        
-        <xsl:variable name="thisCellCol">
-            <xsl:call-template name="NumbersToChars">
-                <xsl:with-param name="num">
-                    <xsl:value-of select="$colNum -1"/>
-                </xsl:with-param>
-            </xsl:call-template>
-        </xsl:variable>
-        
-        <xsl:variable name="thisCell">
-            <xsl:value-of select="concat($thisCellCol,$rowNum)"/>
-        </xsl:variable>
-        
-        <xsl:apply-templates select="document(concat('xl/comments',$sheetNr,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
-            <xsl:with-param name="number" select="$sheetNr"/>
-        </xsl:apply-templates>
-    
-    </xsl:template>
-    
-    
-    <!-- Insert Comment -->
-    <xsl:template match="e:comment">
-        
-        <!--@Description: adds a note -->
-        <!--@context: none -->
-        
-        <xsl:param name="number"/>
-        
-        <!--(int) number of comments file -->
-        <xsl:variable name="numberOfComment">
-            <xsl:value-of select="count(preceding-sibling::e:comment)+1"/>
-        </xsl:variable>
-        
-        <office:annotation>
-            <xsl:apply-templates select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[position()=$numberOfComment]" mode="drawing">
-                <xsl:with-param name="text" select="e:text"/>
-            </xsl:apply-templates>
-            <text:p text:style-name="{generate-id(e:text)}">
-                <xsl:apply-templates select="e:text/e:r"/>
-            </text:p>
-        </office:annotation>
-    </xsl:template>
-    
+
+  <!-- Insert Note in This Cell -->
+  <xsl:template name="InsertNoteInThisCell">
+    <xsl:param name="rowNum"/>
+    <xsl:param name="colNum"/>
+    <xsl:param name="sheetNr"/>
+
+    <xsl:variable name="thisCellCol">
+      <xsl:call-template name="NumbersToChars">
+        <xsl:with-param name="num">
+          <xsl:value-of select="$colNum -1"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="thisCell">
+      <xsl:value-of select="concat($thisCellCol,$rowNum)"/>
+    </xsl:variable>
+
+    <xsl:variable name="targetFile">
+      <xsl:value-of
+        select="document(concat('xl/worksheets/_rels/sheet',$sheetNr,'.xml.rels'))//node()[name()='Relationship' and contains(@Type,'comments' )]/@Target"
+      />
+    </xsl:variable>
+
+    <xsl:variable name="fileNumber">
+      <xsl:value-of select="substring-before(substring-after($targetFile,'comments'),'.xml')"/>
+    </xsl:variable>
+
+    <xsl:apply-templates
+      select="document(concat('xl/comments',$fileNumber,'.xml'))/e:comments/e:commentList/e:comment[@ref=$thisCell]">
+      <xsl:with-param name="number" select="$fileNumber"/>
+    </xsl:apply-templates>
+
+  </xsl:template>
+
+
+  <!-- Insert Comment -->
+  <xsl:template match="e:comment">
+
+    <!--@Description: adds a note -->
+    <!--@context: none -->
+
+    <xsl:param name="number"/>
+
+    <!--(int) number of comments file -->
+    <xsl:variable name="numberOfComment">
+      <xsl:value-of select="count(preceding-sibling::e:comment)+1"/>
+    </xsl:variable>
+
+    <office:annotation>
+      <xsl:apply-templates
+        select="document(concat('xl/drawings/vmlDrawing',$number,'.vml'))/xml/v:shape[position()=$numberOfComment]"
+        mode="drawing">
+        <xsl:with-param name="text" select="e:text"/>
+      </xsl:apply-templates>
+      <text:p text:style-name="{generate-id(e:text)}">
+        <xsl:apply-templates select="e:text/e:r"/>
+      </text:p>
+    </office:annotation>
+  </xsl:template>
+
 </xsl:stylesheet>
