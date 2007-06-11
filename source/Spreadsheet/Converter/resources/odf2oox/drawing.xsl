@@ -72,7 +72,7 @@
 
       <!--Insert Picture -->
       <xsl:for-each
-        select="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        select="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' ) and not(parent::node()/draw:object)]">
 
         <xdr:twoCellAnchor>
           <xsl:call-template name="SetPosition"/>
