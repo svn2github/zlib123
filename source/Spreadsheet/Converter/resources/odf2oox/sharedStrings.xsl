@@ -68,10 +68,10 @@
       <si>
         <xsl:choose>
           <xsl:when test="text:span|text:p/text:span">
-            <xsl:apply-templates mode="run"/>
+            <xsl:apply-templates mode="run" select="text:p"/>
           </xsl:when>
           <xsl:otherwise>
-            <t xml:space="preserve"><xsl:apply-templates mode="text"/></t>
+            <t xml:space="preserve"><xsl:apply-templates mode="text" select="text:p"/></t>
           </xsl:otherwise>
         </xsl:choose>
       </si>
@@ -129,8 +129,6 @@
 
   <xsl:template match="text()[parent::dc:date]" mode="text"/>
   <xsl:template match="text()[parent::dc:date]" mode="run"/>
-  <xsl:template match="text:p[parent::office:annotation]" mode="text"/>
-  <xsl:template match="text:span[ancestor::office:annotation]" mode="text"/>
 
   <xsl:template match="text()" mode="text">
     <xsl:variable name="value">
@@ -179,15 +177,15 @@
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:for-each>
-      <t xml:space="preserve"><xsl:value-of select="'&#xD;&#xA;'"/></t>
+      <t xml:space="preserve"><xsl:value-of select="'&#xD;'"/></t>
     </r>
     <xsl:if test="text() or text:span/text()">
       <xsl:apply-templates mode="run"/>
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="text:p[preceding-sibling::text:p and parent::table:table-cell]" mode="text">
-    <xsl:value-of select="'&#xD;&#xA;'"/>
+  <xsl:template match="text:p[preceding-sibling::text:p]" mode="text">
+    <xsl:value-of select="'&#xD;'"/>
     <xsl:apply-templates mode="text"/>
   </xsl:template>
 

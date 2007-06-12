@@ -103,7 +103,7 @@
   
 <xsl:template name="InsertCommentText">
   <xsl:choose>
-    <xsl:when test="text:p|text:span|text:p/text:span">
+    <xsl:when test="text:span|text:p/text:span">
       <xsl:apply-templates mode="run"/>
     </xsl:when>
     <xsl:otherwise>
