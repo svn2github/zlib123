@@ -71,7 +71,7 @@
           <xsl:with-param name="cellNumber">
             <xsl:text>0</xsl:text>
           </xsl:with-param>
-          <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>          
+          <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
@@ -91,7 +91,7 @@
           <xsl:with-param name="cellNumber">
             <xsl:text>0</xsl:text>
           </xsl:with-param>
-          <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>          
+          <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
         </xsl:apply-templates>
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
@@ -112,7 +112,7 @@
           <xsl:with-param name="cellNumber">
             <xsl:text>0</xsl:text>
           </xsl:with-param>
-          <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>          
+          <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -122,8 +122,8 @@
   <xsl:template match="table:table-cell|table:covered-table-cell" mode="conditional">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
-    <xsl:param name="TableColumnTagNum"/>          
-    
+    <xsl:param name="TableColumnTagNum"/>
+
     <xsl:variable name="columnCellStyle">
       <xsl:call-template name="GetColumnCellStyle">
         <xsl:with-param name="colNum">
@@ -134,7 +134,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="styleName">
       <xsl:choose>
         <xsl:when test="@table:style-name != '' ">
@@ -143,9 +143,9 @@
         <xsl:otherwise>
           <xsl:value-of select="$columnCellStyle"/>
         </xsl:otherwise>
-      </xsl:choose>      
+      </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:if test="key('style',$styleName)/style:map/@style:condition != '' ">
       <conditionalFormatting>
         <xsl:variable name="ColChar">
@@ -221,7 +221,7 @@
         <xsl:with-param name="rowNumber">
           <xsl:value-of select="$rowNumber"/>
         </xsl:with-param>
-        <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>          
+        <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
       </xsl:apply-templates>
     </xsl:if>
 
@@ -278,6 +278,9 @@
 
   <xsl:template name="InsertCoditionalFormula">
     <xsl:choose>
+      <xsl:when test="contains(@style:condition, '.$#REF!$#REF!')">
+        <formula/>
+      </xsl:when>
       <xsl:when test="contains(@style:condition, '&lt;=')">
         <formula>
           <xsl:choose>
