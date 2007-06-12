@@ -76,7 +76,9 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         private const string ZIP_POST_PROCESS_NAMESPACE = "urn:cleverage:xmlns:post-processings:zip";
         private const string PART_ELEMENT = "entry";
         private const string ARCHIVE_ELEMENT = "archive";
-        private const string COPY_ELEMENT = "copy";
+        private const string COPY_ELEMENT = "copy";  
+        //Added by Sonata
+        private const string EXTRACT_ELEMENT = "extract";
 
         /// <summary>
         /// The zip archive
@@ -106,6 +108,24 @@ namespace CleverAge.OdfConverter.OdfZipUtils
 		/// Table of binary files to be added to the package
 		/// </summary>
 		private Hashtable binaries;
+
+        //Added  by sonata
+        /// <summary>
+        /// Table of Audio files to be added to the package
+        /// </summary>
+        private Hashtable audioFilesList;
+
+        //Added  by sonata
+        /// <summary>
+        /// source attribute of the currently processed audio file
+        /// </summary>
+        private string audioFileSource;
+        //Added  by sonata
+        /// <summary>
+        /// Target attribute of the currently processed audio file
+        /// </summary>
+        private string audioFileDestination;
+
         
         /// <summary>
         /// Constructor
@@ -197,6 +217,8 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         {
                         	// Copy binaries before closing the archive
                         	CopyBinaries();
+                            //Added by Sonata - Copy Audio files before closing archive
+                            CopyAudioFiles();
                             Debug.WriteLine("[closing archive]");
                             zipOutputStream.Close();
                             zipOutputStream = null;
@@ -229,8 +251,19 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                         	}
                         	binarySource = null;
                         	binaryTarget = null;
+                        }                       
+                        break;     
+                    case EXTRACT_ELEMENT:
+                        if (audioFileSource != null && audioFileDestination != null)
+                        {
+                            if (audioFilesList != null && !audioFilesList.ContainsKey(audioFileSource))
+                            {
+                                audioFilesList.Add(audioFileSource, audioFileDestination);
+                            }
+                            audioFileSource = null;
+                            audioFileDestination = null;
                         }
-                        break;
+                        break;     
                 }
          
             }
@@ -303,6 +336,8 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                                     zipOutputStream = ZipFactory.CreateArchive(text);
                                     processingState = ProcessingState.EntryWaiting;
                                     binaries = new Hashtable();
+                                    //Added by sonata
+                                    audioFilesList = new Hashtable();
                                 }
                                 break;
                             case PART_ELEMENT:
@@ -328,6 +363,21 @@ namespace CleverAge.OdfConverter.OdfZipUtils
                                     {
                                         binaryTarget += text;
                                         Debug.WriteLine("copy target=" + binaryTarget);
+                                    }
+                                }
+                                break;
+                            case EXTRACT_ELEMENT:
+                                if (processingState != ProcessingState.None)
+                                {
+                                    if (attr.Name.Equals("source"))
+                                    {
+                                        audioFileSource += text;
+                                        Debug.WriteLine("copy source=" + audioFileSource);
+                                    }
+                                    if (attr.Name.Equals("target"))
+                                    {
+                                        audioFileDestination += text;
+                                        Debug.WriteLine("copy target=" + audioFileDestination);
                                     }
                                 }
                                 break;
@@ -503,7 +553,7 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         		CopyBinary(s, (string) binaries[s]);
         	}
         }
-        
+
         private const int BUFFER_SIZE = 4096;
         
         /// <summary>
@@ -514,18 +564,229 @@ namespace CleverAge.OdfConverter.OdfZipUtils
         /// <param name="source">Relative path inside the source archive</param>
         /// <param name="target">Relative path inside the destination archive</param>
         private void CopyBinary(String source, String target)
-        {
-        	Stream sourceStream = GetStream(source);
+        {            
+            Stream sourceStream = GetStream(source);
         	
-        	if (sourceStream != null && zipOutputStream != null)
-        	{
-        		// New file entry
-        		zipOutputStream.AddEntry(target);
-        		
-        		int bytesCopied = StreamCopy(sourceStream, zipOutputStream);
-        		
-        		Debug.WriteLine("CopyBinary : "+source+" --> "+target+", bytes copied = "+bytesCopied);
-        	}
+    	    if (sourceStream != null && zipOutputStream != null)
+    	    {
+    		    // New file entry
+    		    zipOutputStream.AddEntry(target);            		
+    		    int bytesCopied = StreamCopy(sourceStream, zipOutputStream);            		
+    		    Debug.WriteLine("CopyBinary : "+source+" --> "+target+", bytes copied = "+bytesCopied);
+    	    }           
+
+        }
+
+        //Added by Sonata to Copy the audio files From physical directory to Ziparchive and Vice versa
+        private void CopyAudioFiles()
+        {
+            foreach (string strfile in audioFilesList.Keys)
+            {
+                CopyAudioFile(strfile, (string)audioFilesList[strfile]);
+            }
+        }
+
+        //Added by Sonata to Copy the audio files From physical directory to Ziparchive and Vice versa
+        /// <summary>
+        /// Transfer a audio file between ziparchive and physica directory 
+        /// The source archive is handled by the resolver, while the destination archive 
+        /// corresponds to our zipOutputStream.  
+        /// </summary>
+        /// <param name="inputFileSource">File path inside the source archive or physica directory</param>
+        /// <param name="outputFileTarget">File path inside the destination archive or physica directory</param>
+        private void CopyAudioFile(String inputFileSource, String outputFileTarget)
+        {
+            string inputFilePath = "";
+            string outputFilePath = "";
+            string targetFolderName = "";
+            string targetFileName = "";
+
+            bool ConvertPPTX2ODP = false;
+            bool isBatchODP = false;
+            bool isBatchPPTX = false;
+
+            // Gets the Target folder name - Copying the .wav files for ODP
+            if (outputFileTarget.Contains("|"))
+            {
+                targetFolderName = outputFileTarget.Substring(0, outputFileTarget.IndexOf('|'));
+                targetFileName = outputFileTarget.Substring(outputFileTarget.IndexOf('|') + 1);
+            }
+
+            #region Get Input and Output path
+            for (int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
+            {
+                if (Environment.GetCommandLineArgs()[i].Contains("/I"))
+                    inputFilePath = Environment.GetCommandLineArgs()[i + 1];
+                if (Environment.GetCommandLineArgs()[i].Contains("/O"))
+                    outputFilePath = Environment.GetCommandLineArgs()[i + 1];
+                if (Environment.GetCommandLineArgs()[i].Contains("/BATCH-ODP"))
+                    isBatchODP = true;
+                if (Environment.GetCommandLineArgs()[i].Contains("/BATCH-PPTX"))
+                    isBatchPPTX = true;
+            }
+            #endregion
+
+            #region For Addin Conversion
+            string strCurrentDirectory = Environment.CurrentDirectory;
+
+            if (inputFilePath == "" && outputFilePath == "")
+            {                
+                if (inputFileSource.Contains("ppt/media"))
+                {
+                   ConvertPPTX2ODP = true;
+                   inputFilePath = strCurrentDirectory + "\\Dummy.pptx";
+                }
+                else
+                {
+                    ConvertPPTX2ODP = false;
+                    inputFilePath = strCurrentDirectory + "\\Dummy.odp";
+                }
+            }
+            #endregion
+
+            string audioFilePath = "";
+            string directoryPath = "";
+            string absolutePath = "";
+            string relativePath = "";
+            int startIndex = 0;
+            int endIndex = 0;
+            int replaceIndex = 0;
+
+            #region Batch Processing
+
+            //For Batch ODP
+            if (isBatchODP)
+            {
+                if (outputFilePath != "")
+                {
+                    outputFilePath = outputFilePath.Replace("\\", "//");
+                    audioFilePath = outputFilePath + "//_MediaFilesForOdp_" + targetFolderName;
+                }
+            }
+
+            //For Batch PPTX
+            if (isBatchPPTX)
+            {
+                //to resolve relative path
+                if (inputFileSource.Contains(".."))
+                {
+                    absolutePath = inputFileSource;
+                    startIndex = absolutePath.IndexOf("../");
+                    endIndex = absolutePath.LastIndexOf("../");
+                    replaceIndex = endIndex / 3;
+
+                    relativePath = inputFileSource.Substring(endIndex + 3, absolutePath.Length - (endIndex + 3));
+                    absolutePath = "";
+                    string[] pathSplitArray = inputFilePath.Replace("\\", "|").Split('|');
+
+                    for (int cnt = 0; cnt < (pathSplitArray.Length - replaceIndex); cnt++)
+                    {
+                        absolutePath = absolutePath + pathSplitArray[cnt] + "//";
+                    }
+
+                    audioFilePath = absolutePath + relativePath.Replace("/", "//");
+                    audioFilePath = audioFilePath.Replace("%20", " ");
+                }
+                else
+                {
+                    audioFilePath = inputFileSource.Replace("/", "//").Replace("%20", " ");
+                }
+            }
+            #endregion
+
+            #region File Processing
+            else
+            {
+                if (outputFilePath != "")
+                {
+                    if (outputFilePath.Contains(".odp"))
+                    {
+                        directoryPath = Path.GetDirectoryName(outputFilePath).Replace("\\", "//");
+                        audioFilePath = directoryPath + "//_MediaFilesForOdp_" + targetFolderName;
+                    }
+                }
+                else
+                {
+                    if (inputFilePath.Contains(".pptx"))
+                    {
+                        directoryPath = Path.GetDirectoryName(inputFilePath).Replace("\\", "//");
+                        audioFilePath = directoryPath + "//_MediaFilesForOdp_" + targetFolderName;
+                        ConvertPPTX2ODP = true;
+                    }
+                    if (inputFilePath.Contains(".odp"))
+                    {
+                        if (inputFileSource.Contains(".."))
+                        {
+                            directoryPath = Path.GetDirectoryName(inputFilePath);
+                            absolutePath = inputFileSource;
+                            startIndex = absolutePath.IndexOf("../");
+                            endIndex = absolutePath.LastIndexOf("../");
+                            replaceIndex = endIndex / 3;
+
+                            relativePath = inputFileSource.Substring(endIndex + 3, absolutePath.Length - (endIndex + 3));
+
+                            absolutePath = "";
+                            string[] pathSplitArray = directoryPath.Replace("\\", "|").Split('|');
+                            for (int cnt = 0; cnt < (pathSplitArray.Length - replaceIndex); cnt++)
+                            {
+                                absolutePath = absolutePath + pathSplitArray[cnt] + "//";
+                            }
+
+                            audioFilePath = absolutePath + relativePath.Replace("/", "//");
+                            audioFilePath = audioFilePath.Replace("%20", " ");
+                        }
+                        else
+                        {
+                            audioFilePath = inputFileSource.Replace("/", "//").Replace("%20", " ");
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            #region Add files From External Directory to ZipArchive - Vice versa
+            // Condition added by lohith.ar@sonata-software.com to check for audio files
+            try
+            {
+
+                if (ConvertPPTX2ODP)
+                {
+                    //Copy ppt/Media files to external directory 
+                    Stream inputStream = GetStream(inputFileSource);
+                    if (inputStream != null)
+                    {
+                        Directory.CreateDirectory(audioFilePath);
+                        audioFilePath = audioFilePath + "//" + targetFileName;
+                        if (!File.Exists(audioFilePath))
+                        {
+                            FileStream fsFile = new FileStream(audioFilePath, FileMode.Create);
+                            StreamCopy(inputStream, fsFile);
+                        }
+                    }
+                }
+                else
+                {
+                    //Copy referd audio fiels from external directory to ppt/media
+                    if (zipOutputStream != null)
+                    {
+                        if (File.Exists(audioFilePath))
+                        {
+                            zipOutputStream.AddEntry(outputFileTarget);
+                            FileStream fsSourceFile = new FileStream(audioFilePath, FileMode.Open, FileAccess.Read);
+
+                            int bytesCopied = StreamCopy(fsSourceFile, zipOutputStream);
+                            Debug.WriteLine("CopyBinary : " + inputFileSource + " --> " + outputFileTarget + ", bytes copied = " + bytesCopied);
+                        }
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                ZipException exZip = new ZipException(e.Message);
+                throw exZip;
+            }
+            #endregion
+
         }
         
         private Stream GetStream(string relativeUri) 
