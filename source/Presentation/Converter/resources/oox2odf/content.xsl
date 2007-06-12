@@ -52,7 +52,8 @@ xmlns:dcterms="http://purl.org/dc/terms/"
 exclude-result-prefixes="p a r xlink ">
   <xsl:import href="common.xsl"/>
   <xsl:import href="shapes_reverse.xsl"/>
-
+  <!-- Import Bullets and numbering-->
+  <xsl:import href ="BulletsNumberingoox2odf.xsl"/>
   <xsl:strip-space elements="*"/>
 
   <!--main document-->
@@ -395,6 +396,28 @@ exclude-result-prefixes="p a r xlink ">
       </xsl:variable>
       <!-- Slide Files Loop Main Loop-->
       <xsl:for-each select ="document(concat('ppt/',$slideNo))/p:sld/p:cSld/p:spTree/p:sp">
+        <!--Code Inserted by Vijayeta for Bullets And Numbering
+            If the bullets are default,go to slide masters and get the bullets
+            This part of code,checks for the type of layout and sets a falg true if condition met.
+            If flag is set to true and no bullets present,then get the bullets type from slideMasters1.xml-->
+        <xsl:variable name ="bulletTypeBool">
+          <xsl:for-each select ="document($slideRel)//rels:Relationships/rels:Relationship">
+            <xsl:if test ="document($slideRel)//rels:Relationships/rels:Relationship/@Target[contains(.,'slideLayouts')]">          
+            <xsl:variable name ="layout" select ="substring-after((@Target),'../slideLayouts/')"/>
+            <xsl:for-each select ="document(concat('ppt/slideLayouts/',$layout))//p:sldLayout">
+              <xsl:choose >
+                <xsl:when test ="p:cSld['@name=Title and Content'] or p:cSld['@name=Two Content']  or p:cSld['@name=Comparison']">
+                  <xsl:value-of select ="'true'"/>
+                </xsl:when>
+                <xsl:otherwise >
+                  <xsl:value-of select ="'false'"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:if>
+          </xsl:for-each>
+        </xsl:variable >
+        <!--End of code Inserted by Vijayeta for Bullets and Numbering,in case of default bullets-->
         <xsl:variable name ="LayoutName">
           <xsl:for-each select ="p:nvSpPr/p:nvPr/p:ph/@type">
             <xsl:value-of select ="."/>
@@ -406,6 +429,11 @@ exclude-result-prefixes="p a r xlink ">
 		  <xsl:variable name ="textLayoutId"  >
 			  <xsl:value-of  select ="concat(substring-before($SlideFile,'.xml'),'pr',position())"/>
 		  </xsl:variable>
+        <!--code Inserted by Vijayeta for Bullets and Numbering,Assign a style name-->        
+        <xsl:variable name ="listStyleName">
+          <xsl:value-of select ="concat(substring-before($SlideFile,'.xml'),'List',position())"/>
+        </xsl:variable>
+        <!--End of code Inserted by Vijayeta for Bullets and Numbering,Assign a style name-->
 		  <!-- Code for shapes start-->
 		  <xsl:variable  name ="GraphicId">
 			  <xsl:value-of select ="concat('s',substring($SlideFile,6,string-length($SlideFile)-9) ,concat('gr',position()))"/>
@@ -420,7 +448,7 @@ exclude-result-prefixes="p a r xlink ">
 					<xsl:when test ="not(contains(p:nvSpPr/p:cNvPr/@name,'Title')
 						   or contains(p:nvSpPr/p:cNvPr/@name,'Content')
 						   or contains(p:nvSpPr/p:cNvPr/@name,'Subtitle')
-						  or contains(p:nvSpPr/p:cNvPr/@name,'Placeholder'))">
+						  or contains(p:nvSpPr/p:cNvPr/@name,'Placeholder') or contains(p:nvSpPr/p:cNvPr/@name,'Rectangle'))">
 						 
 					</xsl:when>
 				  <xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt') 
@@ -475,78 +503,175 @@ exclude-result-prefixes="p a r xlink ">
 					  </xsl:for-each>
 					  <draw:text-box>
 						<xsl:for-each select ="p:txBody/a:p">
-						  <text:p >
-							<xsl:attribute name ="text:style-name">
-							  <xsl:value-of select ="concat($ParaId,position())"/>
-							</xsl:attribute>
-							<xsl:for-each select ="node()">
-							  <xsl:if test ="name()='a:r'">
-								<text:span text:style-name="{generate-id()}">
-								  <!--<xsl:value-of select ="a:t"/>-->
-								  <!--converts whitespaces sequence to text:s-->
-									<!-- 1699083 bug fix  -->
-									<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-									<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-									<xsl:choose >
-										<xsl:when test ="a:rPr[@cap='all']">
-											<xsl:choose >
-												<xsl:when test =".=''">
-													<text:s/>
-												</xsl:when>
-												<xsl:when test ="not(contains(.,'  '))">
-													<xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
-												</xsl:when>
-												<xsl:when test =". =' '">
-													<text:s/>
-												</xsl:when>
-												<xsl:otherwise >
-													<xsl:call-template name ="InsertWhiteSpaces">
-														<xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-													</xsl:call-template>
-												</xsl:otherwise>
-											</xsl:choose>
-										</xsl:when>
-										<xsl:when test ="a:rPr[@cap='small']">
-											<xsl:choose >
-												<xsl:when test =".=''">
-													<text:s/>
-												</xsl:when>
-												<xsl:when test ="not(contains(.,'  '))">
-													<xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
-												</xsl:when>
-												<xsl:when test =".= ' '">
-													<text:s/>
-												</xsl:when>
-												<xsl:otherwise >
-													<xsl:call-template name ="InsertWhiteSpaces">
-														<xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-													</xsl:call-template>
-												</xsl:otherwise> 
-											</xsl:choose >
-										</xsl:when>
-										<xsl:otherwise >
-											<xsl:choose >
-												<xsl:when test =".=''">
-													<text:s/>
-												</xsl:when>
-												<xsl:when test ="not(contains(.,'  '))">
-													<xsl:value-of select ="."/>
-												</xsl:when>										
-												<xsl:otherwise >
-													<xsl:call-template name ="InsertWhiteSpaces">
-														<xsl:with-param name ="string" select ="."/>
-													</xsl:call-template>
-												</xsl:otherwise >
-											</xsl:choose>
-										</xsl:otherwise>
-									</xsl:choose>
-								</text:span>
-							  </xsl:if >
-							  <xsl:if test ="name()='a:br'">
-								<text:line-break/>
-							  </xsl:if>
-							</xsl:for-each>
-						  </text:p>
+              <xsl:if test ="$LayoutName != 'title'">
+                <!--Code Inserted by Vijayeta for Bullets And Numbering
+                  check for levels and then depending on the condition,insert bullets,Layout or Master properties-->
+                <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip">
+                  <xsl:call-template name ="insertBulletsNumbersoox2odf">
+                    <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+                    <xsl:with-param name ="ParaId" select ="$ParaId"/>
+                  </xsl:call-template>
+                </xsl:if>
+                <!-- If no bullets are present or default bullets-->
+                <xsl:if test ="not(a:pPr/a:buChar) and not(a:pPr/a:buAutoNum)and not(a:pPr/a:buBlip)">
+                  <!-- If bullets are default-->
+                  <xsl:if test ="$bulletTypeBool='true'">
+                    <xsl:call-template name ="insertBulletsNumbersoox2odf">
+                      <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+                      <xsl:with-param name ="ParaId" select ="$ParaId"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </xsl:if>
+                <!-- If no bullets present at all-->
+                <xsl:if test ="not($bulletTypeBool='true')">
+                  <text:p >
+                    <xsl:attribute name ="text:style-name">
+                      <xsl:value-of select ="concat($ParaId,position())"/>
+                    </xsl:attribute>
+                    <xsl:for-each select ="node()">
+                      <xsl:if test ="name()='a:r'">
+                        <text:span text:style-name="{generate-id()}">
+                          <!--<xsl:value-of select ="a:t"/>-->
+                          <!--converts whitespaces sequence to text:s-->
+                          <!-- 1699083 bug fix  -->
+                          <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                          <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                          <xsl:choose >
+                            <xsl:when test ="a:rPr[@cap='all']">
+                              <xsl:choose >
+                                <xsl:when test =".=''">
+                                  <text:s/>
+                                </xsl:when>
+                                <xsl:when test ="not(contains(.,'  '))">
+                                  <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                                </xsl:when>
+                                <xsl:when test =". =' '">
+                                  <text:s/>
+                                </xsl:when>
+                                <xsl:otherwise >
+                                  <xsl:call-template name ="InsertWhiteSpaces">
+                                    <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                  </xsl:call-template>
+                                </xsl:otherwise>
+                              </xsl:choose>
+                            </xsl:when>
+                            <xsl:when test ="a:rPr[@cap='small']">
+                              <xsl:choose >
+                                <xsl:when test =".=''">
+                                  <text:s/>
+                                </xsl:when>
+                                <xsl:when test ="not(contains(.,'  '))">
+                                  <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
+                                </xsl:when>
+                                <xsl:when test =".= ' '">
+                                  <text:s/>
+                                </xsl:when>
+                                <xsl:otherwise >
+                                  <xsl:call-template name ="InsertWhiteSpaces">
+                                    <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                  </xsl:call-template>
+                                </xsl:otherwise>
+                              </xsl:choose >
+                            </xsl:when>
+                            <xsl:otherwise >
+                              <xsl:choose >
+                                <xsl:when test =".=''">
+                                  <text:s/>
+                                </xsl:when>
+                                <xsl:when test ="not(contains(.,'  '))">
+                                  <xsl:value-of select ="."/>
+                                </xsl:when>
+                                <xsl:otherwise >
+                                  <xsl:call-template name ="InsertWhiteSpaces">
+                                    <xsl:with-param name ="string" select ="."/>
+                                  </xsl:call-template>
+                                </xsl:otherwise >
+                              </xsl:choose>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </text:span>
+                      </xsl:if >
+                      <xsl:if test ="name()='a:br'">
+                        <text:line-break/>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </text:p>
+                </xsl:if>
+              </xsl:if >
+              <xsl:if test ="$LayoutName = 'title'">
+                <text:p >
+                  <xsl:attribute name ="text:style-name">
+                    <xsl:value-of select ="concat($ParaId,position())"/>
+                  </xsl:attribute>
+                  <xsl:for-each select ="node()">
+                    <xsl:if test ="name()='a:r'">
+                      <text:span text:style-name="{generate-id()}">
+                        <!--<xsl:value-of select ="a:t"/>-->
+                        <!--converts whitespaces sequence to text:s-->
+                        <!-- 1699083 bug fix  -->
+                        <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                        <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                        <xsl:choose >
+                          <xsl:when test ="a:rPr[@cap='all']">
+                            <xsl:choose >
+                              <xsl:when test =".=''">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:when test ="not(contains(.,'  '))">
+                                <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                              </xsl:when>
+                              <xsl:when test =". =' '">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:otherwise >
+                                <xsl:call-template name ="InsertWhiteSpaces">
+                                  <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                </xsl:call-template>
+                              </xsl:otherwise>
+                            </xsl:choose>
+                          </xsl:when>
+                          <xsl:when test ="a:rPr[@cap='small']">
+                            <xsl:choose >
+                              <xsl:when test =".=''">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:when test ="not(contains(.,'  '))">
+                                <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
+                              </xsl:when>
+                              <xsl:when test =".= ' '">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:otherwise >
+                                <xsl:call-template name ="InsertWhiteSpaces">
+                                  <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                </xsl:call-template>
+                              </xsl:otherwise>
+                            </xsl:choose >
+                          </xsl:when>
+                          <xsl:otherwise >
+                            <xsl:choose >
+                              <xsl:when test =".=''">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:when test ="not(contains(.,'  '))">
+                                <xsl:value-of select ="."/>
+                              </xsl:when>
+                              <xsl:otherwise >
+                                <xsl:call-template name ="InsertWhiteSpaces">
+                                  <xsl:with-param name ="string" select ="."/>
+                                </xsl:call-template>
+                              </xsl:otherwise >
+                            </xsl:choose>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </text:span>
+                    </xsl:if >
+                    <xsl:if test ="name()='a:br'">
+                      <text:line-break/>
+                    </xsl:if>
+                  </xsl:for-each>
+                </text:p>
+              </xsl:if>
 						</xsl:for-each>
 					  </draw:text-box >
 					  <!-- Added by lohith.ar - Start - Mouse click hyperlinks -->
@@ -749,72 +874,175 @@ exclude-result-prefixes="p a r xlink ">
 					</xsl:variable>
 					<xsl:variable name ="TextSpanNode">
 					  <xsl:for-each select ="p:txBody/a:p">
-						<text:p>
-						  <xsl:attribute name ="text:style-name">
-							<xsl:value-of select ="concat($ParaId,position())"/>
-						  </xsl:attribute >
-						  <xsl:for-each select ="node()">
-							<xsl:if test ="name()='a:r'">
-								<text:span text:style-name="{generate-id()}">
-									<!--<xsl:value-of select ="a:t"/>-->
-									<!--converts whitespaces sequence to text:s-->
-									<!-- 1699083 bug fix  -->
-									<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-									<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-									<xsl:choose >
-										<xsl:when test ="a:rPr[@cap='all']">
-											<xsl:choose >
-												<xsl:when test =".=''">
-													<text:s/>
-												</xsl:when>
-												<xsl:when test ="not(contains(.,'  '))">
-													<xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
-												</xsl:when>
-												<xsl:otherwise >
-													<xsl:call-template name ="InsertWhiteSpaces">
-														<xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-													</xsl:call-template>
-												</xsl:otherwise>
-											</xsl:choose>
-										</xsl:when>
-										<xsl:when test ="a:rPr[@cap='small']">
-											<xsl:choose >
-												<xsl:when test =".=''">
-													<text:s/>
-												</xsl:when>
-												<xsl:when test ="not(contains(.,'  '))">
-													<xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
-												</xsl:when>
-												<xsl:otherwise >
-													<xsl:call-template name ="InsertWhiteSpaces">
-														<xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-													</xsl:call-template>
-												</xsl:otherwise> 
-											</xsl:choose >
-										</xsl:when>
-										<xsl:otherwise >
-											<xsl:choose >
-												<xsl:when test =".=''">
-													<text:s/>
-												</xsl:when>
-												<xsl:when test ="not(contains(.,'  '))">
-													<xsl:value-of select ="."/>
-												</xsl:when>
-												<xsl:otherwise >
-													<xsl:call-template name ="InsertWhiteSpaces">
-														<xsl:with-param name ="string" select ="."/>
-													</xsl:call-template>
-												</xsl:otherwise >
-											</xsl:choose>
-										</xsl:otherwise>
-									</xsl:choose>
-								</text:span>
-							</xsl:if >
-							<xsl:if test ="name()='a:br'">
-							  <text:line-break/>
-							</xsl:if>
-						  </xsl:for-each>
-						</text:p>
+              <!--Code Inserted by Vijayeta for Bullets And Numbering
+                  check for levels and then depending on the condition,insert bullets,If properties are defined in corresponding layouts-->
+              <xsl:if test ="$LayoutName != 'title'">            
+              <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip">
+                <xsl:call-template name ="insertBulletsNumbersoox2odf">
+                  <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+                  <xsl:with-param name ="ParaId" select ="$ParaId"/>
+                </xsl:call-template>
+              </xsl:if>
+              <!-- If no bullets are present or default bullets-->
+              <xsl:if test ="not(a:pPr/a:buChar) and not(a:pPr/a:buAutoNum)and not(a:pPr/a:buBlip)">
+                <!-- If bullets are default-->
+                <xsl:if test ="$bulletTypeBool='true'">
+                  <xsl:call-template name ="insertBulletsNumbersoox2odf">
+                    <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+                    <xsl:with-param name ="ParaId" select ="$ParaId"/>
+                  </xsl:call-template>
+                </xsl:if>
+              </xsl:if>
+              <!-- If no bullets present at all-->
+              <xsl:if test ="not($bulletTypeBool='true')">
+                <text:p >
+                  <xsl:attribute name ="text:style-name">
+                    <xsl:value-of select ="concat($ParaId,position())"/>
+                  </xsl:attribute>
+                  <xsl:for-each select ="node()">
+                    <xsl:if test ="name()='a:r'">
+                      <text:span text:style-name="{generate-id()}">
+                        <!--<xsl:value-of select ="a:t"/>-->
+                        <!--converts whitespaces sequence to text:s-->
+                        <!-- 1699083 bug fix  -->
+                        <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                        <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                        <xsl:choose >
+                          <xsl:when test ="a:rPr[@cap='all']">
+                            <xsl:choose >
+                              <xsl:when test =".=''">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:when test ="not(contains(.,'  '))">
+                                <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                              </xsl:when>
+                              <xsl:when test =". =' '">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:otherwise >
+                                <xsl:call-template name ="InsertWhiteSpaces">
+                                  <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                </xsl:call-template>
+                              </xsl:otherwise>
+                            </xsl:choose>
+                          </xsl:when>
+                          <xsl:when test ="a:rPr[@cap='small']">
+                            <xsl:choose >
+                              <xsl:when test =".=''">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:when test ="not(contains(.,'  '))">
+                                <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
+                              </xsl:when>
+                              <xsl:when test =".= ' '">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:otherwise >
+                                <xsl:call-template name ="InsertWhiteSpaces">
+                                  <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                </xsl:call-template>
+                              </xsl:otherwise>
+                            </xsl:choose >
+                          </xsl:when>
+                          <xsl:otherwise >
+                            <xsl:choose >
+                              <xsl:when test =".=''">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:when test ="not(contains(.,'  '))">
+                                <xsl:value-of select ="."/>
+                              </xsl:when>
+                              <xsl:otherwise >
+                                <xsl:call-template name ="InsertWhiteSpaces">
+                                  <xsl:with-param name ="string" select ="."/>
+                                </xsl:call-template>
+                              </xsl:otherwise >
+                            </xsl:choose>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </text:span>
+                    </xsl:if >
+                    <xsl:if test ="name()='a:br'">
+                      <text:line-break/>
+                    </xsl:if>
+                  </xsl:for-each>
+                </text:p>
+              </xsl:if>
+              </xsl:if>
+              <xsl:if test ="$LayoutName = 'title'">
+                <text:p >
+                  <xsl:attribute name ="text:style-name">
+                    <xsl:value-of select ="concat($ParaId,position())"/>
+                  </xsl:attribute>
+                  <xsl:for-each select ="node()">
+                    <xsl:if test ="name()='a:r'">
+                      <text:span text:style-name="{generate-id()}">
+                        <!--<xsl:value-of select ="a:t"/>-->
+                        <!--converts whitespaces sequence to text:s-->
+                        <!-- 1699083 bug fix  -->
+                        <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                        <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                        <xsl:choose >
+                          <xsl:when test ="a:rPr[@cap='all']">
+                            <xsl:choose >
+                              <xsl:when test =".=''">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:when test ="not(contains(.,'  '))">
+                                <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                              </xsl:when>
+                              <xsl:when test =". =' '">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:otherwise >
+                                <xsl:call-template name ="InsertWhiteSpaces">
+                                  <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                </xsl:call-template>
+                              </xsl:otherwise>
+                            </xsl:choose>
+                          </xsl:when>
+                          <xsl:when test ="a:rPr[@cap='small']">
+                            <xsl:choose >
+                              <xsl:when test =".=''">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:when test ="not(contains(.,'  '))">
+                                <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
+                              </xsl:when>
+                              <xsl:when test =".= ' '">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:otherwise >
+                                <xsl:call-template name ="InsertWhiteSpaces">
+                                  <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                                </xsl:call-template>
+                              </xsl:otherwise>
+                            </xsl:choose >
+                          </xsl:when>
+                          <xsl:otherwise >
+                            <xsl:choose >
+                              <xsl:when test =".=''">
+                                <text:s/>
+                              </xsl:when>
+                              <xsl:when test ="not(contains(.,'  '))">
+                                <xsl:value-of select ="."/>
+                              </xsl:when>
+                              <xsl:otherwise >
+                                <xsl:call-template name ="InsertWhiteSpaces">
+                                  <xsl:with-param name ="string" select ="."/>
+                                </xsl:call-template>
+                              </xsl:otherwise >
+                            </xsl:choose>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </text:span>
+                    </xsl:if >
+                    <xsl:if test ="name()='a:br'">
+                      <text:line-break/>
+                    </xsl:if>
+                  </xsl:for-each>
+                </text:p>
+              </xsl:if>
 					  </xsl:for-each>
 					</xsl:variable>
 					<!-- Added by lohith.ar - Start - Variable for Mouse click hyperlinks -->
@@ -1289,10 +1517,60 @@ exclude-result-prefixes="p a r xlink ">
 			<xsl:variable name ="SlideId">
 				<xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
 			</xsl:variable>
+      <!--Code by Vijayeta for Bullets,set style name in case of default bullets-->
+      <xsl:variable name ="slideRel">
+        <xsl:value-of select ="concat(concat('ppt/slides/_rels/',$SlideNumber,'.xml'),'.rels')"/>
+      </xsl:variable>
+      <xsl:variable name ="bulletTypeBool">
+        <xsl:for-each select ="document($slideRel)//rels:Relationships/rels:Relationship">
+          <xsl:if test ="document($slideRel)//rels:Relationships/rels:Relationship/@Target[contains(.,'slideLayouts')]">
+            <xsl:variable name ="layout" select ="substring-after((@Target),'../slideLayouts/')"/>
+            <xsl:for-each select ="document(concat('ppt/slideLayouts/',$layout))//p:sldLayout">
+              <xsl:choose >
+                <xsl:when test ="p:cSld['@name=Title and Content'] or p:cSld['@name=Two Content']  or p:cSld['@name=Comparison']">
+                  <xsl:value-of select ="'true'"/>
+                </xsl:when>
+                <xsl:otherwise >
+                  <xsl:value-of select ="'false'"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable >
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp/p:txBody">
 				<xsl:variable name ="ParaId">
 					<xsl:value-of select ="concat($SlideNumber,concat('PARA',position()))"/>
 				</xsl:variable>
+        <!--Code by Vijayeta for Bullets,set style name in case of default bullets-->
+        <xsl:variable name ="listStyleName">
+          <xsl:choose>
+            <xsl:when test ="./parent::node()/p:spPr/a:prstGeom/@prst or ./parent::node()/child::node()[1]/child::node()[1]/@name[contains(., 'TextBox')] or ./parent::node()/child::node()[1]/child::node()[1]/@name[contains(., 'Text Box')]">
+              <xsl:value-of select ="concat($SlideNumber,'textboxshape_List',position())"/>
+            </xsl:when>
+            <xsl:otherwise >
+              <xsl:value-of select ="concat($SlideNumber,'List',position())"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <!--If bullets present-->
+        <xsl:if test ="(a:p/a:pPr/a:buChar) or (a:p/a:pPr/a:buAutoNum) or (a:p/a:pPr/a:buBlip) ">
+          <xsl:call-template name ="insertBulletStyle">
+            <xsl:with-param name ="slideRel" select ="$slideRel"/>
+            <xsl:with-param name ="ParaId" select ="$ParaId"/>
+            <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+          </xsl:call-template>
+        </xsl:if>
+        <!-- bullets are default-->
+        <xsl:if test ="not(a:p/a:pPr/a:buChar or a:p/a:pPr/a:buAutoNum or a:p/a:pPr/a:buBlip) ">
+          <xsl:if test ="$bulletTypeBool='true'">
+            <xsl:call-template name ="insertDefaultBulletNumberStyle">
+              <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:if>
+        <!--End of code if bullets are default-->
+        <!--End of code inserted by Vijayeta,InsertStyle For Bullets and Numbering-->        
 				<xsl:for-each select ="a:p">
 					<style:style style:family="paragraph">
 						<xsl:attribute name ="style:name">
@@ -1359,6 +1637,34 @@ exclude-result-prefixes="p a r xlink ">
                 </xsl:attribute>
               </xsl:if>
               <!--End of Code Added By Vijayeta-->
+              <!-- Code inserted by VijayetaFor Bullets, Enable Numbering-->
+              <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip ">
+                <!--<xsl:if test ="./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph['@type=title']">
+                  <xsl:attribute name="text:enable-numbering">
+                    <xsl:value-of select ="'false'"/>
+                  </xsl:attribute>
+                </xsl:if>
+                <xsl:if test ="not(./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph['@type=!title'])">-->
+                  <xsl:attribute name="text:enable-numbering">
+                    <xsl:value-of select ="'true'"/>
+                  </xsl:attribute>
+                </xsl:if>
+              <!--</xsl:if>-->
+              <xsl:if test ="not(a:pPr/a:buChar) or not(a:pPr/a:buAutoNum) or not(a:pPr/a:buBlip) ">
+                <xsl:if test ="$bulletTypeBool='true'">
+                  <xsl:if test ="./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Title')]">
+                    <xsl:attribute name="text:enable-numbering">
+                      <xsl:value-of select ="'false'"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                  <xsl:if test ="not(./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Title')])">
+                    <xsl:attribute name="text:enable-numbering">
+                      <xsl:value-of select ="'true'"/>
+                    </xsl:attribute>
+                  </xsl:if>
+                </xsl:if>
+              </xsl:if>
+              <!--End of Code inserted by VijayetaFor Bullets, Enable Numbering-->
 						</style:paragraph-properties >
 					</style:style>
 					<xsl:for-each select ="a:r" >
@@ -1415,11 +1721,6 @@ exclude-result-prefixes="p a r xlink ">
 											<xsl:value-of select ="."/>
 										</xsl:for-each>
 									</xsl:variable>
-									<xsl:variable name ="shapeName">
-										<xsl:for-each select ="parent::node()/parent::node()/parent::node()/child::node()/p:cNvPr/@name">
-											<xsl:value-of select ="."/>
-										</xsl:for-each>
-									</xsl:variable>
 									<xsl:choose >
 										<xsl:when test ="$layoutFontSize &gt; 0">
 											<xsl:attribute name ="fo:font-size"	>												
@@ -1436,7 +1737,7 @@ exclude-result-prefixes="p a r xlink ">
 												<xsl:value-of select ="concat(format-number($DefFontSizeTitle div 100,'#.##'), 'pt')"/>
 											</xsl:attribute>
 										</xsl:when>
-										<xsl:when test ="contains($shapeName, 'TextBox') or contains($shapeName, 'Text Box') or  contains($shapeName, 'Rectangle') or (contains($shapeName, 'Rectangle') and not($lName)) ">
+										<xsl:when test ="$DefFontSizeOther != ''">
 											<xsl:attribute name ="fo:font-size"	>
 												<xsl:value-of select ="concat(format-number($DefFontSizeOther div 100,'#.##'), 'pt')"/>
 											</xsl:attribute>
@@ -1458,6 +1759,7 @@ exclude-result-prefixes="p a r xlink ">
                           <xsl:value-of select ="concat(format-number($DefFontSizeBody div 100,'#.##'), 'pt')"/>
                         </xsl:if>
                         <!--End of Code Added By Vijayeta,For Line Spacing -->
+												
 											</xsl:attribute>
 										</xsl:otherwise>
 									</xsl:choose>
@@ -1493,6 +1795,29 @@ exclude-result-prefixes="p a r xlink ">
 											</xsl:with-param>
 										</xsl:call-template>
 									</xsl:attribute>
+								</xsl:if>
+								<!-- Bug fix - 1733229-->
+								<xsl:if test ="not(a:rPr/a:solidFill/a:srgbClr/@val) and not(a:rPr/a:solidFill/a:schemeClr/@val)">
+									<xsl:if test ="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:srgbClr">
+										<xsl:attribute name ="fo:color">
+											<xsl:value-of select ="translate(concat('#',parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:srgbClr/@val),$ucletters,$lcletters)"/>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr">
+										<xsl:attribute name ="fo:color">
+											<xsl:call-template name ="getColorCode">
+												<xsl:with-param name ="color">
+													<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr/@val"/>
+												</xsl:with-param>
+												<xsl:with-param name ="lumMod">
+													<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr/a:lumMod/@val"/>
+												</xsl:with-param>
+												<xsl:with-param name ="lumOff">
+													<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr/a:lumOff/@val"/>
+												</xsl:with-param>
+											</xsl:call-template>
+										</xsl:attribute>
+									</xsl:if>
 								</xsl:if>
 								<!-- Italic-->
 								<xsl:if test ="a:rPr/@i">

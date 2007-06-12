@@ -117,7 +117,51 @@ Copyright (c) 2007, Sonata Software Limited
 
 	<xsl:template name ="InsertDefaultStyles">
 		<style:style style:name="standard" style:family="graphic">
-			<style:graphic-properties draw:stroke="solid" svg:stroke-color="#385d8a" svg:stroke-width=".07cm" draw:marker-start-width="0.3cm" draw:marker-start-center="false" draw:marker-end-width="0.3cm" draw:marker-end-center="false" draw:fill="solid" draw:fill-color="#4F81BD" fo:padding-top="0.125cm" fo:padding-bottom="0.125cm" fo:padding-left="0.25cm" fo:padding-right="0.25cm" />
+			<style:graphic-properties draw:stroke="solid" svg:stroke-color="#385d8a" svg:stroke-width=".07cm" draw:marker-start-width="0.3cm" draw:marker-start-center="false" draw:marker-end-width="0.3cm" draw:marker-end-center="false" draw:fill="solid" draw:fill-color="#4F81BD" fo:padding-top="0.125cm" fo:padding-bottom="0.125cm" fo:padding-left="0.25cm" fo:padding-right="0.25cm">
+				<text:list-style>
+					<text:list-level-style-bullet text:level="1" text:bullet-char="●">
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+					<text:list-level-style-bullet text:level="2" text:bullet-char="●">
+						<style:list-level-properties text:space-before="0.6cm" text:min-label-width="0.6cm"/>
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+					<text:list-level-style-bullet text:level="3" text:bullet-char="●">
+						<style:list-level-properties text:space-before="1.2cm" text:min-label-width="0.6cm"/>
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+					<text:list-level-style-bullet text:level="4" text:bullet-char="●">
+						<style:list-level-properties text:space-before="1.8cm" text:min-label-width="0.6cm"/>
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+					<text:list-level-style-bullet text:level="5" text:bullet-char="●">
+						<style:list-level-properties text:space-before="2.4cm" text:min-label-width="0.6cm"/>
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+					<text:list-level-style-bullet text:level="6" text:bullet-char="●">
+						<style:list-level-properties text:space-before="3cm" text:min-label-width="0.6cm"/>
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+					<text:list-level-style-bullet text:level="7" text:bullet-char="●">
+						<style:list-level-properties text:space-before="3.6cm" text:min-label-width="0.6cm"/>
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+					<text:list-level-style-bullet text:level="8" text:bullet-char="●">
+						<style:list-level-properties text:space-before="4.2cm" text:min-label-width="0.6cm"/>
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+					<text:list-level-style-bullet text:level="9" text:bullet-char="●">
+						<style:list-level-properties text:space-before="4.8cm" text:min-label-width="0.6cm"/>
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+					<text:list-level-style-bullet text:level="10" text:bullet-char="●">
+						<style:list-level-properties text:space-before="5.4cm" text:min-label-width="0.6cm"/>
+						<style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+					</text:list-level-style-bullet>
+				</text:list-style>
+			</style:graphic-properties>
+			<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:line-height="100%" text:enable-numbering="false" fo:text-indent="0cm"/>
+			<style:text-properties style:use-window-font-color="true" style:text-outline="false" style:text-line-through-style="none" fo:font-family="Arial" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="18pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:font-family-asian="&apos;Arial Unicode MS&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="18pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-family-complex="Tahoma" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="18pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-emphasize="none" style:font-relief="none"/>
 		</style:style>
 	<!--<style:default-style>
 			<xsl:attribute name ="style:family">
