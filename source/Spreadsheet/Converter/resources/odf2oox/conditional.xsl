@@ -159,7 +159,7 @@
           <xsl:value-of select="concat($ColChar, $rowNumber)"/>
         </xsl:attribute>
         <xsl:for-each select="key('style', $styleName)/style:map">
-          <cfRule type="cellIs" priority="2">
+          <cfRule type="cellIs" priority="{position()}">
             <xsl:if test="contains(@style:condition,'is-true-formula')">
               <xsl:attribute name="type">
                 <xsl:text>expression</xsl:text>
