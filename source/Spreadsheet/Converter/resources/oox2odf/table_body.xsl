@@ -1693,7 +1693,7 @@
             </xsl:call-template>
           </xsl:with-param>
           <xsl:with-param name="StartColl">
-            <xsl:value-of select="$colNum + 1"/>            
+            <xsl:value-of select="$colNum"/>            
           </xsl:with-param>
           <xsl:with-param name="EndColl">
             <xsl:text>256</xsl:text>

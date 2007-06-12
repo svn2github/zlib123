@@ -345,7 +345,7 @@
 
     <xsl:variable name="GetMinRowWithNote">
       <xsl:call-template name="GetMinRowWithPicture">
-        <xsl:with-param name="PictureOrNoteRow">
+        <xsl:with-param name="PictureRow">
           <xsl:value-of select="$NoteRow"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
