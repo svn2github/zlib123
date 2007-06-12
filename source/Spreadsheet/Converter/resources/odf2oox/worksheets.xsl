@@ -105,7 +105,7 @@
           select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name =  $masterPage]/@style:page-layout-name"
         />
       </xsl:variable>
-      
+
       <!-- get default font size -->
       <xsl:variable name="baseFontSize">
         <xsl:for-each select="document('styles.xml')">
@@ -120,7 +120,7 @@
           </xsl:choose>
         </xsl:for-each>
       </xsl:variable>
-      
+
       <xsl:variable name="defaultFontSize">
         <xsl:choose>
           <xsl:when test="contains($baseFontSize,'pt')">
@@ -131,14 +131,14 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-            
+
       <xsl:variable name="ColumnTagNum">
         <xsl:apply-templates select="descendant::table:table-column[1]" mode="tag">
           <xsl:with-param name="colNumber">1</xsl:with-param>
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
       </xsl:variable>
-      
+
       <!-- if property 'fit print range(s) to width/height' is being used -->
       <xsl:for-each select="document('styles.xml')">
         <xsl:if
@@ -185,8 +185,9 @@
           <xsl:value-of select="$MergeCellStyle"/>
         </xsl:with-param>
       </xsl:call-template>
-      
-      <xsl:if test="ancestor::office:document-content/office:automatic-styles/style:style/style:map/@style:condition != ''">
+
+      <xsl:if
+        test="ancestor::office:document-content/office:automatic-styles/style:style/style:map/@style:condition != ''">
         <xsl:apply-templates select="table:table-row[1]" mode="conditional">
           <xsl:with-param name="rowNumber">
             <xsl:text>1</xsl:text>
@@ -197,18 +198,19 @@
           <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
         </xsl:apply-templates>
       </xsl:if>
-      
+
       <xsl:call-template name="InsertHyperlinks"/>
-      
+
       <xsl:call-template name="InsertPageProperties">
         <xsl:with-param name="pageStyle" select="$pageStyle"/>
       </xsl:call-template>
-      
+
       <xsl:call-template name="InsertHeaderFooter"/>
 
       <xsl:variable name="picture">
         <xsl:choose>
-          <xsl:when test="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
+          <xsl:when
+            test="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -216,7 +218,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:variable name="chart">
         <xsl:for-each select="descendant::draw:frame/draw:object">
           <xsl:for-each select="document(concat(translate(@xlink:href,'./',''),'/content.xml'))">
@@ -410,7 +412,7 @@
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="ColumnTagNum"/>
-    <xsl:param name="defaultFontSize"/>    
+    <xsl:param name="defaultFontSize"/>
     <!-- baseFontSize -->
 
     <!-- compute default row height -->
@@ -902,60 +904,110 @@
     </xsl:choose>
   </xsl:template>
 
-<xsl:template name="InsertHyperlinks">
+  <!-- change  '%20' to space  after conversion-->
+  <xsl:template name="RemoveHash">
+    <xsl:param name="string"/>
 
-  <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
-  <xsl:if test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
-    <hyperlinks>
-      <xsl:for-each select="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
-        <xsl:variable name="ViewHyperlinks">
-          <xsl:value-of select="."/>
-        </xsl:variable>
-        
-        <xsl:variable name="colPosition">
-          <xsl:for-each select="ancestor::table:table-cell">
-            <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
-          </xsl:for-each>
-        </xsl:variable>
-        
-        <xsl:variable name="rowPosition">
-          <xsl:value-of select="generate-id(ancestor::table:table-row)"/>
-        </xsl:variable>
-        
-        
-        <!-- real column number -->
-        <xsl:variable name="colNum">
-          <xsl:for-each select="ancestor::table:table-row/table:table-cell[1]">
-            <xsl:call-template name="GetColNumber">
-              <xsl:with-param name="position">
-                <xsl:value-of select="$colPosition"/>
-              </xsl:with-param>
+    <xsl:choose>
+      <xsl:when test="contains($string,'%20')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,'%20') =''">
+            <xsl:call-template name="RemoveHash">
+              <xsl:with-param name="string" select="concat(' ',substring-after($string,'%20'))"/>
             </xsl:call-template>
-          </xsl:for-each>
-        </xsl:variable>
-        
-        <xsl:variable name="rows">
-          <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
-            
-            <xsl:call-template name="GetRowNumber">
-              <xsl:with-param name="rowId" select="$rowPosition"/>
-              <xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
+          </xsl:when>
+          <xsl:when test="substring-before($string,'%20') !=''">
+            <xsl:call-template name="RemoveHash">
+              <xsl:with-param name="string"
+                select="concat(substring-before($string,'%20'),' ',substring-after($string,'%20'))"
+              />
             </xsl:call-template>
-            
-          </xsl:for-each>
-        </xsl:variable>
-        
-        <xsl:variable name="colChar">
-          <xsl:call-template name="NumbersToChars">
-            <xsl:with-param name="num" select="$colNum -1"/>
-          </xsl:call-template>
-        </xsl:variable>
-        
-        <hyperlink ref="{concat($colChar,$rows)}" r:id="{generate-id (.)}"/>
-      </xsl:for-each>
-    </hyperlinks>
-  </xsl:if>
-  
-</xsl:template>
-  
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <xsl:value-of select="$string"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="InsertHyperlinks">
+
+    <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
+    <xsl:if
+      test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+      <hyperlinks>
+        <xsl:for-each
+          select="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+          <xsl:variable name="ViewHyperlinks">
+            <xsl:value-of select="."/>
+          </xsl:variable>
+
+          <xsl:variable name="colPosition">
+            <xsl:for-each select="ancestor::table:table-cell">
+              <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:variable name="rowPosition">
+            <xsl:value-of select="generate-id(ancestor::table:table-row)"/>
+          </xsl:variable>
+
+
+          <!-- real column number -->
+          <xsl:variable name="colNum">
+            <xsl:for-each select="ancestor::table:table-row/table:table-cell[1]">
+              <xsl:call-template name="GetColNumber">
+                <xsl:with-param name="position">
+                  <xsl:value-of select="$colPosition"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:variable name="rows">
+            <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
+
+              <xsl:call-template name="GetRowNumber">
+                <xsl:with-param name="rowId" select="$rowPosition"/>
+                <xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
+              </xsl:call-template>
+
+            </xsl:for-each>
+          </xsl:variable>
+
+          <xsl:variable name="colChar">
+            <xsl:call-template name="NumbersToChars">
+              <xsl:with-param name="num" select="$colNum -1"/>
+            </xsl:call-template>
+          </xsl:variable>
+
+          <hyperlink ref="{concat($colChar,$rows)}" r:id="{generate-id (.)}">
+
+            <xsl:variable name="convertedSpaces">
+              <xsl:call-template name="RemoveHash">
+                <xsl:with-param name="string" select="@xlink:href"/>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <xsl:attribute name="location">
+              <xsl:if test="@xlink:href">
+                <xsl:choose>
+                  <!-- when starts with up '#' -->
+                  <xsl:when test="starts-with($convertedSpaces,'#' )">
+                    <xsl:value-of select="translate(substring-after($convertedSpaces,'#'),'.','!')"
+                    />
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:if>
+            </xsl:attribute>
+          </hyperlink>
+        </xsl:for-each>
+      </hyperlinks>
+    </xsl:if>
+
+  </xsl:template>
+
 </xsl:stylesheet>
