@@ -571,6 +571,8 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:with-param name ="paraId" >
 								<xsl:value-of select ="@text:style-name"/>								
 							</xsl:with-param >
+              <xsl:with-param name ="isBulleted" select ="'false'"/>
+              <xsl:with-param name ="level" select ="'0'"/>
 						</xsl:call-template >
 						<xsl:for-each select ="child::node()[position()]">
 							<xsl:choose >
@@ -633,13 +635,34 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:for-each >
 			</xsl:when>
 			<xsl:when test ="draw:text-box/text:list/text:list-item/text:p/text:span">
-				<xsl:for-each select ="draw:text-box/text:list/text:list-item/text:p">
+				<xsl:for-each select ="draw:text-box/text:list">
 					<a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+            <!--Code inserted by Vijayets for Bullets and numbering-->
+            <!--Check if Levels are present-->
+            <xsl:variable name ="lvl">
+              <xsl:if test ="text:list-item/text:list">
+                <xsl:call-template name ="getListLevel">
+                  <xsl:with-param name ="levelCount"/>
+                </xsl:call-template>
+              </xsl:if>
+              <xsl:if test ="not(text:list-item/text:list)">
+                <xsl:value-of select ="'0'"/>
+              </xsl:if>
+            </xsl:variable >
 						<xsl:call-template name ="paraProperties" >
 							<xsl:with-param name ="paraId" >
+                <xsl:call-template name ="getParaStyleName">
+                  <xsl:with-param name ="lvl" select ="$lvl"/>                 
+                </xsl:call-template>                
+              </xsl:with-param >
+              <!-- list property also included-->
+              <xsl:with-param name ="listId">
 								<xsl:value-of select ="@text:style-name"/>
 							</xsl:with-param >
+              <xsl:with-param name ="isBulleted" select ="'true'"/>
+              <xsl:with-param name ="level" select ="$lvl"/>
 						</xsl:call-template >
+            <!--End of Code inserted by Vijayets for Bullets and numbering-->
 						<xsl:for-each select ="child::node()[position()]">
 							<xsl:choose >
 								<xsl:when test ="name()='text:span'">
@@ -689,13 +712,33 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:for-each >
 			</xsl:when>
 			<xsl:when test ="draw:text-box/text:list/text:list-item/text:p">
-				<xsl:for-each select ="draw:text-box/text:list/text:list-item/text:p">
+				<xsl:for-each select ="draw:text-box/text:list">
 					<a:p  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+            <!--Check if Levels are present-->
+            <xsl:variable name ="lvl">
+              <xsl:if test ="text:list-item/text:list">
+                <xsl:call-template name ="getListLevel">
+                  <xsl:with-param name ="levelCount"/>
+                </xsl:call-template>
+              </xsl:if>
+              <xsl:if test ="not(text:list-item/text:list)">
+                <xsl:value-of select ="'0'"/>
+              </xsl:if>
+            </xsl:variable >
 						<xsl:call-template name ="paraProperties" >
 							<xsl:with-param name ="paraId" >
+                <xsl:call-template name ="getParaStyleName">
+                  <xsl:with-param name ="lvl" select ="$lvl"/>
+                </xsl:call-template>
+              </xsl:with-param >
+              <!-- list property also included-->
+              <xsl:with-param name ="listId">
 								<xsl:value-of select ="@text:style-name"/>
 							</xsl:with-param >
+              <xsl:with-param name ="isBulleted" select ="'true'"/>
+              <xsl:with-param name ="level" select ="$lvl"/>
 						</xsl:call-template >
+            <!--End of Code inserted by Vijayets for Bullets and numbering-->
 						<a:r >
 							<a:rPr lang="en-US" smtClean="0">
 								<xsl:variable name ="DefFontSize">
@@ -729,6 +772,8 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:with-param name ="paraId" >
 								<xsl:value-of select ="@text:style-name"/>
 							</xsl:with-param >
+              <xsl:with-param name ="isBulleted" select ="'false'"/>
+              <xsl:with-param name ="level" select ="'0'"/>
 						</xsl:call-template >
 						<a:r >
 							<a:rPr lang="en-US" smtClean="0">
@@ -1807,6 +1852,23 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:for-each>
       </xsl:if>
       <!-- End - Add relation files of hyperlinks-->
+      <!--Code inserted by Vijayeta for Bullets and numbering,set relatioship for pictures-->
+      <xsl:for-each select ="document('content.xml')//office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image">
+        <xsl:if test ="@text:level='1'">
+          <Relationship>
+            <xsl:attribute name="Id">
+              <xsl:value-of select="$rId"/>
+            </xsl:attribute>
+            <xsl:attribute name="Type">
+              <xsl:value-of select="'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image'"/>
+            </xsl:attribute>
+            <xsl:attribute name="Target">
+              <xsl:value-of select="concat('../media/',substring-after(@xlink:href,'Pictures/'))"/>
+            </xsl:attribute>
+          </Relationship>
+        </xsl:if>
+      </xsl:for-each>
+      <!--End of Code inserted by Vijayeta for Bullets and numbering,set relatioship for pictures-->
 		</Relationships>
 	</xsl:template>
 
@@ -1890,4 +1952,40 @@ Copyright (c) 2007, Sonata Software Limited
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template name ="getParaStyleName">
+    <xsl:param name ="lvl"/>
+    <xsl:choose>
+      <xsl:when test ="$lvl='0'">
+        <xsl:value-of select ="text:list-item/text:p/@text:style-name"/>
+      </xsl:when >
+      <xsl:when test ="$lvl='1'">
+        <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+      <xsl:when test ="$lvl='2'">
+        <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+      <xsl:when test ="$lvl='3'">
+        <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+      <xsl:when test ="$lvl='4'">
+        <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+      <xsl:when test ="$lvl='5'">
+        <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+      <xsl:when test ="$lvl='6'">
+        <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+      <xsl:when test ="$lvl='7'">
+        <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+      <xsl:when test ="$lvl='8'">
+        <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+      <xsl:when test ="$lvl='9'">
+        <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>

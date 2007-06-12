@@ -35,7 +35,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   exclude-result-prefixes="style draw fo text">
-
+  <xsl:import href ="BulletsNumbering.xsl"/>
 	<xsl:template name ="convertToPoints">
 		<xsl:param name ="unit"/>
 		<xsl:param name ="length"/>
@@ -261,18 +261,20 @@ Copyright (c) 2007, Sonata Software Limited
 			<!-- Font Strike through end-->			
 			<!--Charector spacing -->
       <!-- Modfied by lohith - @fo:letter-spacing will have a text value 'normal' when no change is required -->
-			<xsl:if test ="style:text-properties/@fo:letter-spacing [contains(.,'cm')]">              
-        <!-- Modfied by lohith - "spc" should be a int value, '#.##'has been replaced by '#'   -->
+			<xsl:if test ="style:text-properties/@fo:letter-spacing [contains(.,'cm')]">
+				<!-- Modfied by lohith - "spc" should be a int value, '#.##'has been replaced by '#'   -->
 				<xsl:attribute name ="spc">
 					<xsl:if test ="substring-before(style:text-properties/@fo:letter-spacing,'cm')&lt; 0 ">
-						<xsl:value-of select ="format-number(substring-before(style:text-properties/@fo:letter-spacing,'cm') * 3.5 *1000 ,'#')"/>
+						<!--<xsl:value-of select ="format-number(substring-before(style:text-properties/@fo:letter-spacing,'cm') * 3.5 *1000 ,'#')"/>-->
+						<xsl:value-of select ="format-number(substring-before(style:text-properties/@fo:letter-spacing,'cm') * 7200 div 2.54 ,'#')"/>
 					</xsl:if >
 					<xsl:if test ="substring-before(style:text-properties/@fo:letter-spacing,'cm')
 								&gt; 0 or substring-before(style:text-properties/@fo:letter-spacing,'cm') = 0 ">
-						<xsl:value-of select ="format-number((substring-before(style:text-properties/@fo:letter-spacing,'cm') div .035) *100 ,'#')"/>
+						<!--<xsl:value-of select ="format-number((substring-before(style:text-properties/@fo:letter-spacing,'cm') div .035) *100 ,'#')"/>-->
+						<xsl:value-of select ="format-number((substring-before(style:text-properties/@fo:letter-spacing,'cm') * 72 div 2.54) *100 ,'#')"/>
 					</xsl:if>
 				</xsl:attribute>
-			</xsl:if >			
+			</xsl:if >
 			<!--Color Node set as standard colors -->
 			<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
 			<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
@@ -330,9 +332,21 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:for-each >
 	</xsl:template>
 	<xsl:template name ="paraProperties" >
+    <!--- Code inserted by Vijayeta for Bullets and numbering,For bullet properties-->
 		<xsl:param name ="paraId" />
+    <xsl:param name ="listId"/>
+    <xsl:param name ="isBulleted" />
+    <xsl:param name ="level"/>
+   
 		<xsl:for-each select ="document('content.xml')//style:style[@style:name=$paraId]">
 			<a:pPr>
+        <!-- Code inserted by Vijayeta for Bullets and numbering,For bullet properties-->
+        <xsl:if test ="not($level='0')">
+          <xsl:attribute name ="lvl">
+            <xsl:value-of select ="$level"/>
+          </xsl:attribute>
+        </xsl:if>         
+       
 				<!--marL="first line indent property"-->
 				<xsl:if test ="style:paragraph-properties/@fo:text-indent 
 							and substring-before(style:paragraph-properties/@fo:text-indent,'cm') &gt; 0">
@@ -370,6 +384,7 @@ Copyright (c) 2007, Sonata Software Limited
 						</xsl:call-template>
 					</xsl:attribute>
 				</xsl:if >				
+        
         <!--Code inserted by Vijayeta For Line Spacing,
             If the line spacing is in terms of Percentage, multiply the value with 1000-->
 				<xsl:if test ="style:paragraph-properties/@fo:line-height and 
@@ -431,7 +446,17 @@ Copyright (c) 2007, Sonata Software Limited
 					</a:spcAft>
 				</xsl:if >
 				<!-- Code Added by Vijayeta,for Paragraph Spacing, Before and After-->
+        <xsl:if test ="isBulleted='false'">
 				<a:buNone/>
+        </xsl:if>
+        <xsl:if test ="$isBulleted='true'">
+          <xsl:call-template name ="insertBulletsNumbers" >
+            <xsl:with-param name ="listId" select ="$listId"/>
+            <xsl:with-param name ="level" select ="$level+1"/>
+          </xsl:call-template>
+        </xsl:if>
+
+        <!--Code Inserted by vijayeta,For Bullets and Numbering,Set Level if present-->
 			</a:pPr>
 		</xsl:for-each >
 	</xsl:template>
