@@ -747,6 +747,7 @@
   <xsl:template name="SetPosition">
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
+    
     <xsl:attribute name="table:end-cell-address">
      <xsl:variable name="ColEnd">
         <xsl:call-template name="NumbersToChars">
@@ -772,8 +773,23 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:value-of select="concat($NameSheet, '.', $ColEnd, $RowEnd)"/>
+      
+      <xsl:variable name="sheetName">
+        <xsl:choose>
+          <xsl:when test="contains($NameSheet,' ')">
+            <xsl:text>&apos;</xsl:text>
+            <xsl:value-of select="$NameSheet"/>
+            <xsl:text>&apos;</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:otherwise>
+        </xsl:choose>        
+      </xsl:variable>
+      
+      <xsl:value-of select="concat($sheetName, '.', $ColEnd, $RowEnd)"/>
     </xsl:attribute>
+    
     <xsl:attribute name="svg:x">
         <xsl:choose>
           <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
