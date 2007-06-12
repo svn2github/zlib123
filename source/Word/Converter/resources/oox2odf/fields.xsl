@@ -1697,12 +1697,18 @@
 
   <xsl:template name="InsertField">
     <xsl:choose>
+      <!-- workaround for autonum fields - inserting numbera as plain text -->
+      <xsl:when test="child::w:instrText[contains(.,'AUTONUM')]">
+        <text:span text:style-name="{generate-id(self::node())}">
+          <xsl:value-of select="concat(count(preceding::w:instrText[contains(.,'AUTONUM')])+1,'.')"/>
+        </text:span>
+      </xsl:when>
       <!-- default scenario - catch beginning of field instruction. Other runs ignored (handled by first w:instrText processing). -->
-      <xsl:when test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] and not(contains(w:instrText[1],'AUTOTEXT'))">
+      <xsl:when test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] and not(contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
         <xsl:apply-templates select="w:instrText[1]"/>
       </xsl:when>
       <!-- autotext fields should be processed like normal text, because there is no autotext field in OO -->
-      <xsl:when test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] and contains(w:instrText[1],'AUTOTEXT')">
+      <xsl:when test="preceding::*[1][self::w:fldChar[@w:fldCharType='begin']] and (contains(w:instrText[1],'AUTOTEXT') or contains(w:instrText[1],'AUTONUM'))">
         <xsl:choose>
           <xsl:when test="w:rPr[not(count(child::node())=1 and child::w:noProof)]">
             <text:span text:style-name="{generate-id(self::node())}">
@@ -1718,7 +1724,7 @@
         <!--  the same hyperlink can be in more then one paragraph so print as seperate text:a for each run which is in hyperlink field (between w:fldChar begin - end)-->
         <xsl:choose>
           <!-- autotext fields should be processed like normal text, because there is no autotext field in OO -->
-          <xsl:when test="preceding::w:instrText[1][contains(.,'AUTOTEXT')]">
+          <xsl:when test="preceding::w:instrText[1][contains(.,'AUTOTEXT') or contains(.,'AUTONUM')]">
             <xsl:choose>
               <xsl:when test="w:rPr[not(count(child::node())=1 and child::w:noProof)]">
                 <text:span text:style-name="{generate-id(self::node())}">
