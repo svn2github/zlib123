@@ -395,6 +395,7 @@
             <xsl:with-param name="decimalReplacement">
               <xsl:choose>
                 <xsl:when test="number:number/@number:decimal-replacement=''">#</xsl:when>
+                <xsl:when test="not(number:number/@number:decimal-places) and document('styles.xml')/office:document-styles/office:styles/style:default-style/style:table-cell-properties/@style:decimal-places">#</xsl:when>
                 <xsl:otherwise>0</xsl:otherwise>
               </xsl:choose>
             </xsl:with-param>
