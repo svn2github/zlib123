@@ -947,7 +947,7 @@
 
           <xsl:variable name="colPosition">
             <xsl:for-each select="ancestor::table:table-cell">
-              <xsl:value-of select="count(preceding-sibling::table:table-cell) + 1"/>
+              <xsl:value-of select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1"/>
             </xsl:for-each>
           </xsl:variable>
 
