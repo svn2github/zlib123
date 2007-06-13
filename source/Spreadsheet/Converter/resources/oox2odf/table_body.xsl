@@ -54,6 +54,7 @@
     <xsl:param name="PictureCell"/>
     <xsl:param name="NoteCell"/>
     <xsl:param name="PictureAndNoteCell"/>
+    
     <xsl:choose>
       <!-- when sheet is empty  -->
       <xsl:when
@@ -65,7 +66,7 @@
       </xsl:when>
       <!-- when there are only picture in sheet  -->
       <xsl:when
-        test="not(e:worksheet/e:sheetData/e:row) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell != ''">
+        test="not(e:worksheet/e:sheetData/e:row/e:c/e:v) and $BigMergeCell = '' and $BigMergeRow = '' and $PictureCell != ''">
   
         <xsl:call-template name="InsertEmptySheetWithPicture">
           <xsl:with-param name="PictureCell">

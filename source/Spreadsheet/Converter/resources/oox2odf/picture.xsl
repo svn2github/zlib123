@@ -45,7 +45,7 @@
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="chart.xsl"/>
-  
+
   <xsl:key name="drawing" match="e:drawing" use="''"/>
 
   <!-- Get cell with picture -->
@@ -135,7 +135,7 @@
     </xsl:variable>
 
     <xsl:variable name="PictureRowStart">
-     <xsl:choose>
+      <xsl:choose>
         <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
           <xsl:value-of select="xdr:to/xdr:row"/>
         </xsl:when>
@@ -228,7 +228,7 @@
         </xsl:for-each>
 
         <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
-           <xsl:choose>
+          <xsl:choose>
             <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1'">
               <xsl:if
                 test="xdr:to/xdr:col = number(substring-before($CollsWithPicture, ';')) and xdr:to/xdr:row = $rowNum">
@@ -355,9 +355,11 @@
 
           <draw:object xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
             <xsl:attribute name="xlink:href">
-              <xsl:value-of select="concat('./Object ',generate-id(xdr:graphicFrame/a:graphic/a:graphicData/c:chart))"/>
+              <xsl:value-of
+                select="concat('./Object ',generate-id(xdr:graphicFrame/a:graphic/a:graphicData/c:chart))"
+              />
             </xsl:attribute>
-<!--            <draw:object draw:notify-on-update-of-ranges="Sheet1.D6:Sheet1.D6"
+            <!--            <draw:object draw:notify-on-update-of-ranges="Sheet1.D6:Sheet1.D6"
               xlink:href="./Object 1"/>-->
           </draw:object>
 
@@ -522,6 +524,21 @@
         </xsl:for-each>
       </xsl:variable>
 
+      <xsl:variable name="rowStyle">
+        <xsl:choose>
+          <xsl:when
+            test="document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[@r = substring-before($PictureRow,';') + 1]/@ht">
+            <xsl:for-each
+              select="document(concat('xl/',$sheet))/e:worksheet/e:sheetData/e:row[@r = substring-before($PictureRow,';') + 1]">
+              <xsl:value-of select="generate-id(.)"/>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$TableStyleName"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
       <xsl:variable name="GetMinRowWithPicture">
         <xsl:call-template name="GetMinRowWithPicture">
           <xsl:with-param name="PictureRow">
@@ -549,9 +566,9 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-
+      
       <!-- Insert Empty Row with picture (pictures) -->
-      <table:table-row table:style-name="{$TableStyleName}">
+      <table:table-row table:style-name="{$rowStyle}">
         <xsl:call-template name="InsertPictureEmptySheet">
           <xsl:with-param name="collNum">
             <xsl:text>0</xsl:text>
@@ -747,9 +764,9 @@
   <xsl:template name="SetPosition">
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
-    
+
     <xsl:attribute name="table:end-cell-address">
-     <xsl:variable name="ColEnd">
+      <xsl:variable name="ColEnd">
         <xsl:call-template name="NumbersToChars">
           <xsl:with-param name="num">
             <xsl:choose>
@@ -773,7 +790,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:variable name="sheetName">
         <xsl:choose>
           <xsl:when test="contains($NameSheet,' ')">
@@ -784,27 +801,27 @@
           <xsl:otherwise>
             <xsl:value-of select="$NameSheet"/>
           </xsl:otherwise>
-        </xsl:choose>        
+        </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:value-of select="concat($sheetName, '.', $ColEnd, $RowEnd)"/>
     </xsl:attribute>
-    
+
     <xsl:attribute name="svg:x">
-        <xsl:choose>
-          <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
-            <xsl:call-template name="ConvertEmu">
-        		<xsl:with-param name="length" select="xdr:to/xdr:colOff"/>
-        		<xsl:with-param name="unit">cm</xsl:with-param>
-      		</xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="ConvertEmu">
-        		<xsl:with-param name="length" select="xdr:from/xdr:colOff"/>
-        		<xsl:with-param name="unit">cm</xsl:with-param>
-      		</xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="xdr:to/xdr:colOff"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="xdr:from/xdr:colOff"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:attribute>
     <xsl:attribute name="svg:y">
       <xsl:call-template name="ConvertEmu">
@@ -826,7 +843,7 @@
             <xsl:with-param name="unit">cm</xsl:with-param>
           </xsl:call-template>
         </xsl:otherwise>
-      </xsl:choose>     
+      </xsl:choose>
     </xsl:attribute>
     <xsl:attribute name="table:end-y">
       <xsl:call-template name="ConvertEmu">
@@ -837,10 +854,10 @@
   </xsl:template>
 
   <!-- Insert Picture Style -->
-  
+
   <xsl:template name="InsertPictureProperties">
-    <style:style style:name="{generate-id(.)}" style:family="graphic">      
-      <style:graphic-properties>      
+    <style:style style:name="{generate-id(.)}" style:family="graphic">
+      <style:graphic-properties>
         <xsl:call-template name="InsertImageFlip">
           <xsl:with-param name="atribute">
             <xsl:text>style</xsl:text>
@@ -932,24 +949,20 @@
   <!-- To do insert border -->
 
   <xsl:template name="InsertImageBorder">
-    <xsl:if
-      test="xdr:pic/xdr:spPr/a:ln[not(a:noFill)]">
+    <xsl:if test="xdr:pic/xdr:spPr/a:ln[not(a:noFill)]">
 
       <xsl:variable name="width">
         <xsl:call-template name="ConvertEmu3">
           <xsl:with-param name="length">
-            <xsl:value-of
-              select="xdr:pic/xdr:spPr/a:ln/@w"
-            />
+            <xsl:value-of select="xdr:pic/xdr:spPr/a:ln/@w"/>
           </xsl:with-param>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <xsl:variable name="type">
         <xsl:choose>
-          <xsl:when
-            test="xdr:pic/xdr:spPr/a:ln/a:prstDash/@val = 'solid'">
+          <xsl:when test="xdr:pic/xdr:spPr/a:ln/a:prstDash/@val = 'solid'">
             <xsl:text>solid</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -957,37 +970,34 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
+
       <xsl:variable name="color">
         <xsl:choose>
-          <xsl:when
-            test="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr/@val != ''">
-            <xsl:value-of
-              select="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr/@val"
-            />
+          <xsl:when test="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr/@val != ''">
+            <xsl:value-of select="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr/@val"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>000000</xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-     
+
       <xsl:attribute name="draw:stroke">
-          <xsl:value-of select="$type"/>        
+        <xsl:value-of select="$type"/>
       </xsl:attribute>
-      
+
       <xsl:attribute name="draw:stroke-dash">
-        <xsl:text>Line_20_with_20_Fine_20_Dots</xsl:text>        
+        <xsl:text>Line_20_with_20_Fine_20_Dots</xsl:text>
       </xsl:attribute>
-      
+
       <xsl:attribute name="svg:stroke-width">
         <xsl:value-of select="$width"/>
       </xsl:attribute>
-      
+
       <xsl:attribute name="svg:stroke-color">
         <xsl:value-of select="concat('#', $color)"/>
       </xsl:attribute>
-      
+
     </xsl:if>
   </xsl:template>
 
@@ -997,12 +1007,12 @@
     <!--  picture flip (vertical, horizontal)-->
     <xsl:if test="xdr:pic/xdr:spPr/a:xfrm/attribute::node()">
       <xsl:choose>
-       <!-- TO DO Vertical  -->
-         <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1' and $atribute != 'style'">
-            <xsl:attribute name="draw:transform">
-              <xsl:text>rotate (3.1415926535892) translate (2.064cm 0.425cm)</xsl:text>
-            </xsl:attribute>
-         </xsl:when>
+        <!-- TO DO Vertical  -->
+        <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1' and $atribute != 'style'">
+          <xsl:attribute name="draw:transform">
+            <xsl:text>rotate (3.1415926535892) translate (2.064cm 0.425cm)</xsl:text>
+          </xsl:attribute>
+        </xsl:when>
         <!-- horizontal -->
         <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipH = '1'  and $atribute = 'style'">
           <xsl:attribute name="style:mirror">
@@ -1073,7 +1083,7 @@
               <xsl:text>0</xsl:text>
             </xsl:with-param>
             <xsl:with-param name="EndColl">
-              
+
               <xsl:text>256</xsl:text>
             </xsl:with-param>
           </xsl:call-template>
@@ -1255,7 +1265,7 @@
           </xsl:call-template>
         </xsl:for-each>
 
-      <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
+        <xsl:for-each select="xdr:wsDr/xdr:twoCellAnchor">
 
           <xsl:choose>
             <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = 1">
