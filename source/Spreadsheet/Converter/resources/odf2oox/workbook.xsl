@@ -313,7 +313,7 @@
 
     <xsl:variable name="sheetName">
       <xsl:choose>
-        <xsl:when test="contains(@table:name,' ')">
+        <xsl:when test="contains(@table:name,' ') or contains(@table:name,'!') ">
           <xsl:text>'</xsl:text>
           <xsl:value-of select="@table:name"/>
           <xsl:text>'</xsl:text>
@@ -357,7 +357,7 @@
 
     <xsl:variable name="sheetName">
       <xsl:choose>
-        <xsl:when test="contains(@table:name,' ')">
+        <xsl:when test="contains(@table:name,' ') or contains(@table:name,'!') ">
           <xsl:text>'</xsl:text>
           <xsl:value-of select="@table:name"/>
           <xsl:text>'</xsl:text>
