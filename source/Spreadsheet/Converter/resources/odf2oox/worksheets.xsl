@@ -1003,6 +1003,14 @@
                 </xsl:choose>
               </xsl:if>
             </xsl:attribute>
+            <xsl:attribute name="display">
+              <xsl:variable name="HypeDiscDisp">
+              <text:a>
+                <xsl:value-of select="."/>
+              </text:a>
+              </xsl:variable>
+              <xsl:value-of select="$HypeDiscDisp"/>
+            </xsl:attribute>
           </hyperlink>
         </xsl:for-each>
       </hyperlinks>
