@@ -205,7 +205,9 @@
         <xsl:with-param name="pageStyle" select="$pageStyle"/>
       </xsl:call-template>
 
-      <xsl:call-template name="InsertHeaderFooter"/>
+      <xsl:call-template name="InsertHeaderFooter">
+        <xsl:with-param name="masterPage" select="$masterPage"/>
+      </xsl:call-template>
 
       <xsl:variable name="picture">
         <xsl:choose>
@@ -546,12 +548,14 @@
   </xsl:template>
 
   <xsl:template name="InsertHeaderFooter">
+    <xsl:param name="masterPage"/>
+    
     <xsl:if
-      test="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:header[not(@style:display = 'false' )]/child::node() or
-      document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']/style:footer[not(@style:display = 'false' )]/child::node()">
+      test="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = $masterPage]/style:header[not(@style:display = 'false' )]/child::node() or
+      document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = $masterPage]/style:footer[not(@style:display = 'false' )]/child::node()">
       <headerFooter>
         <xsl:for-each
-          select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = 'Default']">
+          select="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = $masterPage]">
           <xsl:if
             test="not(style:header-left/@style:display = 'false' ) or not(style:footer-left/@style:display = 'false' )">
             <xsl:attribute name="differentOddEven">
@@ -564,8 +568,12 @@
           </xsl:if>
         </xsl:for-each>
         <xsl:for-each select="document('styles.xml')/office:document-styles">
-          <xsl:call-template name="OddHeaderFooter"/>
-          <xsl:call-template name="EvenHeaderFooter"/>
+          <xsl:call-template name="OddHeaderFooter">
+            <xsl:with-param name="masterPage" select="$masterPage"/>
+          </xsl:call-template>
+          <xsl:call-template name="EvenHeaderFooter">
+            <xsl:with-param name="masterPage" select="$masterPage"/>
+          </xsl:call-template>
         </xsl:for-each>
       </headerFooter>
     </xsl:if>

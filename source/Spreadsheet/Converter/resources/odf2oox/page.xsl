@@ -35,15 +35,17 @@
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" exclude-result-prefixes="svg">
 
   <xsl:template name="OddHeaderFooter">
+    <xsl:param name="masterPage"/>
+    
     <xsl:for-each
-      select="office:master-styles/style:master-page[@style:name = 'Default']/style:header">
+      select="office:master-styles/style:master-page[@style:name = $masterPage]/style:header">
       <xsl:if test="not(@style:display = 'false' )">
         <oddHeader xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></oddHeader>
       </xsl:if>
     </xsl:for-each>
 
     <xsl:for-each
-      select="office:master-styles/style:master-page[@style:name = 'Default']/style:footer">
+      select="office:master-styles/style:master-page[@style:name = $masterPage]/style:footer">
       <xsl:if test="not(@style:display = 'false' )">
         <oddFooter xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></oddFooter>
       </xsl:if>
@@ -51,25 +53,27 @@
   </xsl:template>
 
   <xsl:template name="EvenHeaderFooter">
+    <xsl:param name="masterPage"/>
+    
     <!-- if there is even header or footer -->
     <xsl:if
-      test="office:master-styles/style:master-page[@style:name = 'Default']/style:header-left[not(@style:display = 'false' )] or office:master-styles/style:master-page[@style:name = 'Default']/style:footer-left[not(@style:display = 'false' )]">
+      test="office:master-styles/style:master-page[@style:name = $masterPage]/style:header-left[not(@style:display = 'false' )] or office:master-styles/style:master-page[@style:name = $masterPage]/style:footer-left[not(@style:display = 'false' )]">
 
       <!-- print even header -->
       <xsl:choose>
         <!-- if even header has to be printed then print it -->
         <xsl:when
-          test="office:master-styles/style:master-page[@style:name = 'Default']/style:header-left[not(@style:display = 'false' )]">
+          test="office:master-styles/style:master-page[@style:name = $masterPage]/style:header-left[not(@style:display = 'false' )]">
           <xsl:for-each
-            select="office:master-styles/style:master-page[@style:name = 'Default']/style:header-left">
+            select="office:master-styles/style:master-page[@style:name = $masterPage]/style:header-left">
             <evenHeader xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenHeader>
           </xsl:for-each>
         </xsl:when>
         <!-- if not then if odd header has to be printed - print it also for even pages -->
         <xsl:when
-          test="office:master-styles/style:master-page[@style:name = 'Default']/style:header[not(@style:display = 'false' )] and office:master-styles/style:master-page[@style:name = 'Default']/style:footer-left[not(@style:display = 'false' )]">
+          test="office:master-styles/style:master-page[@style:name = $masterPage]/style:header[not(@style:display = 'false' )] and office:master-styles/style:master-page[@style:name = $masterPage]/style:footer-left[not(@style:display = 'false' )]">
           <xsl:for-each
-            select="office:master-styles/style:master-page[@style:name = 'Default']/style:header">
+            select="office:master-styles/style:master-page[@style:name = $masterPage]/style:header">
             <evenHeader xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenHeader>
           </xsl:for-each>
         </xsl:when>
@@ -79,17 +83,17 @@
       <xsl:choose>
         <!-- if even footer has to be printed then print it -->
         <xsl:when
-          test="office:master-styles/style:master-page[@style:name = 'Default']/style:footer-left[not(@style:display = 'false' )]">
+          test="office:master-styles/style:master-page[@style:name = $masterPage]/style:footer-left[not(@style:display = 'false' )]">
           <xsl:for-each
-            select="office:master-styles/style:master-page[@style:name = 'Default']/style:footer-left">
+            select="office:master-styles/style:master-page[@style:name = $masterPage]/style:footer-left">
             <evenFooter xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenFooter>
           </xsl:for-each>
         </xsl:when>
         <!-- if not then if odd footer has to be printed - print it also for even pages -->
         <xsl:when
-          test="office:master-styles/style:master-page[@style:name = 'Default']/style:footer[not(@style:display = 'false' )] and office:master-styles/style:master-page[@style:name = 'Default']/style:header-left[not(@style:display = 'false' )]">
+          test="office:master-styles/style:master-page[@style:name = $masterPage]/style:footer[not(@style:display = 'false' )] and office:master-styles/style:master-page[@style:name = $masterPage]/style:header-left[not(@style:display = 'false' )]">
           <xsl:for-each
-            select="office:master-styles/style:master-page[@style:name = 'Default']/style:footer">
+            select="office:master-styles/style:master-page[@style:name = $masterPage]/style:footer">
             <evenFooter xml:space="preserve"><xsl:call-template name="InsertHeaderFooterContent"/></evenFooter>
           </xsl:for-each>
         </xsl:when>
