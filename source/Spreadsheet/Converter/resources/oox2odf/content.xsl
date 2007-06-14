@@ -122,17 +122,20 @@
 
       <!-- Insert Table (Sheet) Name -->
 
-      <xsl:attribute name="table:name">
-        <xsl:value-of select="@name"/>
-
-        <!--<xsl:call-template name="CheckSheetName">
+      <xsl:variable name="checkedName">
+        <xsl:call-template name="CheckSheetName">
           <xsl:with-param name="sheetNumber">
             <xsl:value-of select="$number"/>
           </xsl:with-param>
           <xsl:with-param name="name">
-            <xsl:value-of select="translate(@name,'!$-','')"/>
+            <xsl:value-of select="translate(@name,'!$-()','')"/>
           </xsl:with-param>
-        </xsl:call-template>-->
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:attribute name="table:name">
+        <!--        <xsl:value-of select="@name"/>-->
+        <xsl:value-of select="$checkedName"/>
       </xsl:attribute>
 
       <!-- Insert Table Style Name (style:table-properties) -->
@@ -146,6 +149,9 @@
         mode="PrintArea">
         <xsl:with-param name="name">
           <xsl:value-of select="@name"/>
+        </xsl:with-param>
+        <xsl:with-param name="checkedName">
+          <xsl:value-of select="$checkedName"/>
         </xsl:with-param>
       </xsl:apply-templates>
 
@@ -187,6 +193,7 @@
 
   <xsl:template match="e:definedName" mode="PrintArea">
     <xsl:param name="name"/>
+    <xsl:param name="checkedName"/>
 
     <xsl:variable name="value">
       <xsl:value-of select="."/>
@@ -194,6 +201,7 @@
 
     <xsl:choose>
       <xsl:when test="contains($value, $name) and @name = '_xlnm.Print_Area' ">
+
         <!--         
         <xsl:variable name="apos">
           <xsl:text>&apos;</xsl:text>
@@ -221,6 +229,7 @@
           <xsl:call-template name="InsertRanges">
             <xsl:with-param name="ranges" select="text()"/>
             <xsl:with-param name="mode" select="substring-after(text(),',')"/>
+            <xsl:with-param name="checkedName" select="$checkedName"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
@@ -231,6 +240,9 @@
             <xsl:apply-templates select="following-sibling::e:definedName[1]" mode="PrintArea">
               <xsl:with-param name="name">
                 <xsl:value-of select="$name"/>
+              </xsl:with-param>
+              <xsl:with-param name="checkedName">
+                <xsl:value-of select="$checkedName"/>
               </xsl:with-param>
             </xsl:apply-templates>
           </xsl:when>
@@ -247,11 +259,14 @@
   <xsl:template name="InsertRanges">
     <xsl:param name="ranges"/>
     <xsl:param name="mode"/>
+    <xsl:param name="checkedName"/>
 
     <xsl:variable name="apos">
       <xsl:text>&apos;</xsl:text>
     </xsl:variable>
 
+    <!-- take sheet name from <definedName> (can be distinct from $checkedName) 
+           it is needed for <definedName> processing -->
     <xsl:variable name="sheetName">
       <xsl:choose>
         <xsl:when test="starts-with($ranges,$apos)">
@@ -330,12 +345,14 @@
           </xsl:choose>
         </xsl:variable>
 
-        <xsl:value-of select="concat($sheetName,'.',$start,':',$sheetName,'.',$end)"/>
+        <xsl:value-of
+          select="concat($apos,$checkedName,$apos,'.',$start,':',$apos,$checkedName,$apos,'.',$end)"/>
         <xsl:text> </xsl:text>
 
         <xsl:call-template name="InsertRanges">
           <xsl:with-param name="ranges" select="substring-after($ranges,',')"/>
           <xsl:with-param name="mode" select="substring-after(substring-after($ranges,','),',')"/>
+          <xsl:with-param name="checkedName" select="$checkedName"/>
         </xsl:call-template>
       </xsl:when>
 
@@ -399,9 +416,7 @@
         </xsl:variable>
 
         <xsl:value-of
-          select="concat($sheetName,'.',$start,':',$sheetName,'.',$end)"/>
-<!--        <xsl:value-of select="$endRange"/>-->
-        <!--<xsl:value-of select="$sheetName"/>-->
+          select="concat($apos,$checkedName,$apos,'.',$start,':',$apos,$checkedName,$apos,'.',$end)"/>
 
       </xsl:otherwise>
     </xsl:choose>
@@ -518,7 +533,7 @@
           </xsl:when>
         </xsl:choose>
       </xsl:variable>
-      
+
       <!-- Check If Picture are in this sheet  -->
       <xsl:variable name="PictureCell">
         <xsl:call-template name="PictureCell">
@@ -1460,15 +1475,15 @@
 
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
-      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-','') = $name][2]">
+      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-()','') = $name][2]">
         <xsl:variable name="nameConflictsBefore">
           <!-- count sheets before this one whose name (after correction) collide with this sheet name (after correction) -->
           <xsl:value-of
-            select="count(parent::node()/e:sheet[translate(@name,'!$-','') = $name and position() &lt; $sheetNumber])"
+            select="count(parent::node()/e:sheet[translate(@name,'!$-()','') = $name and position() &lt; $sheetNumber])"
           />
         </xsl:variable>
         <!-- cut name and add "(N)" at the end where N is seqential number of duplicated name -->
-        <xsl:value-of select="concat(translate(@name,'!$-',''),'(',$nameConflictsBefore + 1,')')"/>
+        <xsl:value-of select="concat(translate(@name,'!$-()',''),'_',$nameConflictsBefore + 1)"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$name"/>
