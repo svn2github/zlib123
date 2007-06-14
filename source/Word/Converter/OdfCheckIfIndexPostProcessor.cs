@@ -42,23 +42,45 @@ namespace CleverAge.OdfConverter.Word
 		private bool isIndex;
 		private int context;
 		private Stack context2;
+        private int sectionContext;
+        private int sectionParagraphs;
 		public OdfCheckIfIndexPostProcessor(XmlWriter nextWriter):base(nextWriter)
 		{
 			this.numberOfParagraphs = 0;
 			this.isIndex = false;
 			this.context = 0;
 			this.context2 = new Stack();
+            this.sectionContext = 0;
 		}
 		public override void WriteStartElement(string prefix, string localName, string ns)
         {
+            //field this.sectionContext is increased each time when we start an element in section and decreased when we end an element in section,
+            //so when it's value is more than 0, the current element must be in section 
+            if (IsSection(localName))
+            {
+                this.sectionContext = 1;
+            }
+            else if (this.sectionContext > 0)
+            {
+                this.sectionContext++;
+                if (IsParagraph(localName))
+                {
+                    this.sectionParagraphs++;
+                }
+            }
 			if(IsIndex(localName))
 			{
 				this.isIndex = true;
 				this.nextWriter.WriteStartElement(prefix,localName,ns);
-				if(IsAlphabetical(localName)){
-					this.numberOfParagraphs++;
-					this.context++;
-				}
+                if (IsAlphabetical(localName))
+                {
+                    this.numberOfParagraphs++;
+                    //we increse context only if there are no paragraphs between beginning of section and beginning of alphabetical index
+                    if (!(this.sectionParagraphs > 0))
+                    {
+                        this.context++;
+                    }
+                }
 			}
 			else
 			{
@@ -126,6 +148,15 @@ namespace CleverAge.OdfConverter.Word
         }
 		public override void WriteEndElement()
         {
+            //we decrease this.sectionContext field when we end an element in section
+            if (this.sectionContext > 0)
+            {
+                this.sectionContext--;
+            }
+            else if (this.sectionParagraphs > 0)
+            {
+                this.sectionParagraphs = 0;
+            }
         	if(this.context > 0)
         	{
 				this.context--;
@@ -184,6 +215,14 @@ namespace CleverAge.OdfConverter.Word
         	   	return true;
         	}
         	return false;
+        }
+        public bool IsSection(string elementName)
+        {
+            if (elementName.Equals("section"))
+            {
+                return true;
+            }
+            return false;
         } 	
 	}
 }
