@@ -185,14 +185,33 @@
 
     <xsl:choose>
       <xsl:when test="contains($value, $name) and @name = '_xlnm.Print_Area' ">
-        <xsl:variable name="printArea">
-          <xsl:value-of select="translate(text(),'$','')"/>
+        <!--         
+        <xsl:variable name="apos">
+          <xsl:text>&apos;</xsl:text>
         </xsl:variable>
-
+        
+        <xsl:variable name="sheetName">
+          <xsl:choose>
+            <xsl:when test="starts-with(text(),$apos)">
+              <xsl:value-of select="$apos"/>
+              <xsl:value-of select="substring-before(substring-after(text(),$apos),$apos)"/>
+              <xsl:value-of select="$apos"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="substring-before(text(),'!')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+     
+        <xsl:variable name="printArea">
+          <xsl:value-of select="$sheetName"/>
+          <xsl:value-of select="substring-after(text(),$sheetName)"/>
+        </xsl:variable>
+-->
         <xsl:attribute name="table:print-ranges">
           <xsl:call-template name="InsertRanges">
-            <xsl:with-param name="ranges" select="$printArea"/>
-            <xsl:with-param name="mode" select="substring-after($printArea,',')"/>
+            <xsl:with-param name="ranges" select="text()"/>
+            <xsl:with-param name="mode" select="substring-after(text(),',')"/>
           </xsl:call-template>
         </xsl:attribute>
       </xsl:when>
@@ -220,6 +239,23 @@
     <xsl:param name="ranges"/>
     <xsl:param name="mode"/>
 
+    <xsl:variable name="apos">
+      <xsl:text>&apos;</xsl:text>
+    </xsl:variable>
+
+    <xsl:variable name="sheetName">
+      <xsl:choose>
+        <xsl:when test="starts-with($ranges,$apos)">
+          <xsl:value-of select="$apos"/>
+          <xsl:value-of select="substring-before(substring-after($ranges,$apos),$apos)"/>
+          <xsl:value-of select="$apos"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-before($ranges,'!')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:choose>
       <!-- when there are more than one range -->
       <xsl:when test="$mode != '' ">
@@ -227,11 +263,14 @@
         <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
         <xsl:variable name="startRange">
           <xsl:choose>
-            <xsl:when test="contains(substring-before(substring-after($ranges, '!' ),','), ':' )">
-              <xsl:value-of select="substring-before(substring-after($ranges,'!'),':' )"/>
+            <xsl:when
+              test="contains(substring-before(substring-after($ranges, concat($sheetName,'!') ),','), ':' )">
+              <xsl:value-of
+                select="substring-before(substring-after($ranges,concat($sheetName,'!')),':' )"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="substring-before(substring-after($ranges,'!'),',' )"/>
+              <xsl:value-of
+                select="substring-before(substring-after($ranges,concat($sheetName,'!')),',' )"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
@@ -239,17 +278,50 @@
         <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
         <xsl:variable name="endRange">
           <xsl:choose>
-            <xsl:when test="contains(substring-before(substring-after($ranges, '!' ),','), ':' )">
+            <xsl:when
+              test="contains(substring-before(substring-after($ranges, concat($sheetName,'!') ),','), ':' )">
               <xsl:value-of select="substring-before(substring-after($ranges,':'),',' )"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="substring-before(substring-after($ranges,'!'),',' )"/>
+              <xsl:value-of
+                select="substring-before(substring-after($ranges,concat($sheetName,'!')),',' )"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
 
-        <xsl:value-of
-          select="concat(substring-before($ranges,'!'),'.',$startRange,':',substring-before($ranges,'!'),'.',$endRange)"/>
+        <xsl:variable name="start">
+          <xsl:choose>
+            <!-- when print range is defined for whole rows -->
+            <xsl:when test="number(translate($startRange,'$',''))">
+              <xsl:value-of select="concat('A',translate($startRange,'$',''))"/>
+            </xsl:when>
+            <!-- when print range is defined for whole columns -->
+            <xsl:when test="$startRange = translate($startRange,'1234567890','')">
+              <xsl:value-of select="concat(translate($startRange,'$',''),'1')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="translate($startRange,'$','')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="end">
+          <xsl:choose>
+            <!-- when print range is defined for whole rows -->
+            <xsl:when test="number(translate($startRange,'$',''))">
+              <xsl:value-of select="concat('IV',translate($startRange,'$',''))"/>
+            </xsl:when>
+            <!-- when print range is defined for whole columns -->
+            <xsl:when test="$startRange = translate($startRange,'1234567890','')">
+              <xsl:value-of select="concat(translate($startRange,'$',''),'65536')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="translate($startRange,'$','')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:value-of select="concat($sheetName,'.',$start,':',$sheetName,'.',$end)"/>
         <xsl:text> </xsl:text>
 
         <xsl:call-template name="InsertRanges">
@@ -263,11 +335,12 @@
         <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
         <xsl:variable name="startRange">
           <xsl:choose>
-            <xsl:when test="contains(substring-after($ranges, '!' ), ':' )">
-              <xsl:value-of select="substring-before(substring-after($ranges,'!'),':' )"/>
+            <xsl:when test="contains(substring-after($ranges, concat($sheetName,'!') ), ':' )">
+              <xsl:value-of
+                select="substring-before(substring-after($ranges,concat($sheetName,'!')),':' )"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="substring-after($ranges,'!')"/>
+              <xsl:value-of select="substring-after($ranges,concat($sheetName,'!'))"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
@@ -275,17 +348,51 @@
         <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
         <xsl:variable name="endRange">
           <xsl:choose>
-            <xsl:when test="contains(substring-after($ranges, '!' ), ':' )">
+            <xsl:when test="contains(substring-after($ranges, concat($sheetName,'!') ), ':' )">
               <xsl:value-of select="substring-after($ranges,':')"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="substring-after($ranges,'!')"/>
+              <xsl:value-of select="substring-after($ranges,concat($sheetName,'!'))"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
 
-        <xsl:value-of
-          select="concat(substring-before($ranges,'!'),'.',$startRange,':',substring-before($ranges,'!'),'.',$endRange)"/>
+        <xsl:variable name="start">
+          <xsl:choose>
+            <!-- when print range is defined for whole rows -->
+            <xsl:when test="number(translate($startRange,'$',''))">
+              <xsl:value-of select="concat('A',translate($startRange,'$',''))"/>
+            </xsl:when>
+            <!-- when print range is defined for whole columns -->
+            <xsl:when test="$startRange = translate($startRange,'1234567890','')">
+              <xsl:value-of select="concat(translate($startRange,'$',''),'1')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="translate($startRange,'$','')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <xsl:variable name="end">
+          <xsl:choose>
+            <!-- when print range is defined for whole rows -->
+            <xsl:when test="number(translate($startRange,'$',''))">
+              <xsl:value-of select="concat('IV',translate($startRange,'$',''))"/>
+            </xsl:when>
+            <!-- when print range is defined for whole columns -->
+            <xsl:when test="$startRange = translate($startRange,'1234567890','')">
+              <xsl:value-of select="concat(translate($startRange,'$',''),'65536')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="translate($startRange,'$','')"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        
+        <!--<xsl:value-of
+          select="concat($sheetName,'.',$start,':',$sheetName,'.',$end)"/>-->
+        <xsl:value-of select="$endRange"/>
+        <!--<xsl:value-of select="$sheetName"/>-->
 
       </xsl:otherwise>
     </xsl:choose>
@@ -336,7 +443,7 @@
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of
-                select="substring-before(substring-after(substring-after(text(),','),'$'),':')"/>
+                    select="substring-before(substring-after(substring-after(text(),$apos),concat($apos,'!$')),':')"
                   />
                 </xsl:otherwise>
               </xsl:choose>
@@ -369,31 +476,30 @@
           <!-- if sheet name in range definition is in apostrophes -->
           <xsl:when
             test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
-        <xsl:for-each
-          select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and contains(text(),$sheetName)]">
-          <xsl:choose>
-            <!-- when header columns are present -->
-            <xsl:when test="contains(text(),',')">
-              <xsl:value-of
-                select="substring-after(substring-after(substring-after(text(),','),':'),'$')"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="substring-after(substring-after(text(),':'),'$')"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-          </xsl:when>
-
-          <xsl:when
-            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
             <xsl:for-each
-              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
               <xsl:choose>
                 <!-- when header columns are present -->
                 <xsl:when test="contains(text(),',')">
                   <xsl:value-of
-                    select="substring-after(substring-after(substring-after(text(),','),':'),'$')"
-                  />
+                    select="substring-after(substring-after(substring-after(text(),','),':'),'$')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring-after(substring-after(text(),':'),'$')"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:when>
+
+          <xsl:when
+            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+            <xsl:for-each
+              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+              <xsl:choose>
+                <!-- when header columns are present -->
+                <xsl:when test="contains(text(),',')">
+                  <xsl:value-of
+                    select="substring-after(substring-after(substring-after(text(),','),':'),'$')"/>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of select="substring-after(substring-after(text(),':'),'$')"/>
@@ -403,10 +509,6 @@
           </xsl:when>
         </xsl:choose>
       </xsl:variable>
-
-      <zzz>
-        <xsl:value-of select="concat($headerRowsStart,'#',$headerRowsEnd)"/>
-      </zzz>
 
       <!-- Check If Picture are in this sheet  -->
       <xsl:variable name="PictureCell">

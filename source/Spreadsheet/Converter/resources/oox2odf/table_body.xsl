@@ -1918,9 +1918,9 @@
         </xsl:when>
         
         <xsl:when
-          test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+          test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
           <xsl:for-each
-            select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+            select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
             <xsl:choose>
               <!-- when header columns are present -->
               <xsl:when test="contains(text(),',')">
@@ -1936,10 +1936,6 @@
       </xsl:choose>
     </xsl:variable>
 
-    <zzz>
-      <xsl:value-of select="concat($charHeaderColsStart,'#',$charHeaderColsEnd)"/>
-    </zzz>
-    
     <xsl:variable name="headerColsStart">
       <xsl:if test="$charHeaderColsStart != '' and not(number($charHeaderColsStart))">
         <xsl:call-template name="GetAlphabeticPosition">
