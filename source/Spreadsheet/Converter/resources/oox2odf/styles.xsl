@@ -452,6 +452,24 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
+
+          <xsl:if test="e:alignment/@indent">
+            <xsl:attribute name="fo:margin-left">
+              <xsl:variable name="indennt">
+                <xsl:value-of select="e:alignment/@indent"/>
+              </xsl:variable>              
+              <xsl:value-of select="format-number($indennt*0.353,'##.###cm') "/>
+            </xsl:attribute>            
+          </xsl:if>
+          <xsl:if test="e:alignment/@indent">
+            <xsl:attribute name="fo:margin-right">
+              <xsl:variable name="indennnt">
+                <xsl:value-of select="e:alignment/@indent"/>
+              </xsl:variable>              
+              <xsl:value-of select="format-number($indennnt*0.353,'##.###cm') "/>
+            </xsl:attribute>            
+          </xsl:if>
+
         </style:paragraph-properties>
       </xsl:if>
     </xsl:if>
@@ -507,23 +525,24 @@
   </xsl:template>
 
   <xsl:template name="InsertTextStyles">
-    
+
     <!-- @Description: inserts text styles -->
     <!-- @Context: none -->
-    
+
     <xsl:apply-templates select="document('xl/sharedStrings.xml')/e:sst/e:si/e:r[e:rPr]"
       mode="automaticstyles"/>
     <xsl:apply-templates select="document('xl/comments1.xml')/e:comments">
       <xsl:with-param name="number">1</xsl:with-param>
     </xsl:apply-templates>
   </xsl:template>
-  
+
   <xsl:template match="e:comments">
-    
+
     <!-- @Description: inserts text styles in notes -->
     <!-- @Context: none -->
-    
-    <xsl:param name="number"/><!--(int) number of sheet/comments file -->
+
+    <xsl:param name="number"/>
+    <!--(int) number of sheet/comments file -->
     <xsl:apply-templates select="e:commentList/e:comment/e:text/e:r[e:rPr]" mode="automaticstyles"/>
     <xsl:apply-templates select="document(concat('xl/comments',$number + 1,'.xml'))">
       <xsl:with-param name="number">
@@ -531,7 +550,7 @@
       </xsl:with-param>
     </xsl:apply-templates>
   </xsl:template>
-  
+
   <!-- convert run properties into span style -->
   <xsl:template match="e:r" mode="automaticstyles">
     <style:style style:name="{generate-id(.)}" style:family="text">
