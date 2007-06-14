@@ -130,7 +130,7 @@
             <xsl:value-of select="$number"/>
           </xsl:with-param>
           <xsl:with-param name="name">
-            <xsl:value-of select="translate(@name,'!$','')"/>
+            <xsl:value-of select="translate(@name,'!$-','')"/>
           </xsl:with-param>
         </xsl:call-template>-->
       </xsl:attribute>
@@ -321,7 +321,7 @@
               <xsl:value-of select="concat('IV',translate($endRange,'$',''))"/>
             </xsl:when>
             <!-- when print range is defined for whole columns -->
-            <xsl:when test="$startRange = translate($endRange,'1234567890','')">
+            <xsl:when test="$endRange = translate($endRange,'1234567890','')">
               <xsl:value-of select="concat(translate($endRange,'$',''),'65536')"/>
             </xsl:when>
             <xsl:otherwise>
@@ -389,7 +389,7 @@
               <xsl:value-of select="concat('IV',translate($endRange,'$',''))"/>
             </xsl:when>
             <!-- when print range is defined for whole columns -->
-            <xsl:when test="$startRange = translate($endRange,'1234567890','')">
+            <xsl:when test="$endRange = translate($endRange,'1234567890','')">
               <xsl:value-of select="concat(translate($endRange,'$',''),'65536')"/>
             </xsl:when>
             <xsl:otherwise>
@@ -1460,15 +1460,15 @@
 
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
-      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$','') = $name][2]">
+      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-','') = $name][2]">
         <xsl:variable name="nameConflictsBefore">
           <!-- count sheets before this one whose name (after correction) collide with this sheet name (after correction) -->
           <xsl:value-of
-            select="count(parent::node()/e:sheet[translate(@name,'!$','') = $name and position() &lt; $sheetNumber])"
+            select="count(parent::node()/e:sheet[translate(@name,'!$-','') = $name and position() &lt; $sheetNumber])"
           />
         </xsl:variable>
         <!-- cut name and add "(N)" at the end where N is seqential number of duplicated name -->
-        <xsl:value-of select="concat(translate(@name,'!$',''),'(',$nameConflictsBefore + 1,')')"/>
+        <xsl:value-of select="concat(translate(@name,'!$-',''),'(',$nameConflictsBefore + 1,')')"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$name"/>
