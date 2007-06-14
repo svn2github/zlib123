@@ -151,8 +151,8 @@
     <xsl:param name="NameSheet"/>
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
-    <xsl:param name="ConditionalCellStyle"/>    
- 
+    <xsl:param name="ConditionalCellStyle"/>
+
 
     <xsl:variable name="GetMinRowWithPicture">
       <xsl:call-template name="GetMinRowWithPicture">
@@ -875,7 +875,8 @@
             </xsl:attribute>
           </xsl:if>
 
-          <xsl:if test="@s or contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $colNum, ';'))">
+          <xsl:if
+            test="@s or contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $colNum, ';'))">
             <xsl:choose>
               <xsl:when test="@s">
                 <xsl:attribute name="table:style-name">
@@ -886,11 +887,13 @@
               </xsl:when>
               <xsl:otherwise>
                 <xsl:attribute name="table:style-name">
-                  <xsl:value-of select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1])"/>
-                </xsl:attribute>            
+                  <xsl:value-of
+                    select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1])"
+                  />
+                </xsl:attribute>
               </xsl:otherwise>
             </xsl:choose>
-                  
+
 
             <xsl:variable name="horizontal">
               <xsl:for-each select="document('xl/styles.xml')">
@@ -1103,6 +1106,7 @@
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="sheetNr"/>
+    
     <xsl:choose>
       <xsl:when test="@t='s' ">
         <xsl:attribute name="office:value-type">
@@ -1136,16 +1140,17 @@
                     <!-- when hyperlink leads to another place in workbook -->
                     <xsl:when test="key('ref',@r)/@location != '' ">
                       <xsl:for-each select="key('ref',@r)">
-                        
+
                         <xsl:variable name="apos">
                           <xsl:text>&apos;</xsl:text>
                         </xsl:variable>
-                        
+
                         <xsl:variable name="sheetName">
                           <xsl:choose>
                             <xsl:when test="starts-with(@location,$apos)">
                               <xsl:value-of select="$apos"/>
-                              <xsl:value-of select="substring-before(substring-after(@location,$apos),$apos)"/>
+                              <xsl:value-of
+                                select="substring-before(substring-after(@location,$apos),$apos)"/>
                               <xsl:value-of select="$apos"/>
                             </xsl:when>
                             <xsl:otherwise>
@@ -1153,31 +1158,32 @@
                             </xsl:otherwise>
                           </xsl:choose>
                         </xsl:variable>
-                        
-                        <xsl:variable name="checkedName">
-                          <xsl:call-template name="CheckSheetName">
-                            <xsl:with-param name="sheetNumber">
-                              <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
-                               <xsl:value-of select="count(preceding-sibling::e:sheet) + 1"/>
-                              </xsl:for-each>
-                            </xsl:with-param>
-                            <xsl:with-param name="name">
-                              <xsl:value-of select="translate($sheetName,'!$-()','')"/>
-                            </xsl:with-param>
-                          </xsl:call-template>
+
+                        <xsl:variable name="invalidChars">
+                          <xsl:text>&apos;!$-()</xsl:text>
                         </xsl:variable>
-                        
-                        <xsl:variable name="zzzz">
+
+                        <xsl:variable name="checkedName">
                           <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
-                            <xsl:value-of select="count(preceding-sibling::e:sheet)"/>
+                            <xsl:call-template name="CheckSheetName">
+                              <xsl:with-param name="sheetNumber">
+                                <xsl:for-each
+                                  select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
+                                  <xsl:value-of select="count(preceding-sibling::e:sheet) + 1"/>
+                                </xsl:for-each>
+                              </xsl:with-param>
+                              <xsl:with-param name="name">
+                                <xsl:value-of select="translate($sheetName,$invalidChars,'')"/>
+                              </xsl:with-param>
+                            </xsl:call-template>
                           </xsl:for-each>
                         </xsl:variable>
-                        
+
                         <xsl:text>#</xsl:text>
                         <xsl:value-of select="$checkedName"/>
                         <xsl:text>.</xsl:text>
                         <xsl:value-of select="substring-after(@location,concat($sheetName,'!'))"/>
-                        
+
                       </xsl:for-each>
                     </xsl:when>
                     <!--when hyperlink leads to a document -->
@@ -1969,10 +1975,13 @@
               <!-- when header columns are present -->
               <xsl:when test="contains(text(),',')">
                 <xsl:value-of
-                  select="substring-before(substring-after(substring-after(substring-before(text(),','),$apos),concat($apos,'!$')),':')"/>
+                  select="substring-before(substring-after(substring-after(substring-before(text(),','),$apos),concat($apos,'!$')),':')"
+                />
               </xsl:when>
               <xsl:otherwise>
-                <xsl:value-of select="substring-before(substring-after(substring-after(text(),$apos),concat($apos,'!$')),':')"/>
+                <xsl:value-of
+                  select="substring-before(substring-after(substring-after(text(),$apos),concat($apos,'!$')),':')"
+                />
               </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each>
@@ -2016,7 +2025,7 @@
             </xsl:choose>
           </xsl:for-each>
         </xsl:when>
-        
+
         <xsl:when
           test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
           <xsl:for-each
