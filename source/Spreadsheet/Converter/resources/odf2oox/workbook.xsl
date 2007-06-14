@@ -171,7 +171,7 @@
         </xsl:variable>
         <!-- cut name and add "(N)" at the end where N is seqential number of duplicated name -->
         <xsl:value-of
-          select="concat(substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31 - 2 - string-length($nameConflictsBefore + 1)),'(',$nameConflictsBefore + 1,')')"
+          select="concat(substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31 - 2 - string-length($nameConflictsBefore + 1)),'_',$nameConflictsBefore + 1)"
         />
       </xsl:when>
       <xsl:otherwise>
