@@ -2788,7 +2788,7 @@
     <!-- wrapping of text (horizontal adjustment) -->
     <xsl:if
       test="$shapeProperties/@fo:min-width or $shapeStyle/style:graphic-properties/@draw:auto-grow-width = 'true' ">
-      <xsl:text>mso-wrap-style:none;</xsl:text>
+      <!--<xsl:text>mso-wrap-style:none;</xsl:text>-->
     </xsl:if>
 
     <!--text-box spacing/margins -->
