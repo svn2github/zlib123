@@ -1133,6 +1133,53 @@
                     <xsl:when test="contains($target,':')">
                       <xsl:value-of select="$target"/>
                     </xsl:when>
+                    <!-- when hyperlink leads to another place in workbook -->
+                    <xsl:when test="key('ref',@r)/@location != '' ">
+                      <xsl:for-each select="key('ref',@r)">
+                        
+                        <xsl:variable name="apos">
+                          <xsl:text>&apos;</xsl:text>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="sheetName">
+                          <xsl:choose>
+                            <xsl:when test="starts-with(@location,$apos)">
+                              <xsl:value-of select="$apos"/>
+                              <xsl:value-of select="substring-before(substring-after(@location,$apos),$apos)"/>
+                              <xsl:value-of select="$apos"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="substring-before(@location,'!')"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="checkedName">
+                          <xsl:call-template name="CheckSheetName">
+                            <xsl:with-param name="sheetNumber">
+                              <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
+                               <xsl:value-of select="count(preceding-sibling::e:sheet) + 1"/>
+                              </xsl:for-each>
+                            </xsl:with-param>
+                            <xsl:with-param name="name">
+                              <xsl:value-of select="translate($sheetName,'!$-()','')"/>
+                            </xsl:with-param>
+                          </xsl:call-template>
+                        </xsl:variable>
+                        
+                        <xsl:variable name="zzzz">
+                          <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($sheetName,$apos,'')]">
+                            <xsl:value-of select="count(preceding-sibling::e:sheet)"/>
+                          </xsl:for-each>
+                        </xsl:variable>
+                        
+                        <xsl:text>#</xsl:text>
+                        <xsl:value-of select="$checkedName"/>
+                        <xsl:text>.</xsl:text>
+                        <xsl:value-of select="substring-after(@location,concat($sheetName,'!'))"/>
+                        
+                      </xsl:for-each>
+                    </xsl:when>
                     <!--when hyperlink leads to a document -->
                     <xsl:otherwise>
                       <xsl:call-template name="Change20PercentToSpace">
