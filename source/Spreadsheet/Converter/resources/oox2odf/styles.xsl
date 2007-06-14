@@ -68,6 +68,8 @@
       <office:styles>
         <xsl:call-template name="InsertDefaultTableCellStyle"/>
         <xsl:call-template name="InsertCellStyle"/>
+        <!-- Insert Conditional Styles-->
+        <xsl:call-template name="InsertConditionalStyles"/>
       </office:styles>
       <office:automatic-styles>
         <xsl:call-template name="InsertPageLayout">
@@ -630,8 +632,17 @@
       <xsl:call-template name="InsertColor"/>
     </xsl:attribute>
   </xsl:template>
-
-  <xsl:template match="e:color" mode="style">
+  
+  <!-- cell color fill in conditional -->
+  <xsl:template match="e:bgColor" mode="style">
+    <xsl:if test="ancestor::e:dxf">
+    <xsl:attribute name="fo:background-color">
+      <xsl:call-template name="InsertColor"/>
+    </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  
+   <xsl:template match="e:color" mode="style">
 
     <xsl:attribute name="fo:color">
       <xsl:call-template name="InsertColor"/>

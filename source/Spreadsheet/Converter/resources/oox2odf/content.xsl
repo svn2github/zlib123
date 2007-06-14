@@ -44,12 +44,15 @@
   <xsl:import href="number.xsl"/>
   <xsl:import href="picture.xsl"/>
   <xsl:import href="note.xsl"/>
-
+  <xsl:import href="conditional.xsl"/>
+  
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="''"/>
+  <xsl:key name="Dxf" match="e:styleSheet/e:dxfs/e:dxf" use="''"/>
   <xsl:key name="Sst" match="e:si" use="''"/>
   <xsl:key name="SheetFormatPr" match="e:sheetFormatPr" use="''"/>
   <xsl:key name="Col" match="e:col" use="''"/>
+  <xsl:key name="ConditionalFormatting" match="e:conditionalFormatting" use="''"/>
 
   <xsl:template name="content">
     <office:document-content>
@@ -69,6 +72,10 @@
           mode="PictureStyle">
           <xsl:with-param name="number">1</xsl:with-param>
         </xsl:apply-templates>
+        <!-- Insert Conditional Properties -->
+        <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]" mode="ConditionalStyle">
+          <xsl:with-param name="number">1</xsl:with-param>
+        </xsl:apply-templates>        
       </office:automatic-styles>
       <xsl:call-template name="InsertSheets"/>
     </office:document-content>
@@ -549,7 +556,21 @@
           <xsl:with-param name="sheetNr" select="$sheetNr"/>
         </xsl:call-template>
       </xsl:variable>
+      
+      <!-- Check If Conditionals are in this sheet -->
+      
+      <xsl:variable name="ConditionalCell">
+        <xsl:call-template name="ConditionalCell"/>
+      </xsl:variable>
 
+      <xsl:variable name="ConditionalCellStyle">
+        <xsl:call-template name="ConditionalCell">
+          <xsl:with-param name="document">
+            <xsl:text>style</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      
       <xsl:variable name="PictureAndNoteCell">
         <xsl:value-of select="concat($PictureCell,$NoteCell)"/>
       </xsl:variable>
@@ -740,6 +761,12 @@
                   <xsl:value-of select="$NameSheet"/>
                 </xsl:with-param>
                 <xsl:with-param name="sheetNr" select="$sheetNr"/>
+                <xsl:with-param name="ConditionalCell">
+                  <xsl:value-of select="$ConditionalCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellStyle">
+                  <xsl:value-of select="$ConditionalCellStyle"/>
+                </xsl:with-param>
               </xsl:apply-templates>
             </xsl:when>
 
@@ -798,6 +825,8 @@
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="sheetNr"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -982,6 +1011,12 @@
         <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
+      <xsl:with-param name="ConditionalCell">
+        <xsl:value-of select="$ConditionalCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellStyle">
+        <xsl:value-of select="$ConditionalCellStyle"/>
+      </xsl:with-param>
     </xsl:call-template>
 
     <xsl:if
@@ -1208,6 +1243,8 @@
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="sheetNr"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -1381,6 +1418,12 @@
         <xsl:value-of select="$GetMinCollWithPicture"/>
       </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
+      <xsl:with-param name="ConditionalCell">
+        <xsl:value-of select="$ConditionalCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellStyle">
+        <xsl:value-of select="$ConditionalCellStyle"/>
+      </xsl:with-param>
     </xsl:call-template>
 
     <!-- Insert next coll -->
@@ -1426,6 +1469,12 @@
         <xsl:value-of select="$GetMinCollWithPicture"/>
       </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
+      <xsl:with-param name="ConditionalCell">
+        <xsl:value-of select="$ConditionalCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConditionalCellStyle">
+        <xsl:value-of select="$ConditionalCellStyle"/>
+      </xsl:with-param>
     </xsl:call-template>
 
   </xsl:template>

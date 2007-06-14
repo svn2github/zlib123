@@ -41,156 +41,172 @@
   <xsl:template name="InsertBorder">
     
     <xsl:variable name="BorderId">
-      <xsl:value-of select="@borderId"/>
+      <xsl:choose>
+        <xsl:when test="@borderId != ''">
+          <xsl:value-of select="@borderId"/>    
+        </xsl:when>
+        <xsl:otherwise/>
+      </xsl:choose>
     </xsl:variable>
+   
+    <xsl:choose>
+      <xsl:when test="$BorderId != 0 and $BorderId != ''">
+        <xsl:for-each select="key('Border', '')/e:border[position() = $BorderId + 1]">
+          <xsl:call-template name="InsertBorderProperties"/>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each select="e:border">
+            <xsl:call-template name="InsertBorderProperties"/>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
     
-    <xsl:if test="$BorderId != 0">
-      <xsl:for-each select="key('Border', '')/e:border[position() = $BorderId + 1]">
-        
-        <xsl:attribute name="fo:border-bottom">       
-          <xsl:variable name="BorderStyleBottom">
-            <xsl:call-template name="GetBorderStyle">
-              <xsl:with-param name="style">
-                <xsl:value-of select="e:bottom/@style"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="BorderColorBottom">
-            <xsl:for-each select="e:bottom/e:color">
-              <xsl:call-template name="InsertColor"/>
-            </xsl:for-each>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="$BorderStyleBottom != 'none'">
-              <xsl:value-of select="concat($BorderStyleBottom, concat(' ', $BorderColorBottom))"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$BorderStyleBottom"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        
-        <xsl:attribute name="fo:border-left">
-          <xsl:variable name="BorderStyleLeft">
-            <xsl:call-template name="GetBorderStyle">
-              <xsl:with-param name="style">
-                <xsl:value-of select="e:left/@style"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="BorderColorLeft">
-            <xsl:for-each select="e:left/e:color">
-              <xsl:call-template name="InsertColor"/>
-            </xsl:for-each>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="$BorderStyleLeft != 'none'">
-              <xsl:value-of select="concat($BorderStyleLeft, concat(' ', $BorderColorLeft))"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$BorderStyleLeft"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        
-        <xsl:attribute name="fo:border-right">
-          <xsl:variable name="BorderStyleRight">
-            <xsl:call-template name="GetBorderStyle">
-              <xsl:with-param name="style">
-                <xsl:value-of select="e:right/@style"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="BorderColorRight">
-            <xsl:for-each select="e:right/e:color">
-              <xsl:call-template name="InsertColor"/>
-            </xsl:for-each>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="$BorderStyleRight != 'none'">
-              <xsl:value-of select="concat($BorderStyleRight, concat(' ', $BorderColorRight))"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$BorderStyleRight"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>         
-        
-        <xsl:attribute name="fo:border-top">
-          <xsl:variable name="BorderStyleTop">
-            <xsl:call-template name="GetBorderStyle">
-              <xsl:with-param name="style">
-                <xsl:value-of select="e:top/@style"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:variable name="BorderColorTop">
-            <xsl:for-each select="e:top/e:color">
-              <xsl:call-template name="InsertColor"/>
-            </xsl:for-each>
-          </xsl:variable>
-          <xsl:choose>
-            <xsl:when test="$BorderStyleTop != 'none'">
-              <xsl:value-of select="concat($BorderStyleTop, concat(' ', $BorderColorTop))"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$BorderStyleTop"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-        
-        <xsl:if test="@diagonalUp = '1'">
-          <xsl:attribute name="style:diagonal-bl-tr">          
-            <xsl:variable name="BorderStyleTop">
-              <xsl:call-template name="GetBorderStyle">
-                <xsl:with-param name="style">
-                  <xsl:value-of select="e:diagonal/@style"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:variable name="BorderColorTop">
-              <xsl:for-each select="e:diagonal/e:color">
-                <xsl:call-template name="InsertColor"/>
-              </xsl:for-each>
-            </xsl:variable>
-            <xsl:choose>
-              <xsl:when test="$BorderStyleTop != 'none'">
-                <xsl:value-of select="concat($BorderStyleTop, concat(' ', $BorderColorTop))"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$BorderStyleTop"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </xsl:if>
-        
-        <xsl:if test="@diagonalDown = '1'">
-          <xsl:attribute name="style:diagonal-tl-br">          
-            <xsl:variable name="BorderStyleTop">
-              <xsl:call-template name="GetBorderStyle">
-                <xsl:with-param name="style">
-                  <xsl:value-of select="e:diagonal/@style"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:variable name="BorderColorTop">
-              <xsl:for-each select="e:diagonal/e:color">
-                <xsl:call-template name="InsertColor"/>
-              </xsl:for-each>
-            </xsl:variable>
-            <xsl:choose>
-              <xsl:when test="$BorderStyleTop != 'none'">
-                <xsl:value-of select="concat($BorderStyleTop, concat(' ', $BorderColorTop))"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$BorderStyleTop"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </xsl:if>
-        
-      </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template name="InsertBorderProperties">
+    
+    <xsl:attribute name="fo:border-bottom">       
+      <xsl:variable name="BorderStyleBottom">
+        <xsl:call-template name="GetBorderStyle">
+          <xsl:with-param name="style">
+            <xsl:value-of select="e:bottom/@style"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="BorderColorBottom">
+        <xsl:for-each select="e:bottom/e:color">
+          <xsl:call-template name="InsertColor"/>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$BorderStyleBottom != 'none'">
+          <xsl:value-of select="concat($BorderStyleBottom, concat(' ', $BorderColorBottom))"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$BorderStyleBottom"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    
+    <xsl:attribute name="fo:border-left">
+      <xsl:variable name="BorderStyleLeft">
+        <xsl:call-template name="GetBorderStyle">
+          <xsl:with-param name="style">
+            <xsl:value-of select="e:left/@style"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="BorderColorLeft">
+        <xsl:for-each select="e:left/e:color">
+          <xsl:call-template name="InsertColor"/>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$BorderStyleLeft != 'none'">
+          <xsl:value-of select="concat($BorderStyleLeft, concat(' ', $BorderColorLeft))"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$BorderStyleLeft"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    
+    <xsl:attribute name="fo:border-right">
+      <xsl:variable name="BorderStyleRight">
+        <xsl:call-template name="GetBorderStyle">
+          <xsl:with-param name="style">
+            <xsl:value-of select="e:right/@style"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="BorderColorRight">
+        <xsl:for-each select="e:right/e:color">
+          <xsl:call-template name="InsertColor"/>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$BorderStyleRight != 'none'">
+          <xsl:value-of select="concat($BorderStyleRight, concat(' ', $BorderColorRight))"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$BorderStyleRight"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>         
+    
+    <xsl:attribute name="fo:border-top">
+      <xsl:variable name="BorderStyleTop">
+        <xsl:call-template name="GetBorderStyle">
+          <xsl:with-param name="style">
+            <xsl:value-of select="e:top/@style"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="BorderColorTop">
+        <xsl:for-each select="e:top/e:color">
+          <xsl:call-template name="InsertColor"/>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="$BorderStyleTop != 'none'">
+          <xsl:value-of select="concat($BorderStyleTop, concat(' ', $BorderColorTop))"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$BorderStyleTop"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    
+    <xsl:if test="@diagonalUp = '1'">
+      <xsl:attribute name="style:diagonal-bl-tr">          
+        <xsl:variable name="BorderStyleTop">
+          <xsl:call-template name="GetBorderStyle">
+            <xsl:with-param name="style">
+              <xsl:value-of select="e:diagonal/@style"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="BorderColorTop">
+          <xsl:for-each select="e:diagonal/e:color">
+            <xsl:call-template name="InsertColor"/>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="$BorderStyleTop != 'none'">
+            <xsl:value-of select="concat($BorderStyleTop, concat(' ', $BorderColorTop))"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$BorderStyleTop"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
     </xsl:if>
+    
+    <xsl:if test="@diagonalDown = '1'">
+      <xsl:attribute name="style:diagonal-tl-br">          
+        <xsl:variable name="BorderStyleTop">
+          <xsl:call-template name="GetBorderStyle">
+            <xsl:with-param name="style">
+              <xsl:value-of select="e:diagonal/@style"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="BorderColorTop">
+          <xsl:for-each select="e:diagonal/e:color">
+            <xsl:call-template name="InsertColor"/>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="$BorderStyleTop != 'none'">
+            <xsl:value-of select="concat($BorderStyleTop, concat(' ', $BorderColorTop))"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$BorderStyleTop"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </xsl:if>    
     
   </xsl:template>
   

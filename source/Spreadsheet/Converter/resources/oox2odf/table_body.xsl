@@ -150,6 +150,9 @@
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="sheetNr"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>    
+ 
 
     <xsl:variable name="GetMinRowWithPicture">
       <xsl:call-template name="GetMinRowWithPicture">
@@ -246,6 +249,12 @@
                 <xsl:value-of select="$NameSheet"/>
               </xsl:with-param>
               <xsl:with-param name="sheetNr" select="$sheetNr"/>
+              <xsl:with-param name="ConditionalCell">
+                <xsl:value-of select="$ConditionalCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="ConditionalCellStyle">
+                <xsl:value-of select="$ConditionalCellStyle"/>
+              </xsl:with-param>
             </xsl:apply-templates>
           </xsl:if>
 
@@ -781,6 +790,8 @@
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="sheetNr"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
 
     <xsl:message terminate="no">progress:c</xsl:message>
 
@@ -798,7 +809,6 @@
                     <xsl:value-of select="256 - $colNum"/>
                   </xsl:when>
                   <xsl:otherwise>
-                    <!--xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/-->
                     <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
                   </xsl:otherwise>
                 </xsl:choose>
@@ -865,12 +875,23 @@
             </xsl:attribute>
           </xsl:if>
 
-          <xsl:if test="@s">
-            <xsl:attribute name="table:style-name">
-              <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
-              </xsl:for-each>
-            </xsl:attribute>
+          <xsl:if test="@s or contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $colNum, ';'))">
+            <xsl:choose>
+              <xsl:when test="@s">
+                <xsl:attribute name="table:style-name">
+                  <xsl:for-each select="document('xl/styles.xml')">
+                    <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+                  </xsl:for-each>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="table:style-name">
+                  <xsl:value-of select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1])"/>
+                </xsl:attribute>            
+              </xsl:otherwise>
+            </xsl:choose>
+                  
+
             <xsl:variable name="horizontal">
               <xsl:for-each select="document('xl/styles.xml')">
                 <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"
@@ -1391,6 +1412,8 @@
     <xsl:param name="NameSheet"/>
     <xsl:param name="GetMinCollWithPicture"/>
     <xsl:param name="sheetNr"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
 
 
     <xsl:variable name="CheckIfBigMergeBefore">
@@ -1500,6 +1523,12 @@
                 <xsl:value-of select="$NameSheet"/>
               </xsl:with-param>
               <xsl:with-param name="sheetNr" select="$sheetNr"/>
+              <xsl:with-param name="ConditionalCell">
+                <xsl:value-of select="$ConditionalCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="ConditionalCellStyle">
+                <xsl:value-of select="$ConditionalCellStyle"/>
+              </xsl:with-param>
             </xsl:apply-templates>
           </xsl:when>
           <!-- if this cell is inside row of merged cells ($CheckIfMerged is true:number_of_cols_spaned) -->
@@ -1542,6 +1571,12 @@
                   <xsl:value-of select="$NameSheet"/>
                 </xsl:with-param>
                 <xsl:with-param name="sheetNr" select="$sheetNr"/>
+                <xsl:with-param name="ConditionalCell">
+                  <xsl:value-of select="$ConditionalCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellStyle">
+                  <xsl:value-of select="$ConditionalCellStyle"/>
+                </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
           </xsl:when>
@@ -1586,6 +1621,12 @@
                   <xsl:value-of select="$NameSheet"/>
                 </xsl:with-param>
                 <xsl:with-param name="sheetNr" select="$sheetNr"/>
+                <xsl:with-param name="ConditionalCell">
+                  <xsl:value-of select="$ConditionalCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellStyle">
+                  <xsl:value-of select="$ConditionalCellStyle"/>
+                </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
           </xsl:otherwise>
@@ -1635,6 +1676,12 @@
               <xsl:value-of select="$NameSheet"/>
             </xsl:with-param>
             <xsl:with-param name="sheetNr" select="$sheetNr"/>
+            <xsl:with-param name="ConditionalCell">
+              <xsl:value-of select="$ConditionalCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellStyle">
+              <xsl:value-of select="$ConditionalCellStyle"/>
+            </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>
       </xsl:when>
@@ -1755,6 +1802,12 @@
             </xsl:with-param>
             <xsl:with-param name="sheetNr">
               <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCell">
+              <xsl:value-of select="$ConditionalCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellStyle">
+              <xsl:value-of select="$ConditionalCellStyle"/>
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>
