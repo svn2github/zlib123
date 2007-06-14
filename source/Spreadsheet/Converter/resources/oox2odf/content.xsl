@@ -124,6 +124,15 @@
 
       <xsl:attribute name="table:name">
         <xsl:value-of select="@name"/>
+
+        <!--<xsl:call-template name="CheckSheetName">
+          <xsl:with-param name="sheetNumber">
+            <xsl:value-of select="$number"/>
+          </xsl:with-param>
+          <xsl:with-param name="name">
+            <xsl:value-of select="translate(@name,'!$','')"/>
+          </xsl:with-param>
+        </xsl:call-template>-->
       </xsl:attribute>
 
       <!-- Insert Table Style Name (style:table-properties) -->
@@ -308,15 +317,15 @@
         <xsl:variable name="end">
           <xsl:choose>
             <!-- when print range is defined for whole rows -->
-            <xsl:when test="number(translate($startRange,'$',''))">
-              <xsl:value-of select="concat('IV',translate($startRange,'$',''))"/>
+            <xsl:when test="number(translate($endRange,'$',''))">
+              <xsl:value-of select="concat('IV',translate($endRange,'$',''))"/>
             </xsl:when>
             <!-- when print range is defined for whole columns -->
-            <xsl:when test="$startRange = translate($startRange,'1234567890','')">
-              <xsl:value-of select="concat(translate($startRange,'$',''),'65536')"/>
+            <xsl:when test="$startRange = translate($endRange,'1234567890','')">
+              <xsl:value-of select="concat(translate($endRange,'$',''),'65536')"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="translate($startRange,'$','')"/>
+              <xsl:value-of select="translate($endRange,'$','')"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
@@ -372,26 +381,26 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:variable name="end">
           <xsl:choose>
             <!-- when print range is defined for whole rows -->
-            <xsl:when test="number(translate($startRange,'$',''))">
-              <xsl:value-of select="concat('IV',translate($startRange,'$',''))"/>
+            <xsl:when test="number(translate($endRange,'$',''))">
+              <xsl:value-of select="concat('IV',translate($endRange,'$',''))"/>
             </xsl:when>
             <!-- when print range is defined for whole columns -->
-            <xsl:when test="$startRange = translate($startRange,'1234567890','')">
-              <xsl:value-of select="concat(translate($startRange,'$',''),'65536')"/>
+            <xsl:when test="$startRange = translate($endRange,'1234567890','')">
+              <xsl:value-of select="concat(translate($endRange,'$',''),'65536')"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="translate($startRange,'$','')"/>
+              <xsl:value-of select="translate($endRange,'$','')"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
-        <!--<xsl:value-of
-          select="concat($sheetName,'.',$start,':',$sheetName,'.',$end)"/>-->
-        <xsl:value-of select="$endRange"/>
+
+        <xsl:value-of
+          select="concat($sheetName,'.',$start,':',$sheetName,'.',$end)"/>
+<!--        <xsl:value-of select="$endRange"/>-->
         <!--<xsl:value-of select="$sheetName"/>-->
 
       </xsl:otherwise>
@@ -492,9 +501,9 @@
           </xsl:when>
 
           <xsl:when
-            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
             <xsl:for-each
-              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
               <xsl:choose>
                 <!-- when header columns are present -->
                 <xsl:when test="contains(text(),',')">
@@ -509,7 +518,7 @@
           </xsl:when>
         </xsl:choose>
       </xsl:variable>
-
+      
       <!-- Check If Picture are in this sheet  -->
       <xsl:variable name="PictureCell">
         <xsl:call-template name="PictureCell">
@@ -1441,6 +1450,28 @@
           <text:s/>
         </xsl:if>
         <xsl:call-template name="InsertWhiteSpaces"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="CheckSheetName">
+    <xsl:param name="name"/>
+    <xsl:param name="sheetNumber"/>
+
+    <xsl:choose>
+      <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
+      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$','') = $name][2]">
+        <xsl:variable name="nameConflictsBefore">
+          <!-- count sheets before this one whose name (after correction) collide with this sheet name (after correction) -->
+          <xsl:value-of
+            select="count(parent::node()/e:sheet[translate(@name,'!$','') = $name and position() &lt; $sheetNumber])"
+          />
+        </xsl:variable>
+        <!-- cut name and add "(N)" at the end where N is seqential number of duplicated name -->
+        <xsl:value-of select="concat(translate(@name,'!$',''),'(',$nameConflictsBefore + 1,')')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$name"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
