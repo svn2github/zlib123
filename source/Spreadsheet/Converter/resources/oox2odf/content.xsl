@@ -316,23 +316,59 @@
 
     <xsl:for-each select="document(concat('xl/',$sheet))">
 
+      <xsl:variable name="apos">
+        <xsl:text>&apos;</xsl:text>
+      </xsl:variable>
+
       <xsl:variable name="headerRowsStart">
-        <xsl:for-each
-          select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and contains(text(),$sheetName)]">
-          <xsl:choose>
-            <!-- when header columns are present -->
-            <xsl:when test="contains(text(),',')">
-              <xsl:value-of
+        <xsl:choose>
+          <!-- if sheet name in range definition is in apostrophes -->
+          <xsl:when
+            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+            <xsl:for-each
+              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
+              <xsl:choose>
+                <!-- when header columns are present -->
+                <xsl:when test="contains(text(),',')">
+                  <xsl:value-of
+                    select="substring-before(substring-after(substring-after(substring-after(text(),','),$apos),concat($apos,'!$')),':')"
+                  />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of
                 select="substring-before(substring-after(substring-after(text(),','),'$'),':')"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="substring-before(substring-after(text(),'$'),':')"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
+                  />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:when>
+
+          <xsl:when
+            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+            <xsl:for-each
+              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+              <xsl:choose>
+                <!-- when header columns are present -->
+                <xsl:when test="contains(text(),',')">
+                  <xsl:value-of
+                    select="substring-before(substring-after(substring-after(text(),','),'$'),':')"
+                  />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring-before(substring-after(text(),'$'),':')"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
+
       </xsl:variable>
 
       <xsl:variable name="headerRowsEnd">
+        <xsl:choose>
+          <!-- if sheet name in range definition is in apostrophes -->
+          <xsl:when
+            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($apos,$sheetName,$apos))]">
         <xsl:for-each
           select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and contains(text(),$sheetName)]">
           <xsl:choose>
@@ -346,7 +382,31 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:for-each>
+          </xsl:when>
+
+          <xsl:when
+            test="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+            <xsl:for-each
+              select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[@name= '_xlnm.Print_Titles' and starts-with(text(),concat($sheetName,'!'))]">
+              <xsl:choose>
+                <!-- when header columns are present -->
+                <xsl:when test="contains(text(),',')">
+                  <xsl:value-of
+                    select="substring-after(substring-after(substring-after(text(),','),':'),'$')"
+                  />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring-after(substring-after(text(),':'),'$')"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
       </xsl:variable>
+
+      <zzz>
+        <xsl:value-of select="concat($headerRowsStart,'#',$headerRowsEnd)"/>
+      </zzz>
 
       <!-- Check If Picture are in this sheet  -->
       <xsl:variable name="PictureCell">
@@ -798,7 +858,8 @@
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
     </xsl:call-template>
 
-    <xsl:if test="not(following-sibling::e:row) and $PictureRow != '' and ($GetMinRowWithPicture +1 &gt; @r or (not(e:c) and $GetMinRowWithPicture + 1 = @r))">
+    <xsl:if
+      test="not(following-sibling::e:row) and $PictureRow != '' and ($GetMinRowWithPicture +1 &gt; @r or (not(e:c) and $GetMinRowWithPicture + 1 = @r))">
 
       <xsl:call-template name="InsertPictureBetwenTwoRows">
         <xsl:with-param name="StartRow">
@@ -824,8 +885,9 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-   
-    <xsl:if test="not(following-sibling::e:row) and $NoteRow != '' and ($GetMinRowWithPicture &gt; @r or (not(e:c) and $GetMinRowWithPicture = @r))">
+
+    <xsl:if
+      test="not(following-sibling::e:row) and $NoteRow != '' and ($GetMinRowWithPicture &gt; @r or (not(e:c) and $GetMinRowWithPicture = @r))">
 
       <xsl:call-template name="InsertNoteBetwenTwoRows">
         <xsl:with-param name="StartRow">
