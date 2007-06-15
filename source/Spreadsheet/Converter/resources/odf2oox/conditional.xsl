@@ -285,7 +285,9 @@
         <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-after(@style:condition, '=')"/>
@@ -297,7 +299,9 @@
         <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-after(@style:condition, '&lt;')"/>
@@ -309,7 +313,9 @@
         <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-after(@style:condition, '=')"/>
@@ -321,7 +327,9 @@
         <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-after(@style:condition, '&gt;')"/>
@@ -333,7 +341,9 @@
         <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-after(@style:condition, '=')"/>
@@ -345,7 +355,9 @@
         <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-before(substring-after(@style:condition, '('), ',')"/>
@@ -355,7 +367,9 @@
         <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-before(substring-after(@style:condition, ','), ')')"/>
@@ -367,7 +381,9 @@
         <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-before(substring-after(@style:condition, '('), ',')"/>
@@ -377,7 +393,9 @@
         <formula>
           <xsl:choose>
             <xsl:when test="contains(@style:condition, '[')">
-              <xsl:value-of select="substring-before(substring-after(@style:condition, '['), ']')"/>
+              <xsl:value-of
+                select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
+              />              
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-before(substring-after(@style:condition, ','), ')')"/>
