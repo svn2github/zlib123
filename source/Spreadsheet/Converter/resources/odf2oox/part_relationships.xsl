@@ -129,7 +129,7 @@
                 <xsl:choose>
                   <!-- when hyperlink to a site or mailto-->
                   <xsl:when test="contains(@xlink:href,':') and not(starts-with(@xlink:href,'/'))">
-                    <xsl:value-of select="@xlink:href"/>
+                    <xsl:value-of select="translate(@xlink:href,' ','')"/>
                   </xsl:when>
                   <!-- when hyperlink to an document-->
                   <xsl:otherwise>
