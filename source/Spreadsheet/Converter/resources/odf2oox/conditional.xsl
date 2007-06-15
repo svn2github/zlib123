@@ -281,6 +281,9 @@
       <xsl:when test="contains(@style:condition, '.$#REF!$#REF!')">
         <formula/>
       </xsl:when>
+      <xsl:when test="contains(@style:condition, 'is-true-formula')">
+        <formula/>
+      </xsl:when>      
       <xsl:when test="contains(@style:condition, '&lt;=')">
         <formula>
           <xsl:choose>
@@ -416,9 +419,6 @@
             </xsl:otherwise>
           </xsl:choose>
         </formula>
-      </xsl:when>
-      <xsl:when test="contains(@style:condition, 'is-true-formula')">
-        <formula/>
       </xsl:when>
       <xsl:otherwise>
         <formula>
