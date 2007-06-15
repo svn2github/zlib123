@@ -791,20 +791,33 @@
         </xsl:choose>
       </xsl:variable>
 
-      <xsl:variable name="sheetName">
-        <xsl:choose>
-          <xsl:when test="contains($NameSheet,' ')">
-            <xsl:text>&apos;</xsl:text>
-            <xsl:value-of select="$NameSheet"/>
-            <xsl:text>&apos;</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$NameSheet"/>
-          </xsl:otherwise>
-        </xsl:choose>
+      
+      <xsl:variable name="apos">
+        <xsl:text>&apos;</xsl:text>
+      </xsl:variable>
+      
+      <xsl:variable name="invalidChars">
+        <xsl:text>&apos;!$-()</xsl:text>
       </xsl:variable>
 
-      <xsl:value-of select="concat($sheetName, '.', $ColEnd, $RowEnd)"/>
+      <xsl:variable name="checkedName">
+        <xsl:for-each
+          select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($NameSheet,$apos,'')]">
+          <xsl:call-template name="CheckSheetName">
+            <xsl:with-param name="sheetNumber">
+              <xsl:for-each
+                select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[@name = translate($NameSheet,$apos,'')]">
+                <xsl:value-of select="count(preceding-sibling::e:sheet) + 1"/>
+              </xsl:for-each>
+            </xsl:with-param>
+            <xsl:with-param name="name">
+              <xsl:value-of select="translate($NameSheet,$invalidChars,'')"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <xsl:value-of select="concat($apos,$checkedName,$apos, '.', $ColEnd, $RowEnd)"/>
     </xsl:attribute>
 
     <xsl:attribute name="svg:x">

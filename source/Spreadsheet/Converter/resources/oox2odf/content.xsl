@@ -272,7 +272,7 @@
       <xsl:text>&apos;</xsl:text>
     </xsl:variable>
 
-    <!-- take sheet name from <definedName> (can be distinct from $checkedName) 
+    <!-- take sheet name from <definedName> (can be inside apostrophes and can be distinct from $checkedName) 
            it is needed for <definedName> processing -->
     <xsl:variable name="sheetName">
       <xsl:choose>
