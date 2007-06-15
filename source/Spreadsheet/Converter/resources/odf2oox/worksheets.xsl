@@ -945,10 +945,10 @@
 
     <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
     <xsl:if
-      test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+      test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
       <hyperlinks>
         <xsl:for-each
-          select="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+          select="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
           <xsl:variable name="ViewHyperlinks">
             <xsl:value-of select="."/>
           </xsl:variable>

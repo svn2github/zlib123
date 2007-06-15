@@ -38,7 +38,8 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  exclude-result-prefixes="svg table r text style number fo">
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  exclude-result-prefixes="svg table r text style number fo draw">
 
   <xsl:import href="measures.xsl"/>
   <xsl:key name="number" match="number:number-style" use="@style:name"/>
@@ -261,7 +262,7 @@
     <fonts>
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)])"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)])"
         />
       </xsl:attribute>
 
@@ -299,7 +300,7 @@
       <!--hyperlink font properties-->
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+          test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
           <font>
             <u val="single"/>
             <sz val="11"/>
@@ -576,7 +577,7 @@
 
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(document('content.xml')/descendant::text:a[@xlink:href and not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)])"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(document('content.xml')/descendant::text:a[@xlink:href and not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)])"
         />
       </xsl:attribute>
 
@@ -683,7 +684,7 @@
       </xsl:for-each>
 
       <xsl:if
-        test="not(document('styles.xml')/office:document-styles/office:styles/style:style/@style:name = 'Hyperlink') and document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+        test="not(document('styles.xml')/office:document-styles/office:styles/style:style/@style:name = 'Hyperlink') and document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
         <cellStyle
           xfId="{count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1}"
           name="Hyperlink"/>
@@ -2302,7 +2303,7 @@
 
   <xsl:template name="InsertHyperlinksProperties">
     <xsl:if
-      test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell)]">
+      test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
       <xsl:variable name="xfId">
         <xsl:value-of
           select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
