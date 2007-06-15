@@ -418,12 +418,7 @@
         </formula>
       </xsl:when>
       <xsl:when test="contains(@style:condition, 'is-true-formula')">
-        <formula>
-          <!-- string inside is-true-formula(...) -->
-          <xsl:value-of
-            select="substring-after(substring(@style:condition,1,string-length(@style:condition) -1), 'is-true-formula(' )"
-          />
-        </formula>
+        <formula/>
       </xsl:when>
       <xsl:otherwise>
         <formula>
