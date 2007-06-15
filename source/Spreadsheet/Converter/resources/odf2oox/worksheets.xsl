@@ -70,9 +70,8 @@
         <!-- last 'or' for cells with error -->
         <!-- cellNumber + number string cells inside simple rows + number string cells inside header rows -->
         <xsl:value-of
-          select="$cellNumber + count(table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))]) +
-          count(table:table-header-rows/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))])"
-        />
+          select="$cellNumber + count(descendant::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))])
+          "/>
       </xsl:with-param>
       <xsl:with-param name="sheetId">
         <xsl:value-of select="$sheetId + 1"/>
@@ -525,6 +524,7 @@
       <xsl:apply-templates select="descendant::table:table-row[1]" mode="sheet">
         <xsl:with-param name="rowNumber">1</xsl:with-param>
         <xsl:with-param name="cellNumber" select="$cellNumber"/>
+        <xsl:with-param name="sheetId" select="$sheetId"/>
         <xsl:with-param name="defaultRowHeight" select="$defaultRowHeight"/>
         <xsl:with-param name="TableColumnTagNum">
           <xsl:value-of select="$ColumnTagNum"/>
@@ -1004,10 +1004,16 @@
               <xsl:if test="@xlink:href">
                 <xsl:choose>
                   <!-- when starts with up '#' -->
+                  <xsl:when test="starts-with($convertedSpaces,'#' ) and not(contains($convertedSpaces,'.'))">
+                    <xsl:value-of select="concat(substring-after($convertedSpaces,'#'),'!A1')"
+                    />
+                  </xsl:when>
+                  
                   <xsl:when test="starts-with($convertedSpaces,'#' )">
                     <xsl:value-of select="translate(substring-after($convertedSpaces,'#'),'.','!')"
                     />
                   </xsl:when>
+                  
                 </xsl:choose>
               </xsl:if>
             </xsl:attribute>
