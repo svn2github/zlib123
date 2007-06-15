@@ -411,15 +411,45 @@
     <xsl:variable name="sheetName">
       <xsl:value-of select="@name"/>
     </xsl:variable>
+    
+    <!-- Check If Conditionals are in this sheet -->
+    
+    <xsl:variable name="ConditionalCell">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+        <xsl:call-template name="ConditionalCell"/>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:variable name="ConditionalCellStyle">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+        <xsl:call-template name="ConditionalCell">
+          <xsl:with-param name="document">
+            <xsl:text>style</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:variable>
 
     <xsl:for-each select="document(concat('xl/',$Id))">
+      
       <xsl:apply-templates select="e:worksheet/e:conditionalFormatting " mode="ConditionalStyle">
         <xsl:with-param name="sheet">
           <xsl:value-of select="$Id"/>
         </xsl:with-param>
       </xsl:apply-templates>
+      
+      <xsl:apply-templates select="e:worksheet/e:sheetData/e:row/e:c" mode="ConditionalAndCellStyle">
+        <xsl:with-param name="ConditionalCell">
+          <xsl:value-of select="$ConditionalCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellStyle">
+          <xsl:value-of select="$ConditionalCellStyle"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+      
+      
     </xsl:for-each>
-
+    
     <!-- Insert next Table -->
 
     <xsl:apply-templates select="following-sibling::e:sheet[1]" mode="ConditionalStyle">
@@ -437,75 +467,83 @@
   <xsl:template name="InsertConditionalProperties">
     <style:style style:name="{generate-id(.)}" style:family="table-cell"
       style:parent-style-name="Default">
-      <style:map style:base-cell-address="Sheet1.D10">
-        <xsl:attribute name="style:apply-style-name">          
-          <xsl:variable name="PositionStyle">
-            <xsl:value-of select="e:cfRule/@dxfId"/>
-          </xsl:variable>
-          <xsl:for-each select="document('xl/styles.xml')">
-            <xsl:value-of select="generate-id(key('Dxf', '')[position() = $PositionStyle + 1])"/>
-          </xsl:for-each>
-        </xsl:attribute>
-        <xsl:choose>
-          <xsl:when test="e:cfRule/@operator='equal'">
-            <xsl:attribute name="style:condition">
-              <xsl:text>cell-content()=</xsl:text>
-              <xsl:value-of select="e:cfRule/e:formula"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="e:cfRule/@operator='lessThanOrEqual'">
-            <xsl:attribute name="style:condition">
-              <xsl:text>cell-content()&lt;=</xsl:text>
-              <xsl:value-of select="e:cfRule/e:formula"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="e:cfRule/@operator='lessThan'">
-            <xsl:attribute name="style:condition">
-              <xsl:text>cell-content()&lt;</xsl:text>
-              <xsl:value-of select="e:cfRule/e:formula"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="e:cfRule/@operator='greaterThan'">
-            <xsl:attribute name="style:condition">
-              <xsl:text>cell-content()&gt;</xsl:text>
-              <xsl:value-of select="e:cfRule/e:formula"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="e:cfRule/@operator='greaterThanOrEqual'">
-            <xsl:attribute name="style:condition">
-              <xsl:text>cell-content()&gt;=</xsl:text>
-              <xsl:value-of select="e:cfRule/e:formula"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="e:cfRule/@operator='notEqual'">
-            <xsl:attribute name="style:condition">
-              <xsl:text>cell-content()!=</xsl:text>
-              <xsl:value-of select="e:cfRule/e:formula"/>
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="e:cfRule/@operator='between'">
-            <xsl:attribute name="style:condition">
-              <xsl:value-of
-                select="concat('cell-content-is-between(', e:cfRule/e:formula, ',', e:cfRule/e:formula[2], ')') "
-              />
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:when test="e:cfRule/@operator='notBetween'">
-            <xsl:attribute name="style:condition">
-              <xsl:value-of
-                select="concat('cell-content-is-not-between(', e:cfRule/e:formula, ',', e:cfRule/e:formula[2], ')') "
-              />
-            </xsl:attribute>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="style:condition">
-              <xsl:text>cell-content()=</xsl:text>
-              <xsl:value-of select="e:cfRule/e:formula"/>
-            </xsl:attribute>
-          </xsl:otherwise>
-        </xsl:choose>
-      </style:map>
+      <xsl:call-template name="InsertConditional"/>
     </style:style>
+  </xsl:template>
+  
+  <!-- Insert Conditional -->
+  <xsl:template name="InsertConditional">
+    <xsl:for-each select="e:cfRule">
+      <xsl:sort select="@priority"/>
+    <style:map>
+      <xsl:attribute name="style:apply-style-name">          
+        <xsl:variable name="PositionStyle">
+          <xsl:value-of select="@dxfId"/>
+        </xsl:variable>
+        <xsl:for-each select="document('xl/styles.xml')">
+          <xsl:value-of select="generate-id(key('Dxf', '')[position() = $PositionStyle + 1])"/>
+        </xsl:for-each>
+      </xsl:attribute>
+      <xsl:choose>
+        <xsl:when test="@operator='equal'">
+          <xsl:attribute name="style:condition">
+            <xsl:text>cell-content()=</xsl:text>
+            <xsl:value-of select="e:formula"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@operator='lessThanOrEqual'">
+          <xsl:attribute name="style:condition">
+            <xsl:text>cell-content()&lt;=</xsl:text>
+            <xsl:value-of select="e:formula"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@operator='lessThan'">
+          <xsl:attribute name="style:condition">
+            <xsl:text>cell-content()&lt;</xsl:text>
+            <xsl:value-of select="e:formula"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@operator='greaterThan'">
+          <xsl:attribute name="style:condition">
+            <xsl:text>cell-content()&gt;</xsl:text>
+            <xsl:value-of select="e:formula"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@operator='greaterThanOrEqual'">
+          <xsl:attribute name="style:condition">
+            <xsl:text>cell-content()&gt;=</xsl:text>
+            <xsl:value-of select="e:formula"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@operator='notEqual'">
+          <xsl:attribute name="style:condition">
+            <xsl:text>cell-content()!=</xsl:text>
+            <xsl:value-of select="e:formula"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@operator='between'">
+          <xsl:attribute name="style:condition">
+            <xsl:value-of
+              select="concat('cell-content-is-between(', e:formula, ',', e:formula[2], ')') "
+            />
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="@operator='notBetween'">
+          <xsl:attribute name="style:condition">
+            <xsl:value-of
+              select="concat('cell-content-is-not-between(', e:formula, ',', e:formula[2], ')') "
+            />
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="style:condition">
+            <xsl:text>cell-content()=</xsl:text>
+            <xsl:value-of select="e:formula"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
+    </style:map>
+    </xsl:for-each>
   </xsl:template>
 
   <!-- Insert Coditional Styles -->
@@ -528,6 +566,65 @@
       </style:table-cell-properties>
     </style:style>
   </xsl:template>
+  
+  <!-- Insert Cell Style and Conditional Style -->
+  <xsl:template match="e:c" mode="ConditionalAndCellStyle">
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
+    
+    <xsl:variable name="colNum">
+      <xsl:call-template name="GetColNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="@r"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="rowNum">
+      <xsl:call-template name="GetRowNum">
+        <xsl:with-param name="cell">
+          <xsl:value-of select="@r"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+   <xsl:if test="contains(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';')) and @s != ''">
+     
+     <xsl:variable name="CellStyleNumber">
+       <xsl:value-of select="@s"/>
+     </xsl:variable>
 
+       <style:style style:family="table-cell">
+         
+         <xsl:attribute name="style:name">
+           <xsl:variable name="CellStyleId">
+             <xsl:for-each select="document('xl/styles.xml')/e:styleSheet">
+               <xsl:for-each select="key('Xf', '')[position() = $CellStyleNumber + 1]">
+                 <xsl:value-of select="generate-id(.)"/>
+               </xsl:for-each>
+             </xsl:for-each>
+           </xsl:variable>
+           <xsl:variable name="ConditionalStyleId">
+             <xsl:for-each select="key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1]">
+               <xsl:value-of select="generate-id(.)"/>
+             </xsl:for-each>
+           </xsl:variable>
+           <xsl:value-of select="concat($CellStyleId, $ConditionalStyleId)"/>
+         </xsl:attribute>
+         
+         <xsl:for-each select="document('xl/styles.xml')/e:styleSheet">
+           <xsl:for-each select="key('Xf', '')[position() = $CellStyleNumber + 1]">
+           <xsl:call-template name="InsertCellFormat"/>
+         </xsl:for-each>
+         </xsl:for-each>
+         <xsl:for-each select="key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1]">
+           <xsl:call-template name="InsertConditional"/>
+         </xsl:for-each>
+       </style:style>
+     
+   </xsl:if>
+    
+   </xsl:template>
+  
 
 </xsl:stylesheet>

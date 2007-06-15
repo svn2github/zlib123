@@ -75,7 +75,7 @@
         <!-- Insert Conditional Properties -->
         <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]" mode="ConditionalStyle">
           <xsl:with-param name="number">1</xsl:with-param>
-        </xsl:apply-templates>        
+        </xsl:apply-templates>
       </office:automatic-styles>
       <xsl:call-template name="InsertSheets"/>
     </office:document-content>
@@ -124,6 +124,76 @@
         <xsl:apply-templates select="e:mergeCell[1]" mode="BigMergeRow"/>
       </xsl:for-each>
     </xsl:variable>
+    
+
+    
+    <!-- Check If Picture are in this sheet  -->
+    <xsl:variable name="PictureCell">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:call-template name="PictureCell">
+        <xsl:with-param name="sheet">
+          <xsl:value-of select="substring-after($Id, '/')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <!-- Check if notes are in this sheet -->
+    <xsl:variable name="NoteCell">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:call-template name="NoteCell">
+        <xsl:with-param name="sheetNr" select="$number"/>
+      </xsl:call-template>
+     </xsl:for-each>
+    </xsl:variable>
+    
+    <!-- Check If Conditionals are in this sheet -->
+    
+    <xsl:variable name="ConditionalCell">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:call-template name="ConditionalCell"/>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:variable name="ConditionalCellStyle">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:call-template name="ConditionalCell">
+        <xsl:with-param name="document">
+          <xsl:text>style</xsl:text>
+        </xsl:with-param>
+      </xsl:call-template>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:variable name="PictureAndNoteCell">
+      <xsl:value-of select="concat($PictureCell,$NoteCell)"/>
+    </xsl:variable>
+    
+    <xsl:variable name="PictureRow">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:call-template name="PictureRow">
+        <xsl:with-param name="PictureCell">
+          <xsl:value-of select="$PictureCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+       </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:variable name="NoteRow">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+      <xsl:call-template name="NoteRow">
+        <xsl:with-param name="NoteCell">
+          <xsl:value-of select="$NoteCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+      </xsl:for-each>
+    </xsl:variable>
+    
+    <xsl:variable name="PictureAndNoteRow">
+      <xsl:value-of select="concat($PictureRow,$NoteRow)"/>
+    </xsl:variable>
+
+
 
     <table:table>
 
@@ -178,6 +248,31 @@
         <xsl:with-param name="sheetNr">
           <xsl:value-of select="$number"/>
         </xsl:with-param>
+        <xsl:with-param name="ConditionalCell">
+          <xsl:value-of select="$ConditionalCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="NoteCell">
+          <xsl:value-of select="$NoteCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="NoteRow">
+          <xsl:value-of select="$NoteRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureAndNoteCell">
+          <xsl:value-of select="$PictureAndNoteCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureAndNoteRow">
+          <xsl:value-of select="$PictureAndNoteRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellStyle">
+          <xsl:value-of select="$ConditionalCellStyle"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureCell">
+          <xsl:value-of select="$PictureCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$PictureRow"/>
+        </xsl:with-param>
+       
       </xsl:call-template>
 
     </table:table>
@@ -443,6 +538,15 @@
     <xsl:param name="BigMergeCell"/>
     <xsl:param name="BigMergeRow"/>
     <xsl:param name="sheetNr"/>
+    <xsl:param name="PictureCell"/>
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="PictureAndNoteCell"/>
+    <xsl:param name="PictureRow"/>
+    <xsl:param name="NoteRow"/>  
+    <xsl:param name="PictureAndNoteRow"/>
+    
 
     <xsl:call-template name="InsertColumns">
       <xsl:with-param name="sheet" select="$sheet"/>
@@ -539,60 +643,6 @@
             </xsl:for-each>
           </xsl:when>
         </xsl:choose>
-      </xsl:variable>
-
-      <!-- Check If Picture are in this sheet  -->
-      <xsl:variable name="PictureCell">
-        <xsl:call-template name="PictureCell">
-          <xsl:with-param name="sheet">
-            <xsl:value-of select="substring-after($sheet, '/')"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <!-- Check if notes are in this sheet -->
-      <xsl:variable name="NoteCell">
-        <xsl:call-template name="NoteCell">
-          <xsl:with-param name="sheetNr" select="$sheetNr"/>
-        </xsl:call-template>
-      </xsl:variable>
-      
-      <!-- Check If Conditionals are in this sheet -->
-      
-      <xsl:variable name="ConditionalCell">
-        <xsl:call-template name="ConditionalCell"/>
-      </xsl:variable>
-
-      <xsl:variable name="ConditionalCellStyle">
-        <xsl:call-template name="ConditionalCell">
-          <xsl:with-param name="document">
-            <xsl:text>style</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-      
-      <xsl:variable name="PictureAndNoteCell">
-        <xsl:value-of select="concat($PictureCell,$NoteCell)"/>
-      </xsl:variable>
-
-      <xsl:variable name="PictureRow">
-        <xsl:call-template name="PictureRow">
-          <xsl:with-param name="PictureCell">
-            <xsl:value-of select="$PictureCell"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:variable name="NoteRow">
-        <xsl:call-template name="NoteRow">
-          <xsl:with-param name="NoteCell">
-            <xsl:value-of select="$NoteCell"/>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:variable name="PictureAndNoteRow">
-        <xsl:value-of select="concat($PictureRow,$NoteRow)"/>
       </xsl:variable>
 
       <!-- Insert Row  -->

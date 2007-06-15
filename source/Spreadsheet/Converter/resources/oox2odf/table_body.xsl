@@ -878,6 +878,25 @@
           <xsl:if
             test="@s or contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $colNum, ';'))">
             <xsl:choose>
+              
+             <xsl:when test="@s and contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $colNum, ';'))">
+                <xsl:variable name="CellStyleId">
+                  <xsl:for-each select="document('xl/styles.xml')">
+                    <xsl:value-of select="generate-id(key('Xf', '')[position() = $position])"/>
+                  </xsl:for-each>
+                </xsl:variable>
+                <xsl:variable name="ConditionalStyleId">
+                  <xsl:value-of
+                    select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $colNum, ';-')), ';') + 1])"
+                  />
+                </xsl:variable>
+                <xsl:attribute name="table:style-name">
+                  <xsl:for-each select="document('xl/styles.xml')">
+                    <xsl:value-of select="concat($CellStyleId, $ConditionalStyleId)"/>
+                  </xsl:for-each>
+                </xsl:attribute>
+              </xsl:when>
+              
               <xsl:when test="@s">
                 <xsl:attribute name="table:style-name">
                   <xsl:for-each select="document('xl/styles.xml')">
@@ -885,6 +904,7 @@
                   </xsl:for-each>
                 </xsl:attribute>
               </xsl:when>
+              
               <xsl:otherwise>
                 <xsl:attribute name="table:style-name">
                   <xsl:value-of
