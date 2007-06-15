@@ -990,6 +990,24 @@
             <xsl:text>1</xsl:text>
           </xsl:attribute>
         </xsl:if>
+
+        <!-- Indent  -->
+        <xsl:if test="style:paragraph-properties/@fo:margin-left">
+          <xsl:attribute name="indent">
+            <xsl:variable name="indentLeft">
+              <xsl:value-of select="style:paragraph-properties/@fo:margin-left"/>
+            </xsl:variable>
+            <xsl:variable name="indent_value">
+              <xsl:call-template name="point-measure">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="$indentLeft"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:value-of select="$indent_value div 10"/>
+          </xsl:attribute>
+        </xsl:if>
+
       </alignment>
 
     </xsl:if>
