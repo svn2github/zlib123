@@ -236,7 +236,16 @@
     <!-- if sheet name contains space then name has to be inside apostrophes -->
     <xsl:variable name="sheetName">
       <xsl:text>'</xsl:text>
-      <xsl:value-of select="@table:name"/>
+      <xsl:call-template name="CheckSheetName">
+        <xsl:with-param name="sheetNumber">
+          <xsl:value-of select="position()"/>
+        </xsl:with-param>
+        <xsl:with-param name="name">
+          <xsl:value-of
+            select="substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"
+          />
+        </xsl:with-param>
+      </xsl:call-template>      
       <xsl:text>'</xsl:text>
     </xsl:variable>
 
@@ -312,16 +321,18 @@
     </xsl:variable>
 
     <xsl:variable name="sheetName">
-      <xsl:choose>
-        <xsl:when test="contains(@table:name,' ') or contains(@table:name,'!') or contains(@table:name,'$')">
-          <xsl:text>'</xsl:text>
-          <xsl:value-of select="@table:name"/>
-          <xsl:text>'</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="@table:name"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:text>&apos;</xsl:text>
+      <xsl:call-template name="CheckSheetName">
+        <xsl:with-param name="sheetNumber">
+          <xsl:value-of select="position()"/>
+        </xsl:with-param>
+        <xsl:with-param name="name">
+          <xsl:value-of
+            select="substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"
+          />
+        </xsl:with-param>
+      </xsl:call-template>
+      <xsl:text>&apos;</xsl:text>
     </xsl:variable>
 
     <xsl:value-of
@@ -356,16 +367,18 @@
     </xsl:variable>
 
     <xsl:variable name="sheetName">
-      <xsl:choose>
-        <xsl:when test="contains(@table:name,' ') or contains(@table:name,'!') or contains(@table:name,'$')">
-          <xsl:text>'</xsl:text>
-          <xsl:value-of select="@table:name"/>
-          <xsl:text>'</xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="@table:name"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:text>&apos;</xsl:text>
+      <xsl:call-template name="CheckSheetName">
+        <xsl:with-param name="sheetNumber">
+          <xsl:value-of select="position()"/>
+        </xsl:with-param>
+        <xsl:with-param name="name">
+          <xsl:value-of
+            select="substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"
+          />
+        </xsl:with-param>
+      </xsl:call-template>
+      <xsl:text>&apos;</xsl:text>
     </xsl:variable>
 
     <xsl:value-of select="concat($sheetName,'!$',$charHeaderColStart,':$',$charHeaderColEnd)"/>
