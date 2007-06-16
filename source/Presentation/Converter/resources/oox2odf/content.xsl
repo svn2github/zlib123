@@ -212,7 +212,7 @@ exclude-result-prefixes="p a r xlink ">
 		</xsl:for-each>
 	</xsl:when>
 	 <!-- GET COLOR FROM SLIDE MASTER  -->
-	 <xsl:when test="document('ppt/slideMasters/slideMaster1.xml')/p:sldMaster/p:cSld/p:bg/p:bgPr/a:solidFill/a:srgbClr/@val or document('ppt/slideMasters/slideMaster1.xml')/p:sldMaster/p:cSld/p:bg/p:bgPr/a:solidFill/a:schemeClr/@val or document('ppt/slideMasters/slideMaster1.xml')/p:sldMaster/p:cSld/p:bg/p:bgRef/a:schemeClr/@val">
+	 <!--<xsl:when test="document('ppt/slideMasters/slideMaster1.xml')/p:sldMaster/p:cSld/p:bg/p:bgPr/a:solidFill/a:srgbClr/@val or document('ppt/slideMasters/slideMaster1.xml')/p:sldMaster/p:cSld/p:bg/p:bgPr/a:solidFill/a:schemeClr/@val or document('ppt/slideMasters/slideMaster1.xml')/p:sldMaster/p:cSld/p:bg/p:bgRef/a:schemeClr/@val">
 	   <xsl:for-each select="document('ppt/slideMasters/slideMaster1.xml')/p:sldMaster/p:cSld">
 		 <xsl:if test="p:bg/p:bgPr/a:solidFill/a:srgbClr/@val">
 			 <xsl:attribute name="draw:fill-color">
@@ -268,7 +268,7 @@ exclude-result-prefixes="p a r xlink ">
 				</xsl:attribute>
 			</xsl:if>
 		</xsl:for-each>
-	  </xsl:when>
+	  </xsl:when>-->
 	</xsl:choose>
 	<!--End-->	
         </style:drawing-page-properties>
@@ -354,8 +354,15 @@ exclude-result-prefixes="p a r xlink ">
   </xsl:template>
 	<xsl:template name ="InsertDrawingPage"  >
 		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
-			<draw:page  
-				  draw:master-page-name="Default">
+      <draw:page>
+        <!--added by vipul to link each slides with slide Master-->
+        <!--Start-->
+        <xsl:attribute name="draw:master-page-name">
+          <xsl:call-template name ="GetMasterFileName">
+            <xsl:with-param name="slideId" select ="position()"/>
+          </xsl:call-template>
+        </xsl:attribute>
+        <!--End-->
 				<xsl:attribute name ="draw:style-name">
 					<xsl:value-of select ="concat('dp',position())"/>
 				</xsl:attribute>
@@ -406,7 +413,7 @@ exclude-result-prefixes="p a r xlink ">
             <xsl:variable name ="layout" select ="substring-after((@Target),'../slideLayouts/')"/>
             <xsl:for-each select ="document(concat('ppt/slideLayouts/',$layout))//p:sldLayout">
               <xsl:choose >
-                <xsl:when test ="p:cSld['@name=Title and Content'] or p:cSld['@name=Two Content']  or p:cSld['@name=Comparison']">
+                <xsl:when test ="p:cSld/@name[contains(.,'Title and Content')] or p:cSld/@name[contains(.,'Two Content')] or  p:cSld/@name[contains(.,'Comparison')]">
                   <xsl:value-of select ="'true'"/>
                 </xsl:when>
                 <xsl:otherwise >
@@ -448,8 +455,13 @@ exclude-result-prefixes="p a r xlink ">
 					<xsl:when test ="not(contains(p:nvSpPr/p:cNvPr/@name,'Title')
 						   or contains(p:nvSpPr/p:cNvPr/@name,'Content')
 						   or contains(p:nvSpPr/p:cNvPr/@name,'Subtitle')
-						  or contains(p:nvSpPr/p:cNvPr/@name,'Placeholder') or contains(p:nvSpPr/p:cNvPr/@name,'Rectangle'))">
-						 
+						  or contains(p:nvSpPr/p:cNvPr/@name,'Placeholder')
+              or contains(p:nvSpPr/p:nvPr/p:ph/@type,'ctrTitle')
+              or contains(p:nvSpPr/p:nvPr/p:ph/@type,'subTitle')
+              or contains(p:nvSpPr/p:nvPr/p:ph/@type,'outline')
+              or contains(p:nvSpPr/p:nvPr/p:ph/@type,'title')
+              or contains(p:nvSpPr/p:nvPr/p:ph/@type,'body'))">
+            <!-- Added ctrTitle,subtitle, outline, titel, body to fix the bug 1719280-->
 					</xsl:when>
 				  <xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt') 
 							or contains(.,'ftr') or contains(.,'sldNum')]">
@@ -508,7 +520,7 @@ exclude-result-prefixes="p a r xlink ">
                   check for levels and then depending on the condition,insert bullets,Layout or Master properties-->
                 <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip">
                   <xsl:call-template name ="insertBulletsNumbersoox2odf">
-                    <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+                    <xsl:with-param name ="listStyleName" select ="concat($listStyleName,position())"/>
                     <xsl:with-param name ="ParaId" select ="$ParaId"/>
                   </xsl:call-template>
                 </xsl:if>
@@ -879,7 +891,7 @@ exclude-result-prefixes="p a r xlink ">
               <xsl:if test ="$LayoutName != 'title'">            
               <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip">
                 <xsl:call-template name ="insertBulletsNumbersoox2odf">
-                  <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
+                  <xsl:with-param name ="listStyleName" select ="concat($listStyleName,position())"/>
                   <xsl:with-param name ="ParaId" select ="$ParaId"/>
                 </xsl:call-template>
               </xsl:if>
@@ -1246,15 +1258,17 @@ exclude-result-prefixes="p a r xlink ">
 						</xsl:for-each>
 					  </xsl:variable>
 					  <xsl:choose >
-										<xsl:when test ="$SlFrameName != $frameName 
-														or $SlFrameNameInd != $FrameIdx ">
+                <!-- Modified by lohith to fix the bug 1719280-->
+                <xsl:when test ="not($SlFrameName = $frameName 
+														or $SlFrameNameInd = $FrameIdx) ">
 											<!-- Do nothing-or $SlFrameNameInd=$FrameIdx -->
 										</xsl:when>								
-										<xsl:when test ="$SlFrameName != $frameName 
+                <!-- Commented by lohith to fix the bug 1719280-->
+                <!--<xsl:when test ="not($SlFrameName = $frameName) 
 														and string-length($SlFrameName) &gt; 0 
 														and string-length($frameName) &gt; 0 ">
-											<!-- Do nothing-or $SlFrameNameInd=$FrameIdx -->
-						</xsl:when>
+                  --><!-- Do nothing-or $SlFrameNameInd=$FrameIdx --><!--
+                </xsl:when>-->
 						<xsl:when test ="p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'dt') 
 										or contains(.,'ftr') or contains(.,'sldNum')]">
 						  <!-- Do nothing-->
@@ -1527,7 +1541,7 @@ exclude-result-prefixes="p a r xlink ">
             <xsl:variable name ="layout" select ="substring-after((@Target),'../slideLayouts/')"/>
             <xsl:for-each select ="document(concat('ppt/slideLayouts/',$layout))//p:sldLayout">
               <xsl:choose >
-                <xsl:when test ="p:cSld['@name=Title and Content'] or p:cSld['@name=Two Content']  or p:cSld['@name=Comparison']">
+                <xsl:when test ="p:cSld/@name[contains(.,'Title and Content')] or p:cSld/@name[contains(.,'Two Content')] or  p:cSld/@name[contains(.,'Comparison')]">
                   <xsl:value-of select ="'true'"/>
                 </xsl:when>
                 <xsl:otherwise >
@@ -1539,6 +1553,13 @@ exclude-result-prefixes="p a r xlink ">
         </xsl:for-each>
       </xsl:variable >
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp/p:txBody">
+        <!-- Added By Vijayeta,Check if textbox is present-->
+        <xsl:variable name ="isTextBox">
+          <xsl:if test ="parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'TextBox')]">
+            <xsl:value-of select ="'true'"/>
+          </xsl:if>
+        </xsl:variable >
+          <!--end of code By Vijayeta,Check if textbox is present-->
 				<xsl:variable name ="ParaId">
 					<xsl:value-of select ="concat($SlideNumber,concat('PARA',position()))"/>
 				</xsl:variable>
@@ -1572,6 +1593,18 @@ exclude-result-prefixes="p a r xlink ">
         <!--End of code if bullets are default-->
         <!--End of code inserted by Vijayeta,InsertStyle For Bullets and Numbering-->        
 				<xsl:for-each select ="a:p">
+          <!-- Code by vijayeta,to set default font size for inner levels,in case of multiple levels-->
+          <xsl:variable name ="levelForDefFont">
+            <xsl:if test ="$bulletTypeBool='true'">
+              <xsl:if test ="a:pPr/@lvl">
+                <xsl:value-of select ="a:pPr/@lvl"/>
+              </xsl:if>
+              <xsl:if test ="not(a:pPr/@lvl)">
+                <xsl:value-of select ="'0'"/>
+              </xsl:if>
+            </xsl:if>
+          </xsl:variable>
+          <!--End of Code by vijayeta,to set default font size for inner levels,in case of multiple levels-->
 					<style:style style:family="paragraph">
 						<xsl:attribute name ="style:name">
 							<xsl:value-of select ="concat($ParaId,position())"/>
@@ -1582,7 +1615,10 @@ exclude-result-prefixes="p a r xlink ">
 									<xsl:value-of select ="'tb-rl'"/>
 								</xsl:attribute>
 							</xsl:if>
-							<xsl:if test ="a:pPr/@algn ='ctr' or a:pPr/@algn ='r' or a:pPr/@algn ='l'">
+              <!-- commented by pradeep -->
+              <!--start-->
+							<!--<xsl:if test ="a:pPr/@algn ='ctr' or a:pPr/@algn ='r' or a:pPr/@algn ='l'">-->
+              <!--End-->							
 								<xsl:attribute name ="fo:text-align">
 									<xsl:choose>
 										<!-- Center Alignment-->
@@ -1594,12 +1630,21 @@ exclude-result-prefixes="p a r xlink ">
 											<xsl:value-of select ="'end'"/>
 										</xsl:when>
 										<!-- Left Alignment-->
-										<xsl:when test ="a:pPr/@algn ='l' or a:pPr/@algn">
+										<xsl:when test ="a:pPr/@algn ='l'">
 											<xsl:value-of select ="'start'"/>
 										</xsl:when>
+                    <!-- added by pradeep-->
+                    <!--start-->
+                    <xsl:otherwise >
+                      <xsl:value-of select ="'start'"/>
+                    </xsl:otherwise>
+                    <!-- end-->
 									</xsl:choose>
 								</xsl:attribute>
-							</xsl:if >
+              <!-- commented by pradeep -->
+              <!--start-->
+              <!--</xsl:if >-->
+              <!--End-->
 							<!-- Convert Laeft margin of the paragraph-->
 							<xsl:if test ="a:pPr/@marL">
 								<xsl:attribute name ="fo:margin-left">
@@ -1638,13 +1683,7 @@ exclude-result-prefixes="p a r xlink ">
               </xsl:if>
               <!--End of Code Added By Vijayeta-->
               <!-- Code inserted by VijayetaFor Bullets, Enable Numbering-->
-              <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip ">
-                <!--<xsl:if test ="./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph['@type=title']">
-                  <xsl:attribute name="text:enable-numbering">
-                    <xsl:value-of select ="'false'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="not(./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph['@type=!title'])">-->
+              <xsl:if test ="a:pPr/a:buChar or a:pPr/a:buAutoNum or a:pPr/a:buBlip ">               
                   <xsl:attribute name="text:enable-numbering">
                     <xsl:value-of select ="'true'"/>
                   </xsl:attribute>
@@ -1737,13 +1776,32 @@ exclude-result-prefixes="p a r xlink ">
 												<xsl:value-of select ="concat(format-number($DefFontSizeTitle div 100,'#.##'), 'pt')"/>
 											</xsl:attribute>
 										</xsl:when>
-										<xsl:when test ="$DefFontSizeOther != ''">
-											<xsl:attribute name ="fo:font-size"	>
-												<xsl:value-of select ="concat(format-number($DefFontSizeOther div 100,'#.##'), 'pt')"/>
-											</xsl:attribute>
-										</xsl:when>
+                    <xsl:when test ="$isTextBox = 'true'">
+                      <xsl:attribute name ="fo:font-size"	>
+                        <xsl:value-of select ="concat(format-number($DefFontSizeOther div 100,'#.##'), 'pt')"/>
+                      </xsl:attribute>
+                    </xsl:when>
 										<xsl:otherwise>
 											<xsl:attribute name ="fo:font-size"	>
+                        <!-- Code By vijayeta,to set fontsize,if levels present-->
+                        <xsl:variable name ="newFontSize">
+                          <xsl:variable name ="fontSizeBody">
+                            <xsl:if test ="$bulletTypeBool='true'">
+                              <xsl:if test =" $levelForDefFont != '0'">
+                                <xsl:call-template name ="getFontSizeForLevels">
+                                  <xsl:with-param name ="levelForDefFont" select ="$levelForDefFont"/>
+                                </xsl:call-template>
+                              </xsl:if>
+                              <xsl:if test =" $levelForDefFont = '0'">
+                                <xsl:value-of select ="$DefFontSizeBody"/>
+                              </xsl:if>
+                            </xsl:if>
+                            <xsl:if test ="not($bulletTypeBool='true')">
+                              <xsl:value-of select ="$DefFontSizeBody"/>
+                            </xsl:if>
+                          </xsl:variable >
+                          <xsl:value-of select="$fontSizeBody"/>
+                        </xsl:variable >
                         <!--Code Added By Vijayeta,For Line Spacing
                              If the input file has an option to Decrease the font size to fit.
                              100% being equal to 100000 and 1% to 1000,divide the scale, by which the actual font size is to be reduced, by 1000.
@@ -1752,14 +1810,13 @@ exclude-result-prefixes="p a r xlink ">
                           <xsl:variable name ="fontScaleReductionValue">
                             <xsl:value-of select ="parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale div 1000 "/>
                           </xsl:variable>
-                          <xsl:value-of select ="concat(round(format-number(($DefFontSizeBody * $fontScaleReductionValue) div 10000,'#.##')), 'pt')"/>
+                          <xsl:value-of select ="concat(round(format-number(($newFontSize * $fontScaleReductionValue) div 10000,'#.##')), 'pt')"/>
                         </xsl:if>
                         <!-- Do not change the font size if the option is selected to be off-->
                         <xsl:if test ="not(parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale)">
-                          <xsl:value-of select ="concat(format-number($DefFontSizeBody div 100,'#.##'), 'pt')"/>
+                          <xsl:value-of select ="concat(format-number($newFontSize div 100,'#.##'), 'pt')"/>
                         </xsl:if>
-                        <!--End of Code Added By Vijayeta,For Line Spacing -->
-												
+                        <!--End of Code Added By Vijayeta,For Line Spacing -->												
 											</xsl:attribute>
 										</xsl:otherwise>
 									</xsl:choose>
@@ -2272,9 +2329,12 @@ exclude-result-prefixes="p a r xlink ">
 								<xsl:with-param name ="defType" select ="'wrap'"/>
 							</xsl:call-template >
 						</xsl:if >
-						<xsl:attribute name ="draw:fill-color" >
+            <!--commented by vipul -->
+            <!--start-->
+						<!--<xsl:attribute name ="draw:fill-color" >
 							<xsl:value-of select ="'#ffffff'"/>
-						</xsl:attribute>
+						</xsl:attribute>-->
+            <!--end-->
             <!--Code Added by Vijayeta,for Line Spacing,if 'Change Size of shape to fit the text' is turned ON.
                 If the option is ON,set the attribute 'draw:auto-grow-height' as 'true'-->
             <xsl:if test ="p:txBody/a:bodyPr/a:spAutoFit">
@@ -2586,6 +2646,51 @@ exclude-result-prefixes="p a r xlink ">
 			<xsl:value-of select="substring(.,17)" />
 	</xsl:for-each>
 	</xsl:template>
+  <xsl:template name ="GetMasterFileName">
+    <xsl:param name ="slideId"/>
+    <xsl:variable name ="layoutName">
+      <xsl:value-of select ="document(concat('ppt/slides/_rels/','slide',$slideId,'.xml.rels'))//node()/@Target[ contains(.,'Layout')]"/>
+    </xsl:variable>
+    <xsl:variable name ="lauoutReln">
+      <xsl:value-of select ="concat('ppt/slideLayouts/_rels/', substring($layoutName,17),'.rels')"/>
+    </xsl:variable>
+    <xsl:variable name ="slideMaster">
+      <xsl:value-of select ="document($lauoutReln)//node()/@Target[ contains(.,'slideMaster')]"/>
+    </xsl:variable>
+    <xsl:value-of select ="substring-before(substring($slideMaster,17),'.xml')"/>
+  </xsl:template>
+  <!-- Code By vijayeta,get font size for diff levels-->
+  <xsl:template name ="getFontSizeForLevels">
+    <xsl:param name ="levelForDefFont" />
+    <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:txStyles/p:bodyStyle">
+      <xsl:choose >
+        <xsl:when test ="$levelForDefFont='1'" >
+          <xsl:value-of select ="a:lvl2pPr/a:defRPr/@sz"/>
+        </xsl:when>
+        <xsl:when test ="$levelForDefFont='2'" >
+          <xsl:value-of select ="a:lvl3pPr/a:defRPr/@sz"/>
+        </xsl:when>
+        <xsl:when test ="$levelForDefFont='3'" >
+          <xsl:value-of select ="a:lvl4pPr/a:defRPr/@sz"/>
+        </xsl:when>
+        <xsl:when test ="$levelForDefFont='4'" >
+          <xsl:value-of select ="a:lvl5pPr/a:defRPr/@sz"/>
+        </xsl:when>
+        <xsl:when test ="$levelForDefFont='5'" >
+          <xsl:value-of select ="a:lvl6pPr/a:defRPr/@sz"/>
+        </xsl:when>
+        <xsl:when test ="$levelForDefFont='6'" >
+          <xsl:value-of select ="a:lvl7pPr/a:defRPr/@sz"/>
+        </xsl:when>
+        <xsl:when test ="$levelForDefFont='7'" >
+          <xsl:value-of select ="a:lvl8pPr/a:defRPr/@sz"/>
+        </xsl:when>
+        <xsl:when test ="$levelForDefFont='8'" >
+          <xsl:value-of select ="a:lvl9pPr/a:defRPr/@sz"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
 	<!--End-->
 	
 </xsl:stylesheet>
