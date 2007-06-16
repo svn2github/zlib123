@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<xsl:stylesheet version="1.0" 
+<xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"   
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:odf="urn:odf"
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"  
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
+  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:page="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" 
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
   xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink"  
+  xmlns:xlink="http://www.w3.org/1999/xlink"
   exclude-result-prefixes="odf style text number draw page">
 
   <xsl:variable name ="rId" select ="generate-id(.)"/>
@@ -43,22 +43,24 @@
       </xsl:if>
       <a:buFont>
         <xsl:attribute name ="typeface">
-          <!--<xsl:call-template name ="getBulletType">
-            <xsl:with-param name ="type" select ="@text:bullet-char"/>
-          </xsl:call-template>-->
+          <xsl:call-template name ="getBulletType">
+            <xsl:with-param name ="character" select ="text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
+            <xsl:with-param name ="typeFace"/>
+          </xsl:call-template>
         </xsl:attribute>
       </a:buFont>
       <xsl:if test ="text:list-level-style-bullet">
         <!--<xsl:for-each select ="./child::node()[1]">-->
-          <xsl:if test ="text:list-level-style-bullet[@text:level=$level]">
+        <xsl:if test ="text:list-level-style-bullet[@text:level=$level]">
           <a:buChar>
             <xsl:attribute name ="char">
               <xsl:call-template name="insertBulletChar">
-                <xsl:with-param name="character" select="./child::node()[$level]/@text:bullet-char"/>
+                <xsl:with-param name ="character" select ="text:list-level-style-bullet[@text:level=$level]/@text:bullet-char"/>
+                <!--<xsl:with-param name="character" select="./child::node()[$level]/@text:bullet-char"/>-->
               </xsl:call-template>
             </xsl:attribute>
           </a:buChar>
-          </xsl:if>        
+        </xsl:if>
         <!--</xsl:for-each >-->
       </xsl:if>
       <xsl:if test="text:list-level-style-number">
@@ -66,34 +68,43 @@
         <xsl:if test ="text:list-level-style-number[@text:level =$level]">
           <a:buAutoNum>
             <xsl:attribute name ="type">
-                <xsl:call-template name="getNumFormat">
-                  <xsl:with-param name="format">
-                    <xsl:value-of select="./child::node()[$level]/@style:num-format"/>
-                  </xsl:with-param>
-                  <xsl:with-param name ="suff" select ="./child::node()[$level]/@style:num-suffix"/>
-                  <xsl:with-param name ="prefix" select ="./child::node()[$level]/@style:num-prefix"/>
-                </xsl:call-template>
+              <xsl:call-template name="getNumFormat">
+                <xsl:with-param name="format">
+                  <xsl:value-of select ="text:list-level-style-number[@text:level =$level]/@style:num-format"/>
+                  <!--<xsl:value-of select="./child::node()[$level]/@style:num-format"/>-->
+                </xsl:with-param>
+                <xsl:with-param name ="suff" select ="text:list-level-style-number[@text:level =$level]/@style:num-suffix"/>
+                <xsl:with-param name ="prefix" select ="text:list-level-style-number[@text:level =$level]/@style:num-prefix"/>
+              </xsl:call-template>
+            </xsl:attribute>
+            <xsl:if test ="text:list-level-style-number[@text:level =$level]/@text:start-value">
+              <xsl:attribute name ="startAt">
+                <xsl:value-of select ="text:list-level-style-number[@text:level =$level]/@text:start-value"/>
               </xsl:attribute>
-              <xsl:if test ="@text:start-value">
-                <xsl:attribute name ="startAt">
-                  <xsl:value-of select ="@text:start-value"/>
-                </xsl:attribute>
-              </xsl:if>
-            </a:buAutoNum>
-          </xsl:if>
+            </xsl:if>
+          </a:buAutoNum>
+        </xsl:if>
         <!--</xsl:for-each>-->
       </xsl:if>
       <xsl:if test ="text:list-level-style-image">
+        <a:buChar>
+          <xsl:attribute name ="char">
+            <xsl:call-template name="insertBulletChar">
+              <xsl:with-param name ="character" select ="'.'"/>
+              <!--<xsl:with-param name="character" select="./child::node()[$level]/@text:bullet-char"/>-->
+            </xsl:call-template>
+          </xsl:attribute>
+        </a:buChar>
         <!--<xsl:if test ="text:list-level-style-image[@text:level=$level]">-->
-          <a:buBlip>
+        <!--<a:buBlip>
             <a:blip>
                 <xsl:attribute name ="r:embed">
                   <xsl:value-of select ="$rId"/>
                 </xsl:attribute>
               </a:blip>
-            </a:buBlip>
-          </xsl:if>        
-        <xsl:call-template name="copyPictures"/>
+            </a:buBlip>-->
+      </xsl:if>
+      <!--<xsl:call-template name="copyPictures"/>-->
       <!--</xsl:if>-->
     </xsl:for-each>
     <!--End of condition,If Levels Present-->
@@ -102,19 +113,72 @@
   <xsl:template name="insertBulletChar">
     <xsl:param name ="character"/>
     <xsl:choose>
-      <xsl:when test="$character = '' "></xsl:when>
+      <!--<xsl:when test="$character = '' "></xsl:when>-->
+      <xsl:when test="$character = '' ">
+        <xsl:value-of select ="'q'"/>
+      </xsl:when>
       <xsl:when test="$character = '' "></xsl:when>
       <xsl:when test="$character = '☑' ">☑</xsl:when>
       <xsl:when test="$character = '•' ">•</xsl:when>
       <xsl:when test="$character= '●' ">●</xsl:when>
-      <xsl:when test="$character = '➢' ">➢</xsl:when>
-      <xsl:when test="$character = '✔' ">✔</xsl:when>
-      <xsl:when test="$character = '■' ">■</xsl:when>
+      <xsl:when test="$character = '➢' ">
+        <xsl:value-of select ="'Ø'"/>
+      </xsl:when>
+      <!--<xsl:when test="$character = '➢' ">➢</xsl:when>-->
+      <!--<xsl:when test="$character = '✔' ">✔</xsl:when>-->
+      <xsl:when test="$character = '✔' ">
+        <xsl:value-of select ="'ü'"/>
+      </xsl:when>
+      <!--<xsl:when test="$character = '■' ">■</xsl:when>-->
+      <xsl:when test="$character = '■' ">
+        <xsl:value-of select ="'§'"/>
+      </xsl:when>
       <xsl:when test="$character = '○' ">o</xsl:when>
       <xsl:when test="$character = '➔' ">➔</xsl:when>
       <xsl:when test="$character = '✗' ">✗</xsl:when>
       <xsl:when test="$character = '–' ">–</xsl:when>
       <xsl:otherwise>•</xsl:otherwise>
+    </xsl:choose>
+
+    <!--<xsl:choose>
+      <xsl:when test="a:pPr/a:buChar/@char= 'Ø'">
+        <xsl:value-of select ="'➢'"/>
+      </xsl:when>
+      <xsl:when test="a:pPr/a:buChar/@char= 'o'">
+        <xsl:value-of select ="'○'"/>
+      </xsl:when>
+      <xsl:when test="a:pPr/a:buChar/@char= '§'">
+        <xsl:value-of select ="'■'"/>
+      </xsl:when>
+      <xsl:when test="a:pPr/a:buChar/@char= 'q'">
+        <xsl:value-of select ="''"/>
+      </xsl:when>
+      <xsl:when test="a:pPr/a:buChar/@char= 'ü'">
+        <xsl:value-of select ="'✔'"/>
+      </xsl:when>
+      <xsl:when test="a:pPr/a:buChar/@char = '–'">
+        <xsl:value-of select ="'–'"/>
+      </xsl:when>
+      <xsl:when test="a:pPr/a:buChar/@char = '»'">
+        <xsl:value-of select ="'»'"/>
+      </xsl:when>
+      <xsl:otherwise>•</xsl:otherwise>
+    </xsl:choose >-->
+
+  </xsl:template>
+  <xsl:template name ="getBulletType">
+    <xsl:param name ="character"/>
+    <xsl:param name ="typeFace"/>
+    <xsl:choose >
+      <xsl:when test="$character= '➢' or $character= '' or $character= '✔' or $character= '■'">
+       <xsl:value-of select ="'Wingdings'"/>      
+      </xsl:when>
+      <xsl:when test="$character= 'o'">
+        <xsl:value-of select ="'Courier New'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select ="''"/>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   <xsl:template name="getNumFormat">
@@ -183,5 +247,13 @@
         <xsl:value-of select ="'9'"/>
       </xsl:when>
     </xsl:choose>
+  </xsl:template>
+  <xsl:template name ="getFontStyleFromStyles">
+    <xsl:param name ="lvl"/>
+    <xsl:variable name ="outlineName" select ="concat('Default-outline',$lvl+1)"/>
+    <xsl:for-each select ="document('styles.xml')//office:styles/style:style">
+      <xsl:if test ="@style:name=$outlineName">
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
 </xsl:stylesheet>

@@ -106,6 +106,13 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:if>
 		</xsl:for-each>
 
+		<!-- Ellipse -->
+		<xsl:for-each select ="draw:ellipse">
+			<xsl:call-template name ="CreateShape">
+				<xsl:with-param name ="shapeName" select="'Oval '" />
+			</xsl:call-template>
+		</xsl:for-each>
+		
 		<!-- Custom shapes -->
 		<xsl:for-each select ="draw:custom-shape">
 			<xsl:variable name ="shapeName">
@@ -116,7 +123,7 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:when>
 					<!-- Oval -->
 					<xsl:when test ="(draw:enhanced-geometry/@draw:type='ellipse')">
-						<xsl:value-of select ="'Oval '"/>
+						<xsl:value-of select ="'Oval Custom '"/>
 					</xsl:when>
 					<!-- Isosceles Triangle -->
 					<xsl:when test ="(draw:enhanced-geometry/@draw:type='isosceles-triangle')">
@@ -1800,6 +1807,8 @@ Copyright (c) 2007, Sonata Software Limited
               <xsl:with-param name ="level" select ="'0'"/>
 						</xsl:call-template >
 						<xsl:for-each select ="text:span">
+              <!-- Added by lohith - condition test="node()" to fix bug 1731885 -->
+              <xsl:if test="node()">
 							<a:r>
 								<a:rPr lang="en-US" smtClean="0">
 									<!--Font Size -->
@@ -1822,6 +1831,22 @@ Copyright (c) 2007, Sonata Software Limited
 									<xsl:with-param name ="T" select ="@text:style-name" />
 								</xsl:call-template>
 							</xsl:if>
+              </xsl:if>
+              <!-- Added by lohith - condition test="node()" to fix bug 1731885 -->
+              <xsl:if test="not(node())">
+                <a:endParaRPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='') or not($parentStyle = '')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$parentStyle" />
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:endParaRPr>
+              </xsl:if>
 						</xsl:for-each >
 					</a:p>
 
@@ -1863,17 +1888,23 @@ Copyright (c) 2007, Sonata Software Limited
 							</xsl:call-template >-->
 							<xsl:for-each select ="child::node()[position()]">
 								<xsl:choose >
-									<xsl:when test ="name()='text:span'">
+                  <xsl:when test ="name()='text:list-item'">
+                    <xsl:variable name ="currentNodeStyle">
+                      <xsl:call-template name ="getTextNodeForFontStyle">
+                        <xsl:with-param name ="this"/>
+                      </xsl:call-template>
+                    </xsl:variable>
 										<a:r>
 											<a:rPr lang="en-US" smtClean="0">
 												<!--Font Size -->
 												<xsl:variable name ="textId">
-													<xsl:value-of select ="@text:style-name"/>
+													<xsl:value-of select ="$currentNodeStyle"/>
 												</xsl:variable>
 												<xsl:if test ="not($textId ='') or not($parentStyle = '')">
 													<xsl:call-template name ="fontStyles">
 														<xsl:with-param name ="Tid" select ="$textId" />
 														<xsl:with-param name ="prClassName" select ="$parentStyle" />
+                            <xsl:with-param name ="lvl" select ="$lvl"/>
 													</xsl:call-template>
 												</xsl:if>
 											</a:rPr >
@@ -1881,26 +1912,7 @@ Copyright (c) 2007, Sonata Software Limited
 												<xsl:call-template name ="insertTab" />
 											</a:t>
 										</a:r>
-									</xsl:when >
-									<xsl:when test ="not(name()='text:span')">
-										<a:r>
-											<a:rPr lang="en-US" smtClean="0">
-												<!--Font Size -->
-												<xsl:variable name ="textId">
-													<xsl:value-of select ="@text:style-name"/>
-												</xsl:variable>
-												<xsl:if test ="not($textId ='') or not($parentStyle = '')">
-													<xsl:call-template name ="fontStyles">
-														<xsl:with-param name ="Tid" select ="$textId" />
-														<xsl:with-param name ="prClassName" select ="$parentStyle" />
-													</xsl:call-template>
-												</xsl:if>
-											</a:rPr >
-											<a:t>
-												<xsl:call-template name ="insertTab" />
-											</a:t>
-										</a:r>
-									</xsl:when >
+									</xsl:when >								
 								</xsl:choose>
 							</xsl:for-each>
 						</a:p >
@@ -1936,14 +1948,36 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:with-param name ="isBulleted" select ="'true'"/>
                 <xsl:with-param name ="level" select ="$lvl"/>
 							</xsl:call-template >
-                <!--End of Code inserted by Vijayets for Bullets and numbering-->                
+                <!--End of Code inserted by Vijayets for Bullets and numbering-->
+              <xsl:for-each select ="child::node()[position()]">
+                <xsl:choose >
+                  <xsl:when test ="name()='text:list-item'">
+                    <xsl:variable name ="currentNodeStyle">
+                      <xsl:call-template name ="getTextNodeForFontStyle">
+                        <xsl:with-param name ="this"/>
+                      </xsl:call-template>
+                    </xsl:variable>
 							<a:r >
 								<a:rPr lang="en-US" smtClean="0">
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="$currentNodeStyle"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='') or not($parentStyle = '')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$parentStyle"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                  <!--End of code, Applying text styles-->
 								</a:rPr >
 								<a:t>
 									<xsl:call-template name ="insertTab" />
 								</a:t>
 							</a:r>
+                  </xsl:when >
+                </xsl:choose>
+              </xsl:for-each>
 						</a:p>
 					</xsl:for-each >
 				</xsl:when>
@@ -1954,6 +1988,7 @@ Copyright (c) 2007, Sonata Software Limited
 								<xsl:with-param name ="paraId" >
 									<xsl:value-of select ="@text:style-name"/>
 								</xsl:with-param >
+                <!-- Parameters added by vijayeta,Set bulleting as true/false,and set level -->
                 <xsl:with-param name ="isBulleted" select ="'false'"/>
                 <xsl:with-param name ="level" select ="'0'"/>
 							</xsl:call-template >
@@ -2068,6 +2103,102 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
       <xsl:when test ="$lvl='9'">
         <xsl:value-of select ="./text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  <!-- Inner levels,styles-->
+  <xsl:template name ="getTextNodeForFontStyle">
+    <xsl:param name ="this"/>
+    <xsl:choose>
+      <xsl:when test ="./text:p">
+        <xsl:choose >
+          <xsl:when test ="./text:p/text:span">
+            <xsl:value-of select ="./text:p/text:span/@text:style-name"/>
+          </xsl:when>
+          <xsl:otherwise >
+            <xsl:value-of select ="./text:p/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:p">
+        <xsl:choose >
+          <xsl:when test ="./text:list/text:list-item/text:p/text:span">
+            <xsl:value-of select ="./text:list/text:list-item/text:p/text:span/@text:style-name"/>
+          </xsl:when>
+          <xsl:otherwise >
+            <xsl:value-of select ="./text:list/text:list-item/text:p/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:choose >
+          <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:p/text:span">
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:p/text:span/@text:style-name"/>
+          </xsl:when>
+          <xsl:otherwise >
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:choose >
+          <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span">
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/@text:style-name"/>
+          </xsl:when>
+          <xsl:otherwise >
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:choose >
+          <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span">
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/@text:style-name"/>
+          </xsl:when>
+          <xsl:otherwise >
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:choose >
+          <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span">
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/@text:style-name"/>
+          </xsl:when>
+          <xsl:otherwise >
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:choose >
+          <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span">
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/@text:style-name"/>
+          </xsl:when>
+          <xsl:otherwise >
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:choose >
+          <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span">
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/@text:style-name"/>
+          </xsl:when>
+          <xsl:otherwise >
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:choose >
+          <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span">
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/text:span/@text:style-name"/>
+          </xsl:when>
+          <xsl:otherwise >
+            <xsl:value-of select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p/@text:style-name"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
