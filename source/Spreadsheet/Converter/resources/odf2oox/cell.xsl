@@ -51,7 +51,7 @@
     <xsl:variable name="max">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
-          <xsl:value-of select="$colNumber+@table:number-columns-repeated - 1"/>
+          <xsl:value-of select="$colNumber+@table:number-columns-repeated "/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$colNumber"/>
@@ -81,6 +81,29 @@
           <xsl:attribute name="customWidth">1</xsl:attribute>
         </xsl:if>
 
+        <!-- get parent table:table-row id-->
+        <xsl:variable name="columnId">
+          <xsl:value-of select="generate-id(.)"/>
+        </xsl:variable>
+
+        <!-- go to first table:table-column-->
+        <xsl:for-each select="ancestor::table:table/descendant::table:table-column[1]">
+          <xsl:variable name="number">
+          <xsl:call-template name="GetColNumber">
+            <xsl:with-param name="columnId" select="$columnId"/>
+            <xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
+          </xsl:call-template>
+          </xsl:variable>
+        </xsl:for-each>
+
+        <xsl:attribute name="outlineLevel">
+          <xsl:value-of select="count(ancestor::table:table-column-group)"/>
+        </xsl:attribute>
+
+        <xsl:if test="ancestor::table:table-column-group/descendant::table:table-column[@table:visibility = 'collapse']">
+          <xsl:attribute name="collapsed">1</xsl:attribute>
+        </xsl:if>
+        
         <xsl:if test="@table:visibility = 'collapse'">
           <xsl:attribute name="hidden">1</xsl:attribute>
         </xsl:if>
@@ -110,8 +133,8 @@
     <!-- insert next column -->
     <xsl:choose>
       <!-- next column is sibling of this one -->
-      <xsl:when test="following-sibling::node()[1][name() = 'table:table-column' ]">
-        <xsl:apply-templates select="following-sibling::table:table-column[1]" mode="sheet">
+      <xsl:when test="following::table:table-column[generate-id(ancestor::table:table) = $tableId]">
+        <xsl:apply-templates select="following::table:table-column[generate-id(ancestor::table:table) = $tableId][1]" mode="sheet">
           <xsl:with-param name="colNumber">
             <xsl:choose>
               <xsl:when test="@table:number-columns-repeated">
@@ -125,23 +148,7 @@
           <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
         </xsl:apply-templates>
       </xsl:when>
-      <!-- this is the last column before header  -->
-      <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-columns' ]">
-        <xsl:apply-templates select="following-sibling::node()[1]/table:table-column[1]"
-          mode="sheet">
-          <xsl:with-param name="colNumber">
-            <xsl:choose>
-              <xsl:when test="@table:number-columns-repeated">
-                <xsl:value-of select="$colNumber+@table:number-columns-repeated"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$colNumber+1"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:with-param>
-          <xsl:with-param name="defaultFontSize" select="$defaultFontSize"/>
-        </xsl:apply-templates>
-      </xsl:when>
+      
       <!-- this is the last column inside header -->
       <xsl:when
         test="not(following-sibling::node()[1][name() = 'table:table-column' ]) and parent::node()[name() = 'table:table-header-columns' ] and parent::node()/following-sibling::table:table-column[1]">
@@ -203,6 +210,11 @@
                 <xsl:text>false</xsl:text>
               </xsl:with-param>
             </xsl:apply-templates>
+
+            <xsl:variable name="tableId">
+              <xsl:value-of select="generate-id(ancestor::table:table)"/>
+            </xsl:variable>
+
           </xsl:when>
           <!-- this is the last column before header -->
           <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-columns' ]">
@@ -551,6 +563,30 @@
           </xsl:if>
         </xsl:if>
 
+        <xsl:variable name="tableId">
+          <xsl:value-of select="generate-id(ancestor::table:table)"/>
+        </xsl:variable>
+
+        <!-- get parent table:table-row id -->
+        <xsl:variable name="rowId">
+          <xsl:value-of select="generate-id(.)"/>
+        </xsl:variable>
+
+        <!-- go to first table:table-row-->
+        <xsl:for-each select="ancestor::table:table/descendant::table:table-row[1]">
+          <xsl:variable name="number">
+            <xsl:call-template name="GetRowNumber">
+              <xsl:with-param name="rowId" select="$rowId"/>
+              <xsl:with-param name="tableId" select="generate-id(ancestor::table:table)"/>
+            </xsl:call-template>
+          </xsl:variable>
+        </xsl:for-each>
+
+        <xsl:attribute name="outlineLevel">
+          <xsl:value-of select="count(ancestor::table:table-row-group)"/>
+        </xsl:attribute>
+        <!--/xsl:for-each-->
+
         <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
           <xsl:attribute name="hidden">1</xsl:attribute>
         </xsl:if>
@@ -613,11 +649,17 @@
 
     </xsl:if>
 
+    <xsl:variable name="tableId">
+      <xsl:value-of select="generate-id(ancestor::table:table)"/>
+    </xsl:variable>
+
     <!-- insert next row -->
     <xsl:choose>
       <!-- next row is a sibling -->
-      <xsl:when test="following-sibling::node()[1][name() = 'table:table-row' ]">
-        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="sheet">
+      <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId]">
+        <xsl:apply-templates
+          select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]"
+          mode="sheet">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="@table:number-rows-repeated">
@@ -1209,7 +1251,7 @@
                   test="not(document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = 'Hyperlink' ])">
                   <xsl:value-of select="$cellFormats + $cellStyles + $multilines"/>
                 </xsl:when>
-                
+
                 <xsl:otherwise>
                   <xsl:variable name="hyperlinkStyle">
                     <xsl:for-each select="document('styles.xml')">
@@ -1434,7 +1476,8 @@
           </xsl:choose>
         </xsl:variable>
 
-        <xsl:for-each select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]">
+        <xsl:for-each
+          select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]">
           <xsl:call-template name="GetColNumber">
             <xsl:with-param name="position">
               <xsl:value-of select="$position"/>

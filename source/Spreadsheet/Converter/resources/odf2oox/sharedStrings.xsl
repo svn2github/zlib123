@@ -49,6 +49,7 @@
           document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-header-rows/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))])"
         />
       </xsl:variable>
+      <!-- possibly unnecessary attribute-->
       <xsl:attribute name="count">
         <xsl:value-of select="$Count"/>
       </xsl:attribute>
@@ -63,8 +64,8 @@
   <xsl:template name="InsertString">
     <!-- string can be in a simple row or a header row -->
     <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))] |
-      document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-header-rows/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))]">
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))]
+      ">
       <si>
         <xsl:choose>
           <xsl:when test="text:span|text:p/text:span">
