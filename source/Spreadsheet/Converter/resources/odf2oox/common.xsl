@@ -334,14 +334,14 @@
     <xsl:variable name="seconds">
       <xsl:value-of select="substring-after(substring-after($value,':'),':')"/>
     </xsl:variable>
-    
+
     <!-- number of leap years between given year and 1900 -->
     <xsl:variable name="leapYears">
       <xsl:value-of
         select="floor(($year -1901) div 4) - floor(($year - 1901) div 100) + floor(($year - 1601) div 400)"
       />
     </xsl:variable>
-    
+
     <!-- get number of days before given month -->
     <xsl:variable name="daysOfMonths">
       <xsl:call-template name="MonthsToDays">
@@ -358,7 +358,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="realValue">
       <xsl:choose>
         <xsl:when test="contains($value,'T')">
@@ -367,11 +367,12 @@
           />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="number($day) + $daysOfMonths + 365 * ($year - 1900) + $leapYears + 1"/>
+          <xsl:value-of
+            select="number($day) + $daysOfMonths + 365 * ($year - 1900) + $leapYears + 1"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <!-- modification due to Excel date bug(leap year 1900) -->
     <xsl:choose>
       <xsl:when test="$realValue &lt; 61">
@@ -381,11 +382,11 @@
         <xsl:value-of select="$realValue"/>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
 
   <!-- template which converts time to number -->
-  
+
   <xsl:template name="TimeToNumber">
     <xsl:param name="value"/>
     <xsl:variable name="hour">
@@ -397,11 +398,9 @@
     <xsl:variable name="seconds">
       <xsl:value-of select="substring-before(substring-after($value,'M'),'S')"/>
     </xsl:variable>
-    <xsl:value-of
-      select="$hour div 24 + $minutes div 1440 + $seconds div 8640"
-    />
+    <xsl:value-of select="$hour div 24 + $minutes div 1440 + $seconds div 86400"/>
   </xsl:template>
-  
+
   <xsl:template name="MonthsToDays">
     <xsl:param name="month"/>
     <xsl:param name="isYearLeap"/>
