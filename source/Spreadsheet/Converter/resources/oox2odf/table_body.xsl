@@ -2754,6 +2754,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
     <xsl:choose>
 
       <!-- add '%' if it's percentage format-->
@@ -2843,8 +2844,8 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of
-          select="concat($valueBeforeComma,format-number(concat('.',$valueAfterComma),concat('.',substring-after($plainFormat,'.'))))"
-        />
+          select="concat($valueBeforeComma, '.', $valueAfterComma)"
+          />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
