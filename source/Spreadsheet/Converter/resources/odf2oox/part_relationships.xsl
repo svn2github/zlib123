@@ -64,22 +64,60 @@
     </Relationships>
   </xsl:template>
 
-  <!-- change space to  '%20' after conversion-->
-  <xsl:template name="SpaceTo20Percent">
+  <xsl:template name="TranslateIllegalChars">
     <xsl:param name="string"/>
-
+    
     <xsl:choose>
+      <!-- change space to  '%20' after conversion-->
       <xsl:when test="contains($string,' ')">
         <xsl:choose>
           <xsl:when test="substring-before($string,' ') =''">
-            <xsl:call-template name="SpaceTo20Percent">
+            <xsl:call-template name="TranslateIllegalChars">
               <xsl:with-param name="string" select="concat('%20',substring-after($string,' '))"/>
             </xsl:call-template>
           </xsl:when>
           <xsl:when test="substring-before($string,' ') !=''">
-            <xsl:call-template name="SpaceTo20Percent">
+            <xsl:call-template name="TranslateIllegalChars">
               <xsl:with-param name="string"
                 select="concat(substring-before($string,' '),'%20',substring-after($string,' '))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+      <!-- change  '&lt;' to '%3C'  after conversion-->
+      <xsl:when test="contains($string,'&lt;')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,'&lt;') =''">
+            <xsl:call-template name="TranslateIllegalChars">
+              <xsl:with-param name="string"
+                select="concat('%3C',substring-after($string,'&lt;'))"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="substring-before($string,'&lt;') !=''">
+            <xsl:call-template name="TranslateIllegalChars">
+              <xsl:with-param name="string"
+                select="concat(substring-before($string,'&lt;'),'%3C',substring-after($string,'&lt;'))"
+              />
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+
+      <!-- change  '&gt;' to '%3E'  after conversion-->
+      <xsl:when test="contains($string,'&gt;')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,'&gt;') =''">
+            <xsl:call-template name="TranslateIllegalChars">
+              <xsl:with-param name="string"
+                select="concat('%3E',substring-after($string,'&gt;'))"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="substring-before($string,'&gt;') !=''">
+            <xsl:call-template name="TranslateIllegalChars">
+              <xsl:with-param name="string"
+                select="concat(substring-before($string,'&gt;'),'%3E',substring-after($string,'&gt;'))"
+              />
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
@@ -129,31 +167,33 @@
                 <xsl:choose>
                   <!-- when hyperlink to a site or mailto-->
                   <xsl:when test="contains(@xlink:href,':') and not(starts-with(@xlink:href,'/'))">
-                    <xsl:value-of select="translate(@xlink:href,' ','')"/>
+                    <xsl:call-template name="TranslateIllegalChars">
+                      <xsl:with-param name="string" select="@xlink:href"/>
+                    </xsl:call-template>
                   </xsl:when>
                   <!-- when hyperlink to an document-->
                   <xsl:otherwise>
 
-                    <xsl:variable name="convertedSpaces">
-                      <xsl:call-template name="SpaceTo20Percent">
+                    <xsl:variable name="translatedTarget">
+                      <xsl:call-template name="TranslateIllegalChars">
                         <xsl:with-param name="string" select="@xlink:href"/>
                       </xsl:call-template>
                     </xsl:variable>
 
                     <xsl:choose>
                       <!-- when starts with up folder sign -->
-                      <xsl:when test="starts-with($convertedSpaces,'../' )">
+                      <xsl:when test="starts-with($translatedTarget,'../' )">
                         <xsl:value-of
-                          select="translate(substring-after($convertedSpaces,'../'),'/','\')"/>
+                          select="translate(substring-after($translatedTarget,'../'),'/','\')"/>
                       </xsl:when>
                       <!-- when file is in another disk -->
-                      <xsl:when test="starts-with($convertedSpaces,'/')">
+                      <xsl:when test="starts-with($translatedTarget,'/')">
                         <xsl:value-of
-                          select="concat('file:///',translate(substring-after($convertedSpaces,'/'),'/','\'))"
+                          select="concat('file:///',translate(substring-after($translatedTarget,'/'),'/','\'))"
                         />
                       </xsl:when>
                       <xsl:otherwise>
-                        <xsl:value-of select="translate($convertedSpaces,'/','\')"/>
+                        <xsl:value-of select="translate($translatedTarget,'/','\')"/>
                       </xsl:otherwise>
                     </xsl:choose>
 
@@ -205,27 +245,27 @@
           <xsl:otherwise>
 
             <!-- change spaces to %20 -->
-            <xsl:variable name="convertedSpaces">
-              <xsl:call-template name="SpaceTo20Percent">
+            <xsl:variable name="translatedTarget">
+              <xsl:call-template name="TranslateIllegalChars">
                 <xsl:with-param name="string" select="@xlink:href"/>
               </xsl:call-template>
             </xsl:variable>
-            
+
             <xsl:variable name="target">
               <xsl:choose>
                 <!-- when starts with up folder sign -->
-                <xsl:when test="starts-with($convertedSpaces,'../' )">
-                  <xsl:value-of select="translate(substring-after($convertedSpaces,'../'),'/','\')"
+                <xsl:when test="starts-with($translatedTarget,'../' )">
+                  <xsl:value-of select="translate(substring-after($translatedTarget,'../'),'/','\')"
                   />
                 </xsl:when>
                 <!-- when file is in another disk -->
-                <xsl:when test="starts-with($convertedSpaces,'/')">
+                <xsl:when test="starts-with($translatedTarget,'/')">
                   <xsl:value-of
-                    select="concat('file:///',translate(substring-after($convertedSpaces,'/'),'/','\'))"
+                    select="concat('file:///',translate(substring-after($translatedTarget,'/'),'/','\'))"
                   />
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:value-of select="translate($convertedSpaces,'/','\')"/>
+                  <xsl:value-of select="translate($translatedTarget,'/','\')"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
