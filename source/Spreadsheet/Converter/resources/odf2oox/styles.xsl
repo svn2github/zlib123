@@ -926,7 +926,7 @@
             <!-- change default horizontal alignment of angle oriented text when angle equals 90 degrees -->
             <xsl:when test="$rotation = 90">
               <xsl:attribute name="horizontal">
-                <xsl:text>right</xsl:text>
+                <xsl:text>center</xsl:text>
               </xsl:attribute>
             </xsl:when>
             <!-- change default horizontal alignment of angle oriented text when angle equals -90 degrees -->
