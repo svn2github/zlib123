@@ -100,10 +100,6 @@
           <xsl:value-of select="count(ancestor::table:table-column-group)"/>
         </xsl:attribute>
 
-        <xsl:if test="ancestor::table:table-column-group/descendant::table:table-column[@table:visibility = 'collapse']">
-          <xsl:attribute name="collapsed">1</xsl:attribute>
-        </xsl:if>
-        
         <xsl:if test="@table:visibility = 'collapse'">
           <xsl:attribute name="hidden">1</xsl:attribute>
         </xsl:if>
