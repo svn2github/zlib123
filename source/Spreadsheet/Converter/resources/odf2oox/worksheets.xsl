@@ -195,9 +195,10 @@
             <xsl:text>1</xsl:text>
           </xsl:with-param>
           <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
+          <xsl:with-param name="MergeCell" select="$MergeCell"/>
         </xsl:apply-templates>
       </xsl:if>
-
+      
       <xsl:call-template name="InsertHyperlinks"/>
 
       <xsl:call-template name="InsertPageProperties">

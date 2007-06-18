@@ -43,14 +43,17 @@
     <xsl:param name="rowNumber"/>
     <xsl:param name="cellNumber"/>
     <xsl:param name="TableColumnTagNum"/>
+    <xsl:param name="MergeCell"/>
 
-
-    <xsl:apply-templates select="table:table-cell[1]" mode="conditional">
+    <xsl:apply-templates
+      select="child::node()[name() = 'table:table-cell' or name()= 'table:covered-table-cell'][1]"
+      mode="conditional">
       <xsl:with-param name="colNumber">
         <xsl:text>0</xsl:text>
       </xsl:with-param>
       <xsl:with-param name="rowNumber" select="$rowNumber"/>
       <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
+      <xsl:with-param name="MergeCell" select="$MergeCell"/>
     </xsl:apply-templates>
 
     <!-- check next row -->
@@ -72,6 +75,7 @@
             <xsl:text>0</xsl:text>
           </xsl:with-param>
           <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
+          <xsl:with-param name="MergeCell" select="$MergeCell"/>
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
@@ -92,6 +96,7 @@
             <xsl:text>0</xsl:text>
           </xsl:with-param>
           <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
+          <xsl:with-param name="MergeCell" select="$MergeCell"/>
         </xsl:apply-templates>
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
@@ -113,16 +118,48 @@
             <xsl:text>0</xsl:text>
           </xsl:with-param>
           <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
+          <xsl:with-param name="MergeCell" select="$MergeCell"/>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
 
-  <!-- insert coditional -->
-  <xsl:template match="table:table-cell|table:covered-table-cell" mode="conditional">
+  <xsl:template match="table:covered-table-cell" mode="conditional">
     <xsl:param name="colNumber"/>
     <xsl:param name="rowNumber"/>
     <xsl:param name="TableColumnTagNum"/>
+    <xsl:param name="MergeCell"/>
+
+    <xsl:if test="following-sibling::table:table-cell">
+      <xsl:apply-templates
+        select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]"
+        mode="conditional">
+        <xsl:with-param name="colNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated != ''">
+              <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$colNumber + 1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="$rowNumber"/>
+        </xsl:with-param>
+        <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
+        <xsl:with-param name="MergeCell" select="$MergeCell"/>
+      </xsl:apply-templates>
+    </xsl:if>
+
+  </xsl:template>
+
+  <!-- insert coditional -->
+  <xsl:template match="table:table-cell" mode="conditional">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="TableColumnTagNum"/>
+    <xsl:param name="MergeCell"/>
 
     <xsl:variable name="columnCellStyle">
       <xsl:call-template name="GetColumnCellStyle">
@@ -155,9 +192,21 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
+
         <xsl:attribute name="sqref">
-          <xsl:value-of select="concat($ColChar, $rowNumber)"/>
+          <xsl:choose>
+            <!-- if condition is applied to merged cell then enter merged cell range -->
+            <xsl:when test="contains($MergeCell,concat($ColChar, $rowNumber))">
+              <xsl:value-of
+                select="concat($ColChar, $rowNumber,substring-before(substring-after($MergeCell,concat($ColChar, $rowNumber)),';'))"
+              />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat($ColChar, $rowNumber)"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
+
         <xsl:for-each select="key('style', $styleName)/style:map">
           <cfRule type="cellIs" priority="{position()}">
             <xsl:if test="contains(@style:condition,'is-true-formula')">
@@ -206,7 +255,7 @@
 
     <xsl:if test="following-sibling::table:table-cell">
       <xsl:apply-templates
-        select="following-sibling::table:table-cell[1]|following-sibling::table:covered-table-cell[1]"
+        select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]"
         mode="conditional">
         <xsl:with-param name="colNumber">
           <xsl:choose>
@@ -222,6 +271,7 @@
           <xsl:value-of select="$rowNumber"/>
         </xsl:with-param>
         <xsl:with-param name="TableColumnTagNum" select="$TableColumnTagNum"/>
+        <xsl:with-param name="MergeCell" select="$MergeCell"/>
       </xsl:apply-templates>
     </xsl:if>
 
@@ -283,7 +333,7 @@
       </xsl:when>
       <xsl:when test="contains(@style:condition, 'is-true-formula')">
         <formula/>
-      </xsl:when>      
+      </xsl:when>
       <xsl:when test="contains(@style:condition, '&lt;=')">
         <formula>
           <xsl:choose>
@@ -398,7 +448,7 @@
             <xsl:when test="contains(@style:condition, '[')">
               <xsl:value-of
                 select="substring-after(substring-before(substring-after(@style:condition, '['), ']'), '.')"
-              />              
+              />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="substring-before(substring-after(@style:condition, ','), ')')"/>
