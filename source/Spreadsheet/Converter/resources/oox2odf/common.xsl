@@ -1204,16 +1204,43 @@
     <!-- @Context: None -->
     
     <xsl:param name="value"/><!-- (float) number value -->
+    
     <xsl:variable name="hours">
-      <xsl:value-of select="floor($value * 24)"/>
+      <xsl:choose>        
+        <xsl:when test="number($value)">
+          <xsl:value-of select="floor($value * 24)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
+    
     <xsl:variable name="minutes">
-      <xsl:value-of select="floor(($value * 24 - $hours) * 60)"/>
+      <xsl:choose>        
+        <xsl:when test="number($value)">
+            <xsl:value-of select="floor(($value * 24 - $hours) * 60)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
+    
     <xsl:variable name="seconds">
-      <xsl:value-of select="$value * 86400 - $minutes * 60 - $hours * 3600"/>
+      <xsl:choose>        
+        <xsl:when test="number($value)">
+            <xsl:value-of select="$value * 86400 - $minutes * 60 - $hours * 3600"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>0</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:variable>
+    
     <xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>
+    
+    
   </xsl:template>
   
   <xsl:template name="DaysToMonthsAndDays">
