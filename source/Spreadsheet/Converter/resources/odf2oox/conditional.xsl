@@ -459,6 +459,8 @@
     <xsl:choose>
       <!-- when formula starts with &apos; -->
       <xsl:when test="starts-with($formula,$apos)"/>
+      <!-- when formula contains a function (or i.e (2+5)*12 )-->
+      <xsl:when test="contains($formula,'(')"/>
 
       <!-- if condition is given by the formula /is-true-formula(...)/-->
       <xsl:when test="$operator != ''">
