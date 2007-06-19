@@ -194,6 +194,7 @@
           <xsl:with-param name="cellNumber">
             <xsl:text>1</xsl:text>
           </xsl:with-param>
+          <xsl:with-param name="tableName" select="@table:name"/>
           <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
           <xsl:with-param name="MergeCell" select="$MergeCell"/>
         </xsl:apply-templates>
