@@ -1147,7 +1147,9 @@
                         <xsl:with-param name="id">
                           <xsl:value-of select="@r:id"/>
                         </xsl:with-param>
-                        <xsl:with-param name="document">xl/worksheets/sheet1.xml</xsl:with-param>
+                          <xsl:with-param name="document">
+                            <xsl:value-of select="concat('xl/worksheets/sheet', $sheetNr, '.xml')"/>
+                          </xsl:with-param>
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:variable>
