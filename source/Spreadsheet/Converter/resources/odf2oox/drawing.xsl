@@ -188,15 +188,25 @@
     </xdr:from>
     <xdr:to>
       <xdr:col>
+        
+        <!-- To do  (check roundtrip Diagrammtypen.xlsx)-->
         <xsl:choose>
           <xsl:when
-            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= '' and $InsertStartColumn != '' and $InsertStartColumn != 'NaN'">
             <xsl:value-of select="$InsertStartColumn"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="$InsertEndColumn"/>
+            <xsl:choose>
+              <xsl:when test="$InsertEndColumn != '' and $InsertEndColumn != 'NaN'">
+                <xsl:value-of select="$InsertEndColumn"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$InsertStartColumn"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:otherwise>
         </xsl:choose>
+        
       </xdr:col>
       <xdr:colOff>
         <xsl:value-of select="$InsertEndColumnOffset"/>
