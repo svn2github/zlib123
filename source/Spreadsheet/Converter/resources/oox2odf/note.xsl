@@ -519,7 +519,9 @@
             <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl}"/>
           </xsl:when>
           <xsl:otherwise>
-            <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl - 1}"/>
+            <xsl:if test="$EndColl - $StartColl -2 &gt; 0">
+            <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl - 2}"/>
+            </xsl:if>
           </xsl:otherwise>
 
         </xsl:choose>

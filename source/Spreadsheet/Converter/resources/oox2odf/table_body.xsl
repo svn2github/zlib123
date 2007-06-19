@@ -1477,15 +1477,16 @@
     <xsl:param name="colNum"/>
     <xsl:param name="rowNum"/>
     <xsl:param name="CheckIfMerge"/>
-    <xsl:param name="PictureCell"/>
+    <xsl:param name="PictureCell"/>    
     <xsl:param name="PictureRow"/>
+    <xsl:param name="PictureColl"/>
     <xsl:param name="NoteCell"/>
     <xsl:param name="NoteRow"/>
+    <xsl:param name="NoteColl"/>
     <xsl:param name="PictureAndNoteCell"/>
     <xsl:param name="PictureAndNoteRow"/>
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
-    <xsl:param name="GetMinCollWithPicture"/>
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
@@ -1549,7 +1550,28 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
+    
+    <xsl:variable name="GetMinCollWithPicture">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="concat($PictureColl, $NoteColl)"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:choose>
+            <xsl:when test="$prevCellCol = ''">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:when test="not(following-sibling::e:c)">
+              <xsl:value-of select="$colNum"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$prevCellCol - 1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+   
     <xsl:choose>
 
       <!-- calc supports only 256 columns -->
@@ -1724,6 +1746,7 @@
       </xsl:when>
       <!-- skip merged cells when horizontal alignment = 'centerContinuous' -->
       <xsl:when test="$countContinuous != 0">
+
         <xsl:if test="following-sibling::e:c[$countContinuous]">
           <xsl:apply-templates select="following-sibling::e:c[position() = $countContinuous]">
             <xsl:with-param name="BeforeMerge">
@@ -1762,7 +1785,7 @@
       </xsl:when>
 
       <xsl:when
-        test="not(following-sibling::e:c) and ($PictureCell != '' or $NoteCell != '') and $GetMinCollWithPicture &gt; $colNum">
+        test="not(following-sibling::e:c) and ($PictureCell != '' or $NoteCell != '') and ($GetMinCollWithPicture + 1) &gt; $colNum">
 
 
         <xsl:if
@@ -1839,6 +1862,7 @@
       </xsl:when>
 
       <xsl:otherwise>
+
         <xsl:if test="following-sibling::e:c">
           <xsl:apply-templates select="following-sibling::e:c[1]">
             <xsl:with-param name="prevCellCol">

@@ -1485,7 +1485,7 @@
         <xsl:value-of select="$BigMergeCell"/>
       </xsl:with-param>
       <xsl:with-param name="prevCellCol">
-        <xsl:value-of select="$prevCellCol"/>
+        <xsl:value-of select="$colNum"/>
       </xsl:with-param>
       <xsl:with-param name="this" select="$this"/>
       <xsl:with-param name="colNum">
@@ -1503,21 +1503,24 @@
       <xsl:with-param name="PictureCell">
         <xsl:value-of select="$PictureCell"/>
       </xsl:with-param>
+      <xsl:with-param name="PictureColl">
+        <xsl:value-of select="$PictureColl"/>
+      </xsl:with-param>
       <xsl:with-param name="NoteRow">
         <xsl:value-of select="$NoteRow"/>
       </xsl:with-param>
       <xsl:with-param name="NoteCell">
         <xsl:value-of select="$NoteCell"/>
       </xsl:with-param>
+      <xsl:with-param name="NoteColl">
+        <xsl:value-of select="$NoteColl"/>
+      </xsl:with-param>
       <xsl:with-param name="sheet">
         <xsl:value-of select="$sheet"/>
       </xsl:with-param>
       <xsl:with-param name="NameSheet">
         <xsl:value-of select="$NameSheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="GetMinCollWithPicture">
-        <xsl:value-of select="$GetMinCollWithPicture"/>
-      </xsl:with-param>
+      </xsl:with-param>   
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
       <xsl:with-param name="ConditionalCell">
         <xsl:value-of select="$ConditionalCell"/>
