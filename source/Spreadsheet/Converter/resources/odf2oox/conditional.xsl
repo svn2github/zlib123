@@ -514,8 +514,8 @@
         </xsl:variable>
 
         <xsl:choose>
-          <!-- when reference is to a cell in the same sheet (it can optionally start from $)-->
-          <xsl:when test="substring-before($reference,'.') = concat('$',$tableName)">
+          <!-- when reference is to a cell in the same sheet ($sheet_name.ref or .ref)-->
+          <xsl:when test="substring-before($reference,'.') = concat('$',$tableName) or substring-before($reference,'.') = '' ">
             <xsl:call-template name="TranslateReferences">
               <xsl:with-param name="string">
                 <xsl:value-of select="substring-before($string,'[')"/>
