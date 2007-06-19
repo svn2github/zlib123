@@ -68,23 +68,24 @@
     <xsl:param name="string"/>
     
     <xsl:choose>
-      <!-- change space to  '%20' after conversion-->
+
+      <!-- remove space-->
       <xsl:when test="contains($string,' ')">
         <xsl:choose>
           <xsl:when test="substring-before($string,' ') =''">
             <xsl:call-template name="TranslateIllegalChars">
-              <xsl:with-param name="string" select="concat('%20',substring-after($string,' '))"/>
+              <xsl:with-param name="string" select="substring-after($string,' ')"/>
             </xsl:call-template>
           </xsl:when>
           <xsl:when test="substring-before($string,' ') !=''">
             <xsl:call-template name="TranslateIllegalChars">
               <xsl:with-param name="string"
-                select="concat(substring-before($string,' '),'%20',substring-after($string,' '))"/>
+                select="concat(substring-before($string,' '),substring-after($string,' '))"/>
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
       </xsl:when>
-
+      
       <!-- change  '&lt;' to '%3C'  after conversion-->
       <xsl:when test="contains($string,'&lt;')">
         <xsl:choose>
@@ -175,7 +176,7 @@
                   <xsl:otherwise>
 
                     <xsl:variable name="translatedTarget">
-                      <xsl:call-template name="TranslateIllegalChars">
+                      <xsl:call-template name="SpaceTo20Percent">
                         <xsl:with-param name="string" select="@xlink:href"/>
                       </xsl:call-template>
                     </xsl:variable>
@@ -281,4 +282,32 @@
 
     </Relationships>
   </xsl:template>
+
+  <xsl:template name="SpaceTo20Percent">
+  <xsl:param name="string"/>
+    
+    <xsl:choose>
+      <!-- change space to  '%20' after conversion-->
+      <xsl:when test="contains($string,' ')">
+        <xsl:choose>
+          <xsl:when test="substring-before($string,' ') =''">
+            <xsl:call-template name="TranslateIllegalChars">
+              <xsl:with-param name="string" select="concat('%20',substring-after($string,' '))"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="substring-before($string,' ') !=''">
+            <xsl:call-template name="SpaceTo20Percent">
+              <xsl:with-param name="string"
+                select="concat(substring-before($string,' '),'%20',substring-after($string,' '))"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:when>
+      
+      <xsl:otherwise>
+        <xsl:value-of select="$string"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>
