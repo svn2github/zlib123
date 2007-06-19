@@ -183,7 +183,7 @@
         </xsl:choose>
       </xdr:row>
       <xdr:rowOff>
-        <xsl:value-of select="$InsertStartColumnOffset"/>
+        <xsl:value-of select="$InsertStartRowOffset"/>
       </xdr:rowOff>
     </xdr:from>
     <xdr:to>
