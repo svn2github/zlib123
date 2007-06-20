@@ -733,8 +733,8 @@
         <xsl:when test="$index=48"><xsl:text>3366FF</xsl:text></xsl:when>
         <xsl:when test="$index=49"><xsl:text>33CCCC</xsl:text></xsl:when>
         <xsl:when test="$index=50"><xsl:text>339933</xsl:text></xsl:when>
-        <xsl:when test="$index=51"><xsl:text>999933</xsl:text></xsl:when>
-        <xsl:when test="$index=52"><xsl:text>996633</xsl:text></xsl:when>
+        <xsl:when test="$index=51"><xsl:text>FFD700</xsl:text></xsl:when>
+        <xsl:when test="$index=52"><xsl:text>FFA500</xsl:text></xsl:when>
         <xsl:when test="$index=53"><xsl:text>996666</xsl:text></xsl:when>
         <xsl:when test="$index=54"><xsl:text>666699</xsl:text></xsl:when>
         <xsl:when test="$index=55"><xsl:text>969696</xsl:text></xsl:when>
