@@ -1823,7 +1823,31 @@
                   </xsl:choose>
 
                 </xsl:when>
-                <!-- when there was no style -->
+                <!-- when there was no style and there is hyperlink in merged cell -->
+                <xsl:when test="descendant::text:a">
+                  
+                  <xsl:attribute name="xfId">
+                    <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"/>
+                  </xsl:attribute>
+                  
+                  <xsl:variable name="contentFontCount">
+                    <xsl:value-of
+                      select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
+                    />
+                  </xsl:variable>
+                  
+                  <xsl:variable name="styleFontCount">
+                    <xsl:value-of
+                      select="count(document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
+                    />
+                  </xsl:variable>
+                  
+                  <xsl:attribute name="fontId">
+                    <xsl:value-of select="$contentFontCount + $styleFontCount +2"/>
+                  </xsl:attribute>
+                  
+                  <alignment wrapText="1"/>
+                </xsl:when>
                 <xsl:otherwise>
                   <alignment wrapText="1"/>
                 </xsl:otherwise>
