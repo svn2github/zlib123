@@ -455,7 +455,7 @@
             </xsl:choose>
           </xsl:attribute>
 
-          <xsl:if test="e:alignment/@indent">
+          <xsl:if test="e:alignment/@indent and e:alignment/@indent != '0'">
             <xsl:attribute name="fo:margin-left">
               <xsl:variable name="indennt">
                 <xsl:value-of select="e:alignment/@indent"/>
@@ -463,7 +463,8 @@
               <xsl:value-of select="format-number($indennt*0.353,'##.###cm') "/>
             </xsl:attribute>            
           </xsl:if>
-          <xsl:if test="e:alignment/@indent">
+                 
+          <xsl:if test="e:alignment/@indent and e:alignment/@indent != '0'">
             <xsl:attribute name="fo:margin-right">
               <xsl:variable name="indennnt">
                 <xsl:value-of select="e:alignment/@indent"/>
