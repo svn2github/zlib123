@@ -1002,23 +1002,71 @@
               </xsl:call-template>
             </xsl:variable>
 
-            <xsl:attribute name="location">
-              <xsl:if test="@xlink:href">
+                   <xsl:if test="starts-with(@xlink:href,'#')">
+              <xsl:attribute name="location">
+
+                <xsl:variable name="apos">
+                  <xsl:text>&apos;</xsl:text>
+                </xsl:variable>
+
+                <xsl:variable name="sheet">
+                  <xsl:choose>
+                    <xsl:when test="contains(@xlink:href,'.')">
+                      <xsl:value-of select="substring-after(substring-before(@xlink:href,'.'),'#')"
+                      />
+                    </xsl:when>
+
+                    <xsl:otherwise>
+                      <xsl:value-of select="substring-after(@xlink:href,'#')"/>
+                    </xsl:otherwise>
+
+                  </xsl:choose>
+                </xsl:variable>
+
+                <xsl:variable name="checkName">
+                  <xsl:for-each
+                    select="/office:document-content/office:body/office:spreadsheet/table:table[@table:name = translate($sheet,$apos,'')]">
+                    <xsl:call-template name="CheckSheetName">
+                      <xsl:with-param name="sheetNumber">
+                        <xsl:number count="table:table" level="single"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="name">
+                        <xsl:value-of
+                          select="substring(translate($sheet,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"/>
+
+                      </xsl:with-param>
+                    </xsl:call-template>
+                  </xsl:for-each>
+                </xsl:variable>
+
+                <xsl:variable name="hyperSheetNumber">
+                  <xsl:for-each
+                    select="/office:document-content/office:body/office:spreadsheet/table:table[@table:name = translate($convertedSpaces,'#','')]">
+                    <xsl:number count="table:table" level="single"/>
+                  </xsl:for-each>
+                </xsl:variable>
+
+                <!-- if sheet name has space than write name in apostrophes -->
+                <xsl:if test="contains($checkName,' ')">
+                  <xsl:text>&apos;</xsl:text>
+                </xsl:if>
+                <xsl:value-of select="$checkName"/>
+                <xsl:if test="contains($checkName,' ')">
+                  <xsl:text>&apos;</xsl:text>
+                </xsl:if>
+                <xsl:text>!</xsl:text>
+                
                 <xsl:choose>
-                  <!-- when starts with up '#' -->
-                  <xsl:when test="starts-with($convertedSpaces,'#' ) and not(contains($convertedSpaces,'.'))">
-                    <xsl:value-of select="concat(substring-after($convertedSpaces,'#'),'!A1')"
-                    />
+                  <xsl:when test="contains(@xlink:href,'.')">
+                    <xsl:value-of select="substring-after(@xlink:href,'.')"/>
                   </xsl:when>
-                  
-                  <xsl:when test="starts-with($convertedSpaces,'#' )">
-                    <xsl:value-of select="translate(substring-after($convertedSpaces,'#'),'.','!')"
-                    />
-                  </xsl:when>
-                  
+                  <xsl:otherwise>
+                    <xsl:text>A1</xsl:text>
+                  </xsl:otherwise>
                 </xsl:choose>
-              </xsl:if>
-            </xsl:attribute>
+                
+              </xsl:attribute>
+            </xsl:if>
             <xsl:attribute name="display">
               <xsl:variable name="HypeDiscDisp">
               <text:a>
