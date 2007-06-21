@@ -26,30 +26,9 @@ Copyright (c) 2007, Sonata Software Limited
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 -->
-<!--<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">-->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:odf="urn:odf"
-  xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:page="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-  xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0"
-  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
-  xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="odf style text number draw page">
-	<xsl:import href ="common.xsl"/>
-	<xsl:import href ="shapes_direct.xsl"/>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Templated for Slide Layouts - Added by lohith.ar -->
   <xsl:template name="InsertSlideLayout1">
-	  <xsl:param name="slideMasterName"/>
     <p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
                  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" 
                  xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" 
@@ -80,53 +59,10 @@ Copyright (c) 2007, Sonata Software Limited
               </p:nvPr>
             </p:nvSpPr>
             <p:spPr>
-				  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:presentation-page-layout">
-					  <xsl:if test="./@style:name[contains(.,'T0')]">
-						  <xsl:for-each select="./presentation:placeholder">
-							  <xsl:if test="@presentation:object='title'">
               <a:xfrm>
-									  <a:off>
-										  <xsl:attribute name ="x">
-											  <!--<xsl:value-of select ="@svg:x"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:x"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="y">
-											  <!--<xsl:value-of select ="@svg:y"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:y"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:off>
-									  <!--<a:ext cx="7772400" cy="1600200" />-->
-									  <a:ext>
-										  <xsl:attribute name ="cx">
-											  <!--<xsl:value-of select ="@svg:width"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:width"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="cy">
-											  <!--<xsl:value-of select ="@svg:height"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:height"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:ext>
-								  </a:xfrm>
-							  </xsl:if>
-						  </xsl:for-each>
-					  </xsl:if>
-				  </xsl:for-each>
-				  <!--<a:xfrm>
                 <a:off x="685800" y="2130425"/>
                 <a:ext cx="7772400" cy="1470025"/>
-              </a:xfrm>-->
+              </a:xfrm>
             </p:spPr>
             <p:txBody>
               <a:bodyPr/>
@@ -151,53 +87,10 @@ Copyright (c) 2007, Sonata Software Limited
               </p:nvPr>
             </p:nvSpPr>
             <p:spPr>
-				  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:presentation-page-layout">
-					  <xsl:if test="./@style:name[contains(.,'T0')]">
-						  <xsl:for-each select="./presentation:placeholder">
-							  <xsl:if test="@presentation:object='subtitle'">
               <a:xfrm>
-									  <a:off>
-										  <xsl:attribute name ="x">
-											  <!--<xsl:value-of select ="@svg:x"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:x"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="y">
-											  <!--<xsl:value-of select ="@svg:y"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:y"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:off>
-									  <!--<a:ext cx="7772400" cy="1600200" />-->
-									  <a:ext>
-										  <xsl:attribute name ="cx">
-											  <!--<xsl:value-of select ="@svg:width"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:width"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="cy">
-											  <!--<xsl:value-of select ="@svg:height"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:height"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:ext>
+                <a:off x="1371600" y="3886200"/>
+                <a:ext cx="6400800" cy="1752600"/>
               </a:xfrm>
-							  </xsl:if>
-						  </xsl:for-each>
-					  </xsl:if>
-				  </xsl:for-each>
-				  <!--<a:xfrm>
-                <a:off x="685800" y="2130425"/>
-                <a:ext cx="7772400" cy="1470025"/>
-              </a:xfrm>-->
             </p:spPr>
             <p:txBody>
               <a:bodyPr/>
@@ -410,57 +303,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-			  <p:spPr>
-				  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:presentation-page-layout">
-					  <xsl:if test="./@style:name[contains(.,'T1')]">
-						  <xsl:if test="not(./@style:name[contains(.,'T19')])">
-						  <xsl:for-each select="./presentation:placeholder">
-							  <xsl:if test="@presentation:object='title'">
-								  <a:xfrm>
-									  <a:off>
-										  <xsl:attribute name ="x">
-											  <!--<xsl:value-of select ="@svg:x"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:x"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="y">
-											  <!--<xsl:value-of select ="@svg:y"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:y"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:off>
-									  <!--<a:ext cx="7772400" cy="1600200" />-->
-									  <a:ext>
-										  <xsl:attribute name ="cx">
-											  <!--<xsl:value-of select ="@svg:width"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:width"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="cy">
-											  <!--<xsl:value-of select ="@svg:height"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:height"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:ext>
-								  </a:xfrm>
-							  </xsl:if>
-						  </xsl:for-each>
-					  </xsl:if>
-					  </xsl:if>
-				  </xsl:for-each>
-				  <!--<a:xfrm>
-                <a:off x="685800" y="2130425"/>
-                <a:ext cx="7772400" cy="1470025"/>
-              </a:xfrm>-->
-			  </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle/>
@@ -483,55 +326,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph idx="1"/>
               </p:nvPr>
             </p:nvSpPr>
-			  <p:spPr>
-				  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:presentation-page-layout">
-					  <xsl:if test="./@style:name[contains(.,'T1')]">
-						  <xsl:for-each select="./presentation:placeholder">
-							  <xsl:if test="@presentation:object='outline'">
-								  <a:xfrm>
-									  <a:off>
-										  <xsl:attribute name ="x">
-											  <!--<xsl:value-of select ="@svg:x"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:x"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="y">
-											  <!--<xsl:value-of select ="@svg:y"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:y"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:off>
-									  <!--<a:ext cx="7772400" cy="1600200" />-->
-									  <a:ext>
-										  <xsl:attribute name ="cx">
-											  <!--<xsl:value-of select ="@svg:width"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:width"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="cy">
-											  <!--<xsl:value-of select ="@svg:height"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:height"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:ext>
-								  </a:xfrm>
-							  </xsl:if>
-						  </xsl:for-each>
-					  </xsl:if>
-				  </xsl:for-each>
-				  <!--<a:xfrm>
-                <a:off x="685800" y="2130425"/>
-                <a:ext cx="7772400" cy="1470025"/>
-              </a:xfrm>-->
-			  </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle/>
@@ -930,55 +725,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-			  <p:spPr>
-				  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:presentation-page-layout">
-					  <xsl:if test="./@style:name[contains(.,'T3')]">
-						  <xsl:for-each select="./presentation:placeholder">
-							  <xsl:if test="@presentation:object='title'">
-								  <a:xfrm>
-									  <a:off>
-										  <xsl:attribute name ="x">
-											  <!--<xsl:value-of select ="@svg:x"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:x"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="y">
-											  <!--<xsl:value-of select ="@svg:y"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:y"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:off>
-									  <!--<a:ext cx="7772400" cy="1600200" />-->
-									  <a:ext>
-										  <xsl:attribute name ="cx">
-											  <!--<xsl:value-of select ="@svg:width"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:width"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="cy">
-											  <!--<xsl:value-of select ="@svg:height"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:height"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:ext>
-								  </a:xfrm>
-							  </xsl:if>
-						  </xsl:for-each>
-					  </xsl:if>
-				  </xsl:for-each>
-				  <!--<a:xfrm>
-                <a:off x="685800" y="2130425"/>
-                <a:ext cx="7772400" cy="1470025"/>
-              </a:xfrm>-->
-			  </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle/>
@@ -1002,55 +749,10 @@ Copyright (c) 2007, Sonata Software Limited
               </p:nvPr>
             </p:nvSpPr>
             <p:spPr>
-				  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:presentation-page-layout">
-					  <xsl:if test="./@style:name[contains(.,'T3')]">
-						  <xsl:for-each select="./presentation:placeholder">
-							  <xsl:if test="@presentation:object='outline' and position()=2">
-								  <xsl:variable name="a" select="1"/>
               <a:xfrm>
-									  <a:off>
-										  <xsl:attribute name ="x">
-											  <!--<xsl:value-of select ="@svg:x"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:x"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="y">
-											  <!--<xsl:value-of select ="@svg:y"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:y"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:off>
-									  <!--<a:ext cx="7772400" cy="1600200" />-->
-									  <a:ext>
-										  <xsl:attribute name ="cx">
-											  <!--<xsl:value-of select ="@svg:width"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:width"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="cy">
-											  <!--<xsl:value-of select ="@svg:height"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:height"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:ext>
+                <a:off x="457200" y="1600200"/>
+                <a:ext cx="4038600" cy="4525963"/>
               </a:xfrm>
-								  
-							  </xsl:if>
-						  </xsl:for-each>
-					  </xsl:if>
-				  </xsl:for-each>
-				  <!--<a:xfrm>
-                <a:off x="685800" y="2130425"/>
-                <a:ext cx="7772400" cy="1470025"/>
-              </a:xfrm>-->
             </p:spPr>
             <p:txBody>
               <a:bodyPr/>
@@ -1132,54 +834,10 @@ Copyright (c) 2007, Sonata Software Limited
               </p:nvPr>
             </p:nvSpPr>
             <p:spPr>
-				  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:presentation-page-layout">
-					  <xsl:if test="./@style:name[contains(.,'T3')]">
-						  <xsl:for-each select="./presentation:placeholder">
-							  <xsl:if test="@presentation:object='outline' and position()=3">
               <a:xfrm>
-									  <a:off>
-										  <xsl:attribute name ="x">
-											  <!--<xsl:value-of select ="@svg:x"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:x"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="y">
-											  <!--<xsl:value-of select ="@svg:y"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:y"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:off>
-									  <!--<a:ext cx="7772400" cy="1600200" />-->
-									  <a:ext>
-										  <xsl:attribute name ="cx">
-											  <!--<xsl:value-of select ="@svg:width"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="11.67"/>
-												  <!--<xsl:with-param name ="length" select ="@svg:width"/>-->
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="cy">
-											  <!--<xsl:value-of select ="@svg:height"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:height"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:ext>
+                <a:off x="4648200" y="1600200"/>
+                <a:ext cx="4038600" cy="4525963"/>
               </a:xfrm>
-							  </xsl:if>
-						  </xsl:for-each>
-					  </xsl:if>
-				  </xsl:for-each>
-				  <!--<a:xfrm>
-                <a:off x="685800" y="2130425"/>
-                <a:ext cx="7772400" cy="1470025"/>
-              </a:xfrm>-->
             </p:spPr>
             <p:txBody>
               <a:bodyPr/>
@@ -1785,55 +1443,7 @@ Copyright (c) 2007, Sonata Software Limited
                 <p:ph type="title"/>
               </p:nvPr>
             </p:nvSpPr>
-			  <p:spPr>
-				  <xsl:for-each select="document('styles.xml')/office:document-styles/office:styles/style:presentation-page-layout">
-					  <xsl:if test="./@style:name[contains(.,'T19')]">
-						  <xsl:for-each select="./presentation:placeholder">
-							  <xsl:if test="@presentation:object='title'">
-								  <a:xfrm>
-									  <a:off>
-										  <xsl:attribute name ="x">
-											  <!--<xsl:value-of select ="@svg:x"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:x"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="y">
-											  <!--<xsl:value-of select ="@svg:y"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:y"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:off>
-									  <!--<a:ext cx="7772400" cy="1600200" />-->
-									  <a:ext>
-										  <xsl:attribute name ="cx">
-											  <!--<xsl:value-of select ="@svg:width"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:width"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-										  <xsl:attribute name ="cy">
-											  <!--<xsl:value-of select ="@svg:height"/>-->
-											  <xsl:call-template name ="convertToPoints">
-												  <xsl:with-param name ="unit" select ="'cm'"/>
-												  <xsl:with-param name ="length" select ="@svg:height"/>
-											  </xsl:call-template>
-										  </xsl:attribute>
-									  </a:ext>
-								  </a:xfrm>
-							  </xsl:if>
-						  </xsl:for-each>
-						  </xsl:if>
-					  </xsl:for-each>
-				  <!--<a:xfrm>
-                <a:off x="685800" y="2130425"/>
-                <a:ext cx="7772400" cy="1470025"/>
-              </a:xfrm>-->
-			  </p:spPr>
+            <p:spPr/>
             <p:txBody>
               <a:bodyPr/>
               <a:lstStyle/>

@@ -42,9 +42,8 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:import href ="slides.xsl"/>
   <xsl:import href="presentation.xsl"/>
   <xsl:import href ="theme.xsl"/>
-  <xsl:import href="slideLayouts.xsl"/>
   <xsl:import href ="slideMasters.xsl"/>
-  
+  <xsl:import href="slideLayouts.xsl"/>
 
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="text:p text:span number:text"/>
@@ -170,45 +169,12 @@ Copyright (c) 2007, Sonata Software Limited
       <pzip:entry pzip:target="ppt/theme/theme1.xml">
         <xsl:call-template name="theme"/>
       </pzip:entry>
-      <!--<pzip:entry pzip:target="ppt/slideMasters/slideMaster1.xml">
+      <pzip:entry pzip:target="ppt/slideMasters/slideMaster1.xml">
         <xsl:call-template name="slideMaster1"/>
       </pzip:entry>
       <pzip:entry pzip:target="ppt/slideMasters/_rels/slideMaster1.xml.rels">
         <xsl:call-template name="slideMaster1Rel"/>
-      </pzip:entry>-->
-		<!--pradeep-->
-		<!--<xsl:for-each select ="document('styles.xml')//style:master-page">
-			
-			<xsl:variable name ="SlideMaster">
-				<xsl:value-of select ="concat('slideMaster',position())"/>
-			</xsl:variable>
-			<pzip:entry pzip:target="{concat('ppt/slideMasters/',$SlideMaster,'.xml')}">
-				--><!-- Check the below template name --><!--
-				
-				<xsl:call-template name="slideMasters"/>
-			</pzip:entry>
-			<pzip:entry pzip:target="{concat('ppt/slideMasters/_rels/',$SlideMaster,'.xml.rels')}">
-				<xsl:call-template name="slideMaster1Rel"/>
       </pzip:entry>
-		</xsl:for-each>-->
-		<xsl:for-each select ="document('styles.xml')//style:master-page">
-			<xsl:if test ="position()=1">
-				<xsl:variable name ="SlideMaster">
-					<xsl:value-of select ="concat('slideMaster',position())"/>
-				</xsl:variable>
-				<pzip:entry pzip:target="{concat('ppt/slideMasters/',$SlideMaster,'.xml')}">
-					<xsl:call-template name="slideMasters">
-						<xsl:with-param name="slideMasterName">
-							<xsl:value-of select="@style:name"/>
-						</xsl:with-param>
-					</xsl:call-template>
-				</pzip:entry>
-				<pzip:entry pzip:target="{concat('ppt/slideMasters/_rels/',$SlideMaster,'.xml.rels')}">
-					<xsl:call-template name="slideMaster1Rel"/>
-				</pzip:entry>
-			</xsl:if>
-		</xsl:for-each>
-		<!--end-->
 
       <xsl:for-each select ="document('content.xml')
 				/office:document-content/office:body/office:presentation/draw:page">

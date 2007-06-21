@@ -47,18 +47,7 @@ Copyright (c) 2007, Sonata Software Limited
   <xsl:template name ="presentation">
     <p:presentation>
       <p:sldMasterIdLst>
-		  <xsl:for-each select ="document('styles.xml')//office:master-styles/style:master-page ">
-			  <xsl:if test ="position()=1">
-				  <p:sldMasterId >
-					  <xsl:attribute name ="id">
-						  <xsl:value-of select ="2147483647 + position()"/>
-					  </xsl:attribute>
-					  <xsl:attribute name ="r:id">
-						  <xsl:value-of select ="concat('smId',position())"/>
-					  </xsl:attribute>
-				  </p:sldMasterId >
-			  </xsl:if >
-		  </xsl:for-each>
+        <p:sldMasterId id="2147483648" r:id="rId1" />
       </p:sldMasterIdLst>
       <p:sldIdLst>
         <xsl:for-each select ="document('content.xml')
@@ -245,7 +234,7 @@ Copyright (c) 2007, Sonata Software Limited
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps" Target="presProps.xml"/>
       <!--<Relationship Id="sId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide1.xml"/>-->
-      <!--<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>-->
+      <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>
       <Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles" Target="tableStyles.xml"/>
       <Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
       <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps" Target="viewProps.xml"/>
@@ -261,21 +250,6 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:attribute>
         </Relationship >
       </xsl:for-each >
-		<!-- @@Slide master code begins Pradeep Nemadi-->
-		<xsl:for-each select ="document('styles.xml')//office:master-styles/style:master-page ">
-			<xsl:if test ="position()=1">
-				<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster">
-					<xsl:attribute name ="Id">
-						<xsl:value-of select ="concat('smId',position())"/>
-					</xsl:attribute>
-					<xsl:attribute name ="Target">
-						<xsl:value-of select ="concat('slideMasters/slideMaster',position(),'.xml')"/>
-					</xsl:attribute>
-				</Relationship>
-			</xsl:if >
-		</xsl:for-each>
-		<!-- @@Slide master code ends Pradeep Nemadi-->
-
     </Relationships>
   </xsl:template >
 

@@ -208,7 +208,8 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:when test="style:text-properties/@style:text-underline-style = 'dot-dash' and
 								style:text-properties/@style:text-underline-width[contains(.,'auto')]">
 					<xsl:attribute name ="u">
-						<xsl:value-of select ="'dotDashLong'"/>
+						<xsl:value-of select ="'dotDash'"/>
+            <!-- Modified by lohith for fix 1739785 - dotDashLong to dotDash-->
 					</xsl:attribute >
 				</xsl:when>
         <xsl:when test="style:text-properties/@style:text-underline-style = 'dot-dash' and
@@ -388,6 +389,9 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:when test ="style:paragraph-properties/@fo:text-align='end'">
 								<xsl:value-of select ="'r'"/>
 							</xsl:when>
+							<xsl:when test ="style:paragraph-properties/@fo:text-align='justify'">
+								<xsl:value-of select ="'just'"/>
+							</xsl:when>
 							<xsl:otherwise >
 								<xsl:value-of select ="'l'"/>
 							</xsl:otherwise>
@@ -511,18 +515,22 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
 		<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
 		<xsl:for-each select ="document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:name=$prId] ">
-      <!--test="not(style:graphic-properties/@draw:fill = 'none' - Added by lohith.ar for invalid fill color for textboxes - Fill type should be given priority on fill color-->    
-      <xsl:if test="not(style:graphic-properties/@draw:fill = 'none')">
+      <!--test="not(style:graphic-properties/@draw:fill = 'none' - Added by lohith.ar for invalid fill color for textboxes - Fill type should be given priority on fill color-->
 			<xsl:if test ="style:graphic-properties/@draw:fill-color">
 				<a:solidFill>
 					<a:srgbClr  >
 						<xsl:attribute name ="val">
 							<xsl:value-of select ="translate(substring-after(style:graphic-properties/@draw:fill-color,'#'),$lcletters,$ucletters)"/>
 						</xsl:attribute>
+						<xsl:if test ="not(style:graphic-properties/@draw:fill)">
+							<a:alpha val="0" />
+						</xsl:if>
+						<xsl:if test ="style:graphic-properties/@draw:fill ='none'">
+							<a:alpha val="0" />
+						</xsl:if>
 					</a:srgbClr >
 				</a:solidFill>
 			</xsl:if>
-      </xsl:if>
 		</xsl:for-each>
 	</xsl:template>
 	<xsl:template name ="getClassName">
@@ -672,7 +680,8 @@ Copyright (c) 2007, Sonata Software Limited
         <xsl:when test="style:text-properties/@style:text-underline-style= 'dot-dash' and
 								style:text-properties/@style:text-underline-width[contains(.,'auto')]">
 					<xsl:attribute name ="u">
-						<xsl:value-of select ="'dotDashLong'"/>
+						<xsl:value-of select ="'dotDash'"/>
+            <!-- Modified by lohith for fix 1739785 - dotDashLong to dotDash-->
 					</xsl:attribute >
 				</xsl:when>
         <xsl:when test="style:text-properties/@style:text-underline-style= 'dot-dash' and

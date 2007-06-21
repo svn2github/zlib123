@@ -1213,7 +1213,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<!-- Default border width from styles.xml-->
 				<xsl:when test ="($parentStyle != '')">
 					<xsl:for-each select ="document('styles.xml')/office:document-styles/office:styles/style:style[@style:name = $parentStyle]/style:graphic-properties">
-						<xsl:if test ="@svg:stroke-width and (@svg:stroke-width != '0cm')">
+						<xsl:if test ="@svg:stroke-width">
 							<xsl:attribute name ="w">
 								<xsl:call-template name ="convertToPoints">
 									<xsl:with-param name="length"  select ="@svg:stroke-width"/>
@@ -1805,6 +1805,7 @@ Copyright (c) 2007, Sonata Software Limited
 							</xsl:with-param >
               <xsl:with-param name ="isBulleted" select ="'false'"/>
               <xsl:with-param name ="level" select ="'0'"/>
+              <xsl:with-param name ="isNumberingEnabled" select ="'false'"/>
 						</xsl:call-template >
 						<xsl:for-each select ="text:span">
               <!-- Added by lohith - condition test="node()" to fix bug 1731885 -->
@@ -1867,25 +1868,32 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select ="'0'"/>
                 </xsl:if>
               </xsl:variable >
+              <xsl:variable name="paragraphId" >
+                <xsl:call-template name ="getParaStyleName">
+                  <xsl:with-param name ="lvl" select ="$lvl"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name ="isNumberingEnabled">
+                <xsl:if test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                  <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+                </xsl:if>
+                <xsl:if test ="not(document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering)">
+                  <xsl:value-of select ="'true'"/>
+                </xsl:if>
+              </xsl:variable>
 							<xsl:call-template name ="paraProperties" >
-								<xsl:with-param name ="paraId" >
-                  <xsl:call-template name ="getParaStyleName">
-                    <xsl:with-param name ="lvl" select ="$lvl"/>
-                  </xsl:call-template>
+                <xsl:with-param name ="paraId" >
+                  <xsl:value-of select ="$paragraphId"/>
                 </xsl:with-param >
-                 <!--list property also included-->
+                <!--list property also included-->
                 <xsl:with-param name ="listId">
 									<xsl:value-of select ="@text:style-name"/>
 								</xsl:with-param >
                 <xsl:with-param name ="isBulleted" select ="'true'"/>
                 <xsl:with-param name ="level" select ="$lvl"/>
+                <xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
 							</xsl:call-template >
-              <!--End of Code inserted by Vijayets for Bullets and numbering-->
-              <!--<xsl:call-template name ="paraProperties" >
-								<xsl:with-param name ="paraId" >
-									<xsl:value-of select ="@text:style-name"/>
-								</xsl:with-param >
-							</xsl:call-template >-->
+              <!--End of Code inserted by Vijayets for Bullets and numbering-->             
 							<xsl:for-each select ="child::node()[position()]">
 								<xsl:choose >
                   <xsl:when test ="name()='text:list-item'">
@@ -1933,20 +1941,30 @@ Copyright (c) 2007, Sonata Software Limited
                   <xsl:value-of select ="'0'"/>
                 </xsl:if>
               </xsl:variable >
+              <xsl:variable name="paragraphId" >
+                <xsl:call-template name ="getParaStyleName">
+                  <xsl:with-param name ="lvl" select ="$lvl"/>
+                </xsl:call-template>
+              </xsl:variable>
+              <xsl:variable name ="isNumberingEnabled">
+                <xsl:if test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                  <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+                </xsl:if>
+                <xsl:if test ="not(document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering)">
+                  <xsl:value-of select ="'true'"/>
+                </xsl:if>
+              </xsl:variable>
 							<xsl:call-template name ="paraProperties" >
-								<xsl:with-param name ="paraId" >
-                  <xsl:call-template name ="getParaStyleName">
-                    <xsl:with-param name ="lvl" select ="$lvl"/>
-                  </xsl:call-template>
+                <xsl:with-param name ="paraId" >
+                  <xsl:value-of select ="$paragraphId"/>
                 </xsl:with-param >
-                
-                 <!--list property also included-->
-                
+                <!--list property also included-->                
                 <xsl:with-param name ="listId">
 									<xsl:value-of select ="@text:style-name"/>
 								</xsl:with-param >
                 <xsl:with-param name ="isBulleted" select ="'true'"/>
                 <xsl:with-param name ="level" select ="$lvl"/>
+                <xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
 							</xsl:call-template >
                 <!--End of Code inserted by Vijayets for Bullets and numbering-->
               <xsl:for-each select ="child::node()[position()]">

@@ -120,7 +120,7 @@
       <xsl:when test="$character = '' "></xsl:when>
       <xsl:when test="$character = '☑' ">☑</xsl:when>
       <xsl:when test="$character = '•' ">•</xsl:when>
-      <xsl:when test="$character= '●' ">●</xsl:when>
+      <xsl:when test="$character= '●' ">•</xsl:when>
       <xsl:when test="$character = '➢' ">
         <xsl:value-of select ="'Ø'"/>
       </xsl:when>
@@ -134,47 +134,26 @@
         <xsl:value-of select ="'§'"/>
       </xsl:when>
       <xsl:when test="$character = '○' ">o</xsl:when>
-      <xsl:when test="$character = '➔' ">➔</xsl:when>
+      <!--<xsl:when test="$character = '➔' ">➔</xsl:when>-->
+      <xsl:when test="$character = '➔' ">è</xsl:when>
       <xsl:when test="$character = '✗' ">✗</xsl:when>
       <xsl:when test="$character = '–' ">–</xsl:when>
       <xsl:otherwise>•</xsl:otherwise>
     </xsl:choose>
-
-    <!--<xsl:choose>
-      <xsl:when test="a:pPr/a:buChar/@char= 'Ø'">
-        <xsl:value-of select ="'➢'"/>
-      </xsl:when>
-      <xsl:when test="a:pPr/a:buChar/@char= 'o'">
-        <xsl:value-of select ="'○'"/>
-      </xsl:when>
-      <xsl:when test="a:pPr/a:buChar/@char= '§'">
-        <xsl:value-of select ="'■'"/>
-      </xsl:when>
-      <xsl:when test="a:pPr/a:buChar/@char= 'q'">
-        <xsl:value-of select ="''"/>
-      </xsl:when>
-      <xsl:when test="a:pPr/a:buChar/@char= 'ü'">
-        <xsl:value-of select ="'✔'"/>
-      </xsl:when>
-      <xsl:when test="a:pPr/a:buChar/@char = '–'">
-        <xsl:value-of select ="'–'"/>
-      </xsl:when>
-      <xsl:when test="a:pPr/a:buChar/@char = '»'">
-        <xsl:value-of select ="'»'"/>
-      </xsl:when>
-      <xsl:otherwise>•</xsl:otherwise>
-    </xsl:choose >-->
 
   </xsl:template>
   <xsl:template name ="getBulletType">
     <xsl:param name ="character"/>
     <xsl:param name ="typeFace"/>
     <xsl:choose >
-      <xsl:when test="$character= '➢' or $character= '' or $character= '✔' or $character= '■'">
-       <xsl:value-of select ="'Wingdings'"/>      
+      <xsl:when test="$character= '➢' or $character= '' or $character= '✔' or $character= '■' or $character= '➔'">
+        <xsl:value-of select ="'Wingdings'"/>
       </xsl:when>
       <xsl:when test="$character= 'o'">
         <xsl:value-of select ="'Courier New'"/>
+      </xsl:when>
+      <xsl:when test="$character= '•'">
+        <xsl:value-of select ="'Arial'"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select ="''"/>

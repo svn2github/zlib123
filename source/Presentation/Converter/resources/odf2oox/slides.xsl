@@ -54,37 +54,47 @@ Copyright (c) 2007, Sonata Software Limited
 		   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
 	<p:cSld>
 	<!--Added by sateesh - Background Color-->
-	 <p:bg>
-	   <p:bgPr>
-	     <a:solidFill>
-	       <a:srgbClr>
-			 <xsl:variable name="dpName">
-			  <xsl:value-of select="@draw:style-name" /> 
-			 </xsl:variable>
-			 <xsl:attribute name="val">
-			 <xsl:choose>
-			 <xsl:when test="document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties/@draw:fill-color">
-				 <xsl:for-each select="document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties">
-				  <xsl:value-of select="substring-after(@draw:fill-color,'#')" /> 
-				  </xsl:for-each>
-			 </xsl:when>
-			 <xsl:when test="document('styles.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties/@draw:fill-color">
-				 <xsl:for-each select="document('styles.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties">
-				  <xsl:value-of select="substring-after(@draw:fill-color,'#')" /> 
-				  </xsl:for-each>
-			 </xsl:when>
-			 <xsl:otherwise>
-				 <xsl:if test="not(@draw:fill-color)">
-				  <xsl:value-of select="'ffffff'" /> 
-				  </xsl:if>
-			 </xsl:otherwise>
-			  </xsl:choose>
-			 </xsl:attribute>
-	        </a:srgbClr>
-	        </a:solidFill>
-	      <a:effectLst /> 
-	    </p:bgPr>
-	 </p:bg>
+		<p:bg>
+			<p:bgPr>
+				<a:solidFill>
+					<a:srgbClr>
+						<xsl:variable name="dpName">
+							<xsl:value-of select="@draw:style-name" />
+						</xsl:variable>
+						<xsl:variable name="SMName">
+							<xsl:value-of select="@draw:master-page-name" />
+						</xsl:variable>
+						<xsl:variable name="SMdpName">
+							<xsl:value-of select="document('styles.xml')//style:master-page[@style:name= $SMName]/@draw:style-name"/>
+						</xsl:variable>
+						<xsl:attribute name="val">
+							<xsl:choose>
+								<xsl:when test="document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties/@draw:fill-color">
+									<xsl:if test="document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties">
+										<xsl:value-of select="substring-after(document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties/@draw:fill-color,'#')" />
+									</xsl:if>
+								</xsl:when>
+								<xsl:when test="document('styles.xml')//style:style[@style:name= $SMdpName]/style:drawing-page-properties/@draw:fill-color">
+									<!--<xsl:when test="document('styles.xml')//style:master-page[@style:name= $SMName]">-->
+									<!--<xsl:variable name="SMdpName">
+                    <xsl:value-of select="document('styles.xml')//style:master-page[@style:name= $SMName]/@draw:style-name"/>
+                  </xsl:variable>-->
+									<xsl:if test="document('styles.xml')//style:style[@style:name= $SMdpName]/style:drawing-page-properties">
+										<xsl:value-of select="substring-after(document('styles.xml')//style:style[@style:name= $SMdpName]/style:drawing-page-properties/@draw:fill-color,'#')" />
+									</xsl:if>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:if test="not(@draw:fill-color)">
+										<xsl:value-of select="'ffffff'" />
+									</xsl:if>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:attribute>
+					</a:srgbClr>
+				</a:solidFill>
+				<a:effectLst />
+			</p:bgPr>
+		</p:bg>
 	 <!--end-->
 				<p:spTree>
 					<p:nvGrpSpPr>
@@ -1897,7 +1907,7 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:if>
       <!-- End - Add relation files of hyperlinks-->
       <!--Code inserted by Vijayeta for Bullets and numbering,set relatioship for pictures-->
-      <xsl:for-each select ="document('content.xml')//office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image">
+      <!--<xsl:for-each select ="document('content.xml')//office:document-content/office:automatic-styles/text:list-style/text:list-level-style-image">
         <xsl:if test ="@text:level='1'">
           <Relationship>
             <xsl:attribute name="Id">
@@ -1911,7 +1921,7 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:attribute>
           </Relationship>
         </xsl:if>
-      </xsl:for-each>
+      </xsl:for-each>-->
       <!--End of Code inserted by Vijayeta for Bullets and numbering,set relatioship for pictures-->
 		</Relationships>
 	</xsl:template>
