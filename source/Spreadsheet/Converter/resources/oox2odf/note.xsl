@@ -157,7 +157,7 @@
         <xsl:with-param name="text" select="e:text"/>
       </xsl:apply-templates>
       <text:p text:style-name="{generate-id(e:text)}">
-        <xsl:apply-templates select="e:text/e:r"/>
+        <xsl:apply-templates select="e:text/e:r|e:text/e:t"/>
       </text:p>
     </office:annotation>
   </xsl:template>
