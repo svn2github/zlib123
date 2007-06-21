@@ -121,21 +121,549 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     <xsl:param name ="listStyleName"/>
     <xsl:if test ="./a:p/a:pPr/@lvl">
       <xsl:for-each select ="./a:p">
-        <xsl:if test ="a:pPr/@lvl">
-          <xsl:variable name ="levelStyle">
-            <xsl:value-of select ="concat($listStyleName,position(),'lvl',a:pPr/@lvl)"/>
-          </xsl:variable>
-          <xsl:variable name ="textLevel" select ="a:pPr/@lvl"/>
-          <xsl:variable name ="newTextLvl" select ="$textLevel+1"/>
-          <text:list-style>
-            <xsl:attribute name ="style:name">
-              <xsl:value-of select ="$levelStyle"/>
-            </xsl:attribute >
-            <xsl:choose >
-              <xsl:when test ="a:pPr/a:buChar">
+        <!-- Addded by vijayeta on 18th june,to check for bunone-->
+        <xsl:if test ="not(a:pPr/a:buNone)">
+          <!-- Addded by vijayeta on 18th june,to check for bunone-->
+          <xsl:if test ="a:pPr/@lvl">
+            <xsl:variable name ="levelStyle">
+              <xsl:value-of select ="concat($listStyleName,position(),'lvl',a:pPr/@lvl)"/>
+            </xsl:variable>
+            <xsl:variable name ="textLevel" select ="a:pPr/@lvl"/>
+            <xsl:variable name ="newTextLvl" select ="$textLevel+1"/>
+            <text:list-style>
+              <xsl:attribute name ="style:name">
+                <xsl:value-of select ="$levelStyle"/>
+              </xsl:attribute >
+              <xsl:choose >
+                <xsl:when test ="a:pPr/a:buChar">
+                  <text:list-level-style-bullet>
+                    <xsl:attribute name ="text:level">
+                      <xsl:value-of select ="$textLevel + 1"/>
+                    </xsl:attribute >
+                    <xsl:attribute name ="text:bullet-char">
+                      <xsl:choose>
+                        <xsl:when test="a:pPr/a:buChar/@char= 'Ø'">
+                          <xsl:value-of select ="'➢'"/>
+                        </xsl:when>
+                        <xsl:when test="a:pPr/a:buChar/@char= 'o'">
+                          <xsl:value-of select ="'○'"/>
+                        </xsl:when>
+                        <xsl:when test="a:pPr/a:buChar/@char= '§'">
+                          <xsl:value-of select ="'■'"/>
+                        </xsl:when>
+                        <xsl:when test="a:pPr/a:buChar/@char= 'q'">
+                          <xsl:value-of select ="''"/>
+                        </xsl:when>
+                        <xsl:when test="a:pPr/a:buChar/@char= 'ü'">
+                          <xsl:value-of select ="'✔'"/>
+                        </xsl:when>
+                        <xsl:when test="a:pPr/a:buChar/@char = '-'">
+                          <xsl:value-of select ="'-'"/>
+                        </xsl:when>
+                        <xsl:when test="a:pPr/a:buChar/@char = '»'">
+                          <xsl:value-of select ="'»'"/>
+                        </xsl:when>
+                        <!-- Added by  vijayeta ,on 19th june-->
+                        <xsl:when test="a:pPr/a:buChar/@char = 'è'">
+                          <xsl:value-of select ="'➔'"/>
+                        </xsl:when>
+                        <!-- Added by  vijayeta ,on 19th june-->
+                        <xsl:otherwise>•</xsl:otherwise>
+                      </xsl:choose >
+                    </xsl:attribute >
+                    <style:list-level-properties text:min-label-width="0.8cm">
+                      <xsl:attribute name ="text:space-before">
+                        <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle">
+                          <xsl:value-of select="concat(format-number(child::node()[$newTextLvl]/@marL div 360000,'#.##'),'cm')"/>
+                        </xsl:for-each>
+                      </xsl:attribute>
+                    </style:list-level-properties>
+                    <style:text-properties style:font-charset="x-symbol">
+                      <xsl:if test ="a:pPr/a:buFont/@typeface">
+                        <xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
+                          <xsl:attribute name ="fo:font-family">
+                            <xsl:value-of select ="'StarSymbol'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
+                          <xsl:attribute name ="fo:font-family">
+                            <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
+                        <xsl:attribute name ="fo:font-family">
+                          <xsl:value-of select ="'StarSymbol'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:pPr/a:buSzPct">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="concat((a:pPr/a:buSzPct/@val div 1000),'%')"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buSzPct)">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="'100%'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:pPr/a:buClr">
+                        <xsl:if test ="a:pPr/a:buClr/a:srgbClr">
+                          <xsl:variable name ="color" select ="a:pPr/a:buClr/a:srgbClr/@val"/>
+                          <xsl:attribute name ="fo:color">
+                            <xsl:value-of select ="concat('#',$color)"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:pPr/a:buClr/a:schemeClr">
+                          <xsl:call-template name ="getColorCode">
+                            <xsl:with-param name ="color">
+                              <xsl:value-of select="a:pPr/a:buClr/a:schemeClr/@val"/>
+                            </xsl:with-param>
+                          </xsl:call-template >
+                        </xsl:if>
+                      </xsl:if>
+                    </style:text-properties >
+                  </text:list-level-style-bullet>
+                </xsl:when>
+                <xsl:when test ="a:pPr/a:buAutoNum">
+                  <text:list-level-style-number>
+                    <xsl:attribute name ="text:level">
+                      <xsl:value-of select ="$textLevel + 1"/>
+                    </xsl:attribute >
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'arabicPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'1'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'arabicParenR')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'1'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'arabicParenBoth')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'1'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                      <xsl:attribute name ="style:num-prefix">
+                        <xsl:value-of select ="'('"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaUcPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'A'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaUcParenR')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'A'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaUcParenBoth')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'A'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                      <xsl:attribute name ="style:num-prefix">
+                        <xsl:value-of select ="'('"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaLcPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'a'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaLcParenR')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'a'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaLcParenBoth')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'a'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                      <xsl:attribute name ="style:num-prefix">
+                        <xsl:value-of select ="'('"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'romanUcPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'I'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'romanLcPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'i'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if >
+                    <!-- start at value-->
+                    <xsl:if test ="a:pPr/a:buAutoNum/@startAt">
+                      <xsl:attribute name ="text:start-value">
+                        <xsl:value-of select ="a:pPr/a:buAutoNum/@startAt"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <style:list-level-properties text:min-label-width="0.952cm" />
+                    <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
+                      <xsl:if test ="a:pPr/a:buFont/@typeface">
+                        <xsl:attribute name ="fo:font-family">
+                          <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
+                        <xsl:attribute name ="fo:font-family">
+                          <xsl:value-of select ="'Arial'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="not(a:pPr/a:buSzPct)">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="'100%'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:pPr/a:buClr">
+                        <xsl:if test ="a:p/a:pPr/a:buClr/a:srgbClr">
+                          <xsl:attribute name ="fo:color">
+                            <xsl:value-of select ="concat('#',a:p/a:pPr/a:buClr/a:srgbClr/@val)"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:pPr/a:buClr/a:schemeClr">
+                          <xsl:call-template name ="getColorCode">
+                            <xsl:with-param name ="color">
+                              <xsl:value-of select="a:pPr/a:buClr/a:schemeClr/@val"/>
+                            </xsl:with-param>
+                          </xsl:call-template >
+                        </xsl:if>
+                      </xsl:if>
+                    </style:text-properties>
+                  </text:list-level-style-number>
+                </xsl:when>
+                <xsl:when test ="a:pPr/a:buBlip">
+                  <xsl:variable name ="rId" select ="a:pPr/a:buBlip/a:blip/@r:embed"/>
+                  <xsl:variable name="XlinkHref">
+                    <xsl:variable name="pzipsource">
+                      <xsl:value-of select="document($slideRel)//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+                    </xsl:variable>
+                    <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+                  </xsl:variable>
+                  <xsl:call-template name="copyPictures">
+                    <xsl:with-param name="document">
+                      <xsl:value-of select="$slideRel"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="rId">
+                      <xsl:value-of select ="$rId"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <text:list-style>
+                    <xsl:attribute name ="style:name">
+                      <xsl:value-of select ="$listStyleName"/>
+                    </xsl:attribute >
+                    <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                      <xsl:attribute name="xlink:href">
+                        <xsl:value-of select="$XlinkHref"/>
+                      </xsl:attribute>
+                      <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+                    </text:list-level-style-image>
+                  </text:list-style>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[1]">
+                    <xsl:if test ="a:buChar">
+                      <text:list-level-style-bullet>
+                        <xsl:attribute name ="text:level">
+                          <xsl:value-of select ="$textLevel + 1"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="text:bullet-char">
+                          <xsl:choose>
+                            <xsl:when test="a:buChar/@char= 'Ø'">
+                              <xsl:value-of select ="'➢'"/>
+                            </xsl:when>
+                            <xsl:when test="a:buChar/@char= 'o'">
+                              <xsl:value-of select ="'○'"/>
+                            </xsl:when>
+                            <xsl:when test="a:buChar/@char= '§'">
+                              <xsl:value-of select ="'■'"/>
+                            </xsl:when>
+                            <xsl:when test="a:buChar/@char= 'q'">
+                              <xsl:value-of select ="''"/>
+                            </xsl:when>
+                            <xsl:when test="a:buChar/@char= 'ü'">
+                              <xsl:value-of select ="'✔'"/>
+                            </xsl:when>
+                            <xsl:when test="a:buChar/@char = '-'">
+                              <xsl:value-of select ="'-'"/>
+                            </xsl:when>
+                            <xsl:when test="a:buChar/@char = '»'">
+                              <xsl:value-of select ="'»'"/>
+                            </xsl:when>
+                            <!-- Added by  vijayeta ,on 19th june-->
+                            <xsl:when test="a:buChar/@char = 'è'">
+                              <xsl:value-of select ="'➔'"/>
+                            </xsl:when>
+                            <!-- Added by  vijayeta ,on 19th june-->
+                            <xsl:otherwise>•</xsl:otherwise>
+                          </xsl:choose >
+                        </xsl:attribute >
+                        <style:list-level-properties text:min-label-width="0.952cm" />
+                        <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
+                          <xsl:if test ="a:pPr/a:buFont/@typeface">
+                            <xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
+                              <xsl:attribute name ="fo:font-family">
+                                <xsl:value-of select ="'StarSymbol'"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                            <xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
+                              <xsl:attribute name ="fo:font-family">
+                                <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                          </xsl:if>
+                          <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
+                            <xsl:attribute name ="fo:font-family">
+                              <xsl:value-of select ="'StarSymbol'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="a:buSzPct">
+                            <xsl:attribute name ="fo:font-size">
+                              <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="not(a:buSzPct)">
+                            <xsl:attribute name ="fo:font-size">
+                              <xsl:value-of select ="'100%'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="a:buClr">
+                            <xsl:if test ="a:buClr/a:srgbClr">
+                              <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
+                              <xsl:attribute name ="fo:color">
+                                <xsl:value-of select ="concat('#',$color)"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                            <xsl:if test ="a:buClr/a:schemeClr">
+                              <xsl:call-template name ="getColorCode">
+                                <xsl:with-param name ="color">
+                                  <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
+                                </xsl:with-param>
+                              </xsl:call-template >
+                            </xsl:if>
+                          </xsl:if>
+                        </style:text-properties >
+                      </text:list-level-style-bullet>
+                    </xsl:if>
+                    <xsl:if test ="a:buAutoNum">
+                      <text:list-level-style-number>
+                        <xsl:attribute name ="text:level">
+                          <xsl:value-of select ="$textLevel + 1"/>
+                        </xsl:attribute >
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicPeriod')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'1'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="'.'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenR')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'1'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="')'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenBoth')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'1'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="')'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name ="style:num-prefix">
+                            <xsl:value-of select ="'('"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcPeriod')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'A'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="'.'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenR')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'A'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="')'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenBoth')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'A'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="')'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name ="style:num-prefix">
+                            <xsl:value-of select ="'('"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcPeriod')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'a'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="'.'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenR')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'a'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="')'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenBoth')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'a'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="')'"/>
+                          </xsl:attribute>
+                          <xsl:attribute name ="style:num-prefix">
+                            <xsl:value-of select ="'('"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'romanUcPeriod')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'I'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="'.'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buAutoNum/@type[contains(.,'romanLcPeriod')]">
+                          <xsl:attribute name ="style:num-format" >
+                            <xsl:value-of  select ="'i'"/>
+                          </xsl:attribute >
+                          <xsl:attribute name ="style:num-suffix">
+                            <xsl:value-of select ="'.'"/>
+                          </xsl:attribute>
+                        </xsl:if >
+                        <!-- start at value-->
+                        <xsl:if test ="a:buAutoNum/@startAt">
+                          <xsl:attribute name ="text:start-value">
+                            <xsl:value-of select ="a:buAutoNum/@startAt"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <style:list-level-properties text:min-label-width="0.952cm" />
+                        <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable" fo:color="#000000" fo:font-size="100%">
+                          <xsl:if test ="a:buFont/@typeface">
+                            <xsl:attribute name ="fo:font-familyr">
+                              <xsl:value-of select ="a:buFont/@typeface"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="not(a:buFont/@typeface)">
+                            <xsl:attribute name ="fo:font-familyr">
+                              <xsl:value-of select ="'Arial'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="a:buSzPct">
+                            <xsl:attribute name ="fo:font-size">
+                              <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="not(a:buSzPct)">
+                            <xsl:attribute name ="fo:font-size">
+                              <xsl:value-of select ="'100%'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="a:buClr">
+                            <xsl:if test ="a:buClr/a:srgbClr">
+                              <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
+                              <xsl:attribute name ="fo:color">
+                                <xsl:value-of select ="concat('#',$color)"/>
+                              </xsl:attribute>
+                            </xsl:if>
+                            <xsl:if test ="a:buClr/a:schemeClr">
+                              <xsl:call-template name ="getColorCode">
+                                <xsl:with-param name ="color">
+                                  <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
+                                </xsl:with-param>
+                              </xsl:call-template >
+                            </xsl:if>
+                          </xsl:if>
+                        </style:text-properties>
+                      </text:list-level-style-number>
+                    </xsl:if>
+                    <xsl:if test ="a:buBlip">
+                      <xsl:variable name ="rId" select ="a:buBlip/a:blip/@r:embed"/>
+                      <xsl:variable name="XlinkHref">
+                        <xsl:variable name="pzipsource">
+                          <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+                        </xsl:variable>
+                        <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+                      </xsl:variable>
+                      <xsl:call-template name="copyPictures">
+                        <xsl:with-param name="document">
+                          <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')"/>
+                        </xsl:with-param>
+                        <xsl:with-param name="rId">
+                          <xsl:value-of select ="$rId"/>
+                        </xsl:with-param>
+                      </xsl:call-template>
+                      <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                        <xsl:attribute name="xlink:href">
+                          <xsl:value-of select="$XlinkHref"/>
+                        </xsl:attribute>
+                        <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+                      </text:list-level-style-image>
+                    </xsl:if>
+                  </xsl:for-each>
+                </xsl:otherwise>
+              </xsl:choose>
+            </text:list-style>
+          </xsl:if>
+          <xsl:if test ="not(a:pPr/@lvl)">
+            <text:list-style>
+              <xsl:attribute name ="style:name">
+                <xsl:value-of select ="concat($listStyleName,position())"/>
+              </xsl:attribute >
+              <xsl:if test ="a:pPr/a:buChar">
                 <text:list-level-style-bullet>
                   <xsl:attribute name ="text:level">
-                    <xsl:value-of select ="$textLevel + 1"/>
+                    <xsl:value-of select ="1"/>
                   </xsl:attribute >
                   <xsl:attribute name ="text:bullet-char">
                     <xsl:choose>
@@ -155,22 +683,27 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                         <xsl:value-of select ="'✔'"/>
                       </xsl:when>
                       <xsl:when test="a:pPr/a:buChar/@char = '–'">
-                        <xsl:value-of select ="'–'"/>
+                        <xsl:value-of select ="'-'"/>
                       </xsl:when>
                       <xsl:when test="a:pPr/a:buChar/@char = '»'">
                         <xsl:value-of select ="'»'"/>
                       </xsl:when>
+                      <!-- Added by  vijayeta ,on 19th june-->
+                      <xsl:when test="a:pPr/a:buChar/@char = 'è'">
+                        <xsl:value-of select ="'➔'"/>
+                      </xsl:when>
+                      <!-- Added by  vijayeta ,on 19th june-->
                       <xsl:otherwise>•</xsl:otherwise>
                     </xsl:choose >
                   </xsl:attribute >
                   <style:list-level-properties text:min-label-width="0.8cm">
                     <xsl:attribute name ="text:space-before">
                       <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle">
-                        <xsl:value-of select="concat(format-number(child::node()[$newTextLvl]/@marL div 360000,'#.##'),'cm')"/>
+                        <xsl:value-of select="concat(format-number(child::node()[1]/@marL div 360000,'#.##'),'cm')"/>
                       </xsl:for-each>
                     </xsl:attribute>
                   </style:list-level-properties>
-                  <style:text-properties style:font-charset="x-symbol">
+                  <style:text-properties style:font-charset="x-symbol" >
                     <xsl:if test ="a:pPr/a:buFont/@typeface">
                       <xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
                         <xsl:attribute name ="fo:font-family">
@@ -195,7 +728,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:if>
                     <xsl:if test ="not(a:pPr/a:buSzPct)">
                       <xsl:attribute name ="fo:font-size">
-                        <xsl:value-of select ="'45%'"/>
+                        <xsl:value-of select ="'100%'"/>
                       </xsl:attribute>
                     </xsl:if>
                     <xsl:if test ="a:pPr/a:buClr">
@@ -215,11 +748,11 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:if>
                   </style:text-properties >
                 </text:list-level-style-bullet>
-              </xsl:when>
-              <xsl:when test ="a:pPr/a:buAutoNum">
+              </xsl:if>
+              <xsl:if test ="a:pPr/a:buAutoNum">
                 <text:list-level-style-number>
                   <xsl:attribute name ="text:level">
-                    <xsl:value-of select ="$textLevel + 1"/>
+                    <xsl:value-of select ="'1'"/>
                   </xsl:attribute >
                   <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'arabicPeriod')]">
                     <xsl:attribute name ="style:num-format" >
@@ -317,13 +850,13 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     <xsl:attribute name ="style:num-suffix">
                       <xsl:value-of select ="'.'"/>
                     </xsl:attribute>
-                    <!-- start at value-->
-                    <xsl:if test ="@startAt">
-                      <xsl:attribute name ="text:start-value">
-                        <xsl:value-of select ="a:pPr/a:buAutoNum[@startAt]"/>
-                      </xsl:attribute>
-                    </xsl:if>
                   </xsl:if >
+                  <!-- start at value-->
+                  <xsl:if test ="a:pPr/a:buAutoNum/@startAt">
+                    <xsl:attribute name ="text:start-value">
+                      <xsl:value-of select ="a:pPr/a:buAutoNum/@startAt"/>
+                    </xsl:attribute>
+                  </xsl:if>
                   <style:list-level-properties text:min-label-width="0.952cm" />
                   <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
                     <xsl:if test ="a:pPr/a:buFont/@typeface">
@@ -336,9 +869,14 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                         <xsl:value-of select ="'Arial'"/>
                       </xsl:attribute>
                     </xsl:if>
+                    <xsl:if test ="a:pPr/a:buSzPct">
+                      <xsl:attribute name ="fo:font-size">
+                        <xsl:value-of select ="concat((a:pPr/a:buSzPct/@val div 1000),'%')"/>
+                      </xsl:attribute>
+                    </xsl:if>
                     <xsl:if test ="not(a:pPr/a:buSzPct)">
                       <xsl:attribute name ="fo:font-size">
-                        <xsl:value-of select ="'45%'"/>
+                        <xsl:value-of select ="'100%'"/>
                       </xsl:attribute>
                     </xsl:if>
                     <xsl:if test ="a:pPr/a:buClr">
@@ -357,8 +895,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:if>
                   </style:text-properties>
                 </text:list-level-style-number>
-              </xsl:when>
-              <xsl:when test ="a:pPr/a:buBlip">
+              </xsl:if>
+              <xsl:if test ="a:pPr/a:buBlip">
                 <xsl:variable name ="rId" select ="a:pPr/a:buBlip/a:blip/@r:embed"/>
                 <xsl:variable name="XlinkHref">
                   <xsl:variable name="pzipsource">
@@ -385,269 +923,26 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
                   </text:list-level-style-image>
                 </text:list-style>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[1]">
-                  <xsl:if test ="a:buChar">
-                    <text:list-level-style-bullet>
-                      <xsl:attribute name ="text:level">
-                        <xsl:value-of select ="$textLevel + 1"/>
-                      </xsl:attribute >
-                      <xsl:attribute name ="text:bullet-char">
-                        <xsl:choose>
-                          <xsl:when test="a:buChar/@char= 'Ø'">
-                            <xsl:value-of select ="'➢'"/>
-                          </xsl:when>
-                          <xsl:when test="a:buChar/@char= 'o'">
-                            <xsl:value-of select ="'○'"/>
-                          </xsl:when>
-                          <xsl:when test="a:buChar/@char= '§'">
-                            <xsl:value-of select ="'■'"/>
-                          </xsl:when>
-                          <xsl:when test="a:buChar/@char= 'q'">
-                            <xsl:value-of select ="''"/>
-                          </xsl:when>
-                          <xsl:when test="a:buChar/@char= 'ü'">
-                            <xsl:value-of select ="'✔'"/>
-                          </xsl:when>
-                          <xsl:when test="a:buChar/@char = '–'">
-                            <xsl:value-of select ="'–'"/>
-                          </xsl:when>
-                          <xsl:when test="a:buChar/@char = '»'">
-                            <xsl:value-of select ="'»'"/>
-                          </xsl:when>
-                          <xsl:otherwise>•</xsl:otherwise>
-                        </xsl:choose >
-                      </xsl:attribute >
-                      <style:list-level-properties text:min-label-width="0.952cm" />
-                      <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
-                        <xsl:if test ="a:pPr/a:buFont/@typeface">
-                          <xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
-                            <xsl:attribute name ="fo:font-family">
-                              <xsl:value-of select ="'StarSymbol'"/>
-                            </xsl:attribute>
-                          </xsl:if>
-                          <xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
-                            <xsl:attribute name ="fo:font-family">
-                              <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-                            </xsl:attribute>
-                          </xsl:if>
-                        </xsl:if>
-                        <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-                          <xsl:attribute name ="fo:font-family">
-                            <xsl:value-of select ="'StarSymbol'"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test ="a:buSzPct">
-                          <xsl:attribute name ="fo:font-size">
-                            <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test ="not(a:buSzPct)">
-                          <xsl:attribute name ="fo:font-size">
-                            <xsl:value-of select ="'45%'"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test ="a:buClr">
-                          <xsl:if test ="a:buClr/a:srgbClr">
-                            <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
-                            <xsl:attribute name ="fo:color">
-                              <xsl:value-of select ="concat('#',$color)"/>
-                            </xsl:attribute>
-                          </xsl:if>
-                          <xsl:if test ="a:buClr/a:schemeClr">
-                            <xsl:call-template name ="getColorCode">
-                              <xsl:with-param name ="color">
-                                <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
-                              </xsl:with-param>
-                            </xsl:call-template >
-                          </xsl:if>
-                        </xsl:if>
-                      </style:text-properties >
-                    </text:list-level-style-bullet>
-                  </xsl:if>
-                  <xsl:if test ="a:buAutoNum">
-                    <text:list-level-style-number>
-                      <xsl:attribute name ="text:level">
-                        <xsl:value-of select ="$textLevel + 1"/>
-                      </xsl:attribute >
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicPeriod')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'1'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="'.'"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenR')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'1'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="')'"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenBoth')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'1'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="')'"/>
-                        </xsl:attribute>
-                        <xsl:attribute name ="style:num-prefix">
-                          <xsl:value-of select ="'('"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcPeriod')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'A'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="'.'"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenR')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'A'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="')'"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenBoth')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'A'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="')'"/>
-                        </xsl:attribute>
-                        <xsl:attribute name ="style:num-prefix">
-                          <xsl:value-of select ="'('"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcPeriod')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'a'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="'.'"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenR')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'a'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="')'"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenBoth')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'a'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="')'"/>
-                        </xsl:attribute>
-                        <xsl:attribute name ="style:num-prefix">
-                          <xsl:value-of select ="'('"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'romanUcPeriod')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'I'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="'.'"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:if test ="a:buAutoNum/@type[contains(.,'romanLcPeriod')]">
-                        <xsl:attribute name ="style:num-format" >
-                          <xsl:value-of  select ="'i'"/>
-                        </xsl:attribute >
-                        <xsl:attribute name ="style:num-suffix">
-                          <xsl:value-of select ="'.'"/>
-                        </xsl:attribute>
-                        <!-- start at value-->
-                        <xsl:if test ="@startAt">
-                          <xsl:attribute name ="text:start-value">
-                            <xsl:value-of select ="a:buAutoNum[@startAt]"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                      </xsl:if >
-                      <style:list-level-properties text:min-label-width="0.952cm" />
-                      <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable" fo:color="#000000" fo:font-size="100%">
-                        <xsl:if test ="a:buFont/@typeface">
-                          <xsl:attribute name ="fo:font-familyr">
-                            <xsl:value-of select ="a:buFont/@typeface"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test ="not(a:buFont/@typeface)">
-                          <xsl:attribute name ="fo:font-familyr">
-                            <xsl:value-of select ="'Arial'"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test ="a:buSzPct">
-                          <xsl:attribute name ="fo:font-size">
-                            <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test ="not(a:buSzPct)">
-                          <xsl:attribute name ="fo:font-size">
-                            <xsl:value-of select ="'45%'"/>
-                          </xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test ="a:buClr">
-                          <xsl:if test ="a:buClr/a:srgbClr">
-                            <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
-                            <xsl:attribute name ="fo:color">
-                              <xsl:value-of select ="concat('#',$color)"/>
-                            </xsl:attribute>
-                          </xsl:if>
-                          <xsl:if test ="a:buClr/a:schemeClr">
-                            <xsl:call-template name ="getColorCode">
-                              <xsl:with-param name ="color">
-                                <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
-                              </xsl:with-param>
-                            </xsl:call-template >
-                          </xsl:if>
-                        </xsl:if>
-                      </style:text-properties>
-                    </text:list-level-style-number>
-                  </xsl:if>
-                  <xsl:if test ="a:buBlip">
-                    <xsl:variable name ="rId" select ="a:buBlip/a:blip/@r:embed"/>
-                    <xsl:variable name="XlinkHref">
-                      <xsl:variable name="pzipsource">
-                        <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
-                      </xsl:variable>
-                      <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
-                    </xsl:variable>
-                    <xsl:call-template name="copyPictures">
-                      <xsl:with-param name="document">
-                        <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')"/>
-                      </xsl:with-param>
-                      <xsl:with-param name="rId">
-                        <xsl:value-of select ="$rId"/>
-                      </xsl:with-param>
-                    </xsl:call-template>
-                    <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-                      <xsl:attribute name="xlink:href">
-                        <xsl:value-of select="$XlinkHref"/>
-                      </xsl:attribute>
-                      <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
-                    </text:list-level-style-image>
-                  </xsl:if>
-                </xsl:for-each>
-              </xsl:otherwise>
-            </xsl:choose>
-          </text:list-style>
+              </xsl:if>
+            </text:list-style>
+          </xsl:if>
+          <!-- Addded by vijayeta on 18th june,to check for bunone-->
         </xsl:if>
-        <xsl:if test ="not(a:pPr/@lvl)">
-          <text:list-style>
-            <xsl:attribute name ="style:name">
-              <xsl:value-of select ="concat($listStyleName,position())"/>
-            </xsl:attribute >
-            <xsl:if test ="a:pPr/a:buChar">
+        <!-- Addded by vijayeta on 18th june,to check for bunone-->
+      </xsl:for-each>
+    </xsl:if>
+    <!--End of Condition if levels are present-->
+    <!--Condition if levels are not present-->
+    <xsl:if test ="not(./a:p/a:pPr/@lvl)">
+      <xsl:for-each select ="./a:p">
+        <!-- Addded by vijayeta on 18th june,to check for bunone-->
+        <xsl:if test ="not(a:pPr/a:buNone)">
+          <!-- Addded by vijayeta on 18th june,to check for bunone-->
+          <xsl:if test ="a:pPr/a:buChar">
+            <text:list-style>
+              <xsl:attribute name ="style:name">
+                <xsl:value-of select ="concat($listStyleName,position())"/>
+              </xsl:attribute >
               <text:list-level-style-bullet>
                 <xsl:attribute name ="text:level">
                   <xsl:value-of select ="1"/>
@@ -669,23 +964,22 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     <xsl:when test="a:pPr/a:buChar/@char= 'ü'">
                       <xsl:value-of select ="'✔'"/>
                     </xsl:when>
-                    <xsl:when test="a:pPr/a:buChar/@char = '–'">
-                      <xsl:value-of select ="'–'"/>
+                    <xsl:when test="a:pPr/a:buChar/@char = '-'">
+                      <xsl:value-of select ="'-'"/>
                     </xsl:when>
                     <xsl:when test="a:pPr/a:buChar/@char = '»'">
                       <xsl:value-of select ="'»'"/>
                     </xsl:when>
+                    <!-- Added by  vijayeta ,on 19th june-->
+                    <xsl:when test="a:pPr/a:buChar/@char = 'è'">
+                      <xsl:value-of select ="'➔'"/>
+                    </xsl:when>
+                    <!-- Added by  vijayeta ,on 19th june-->
                     <xsl:otherwise>•</xsl:otherwise>
                   </xsl:choose >
                 </xsl:attribute >
-                <style:list-level-properties text:min-label-width="0.8cm">
-                  <xsl:attribute name ="text:space-before">
-                    <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle">
-                      <xsl:value-of select="concat(format-number(child::node()[1]/@marL div 360000,'#.##'),'cm')"/>
-                    </xsl:for-each>
-                  </xsl:attribute>
-                </style:list-level-properties>
-                <style:text-properties style:font-charset="x-symbol" >
+                <style:list-level-properties text:min-label-width="0.952cm" />
+                <style:text-properties style:font-charset="x-symbol">
                   <xsl:if test ="a:pPr/a:buFont/@typeface">
                     <xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
                       <xsl:attribute name ="fo:font-family">
@@ -713,9 +1007,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="'100%'"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="a:pPr/a:buClr">
+                  <xsl:if test ="a:p/a:pPr/a:buClr">
                     <xsl:if test ="a:pPr/a:buClr/a:srgbClr">
-                      <xsl:variable name ="color" select ="a:pPr/a:buClr/a:srgbClr/@val"/>
+                      <xsl:variable name ="color" select ="/a:pPr/a:buClr/a:srgbClr/@val"/>
                       <xsl:attribute name ="fo:color">
                         <xsl:value-of select ="concat('#',$color)"/>
                       </xsl:attribute>
@@ -730,8 +1024,13 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   </xsl:if>
                 </style:text-properties >
               </text:list-level-style-bullet>
-            </xsl:if>
-            <xsl:if test ="a:pPr/a:buAutoNum">
+            </text:list-style>
+          </xsl:if>
+          <xsl:if test ="a:pPr/a:buAutoNum">
+            <text:list-style>
+              <xsl:attribute name ="style:name">
+                <xsl:value-of select ="concat($listStyleName,position())"/>
+              </xsl:attribute >
               <text:list-level-style-number>
                 <xsl:attribute name ="text:level">
                   <xsl:value-of select ="'1'"/>
@@ -832,13 +1131,13 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   <xsl:attribute name ="style:num-suffix">
                     <xsl:value-of select ="'.'"/>
                   </xsl:attribute>
-                  <!-- start at value-->
-                  <xsl:if test ="@startAt">
-                    <xsl:attribute name ="text:start-value">
-                      <xsl:value-of select ="a:pPr/a:buAutoNum[@startAt]"/>
-                    </xsl:attribute>
-                  </xsl:if>
                 </xsl:if >
+                <!-- start at value-->
+                <xsl:if test ="a:pPr/a:buAutoNum/@startAt">
+                  <xsl:attribute name ="text:start-value">
+                    <xsl:value-of select ="a:pPr/a:buAutoNum/@startAt"/>
+                  </xsl:attribute>
+                </xsl:if>
                 <style:list-level-properties text:min-label-width="0.952cm" />
                 <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
                   <xsl:if test ="a:pPr/a:buFont/@typeface">
@@ -853,7 +1152,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   </xsl:if>
                   <xsl:if test ="a:pPr/a:buSzPct">
                     <xsl:attribute name ="fo:font-size">
-                      <xsl:value-of select ="concat((a:pPr/a:buSzPct/@val div 1000),'%')"/>
+                      <xsl:value-of select ="concat((/a:pPr/a:buSzPct/@val div 1000),'%')"/>
                     </xsl:attribute>
                   </xsl:if>
                   <xsl:if test ="not(a:pPr/a:buSzPct)">
@@ -862,9 +1161,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute>
                   </xsl:if>
                   <xsl:if test ="a:pPr/a:buClr">
-                    <xsl:if test ="a:p/a:pPr/a:buClr/a:srgbClr">
+                    <xsl:if test ="a:pPr/a:buClr/a:srgbClr">
                       <xsl:attribute name ="fo:color">
-                        <xsl:value-of select ="concat('#',a:p/a:pPr/a:buClr/a:srgbClr/@val)"/>
+                        <xsl:value-of select ="concat('#',a:pPr/a:buClr/a:srgbClr/@val)"/>
                       </xsl:attribute>
                     </xsl:if>
                     <xsl:if test ="a:pPr/a:buClr/a:schemeClr">
@@ -877,306 +1176,39 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   </xsl:if>
                 </style:text-properties>
               </text:list-level-style-number>
-            </xsl:if>
-            <xsl:if test ="a:pPr/a:buBlip">
-              <xsl:variable name ="rId" select ="a:pPr/a:buBlip/a:blip/@r:embed"/>
-              <xsl:variable name="XlinkHref">
-                <xsl:variable name="pzipsource">
-                  <xsl:value-of select="document($slideRel)//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
-                </xsl:variable>
-                <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+            </text:list-style>
+          </xsl:if>
+          <xsl:if test ="a:pPr/a:buBlip">
+            <xsl:variable name ="rId" select ="./a:p/a:pPr/a:buBlip/a:blip/@r:embed"/>
+            <xsl:variable name="XlinkHref">
+              <xsl:variable name="pzipsource">
+                <xsl:value-of select="document($slideRel)//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
               </xsl:variable>
-              <xsl:call-template name="copyPictures">
-                <xsl:with-param name="document">
-                  <xsl:value-of select="$slideRel"/>
-                </xsl:with-param>
-                <xsl:with-param name="rId">
-                  <xsl:value-of select ="$rId"/>
-                </xsl:with-param>
-              </xsl:call-template>
-              <text:list-style>
-                <xsl:attribute name ="style:name">
-                  <xsl:value-of select ="$listStyleName"/>
-                </xsl:attribute >
-                <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-                  <xsl:attribute name="xlink:href">
-                    <xsl:value-of select="$XlinkHref"/>
-                  </xsl:attribute>
-                  <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
-                </text:list-level-style-image>
-              </text:list-style>
-            </xsl:if>
-          </text:list-style>
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:if>
-    <!--End of Condition if levels are present-->
-    <!--Condition if levels are not present-->
-    <xsl:if test ="not(./a:p/a:pPr/@lvl)">
-      <xsl:for-each select ="./a:p">
-        <xsl:if test ="a:pPr/a:buChar">
-          <text:list-style>
-            <xsl:attribute name ="style:name">
-              <xsl:value-of select ="concat($listStyleName,position())"/>
-            </xsl:attribute >
-            <text:list-level-style-bullet>
-              <xsl:attribute name ="text:level">
-                <xsl:value-of select ="1"/>
-              </xsl:attribute >
-              <xsl:attribute name ="text:bullet-char">
-                <xsl:choose>
-                  <xsl:when test="a:pPr/a:buChar/@char= 'Ø'">
-                    <xsl:value-of select ="'➢'"/>
-                  </xsl:when>
-                  <xsl:when test="a:pPr/a:buChar/@char= 'o'">
-                    <xsl:value-of select ="'○'"/>
-                  </xsl:when>
-                  <xsl:when test="a:pPr/a:buChar/@char= '§'">
-                    <xsl:value-of select ="'■'"/>
-                  </xsl:when>
-                  <xsl:when test="a:pPr/a:buChar/@char= 'q'">
-                    <xsl:value-of select ="''"/>
-                  </xsl:when>
-                  <xsl:when test="a:pPr/a:buChar/@char= 'ü'">
-                    <xsl:value-of select ="'✔'"/>
-                  </xsl:when>
-                  <xsl:when test="a:pPr/a:buChar/@char = '–'">
-                    <xsl:value-of select ="'–'"/>
-                  </xsl:when>
-                  <xsl:when test="a:pPr/a:buChar/@char = '»'">
-                    <xsl:value-of select ="'»'"/>
-                  </xsl:when>
-                  <xsl:otherwise>•</xsl:otherwise>
-                </xsl:choose >
-              </xsl:attribute >
-              <style:list-level-properties text:min-label-width="0.952cm" />
-              <style:text-properties style:font-charset="x-symbol">
-                <xsl:if test ="a:pPr/a:buFont/@typeface">
-                  <xsl:if test ="a:pPr/a:buFont[@typeface='Arial']">
-                    <xsl:attribute name ="fo:font-family">
-                      <xsl:value-of select ="'StarSymbol'"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="not(a:pPr/a:buFont[@typeface='Arial'])">
-                    <xsl:attribute name ="fo:font-family">
-                      <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:if>
-                <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="'StarSymbol'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:pPr/a:buSzPct">
-                  <xsl:attribute name ="fo:font-size">
-                    <xsl:value-of select ="concat((a:pPr/a:buSzPct/@val div 1000),'%')"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="not(a:pPr/a:buSzPct)">
-                  <xsl:attribute name ="fo:font-size">
-                    <xsl:value-of select ="'100%'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:p/a:pPr/a:buClr">
-                  <xsl:if test ="a:pPr/a:buClr/a:srgbClr">
-                    <xsl:variable name ="color" select ="/a:pPr/a:buClr/a:srgbClr/@val"/>
-                    <xsl:attribute name ="fo:color">
-                      <xsl:value-of select ="concat('#',$color)"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="a:pPr/a:buClr/a:schemeClr">
-                    <xsl:call-template name ="getColorCode">
-                      <xsl:with-param name ="color">
-                        <xsl:value-of select="a:pPr/a:buClr/a:schemeClr/@val"/>
-                      </xsl:with-param>
-                    </xsl:call-template >
-                  </xsl:if>
-                </xsl:if>
-              </style:text-properties >
-            </text:list-level-style-bullet>
-          </text:list-style>
-        </xsl:if>
-        <xsl:if test ="a:pPr/a:buAutoNum">
-          <text:list-style>
-            <xsl:attribute name ="style:name">
-              <xsl:value-of select ="concat($listStyleName,position())"/>
-            </xsl:attribute >
-            <text:list-level-style-number>
-              <xsl:attribute name ="text:level">
-                <xsl:value-of select ="'1'"/>
-              </xsl:attribute >
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'arabicPeriod')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'1'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="'.'"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'arabicParenR')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'1'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="')'"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'arabicParenBoth')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'1'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="')'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="style:num-prefix">
-                  <xsl:value-of select ="'('"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaUcPeriod')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'A'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="'.'"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaUcParenR')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'A'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="')'"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaUcParenBoth')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'A'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="')'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="style:num-prefix">
-                  <xsl:value-of select ="'('"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaLcPeriod')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'a'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="'.'"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaLcParenR')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'a'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="')'"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'alphaLcParenBoth')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'a'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="')'"/>
-                </xsl:attribute>
-                <xsl:attribute name ="style:num-prefix">
-                  <xsl:value-of select ="'('"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'romanUcPeriod')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'I'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="'.'"/>
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:if test ="a:pPr/a:buAutoNum/@type[contains(.,'romanLcPeriod')]">
-                <xsl:attribute name ="style:num-format" >
-                  <xsl:value-of  select ="'i'"/>
-                </xsl:attribute >
-                <xsl:attribute name ="style:num-suffix">
-                  <xsl:value-of select ="'.'"/>
-                </xsl:attribute>
-                <!-- start at value-->
-                <xsl:if test ="@startAt">
-                  <xsl:attribute name ="text:start-value">
-                    <xsl:value-of select ="a:pPr/a:buAutoNum[@startAt]"/>
-                  </xsl:attribute>
-                </xsl:if>
-              </xsl:if >
-              <style:list-level-properties text:min-label-width="0.952cm" />
-              <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable">
-                <xsl:if test ="a:pPr/a:buFont/@typeface">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="a:pPr/a:buFont/@typeface"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="not(a:pPr/a:buFont/@typeface)">
-                  <xsl:attribute name ="fo:font-family">
-                    <xsl:value-of select ="'Arial'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:pPr/a:buSzPct">
-                  <xsl:attribute name ="fo:font-size">
-                    <xsl:value-of select ="concat((/a:pPr/a:buSzPct/@val div 1000),'%')"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="not(a:pPr/a:buSzPct)">
-                  <xsl:attribute name ="fo:font-size">
-                    <xsl:value-of select ="'100%'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:pPr/a:buClr">
-                  <xsl:if test ="a:pPr/a:buClr/a:srgbClr">
-                    <xsl:attribute name ="fo:color">
-                      <xsl:value-of select ="concat('#',a:pPr/a:buClr/a:srgbClr/@val)"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="a:pPr/a:buClr/a:schemeClr">
-                    <xsl:call-template name ="getColorCode">
-                      <xsl:with-param name ="color">
-                        <xsl:value-of select="a:pPr/a:buClr/a:schemeClr/@val"/>
-                      </xsl:with-param>
-                    </xsl:call-template >
-                  </xsl:if>
-                </xsl:if>
-              </style:text-properties>
-            </text:list-level-style-number>
-          </text:list-style>
-        </xsl:if>
-        <xsl:if test ="a:pPr/a:buBlip">
-          <xsl:variable name ="rId" select ="./a:p/a:pPr/a:buBlip/a:blip/@r:embed"/>
-          <xsl:variable name="XlinkHref">
-            <xsl:variable name="pzipsource">
-              <xsl:value-of select="document($slideRel)//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+              <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
             </xsl:variable>
-            <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
-          </xsl:variable>
-          <xsl:call-template name="copyPictures">
-            <xsl:with-param name="document">
-              <xsl:value-of select="$slideRel"/>
-            </xsl:with-param>
-            <xsl:with-param name="rId">
-              <xsl:value-of select ="$rId"/>
-            </xsl:with-param>
-          </xsl:call-template>
-          <text:list-style>
-            <xsl:attribute name ="style:name">
-              <xsl:value-of select ="$listStyleName"/>
-            </xsl:attribute >
-            <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-              <xsl:attribute name="xlink:href">
-                <xsl:value-of select="$XlinkHref"/>
-              </xsl:attribute>
-              <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
-            </text:list-level-style-image>
-          </text:list-style>
-        </xsl:if>
+            <xsl:call-template name="copyPictures">
+              <xsl:with-param name="document">
+                <xsl:value-of select="$slideRel"/>
+              </xsl:with-param>
+              <xsl:with-param name="rId">
+                <xsl:value-of select ="$rId"/>
+              </xsl:with-param>
+            </xsl:call-template>
+            <text:list-style>
+              <xsl:attribute name ="style:name">
+                <xsl:value-of select ="$listStyleName"/>
+              </xsl:attribute >
+              <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                <xsl:attribute name="xlink:href">
+                  <xsl:value-of select="$XlinkHref"/>
+                </xsl:attribute>
+                <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+              </text:list-level-style-image>
+            </text:list-style>
+          </xsl:if>
+          <!-- Addded by vijayeta on 18th june,to check for bunone-->
+        </xsl:if >
+        <!-- Addded by vijayeta on 18th june,to check for bunone-->
       </xsl:for-each>
     </xsl:if>
     <!--End  of Condition if levels are not present-->
@@ -1185,107 +1217,664 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     <xsl:param name ="listStyleName"/>
     <xsl:if test ="./a:p/a:pPr/@lvl">
       <xsl:for-each select ="./a:p">
-        <!--Condition if levels are present,and bullets are default-->
-        <!--<xsl:if test ="./a:pPr/@lvl">-->
-        <xsl:if test ="not(./a:pPr/a:buNone)">
-          <xsl:variable name ="levelStyle">
-            <xsl:value-of select ="concat($listStyleName,'lvl',a:pPr/@lvl)"/>
-          </xsl:variable>
-          <xsl:variable name ="textLevel" select ="a:pPr/@lvl"/>
-          <xsl:variable name ="newTextLvl" select ="$textLevel+1"/>
-          <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle">
-            <text:list-style>
-              <xsl:attribute name ="style:name">
-                <xsl:value-of select ="$levelStyle"/>
-              </xsl:attribute >
-              <xsl:if test ="child::node()[$newTextLvl]/a:buChar">
+        <xsl:variable name ="position" select ="position()"/>
+        <xsl:if test ="not(a:pPr/a:buNone)">
+          <!--Condition if levels are present,and bullets are default-->
+          <xsl:if test ="./a:pPr/@lvl">
+            <xsl:variable name ="textLevel" select ="a:pPr/@lvl"/>
+            <!--<xsl:if test ="not(./a:pPr/a:buNone)">-->
+            <xsl:variable name ="levelStyle">
+              <xsl:value-of select ="concat($listStyleName,$position,'lvl',$textLevel)"/>
+            </xsl:variable>
+            <xsl:variable name ="newTextLvl" select ="$textLevel+1"/>
+            <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle">
+              <text:list-style>
+                <xsl:attribute name ="style:name">
+                  <xsl:value-of select ="$levelStyle"/>
+                </xsl:attribute >
+                <xsl:if test ="child::node()[$newTextLvl]/a:buChar">
+                  <text:list-level-style-bullet>
+                    <xsl:attribute name ="text:level">
+                      <xsl:value-of select ="$textLevel+1"/>
+                    </xsl:attribute >
+                    <xsl:attribute name ="text:bullet-char">
+                      <xsl:choose>
+                        <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'Ø'">
+                          <xsl:value-of select ="'➢'"/>
+                        </xsl:when>
+                        <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'o'">
+                          <xsl:value-of select ="'○'"/>
+                        </xsl:when>
+                        <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= '§'">
+                          <xsl:value-of select ="'■'"/>
+                        </xsl:when>
+                        <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'q'">
+                          <xsl:value-of select ="''"/>
+                        </xsl:when>
+                        <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'ü'">
+                          <xsl:value-of select ="'✔'"/>
+                        </xsl:when>
+                        <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char = '–'">
+                          <xsl:value-of select ="'–'"/>
+                        </xsl:when>
+                        <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char = '»'">
+                          <xsl:value-of select ="'»'"/>
+                        </xsl:when>
+                        <!-- Added by  vijayeta ,on 19th june-->
+                        <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char = 'è'">
+                          <xsl:value-of select ="'➔'"/>
+                        </xsl:when>
+                        <!-- Added by  vijayeta ,on 19th june-->
+                        <xsl:otherwise>•</xsl:otherwise>
+                      </xsl:choose >
+                    </xsl:attribute >
+                    <style:list-level-properties text:min-label-width="0.8cm">
+                      <xsl:attribute name ="text:space-before">
+                        <xsl:value-of select="concat(format-number(child::node()[$newTextLvl]/@marL div 360000,'#.##'),'cm')"/>
+                      </xsl:attribute>
+                    </style:list-level-properties>
+                    <style:text-properties fo:font-family="StarSymbol" style:font-charset="x-symbol">
+                      <xsl:if test ="child::node()[$newTextLvl]/a:buFont/@typeface">
+                        <xsl:if test ="child::node()[$newTextLvl]/a:buFont[@typeface='Arial']">
+                          <xsl:attribute name ="fo:font-family">
+                            <xsl:value-of select ="'StarSymbol'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="not(child::node()[$newTextLvl]/a:buFont[@typeface='Arial'])">
+                          <xsl:attribute name ="fo:font-family">
+                            <xsl:value-of select ="child::node()[$newTextLvl]/a:buFont/@typeface"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                      </xsl:if>
+                      <xsl:if test ="not(child::node()[$newTextLvl]/a:buFont/@typeface)">
+                        <xsl:attribute name ="fo:font-family">
+                          <xsl:value-of select ="'StarSymbol'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="child::node()[$newTextLvl]/a:buSzPct">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="concat((child::node()[$newTextLvl]/a:buSzPct/@val div 1000),'%')"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="not(child::node()[$newTextLvl]/a:buSzPct)">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="'100%'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="child::node()[$newTextLvl]/a:buClr">
+                        <xsl:if test ="child::node()[$newTextLvl]/a:buClr/a:srgbClr">
+                          <xsl:variable name ="color" select ="child::node()[$newTextLvl]/a:buClr/a:srgbClr/@val"/>
+                          <xsl:attribute name ="fo:color">
+                            <xsl:value-of select ="concat('#',$color)"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="child::node()[$newTextLvl]/a:buClr/a:schemeClr">
+                          <xsl:call-template name ="getColorCode">
+                            <xsl:with-param name ="color">
+                              <xsl:value-of select="child::node()[$newTextLvl]/a:buClr/a:schemeClr/@val"/>
+                            </xsl:with-param>
+                          </xsl:call-template >
+                        </xsl:if>
+                      </xsl:if>
+                    </style:text-properties >
+                  </text:list-level-style-bullet>
+                </xsl:if>
+                <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum">
+                  <text:list-level-style-number>
+                    <xsl:attribute name ="text:level">
+                      <xsl:value-of select ="$textLevel+1"/>
+                    </xsl:attribute >
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'arabicPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'1'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'arabicParenR')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'1'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'arabicParenBoth')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'1'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                      <xsl:attribute name ="style:num-prefix">
+                        <xsl:value-of select ="'('"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaUcPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'A'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaUcParenR')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'A'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaUcParenBoth')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'A'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                      <xsl:attribute name ="style:num-prefix">
+                        <xsl:value-of select ="'('"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaLcPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'a'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaLcParenR')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'a'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaLcParenBoth')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'a'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="')'"/>
+                      </xsl:attribute>
+                      <xsl:attribute name ="style:num-prefix">
+                        <xsl:value-of select ="'('"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'romanUcPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'I'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'romanLcPeriod')]">
+                      <xsl:attribute name ="style:num-format" >
+                        <xsl:value-of  select ="'i'"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="style:num-suffix">
+                        <xsl:value-of select ="'.'"/>
+                      </xsl:attribute>
+                    </xsl:if >
+                    <!-- start at value-->
+                    <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@startAt">
+                      <xsl:attribute name ="text:start-value">
+                        <xsl:value-of select ="child::node()[$newTextLvl]/a:buAutoNum/@startAt"/>
+                      </xsl:attribute>
+                    </xsl:if>
+                    <style:list-level-properties text:min-label-width="0.952cm" />
+                    <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable" fo:color="#000000" fo:font-size="100%">
+                      <xsl:if test ="child::node()[$newTextLvl]/a:buFont/@typeface">
+                        <xsl:attribute name ="fo:font-family">
+                          <xsl:value-of select ="child::node()[$newTextLvl]/a:buFont/@typeface"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="not(child::node()[$newTextLvl]/a:buFont/@typeface)">
+                        <xsl:attribute name ="fo:font-family">
+                          <xsl:value-of select ="'Arial'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="child::node()[$newTextLvl]/a:buSzPct">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="concat((child::node()[$newTextLvl]/a:buSzPct/@val div 1000),'%')"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="not(child::node()[$newTextLvl]/a:buSzPct)">
+                        <xsl:attribute name ="fo:font-size">
+                          <xsl:value-of select ="'100%'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="child::node()[$newTextLvl]/a:buClr">
+                        <xsl:if test ="child::node()[$newTextLvl]/a:buClr/a:srgbClr">
+                          <xsl:variable name ="color" select ="child::node()[$newTextLvl]/a:buClr/a:srgbClr/@val"/>
+                          <xsl:attribute name ="fo:color">
+                            <xsl:value-of select ="concat('#',$color)"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="child::node()[$newTextLvl]/a:buClr/a:schemeClr">
+                          <xsl:call-template name ="getColorCode">
+                            <xsl:with-param name ="color">
+                              <xsl:value-of select="child::node()[$newTextLvl]/a:buClr/a:schemeClr/@val"/>
+                            </xsl:with-param>
+                          </xsl:call-template >
+                        </xsl:if>
+                      </xsl:if>
+                    </style:text-properties>
+                  </text:list-level-style-number>
+                </xsl:if>
+                <xsl:if test ="child::node()[$newTextLvl]/a:buBlip">
+                  <xsl:variable name ="rId" select ="child::node()[$newTextLvl]/a:buBlip/a:blip/@r:embed"/>
+                  <xsl:variable name="XlinkHref">
+                    <xsl:variable name="pzipsource">
+                      <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+                    </xsl:variable>
+                    <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+                  </xsl:variable>
+                  <xsl:call-template name="copyPictures">
+                    <xsl:with-param name="document">
+                      <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="rId">
+                      <xsl:value-of select ="$rId"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                  <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                    <xsl:attribute name="xlink:href">
+                      <xsl:value-of select="$XlinkHref"/>
+                    </xsl:attribute>
+                    <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+                  </text:list-level-style-image>
+                </xsl:if>
+              </text:list-style>
+            </xsl:for-each>
+            <!--</xsl:if>-->
+          </xsl:if>
+          <xsl:if test ="not(./a:pPr/@lvl)">
+            <xsl:if test ="not(./a:pPr/a:buNone)">
+              <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[1]">
+                <text:list-style>
+                  <xsl:attribute name ="style:name">
+                    <xsl:value-of select ="concat($listStyleName,$position)"/>
+                  </xsl:attribute >
+                  <xsl:if test ="a:buChar">
+                    <text:list-level-style-bullet>
+                      <xsl:attribute name ="text:level">
+                        <xsl:value-of select ="1"/>
+                      </xsl:attribute >
+                      <xsl:attribute name ="text:bullet-char">
+                        <xsl:choose>
+                          <xsl:when test="a:buChar/@char= 'Ø'">
+                            <xsl:value-of select ="'➢'"/>
+                          </xsl:when>
+                          <xsl:when test="a:buChar/@char= 'o'">
+                            <xsl:value-of select ="'○'"/>
+                          </xsl:when>
+                          <xsl:when test="a:buChar/@char= '§'">
+                            <xsl:value-of select ="'■'"/>
+                          </xsl:when>
+                          <xsl:when test="a:buChar/@char= 'q'">
+                            <xsl:value-of select ="''"/>
+                          </xsl:when>
+                          <xsl:when test="a:buChar/@char= 'ü'">
+                            <xsl:value-of select ="'✔'"/>
+                          </xsl:when>
+                          <xsl:when test="a:buChar/@char = '–'">
+                            <xsl:value-of select ="'–'"/>
+                          </xsl:when>
+                          <xsl:when test="a:buChar/@char = '»'">
+                            <xsl:value-of select ="'»'"/>
+                          </xsl:when>
+                          <!-- Added by  vijayeta ,on 19th june-->
+                          <xsl:when test="a:buChar/@char = 'è'">
+                            <xsl:value-of select ="'➔'"/>
+                          </xsl:when>
+                          <!-- Added by  vijayeta ,on 19th june-->
+                          <xsl:otherwise>•</xsl:otherwise>
+                        </xsl:choose >
+                      </xsl:attribute >
+                      <style:list-level-properties text:min-label-width="0.8cm">
+                        <xsl:attribute name ="text:space-before">
+                          <xsl:value-of select="concat(format-number(@marL div 360000,'#.##'),'cm')"/>
+                        </xsl:attribute>
+                      </style:list-level-properties>
+                      <style:text-properties fo:font-family="StarSymbol" style:font-charset="x-symbol">
+                        <xsl:if test ="a:buFont/@typeface">
+                          <xsl:if test ="a:buFont[@typeface='Arial']">
+                            <xsl:attribute name ="fo:font-family">
+                              <xsl:value-of select ="'StarSymbol'"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="not(a:buFont[@typeface='Arial'])">
+                            <xsl:attribute name ="fo:font-family">
+                              <xsl:value-of select ="a:buFont/@typeface"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                        </xsl:if>
+                        <xsl:if test ="not(a:buFont/@typeface)">
+                          <xsl:attribute name ="fo:font-family">
+                            <xsl:value-of select ="'StarSymbol'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buSzPct">
+                          <xsl:attribute name ="fo:font-size">
+                            <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="not(a:buSzPct)">
+                          <xsl:attribute name ="fo:font-size">
+                            <xsl:value-of select ="'100%'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buClr">
+                          <xsl:if test ="a:buClr/a:srgbClr">
+                            <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
+                            <xsl:attribute name ="fo:color">
+                              <xsl:value-of select ="concat('#',$color)"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="a:buClr/a:schemeClr">
+                            <xsl:call-template name ="getColorCode">
+                              <xsl:with-param name ="color">
+                                <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
+                              </xsl:with-param>
+                            </xsl:call-template >
+                          </xsl:if>
+                        </xsl:if>
+                      </style:text-properties >
+                    </text:list-level-style-bullet>
+                  </xsl:if>
+                  <xsl:if test ="a:buAutoNum">
+                    <text:list-level-style-number>
+                      <xsl:attribute name ="text:level">
+                        <xsl:value-of select ="'1'"/>
+                      </xsl:attribute >
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicPeriod')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'1'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="'.'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenR')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'1'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="')'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenBoth')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'1'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="')'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:num-prefix">
+                          <xsl:value-of select ="'('"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcPeriod')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'A'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="'.'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenR')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'A'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="')'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenBoth')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'A'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="')'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:num-prefix">
+                          <xsl:value-of select ="'('"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcPeriod')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'a'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="'.'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenR')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'a'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="')'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenBoth')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'a'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="')'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:num-prefix">
+                          <xsl:value-of select ="'('"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'romanUcPeriod')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'I'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="'.'"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <xsl:if test ="a:buAutoNum/@type[contains(.,'romanLcPeriod')]">
+                        <xsl:attribute name ="style:num-format" >
+                          <xsl:value-of  select ="'i'"/>
+                        </xsl:attribute >
+                        <xsl:attribute name ="style:num-suffix">
+                          <xsl:value-of select ="'.'"/>
+                        </xsl:attribute>
+                      </xsl:if >
+                      <!-- start at value-->
+                      <xsl:if test ="a:buAutoNum/@startAt">
+                        <xsl:attribute name ="text:start-value">
+                          <xsl:value-of select ="a:buAutoNum/@startAt"/>
+                        </xsl:attribute>
+                      </xsl:if>
+                      <style:list-level-properties text:min-label-width="0.952cm" />
+                      <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable" fo:color="#000000" fo:font-size="100%">
+                        <xsl:if test ="a:buFont/@typeface">
+                          <xsl:attribute name ="fo:font-family">
+                            <xsl:value-of select ="a:buFont/@typeface"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="not(a:buFont/@typeface)">
+                          <xsl:attribute name ="fo:font-family">
+                            <xsl:value-of select ="'Arial'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buSzPct">
+                          <xsl:attribute name ="fo:font-size">
+                            <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="not(a:buSzPct)">
+                          <xsl:attribute name ="fo:font-size">
+                            <xsl:value-of select ="'100%'"/>
+                          </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test ="a:buClr">
+                          <xsl:if test ="a:buClr/a:srgbClr">
+                            <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
+                            <xsl:attribute name ="fo:color">
+                              <xsl:value-of select ="concat('#',$color)"/>
+                            </xsl:attribute>
+                          </xsl:if>
+                          <xsl:if test ="a:buClr/a:schemeClr">
+                            <xsl:call-template name ="getColorCode">
+                              <xsl:with-param name ="color">
+                                <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
+                              </xsl:with-param>
+                            </xsl:call-template >
+                          </xsl:if>
+                        </xsl:if>
+                      </style:text-properties>
+                    </text:list-level-style-number>
+                  </xsl:if>
+                  <xsl:if test ="a:buBlip">
+                    <xsl:variable name ="rId" select ="a:buBlip/a:blip/@r:embed"/>
+                    <xsl:variable name="XlinkHref">
+                      <xsl:variable name="pzipsource">
+                        <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
+                      </xsl:variable>
+                      <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
+                    </xsl:variable>
+                    <xsl:call-template name="copyPictures">
+                      <xsl:with-param name="document">
+                        <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')"/>
+                      </xsl:with-param>
+                      <xsl:with-param name="rId">
+                        <xsl:value-of select ="$rId"/>
+                      </xsl:with-param>
+                    </xsl:call-template>
+                    <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                      <xsl:attribute name="xlink:href">
+                        <xsl:value-of select="$XlinkHref"/>
+                      </xsl:attribute>
+                      <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
+                    </text:list-level-style-image>
+                  </xsl:if>
+                </text:list-style>
+              </xsl:for-each>
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:if>
+    <!--Condition if levels are present,and bullets are default-->
+    <!--<xsl:if test ="not(./a:pPr/@lvl)">-->
+    <xsl:if test ="not(./a:p/a:pPr/@lvl)">
+      <xsl:if test ="not(./a:p/a:pPr/a:buNone)">
+        <xsl:for-each select ="./a:p">
+          <xsl:variable name ="position" select ="position()"/>
+          <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[1]">
+            <xsl:if test ="a:buChar">
+              <text:list-style>
+                <xsl:attribute name ="style:name">
+                  <xsl:value-of select ="concat($listStyleName,$position)"/>
+                </xsl:attribute >
                 <text:list-level-style-bullet>
                   <xsl:attribute name ="text:level">
-                    <xsl:value-of select ="$textLevel+1"/>
+                    <xsl:value-of select ="1"/>
                   </xsl:attribute >
                   <xsl:attribute name ="text:bullet-char">
                     <xsl:choose>
-                      <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'Ø'">
+                      <xsl:when test="a:buChar/@char= 'Ø'">
                         <xsl:value-of select ="'➢'"/>
                       </xsl:when>
-                      <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'o'">
+                      <xsl:when test="a:buChar/@char= 'o'">
                         <xsl:value-of select ="'○'"/>
                       </xsl:when>
-                      <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= '§'">
+                      <xsl:when test="a:buChar/@char= '§'">
                         <xsl:value-of select ="'■'"/>
                       </xsl:when>
-                      <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'q'">
+                      <xsl:when test="a:buChar/@char= 'q'">
                         <xsl:value-of select ="''"/>
                       </xsl:when>
-                      <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'ü'">
+                      <xsl:when test="a:buChar/@char= 'ü'">
                         <xsl:value-of select ="'✔'"/>
                       </xsl:when>
-                      <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char = '–'">
+                      <xsl:when test="a:buChar/@char = '–'">
                         <xsl:value-of select ="'–'"/>
                       </xsl:when>
-                      <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char = '»'">
+                      <xsl:when test="a:buChar/@char = '»'">
                         <xsl:value-of select ="'»'"/>
                       </xsl:when>
+                      <!-- Added by  vijayeta ,on 19th june-->
+                      <xsl:when test="a:buChar/@char = 'è'">
+                        <xsl:value-of select ="'➔'"/>
+                      </xsl:when>
+                      <!-- Added by  vijayeta ,on 19th june-->
                       <xsl:otherwise>•</xsl:otherwise>
                     </xsl:choose >
                   </xsl:attribute >
                   <style:list-level-properties text:min-label-width="0.8cm">
                     <xsl:attribute name ="text:space-before">
-                      <xsl:value-of select="concat(format-number(child::node()[$newTextLvl]/@marL div 360000,'#.##'),'cm')"/>
+                      <xsl:value-of select="concat(format-number(@marL div 360000,'#.##'),'cm')"/>
                     </xsl:attribute>
                   </style:list-level-properties>
                   <style:text-properties fo:font-family="StarSymbol" style:font-charset="x-symbol">
-                    <xsl:if test ="child::node()[$newTextLvl]/a:buFont/@typeface">
-                      <xsl:if test ="child::node()[$newTextLvl]/a:buFont[@typeface='Arial']">
+                    <xsl:if test ="a:buFont/@typeface">
+                      <xsl:if test ="a:buFont[@typeface='Arial']">
                         <xsl:attribute name ="fo:font-family">
                           <xsl:value-of select ="'StarSymbol'"/>
                         </xsl:attribute>
                       </xsl:if>
-                      <xsl:if test ="not(child::node()[$newTextLvl]/a:buFont[@typeface='Arial'])">
+                      <xsl:if test ="not(a:buFont[@typeface='Arial'])">
                         <xsl:attribute name ="fo:font-family">
-                          <xsl:value-of select ="child::node()[$newTextLvl]/a:buFont/@typeface"/>
+                          <xsl:value-of select ="a:buFont/@typeface"/>
                         </xsl:attribute>
                       </xsl:if>
                     </xsl:if>
-                    <xsl:if test ="not(child::node()[$newTextLvl]/a:buFont/@typeface)">
+                    <xsl:if test ="not(a:buFont/@typeface)">
                       <xsl:attribute name ="fo:font-family">
                         <xsl:value-of select ="'StarSymbol'"/>
                       </xsl:attribute>
                     </xsl:if>
-                    <xsl:if test ="child::node()[$newTextLvl]/a:buSzPct">
+                    <xsl:if test ="a:buSzPct">
                       <xsl:attribute name ="fo:font-size">
-                        <xsl:value-of select ="concat((child::node()[$newTextLvl]/a:buSzPct/@val div 1000),'%')"/>
+                        <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
                       </xsl:attribute>
                     </xsl:if>
-                    <xsl:if test ="not(child::node()[$newTextLvl]/a:buSzPct)">
+                    <xsl:if test ="not(a:buSzPct)">
                       <xsl:attribute name ="fo:font-size">
-                        <xsl:value-of select ="'45%'"/>
+                        <xsl:value-of select ="'100%'"/>
                       </xsl:attribute>
                     </xsl:if>
-                    <xsl:if test ="child::node()[$newTextLvl]/a:buClr">
-                      <xsl:if test ="child::node()[$newTextLvl]/a:buClr/a:srgbClr">
-                        <xsl:variable name ="color" select ="child::node()[$newTextLvl]/a:buClr/a:srgbClr/@val"/>
+                    <xsl:if test ="a:buClr">
+                      <xsl:if test ="a:buClr/a:srgbClr">
+                        <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
                         <xsl:attribute name ="fo:color">
                           <xsl:value-of select ="concat('#',$color)"/>
                         </xsl:attribute>
                       </xsl:if>
-                      <xsl:if test ="child::node()[$newTextLvl]/a:buClr/a:schemeClr">
+                      <xsl:if test ="a:buClr/a:schemeClr">
                         <xsl:call-template name ="getColorCode">
                           <xsl:with-param name ="color">
-                            <xsl:value-of select="child::node()[$newTextLvl]/a:buClr/a:schemeClr/@val"/>
+                            <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
                           </xsl:with-param>
                         </xsl:call-template >
                       </xsl:if>
                     </xsl:if>
                   </style:text-properties >
                 </text:list-level-style-bullet>
-              </xsl:if>
-              <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum">
+              </text:list-style>
+            </xsl:if>
+            <xsl:if test ="a:buAutoNum">
+              <text:list-style>
+                <xsl:attribute name ="style:name">
+                  <xsl:value-of select ="concat($listStyleName,$position)"/>
+                </xsl:attribute >
                 <text:list-level-style-number>
                   <xsl:attribute name ="text:level">
-                    <xsl:value-of select ="$textLevel+1"/>
+                    <xsl:value-of select ="'1'"/>
                   </xsl:attribute >
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'arabicPeriod')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicPeriod')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'1'"/>
                     </xsl:attribute >
@@ -1293,7 +1882,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="'.'"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'arabicParenR')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenR')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'1'"/>
                     </xsl:attribute >
@@ -1301,7 +1890,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="')'"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'arabicParenBoth')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenBoth')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'1'"/>
                     </xsl:attribute >
@@ -1312,7 +1901,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="'('"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaUcPeriod')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcPeriod')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'A'"/>
                     </xsl:attribute >
@@ -1320,7 +1909,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="'.'"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaUcParenR')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenR')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'A'"/>
                     </xsl:attribute >
@@ -1328,7 +1917,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="')'"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaUcParenBoth')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenBoth')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'A'"/>
                     </xsl:attribute >
@@ -1339,7 +1928,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="'('"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaLcPeriod')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcPeriod')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'a'"/>
                     </xsl:attribute >
@@ -1347,7 +1936,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="'.'"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaLcParenR')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenR')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'a'"/>
                     </xsl:attribute >
@@ -1355,7 +1944,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="')'"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'alphaLcParenBoth')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenBoth')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'a'"/>
                     </xsl:attribute >
@@ -1366,7 +1955,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="'('"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'romanUcPeriod')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'romanUcPeriod')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'I'"/>
                     </xsl:attribute >
@@ -1374,327 +1963,60 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       <xsl:value-of select ="'.'"/>
                     </xsl:attribute>
                   </xsl:if>
-                  <xsl:if test ="child::node()[$newTextLvl]/a:buAutoNum/@type[contains(.,'romanLcPeriod')]">
+                  <xsl:if test ="a:buAutoNum/@type[contains(.,'romanLcPeriod')]">
                     <xsl:attribute name ="style:num-format" >
                       <xsl:value-of  select ="'i'"/>
                     </xsl:attribute >
                     <xsl:attribute name ="style:num-suffix">
                       <xsl:value-of select ="'.'"/>
                     </xsl:attribute>
-                    <!-- start at value-->
-                    <xsl:if test ="@startAt">
-                      <xsl:attribute name ="text:start-value">
-                        <xsl:value-of select ="child::node()[$newTextLvl]/a:buAutoNum[@startAt]"/>
-                      </xsl:attribute>
-                    </xsl:if>
                   </xsl:if >
+                  <!-- start at value-->
+                  <xsl:if test ="a:buAutoNum/@startAt">
+                    <xsl:attribute name ="text:start-value">
+                      <xsl:value-of select ="a:buAutoNum/@startAt"/>
+                    </xsl:attribute>
+                  </xsl:if>
                   <style:list-level-properties text:min-label-width="0.952cm" />
                   <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable" fo:color="#000000" fo:font-size="100%">
-                    <xsl:if test ="child::node()[$newTextLvl]/a:buFont/@typeface">
+                    <xsl:if test ="a:buFont/@typeface">
                       <xsl:attribute name ="fo:font-family">
-                        <xsl:value-of select ="child::node()[$newTextLvl]/a:buFont/@typeface"/>
+                        <xsl:value-of select ="a:buFont/@typeface"/>
                       </xsl:attribute>
                     </xsl:if>
-                    <xsl:if test ="not(child::node()[$newTextLvl]/a:buFont/@typeface)">
+                    <xsl:if test ="not(a:buFont/@typeface)">
                       <xsl:attribute name ="fo:font-family">
                         <xsl:value-of select ="'Arial'"/>
                       </xsl:attribute>
                     </xsl:if>
-                    <xsl:if test ="child::node()[$newTextLvl]/a:buSzPct">
+                    <xsl:if test ="a:buSzPct">
                       <xsl:attribute name ="fo:font-size">
-                        <xsl:value-of select ="concat((child::node()[$newTextLvl]/a:buSzPct/@val div 1000),'%')"/>
+                        <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
                       </xsl:attribute>
                     </xsl:if>
-                    <xsl:if test ="not(child::node()[$newTextLvl]/a:buSzPct)">
+                    <xsl:if test ="not(a:buSzPct)">
                       <xsl:attribute name ="fo:font-size">
-                        <xsl:value-of select ="'45%'"/>
+                        <xsl:value-of select ="'100%'"/>
                       </xsl:attribute>
                     </xsl:if>
-                    <xsl:if test ="child::node()[$newTextLvl]/a:buClr">
-                      <xsl:if test ="child::node()[$newTextLvl]/a:buClr/a:srgbClr">
-                        <xsl:variable name ="color" select ="child::node()[$newTextLvl]/a:buClr/a:srgbClr/@val"/>
+                    <xsl:if test ="a:buClr">
+                      <xsl:if test ="a:buClr/a:srgbClr">
+                        <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
                         <xsl:attribute name ="fo:color">
                           <xsl:value-of select ="concat('#',$color)"/>
                         </xsl:attribute>
                       </xsl:if>
-                      <xsl:if test ="child::node()[$newTextLvl]/a:buClr/a:schemeClr">
+                      <xsl:if test ="a:buClr/a:schemeClr">
                         <xsl:call-template name ="getColorCode">
                           <xsl:with-param name ="color">
-                            <xsl:value-of select="child::node()[$newTextLvl]/a:buClr/a:schemeClr/@val"/>
+                            <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
                           </xsl:with-param>
                         </xsl:call-template >
                       </xsl:if>
                     </xsl:if>
                   </style:text-properties>
                 </text:list-level-style-number>
-              </xsl:if>
-              <xsl:if test ="a:buBlip">
-                <xsl:variable name ="rId" select ="a:buBlip/a:blip/@r:embed"/>
-                <xsl:variable name="XlinkHref">
-                  <xsl:variable name="pzipsource">
-                    <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')//rels:Relationships/rels:Relationship[@Id=$rId]/@Target"/>
-                  </xsl:variable>
-                  <xsl:value-of select="concat('Pictures/', substring-after($pzipsource,'../media/'))"/>
-                </xsl:variable>
-                <xsl:call-template name="copyPictures">
-                  <xsl:with-param name="document">
-                    <xsl:value-of select="document('ppt/slideMasters/_rels/slideMaster1.xml.rels')"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="rId">
-                    <xsl:value-of select ="$rId"/>
-                  </xsl:with-param>
-                </xsl:call-template>
-                <text:list-level-style-image text:level="1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
-                  <xsl:attribute name="xlink:href">
-                    <xsl:value-of select="$XlinkHref"/>
-                  </xsl:attribute>
-                  <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
-                </text:list-level-style-image>
-              </xsl:if>
-            </text:list-style>
-          </xsl:for-each>
-        </xsl:if>
-        <!--</xsl:if>-->
-      </xsl:for-each>
-    </xsl:if>
-    <!--Condition if levels are present,and bullets are default-->
-    <!--<xsl:if test ="not(./a:pPr/@lvl)">-->
-    <xsl:if test ="not(./a:p/a:pPr/@lvl)">
-      <xsl:if test ="not(./a:p/a:pPr/a:buNone)">
-        <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[1]">
-          <text:list-style>
-            <xsl:attribute name ="style:name">
-              <xsl:value-of select ="$listStyleName"/>
-            </xsl:attribute >
-            <xsl:if test ="a:buChar">
-              <text:list-level-style-bullet>
-                <xsl:attribute name ="text:level">
-                  <xsl:value-of select ="1"/>
-                </xsl:attribute >
-                <xsl:attribute name ="text:bullet-char">
-                  <xsl:choose>
-                    <xsl:when test="a:buChar/@char= 'Ø'">
-                      <xsl:value-of select ="'➢'"/>
-                    </xsl:when>
-                    <xsl:when test="a:buChar/@char= 'o'">
-                      <xsl:value-of select ="'○'"/>
-                    </xsl:when>
-                    <xsl:when test="a:buChar/@char= '§'">
-                      <xsl:value-of select ="'■'"/>
-                    </xsl:when>
-                    <xsl:when test="a:buChar/@char= 'q'">
-                      <xsl:value-of select ="''"/>
-                    </xsl:when>
-                    <xsl:when test="a:buChar/@char= 'ü'">
-                      <xsl:value-of select ="'✔'"/>
-                    </xsl:when>
-                    <xsl:when test="a:buChar/@char = '–'">
-                      <xsl:value-of select ="'–'"/>
-                    </xsl:when>
-                    <xsl:when test="a:buChar/@char = '»'">
-                      <xsl:value-of select ="'»'"/>
-                    </xsl:when>
-                    <xsl:otherwise>•</xsl:otherwise>
-                  </xsl:choose >
-                </xsl:attribute >
-                <style:list-level-properties text:min-label-width="0.8cm">
-                  <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(@marL div 360000,'#.##'),'cm')"/>
-                  </xsl:attribute>
-                </style:list-level-properties>
-                <style:text-properties fo:font-family="StarSymbol" style:font-charset="x-symbol">
-                  <xsl:if test ="a:buFont/@typeface">
-                    <xsl:if test ="a:buFont[@typeface='Arial']">
-                      <xsl:attribute name ="fo:font-family">
-                        <xsl:value-of select ="'StarSymbol'"/>
-                      </xsl:attribute>
-                    </xsl:if>
-                    <xsl:if test ="not(a:buFont[@typeface='Arial'])">
-                      <xsl:attribute name ="fo:font-family">
-                        <xsl:value-of select ="a:buFont/@typeface"/>
-                      </xsl:attribute>
-                    </xsl:if>
-                  </xsl:if>
-                  <xsl:if test ="not(a:buFont/@typeface)">
-                    <xsl:attribute name ="fo:font-family">
-                      <xsl:value-of select ="'StarSymbol'"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="a:buSzPct">
-                    <xsl:attribute name ="fo:font-size">
-                      <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="not(a:buSzPct)">
-                    <xsl:attribute name ="fo:font-size">
-                      <xsl:value-of select ="'100%'"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="a:buClr">
-                    <xsl:if test ="a:buClr/a:srgbClr">
-                      <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
-                      <xsl:attribute name ="fo:color">
-                        <xsl:value-of select ="concat('#',$color)"/>
-                      </xsl:attribute>
-                    </xsl:if>
-                    <xsl:if test ="a:buClr/a:schemeClr">
-                      <xsl:call-template name ="getColorCode">
-                        <xsl:with-param name ="color">
-                          <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
-                        </xsl:with-param>
-                      </xsl:call-template >
-                    </xsl:if>
-                  </xsl:if>
-                </style:text-properties >
-              </text:list-level-style-bullet>
-            </xsl:if>
-            <xsl:if test ="a:buAutoNum">
-              <text:list-level-style-number>
-                <xsl:attribute name ="text:level">
-                  <xsl:value-of select ="'1'"/>
-                </xsl:attribute >
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicPeriod')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'1'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="'.'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenR')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'1'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="')'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'arabicParenBoth')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'1'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="')'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="style:num-prefix">
-                    <xsl:value-of select ="'('"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcPeriod')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'A'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="'.'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenR')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'A'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="')'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaUcParenBoth')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'A'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="')'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="style:num-prefix">
-                    <xsl:value-of select ="'('"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcPeriod')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'a'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="'.'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenR')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'a'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="')'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'alphaLcParenBoth')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'a'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="')'"/>
-                  </xsl:attribute>
-                  <xsl:attribute name ="style:num-prefix">
-                    <xsl:value-of select ="'('"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'romanUcPeriod')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'I'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="'.'"/>
-                  </xsl:attribute>
-                </xsl:if>
-                <xsl:if test ="a:buAutoNum/@type[contains(.,'romanLcPeriod')]">
-                  <xsl:attribute name ="style:num-format" >
-                    <xsl:value-of  select ="'i'"/>
-                  </xsl:attribute >
-                  <xsl:attribute name ="style:num-suffix">
-                    <xsl:value-of select ="'.'"/>
-                  </xsl:attribute>
-                  <!-- start at value-->
-                  <xsl:if test ="@startAt">
-                    <xsl:attribute name ="text:start-value">
-                      <xsl:value-of select ="a:buAutoNum[@startAt]"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                </xsl:if >
-                <style:list-level-properties text:min-label-width="0.952cm" />
-                <style:text-properties style:font-family-generic="swiss" style:font-pitch="variable" fo:color="#000000" fo:font-size="100%">
-                  <xsl:if test ="a:buFont/@typeface">
-                    <xsl:attribute name ="fo:font-family">
-                      <xsl:value-of select ="a:buFont/@typeface"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="not(a:buFont/@typeface)">
-                    <xsl:attribute name ="fo:font-family">
-                      <xsl:value-of select ="'Arial'"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="a:buSzPct">
-                    <xsl:attribute name ="fo:font-size">
-                      <xsl:value-of select ="concat((a:buSzPct/@val div 1000),'%')"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="not(a:buSzPct)">
-                    <xsl:attribute name ="fo:font-size">
-                      <xsl:value-of select ="'45%'"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:if test ="a:buClr">
-                    <xsl:if test ="a:buClr/a:srgbClr">
-                      <xsl:variable name ="color" select ="a:buClr/a:srgbClr/@val"/>
-                      <xsl:attribute name ="fo:color">
-                        <xsl:value-of select ="concat('#',$color)"/>
-                      </xsl:attribute>
-                    </xsl:if>
-                    <xsl:if test ="a:buClr/a:schemeClr">
-                      <xsl:call-template name ="getColorCode">
-                        <xsl:with-param name ="color">
-                          <xsl:value-of select="a:buClr/a:schemeClr/@val"/>
-                        </xsl:with-param>
-                      </xsl:call-template >
-                    </xsl:if>
-                  </xsl:if>
-                </style:text-properties>
-              </text:list-level-style-number>
+              </text:list-style>
             </xsl:if>
             <xsl:if test ="a:buBlip">
               <xsl:variable name ="rId" select ="a:buBlip/a:blip/@r:embed"/>
@@ -1719,7 +2041,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 <style:list-level-properties style:vertical-pos="middle" style:vertical-rel="line" fo:width="0.318cm" fo:height="0.318cm" />
               </text:list-level-style-image>
             </xsl:if>
-          </text:list-style>
+            <!--</text:list-style>-->
+          </xsl:for-each>
         </xsl:for-each>
       </xsl:if>
     </xsl:if >
@@ -2642,7 +2965,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
         </text:list>
       </xsl:when>
     </xsl:choose>
-  </xsl:template> 
+  </xsl:template>
   <xsl:template name="copyPictures">
     <xsl:param name="document"/>
     <xsl:param name="rId"/>
@@ -2690,7 +3013,7 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
 
   </xsl:template>
   <!-- delete this-->
-  <xsl:template name="getColorCode">
+  <!--<xsl:template name="getColorCode">
     <xsl:param name="color"/>
     <xsl:param name ="lumMod"/>
     <xsl:param name ="lumOff"/>
@@ -2767,9 +3090,9 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
           <xsl:with-param name ="Blue" select ="$NewBlue"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test ="$lumMod = '' and $lumOff != ''">
+      <xsl:when test ="$lumMod = '' and $lumOff != ''">-->
         <!-- TBD Not sure whether this condition will occure-->
-      </xsl:when>
+      <!--</xsl:when>
       <xsl:when test ="$lumMod = '' and $lumOff =''">
         <xsl:value-of  select ="concat('#',$color)"/>
       </xsl:when>
@@ -2790,5 +3113,6 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
-  </xsl:template>
+  </xsl:template>-->
+	
 </xsl:stylesheet>

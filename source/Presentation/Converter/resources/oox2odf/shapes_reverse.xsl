@@ -789,6 +789,9 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:call-template name ="CreateShape">
 								<xsl:with-param name="grID" select ="$GraphicId"/>
 								<xsl:with-param name ="prID" select="$ParaId" />
+                <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+                <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+                <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
 							</xsl:call-template>
 							<xsl:copy-of select="$varHyperLinksForShapes" />
 						</draw:frame>
