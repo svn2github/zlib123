@@ -32,7 +32,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"  
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
   xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
   xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
@@ -78,7 +78,7 @@
       <pzip:entry pzip:target="styles.xml">
         <xsl:call-template name="styles"/>
       </pzip:entry>
-      
+
       <!-- meta -->
       <pzip:entry pzip:target="meta.xml">
         <xsl:call-template name="meta"/>
@@ -88,54 +88,79 @@
       <pzip:entry pzip:target="settings.xml">
         <xsl:call-template name="InsertSettings"/>
       </pzip:entry>
-      
-      <!-- charts -->
-      <xsl:call-template name="CreateCharts"/>
+
+      <!-- charts created as new object -->
+      <xsl:call-template name="CreateObjectCharts"/>
+      <!-- charts created as new sheet -->
+      <xsl:call-template name="CreateSheetCharts"/>
 
     </pzip:archive>
   </xsl:template>
-  
-<xsl:template name="InsertChartEntries">
-  <!-- get all sheet Id's -->
-  <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
-    
-    <xsl:variable name="sheet">
-      <xsl:call-template name="GetTarget">
-        <xsl:with-param name="id">
-          <xsl:value-of select="@r:id"/>
-        </xsl:with-param>
-        <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-    <!--i.e. $sheet = worksheets/sheet1.xml -->
-    
-    <xsl:variable name="sheetNum">
-      <xsl:value-of select="position()"/>
-    </xsl:variable>
-    
-    <!-- go to sheet file and search for drawing -->
-    <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:drawing">
-      
-      <xsl:variable name="drawing">
+
+  <xsl:template name="InsertChartEntries">
+    <!-- get all sheet Id's -->
+    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+
+      <xsl:variable name="sheet">
         <xsl:call-template name="GetTarget">
           <xsl:with-param name="id">
             <xsl:value-of select="@r:id"/>
           </xsl:with-param>
-          <xsl:with-param name="document">
-            <xsl:value-of select="concat('xl/',$sheet)"/>
-          </xsl:with-param>
+          <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-      <!-- i.e. $drawing = ../drawings/drawing2.xml -->
-      
-      <!-- finally insert entry for each chart -->
-      <xsl:for-each
-        select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
-        
-        <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.chart" manifest:full-path="{concat('Object ',generate-id(.),'/')}"/>
-        
+      <!--i.e. $sheet = worksheets/sheet1.xml -->
+    
+      <xsl:variable name="sheetNum">
+        <xsl:value-of select="position()"/>
+      </xsl:variable>
+
+      <!-- go to worksheet file and search for drawing -->
+      <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:drawing">
+
+        <xsl:variable name="drawing">
+          <xsl:call-template name="GetTarget">
+            <xsl:with-param name="id">
+              <xsl:value-of select="@r:id"/>
+            </xsl:with-param>
+            <xsl:with-param name="document">
+              <xsl:value-of select="concat('xl/',$sheet)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <!-- i.e. $drawing = ../drawings/drawing2.xml -->
+
+        <!-- finally insert entry for each chart -->
+        <xsl:for-each
+          select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+          <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.chart"
+            manifest:full-path="{concat('Object ',generate-id(.),'/')}"/>
+        </xsl:for-each>
       </xsl:for-each>
+
+      <!-- go to chartsheet file and search for drawing -->
+      <xsl:for-each select="document(concat('xl/',$sheet))/e:chartsheet/e:drawing">
+
+        <xsl:variable name="drawing">
+          <xsl:call-template name="GetTarget">
+            <xsl:with-param name="id">
+              <xsl:value-of select="@r:id"/>
+            </xsl:with-param>
+            <xsl:with-param name="document">
+              <xsl:value-of select="concat('xl/',$sheet)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <!-- i.e. $drawing = ../drawings/drawing2.xml -->
+
+        <!-- finally insert entry for each chart -->
+        <xsl:for-each
+          select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+          <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.chart"
+            manifest:full-path="{concat('Object ',generate-id(.),'/')}"/>
+        </xsl:for-each>
+      </xsl:for-each>
+
     </xsl:for-each>
-  </xsl:for-each>  
-</xsl:template>
+  </xsl:template>
 </xsl:stylesheet>

@@ -55,7 +55,7 @@
   <xsl:key name="plotArea" match="c:plotArea" use="''"/>
   <xsl:key name="grouping" match="c:grouping" use="''"/>
 
-  <xsl:template name="CreateCharts">
+  <xsl:template name="CreateObjectCharts">
     <!-- @Description: Searches for all charts within workbook and starts conversion. -->
     <!-- @Context: None -->
 
@@ -70,11 +70,6 @@
           </xsl:with-param>
           <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
         </xsl:call-template>
-      </xsl:variable>
-
-      <xsl:variable name="sheetNum">
-        <!-- sheet number -->
-        <xsl:value-of select="position()"/>
       </xsl:variable>
 
       <!-- go to sheet file and search for drawing -->
@@ -95,6 +90,65 @@
         <!-- go to sheet drawing file and search for charts -->
         <xsl:for-each
           select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
+
+          <xsl:variable name="chart">
+            <!-- path to chart file from xl/ catalog (i.e. $chart = ../charts/chart1.xml) -->
+            <xsl:call-template name="GetTarget">
+              <xsl:with-param name="id">
+                <xsl:value-of select="@r:id"/>
+              </xsl:with-param>
+              <xsl:with-param name="document">
+                <xsl:value-of select="concat('xl/',substring-after($drawing,'/'))"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+
+          <xsl:variable name="chartId">
+            <!-- unique chart identifier -->
+            <xsl:value-of select="generate-id(.)"/>
+          </xsl:variable>
+
+          <!-- finally go to a chart file -->
+          <xsl:for-each select="document(concat('xl/',substring-after($chart,'/')))">
+
+            <xsl:call-template name="InsertChart">
+              <xsl:with-param name="chartId" select="$chartId"/>
+            </xsl:call-template>
+
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:for-each>
+
+  </xsl:template>
+
+  <xsl:template name="CreateSheetCharts">
+
+    <xsl:for-each
+      select="document('xl/_rels/workbook.xml.rels')//node()[name() = 'Relationship' and starts-with(@Target,'chartsheets/')]">
+
+      <xsl:variable name="sheet">
+        <xsl:value-of select="@Target"/>
+      </xsl:variable>
+
+      <!-- go to sheet file and search for drawing -->
+      <xsl:for-each select="document(concat('xl/',$sheet))/e:chartsheet/e:drawing">
+
+        <xsl:variable name="drawing">
+          <!-- path to drawing file from xl/ catalog (i.e. $drawing = ../drawings/drawing2.xml) -->
+          <xsl:call-template name="GetTarget">
+            <xsl:with-param name="id">
+              <xsl:value-of select="@r:id"/>
+            </xsl:with-param>
+            <xsl:with-param name="document">
+              <xsl:value-of select="concat('xl/',$sheet)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <!-- go to sheet drawing file and search for charts -->
+        <xsl:for-each
+          select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:absoluteAnchor/xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
 
           <xsl:variable name="chart">
             <!-- path to chart file from xl/ catalog (i.e. $chart = ../charts/chart1.xml) -->

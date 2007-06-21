@@ -32,6 +32,7 @@
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
@@ -51,11 +52,25 @@
   <!-- Get cell with picture -->
   <xsl:template name="PictureCell">
     <xsl:param name="sheet"/>
-    <xsl:apply-templates select="e:worksheet/e:drawing">
-      <xsl:with-param name="sheet">
-        <xsl:value-of select="$sheet"/>
-      </xsl:with-param>
-    </xsl:apply-templates>
+    <xsl:param name="mode"/>
+
+    <xsl:choose>
+      <!-- when this is a chartsheet (chartsheets/sheet1.xml)-->
+      <xsl:when test="$mode = 'chartsheets' ">
+        <xsl:apply-templates select="e:chartsheet/e:drawing" mode="chartsheet">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="e:worksheet/e:drawing">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- Get Row with Picture -->
@@ -100,6 +115,32 @@
       </xsl:if>
     </xsl:for-each>
 
+  </xsl:template>
+
+  <xsl:template match="e:drawing" mode="chartsheet">
+    <xsl:param name="sheet"/>
+
+    <xsl:variable name="id">
+      <xsl:value-of select="@r:id"/>
+    </xsl:variable>
+
+    <xsl:variable name="Target">
+      <xsl:if
+        test="document(concat(concat('xl/chartsheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
+        <xsl:for-each
+          select="document(concat(concat('xl/chartsheets/_rels/', $sheet), '.rels'))//node()[name()='Relationship']">
+          <xsl:if test="./@Id=$id">
+            <xsl:value-of select="@Target"/>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+      <xsl:if test="xdr:wsDr/xdr:absoluteAnchor">
+        <xsl:text>1:1;</xsl:text>
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
 
   <!-- We check drawing's file -->
@@ -227,8 +268,6 @@
                 select="concat('./Object ',generate-id(xdr:graphicFrame/a:graphic/a:graphicData/c:chart))"
               />
             </xsl:attribute>
-            <!--            <draw:object draw:notify-on-update-of-ranges="Sheet1.D6:Sheet1.D6"
-              xlink:href="./Object 1"/>-->
           </draw:object>
 
         </draw:frame>
@@ -342,9 +381,9 @@
 
   </xsl:template>
 
-  
 
- 
+
+
 
   <!-- delete cell with picture which are inserted -->
 
@@ -453,11 +492,11 @@
         </xsl:choose>
       </xsl:variable>
 
-      
+
       <xsl:variable name="apos">
         <xsl:text>&apos;</xsl:text>
       </xsl:variable>
-      
+
       <xsl:variable name="invalidChars">
         <xsl:text>&apos;!$-()</xsl:text>
       </xsl:variable>
@@ -757,11 +796,127 @@
               </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
+
         </xsl:for-each>
 
       </xsl:if>
     </xsl:for-each>
 
+  </xsl:template>
+
+  <xsl:template name="InsertChartsheet">
+    <xsl:param name="number"/>
+    <xsl:param name="sheet"/>
+
+    <table:table>
+
+      <!-- Insert Table (Sheet) Name -->
+
+      <xsl:variable name="checkedName">
+        <xsl:call-template name="CheckSheetName">
+          <xsl:with-param name="sheetNumber">
+            <xsl:value-of select="$number"/>
+          </xsl:with-param>
+          <xsl:with-param name="name">
+            <xsl:value-of select="translate(@name,'!$-()','')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:attribute name="table:name">
+        <!--        <xsl:value-of select="@name"/>-->
+        <xsl:value-of select="$checkedName"/>
+      </xsl:attribute>
+
+      <!-- Insert Table Style Name (style:table-properties) -->
+
+      <xsl:attribute name="table:style-name">
+        <xsl:value-of select="generate-id()"/>
+      </xsl:attribute>
+
+      <!-- drawing.xml file path -->
+      <xsl:variable name="Target">
+        <xsl:for-each select="document(concat('xl/',$sheet))/e:chartsheet/e:drawing">
+          <xsl:variable name="id">
+            <xsl:value-of select="@r:id"/>
+          </xsl:variable>
+          <xsl:if
+            test="document(concat(concat('xl/chartsheets/_rels/', substring-after($sheet,'/')), '.rels'))//node()[name()='Relationship']">
+            <xsl:for-each
+              select="document(concat(concat('xl/chartsheets/_rels/', substring-after($sheet,'/')), '.rels'))//node()[name()='Relationship']">
+              <xsl:if test="./@Id=$id">
+                <xsl:value-of select="@Target"/>
+              </xsl:if>
+            </xsl:for-each>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable>
+
+      <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
+      <table:shapes>
+
+        <xsl:for-each select="document(concat('xl/', substring-after($Target, '/')))">
+          <xsl:for-each select="xdr:wsDr/xdr:absoluteAnchor">
+
+            <draw:frame draw:z-index="0" svg:width="7.999cm" svg:height="6.999cm" svg:x="0cm"
+              svg:y="0cm">
+              
+              <xsl:call-template name="InsertAbsolutePosition"/>
+              <xsl:call-template name="InsertAbsoluteSize"/>
+
+              <draw:object xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
+                <xsl:attribute name="xlink:href">
+                  <xsl:value-of
+                    select="concat('./Object ',generate-id(xdr:graphicFrame/a:graphic/a:graphicData/c:chart))"
+                  />
+                </xsl:attribute>
+              </draw:object>
+
+            </draw:frame>
+          </xsl:for-each>
+        </xsl:for-each>
+
+      </table:shapes>
+      <table:table-row>
+        <table:table-cell/>
+      </table:table-row>
+    </table:table>
+  </xsl:template>
+  
+  <xsl:template name="InsertAbsolutePosition">
+    
+    <xsl:if test="xdr:pos">
+      <xsl:attribute name="svg:x">
+      <xsl:call-template name="ConvertEmu">
+        <xsl:with-param name="length" select="xdr:pos/@x"/>
+        <xsl:with-param name="unit">cm</xsl:with-param>
+      </xsl:call-template>
+      </xsl:attribute>
+      <xsl:attribute name="svg:y">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="xdr:pos/@y"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>    
+  </xsl:template>
+  
+  <xsl:template name="InsertAbsoluteSize">
+    
+    <xsl:if test="xdr:ext">
+      <xsl:attribute name="svg:width">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="xdr:ext/@cx"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:attribute name="svg:height">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="xdr:ext/@cy"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>    
   </xsl:template>
 
 </xsl:stylesheet>
