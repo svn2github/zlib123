@@ -221,7 +221,7 @@
     </xsl:template>
 
     <!-- user defined properties -->
-    <xsl:template match="/office:document-meta/office:meta/meta:user-defined">
+  <xsl:template match="/office:document-meta/office:meta/meta:user-defined[@meta:name != '' ]">
         <!-- @Description: User defined properties -->
         <property xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
             xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
