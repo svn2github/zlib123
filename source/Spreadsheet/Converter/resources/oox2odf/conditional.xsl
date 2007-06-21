@@ -49,6 +49,30 @@
     </xsl:apply-templates>
   </xsl:template>
 
+ <!-- Get Row with Conditional -->
+  <xsl:template name="ConditionalRow">
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="Result"/>
+    <xsl:choose>
+      <xsl:when test="$ConditionalCell != ''">
+        <xsl:call-template name="ConditionalRow">
+          <xsl:with-param name="ConditionalCell">
+            <xsl:value-of select="substring-after($ConditionalCell, ';')"/>
+          </xsl:with-param>
+          <xsl:with-param name="Result">
+            <xsl:value-of
+              select="concat($Result,  concat(substring-before($ConditionalCell, ':'), ';'))"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$Result"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+
+
   <xsl:template match="e:conditionalFormatting">
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="document"/>

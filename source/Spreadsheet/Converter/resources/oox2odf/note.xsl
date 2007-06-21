@@ -134,7 +134,7 @@
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
 
           <xsl:variable name="PictureColl">
-            <xsl:call-template name="GetCollsWithPicture">
+            <xsl:call-template name="GetCollsWithElement">
               <xsl:with-param name="rowNumber">
                 <xsl:value-of select="$GetMinRowWithPicture"/>
               </xsl:with-param>
@@ -367,7 +367,7 @@
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
 
           <xsl:variable name="NoteColl">
-            <xsl:call-template name="GetCollsWithPicture">
+            <xsl:call-template name="GetCollsWithElement">
               <xsl:with-param name="rowNumber">
                 <xsl:value-of select="$GetMinRowWithNote"/>
               </xsl:with-param>
@@ -519,8 +519,8 @@
             <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl}"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:if test="$EndColl - $StartColl -2 &gt; 0">
-            <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl - 2}"/>
+            <xsl:if test="$EndColl - $StartColl -1 &gt; 0">
+                        <table:table-cell table:number-columns-repeated="{$EndColl - $StartColl - 1}"/>
             </xsl:if>
           </xsl:otherwise>
 
