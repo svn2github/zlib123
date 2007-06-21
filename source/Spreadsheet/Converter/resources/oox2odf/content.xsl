@@ -139,6 +139,8 @@
       </xsl:for-each>
     </xsl:variable>
     
+
+    
     <!-- Check if notes are in this sheet -->
     <xsl:variable name="NoteCell">
       <xsl:for-each select="document(concat('xl/',$Id))">
@@ -1026,7 +1028,7 @@
       <xsl:when
         test="preceding::e:row[1]/@r &lt;  @r - 1 and $GetMinRowWithElement &gt; preceding::e:row[1]/@r and $GetMinRowWithElement &lt; @r - 1">
 
-        
+       
         <xsl:call-template name="InsertElementsBetwenTwoRows">
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>
@@ -1156,7 +1158,7 @@
           <xsl:value-of select="65535"/>
         </xsl:with-param>
         <xsl:with-param name="prevRow">
-          <xsl:value-of select="preceding::e:row[1]/@r + 1"/>
+          <xsl:value-of select="@r"/>
         </xsl:with-param>
       </xsl:call-template>
       
@@ -1383,7 +1385,7 @@
       </xsl:call-template>
     </xsl:variable>
 
-    <xsl:variable name="GetMinCollWithPicture">
+    <xsl:variable name="GetMinCollWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
           <xsl:value-of select="concat($PictureColl, $NoteColl)"/>
@@ -1489,7 +1491,7 @@
         <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
       <xsl:with-param name="GetMinCollWithPicture">
-        <xsl:value-of select="$GetMinCollWithPicture"/>
+        <xsl:value-of select="$GetMinCollWithElement"/>
       </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
       <xsl:with-param name="ConditionalCell">
@@ -1509,7 +1511,7 @@
         <xsl:value-of select="$BigMergeCell"/>
       </xsl:with-param>
       <xsl:with-param name="prevCellCol">
-      <xsl:value-of select="$prevCellCol"/>
+      <xsl:value-of select="$colNum"/>
       </xsl:with-param>
       <xsl:with-param name="this" select="$this"/>
       <xsl:with-param name="colNum">
@@ -1527,11 +1529,17 @@
       <xsl:with-param name="PictureCell">
         <xsl:value-of select="$PictureCell"/>
       </xsl:with-param>
+      <xsl:with-param name="PictureColl">
+        <xsl:value-of select="$PictureColl"/>
+      </xsl:with-param>
       <xsl:with-param name="NoteRow">
         <xsl:value-of select="$NoteRow"/>
       </xsl:with-param>
       <xsl:with-param name="NoteCell">
         <xsl:value-of select="$NoteCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="NoteColl">
+        <xsl:value-of select="$NoteColl"/>
       </xsl:with-param>
       <xsl:with-param name="sheet">
         <xsl:value-of select="$sheet"/>
@@ -1539,8 +1547,8 @@
       <xsl:with-param name="NameSheet">
         <xsl:value-of select="$NameSheet"/>
       </xsl:with-param>
-      <xsl:with-param name="GetMinCollWithPicture">
-        <xsl:value-of select="$GetMinCollWithPicture"/>
+      <xsl:with-param name="GetMinCollWithElement">
+        <xsl:value-of select="$GetMinCollWithElement"/>
       </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
       <xsl:with-param name="ConditionalCell">

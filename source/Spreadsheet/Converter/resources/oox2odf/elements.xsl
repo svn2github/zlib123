@@ -514,7 +514,7 @@
     
   </xsl:template>
   
-  <xsl:template name="InsertElementsBetweenTwoRow">
+  <xsl:template name="InsertElementsBetweenTwoColl">
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="PictureCell"/>
@@ -605,7 +605,7 @@
             
           </table:table-cell>
           
-          <xsl:call-template name="InsertElementsBetweenTwoRow">
+          <xsl:call-template name="InsertElementsBetweenTwoColl">
             <xsl:with-param name="sheet">
               <xsl:value-of select="$sheet"/>
             </xsl:with-param>
@@ -659,13 +659,6 @@
       </xsl:otherwise>
       
     </xsl:choose>
-    
-    
-    
-    
-      
-
-    
   </xsl:template>
 
 </xsl:stylesheet>
