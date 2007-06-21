@@ -171,10 +171,10 @@
     <xsl:param name="ConditionalCellStyle"/>
 
 
-    <xsl:variable name="GetMinRowWithPicture">
+    <xsl:variable name="GetMinRowWithElements">
       <xsl:call-template name="GetMinRowWithPicture">
          <xsl:with-param name="PictureRow">
-          <xsl:value-of select="$PictureRow"/>
+          <xsl:value-of select="concat($PictureRow, $NoteRow)"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
           <xsl:value-of select="$lastCellColumnNumber"/>
@@ -335,28 +335,44 @@
                 </xsl:if>
               </table:table-cell>
             </xsl:when>
-            <xsl:when test="$PictureCell != '' and $GetMinRowWithPicture=@r and not(e:c)">
-              <xsl:call-template name="InsertPictureBetwenTwoColl">
+            <xsl:when test="$PictureCell != '' and $GetMinRowWithElements=@r and not(e:c)">              
+              <xsl:call-template name="InsertElementsBetweenTwoColl">
                 <xsl:with-param name="sheet">
                   <xsl:value-of select="$sheet"/>
                 </xsl:with-param>
                 <xsl:with-param name="NameSheet">
                   <xsl:value-of select="$NameSheet"/>
                 </xsl:with-param>
+                <xsl:with-param name="PictureCell">
+                  <xsl:value-of select="$PictureCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="PictureRow">
+                  <xsl:value-of select="$PictureRow"/>
+                </xsl:with-param>
+                <xsl:with-param name="NoteCell">
+                  <xsl:value-of select="$NoteCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="NoteRow">
+                  <xsl:value-of select="$NoteRow"/>
+                </xsl:with-param>
+                <!--xsl:with-param name="ConditionalCell">
+                  <xsl:value-of select="$ConditionalCell"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="ConditionalCellStyle">
+                  <xsl:value-of select="$ConditionalCellStyle"/>
+                  </xsl:with-param-->
+                <xsl:with-param name="ElementsColl">
+                  <xsl:value-of select="concat($PictureColl, $NoteColl)"/>
+                </xsl:with-param>
                 <xsl:with-param name="rowNum">
                   <xsl:value-of select="@r"/>
                 </xsl:with-param>
-                <xsl:with-param name="PictureColl">
-                  <xsl:value-of select="$PictureColl"/>
-                </xsl:with-param>
-                <xsl:with-param name="StartColl">
+                <xsl:with-param name="prevColl">
                   <xsl:text>0</xsl:text>
                 </xsl:with-param>
+                <xsl:with-param name="sheetNr" select="$sheetNr"/>
                 <xsl:with-param name="EndColl">
                   <xsl:text>256</xsl:text>
-                </xsl:with-param>
-                <xsl:with-param name="document">
-                  <xsl:text>worksheet</xsl:text>
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:when>
@@ -523,7 +539,51 @@
           </xsl:if>
         </table:table-cell>
       </xsl:when>
-
+      <xsl:when
+        test="position() = 1 and $colNum > 1 and not(preceding-sibling::e:c) and $BeforeMerge != 'true' and $CheckIfBigMergeBefore != 'true' and $GetMinCollWithElement != '' and $GetMinCollWithElement &lt; $colNum">
+        
+        <!-- Insert picture before this col -->
+        <xsl:call-template name="InsertElementsBetweenTwoColl">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureRow">
+            <xsl:value-of select="$PictureRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteCell">
+            <xsl:value-of select="$NoteCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteRow">
+            <xsl:value-of select="$NoteRow"/>
+          </xsl:with-param>
+          <!--xsl:with-param name="ConditionalCell">
+            <xsl:value-of select="$ConditionalCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellStyle">
+            <xsl:value-of select="$ConditionalCellStyle"/>
+            </xsl:with-param-->
+          <xsl:with-param name="ElementsColl">
+            <xsl:value-of select="$ElementsColl"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="prevColl">
+            <xsl:text>0</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="sheetNr" select="$sheetNr"/>
+          <xsl:with-param name="EndColl">
+            <xsl:text>256</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+        
+      </xsl:when>
       
       <xsl:when
         test="$colNum>1 and $BeforeMerge != 'true' and $CheckIfBigMergeBefore != 'true' and $GetMinCollWithElement != '' and $GetMinCollWithElement &lt; $colNum">
