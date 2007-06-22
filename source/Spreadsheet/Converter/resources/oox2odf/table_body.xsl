@@ -1137,8 +1137,11 @@
                       </xsl:call-template>
                     </xsl:for-each>
                   </xsl:variable>
-                  <!--xsl:value-of select="$target"/-->
                   <xsl:choose>
+                    <!-- when hyperlink leads to a file in network -->
+                    <xsl:when test="starts-with($target,'file:///\\')">
+                      <xsl:value-of select="translate(substring-after($target,'file:///'),'\','/')"/>
+                    </xsl:when>
                     <!--when hyperlink leads to www or mailto -->
                     <xsl:when test="contains($target,':')">
                       <xsl:value-of select="$target"/>
