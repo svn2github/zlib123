@@ -1825,27 +1825,29 @@
                 </xsl:when>
                 <!-- when there was no style and there is hyperlink in merged cell -->
                 <xsl:when test="descendant::text:a">
-                  
+
                   <xsl:attribute name="xfId">
-                    <xsl:value-of select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"/>
+                    <xsl:value-of
+                      select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"
+                    />
                   </xsl:attribute>
-                  
+
                   <xsl:variable name="contentFontCount">
                     <xsl:value-of
                       select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
                     />
                   </xsl:variable>
-                  
+
                   <xsl:variable name="styleFontCount">
                     <xsl:value-of
                       select="count(document('styles.xml')/office:document-styles/office:styles/style:style/style:text-properties[parent::node()[@style:family='table-cell' or @style:family='text']])"
                     />
                   </xsl:variable>
-                  
+
                   <xsl:attribute name="fontId">
                     <xsl:value-of select="$contentFontCount + $styleFontCount +2"/>
                   </xsl:attribute>
-                  
+
                   <alignment wrapText="1"/>
                 </xsl:when>
                 <xsl:otherwise>
@@ -2388,7 +2390,7 @@
     <xsl:param name="timeStyleCount"/>
 
     <xsl:choose>
-      <xsl:when test="@style:data-style-name">
+      <xsl:when test="@style:data-style-name and @style:data-style-name != 'N0' ">
         <xsl:call-template name="GetNumFmtId">
           <xsl:with-param name="numStyle">
             <xsl:value-of select="@style:data-style-name"/>
