@@ -262,6 +262,9 @@
         <xsl:attribute name="style:family">
           <xsl:text>table</xsl:text>
         </xsl:attribute>
+        <xsl:attribute name="style:master-page-name">
+          <xsl:text>Default</xsl:text>
+        </xsl:attribute>
         <style:table-properties>
           <xsl:if test="@state='hidden'">
             <xsl:attribute name="table:display">
