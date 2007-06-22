@@ -447,9 +447,10 @@
     <xsl:variable name="reverseCategories">
       <xsl:for-each select="key('style',chart:plot-area/@chart:style-name)/style:chart-properties">
         <xsl:choose>
-          <!-- reverse categories for: (pie charts) or (ring charts) or (2D bar charts) -->
+          <!-- reverse categories for: (pie charts) or (ring charts) or (2D bar charts stacked or percentage) -->
           <xsl:when
-            test="(key('chart','')/@chart:class = 'chart:circle' ) or (key('chart','')/@chart:class = 'chart:ring' ) or (@chart:vertical = 'true' and @chart:three-dimentional = 'false' )">
+            test="(key('chart','')/@chart:class = 'chart:circle' ) or (key('chart','')/@chart:class = 'chart:ring' ) or 
+            (@chart:vertical = 'true' and @chart:three-dimensional = 'false' )">
             <xsl:text>true</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -475,7 +476,7 @@
         </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
-
+    
     <xsl:for-each select="key('rows','')">
       <xsl:call-template name="InsertSeries">
         <xsl:with-param name="numSeries" select="$numSeries"/>
@@ -606,7 +607,7 @@
   <xsl:template name="InsertSeries">
     <!-- @Description: Outputs chart series and their values -->
     <!-- @Context: table:table-rows -->
-
+    
     <xsl:param name="numSeries"/>
     <!-- (number) number of series inside chart -->
     <xsl:param name="numPoints"/>
@@ -937,28 +938,33 @@
     <c:spPr>
 
       <!-- fill color -->
-      <a:solidFill>
-        <a:srgbClr val="9999FF">
-          <xsl:attribute name="val">
-            <xsl:choose>
-              <xsl:when test="key('style',$styleName)/style:graphic-properties/@draw:fill-color">
-                <xsl:value-of
-                  select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
-                />
-              </xsl:when>
-              <xsl:when
-                test="key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color">
-                <xsl:value-of
-                  select="substring(key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color,2)"
-                />
-              </xsl:when>
-            </xsl:choose>
-          </xsl:attribute>
-        </a:srgbClr>
-      </a:solidFill>
+      <xsl:if
+        test="key('style',$styleName)/style:graphic-properties/@draw:fill-color or key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color">
+        <a:solidFill>
+          <a:srgbClr val="9999FF">
+            <xsl:attribute name="val">
+              <xsl:choose>
+                <xsl:when test="key('style',$styleName)/style:graphic-properties/@draw:fill-color">
+                  <xsl:value-of
+                    select="substring(key('style',$styleName)/style:graphic-properties/@draw:fill-color,2)"
+                  />
+                </xsl:when>
+                <xsl:when
+                  test="key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color">
+                  <xsl:value-of
+                    select="substring(key('style',$parentStyleName)/style:graphic-properties/@draw:fill-color,2)"
+                  />
+                </xsl:when>
+              </xsl:choose>
+            </xsl:attribute>
+          </a:srgbClr>
+        </a:solidFill>
+      </xsl:if>
 
       <!-- line color -->
-      <xsl:if test="not(key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none')">
+      <xsl:if
+        test="not(key('style',$styleName)/style:graphic-properties/@draw:stroke = 'none') and 
+        (key('style',$styleName)/style:graphic-properties/@svg:stroke-color or key('style',$parentStyleName)/style:graphic-properties/@svg:stroke-color)">
         <a:ln w="3175">
           <a:solidFill>
             <a:srgbClr val="000000">
