@@ -1387,5 +1387,412 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  <!-- Insert table:covered-table-cell -->
+  
+  <xsl:template name="InsertCoveredTableCell">
+    <xsl:param name="BeforeMerge"/>
+    <xsl:param name="prevCellCol"/>
+    <xsl:param name="BigMergeCell"/>
+    <xsl:param name="this"/>
+    <xsl:param name="colNum"/>
+    <xsl:param name="rowNum"/>
+    <xsl:param name="CheckIfMerge"/>
+    <xsl:param name="PictureCell"/>
+    <xsl:param name="PictureRow"/>
+    <xsl:param name="PictureColl"/>
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="NoteRow"/>
+    <xsl:param name="NoteColl"/>
+    <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
+    <xsl:param name="sheetNr"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ConvertRepeat" select="0"/>
+    
+    <xsl:variable name="GetMinColWithElement">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="concat($NoteColl, $PictureColl)"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="$colNum"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+   
+    <xsl:choose>
+      <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 1 and $GetMinColWithElement != '' and $GetMinColWithElement &lt;= ($colNum - 1 + number(substring-after($CheckIfMerge, ':')))">
+       
+        <xsl:call-template name="InsertPictureInMergeCell">
+          <xsl:with-param name="BeforeMerge">
+            <xsl:value-of select="$BeforeMerge"/>
+          </xsl:with-param>
+          <xsl:with-param name="prevCellCol">
+            <xsl:value-of select="$prevCellCol"/>
+          </xsl:with-param>
+          <xsl:with-param name="BigMergeCell">
+            <xsl:value-of select="$BigMergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="this">
+            <xsl:value-of select="$this"/>
+          </xsl:with-param>
+          <xsl:with-param name="colNum">
+            <xsl:value-of select="$colNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfMerge">
+            <xsl:value-of select="$CheckIfMerge"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureRow">
+            <xsl:value-of select="$PictureRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureColl">
+            <xsl:value-of select="$PictureColl"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteCell">
+            <xsl:value-of select="$NoteCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteRow">
+            <xsl:value-of select="$NoteRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteColl">
+            <xsl:value-of select="$NoteColl"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheetNr">
+            <xsl:value-of select="$sheetNr"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCell">
+            <xsl:value-of select="$ConditionalCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellStyle">
+            <xsl:value-of select="$ConditionalCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="EndColl">
+            <xsl:value-of select="number(substring-after($CheckIfMerge, ':'))"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        
+        <!--xsl:if test="$GetMinColWithElement - $colNum &gt; 0">
+          <table:covered-table-cell>
+            <xsl:attribute name="table:number-columns-repeated">
+              <xsl:value-of select="$GetMinColWithElement - $colNum"/>
+            </xsl:attribute>
+          </table:covered-table-cell>
+        </xsl:if>
+        
+      <table:covered-table-cell>
+      
+        <xsl:variable name="Target">
+          <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
+            <xsl:call-template name="GetTargetPicture">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="substring-after($sheet, '/')"/>
+              </xsl:with-param>
+              <xsl:with-param name="id">
+                <xsl:value-of select="@r:id"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:variable>
+        
+        <xsl:if test="contains(concat(';', $PictureCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+          
+        <xsl:call-template name="InsertPictureInThisCell">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="collNum">
+            <xsl:value-of select="$GetMinColWithElement"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="Target">
+            <xsl:value-of select="$Target"/>
+          </xsl:with-param>
+        </xsl:call-template>
+        
+        </xsl:if>
+        
+      </table:covered-table-cell>
+      
+        <xsl:call-template name="InsertCoveredTableCell">
+          <xsl:with-param name="BeforeMerge">
+            <xsl:value-of select="$BeforeMerge"/>
+          </xsl:with-param>
+          <xsl:with-param name="prevCellCol">
+            <xsl:value-of select="$prevCellCol"/>
+          </xsl:with-param>
+          <xsl:with-param name="BigMergeCell">
+            <xsl:value-of select="$BigMergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="this">
+            <xsl:value-of select="$this"/>
+          </xsl:with-param>
+          <xsl:with-param name="colNum">
+            <xsl:value-of select="$GetMinColWithElement + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfMerge">
+            <xsl:value-of select="$CheckIfMerge"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureRow">
+            <xsl:value-of select="$PictureRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureColl">
+            <xsl:value-of select="$PictureColl"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteCell">
+            <xsl:value-of select="$NoteCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteRow">
+            <xsl:value-of select="$NoteRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteColl">
+            <xsl:value-of select="$NoteColl"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheetNr">
+            <xsl:value-of select="$sheetNr"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCell">
+            <xsl:value-of select="$ConditionalCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellStyle">
+            <xsl:value-of select="$ConditionalCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConvertRepeat">
+            <xsl:value-of select="$GetMinColWithElement + 1"/>
+          </xsl:with-param>
+        </xsl:call-template-->
+
+      </xsl:when>
+      <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 1">
+        <table:covered-table-cell>
+          
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:choose>
+              <xsl:when test="$colNum + number(substring-after($CheckIfMerge, ':')) &gt; 256">
+                <xsl:value-of select="256 - $colNum"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+
+        </table:covered-table-cell>
+      </xsl:when>
+      <xsl:otherwise>
+      <table:covered-table-cell/>
+      </xsl:otherwise>
+      </xsl:choose>
+    
+    <!--xsl:choose>
+      <xsl:when test="number(substring-after($CheckIfMerge, ':')) &gt; 1">
+      <table:covered-table-cell>
+      <xsl:attribute name="table:number-columns-repeated">
+      <xsl:choose>
+      <xsl:when
+      test="$colNum + number(substring-after($CheckIfMerge, ':')) &gt; 256">
+      <xsl:value-of select="256 - $colNum"/>
+      </xsl:when>
+      <xsl:otherwise>
+      <xsl:value-of select="number(substring-after($CheckIfMerge, ':')) - 1"/>
+      </xsl:otherwise>
+      </xsl:choose>
+      </xsl:attribute>
+      </table:covered-table-cell>
+      </xsl:when>
+      <xsl:otherwise>
+      <table:covered-table-cell/>
+      </xsl:otherwise>
+      </xsl:choose-->
+    
+  </xsl:template>
+  
+  <xsl:template name="InsertPictureInMergeCell">
+    <xsl:param name="BeforeMerge"/>
+    <xsl:param name="prevCellCol"/>
+    <xsl:param name="BigMergeCell"/>
+    <xsl:param name="this"/>
+    <xsl:param name="colNum"/>
+    <xsl:param name="rowNum"/>
+    <xsl:param name="CheckIfMerge"/>
+    <xsl:param name="PictureCell"/>
+    <xsl:param name="PictureRow"/>
+    <xsl:param name="PictureColl"/>
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="NoteRow"/>
+    <xsl:param name="NoteColl"/>
+    <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
+    <xsl:param name="sheetNr"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="EndColl"/>
+    
+    
+    
+    <xsl:variable name="GetMinColWithElement">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="concat($NoteColl, $PictureColl)"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="$colNum"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="$EndColl &gt; 1 and $GetMinColWithElement != '' and $GetMinColWithElement &lt;= ($colNum - 1 + $EndColl)">
+        <xsl:if test="$GetMinColWithElement - $colNum &gt; 0">
+          <table:covered-table-cell>
+            <xsl:attribute name="table:number-columns-repeated">
+              <xsl:value-of select="$GetMinColWithElement - $colNum"/>
+            </xsl:attribute>
+          </table:covered-table-cell>
+        </xsl:if>
+        
+        <table:covered-table-cell>
+          
+          <xsl:variable name="Target">
+            <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
+              <xsl:call-template name="GetTargetPicture">
+                <xsl:with-param name="sheet">
+                  <xsl:value-of select="substring-after($sheet, '/')"/>
+                </xsl:with-param>
+                <xsl:with-param name="id">
+                  <xsl:value-of select="@r:id"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:variable>
+          
+          
+          
+          <xsl:if test="contains(concat(';', $PictureCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+            
+            <xsl:call-template name="InsertPictureInThisCell">
+              <xsl:with-param name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:with-param>
+              <xsl:with-param name="NameSheet">
+                <xsl:value-of select="$NameSheet"/>
+              </xsl:with-param>
+              <xsl:with-param name="collNum">
+                <xsl:value-of select="$GetMinColWithElement"/>
+              </xsl:with-param>
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="Target">
+                <xsl:value-of select="$Target"/>
+              </xsl:with-param>
+            </xsl:call-template>
+            
+          </xsl:if>
+          
+        </table:covered-table-cell>
+        
+        <xsl:call-template name="InsertPictureInMergeCell">
+          <xsl:with-param name="BeforeMerge">
+            <xsl:value-of select="$BeforeMerge"/>
+          </xsl:with-param>
+          <xsl:with-param name="prevCellCol">
+            <xsl:value-of select="$GetMinColWithElement"/>
+          </xsl:with-param>
+          <xsl:with-param name="BigMergeCell">
+            <xsl:value-of select="$BigMergeCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="this">
+            <xsl:value-of select="$this"/>
+          </xsl:with-param>
+          <xsl:with-param name="colNum">
+            <xsl:value-of select="$GetMinColWithElement + 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="rowNum">
+            <xsl:value-of select="$rowNum"/>
+          </xsl:with-param>
+          <xsl:with-param name="CheckIfMerge">
+            <xsl:value-of select="$CheckIfMerge"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureCell">
+            <xsl:value-of select="$PictureCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureRow">
+            <xsl:value-of select="$PictureRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="PictureColl">
+            <xsl:value-of select="$PictureColl"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteCell">
+            <xsl:value-of select="$NoteCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteRow">
+            <xsl:value-of select="$NoteRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="NoteColl">
+            <xsl:value-of select="$NoteColl"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="NameSheet">
+            <xsl:value-of select="$NameSheet"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheetNr">
+            <xsl:value-of select="$sheetNr"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCell">
+            <xsl:value-of select="$ConditionalCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="ConditionalCellStyle">
+            <xsl:value-of select="$ConditionalCellStyle"/>
+          </xsl:with-param>
+          <xsl:with-param name="EndColl">
+            <xsl:value-of select="$EndColl"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$EndColl &gt; 1 and $GetMinColWithElement = ''">
+        <table:covered-table-cell>
+          <xsl:attribute name="table:number-columns-repeated">
+            <xsl:value-of select="$EndColl - $prevCellCol"/>
+          </xsl:attribute>
+        </table:covered-table-cell>
+      </xsl:when>
+    </xsl:choose>
+
+  </xsl:template>
+  
+  
 
 </xsl:stylesheet>

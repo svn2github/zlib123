@@ -1508,11 +1508,17 @@
       <xsl:with-param name="PictureCell">
         <xsl:value-of select="$PictureCell"/>
       </xsl:with-param>
+      <xsl:with-param name="PictureColl">
+        <xsl:value-of select="$PictureColl"/>
+      </xsl:with-param>
       <xsl:with-param name="NoteRow">
         <xsl:value-of select="$NoteRow"/>
       </xsl:with-param>
-      <xsl:with-param name="NoteCell">
+	  <xsl:with-param name="NoteCell">
         <xsl:value-of select="$NoteCell"/>
+      </xsl:with-param>      
+      <xsl:with-param name="NoteColl">
+        <xsl:value-of select="$NoteColl"/>
       </xsl:with-param>
       <xsl:with-param name="sheet">
         <xsl:value-of select="$sheet"/>
