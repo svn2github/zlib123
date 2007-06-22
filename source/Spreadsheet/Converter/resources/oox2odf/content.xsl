@@ -821,7 +821,7 @@
         <xsl:otherwise>
 
           <xsl:choose>
-            <xsl:when test="e:worksheet/e:sheetData/e:row/e:c/e:v">
+            <xsl:when test="e:worksheet/e:sheetData/e:row/e:c">
               <xsl:apply-templates select="e:worksheet/e:sheetData/e:row[@r &lt; 65537]">
                 <xsl:with-param name="BigMergeCell">
                   <xsl:value-of select="$BigMergeCell"/>
