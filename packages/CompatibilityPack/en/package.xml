@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"	encoding="utf-8" ?>
+
+<Package xmlns="http://schemas.microsoft.com/developer/2004/01/bootstrapper"
+  Name="DisplayName"
+  Culture="Culture">
+
+<Strings>
+    <String	Name="DisplayName">Compatibility Pack for the 2007 Office system</String>
+    <String Name="FileFormatConvertersExe">http://download.microsoft.com/download/9/2/2/9222d67f-7630-4f49-bd26-476b51517fc1/FileFormatConverters.exe</String>
+    <String	Name="Culture">en</String>
+  </Strings>
+</Package>
