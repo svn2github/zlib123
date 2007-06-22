@@ -207,7 +207,7 @@
 
   <!-- Insert picture -->
 
-  <xsl:template name="InsertPicture">
+    <xsl:template name="InsertPicture">
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="Drawing"/>
@@ -877,7 +877,8 @@
         </xsl:for-each>
 
       </table:shapes>
-      <table:table-row>
+      <table:table-column table:style-name="{generate-id(document('xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}"/>
+      <table:table-row table:style-name="{generate-id(document('xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}">
         <table:table-cell/>
       </table:table-row>
     </table:table>
