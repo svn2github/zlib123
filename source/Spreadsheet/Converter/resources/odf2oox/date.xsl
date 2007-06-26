@@ -33,14 +33,15 @@
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
   xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
   exclude-result-prefixes="number style fo">
-  
+
   <!-- template to insert date formats -->
-  
+
   <xsl:template match="number:date-style" mode="numFormat">
     <xsl:param name="numId"/>
     <numFmt numFmtId="{$numId}">
       <xsl:attribute name="formatCode">
         <xsl:apply-templates mode="date"/>
+        <xsl:text>;@</xsl:text>
       </xsl:attribute>
     </numFmt>
     <xsl:choose>
@@ -53,12 +54,13 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template match="number:time-style" mode="numFormat">
     <xsl:param name="numId"/>
     <numFmt numFmtId="{$numId}">
       <xsl:attribute name="formatCode">
         <xsl:apply-templates mode="date"/>
+        <xsl:text>;@</xsl:text>
       </xsl:attribute>
     </numFmt>
     <xsl:choose>
@@ -71,18 +73,18 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- insert year format -->
-  
+
   <xsl:template match="number:year" mode="date">
     <xsl:choose>
       <xsl:when test="@number:style='long'">yyyy</xsl:when>
       <xsl:otherwise>yy</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- insert month format -->
-  
+
   <xsl:template match="number:month" mode="date">
     <xsl:choose>
       <xsl:when test="@number:style='long' and @number:textual='true'">mmmm</xsl:when>
@@ -91,26 +93,27 @@
       <xsl:otherwise>m</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- insert day of week format -->
-  
+
   <xsl:template match="number:day-of-week" mode="date">
     <xsl:choose>
-    <xsl:when test="@number:style='long'">dddd</xsl:when>
-    <xsl:otherwise>ddd</xsl:otherwise>
-  </xsl:choose></xsl:template>
-  
+      <xsl:when test="@number:style='long'">dddd</xsl:when>
+      <xsl:otherwise>ddd</xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- insert day format -->
-  
+
   <xsl:template match="number:day" mode="date">
     <xsl:choose>
       <xsl:when test="@number:style='long'">dd</xsl:when>
       <xsl:otherwise>d</xsl:otherwise>
     </xsl:choose>
-  </xsl:template> 
-  
+  </xsl:template>
+
   <!-- insert hour format -->
-  
+
   <xsl:template match="number:hours" mode="date">
     <xsl:if test="parent::node()/@number:truncate-on-overflow='false'">[</xsl:if>
     <xsl:choose>
@@ -119,22 +122,22 @@
     </xsl:choose>
     <xsl:if test="parent::node()/@number:truncate-on-overflow='false'">]</xsl:if>
   </xsl:template>
-  
+
   <!-- insert minute format -->
-  
+
   <xsl:template match="number:minutes" mode="date">
     <xsl:choose>
       <xsl:when test="@number:style='long'">mm</xsl:when>
       <xsl:otherwise>m</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- add am or pm -->
-  
+
   <xsl:template match="number:am-pm" mode="date">AM/PM</xsl:template>
-  
+
   <!-- insert second format -->
-  
+
   <xsl:template match="number:seconds" mode="date">
     <xsl:choose>
       <xsl:when test="@number:style='long'">ss</xsl:when>
@@ -155,15 +158,16 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-  
+
   <!-- add all formatting characters -->
-  
+
   <xsl:template match="number:text" mode="date">
     <xsl:variable name="text">
       <xsl:value-of select="."/>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$text=':' or $text='-' or $text='/' or $text='\' or $text=' ' or $text=',' or $text=', ' or $text='.' or $text='. '">
+      <xsl:when
+        test="$text=':' or $text='-' or $text='/' or $text='\' or $text=' ' or $text=',' or $text=', ' or $text='.' or $text='. '">
         <xsl:value-of select="$text"/>
       </xsl:when>
       <xsl:when test="$text=''"/>
@@ -172,5 +176,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>
