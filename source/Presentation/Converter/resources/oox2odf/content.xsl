@@ -598,6 +598,10 @@ exclude-result-prefixes="p a r xlink ">
 													<xsl:if test ="name()='a:br'">
 														<text:line-break/>
 													</xsl:if>
+													<!-- Added by lohith.ar for fix 1731885-->
+													<xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">
+														<text:span text:style-name="{generate-id()}" />
+													</xsl:if>
 												</xsl:for-each>
 											</text:p>
 										</xsl:if>
@@ -672,6 +676,10 @@ exclude-result-prefixes="p a r xlink ">
 												</xsl:if >
 												<xsl:if test ="name()='a:br'">
 													<text:line-break/>
+												</xsl:if>
+												<!-- Added by lohith.ar for fix 1731885-->
+												<xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">
+													<text:span text:style-name="{generate-id()}" />
 												</xsl:if>
 											</xsl:for-each>
 										</text:p>
@@ -969,6 +977,10 @@ exclude-result-prefixes="p a r xlink ">
 												<xsl:if test ="name()='a:br'">
 													<text:line-break/>
 												</xsl:if>
+												<!-- Added by lohith.ar for fix 1731885-->
+												<xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">
+													<text:span text:style-name="{generate-id()}" />
+												</xsl:if>
 											</xsl:for-each>
 										</text:p>
 									</xsl:if>
@@ -1043,6 +1055,10 @@ exclude-result-prefixes="p a r xlink ">
 											</xsl:if >
 											<xsl:if test ="name()='a:br'">
 												<text:line-break/>
+											</xsl:if>
+											<!-- Added by lohith.ar for fix 1731885-->
+											<xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">
+												<text:span text:style-name="{generate-id()}" />
 											</xsl:if>
 										</xsl:for-each>
 									</text:p>
@@ -1539,22 +1555,29 @@ exclude-result-prefixes="p a r xlink ">
 			<xsl:variable name ="slideRel">
 				<xsl:value-of select ="concat(concat('ppt/slides/_rels/',$SlideNumber,'.xml'),'.rels')"/>
 			</xsl:variable>
-			<xsl:variable name ="bulletTypeBool">
+			<xsl:variable name ="layout" >
 				<xsl:for-each select ="document($slideRel)//rels:Relationships/rels:Relationship">
 					<xsl:if test ="document($slideRel)//rels:Relationships/rels:Relationship/@Target[contains(.,'slideLayouts')]">
-						<xsl:variable name ="layout" select ="substring-after((@Target),'../slideLayouts/')"/>
-						<xsl:for-each select ="document(concat('ppt/slideLayouts/',$layout))//p:sldLayout">
-							<xsl:choose >
-								<xsl:when test ="p:cSld/@name[contains(.,'Content with Caption')] or p:cSld/@name[contains(.,'Title and Content')] or p:cSld/@name[contains(.,'Two Content')] or  p:cSld/@name[contains(.,'Comparison')]">
-									<xsl:value-of select ="'true'"/>
-								</xsl:when>
-								<xsl:otherwise >
-									<xsl:value-of select ="'false'"/>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:for-each>
+						<xsl:value-of select ="substring-after((@Target),'../slideLayouts/')"/>
 					</xsl:if>
 				</xsl:for-each>
+			</xsl:variable>
+			<xsl:variable name ="bulletTypeBool">
+				<!--<xsl:for-each select ="document($slideRel)//rels:Relationships/rels:Relationship">-->
+				<!--<xsl:if test ="document($slideRel)//rels:Relationships/rels:Relationship/@Target[contains(.,'slideLayouts')]">-->
+				<!--<xsl:variable name ="layout" select ="substring-after((@Target),'../slideLayouts/')"/>-->
+				<xsl:for-each select ="document(concat('ppt/slideLayouts/',$layout))//p:sldLayout">
+					<xsl:choose >
+						<xsl:when test ="p:cSld/@name[contains(.,'Content with Caption')] or p:cSld/@name[contains(.,'Title and Content')] or p:cSld/@name[contains(.,'Two Content')] or  p:cSld/@name[contains(.,'Comparison')]">
+							<xsl:value-of select ="'true'"/>
+						</xsl:when>
+						<xsl:otherwise >
+							<xsl:value-of select ="'false'"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
+				<!--</xsl:if>-->
+				<!--</xsl:for-each>-->
 			</xsl:variable >
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp/p:txBody">
 				<xsl:variable name ="ParaId">
@@ -1588,7 +1611,7 @@ exclude-result-prefixes="p a r xlink ">
                     or ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Subtitle')]                   
                     or ./parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'subTitle')]
                     or ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'outline')]
-                    or (./parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">							
+                    or (./parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">
 							<!-- Added by  vijayeta ,on 19th june-->
 							<xsl:call-template name ="insertDefaultBulletNumberStyle">
 								<xsl:with-param name ="listStyleName" select ="$listStyleName"/>
@@ -1713,7 +1736,7 @@ exclude-result-prefixes="p a r xlink ">
                    or ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Subtitle')]                   
                     or ./parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'subTitle')]
                     or ./parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'outline')]
-                              or (./parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">											
+                              or (./parent::node()/p:nvSpPr/p:nvPr/p:ph/@type[contains(.,'body')] and ./parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">
 											<!-- Added by vijayeta on 19th june,to enable or disable depending on buNone-->
 											<xsl:if test ="a:r/a:t">
 												<xsl:if test ="a:pPr/a:buNone">
@@ -1745,412 +1768,572 @@ exclude-result-prefixes="p a r xlink ">
 							<!--End of Code inserted by VijayetaFor Bullets, Enable Numbering-->
 						</style:paragraph-properties >
 					</style:style>
-					<xsl:for-each select ="a:r" >
-						<style:style style:name="{generate-id()}"  style:family="text">
-							<style:text-properties>
-								<!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
-								<xsl:attribute name ="fo:font-family">
-									<xsl:if test ="a:rPr/a:latin/@typeface">
-										<xsl:variable name ="typeFaceVal" select ="a:rPr/a:latin/@typeface"/>
-										<xsl:for-each select ="a:rPr/a:latin/@typeface">
-											<xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
-												<xsl:value-of select ="$DefFont"/>
-											</xsl:if>
-											<!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
-											<xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
-												<xsl:value-of select ="."/>
-											</xsl:if>
-										</xsl:for-each>
-									</xsl:if>
-									<xsl:if test ="not(a:rPr/a:latin/@typeface)">
-										<xsl:value-of select ="$DefFont"/>
-									</xsl:if>
-								</xsl:attribute>
-								<xsl:attribute name ="style:font-family-generic"	>
-									<xsl:value-of select ="'roman'"/>
-								</xsl:attribute>
-								<xsl:attribute name ="style:font-pitch"	>
-									<xsl:value-of select ="'variable'"/>
-								</xsl:attribute>
-								<xsl:if test ="a:rPr/@sz">
-									<xsl:attribute name ="fo:font-size"	>
-										<xsl:for-each select ="a:rPr/@sz">
-											<xsl:value-of select ="concat(format-number(. div 100,'#.##'), 'pt')"/>
-										</xsl:for-each>
+					<!-- Modified by pradeep for fix 1731885-->
+					<xsl:for-each select ="node()" >
+						<!-- Add here-->
+						<xsl:if test ="name()='a:r'">
+							<style:style style:name="{generate-id()}"  style:family="text">
+								<style:text-properties>
+									<!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
+									<xsl:attribute name ="fo:font-family">
+										<xsl:if test ="a:rPr/a:latin/@typeface">
+											<xsl:variable name ="typeFaceVal" select ="a:rPr/a:latin/@typeface"/>
+											<xsl:for-each select ="a:rPr/a:latin/@typeface">
+												<xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+													<xsl:value-of select ="$DefFont"/>
+												</xsl:if>
+												<!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
+												<xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+													<xsl:value-of select ="."/>
+												</xsl:if>
+											</xsl:for-each>
+										</xsl:if>
+										<xsl:if test ="not(a:rPr/a:latin/@typeface)">
+											<!-- ADDED BY VIJAYETA,get font types for each level-->
+											<!--<xsl:for-each select ="document(concat('ppt/slideLayouts/',$layout))//p:sldLayout"-->
+											<xsl:variable name ="cnvPrId">
+												<xsl:value-of select ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type"/>
+											</xsl:variable>
+											<xsl:variable name ="Id">
+												<xsl:value-of select ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@idx"/>
+											</xsl:variable>
+											<xsl:call-template name ="FontTypeFromLayout">
+												<xsl:with-param name ="prId" select ="$cnvPrId" />
+												<xsl:with-param name ="sldName" select ="$SlideNumber"/>
+												<xsl:with-param name ="Id" select ="$Id"/>
+												<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont"/>
+												<xsl:with-param name ="DefFont" select ="$DefFont"/>
+											</xsl:call-template>
+											<!-- ADDED BY VIJAYETA,get font types for each level-->
+											<!--<xsl:value-of select ="$DefFont"/>-->
+										</xsl:if>
 									</xsl:attribute>
-								</xsl:if>
-								<xsl:if test ="not(a:rPr/@sz)">
-									<!--<xsl:value-of select ="parent::node()/parent::node()/parent::node()/child::node()/p:nvPr/p:ph/@type"/>-->
-									<xsl:variable name ="cnvPrId">
-										<xsl:value-of select ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type"/>
-									</xsl:variable>
-									<xsl:variable name ="Id">
-										<xsl:value-of select ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@idx"/>
-									</xsl:variable>
-									<xsl:variable name ="layoutFontSize">
-										<xsl:call-template name ="getDefaultFontSize">
-											<xsl:with-param name ="prId" select ="$cnvPrId" />
-											<xsl:with-param name ="sldName" select ="$SlideNumber"/>
-											<xsl:with-param name ="Id" select ="$Id"/>
-										</xsl:call-template>
-									</xsl:variable>
-									<xsl:variable name ="lName">
-										<xsl:for-each select ="parent::node()/parent::node()/parent::node()/child::node()/p:nvPr/p:ph/@type">
-											<xsl:value-of select ="."/>
-										</xsl:for-each>
-									</xsl:variable>
-									<!-- Added By Vijayeta,Check if textbox is present-->
-									<xsl:variable name ="isContent">
-										<xsl:if test="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')]">
-											<xsl:value-of select ="'true'"/>
-										</xsl:if>
-										<!--End, Added By Vijayeta,Check if textbox is present-->
-										<xsl:if test="not(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">
-											<xsl:value-of select ="'false'"/>
-										</xsl:if>
-									</xsl:variable>
-									<xsl:choose >
-										<xsl:when test ="$layoutFontSize &gt; 0">
-											<xsl:attribute name ="fo:font-size"	>
-												<xsl:value-of select ="concat($layoutFontSize,'pt')"/>
-											</xsl:attribute >
-										</xsl:when>
-										<xsl:when test ="$lName='title' or $lName='ctrTitle'">
-											<xsl:attribute name ="fo:font-size"	>
-												<xsl:value-of select ="concat(format-number($DefFontSizeTitle div 100,'#.##'), 'pt')"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="$lName='title' or $lName='ctrTitle'">
-											<xsl:attribute name ="fo:font-size"	>
-												<xsl:value-of select ="concat(format-number($DefFontSizeTitle div 100,'#.##'), 'pt')"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="not($lName='title' or $lName='ctrTitle') and  $isContent = 'false' ">
-											<xsl:attribute name ="fo:font-size"	>
-												<xsl:value-of select ="concat(format-number($DefFontSizeOther div 100,'#.##'), 'pt')"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:otherwise>
-											<xsl:attribute name ="fo:font-size"	>
-												<!-- Code By vijayeta,to set fontsize,if levels present-->
-												<xsl:variable name ="newFontSize">
-													<xsl:variable name ="fontSizeBody">
-														<xsl:if test ="$bulletTypeBool='true'">
-															<xsl:if test =" $levelForDefFont != '0'">
-																<xsl:call-template name ="getFontSizeForLevels">
-																	<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont"/>
-																</xsl:call-template>
+									<xsl:attribute name ="style:font-family-generic"	>
+										<xsl:value-of select ="'roman'"/>
+									</xsl:attribute>
+									<xsl:attribute name ="style:font-pitch"	>
+										<xsl:value-of select ="'variable'"/>
+									</xsl:attribute>
+									<xsl:if test ="a:rPr/@sz">
+										<xsl:attribute name ="fo:font-size"	>
+											<xsl:for-each select ="a:rPr/@sz">
+												<xsl:value-of select ="concat(format-number(. div 100,'#.##'), 'pt')"/>
+											</xsl:for-each>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="not(a:rPr/@sz)">
+										<!--<xsl:value-of select ="parent::node()/parent::node()/parent::node()/child::node()/p:nvPr/p:ph/@type"/>-->
+										<xsl:variable name ="cnvPrId">
+											<xsl:value-of select ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type"/>
+										</xsl:variable>
+										<xsl:variable name ="Id">
+											<xsl:value-of select ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@idx"/>
+										</xsl:variable>
+										<xsl:variable name ="layoutFontSize">
+											<xsl:call-template name ="getDefaultFontSize">
+												<xsl:with-param name ="prId" select ="$cnvPrId" />
+												<xsl:with-param name ="sldName" select ="$SlideNumber"/>
+												<xsl:with-param name ="Id" select ="$Id"/>
+												<!-- added by vijayeta,get font size for differant levels-->
+												<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont"/>
+											</xsl:call-template>
+										</xsl:variable>
+										<xsl:variable name ="lName">
+											<xsl:for-each select ="parent::node()/parent::node()/parent::node()/child::node()/p:nvPr/p:ph/@type">
+												<xsl:value-of select ="."/>
+											</xsl:for-each>
+										</xsl:variable>
+										<!-- Added By Vijayeta,Check if textbox is present-->
+										<xsl:variable name ="isContent">
+											<xsl:if test="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')]">
+												<xsl:value-of select ="'true'"/>
+											</xsl:if>
+											<!--End, Added By Vijayeta,Check if textbox is present-->
+											<xsl:if test="not(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">
+												<xsl:value-of select ="'false'"/>
+											</xsl:if>
+										</xsl:variable>
+										<xsl:choose >
+											<xsl:when test ="$layoutFontSize &gt; 0">
+												<xsl:attribute name ="fo:font-size"	>
+													<xsl:value-of select ="concat($layoutFontSize,'pt')"/>
+												</xsl:attribute >
+											</xsl:when>
+											<xsl:when test ="$lName='title' or $lName='ctrTitle'">
+												<xsl:attribute name ="fo:font-size"	>
+													<xsl:value-of select ="concat(format-number($DefFontSizeTitle div 100,'#.##'), 'pt')"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="$lName='title' or $lName='ctrTitle'">
+												<xsl:attribute name ="fo:font-size"	>
+													<xsl:value-of select ="concat(format-number($DefFontSizeTitle div 100,'#.##'), 'pt')"/>
+												</xsl:attribute>
+											</xsl:when>
+											<!-- Bug fix,1738973,by shweta and vijayeta-->
+											<xsl:when test ="not(contains(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name,'Title')
+						   or contains(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name,'Content')
+						   or contains(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name,'Subtitle')
+						   or contains(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name,'Placeholder')
+                           or contains(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type,'ctrTitle')
+                           or contains(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type,'subTitle')
+                           or contains(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type,'outline')              
+                           or contains(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type,'body'))">
+												<!--<xsl:when test ="not($lName='title' or $lName='ctrTitle') and  $isContent = 'false' ">-->
+												<xsl:attribute name ="fo:font-size"	>
+													<xsl:value-of select ="concat(format-number($DefFontSizeOther div 100,'#.##'), 'pt')"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:attribute name ="fo:font-size"	>
+													<!-- Code By vijayeta,to set fontsize,if levels present-->
+													<xsl:variable name ="newFontSize">
+														<xsl:variable name ="fontSizeBody">
+															<xsl:if test ="$bulletTypeBool='true'">
+																<xsl:if test =" $levelForDefFont != '0'">
+																	<xsl:call-template name ="getFontSizeForLevelsFromMaster">
+																		<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont"/>
+																	</xsl:call-template>
+																</xsl:if>
+																<xsl:if test =" $levelForDefFont = '0'">
+																	<xsl:value-of select ="$DefFontSizeBody"/>
+																</xsl:if>
 															</xsl:if>
-															<xsl:if test =" $levelForDefFont = '0'">
+															<xsl:if test ="not($bulletTypeBool='true')">
 																<xsl:value-of select ="$DefFontSizeBody"/>
 															</xsl:if>
-														</xsl:if>
-														<xsl:if test ="not($bulletTypeBool='true')">
-															<xsl:value-of select ="$DefFontSizeBody"/>
-														</xsl:if>
+														</xsl:variable >
+														<xsl:value-of select="$fontSizeBody"/>
 													</xsl:variable >
-													<xsl:value-of select="$fontSizeBody"/>
-												</xsl:variable >
-												<!--Code Added By Vijayeta,For Line Spacing
+													<!--Code Added By Vijayeta,For Line Spacing
                              If the input file has an option to Decrease the font size to fit.
                              100% being equal to 100000 and 1% to 1000,divide the scale, by which the actual font size is to be reduced, by 1000.
                              final font size=((ActualFontSize/100)* (scale/1000))/100-->
-												<xsl:if test ="parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale">
-													<xsl:variable name ="fontScaleReductionValue">
-														<xsl:value-of select ="parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale div 1000 "/>
-													</xsl:variable>
-													<xsl:value-of select ="concat(round(format-number(($newFontSize * $fontScaleReductionValue) div 10000,'#.##')), 'pt')"/>
-												</xsl:if>
-												<!-- Do not change the font size if the option is selected to be off-->
-												<xsl:if test ="not(parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale)">
-													<xsl:value-of select ="concat(format-number($newFontSize div 100,'#.##'), 'pt')"/>
-												</xsl:if>
-												<!--End of Code Added By Vijayeta,For Line Spacing -->
-											</xsl:attribute>
-										</xsl:otherwise>
-									</xsl:choose>
-								</xsl:if>
-								<xsl:attribute name ="fo:font-weight">
-									<!-- Bold Property-->
-									<xsl:if test ="a:rPr/@b">
-										<xsl:value-of select ="'bold'"/>
-									</xsl:if >
-									<xsl:if test ="not(a:rPr/@b)">
-										<xsl:value-of select ="'normal'"/>
-									</xsl:if >
-								</xsl:attribute>
-								<!-- Color -->
-								<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-								<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-								<xsl:if test ="a:rPr/a:solidFill/a:srgbClr/@val">
-									<xsl:attribute name ="fo:color">
-										<xsl:value-of select ="translate(concat('#',a:rPr/a:solidFill/a:srgbClr/@val),$ucletters,$lcletters)"/>
+													<xsl:if test ="parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale">
+														<xsl:variable name ="fontScaleReductionValue">
+															<xsl:value-of select ="parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale div 1000 "/>
+														</xsl:variable>
+														<xsl:value-of select ="concat(round(format-number(($newFontSize * $fontScaleReductionValue) div 10000,'#.##')), 'pt')"/>
+													</xsl:if>
+													<!-- Do not change the font size if the option is selected to be off-->
+													<xsl:if test ="not(parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale)">
+														<xsl:value-of select ="concat(format-number($newFontSize div 100,'#.##'), 'pt')"/>
+													</xsl:if>
+													<!--End of Code Added By Vijayeta,For Line Spacing -->
+												</xsl:attribute>
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:if>
+									<xsl:attribute name ="fo:font-weight">
+										<!-- Bold Property-->
+										<xsl:if test ="a:rPr/@b">
+											<xsl:value-of select ="'bold'"/>
+										</xsl:if >
+										<xsl:if test ="not(a:rPr/@b)">
+											<xsl:value-of select ="'normal'"/>
+										</xsl:if >
 									</xsl:attribute>
-								</xsl:if>
-								<xsl:if test ="a:rPr/a:solidFill/a:schemeClr/@val">
-									<xsl:attribute name ="fo:color">
-										<xsl:call-template name ="getColorCode">
-											<xsl:with-param name ="color">
-												<xsl:value-of select="a:rPr/a:solidFill/a:schemeClr/@val"/>
-											</xsl:with-param>
-											<xsl:with-param name ="lumMod">
-												<xsl:value-of select="a:rPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
-											</xsl:with-param>
-											<xsl:with-param name ="lumOff">
-												<xsl:value-of select="a:rPr/a:solidFill/a:schemeClr/a:lumOff/@val"/>
-											</xsl:with-param>
-										</xsl:call-template>
-									</xsl:attribute>
-								</xsl:if>
-								<!-- Bug fix - 1733229-->
-								<xsl:if test ="not(a:rPr/a:solidFill/a:srgbClr/@val) and not(a:rPr/a:solidFill/a:schemeClr/@val)">
-									<xsl:if test ="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:srgbClr">
+									<!-- Color -->
+									<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+									<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+									<xsl:if test ="a:rPr/a:solidFill/a:srgbClr/@val">
 										<xsl:attribute name ="fo:color">
-											<xsl:value-of select ="translate(concat('#',parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:srgbClr/@val),$ucletters,$lcletters)"/>
+											<xsl:value-of select ="translate(concat('#',a:rPr/a:solidFill/a:srgbClr/@val),$ucletters,$lcletters)"/>
 										</xsl:attribute>
 									</xsl:if>
-									<xsl:if test ="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr">
+									<xsl:if test ="a:rPr/a:solidFill/a:schemeClr/@val">
 										<xsl:attribute name ="fo:color">
 											<xsl:call-template name ="getColorCode">
 												<xsl:with-param name ="color">
-													<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr/@val"/>
+													<xsl:value-of select="a:rPr/a:solidFill/a:schemeClr/@val"/>
 												</xsl:with-param>
 												<xsl:with-param name ="lumMod">
-													<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr/a:lumMod/@val"/>
+													<xsl:value-of select="a:rPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
 												</xsl:with-param>
 												<xsl:with-param name ="lumOff">
-													<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr/a:lumOff/@val"/>
+													<xsl:value-of select="a:rPr/a:solidFill/a:schemeClr/a:lumOff/@val"/>
 												</xsl:with-param>
 											</xsl:call-template>
 										</xsl:attribute>
 									</xsl:if>
-									<xsl:if test ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'TextBox')]
+									<!-- Bug fix - 1733229-->
+									<xsl:if test ="not(a:rPr/a:solidFill/a:srgbClr/@val) and not(a:rPr/a:solidFill/a:schemeClr/@val)">
+										<xsl:if test ="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:srgbClr">
+											<xsl:attribute name ="fo:color">
+												<xsl:value-of select ="translate(concat('#',parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:srgbClr/@val),$ucletters,$lcletters)"/>
+											</xsl:attribute>
+										</xsl:if>
+										<xsl:if test ="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr">
+											<xsl:attribute name ="fo:color">
+												<xsl:call-template name ="getColorCode">
+													<xsl:with-param name ="color">
+														<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr/@val"/>
+													</xsl:with-param>
+													<xsl:with-param name ="lumMod">
+														<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr/a:lumMod/@val"/>
+													</xsl:with-param>
+													<xsl:with-param name ="lumOff">
+														<xsl:value-of select="parent::node()/parent::node()/parent::node()/p:style/a:fontRef/a:schemeClr/a:lumOff/@val"/>
+													</xsl:with-param>
+												</xsl:call-template>
+											</xsl:attribute>
+										</xsl:if>
+										<xsl:if test ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:cNvPr/@name[contains(.,'TextBox')]
                     and not(parent::node()/parent::node()/parent::node()/p:style/a:fontRef)">
-										<xsl:attribute name ="fo:color">
-											<xsl:value-of select ="'#000000'"/>
-										</xsl:attribute>
-									</xsl:if>
+											<xsl:attribute name ="fo:color">
+												<xsl:value-of select ="'#000000'"/>
+											</xsl:attribute>
+										</xsl:if>
 
-								</xsl:if>
-								<!-- Italic-->
-								<xsl:if test ="a:rPr/@i">
-									<xsl:attribute name ="fo:font-style">
-										<xsl:value-of select ="'italic'"/>
-									</xsl:attribute>
-								</xsl:if>
-								<!-- style:text-underline-style
+									</xsl:if>
+									<!-- Italic-->
+									<xsl:if test ="a:rPr/@i">
+										<xsl:attribute name ="fo:font-style">
+											<xsl:value-of select ="'italic'"/>
+										</xsl:attribute>
+									</xsl:if>
+									<!-- style:text-underline-style
 								style:text-underline-style="solid" style:text-underline-width="auto"-->
-								<xsl:if test ="a:rPr/@u">
-									<!-- style:text-underline-style="solid" style:text-underline-type="double"-->
-									<xsl:if test ="a:rPr/a:uFill/a:solidFill/a:srgbClr/@val">
-										<xsl:attribute name ="style:text-underline-color">
-											<xsl:value-of select ="translate(concat('#',a:rPr/a:uFill/a:solidFill/a:srgbClr/@val),$ucletters,$lcletters)"/>
+									<xsl:if test ="a:rPr/@u">
+										<!-- style:text-underline-style="solid" style:text-underline-type="double"-->
+										<xsl:if test ="a:rPr/a:uFill/a:solidFill/a:srgbClr/@val">
+											<xsl:attribute name ="style:text-underline-color">
+												<xsl:value-of select ="translate(concat('#',a:rPr/a:uFill/a:solidFill/a:srgbClr/@val),$ucletters,$lcletters)"/>
+											</xsl:attribute>
+										</xsl:if>
+										<xsl:if test ="a:rPr/a:uFill/a:solidFill/a:schemeClr/@val">
+											<xsl:attribute name ="style:text-underline-color">
+												<xsl:call-template name ="getColorCode">
+													<xsl:with-param name ="color">
+														<xsl:value-of select="a:rPr/a:uFill/a:solidFill/a:schemeClr/@val"/>
+													</xsl:with-param>
+													<xsl:with-param name ="lumMod">
+														<xsl:value-of select="a:rPr/a:uFill/a:solidFill/a:schemeClr/a:lumMod/@val"/>
+													</xsl:with-param>
+													<xsl:with-param name ="lumOff">
+														<xsl:value-of select="a:rPr/a:uFill/a:solidFill/a:schemeClr/a:lumOff/@val"/>
+													</xsl:with-param>
+												</xsl:call-template>
+											</xsl:attribute>
+										</xsl:if>
+										<xsl:choose >
+											<xsl:when test ="a:rPr/@u='dbl'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'solid'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-type">
+													<xsl:value-of select ="'double'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'auto'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='heavy'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'solid'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'bold'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='dotted'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'dotted'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'auto'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<!-- dottedHeavy-->
+											<xsl:when test ="a:rPr/@u='dottedHeavy'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'dotted'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'bold'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='dash'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'dash'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'auto'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='dashHeavy'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'dash'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'bold'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='dashLong'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'long-dash'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'auto'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='dashLongHeavy'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'long-dash'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'bold'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='dotDash'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'dot-dash'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'auto'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='dotDashHeavy'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'dot-dash'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'bold'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<!-- dot-dot-dash-->
+											<xsl:when test ="a:rPr/@u='dotDotDash'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'dot-dot-dash'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'auto'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='dotDotDashHeavy'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'dot-dot-dash'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'bold'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<!-- Wavy and Heavy-->
+											<xsl:when test ="a:rPr/@u='wavy'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'wave'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'auto'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@u='wavyHeavy'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'wave'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'bold'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<!-- wavyDbl-->
+											<!-- style:text-underline-style="wave" style:text-underline-type="double"-->
+											<xsl:when test ="a:rPr/@u='wavyDbl'">
+												<xsl:attribute name ="style:text-underline-style">
+													<xsl:value-of select ="'wave'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-type">
+													<xsl:value-of select ="'double'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'auto'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:otherwise >
+												<xsl:attribute name ="style:text-underline-type">
+													<xsl:value-of select ="'single'"/>
+												</xsl:attribute>
+												<xsl:attribute name ="style:text-underline-width">
+													<xsl:value-of select ="'auto'"/>
+												</xsl:attribute>
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:if>
+									<!-- strike style:text-line-through-style-->
+									<xsl:if test ="a:rPr/@strike">
+										<xsl:attribute name ="style:text-line-through-style">
+											<xsl:value-of select ="'solid'"/>
+										</xsl:attribute>
+										<xsl:choose >
+											<xsl:when test ="a:rPr/@strike='dblStrike'">
+												<xsl:attribute name ="style:text-line-through-type">
+													<xsl:value-of select ="'double'"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="a:rPr/@strike='sngStrike'">
+												<xsl:attribute name ="style:text-line-through-type">
+													<xsl:value-of select ="'single'"/>
+												</xsl:attribute>
+											</xsl:when>
+										</xsl:choose>
+									</xsl:if>
+									<!-- Character Spacing fo:letter-spacing Bug (1719230) fix by Sateesh -->
+									<xsl:if test ="a:rPr/@spc">
+										<xsl:attribute name ="fo:letter-spacing">
+											<xsl:variable name="length" select="a:rPr/@spc" />
+											<xsl:value-of select="concat(format-number($length * 2.54 div 7200,'#.###'),'cm')"/>
 										</xsl:attribute>
 									</xsl:if>
-									<xsl:if test ="a:rPr/a:uFill/a:solidFill/a:schemeClr/@val">
-										<xsl:attribute name ="style:text-underline-color">
-											<xsl:call-template name ="getColorCode">
-												<xsl:with-param name ="color">
-													<xsl:value-of select="a:rPr/a:uFill/a:solidFill/a:schemeClr/@val"/>
-												</xsl:with-param>
-												<xsl:with-param name ="lumMod">
-													<xsl:value-of select="a:rPr/a:uFill/a:solidFill/a:schemeClr/a:lumMod/@val"/>
-												</xsl:with-param>
-												<xsl:with-param name ="lumOff">
-													<xsl:value-of select="a:rPr/a:uFill/a:solidFill/a:schemeClr/a:lumOff/@val"/>
-												</xsl:with-param>
+									<!--Shadow fo:text-shadow-->
+									<xsl:if test ="a:rPr/a:effectLst/a:outerShdw">
+										<xsl:attribute name ="fo:text-shadow">
+											<xsl:value-of select ="'1pt 1pt'"/>
+										</xsl:attribute>
+									</xsl:if>
+									<!--Kerning true or false -->
+									<xsl:attribute name ="style:letter-kerning">
+										<xsl:choose >
+											<xsl:when test ="a:rPr/@kern = '0'">
+												<xsl:value-of select ="'false'"/>
+											</xsl:when >
+											<xsl:when test ="format-number(a:rPr/@kern,'#.##') &gt; 0">
+												<xsl:value-of select ="'true'"/>
+											</xsl:when >
+											<xsl:otherwise >
+												<xsl:value-of select ="'true'"/>
+											</xsl:otherwise>
+										</xsl:choose>
+									</xsl:attribute >
+								</style:text-properties>
+							</style:style>
+						</xsl:if>
+						<!-- Added by lohith.ar for fix 1731885-->
+						<xsl:if test ="name()='a:endParaRPr'">
+							<style:style style:name="{generate-id()}"  style:family="text">
+								<style:text-properties>
+									<!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
+									<xsl:attribute name ="fo:font-family">
+										<xsl:if test ="a:endParaRPr/a:latin/@typeface">
+											<xsl:variable name ="typeFaceVal" select ="a:rPr/a:latin/@typeface"/>
+											<xsl:for-each select ="a:endParaRPr/a:latin/@typeface">
+												<xsl:if test ="$typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt'">
+													<xsl:value-of select ="$DefFont"/>
+												</xsl:if>
+												<!-- Bug 1711910 Fixed,On date 2-06-07,by Vijayeta-->
+												<xsl:if test ="not($typeFaceVal='+mn-lt' or $typeFaceVal='+mj-lt')">
+													<xsl:value-of select ="."/>
+												</xsl:if>
+											</xsl:for-each>
+										</xsl:if>
+										<xsl:if test ="not(a:endParaRPr/a:latin/@typeface)">
+											<xsl:value-of select ="$DefFont"/>
+										</xsl:if>
+									</xsl:attribute>
+									<xsl:attribute name ="style:font-family-generic"	>
+										<xsl:value-of select ="'roman'"/>
+									</xsl:attribute>
+									<xsl:attribute name ="style:font-pitch"	>
+										<xsl:value-of select ="'variable'"/>
+									</xsl:attribute>
+									<xsl:if test ="./@sz">
+										<xsl:attribute name ="fo:font-size"	>
+											<xsl:for-each select ="./@sz">
+												<xsl:value-of select ="concat(format-number(. div 100,'#.##'), 'pt')"/>
+											</xsl:for-each>
+										</xsl:attribute>
+									</xsl:if>
+									<xsl:if test ="not(./@sz)">
+										<!--<xsl:value-of select ="parent::node()/parent::node()/parent::node()/child::node()/p:nvPr/p:ph/@type"/>-->
+										<xsl:variable name ="cnvPrId">
+											<xsl:value-of select ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@type"/>
+										</xsl:variable>
+										<xsl:variable name ="Id">
+											<xsl:value-of select ="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvPr/p:ph/@idx"/>
+										</xsl:variable>
+										<xsl:variable name ="layoutFontSize">
+											<xsl:call-template name ="getDefaultFontSize">
+												<xsl:with-param name ="prId" select ="$cnvPrId" />
+												<xsl:with-param name ="sldName" select ="$SlideNumber"/>
+												<xsl:with-param name ="Id" select ="$Id"/>
 											</xsl:call-template>
-										</xsl:attribute>
+										</xsl:variable>
+										<xsl:variable name ="lName">
+											<xsl:for-each select ="parent::node()/parent::node()/parent::node()/child::node()/p:nvPr/p:ph/@type">
+												<xsl:value-of select ="."/>
+											</xsl:for-each>
+										</xsl:variable>
+										<!-- Added By Vijayeta,Check if textbox is present-->
+										<xsl:variable name ="isContent">
+											<xsl:if test="parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')]">
+												<xsl:value-of select ="'true'"/>
+											</xsl:if>
+											<!--End, Added By Vijayeta,Check if textbox is present-->
+											<xsl:if test="not(parent::node()/parent::node()/parent::node()/p:nvSpPr/p:nvSpPr/p:cNvPr/@name[contains(.,'Content')])">
+												<xsl:value-of select ="'false'"/>
+											</xsl:if>
+										</xsl:variable>
+										<xsl:choose >
+											<xsl:when test ="$layoutFontSize &gt; 0">
+												<xsl:attribute name ="fo:font-size"	>
+													<xsl:value-of select ="concat($layoutFontSize,'pt')"/>
+												</xsl:attribute >
+											</xsl:when>
+											<xsl:when test ="$lName='title' or $lName='ctrTitle'">
+												<xsl:attribute name ="fo:font-size"	>
+													<xsl:value-of select ="concat(format-number($DefFontSizeTitle div 100,'#.##'), 'pt')"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="$lName='title' or $lName='ctrTitle'">
+												<xsl:attribute name ="fo:font-size"	>
+													<xsl:value-of select ="concat(format-number($DefFontSizeTitle div 100,'#.##'), 'pt')"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:when test ="not($lName='title' or $lName='ctrTitle') and  $isContent = 'false' ">
+												<xsl:attribute name ="fo:font-size"	>
+													<xsl:value-of select ="concat(format-number($DefFontSizeOther div 100,'#.##'), 'pt')"/>
+												</xsl:attribute>
+											</xsl:when>
+											<xsl:otherwise>
+												<xsl:attribute name ="fo:font-size"	>
+													<!-- Code By vijayeta,to set fontsize,if levels present-->
+													<xsl:variable name ="newFontSize">
+														<xsl:variable name ="fontSizeBody">
+															<xsl:if test ="$bulletTypeBool='true'">
+																<xsl:if test =" $levelForDefFont != '0'">
+																	<xsl:call-template name ="getFontSizeForLevelsFromMaster">
+																		<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont"/>
+																	</xsl:call-template>
+																</xsl:if>
+																<xsl:if test =" $levelForDefFont = '0'">
+																	<xsl:value-of select ="$DefFontSizeBody"/>
+																</xsl:if>
+															</xsl:if>
+															<xsl:if test ="not($bulletTypeBool='true')">
+																<xsl:value-of select ="$DefFontSizeBody"/>
+															</xsl:if>
+														</xsl:variable >
+														<xsl:value-of select="$fontSizeBody"/>
+													</xsl:variable >
+													<!--Code Added By Vijayeta,For Line Spacing
+                             If the input file has an option to Decrease the font size to fit.
+                             100% being equal to 100000 and 1% to 1000,divide the scale, by which the actual font size is to be reduced, by 1000.
+                             final font size=((ActualFontSize/100)* (scale/1000))/100-->
+													<xsl:if test ="parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale">
+														<xsl:variable name ="fontScaleReductionValue">
+															<xsl:value-of select ="parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale div 1000 "/>
+														</xsl:variable>
+														<xsl:value-of select ="concat(round(format-number(($newFontSize * $fontScaleReductionValue) div 10000,'#.##')), 'pt')"/>
+													</xsl:if>
+													<!-- Do not change the font size if the option is selected to be off-->
+													<xsl:if test ="not(parent::node()/parent::node()/a:bodyPr/a:normAutofit/@fontScale)">
+														<xsl:value-of select ="concat(format-number($newFontSize div 100,'#.##'), 'pt')"/>
+													</xsl:if>
+													<!--End of Code Added By Vijayeta,For Line Spacing -->
+												</xsl:attribute>
+											</xsl:otherwise>
+										</xsl:choose>
 									</xsl:if>
-									<xsl:choose >
-										<xsl:when test ="a:rPr/@u='dbl'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'solid'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-type">
-												<xsl:value-of select ="'double'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'auto'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='heavy'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'solid'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'bold'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='dotted'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'dotted'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'auto'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<!-- dottedHeavy-->
-										<xsl:when test ="a:rPr/@u='dottedHeavy'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'dotted'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'bold'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='dash'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'dash'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'auto'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='dashHeavy'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'dash'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'bold'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='dashLong'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'long-dash'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'auto'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='dashLongHeavy'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'long-dash'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'bold'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='dotDash'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'dot-dash'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'auto'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='dotDashHeavy'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'dot-dash'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'bold'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<!-- dot-dot-dash-->
-										<xsl:when test ="a:rPr/@u='dotDotDash'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'dot-dot-dash'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'auto'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='dotDotDashHeavy'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'dot-dot-dash'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'bold'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<!-- Wavy and Heavy-->
-										<xsl:when test ="a:rPr/@u='wavy'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'wave'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'auto'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@u='wavyHeavy'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'wave'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'bold'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<!-- wavyDbl-->
-										<!-- style:text-underline-style="wave" style:text-underline-type="double"-->
-										<xsl:when test ="a:rPr/@u='wavyDbl'">
-											<xsl:attribute name ="style:text-underline-style">
-												<xsl:value-of select ="'wave'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-type">
-												<xsl:value-of select ="'double'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'auto'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:otherwise >
-											<xsl:attribute name ="style:text-underline-type">
-												<xsl:value-of select ="'single'"/>
-											</xsl:attribute>
-											<xsl:attribute name ="style:text-underline-width">
-												<xsl:value-of select ="'auto'"/>
-											</xsl:attribute>
-										</xsl:otherwise>
-									</xsl:choose>
-								</xsl:if>
-								<!-- strike style:text-line-through-style-->
-								<xsl:if test ="a:rPr/@strike">
-									<xsl:attribute name ="style:text-line-through-style">
-										<xsl:value-of select ="'solid'"/>
-									</xsl:attribute>
-									<xsl:choose >
-										<xsl:when test ="a:rPr/@strike='dblStrike'">
-											<xsl:attribute name ="style:text-line-through-type">
-												<xsl:value-of select ="'double'"/>
-											</xsl:attribute>
-										</xsl:when>
-										<xsl:when test ="a:rPr/@strike='sngStrike'">
-											<xsl:attribute name ="style:text-line-through-type">
-												<xsl:value-of select ="'single'"/>
-											</xsl:attribute>
-										</xsl:when>
-									</xsl:choose>
-								</xsl:if>
-								<!-- Character Spacing fo:letter-spacing Bug (1719230) fix by Sateesh -->
-								<xsl:if test ="a:rPr/@spc">
-									<xsl:attribute name ="fo:letter-spacing">
-										<xsl:variable name="length" select="a:rPr/@spc" />
-										<xsl:value-of select="concat(format-number($length * 2.54 div 7200,'#.###'),'cm')"/>
-									</xsl:attribute>
-								</xsl:if>
-								<!--Shadow fo:text-shadow-->
-								<xsl:if test ="a:rPr/a:effectLst/a:outerShdw">
-									<xsl:attribute name ="fo:text-shadow">
-										<xsl:value-of select ="'1pt 1pt'"/>
-									</xsl:attribute>
-								</xsl:if>
-								<!--Kerning true or false -->
-								<xsl:attribute name ="style:letter-kerning">
-									<xsl:choose >
-										<xsl:when test ="a:rPr/@kern = '0'">
-											<xsl:value-of select ="'false'"/>
-										</xsl:when >
-										<xsl:when test ="format-number(a:rPr/@kern,'#.##') &gt; 0">
-											<xsl:value-of select ="'true'"/>
-										</xsl:when >
-										<xsl:otherwise >
-											<xsl:value-of select ="'true'"/>
-										</xsl:otherwise>
-									</xsl:choose>
-								</xsl:attribute >
-							</style:text-properties>
-						</style:style>
+								</style:text-properties>
+							</style:style>
+						</xsl:if>
 					</xsl:for-each >
 				</xsl:for-each>
 			</xsl:for-each>
@@ -2542,6 +2725,7 @@ exclude-result-prefixes="p a r xlink ">
 		<xsl:param name ="Id"  />
 		<xsl:param name ="sldName" />
 		<xsl:param name ="sz" />
+		<xsl:param name ="levelForDefFont"/>
 		<xsl:variable name ="slLtName">
 			<xsl:value-of select ="concat('ppt/slides/_rels/',$sldName,'.xml.rels')"/>
 		</xsl:variable>
@@ -2557,32 +2741,113 @@ exclude-result-prefixes="p a r xlink ">
 		<xsl:choose >
 			<xsl:when test ="$Id !='' and $prId != ''"	>
 				<xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@idx=$Id and @type=$prId]">
-					<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>
+					<!--<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>-->
+					<!-- Added by vijayeta,Font Size for levels-->
+					<xsl:call-template name ="getFontSizeForLevelsFromLayout">
+						<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
+					</xsl:call-template>
+					<!-- Added by vijayeta,Font Size for levels-->
 				</xsl:for-each>
 			</xsl:when>
 			<xsl:when test ="$prId =''  and $Id !=''">
 				<xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@idx=$Id]">
-					<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>
+					<!-- Added by vijayeta,Font Size for levels-->
+					<xsl:call-template name ="getFontSizeForLevelsFromLayout">
+						<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
+					</xsl:call-template>
+					<!--<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>-->
+					<!-- Added by vijayeta,Font Size for levels-->
 				</xsl:for-each>
 			</xsl:when>
 			<xsl:otherwise >
 				<xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$prId]">
 					<xsl:if test ="@idx">
-						<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>
+						<!-- Added by vijayeta,Font Size for levels-->
+						<xsl:call-template name ="getFontSizeForLevelsFromLayout">
+							<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
+						</xsl:call-template>
+						<!-- Added by vijayeta,Font Size for levels-->
+						<!--<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>-->
 					</xsl:if>
 					<xsl:if  test ="not(@idx)">
-						<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>
+						<!-- Added by vijayeta,Font Size for levels-->
+						<xsl:call-template name ="getFontSizeForLevelsFromLayout">
+							<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
+						</xsl:call-template>
+						<!-- Added by vijayeta,Font Size for levels-->
+						<!--<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>-->
 					</xsl:if>
 				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>
-
 	</xsl:template>
+	<!-- Template added by vijayeta to fix bug 1739076,get font family from slide layout-->
+	<xsl:template name ="FontTypeFromLayout">
+		<xsl:param name ="prId"  />
+		<xsl:param name ="Id"  />
+		<xsl:param name ="sldName" />
+		<xsl:param name ="sz" />
+		<xsl:param name ="levelForDefFont"/>
+		<xsl:param name ="DefFont"/>
+		<xsl:variable name ="slLtName">
+			<xsl:value-of select ="concat('ppt/slides/_rels/',$sldName,'.xml.rels')"/>
+		</xsl:variable>
+		<xsl:variable name ="layoutName">
+			<xsl:for-each  select ="document($slLtName)//node()/@Target[contains(.,'slideLayouts')]">
+				<xsl:value-of select ="concat('ppt',substring(.,3))"/>
+			</xsl:for-each >
+		</xsl:variable>
+		<xsl:choose >
+			<xsl:when test ="$Id !='' and $prId != ''"	>
+				<xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@idx=$Id and @type=$prId]">
+					<xsl:call-template name ="getFontFamilyForLevelsFromLayout">
+						<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
+						<xsl:with-param name ="DefFont" select ="$DefFont"/>
+					</xsl:call-template>
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:when test ="$prId =''  and $Id !=''">
+				<xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@idx=$Id]">
+					<xsl:call-template name ="getFontFamilyForLevelsFromLayout">
+						<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
+						<xsl:with-param name ="DefFont" select ="$DefFont"/>
+					</xsl:call-template>
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:otherwise >
+				<xsl:for-each select ="document($layoutName)/p:sldLayout/p:cSld/p:spTree/p:sp/p:nvSpPr/p:nvPr/p:ph[@type=$prId]">
+					<xsl:if test ="@idx">
+						<xsl:call-template name ="getFontFamilyForLevelsFromLayout">
+							<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
+							<xsl:with-param name ="DefFont" select ="$DefFont"/>
+						</xsl:call-template>
+					</xsl:if>
+					<xsl:if  test ="not(@idx)">
+						<xsl:call-template name ="getFontFamilyForLevelsFromLayout">
+							<xsl:with-param name ="levelForDefFont" select ="$levelForDefFont+1"/>
+							<xsl:with-param name ="DefFont" select ="$DefFont"/>
+						</xsl:call-template>
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!-- Template added by vijayeta to fix bug 1739076,get font family from slide layout-->
 	<!--@@Get default inner margins settings from slide master -->
 	<xsl:template name ="DefaultTextSpacingProp">
 		<xsl:param name ="phType"/>
 		<xsl:param name ="defType"/>
-		<xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:nvPr/p:ph[@type = $phType]">
+		<xsl:variable name ="acPhType">
+			<xsl:choose >
+				<xsl:when test ="$phType!=''">
+					<xsl:value-of select ="$phType"/>
+				</xsl:when>
+				<xsl:otherwise >
+					<xsl:value-of select ="'body'"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:nvPr/p:ph[@type = $acPhType]">
 			<xsl:for-each select ="parent::node()/parent::node()/parent::node()">
 				<xsl:choose>
 					<xsl:when test ="$defType ='tIns'">
@@ -2714,7 +2979,7 @@ exclude-result-prefixes="p a r xlink ">
 		<xsl:value-of select ="substring-before(substring($slideMaster,17),'.xml')"/>
 	</xsl:template>
 	<!-- Code By vijayeta,get font size for diff levels-->
-	<xsl:template name ="getFontSizeForLevels">
+	<xsl:template name ="getFontSizeForLevelsFromMaster">
 		<xsl:param name ="levelForDefFont" />
 		<xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:txStyles/p:bodyStyle">
 			<xsl:choose >
@@ -2744,6 +3009,116 @@ exclude-result-prefixes="p a r xlink ">
 				</xsl:when>
 			</xsl:choose>
 		</xsl:for-each>
+	</xsl:template>
+	<xsl:template name ="getFontSizeForLevelsFromLayout">
+		<xsl:param name ="levelForDefFont" />
+		<xsl:choose >
+			<xsl:when test ="$levelForDefFont='1'" >
+				<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/@sz div 100,'#.##')"/>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='2'" >
+				<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/@sz div 100,'#.##')"/>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='3'" >
+				<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:defRPr/@sz div 100,'#.##')"/>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='4'" >
+				<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/@sz div 100,'#.##')"/>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='5'" >
+				<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:defRPr/@sz div 100,'#.##')"/>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='6'" >
+				<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/@sz div 100,'#.##')"/>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='7'" >
+				<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/@sz div 100,'#.##')"/>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='8'" >
+				<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:defRPr/@sz div 100,'#.##')"/>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='9'" >
+				<xsl:value-of  select ="format-number(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:defRPr/@sz div 100,'#.##')"/>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:template>
+	<xsl:template name ="getFontFamilyForLevelsFromLayout">
+		<xsl:param name ="levelForDefFont" />
+		<xsl:param name ="DefFont" />
+		<xsl:choose >
+			<xsl:when test ="$levelForDefFont='1'" >
+				<xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/a:latin/@typeface">
+					<xsl:value-of  select ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/a:latin/@typeface"/>
+				</xsl:if>
+				<xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl1pPr/a:defRPr/a:latin/@typeface)">
+					<xsl:value-of  select ="$DefFont"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='2'" >
+				<xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:latin/@typeface">
+					<xsl:value-of  select ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:latin/@typeface"/>
+				</xsl:if>
+				<xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl2pPr/a:defRPr/a:latin/@typeface)">
+					<xsl:value-of  select ="$DefFont"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='3'" >
+				<xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:defRPr/a:latin/@typeface">
+					<xsl:value-of  select ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:defRPr/a:latin/@typeface"/>
+				</xsl:if>
+				<xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl3pPr/a:defRPr/a:latin/@typeface)">
+					<xsl:value-of  select ="$DefFont"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='4'" >
+				<xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:latin/@typeface">
+					<xsl:value-of  select ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:latin/@typeface"/>
+				</xsl:if>
+				<xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl4pPr/a:defRPr/a:latin/@typeface)">
+					<xsl:value-of  select ="$DefFont"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='5'" >
+				<xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:defRPr/a:latin/@typeface">
+					<xsl:value-of  select ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:defRPr/a:latin/@typeface"/>
+				</xsl:if>
+				<xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl5pPr/a:defRPr/a:latin/@typeface)">
+					<xsl:value-of  select ="$DefFont"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='6'" >
+				<xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:latin/@typeface">
+					<xsl:value-of  select ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:latin/@typeface"/>
+				</xsl:if>
+				<xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl6pPr/a:defRPr/a:latin/@typeface)">
+					<xsl:value-of  select ="$DefFont"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='7'" >
+				<xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:latin/@typeface">
+					<xsl:value-of  select ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:latin/@typeface"/>
+				</xsl:if>
+				<xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl7pPr/a:defRPr/a:latin/@typeface)">
+					<xsl:value-of  select ="$DefFont"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='8'" >
+				<xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:defRPr/a:latin/@typeface">
+					<xsl:value-of  select ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:defRPr/a:latin/@typeface"/>
+				</xsl:if>
+				<xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl8pPr/a:defRPr/a:latin/@typeface)">
+					<xsl:value-of  select ="$DefFont"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test ="$levelForDefFont='9'" >
+				<xsl:if test ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:defRPr/a:latin/@typeface">
+					<xsl:value-of  select ="parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:defRPr/a:latin/@typeface"/>
+				</xsl:if>
+				<xsl:if test ="not(parent::node()/parent::node()/parent::node()/p:txBody/a:lstStyle/a:lvl9pPr/a:defRPr/a:latin/@typeface)">
+					<xsl:value-of  select ="$DefFont"/>
+				</xsl:if>
+			</xsl:when>
+		</xsl:choose>
 	</xsl:template>
 	<!--End-->
 

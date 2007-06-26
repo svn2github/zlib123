@@ -1644,6 +1644,10 @@ Copyright (c) 2007, Sonata Software Limited
 					<xsl:if test ="name()='a:br'">
 						<text:line-break/>
 					</xsl:if>
+              <!-- Added by lohith.ar for fix 1731885-->
+              <xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">               
+                <text:span text:style-name="{generate-id()}" />
+              </xsl:if>
 				</xsl:for-each>
 			</text:p>
           <!--Code inserted by vijayeta,for Bullets and Numbering If Bullets are present-->
@@ -2196,7 +2200,7 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:attribute>
 
 			<!--fo:padding-->
-			<xsl:if test ="a:bodyPr/@lIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
+			<!--<xsl:if test ="a:bodyPr/@lIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
 				<xsl:attribute name ="fo:padding-left">
 					<xsl:call-template name="getPadding">
 						<xsl:with-param name="length" select="a:bodyPr/@lIns"/>
@@ -2226,6 +2230,74 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:with-param name="length" select="a:bodyPr/@bIns"/>
 					</xsl:call-template>
 				</xsl:attribute>
+			</xsl:if>-->
+
+			<xsl:if test ="a:bodyPr/@lIns">
+				<xsl:attribute name ="fo:padding-left">
+					<xsl:call-template name="ConvertEmu">
+						<xsl:with-param name="length" select="a:bodyPr/@lIns"/>
+						<xsl:with-param name="unit">cm</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test ="not(a:bodyPr/@lIns)">
+				<xsl:attribute name ="fo:padding-left">
+					<xsl:call-template name="ConvertEmu">
+						<xsl:with-param name="length" select="'91440'"/>
+						<xsl:with-param name="unit">cm</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
+			</xsl:if>
+			
+			<xsl:if test ="a:bodyPr/@tIns">
+				<xsl:attribute name ="fo:padding-top">
+					<xsl:call-template name="ConvertEmu">
+						<xsl:with-param name="length" select="a:bodyPr/@tIns"/>
+						<xsl:with-param name="unit">cm</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test ="not(a:bodyPr/@tIns)">
+				<xsl:attribute name ="fo:padding-top">
+					<xsl:call-template name="ConvertEmu">
+						<xsl:with-param name="length" select="'45720'"/>
+						<xsl:with-param name="unit">cm</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
+			</xsl:if>
+
+			<xsl:if test ="a:bodyPr/@rIns">
+				<xsl:attribute name ="fo:padding-right">
+					<xsl:call-template name="ConvertEmu">
+						<xsl:with-param name="length" select="a:bodyPr/@rIns"/>
+						<xsl:with-param name="unit">cm</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test ="not(a:bodyPr/@rIns)">
+				<xsl:attribute name ="fo:padding-right">
+					<xsl:call-template name="ConvertEmu">
+						<xsl:with-param name="length" select="'91440'"/>
+						<xsl:with-param name="unit">cm</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
+			</xsl:if>
+
+			<xsl:if test ="a:bodyPr/@bIns">
+				<xsl:attribute name ="fo:padding-bottom">
+					<xsl:call-template name="ConvertEmu">
+						<xsl:with-param name="length" select="a:bodyPr/@bIns"/>
+						<xsl:with-param name="unit">cm</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test ="not(a:bodyPr/@bIns)">
+				<xsl:attribute name ="fo:padding-bottom">
+					<xsl:call-template name="ConvertEmu">
+						<xsl:with-param name="length" select="'45720'"/>
+						<xsl:with-param name="unit">cm</xsl:with-param>
+					</xsl:call-template>
+				</xsl:attribute>
 			</xsl:if>
 
 			<!--Wrap text in shape -->
@@ -2240,6 +2312,11 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:value-of select ="'no-wrap'"/>
 					</xsl:attribute>
 				</xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name ="fo:wrap-option">
+            <xsl:value-of select ="'no-wrap'"/>
+          </xsl:attribute>
+        </xsl:otherwise>
 			</xsl:choose>
 
 			<xsl:if test ="( (a:bodyPr/a:spAutoFit) or (a:bodyPr/@wrap='square') )">

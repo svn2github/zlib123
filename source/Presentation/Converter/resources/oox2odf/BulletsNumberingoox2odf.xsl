@@ -32,7 +32,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
         <xsl:with-param name ="listStyleName" select ="$listStyleName"/>
       </xsl:call-template>
     </xsl:if>
-    <xsl:if test ="not(./a:pPr/@lvl)">
+    <!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
+    <xsl:if test ="not(./a:pPr/@lvl) or ./a:pPr/@lvl='0'">
       <text:list>
         <xsl:attribute name ="text:style-name">
           <xsl:value-of select ="$listStyleName"/>
@@ -142,23 +143,26 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute >
                     <xsl:attribute name ="text:bullet-char">
                       <xsl:choose>
+						  <xsl:when test="a:pPr/a:buChar/@char= '•'">
+							  <xsl:value-of select ="'•'"/>
+						  </xsl:when>
                         <xsl:when test="a:pPr/a:buChar/@char= 'Ø'">
                           <xsl:value-of select ="'➢'"/>
                         </xsl:when>
                         <xsl:when test="a:pPr/a:buChar/@char= 'o'">
                           <xsl:value-of select ="'○'"/>
                         </xsl:when>
-                        <xsl:when test="a:pPr/a:buChar/@char= '§'">
+                        <!--<xsl:when test="a:pPr/a:buChar/@char= '§'">
                           <xsl:value-of select ="'■'"/>
                         </xsl:when>
                         <xsl:when test="a:pPr/a:buChar/@char= 'q'">
                           <xsl:value-of select ="''"/>
-                        </xsl:when>
+                        </xsl:when>-->
                         <xsl:when test="a:pPr/a:buChar/@char= 'ü'">
                           <xsl:value-of select ="'✔'"/>
-                        </xsl:when>
-                        <xsl:when test="a:pPr/a:buChar/@char = '-'">
-                          <xsl:value-of select ="'-'"/>
+                        </xsl:when>                        
+                        <xsl:when test="a:pPr/a:buChar/@char = '–'">
+                          <xsl:value-of select ="'–'"/>
                         </xsl:when>
                         <xsl:when test="a:pPr/a:buChar/@char = '»'">
                           <xsl:value-of select ="'»'"/>
@@ -403,18 +407,21 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                         </xsl:attribute >
                         <xsl:attribute name ="text:bullet-char">
                           <xsl:choose>
+							  <xsl:when test="a:buChar/@char= '•'">
+								  <xsl:value-of select ="'•'"/>
+							  </xsl:when>
                             <xsl:when test="a:buChar/@char= 'Ø'">
                               <xsl:value-of select ="'➢'"/>
                             </xsl:when>
                             <xsl:when test="a:buChar/@char= 'o'">
                               <xsl:value-of select ="'○'"/>
                             </xsl:when>
-                            <xsl:when test="a:buChar/@char= '§'">
+                            <!--<xsl:when test="a:buChar/@char= '§'">
                               <xsl:value-of select ="'■'"/>
                             </xsl:when>
                             <xsl:when test="a:buChar/@char= 'q'">
                               <xsl:value-of select ="''"/>
-                            </xsl:when>
+                            </xsl:when>-->
                             <xsl:when test="a:buChar/@char= 'ü'">
                               <xsl:value-of select ="'✔'"/>
                             </xsl:when>
@@ -655,7 +662,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
               </xsl:choose>
             </text:list-style>
           </xsl:if>
-          <xsl:if test ="not(a:pPr/@lvl)">
+          <!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
+          <xsl:if test ="not(a:pPr/@lvl)or a:pPr/@lvl='0' ">
             <text:list-style>
               <xsl:attribute name ="style:name">
                 <xsl:value-of select ="concat($listStyleName,position())"/>
@@ -667,18 +675,21 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   </xsl:attribute >
                   <xsl:attribute name ="text:bullet-char">
                     <xsl:choose>
+						<xsl:when test="a:pPr/a:buChar/@char= '•'">
+							<xsl:value-of select ="'•'"/>
+						</xsl:when>
                       <xsl:when test="a:pPr/a:buChar/@char= 'Ø'">
                         <xsl:value-of select ="'➢'"/>
                       </xsl:when>
                       <xsl:when test="a:pPr/a:buChar/@char= 'o'">
                         <xsl:value-of select ="'○'"/>
                       </xsl:when>
-                      <xsl:when test="a:pPr/a:buChar/@char= '§'">
+                      <!--<xsl:when test="a:pPr/a:buChar/@char= '§'">
                         <xsl:value-of select ="'■'"/>
                       </xsl:when>
                       <xsl:when test="a:pPr/a:buChar/@char= 'q'">
                         <xsl:value-of select ="''"/>
-                      </xsl:when>
+                      </xsl:when>-->
                       <xsl:when test="a:pPr/a:buChar/@char= 'ü'">
                         <xsl:value-of select ="'✔'"/>
                       </xsl:when>
@@ -933,7 +944,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     </xsl:if>
     <!--End of Condition if levels are present-->
     <!--Condition if levels are not present-->
-    <xsl:if test ="not(./a:p/a:pPr/@lvl)">
+    <!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
+    <xsl:if test ="not(./a:p/a:pPr/@lvl) or ./a:p/a:pPr/@lvl='0'">
       <xsl:for-each select ="./a:p">
         <!-- Addded by vijayeta on 18th june,to check for bunone-->
         <xsl:if test ="not(a:pPr/a:buNone)">
@@ -949,18 +961,21 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                 </xsl:attribute >
                 <xsl:attribute name ="text:bullet-char">
                   <xsl:choose>
+					  <xsl:when test="a:pPr/a:buChar/@char= '•'">
+						  <xsl:value-of select ="'•'"/>
+					  </xsl:when>
                     <xsl:when test="a:pPr/a:buChar/@char= 'Ø'">
                       <xsl:value-of select ="'➢'"/>
                     </xsl:when>
                     <xsl:when test="a:pPr/a:buChar/@char= 'o'">
                       <xsl:value-of select ="'○'"/>
                     </xsl:when>
-                    <xsl:when test="a:pPr/a:buChar/@char= '§'">
+                    <!--<xsl:when test="a:pPr/a:buChar/@char= '§'">
                       <xsl:value-of select ="'■'"/>
                     </xsl:when>
                     <xsl:when test="a:pPr/a:buChar/@char= 'q'">
                       <xsl:value-of select ="''"/>
-                    </xsl:when>
+                    </xsl:when>-->
                     <xsl:when test="a:pPr/a:buChar/@char= 'ü'">
                       <xsl:value-of select ="'✔'"/>
                     </xsl:when>
@@ -1239,18 +1254,21 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                     </xsl:attribute >
                     <xsl:attribute name ="text:bullet-char">
                       <xsl:choose>
+						  <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= '•'">
+							  <xsl:value-of select ="'•'"/>
+						  </xsl:when>
                         <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'Ø'">
                           <xsl:value-of select ="'➢'"/>
                         </xsl:when>
                         <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'o'">
                           <xsl:value-of select ="'○'"/>
                         </xsl:when>
-                        <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= '§'">
+                        <!--<xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= '§'">
                           <xsl:value-of select ="'■'"/>
                         </xsl:when>
                         <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'q'">
                           <xsl:value-of select ="''"/>
-                        </xsl:when>
+                        </xsl:when>-->
                         <xsl:when test="child::node()[$newTextLvl]/a:buChar/@char= 'ü'">
                           <xsl:value-of select ="'✔'"/>
                         </xsl:when>
@@ -1494,7 +1512,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
             </xsl:for-each>
             <!--</xsl:if>-->
           </xsl:if>
-          <xsl:if test ="not(./a:pPr/@lvl)">
+          <!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
+          <xsl:if test ="not(./a:pPr/@lvl) or ./a:pPr/@lvl='0'">
             <xsl:if test ="not(./a:pPr/a:buNone)">
               <xsl:for-each select ="document('ppt/slideMasters/slideMaster1.xml')//p:sldMaster/p:txStyles/p:bodyStyle/child::node()[1]">
                 <text:list-style>
@@ -1508,18 +1527,21 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                       </xsl:attribute >
                       <xsl:attribute name ="text:bullet-char">
                         <xsl:choose>
+							<xsl:when test="a:buChar/@char= '•'">
+								<xsl:value-of select ="'•'"/>
+							</xsl:when>
                           <xsl:when test="a:buChar/@char= 'Ø'">
                             <xsl:value-of select ="'➢'"/>
                           </xsl:when>
                           <xsl:when test="a:buChar/@char= 'o'">
                             <xsl:value-of select ="'○'"/>
                           </xsl:when>
-                          <xsl:when test="a:buChar/@char= '§'">
+                          <!--<xsl:when test="a:buChar/@char= '§'">
                             <xsl:value-of select ="'■'"/>
                           </xsl:when>
                           <xsl:when test="a:buChar/@char= 'q'">
                             <xsl:value-of select ="''"/>
-                          </xsl:when>
+                          </xsl:when>-->
                           <xsl:when test="a:buChar/@char= 'ü'">
                             <xsl:value-of select ="'✔'"/>
                           </xsl:when>
@@ -1768,7 +1790,8 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     </xsl:if>
     <!--Condition if levels are present,and bullets are default-->
     <!--<xsl:if test ="not(./a:pPr/@lvl)">-->
-    <xsl:if test ="not(./a:p/a:pPr/@lvl)">
+    <!-- Fix by vijayeta,on 22nd june,bug number1739817,also test if explicit lvl=0-->
+    <xsl:if test ="not(./a:p/a:pPr/@lvl) or ./a:p/a:pPr/@lvl='0'">
       <xsl:if test ="not(./a:p/a:pPr/a:buNone)">
         <xsl:for-each select ="./a:p">
           <xsl:variable name ="position" select ="position()"/>
@@ -1784,18 +1807,21 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
                   </xsl:attribute >
                   <xsl:attribute name ="text:bullet-char">
                     <xsl:choose>
+						<xsl:when test="a:buChar/@char= '•'">
+							<xsl:value-of select ="'•'"/>
+						</xsl:when>
                       <xsl:when test="a:buChar/@char= 'Ø'">
                         <xsl:value-of select ="'➢'"/>
                       </xsl:when>
                       <xsl:when test="a:buChar/@char= 'o'">
                         <xsl:value-of select ="'○'"/>
                       </xsl:when>
-                      <xsl:when test="a:buChar/@char= '§'">
+                      <!--<xsl:when test="a:buChar/@char= '§'">
                         <xsl:value-of select ="'■'"/>
                       </xsl:when>
                       <xsl:when test="a:buChar/@char= 'q'">
                         <xsl:value-of select ="''"/>
-                      </xsl:when>
+                      </xsl:when>-->
                       <xsl:when test="a:buChar/@char= 'ü'">
                         <xsl:value-of select ="'✔'"/>
                       </xsl:when>
@@ -3012,107 +3038,6 @@ xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
     </xsl:for-each>
 
   </xsl:template>
-  <!-- delete this-->
-  <!--<xsl:template name="getColorCode">
-    <xsl:param name="color"/>
-    <xsl:param name ="lumMod"/>
-    <xsl:param name ="lumOff"/>
-    <xsl:variable name ="ThemeColor">
-      <xsl:for-each select ="document('ppt/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
-        <xsl:for-each select ="node()">
-          <xsl:if test ="name() =concat('a:',$color)">
-            <xsl:value-of select ="a:srgbClr/@val"/>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:for-each>
-    </xsl:variable>
-    <xsl:variable name ="BgTxColors">
-      <xsl:if test ="$color ='bg2'">
-        <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt2/a:srgbClr/@val"/>
-      </xsl:if>
-      <xsl:if test ="$color ='bg1'">
-        <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:lt1/a:srgbClr/@lastClr"/>
-      </xsl:if>
-      <xsl:if test ="$color ='tx1'">
-        <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:dk1/a:srgbClr/@lastClr"/>
-      </xsl:if>
-      <xsl:if test ="$color ='tx2'">
-        <xsl:value-of select ="document('ppt/theme/theme1.xml') //a:dk2/a:srgbClr/@val"/>
-      </xsl:if>
-    </xsl:variable>
-    <xsl:variable name ="NewColor">
-      <xsl:if test ="$ThemeColor != ''">
-        <xsl:value-of select ="$ThemeColor"/>
-      </xsl:if>
-      <xsl:if test ="$BgTxColors !=''">
-        <xsl:value-of select ="$BgTxColors"/>
-      </xsl:if>
-    </xsl:variable>
-    <xsl:call-template name ="ConverThemeColor">
-      <xsl:with-param name="color" select="$NewColor" />
-      <xsl:with-param name ="lumMod" select ="$lumMod"/>
-      <xsl:with-param name ="lumOff" select ="$lumOff"/>
-    </xsl:call-template>
-  </xsl:template >
-  <xsl:template name="ConverThemeColor">
-    <xsl:param name="color"/>
-    <xsl:param name ="lumMod"/>
-    <xsl:param name ="lumOff"/>
-    <xsl:variable name ="Red">
-      <xsl:call-template name ="HexToDec">
-        <xsl:with-param name ="number" select ="substring($color,1,2)"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name ="Green">
-      <xsl:call-template name ="HexToDec">
-        <xsl:with-param name ="number" select ="substring($color,3,2)"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name ="Blue">
-      <xsl:call-template name ="HexToDec">
-        <xsl:with-param name ="number" select ="substring($color,5,2)"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:choose >
-      <xsl:when test ="$lumOff = '' and $lumMod != '' ">
-        <xsl:variable name ="NewRed">
-          <xsl:value-of  select =" floor($Red * $lumMod div 100000) "/>
-        </xsl:variable>
-        <xsl:variable name ="NewGreen">
-          <xsl:value-of  select =" floor($Green * $lumMod div 100000)"/>
-        </xsl:variable>
-        <xsl:variable name ="NewBlue">
-          <xsl:value-of  select =" floor($Blue * $lumMod div 100000)"/>
-        </xsl:variable>
-        <xsl:call-template name ="CreateRGBColor">
-          <xsl:with-param name ="Red" select ="$NewRed"/>
-          <xsl:with-param name ="Green" select ="$NewGreen"/>
-          <xsl:with-param name ="Blue" select ="$NewBlue"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test ="$lumMod = '' and $lumOff != ''">-->
-        <!-- TBD Not sure whether this condition will occure-->
-      <!--</xsl:when>
-      <xsl:when test ="$lumMod = '' and $lumOff =''">
-        <xsl:value-of  select ="concat('#',$color)"/>
-      </xsl:when>
-      <xsl:when test ="$lumOff != '' and $lumMod!= '' ">
-        <xsl:variable name ="NewRed">
-          <xsl:value-of select ="floor(((255 - $Red) * (1 - ($lumMod  div 100000)))+ $Red )"/>
-        </xsl:variable>
-        <xsl:variable name ="NewGreen">
-          <xsl:value-of select ="floor(((255 - $Green) * ($lumOff  div 100000)) + $Green )"/>
-        </xsl:variable>
-        <xsl:variable name ="NewBlue">
-          <xsl:value-of select ="floor(((255 - $Blue) * ($lumOff div 100000)) + $Blue) "/>
-        </xsl:variable>
-        <xsl:call-template name ="CreateRGBColor">
-          <xsl:with-param name ="Red" select ="$NewRed"/>
-          <xsl:with-param name ="Green" select ="$NewGreen"/>
-          <xsl:with-param name ="Blue" select ="$NewBlue"/>
-        </xsl:call-template>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>-->
-	
+ 
+  
 </xsl:stylesheet>
