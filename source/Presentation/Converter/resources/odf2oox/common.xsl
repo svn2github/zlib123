@@ -47,6 +47,16 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:when test="contains($length,'pt')">
 					<xsl:value-of select="substring-before($length,'pt')"/>
 				</xsl:when>
+				<xsl:when test="contains($length,'in')">
+					<xsl:choose>
+						<xsl:when test ="$unit='cm'" >
+							<xsl:value-of select="substring-before($length,'in') * 2.54 "/>
+						</xsl:when>
+						<xsl:otherwise >
+							<xsl:value-of select="substring-before($length,'in')" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="$length"/>
 				</xsl:otherwise>
@@ -132,6 +142,11 @@ Copyright (c) 2007, Sonata Software Limited
         </xsl:attribute>
       </xsl:if>
       <xsl:if test ="style:text-properties/@style:letter-kerning = 'false'">
+        <xsl:attribute name ="kern">
+          <xsl:value-of select="0"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="not(style:text-properties/@style:letter-kerning)">
         <xsl:attribute name ="kern">
           <xsl:value-of select="0"/>
         </xsl:attribute>
@@ -308,7 +323,7 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:if>
 
 			<!-- Text Shadow fix -->
-			<xsl:if test ="style:text-properties/@fo:text-shadow">
+			<xsl:if test ="style:text-properties/@fo:text-shadow != 'none'">
 				<a:effectLst>
 					<a:outerShdw blurRad="38100" dist="38100" dir="2700000" >
 						<a:srgbClr val="000000">
@@ -370,7 +385,7 @@ Copyright (c) 2007, Sonata Software Limited
        
 				<!--marL="first line indent property"-->
 				<xsl:if test ="style:paragraph-properties/@fo:text-indent 
-							and substring-before(style:paragraph-properties/@fo:text-indent,'cm') &gt; 0">
+							and substring-before(style:paragraph-properties/@fo:text-indent,'cm') != 0">
 					<xsl:attribute name ="indent">
 						<!--fo:text-indent-->
 						<xsl:call-template name ="convertToPoints">
@@ -568,10 +583,16 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:variable>
 		<xsl:choose >
 			<xsl:when test ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:paragraph-properties/@fo:font-family">
-				<xsl:value-of select ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:paragraph-properties/@fo:font-family"/>
+				<xsl:variable name ="FontName">
+					<xsl:value-of select ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:paragraph-properties/@fo:font-family"/>
+				</xsl:variable>
+				<xsl:value-of select ="translate($FontName, &quot;'&quot;,'')" />
 			</xsl:when>
 			<xsl:when test ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:text-properties/@fo:font-family">
-				<xsl:value-of select ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:text-properties/@fo:font-family"/>
+				<xsl:variable name ="FontName">
+					<xsl:value-of select ="document('styles.xml')//style:style[@style:name = $defaultClsName]/style:text-properties/@fo:font-family"/>
+				</xsl:variable >
+				<xsl:value-of select ="translate($FontName, &quot;'&quot;,'')" />
 			</xsl:when>
 			<!-- Added by lohith - to access default Font family-->
 			<xsl:when test ="$defaultClsName='standard'">
@@ -831,6 +852,9 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:otherwise>
 			</xsl:choose> 
 		</xsl:for-each>
+		<xsl:if test ="not(node())">
+			<xsl:value-of select ="."/>
+		</xsl:if>
 	</xsl:template>
 
 </xsl:stylesheet>
