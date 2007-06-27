@@ -79,6 +79,7 @@
 	<EmbeddedResource Include="resources\oox2odf\chart.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
     <Compile Include="OoxHeaderFooterPostProcessor.cs" />
+    <Compile Include="OoxMaximumCellTextPostProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\OdfConverterLib\OdfConverterLib.csproj">

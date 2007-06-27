@@ -63,10 +63,15 @@
   <!-- template which inserts a string into sharedstrings -->
   <xsl:template name="InsertString">
     <!-- string can be in a simple row or a header row -->
-    <xsl:for-each
+<!--this is shortened version for grouping-->    
+<!--xsl:for-each
       select="document('content.xml')/office:document-content/office:body/office:spreadsheet/descendant::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))]
-      ">
+      "-->
+<xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))] |
+      document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-header-rows/table:table-row/table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))]">
       <si>
+        <pxsi:maxlength xmlns:pxsi="urn:cleverage:xmlns:post-processings:cellText">        
         <xsl:choose>
           <xsl:when test="text:span|text:p/text:span">
             <xsl:apply-templates mode="run" select="text:p"/>
@@ -75,6 +80,7 @@
             <t xml:space="preserve"><xsl:apply-templates mode="text" select="text:p"/></t>
           </xsl:otherwise>
         </xsl:choose>
+        </pxsi:maxlength>
       </si>
     </xsl:for-each>
   </xsl:template>
