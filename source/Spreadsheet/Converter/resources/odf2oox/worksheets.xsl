@@ -210,6 +210,36 @@
         <xsl:with-param name="masterPage" select="$masterPage"/>
       </xsl:call-template>
 
+      <!-- if there are row breakes in the workbook -->
+      <xsl:if
+        test="/office:document-content/office:automatic-styles/style:style[@style:family = 'table-row' ]/style:table-row-properties/@fo:break-before='page' ">
+        <xsl:variable name="rowBreakes">
+          <xsl:apply-templates select="descendant::table:table-row[1]" mode="rowBreakes">
+            <xsl:with-param name="tableId" select="generate-id(.)"/>
+          </xsl:apply-templates>
+        </xsl:variable>
+        
+        <!-- if there are row breakes in this sheet -->
+        <xsl:if test="$rowBreakes != '' ">
+          <xsl:variable name="countBreakes">
+            <xsl:value-of select="string-length($rowBreakes) - string-length(translate($rowBreakes,';',''))"/>
+          </xsl:variable>
+          
+          <rowBreaks>
+            <xsl:attribute name="count">
+              <xsl:value-of select="$countBreakes"/>
+            </xsl:attribute>
+            <xsl:attribute name="manualBreakCount">
+              <xsl:value-of select="$countBreakes"/>
+            </xsl:attribute>
+            
+            <xsl:call-template name="InsertRowBreakes">
+              <xsl:with-param name="rowBreakes" select="$rowBreakes"/>
+            </xsl:call-template>
+          </rowBreaks>
+        </xsl:if>
+      </xsl:if>
+      
       <xsl:variable name="picture">
         <xsl:choose>
           <xsl:when
@@ -243,36 +273,6 @@
 
       <xsl:if test="descendant::office:annotation">
         <legacyDrawing r:id="{concat('v_rId',$sheetId)}"/>
-      </xsl:if>
-
-      <!-- if there are row breakes in the workbook -->
-      <xsl:if
-        test="/office:document-content/office:automatic-styles/style:style[@style:family = 'table-row' ]/style:table-row-properties/@fo:break-before='page' ">
-        <xsl:variable name="rowBreakes">
-          <xsl:apply-templates select="descendant::table:table-row[1]" mode="rowBreakes">
-            <xsl:with-param name="tableId" select="generate-id(.)"/>
-          </xsl:apply-templates>
-        </xsl:variable>
-
-        <!-- if there are row breakes in this sheet -->
-        <xsl:if test="$rowBreakes != '' ">
-          <xsl:variable name="countBreakes">
-            <xsl:value-of select="string-length($rowBreakes) - string-length(translate($rowBreakes,';',''))"/>
-          </xsl:variable>
-          
-          <rowBreaks>
-            <xsl:attribute name="count">
-              <xsl:value-of select="$countBreakes"/>
-            </xsl:attribute>
-            <xsl:attribute name="manualBreakCount">
-              <xsl:value-of select="$countBreakes"/>
-            </xsl:attribute>
-            
-            <xsl:call-template name="InsertRowBreakes">
-              <xsl:with-param name="rowBreakes" select="$rowBreakes"/>
-            </xsl:call-template>
-          </rowBreaks>
-        </xsl:if>
       </xsl:if>
 
     </worksheet>
