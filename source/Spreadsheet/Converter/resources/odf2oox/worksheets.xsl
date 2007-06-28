@@ -199,7 +199,7 @@
           <xsl:with-param name="MergeCell" select="$MergeCell"/>
         </xsl:apply-templates>
       </xsl:if>
-      
+
       <xsl:call-template name="InsertHyperlinks"/>
 
       <xsl:call-template name="InsertPageProperties">
@@ -243,6 +243,36 @@
 
       <xsl:if test="descendant::office:annotation">
         <legacyDrawing r:id="{concat('v_rId',$sheetId)}"/>
+      </xsl:if>
+
+      <!-- if there are row breakes in the workbook -->
+      <xsl:if
+        test="/office:document-content/office:automatic-styles/style:style[@style:family = 'table-row' ]/style:table-row-properties/@fo:break-before='page' ">
+        <xsl:variable name="rowBreakes">
+          <xsl:apply-templates select="descendant::table:table-row[1]" mode="rowBreakes">
+            <xsl:with-param name="tableId" select="generate-id(.)"/>
+          </xsl:apply-templates>
+        </xsl:variable>
+
+        <!-- if there are row breakes in this sheet -->
+        <xsl:if test="$rowBreakes != '' ">
+          <xsl:variable name="countBreakes">
+            <xsl:value-of select="string-length($rowBreakes) - string-length(translate($rowBreakes,';',''))"/>
+          </xsl:variable>
+          
+          <rowBreaks>
+            <xsl:attribute name="count">
+              <xsl:value-of select="$countBreakes"/>
+            </xsl:attribute>
+            <xsl:attribute name="manualBreakCount">
+              <xsl:value-of select="$countBreakes"/>
+            </xsl:attribute>
+            
+            <xsl:call-template name="InsertRowBreakes">
+              <xsl:with-param name="rowBreakes" select="$rowBreakes"/>
+            </xsl:call-template>
+          </rowBreaks>
+        </xsl:if>
       </xsl:if>
 
     </worksheet>
@@ -551,7 +581,7 @@
 
   <xsl:template name="InsertHeaderFooter">
     <xsl:param name="masterPage"/>
-    
+
     <xsl:if
       test="document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = $masterPage]/style:header[not(@style:display = 'false' )]/child::node() or
       document('styles.xml')/office:document-styles/office:master-styles/style:master-page[@style:name = $masterPage]/style:footer[not(@style:display = 'false' )]/child::node()">
@@ -957,7 +987,9 @@
 
           <xsl:variable name="colPosition">
             <xsl:for-each select="ancestor::table:table-cell">
-              <xsl:value-of select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1"/>
+              <xsl:value-of
+                select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1"
+              />
             </xsl:for-each>
           </xsl:variable>
 
@@ -1002,7 +1034,7 @@
               </xsl:call-template>
             </xsl:variable>
 
-                   <xsl:if test="starts-with(@xlink:href,'#')">
+            <xsl:if test="starts-with(@xlink:href,'#')">
               <xsl:attribute name="location">
 
                 <xsl:variable name="apos">
@@ -1055,7 +1087,7 @@
                   <xsl:text>&apos;</xsl:text>
                 </xsl:if>
                 <xsl:text>!</xsl:text>
-                
+
                 <xsl:choose>
                   <xsl:when test="contains(@xlink:href,'.')">
                     <xsl:value-of select="substring-after(@xlink:href,'.')"/>
@@ -1064,14 +1096,14 @@
                     <xsl:text>A1</xsl:text>
                   </xsl:otherwise>
                 </xsl:choose>
-                
+
               </xsl:attribute>
             </xsl:if>
             <xsl:attribute name="display">
               <xsl:variable name="HypeDiscDisp">
-              <text:a>
-                <xsl:value-of select="."/>
-              </text:a>
+                <text:a>
+                  <xsl:value-of select="."/>
+                </text:a>
               </xsl:variable>
               <xsl:value-of select="$HypeDiscDisp"/>
             </xsl:attribute>
@@ -1080,6 +1112,79 @@
       </hyperlinks>
     </xsl:if>
 
+  </xsl:template>
+
+  <xsl:template match="table:table-row" mode="rowBreakes">
+    <!-- @Description: creates string containing in ascending order row numbers (0 based) followed by ";" that contain row breakes if there aren't any it returnes empty string -->
+    <xsl:param name="tableId"/>
+    <xsl:param name="rowNumber" select="0"/>
+    <xsl:param name="rowBreakes"/>
+
+    <xsl:variable name="rows">
+      <xsl:choose>
+        <xsl:when test="@table:number-rows-repeated">
+          <xsl:value-of select="@table:number-rows-repeated"/>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <xsl:variable name="breakes">
+      <xsl:choose>
+        <xsl:when
+          test="key('style',@table:style-name)/style:table-row-properties/@fo:break-before='page' ">
+          
+          <xsl:value-of select="$rowBreakes"/>
+          <xsl:if test="$rowBreakes != '' ">
+            <xsl:text>;</xsl:text>
+          </xsl:if>
+          <xsl:value-of select="$rowNumber"/>
+          
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$rowBreakes"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId]">
+        <xsl:apply-templates
+          select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]"
+          mode="rowBreakes">
+          <xsl:with-param name="tableId" select="$tableId"/>
+          <xsl:with-param name="rowNumber" select="$rowNumber + $rows"/>
+          <xsl:with-param name="rowBreakes">
+            <xsl:value-of select="$breakes"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$breakes"/>
+        <xsl:if test="$breakes!= '' ">
+          <xsl:text>;</xsl:text>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertRowBreakes">
+    <xsl:param name="rowBreakes"/>
+
+    <brk max="16383" man="1">
+      <xsl:attribute name="id">
+        <xsl:value-of select="substring-before($rowBreakes,';')"/>
+      </xsl:attribute>
+    </brk>
+
+    <xsl:if test="substring-after($rowBreakes,';') != '' ">
+      <xsl:call-template name="InsertRowBreakes">
+        <xsl:with-param name="rowBreakes">
+          <xsl:value-of select="substring-after($rowBreakes,';')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    
   </xsl:template>
 
 </xsl:stylesheet>
