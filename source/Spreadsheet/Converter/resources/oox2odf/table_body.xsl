@@ -335,7 +335,7 @@
                 </xsl:if>
               </table:table-cell>
             </xsl:when>
-            <xsl:when test="$PictureCell != '' and $GetMinRowWithElements=@r and not(e:c)">              
+            <xsl:when test="$PictureCell != '' and $GetMinRowWithElements=@r and not(e:c)">  
               <xsl:call-template name="InsertElementsBetweenTwoColl">
                 <xsl:with-param name="sheet">
                   <xsl:value-of select="$sheet"/>
@@ -579,7 +579,7 @@
           </xsl:with-param>
           <xsl:with-param name="sheetNr" select="$sheetNr"/>
           <xsl:with-param name="EndColl">
-            <xsl:text>256</xsl:text>
+            <xsl:value-of select="$colNum"/>
           </xsl:with-param>
         </xsl:call-template>
         
