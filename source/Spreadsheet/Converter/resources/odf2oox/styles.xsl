@@ -991,8 +991,8 @@
           </xsl:attribute>
         </xsl:if>
 
-        <!-- Indent  -->
-        <xsl:if test="style:paragraph-properties/@fo:margin-left">
+        <!-- Indent  (can not be negative)-->
+        <xsl:if test="style:paragraph-properties/@fo:margin-left and not(starts-with(style:paragraph-properties/@fo:margin-left,'-'))">
           <xsl:attribute name="indent">
             <xsl:variable name="indentLeft">
               <xsl:value-of select="style:paragraph-properties/@fo:margin-left"/>
@@ -1004,7 +1004,7 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:variable>
-            <xsl:value-of select="$indent_value div 10"/>
+              <xsl:value-of select="round($indent_value div 10)"/>
           </xsl:attribute>
         </xsl:if>
 
