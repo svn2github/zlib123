@@ -192,7 +192,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- calculates power function -->
   <xsl:template name="Power">
     <xsl:param name="base"/>
@@ -668,93 +668,225 @@
       </xsl:call-template>
     </xsl:variable>
 
-  <xsl:choose>
-    <xsl:when test="$sign = '+'">
-      <xsl:value-of select="$base * $factor"/>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:value-of select="$base div $factor"/>
-    </xsl:otherwise>
-  </xsl:choose>
-    
+    <xsl:choose>
+      <xsl:when test="$sign = '+'">
+        <xsl:value-of select="$base * $factor"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$base div $factor"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
-  
+
   <xsl:template name="GetBuildInColor">
-    <xsl:param name="index"/>      
-      <xsl:choose>
-        <xsl:when test="$index=0"><xsl:text>000000</xsl:text></xsl:when>
-        <xsl:when test="$index=1"><xsl:text>FFFFFF</xsl:text></xsl:when>
-        <xsl:when test="$index=2"><xsl:text>FF0000</xsl:text></xsl:when>
-        <xsl:when test="$index=3"><xsl:text>00FF00</xsl:text></xsl:when>
-        <xsl:when test="$index=4"><xsl:text>0000FF</xsl:text></xsl:when>
-        <xsl:when test="$index=5"><xsl:text>FFFF00</xsl:text></xsl:when>
-        <xsl:when test="$index=6"><xsl:text>FF00FF</xsl:text></xsl:when>
-        <xsl:when test="$index=7"><xsl:text>00FFFF</xsl:text></xsl:when>
-        <xsl:when test="$index=8"><xsl:text>000000</xsl:text></xsl:when>
-        <xsl:when test="$index=9"><xsl:text>FFFFFF</xsl:text></xsl:when>
-        <xsl:when test="$index=10"><xsl:text>FF0000</xsl:text></xsl:when>
-        <xsl:when test="$index=11"><xsl:text>00FF00</xsl:text></xsl:when>
-        <xsl:when test="$index=12"><xsl:text>0000FF</xsl:text></xsl:when>
-        <xsl:when test="$index=13"><xsl:text>FFFF00</xsl:text></xsl:when>
-        <xsl:when test="$index=14"><xsl:text>FF00FF</xsl:text></xsl:when>
-        <xsl:when test="$index=15"><xsl:text>00FFFF</xsl:text></xsl:when>
-        <xsl:when test="$index=16"><xsl:text>800000</xsl:text></xsl:when>
-        <xsl:when test="$index=17"><xsl:text>008000</xsl:text></xsl:when>
-        <xsl:when test="$index=18"><xsl:text>000080</xsl:text></xsl:when>
-        <xsl:when test="$index=19"><xsl:text>808000</xsl:text></xsl:when>
-        <xsl:when test="$index=20"><xsl:text>800080</xsl:text></xsl:when>
-        <xsl:when test="$index=21"><xsl:text>008080</xsl:text></xsl:when>
-        <xsl:when test="$index=22"><xsl:text>C0C0C0</xsl:text></xsl:when>
-        <xsl:when test="$index=23"><xsl:text>808080</xsl:text></xsl:when>
-        <xsl:when test="$index=24"><xsl:text>8080FF</xsl:text></xsl:when>
-        <xsl:when test="$index=25"><xsl:text>802060</xsl:text></xsl:when>
-        <xsl:when test="$index=26"><xsl:text>FFFFC0</xsl:text></xsl:when>
-        <xsl:when test="$index=27"><xsl:text>A0E0E0</xsl:text></xsl:when>
-        <xsl:when test="$index=28"><xsl:text>600080</xsl:text></xsl:when>
-        <xsl:when test="$index=29"><xsl:text>FF8080</xsl:text></xsl:when>
-        <xsl:when test="$index=30"><xsl:text>0080C0</xsl:text></xsl:when>
-        <xsl:when test="$index=31"><xsl:text>C0C0FF</xsl:text></xsl:when>
-        <xsl:when test="$index=32"><xsl:text>000080</xsl:text></xsl:when>
-        <xsl:when test="$index=33"><xsl:text>FF00FF</xsl:text></xsl:when>
-        <xsl:when test="$index=34"><xsl:text>FFFF00</xsl:text></xsl:when>
-        <xsl:when test="$index=35"><xsl:text>00FFFF</xsl:text></xsl:when>
-        <xsl:when test="$index=36"><xsl:text>800080</xsl:text></xsl:when>
-        <xsl:when test="$index=37"><xsl:text>800000</xsl:text></xsl:when>
-        <xsl:when test="$index=38"><xsl:text>008080</xsl:text></xsl:when>
-        <xsl:when test="$index=39"><xsl:text>0000FF</xsl:text></xsl:when>
-        <xsl:when test="$index=40"><xsl:text>00CCFF</xsl:text></xsl:when>
-        <xsl:when test="$index=41"><xsl:text>CCFFFF</xsl:text></xsl:when>
-        <xsl:when test="$index=42"><xsl:text>CCFFCC</xsl:text></xsl:when>
-        <xsl:when test="$index=43"><xsl:text>FFFF99</xsl:text></xsl:when>
-        <xsl:when test="$index=44"><xsl:text>A6CAF0</xsl:text></xsl:when>
-        <xsl:when test="$index=45"><xsl:text>CC9CCC</xsl:text></xsl:when>
-        <xsl:when test="$index=46"><xsl:text>CC99FF</xsl:text></xsl:when>
-        <xsl:when test="$index=47"><xsl:text>FFCC99</xsl:text></xsl:when>
-        <xsl:when test="$index=48"><xsl:text>3366FF</xsl:text></xsl:when>
-        <xsl:when test="$index=49"><xsl:text>33CCCC</xsl:text></xsl:when>
-        <xsl:when test="$index=50"><xsl:text>339933</xsl:text></xsl:when>
-        <xsl:when test="$index=51"><xsl:text>FFD700</xsl:text></xsl:when>
-        <xsl:when test="$index=52"><xsl:text>FFA500</xsl:text></xsl:when>
-        <xsl:when test="$index=53"><xsl:text>996666</xsl:text></xsl:when>
-        <xsl:when test="$index=54"><xsl:text>666699</xsl:text></xsl:when>
-        <xsl:when test="$index=55"><xsl:text>969696</xsl:text></xsl:when>
-        <xsl:when test="$index=56"><xsl:text>3333CC</xsl:text></xsl:when>
-        <xsl:when test="$index=57"><xsl:text>336666</xsl:text></xsl:when>
-        <xsl:when test="$index=58"><xsl:text>003300</xsl:text></xsl:when>
-        <xsl:when test="$index=59"><xsl:text>333300</xsl:text></xsl:when>
-        <xsl:when test="$index=60"><xsl:text>663300</xsl:text></xsl:when>
-        <xsl:when test="$index=61"><xsl:text>993366</xsl:text></xsl:when>
-        <xsl:when test="$index=62"><xsl:text>333399</xsl:text></xsl:when>
-        <xsl:when test="$index=63"><xsl:text>424242</xsl:text></xsl:when>
-        <xsl:when test="$index=64"><xsl:text>000000</xsl:text></xsl:when>
-        <xsl:when test="$index=65"><xsl:text>FFFFFF</xsl:text></xsl:when>
-        <xsl:otherwise>000000</xsl:otherwise>
-      </xsl:choose>
+    <xsl:param name="index"/>
+    <xsl:choose>
+      <xsl:when test="$index=0">
+        <xsl:text>000000</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=1">
+        <xsl:text>FFFFFF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=2">
+        <xsl:text>FF0000</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=3">
+        <xsl:text>00FF00</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=4">
+        <xsl:text>0000FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=5">
+        <xsl:text>FFFF00</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=6">
+        <xsl:text>FF00FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=7">
+        <xsl:text>00FFFF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=8">
+        <xsl:text>000000</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=9">
+        <xsl:text>FFFFFF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=10">
+        <xsl:text>FF0000</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=11">
+        <xsl:text>00FF00</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=12">
+        <xsl:text>0000FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=13">
+        <xsl:text>FFFF00</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=14">
+        <xsl:text>FF00FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=15">
+        <xsl:text>00FFFF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=16">
+        <xsl:text>800000</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=17">
+        <xsl:text>008000</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=18">
+        <xsl:text>000080</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=19">
+        <xsl:text>808000</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=20">
+        <xsl:text>800080</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=21">
+        <xsl:text>008080</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=22">
+        <xsl:text>C0C0C0</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=23">
+        <xsl:text>808080</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=24">
+        <xsl:text>8080FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=25">
+        <xsl:text>802060</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=26">
+        <xsl:text>FFFFC0</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=27">
+        <xsl:text>A0E0E0</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=28">
+        <xsl:text>600080</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=29">
+        <xsl:text>FF8080</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=30">
+        <xsl:text>0080C0</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=31">
+        <xsl:text>C0C0FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=32">
+        <xsl:text>000080</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=33">
+        <xsl:text>FF00FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=34">
+        <xsl:text>FFFF00</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=35">
+        <xsl:text>00FFFF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=36">
+        <xsl:text>800080</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=37">
+        <xsl:text>800000</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=38">
+        <xsl:text>008080</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=39">
+        <xsl:text>0000FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=40">
+        <xsl:text>00CCFF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=41">
+        <xsl:text>CCFFFF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=42">
+        <xsl:text>CCFFCC</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=43">
+        <xsl:text>FFFF99</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=44">
+        <xsl:text>A6CAF0</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=45">
+        <xsl:text>CC9CCC</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=46">
+        <xsl:text>CC99FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=47">
+        <xsl:text>FFCC99</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=48">
+        <xsl:text>3366FF</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=49">
+        <xsl:text>33CCCC</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=50">
+        <xsl:text>339933</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=51">
+        <xsl:text>FFD700</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=52">
+        <xsl:text>FFA500</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=53">
+        <xsl:text>996666</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=54">
+        <xsl:text>666699</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=55">
+        <xsl:text>969696</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=56">
+        <xsl:text>3333CC</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=57">
+        <xsl:text>336666</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=58">
+        <xsl:text>003300</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=59">
+        <xsl:text>333300</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=60">
+        <xsl:text>663300</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=61">
+        <xsl:text>993366</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=62">
+        <xsl:text>333399</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=63">
+        <xsl:text>424242</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=64">
+        <xsl:text>000000</xsl:text>
+      </xsl:when>
+      <xsl:when test="$index=65">
+        <xsl:text>FFFFFF</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>000000</xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="ConvertFromCharacters">
     <xsl:param name="value"/>
-    
+
     <!-- strange but true: the best result is when you WON'T convert average digit width from pt to px-->
     <xsl:variable name="defaultFontSize">
       <xsl:for-each select="document('xl/styles.xml')">
@@ -768,7 +900,7 @@
         </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
-    
+
     <xsl:variable name="fontSize">
       <xsl:call-template name="ConvertPoints">
         <xsl:with-param name="length">
@@ -797,7 +929,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertColor">
 
     <xsl:variable name="this" select="."/>
@@ -848,7 +980,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <!-- color from theme -->
         <xsl:variable name="themeColor">
           <xsl:choose>
@@ -866,7 +998,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:variable name="color">
           <xsl:choose>
             <!-- if tinted color -->
@@ -894,17 +1026,17 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        
+
         <xsl:value-of select="concat('#',$color)"/>
       </xsl:when>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="InsertPaperSize">
     <xsl:param name="paperSize"/>
     <xsl:param name="orientation"/>
-    
+
     <xsl:choose>
       <xsl:when test="$orientation='landscape' ">
         <xsl:choose>
@@ -997,7 +1129,7 @@
               <xsl:text>20.999cm</xsl:text>
             </xsl:attribute>
           </xsl:otherwise>
-        </xsl:choose>        
+        </xsl:choose>
       </xsl:when>
       <!-- when orientation is 'portrait' -->
       <xsl:otherwise>
@@ -1091,18 +1223,19 @@
               <xsl:text>29.699cm</xsl:text>
             </xsl:attribute>
           </xsl:otherwise>
-        </xsl:choose>        
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
-    
+
   </xsl:template>
-  
+
   <xsl:template name="NumberToDate">
-    
+
     <!-- @Descripition: converts number value to date value -->
     <!-- @Context: None -->
-    
-    <xsl:param name="value"/><!-- (float) number value -->
+
+    <xsl:param name="value"/>
+    <!-- (float) number value -->
     <xsl:variable name="time">
       <xsl:value-of select="concat('0.',substring-after($value,'.'))"/>
     </xsl:variable>
@@ -1118,7 +1251,7 @@
     <xsl:variable name="mins">
       <xsl:value-of select="floor($timeInMins)"/>
     </xsl:variable>
-    
+
     <!-- seconds -->
     <xsl:variable name="seconds">
       <xsl:value-of select="($timeInMins - $mins) *  60"/>
@@ -1140,7 +1273,7 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="date">
       <xsl:choose>
         <xsl:when test="contains($value,'.')">
@@ -1151,17 +1284,17 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="YearAndDay">
       <xsl:call-template name="CalculateYearAndDay">
         <xsl:with-param name="days">
           <xsl:choose>
-            
+
             <!-- modification due to Excel Date Bug(leap year 1900) -->
             <xsl:when test="$date &gt; 59">
               <xsl:value-of select="$date - 1"/>
             </xsl:when>
-            
+
             <xsl:otherwise>
               <xsl:value-of select="$date"/>
             </xsl:otherwise>
@@ -1170,16 +1303,16 @@
         <xsl:with-param name="currentYear">1900</xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <!-- year -->
     <xsl:variable name="years">
       <xsl:value-of select="substring-before($YearAndDay,':') - 1900"/>
     </xsl:variable>
-    
+
     <xsl:variable name="dateInLastYear">
       <xsl:value-of select="substring-after($YearAndDay,':')"/>
     </xsl:variable>
-    
+
     <!-- month and day -->
     <xsl:variable name="monthsAndDays">
       <xsl:call-template name="DaysToMonthsAndDays">
@@ -1188,68 +1321,123 @@
         </xsl:with-param>
         <xsl:with-param name="ExtraDay">
           <xsl:choose>
-            <xsl:when test="((1900 + $years - 4 * floor((1900 + $years) div 4)) = 0 and (1900 + $years - 100 * floor((1900 + $years) div 100) != 0)) or (1900 + $years - 400 * floor((1900 + $years) div 400)) = 0">1</xsl:when>
+            <xsl:when
+              test="((1900 + $years - 4 * floor((1900 + $years) div 4)) = 0 and (1900 + $years - 100 * floor((1900 + $years) div 100) != 0)) or (1900 + $years - 400 * floor((1900 + $years) div 400)) = 0"
+              >1</xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
           </xsl:choose>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
-    <xsl:value-of select="concat(concat(concat(concat(concat(concat(concat(concat((1900+$years),'-'),$monthsAndDays),'T'),format-number($hours,'00')),':'),format-number($mins,'00')),':'),concat($secondsBeforeComma,$secondsAfterComma))"/>
+
+    <xsl:value-of
+      select="concat(concat(concat(concat(concat(concat(concat(concat((1900+$years),'-'),$monthsAndDays),'T'),format-number($hours,'00')),':'),format-number($mins,'00')),':'),concat($secondsBeforeComma,$secondsAfterComma))"
+    />
   </xsl:template>
-  
+
   <xsl:template name="NumberToTime">
-    
+
     <!-- @Descripition: converts number value to time value -->
     <!-- @Context: None -->
-    
-    <xsl:param name="value"/><!-- (float) number value -->
-    
-    <xsl:variable name="hours">
-      <xsl:choose>        
-        <xsl:when test="number($value)">
-          <xsl:value-of select="floor($value * 24)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>0</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    
-    <xsl:variable name="minutes">
-      <xsl:choose>        
-        <xsl:when test="number($value)">
-            <xsl:value-of select="floor(($value * 24 - $hours) * 60)"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>0</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    
-    <xsl:variable name="seconds">
-      <xsl:choose>        
-        <xsl:when test="number($value)">
-            <xsl:value-of select="$value * 86400 - $minutes * 60 - $hours * 3600"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>0</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    
-    <xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>
-    
-    
+    <xsl:param name="value"/>
+
+    <xsl:choose>
+      <xsl:when test="contains($value, 'E')">
+
+        <xsl:variable name="Scient2time">
+          <xsl:call-template name="ConvertScientific">
+            <xsl:with-param name="value">
+              <xsl:value-of select="."/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="hours">
+          <xsl:choose>
+            <xsl:when test="number($Scient2time)">
+              <xsl:value-of select="floor($Scient2time * 24)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="minutes">
+          <xsl:choose>
+            <xsl:when test="number($Scient2time)">
+              <xsl:value-of select="floor(($Scient2time * 24 - $hours) * 60)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="seconds">
+          <xsl:choose>
+            <xsl:when test="number($Scient2time)">
+              <xsl:value-of select="$Scient2time * 86400 - $minutes * 60 - $hours * 3600"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>
+
+      </xsl:when>
+      <xsl:otherwise>
+
+        <xsl:variable name="hours">
+          <xsl:choose>
+            <xsl:when test="number($value)">
+              <xsl:value-of select="floor($value * 24)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="minutes">
+          <xsl:choose>
+            <xsl:when test="number($value)">
+              <xsl:value-of select="floor(($value * 24 - $hours) * 60)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="seconds">
+          <xsl:choose>
+            <xsl:when test="number($value)">
+              <xsl:value-of select="$value * 86400 - $minutes * 60 - $hours * 3600"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>0</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:value-of select="concat('PT',$hours,'H',$minutes,'M',$seconds,'S')"/>
+
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
-  
+
   <xsl:template name="DaysToMonthsAndDays">
-    
+
     <!-- @Descripition: converts day of a year to month and day of the year -->
     <!-- @Context: None -->
-    
-    <xsl:param name="days"/><!-- (int) day of year -->
-    <xsl:param name="ExtraDay"/><!-- (int) extra day if it's a leap year -->
+
+    <xsl:param name="days"/>
+    <!-- (int) day of year -->
+    <xsl:param name="ExtraDay"/>
+    <!-- (int) extra day if it's a leap year -->
     <xsl:choose>
       <xsl:when test="$days &lt; 32">
         <xsl:value-of select="concat('01-',format-number($days,'00'))"/>
@@ -1289,18 +1477,21 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-  
+
   <!-- calcualte year and number of days left from number of days -->
-  
+
   <xsl:template name="CalculateYearAndDay">
-    
+
     <!-- @Descripition: calcualte year and number of days left from number of days after 1.01.1900 -->
     <!-- @Context: None -->
-    
-    <xsl:param name="days"/><!-- (int) number of days -->
-    <xsl:param name="currentYear"/><!-- (int) current year -->
+
+    <xsl:param name="days"/>
+    <!-- (int) number of days -->
+    <xsl:param name="currentYear"/>
+    <!-- (int) current year -->
     <xsl:choose>
-      <xsl:when test="(($currentYear - 4 * floor(($currentYear) div 4)) = 0 and ($currentYear - 100 * floor(($currentYear) div 100) != 0)) or ($currentYear - 400 * floor(($currentYear) div 400)) = 0">
+      <xsl:when
+        test="(($currentYear - 4 * floor(($currentYear) div 4)) = 0 and ($currentYear - 100 * floor(($currentYear) div 100) != 0)) or ($currentYear - 400 * floor(($currentYear) div 400)) = 0">
         <xsl:choose>
           <xsl:when test="$days &gt; 366">
             <xsl:call-template name="CalculateYearAndDay">
@@ -1336,5 +1527,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>
