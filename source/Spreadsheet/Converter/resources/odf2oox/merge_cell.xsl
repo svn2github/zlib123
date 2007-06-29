@@ -33,7 +33,6 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   exclude-result-prefixes="table">
   
   
@@ -89,14 +88,20 @@
       
     </xsl:if>
     
+    <xsl:variable name="tableId">
+      <xsl:value-of select="generate-id(ancestor::table:table)"/>
+    </xsl:variable>
+    
     <xsl:choose>
       <!-- next row is a sibling -->
-      <xsl:when test="following-sibling::node()[1][name() = 'table:table-row' ]">
-        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="mergestyle">
+      <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId]">
+        <xsl:apply-templates select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]" mode="mergestyle">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="following-sibling::table:table-row[1]/@table:number-rows-repeated">
-                <xsl:value-of select="$rowNumber + following-sibling::table:table-row[1]/@table:number-rows-repeated"/>    
+                <xsl:value-of
+                  select="$rowNumber + following-sibling::table:table-row[1]/@table:number-rows-repeated"
+                />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber + 1"/>
@@ -107,11 +112,15 @@
       </xsl:when>
       <!-- next row is inside header rows -->
       <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ]">
-        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]" mode="mergestyle">
+        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]"
+          mode="mergestyle">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
-              <xsl:when test="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
-                <xsl:value-of select="$rowNumber + following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated"/>    
+              <xsl:when
+                test="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
+                <xsl:value-of
+                  select="$rowNumber + following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated"
+                />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber + 1"/>
@@ -121,12 +130,17 @@
         </xsl:apply-templates>
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
-      <xsl:when test="parent::node()[name()='table:table-header-rows'] and not(following-sibling::node()[1][name() = 'table:table-row' ])">
-        <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]" mode="mergestyle">
+      <xsl:when
+        test="parent::node()[name()='table:table-header-rows'] and not(following-sibling::node()[1][name() = 'table:table-row' ])">
+        <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]"
+          mode="mergestyle">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
-              <xsl:when test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
-                <xsl:value-of select="$rowNumber + parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated"/>    
+              <xsl:when
+                test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
+                <xsl:value-of
+                  select="$rowNumber + parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated"
+                />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber + 1"/>
@@ -163,7 +177,9 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:variable>        
-        <xsl:value-of select="concat(concat(concat(concat($CollStartChar,$rowNumber),':'),  @table:style-name), ';')"/>        
+        <xsl:value-of
+          select="concat(concat(concat(concat($CollStartChar,$rowNumber),':'),  @table:style-name), ';')"
+        />
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
@@ -236,6 +252,10 @@
             <xsl:value-of select="$rowNumber"/>
           </xsl:with-param>
         </xsl:apply-templates>
+
+    <xsl:variable name="tableId">
+      <xsl:value-of select="generate-id(ancestor::table:table-row-group)"/>
+    </xsl:variable>
     
   </xsl:template>
   
@@ -430,12 +450,16 @@
       </xsl:choose>
       
     </xsl:if>
+
+    <xsl:variable name="tableId">
+      <xsl:value-of select="generate-id(ancestor::table:table)"/>
+    </xsl:variable>
     
     <!-- Check if next row exist -->
     <xsl:choose>
       <!-- next row is a sibling -->
-      <xsl:when test="following-sibling::node()[1][name() = 'table:table-row' ]">
-        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="merge">
+      <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId]">
+        <xsl:apply-templates select="following::table:table-row[generate-id(ancestor::table:table) = $tableId][1]" mode="merge">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="following-sibling::table:table-row[1]/@table:number-rows-repeated">
@@ -450,11 +474,15 @@
       </xsl:when>
       <!-- next row is inside header rows -->
       <xsl:when test="following-sibling::node()[1][name() = 'table:table-header-rows' ]">
-        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]" mode="merge">
+        <xsl:apply-templates select="following-sibling::table:table-header-rows/table:table-row[1]"
+          mode="merge">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
-              <xsl:when test="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
-                <xsl:value-of select="$rowNumber + following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated"/>    
+              <xsl:when
+                test="following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated">
+                <xsl:value-of
+                  select="$rowNumber + following-sibling::table:table-header-rows/table:table-row[1]/@table:number-rows-repeated"
+                />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber + 1"/>
@@ -468,8 +496,11 @@
         <xsl:apply-templates select="parent::node()/following-sibling::table:table-row[1]" mode="merge">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
-              <xsl:when test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
-                <xsl:value-of select="$rowNumber + parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated"/>    
+              <xsl:when
+                test="parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated">
+                <xsl:value-of
+                  select="$rowNumber + parent::node()/following-sibling::table:table-row[1]/@table:number-rows-repeated"
+                />
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$rowNumber + 1"/>
@@ -570,7 +601,5 @@
     </xsl:if>
     
   </xsl:template>
-  
-  
   
 </xsl:stylesheet>

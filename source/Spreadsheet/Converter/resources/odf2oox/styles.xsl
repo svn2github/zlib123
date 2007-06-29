@@ -262,7 +262,7 @@
     <fonts>
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)])"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']/style:text-properties) + 1 + count(document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)])"
         />
       </xsl:attribute>
 
@@ -300,7 +300,7 @@
       <!--hyperlink font properties-->
       <xsl:choose>
         <xsl:when
-          test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
+          test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)]">
           <font>
             <u val="single"/>
             <sz val="11"/>
@@ -577,7 +577,7 @@
 
       <xsl:attribute name="count">
         <xsl:value-of
-          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(document('content.xml')/descendant::text:a[@xlink:href and not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)])"
+          select="count(document('content.xml')/office:document-content/office:automatic-styles/style:style[@style:family='table-cell']) + 1 + $multilines  + count(document('content.xml')/descendant::text:a[@xlink:href and not(ancestor::draw:custom-shape)])"
         />
       </xsl:attribute>
 
@@ -684,7 +684,7 @@
       </xsl:for-each>
 
       <xsl:if
-        test="not(document('styles.xml')/office:document-styles/office:styles/style:style/@style:name = 'Hyperlink') and document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
+        test="not(document('styles.xml')/office:document-styles/office:styles/style:style/@style:name = 'Hyperlink') and document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)]">
         <cellStyle
           xfId="{count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1}"
           name="Hyperlink"/>
@@ -2347,7 +2347,7 @@
 
   <xsl:template name="InsertHyperlinksProperties">
     <xsl:if
-      test="document('content.xml')/descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
+      test="document('content.xml')/descendant::text:a[not(ancestor::draw:custom-shape)]">
       <xsl:variable name="xfId">
         <xsl:value-of
           select="count(document('styles.xml')/office:document-styles/office:styles/style:style[@style:family = 'table-cell']) + 1"

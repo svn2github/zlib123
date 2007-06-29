@@ -157,7 +157,7 @@
       <!--hyperlink-->
       <xsl:if test="$hyperlink = 'true' ">
         <xsl:for-each
-          select="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
+          select="descendant::text:a[not(ancestor::draw:custom-shape)]">
 
           <Relationship Id="{generate-id(.)}"
             Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"

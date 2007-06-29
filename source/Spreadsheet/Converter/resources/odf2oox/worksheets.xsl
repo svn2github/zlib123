@@ -187,7 +187,7 @@
 
       <xsl:if
         test="ancestor::office:document-content/office:automatic-styles/style:style/style:map/@style:condition != ''">
-        <xsl:apply-templates select="table:table-row[1]" mode="conditional">
+        <xsl:apply-templates select="descendant::table:table-row[1]" mode="conditional">
           <xsl:with-param name="rowNumber">
             <xsl:text>1</xsl:text>
           </xsl:with-param>
@@ -488,7 +488,9 @@
     <xsl:variable name="CheckRowHidden">
       <xsl:choose>
         <xsl:when test="table:table-row[@table:visibility='collapse']">
-          <xsl:apply-templates select="descendant::table:table-row[1]" mode="zeroHeight">
+          <xsl:apply-templates
+            select="descendant::table:table-row[1]"
+            mode="zeroHeight">
             <xsl:with-param name="rowNumber">
               <xsl:text>0</xsl:text>
             </xsl:with-param>
@@ -551,7 +553,6 @@
       </cols>
     </xsl:if>
     <sheetData>
-
       <!-- insert first row -->
       <xsl:apply-templates select="descendant::table:table-row[1]" mode="sheet">
         <xsl:with-param name="rowNumber">1</xsl:with-param>
@@ -574,7 +575,6 @@
           <xsl:value-of select="$CheckIfDefaultBorder"/>
         </xsl:with-param>
       </xsl:apply-templates>
-
     </sheetData>
 
   </xsl:template>
@@ -977,10 +977,10 @@
 
     <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
     <xsl:if
-      test="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
+      test="descendant::text:a[not(ancestor::draw:custom-shape)]">
       <hyperlinks>
         <xsl:for-each
-          select="descendant::text:a[not(ancestor::table:table-row-group or ancestor::table:covered-table-cell or ancestor::draw:custom-shape)]">
+          select="descendant::text:a[not(ancestor::draw:custom-shape)]">
           <xsl:variable name="ViewHyperlinks">
             <xsl:value-of select="."/>
           </xsl:variable>
