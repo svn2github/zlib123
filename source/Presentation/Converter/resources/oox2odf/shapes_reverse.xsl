@@ -80,6 +80,19 @@ Copyright (c) 2007, Sonata Software Limited
 		<xsl:value-of select ="'0.4'" />
 	</xsl:variable>
 	
+	<xsl:template name ="drawShapes">
+		<xsl:param name ="SlideID" />
+		<xsl:param name ="SlideRelationId" />
+		<xsl:param name ="grID" />
+		<xsl:param name ="prID" />
+
+		<xsl:call-template name ="shapes">
+			<xsl:with-param name="GraphicId" select ="concat($SlideID,$grID,position())"/>
+			<xsl:with-param name ="ParaId" select ="concat($SlideID,$prID,position())" />
+			<xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
+		</xsl:call-template>
+	</xsl:template>
+	
 	<!-- Template for Shapes in reverse conversion -->
 	<xsl:template  name="shapes">
 		<xsl:param name="GraphicId" />
@@ -1659,19 +1672,19 @@ Copyright (c) 2007, Sonata Software Limited
 
 	</xsl:template>
 	<!-- Generate autometic styles in contet.xsl for graphic properties-->
-	<xsl:template name ="InsertStylesForGraphicProperties"  >
+	<!--<xsl:template name ="InsertStylesForGraphicProperties"  >
 		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
 			<xsl:variable name ="SlideId">
 				<xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
 			</xsl:variable>
-			<!-- Graphic properties for shapes with p:sp nodes-->
+			--><!-- Graphic properties for shapes with p:sp nodes--><!--
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp">
-				<!--Check for shape or texbox -->
-				<!--<xsl:if test = "p:style or p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or 
+				--><!--Check for shape or texbox --><!--
+				--><!--<xsl:if test = "p:style or p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or 
 										   p:style or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')] or 
 										   p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')] or 
-										   p:nvSpPr/p:cNvPr/@name[contains(., 'Line')]">-->
-					<!-- Generate graphic properties ID-->
+										   p:nvSpPr/p:cNvPr/@name[contains(., 'Line')]">--><!--
+					--><!-- Generate graphic properties ID--><!--
 					<xsl:variable  name ="GraphicId">
 						<xsl:value-of select ="concat('s',substring($SlideId,6,string-length($SlideId)-9) ,concat('gr',position()))"/>
 					</xsl:variable>
@@ -1681,6 +1694,85 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:value-of select ="$GraphicId"/>
 						</xsl:attribute >
 						<style:graphic-properties>
+
+							--><!-- FILL --><!--
+							<xsl:call-template name ="Fill" />
+
+							--><!-- LINE COLOR --><!--
+							<xsl:call-template name ="LineColor" />
+
+							--><!-- LINE STYLE --><!--
+							<xsl:call-template name ="LineStyle"/>
+
+							--><!-- TEXT ALIGNMENT --><!--
+							<xsl:call-template name ="TextLayout" />
+
+						</style:graphic-properties >
+						<xsl:if test ="p:txBody/a:bodyPr/@vert">
+							<style:paragraph-properties>
+								<xsl:attribute name ="style:writing-mode">
+									<xsl:call-template name ="getTextDirection">
+										<xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
+									</xsl:call-template>
+								</xsl:attribute>
+							</style:paragraph-properties>
+						</xsl:if>
+					</style:style>
+				--><!--</xsl:if >--><!--
+			</xsl:for-each>
+			--><!-- Graphic properties for shapes with p:cxnSp nodes--><!--
+			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:cxnSp">
+				--><!-- Generate graphic properties ID--><!--
+				<xsl:variable  name ="GraphicId">
+					<xsl:value-of select ="concat('s',substring($SlideId,6,string-length($SlideId)-9) ,concat('grLine',position()))"/>
+				</xsl:variable>
+
+				<style:style style:family="graphic" style:parent-style-name="standard">
+					<xsl:attribute name ="style:name">
+						<xsl:value-of select ="$GraphicId"/>
+					</xsl:attribute >
+					<style:graphic-properties>
+
+						--><!-- LINE COLOR --><!--
+						<xsl:call-template name ="LineColor" />
+
+						--><!-- LINE STYLE --><!--
+						<xsl:call-template name ="LineStyle"/>
+
+					</style:graphic-properties >
+				</style:style>
+
+			</xsl:for-each>
+		</xsl:for-each>
+	</xsl:template>-->
+	<xsl:template name ="InsertStylesForGraphicProperties"  >
+		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+			<xsl:variable name ="SlideId">
+				<xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
+			</xsl:variable>
+			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree">
+				<xsl:call-template name ="getGraphicProperties">
+					<xsl:with-param name ="SlideId" select="$SlideId" />
+					<xsl:with-param name ="grID" select ="'gr'" />
+				</xsl:call-template>
+			</xsl:for-each>
+		</xsl:for-each>
+	</xsl:template>
+	<xsl:template name="getGraphicProperties">
+		<xsl:param name ="SlideId" />
+		<xsl:param name ="grID" />
+		<!-- Graphic properties for shapes with p:sp nodes-->
+		<xsl:for-each select ="p:sp">
+			<!-- Generate graphic properties ID-->
+			<xsl:variable  name ="GraphicId">
+				<xsl:value-of select ="concat('slide',substring($SlideId,6,string-length($SlideId)-9) ,concat($grID,position()))"/>
+			</xsl:variable>
+
+			<style:style style:family="graphic" style:parent-style-name="standard">
+				<xsl:attribute name ="style:name">
+					<xsl:value-of select ="$GraphicId"/>
+				</xsl:attribute >
+				<style:graphic-properties>
 
 							<!-- FILL -->
 							<xsl:call-template name ="Fill" />
@@ -1708,10 +1800,10 @@ Copyright (c) 2007, Sonata Software Limited
 				<!--</xsl:if >-->
 			</xsl:for-each>
 			<!-- Graphic properties for shapes with p:cxnSp nodes-->
-			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:cxnSp">
+		<xsl:for-each select ="p:cxnSp">
 				<!-- Generate graphic properties ID-->
 				<xsl:variable  name ="GraphicId">
-					<xsl:value-of select ="concat('s',substring($SlideId,6,string-length($SlideId)-9) ,concat('grLine',position()))"/>
+				<xsl:value-of select ="concat('slide',substring($SlideId,6,string-length($SlideId)-9) ,concat($grID,'Line',position()))"/>
 				</xsl:variable>
 
 				<style:style style:family="graphic" style:parent-style-name="standard">
@@ -1730,6 +1822,12 @@ Copyright (c) 2007, Sonata Software Limited
 				</style:style>
 
 			</xsl:for-each>
+		<!-- Graphic properties for grouped shapes with p:grpSp nodes-->
+		<xsl:for-each select ="p:grpSp">
+			<xsl:call-template name ="getGraphicProperties">
+				<xsl:with-param name ="SlideId" select="$SlideId" />
+				<xsl:with-param name ="grID" select ="concat('grp',generate-id())" />
+			</xsl:call-template>
 		</xsl:for-each>
 	</xsl:template>
 	<!-- Get fill color for shape-->

@@ -434,14 +434,14 @@ exclude-result-prefixes="p a r xlink ">
 				</xsl:variable>
 				<!--End of code Inserted by Vijayeta for Bullets and Numbering,Assign a style name-->
 				<!-- Code for shapes start-->
-				<xsl:variable  name ="GraphicId">
+				<!--<xsl:variable  name ="GraphicId">
 					<xsl:value-of select ="concat('s',substring($SlideFile,6,string-length($SlideFile)-9) ,concat('gr',position()))"/>
 				</xsl:variable>
 				<xsl:call-template name ="shapes">
 					<xsl:with-param name="GraphicId" select ="$GraphicId"/>
 					<xsl:with-param name ="ParaId" select="$ParaId" />
 					<xsl:with-param name ="SlideRelationId" select="$slideRel" />
-				</xsl:call-template>
+				</xsl:call-template>-->
 				<!-- Code for shapes end-->
 				<xsl:choose >
 					<xsl:when test ="not(contains(p:nvSpPr/p:cNvPr/@name,'Title')
@@ -1458,8 +1458,8 @@ exclude-result-prefixes="p a r xlink ">
 			</xsl:for-each>
 			<!-- exit Slide loop Main Loop-->
 
-			<xsl:for-each select ="document(concat('ppt/',$slideNo))/p:sld/p:cSld/p:spTree/p:cxnSp">
-				<!-- Code for shapes(Line) start-->
+			<!--<xsl:for-each select ="document(concat('ppt/',$slideNo))/p:sld/p:cSld/p:spTree/p:cxnSp">
+				--><!-- Code for shapes(Line) start--><!--
 				<xsl:variable  name ="GraphicId">
 					<xsl:value-of select ="concat('s',substring($SlideFile,6,string-length($SlideFile)-9) ,concat('grLine',position()))"/>
 				</xsl:variable>
@@ -1468,8 +1468,53 @@ exclude-result-prefixes="p a r xlink ">
 					<xsl:with-param name ="SlideRelationId" select="$slideRel" />
 				</xsl:call-template>
 
-				<!-- Code for shapes(Line) end-->
+				--><!-- Code for shapes(Line) end--><!--
+			</xsl:for-each>-->
+			<xsl:for-each select ="document(concat('ppt/',$slideNo))/p:sld/p:cSld/p:spTree">
+				<xsl:variable name ="SlideID">
+					<xsl:value-of select ="concat('slide',substring($SlideFile,6,string-length($SlideFile)-9))"/>
+				</xsl:variable>
+				<xsl:call-template name ="processShapes">
+					<xsl:with-param name ="SlideID"  select ="$SlideID" />
+					<xsl:with-param name ="SlideRelationId" select="$slideRel" />
+					<xsl:with-param name ="grID" select ="'gr'" />
+					<xsl:with-param name ="prID" select ="'PARA'" />
+				</xsl:call-template>
 			</xsl:for-each>
+			<!-- Code for shapes end-->
+		</xsl:for-each>
+	</xsl:template>
+	<xsl:template name ="processShapes">
+		<xsl:param name ="SlideID" />
+		<xsl:param name ="SlideRelationId" />
+		<xsl:param name ="grID" />
+		<xsl:param name ="prID" />
+		<xsl:for-each select ="p:sp">
+			<xsl:call-template name ="drawShapes">
+				<xsl:with-param name ="SlideID" select ="$SlideID" />
+				<xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
+				<xsl:with-param name ="grID" select ="$grID" />
+				<xsl:with-param name ="prID" select ="$prID" />
+			</xsl:call-template>
+			</xsl:for-each>
+
+		<xsl:for-each select ="p:cxnSp">
+			<xsl:call-template name ="drawShapes">
+				<xsl:with-param name ="SlideID" select ="$SlideID" />
+				<xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
+				<xsl:with-param name ="grID" select ="concat($grID,'Line')" />
+			</xsl:call-template>
+		</xsl:for-each>
+
+		<xsl:for-each select ="p:grpSp">
+			<!--<draw:g>-->
+			<xsl:call-template name ="processShapes">
+				<xsl:with-param name ="SlideID"  select ="$SlideID" />
+				<xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
+				<xsl:with-param name ="grID" select ="concat('grp', generate-id())" />
+				<xsl:with-param name ="prID" select ="concat('prp', generate-id())" />
+			</xsl:call-template>
+			<!--</draw:g>-->
 		</xsl:for-each >
 	</xsl:template>
 	<xsl:template name ="FrameProperties" match ="p:spPr/a:xfrm">
