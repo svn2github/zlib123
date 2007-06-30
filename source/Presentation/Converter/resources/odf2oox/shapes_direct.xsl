@@ -359,6 +359,12 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:with-param name ="connectorType" select ="$type" />
 			</xsl:call-template>
 		</xsl:for-each>
+
+		<!-- Grouping/Ungrouping-->
+		<xsl:for-each select="draw:g">
+			<xsl:call-template name="shapes"/>
+		</xsl:for-each>
+		
 	</xsl:template>
 	<!-- Create p:sp node for shape -->
 	<xsl:template name ="CreateShape">
@@ -2069,6 +2075,7 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:with-param name="framePresentaionStyleId" select="parent::node()/parent::node()/./@presentation:style-name" />
 							<xsl:with-param name ="isNumberingEnabled" select ="'false'"/>
 						</xsl:call-template >
+            <xsl:if test="node()">
 						<a:r >
 							<a:rPr lang="en-US" smtClean="0">
 								<xsl:variable name ="DefFontSize">
@@ -2091,6 +2098,26 @@ Copyright (c) 2007, Sonata Software Limited
 								<xsl:call-template name ="insertTab" />
 							</a:t>
 						</a:r>
+            </xsl:if>
+            <!-- Added by lohit for bug fix: 1731885 -->
+            <xsl:if test="not(node())">
+              <a:endParaRPr lang="en-US" smtClean="0">
+                <xsl:variable name ="DefFontSize">
+                  <xsl:call-template name ="getDefaultFontSize">
+                    <xsl:with-param name ="className" select ="$prClsName"/>
+                  </xsl:call-template >
+                </xsl:variable>
+                <xsl:if  test ="$DefFontSize!=''">
+                  <xsl:attribute name ="sz">
+                    <xsl:call-template name ="convertToPoints">
+                      <xsl:with-param name ="unit" select ="'pt'"/>
+                      <xsl:with-param name ="length" select ="$DefFontSize"/>
+                    </xsl:call-template>
+                  </xsl:attribute>
+                </xsl:if>
+                <a:latin charset="0" typeface="Arial" />
+              </a:endParaRPr>
+            </xsl:if>
 						<xsl:if test ="text:span/text:line-break">
 							<xsl:call-template name ="processBR">
 								<xsl:with-param name ="T" select ="text:span/@text:style-name" />
