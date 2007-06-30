@@ -182,10 +182,10 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             string attVal = "";
             if (arrVal.Length == 6)
             {
-                double x1 = double.Parse(arrVal[2]);
-                double x2 = double.Parse(arrVal[3]);
-                double y1 = double.Parse(arrVal[4]);
-                double y2 = double.Parse(arrVal[5]);
+                double x1 = double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+                double x2 = double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
+                double y1 = double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
+                double y2 = double.Parse(arrVal[5], System.Globalization.CultureInfo.InvariantCulture);
 
                 double xCenter = (x1 + x2) * 360000 / 2;
                 double yCenter = (y1 + y2) * 360000 / 2;

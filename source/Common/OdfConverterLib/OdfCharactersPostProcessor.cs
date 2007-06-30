@@ -150,33 +150,39 @@ namespace CleverAge.OdfConverter.OdfConverterLib
             Double x = 0;
             if (arrVal.Length == 5)
             {
+                double arrValue1 = Double.Parse(arrVal[1], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValue2 = Double.Parse(arrVal[2], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValue3 = Double.Parse(arrVal[3], System.Globalization.CultureInfo.InvariantCulture);
+                double arrValue4 = Double.Parse(arrVal[4], System.Globalization.CultureInfo.InvariantCulture);
+
                 if (arrVal[0].Contains("svg-x1"))
                 {
-                    x = Math.Round(((Double.Parse(arrVal[1]) -
-                        Math.Cos(Double.Parse(arrVal[4])) * Double.Parse(arrVal[2]) +
-                        Math.Sin(Double.Parse(arrVal[4])) * Double.Parse(arrVal[3])) / 360000), 2);
+                    x = Math.Round(((arrValue1 -
+                        Math.Cos(arrValue4) * arrValue2 +
+                        Math.Sin(arrValue4) * arrValue3) / 360000), 2);
                 }
                 else if (arrVal[0].Contains("svg-y1"))
                 {
-                    x = Math.Round(((Double.Parse(arrVal[1].ToString()) -
-                        Math.Sin(Double.Parse(arrVal[4])) * Double.Parse(arrVal[2]) -
-                        Math.Cos(Double.Parse(arrVal[4])) * Double.Parse(arrVal[3])) / 360000), 2);
+                    x = Math.Round(((arrValue1 -
+                        Math.Sin(arrValue4) * arrValue2 -
+                        Math.Cos(arrValue4) * arrValue3) / 360000), 2);
                 }
                 else if (arrVal[0].Contains("svg-x2"))
                 {
-                    x = Math.Round(((Double.Parse(arrVal[1]) +
-                        Math.Cos(Double.Parse(arrVal[4])) * Double.Parse(arrVal[2].ToString()) -
-                        Math.Sin(Double.Parse(arrVal[4])) * Double.Parse(arrVal[3])) / 360000), 2);
+                    x = Math.Round(((arrValue1 +
+                        Math.Cos(arrValue4) * arrValue2 -
+                        Math.Sin(arrValue4) * arrValue3) / 360000), 2);
                 }
                 else if (arrVal[0].Contains("svg-y2"))
                 {
-                    x = Math.Round(((Double.Parse(arrVal[1]) +
-                        Math.Sin(Double.Parse(arrVal[4])) * Double.Parse(arrVal[2]) +
-                        Math.Cos(Double.Parse(arrVal[4])) * Double.Parse(arrVal[3])) / 360000), 2);
+                    x = Math.Round(((arrValue1 +
+                        Math.Sin(arrValue4) * arrValue2 +
+                        Math.Cos(arrValue4) * arrValue3) / 360000), 2);
                 }
+                
             }
 
-            return x.ToString() + "cm";
+            return x.ToString().Replace(',','.') + "cm";
         }
          
 
