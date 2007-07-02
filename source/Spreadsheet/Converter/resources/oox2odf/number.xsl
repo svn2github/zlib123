@@ -682,6 +682,13 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    
+    <xsl:variable name="formatingMarks">
+      <xsl:call-template name="StripText">
+        <xsl:with-param name="formatCode" select="$realFormatCode"/>
+      </xsl:call-template>      
+    </xsl:variable>
+    
     <xsl:choose>
       
     <!-- decimal places -->
@@ -698,10 +705,10 @@
             <xsl:with-param name="value">0</xsl:with-param>
           </xsl:call-template>
         </xsl:when>
-        <xsl:when test="contains($realFormatCode,'.')">
+        <xsl:when test="contains($formatingMarks,'.')">
           <xsl:call-template name="InsertDecimalPlaces">
             <xsl:with-param name="code">
-              <xsl:value-of select="substring-after($realFormatCode,'.')"/>
+              <xsl:value-of select="substring-after($formatingMarks,'.')"/>
             </xsl:with-param>
             <xsl:with-param name="value">0</xsl:with-param>
           </xsl:call-template>
