@@ -51,6 +51,8 @@
   <xsl:key name="ConfigItem"
     match="office:document-settings/office:settings/config:config-item-set[@config:name = 'ooo:view-settings']/config:config-item-map-indexed[@config:name = 'Views']/config:config-item-map-entry/config:config-item"
     use="@config:name"/>
+  <xsl:key name="style" match="style:style" use="@style:name"/>
+
 
   <!-- table is converted into sheet -->
   <xsl:template match="table:table" mode="sheet">
@@ -311,6 +313,17 @@
             </xsl:choose>
           </xsl:for-each>
         </xsl:variable>
+        
+        <!-- Right-to-left text orientation -->
+        <xsl:for-each select="key('style', @table:style-name)">
+          <xsl:for-each select="style:table-properties">
+            <xsl:if test="attribute::style:writing-mode='rl-tb'">
+              <xsl:attribute name="rightToLeft">
+                <xsl:value-of select="1"> </xsl:value-of>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:for-each>
 
         <xsl:for-each select="document('settings.xml')">
 

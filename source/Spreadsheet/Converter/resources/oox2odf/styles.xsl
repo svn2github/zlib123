@@ -271,6 +271,27 @@
               <xsl:text>false</xsl:text>
             </xsl:attribute>
           </xsl:if>
+
+          <xsl:variable name="sheet">
+            <xsl:call-template name="GetTarget">
+              <xsl:with-param name="id">
+                <xsl:value-of select="@r:id"/>
+              </xsl:with-param>
+              <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+
+          <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:sheetViews/e:sheetView">
+            <xsl:if test="@rightToLeft = 1">
+              <xsl:attribute name="style:writing-mode">
+                <xsl:value-of select="'rl-tb'"/>
+              </xsl:attribute>
+              <xsl:attribute name="sheet">
+                <xsl:value-of select="$sheet"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:for-each>
+
         </style:table-properties>
       </style:style>
     </xsl:for-each>
@@ -462,18 +483,18 @@
             <xsl:attribute name="fo:margin-left">
               <xsl:variable name="indennt">
                 <xsl:value-of select="e:alignment/@indent"/>
-              </xsl:variable>              
+              </xsl:variable>
               <xsl:value-of select="format-number($indennt*0.353,'##.###cm') "/>
-            </xsl:attribute>            
+            </xsl:attribute>
           </xsl:if>
-                 
+
           <xsl:if test="e:alignment/@indent and e:alignment/@indent != '0'">
             <xsl:attribute name="fo:margin-right">
               <xsl:variable name="indennnt">
                 <xsl:value-of select="e:alignment/@indent"/>
-              </xsl:variable>              
+              </xsl:variable>
               <xsl:value-of select="format-number($indennnt*0.353,'##.###cm') "/>
-            </xsl:attribute>            
+            </xsl:attribute>
           </xsl:if>
 
         </style:paragraph-properties>
@@ -636,17 +657,17 @@
       <xsl:call-template name="InsertColor"/>
     </xsl:attribute>
   </xsl:template>
-  
+
   <!-- cell color fill in conditional -->
   <xsl:template match="e:bgColor" mode="style">
     <xsl:if test="ancestor::e:dxf">
-    <xsl:attribute name="fo:background-color">
-      <xsl:call-template name="InsertColor"/>
-    </xsl:attribute>
+      <xsl:attribute name="fo:background-color">
+        <xsl:call-template name="InsertColor"/>
+      </xsl:attribute>
     </xsl:if>
   </xsl:template>
-  
-   <xsl:template match="e:color" mode="style">
+
+  <xsl:template match="e:color" mode="style">
 
     <xsl:attribute name="fo:color">
       <xsl:call-template name="InsertColor"/>
