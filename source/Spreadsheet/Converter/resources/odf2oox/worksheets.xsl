@@ -242,6 +242,35 @@
         </xsl:if>
       </xsl:if>
       
+      <xsl:if
+        test="/office:document-content/office:automatic-styles/style:style[@style:family = 'table-column' ]/style:table-column-properties/@fo:break-before='page' ">
+        <xsl:variable name="colBreakes">
+          <xsl:apply-templates select="descendant::table:table-column[1]" mode="colBreakes">
+            <xsl:with-param name="tableId" select="generate-id(.)"/>
+          </xsl:apply-templates>
+        </xsl:variable>
+        
+        <!-- if there are column breakes in this sheet -->
+        <xsl:if test="$colBreakes != '' ">
+          <xsl:variable name="countBreakes">
+            <xsl:value-of select="string-length($colBreakes) - string-length(translate($colBreakes,';',''))"/>
+          </xsl:variable>
+          
+          <colBreaks>
+            <xsl:attribute name="count">
+              <xsl:value-of select="$countBreakes"/>
+            </xsl:attribute>
+            <xsl:attribute name="manualBreakCount">
+              <xsl:value-of select="$countBreakes"/>
+            </xsl:attribute>
+            
+            <xsl:call-template name="InsertColBreakes">
+              <xsl:with-param name="colBreakes" select="$colBreakes"/>
+            </xsl:call-template>
+          </colBreaks>
+        </xsl:if>
+      </xsl:if>
+      
       <xsl:variable name="picture">
         <xsl:choose>
           <xsl:when
@@ -1194,6 +1223,79 @@
       <xsl:call-template name="InsertRowBreakes">
         <xsl:with-param name="rowBreakes">
           <xsl:value-of select="substring-after($rowBreakes,';')"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+    
+  </xsl:template>
+
+  <xsl:template match="table:table-column" mode="colBreakes">
+    <!-- @Description: creates string containing in ascending order row numbers (0 based) followed by ";" that contain row breakes if there aren't any it returnes empty string -->
+    <xsl:param name="tableId"/>
+    <xsl:param name="colNumber" select="0"/>
+    <xsl:param name="colBreakes"/>
+    
+    <xsl:variable name="cols">
+      <xsl:choose>
+        <xsl:when test="@table:number-columns-repeated">
+          <xsl:value-of select="@table:number-columns-repeated"/>
+        </xsl:when>
+        <xsl:otherwise>1</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:variable name="breakes">
+      <xsl:choose>
+        <xsl:when
+          test="key('style',@table:style-name)/style:table-column-properties/@fo:break-before='page' ">
+          
+          <xsl:value-of select="$colBreakes"/>
+          <xsl:if test="$colBreakes != '' ">
+            <xsl:text>;</xsl:text>
+          </xsl:if>
+          <xsl:value-of select="$colNumber"/>
+          
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$colBreakes"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="following::table:table-column[generate-id(ancestor::table:table) = $tableId]">
+        <xsl:apply-templates
+          select="following::table:table-column[generate-id(ancestor::table:table) = $tableId][1]"
+          mode="colBreakes">
+          <xsl:with-param name="tableId" select="$tableId"/>
+          <xsl:with-param name="colNumber" select="$colNumber + $cols"/>
+          <xsl:with-param name="colBreakes">
+            <xsl:value-of select="$breakes"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$breakes"/>
+        <xsl:if test="$breakes!= '' ">
+          <xsl:text>;</xsl:text>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertColBreakes">
+    <xsl:param name="colBreakes"/>
+    
+    <brk max="1048575" man="1">
+      <xsl:attribute name="id">
+        <xsl:value-of select="substring-before($colBreakes,';')"/>
+      </xsl:attribute>
+    </brk>
+    
+    <xsl:if test="substring-after($colBreakes,';') != '' ">
+      <xsl:call-template name="InsertColBreakes">
+        <xsl:with-param name="colBreakes">
+          <xsl:value-of select="substring-after($colBreakes,';')"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
