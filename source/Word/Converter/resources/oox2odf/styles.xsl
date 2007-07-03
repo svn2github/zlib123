@@ -1308,7 +1308,11 @@
                 <xsl:value-of select="w:pgNumType/@w:start"/>
               </xsl:attribute>
             </xsl:when>
-            <xsl:otherwise>1</xsl:otherwise>
+            <xsl:otherwise>1</xsl:otherwise> 
+            <!--  shouldnt  line above look like following:
+              <xsl:otherwise><xsl:attribute name="style:num-format">1</xsl:attribute></xsl:otherwise> 
+              ???
+            -->
           </xsl:choose>
         </xsl:when>
         <xsl:when test="w:pgNumType/@w:fmt = 'lowerLetter' ">
