@@ -889,7 +889,6 @@
         <!-- 1st 'or' - horizontal alignment 
                 2nd 'or' - horizontal alignment 'fill' 
         -->
-
         <xsl:if test="($horizontalAlign != '' ) or ($repeatContent = 'true' )">
           <xsl:attribute name="horizontal">
             <xsl:choose>
@@ -914,6 +913,7 @@
             </xsl:choose>
           </xsl:attribute>
         </xsl:if>
+
         <!-- change default horizontal alignment-->
         <xsl:if test="$horizontalAlign = '' ">
           <xsl:choose>
@@ -926,7 +926,7 @@
             <!-- change default horizontal alignment of angle oriented text when angle equals 90 degrees -->
             <xsl:when test="$rotation = 90">
               <xsl:attribute name="horizontal">
-                <xsl:text>center</xsl:text>
+                <xsl:text>left</xsl:text>
               </xsl:attribute>
             </xsl:when>
             <!-- change default horizontal alignment of angle oriented text when angle equals -90 degrees -->
