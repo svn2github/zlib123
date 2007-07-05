@@ -177,6 +177,11 @@
         </xsl:with-param>
       </xsl:call-template>
 
+      <!-- insert filters -->
+      <xsl:call-template name="MatchFilters">
+        <xsl:with-param name="tableName" select="@table:name"/>
+      </xsl:call-template>
+      
       <!-- Insert Merge Cells -->
       <xsl:call-template name="InsertMergeCells">
         <xsl:with-param name="MergeCell">
@@ -1302,4 +1307,206 @@
     
   </xsl:template>
 
+  <xsl:template name="MatchFilters">
+    <xsl:param name="tableName"/>
+    
+    <xsl:variable name="apos">
+      <xsl:text>&apos;</xsl:text>
+    </xsl:variable>
+    
+    <xsl:for-each
+      select="parent::node()/table:database-ranges/table:database-range[table:filter and substring-before(translate(@table:target-range-address,$apos,''),'.') = $tableName]">
+      
+      <!-- select filter combinations wchich will be converted -->
+      <xsl:choose>
+        <!-- single condition filter -->
+        <xsl:when
+          test="count(table:filter/child::node()) = 1 and table:filter/table:filter-condition">
+          <xsl:call-template name="InsertSingleConditionFilter"/>
+        </xsl:when>
+        
+        <!-- single column 'and' filter i.e between X and Y (can not contain top/below values/percent conditions)-->
+        <xsl:when
+          test="count(table:filter/child::node()) = 1 and table:filter/table:filter-and/table:filter-condition and 
+          not(table:filter/table:filter-and/table:filter-condition/@table:operator = 'top values' or  table:filter/table:filter-and/table:filter-condition/@table:operator = 'bottom values' or
+          table:filter/table:filter-and/table:filter-condition/@table:operator = 'top percent' or table:filter/table:filter-and/table:filter-condition/@table:operator = 'bottom percent' )">
+          
+          <xsl:variable name="fieldNumber">
+            <xsl:value-of
+              select="table:filter/table:filter-and/table:filter-condition[1]/@table:field-number"/>
+          </xsl:variable>
+          
+          <xsl:if
+            test="not(table:filter/table:filter-and/table:filter-condition[@table:field-number != $fieldNumber])">
+            <xsl:call-template name="InsertSingleColumnAndFilter"/>
+          </xsl:if>
+          
+        </xsl:when>
+        
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template name="InsertSingleConditionFilter">
+    
+    <autoFilter>
+      <xsl:attribute name="ref">
+        <xsl:value-of
+          select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+        <xsl:text>:</xsl:text>
+        <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
+        />
+      </xsl:attribute>
+      
+      <xsl:for-each select="table:filter/table:filter-condition">
+        <filterColumn>
+          <xsl:attribute name="colId">
+            <xsl:value-of select="@table:field-number"/>
+          </xsl:attribute>
+          
+          <!-- choose filter type -->
+          <xsl:choose>
+            <xsl:when
+              test="@table:operator = 'top values' or @table:operator = 'bottom values'  or @table:operator = 'top percent' or @table:operator = 'bottom percent' ">
+              <top10>
+                <xsl:call-template name="InsertFilterConditions"/>
+              </top10>
+            </xsl:when>
+            <xsl:when test="@table:operator = '=' ">
+              <filters>
+                <filter>
+                  <xsl:call-template name="InsertFilterConditions"/>
+                </filter>
+              </filters>
+            </xsl:when>
+            <xsl:otherwise>
+              <customFilters>
+                <customFilter>
+                  <xsl:call-template name="InsertFilterConditions"/>
+                </customFilter>
+              </customFilters>
+            </xsl:otherwise>
+          </xsl:choose>
+          
+        </filterColumn>
+      </xsl:for-each>
+      
+    </autoFilter>
+  </xsl:template>
+  
+  <xsl:template name="InsertSingleColumnAndFilter">
+    
+    <autoFilter>
+      <xsl:attribute name="ref">
+        <xsl:value-of
+          select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+        <xsl:text>:</xsl:text>
+        <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
+        />
+      </xsl:attribute>
+      
+      <xsl:for-each select="table:filter/table:filter-and">
+        <filterColumn>
+          <xsl:attribute name="colId">
+            <xsl:value-of select="table:filter-condition[1]/@table:field-number"/>
+          </xsl:attribute>
+          
+          <customFilters and="1">
+            <xsl:for-each select="table:filter-condition">
+              <customFilter>
+                <xsl:call-template name="InsertFilterConditions"/>
+              </customFilter>
+            </xsl:for-each>
+          </customFilters>
+        </filterColumn>
+      </xsl:for-each>
+      
+    </autoFilter>
+  </xsl:template>
+  
+  <xsl:template name="InsertFilterConditions">
+    
+    <xsl:attribute name="val">
+      <xsl:choose>
+        <!-- when condition is expressed by regular expression (usually used for parts of text occurence) -->
+        <xsl:when test="@table:operator = 'match' or @table:operator = '!match'">
+          <xsl:choose>
+            <!-- (not) contains "x" condition [.*x.*] -->
+            <xsl:when
+              test="starts-with(@table:value,'.*') and substring(@table:value,string-length(@table:value)-1) = '.*' ">
+              <xsl:text>*</xsl:text>
+              <xsl:value-of select="substring(@table:value,3,string-length(@table:value)-4)"/>
+              <xsl:text>*</xsl:text>
+            </xsl:when>
+            
+            <!-- (not) begins with "x" condition [^x.*] -->
+            <xsl:when
+              test="starts-with(@table:value,'^') and substring(@table:value,string-length(@table:value)-1) = '.*' ">
+              <xsl:value-of select="substring(@table:value,2,string-length(@table:value)-3)"/>
+              <xsl:text>*</xsl:text>
+            </xsl:when>
+            
+            <!-- (not) ends with "x" condition [.*x$] -->
+            <xsl:when
+              test="starts-with(@table:value,'.*') and substring(@table:value,string-length(@table:value)) = '$' ">
+              <xsl:text>*</xsl:text>
+              <xsl:value-of select="substring(@table:value,3,string-length(@table:value)-3)"/>
+            </xsl:when>
+            
+            <xsl:otherwise>
+              <xsl:value-of select="@table:value"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        
+        <xsl:otherwise>
+          <xsl:value-of select="@table:value"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    
+    <!-- translate operator -->
+    <xsl:choose>
+      <xsl:when test="@table:operator = '!match' or @table:operator = '!=' ">
+        <xsl:attribute name="operator">
+          <xsl:text>notEqual</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="@table:operator = '&lt;' ">
+        <xsl:attribute name="operator">
+          <xsl:text>lessThan</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="@table:operator = '&gt;' ">
+        <xsl:attribute name="operator">
+          <xsl:text>greaterThan</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="@table:operator = '&lt;=' ">
+        <xsl:attribute name="operator">
+          <xsl:text>lessThanOrEqual</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="@table:operator = '&gt;=' ">
+        <xsl:attribute name="operator">
+          <xsl:text>greaterThanOrEqual</xsl:text>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+    
+    <!-- if bottom condition -->
+    <xsl:if test="@table:operator = 'bottom values' or @table:operator = 'bottom percent' ">
+      <xsl:attribute name="top">
+        <xsl:text>0</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+    
+    <!-- if percent condition -->
+    <xsl:if test="@table:operator = 'bottom percent' or @table:operator = 'top percent' ">
+      <xsl:attribute name="percent">
+        <xsl:text>1</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
+    
+  </xsl:template>
 </xsl:stylesheet>
