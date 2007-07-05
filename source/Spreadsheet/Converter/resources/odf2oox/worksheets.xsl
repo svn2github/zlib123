@@ -73,7 +73,8 @@
         <!-- cellNumber + number string cells inside simple rows + number string cells inside header rows -->
         <xsl:value-of
           select="$cellNumber + count(descendant::table:table-cell[text:p and not(@office:value-type='float') and (@office:value-type='string' or @office:value-type='boolean' or not((number(text:p) or text:p = 0 or contains(text:p,',') or contains(text:p,'%') or @office:value-type='currency' or @office:value-type='date' or @office:value-type='time')))])
-          "/>
+          "
+        />
       </xsl:with-param>
       <xsl:with-param name="sheetId">
         <xsl:value-of select="$sheetId + 1"/>
@@ -181,7 +182,7 @@
       <xsl:call-template name="MatchFilters">
         <xsl:with-param name="tableName" select="@table:name"/>
       </xsl:call-template>
-      
+
       <!-- Insert Merge Cells -->
       <xsl:call-template name="InsertMergeCells">
         <xsl:with-param name="MergeCell">
@@ -225,13 +226,14 @@
             <xsl:with-param name="tableId" select="generate-id(.)"/>
           </xsl:apply-templates>
         </xsl:variable>
-        
+
         <!-- if there are row breakes in this sheet -->
         <xsl:if test="$rowBreakes != '' ">
           <xsl:variable name="countBreakes">
-            <xsl:value-of select="string-length($rowBreakes) - string-length(translate($rowBreakes,';',''))"/>
+            <xsl:value-of
+              select="string-length($rowBreakes) - string-length(translate($rowBreakes,';',''))"/>
           </xsl:variable>
-          
+
           <rowBreaks>
             <xsl:attribute name="count">
               <xsl:value-of select="$countBreakes"/>
@@ -239,14 +241,14 @@
             <xsl:attribute name="manualBreakCount">
               <xsl:value-of select="$countBreakes"/>
             </xsl:attribute>
-            
+
             <xsl:call-template name="InsertRowBreakes">
               <xsl:with-param name="rowBreakes" select="$rowBreakes"/>
             </xsl:call-template>
           </rowBreaks>
         </xsl:if>
       </xsl:if>
-      
+
       <xsl:if
         test="/office:document-content/office:automatic-styles/style:style[@style:family = 'table-column' ]/style:table-column-properties/@fo:break-before='page' ">
         <xsl:variable name="colBreakes">
@@ -254,13 +256,14 @@
             <xsl:with-param name="tableId" select="generate-id(.)"/>
           </xsl:apply-templates>
         </xsl:variable>
-        
+
         <!-- if there are column breakes in this sheet -->
         <xsl:if test="$colBreakes != '' ">
           <xsl:variable name="countBreakes">
-            <xsl:value-of select="string-length($colBreakes) - string-length(translate($colBreakes,';',''))"/>
+            <xsl:value-of
+              select="string-length($colBreakes) - string-length(translate($colBreakes,';',''))"/>
           </xsl:variable>
-          
+
           <colBreaks>
             <xsl:attribute name="count">
               <xsl:value-of select="$countBreakes"/>
@@ -268,14 +271,14 @@
             <xsl:attribute name="manualBreakCount">
               <xsl:value-of select="$countBreakes"/>
             </xsl:attribute>
-            
+
             <xsl:call-template name="InsertColBreakes">
               <xsl:with-param name="colBreakes" select="$colBreakes"/>
             </xsl:call-template>
           </colBreaks>
         </xsl:if>
       </xsl:if>
-      
+
       <xsl:variable name="picture">
         <xsl:choose>
           <xsl:when
@@ -347,7 +350,7 @@
             </xsl:choose>
           </xsl:for-each>
         </xsl:variable>
-        
+
         <!-- Right-to-left text orientation -->
         <xsl:for-each select="key('style', @table:style-name)">
           <xsl:for-each select="style:table-properties">
@@ -535,9 +538,7 @@
     <xsl:variable name="CheckRowHidden">
       <xsl:choose>
         <xsl:when test="table:table-row[@table:visibility='collapse']">
-          <xsl:apply-templates
-            select="descendant::table:table-row[1]"
-            mode="zeroHeight">
+          <xsl:apply-templates select="descendant::table:table-row[1]" mode="zeroHeight">
             <xsl:with-param name="rowNumber">
               <xsl:text>0</xsl:text>
             </xsl:with-param>
@@ -1023,11 +1024,9 @@
   <xsl:template name="InsertHyperlinks">
 
     <!-- for now hiperlinks inside a group are omitted because groups are omitted for now -->
-    <xsl:if
-      test="descendant::text:a[not(ancestor::draw:custom-shape)]">
+    <xsl:if test="descendant::text:a[not(ancestor::draw:custom-shape)]">
       <hyperlinks>
-        <xsl:for-each
-          select="descendant::text:a[not(ancestor::draw:custom-shape)]">
+        <xsl:for-each select="descendant::text:a[not(ancestor::draw:custom-shape)]">
           <xsl:variable name="ViewHyperlinks">
             <xsl:value-of select="."/>
           </xsl:variable>
@@ -1180,20 +1179,20 @@
       <xsl:choose>
         <xsl:when
           test="key('style',@table:style-name)/style:table-row-properties/@fo:break-before='page' ">
-          
+
           <xsl:value-of select="$rowBreakes"/>
           <xsl:if test="$rowBreakes != '' ">
             <xsl:text>;</xsl:text>
           </xsl:if>
           <xsl:value-of select="$rowNumber"/>
-          
+
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$rowBreakes"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="following::table:table-row[generate-id(ancestor::table:table) = $tableId]">
         <xsl:apply-templates
@@ -1231,7 +1230,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-    
+
   </xsl:template>
 
   <xsl:template match="table:table-column" mode="colBreakes">
@@ -1239,7 +1238,7 @@
     <xsl:param name="tableId"/>
     <xsl:param name="colNumber" select="0"/>
     <xsl:param name="colBreakes"/>
-    
+
     <xsl:variable name="cols">
       <xsl:choose>
         <xsl:when test="@table:number-columns-repeated">
@@ -1248,25 +1247,25 @@
         <xsl:otherwise>1</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:variable name="breakes">
       <xsl:choose>
         <xsl:when
           test="key('style',@table:style-name)/style:table-column-properties/@fo:break-before='page' ">
-          
+
           <xsl:value-of select="$colBreakes"/>
           <xsl:if test="$colBreakes != '' ">
             <xsl:text>;</xsl:text>
           </xsl:if>
           <xsl:value-of select="$colNumber"/>
-          
+
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$colBreakes"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
+
     <xsl:choose>
       <xsl:when test="following::table:table-column[generate-id(ancestor::table:table) = $tableId]">
         <xsl:apply-templates
@@ -1287,16 +1286,16 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
   <xsl:template name="InsertColBreakes">
     <xsl:param name="colBreakes"/>
-    
+
     <brk max="1048575" man="1">
       <xsl:attribute name="id">
         <xsl:value-of select="substring-before($colBreakes,';')"/>
       </xsl:attribute>
     </brk>
-    
+
     <xsl:if test="substring-after($colBreakes,';') != '' ">
       <xsl:call-template name="InsertColBreakes">
         <xsl:with-param name="colBreakes">
@@ -1304,19 +1303,29 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-    
+
   </xsl:template>
 
   <xsl:template name="MatchFilters">
     <xsl:param name="tableName"/>
-    
+
     <xsl:variable name="apos">
       <xsl:text>&apos;</xsl:text>
     </xsl:variable>
-    
+
     <xsl:for-each
       select="parent::node()/table:database-ranges/table:database-range[table:filter and substring-before(translate(@table:target-range-address,$apos,''),'.') = $tableName]">
-      
+
+      <xsl:variable name="andFieldNumber">
+        <xsl:value-of
+          select="table:filter/table:filter-and/table:filter-condition[1]/@table:field-number"/>
+      </xsl:variable>
+
+      <xsl:variable name="orFieldNumber">
+        <xsl:value-of
+          select="table:filter/table:filter-or/table:filter-condition[1]/@table:field-number"/>
+      </xsl:variable>
+
       <!-- select filter combinations wchich will be converted -->
       <xsl:choose>
         <!-- single condition filter -->
@@ -1324,31 +1333,30 @@
           test="count(table:filter/child::node()) = 1 and table:filter/table:filter-condition">
           <xsl:call-template name="InsertSingleConditionFilter"/>
         </xsl:when>
-        
+
+        <!-- single column values selection fiter -->
+        <xsl:when
+          test="count(table:filter/child::node()) = 1 and table:filter/table:filter-or/table:filter-condition and not(table:filter/table:filter-or/table:filter-condition/@table:operator != '=') and
+          not(table:filter/table:filter-or/table:filter-condition[@table:field-number != $orFieldNumber])">
+
+          <xsl:call-template name="InsertValueSelectionFilter"/>
+        </xsl:when>
+
         <!-- single column 'and' filter i.e between X and Y (can not contain top/below values/percent conditions)-->
         <xsl:when
-          test="count(table:filter/child::node()) = 1 and table:filter/table:filter-and/table:filter-condition and 
+          test="count(table:filter/child::node()) = 1 and table:filter/table:filter-and/table:filter-condition and not(table:filter/table:filter-and/table:filter-condition[@table:field-number != $andFieldNumber]) and
           not(table:filter/table:filter-and/table:filter-condition/@table:operator = 'top values' or  table:filter/table:filter-and/table:filter-condition/@table:operator = 'bottom values' or
           table:filter/table:filter-and/table:filter-condition/@table:operator = 'top percent' or table:filter/table:filter-and/table:filter-condition/@table:operator = 'bottom percent' )">
-          
-          <xsl:variable name="fieldNumber">
-            <xsl:value-of
-              select="table:filter/table:filter-and/table:filter-condition[1]/@table:field-number"/>
-          </xsl:variable>
-          
-          <xsl:if
-            test="not(table:filter/table:filter-and/table:filter-condition[@table:field-number != $fieldNumber])">
-            <xsl:call-template name="InsertSingleColumnAndFilter"/>
-          </xsl:if>
-          
+
+          <xsl:call-template name="InsertSingleColumnAndFilter"/>
         </xsl:when>
-        
+
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
-  
-  <xsl:template name="InsertSingleConditionFilter">
-    
+
+  <xsl:template name="InsertValueSelectionFilter">
+
     <autoFilter>
       <xsl:attribute name="ref">
         <xsl:value-of
@@ -1357,13 +1365,42 @@
         <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
         />
       </xsl:attribute>
-      
+
+      <xsl:for-each select="table:filter/table:filter-or">
+        <filterColumn>
+          <xsl:attribute name="colId">
+            <xsl:value-of select="table:filter-condition[1]/@table:field-number"/>
+          </xsl:attribute>
+
+          <filters>
+            <xsl:for-each select="table:filter-condition">
+              <filter>
+                <xsl:call-template name="InsertFilterConditions"/>
+              </filter>
+            </xsl:for-each>
+          </filters>
+        </filterColumn>
+      </xsl:for-each>
+    </autoFilter>
+  </xsl:template>
+
+  <xsl:template name="InsertSingleConditionFilter">
+
+    <autoFilter>
+      <xsl:attribute name="ref">
+        <xsl:value-of
+          select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+        <xsl:text>:</xsl:text>
+        <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
+        />
+      </xsl:attribute>
+
       <xsl:for-each select="table:filter/table:filter-condition">
         <filterColumn>
           <xsl:attribute name="colId">
             <xsl:value-of select="@table:field-number"/>
           </xsl:attribute>
-          
+
           <!-- choose filter type -->
           <xsl:choose>
             <xsl:when
@@ -1387,15 +1424,15 @@
               </customFilters>
             </xsl:otherwise>
           </xsl:choose>
-          
+
         </filterColumn>
       </xsl:for-each>
-      
+
     </autoFilter>
   </xsl:template>
-  
+
   <xsl:template name="InsertSingleColumnAndFilter">
-    
+
     <autoFilter>
       <xsl:attribute name="ref">
         <xsl:value-of
@@ -1404,13 +1441,13 @@
         <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
         />
       </xsl:attribute>
-      
+
       <xsl:for-each select="table:filter/table:filter-and">
         <filterColumn>
           <xsl:attribute name="colId">
             <xsl:value-of select="table:filter-condition[1]/@table:field-number"/>
           </xsl:attribute>
-          
+
           <customFilters and="1">
             <xsl:for-each select="table:filter-condition">
               <customFilter>
@@ -1420,12 +1457,12 @@
           </customFilters>
         </filterColumn>
       </xsl:for-each>
-      
+
     </autoFilter>
   </xsl:template>
-  
+
   <xsl:template name="InsertFilterConditions">
-    
+
     <xsl:attribute name="val">
       <xsl:choose>
         <!-- when condition is expressed by regular expression (usually used for parts of text occurence) -->
@@ -1438,33 +1475,33 @@
               <xsl:value-of select="substring(@table:value,3,string-length(@table:value)-4)"/>
               <xsl:text>*</xsl:text>
             </xsl:when>
-            
+
             <!-- (not) begins with "x" condition [^x.*] -->
             <xsl:when
               test="starts-with(@table:value,'^') and substring(@table:value,string-length(@table:value)-1) = '.*' ">
               <xsl:value-of select="substring(@table:value,2,string-length(@table:value)-3)"/>
               <xsl:text>*</xsl:text>
             </xsl:when>
-            
+
             <!-- (not) ends with "x" condition [.*x$] -->
             <xsl:when
               test="starts-with(@table:value,'.*') and substring(@table:value,string-length(@table:value)) = '$' ">
               <xsl:text>*</xsl:text>
               <xsl:value-of select="substring(@table:value,3,string-length(@table:value)-3)"/>
             </xsl:when>
-            
+
             <xsl:otherwise>
               <xsl:value-of select="@table:value"/>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
-        
+
         <xsl:otherwise>
           <xsl:value-of select="@table:value"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
-    
+
     <!-- translate operator -->
     <xsl:choose>
       <xsl:when test="@table:operator = '!match' or @table:operator = '!=' ">
@@ -1493,20 +1530,20 @@
         </xsl:attribute>
       </xsl:when>
     </xsl:choose>
-    
+
     <!-- if bottom condition -->
     <xsl:if test="@table:operator = 'bottom values' or @table:operator = 'bottom percent' ">
       <xsl:attribute name="top">
         <xsl:text>0</xsl:text>
       </xsl:attribute>
     </xsl:if>
-    
+
     <!-- if percent condition -->
     <xsl:if test="@table:operator = 'bottom percent' or @table:operator = 'top percent' ">
       <xsl:attribute name="percent">
         <xsl:text>1</xsl:text>
       </xsl:attribute>
     </xsl:if>
-    
+
   </xsl:template>
 </xsl:stylesheet>
