@@ -1342,16 +1342,7 @@
           <xsl:call-template name="ValueSelectionFilter"/>
         </xsl:when>
 
-        <!-- single column 'and' filter i.e between X and Y (can not contain top/below values/percent conditions)-->
-        <xsl:when
-          test="count(table:filter/child::node()) = 1 and table:filter/table:filter-and/table:filter-condition and not(table:filter/table:filter-and/table:filter-condition[@table:field-number != $andFieldNumber]) and
-          not(table:filter/table:filter-and/table:filter-condition/@table:operator = 'top values' or  table:filter/table:filter-and/table:filter-condition/@table:operator = 'bottom values' or
-          table:filter/table:filter-and/table:filter-condition/@table:operator = 'top percent' or table:filter/table:filter-and/table:filter-condition/@table:operator = 'bottom percent' )">
-
-          <xsl:call-template name="SingleColumnAndFilter"/>
-        </xsl:when>
-
-        <!-- multicolumn AND filter -->
+        <!-- single AND filter -->
         <xsl:when
           test="count(table:filter/child::node()) = 1 and table:filter/table:filter-and/table:filter-condition">
           
@@ -1555,36 +1546,6 @@
             </xsl:otherwise>
           </xsl:choose>
 
-        </filterColumn>
-      </xsl:for-each>
-
-    </autoFilter>
-  </xsl:template>
-
-  <xsl:template name="SingleColumnAndFilter">
-
-    <autoFilter>
-      <xsl:attribute name="ref">
-        <xsl:value-of
-          select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
-        <xsl:text>:</xsl:text>
-        <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
-        />
-      </xsl:attribute>
-
-      <xsl:for-each select="table:filter/table:filter-and">
-        <filterColumn>
-          <xsl:attribute name="colId">
-            <xsl:value-of select="table:filter-condition[1]/@table:field-number"/>
-          </xsl:attribute>
-
-          <customFilters and="1">
-            <xsl:for-each select="table:filter-condition">
-              <customFilter>
-                <xsl:call-template name="InsertFilterConditions"/>
-              </customFilter>
-            </xsl:for-each>
-          </customFilters>
         </filterColumn>
       </xsl:for-each>
 
