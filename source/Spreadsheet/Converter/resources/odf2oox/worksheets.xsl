@@ -1331,7 +1331,7 @@
         <!-- single condition filter -->
         <xsl:when
           test="count(table:filter/child::node()) = 1 and table:filter/table:filter-condition">
-          <xsl:call-template name="InsertSingleConditionFilter"/>
+          <xsl:call-template name="SingleConditionFilter"/>
         </xsl:when>
 
         <!-- single column values selection fiter -->
@@ -1339,7 +1339,7 @@
           test="count(table:filter/child::node()) = 1 and table:filter/table:filter-or/table:filter-condition and not(table:filter/table:filter-or/table:filter-condition/@table:operator != '=') and
           not(table:filter/table:filter-or/table:filter-condition[@table:field-number != $orFieldNumber])">
 
-          <xsl:call-template name="InsertValueSelectionFilter"/>
+          <xsl:call-template name="ValueSelectionFilter"/>
         </xsl:when>
 
         <!-- single column 'and' filter i.e between X and Y (can not contain top/below values/percent conditions)-->
@@ -1348,14 +1348,144 @@
           not(table:filter/table:filter-and/table:filter-condition/@table:operator = 'top values' or  table:filter/table:filter-and/table:filter-condition/@table:operator = 'bottom values' or
           table:filter/table:filter-and/table:filter-condition/@table:operator = 'top percent' or table:filter/table:filter-and/table:filter-condition/@table:operator = 'bottom percent' )">
 
-          <xsl:call-template name="InsertSingleColumnAndFilter"/>
+          <xsl:call-template name="SingleColumnAndFilter"/>
         </xsl:when>
 
+        <!-- multicolumn AND filter -->
+        <xsl:when
+          test="count(table:filter/child::node()) = 1 and table:filter/table:filter-and/table:filter-condition">
+          
+          <xsl:choose>
+            <!-- when there is top 10 condition then for this filed can not be another condition -->
+            <xsl:when
+              test="table:filter/table:filter-and/table:filter-condition[@table:operator = 'top values' or  @table:operator = 'bottom values' or @table:operator = 'top percent' or 
+              @table:operator = 'bottom percent' ]">
+
+              <xsl:for-each
+                select="table:filter/table:filter-and/table:filter-condition[@table:operator = 'top values' or  @table:operator = 'bottom values' or @table:operator = 'top percent' or 
+                @table:operator = 'bottom percent' ]">
+
+                <xsl:variable name="fieldNumber">
+                  <xsl:value-of select="@table:field-number"/>
+                </xsl:variable>
+                <xsl:variable name="conditionId">
+                  <xsl:value-of select="generate-id(.)"/>
+                </xsl:variable>
+
+                <xsl:if
+                  test="not(parent::node()/table:filter-condition[@table:field-number = $fieldNumber and generate-id(.) != $conditionId])">
+                  <xsl:call-template name="MultiColumnAndFilter"/>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:when>
+
+            <xsl:otherwise>
+              <xsl:call-template name="MultiColumnAndFilter"/>
+            </xsl:otherwise>
+          </xsl:choose>
+
+        </xsl:when>
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template name="InsertValueSelectionFilter">
+  <xsl:template name="MultiColumnAndFilter">
+    <autoFilter>
+      <xsl:attribute name="ref">
+        <xsl:value-of
+          select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+        <xsl:text>:</xsl:text>
+        <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
+        />
+      </xsl:attribute>
+
+      <xsl:for-each select="table:filter/table:filter-and">
+        <xsl:apply-templates select="table:filter-condition[1]">
+          <xsl:with-param name="fieldsConversed" select=" ',' "/>
+        </xsl:apply-templates>
+      </xsl:for-each>
+
+    </autoFilter>
+  </xsl:template>
+
+  <xsl:template match="table:filter-condition">
+    <xsl:param name="fieldsConversed"/>
+
+    <xsl:choose>
+      <xsl:when test="not(contains($fieldsConversed,concat(',',@table:field-number,',')))">
+        <xsl:variable name="fieldNumber">
+          <xsl:value-of select="@table:field-number"/>
+        </xsl:variable>
+
+        <filterColumn>
+          <xsl:attribute name="colId">
+            <xsl:value-of select="$fieldNumber"/>
+          </xsl:attribute>
+
+          <xsl:choose>
+            <!-- when there is only one condition for this field -->
+            <xsl:when
+              test="not(following-sibling::table:filter-condition[@table:field-number = $fieldNumber])">
+
+              <!-- choose filter type -->
+              <xsl:choose>
+                <xsl:when
+                  test="@table:operator = 'top values' or @table:operator = 'bottom values'  or @table:operator = 'top percent' or @table:operator = 'bottom percent' ">
+                  <top10>
+                    <xsl:call-template name="InsertFilterConditions"/>
+                  </top10>
+                </xsl:when>
+                <xsl:when test="@table:operator = '=' ">
+                  <filters>
+                    <filter>
+                      <xsl:call-template name="InsertFilterConditions"/>
+                    </filter>
+                  </filters>
+                </xsl:when>
+
+                <xsl:otherwise>
+                  <customFilters>
+                    <customFilter>
+                      <xsl:call-template name="InsertFilterConditions"/>
+                    </customFilter>
+                  </customFilters>
+                </xsl:otherwise>
+              </xsl:choose>
+
+            </xsl:when>
+
+            <!-- when this field has more than one "AND" condition-->
+            <xsl:otherwise>
+              <customFilters and="1">
+                <xsl:for-each
+                  select="parent::node()/table:filter-condition[@table:field-number = $fieldNumber]">
+                  <customFilter>
+                    <xsl:call-template name="InsertFilterConditions"/>
+                  </customFilter>
+                </xsl:for-each>
+              </customFilters>
+            </xsl:otherwise>
+          </xsl:choose>
+        </filterColumn>
+
+        <xsl:apply-templates select="following-sibling::table:filter-condition[1]">
+          <xsl:with-param name="fieldsConversed">
+            <xsl:value-of select="concat($fieldsConversed,$fieldNumber,',')"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+
+      <!-- when this field was conversed before -->
+      <xsl:otherwise>
+        <xsl:apply-templates select="following-sibling::table:filter-condition[1]">
+          <xsl:with-param name="fieldsConversed" select="$fieldsConversed"/>
+        </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="ValueSelectionFilter">
 
     <autoFilter>
       <xsl:attribute name="ref">
@@ -1384,7 +1514,7 @@
     </autoFilter>
   </xsl:template>
 
-  <xsl:template name="InsertSingleConditionFilter">
+  <xsl:template name="SingleConditionFilter">
 
     <autoFilter>
       <xsl:attribute name="ref">
@@ -1431,7 +1561,7 @@
     </autoFilter>
   </xsl:template>
 
-  <xsl:template name="InsertSingleColumnAndFilter">
+  <xsl:template name="SingleColumnAndFilter">
 
     <autoFilter>
       <xsl:attribute name="ref">
