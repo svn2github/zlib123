@@ -253,7 +253,7 @@
             <xsl:value-of select="$number"/>
           </xsl:with-param>
           <xsl:with-param name="name">
-            <xsl:value-of select="translate(@name,'!-()','')"/>
+            <xsl:value-of select="translate(@name,'!-$()','')"/>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
