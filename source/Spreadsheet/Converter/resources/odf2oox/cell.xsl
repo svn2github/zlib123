@@ -534,6 +534,7 @@
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CheckRowHidden"/>
     <xsl:param name="CheckIfDefaultBorder"/>
+    <xsl:param name="ignoreFilter"/> 
 
     <xsl:variable name="height">
       <xsl:call-template name="point-measure">
@@ -584,7 +585,7 @@
           <xsl:value-of select="count(ancestor::table:table-row-group)"/>
         </xsl:attribute>
 
-        <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
+        <xsl:if test="@table:visibility = 'collapse' or (@table:visibility = 'filter' and $ignoreFilter = '')">
           <xsl:attribute name="hidden">1</xsl:attribute>
         </xsl:if>
 
@@ -602,6 +603,7 @@
           <xsl:with-param name="MergeCellStyle">
             <xsl:value-of select="$MergeCellStyle"/>
           </xsl:with-param>
+          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>          
         </xsl:apply-templates>
       </row>
 
@@ -640,6 +642,7 @@
             <xsl:with-param name="CheckIfDefaultBorder">
               <xsl:value-of select="$CheckIfDefaultBorder"/>
             </xsl:with-param>
+            <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
           </xsl:call-template>
         </xsl:if>
       </xsl:if>
@@ -689,6 +692,7 @@
           <xsl:with-param name="CheckIfDefaultBorder">
             <xsl:value-of select="$CheckIfDefaultBorder"/>
           </xsl:with-param>
+          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>          
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
@@ -727,6 +731,7 @@
           <xsl:with-param name="CheckIfDefaultBorder">
             <xsl:value-of select="$CheckIfDefaultBorder"/>
           </xsl:with-param>
+          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
         </xsl:apply-templates>
       </xsl:when>
       <!-- this is last row inside header rows, next row is outside -->
@@ -766,6 +771,7 @@
           <xsl:with-param name="CheckIfDefaultBorder">
             <xsl:value-of select="$CheckIfDefaultBorder"/>
           </xsl:with-param>
+          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
         </xsl:apply-templates>
       </xsl:when>
     </xsl:choose>
@@ -783,6 +789,7 @@
     <xsl:param name="MergeCell"/>
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CheckIfDefaultBorder"/>
+    <xsl:param name="ignoreFilter"/>
 
     <xsl:if
       test="table:table-cell/text:p or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') and @ table:table-row[@table:number-rows-repeated] or parent::table:table-row-group">
@@ -808,7 +815,7 @@
               </xsl:attribute>
             </xsl:if>
 
-            <xsl:if test="@table:visibility = 'collapse' or @table:visibility = 'filter'">
+            <xsl:if test="@table:visibility = 'collapse' or (@table:visibility = 'filter' and $ignoreFilter = '' )">
               <xsl:attribute name="hidden">1</xsl:attribute>
             </xsl:if>
 

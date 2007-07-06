@@ -141,6 +141,16 @@
         </xsl:apply-templates>
       </xsl:variable>
 
+      <!-- check if filter can be conversed -->
+      <xsl:variable name="ignoreFilter">
+        <xsl:call-template name="MatchFilter">
+          <xsl:with-param name="tableName" select="@table:name"/>
+          <xsl:with-param name="ignoreFilter">
+            <xsl:text>check</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      
       <!-- if property 'fit print range(s) to width/height' is being used -->
       <xsl:for-each select="document('styles.xml')">
         <xsl:if
@@ -176,12 +186,15 @@
         <xsl:with-param name="defaultFontSize">
           <xsl:value-of select="$defaultFontSize"/>
         </xsl:with-param>
+        <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
       </xsl:call-template>
 
-      <!-- insert filters -->
-      <xsl:call-template name="MatchFilters">
-        <xsl:with-param name="tableName" select="@table:name"/>
-      </xsl:call-template>
+      <!-- insert filter -->
+      <xsl:if test="$ignoreFilter = '' ">
+        <xsl:call-template name="MatchFilter">
+          <xsl:with-param name="tableName" select="@table:name"/>
+        </xsl:call-template>
+      </xsl:if>
 
       <!-- Insert Merge Cells -->
       <xsl:call-template name="InsertMergeCells">
@@ -496,6 +509,7 @@
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="ColumnTagNum"/>
     <xsl:param name="defaultFontSize"/>
+    <xsl:param name="ignoreFilter"/>
     <!-- baseFontSize -->
 
     <!-- compute default row height -->
@@ -622,6 +636,7 @@
         <xsl:with-param name="CheckIfDefaultBorder">
           <xsl:value-of select="$CheckIfDefaultBorder"/>
         </xsl:with-param>
+        <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>        
       </xsl:apply-templates>
     </sheetData>
 
@@ -1306,8 +1321,12 @@
 
   </xsl:template>
 
-  <xsl:template name="MatchFilters">
+  <xsl:template name="MatchFilter">
+    <!-- @Description: Checks if filter can be conversed and returnes true or false when parameter 'ignoreFilter' is not empty otherwise makes the conversion -->
+    <!-- @Context: chart:chart -->
+
     <xsl:param name="tableName"/>
+    <xsl:param name="ignoreFilter"/>
 
     <xsl:variable name="apos">
       <xsl:text>&apos;</xsl:text>
@@ -1352,22 +1371,35 @@
               test="table:filter/table:filter-and/table:filter-condition[@table:operator = 'top values' or  @table:operator = 'bottom values' or @table:operator = 'top percent' or 
               @table:operator = 'bottom percent' ]">
 
-              <xsl:for-each
-                select="table:filter/table:filter-and/table:filter-condition[@table:operator = 'top values' or  @table:operator = 'bottom values' or @table:operator = 'top percent' or 
-                @table:operator = 'bottom percent' ]">
-
-                <xsl:variable name="fieldNumber">
-                  <xsl:value-of select="@table:field-number"/>
-                </xsl:variable>
-                <xsl:variable name="conditionId">
-                  <xsl:value-of select="generate-id(.)"/>
-                </xsl:variable>
-
-                <xsl:if
-                  test="not(parent::node()/table:filter-condition[@table:field-number = $fieldNumber and generate-id(.) != $conditionId])">
+              <xsl:variable name="ignore">
+                <xsl:for-each
+                  select="table:filter/table:filter-and/table:filter-condition[@table:operator = 'top values' or  @table:operator = 'bottom values' or @table:operator = 'top percent' or 
+                  @table:operator = 'bottom percent' ]">
+                  
+                  <xsl:variable name="fieldNumber">
+                    <xsl:value-of select="@table:field-number"/>
+                  </xsl:variable>
+                  <xsl:variable name="conditionId">
+                    <xsl:value-of select="generate-id(.)"/>
+                  </xsl:variable>
+                  
+                  <xsl:if
+                    test="parent::node()/table:filter-condition[@table:field-number = $fieldNumber and generate-id(.) != $conditionId]">
+                    <xsl:text>ignore</xsl:text>
+                  </xsl:if>
+                  </xsl:for-each>
+              </xsl:variable>
+              
+              <xsl:choose>
+                <xsl:when test="$ignore = '' ">
                   <xsl:call-template name="MultiColumnAndFilter"/>
-                </xsl:if>
-              </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:if test="$ignoreFilter != '' ">
+                    <xsl:text>true</xsl:text>
+                  </xsl:if>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:when>
 
             <xsl:otherwise>
@@ -1376,6 +1408,11 @@
           </xsl:choose>
 
         </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="$ignoreFilter != '' ">
+            <xsl:text>true</xsl:text>
+          </xsl:if>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
