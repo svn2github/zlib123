@@ -2,7 +2,7 @@ top_srcdir=../../..
 
 include $(top_srcdir)/build/common.mk
 
-ID_SUFFIX=CleverAge.OdfConverter.OdfConverterLib.resources
+ID_SUFFIX=CleverAge.OdfConverter.Spreadsheet.resources
 
 OOX2ODF_RES= \
     $(wildcard resources/oox2odf/*.xsl) \
@@ -25,14 +25,18 @@ RESOURCE_FLAGS+=${foreach file, $(ODF2OOX_XML), $(PREFIX2)/$(file),$(ID_SUFFIX2)
 SOURCE=${wildcard *.cs}
 DISTFILES=$(SOURCE) $(ODF2OOX_RES) $(OOX2ODF_RES)
 
-all-local: OdfConverterLib.dll OdfConverterLibStatic.dll 
-OdfConverterLib.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library -reference:../OdfZipUtils/OdfZipUtils.dll \
-		-out:OdfConverterLib.dll $(SOURCE)
+all-local: Spreadsheet.dll SpreadsheetStatic.dll 
+Spreadsheet.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
+	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
+		-reference:../../Common/OdfZipUtils/OdfZipUtils.dll \
+		-reference:../../Common/OdfConverterLib/OdfConverterLib.dll \
+		-out:Spreadsheet.dll $(SOURCE)
 
-OdfConverterLibStatic.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library -reference:../OdfZipUtils/OdfZipUtilsStatic.dll \
-		-out:OdfConverterLibStatic.dll $(SOURCE)
+SpreadsheetStatic.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
+	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
+		-reference:../../Common/OdfZipUtils/OdfZipUtilsStatic.dll \
+		-reference:../../Common/OdfConverterLib/OdfConverterLibStatic.dll \
+		-out:SpreadsheetStatic.dll $(SOURCE)
 
 clean-local:
 

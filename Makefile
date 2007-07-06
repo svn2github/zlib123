@@ -4,9 +4,12 @@ top_srcdir=.
 
 SUBDIRS= \
 	source/AdditionalTools/zlib123/contrib/minizip \
-	source/OdfZipUtils \
-	source/OdfConverterLib \
-	source/OdfConverterTest
+	source/Common/OdfZipUtils \
+	source/Common/OdfConverterLib \
+	source/Word/Converter \
+	source/Presentation/Converter \
+	source/Spreadsheet/Converter \
+	source/Shell/OdfConverterTest
 DISTFILES= \
 	build/common.mk \
 	source/AdditionalTools/zlib123/zconf.h \

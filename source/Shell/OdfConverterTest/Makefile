@@ -1,4 +1,4 @@
-top_srcdir=../..
+top_srcdir=../../..
 include $(top_srcdir)/build/common.mk
 
 ifeq ($(OS),Cygwin)
@@ -28,27 +28,33 @@ endif
 
 SOURCE = \
     OdfCommandLineException.cs \
-    OdfConverterTest.cs \
+    OdfConverter.cs \
     OoxValidator.cs \
     OdfValidator.cs
 DISTFILES=$(SOURCE) zlib.def
 
 all-local: OdfConverterTest.exe OdfConverter$(EXEEXT)
 
-OdfConverterTest.exe : Makefile $(SOURCE) ../OdfZipUtils/OdfZipUtils.dll ../OdfConverterLib/OdfConverterLib.dll
+OdfConverterTest.exe : Makefile $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtils.dll ../../Common/OdfConverterLib/OdfConverterLib.dll ../../Word/Converter/Word.dll ../../Presentation/Converter/Presentation.dll ../../Spreadsheet/Converter/Spreadsheet.dll
 	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:OdfConverterTest.exe \
-		-reference:../OdfZipUtils/OdfZipUtils.dll \
-		-reference:../OdfConverterLib/OdfConverterLib.dll \
+		-reference:../../Common/OdfZipUtils/OdfZipUtils.dll \
+		-reference:../../Common/OdfConverterLib/OdfConverterLib.dll \
+		-reference:../../Word/Converter/Word.dll \
+		-reference:../../Presentation/Converter/Presentation.dll \
+		-reference:../../Spreadsheet/Converter/Spreadsheet.dll \
 		$(SOURCE)
 
-OdfConverterTestStatic.exe : $(SOURCE) ../OdfZipUtils/OdfZipUtilsStatic.dll ../OdfConverterLib/OdfConverterLibStatic.dll
+OdfConverterTestStatic.exe : $(SOURCE) ../../Common/OdfZipUtils/OdfZipUtilsStatic.dll ../../Common/OdfConverterLib/OdfConverterLibStatic.dll ../../Word/Converter/WordStatic.dll ../../Presentation/Converter/PresentationStatic.dll ../../Spreadsheet/Converter/SpreadsheetStatic.dll
 	$(CSC) $(CSC_DEBUG) -d:MONO -target:exe -out:OdfConverterTestStatic.exe \
-		-reference:../OdfZipUtils/OdfZipUtilsStatic.dll \
-		-reference:../OdfConverterLib/OdfConverterLibStatic.dll \
+		-reference:../../Common/OdfZipUtils/OdfZipUtilsStatic.dll \
+		-reference:../../Common/OdfConverterLib/OdfConverterLibStatic.dll \
+		-reference:../../Word/Converter/WordStatic.dll \
+		-reference:../../Presentation/Converter/PresentationStatic.dll \
+		-reference:../../Spreadsheet/Converter/SpreadsheetStatic.dll \
 		$(SOURCE)
 
 main.c bundle.o : OdfConverterTestStatic.exe Makefile
-	MONO_PATH='../OdfZipUtils$(PATHSEP)../OdfConverterLib' mkbundle2 -c -o main.c -oo bundle.o --deps $(MACHINE_CONFIG_FILE) OdfConverterTestStatic.exe
+	MONO_PATH='../../Common/OdfZipUtils$(PATHSEP)../../Common/OdfConverterLib$(PATHSEP)../../Word/Converter$(PATHSEP)../../Presentation/Converter$(PATHSEP)../../Spreadsheet/Converter' mkbundle2 -c -o main.c -oo bundle.o --deps $(MACHINE_CONFIG_FILE) OdfConverterTestStatic.exe
 
 OdfConverter$(EXEEXT) : main.c bundle.o $(ZLIBDEP) Makefile
 	rm -f $@
@@ -57,7 +63,7 @@ ifeq ($(OS),Darwin)
 # its dependencies which are not included in a standard Mac OS X installation
 	$(CC) -o OdfConverter -Wall `pkg-config --cflags mono` main.c \
 		`pkg-config --libs-only-L mono` -bind_at_load -all_load -lz \
-	    ../AdditionalTools/zlib123/contrib/minizip/libzlibwapi.a \
+	    ../../AdditionalTools/zlib123/contrib/minizip/libzlibwapi.a \
 		`pkg-config --libs-only-l mono` bundle.o
 else
 	$(CC) -o OdfConverter$(EXEEXT) -Wall `pkg-config --cflags mono` main.c \

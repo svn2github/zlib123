@@ -2,7 +2,7 @@ top_srcdir=../../..
 
 include $(top_srcdir)/build/common.mk
 
-ID_SUFFIX=CleverAge.OdfConverter.OdfConverterLib.resources
+ID_SUFFIX=Sonata.OdfConverter.Presentation.resources
 
 OOX2ODF_RES= \
     $(wildcard resources/oox2odf/*.xsl) \
@@ -25,14 +25,18 @@ RESOURCE_FLAGS+=${foreach file, $(ODF2OOX_XML), $(PREFIX2)/$(file),$(ID_SUFFIX2)
 SOURCE=${wildcard *.cs}
 DISTFILES=$(SOURCE) $(ODF2OOX_RES) $(OOX2ODF_RES)
 
-all-local: OdfConverterLib.dll OdfConverterLibStatic.dll 
-OdfConverterLib.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library -reference:../OdfZipUtils/OdfZipUtils.dll \
-		-out:OdfConverterLib.dll $(SOURCE)
+all-local: Presentation.dll PresentationStatic.dll 
+Presentation.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
+	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
+		-reference:../../Common/OdfZipUtils/OdfZipUtils.dll \
+		-reference:../../Common/OdfConverterLib/OdfConverterLib.dll \
+		-out:Presentation.dll $(SOURCE)
 
-OdfConverterLibStatic.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
-	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library -reference:../OdfZipUtils/OdfZipUtilsStatic.dll \
-		-out:OdfConverterLibStatic.dll $(SOURCE)
+PresentationStatic.dll: $(SOURCE) Makefile $(OOX2ODF_RES) $(ODF2OOX_RES)
+	gmcs $(CSC_DEBUG) $(RESOURCE_FLAGS) -target:library \
+		-reference:../../Common/OdfZipUtils/OdfZipUtilsStatic.dll \
+		-reference:../../Common/OdfConverterLib/OdfConverterLibStatic.dll \
+		-out:PresentationStatic.dll $(SOURCE)
 
 clean-local:
 
