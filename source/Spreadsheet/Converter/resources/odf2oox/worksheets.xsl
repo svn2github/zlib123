@@ -150,7 +150,7 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
-      
+
       <!-- if property 'fit print range(s) to width/height' is being used -->
       <xsl:for-each select="document('styles.xml')">
         <xsl:if
@@ -190,11 +190,17 @@
       </xsl:call-template>
 
       <!-- insert filter -->
-      <xsl:if test="$ignoreFilter = '' ">
-        <xsl:call-template name="MatchFilter">
-          <xsl:with-param name="tableName" select="@table:name"/>
-        </xsl:call-template>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="$ignoreFilter = '' ">
+          <xsl:call-template name="MatchFilter">
+            <xsl:with-param name="tableName" select="@table:name"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:message terminate="no">translation.odf2oox.RemovedFilter</xsl:message>
+        </xsl:otherwise>
+      </xsl:choose>
+
 
       <!-- Insert Merge Cells -->
       <xsl:call-template name="InsertMergeCells">
@@ -636,7 +642,7 @@
         <xsl:with-param name="CheckIfDefaultBorder">
           <xsl:value-of select="$CheckIfDefaultBorder"/>
         </xsl:with-param>
-        <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>        
+        <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
       </xsl:apply-templates>
     </sheetData>
 
@@ -1364,7 +1370,7 @@
         <!-- single AND filter -->
         <xsl:when
           test="count(table:filter/child::node()) = 1 and table:filter/table:filter-and/table:filter-condition">
-          
+
           <xsl:choose>
             <!-- when there is top 10 condition then for this filed can not be another condition -->
             <xsl:when
@@ -1375,21 +1381,21 @@
                 <xsl:for-each
                   select="table:filter/table:filter-and/table:filter-condition[@table:operator = 'top values' or  @table:operator = 'bottom values' or @table:operator = 'top percent' or 
                   @table:operator = 'bottom percent' ]">
-                  
+
                   <xsl:variable name="fieldNumber">
                     <xsl:value-of select="@table:field-number"/>
                   </xsl:variable>
                   <xsl:variable name="conditionId">
                     <xsl:value-of select="generate-id(.)"/>
                   </xsl:variable>
-                  
+
                   <xsl:if
                     test="parent::node()/table:filter-condition[@table:field-number = $fieldNumber and generate-id(.) != $conditionId]">
                     <xsl:text>ignore</xsl:text>
                   </xsl:if>
-                  </xsl:for-each>
+                </xsl:for-each>
               </xsl:variable>
-              
+
               <xsl:choose>
                 <xsl:when test="$ignore = '' ">
                   <xsl:call-template name="MultiColumnAndFilter"/>
