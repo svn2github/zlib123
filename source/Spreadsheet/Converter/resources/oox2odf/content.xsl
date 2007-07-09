@@ -1740,49 +1740,162 @@
             <xsl:value-of select="substring-after(@ref,':')"/>
           </xsl:attribute>
 
+          <xsl:variable name="filtersNum">
+            <xsl:value-of select="count(e:filterColumn/e:filters)"/>
+          </xsl:variable>
+          <xsl:variable name="customFiltersNum">
+            <xsl:value-of select="count(e:filterColumn/e:customFilters)"/>
+          </xsl:variable>
+          <xsl:variable name="topFiltersNum">
+            <xsl:value-of select="count(e:filterColumn/e:top10)"/>
+          </xsl:variable>
+
           <table:filter>
-            <xsl:for-each select="e:filterColumn">
+            <xsl:choose>
 
-              <xsl:variable name="field">
-                <xsl:value-of select="@colId"/>
-              </xsl:variable>
-
-              <xsl:choose>
-                <xsl:when test="count(e:filters/e:filter) &gt; 1">
-                  <table:filter-or>
-                    <xsl:for-each select="e:filters/e:filter">
-                      <table:filter-condition table:operator="=">
-                        <xsl:attribute name="table:field-number">
-                          <xsl:value-of select="$field"/>
-                        </xsl:attribute>
-                        <xsl:attribute name="table:value">
-                          <xsl:value-of select="@val"/>
-                        </xsl:attribute>
-                      </table:filter-condition>
-                    </xsl:for-each>
-                  </table:filter-or>
-                </xsl:when>
-
-                <xsl:when test="e:filters/e:filter">
-                  <xsl:for-each select="e:filters/e:filter">
-                    <table:filter-condition table:operator="=">
-                      <xsl:attribute name="table:field-number">
-                        <xsl:value-of select="$field"/>
-                      </xsl:attribute>
-                      <xsl:attribute name="table:value">
-                        <xsl:value-of select="@val"/>
-                      </xsl:attribute>
-                    </table:filter-condition>
+              <xsl:when test="$filtersNum + $customFiltersNum + $topFiltersNum &gt; 1">
+                <table:filter-and>
+                  <xsl:for-each select="e:filterColumn">
+                    <xsl:call-template name="InsertFilterConditions"/>
                   </xsl:for-each>
-                </xsl:when>
-              </xsl:choose>
+                </table:filter-and>
+              </xsl:when>
 
-            </xsl:for-each>
+              <xsl:otherwise>
+                <xsl:for-each select="e:filterColumn">
+                  <xsl:call-template name="InsertFilterConditions">
+                    <xsl:with-param name="singleColumn" select="1"/>
+                  </xsl:call-template>
+                </xsl:for-each>
+              </xsl:otherwise>
 
+            </xsl:choose>
           </table:filter>
         </table:database-range>
       </xsl:for-each>
     </xsl:if>
+
+  </xsl:template>
+
+  <xsl:template name="InsertFilterConditions">
+    <xsl:param name="singleColumn"/>
+
+    <xsl:variable name="field">
+      <xsl:value-of select="@colId"/>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="e:top10">
+        <xsl:for-each select="e:top10">
+          <table:filter-condition table:operator="=">
+            <xsl:attribute name="table:field-number">
+              <xsl:value-of select="$field"/>
+            </xsl:attribute>
+            <xsl:attribute name="table:value">
+              <xsl:value-of select="@val"/>
+            </xsl:attribute>
+            <xsl:attribute name="table:operator">
+              <xsl:call-template name="TranslateFilterOperator"/>
+            </xsl:attribute>
+          </table:filter-condition>
+        </xsl:for-each>
+      </xsl:when>
+      
+      <xsl:when test="count(e:filters/e:filter) &gt; 1">
+        <table:filter-or>
+          <xsl:for-each select="e:filters/e:filter">
+            <table:filter-condition table:operator="=">
+              <xsl:attribute name="table:field-number">
+                <xsl:value-of select="$field"/>
+              </xsl:attribute>
+              <xsl:attribute name="table:value">
+                <xsl:value-of select="@val"/>
+              </xsl:attribute>
+            </table:filter-condition>
+          </xsl:for-each>
+        </table:filter-or>
+      </xsl:when>
+
+      <xsl:when test="e:filters/e:filter">
+        <xsl:for-each select="e:filters/e:filter">
+          <table:filter-condition table:operator="=">
+            <xsl:attribute name="table:field-number">
+              <xsl:value-of select="$field"/>
+            </xsl:attribute>
+            <xsl:attribute name="table:value">
+              <xsl:value-of select="@val"/>
+            </xsl:attribute>
+          </table:filter-condition>
+        </xsl:for-each>
+      </xsl:when>
+
+      <xsl:when test="$singleColumn = 1 and e:customFilters/@and = 1">
+        <table:filter-and>
+          <xsl:for-each select="e:customFilters/e:customFilter">
+            <table:filter-condition>
+              <xsl:attribute name="table:operator">
+                <xsl:call-template name="TranslateFilterOperator"/>
+              </xsl:attribute>
+              <xsl:attribute name="table:field-number">
+                <xsl:value-of select="$field"/>
+              </xsl:attribute>
+              <xsl:attribute name="table:value">
+                <xsl:value-of select="@val"/>
+              </xsl:attribute>
+            </table:filter-condition>
+          </xsl:for-each>
+        </table:filter-and>
+      </xsl:when>
+      
+      <xsl:when test="e:customFilters/e:customFilter">
+          <xsl:for-each select="e:customFilters/e:customFilter">
+            <table:filter-condition>
+              <xsl:attribute name="table:operator">
+                <xsl:call-template name="TranslateFilterOperator"/>
+              </xsl:attribute>
+              <xsl:attribute name="table:field-number">
+                <xsl:value-of select="$field"/>
+              </xsl:attribute>
+              <xsl:attribute name="table:value">
+                <xsl:value-of select="@val"/>
+              </xsl:attribute>
+            </table:filter-condition>
+          </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="TranslateFilterOperator">
+
+    <xsl:choose>
+      <xsl:when test="@operator = 'notEqual' ">
+        <xsl:text>!=</xsl:text>
+      </xsl:when>
+      <xsl:when test="@operator = 'greaterThan' ">
+        <xsl:text>&gt;</xsl:text>
+      </xsl:when>
+      <xsl:when test="@operator = 'greaterThanOrEqual' ">
+        <xsl:text>&gt;=</xsl:text>
+      </xsl:when>
+      <xsl:when test="@operator = 'lessThan' ">
+        <xsl:text>&lt;</xsl:text>
+      </xsl:when>
+      <xsl:when test="@operator = 'lessThanOrEqual' ">
+        <xsl:text>&lt;=</xsl:text>
+      </xsl:when>
+      <xsl:when test="name() = 'top10' and @top = 0 and @percent = 1">
+        <xsl:text>bottom percent</xsl:text>
+      </xsl:when>
+      <xsl:when test="name() = 'top10' and @percent = 1">
+        <xsl:text>top percent</xsl:text>
+      </xsl:when>
+      <xsl:when test="name() = 'top10' and @top = 0">
+        <xsl:text>bottom values</xsl:text>
+      </xsl:when>
+      <xsl:when test="name() = 'top10' ">
+        <xsl:text>top values</xsl:text>
+      </xsl:when>
+    </xsl:choose>
 
   </xsl:template>
 
