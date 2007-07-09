@@ -120,7 +120,7 @@
   <data name="translation.odf2oox.HeaderFooterCharNumber" xml:space="preserve">
     <value>Excel supports only 256 chars in header/footer strings(with formatting). Any chars above 256 will be lost</value>
   </data>
-    <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
+    <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
     <value>Some data filters had to be removed because Excel doesn't support them</value>
   </data>
   <data name="translation.oox2odf.ColNumber" xml:space="preserve">
