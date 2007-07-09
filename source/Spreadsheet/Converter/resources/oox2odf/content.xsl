@@ -1840,7 +1840,7 @@
                 <xsl:value-of select="$field"/>
               </xsl:attribute>
               <xsl:attribute name="table:value">
-                <xsl:value-of select="@val"/>
+                <xsl:call-template name="TranslateFilterValue"/>
               </xsl:attribute>
             </table:filter-condition>
           </xsl:for-each>
@@ -1857,7 +1857,7 @@
                 <xsl:value-of select="$field"/>
               </xsl:attribute>
               <xsl:attribute name="table:value">
-                <xsl:value-of select="@val"/>
+                <xsl:call-template name="TranslateFilterValue"/>
               </xsl:attribute>
             </table:filter-condition>
           </xsl:for-each>
@@ -1865,9 +1865,42 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="TranslateFilterValue">
+    <xsl:choose>
+      <!-- contains -->
+      <xsl:when test="substring(@val,1,1) = '*' and substring(@val,string-length(@val),1) = '*' ">
+        <xsl:text>.</xsl:text>
+        <xsl:value-of select="substring(@val,1,string-length(@val)-1)"/>
+        <xsl:text>.*</xsl:text>
+      </xsl:when>
+      <!-- begins with -->
+      <xsl:when test="substring(@val,string-length(@val),1) = '*' ">
+        <xsl:text>^</xsl:text>
+        <xsl:value-of select="substring(@val,1,string-length(@val)-1)"/>
+        <xsl:text>.*</xsl:text>
+      </xsl:when>
+      <!-- ends with -->
+      <xsl:when test="substring(@val,1,1) = '*' ">
+        <xsl:text>.</xsl:text>
+        <xsl:value-of select="@val"/>
+        <xsl:text>$</xsl:text>
+      </xsl:when>      
+      <xsl:otherwise>
+        <xsl:value-of select="@val"/>
+      </xsl:otherwise>
+    </xsl:choose>   
+    
+  </xsl:template>
+  
   <xsl:template name="TranslateFilterOperator">
 
     <xsl:choose>
+      <xsl:when test="substring(@val,1,1) = '*' or substring(@val,string-length(@val),1) = '*' ">
+        <xsl:if test="@operator = 'notEqual' ">
+          <xsl:text>!</xsl:text>
+        </xsl:if>
+        <xsl:text>match</xsl:text>
+      </xsl:when>
       <xsl:when test="@operator = 'notEqual' ">
         <xsl:text>!=</xsl:text>
       </xsl:when>
