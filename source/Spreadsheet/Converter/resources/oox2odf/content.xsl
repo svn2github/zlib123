@@ -99,12 +99,20 @@
           <xsl:with-param name="number">1</xsl:with-param>
         </xsl:apply-templates>
 
+        <table:database-ranges>
+          <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]">
+            <xsl:with-param name="number">1</xsl:with-param>
+            <xsl:with-param name="mode" select="'database'"/>
+          </xsl:apply-templates>
+        </table:database-ranges>
+
       </office:spreadsheet>
     </office:body>
   </xsl:template>
 
   <xsl:template match="e:sheet">
     <xsl:param name="number"/>
+    <xsl:param name="mode"/>
 
     <xsl:variable name="target">
       <xsl:call-template name="GetTarget">
@@ -116,18 +124,33 @@
     </xsl:variable>
 
     <xsl:choose>
-      <!-- when sheet is a chartsheet -->
-      <xsl:when test="starts-with($target,'chartsheets/')">
-        <xsl:call-template name="InsertChartsheet">
-          <xsl:with-param name="number" select="$number"/>
-          <xsl:with-param name="sheet" select="$target"/>
-        </xsl:call-template>
+      <!-- insert tables -->
+      <xsl:when test="$mode = '' ">
+
+        <xsl:choose>
+          <!-- when sheet is a chartsheet -->
+          <xsl:when test="starts-with($target,'chartsheets/')">
+            <xsl:call-template name="InsertChartsheet">
+              <xsl:with-param name="number" select="$number"/>
+              <xsl:with-param name="sheet" select="$target"/>
+            </xsl:call-template>
+          </xsl:when>
+          <!-- when sheet is a worksheet -->
+          <xsl:otherwise>
+            <xsl:call-template name="InsertWorksheet">
+              <xsl:with-param name="number" select="$number"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
-      <!-- when sheet is a worksheet -->
+
+      <!-- insert database ranges -->
       <xsl:otherwise>
-        <xsl:call-template name="InsertWorksheet">
+
+        <xsl:call-template name="InsertFilter">
           <xsl:with-param name="number" select="$number"/>
         </xsl:call-template>
+
       </xsl:otherwise>
     </xsl:choose>
 
@@ -141,6 +164,7 @@
           <xsl:with-param name="number">
             <xsl:value-of select="$number + 1"/>
           </xsl:with-param>
+          <xsl:with-param name="mode" select="$mode"/>
         </xsl:apply-templates>
       </xsl:otherwise>
     </xsl:choose>
@@ -199,11 +223,11 @@
 
     <xsl:variable name="ConditionalCell">
       <xsl:for-each select="document(concat('xl/',$Id))">
-      <xsl:call-template name="ConditionalCell"/>
+        <xsl:call-template name="ConditionalCell"/>
       </xsl:for-each>
     </xsl:variable>
 
- <xsl:variable name="ConditionalRow">
+    <xsl:variable name="ConditionalRow">
       <xsl:call-template name="ConditionalRow">
         <xsl:with-param name="ConditionalCell">
           <xsl:value-of select="$ConditionalCell"/>
@@ -213,11 +237,11 @@
 
     <xsl:variable name="ConditionalCellStyle">
       <xsl:for-each select="document(concat('xl/',$Id))">
-      <xsl:call-template name="ConditionalCell">
-        <xsl:with-param name="document">
-          <xsl:text>style</xsl:text>
-        </xsl:with-param>
-      </xsl:call-template>
+        <xsl:call-template name="ConditionalCell">
+          <xsl:with-param name="document">
+            <xsl:text>style</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:for-each>
     </xsl:variable>
 
@@ -1514,9 +1538,9 @@
       <xsl:with-param name="NoteRow">
         <xsl:value-of select="$NoteRow"/>
       </xsl:with-param>
-	  <xsl:with-param name="NoteCell">
+      <xsl:with-param name="NoteCell">
         <xsl:value-of select="$NoteCell"/>
-      </xsl:with-param>      
+      </xsl:with-param>
       <xsl:with-param name="NoteColl">
         <xsl:value-of select="$NoteColl"/>
       </xsl:with-param>
@@ -1547,7 +1571,7 @@
         <xsl:value-of select="$BigMergeCell"/>
       </xsl:with-param>
       <xsl:with-param name="prevCellCol">
-      <xsl:value-of select="$colNum"/>
+        <xsl:value-of select="$colNum"/>
       </xsl:with-param>
       <xsl:with-param name="this" select="$this"/>
       <xsl:with-param name="colNum">
@@ -1656,6 +1680,110 @@
         <xsl:value-of select="$name"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertFilter">
+    <xsl:param name="number"/>
+
+    <xsl:variable name="sheet">
+      <xsl:call-template name="GetTarget">
+        <xsl:with-param name="id">
+          <xsl:value-of select="@r:id"/>
+        </xsl:with-param>
+        <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:if test="document(concat('xl/',$sheet))/e:worksheet/e:autoFilter">
+
+      <xsl:variable name="checkedName">
+        <xsl:call-template name="CheckSheetName">
+          <xsl:with-param name="sheetNumber">
+            <xsl:value-of select="$number"/>
+          </xsl:with-param>
+          <xsl:with-param name="name">
+            <xsl:value-of select="translate(@name,'!-$()','')"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:autoFilter">
+        <table:database-range table:display-filter-buttons="true">
+          <xsl:attribute name="table:name">
+            <xsl:value-of select="translate($checkedName,' ','_')"/>
+          </xsl:attribute>
+          <xsl:attribute name="table:target-range-address">
+
+            <!-- sheet_name -->
+            <xsl:if test="contains($checkedName,' ')">
+              <xsl:text>&apos;</xsl:text>
+            </xsl:if>
+            <xsl:value-of select="$checkedName"/>
+            <xsl:if test="contains($checkedName,' ')">
+              <xsl:text>&apos;</xsl:text>
+            </xsl:if>
+
+            <xsl:text>.</xsl:text>
+            <xsl:value-of select="substring-before(@ref,':')"/>
+            <xsl:text>:</xsl:text>
+
+            <!-- sheet_name -->
+            <xsl:if test="contains($checkedName,' ')">
+              <xsl:text>&apos;</xsl:text>
+            </xsl:if>
+            <xsl:value-of select="$checkedName"/>
+            <xsl:if test="contains($checkedName,' ')">
+              <xsl:text>&apos;</xsl:text>
+            </xsl:if>
+
+            <xsl:text>.</xsl:text>
+            <xsl:value-of select="substring-after(@ref,':')"/>
+          </xsl:attribute>
+
+          <table:filter>
+            <xsl:for-each select="e:filterColumn">
+
+              <xsl:variable name="field">
+                <xsl:value-of select="@colId"/>
+              </xsl:variable>
+
+              <xsl:choose>
+                <xsl:when test="count(e:filters/e:filter) &gt; 1">
+                  <table:filter-or>
+                    <xsl:for-each select="e:filters/e:filter">
+                      <table:filter-condition table:operator="=">
+                        <xsl:attribute name="table:field-number">
+                          <xsl:value-of select="$field"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="table:value">
+                          <xsl:value-of select="@val"/>
+                        </xsl:attribute>
+                      </table:filter-condition>
+                    </xsl:for-each>
+                  </table:filter-or>
+                </xsl:when>
+
+                <xsl:when test="e:filters/e:filter">
+                  <xsl:for-each select="e:filters/e:filter">
+                    <table:filter-condition table:operator="=">
+                      <xsl:attribute name="table:field-number">
+                        <xsl:value-of select="$field"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="table:value">
+                        <xsl:value-of select="@val"/>
+                      </xsl:attribute>
+                    </table:filter-condition>
+                  </xsl:for-each>
+                </xsl:when>
+              </xsl:choose>
+
+            </xsl:for-each>
+
+          </table:filter>
+        </table:database-range>
+      </xsl:for-each>
+    </xsl:if>
+
   </xsl:template>
 
 </xsl:stylesheet>
