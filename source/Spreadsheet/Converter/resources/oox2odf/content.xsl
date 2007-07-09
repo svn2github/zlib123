@@ -875,6 +875,9 @@
                 <xsl:with-param name="ConditionalCell">
                   <xsl:value-of select="$ConditionalCell"/>
                 </xsl:with-param>
+                <xsl:with-param name="ConditionalRow">
+                  <xsl:value-of select="$ConditionalRow"/>
+                </xsl:with-param>
                 <xsl:with-param name="ConditionalCellStyle">
                   <xsl:value-of select="$ConditionalCellStyle"/>
                 </xsl:with-param>
@@ -993,12 +996,11 @@
       </xsl:call-template>
     </xsl:variable>
 
-
     <!-- if there were empty rows before this one then insert empty rows -->
     <xsl:choose>
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll and Pictures-->
       <xsl:when
-        test="position()=1 and @r>1 and $BigMergeCell = '' and ($GetMinRowWithPicture = '' or ($GetMinRowWithPicture) &gt;= @r)">
+        test="position()=1 and @r>1 and $BigMergeCell = '' and ($GetMinRowWithElement = '' or ($GetMinRowWithElement) &gt;= @r)">
 
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
           table:number-rows-repeated="{@r - 1}">
@@ -1009,7 +1011,7 @@
 
       <!-- when this row is the first non-empty one but not row 1 and there aren't Big Merge Coll, and there are Pictures before this row-->
       <xsl:when
-        test="position()=1 and @r>1 and $BigMergeCell = '' and $PictureRow != '' and $GetMinRowWithElement &lt; @r">
+        test="position()=1 and @r>1 and $BigMergeCell = '' and $GetMinRowWithElement &lt; @r">
 
         <xsl:call-template name="InsertElementsBetwenTwoRows">
           <xsl:with-param name="sheet">
@@ -1081,7 +1083,6 @@
       <!-- when this row is not first one and there were pictures rows after previous non-empty row-->
       <xsl:when
         test="preceding::e:row[1]/@r &lt;  @r - 1 and $GetMinRowWithElement &gt; preceding::e:row[1]/@r and $GetMinRowWithElement &lt; @r - 1">
-
 
         <xsl:call-template name="InsertElementsBetwenTwoRows">
           <xsl:with-param name="sheet">
@@ -1177,7 +1178,18 @@
     </xsl:call-template>
 
     <xsl:if
-      test="not(following-sibling::e:row) and $PictureRow != '' and ($GetMinRowWithElement &gt; @r)">
+      test="not(following-sibling::e:row) and ($PictureRow != '' or $NoteRow != '' or $ConditionalRow != '')">
+
+      <xsl:variable name="GetMinRowWithElementAfterLastRow">
+        <xsl:call-template name="GetMinRowWithPicture">
+          <xsl:with-param name="PictureRow">
+            <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow)"/>
+          </xsl:with-param>
+          <xsl:with-param name="AfterRow">
+            <xsl:value-of select="@r"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
 
       <xsl:call-template name="InsertElementsBetwenTwoRows">
         <xsl:with-param name="sheet">
@@ -1435,6 +1447,17 @@
         </xsl:with-param>
         <xsl:with-param name="ElementCell">
           <xsl:value-of select="concat(';', $NoteCell)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="ConditionalColl">
+      <xsl:call-template name="GetCollsWithElement">
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="$rowNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="ElementCell">
+          <xsl:value-of select="concat(';', $ConditionalCell)"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>

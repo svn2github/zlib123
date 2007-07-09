@@ -229,7 +229,18 @@
     <xsl:if test="$GetMinColWithElement != ''">
     
     <table:table-cell>
-        
+      
+    <xsl:if test="contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">        
+      <xsl:variable name="ConditionalStyleId">
+        <xsl:value-of
+          select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';') + 1])"
+        />
+      </xsl:variable>
+      <xsl:attribute name="table:style-name">
+        <xsl:value-of select="$ConditionalStyleId"/>
+      </xsl:attribute>
+     </xsl:if>
+      
      <xsl:if test="contains(concat(';', $PictureCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
     
     <xsl:call-template name="InsertPictureInThisCell">
