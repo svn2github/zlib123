@@ -287,7 +287,7 @@
           <!-- complete row with empty cells if last cell number < 256 -->
           <xsl:choose>
             <xsl:when
-              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge = '' and $CheckIfBigMergeAfter != 'true' and $PictureCell = ''">
+              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge = '' and $CheckIfBigMergeAfter != 'true' and $PictureCell = '' and $ConditionalCell = '' and $NoteCell = ''">
               <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
@@ -300,7 +300,7 @@
               </table:table-cell>
             </xsl:when>
             <xsl:when
-              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != '' and not(e:c) and $PictureCell = ''">
+              test="$lastCellColumnNumber &lt; 256 and $CheckIfBigMerge != '' and not(e:c) and $PictureCell = '' and $ConditionalCell = '' and $NoteCell = ''">
               <table:table-cell table:number-columns-repeated="{256 - $lastCellColumnNumber}">
                 <!-- if there is a default cell style for the row -->
                 <xsl:if test="@s">
@@ -337,7 +337,7 @@
                 </xsl:if>
               </table:table-cell>
             </xsl:when>
-            <xsl:when test="$PictureCell != '' and $GetMinRowWithElements=@r and not(e:c)">
+            <xsl:when test="($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '') and $GetMinRowWithElements=@r and not(e:c)">
               <xsl:call-template name="InsertElementsBetweenTwoColl">
                 <xsl:with-param name="sheet">
                   <xsl:value-of select="$sheet"/>
@@ -357,12 +357,12 @@
                 <xsl:with-param name="NoteRow">
                   <xsl:value-of select="$NoteRow"/>
                 </xsl:with-param>
-                <!--xsl:with-param name="ConditionalCell">
+                <xsl:with-param name="ConditionalCell">
                   <xsl:value-of select="$ConditionalCell"/>
                   </xsl:with-param>
                   <xsl:with-param name="ConditionalCellStyle">
                   <xsl:value-of select="$ConditionalCellStyle"/>
-                  </xsl:with-param-->
+                  </xsl:with-param>
                 <xsl:with-param name="ElementsColl">
                   <xsl:value-of select="concat($PictureColl, $NoteColl)"/>
                 </xsl:with-param>
