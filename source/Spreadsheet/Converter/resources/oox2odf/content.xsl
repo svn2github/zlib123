@@ -307,7 +307,6 @@
     </xsl:variable>
 
     <table:table>
-
       <!-- Insert Table (Sheet) Name -->
       <xsl:attribute name="table:name">
         <!--        <xsl:value-of select="@name"/>-->
@@ -320,6 +319,27 @@
         <xsl:value-of select="generate-id()"/>
       </xsl:attribute>
 
+      <!-- insert Print Range -->     
+      <xsl:variable name="print_range1" select="substring-before(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '!')">
+      </xsl:variable>
+      <xsl:variable name="print_range2" select="substring-before(substring-after(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '$'),'$')">
+      </xsl:variable>
+      <xsl:variable name="print_range3" select="substring-before(substring-after(substring-after(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '$'),'$'),':')">
+      </xsl:variable>
+      <xsl:variable name="print_range4" select="substring-before(substring-after(substring-after(substring-after(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '!'),':'),'$'),'$')">
+      </xsl:variable>
+      <xsl:variable name="print_range5" select="substring-after(substring-after(substring-after(substring-after(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '!'),':'),'$'),'$')">
+      </xsl:variable>
+      <xsl:variable name="apostrof">
+        <xsl:text>&apos;</xsl:text>
+      </xsl:variable>
+      
+      <xsl:variable name="print_range" select="concat($apostrof, $print_range1, $apostrof,'.', $print_range2, $print_range3,':', $apostrof, $print_range1, $apostrof, '.',$print_range4, $print_range5)">
+      </xsl:variable>
+      <xsl:attribute name="table:print-ranges">
+        <xsl:value-of select="$print_range" />
+      </xsl:attribute>
+      
       <xsl:apply-templates
         select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1]"
         mode="PrintArea">
@@ -371,8 +391,8 @@
         <xsl:with-param name="removeFilter" select="$removeFilter"/>
 
       </xsl:call-template>
-
-    </table:table>
+      
+   </table:table>
 
   </xsl:template>
 
@@ -444,13 +464,12 @@
     <xsl:param name="ranges"/>
     <xsl:param name="mode"/>
     <xsl:param name="checkedName"/>
-    <!-- if print ranges attribute does not contain 'REF' -->
-    <xsl:if test="not(contains(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[attribute::name = '_xlnm.Print_Area' ],'REF'))">
-      <xsl:attribute name="notREF"></xsl:attribute>  
-    <xsl:variable name="apos">
+    <!-- if print ranges attribute does not contain '#REF' -->
+    <xsl:for-each select="document('xl/workbook.xml')">
+      <xsl:if test="not(contains(//workbook/definedNames/definedName[attribute::name = '_xlnm.Print_Area' ],'#REF'))">
+      <xsl:variable name="apos">
       <xsl:text>&apos;</xsl:text>
     </xsl:variable>
-
     <!-- take sheet name from <definedName> (can be inside apostrophes and can be distinct from $checkedName) 
            it is needed for <definedName> processing -->
     <xsl:variable name="sheetName">
@@ -606,16 +625,21 @@
 
       </xsl:otherwise>
     </xsl:choose>
-    </xsl:if>
-    <!-- if print ranges attribute contains 'REF' then there should be 'table:print' attribute put instead with 'false' value -->
-    <xsl:if test="contains(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[attribute::name = '_xlnm.Print_Area' ],'REF')">
+
+      </xsl:if>
+      </xsl:for-each>
+    <!-- if print ranges attribute contains '#REF' then there should be 'table:print' attribute put instead with 'false' value -->
+    <xsl:for-each select="document('xl/workbook.xml')">
+    <xsl:if test="contains(//workbook/definedNames/definedName[attribute::name = '_xlnm.Print_Area' ],'#REF')">
       <xsl:attribute name="table:print">
         <xsl:value-of select='false'/>
       </xsl:attribute>
     </xsl:if>
-      
+   
+    </xsl:for-each>
   </xsl:template>
-
+  
+   
   <!-- insert string -->
   <xsl:template match="e:si">
     <pxsi:si pxsi:number="{count(preceding-sibling::e:si)}"
