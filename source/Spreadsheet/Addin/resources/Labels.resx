@@ -123,6 +123,9 @@
     <data name="translation.odf2oox.RemovedFilter" xml:space="preserve">
     <value>Some data filters had to be removed because Excel doesn't support them</value>
   </data>
+    <data name="translation.oox2odf.RemovedFilter" xml:space="preserve">
+    <value>Some data filters had to be removed because Calc doesn't support them</value>
+  </data>
   <data name="translation.oox2odf.ColNumber" xml:space="preserve">
     <value>Open Office Calc supports only columns up to IV. Any columns above IV will be lost permanently</value>
   </data>

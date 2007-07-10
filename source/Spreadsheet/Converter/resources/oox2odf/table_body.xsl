@@ -169,6 +169,7 @@
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="removeFilter"/>
 
 
     <xsl:variable name="GetMinRowWithElements">
@@ -229,7 +230,8 @@
             </xsl:choose>
           </xsl:attribute>
 
-          <xsl:if test="@hidden=1">
+          <!-- if row is fidden and fiter is not being removed -->
+          <xsl:if test="@hidden=1 and not(@r &gt;= substring-before($removeFilter,':') and @r &lt;= substring-after($removeFilter,':'))">
             <xsl:attribute name="table:visibility">
               <xsl:text>collapse</xsl:text>
             </xsl:attribute>
