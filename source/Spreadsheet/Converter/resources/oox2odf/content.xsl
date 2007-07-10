@@ -410,13 +410,12 @@
           <xsl:value-of select="substring-after(text(),$sheetName)"/>
         </xsl:variable>
 -->
-        <xsl:attribute name="table:print-ranges">
+        
           <xsl:call-template name="InsertRanges">
             <xsl:with-param name="ranges" select="text()"/>
             <xsl:with-param name="mode" select="substring-after(text(),',')"/>
             <xsl:with-param name="checkedName" select="$checkedName"/>
           </xsl:call-template>
-        </xsl:attribute>
       </xsl:when>
 
       <xsl:otherwise>
@@ -445,7 +444,9 @@
     <xsl:param name="ranges"/>
     <xsl:param name="mode"/>
     <xsl:param name="checkedName"/>
-
+    <!-- if print ranges attribute does not contain 'REF' -->
+    <xsl:if test="not(contains(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[attribute::name = '_xlnm.Print_Area' ],'REF'))">
+      <xsl:attribute name="notREF"></xsl:attribute>  
     <xsl:variable name="apos">
       <xsl:text>&apos;</xsl:text>
     </xsl:variable>
@@ -605,6 +606,14 @@
 
       </xsl:otherwise>
     </xsl:choose>
+    </xsl:if>
+    <!-- if print ranges attribute contains 'REF' then there should be 'table:print' attribute put instead with 'false' value -->
+    <xsl:if test="contains(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[attribute::name = '_xlnm.Print_Area' ],'REF')">
+      <xsl:attribute name="table:print">
+        <xsl:value-of select='false'/>
+      </xsl:attribute>
+    </xsl:if>
+      
   </xsl:template>
 
   <!-- insert string -->
