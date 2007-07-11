@@ -40,6 +40,10 @@
   <!-- content types -->
   <xsl:template name="ContentTypes">
     <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+      <Override PartName="/xl/queryTables/queryTable1.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.queryTable+xml"/>
+      <Override PartName="/xl/theme/theme1.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
       <Default Extension="jpeg" ContentType="image/jpeg"/>
       <Default Extension="jpg" ContentType="image/jpeg"/>
       <Default Extension="gif" ContentType="image/gif"/>
@@ -66,6 +70,8 @@
         ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
       <Default Extension="vml"
         ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing"/>
+      <Override PartName="/xl/connections.xml"
+        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.connections+xml"/>
       <xsl:call-template name="InsertCommentContentTypes"/>
       <xsl:call-template name="InsertDrawingContentTypes"/>
       <xsl:call-template name="InsertSheetContentTypes"/>
@@ -110,7 +116,6 @@
           </xsl:for-each>
         </xsl:for-each>
       </xsl:variable>
-      
             
       <xsl:variable name="picture">
             <xsl:choose>
