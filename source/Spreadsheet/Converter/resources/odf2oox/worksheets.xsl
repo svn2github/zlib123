@@ -44,6 +44,7 @@
   <xsl:import href="page.xsl"/>
   <xsl:import href="border.xsl"/>
   <xsl:import href="conditional.xsl"/>
+  <xsl:import href="common.xsl"/>
 
   <xsl:key name="table-row" match="table:table-row" use=" '' "/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
@@ -201,6 +202,10 @@
         </xsl:otherwise>
       </xsl:choose>
 
+      <!-- insert sort -->
+      <xsl:call-template name="InsertSort">
+        <xsl:with-param name="tableName" select="@table:name"/>
+      </xsl:call-template>
 
       <!-- Insert Merge Cells -->
       <xsl:call-template name="InsertMergeCells">
@@ -1325,6 +1330,205 @@
       </xsl:call-template>
     </xsl:if>
 
+  </xsl:template>
+
+  <xsl:template name="InsertColumnSort">
+
+    <sortState columnSort="1">
+
+      <xsl:if test="table:sort/@table:case-sensitive = 'true' ">
+        <xsl:attribute name="caseSensitive">
+          <xsl:text>1</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+
+      <xsl:variable name="row1">
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell"
+            select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="col1">
+        <!-- substring-before rowNum in cell coordinates-->
+        <xsl:value-of
+          select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$row1)"
+        />
+      </xsl:variable>
+
+      <xsl:variable name="row2">
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell"
+            select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="col2">
+        <xsl:value-of
+          select="substring-before(substring-after(substring-after(@table:target-range-address,':'),'.'),$row2)"
+        />
+      </xsl:variable>
+
+      <xsl:variable name="startCol">
+        <xsl:choose>
+          <xsl:when test="@table:contains-header = 'false' ">
+            <xsl:value-of select="$col1"/>
+          </xsl:when>
+          <!-- make range one row shorter-->
+          <xsl:otherwise>
+            <xsl:variable name="colNum">
+              <!-- A equals 0 -->
+              <xsl:call-template name="GetAlphabeticPosition">
+                <xsl:with-param name="literal" select="$col1"/>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <!-- A equals 1 so it's not necessary to increase by 1 -->
+            <xsl:call-template name="NumbersToChars">
+              <xsl:with-param name="num" select="$colNum"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- sort range -->
+      <xsl:attribute name="ref">
+        <xsl:value-of select="concat($startCol,$row1,':')"/>
+        <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
+        />
+      </xsl:attribute>
+
+      <xsl:for-each select="table:sort/table:sort-by">
+        <sortCondition>
+
+          <!-- field selection -->
+          <xsl:attribute name="ref">
+            <xsl:value-of
+              select="concat($startCol,$row1 + @table:field-number,':',$col2,$row1 + @table:field-number)"
+            />
+          </xsl:attribute>
+
+          <!-- descending order -->
+          <xsl:if test="@table:order = 'descending' ">
+            <xsl:attribute name="descending">
+              <xsl:text>1</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
+        </sortCondition>
+      </xsl:for-each>
+    </sortState>
+  </xsl:template>
+
+  <xsl:template name="InsertRowSort">
+    <sortState>
+
+      <xsl:if test="table:sort/@table:case-sensitive = 'true' ">
+        <xsl:attribute name="caseSensitive">
+          <xsl:text>1</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+
+      <xsl:variable name="row1">
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell"
+            select="substring-after(substring-before(@table:target-range-address,':'),'.')"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="col1">
+        <!-- substring-before rowNum in cell coordinates-->
+        <xsl:value-of
+          select="substring-before(substring-after(substring-before(@table:target-range-address,':'),'.'),$row1)"
+        />
+      </xsl:variable>
+
+      <xsl:variable name="row2">
+        <xsl:call-template name="GetRowNum">
+          <xsl:with-param name="cell"
+            select="substring-after(substring-after(@table:target-range-address,':'),'.')"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:variable name="col2">
+        <xsl:value-of
+          select="substring-before(substring-after(substring-after(@table:target-range-address,':'),'.'),$row2)"
+        />
+      </xsl:variable>
+
+      <xsl:variable name="startRow">
+        <xsl:choose>
+          <xsl:when test="@table:contains-header = 'false' ">
+            <xsl:value-of select="$row1"/>
+          </xsl:when>
+
+          <!-- make range one row shorter-->
+          <xsl:otherwise>
+            <xsl:value-of select="$row1 + 1"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- sort range -->
+      <xsl:attribute name="ref">
+        <xsl:value-of select="concat($col1,$startRow,':')"/>
+        <xsl:value-of select="substring-after(substring-after(@table:target-range-address,':'),'.')"
+        />
+      </xsl:attribute>
+
+      <xsl:for-each select="table:sort/table:sort-by">
+        <sortCondition>
+
+          <!-- field selection -->
+          <xsl:attribute name="ref">
+
+            <xsl:variable name="colNum">
+              <xsl:call-template name="GetAlphabeticPosition">
+                <xsl:with-param name="literal" select="$col1"/>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <xsl:variable name="fieldCol">
+              <xsl:call-template name="NumbersToChars">
+                <xsl:with-param name="num" select="$colNum - 1  + @table:field-number"/>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <xsl:value-of select="concat($fieldCol,$startRow,':',$fieldCol,$row2)"/>
+          </xsl:attribute>
+
+          <!-- descending order -->
+          <xsl:if test="@table:order = 'descending' ">
+            <xsl:attribute name="descending">
+              <xsl:text>1</xsl:text>
+            </xsl:attribute>
+          </xsl:if>
+
+        </sortCondition>
+      </xsl:for-each>
+    </sortState>
+  </xsl:template>
+
+  <xsl:template name="InsertSort">
+    <xsl:param name="tableName"/>
+
+    <xsl:variable name="apos">
+      <xsl:text>&apos;</xsl:text>
+    </xsl:variable>
+
+    <xsl:for-each
+      select="parent::node()/table:database-ranges/table:database-range[table:sort and substring-before(translate(@table:target-range-address,$apos,''),'.') = $tableName]">
+
+      <xsl:choose>
+        <xsl:when test="@table:orientation = 'column' ">
+          <xsl:call-template name="InsertColumnSort"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="InsertRowSort"/>
+        </xsl:otherwise>
+      </xsl:choose>
+
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="MatchFilter">
