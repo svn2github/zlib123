@@ -534,7 +534,7 @@
     <xsl:param name="MergeCellStyle"/>
     <xsl:param name="CheckRowHidden"/>
     <xsl:param name="CheckIfDefaultBorder"/>
-    <xsl:param name="ignoreFilter"/> 
+    <xsl:param name="ignoreFilter"/>
 
     <xsl:variable name="height">
       <xsl:call-template name="point-measure">
@@ -585,7 +585,8 @@
           <xsl:value-of select="count(ancestor::table:table-row-group)"/>
         </xsl:attribute>
 
-        <xsl:if test="@table:visibility = 'collapse' or (@table:visibility = 'filter' and $ignoreFilter = '')">
+        <xsl:if
+          test="@table:visibility = 'collapse' or (@table:visibility = 'filter' and $ignoreFilter = '')">
           <xsl:attribute name="hidden">1</xsl:attribute>
         </xsl:if>
 
@@ -603,7 +604,7 @@
           <xsl:with-param name="MergeCellStyle">
             <xsl:value-of select="$MergeCellStyle"/>
           </xsl:with-param>
-          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>          
+          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
         </xsl:apply-templates>
       </row>
 
@@ -692,7 +693,7 @@
           <xsl:with-param name="CheckIfDefaultBorder">
             <xsl:value-of select="$CheckIfDefaultBorder"/>
           </xsl:with-param>
-          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>          
+          <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
         </xsl:apply-templates>
       </xsl:when>
       <!-- next row is inside header rows -->
@@ -815,7 +816,8 @@
               </xsl:attribute>
             </xsl:if>
 
-            <xsl:if test="@table:visibility = 'collapse' or (@table:visibility = 'filter' and $ignoreFilter = '' )">
+            <xsl:if
+              test="@table:visibility = 'collapse' or (@table:visibility = 'filter' and $ignoreFilter = '' )">
               <xsl:attribute name="hidden">1</xsl:attribute>
             </xsl:if>
 
@@ -1083,7 +1085,7 @@
                   So if inside cell range defined by table:table-cell with repeated columns attribute there is column that has changed default-cell-style-name then before ';'col_number 
                   in $TableColumnTagNum there should be 'K' ($TableColumnTagNum contains listed default-cell-style-name from backward) -->
       <xsl:when
-        test="@table:number-columns-repeated and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p) and not(@table:table-style) and 
+        test="@table:number-columns-repeated and not(following-sibling::node()[1]) and name() = 'table:table-cell' and not(text:p) and not(@table:style-name) and 
         not(contains(substring-before($TableColumnTagNum,';$colNumber:'),'K') or contains($TableColumnTagNum,concat('K',$colNumber)))"> </xsl:when>
 
       <xsl:when
@@ -1244,8 +1246,7 @@
           </xsl:when>
 
           <!-- if it is a hyperlink  in the cell-->
-          <xsl:when
-            test="descendant::text:a">
+          <xsl:when test="descendant::text:a">
 
             <xsl:variable name="multilines">
               <xsl:for-each
