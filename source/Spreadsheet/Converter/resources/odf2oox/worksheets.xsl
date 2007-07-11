@@ -191,16 +191,16 @@
       </xsl:call-template>
 
       <!-- insert filter -->
-      <xsl:choose>
-        <xsl:when test="$ignoreFilter = '' ">
-          <xsl:call-template name="MatchFilter">
-            <xsl:with-param name="tableName" select="@table:name"/>
-          </xsl:call-template>
-        </xsl:when>
+      <!--      <xsl:choose>
+        <xsl:when test="$ignoreFilter = '' ">-->
+      <xsl:call-template name="MatchFilter">
+        <xsl:with-param name="tableName" select="@table:name"/>
+      </xsl:call-template>
+      <!--        </xsl:when>
         <xsl:otherwise>
           <xsl:message terminate="no">translation.odf2oox.RemovedFilter</xsl:message>
         </xsl:otherwise>
-      </xsl:choose>
+      </xsl:choose>-->
 
       <!-- insert sort -->
       <xsl:call-template name="InsertSort">
@@ -1517,7 +1517,7 @@
     </xsl:variable>
 
     <xsl:for-each
-      select="parent::node()/table:database-ranges/table:database-range[table:sort and substring-before(translate(@table:target-range-address,$apos,''),'.') = $tableName]">
+      select="parent::node()/table:database-ranges/table:database-range[table:sort and not(table:filter) and substring-before(translate(@table:target-range-address,$apos,''),'.') = $tableName]">
 
       <xsl:choose>
         <xsl:when test="@table:orientation = 'column' ">
@@ -1624,6 +1624,7 @@
           </xsl:if>
         </xsl:otherwise>
       </xsl:choose>
+
     </xsl:for-each>
   </xsl:template>
 
@@ -1643,6 +1644,11 @@
         </xsl:apply-templates>
       </xsl:for-each>
 
+      <!-- when sort is applyed to filter -->
+      <xsl:if test="table:sort">
+        <xsl:call-template name="InsertRowSort"/>
+      </xsl:if>
+    
     </autoFilter>
   </xsl:template>
 
@@ -1749,6 +1755,12 @@
           </filters>
         </filterColumn>
       </xsl:for-each>
+      
+      <!-- when sort is applyed to filter -->
+      <xsl:if test="table:sort">
+        <xsl:call-template name="InsertRowSort"/>
+      </xsl:if>
+      
     </autoFilter>
   </xsl:template>
 
@@ -1796,6 +1808,10 @@
         </filterColumn>
       </xsl:for-each>
 
+      <!-- when sort is applyed to filter -->
+      <xsl:if test="table:sort">
+        <xsl:call-template name="InsertRowSort"/>
+      </xsl:if>
     </autoFilter>
   </xsl:template>
 
