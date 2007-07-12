@@ -47,7 +47,7 @@
   <xsl:import href="conditional.xsl"/>
   <xsl:import href="elements.xsl"/>
   <xsl:import href="measures.xsl"/>
-  
+
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="''"/>
   <xsl:key name="Dxf" match="e:styleSheet/e:dxfs/e:dxf" use="''"/>
@@ -209,7 +209,7 @@
           <xsl:value-of select="$number"/>
         </xsl:with-param>
         <xsl:with-param name="name">
-          <xsl:value-of select="translate(@name,'!-$()','')"/>
+          <xsl:value-of select="translate(@name,'!-$#()','')"/>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -340,25 +340,19 @@
       </xsl:attribute>
 
       <!-- insert Print Range -->
-      <xsl:variable name="print_range1"
-        select="substring-before(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '!')"> </xsl:variable>
-      <xsl:variable name="print_range2"
-        select="substring-before(substring-after(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '$'),'$')"> </xsl:variable>
-      <xsl:variable name="print_range3"
-        select="substring-before(substring-after(substring-after(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '$'),'$'),':')"> </xsl:variable>
-      <xsl:variable name="print_range4"
-        select="substring-before(substring-after(substring-after(substring-after(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '!'),':'),'$'),'$')"> </xsl:variable>
-      <xsl:variable name="print_range5"
-        select="substring-after(substring-after(substring-after(substring-after(document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1], '!'),':'),'$'),'$')"> </xsl:variable>
       <xsl:variable name="apostrof">
         <xsl:text>&apos;</xsl:text>
       </xsl:variable>
+      <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
+        <xsl:if test="string($checkedName) = substring-before(./self::node(), '!')">
+          <xsl:attribute name="table:print-ranges">
+            <xsl:value-of
+              select="concat($apostrof, substring-before(./self::node(), '!'), $apostrof,'.', substring-before(substring-after(./self::node(), '$'),'$'), substring-before(substring-after(substring-after(./self::node(), '$'),'$'),':'),':', $apostrof, substring-before(./self::node(), '!'), $apostrof, '.',substring-before(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'), substring-after(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'))"
+            />
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:for-each>
 
-      <xsl:variable name="print_range"
-        select="concat($apostrof, $print_range1, $apostrof,'.', $print_range2, $print_range3,':', $apostrof, $print_range1, $apostrof, '.',$print_range4, $print_range5)"> </xsl:variable>
-      <xsl:attribute name="table:print-ranges">
-        <xsl:value-of select="$print_range"/>
-      </xsl:attribute>
 
       <xsl:apply-templates
         select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName[1]"
@@ -427,7 +421,7 @@
     <xsl:choose>
       <xsl:when test="contains($value, $name) and @name = '_xlnm.Print_Area' ">
 
-        <!--         
+    <!--         
         <xsl:variable name="apos">
           <xsl:text>&apos;</xsl:text>
         </xsl:variable>
@@ -451,7 +445,7 @@
         </xsl:variable>
 -->
 
-        <xsl:call-template name="InsertRanges">
+       <xsl:call-template name="InsertRanges">
           <xsl:with-param name="ranges" select="text()"/>
           <xsl:with-param name="mode" select="substring-after(text(),',')"/>
           <xsl:with-param name="checkedName" select="$checkedName"/>
@@ -573,11 +567,11 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-
-            <xsl:value-of
+<!--  
+           <xsl:value-of
               select="concat($apos,$checkedName,$apos,'.',$start,':',$apos,$checkedName,$apos,'.',$end)"/>
             <xsl:text> </xsl:text>
-
+-->
             <xsl:call-template name="InsertRanges">
               <xsl:with-param name="ranges" select="substring-after($ranges,',')"/>
               <xsl:with-param name="mode" select="substring-after(substring-after($ranges,','),',')"/>
@@ -602,7 +596,7 @@
             </xsl:variable>
 
             <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
-            <xsl:variable name="endRange">
+           <xsl:variable name="endRange">
               <xsl:choose>
                 <xsl:when test="contains(substring-after($ranges, concat($sheetName,'!') ), ':' )">
                   <xsl:value-of select="substring-after($ranges,':')"/>
@@ -645,9 +639,9 @@
               </xsl:choose>
             </xsl:variable>
 
-            <xsl:value-of
+  <!--          <xsl:value-of
               select="concat($apos,$checkedName,$apos,'.',$start,':',$apos,$checkedName,$apos,'.',$end)"/>
-
+-->
           </xsl:otherwise>
         </xsl:choose>
 
@@ -658,10 +652,9 @@
       <xsl:if
         test="contains(//workbook/definedNames/definedName[attribute::name = '_xlnm.Print_Area' ],'#REF')">
         <xsl:attribute name="table:print">
-          <xsl:value-of select="false"/>
+          <xsl:value-of select="'false'"/>
         </xsl:attribute>
       </xsl:if>
-
     </xsl:for-each>
   </xsl:template>
 
@@ -1785,15 +1778,15 @@
 
     <xsl:choose>
       <!-- when there are at least 2 sheets with the same name after removal of forbidden characters and cutting to 31 characters (name correction) -->
-      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-()','') = $name][2]">
+      <xsl:when test="parent::node()/e:sheet[translate(@name,'!$-()#','') = $name][2]">
         <xsl:variable name="nameConflictsBefore">
           <!-- count sheets before this one whose name (after correction) collide with this sheet name (after correction) -->
           <xsl:value-of
-            select="count(parent::node()/e:sheet[translate(@name,'!$-()','') = $name and position() &lt; $sheetNumber])"
+            select="count(parent::node()/e:sheet[translate(@name,'!$-()#','') = $name and position() &lt; $sheetNumber])"
           />
         </xsl:variable>
         <!-- cut name and add "(N)" at the end where N is seqential number of duplicated name -->
-        <xsl:value-of select="concat(translate(@name,'!$-()',''),'_',$nameConflictsBefore + 1)"/>
+        <xsl:value-of select="concat(translate(@name,'!$-()#',''),'_',$nameConflictsBefore + 1)"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$name"/>
