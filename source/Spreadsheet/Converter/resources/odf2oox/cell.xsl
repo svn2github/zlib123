@@ -793,7 +793,7 @@
     <xsl:param name="ignoreFilter"/>
 
     <xsl:if
-      test="table:table-cell/text:p or @table:style-name or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') and @ table:table-row[@table:number-rows-repeated] or parent::table:table-row-group">
+      test="table:table-cell/text:p or table:table-cell/@table:style-name or @table:visibility='collapse' or  @table:visibility='filter' or ($height != $defaultRowHeight and following-sibling::table:table-row/table:table-cell/text:p|text:span) or contains($CheckIfDefaultBorder, 'true') and @ table:table-row[@table:number-rows-repeated] or parent::table:table-row-group">
 
       <xsl:choose>
         <xsl:when test="$numberRowsRepeated &gt; 1">
