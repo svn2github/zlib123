@@ -46,6 +46,7 @@
   <xsl:import href="conditional.xsl"/>
   <xsl:import href="common.xsl"/>
   <xsl:import href="sortFilter.xsl"/>
+  <xsl:import href="validation.xsl"/>
 
   <xsl:key name="table-row" match="table:table-row" use=" '' "/>
   <xsl:key name="StyleFamily" match="style:style" use="@style:family"/>
@@ -194,10 +195,10 @@
       <!-- insert filter -->
       <xsl:choose>
         <xsl:when test="$ignoreFilter = '' ">
-      <xsl:call-template name="MatchFilter">
-        <xsl:with-param name="tableName" select="@table:name"/>
-      </xsl:call-template>
-      </xsl:when>
+          <xsl:call-template name="MatchFilter">
+            <xsl:with-param name="tableName" select="@table:name"/>
+          </xsl:call-template>
+        </xsl:when>
         <xsl:otherwise>
           <xsl:message terminate="no">translation.odf2oox.RemovedFilter</xsl:message>
         </xsl:otherwise>
@@ -651,6 +652,24 @@
         <xsl:with-param name="ignoreFilter" select="$ignoreFilter"/>
       </xsl:apply-templates>
     </sheetData>
+
+    <!-- Insert Data Validation -->
+
+    <xsl:if test="table:table-row/table:table-cell/@table:content-validation-name != ''">
+      <dataValidations>
+        <xsl:apply-templates select="table:table-row[1]" mode="validation">
+          <xsl:with-param name="rowNumber">
+            <xsl:text>1</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="cellNumber">
+            <xsl:text>1</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="tableName" select="@table:name"/>
+          <xsl:with-param name="TableColumnTagNum" select="$ColumnTagNum"/>
+          <xsl:with-param name="MergeCell" select="$MergeCell"/>
+        </xsl:apply-templates>
+      </dataValidations>
+    </xsl:if>
 
   </xsl:template>
 
@@ -1332,5 +1351,5 @@
     </xsl:if>
 
   </xsl:template>
-  
+
 </xsl:stylesheet>
