@@ -52,6 +52,7 @@
     <EmbeddedResource Include="resources\odf2oox\workbook.xsl" />
     <EmbeddedResource Include="resources\odf2oox\worksheets.xsl" />
     <EmbeddedResource Include="resources\odf2oox\cell.xsl" />
+    <EmbeddedResource Include="resources\odf2oox\validation.xsl" />
     <EmbeddedResource Include="resources\odf2oox\merge_cell.xsl" />
     <EmbeddedResource Include="resources\odf2oox\common.xsl" />
     <EmbeddedResource Include="resources\odf2oox\styles.xsl" />
