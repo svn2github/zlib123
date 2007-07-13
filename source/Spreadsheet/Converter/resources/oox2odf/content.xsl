@@ -1735,7 +1735,7 @@
 
 
   <!-- convert run into span -->
-  <xsl:template match="e:r">
+  <!--<xsl:template match="e:r">
     <text:span>
       <xsl:if test="e:rPr">
         <xsl:attribute name="text:style-name">
@@ -1744,7 +1744,7 @@
       </xsl:if>
       <xsl:apply-templates/>
     </text:span>
-  </xsl:template>
+  </xsl:template>-->
 
   <xsl:template match="e:t">
     <xsl:choose>
