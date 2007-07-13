@@ -1046,7 +1046,7 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:when>
-        <xsl:otherwise>1</xsl:otherwise>
+        <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
 

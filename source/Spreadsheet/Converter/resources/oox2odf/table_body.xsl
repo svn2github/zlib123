@@ -442,7 +442,14 @@
         <xsl:otherwise>
           <xsl:if test="not(@min = @max)">
             <xsl:attribute name="table:number-columns-repeated">
-              <xsl:value-of select="@max - @min + 1"/>
+              <xsl:choose>
+                <xsl:when test="@max &gt; 256">
+                  <xsl:value-of select="256 - @min + 1"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="@max - @min + 1"/>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:attribute>
           </xsl:if>
         </xsl:otherwise>
