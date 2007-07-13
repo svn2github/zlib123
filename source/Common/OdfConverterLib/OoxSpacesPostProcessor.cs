@@ -44,6 +44,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
         private const string PXS_NAMESPACE = "urn:cleverage:xmlns:post-processings:extra-spaces";
        	private const string XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
        	private const string DEFAULT_NAMESPACE = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+       	private const string DRAWING_NAMESPACE = "http://schemas.openxmlformats.org/drawingml/2006/main";
         
         private Stack currentNode;
         private Stack context;
@@ -168,7 +169,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          private bool IsT()
          {
          	Element e = (Element) this.currentNode.Peek();
-         	return "t".Equals(e.Name) && (W_NAMESPACE.Equals(e.Ns) || DEFAULT_NAMESPACE.Equals(e.Ns));
+         	return "t".Equals(e.Name) && (W_NAMESPACE.Equals(e.Ns) || DEFAULT_NAMESPACE.Equals(e.Ns) || DRAWING_NAMESPACE.Equals(e.Ns));
          }
         
          private bool InT()
@@ -186,7 +187,7 @@ namespace CleverAge.OdfConverter.OdfConverterLib
          private void EndT()
          {
          	Element t = (Element) this.store.Pop();
-         	if (this.preserveSpace && t.GetAttribute("space", XML_NAMESPACE) == null)
+         	if (this.preserveSpace && t.GetAttribute("space", XML_NAMESPACE) == null && !t.Ns.Equals(DRAWING_NAMESPACE))
          	{
          		this.preserveSpace = false;
          		t.AddAttribute(new Attribute("xml", "space", "preserve", XML_NAMESPACE));

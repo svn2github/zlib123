@@ -138,6 +138,7 @@
     <xsl:param name="picture"/>
     <xsl:param name="hyperlink"/>
     <xsl:param name="chart"/>
+    <xsl:param name="textBox"/>
 
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <!-- comments.xml file -->
@@ -207,7 +208,7 @@
       </xsl:if>
 
       <!-- drawing.xml file -->
-      <xsl:if test="contains($chart,'true') or $picture = 'true'">
+      <xsl:if test="contains($chart,'true') or $picture = 'true' or $textBox = 'true' ">
         <Relationship Id="{concat('d_rId',$sheetNum)}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing"
           Target="{concat('../drawings/drawing',$sheetNum,'.xml')}"/>
@@ -230,7 +231,7 @@
 
       <!-- pictures -->
       <xsl:for-each
-        select="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )]">
+        select="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' )  and not(parent::node()/draw:object)]">
 
         <xsl:choose>
           <!-- embeded pictures -->

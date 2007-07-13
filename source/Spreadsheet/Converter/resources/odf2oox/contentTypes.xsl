@@ -127,9 +127,21 @@
               </xsl:otherwise>
             </xsl:choose>
       </xsl:variable>
+      
+      <xsl:variable name="textBox">
+        <xsl:choose>
+          <xsl:when test="descendant::draw:frame/draw:text-box">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
 
       <!-- TO DO for pictures-->      
-      <xsl:if test="contains($chart,'true') or $picture = 'true'">
+      <xsl:if test="contains($chart,'true') or $picture = 'true' or $textBox = 'true' ">
         <Override PartName="{concat('/xl/drawings/drawing',position(),'.xml')}"
           ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>        
         

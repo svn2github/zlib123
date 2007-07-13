@@ -316,6 +316,17 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+      
+      <xsl:variable name="textBox">
+        <xsl:choose>
+          <xsl:when test="descendant::draw:frame/draw:text-box">
+            <xsl:text>true</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>false</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
 
       <xsl:variable name="chart">
         <xsl:for-each select="descendant::draw:frame/draw:object">
@@ -332,7 +343,7 @@
         </xsl:for-each>
       </xsl:variable>
 
-      <xsl:if test="contains($chart,'true') or $picture = 'true'">
+      <xsl:if test="contains($chart,'true') or $picture = 'true' or $textBox = 'true' ">
         <drawing r:id="{concat('d_rId',$sheetId)}"/>
       </xsl:if>
 
