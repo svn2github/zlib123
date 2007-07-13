@@ -464,11 +464,6 @@
               </xsl:with-param>
             </xsl:apply-templates>
           </xsl:when>
-          <xsl:otherwise>
-            <xsl:attribute name="table:print">
-              <xsl:text>false</xsl:text>
-            </xsl:attribute>
-          </xsl:otherwise>
         </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
