@@ -46,94 +46,98 @@
     <xdr:wsDr>
       <!--Insert Chart -->
       <xsl:for-each
-        select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
-        <xdr:twoCellAnchor>
-          <xsl:call-template name="SetPosition"/>
-          <xdr:graphicFrame macro="">
-            <xdr:nvGraphicFramePr>
-              <xdr:cNvPr id="{position()}" name="{concat('Chart ',position())}"/>
-              <xdr:cNvGraphicFramePr>
-                <a:graphicFrameLocks/>
-              </xdr:cNvGraphicFramePr>
-            </xdr:nvGraphicFramePr>
-            <xdr:xfrm>
-              <a:off x="0" y="0"/>
-              <a:ext cx="0" cy="0"/>
-            </xdr:xfrm>
-            <a:graphic>
-              <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">
-                <c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
-                  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-                  r:id="{generate-id(.)}"/>
-              </a:graphicData>
-            </a:graphic>
-          </xdr:graphicFrame>
-          <xdr:clientData/>
-        </xdr:twoCellAnchor>
-      </xsl:for-each>
-
-      <!--Insert Picture -->
-      <xsl:for-each
-        select="descendant::draw:frame/draw:image[not(name(parent::node()/parent::node()) = 'draw:g' ) and not(parent::node()/draw:object)]">
-
-        <xdr:twoCellAnchor>
-          <xsl:call-template name="SetPosition"/>
-          <xdr:pic>
-            <xdr:nvPicPr>
-              <xdr:cNvPr>
-                <xsl:attribute name="id">
-                  <xsl:value-of select="position()"/>
-                </xsl:attribute>
-                <xsl:attribute name="name">
-                  <xsl:value-of select="parent::draw:frame/@draw:name"/>
-                </xsl:attribute>
-                <xsl:attribute name="descr">
-                  <xsl:value-of select="parent::draw:frame/@draw:name"/>
-                </xsl:attribute>
-              </xdr:cNvPr>
-              <xdr:cNvPicPr>
-                <a:picLocks noChangeAspect="1"/>
-              </xdr:cNvPicPr>
-            </xdr:nvPicPr>
-
-            <xdr:blipFill>
-              <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-                <xsl:choose>
-                  <!-- embeded picture -->
-                  <xsl:when test="starts-with(@xlink:href, 'Pictures/')">
-                    <xsl:attribute name="r:embed">
-                      <xsl:value-of select="generate-id()"/>
+        select="descendant::draw:frame">
+        
+        <xsl:choose>
+          <!-- insert chart -->
+          <xsl:when test="draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
+            <xdr:twoCellAnchor>
+              <xsl:call-template name="SetPosition"/>
+              <xdr:graphicFrame macro="">
+                <xdr:nvGraphicFramePr>
+                  <xdr:cNvPr id="{position()}" name="{concat('Chart ',position())}"/>
+                  <xdr:cNvGraphicFramePr>
+                    <a:graphicFrameLocks/>
+                  </xdr:cNvGraphicFramePr>
+                </xdr:nvGraphicFramePr>
+                <xdr:xfrm>
+                  <a:off x="0" y="0"/>
+                  <a:ext cx="0" cy="0"/>
+                </xdr:xfrm>
+                <a:graphic>
+                  <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">
+                    <c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
+                      xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+                      r:id="{generate-id(.)}"/>
+                  </a:graphicData>
+                </a:graphic>
+              </xdr:graphicFrame>
+              <xdr:clientData/>
+            </xdr:twoCellAnchor>
+          </xsl:when>
+          
+          <!-- insert picture -->
+          <xsl:when test="draw:image[not(name(parent::node()/parent::node()) = 'draw:g' ) and not(parent::node()/draw:object)]">
+            <xdr:twoCellAnchor>
+              <xsl:call-template name="SetPosition"/>
+              <xdr:pic>
+                <xdr:nvPicPr>
+                  <xdr:cNvPr>
+                    <xsl:attribute name="id">
+                      <xsl:value-of select="position()"/>
                     </xsl:attribute>
-                  </xsl:when>
-                  <!-- linked picture -->
-                  <xsl:otherwise>
-                    <xsl:attribute name="r:link">
-                      <xsl:value-of select="generate-id()"/>
+                    <xsl:attribute name="name">
+                      <xsl:value-of select="@draw:name"/>
                     </xsl:attribute>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </a:blip>
-              <a:stretch>
-                <a:fillRect/>
-              </a:stretch>
-            </xdr:blipFill>
-
-            <xsl:call-template name="InsertFrameProperties"/>
-
-          </xdr:pic>
-          <xdr:clientData/>
-        </xdr:twoCellAnchor>
+                    <xsl:attribute name="descr">
+                      <xsl:value-of select="@draw:name"/>
+                    </xsl:attribute>
+                  </xdr:cNvPr>
+                  <xdr:cNvPicPr>
+                    <a:picLocks noChangeAspect="1"/>
+                  </xdr:cNvPicPr>
+                </xdr:nvPicPr>
+                
+                <xdr:blipFill>
+                  <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+                    <xsl:choose>
+                      <!-- embeded picture -->
+                      <xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
+                        <xsl:attribute name="r:embed">
+                          <xsl:value-of select="generate-id()"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <!-- linked picture -->
+                      <xsl:otherwise>
+                        <xsl:attribute name="r:link">
+                          <xsl:value-of select="generate-id()"/>
+                        </xsl:attribute>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </a:blip>
+                  <a:stretch>
+                    <a:fillRect/>
+                  </a:stretch>
+                </xdr:blipFill>
+                
+                <xsl:call-template name="InsertFrameProperties"/>
+                
+              </xdr:pic>
+              <xdr:clientData/>
+            </xdr:twoCellAnchor>
+          </xsl:when>
+        </xsl:choose>
       </xsl:for-each>
 
       <!--Insert TextBox -->
-      <xsl:for-each select="descendant::draw:frame/draw:text-box">
+      <!--xsl:for-each select="descendant::draw:frame/draw:text-box">
         <xdr:twoCellAnchor>
 
           <xsl:call-template name="SetPosition"/>
 
           <xdr:sp macro="" textlink="">
             <xdr:nvSpPr>
-              <xdr:cNvPr id="2" name="TextBox 1"/>
+              <xdr:cNvPr id="position()" name="concat('TextBox ',position())"/>
               <xdr:cNvSpPr txBox="1"/>
             </xdr:nvSpPr>
 
@@ -143,10 +147,10 @@
 
               <xsl:call-template name="InsertTextBoxProperties"/>
 
-              <a:lstStyle/>
+              <a:lstStyle/-->
 
               <!-- insert text -->
-              <xsl:apply-templates mode="text-box"/>
+              <!--xsl:apply-templates mode="text-box"/>
 
             </xdr:txBody>
 
@@ -154,7 +158,7 @@
           <xdr:clientData/>
         </xdr:twoCellAnchor>
 
-      </xsl:for-each>
+      </xsl:for-each-->
 
     </xdr:wsDr>
 
@@ -191,7 +195,7 @@
       <xdr:col>
         <xsl:choose>
           <xsl:when
-            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+            test="key('style', @draw:style-name)/style:graphic-properties/@draw:transform!= '' or @draw:transform!= ''">
             <xsl:value-of select="$InsertStartColumn - ($InsertEndColumn - $InsertStartColumn) "/>
           </xsl:when>
           <xsl:otherwise>
@@ -205,7 +209,7 @@
       <xdr:row>
         <xsl:choose>
           <xsl:when
-            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+            test="key('style', @draw:style-name)/style:graphic-properties/@draw:transform!= '' or @draw:transform!= ''">
             <xsl:value-of select="$InsertStartRow - ($InsertEndRow - $InsertStartRow)"/>
           </xsl:when>
           <xsl:otherwise>
@@ -223,7 +227,7 @@
         <!-- To do  (check roundtrip Diagrammtypen.xlsx)-->
         <xsl:choose>
           <xsl:when
-            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= '' and $InsertStartColumn != '' and $InsertStartColumn != 'NaN'">
+            test="key('style', @draw:style-name)/style:graphic-properties/@draw:transform!= '' or @draw:transform!= '' and $InsertStartColumn != '' and $InsertStartColumn != 'NaN'">
             <xsl:value-of select="$InsertStartColumn"/>
           </xsl:when>
           <xsl:otherwise>
@@ -245,7 +249,7 @@
       <xdr:row>
         <xsl:choose>
           <xsl:when
-            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+            test="key('style', @draw:style-name)/style:graphic-properties/@draw:transform!= '' or @draw:transform!= ''">
             <xsl:value-of select="$InsertStartRow"/>
           </xsl:when>
           <xsl:otherwise>
@@ -264,8 +268,8 @@
     <xsl:choose>
       <!-- when anchor is to cell -->
       <xsl:when
-        test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-        <xsl:for-each select="parent::node()/parent::node()">
+        test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
+        <xsl:for-each select="parent::node()">
           <xsl:variable name="position">
             <xsl:value-of
               select="count(preceding-sibling::table:table-cell) + count(preceding-sibling::table:covered-table-cell) + 1"
@@ -283,7 +287,7 @@
         </xsl:for-each>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+      <xsl:when test="parent::node()[name() = 'table:shapes']">
         <xsl:text>1</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -294,7 +298,7 @@
     <xsl:choose>
       <!-- when anchor is to cell -->
       <xsl:when
-        test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
+        test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
         <!-- get parent table:table-row id -->
         <xsl:variable name="rowId">
           <xsl:value-of select="generate-id(ancestor::table:table-row)"/>
@@ -311,7 +315,7 @@
         </xsl:for-each>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+      <xsl:when test="parent::node()[name() = 'table:shapes']">
         <xsl:text>31</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -322,18 +326,16 @@
     <xsl:choose>
       <!-- when anchor is to cell -->
       <xsl:when
-        test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-        <xsl:for-each select="parent::node()">
+        test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
           <xsl:variable name="number">
             <xsl:call-template name="GetColNum">
               <xsl:with-param name="cell" select="substring-after(@table:end-cell-address,'.')"/>
             </xsl:call-template>
           </xsl:variable>
           <xsl:value-of select="$number - 1"/>
-        </xsl:for-each>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+      <xsl:when test="parent::node()[name() = 'table:shapes']">
         <xsl:text>5</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -344,18 +346,16 @@
     <xsl:choose>
       <!-- when anchor is to cell -->
       <xsl:when
-        test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-        <xsl:for-each select="parent::node()">
+        test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
           <xsl:variable name="number">
             <xsl:call-template name="GetRowNum">
               <xsl:with-param name="cell" select="substring-after(@table:end-cell-address,'.')"/>
             </xsl:call-template>
           </xsl:variable>
           <xsl:value-of select="$number - 1"/>
-        </xsl:for-each>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+      <xsl:when test="parent::node()[name() = 'table:shapes']">
         <xsl:text>46</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -366,15 +366,13 @@
     <xsl:choose>
       <!-- when anchor is to cell -->
       <xsl:when
-        test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-        <xsl:for-each select="parent::node()">
+        test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@svg:x"/>
           </xsl:call-template>
-        </xsl:for-each>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+      <xsl:when test="parent::node()[name() = 'table:shapes']">
         <xsl:text>714375</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -385,15 +383,13 @@
     <xsl:choose>
       <!-- when anchor is to cell -->
       <xsl:when
-        test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-        <xsl:for-each select="parent::node()">
+        test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@svg:y"/>
           </xsl:call-template>
-        </xsl:for-each>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+      <xsl:when test="parent::node()[name() = 'table:shapes']">
         <xsl:text>104775</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -404,15 +400,13 @@
     <xsl:choose>
       <!-- when anchor is to cell -->
       <xsl:when
-        test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-        <xsl:for-each select="parent::node()">
+        test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@ table:end-x"/>
           </xsl:call-template>
-        </xsl:for-each>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+      <xsl:when test="parent::node()[name() = 'table:shapes']">
         <xsl:text>447675</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -423,15 +417,13 @@
     <xsl:choose>
       <!-- when anchor is to cell -->
       <xsl:when
-        test="parent::node()/parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-        <xsl:for-each select="parent::node()">
+        test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length" select="@ table:end-y"/>
           </xsl:call-template>
-        </xsl:for-each>
       </xsl:when>
       <!-- when anchor is to page -->
-      <xsl:when test="parent::node()/parent::node()[name() = 'table:shapes']">
+      <xsl:when test="parent::node()[name() = 'table:shapes']">
         <xsl:text>104775</xsl:text>
       </xsl:when>
     </xsl:choose>
@@ -444,13 +436,13 @@
 
       <a:xfrm>
         <xsl:if
-          test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:transform!= '' or parent::draw:frame/@draw:transform!= ''">
+          test="key('style', @draw:style-name)/style:graphic-properties/@draw:transform!= '' or @draw:transform!= ''">
           <xsl:attribute name="flipV">
             <xsl:text>1</xsl:text>
           </xsl:attribute>
         </xsl:if>
         <xsl:if
-          test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@style:mirror='horizontal'">
+          test="key('style', @draw:style-name)/style:graphic-properties/@style:mirror='horizontal'">
           <xsl:attribute name="flipH">
             <xsl:text>1</xsl:text>
           </xsl:attribute>
@@ -462,12 +454,12 @@
       </a:prstGeom>
 
       <xsl:if
-        test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:stroke != 'none' ">
+        test="key('style', @draw:style-name)/style:graphic-properties/@draw:stroke != 'none' ">
 
         <xsl:variable name="strokeWeight">
           <xsl:call-template name="emu-measure">
             <xsl:with-param name="length"
-              select="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@svg:stroke-width"/>
+              select="key('style', @draw:style-name)/style:graphic-properties/@svg:stroke-width"/>
             <xsl:with-param name="unit">emu</xsl:with-param>
           </xsl:call-template>
         </xsl:variable>
@@ -475,9 +467,9 @@
         <xsl:variable name="BorderColor">
           <xsl:choose>
             <xsl:when
-              test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@svg:stroke-color != ''">
+              test="key('style', @draw:style-name)/style:graphic-properties/@svg:stroke-color != ''">
               <xsl:value-of
-                select="substring-after(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@svg:stroke-color, '#')"
+                select="substring-after(key('style', @draw:style-name)/style:graphic-properties/@svg:stroke-color, '#')"
               />
             </xsl:when>
             <xsl:otherwise>
@@ -488,9 +480,9 @@
 
         <xsl:variable name="FillColor">
           <xsl:if
-            test="key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:fill-color">
+            test="key('style', @draw:style-name)/style:graphic-properties/@draw:fill-color">
             <xsl:value-of
-              select="substring-after(key('style', parent::draw:frame/@draw:style-name)/style:graphic-properties/@draw:fill-color, '#')"
+              select="substring-after(key('style', @draw:style-name)/style:graphic-properties/@draw:fill-color, '#')"
             />
           </xsl:if>
         </xsl:variable>

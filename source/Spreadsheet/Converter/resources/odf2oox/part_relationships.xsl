@@ -224,7 +224,7 @@
       <!-- chart rels -->
       <xsl:for-each
         select="descendant::draw:frame/draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
-        <Relationship Id="{generate-id(.)}"
+        <Relationship Id="{generate-id(parent::node())}"
           Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"
           Target="{concat('../charts/chart',$sheetNum,'_',position(),'.xml')}"/>
       </xsl:for-each>
@@ -239,7 +239,7 @@
             <xsl:variable name="imageName" select="substring-after(@xlink:href, 'Pictures/')"/>
             <pzip:copy pzip:source="{@xlink:href}" pzip:target="xl/media/{$imageName}"/>
             <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-              Id="{generate-id(.)}"
+              Id="{generate-id(parent::node())}"
               Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
               Target="../media/{$imageName}"/>
           </xsl:when>
@@ -273,7 +273,7 @@
             </xsl:variable>
 
             <Relationship xmlns="http://schemas.openxmlformats.org/package/2006/relationships"
-              Id="{generate-id(.)}"
+              Id="{generate-id(parent::node())}"
               Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
               Target="{$target}" TargetMode="External"/>
           </xsl:otherwise>
