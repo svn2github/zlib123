@@ -1528,4 +1528,159 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template name="getColorCode">
+    <xsl:param name="color"/>
+    <xsl:param name="lumMod"/>
+    <xsl:param name="lumOff"/>
+
+    <xsl:variable name="ThemeColor">
+      <xsl:for-each select="document('xl/theme/theme1.xml')/a:theme/a:themeElements/a:clrScheme">
+        <xsl:for-each select="node()[name() = concat('a:',$color)]">
+
+          <xsl:choose>
+            <xsl:when test="contains(node()/@val,'window' ) ">
+              <xsl:value-of select="node()/@lastClr"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="node()/@val"/>
+            </xsl:otherwise>
+          </xsl:choose>
+
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="BgTxColors">
+      <xsl:if test="$color = 'bg2' ">
+        <xsl:value-of select="document('xl/theme/theme1.xml')//a:lt2/a:srgbClr/@val"/>
+      </xsl:if>
+
+      <xsl:if test="$color = 'bg1' ">
+        <xsl:choose>
+          <xsl:when test="document('xl/theme/theme1.xml')//a:lt1/a:srgbClr/@val">
+            <xsl:value-of select="document('xl/theme/theme1.xml')//a:lt1/a:srgbClr/@val"/>
+          </xsl:when>
+          <xsl:when test="document('xl/theme/theme1.xml')//a:lt1/node()/@lastClr">
+            <xsl:value-of select="document('xl/theme/theme1.xml')//a:lt1/node()/@lastClr"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+
+      <xsl:if test="$color = 'tx1' ">
+        <xsl:choose>
+          <xsl:when test="document('xl/theme/theme1.xml')//a:dk1/node()/@lastClr">
+            <xsl:value-of select="document('xl/theme/theme1.xml')//a:dk1/node()/@lastClr"/>
+          </xsl:when>
+          <xsl:when test="document('xl/theme/theme1.xml')//a:dk1/node()/@val">
+            <xsl:value-of select="document('xl/theme/theme1.xml')//a:dk1/node()/@val"/>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+
+      <xsl:if test="$color = 'tx2' ">
+        <xsl:value-of select="document('xl/theme/theme1.xml')//a:dk2/a:srgbClr/@val"/>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:variable name="NewColor">
+      <xsl:if test="$ThemeColor != '' ">
+        <xsl:value-of select="$ThemeColor"/>
+      </xsl:if>
+      <xsl:if test="$BgTxColors !='' ">
+        <xsl:value-of select="$BgTxColors"/>
+      </xsl:if>
+    </xsl:variable>
+
+    <xsl:call-template name="ConvertThemeColor">
+      <xsl:with-param name="color" select="$NewColor"/>
+      <xsl:with-param name="lumMod" select="$lumMod"/>
+      <xsl:with-param name="lumOff" select="$lumOff"/>
+    </xsl:call-template>
+
+  </xsl:template>
+
+  <xsl:template name="ConvertThemeColor">
+    <xsl:param name="color"/>
+    <xsl:param name="lumMod"/>
+    <xsl:param name="lumOff"/>
+
+    <xsl:variable name="Red">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number" select="substring($color,1,2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="Green">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number" select="substring($color,3,2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="Blue">
+      <xsl:call-template name="HexToDec">
+        <xsl:with-param name="number" select="substring($color,5,2)"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$lumOff = '' and $lumMod != '' ">
+        <xsl:variable name="NewRed">
+          <xsl:value-of select=" floor($Red * $lumMod div 100000) "/>
+        </xsl:variable>
+
+        <xsl:variable name="NewGreen">
+          <xsl:value-of select=" floor($Green * $lumMod div 100000)"/>
+        </xsl:variable>
+
+        <xsl:variable name="NewBlue">
+          <xsl:value-of select=" floor($Blue * $lumMod div 100000)"/>
+        </xsl:variable>
+
+        <xsl:text>#</xsl:text>
+        <xsl:call-template name="DecToHex">
+          <xsl:with-param name="number" select="$NewRed"/>
+        </xsl:call-template>
+        <xsl:call-template name="DecToHex">
+          <xsl:with-param name="number" select="$NewGreen"/>
+        </xsl:call-template>
+        <xsl:call-template name="DecToHex">
+          <xsl:with-param name="number" select="$NewBlue"/>
+        </xsl:call-template>
+      </xsl:when>
+
+      <xsl:when test="$lumMod = '' and $lumOff != '' ">
+        <!-- TBD Not sure whether this condition will occur-->
+      </xsl:when>
+
+      <xsl:when test="$lumMod = '' and $lumOff ='' ">
+        <xsl:value-of select="concat('#',$color)"/>
+      </xsl:when>
+
+      <xsl:when test="$lumOff != '' and $lumMod!= '' ">
+        <xsl:variable name="NewRed">
+          <xsl:value-of select="floor(((255 - $Red) * (1 - ($lumMod  div 100000)))+ $Red )"/>
+        </xsl:variable>
+
+        <xsl:variable name="NewGreen">
+          <xsl:value-of select="floor(((255 - $Green) * ($lumOff  div 100000)) + $Green )"/>
+        </xsl:variable>
+
+        <xsl:variable name="NewBlue">
+          <xsl:value-of select="floor(((255 - $Blue) * ($lumOff div 100000)) + $Blue) "/>
+        </xsl:variable>
+
+        <xsl:text>#</xsl:text>
+        <xsl:call-template name="DecToHex">
+          <xsl:with-param name="number" select="$NewRed"/>
+        </xsl:call-template>
+        <xsl:call-template name="DecToHex">
+          <xsl:with-param name="number" select="$NewGreen"/>
+        </xsl:call-template>
+        <xsl:call-template name="DecToHex">
+          <xsl:with-param name="number" select="$NewBlue"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>    
+  </xsl:template>
+
 </xsl:stylesheet>

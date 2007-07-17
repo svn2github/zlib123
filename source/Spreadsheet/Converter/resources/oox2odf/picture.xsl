@@ -609,6 +609,8 @@
 
     <xsl:call-template name="InsertGraphicBorder"/>
 
+    <xsl:call-template name="InsertFill"/>
+    
     <xsl:attribute name="fo:min-height">
       <xsl:variable name="border">
         <xsl:choose>
@@ -1037,6 +1039,142 @@
           <text:s/>
         </xsl:if>
         <xsl:call-template name="InsertWhiteSpaces"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsertFill">
+    
+    <xsl:choose>
+      <!-- No fill -->
+      <xsl:when test ="a:noFill">
+        
+        <xsl:attribute name ="draw:fill">
+          <xsl:value-of select="'none'" />
+        </xsl:attribute>
+        
+        <xsl:attribute name ="draw:fill-color">
+          <xsl:value-of select="'#ffffff'"/>
+        </xsl:attribute>
+      </xsl:when>
+      
+      <!-- Solid fill-->
+      <xsl:when test ="a:solidFill">
+        <xsl:attribute name ="draw:fill">
+          <xsl:value-of select="'solid'" />
+        </xsl:attribute>
+        
+        <!-- Standard color-->
+        <xsl:if test ="a:solidFill/a:srgbClr/@val">
+          <xsl:attribute name ="draw:fill-color">
+            <xsl:value-of select="concat('#',a:solidFill/a:srgbClr/@val)"/>
+          </xsl:attribute>
+          
+          <!-- Transparency percentage-->
+          <xsl:if test="a:solidFill/a:srgbClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="a:solidFill/a:srgbClr/a:alpha/@val"/>
+            </xsl:variable>
+            
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="draw:opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+            
+          </xsl:if>
+        </xsl:if>
+        
+        <!--Theme color-->
+        <xsl:if test ="a:solidFill/a:schemeClr/@val">
+          
+          <xsl:attribute name ="draw:fill-color">
+            <xsl:call-template name ="getColorCode">
+              <xsl:with-param name ="color">
+                <xsl:value-of select="a:solidFill/a:schemeClr/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumMod">
+                <xsl:value-of select="a:solidFill/a:schemeClr/a:lumMod/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumOff">
+                <xsl:value-of select="a:solidFill/a:schemeClr/a:lumOff/@val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          
+          <!-- Transparency percentage-->
+          <xsl:if test="a:solidFill/a:schemeClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="a:solidFill/a:schemeClr/a:alpha/@val"/>
+            </xsl:variable>
+            
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="draw:opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+            
+          </xsl:if>
+        </xsl:if>
+      </xsl:when>
+      
+      <!-- fill from style -->
+      <xsl:otherwise>
+        <!--Fill refernce-->
+        <xsl:if test ="parent::node()/xdr:style/a:fillRef">
+          <xsl:attribute name ="draw:fill">
+            <xsl:value-of select="'solid'" />
+          </xsl:attribute>
+          
+          <!-- Standard color-->
+          <xsl:if test ="parent::node()/xdr:style/a:fillRef/a:srgbClr/@val">
+            <xsl:attribute name ="draw:fill-color">
+              <xsl:value-of select="concat('#',parent::node()/xdr:style/a:fillRef/a:srgbClr/@val)"/>
+            </xsl:attribute>
+            
+            <!-- Shade percentage-->
+            <!--<xsl:if test="p:style/a:fillRef/a:srgbClr/a:shade/@val">
+              <xsl:variable name ="shade">
+              <xsl:value-of select ="a:solidFill/a:srgbClr/a:shade/@val"/>
+              </xsl:variable>
+              <xsl:if test="($shade != '') or ($shade != 0)">
+              <xsl:attribute name ="draw:shadow-opacity">
+              <xsl:value-of select="concat(($shade div 1000), '%')"/>
+              </xsl:attribute>
+              </xsl:if>
+              </xsl:if>-->
+          </xsl:if>
+          
+          <!--Theme color-->
+          <xsl:if test ="parent::node()/xdr:style/a:fillRef//a:schemeClr/@val">
+            <xsl:attribute name ="draw:fill-color">
+              <xsl:call-template name ="getColorCode">
+                <xsl:with-param name ="color">
+                  <xsl:value-of select="parent::node()/xdr:style/a:fillRef/a:schemeClr/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name ="lumMod">
+                  <xsl:value-of select="parent::node()/xdr:style/a:fillRef/a:schemeClr/a:lumMod/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name ="lumOff">
+                  <xsl:value-of select="parent::node()/xdr:style/a:fillRef/a:schemeClr/a:lumOff/@val"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+            
+            <!-- Shade percentage-->
+            <!--<xsl:if test="a:solidFill/a:schemeClr/a:shade/@val">
+              <xsl:variable name ="shade">
+              <xsl:value-of select ="a:solidFill/a:schemeClr/a:shade/@val"/>
+              </xsl:variable>
+              <xsl:if test="($shade != '') or ($shade != 0)">
+              <xsl:attribute name ="draw:shadow-opacity">
+              <xsl:value-of select="concat(($shade div 1000), '%')"/>
+              </xsl:attribute>
+              </xsl:if>
+              </xsl:if>-->
+          </xsl:if>
+          
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
