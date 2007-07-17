@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Product xmlns="http://schemas.microsoft.com/developer/2004/01/bootstrapper"
+  ProductCode="Microsoft.Office.o2003pia">
+
+
+  <PackageFiles CopyAllPackageFiles="false">
+    <PackageFile Name="o2003pia.msi"/>
+    <PackageFile Name="o2003pia_eula.txt"/>
+    <!--
+      HomeSite="http://www.microsoft.com/downloads/details.aspx?familyid=3c9a983a-ac14-4125-8ba0-d36d67e0f4ad" PublicKey="3082010A0282010100CF38F7E1A4275EF8F0CCAACEFB3ADE3B6231460546BBF5B6051AD3B3ACC29F0F4C670828C44310F53B75797F6A91F4D633C861BFFA9190007AF0791D5D6870F690B29877B5031D2F9B9D9B75892F4A01417C9E7CCB87439BF49674999E98C1CF40575816F6C0D59216E52485718F9949ED557C65C91F380023C53EAB11D6296CC69EA0705B7DD537D4677720C306CE85F84E3480A035C41C53320157EFB128BD6C01E3AD40BC80A90949DB36E337F41D49AA2AA76BD019D3CC8E9DD686467A134AD64519A553B3E2782F2E35976B4CC6E81AB0D3D1249069ABCEFC696E3E4CFB024162DC07985D7E5CA74C27316B564CE198D8E0D11D718D3D2AC07F714DFFCF0203010001"/>
+  -->
+  </PackageFiles>
+
+  <InstallChecks>
+    <RegistryCheck Property="WordVersion" Key="HKCR\Word.Application\Curver"/>
+    <MsiProductCheck Property="piaInstalled" Product="{91490409-6000-11D3-8CFE-0150048383C9}"/>
+  </InstallChecks>
+
+  <Commands Reboot="Defer">
+    <Command PackageFile="o2003pia.msi" Arguments="/quiet /norestart">
+      <InstallConditions>
+        <BypassIf Property="WordVersion" Compare="ValueNotEqualTo" Value="Word.Application.11"/>
+        <BypassIf Property="piaInstalled" Compare="ValueGreaterThanOrEqualTo" Value="1"/>
+      </InstallConditions>
+      <ExitCodes>
+        <DefaultExitCode Result="Success"/>
+      </ExitCodes>
+    </Command>
+  </Commands>
+
+</Product>

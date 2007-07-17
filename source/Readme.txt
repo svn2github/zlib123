@@ -48,7 +48,7 @@ by following the instructions given at the following address: http://support.mic
 
 Notes
 -----
-To generate the OdfAddInForWordSetup project, you will have to copy the content of KB908002 and DotNetFX
-folders (from the OdfForWordAddInSetup) folders to <.NET 2.0 Framework SDK Folder>\Bootstrapper\Packages folder
+To generate the OdfAddInForWordSetup project, you will have to copy the "packages" subfolders KB908002, DotNetFX, CompatibilityPack and PIA2003
+to <.NET 2.0 Framework SDK Folder>\Bootstrapper\Packages folder
 - OdfAddInForWordSetup/DotNetFX only contains localized strings , add these folders to the existing dotnetfx package folder
 - OdfAddInForWordSetup/KB908002 only contains an updated product.xml and new tool which detects if the office patch has been installed

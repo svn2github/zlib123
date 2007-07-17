@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"	encoding="utf-8" ?>
+
+<Package xmlns="http://schemas.microsoft.com/developer/2004/01/bootstrapper" Name="DisplayName"
+  Culture="Culture">
+
+  <Strings>
+    <String Name="DisplayName">Microsoft Office 2003 Primary Interop Assemblies</String>
+    <!--String Name="O2003PIAEXE"
+      >http://download.microsoft.com/download/8/3/a/83a40b5a-5050-4940-bcc4-7943e1e59590/O2003PIA.EXE</String-->
+    <String Name="Culture">en</String>
+  </Strings>
+</Package>
