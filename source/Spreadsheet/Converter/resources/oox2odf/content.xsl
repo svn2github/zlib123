@@ -69,6 +69,7 @@
         <xsl:call-template name="InsertCellStyles"/>
         <xsl:call-template name="InsertStyleTableProperties"/>
         <xsl:call-template name="InsertTextStyles"/>
+        <xsl:call-template name="InsertTextBoxTextStyles"/>
         <!-- Insert Picture properties -->
         <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
           mode="PictureStyle">

@@ -613,6 +613,10 @@
     <xsl:call-template name="InsertLineColor"/>
     <xsl:call-template name="InsertLineStyle"/>
 
+    <xsl:for-each select="parent::node()/xdr:txBody">
+      <xsl:call-template name="InsertTextLayout"/>
+    </xsl:for-each>
+
     <xsl:attribute name="fo:min-height">
       <xsl:variable name="border">
         <xsl:choose>
@@ -1009,6 +1013,11 @@
 
   <xsl:template match="a:p">
     <text:p>
+      <xsl:if test="a:pPr">
+        <xsl:attribute name="text:style-name">
+          <xsl:value-of select="generate-id(.)"/>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:apply-templates/>
     </text:p>
   </xsl:template>
@@ -1559,4 +1568,222 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template name="InsertTextLayout">
+
+    <xsl:if test="a:bodyPr/@lIns">
+      <xsl:attribute name="fo:padding-left">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="a:bodyPr/@lIns"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="not(a:bodyPr/@lIns)">
+      <xsl:attribute name="fo:padding-left">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="'91440'"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+
+    <xsl:if test="a:bodyPr/@tIns">
+      <xsl:attribute name="fo:padding-top">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="a:bodyPr/@tIns"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="not(a:bodyPr/@tIns)">
+      <xsl:attribute name="fo:padding-top">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="'45720'"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+
+    <xsl:if test="a:bodyPr/@rIns">
+      <xsl:attribute name="fo:padding-right">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="a:bodyPr/@rIns"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="not(a:bodyPr/@rIns)">
+      <xsl:attribute name="fo:padding-right">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="'91440'"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+
+    <xsl:if test="a:bodyPr/@bIns">
+      <xsl:attribute name="fo:padding-bottom">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="a:bodyPr/@bIns"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="not(a:bodyPr/@bIns)">
+      <xsl:attribute name="fo:padding-bottom">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="'45720'"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+
+    <xsl:if test="( (a:bodyPr/a:spAutoFit) or (a:bodyPr/@wrap='square') )">
+      <xsl:attribute name="draw:auto-grow-height">
+        <xsl:value-of select="'true'"/>
+      </xsl:attribute>
+    </xsl:if>
+    <xsl:if test="not(a:bodyPr/a:spAutoFit)">
+      <xsl:attribute name="draw:auto-grow-height">
+        <xsl:value-of select="'false'"/>
+      </xsl:attribute>
+      <xsl:attribute name="draw:auto-grow-width">
+        <xsl:value-of select="'false'"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="InsertTextBoxTextStyles">
+    <!-- get all sheet Id's -->
+    <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet">
+
+      <xsl:variable name="sheet">
+        <xsl:call-template name="GetTarget">
+          <xsl:with-param name="id">
+            <xsl:value-of select="@r:id"/>
+          </xsl:with-param>
+          <xsl:with-param name="document">xl/workbook.xml</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      <!--i.e. $sheet = worksheets/sheet1.xml -->
+
+      <!-- go to worksheet file and search for drawing -->
+      <xsl:for-each select="document(concat('xl/',$sheet))/e:worksheet/e:drawing">
+
+        <xsl:variable name="drawing">
+          <xsl:call-template name="GetTarget">
+            <xsl:with-param name="id">
+              <xsl:value-of select="@r:id"/>
+            </xsl:with-param>
+            <xsl:with-param name="document">
+              <xsl:value-of select="concat('xl/',$sheet)"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+        <!-- i.e. $drawing = ../drawings/drawing2.xml -->
+
+        <!-- finally insert entry for each chart -->
+        <xsl:for-each
+          select="document(concat('xl/',substring-after($drawing,'/')))/xdr:wsDr/xdr:twoCellAnchor/xdr:sp/xdr:txBody">
+
+          <xsl:for-each select="a:p/a:pPr">
+
+            <xsl:call-template name="InsertTextBoxParagraphStyle"/>
+          </xsl:for-each>
+
+        </xsl:for-each>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="InsertTextBoxParagraphStyle">
+    <style:style style:name="{generate-id(parent::node())}" style:family="paragraph">
+      <style:paragraph-properties>
+
+        <!-- horizontal alignment -->
+        <xsl:if test="@algn ='ctr' or @algn ='r' or @algn ='l' or @algn ='just' ">
+          <xsl:attribute name="fo:text-align">
+            <xsl:choose>
+              <!-- Center Alignment-->
+              <xsl:when test="@algn ='ctr' ">
+                <xsl:text>center</xsl:text>
+              </xsl:when>
+              <!-- Right Alignment-->
+              <xsl:when test="@algn ='r' ">
+                <xsl:text>end</xsl:text>
+              </xsl:when>
+              <!-- Left Alignment-->
+              <xsl:when test="@algn ='l' ">
+                <xsl:text>start</xsl:text>
+              </xsl:when>
+              <xsl:when test="@algn ='just' ">
+                <xsl:text>justify</xsl:text>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
+
+        <!-- left margin -->
+        <xsl:if test="@marL">
+          <xsl:attribute name="fo:margin-left">
+            <xsl:value-of select="concat(format-number(@marL div 360000, '0.##'), 'cm')"/>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <!-- first line indent -->
+        <xsl:if test="@indent">
+          <xsl:attribute name="fo:text-indent">
+            <xsl:choose>
+              <xsl:when test="@indent &gt; 0">
+                <xsl:value-of select="concat(format-number(@indent div 360000, '0.##'), 'cm')"/>    
+              </xsl:when>
+              <xsl:when test="@indent = 0">
+                <xsl:text>0</xsl:text>
+              </xsl:when>
+              <xsl:when test="(@indent &lt; 0) and number(substring-after(@indent,'-')) &lt;= @marL">
+                <xsl:value-of select="concat(format-number(@indent div 360000, '0.##'), 'cm')"/>    
+              </xsl:when>
+              <xsl:when test="(@indent &lt; 0) and number(substring-after(@indent,'-')) &gt; @marL">
+                <xsl:value-of select="concat(format-number(@marL div 360000, '0.##'), 'cm')"/>    
+              </xsl:when>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <!-- spacing before -->
+        <xsl:if test="a:spcBef/a:spcPts/@val">
+          <xsl:attribute name="fo:margin-top">
+            <xsl:value-of
+              select="concat(format-number(a:spcBef/a:spcPts/@val div 2835, '0.##'), 'cm')"/>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <!-- spacig after-->
+        <xsl:if test="a:spcAft/a:spcPts/@val">
+          <xsl:attribute name="fo:margin-bottom">
+            <xsl:value-of
+              select="concat(format-number(a:spcAft/a:spcPts/@val div 2835, '0.##'), 'cm')"/>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <!-- If the line space is in Percentage-->
+        <xsl:if test="a:lnSpc/a:spcPct/@val">
+          <xsl:attribute name="fo:line-height">
+            <xsl:value-of
+              select="concat(format-number(a:lnSpc/a:spcPct/@val div 1000,'###'), '%')"/>
+          </xsl:attribute>
+        </xsl:if>
+        
+        <!-- If the line space is in Points-->
+        <xsl:if test="a:lnSpc/a:spcPts">
+          <xsl:attribute name="style:line-height-at-least">
+            <xsl:value-of
+              select="concat(format-number(a:lnSpc/a:spcPts/@val div 2835, '0.##'), 'cm')"/>
+          </xsl:attribute>
+        </xsl:if>
+      </style:paragraph-properties>
+    </style:style>
+  </xsl:template>
+
 </xsl:stylesheet>
