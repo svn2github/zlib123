@@ -1739,7 +1739,6 @@
       </xsl:if>
       <xsl:apply-templates/>
     </text:span>
-    <xsl:for-each select="e:t"><xsl:value-of select="node()"/></xsl:for-each>
   </xsl:template>
 
   <xsl:template match="e:t">
