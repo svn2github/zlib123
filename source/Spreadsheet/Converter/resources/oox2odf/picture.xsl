@@ -610,6 +610,7 @@
     <xsl:call-template name="InsertGraphicBorder"/>
 
     <xsl:call-template name="InsertFill"/>
+    <xsl:call-template name="InsertLineColor"/>
     
     <xsl:attribute name="fo:min-height">
       <xsl:variable name="border">
@@ -1176,6 +1177,145 @@
           
         </xsl:if>
       </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name ="InsertLineColor">
+    
+    <xsl:choose>
+      <!-- No line-->
+      <xsl:when test ="a:ln/a:noFill">
+        <xsl:attribute name ="draw:stroke">
+          <xsl:value-of select="'none'" />
+        </xsl:attribute>
+      </xsl:when>
+      
+      <!-- Solid line color-->
+      <xsl:when test ="a:ln/a:solidFill">
+        <xsl:attribute name ="draw:stroke">
+          <xsl:value-of select="'solid'" />
+        </xsl:attribute>
+        
+        <!-- Standard color for border-->
+        <xsl:if test ="a:ln/a:solidFill/a:srgbClr/@val">
+          <xsl:attribute name ="svg:stroke-color">
+            <xsl:value-of select="concat('#',a:ln/a:solidFill/a:srgbClr/@val)"/>
+          </xsl:attribute>
+          
+          <!-- Transparency percentage-->
+          <xsl:if test="a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="a:ln/a:solidFill/a:srgbClr/a:alpha/@val"/>
+            </xsl:variable>
+            
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="svg:stroke-opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>         
+            
+          </xsl:if>
+        </xsl:if>
+        
+        <!-- Theme color for border-->
+        <xsl:if test ="a:ln/a:solidFill/a:schemeClr/@val">
+          <xsl:attribute name ="svg:stroke-color">
+            <xsl:call-template name ="getColorCode">
+              <xsl:with-param name ="color">
+                <xsl:value-of select="a:ln/a:solidFill/a:schemeClr/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumMod">
+                <xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:lumMod/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumOff">
+                <xsl:value-of select="a:ln/a:solidFill/a:schemeClr/a:lumOff/@val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          
+          <!-- Transparency percentage-->
+          <xsl:if test="a:ln/a:solidFill/a:schemeClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="a:ln/a:solidFill/a:schemeClr/a:alpha/@val"/>
+            </xsl:variable>
+            
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="svg:stroke-opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+            
+          </xsl:if>
+        </xsl:if>
+      </xsl:when>
+      
+      <xsl:otherwise>
+        <!--Line reference-->
+        <xsl:if test ="not( (a:prstGeom/@prst='flowChartInternalStorage') or
+          (a:prstGeom/@prst='flowChartPredefinedProcess') or
+          (a:prstGeom/@prst='flowChartSummingJunction') or
+          (a:prstGeom/@prst='flowChartOr') )">
+          <xsl:if test ="parent::node()/xdr:style/a:lnRef">
+            <xsl:attribute name ="draw:stroke">
+              <xsl:value-of select="'solid'" />
+            </xsl:attribute>
+            
+            <!--Standard color for border-->
+            <xsl:if test ="parent::node()/xdr:style/a:lnRef/a:srgbClr/@val">
+              <xsl:attribute name ="svg:stroke-color">
+                <xsl:value-of select="concat('#',parent::node()/xdr:style/a:lnRef/a:srgbClr/@val)"/>
+              </xsl:attribute>
+              
+              <!--Shade percentage-->
+              <!--
+                <xsl:if test="p:style/a:lnRef/a:srgbClr/a:shade/@val">
+                <xsl:variable name ="shade">
+                <xsl:value-of select ="p:style/a:lnRef/a:srgbClr/a:shade/@val"/>
+                </xsl:variable>
+              -->
+              <!--<xsl:if test="($shade != '') or ($shade != 0)">
+                <xsl:attribute name ="svg:stroke-opacity">
+                <xsl:value-of select="concat(($shade div 1000), '%')"/>
+                </xsl:attribute>
+                </xsl:if>-->
+              <!--
+                </xsl:if>-->
+            </xsl:if>
+            
+            <!--Theme color for border-->
+            <xsl:if test ="parent::node()/xdr:style/a:lnRef/a:schemeClr/@val">
+              <xsl:attribute name ="svg:stroke-color">
+                <xsl:call-template name ="getColorCode">
+                  <xsl:with-param name ="color">
+                    <xsl:value-of select="parent::node()/xdr:style/a:lnRef/a:schemeClr/@val"/>
+                  </xsl:with-param>
+                  <xsl:with-param name ="lumMod">
+                    <xsl:value-of select="parent::node()/xdr:style/a:lnRef/a:schemeClr/a:lumMod/@val"/>
+                  </xsl:with-param>
+                  <xsl:with-param name ="lumOff">
+                    <xsl:value-of select="parent::node()/xdr:style/a:lnRef/a:schemeClr/a:lumOff/@val"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+              
+              <!--Shade percentage -->
+              <!--<xsl:if test="p:style/a:lnRef/a:schemeClr/a:shade/@val">
+                <xsl:variable name ="shade">
+                <xsl:value-of select ="p:style/a:lnRef/a:schemeClr/a:shade/@val"/>
+                </xsl:variable>
+              -->
+              <!--<xsl:if test="($shade != '') or ($shade != 0)">
+                <xsl:attribute name ="svg:stroke-opacity">
+                <xsl:value-of select="concat(($shade div 1000), '%')"/>
+                </xsl:attribute>
+                </xsl:if>-->
+              <!--
+                </xsl:if>-->
+            </xsl:if>
+            
+          </xsl:if>
+        </xsl:if>
+      </xsl:otherwise> 
     </xsl:choose>
   </xsl:template>
 
