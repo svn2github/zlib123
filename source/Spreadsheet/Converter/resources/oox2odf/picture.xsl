@@ -207,12 +207,13 @@
 
   <!-- Insert picture -->
 
-    <xsl:template name="InsertPicture">
+  <xsl:template name="InsertPicture">
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="Drawing"/>
 
     <xsl:choose>
+      <!-- insert picture -->
       <xsl:when test="xdr:pic">
         <draw:frame draw:z-index="0" draw:name="Graphics 1" draw:text-style-name="P1">
           <!--style name-->
@@ -229,12 +230,14 @@
               <xsl:value-of select="$NameSheet"/>
             </xsl:with-param>
           </xsl:call-template>
-
-          <xsl:call-template name="InsertImageFlip">
-            <xsl:with-param name="atribute">
-              <xsl:text>draw</xsl:text>
-            </xsl:with-param>
-          </xsl:call-template>
+                  
+          <xsl:for-each select="xdr:pic/xdr:spPr">
+            <xsl:call-template name="InsertImageFlip">
+              <xsl:with-param name="atribute">
+                <xsl:text>draw</xsl:text>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:for-each>
 
           <draw:image xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
 
@@ -250,6 +253,7 @@
         </draw:frame>
       </xsl:when>
 
+      <!-- insert chart -->
       <xsl:when test="xdr:graphicFrame/a:graphic/a:graphicData/c:chart">
         <draw:frame draw:z-index="0">
           <!-- position -->
@@ -272,6 +276,32 @@
 
         </draw:frame>
       </xsl:when>
+
+      <!-- insert text-box -->
+      <xsl:when test="xdr:sp/xdr:nvSpPr/xdr:cNvSpPr/@txBox = 1">
+        <draw:frame draw:z-index="0">
+
+          <xsl:attribute name="draw:style-name">
+            <xsl:value-of select="generate-id(.)"/>
+          </xsl:attribute>
+
+          <!-- position -->
+          <xsl:call-template name="SetPosition">
+            <xsl:with-param name="sheet">
+              <xsl:value-of select="$sheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="NameSheet">
+              <xsl:value-of select="$NameSheet"/>
+            </xsl:with-param>
+          </xsl:call-template>
+          
+          <draw:text-box>
+            <xsl:apply-templates select="xdr:sp/xdr:txBody"/>
+          </draw:text-box>
+
+        </draw:frame>
+      </xsl:when>
+
     </xsl:choose>
   </xsl:template>
 
@@ -569,17 +599,49 @@
 
   <!-- Insert Picture Style -->
 
-  <xsl:template name="InsertPictureProperties">
-    <style:style style:name="{generate-id(.)}" style:family="graphic">
-      <style:graphic-properties>
-        <xsl:call-template name="InsertImageFlip">
-          <xsl:with-param name="atribute">
-            <xsl:text>style</xsl:text>
-          </xsl:with-param>
-        </xsl:call-template>
-        <xsl:call-template name="InsertImageBorder"/>
-      </style:graphic-properties>
-    </style:style>
+  <xsl:template name="InsertGraphicProperties">
+
+    <xsl:call-template name="InsertImageFlip">
+      <xsl:with-param name="atribute">
+        <xsl:text>style</xsl:text>
+      </xsl:with-param>
+    </xsl:call-template>
+
+    <xsl:call-template name="InsertGraphicBorder"/>
+
+    <xsl:attribute name="fo:min-height">
+      <xsl:variable name="border">
+        <xsl:choose>
+          <xsl:when test="a:ln/@w">
+
+            <xsl:variable name="width">
+              <xsl:call-template name="ConvertEmu3">
+                <xsl:with-param name="length">
+                  <xsl:value-of select="a:ln/@w"/>
+                </xsl:with-param>
+                <xsl:with-param name="unit">cm</xsl:with-param>
+              </xsl:call-template>
+            </xsl:variable>
+
+            <xsl:choose>
+              <xsl:when test="substring($width,1,1) = '.' ">
+                <xsl:value-of select="concat('0',substring-before($width,'cm'))"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-before($width,'cm')"/>
+              </xsl:otherwise>
+            </xsl:choose>
+
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+
+      </xsl:variable>
+      <xsl:value-of select="concat(a:xfrm/a:ext/@cy div 360000 - $border,'cm')"/>
+    </xsl:attribute>
+
   </xsl:template>
 
   <xsl:template match="e:sheet" mode="PictureStyle">
@@ -648,7 +710,26 @@
       <xsl:value-of select="xdr:from/xdr:row"/>
     </xsl:variable>
 
-    <xsl:call-template name="InsertPictureProperties"/>
+    <style:style style:name="{generate-id(.)}" style:family="graphic">
+      <style:graphic-properties>
+
+        <!-- insert graphic properties -->
+        <xsl:choose>
+          <xsl:when test="xdr:pic">
+            <xsl:for-each select="xdr:pic/xdr:spPr">
+              <xsl:call-template name="InsertGraphicProperties"/>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:when test="xdr:sp/xdr:spPr">
+            <xsl:for-each select="xdr:sp/xdr:spPr">
+              <xsl:call-template name="InsertGraphicProperties"/>
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
+      </style:graphic-properties>
+    </style:style>
+
+    <!--xsl:call-template name="InsertGraphicProperties"/-->
 
     <xsl:apply-templates select="following-sibling::xdr:twoCellAnchor[1]" mode="PictureStyle">
       <xsl:with-param name="PictureCell">
@@ -662,13 +743,13 @@
 
   <!-- To do insert border -->
 
-  <xsl:template name="InsertImageBorder">
-    <xsl:if test="xdr:pic/xdr:spPr/a:ln[not(a:noFill)]">
+  <xsl:template name="InsertGraphicBorder">
+    <xsl:if test="a:ln[not(a:noFill)]">
 
       <xsl:variable name="width">
         <xsl:call-template name="ConvertEmu3">
           <xsl:with-param name="length">
-            <xsl:value-of select="xdr:pic/xdr:spPr/a:ln/@w"/>
+            <xsl:value-of select="a:ln/@w"/>
           </xsl:with-param>
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
@@ -676,7 +757,7 @@
 
       <xsl:variable name="type">
         <xsl:choose>
-          <xsl:when test="xdr:pic/xdr:spPr/a:ln/a:prstDash/@val = 'solid'">
+          <xsl:when test="a:ln/a:prstDash/@val = 'solid'">
             <xsl:text>solid</xsl:text>
           </xsl:when>
           <xsl:otherwise>
@@ -687,8 +768,8 @@
 
       <xsl:variable name="color">
         <xsl:choose>
-          <xsl:when test="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr/@val != ''">
-            <xsl:value-of select="xdr:pic/xdr:spPr/a:ln/a:solidFill/a:srgbClr/@val"/>
+          <xsl:when test="a:ln/a:solidFill/a:srgbClr/@val != ''">
+            <xsl:value-of select="a:ln/a:solidFill/a:srgbClr/@val"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:text>000000</xsl:text>
@@ -719,16 +800,16 @@
   <xsl:template name="InsertImageFlip">
     <xsl:param name="atribute"/>
     <!--  picture flip (vertical, horizontal)-->
-    <xsl:if test="xdr:pic/xdr:spPr/a:xfrm/attribute::node()">
+    <xsl:if test="a:xfrm/attribute::node()">
       <xsl:choose>
         <!-- TO DO Vertical  -->
-        <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipV = '1' and $atribute != 'style'">
+        <xsl:when test="a:xfrm/@flipV = '1' and $atribute != 'style'">
           <xsl:attribute name="draw:transform">
             <xsl:text>rotate (3.1415926535892) translate (2.064cm 0.425cm)</xsl:text>
           </xsl:attribute>
         </xsl:when>
         <!-- horizontal -->
-        <xsl:when test="xdr:pic/xdr:spPr/a:xfrm/@flipH = '1'  and $atribute = 'style'">
+        <xsl:when test="a:xfrm/@flipH = '1'  and $atribute = 'style'">
           <xsl:attribute name="style:mirror">
             <xsl:text>horizontal</xsl:text>
           </xsl:attribute>
@@ -860,7 +941,7 @@
 
             <draw:frame draw:z-index="0" svg:width="7.999cm" svg:height="6.999cm" svg:x="0cm"
               svg:y="0cm">
-              
+
               <xsl:call-template name="InsertAbsolutePosition"/>
               <xsl:call-template name="InsertAbsoluteSize"/>
 
@@ -877,21 +958,23 @@
         </xsl:for-each>
 
       </table:shapes>
-      <table:table-column table:style-name="{generate-id(document('xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}"/>
-      <table:table-row table:style-name="{generate-id(document('xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}">
+      <table:table-column
+        table:style-name="{generate-id(document('xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}"/>
+      <table:table-row
+        table:style-name="{generate-id(document('xl/worksheets/sheet1.xml')/e:worksheet/e:sheetFormatPr)}">
         <table:table-cell/>
       </table:table-row>
     </table:table>
   </xsl:template>
-  
+
   <xsl:template name="InsertAbsolutePosition">
-    
+
     <xsl:if test="xdr:pos">
       <xsl:attribute name="svg:x">
-      <xsl:call-template name="ConvertEmu">
-        <xsl:with-param name="length" select="xdr:pos/@x"/>
-        <xsl:with-param name="unit">cm</xsl:with-param>
-      </xsl:call-template>
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="xdr:pos/@x"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
       </xsl:attribute>
       <xsl:attribute name="svg:y">
         <xsl:call-template name="ConvertEmu">
@@ -899,11 +982,11 @@
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
-    </xsl:if>    
+    </xsl:if>
   </xsl:template>
-  
+
   <xsl:template name="InsertAbsoluteSize">
-    
+
     <xsl:if test="xdr:ext">
       <xsl:attribute name="svg:width">
         <xsl:call-template name="ConvertEmu">
@@ -917,7 +1000,45 @@
           <xsl:with-param name="unit">cm</xsl:with-param>
         </xsl:call-template>
       </xsl:attribute>
-    </xsl:if>    
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="a:p">
+    <text:p>
+      <xsl:apply-templates/>
+    </text:p>
+  </xsl:template>
+
+  <xsl:template match="a:r">
+    <text:span>
+      <xsl:apply-templates/>
+    </text:span>
+  </xsl:template>
+
+  <xsl:template match="a:t">
+    <xsl:choose>
+      <!--check whether string contains  whitespace sequence-->
+      <xsl:when test="not(contains(., '  '))">
+        <xsl:choose>
+          <!-- single space before case -->
+          <xsl:when test="substring(text(),1,1) = ' ' ">
+            <text:s/>
+            <xsl:value-of select="substring-after(text(),' ')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="."/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <!--converts whitespaces sequence to text:s -->
+        <!-- inside "if" when text starts with a single space -->
+        <xsl:if test="substring(text(),1,1) = ' ' and substring(text(),2,1) != ' ' ">
+          <text:s/>
+        </xsl:if>
+        <xsl:call-template name="InsertWhiteSpaces"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
