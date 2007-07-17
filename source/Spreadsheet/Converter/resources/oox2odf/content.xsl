@@ -47,6 +47,8 @@
   <xsl:import href="conditional.xsl"/>
   <xsl:import href="elements.xsl"/>
   <xsl:import href="measures.xsl"/>
+  <xsl:import href="connections.xsl"/>
+  
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="''"/>
@@ -308,7 +310,7 @@
           <xsl:variable name="customFiltersNum">
             <xsl:value-of select="count(e:filterColumn/e:customFilters)"/>
           </xsl:variable>
-          <xsl:variable name="topFiltersNum">
+          <xsl:variable name="topFiltersNum">  
             <xsl:value-of select="count(e:filterColumn/e:top10)"/>
           </xsl:variable>
 
@@ -326,7 +328,16 @@
         </xsl:for-each>
       </xsl:if>
     </xsl:variable>
+    
+  <xsl:variable name="ConnectionCell">
+    <xsl:call-template name="ConnectionsCell">
+      <xsl:with-param name="number">
+        <xsl:value-of select="$number - 1"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:variable>
 
+    
     <table:table>
       <!-- Insert Table (Sheet) Name -->
       <xsl:attribute name="table:name">
@@ -345,7 +356,7 @@
         <xsl:text>&apos;</xsl:text>
       </xsl:variable>
       <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
-        <xsl:if test="string($checkedName) = substring-before(./self::node(), '!')">
+        <xsl:if test="string($checkedName) = substring-before(./self::node(), '!') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
           <xsl:attribute name="table:print-ranges">
             <xsl:value-of
               select="concat($apostrof, substring-before(./self::node(), '!'), $apostrof,'.', substring-before(substring-after(./self::node(), '$'),'$'), substring-before(substring-after(substring-after(./self::node(), '$'),'$'),':'),':', $apostrof, substring-before(./self::node(), '!'), $apostrof, '.',substring-before(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'), substring-after(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'))"
@@ -404,7 +415,9 @@
           <xsl:value-of select="$PictureRow"/>
         </xsl:with-param>
         <xsl:with-param name="removeFilter" select="$removeFilter"/>
-
+        <xsl:with-param name="ConnectionsCell">
+          <xsl:value-of select="$ConnectionCell"/>
+        </xsl:with-param>
       </xsl:call-template>
 
     </table:table>
@@ -677,6 +690,7 @@
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
     <xsl:param name="removeFilter"/>
+    <xsl:param name="ConnectionsCell"/>
 
 
     <xsl:call-template name="InsertColumns">
@@ -962,6 +976,9 @@
                   <xsl:value-of select="$ConditionalCellStyle"/>
                 </xsl:with-param>
                 <xsl:with-param name="removeFilter" select="$removeFilter"/>
+                <xsl:with-param name="ConnectionsCell">
+                  <xsl:value-of select="$ConnectionsCell"/>
+                </xsl:with-param>
               </xsl:apply-templates>
             </xsl:when>
 
@@ -1035,6 +1052,7 @@
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
     <xsl:param name="removeFilter"/>
+    <xsl:param name="ConnectionsCell"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -1258,6 +1276,9 @@
         <xsl:value-of select="$ConditionalCellStyle"/>
       </xsl:with-param>
       <xsl:with-param name="removeFilter" select="$removeFilter"/>
+      <xsl:with-param name="ConnectionsCell">
+        <xsl:value-of select="$ConnectionsCell"/>
+      </xsl:with-param>
     </xsl:call-template>
 
     <xsl:if
@@ -1484,6 +1505,7 @@
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ConnectionsCell"/>
 
     <xsl:variable name="this" select="."/>
 
@@ -1668,6 +1690,9 @@
       <xsl:with-param name="ConditionalCellStyle">
         <xsl:value-of select="$ConditionalCellStyle"/>
       </xsl:with-param>
+      <xsl:with-param name="ConnectionsCell">
+        <xsl:value-of select="$ConnectionsCell"/>
+      </xsl:with-param>
     </xsl:call-template>
 
     <!-- Insert next coll -->
@@ -1724,6 +1749,9 @@
       </xsl:with-param>
       <xsl:with-param name="ConditionalCellStyle">
         <xsl:value-of select="$ConditionalCellStyle"/>
+      </xsl:with-param>
+      <xsl:with-param name="ConnectionsCell">
+        <xsl:value-of select="$ConnectionsCell"/>
       </xsl:with-param>
     </xsl:call-template>
 

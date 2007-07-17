@@ -170,6 +170,7 @@
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="removeFilter"/>
+    <xsl:param name="ConnectionsCell"/>
 
 
     <xsl:variable name="GetMinRowWithElements">
@@ -268,6 +269,9 @@
               </xsl:with-param>
               <xsl:with-param name="ConditionalCellStyle">
                 <xsl:value-of select="$ConditionalCellStyle"/>
+              </xsl:with-param>
+              <xsl:with-param name="ConnectionsCell">
+                <xsl:value-of select="$ConnectionsCell"/>
               </xsl:with-param>
             </xsl:apply-templates>
           </xsl:if>
@@ -787,7 +791,8 @@
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
-
+    <xsl:param name="ConnectionsCell"/>
+    
     <xsl:message terminate="no">progress:c</xsl:message>
 
     <xsl:choose>
@@ -966,7 +971,7 @@
               </xsl:attribute>
             </xsl:if>
           </xsl:if>
-
+          
           <xsl:if test="e:v">
             <xsl:call-template name="InsertText">
               <xsl:with-param name="position">
@@ -975,6 +980,24 @@
               <xsl:with-param name="colNum" select="$colNum"/>
               <xsl:with-param name="rowNum" select="$rowNum"/>
               <xsl:with-param name="sheetNr" select="$sheetNr"/>
+            </xsl:call-template>
+          </xsl:if>
+          
+          <!-- Insert Connections Cell  -->
+          <xsl:if test="contains(concat(';', $ConnectionsCell), concat(';', $rowNum, ':', $colNum, '-'))">
+            <xsl:call-template name="InsertConnections">
+              <xsl:with-param name="rowNum">
+                <xsl:value-of select="$rowNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="colNum">
+                <xsl:value-of select="$colNum"/>
+              </xsl:with-param>
+              <xsl:with-param name="ConnecionsCell">
+                <xsl:value-of select="$ConnectionsCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="sheetNr">
+                <xsl:value-of select="$sheetNr"/>
+              </xsl:with-param>
             </xsl:call-template>
           </xsl:if>
 
@@ -1026,7 +1049,8 @@
               </xsl:with-param>
             </xsl:call-template>
           </xsl:if>
-
+       
+          
         </table:table-cell>
 
         <!-- Insert covered cell if Merge Cell is starting-->
@@ -1577,8 +1601,7 @@
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
-
-
+    <xsl:param name="ConnectionsCell"/>
 
 
     <xsl:variable name="CheckIfBigMergeBefore">
@@ -1693,6 +1716,9 @@
               <xsl:with-param name="ConditionalCellStyle">
                 <xsl:value-of select="$ConditionalCellStyle"/>
               </xsl:with-param>
+              <xsl:with-param name="ConnecionsCell">
+                <xsl:value-of select="$ConnectionsCell"/>
+              </xsl:with-param>
             </xsl:apply-templates>
           </xsl:when>
           <!-- if this cell is inside row of merged cells ($CheckIfMerged is true:number_of_cols_spaned) -->
@@ -1734,6 +1760,9 @@
                 </xsl:with-param>
                 <xsl:with-param name="ConditionalCellStyle">
                   <xsl:value-of select="$ConditionalCellStyle"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConnecionsCell">
+                  <xsl:value-of select="$ConnectionsCell"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
@@ -1778,6 +1807,9 @@
                 </xsl:with-param>
                 <xsl:with-param name="ConditionalCellStyle">
                   <xsl:value-of select="$ConditionalCellStyle"/>
+                </xsl:with-param>
+                <xsl:with-param name="ConnecionsCell">
+                  <xsl:value-of select="$ConnectionsCell"/>
                 </xsl:with-param>
               </xsl:apply-templates>
             </xsl:if>
@@ -1835,6 +1867,9 @@
             <xsl:with-param name="ConditionalCellStyle">
               <xsl:value-of select="$ConditionalCellStyle"/>
             </xsl:with-param>
+            <xsl:with-param name="ConnecionsCell">
+              <xsl:value-of select="$ConnectionsCell"/>
+            </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>
       </xsl:when>
@@ -1880,6 +1915,9 @@
           <xsl:with-param name="sheetNr" select="$sheetNr"/>
           <xsl:with-param name="EndColl">
             <xsl:text>256</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="ConnecionsCell">
+            <xsl:value-of select="$ConnectionsCell"/>
           </xsl:with-param>
         </xsl:call-template>
 
@@ -1928,6 +1966,9 @@
             </xsl:with-param>
             <xsl:with-param name="ConditionalCellStyle">
               <xsl:value-of select="$ConditionalCellStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConnectionsCell">
+              <xsl:value-of select="$ConnectionsCell"/>
             </xsl:with-param>
           </xsl:apply-templates>
         </xsl:if>
