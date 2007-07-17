@@ -137,6 +137,8 @@
     <definedNames>
       <xsl:call-template name="InsertPrintRanges"/>
       <xsl:call-template name="InsertHeaders"/>
+     <xsl:call-template name="InsertDefineConnection"/>
+      <!--definedName name="praca" localSheetId="0">Sheet1!$C$11:$D$11</definedName-->
     </definedNames>
 
   </xsl:template>
@@ -439,6 +441,189 @@
         <xsl:value-of select="$value + 1"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertDefineConnection">
+    <xsl:for-each select="table:table">      
+      
+      <!-- if there is a shheet with the same name modify name -->
+      <xsl:variable name="SheetName">
+        <xsl:call-template name="CheckSheetName">
+          <xsl:with-param name="sheetNumber">
+            <xsl:value-of select="position()"/>
+          </xsl:with-param>
+          <xsl:with-param name="name">
+            <xsl:value-of
+              select="substring(translate(@table:name,&quot;*\/[]:&apos;?&quot;,&quot;&quot;),1,31)"
+            />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      
+      <xsl:variable name="SheetId">
+        <xsl:value-of select="position() - 1"/>
+      </xsl:variable>
+      
+     
+        <xsl:apply-templates select="descendant::table:table-row[1]" mode="connection">
+          <xsl:with-param name="rowNumber">
+            <xsl:text>1</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="cellNumber">
+            <xsl:text>0</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="SheetId">
+            <xsl:value-of select="$SheetId"/>
+          </xsl:with-param>
+          <xsl:with-param name="tableName" select="@table:name"/>
+        </xsl:apply-templates>
+      
+      </xsl:for-each>
+     
+  </xsl:template>
+  
+  <!-- search coditional -->
+  <xsl:template match="table:table-row" mode="connection">
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="cellNumber"/>   
+    <xsl:param name="SheetId"/>
+    <xsl:param name="tableName"/>
+
+    <xsl:apply-templates
+      select="child::node()[name() = 'table:table-cell' or name()= 'table:covered-table-cell'][1]"
+      mode="connection">
+      <xsl:with-param name="colNumber">
+        <xsl:text>0</xsl:text>
+      </xsl:with-param>
+      <xsl:with-param name="rowNumber" select="$rowNumber"/>
+      <xsl:with-param name="SheetId">
+        <xsl:value-of select="$SheetId"/>
+      </xsl:with-param>
+      <xsl:with-param name="tableName">
+        <xsl:value-of select="$tableName"/>
+      </xsl:with-param>
+    </xsl:apply-templates>
+
+    <!-- check next row -->
+    <xsl:choose>
+      <!-- next row is a sibling -->
+      <xsl:when test="following::table:table-row">
+        <xsl:apply-templates select="following::table:table-row[1]" mode="connection">
+          <xsl:with-param name="rowNumber">
+            <xsl:choose>
+              <xsl:when test="@table:number-rows-repeated">
+                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$rowNumber+1"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+          <xsl:with-param name="cellNumber">
+            <xsl:text>0</xsl:text>
+          </xsl:with-param>
+          <xsl:with-param name="SheetId">
+            <xsl:value-of select="$SheetId"/>
+          </xsl:with-param>
+          <xsl:with-param name="tableName">
+            <xsl:value-of select="$tableName"/>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template match="table:covered-table-cell" mode="connection">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="SheetId"/>
+    <xsl:param name="tableName"/>
+    
+    
+    <xsl:if test="following-sibling::table:table-cell">
+      <xsl:apply-templates
+        select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]"
+        mode="connection">
+        <xsl:with-param name="colNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated != ''">
+              <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$colNumber + 1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="$rowNumber"/>
+        </xsl:with-param>
+        <xsl:with-param name="SheetId">
+          <xsl:value-of select="$SheetId"/>
+        </xsl:with-param>
+        <xsl:with-param name="tableName">
+          <xsl:value-of select="$tableName"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
+    
+  </xsl:template>
+  
+  <!-- insert define connection -->
+  <xsl:template match="table:table-cell" mode="connection">
+    <xsl:param name="colNumber"/>
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="SheetId"/>
+    <xsl:param name="tableName"/>
+    
+    
+    <xsl:for-each select="table:cell-range-source">
+      <xsl:variable name="ColConnectionStart">
+        <xsl:call-template name="NumbersToChars">
+          <xsl:with-param name="num">
+            <xsl:value-of select="$colNumber"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+      
+        <xsl:variable name="ColConnectionEnd">
+          <xsl:call-template name="NumbersToChars">
+            <xsl:with-param name="num">
+              <xsl:value-of select="$colNumber + @table:last-column-spanned - 1"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:variable>
+  
+      <definedName name="{generate-id()}" localSheetId="{$SheetId}">
+        <xsl:value-of select="concat($tableName, '!$', $ColConnectionStart, '$', $rowNumber, ':$', $ColConnectionEnd, '$', $rowNumber + @table:last-row-spanned - 1)"/>
+      </definedName>
+    </xsl:for-each>
+    
+    <xsl:if test="following-sibling::table:table-cell">
+      <xsl:apply-templates
+        select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]"
+        mode="connection">
+        <xsl:with-param name="colNumber">
+          <xsl:choose>
+            <xsl:when test="@table:number-columns-repeated != ''">
+              <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$colNumber + 1"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="$rowNumber"/>
+        </xsl:with-param>
+        <xsl:with-param name="SheetId">
+          <xsl:value-of select="$SheetId"/>
+        </xsl:with-param>
+        <xsl:with-param name="tableName">
+          <xsl:value-of select="$tableName"/>
+        </xsl:with-param>
+      </xsl:apply-templates>
+    </xsl:if>
+    
   </xsl:template>
 
 </xsl:stylesheet>

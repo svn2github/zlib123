@@ -27,6 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:pzip="urn:cleverage:xmlns:post-processings:zip"
   xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
@@ -61,7 +62,9 @@
       <Relationship Id="rId2"
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings"
         Target="sharedStrings.xml"/>
+      <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/connections" Target="connections.xml" />
     </Relationships>
+    
   </xsl:template>
 
   <xsl:template name="TranslateIllegalChars">
@@ -206,6 +209,13 @@
           </Relationship>
         </xsl:for-each>
       </xsl:if>
+      
+      <xsl:for-each
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">        
+        <xsl:for-each select="table:table-row/table:table-cell/table:cell-range-source">
+          <Relationship Id="{generate-id()}" Target="{concat('../queryTables/queryTable', position(), '.xml')}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/queryTable"/>
+        </xsl:for-each>
+     </xsl:for-each>
 
       <!-- drawing.xml file -->
       <xsl:if test="contains($chart,'true') or $picture = 'true' or $textBox = 'true' ">
@@ -309,6 +319,17 @@
         <xsl:value-of select="$string"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertLinkExternalRels">
+    
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">      
+    
+      <xsl:call-template name="QueryTable"/>
+      
+    </xsl:for-each>
+    
   </xsl:template>
   
 </xsl:stylesheet>

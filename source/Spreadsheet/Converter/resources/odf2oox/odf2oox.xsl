@@ -57,6 +57,7 @@
   <xsl:import href="date.xsl"/>
   <xsl:import href="chart.xsl"/>
   <xsl:import href="drawing.xsl"/>
+  <xsl:import href="connections.xsl"/>
 
   <xsl:strip-space elements="*"/>
   <xsl:preserve-space elements="text:p text:span number:text"/>
@@ -97,6 +98,13 @@
       <pzip:entry pzip:target="xl/workbook.xml">
         <xsl:call-template name="InsertWorkbook"/>
       </pzip:entry>
+      
+      <!-- main content -->
+      <xsl:if test="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+      <pzip:entry pzip:target="xl/connections.xml">
+        <xsl:call-template name="InsertConnections"/>
+      </pzip:entry>
+      </xsl:if>
 
       <!-- shared strings (ewentualny postprocessing)-->
       <pzip:entry pzip:target="xl/sharedStrings.xml">
@@ -285,6 +293,8 @@
       <pzip:entry pzip:target="_rels/.rels">
         <xsl:call-template name="package-relationships"/>
       </pzip:entry>
+      
+      <xsl:call-template name="InsertLinkExternalRels"/>
 
     </pzip:archive>
   </xsl:template>
@@ -321,7 +331,7 @@
     <!--      <xsl:if
         test="$comment = 'true' or $picture != 'true' or $hyperlink = 'true' or contains($chart,'true')">-->
     <xsl:if
-      test="$comment = 'true' or $hyperlink='true' or contains($chart,'true') or $picture = 'true' or $textBox = 'true' ">
+      test="$comment = 'true' or $hyperlink='true' or contains($chart,'true') or $picture = 'true' or $textBox = 'true' or document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
       <!-- package relationship item -->
       <pzip:entry pzip:target="{concat('xl/worksheets/_rels/sheet',position(),'.xml.rels')}">
         <xsl:call-template name="InsertWorksheetsRels">
