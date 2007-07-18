@@ -69,12 +69,12 @@ Copyright (c) 2007, Sonata Software Limited
 						</xsl:variable>
 						<xsl:attribute name="val">
 							<xsl:choose>
-								<xsl:when test="document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties/@draw:fill-color">
+								<xsl:when test="document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties/@draw:fill='solid'">
 									<xsl:if test="document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties">
 										<xsl:value-of select="substring-after(document('content.xml')//style:style[@style:name= $dpName]/style:drawing-page-properties/@draw:fill-color,'#')" />
 									</xsl:if>
 								</xsl:when>
-								<xsl:when test="document('styles.xml')//style:style[@style:name= $SMdpName]/style:drawing-page-properties/@draw:fill-color">
+								<xsl:when test="document('styles.xml')//style:style[@style:name= $SMdpName]/style:drawing-page-properties/@draw:fill='solid'">
 									<!--<xsl:when test="document('styles.xml')//style:master-page[@style:name= $SMName]">-->
 									<!--<xsl:variable name="SMdpName">
                     <xsl:value-of select="document('styles.xml')//style:master-page[@style:name= $SMName]/@draw:style-name"/>
@@ -111,6 +111,8 @@ Copyright (c) 2007, Sonata Software Limited
 						</a:xfrm>
 					</p:grpSpPr>
 					<xsl:for-each select ="draw:frame[@presentation:class[contains(.,'title') or contains(.,'subTitle') or contains(.,'outline')]]">
+            <!-- Paremeter added by vijayeta,get master page name, dated:11-7-07-->
+            <xsl:variable name ="masterPageName" select ="./parent::node()/@draw:master-page-name"/>					 
 					  <xsl:choose >
 						<!-- for convertion title-->
 						<xsl:when test ="@presentation:class ='title' or @presentation:class ='subTitle' or @presentation:class ='subtitle'" >
@@ -183,6 +185,8 @@ Copyright (c) 2007, Sonata Software Limited
 										<a:lstStyle/>
 										<xsl:call-template name ="processText" >
 											<xsl:with-param name ="layoutName" select ="@presentation:class"/>
+                      <!-- Paremeter added by vijayeta,get master page name, dated:13-7-07-->
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 										</xsl:call-template >
 									</p:txBody>
 								</p:sp>
@@ -252,6 +256,8 @@ Copyright (c) 2007, Sonata Software Limited
 										<a:lstStyle/>
 										<xsl:call-template name ="processText" >
 											<xsl:with-param name ="layoutName" select ="@presentation:class"></xsl:with-param>
+                      <!-- Paremeter added by vijayeta,get master page name, dated:11-7-07-->
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 										</xsl:call-template >
 									</p:txBody>
 								</p:sp>
@@ -260,7 +266,9 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:for-each >
 
 					<!-- Code for shapes start-->
-					<xsl:call-template name ="shapes" />
+          <xsl:call-template name ="shapes" >
+            <xsl:with-param name ="fileName" select ="'content.xml'"/>
+          </xsl:call-template >
 					<!-- Code for shapes end-->
 
 					<!-- Code for footer , slide number and date time control -->
@@ -306,6 +314,8 @@ Copyright (c) 2007, Sonata Software Limited
 	</xsl:template>
 	<xsl:template name ="processText" >
 		<xsl:param name ="layoutName"/>
+    <!-- Paremeter added by vijayeta,get master page name, dated:13-7-07-->
+    <xsl:param name ="masterPageName"/>
 		<xsl:variable name ="defFontSize">
 			<xsl:value-of  select ="office:document-styles/office:styles/style:style/style:text-properties/@fo:font-size"/>
 		</xsl:variable>
@@ -575,95 +585,160 @@ Copyright (c) 2007, Sonata Software Limited
 		</xsl:variable>
 		<xsl:choose >
 			<xsl:when test ="draw:text-box/text:p/text:span">
-				<xsl:for-each select ="draw:text-box/text:p">
-					<a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
-						<xsl:call-template name ="paraProperties" >
-							<xsl:with-param name ="paraId" >
-								<xsl:value-of select ="@text:style-name"/>								
-							</xsl:with-param >
-              <xsl:with-param name ="isBulleted" select ="'false'"/>
-              <xsl:with-param name ="level" select ="'0'"/>
-              <xsl:with-param name="framePresentaionStyleId" select="parent::node()/parent::node()/./@presentation:style-name" />
-              <xsl:with-param name ="isNumberingEnabled" select ="'false'"/>
-						</xsl:call-template >
-						<xsl:for-each select ="child::node()[position()]">
-							<xsl:choose >
-								<xsl:when test ="name()='text:span'">
-                  <!-- Added by lohith - bug fix 1731885 -->
-                  <xsl:if test="node()">
-									<a:r>
-										<a:rPr lang="en-US" smtClean="0">
-											<!--Font Size -->
-											<xsl:variable name ="textId">
-												<xsl:value-of select ="@text:style-name"/>
-											</xsl:variable>
-											<xsl:if test ="not($textId ='')">
-												<xsl:call-template name ="fontStyles">
-													<xsl:with-param name ="Tid" select ="$textId" />
-													<xsl:with-param name ="prClassName" select ="$prClsName"/>
-												</xsl:call-template>
-											</xsl:if>
-											<xsl:copy-of select="$varTextHyperLinks"/>
-										</a:rPr >
-										<a:t>
-											<xsl:call-template name ="insertTab" />
-										</a:t>
-									</a:r>
-									<xsl:if test ="text:line-break">
-										<xsl:call-template name ="processBR">
-											<xsl:with-param name ="T" select ="@text:style-name" />
-											<xsl:with-param name ="prClassName" select ="$prClsName"/>
-										</xsl:call-template>
-									</xsl:if>
-                  </xsl:if>
-                  <!-- Added by lohith - bug fix 1731885 -->
-                  <xsl:if test="not(node())">
-                    <a:endParaRPr lang="en-US" smtClean="0">
-                      <!--Font Size -->
-                      <xsl:variable name ="textId">
-                        <xsl:value-of select ="@text:style-name"/>
-                      </xsl:variable>
-                      <xsl:if test ="not($textId ='')">
-                        <xsl:call-template name ="fontStyles">
-                          <xsl:with-param name ="Tid" select ="$textId" />
+        <xsl:for-each select ="node()">
+          <!--<xsl:for-each select ="draw:text-box/text:p">-->
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:choose >
+              <xsl:when test ="name()='text:p'">
+                <a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+                  <xsl:call-template name ="paraProperties" >
+                    <xsl:with-param name ="paraId" >
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:with-param >
+                    <xsl:with-param name ="isBulleted" select ="'false'"/>
+                    <xsl:with-param name ="level" select ="'0'"/>
+                    <xsl:with-param name="framePresentaionStyleId" select="parent::node()/parent::node()/./@presentation:style-name" />
+                    <xsl:with-param name ="isNumberingEnabled" select ="'false'"/>
+                  </xsl:call-template >
+                  <xsl:for-each select ="child::node()[position()]">
+                    <xsl:choose >
+                      <xsl:when test ="name()='text:span'">
+                        <!-- Added by lohith - bug fix 1731885 -->
+                        <xsl:if test="node()">
+                          <a:r>
+                            <a:rPr lang="en-US" smtClean="0">
+                              <!--Font Size -->
+                              <xsl:variable name ="textId">
+                                <xsl:value-of select ="@text:style-name"/>
+                              </xsl:variable>
+                              <xsl:if test ="not($textId ='')">
+                                <xsl:call-template name ="fontStyles">
+                                  <xsl:with-param name ="Tid" select ="$textId" />
+                                  <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                                </xsl:call-template>
+                              </xsl:if>
+                              <xsl:copy-of select="$varTextHyperLinks"/>
+                            </a:rPr >
+                            <a:t>
+                              <xsl:call-template name ="insertTab" />
+                            </a:t>
+                          </a:r>
+                          <xsl:if test ="text:line-break">
+                            <xsl:call-template name ="processBR">
+                              <xsl:with-param name ="T" select ="@text:style-name" />
+                              <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                            </xsl:call-template>
+                          </xsl:if>
+                        </xsl:if>
+                        <!-- Added by lohith - bug fix 1731885 -->
+                        <xsl:if test="not(node())">
+                          <a:endParaRPr lang="en-US" smtClean="0">
+                            <!--Font Size -->
+                            <xsl:variable name ="textId">
+                              <xsl:value-of select ="@text:style-name"/>
+                            </xsl:variable>
+                            <xsl:if test ="not($textId ='')">
+                              <xsl:call-template name ="fontStyles">
+                                <xsl:with-param name ="Tid" select ="$textId" />
+                                <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                              </xsl:call-template>
+                            </xsl:if>
+                          </a:endParaRPr>
+                        </xsl:if>
+
+                      </xsl:when >
+                      <xsl:when test ="name()='text:line-break'">
+                        <xsl:call-template name ="processBR">
+                          <xsl:with-param name ="T" select ="@text:style-name" />
                           <xsl:with-param name ="prClassName" select ="$prClsName"/>
                         </xsl:call-template>
-                      </xsl:if>
-                    </a:endParaRPr>
-                  </xsl:if>
-
-								</xsl:when >
-								<xsl:when test ="name()='text:line-break'">
-									<xsl:call-template name ="processBR">
-										<xsl:with-param name ="T" select ="@text:style-name" />
-										<xsl:with-param name ="prClassName" select ="$prClsName"/>
-									</xsl:call-template>
-								</xsl:when>
-								<xsl:when test ="not(name()='text:span')">
-									<a:r>
-										<a:rPr lang="en-US" smtClean="0">
-											<!--Font Size -->
-											<xsl:variable name ="textId">
-												<xsl:value-of select ="@text:style-name"/>
-											</xsl:variable>
-											<xsl:if test ="not($textId ='')">
-												<xsl:call-template name ="fontStyles">
-													<xsl:with-param name ="Tid" select ="$textId" />
-													<xsl:with-param name ="prClassName" select ="$prClsName"/>
-												</xsl:call-template>
-											</xsl:if>
-											<xsl:copy-of select="$varTextHyperLinks"/>
-										</a:rPr >
-										<a:t>
-											<xsl:call-template name ="insertTab" />
-										</a:t>
-									</a:r>
-								</xsl:when >
-							</xsl:choose>
-						</xsl:for-each>
-						<xsl:copy-of select="$varFrameHyperLinks"/>
-					</a:p>
-				</xsl:for-each >
+                      </xsl:when>
+                      <xsl:when test ="not(name()='text:span')">
+                        <a:r>
+                          <a:rPr lang="en-US" smtClean="0">
+                            <!--Font Size -->
+                            <xsl:variable name ="textId">
+                              <xsl:value-of select ="@text:style-name"/>
+                            </xsl:variable>
+                            <xsl:if test ="not($textId ='')">
+                              <xsl:call-template name ="fontStyles">
+                                <xsl:with-param name ="Tid" select ="$textId" />
+                                <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                              </xsl:call-template>
+                            </xsl:if>
+                            <xsl:copy-of select="$varTextHyperLinks"/>
+                          </a:rPr >
+                          <a:t>
+                            <xsl:call-template name ="insertTab" />
+                          </a:t>
+                        </a:r>
+                      </xsl:when >
+                    </xsl:choose>
+                  </xsl:for-each>
+                  <xsl:copy-of select="$varFrameHyperLinks"/>
+                </a:p >
+              </xsl:when>
+              <xsl:when test ="name()='text:list'">
+                <a:p xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+                  <xsl:variable name ="lvl">
+                    <xsl:if test ="text:list-item/text:list">
+                      <xsl:call-template name ="getListLevel">
+                        <xsl:with-param name ="levelCount"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <xsl:if test ="not(text:list-item/text:list)">
+                      <xsl:value-of select ="'0'"/>
+                    </xsl:if>
+                  </xsl:variable >
+                  <xsl:variable name="paragraphId" >
+                    <xsl:call-template name ="getParaStyleName">
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:variable name ="isNumberingEnabled">
+                    <xsl:if test ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering">
+                      <xsl:value-of select ="document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering"/>
+                    </xsl:if>
+                    <xsl:if test ="not(document('content.xml')//style:style[@style:name=$paragraphId]/style:paragraph-properties/@text:enable-numbering)">
+                      <xsl:value-of select ="'true'"/>
+                    </xsl:if>
+                  </xsl:variable>
+                  <xsl:call-template name ="paraProperties" >
+                    <xsl:with-param name ="paraId" >
+                      <xsl:value-of select ="$paragraphId"/>
+                    </xsl:with-param >
+                    <!-- list property also included-->
+                    <xsl:with-param name ="listId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:with-param >
+                    <!-- Parameters added by vijayeta,Set bulleting as true/false,and set level -->
+                    <xsl:with-param name ="isBulleted" select ="'true'"/>
+                    <xsl:with-param name ="level" select ="$lvl"/>
+                    <xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
+                    <!-- parameter added by vijayeta, dated 11-7-07-->
+                    <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                  </xsl:call-template >
+                  <!--End of Code inserted by Vijayets for Bullets and numbering-->
+                  <xsl:for-each select ="child::node()[position()]">
+                    <xsl:choose >
+                      <xsl:when test ="name()='text:list-item'">
+                        <xsl:variable name ="currentNodeStyle">
+                          <xsl:call-template name ="getTextNodeForFontStyle">
+                            <xsl:with-param name ="prClassName" select ="$prClsName"/>
+                            <xsl:with-param name ="lvl" select ="$lvl"/>
+                            <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                          </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:copy-of select ="$currentNodeStyle"/>
+                      </xsl:when >
+                    </xsl:choose>
+                  </xsl:for-each>
+                  <xsl:copy-of select="$varFrameHyperLinks"/>
+                </a:p >
+              </xsl:when>
+            </xsl:choose>
+          </xsl:for-each>
+        </xsl:for-each >
 			</xsl:when>
 			<xsl:when test ="draw:text-box/text:list/text:list-item">
 			<!--<xsl:when test ="draw:text-box/text:list/text:list-item/text:p/text:span">-->
@@ -706,6 +781,8 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:with-param name ="isBulleted" select ="'true'"/>
 							<xsl:with-param name ="level" select ="$lvl"/>
 							<xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
+              <!-- parameter added by vijayeta, dated 13-7-07-->
+              <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 						</xsl:call-template >
 						<!--End of Code inserted by Vijayets for Bullets and numbering-->
 						<xsl:for-each select ="child::node()[position()]">
@@ -715,6 +792,8 @@ Copyright (c) 2007, Sonata Software Limited
 										<xsl:call-template name ="getTextNodeForFontStyle">
 											<xsl:with-param name ="prClassName" select ="$prClsName"/>
 											<xsl:with-param name ="lvl" select ="$lvl"/>
+                      <!-- parameter added by vijayeta, dated 11-7-07-->
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 										</xsl:call-template>
 									</xsl:variable>
 									<xsl:copy-of select ="$currentNodeStyle"/>
@@ -765,6 +844,8 @@ Copyright (c) 2007, Sonata Software Limited
 							<xsl:with-param name ="isBulleted" select ="'true'"/>
 							<xsl:with-param name ="level" select ="$lvl"/>
 							<xsl:with-param name ="isNumberingEnabled" select ="$isNumberingEnabled"/>
+              <!-- parameter added by vijayeta, dated 11-7-07-->
+              <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 						</xsl:call-template >
 						<!--End of Code inserted by Vijayets for Bullets and numbering-->
 						<xsl:for-each select ="child::node()[position()]">
@@ -774,6 +855,8 @@ Copyright (c) 2007, Sonata Software Limited
 										<xsl:call-template name ="getTextNodeForFontStyle">
 											<xsl:with-param name ="prClassName" select ="$prClsName"/>
 											<xsl:with-param name ="lvl" select ="$lvl"/>
+                      <!-- parameter added by vijayeta, dated 11-7-07-->
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
 										</xsl:call-template>
 									</xsl:variable>
 									<xsl:copy-of select ="$currentNodeStyle"/>
@@ -1113,22 +1196,27 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:value-of select ="0"/>
 					</xsl:if >
 				</xsl:attribute>
-				<xsl:attribute name ="anchor">
-					<xsl:choose >
-						<xsl:when test ="@draw:textarea-vertical-align ='top'">
+        <xsl:variable name ="anchorVal">
+          <xsl:choose >
+            <xsl:when test ="@draw:textarea-vertical-align ='top'">
+              <xsl:value-of select ="'t'"/>
+            </xsl:when>
+            <xsl:when test ="@draw:textarea-vertical-align ='middle'">
+              <xsl:value-of select ="'ctr'"/>
+            </xsl:when>
+            <xsl:when test ="@draw:textarea-vertical-align ='bottom'">
+              <xsl:value-of select ="'b'"/>
+            </xsl:when>
+            <!--<xsl:otherwise >
 							<xsl:value-of select ="'t'"/>
-						</xsl:when>
-						<xsl:when test ="@draw:textarea-vertical-align ='middle'">
-							<xsl:value-of select ="'ctr'"/>
-						</xsl:when>
-						<xsl:when test ="@draw:textarea-vertical-align ='bottom'">
-							<xsl:value-of select ="'b'"/>
-						</xsl:when>
-						<xsl:otherwise >
-							<xsl:value-of select ="'t'"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:attribute>
+						</xsl:otherwise>-->
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:if test ="$anchorVal != ''">
+          <xsl:attribute name ="anchor">
+            <xsl:value-of select ="$anchorVal"/>
+          </xsl:attribute>
+        </xsl:if>
 				<xsl:attribute name ="anchorCtr">
 					<xsl:choose >
 						<xsl:when test ="@draw:textarea-horizontal-align ='center'">
@@ -1153,7 +1241,7 @@ Copyright (c) 2007, Sonata Software Limited
 						<xsl:otherwise >
 							<xsl:value-of select ="'square'"/>
 						</xsl:otherwise>-->
-						<xsl:when test ="((@draw:auto-grow-height = 'false') and (@draw:auto-grow-width = 'false')) or (@fo:wrap-option='wrap')">
+						<xsl:when test ="((@draw:auto-grow-height = 'false') and (@draw:auto-grow-width = 'false'))">
 							<xsl:value-of select ="'none'"/>
 						</xsl:when>
 						<xsl:otherwise>
@@ -1176,195 +1264,57 @@ Copyright (c) 2007, Sonata Software Limited
 	</xsl:template>-->	
 	<xsl:template name ="slidesRel" match ="/office:document-content/office:body/office:presentation/draw:page">
 		<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-			<xsl:variable name ="ctrTitle">
-				<xsl:for-each select ="draw:frame/@presentation:class">
-					<xsl:if test =". = 'title'">
-						<xsl:value-of select ="."/>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable >
 
-			<xsl:variable name ="ctrSubTitle">
-				<xsl:for-each select ="draw:frame/@presentation:class">
-					<xsl:if test =". = 'subtitle'">
-						<xsl:value-of select ="."/>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable >
+      <xsl:variable name ="slMasterName">
+        <xsl:value-of select ="@draw:master-page-name"/>
+      </xsl:variable>
+      <xsl:variable name ="slMasterLink">
+        <xsl:for-each select ="document('styles.xml')//style:master-page/@style:name">
+          <xsl:if test ="$slMasterName = .">
+            <xsl:value-of select ="position()"/>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:variable>
+      <xsl:variable name ="layoutNo">
+        <xsl:choose >
+          <!-- Odp Layout 9,10,11,12,13 is mapped to layout 4-->
+          <xsl:when test ="contains(@presentation:presentation-page-layout-name,'T7')
+								or contains(@presentation:presentation-page-layout-name,'T8') 
+								or contains(@presentation:presentation-page-layout-name,'T9' )
+								or contains(@presentation:presentation-page-layout-name,'T10') 
+								or contains(@presentation:presentation-page-layout-name,'T11')
+								or contains(@presentation:presentation-page-layout-name,'T13')">
+            <xsl:value-of select ="4"/>
+          </xsl:when>
+          <!-- Odp Layout 2 is mapped to layout 1-->
+          <xsl:when test ="contains(@presentation:presentation-page-layout-name,'T0')" >
+            <xsl:value-of select ="1"/>
+          </xsl:when>
+          <!-- Odp Layout 5 is mapped to layout 6-->
+          <xsl:when test ="contains(@presentation:presentation-page-layout-name,'T19')" >
+            <xsl:value-of select ="6"/>
+          </xsl:when>
+          <!-- Odp Layout 3 is mapped to layout 2-->
+          <xsl:when test ="contains(@presentation:presentation-page-layout-name,'T1')" >
+            <xsl:value-of select ="2"/>
+          </xsl:when>
+          <!-- Odp Layout 4 is mapped to layout 4-->
+          <xsl:when test ="contains(@presentation:presentation-page-layout-name,'T3')" >
+            <xsl:value-of select ="4"/>
+          </xsl:when>
+          <!-- Odp Layout 4,5,6,7,8,14,16,17,18,19,20 is mapped to layout 7-->
+          <xsl:otherwise >
+            <xsl:value-of select ="7"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
 
-			<xsl:variable name ="ctrOutline">
-				<xsl:for-each select ="draw:frame/@presentation:class">
-					<xsl:if test =". = 'outline'">
-						<xsl:value-of select ="."/>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable >
-
-			<xsl:variable name ="ctrObject">
-				<xsl:for-each select ="draw:frame/@presentation:class">
-					<xsl:if test =". = 'object'">
-						<xsl:value-of select ="."/>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable>
-			<xsl:variable name ="ctrChart">
-				<xsl:for-each select ="draw:frame/@presentation:class">
-					<xsl:if test =". = 'object'">
-						<xsl:value-of select ="."/>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable >
-			<xsl:variable name ="ctrGraphic">
-				<xsl:for-each select ="draw:frame/@presentation:class">
-					<xsl:if test =". = 'object'">
-						<xsl:value-of select ="."/>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable>
-			<xsl:choose >
-				<xsl:when test ="@presentation:presentation-page-layout-name='AL0T0'" >
-					<Relationship Id="rId1" 
-					Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-					Target="../slideLayouts/slideLayout7.xml"/>
-				</xsl:when>
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline=''
-								and $ctrObject=''
-								and $ctrChart=''
-								and $ctrGraphic=''">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout6.xml"/>
-				</xsl:when>
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='subtitle' 
-								and $ctrOutline=''
-								and $ctrObject=''
-								and $ctrChart=''
-								and $ctrGraphic=''">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout1.xml"/>
-				</xsl:when>
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline='outline'
-								and $ctrObject=''
-								and $ctrChart=''
-								and $ctrGraphic=''">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout2.xml"/>
-				</xsl:when>
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline=''
-								and $ctrObject='object'
-								and $ctrChart=''
-								and $ctrGraphic=''">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout2.xml"/>
-				</xsl:when>
-
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline=''
-								and $ctrObject=''
-								and $ctrChart='chart'
-								and $ctrGraphic=''">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout2.xml"/>
-				</xsl:when >
-
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline=''
-								and $ctrObject=''
-								and $ctrChart=''
-								and $ctrGraphic='graphic'">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout2.xml"/>
-				</xsl:when>
-				<!-- Layout codition starts here here-->
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline='outline'
-								and $ctrObject='object'
-								and $ctrChart=''
-								and $ctrGraphic=''">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout4.xml"/>
-				</xsl:when>
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline='outline'
-								and $ctrObject=''
-								and $ctrChart='chart'
-								and $ctrGraphic=''">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout4.xml"/>
-				</xsl:when>
-
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline='outline'
-								and $ctrObject=''
-								and $ctrChart=''
-								and $ctrGraphic='graphic'">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout4.xml"/>
-				</xsl:when>
-
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline=''
-								and $ctrObject='object'
-								and $ctrChart='chart'
-								and $ctrGraphic=''">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout4.xml"/>
-				</xsl:when>
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline=''
-								and $ctrObject='object'
-								and $ctrChart=''
-								and $ctrGraphic='graphic'">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout4.xml"/>
-				</xsl:when>
-				<xsl:when test ="$ctrTitle='title' 
-								and $ctrSubTitle ='' 
-								and $ctrOutline=''
-								and $ctrObject=''
-								and $ctrChart='chart'
-								and $ctrGraphic='graphic'">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout4.xml"/>
-				</xsl:when>
-				<xsl:when test ="$ctrTitle='title' and
-								 count(draw:frame/@presentation:class[contains(.,'outline')]) =  2 ">
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout4.xml"/>
-				</xsl:when >
-				<!-- Layout 4 codition ends here-->
-				<xsl:otherwise >
-					<Relationship Id="rId1" 
-						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" 
-						Target="../slideLayouts/slideLayout7.xml"/>
-				</xsl:otherwise>
-			</xsl:choose>
+      <Relationship Id="rId1"
+						Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout">
+        <xsl:attribute name ="Target">
+          <xsl:value-of select ="concat('../slideLayouts/slideLayout',((($slMasterLink - 1)*11)  + $layoutNo) ,'.xml')"/>
+        </xsl:attribute>
+      </Relationship >	
 
       <!-- Added by lohith - Start - Add relation files of hyperlinks-->
       <xsl:if test="draw:custom-shape/office:event-listeners">
@@ -2428,552 +2378,581 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-	<xsl:template name ="getTextNodeForFontStyle">
-		<xsl:param name ="prClassName"/>
-		<xsl:param name ="lvl" />
-		<xsl:choose>
-			<xsl:when test ="./text:p">
-				<xsl:for-each select ="./text:p">
-					<xsl:for-each select ="child::node()[position()]">
-						<xsl:if test ="name()='text:span'">
-							<xsl:if test ="not(./text:line-break)">
-								<a:r>
-									<a:rPr lang="en-US" smtClean="0">
-										<!--Font Size -->
-										<xsl:variable name ="textId">
-											<xsl:value-of select ="@text:style-name"/>
-										</xsl:variable>
-										<xsl:if test ="not($textId ='')">
-											<xsl:call-template name ="fontStyles">
-												<xsl:with-param name ="Tid" select ="$textId" />
-												<xsl:with-param name ="prClassName" select ="$prClassName"/>
-												<xsl:with-param name ="lvl" select ="$lvl"/>
-											</xsl:call-template>
-										</xsl:if>
-										<!--<xsl:copy-of select="$varTextHyperLinks"/>-->
-									</a:rPr >
-									<a:t>
-										<xsl:call-template name ="insertTab" />
-									</a:t>
-								</a:r>
-							</xsl:if>
-							<xsl:if test ="./text:line-break">
-								<xsl:call-template name ="processBR">
-									<xsl:with-param name ="T" select ="@text:style-name" />
-									<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								</xsl:call-template>
-							</xsl:if>
-						</xsl:if>
-						<xsl:if test ="name()='text:line-break'">
-							<xsl:call-template name ="processBR">
-								<xsl:with-param name ="T" select ="@text:style-name" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test ="not(name()='text:span' or name()='text:line-break')">
-							<a:r>
-								<a:rPr lang="en-US" smtClean="0">
-									<!--Font Size -->
-									<xsl:variable name ="textId">
-										<xsl:value-of select ="@text:style-name"/>
-									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
-										<xsl:call-template name ="fontStyles">
-											<xsl:with-param name ="Tid" select ="$textId" />
-											<xsl:with-param name ="prClassName" select ="$prClassName"/>
-										</xsl:call-template>
-									</xsl:if>
-								</a:rPr >
-								<a:t>
-									<xsl:call-template name ="insertTab" />
-								</a:t>
-							</a:r>
-						</xsl:if >
-					</xsl:for-each>
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:when test ="./text:list/text:list-item/text:p">
-				<xsl:for-each select ="./text:list/text:list-item/text:p">
-					<xsl:for-each select ="child::node()[position()]">
-						<xsl:if test ="name()='text:span'">
-							<xsl:if test ="not(./text:line-break)">
-								<a:r>
-									<a:rPr lang="en-US" smtClean="0">
-										<!--Font Size -->
-										<xsl:variable name ="textId">
-											<xsl:value-of select ="@text:style-name"/>
-										</xsl:variable>
-										<xsl:if test ="not($textId ='')">
-											<xsl:call-template name ="fontStyles">
-												<xsl:with-param name ="Tid" select ="$textId" />
-												<xsl:with-param name ="prClassName" select ="$prClassName"/>
-												<xsl:with-param name ="lvl" select ="$lvl"/>
-											</xsl:call-template>
-										</xsl:if>
-										<!--<xsl:copy-of select="$varTextHyperLinks"/>-->
-									</a:rPr >
-									<a:t>
-										<xsl:call-template name ="insertTab" />
-									</a:t>
-								</a:r>
-							</xsl:if>
-							<xsl:if test ="./text:line-break">
-								<xsl:call-template name ="processBR">
-									<xsl:with-param name ="T" select ="@text:style-name" />
-									<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								</xsl:call-template>
-							</xsl:if>
-						</xsl:if>
-						<xsl:if test ="name()='text:line-break'">
-							<xsl:call-template name ="processBR">
-								<xsl:with-param name ="T" select ="@text:style-name" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test ="not(name()='text:span' or name()='text:line-break')">
-							<a:r>
-								<a:rPr lang="en-US" smtClean="0">
-									<!--Font Size -->
-									<xsl:variable name ="textId">
-										<xsl:value-of select ="@text:style-name"/>
-									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
-										<xsl:call-template name ="fontStyles">
-											<xsl:with-param name ="Tid" select ="$textId" />
-											<xsl:with-param name ="prClassName" select ="$prClassName"/>
-										</xsl:call-template>
-									</xsl:if>
-								</a:rPr >
-								<a:t>
-									<xsl:call-template name ="insertTab" />
-								</a:t>
-							</a:r>
-						</xsl:if >
-					</xsl:for-each>
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:p">
-				<xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:p">
-					<xsl:for-each select ="child::node()[position()]">
-						<xsl:if test ="name()='text:span'">
-							<xsl:if test ="not(./text:line-break)">
-								<a:r>
-									<a:rPr lang="en-US" smtClean="0">
-										<!--Font Size -->
-										<xsl:variable name ="textId">
-											<xsl:value-of select ="@text:style-name"/>
-										</xsl:variable>
-										<xsl:if test ="not($textId ='')">
-											<xsl:call-template name ="fontStyles">
-												<xsl:with-param name ="Tid" select ="$textId" />
-												<xsl:with-param name ="prClassName" select ="$prClassName"/>
-												<xsl:with-param name ="lvl" select ="$lvl"/>
-											</xsl:call-template>
-										</xsl:if>
-										<!--<xsl:copy-of select="$varTextHyperLinks"/>-->
-									</a:rPr >
-									<a:t>
-										<xsl:call-template name ="insertTab" />
-									</a:t>
-								</a:r>
-							</xsl:if>
-							<xsl:if test ="./text:line-break">
-								<xsl:call-template name ="processBR">
-									<xsl:with-param name ="T" select ="@text:style-name" />
-									<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								</xsl:call-template>
-							</xsl:if>
-						</xsl:if>
-						<xsl:if test ="name()='text:line-break'">
-							<xsl:call-template name ="processBR">
-								<xsl:with-param name ="T" select ="@text:style-name" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test ="not(name()='text:span' or name()='text:line-break')">
-							<a:r>
-								<a:rPr lang="en-US" smtClean="0">
-									<!--Font Size -->
-									<xsl:variable name ="textId">
-										<xsl:value-of select ="@text:style-name"/>
-									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
-										<xsl:call-template name ="fontStyles">
-											<xsl:with-param name ="Tid" select ="$textId" />
-											<xsl:with-param name ="prClassName" select ="$prClassName"/>
-										</xsl:call-template>
-									</xsl:if>
-								</a:rPr >
-								<a:t>
-									<xsl:call-template name ="insertTab" />
-								</a:t>
-							</a:r>
-						</xsl:if >
-					</xsl:for-each>
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-				<xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-					<xsl:for-each select ="child::node()[position()]">
-						<xsl:if test ="name()='text:span'">
-							<xsl:if test ="not(./text:line-break)">
-								<a:r>
-									<a:rPr lang="en-US" smtClean="0">
-										<!--Font Size -->
-										<xsl:variable name ="textId">
-											<xsl:value-of select ="@text:style-name"/>
-										</xsl:variable>
-										<xsl:if test ="not($textId ='')">
-											<xsl:call-template name ="fontStyles">
-												<xsl:with-param name ="Tid" select ="$textId" />
-												<xsl:with-param name ="prClassName" select ="$prClassName"/>
-												<xsl:with-param name ="lvl" select ="$lvl"/>
-											</xsl:call-template>
-										</xsl:if>
-										<!--<xsl:copy-of select="$varTextHyperLinks"/>-->
-									</a:rPr >
-									<a:t>
-										<xsl:call-template name ="insertTab" />
-									</a:t>
-								</a:r>
-							</xsl:if>
-							<xsl:if test ="./text:line-break">
-								<xsl:call-template name ="processBR">
-									<xsl:with-param name ="T" select ="@text:style-name" />
-									<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								</xsl:call-template>
-							</xsl:if>
-						</xsl:if>
-						<xsl:if test ="name()='text:line-break'">
-							<xsl:call-template name ="processBR">
-								<xsl:with-param name ="T" select ="@text:style-name" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test ="not(name()='text:span' or name()='text:line-break')">
-							<a:r>
-								<a:rPr lang="en-US" smtClean="0">
-									<!--Font Size -->
-									<xsl:variable name ="textId">
-										<xsl:value-of select ="@text:style-name"/>
-									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
-										<xsl:call-template name ="fontStyles">
-											<xsl:with-param name ="Tid" select ="$textId" />
-											<xsl:with-param name ="prClassName" select ="$prClassName"/>
-										</xsl:call-template>
-									</xsl:if>
-								</a:rPr >
-								<a:t>
-									<xsl:call-template name ="insertTab" />
-								</a:t>
-							</a:r>
-						</xsl:if >
-					</xsl:for-each>
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-				<xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-					<xsl:for-each select ="child::node()[position()]">
-						<xsl:if test ="name()='text:line-break'">
-							<xsl:call-template name ="processBR">
-								<xsl:with-param name ="T" select ="@text:style-name" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test ="name()='text:span'">
-							<xsl:if test ="not(./text:line-break)">
-								<a:r>
-									<a:rPr lang="en-US" smtClean="0">
-										<!--Font Size -->
-										<xsl:variable name ="textId">
-											<xsl:value-of select ="@text:style-name"/>
-										</xsl:variable>
-										<xsl:if test ="not($textId ='')">
-											<xsl:call-template name ="fontStyles">
-												<xsl:with-param name ="Tid" select ="$textId" />
-												<xsl:with-param name ="prClassName" select ="$prClassName"/>
-												<xsl:with-param name ="lvl" select ="$lvl"/>
-											</xsl:call-template>
-										</xsl:if>
-										<!--<xsl:copy-of select="$varTextHyperLinks"/>-->
-									</a:rPr >
-									<a:t>
-										<xsl:call-template name ="insertTab" />
-									</a:t>
-								</a:r>
-							</xsl:if>
-							<xsl:if test ="./text:line-break">
-								<xsl:call-template name ="processBR">
-									<xsl:with-param name ="T" select ="@text:style-name" />
-									<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								</xsl:call-template>
-							</xsl:if>
-						</xsl:if>
-						<xsl:if test ="not(name()='text:span' or name()='text:line-break')">
-							<a:r>
-								<a:rPr lang="en-US" smtClean="0">
-									<!--Font Size -->
-									<xsl:variable name ="textId">
-										<xsl:value-of select ="@text:style-name"/>
-									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
-										<xsl:call-template name ="fontStyles">
-											<xsl:with-param name ="Tid" select ="$textId" />
-											<xsl:with-param name ="prClassName" select ="$prClassName"/>
-										</xsl:call-template>
-									</xsl:if>
-								</a:rPr >
-								<a:t>
-									<xsl:call-template name ="insertTab" />
-								</a:t>
-							</a:r>
-						</xsl:if >
-					</xsl:for-each>
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-				<xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-					<xsl:for-each select ="child::node()[position()]">
-						<xsl:if test ="name()='text:span'">
-							<xsl:if test ="not(./text:line-break)">
-								<a:r>
-									<a:rPr lang="en-US" smtClean="0">
-										<!--Font Size -->
-										<xsl:variable name ="textId">
-											<xsl:value-of select ="@text:style-name"/>
-										</xsl:variable>
-										<xsl:if test ="not($textId ='')">
-											<xsl:call-template name ="fontStyles">
-												<xsl:with-param name ="Tid" select ="$textId" />
-												<xsl:with-param name ="prClassName" select ="$prClassName"/>
-												<xsl:with-param name ="lvl" select ="$lvl"/>
-											</xsl:call-template>
-										</xsl:if>
-										<!--<xsl:copy-of select="$varTextHyperLinks"/>-->
-									</a:rPr >
-									<a:t>
-										<xsl:call-template name ="insertTab" />
-									</a:t>
-								</a:r>
-							</xsl:if>
-							<xsl:if test ="./text:line-break">
-								<xsl:call-template name ="processBR">
-									<xsl:with-param name ="T" select ="@text:style-name" />
-									<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								</xsl:call-template>
-							</xsl:if>
-						</xsl:if>
-						<xsl:if test ="name()='text:line-break'">
-							<xsl:call-template name ="processBR">
-								<xsl:with-param name ="T" select ="@text:style-name" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test ="not(name()='text:span' or name()='text:line-break')">
-							<a:r>
-								<a:rPr lang="en-US" smtClean="0">
-									<!--Font Size -->
-									<xsl:variable name ="textId">
-										<xsl:value-of select ="@text:style-name"/>
-									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
-										<xsl:call-template name ="fontStyles">
-											<xsl:with-param name ="Tid" select ="$textId" />
-											<xsl:with-param name ="prClassName" select ="$prClassName"/>
-										</xsl:call-template>
-									</xsl:if>
-								</a:rPr >
-								<a:t>
-									<xsl:call-template name ="insertTab" />
-								</a:t>
-							</a:r>
-						</xsl:if >
-					</xsl:for-each>
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-				<xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-					<xsl:for-each select ="child::node()[position()]">
-						<xsl:if test ="name()='text:span'">
-							<xsl:if test ="not(./text:line-break)">
-								<a:r>
-									<a:rPr lang="en-US" smtClean="0">
-										<!--Font Size -->
-										<xsl:variable name ="textId">
-											<xsl:value-of select ="@text:style-name"/>
-										</xsl:variable>
-										<xsl:if test ="not($textId ='')">
-											<xsl:call-template name ="fontStyles">
-												<xsl:with-param name ="Tid" select ="$textId" />
-												<xsl:with-param name ="prClassName" select ="$prClassName"/>
-												<xsl:with-param name ="lvl" select ="$lvl"/>
-											</xsl:call-template>
-										</xsl:if>
-										<!--<xsl:copy-of select="$varTextHyperLinks"/>-->
-									</a:rPr >
-									<a:t>
-										<xsl:call-template name ="insertTab" />
-									</a:t>
-								</a:r>
-							</xsl:if>
-							<xsl:if test ="./text:line-break">
-								<xsl:call-template name ="processBR">
-									<xsl:with-param name ="T" select ="@text:style-name" />
-									<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								</xsl:call-template>
-							</xsl:if>
-						</xsl:if>
-						<xsl:if test ="name()='text:line-break'">
-							<xsl:call-template name ="processBR">
-								<xsl:with-param name ="T" select ="@text:style-name" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test ="not(name()='text:span' or name()='text:line-break')">
-							<a:r>
-								<a:rPr lang="en-US" smtClean="0">
-									<!--Font Size -->
-									<xsl:variable name ="textId">
-										<xsl:value-of select ="@text:style-name"/>
-									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
-										<xsl:call-template name ="fontStyles">
-											<xsl:with-param name ="Tid" select ="$textId" />
-											<xsl:with-param name ="prClassName" select ="$prClassName"/>
-										</xsl:call-template>
-									</xsl:if>
-								</a:rPr >
-								<a:t>
-									<xsl:call-template name ="insertTab" />
-								</a:t>
-							</a:r>
-						</xsl:if >
-					</xsl:for-each>
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-				<xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-					<xsl:for-each select ="child::node()[position()]">
-						<xsl:if test ="name()='text:span'">
-							<xsl:if test ="not(./text:line-break)">
-								<a:r>
-									<a:rPr lang="en-US" smtClean="0">
-										<!--Font Size -->
-										<xsl:variable name ="textId">
-											<xsl:value-of select ="@text:style-name"/>
-										</xsl:variable>
-										<xsl:if test ="not($textId ='')">
-											<xsl:call-template name ="fontStyles">
-												<xsl:with-param name ="Tid" select ="$textId" />
-												<xsl:with-param name ="prClassName" select ="$prClassName"/>
-												<xsl:with-param name ="lvl" select ="$lvl"/>
-											</xsl:call-template>
-										</xsl:if>
-										<!--<xsl:copy-of select="$varTextHyperLinks"/>-->
-									</a:rPr >
-									<a:t>
-										<xsl:call-template name ="insertTab" />
-									</a:t>
-								</a:r>
-							</xsl:if>
-							<xsl:if test ="./text:line-break">
-								<xsl:call-template name ="processBR">
-									<xsl:with-param name ="T" select ="@text:style-name" />
-									<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								</xsl:call-template>
-							</xsl:if>
-						</xsl:if>
-						<xsl:if test ="name()='text:line-break'">
-							<xsl:call-template name ="processBR">
-								<xsl:with-param name ="T" select ="@text:style-name" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test ="not(name()='text:span' or name()='text:line-break')">
-							<a:r>
-								<a:rPr lang="en-US" smtClean="0">
-									<!--Font Size -->
-									<xsl:variable name ="textId">
-										<xsl:value-of select ="@text:style-name"/>
-									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
-										<xsl:call-template name ="fontStyles">
-											<xsl:with-param name ="Tid" select ="$textId" />
-											<xsl:with-param name ="prClassName" select ="$prClassName"/>
-										</xsl:call-template>
-									</xsl:if>
-								</a:rPr >
-								<a:t>
-									<xsl:call-template name ="insertTab" />
-								</a:t>
-							</a:r>
-						</xsl:if >
-					</xsl:for-each>
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-				<xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
-					<xsl:for-each select ="child::node()[position()]">
-						<xsl:if test ="name()='text:span'">
-							<xsl:if test ="not(./text:line-break)">
-								<a:r>
-									<a:rPr lang="en-US" smtClean="0">
-										<!--Font Size -->
-										<xsl:variable name ="textId">
-											<xsl:value-of select ="@text:style-name"/>
-										</xsl:variable>
-										<xsl:if test ="not($textId ='')">
-											<xsl:call-template name ="fontStyles">
-												<xsl:with-param name ="Tid" select ="$textId" />
-												<xsl:with-param name ="prClassName" select ="$prClassName"/>
-												<xsl:with-param name ="lvl" select ="$lvl"/>
-											</xsl:call-template>
-										</xsl:if>
-										<!--<xsl:copy-of select="$varTextHyperLinks"/>-->
-									</a:rPr >
-									<a:t>
-										<xsl:call-template name ="insertTab" />
-									</a:t>
-								</a:r>
-							</xsl:if>
-							<xsl:if test ="./text:line-break">
-								<xsl:call-template name ="processBR">
-									<xsl:with-param name ="T" select ="@text:style-name" />
-									<xsl:with-param name ="prClassName" select ="$prClassName"/>
-								</xsl:call-template>
-							</xsl:if>
-						</xsl:if>
-						<xsl:if test ="name()='text:line-break'">
-							<xsl:call-template name ="processBR">
-								<xsl:with-param name ="T" select ="@text:style-name" />
-								<xsl:with-param name ="prClassName" select ="$prClassName"/>
-							</xsl:call-template>
-						</xsl:if>
-						<xsl:if test ="not(name()='text:span' or name()='text:line-break')">
-							<a:r>
-								<a:rPr lang="en-US" smtClean="0">
-									<!--Font Size -->
-									<xsl:variable name ="textId">
-										<xsl:value-of select ="@text:style-name"/>
-									</xsl:variable>
-									<xsl:if test ="not($textId ='')">
-										<xsl:call-template name ="fontStyles">
-											<xsl:with-param name ="Tid" select ="$textId" />
-											<xsl:with-param name ="prClassName" select ="$prClassName"/>
-										</xsl:call-template>
-									</xsl:if>
-								</a:rPr >
-								<a:t>
-									<xsl:call-template name ="insertTab" />
-								</a:t>
-							</a:r>
-						</xsl:if >
-					</xsl:for-each>
-				</xsl:for-each>
-			</xsl:when>
-		</xsl:choose>
-	</xsl:template>
+  <xsl:template name ="getTextNodeForFontStyle">
+    <xsl:param name ="prClassName"/>
+    <xsl:param name ="lvl" />
+    <xsl:param name ="masterPageName"/>
+    <xsl:choose>
+      <xsl:when test ="./text:p">
+        <xsl:for-each select =".">
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:if test ="name()='text:span'">
+              <xsl:if test ="not(./text:line-break)">
+                <a:r>
+                  <a:rPr lang="en-US" smtClean="0">
+                    <!--Font Size -->
+                    <xsl:variable name ="textId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:variable>
+                    <xsl:if test ="not($textId ='')">
+                      <xsl:call-template name ="fontStyles">
+                        <xsl:with-param name ="Tid" select ="$textId" />
+                        <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                        <xsl:with-param name ="lvl" select ="$lvl"/>
+                        <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
+                  </a:rPr >
+                  <a:t>
+                    <xsl:call-template name ="insertTab" />
+                  </a:t>
+                </a:r>
+              </xsl:if>
+              <xsl:if test ="./text:line-break">
+                <xsl:call-template name ="processBR">
+                  <xsl:with-param name ="T" select ="@text:style-name" />
+                  <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if test ="name()='text:line-break'">
+              <xsl:call-template name ="processBR">
+                <xsl:with-param name ="T" select ="@text:style-name" />
+                <xsl:with-param name ="prClassName" select ="$prClassName"/>
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
+              <a:r>
+                <a:rPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:rPr >
+                <a:t>
+                  <xsl:call-template name ="insertTab" />
+                </a:t>
+              </a:r>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:p">
+        <xsl:for-each select ="./text:list/text:list-item">
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:if test ="name()='text:span'">
+              <xsl:if test ="not(./text:line-break)">
+                <a:r>
+                  <a:rPr lang="en-US" smtClean="0">
+                    <!--Font Size -->
+                    <xsl:variable name ="textId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:variable>
+                    <xsl:if test ="not($textId ='')">
+                      <xsl:call-template name ="fontStyles">
+                        <xsl:with-param name ="Tid" select ="$textId" />
+                        <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                        <xsl:with-param name ="lvl" select ="$lvl"/>
+                        <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
+                  </a:rPr >
+                  <a:t>
+                    <xsl:call-template name ="insertTab" />
+                  </a:t>
+                </a:r>
+              </xsl:if>
+              <xsl:if test ="./text:line-break">
+                <xsl:call-template name ="processBR">
+                  <xsl:with-param name ="T" select ="@text:style-name" />
+                  <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if test ="name()='text:line-break'">
+              <xsl:call-template name ="processBR">
+                <xsl:with-param name ="T" select ="@text:style-name" />
+                <xsl:with-param name ="prClassName" select ="$prClassName"/>
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
+              <a:r>
+                <a:rPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:rPr >
+                <a:t>
+                  <xsl:call-template name ="insertTab" />
+                </a:t>
+              </a:r>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item">
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:if test ="name()='text:span'">
+              <xsl:if test ="not(./text:line-break)">
+                <a:r>
+                  <a:rPr lang="en-US" smtClean="0">
+                    <!--Font Size -->
+                    <xsl:variable name ="textId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:variable>
+                    <xsl:if test ="not($textId ='')">
+                      <xsl:call-template name ="fontStyles">
+                        <xsl:with-param name ="Tid" select ="$textId" />
+                        <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                        <xsl:with-param name ="lvl" select ="$lvl"/>
+                        <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
+                  </a:rPr >
+                  <a:t>
+                    <xsl:call-template name ="insertTab" />
+                  </a:t>
+                </a:r>
+              </xsl:if>
+              <xsl:if test ="./text:line-break">
+                <xsl:call-template name ="processBR">
+                  <xsl:with-param name ="T" select ="@text:style-name" />
+                  <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if test ="name()='text:line-break'">
+              <xsl:call-template name ="processBR">
+                <xsl:with-param name ="T" select ="@text:style-name" />
+                <xsl:with-param name ="prClassName" select ="$prClassName"/>
+
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
+              <a:r>
+                <a:rPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:rPr >
+                <a:t>
+                  <xsl:call-template name ="insertTab" />
+                </a:t>
+              </a:r>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item">
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:if test ="name()='text:span'">
+              <xsl:if test ="not(./text:line-break)">
+                <a:r>
+                  <a:rPr lang="en-US" smtClean="0">
+                    <!--Font Size -->
+                    <xsl:variable name ="textId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:variable>
+                    <xsl:if test ="not($textId ='')">
+                      <xsl:call-template name ="fontStyles">
+                        <xsl:with-param name ="Tid" select ="$textId" />
+                        <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                        <xsl:with-param name ="lvl" select ="$lvl"/>
+                        <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
+                  </a:rPr >
+                  <a:t>
+                    <xsl:call-template name ="insertTab" />
+                  </a:t>
+                </a:r>
+              </xsl:if>
+              <xsl:if test ="./text:line-break">
+                <xsl:call-template name ="processBR">
+                  <xsl:with-param name ="T" select ="@text:style-name" />
+                  <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if test ="name()='text:line-break'">
+              <xsl:call-template name ="processBR">
+                <xsl:with-param name ="T" select ="@text:style-name" />
+                <xsl:with-param name ="prClassName" select ="$prClassName"/>
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
+              <a:r>
+                <a:rPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:rPr >
+                <a:t>
+                  <xsl:call-template name ="insertTab" />
+                </a:t>
+              </a:r>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item">
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:if test ="name()='text:line-break'">
+              <xsl:call-template name ="processBR">
+                <xsl:with-param name ="T" select ="@text:style-name" />
+                <xsl:with-param name ="prClassName" select ="$prClassName"/>
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test ="name()='text:span'">
+              <xsl:if test ="not(./text:line-break)">
+                <a:r>
+                  <a:rPr lang="en-US" smtClean="0">
+                    <!--Font Size -->
+                    <xsl:variable name ="textId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:variable>
+                    <xsl:if test ="not($textId ='')">
+                      <xsl:call-template name ="fontStyles">
+                        <xsl:with-param name ="Tid" select ="$textId" />
+                        <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                        <xsl:with-param name ="lvl" select ="$lvl"/>
+                        <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
+                  </a:rPr >
+                  <a:t>
+                    <xsl:call-template name ="insertTab" />
+                  </a:t>
+                </a:r>
+              </xsl:if>
+              <xsl:if test ="./text:line-break">
+                <xsl:call-template name ="processBR">
+                  <xsl:with-param name ="T" select ="@text:style-name" />
+                  <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
+              <a:r>
+                <a:rPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:rPr >
+                <a:t>
+                  <xsl:call-template name ="insertTab" />
+                </a:t>
+              </a:r>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item">
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:if test ="name()='text:span'">
+              <xsl:if test ="not(./text:line-break)">
+                <a:r>
+                  <a:rPr lang="en-US" smtClean="0">
+                    <!--Font Size -->
+                    <xsl:variable name ="textId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:variable>
+                    <xsl:if test ="not($textId ='')">
+                      <xsl:call-template name ="fontStyles">
+                        <xsl:with-param name ="Tid" select ="$textId" />
+                        <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                        <xsl:with-param name ="lvl" select ="$lvl"/>
+                        <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
+                  </a:rPr >
+                  <a:t>
+                    <xsl:call-template name ="insertTab" />
+                  </a:t>
+                </a:r>
+              </xsl:if>
+              <xsl:if test ="./text:line-break">
+                <xsl:call-template name ="processBR">
+                  <xsl:with-param name ="T" select ="@text:style-name" />
+                  <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if test ="name()='text:line-break'">
+              <xsl:call-template name ="processBR">
+                <xsl:with-param name ="T" select ="@text:style-name" />
+                <xsl:with-param name ="prClassName" select ="$prClassName"/>
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
+              <a:r>
+                <a:rPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:rPr >
+                <a:t>
+                  <xsl:call-template name ="insertTab" />
+                </a:t>
+              </a:r>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item">
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:if test ="name()='text:span'">
+              <xsl:if test ="not(./text:line-break)">
+                <a:r>
+                  <a:rPr lang="en-US" smtClean="0">
+                    <!--Font Size -->
+                    <xsl:variable name ="textId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:variable>
+                    <xsl:if test ="not($textId ='')">
+                      <xsl:call-template name ="fontStyles">
+                        <xsl:with-param name ="Tid" select ="$textId" />
+                        <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                        <xsl:with-param name ="lvl" select ="$lvl"/>
+                        <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
+                  </a:rPr >
+                  <a:t>
+                    <xsl:call-template name ="insertTab" />
+                  </a:t>
+                </a:r>
+              </xsl:if>
+              <xsl:if test ="./text:line-break">
+                <xsl:call-template name ="processBR">
+                  <xsl:with-param name ="T" select ="@text:style-name" />
+                  <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if test ="name()='text:line-break'">
+              <xsl:call-template name ="processBR">
+                <xsl:with-param name ="T" select ="@text:style-name" />
+                <xsl:with-param name ="prClassName" select ="$prClassName"/>
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
+              <a:r>
+                <a:rPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:rPr >
+                <a:t>
+                  <xsl:call-template name ="insertTab" />
+                </a:t>
+              </a:r>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item">
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:if test ="name()='text:span'">
+              <xsl:if test ="not(./text:line-break)">
+                <a:r>
+                  <a:rPr lang="en-US" smtClean="0">
+                    <!--Font Size -->
+                    <xsl:variable name ="textId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:variable>
+                    <xsl:if test ="not($textId ='')">
+                      <xsl:call-template name ="fontStyles">
+                        <xsl:with-param name ="Tid" select ="$textId" />
+                        <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                        <xsl:with-param name ="lvl" select ="$lvl"/>
+                        <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
+                  </a:rPr >
+                  <a:t>
+                    <xsl:call-template name ="insertTab" />
+                  </a:t>
+                </a:r>
+              </xsl:if>
+              <xsl:if test ="./text:line-break">
+                <xsl:call-template name ="processBR">
+                  <xsl:with-param name ="T" select ="@text:style-name" />
+                  <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if test ="name()='text:line-break'">
+              <xsl:call-template name ="processBR">
+                <xsl:with-param name ="T" select ="@text:style-name" />
+                <xsl:with-param name ="prClassName" select ="$prClassName"/>
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
+              <a:r>
+                <a:rPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:rPr >
+                <a:t>
+                  <xsl:call-template name ="insertTab" />
+                </a:t>
+              </a:r>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:p">
+        <xsl:for-each select ="./text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item/text:list/text:list-item">
+          <xsl:for-each select ="child::node()[position()]">
+            <xsl:if test ="name()='text:span'">
+              <xsl:if test ="not(./text:line-break)">
+                <a:r>
+                  <a:rPr lang="en-US" smtClean="0">
+                    <!--Font Size -->
+                    <xsl:variable name ="textId">
+                      <xsl:value-of select ="@text:style-name"/>
+                    </xsl:variable>
+                    <xsl:if test ="not($textId ='')">
+                      <xsl:call-template name ="fontStyles">
+                        <xsl:with-param name ="Tid" select ="$textId" />
+                        <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                        <xsl:with-param name ="lvl" select ="$lvl"/>
+                        <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                      </xsl:call-template>
+                    </xsl:if>
+                    <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
+                  </a:rPr >
+                  <a:t>
+                    <xsl:call-template name ="insertTab" />
+                  </a:t>
+                </a:r>
+              </xsl:if>
+              <xsl:if test ="./text:line-break">
+                <xsl:call-template name ="processBR">
+                  <xsl:with-param name ="T" select ="@text:style-name" />
+                  <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                </xsl:call-template>
+              </xsl:if>
+            </xsl:if>
+            <xsl:if test ="name()='text:line-break'">
+              <xsl:call-template name ="processBR">
+                <xsl:with-param name ="T" select ="@text:style-name" />
+                <xsl:with-param name ="prClassName" select ="$prClassName"/>
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
+              <a:r>
+                <a:rPr lang="en-US" smtClean="0">
+                  <!--Font Size -->
+                  <xsl:variable name ="textId">
+                    <xsl:value-of select ="@text:style-name"/>
+                  </xsl:variable>
+                  <xsl:if test ="not($textId ='')">
+                    <xsl:call-template name ="fontStyles">
+                      <xsl:with-param name ="Tid" select ="$textId" />
+                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
+                      <xsl:with-param name ="lvl" select ="$lvl"/>
+                      <xsl:with-param name ="masterPageName" select ="$masterPageName"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </a:rPr >
+                <a:t>
+                  <xsl:call-template name ="insertTab" />
+                </a:t>
+              </a:r>
+            </xsl:if >
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
   <!--End,to get paragraph style name for each of the levels in multilevelled list-->
 
 </xsl:stylesheet>
