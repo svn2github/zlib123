@@ -45,12 +45,12 @@
   <xsl:template name="InsertDrawing">
     <xdr:wsDr>
       <!--Insert Chart -->
-      <xsl:for-each
-        select="descendant::draw:frame">
-        
+      <xsl:for-each select="descendant::draw:frame">
+
         <xsl:choose>
           <!-- insert chart -->
-          <xsl:when test="draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
+          <xsl:when
+            test="draw:object[document(concat(translate(@xlink:href,'./',''),'/content.xml'))/office:document-content/office:body/office:chart]">
             <xdr:twoCellAnchor>
               <xsl:call-template name="SetPosition"/>
               <xdr:graphicFrame macro="">
@@ -75,9 +75,10 @@
               <xdr:clientData/>
             </xdr:twoCellAnchor>
           </xsl:when>
-          
+
           <!-- insert picture -->
-          <xsl:when test="draw:image[not(name(parent::node()/parent::node()) = 'draw:g' ) and not(parent::node()/draw:object)]">
+          <xsl:when
+            test="draw:image[not(name(parent::node()/parent::node()) = 'draw:g' ) and not(parent::node()/draw:object)]">
             <xdr:twoCellAnchor>
               <xsl:call-template name="SetPosition"/>
               <xdr:pic>
@@ -97,9 +98,10 @@
                     <a:picLocks noChangeAspect="1"/>
                   </xdr:cNvPicPr>
                 </xdr:nvPicPr>
-                
+
                 <xdr:blipFill>
-                  <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+                  <a:blip
+                    xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
                     <xsl:choose>
                       <!-- embeded picture -->
                       <xsl:when test="starts-with(draw:image/@xlink:href, 'Pictures/')">
@@ -119,44 +121,44 @@
                     <a:fillRect/>
                   </a:stretch>
                 </xdr:blipFill>
-                
+
                 <xsl:call-template name="InsertFrameProperties"/>
-                
+
               </xdr:pic>
               <xdr:clientData/>
             </xdr:twoCellAnchor>
           </xsl:when>
-          
+
           <!-- insert text-box -->
           <xsl:when test="draw:text-box">
             <xdr:twoCellAnchor>
-            
-            <xsl:call-template name="SetPosition"/>
-            
-            <xdr:sp macro="" textlink="">
-            <xdr:nvSpPr>
-            <xdr:cNvPr id="{position()}" name="{concat('TextBox ',position())}"/>
-            <xdr:cNvSpPr txBox="1"/>
-            </xdr:nvSpPr>
-            
-            <xsl:call-template name="InsertFrameProperties"/>
-            
-            <xdr:txBody>
-            
-            <xsl:call-template name="InsertTextBoxProperties"/>
-            
-            <a:lstStyle/>
-          
-          <!-- insert text -->
-          <xsl:apply-templates mode="text-box"/>
-            
-            </xdr:txBody>
-            
-            </xdr:sp>
-            <xdr:clientData/>
+
+              <xsl:call-template name="SetPosition"/>
+
+              <xdr:sp macro="" textlink="">
+                <xdr:nvSpPr>
+                  <xdr:cNvPr id="{position()}" name="{concat('TextBox ',position())}"/>
+                  <xdr:cNvSpPr txBox="1"/>
+                </xdr:nvSpPr>
+
+                <xsl:call-template name="InsertFrameProperties"/>
+
+                <xdr:txBody>
+
+                  <xsl:call-template name="InsertTextBoxProperties"/>
+
+                  <a:lstStyle/>
+
+                  <!-- insert text -->
+                  <xsl:apply-templates mode="text-box"/>
+
+                </xdr:txBody>
+
+              </xdr:sp>
+              <xdr:clientData/>
             </xdr:twoCellAnchor>
-            
-            </xsl:when>
+
+          </xsl:when>
         </xsl:choose>
       </xsl:for-each>
 
@@ -180,8 +182,8 @@
 
               <a:lstStyle/-->
 
-              <!-- insert text -->
-              <!--xsl:apply-templates mode="text-box"/>
+      <!-- insert text -->
+      <!--xsl:apply-templates mode="text-box"/>
 
             </xdr:txBody>
 
@@ -358,12 +360,12 @@
       <!-- when anchor is to cell -->
       <xsl:when
         test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-          <xsl:variable name="number">
-            <xsl:call-template name="GetColNum">
-              <xsl:with-param name="cell" select="substring-after(@table:end-cell-address,'.')"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="$number - 1"/>
+        <xsl:variable name="number">
+          <xsl:call-template name="GetColNum">
+            <xsl:with-param name="cell" select="substring-after(@table:end-cell-address,'.')"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="$number - 1"/>
       </xsl:when>
       <!-- when anchor is to page -->
       <xsl:when test="parent::node()[name() = 'table:shapes']">
@@ -378,12 +380,12 @@
       <!-- when anchor is to cell -->
       <xsl:when
         test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-          <xsl:variable name="number">
-            <xsl:call-template name="GetRowNum">
-              <xsl:with-param name="cell" select="substring-after(@table:end-cell-address,'.')"/>
-            </xsl:call-template>
-          </xsl:variable>
-          <xsl:value-of select="$number - 1"/>
+        <xsl:variable name="number">
+          <xsl:call-template name="GetRowNum">
+            <xsl:with-param name="cell" select="substring-after(@table:end-cell-address,'.')"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:value-of select="$number - 1"/>
       </xsl:when>
       <!-- when anchor is to page -->
       <xsl:when test="parent::node()[name() = 'table:shapes']">
@@ -398,9 +400,9 @@
       <!-- when anchor is to cell -->
       <xsl:when
         test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-          <xsl:call-template name="emu-measure">
-            <xsl:with-param name="length" select="@svg:x"/>
-          </xsl:call-template>
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="@svg:x"/>
+        </xsl:call-template>
       </xsl:when>
       <!-- when anchor is to page -->
       <xsl:when test="parent::node()[name() = 'table:shapes']">
@@ -415,9 +417,9 @@
       <!-- when anchor is to cell -->
       <xsl:when
         test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-          <xsl:call-template name="emu-measure">
-            <xsl:with-param name="length" select="@svg:y"/>
-          </xsl:call-template>
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="@svg:y"/>
+        </xsl:call-template>
       </xsl:when>
       <!-- when anchor is to page -->
       <xsl:when test="parent::node()[name() = 'table:shapes']">
@@ -432,9 +434,9 @@
       <!-- when anchor is to cell -->
       <xsl:when
         test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-          <xsl:call-template name="emu-measure">
-            <xsl:with-param name="length" select="@ table:end-x"/>
-          </xsl:call-template>
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="@ table:end-x"/>
+        </xsl:call-template>
       </xsl:when>
       <!-- when anchor is to page -->
       <xsl:when test="parent::node()[name() = 'table:shapes']">
@@ -449,9 +451,9 @@
       <!-- when anchor is to cell -->
       <xsl:when
         test="parent::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ]">
-          <xsl:call-template name="emu-measure">
-            <xsl:with-param name="length" select="@ table:end-y"/>
-          </xsl:call-template>
+        <xsl:call-template name="emu-measure">
+          <xsl:with-param name="length" select="@ table:end-y"/>
+        </xsl:call-template>
       </xsl:when>
       <!-- when anchor is to page -->
       <xsl:when test="parent::node()[name() = 'table:shapes']">
@@ -484,8 +486,7 @@
         <a:avLst/>
       </a:prstGeom>
 
-      <xsl:if
-        test="key('style', @draw:style-name)/style:graphic-properties/@draw:stroke != 'none' ">
+      <xsl:if test="key('style', @draw:style-name)/style:graphic-properties/@draw:stroke != 'none' ">
 
         <xsl:variable name="strokeWeight">
           <xsl:call-template name="emu-measure">
@@ -510,8 +511,7 @@
         </xsl:variable>
 
         <xsl:variable name="FillColor">
-          <xsl:if
-            test="key('style', @draw:style-name)/style:graphic-properties/@draw:fill-color">
+          <xsl:if test="key('style', @draw:style-name)/style:graphic-properties/@draw:fill-color">
             <xsl:value-of
               select="substring-after(key('style', @draw:style-name)/style:graphic-properties/@draw:fill-color, '#')"
             />
@@ -557,14 +557,26 @@
     <xsl:variable name="tekst">
       <xsl:value-of select="."/>
     </xsl:variable>
+    
     <a:p>
-
       <xsl:call-template name="InsertParagraphProperties"/>
 
       <xsl:choose>
-        <xsl:when test="$tekst = '' and not(text:span)">
+        <!-- empty line -->
+        <xsl:when test="$tekst = '' and not(text:s) and not(text:span)">
           <xsl:call-template name="InsertEndPara"/>
         </xsl:when>
+        
+        <!-- text:p without text:span -->
+        <xsl:when test="not(text:span)">
+          <a:r>
+            <xsl:call-template name="InsertRunProperties"/>
+            <a:t>
+              <xsl:apply-templates mode="text-box"/>
+            </a:t>
+          </a:r>
+        </xsl:when>
+        
         <xsl:otherwise>
           <xsl:apply-templates mode="text-box"/>
         </xsl:otherwise>
@@ -579,9 +591,12 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="$tekst != '' ">
+      <xsl:when test="$tekst != '' or text:s">
         <a:r>
-          <xsl:apply-templates mode="text-box"/>
+          <xsl:call-template name="InsertRunProperties"/>
+          <a:t>
+            <xsl:apply-templates mode="text-box"/>
+          </a:t>
         </a:r>
       </xsl:when>
       <xsl:otherwise>
@@ -590,42 +605,34 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="text()[parent::text:p]" mode="text-box">
+  <!--xsl:template match="text()[parent::text:p]" mode="text-box">
     <a:r>
       <xsl:call-template name="InsertRunProperties"/>
       <a:t>
         <xsl:value-of select="."/>
       </a:t>
     </a:r>
-  </xsl:template>
+  </xsl:template-->
 
   <xsl:template match="text()" mode="text-box">
-    <xsl:call-template name="InsertRunProperties"/>
-    <a:t>
-      <xsl:value-of select="."/>
-    </a:t>
+    <xsl:value-of select="."/>
   </xsl:template>
 
   <xsl:template match="text:s" mode="text-box">
-    <a:r>
-      <xsl:for-each select="parent::node()">
-        <xsl:call-template name="InsertRunProperties"/>
-      </xsl:for-each>
-      <a:t>
-        <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
-          <xsl:attribute name="pxs:c">
-            <xsl:choose>
-              <xsl:when test="@text:c">
-                <xsl:value-of select="@text:c"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>1</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
-        </pxs:s>
-      </a:t>
-    </a:r>
+
+    <pxs:s xmlns:pxs="urn:cleverage:xmlns:post-processings:extra-spaces">
+      <xsl:attribute name="pxs:c">
+        <xsl:choose>
+          <xsl:when test="@text:c">
+            <xsl:value-of select="@text:c"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>1</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+    </pxs:s>
+
   </xsl:template>
 
   <xsl:template name="InsertEndPara">
@@ -636,7 +643,7 @@
     <!-- font size 12 default -->
     <a:rPr lang="en-EN" sz="1200">
 
-      <xsl:for-each select="key('style',parent::node()/@text:style-name)/style:text-properties">
+      <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
 
         <!-- font-size -->
         <xsl:if test="@fo:font-size">
@@ -679,144 +686,169 @@
           </xsl:when>
         </xsl:choose>
 
-        <!-- font underline-->        
+        <!-- font underline-->
         <xsl:choose>
           <!-- double-->
-          <xsl:when test="@style:text-underline-style = 'solid' and contains(@style:text-underline-type, 'double' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'solid' and contains(@style:text-underline-type, 'double' )">
+            <xsl:attribute name="u">
               <xsl:text>dbl</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- bold -->
-          <xsl:when test="@style:text-underline-style  = 'solid' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style  = 'solid' and contains(@style:text-underline-width, 'bold' )">
+            <xsl:attribute name="u">
               <xsl:text>heavy</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- single-->
-          <xsl:when test="@style:text-underline-style = 'solid' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'solid' and contains(@style:text-underline-width, 'auto' )">
+            <xsl:attribute name="u">
               <xsl:text>sng</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- dotted -->
-          <xsl:when test="@style:text-underline-style = 'dotted' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'dotted' and contains(@style:text-underline-width, 'auto' )">
+            <xsl:attribute name="u">
               <xsl:text>dotted</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- bold dotted -->
-          <xsl:when test="@style:text-underline-style = 'dotted' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'dotted' and contains(@style:text-underline-width, 'bold' )">
+            <xsl:attribute name="u">
               <xsl:text>dottedHeavy</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- dash -->
-          <xsl:when test="@style:text-underline-style = 'dash' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'dash' and contains(@style:text-underline-width, 'auto' )">
+            <xsl:attribute name="u">
               <xsl:text>dash</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- bold dash-->
-          <xsl:when test="@style:text-underline-style = 'dash' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'dash' and contains(@style:text-underline-width, 'bold' )">
+            <xsl:attribute name="u">
               <xsl:text>dashHeavy</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- dash long -->
-          <xsl:when test="@style:text-underline-style = 'long-dash' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'long-dash' and contains(@style:text-underline-width, 'auto' )">
+            <xsl:attribute name="u">
               <xsl:text>dashLong</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- bold dash long -->
-          <xsl:when test="@style:text-underline-style = 'long-dash' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'long-dash' and contains(@style:text-underline-width, 'bold' )">
+            <xsl:attribute name="u">
               <xsl:text>dashLongHeavy</xsl:text>
             </xsl:attribute>
-          </xsl:when>          
+          </xsl:when>
           <!-- dot dash -->
-          <xsl:when test="@style:text-underline-style = 'dot-dash' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'dot-dash' and contains(@style:text-underline-width, 'auto' )">
+            <xsl:attribute name="u">
               <xsl:text>dotDash</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- bold dot dash -->
-          <xsl:when test="@style:text-underline-style = 'dot-dash' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style = 'dot-dash' and contains(@style:text-underline-width, 'bold' )">
+            <xsl:attribute name="u">
               <xsl:text>dotDashHeavy</xsl:text>
-            </xsl:attribute >
+            </xsl:attribute>
           </xsl:when>
           <!-- dot-dot-dash -->
-          <xsl:when test="@style:text-underline-style= 'dot-dot-dash' and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style= 'dot-dot-dash' and contains(@style:text-underline-width, 'auto' )">
+            <xsl:attribute name="u">
               <xsl:text>dotDotDash</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- bold dot-dot-dash -->
-          <xsl:when test="@style:text-underline-style= 'dot-dot-dash' and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="@style:text-underline-style= 'dot-dot-dash' and contains(@style:text-underline-width, 'bold' )">
+            <xsl:attribute name="u">
               <xsl:text>dotDotDashHeavy</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- double wavy -->
-          <xsl:when test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-type, 'double' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-type, 'double' )">
+            <xsl:attribute name="u">
               <xsl:text>wavyDbl</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- wavy -->
-          <xsl:when test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-width, 'auto' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-width, 'auto' )">
+            <xsl:attribute name="u">
               <xsl:text>wavy</xsl:text>
             </xsl:attribute>
           </xsl:when>
           <!-- bold wavy -->
-          <xsl:when test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-width, 'bold' )">
-            <xsl:attribute name ="u">
+          <xsl:when
+            test="contains(@style:text-underline-style, 'wave' ) and contains(@style:text-underline-width, 'bold' )">
+            <xsl:attribute name="u">
               <xsl:text>wavyHeavy</xsl:text>
             </xsl:attribute>
           </xsl:when>
-        </xsl:choose>		
-        
+        </xsl:choose>
+
         <!-- text position -->
-        <xsl:if test="contains(@style:text-position, 'sub' ) or contains(@style:text-position, 'super' )">
+        <xsl:if
+          test="contains(@style:text-position, 'sub' ) or contains(@style:text-position, 'super' )">
           <xsl:attribute name="baseline">
             <xsl:choose>
               <!-- superscript -->
               <xsl:when test="substring-before(@style:text-position,' ') = 'super' ">
-                <xsl:value-of select="number(substring-before(substring-after(@style:text-position,' '), '%' )) * 1000"/>
+                <xsl:value-of
+                  select="number(substring-before(substring-after(@style:text-position,' '), '%' )) * 1000"
+                />
               </xsl:when>
               <!-- subscript -->
               <xsl:when test="substring-before(@style:text-position,' ') = 'sub' ">
                 <xsl:text>-</xsl:text>
-                <xsl:value-of select="number(substring-before(substring-after(@style:text-position,' '), '%' )) * 1000"/>
+                <xsl:value-of
+                  select="number(substring-before(substring-after(@style:text-position,' '), '%' )) * 1000"
+                />
               </xsl:when>
-            </xsl:choose>            
+            </xsl:choose>
           </xsl:attribute>
         </xsl:if>
-        
+
         <!-- letter kerning-->
-        <xsl:if test ="style:text-properties/@style:letter-kerning = 'true' ">
-          <xsl:attribute name ="kern">
+        <xsl:if test="style:text-properties/@style:letter-kerning = 'true' ">
+          <xsl:attribute name="kern">
             <xsl:value-of select="100"/>
           </xsl:attribute>
         </xsl:if>
-        
+
         <!--character spacing -->
-        <xsl:if test ="@fo:letter-spacing">
-          <xsl:attribute name ="spc">
+        <xsl:if test="@fo:letter-spacing">
+          <xsl:attribute name="spc">
             <!-- condensed -->
-            <xsl:if test ="substring-before(@fo:letter-spacing, 'cm' )&lt; 0 ">
-              <xsl:value-of select ="format-number(substring-before(@fo:letter-spacing,'cm') * 7200 div 2.54 ,'#')"/>
+            <xsl:if test="substring-before(@fo:letter-spacing, 'cm' )&lt; 0 ">
+              <xsl:value-of
+                select="format-number(substring-before(@fo:letter-spacing,'cm') * 7200 div 2.54 ,'#')"
+              />
             </xsl:if>
             <!-- expanded -->
-            <xsl:if test ="substring-before(@fo:letter-spacing, 'cm' ) &gt;= 0">
-              <xsl:value-of select ="format-number((substring-before(@fo:letter-spacing, 'cm' ) * 72 div 2.54) *100 ,'#')"/>
+            <xsl:if test="substring-before(@fo:letter-spacing, 'cm' ) &gt;= 0">
+              <xsl:value-of
+                select="format-number((substring-before(@fo:letter-spacing, 'cm' ) * 72 div 2.54) *100 ,'#')"
+              />
             </xsl:if>
           </xsl:attribute>
-        </xsl:if >
-        
+        </xsl:if>
+
         <!-- font color -->
         <xsl:if test="@fo:color">
           <a:solidFill>
@@ -838,28 +870,28 @@
             </a:outerShdw>
           </a:effectLst>
         </xsl:if>
-        
-        <xsl:if test ="@style:text-underline-color">
+
+        <xsl:if test="@style:text-underline-color">
           <a:uFill>
             <a:solidFill>
               <a:srgbClr>
-                <xsl:attribute name ="val">
-                  <xsl:value-of select ="substring-after(@style:text-underline-color,'#')"/>
+                <xsl:attribute name="val">
+                  <xsl:value-of select="substring-after(@style:text-underline-color,'#')"/>
                 </xsl:attribute>
               </a:srgbClr>
             </a:solidFill>
           </a:uFill>
-        </xsl:if>		
-        
+        </xsl:if>
+
       </xsl:for-each>
 
       <!-- font family  (Times New Roman default)-->
       <a:latin typeface="Times New Roman" charset="0">
         <xsl:if
-          test="key('style',parent::node()/@text:style-name)/style:text-properties/@fo:font-family">
+          test="key('style',@text:style-name)/style:text-properties/@fo:font-family">
           <xsl:attribute name="typeface">
             <xsl:value-of
-              select="translate(key('style',parent::node()/@text:style-name)/style:text-properties/@fo:font-family, &quot;'&quot;,'')"
+              select="translate(key('style',@text:style-name)/style:text-properties/@fo:font-family, &quot;'&quot;,'')"
             />
           </xsl:attribute>
         </xsl:if>
@@ -975,7 +1007,7 @@
   <xsl:template name="InsertTextBoxProperties">
     <a:bodyPr wrap="square" rtlCol="0" anchor="t">
       <xsl:for-each
-        select="key('style',parent::draw:frame/@draw:style-name)/style:graphic-properties">
+        select="key('style',@draw:style-name)/style:graphic-properties">
 
         <xsl:if test="@fo:padding-left">
           <xsl:attribute name="lIns">

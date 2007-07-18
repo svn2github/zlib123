@@ -1586,7 +1586,7 @@
       <xsl:if test="$ThemeColor != '' ">
         <xsl:value-of select="$ThemeColor"/>
       </xsl:if>
-      <xsl:if test="$BgTxColors !='' ">
+      <xsl:if test="$BgTxColors != '' ">
         <xsl:value-of select="$BgTxColors"/>
       </xsl:if>
     </xsl:variable>
@@ -1652,7 +1652,7 @@
         <!-- TBD Not sure whether this condition will occur-->
       </xsl:when>
 
-      <xsl:when test="$lumMod = '' and $lumOff ='' ">
+      <xsl:when test="$lumMod = '' and $lumOff = '' ">
         <xsl:value-of select="concat('#',$color)"/>
       </xsl:when>
 
@@ -1680,7 +1680,7 @@
           <xsl:with-param name="number" select="$NewBlue"/>
         </xsl:call-template>
       </xsl:when>
-    </xsl:choose>    
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
