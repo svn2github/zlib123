@@ -54,7 +54,7 @@ Copyright (c) 2007, Sonata Software Limited
   xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" 
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" 
   xmlns:rels="http://schemas.openxmlformats.org/package/2006/relationships" >
-  
+  <xsl:import href="SlideMaster.xsl"/>
 
 	<!--<xsl:key name="StyleId" match="w:style" use="@w:styleId"/>
   <xsl:key name="default-styles"
@@ -81,7 +81,7 @@ Copyright (c) 2007, Sonata Software Limited
 			<xsl:text>document styles</xsl:text>
 			<office:styles>
 				<xsl:call-template name ="InsertDefaultStyles" />
-       
+                                <xsl:call-template name="SlideMaster"/>
 				<xsl:call-template name="InsertShapeStyles"/>
 				<xsl:call-template name ="InsertLayoutStyle"/>
 			</office:styles>
@@ -89,7 +89,10 @@ Copyright (c) 2007, Sonata Software Limited
 			
 			<xsl:text>automatic styles</xsl:text>
 			<office:automatic-styles>
-       
+        <!-- added by Vipul to insert background color for Slide master-->
+        <!--start-->
+        <xsl:call-template name="slideMasterDrawingPage"/>
+        <!-- end-->
 				<xsl:call-template name="InsertSlideSize"/><!-- Change By Vijayeta-->
 				<xsl:call-template name="InsertNotesSize"/>
 				<style:style style:name="pr1" style:family="presentation" style:parent-style-name="Default-backgroundobjects">
@@ -113,13 +116,21 @@ Copyright (c) 2007, Sonata Software Limited
         <style:style style:name="prp" style:family="presentation" style:parent-style-name="slideMaster1-outline1">
           <style:graphic-properties draw:fill-color="#ffffff" draw:auto-grow-height="false" fo:min-height="12.573cm" />
         </style:style>
-        
-       
+        <xsl:call-template name ="TextParagraphProp"/>
+          
+ 
+        <!--Added by Vipul to insert style for shapes-->
+        <xsl:call-template name="GraphicStyleForSlideMaster"/>
 			</office:automatic-styles>
 			<xsl:text>master styles</xsl:text>
-     			<office:master-styles>
+      <!--commented by vipul as this will be covereded in Slide Master.xsl-->
+      <!--start-->
+			<!--<office:master-styles>
 				<xsl:call-template name="InsertMasterStylesDefinition"/>
-			</office:master-styles>
+			</office:master-styles>-->
+           <!--end-->
+      <!--added by Vipul for slide master page style-->
+      <xsl:call-template name="slideMasterStylePage"></xsl:call-template>
 		</office:document-styles>
 
 	</xsl:template>
@@ -444,10 +455,7 @@ Copyright (c) 2007, Sonata Software Limited
 						<!--<xsl:value-of select ="'portrait'"/>-->
 					</xsl:attribute>
 				</style:page-layout-properties>
-			</style:page-layout>
-			<style:page-layout style:name="PM1">
-        <style:page-layout-properties fo:margin-top="0cm" fo:margin-bottom="0cm" fo:margin-left="0cm" fo:margin-right="0cm" fo:page-width="28cm" fo:page-height="21cm" style:print-orientation="landscape"/>
-      </style:page-layout>
+			</style:page-layout>			
 		</xsl:for-each>
 	</xsl:template>
 	<!-- Notes Size-->

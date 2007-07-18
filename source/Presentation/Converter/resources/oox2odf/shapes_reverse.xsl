@@ -48,58 +48,58 @@ Copyright (c) 2007, Sonata Software Limited
   exclude-result-prefixes="p a dc xlink draw rels">
   <!-- Import Bullets and numbering-->
   <xsl:import href ="BulletsNumberingoox2odf.xsl"/>
-	<xsl:import href="common.xsl"/>
-	<!--<xsl:import href ="trignm.xsl"/>-->
-    <!-- Shape constants-->
-	<!-- Arrow size -->
-	<xsl:variable name="sm-sm">
-		<xsl:value-of select ="'0.15'"/>
-	</xsl:variable>
-	<xsl:variable name="sm-med">
-		<xsl:value-of select ="'0.18'"/>
-	</xsl:variable>
-	<xsl:variable name="sm-lg">
-		<xsl:value-of select ="'0.2'"/>
-	</xsl:variable>
-	<xsl:variable name="med-sm">
-		<xsl:value-of select ="'0.21'" />
-	</xsl:variable>
-	<xsl:variable name="med-med">
-		<xsl:value-of select ="'0.25'"/>
-	</xsl:variable>
-	<xsl:variable name="med-lg">
-		<xsl:value-of select ="'0.3'" />
-	</xsl:variable>
-	<xsl:variable name="lg-sm">
-		<xsl:value-of select ="'0.31'" />
-	</xsl:variable>
-	<xsl:variable name="lg-med">
-		<xsl:value-of select ="'0.35'" />
-	</xsl:variable>
-	<xsl:variable name="lg-lg">
-		<xsl:value-of select ="'0.4'" />
-	</xsl:variable>
-	
-	<xsl:template name ="drawShapes">
-		<xsl:param name ="SlideID" />
-		<xsl:param name ="SlideRelationId" />
-		<xsl:param name ="grID" />
-		<xsl:param name ="prID" />
+  <xsl:import href="common.xsl"/>
+  <!--<xsl:import href ="trignm.xsl"/>-->
+  <!-- Shape constants-->
+  <!-- Arrow size -->
+  <xsl:variable name="sm-sm">
+    <xsl:value-of select ="'0.15'"/>
+  </xsl:variable>
+  <xsl:variable name="sm-med">
+    <xsl:value-of select ="'0.18'"/>
+  </xsl:variable>
+  <xsl:variable name="sm-lg">
+    <xsl:value-of select ="'0.2'"/>
+  </xsl:variable>
+  <xsl:variable name="med-sm">
+    <xsl:value-of select ="'0.21'" />
+  </xsl:variable>
+  <xsl:variable name="med-med">
+    <xsl:value-of select ="'0.25'"/>
+  </xsl:variable>
+  <xsl:variable name="med-lg">
+    <xsl:value-of select ="'0.3'" />
+  </xsl:variable>
+  <xsl:variable name="lg-sm">
+    <xsl:value-of select ="'0.31'" />
+  </xsl:variable>
+  <xsl:variable name="lg-med">
+    <xsl:value-of select ="'0.35'" />
+  </xsl:variable>
+  <xsl:variable name="lg-lg">
+    <xsl:value-of select ="'0.4'" />
+  </xsl:variable>
 
-		<xsl:call-template name ="shapes">
-			<xsl:with-param name="GraphicId" select ="concat($SlideID,$grID,position())"/>
-			<xsl:with-param name ="ParaId" select ="concat($SlideID,$prID,position())" />
-			<xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
-		</xsl:call-template>
-	</xsl:template>
-	
-	<!-- Template for Shapes in reverse conversion -->
-	<xsl:template  name="shapes">
-		<xsl:param name="GraphicId" />
-		<xsl:param name="ParaId" />
-		<xsl:param name="SlideRelationId" />
-		 
-		<xsl:variable name="varHyperLinksForShapes">
+  <xsl:template name ="drawShapes">
+    <xsl:param name ="SlideID" />
+    <xsl:param name ="SlideRelationId" />
+    <xsl:param name ="grID" />
+    <xsl:param name ="prID" />
+
+    <xsl:call-template name ="shapes">
+      <xsl:with-param name="GraphicId" select ="concat($SlideID,$grID,position())"/>
+      <xsl:with-param name ="ParaId" select ="concat($SlideID,$prID,position())" />
+      <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- Template for Shapes in reverse conversion -->
+  <xsl:template  name="shapes">
+    <xsl:param name="GraphicId" />
+    <xsl:param name="ParaId" />
+    <xsl:param name="SlideRelationId" />
+
+    <xsl:variable name="varHyperLinksForShapes">
       <!-- Added by lohith.ar - Start - Mouse click hyperlinks -->
       <office:event-listeners>
         <xsl:for-each select ="p:nvSpPr/p:cNvPr">
@@ -276,7 +276,7 @@ Copyright (c) 2007, Sonata Software Limited
       </office:event-listeners>
       <!-- End - Mouse click hyperlinks-->
     </xsl:variable>
-		<xsl:variable name="varHyperLinksForConnectors">
+    <xsl:variable name="varHyperLinksForConnectors">
       <!-- Added by lohith.ar - Start - Mouse click hyperlinks -->
       <office:event-listeners>
         <xsl:for-each select ="p:nvCxnSpPr/p:cNvPr">
@@ -453,244 +453,438 @@ Copyright (c) 2007, Sonata Software Limited
       </office:event-listeners>
       <!-- End - Mouse click hyperlinks-->
     </xsl:variable>
-		
-		<xsl:choose>
-			
-			<!-- Basic shapes start-->
-			
-			<!--Custom shape - Rectangle -->
-			<xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle Custom')]) and (p:spPr/a:prstGeom/@prst='rect')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+
+    <xsl:choose>
+
+      <!-- Basic shapes start-->
+
+      <!--Custom shape - Rectangle -->
+      <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle Custom')]) and (p:spPr/a:prstGeom/@prst='rect')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 										 draw:type="rectangle" 
 										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Rectangle -->
-			<xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')]) and (p:spPr/a:prstGeom/@prst='rect')">
-				<draw:rect draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
           <xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:rect>
-			</xsl:when>
-			<!-- Oval(Custom shape) -->
-			<xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Oval Custom')]) and (p:spPr/a:prstGeom/@prst='ellipse')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Rectangle -->
+      <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')]) and (p:spPr/a:prstGeom/@prst='rect')">
+        <draw:rect draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:rect>
+      </xsl:when>
+      <!-- Oval(Custom shape) -->
+      <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Oval Custom')]) and (p:spPr/a:prstGeom/@prst='ellipse')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 											draw:text-areas="3200 3200 18400 18400" 
 											draw:type="ellipse"
 											draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160"/>
           <xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Ellipse(Basic shape) -->
-			<xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Oval')]) and (p:spPr/a:prstGeom/@prst='ellipse')">
-				<draw:ellipse draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-						<!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-						<xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-						<!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:ellipse>
-			</xsl:when>
-			<!-- Isosceles Triangle -->
-			<xsl:when test ="(p:spPr/a:prstGeom/@prst='triangle')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Ellipse(Basic shape) -->
+      <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'Oval')]) and (p:spPr/a:prstGeom/@prst='ellipse')">
+        <draw:ellipse draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:ellipse>
+      </xsl:when>
+      <!--Right Arrow (Added by A.Mathi as on 2/07/2007) -->
+      <xsl:when test = "(p:spPr/a:prstGeom/@prst='rightArrow')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					  draw:text-areas="0 ?f0 ?f5 ?f2" 
+					  draw:type="right-arrow" draw:modifiers="16200 5400" 
+					  draw:enhanced-path="M 0 ?f0 L ?f1 ?f0 ?f1 0 21600 10800 ?f1 21600 ?f1 ?f2 0 ?f2 Z N">
+            <draw:equation draw:name="f0" draw:formula="$1 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-?f1 "/>
+            <draw:equation draw:name="f4" draw:formula="?f3 *?f0 /10800"/>
+            <draw:equation draw:name="f5" draw:formula="?f1 +?f4 "/>
+            <draw:equation draw:name="f6" draw:formula="?f1 *?f0 /10800"/>
+            <draw:equation draw:name="f7" draw:formula="?f1 -?f6 "/>
+            <draw:handle draw:handle-position="$0 $1" 
+						  draw:handle-range-x-minimum="0" 
+						  draw:handle-range-x-maximum="21600" 
+						  draw:handle-range-y-minimum="0" 
+						  draw:handle-range-y-maximum="10800"/>
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!--Up Arrow (Added by A.Mathi as on 2/07/2007) -->
+      <xsl:when test = "(p:spPr/a:prstGeom/@prst='upArrow')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name ="grID" select="$GraphicId" />
+            <xsl:with-param name ="prID" select="$ParaId" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					  draw:text-areas="?f0 ?f7 ?f2 21600" 
+					  draw:type="up-arrow" draw:modifiers="5400 5400" 
+					  draw:enhanced-path="M ?f0 21600 L ?f0 ?f1 0 ?f1 10800 0 21600 ?f1 ?f2 ?f1 ?f2 21600 Z N">
+            <draw:equation draw:name="f0" draw:formula="$1 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-?f1 "/>
+            <draw:equation draw:name="f4" draw:formula="?f3 *?f0 /10800"/>
+            <draw:equation draw:name="f5" draw:formula="?f1 +?f4 "/>
+            <draw:equation draw:name="f6" draw:formula="?f1 *?f0 /10800"/>
+            <draw:equation draw:name="f7" draw:formula="?f1 -?f6 "/>
+            <draw:handle draw:handle-position="$1 $0" 
+						  draw:handle-range-x-minimum="0" 
+						  draw:handle-range-x-maximum="10800" 
+						  draw:handle-range-y-minimum="0" 
+						  draw:handle-range-y-maximum="21600"/>
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!--Left Arrow (Added by A.Mathi as on 2/07/2007) -->
+      <xsl:when test = "(p:spPr/a:prstGeom/@prst='leftArrow')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name ="grID" select="$GraphicId" />
+            <xsl:with-param name ="prID" select="$ParaId" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name ="SlideRelationId" select="$SlideRelationId" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					  draw:text-areas="?f7 ?f0 21600 ?f2" 
+					  draw:type="left-arrow" 
+					  draw:modifiers="5400 5400" 
+					  draw:enhanced-path="M 21600 ?f0 L ?f1 ?f0 ?f1 0 0 10800 ?f1 21600 ?f1 ?f2 21600 ?f2 Z N">
+            <draw:equation draw:name="f0" draw:formula="$1 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-?f1 "/>
+            <draw:equation draw:name="f4" draw:formula="?f3 *?f0 /10800"/>
+            <draw:equation draw:name="f5" draw:formula="?f1 +?f4 "/>
+            <draw:equation draw:name="f6" draw:formula="?f1 *?f0 /10800"/>
+            <draw:equation draw:name="f7" draw:formula="?f1 -?f6 "/>
+            <draw:handle draw:handle-position="$0 $1" 
+						  draw:handle-range-x-minimum="0" 
+						  draw:handle-range-x-maximum="21600" 
+						  draw:handle-range-y-minimum="0" 
+						  draw:handle-range-y-maximum="10800"/>
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!--Down Arrow (Added by A.Mathi as on 2/07/2007) -->
+      <xsl:when test = "(p:spPr/a:prstGeom/@prst='downArrow')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name ="grID" select ="$GraphicId" />
+            <xsl:with-param name ="prID" select ="ParaId" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					  draw:text-areas="?f0 0 ?f2 ?f5" 
+					  draw:type="down-arrow" 
+					  draw:modifiers="16200 5400" 
+					  draw:enhanced-path="M ?f0 0 L ?f0 ?f1 0 ?f1 10800 21600 21600 ?f1 ?f2 ?f1 ?f2 0 Z N">
+            <draw:equation draw:name="f0" draw:formula="$1 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-?f1 "/>
+            <draw:equation draw:name="f4" draw:formula="?f3 *?f0 /10800"/>
+            <draw:equation draw:name="f5" draw:formula="?f1 +?f4 "/>
+            <draw:equation draw:name="f6" draw:formula="?f1 *?f0 /10800"/>
+            <draw:equation draw:name="f7" draw:formula="?f1 -?f6 "/>
+            <draw:handle draw:handle-position="$1 $0" 
+						  draw:handle-range-x-minimum="0" 
+						  draw:handle-range-x-maximum="10800" 
+						  draw:handle-range-y-minimum="0" 
+						  draw:handle-range-y-maximum="21600"/>
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!--LeftRight Arrow (Added by A.Mathi as on 3/07/2007) -->
+      <xsl:when test = "(p:spPr/a:prstGeom/@prst='leftRightArrow')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name ="grID" select ="$GraphicId" />
+            <xsl:with-param name ="prID" select ="$ParaId" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					  draw:text-areas="?f5 ?f1 ?f6 ?f3" 
+					  draw:type="left-right-arrow" 
+					  draw:modifiers="4300 5400" 
+					  draw:enhanced-path="M 0 10800 L ?f0 0 ?f0 ?f1 ?f2 ?f1 ?f2 0 21600 10800 ?f2 21600 ?f2 ?f3 ?f0 ?f3 ?f0 21600 Z N">
+            <draw:equation draw:name="f0" draw:formula="$0 "/>
+            <draw:equation draw:name="f1" draw:formula="$1 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$0 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f4" draw:formula="10800-$1 "/>
+            <draw:equation draw:name="f5" draw:formula="$0 *?f4 /10800"/>
+            <draw:equation draw:name="f6" draw:formula="21600-?f5 "/>
+            <draw:equation draw:name="f7" draw:formula="10800-$0 "/>
+            <draw:equation draw:name="f8" draw:formula="$1 *?f7 /10800"/>
+            <draw:equation draw:name="f9" draw:formula="21600-?f8 "/>
+            <draw:handle draw:handle-position="$0 $1" 
+						  draw:handle-range-x-minimum="0" 
+						  draw:handle-range-x-maximum="10800" 
+						  draw:handle-range-y-minimum="0" 
+						  draw:handle-range-y-maximum="10800"/>
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- UpDown Arrow (Added by A.Mathi as on 4/07/2007) -->
+      <xsl:when test = "(p:spPr/a:prstGeom/@prst='upDownArrow')" >
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name ="grID" select ="$GraphicId" />
+            <xsl:with-param name ="prID" select ="$ParaId" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name ="SlideRelationId" select ="$SlideRelationId" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+					  draw:text-areas="?f0 ?f8 ?f2 ?f9" 
+					  draw:type="up-down-arrow" 
+					  draw:modifiers="5400 4300" 
+					  draw:enhanced-path="M 0 ?f1 L 10800 0 21600 ?f1 ?f2 ?f1 ?f2 ?f3 21600 ?f3 10800 21600 0 ?f3 ?f0 ?f3 ?f0 ?f1 Z N">
+            <draw:equation draw:name="f0" draw:formula="$0 "/>
+            <draw:equation draw:name="f1" draw:formula="$1 "/>
+            <draw:equation draw:name="f2" draw:formula="21600-$0 "/>
+            <draw:equation draw:name="f3" draw:formula="21600-$1 "/>
+            <draw:equation draw:name="f4" draw:formula="10800-$1 "/>
+            <draw:equation draw:name="f5" draw:formula="$0 *?f4 /10800"/>
+            <draw:equation draw:name="f6" draw:formula="21600-?f5 "/>
+            <draw:equation draw:name="f7" draw:formula="10800-$0 "/>
+            <draw:equation draw:name="f8" draw:formula="$1 *?f7 /10800"/>
+            <draw:equation draw:name="f9" draw:formula="21600-?f8 "/>
+            <draw:handle draw:handle-position="$0 $1" 
+						  draw:handle-range-x-minimum="0" 
+						  draw:handle-range-x-maximum="10800" 
+						  draw:handle-range-y-minimum="0" 
+						  draw:handle-range-y-maximum="10800"/>
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes"/>
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Isosceles Triangle -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='triangle')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+            <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+            <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
+            <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 						draw:glue-points="10800 0 ?f1 10800 0 21600 10800 21600 21600 21600 ?f7 10800" 
 						draw:text-areas="?f1 10800 ?f2 18000 ?f3 7200 ?f4 21600" 
 						draw:type="isosceles-triangle" draw:modifiers="10800" 
 						draw:enhanced-path="M ?f0 0 L 21600 21600 0 21600 Z N">
-						<draw:equation draw:name="f0" draw:formula="$0 "/>
-						<draw:equation draw:name="f1" draw:formula="$0 /2"/>
-						<draw:equation draw:name="f2" draw:formula="?f1 +10800"/>
-						<draw:equation draw:name="f3" draw:formula="$0 *2/3"/>
-						<draw:equation draw:name="f4" draw:formula="?f3 +7200"/>
-						<draw:equation draw:name="f5" draw:formula="21600-?f0 "/>
-						<draw:equation draw:name="f6" draw:formula="?f5 /2"/>
-						<draw:equation draw:name="f7" draw:formula="21600-?f6 "/>
-						<draw:handle draw:handle-position="$0 top" 
+            <draw:equation draw:name="f0" draw:formula="$0 "/>
+            <draw:equation draw:name="f1" draw:formula="$0 /2"/>
+            <draw:equation draw:name="f2" draw:formula="?f1 +10800"/>
+            <draw:equation draw:name="f3" draw:formula="$0 *2/3"/>
+            <draw:equation draw:name="f4" draw:formula="?f3 +7200"/>
+            <draw:equation draw:name="f5" draw:formula="21600-?f0 "/>
+            <draw:equation draw:name="f6" draw:formula="?f5 /2"/>
+            <draw:equation draw:name="f7" draw:formula="21600-?f6 "/>
+            <draw:handle draw:handle-position="$0 top" 
 									 draw:handle-range-x-minimum="0" 
 									 draw:handle-range-x-maximum="21600"/>
-					</draw:enhanced-geometry>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Right Triangle -->
-			<xsl:when test ="(p:spPr/a:prstGeom/@prst='rtTriangle')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Right Triangle -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='rtTriangle')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 											draw:glue-points="10800 0 5400 10800 0 21600 10800 21600 21600 21600 16200 10800" 
 											draw:text-areas="1900 12700 12700 19700" 
 											draw:type="right-triangle" 
 											draw:enhanced-path="M 0 0 L 21600 21600 0 21600 0 0 Z N"/>
           <xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Parallelogram -->
-			<xsl:when test ="(p:spPr/a:prstGeom/@prst='parallelogram')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Parallelogram -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='parallelogram')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 						draw:glue-points="?f6 0 10800 ?f8 ?f11 10800 ?f9 21600 10800 ?f10 ?f5 10800" 
 						draw:text-areas="?f3 ?f3 ?f4 ?f4" draw:type="parallelogram" 
 						draw:modifiers="5400" draw:enhanced-path="M ?f0 0 L 21600 0 ?f1 21600 0 21600 Z N">
-						<draw:equation draw:name="f0" draw:formula="$0 "/>
-						<draw:equation draw:name="f1" draw:formula="21600-$0 "/>
-						<draw:equation draw:name="f2" draw:formula="$0 *10/24"/>
-						<draw:equation draw:name="f3" draw:formula="?f2 +1750"/>
-						<draw:equation draw:name="f4" draw:formula="21600-?f3 "/>
-						<draw:equation draw:name="f5" draw:formula="?f0 /2"/>
-						<draw:equation draw:name="f6" draw:formula="10800+?f5 "/>
-						<draw:equation draw:name="f7" draw:formula="?f0 -10800"/>
-						<draw:equation draw:name="f8" draw:formula="if(?f7 ,?f13 ,0)"/>
-						<draw:equation draw:name="f9" draw:formula="10800-?f5 "/>
-						<draw:equation draw:name="f10" draw:formula="if(?f7 ,?f12 ,21600)"/>
-						<draw:equation draw:name="f11" draw:formula="21600-?f5 "/>
-						<draw:equation draw:name="f12" draw:formula="21600*10800/?f0 "/>
-						<draw:equation draw:name="f13" draw:formula="21600-?f12 "/>
-						<draw:handle draw:handle-position="$0 top" 
+            <draw:equation draw:name="f0" draw:formula="$0 "/>
+            <draw:equation draw:name="f1" draw:formula="21600-$0 "/>
+            <draw:equation draw:name="f2" draw:formula="$0 *10/24"/>
+            <draw:equation draw:name="f3" draw:formula="?f2 +1750"/>
+            <draw:equation draw:name="f4" draw:formula="21600-?f3 "/>
+            <draw:equation draw:name="f5" draw:formula="?f0 /2"/>
+            <draw:equation draw:name="f6" draw:formula="10800+?f5 "/>
+            <draw:equation draw:name="f7" draw:formula="?f0 -10800"/>
+            <draw:equation draw:name="f8" draw:formula="if(?f7 ,?f13 ,0)"/>
+            <draw:equation draw:name="f9" draw:formula="10800-?f5 "/>
+            <draw:equation draw:name="f10" draw:formula="if(?f7 ,?f12 ,21600)"/>
+            <draw:equation draw:name="f11" draw:formula="21600-?f5 "/>
+            <draw:equation draw:name="f12" draw:formula="21600*10800/?f0 "/>
+            <draw:equation draw:name="f13" draw:formula="21600-?f12 "/>
+            <draw:handle draw:handle-position="$0 top" 
 									 draw:handle-range-x-minimum="0" 
 									 draw:handle-range-x-maximum="21600"/>
-					</draw:enhanced-geometry>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Trapezoid -->
-			<xsl:when test ="(p:spPr/a:prstGeom/@prst='trapezoid')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Trapezoid -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='trapezoid')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 914400 914400" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 914400 914400" 
 											draw:extrusion-allowed="true" 
 											draw:text-areas="152400 152400 762000 914400" 
 											draw:glue-points="457200 0 114300 457200 457200 914400 800100 457200" 
 											draw:type="mso-spt100" 
 											draw:enhanced-path="M 0 914400 L 228600 0 L 685800 0 L 914400 914400 Z N">
-						<draw:handle/>
-					</draw:enhanced-geometry>
+            <draw:handle/>
+          </draw:enhanced-geometry>
           <xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Diamond   -->
-			<xsl:when test ="(p:spPr/a:prstGeom/@prst='diamond')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Diamond   -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='diamond')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 											draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" 
 											draw:text-areas="5400 5400 16200 16200" 
 											draw:type="diamond" 
 											draw:enhanced-path="M 10800 0 L 21600 10800 10800 21600 0 10800 10800 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-				
-			</xsl:when>
-			<!-- Regular Pentagon -->
-			<xsl:when test ="(p:spPr/a:prstGeom/@prst='pentagon')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+
+      </xsl:when>
+      <!-- Regular Pentagon -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='pentagon')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 											draw:glue-points="10800 0 0 8260 4230 21600 10800 21600 17370 21600 21600 8260" 
 											draw:text-areas="4230 5080 17370 21600" 
 											draw:type="pentagon" 
 											draw:enhanced-path="M 10800 0 L 0 8260 4230 21600 17370 21600 21600 8260 10800 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Hexagon -->
-			<xsl:when test ="(p:spPr/a:prstGeom/@prst='hexagon')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Hexagon -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='hexagon')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 											draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" 
 											draw:text-areas="?f3 ?f3 ?f4 ?f4" draw:type="hexagon" 
 											draw:modifiers="5400" 
 											draw:enhanced-path="M ?f0 0 L ?f1 0 21600 10800 ?f1 21600 ?f0 21600 0 10800 Z N">
-											<draw:equation draw:name="f0" draw:formula="$0 "/>
-											<draw:equation draw:name="f1" draw:formula="21600-$0 "/>
-											<draw:equation draw:name="f2" draw:formula="$0 *100/234"/>
-											<draw:equation draw:name="f3" draw:formula="?f2 +1700"/>
-											<draw:equation draw:name="f4" draw:formula="21600-?f3 "/>
-											<draw:handle draw:handle-position="$0 top" 
-														 draw:handle-range-x-minimum="0" 
-														 draw:handle-range-x-maximum="10800"/>
-					</draw:enhanced-geometry>
-					 <xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Octagon -->
-			<xsl:when test ="(p:spPr/a:prstGeom/@prst='octagon')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+            <draw:equation draw:name="f0" draw:formula="$0 "/>
+            <draw:equation draw:name="f1" draw:formula="21600-$0 "/>
+            <draw:equation draw:name="f2" draw:formula="$0 *100/234"/>
+            <draw:equation draw:name="f3" draw:formula="?f2 +1700"/>
+            <draw:equation draw:name="f4" draw:formula="21600-?f3 "/>
+            <draw:handle draw:handle-position="$0 top" 
+                   draw:handle-range-x-minimum="0" 
+                   draw:handle-range-x-maximum="10800"/>
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Octagon -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='octagon')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -720,44 +914,44 @@ Copyright (c) 2007, Sonata Software Limited
       <xsl:when test ="(p:spPr/a:prstGeom/@prst='cube')">
         <draw:custom-shape draw:layer="layout" >
           <xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 						draw:glue-points="?f7 0 ?f6 ?f1 0 ?f10 ?f6 21600 ?f4 ?f10 21600 ?f9" 
 						draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" 
 						draw:text-areas="0 ?f1 ?f4 ?f12" draw:type="cube" draw:modifiers="5400" 
 						draw:enhanced-path="M 0 ?f12 L 0 ?f1 ?f2 0 ?f11 0 ?f11 ?f3 ?f4 ?f12 Z N M 0 ?f1 L ?f2 0 ?f11 0 ?f4 ?f1 Z N M ?f4 ?f12 L ?f4 ?f1 ?f11 0 ?f11 ?f3 Z N">
-						<draw:equation draw:name="f0" draw:formula="$0 "/>
-						<draw:equation draw:name="f1" draw:formula="top+?f0 "/>
-						<draw:equation draw:name="f2" draw:formula="left+?f0 "/>
-						<draw:equation draw:name="f3" draw:formula="bottom-?f0 "/>
-						<draw:equation draw:name="f4" draw:formula="right-?f0 "/>
-						<draw:equation draw:name="f5" draw:formula="right-?f2 "/>
-						<draw:equation draw:name="f6" draw:formula="?f5 /2"/>
-						<draw:equation draw:name="f7" draw:formula="?f2 +?f6 "/>
-						<draw:equation draw:name="f8" draw:formula="bottom-?f1 "/>
-						<draw:equation draw:name="f9" draw:formula="?f8 /2"/>
-						<draw:equation draw:name="f10" draw:formula="?f1 +?f9 "/>
-						<draw:equation draw:name="f11" draw:formula="right"/>
-						<draw:equation draw:name="f12" draw:formula="bottom"/>
-						<draw:handle draw:handle-position="left $0" 
+            <draw:equation draw:name="f0" draw:formula="$0 "/>
+            <draw:equation draw:name="f1" draw:formula="top+?f0 "/>
+            <draw:equation draw:name="f2" draw:formula="left+?f0 "/>
+            <draw:equation draw:name="f3" draw:formula="bottom-?f0 "/>
+            <draw:equation draw:name="f4" draw:formula="right-?f0 "/>
+            <draw:equation draw:name="f5" draw:formula="right-?f2 "/>
+            <draw:equation draw:name="f6" draw:formula="?f5 /2"/>
+            <draw:equation draw:name="f7" draw:formula="?f2 +?f6 "/>
+            <draw:equation draw:name="f8" draw:formula="bottom-?f1 "/>
+            <draw:equation draw:name="f9" draw:formula="?f8 /2"/>
+            <draw:equation draw:name="f10" draw:formula="?f1 +?f9 "/>
+            <draw:equation draw:name="f11" draw:formula="right"/>
+            <draw:equation draw:name="f12" draw:formula="bottom"/>
+            <draw:handle draw:handle-position="left $0" 
 									 draw:handle-switched="true" 
 									 draw:handle-range-y-minimum="0" 
 									 draw:handle-range-y-maximum="21600"/>
-					</draw:enhanced-geometry>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Can -->
-			<xsl:when test ="(p:spPr/a:prstGeom/@prst='can')">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Can -->
+      <xsl:when test ="(p:spPr/a:prstGeom/@prst='can')">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -790,92 +984,92 @@ Copyright (c) 2007, Sonata Software Limited
                 <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
                 <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
                 <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-							</xsl:call-template>
-							<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+              </xsl:call-template>
+              <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 													draw:type="mso-spt202" 
 													draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-							<xsl:copy-of select="$varHyperLinksForShapes" />
-						</draw:custom-shape>
-					</xsl:when>
-					<xsl:otherwise>
-						<draw:frame draw:layer="layout">
-							<xsl:call-template name ="CreateShape">
-								<xsl:with-param name="grID" select ="$GraphicId"/>
-								<xsl:with-param name ="prID" select="$ParaId" />
+              <xsl:copy-of select="$varHyperLinksForShapes" />
+            </draw:custom-shape>
+          </xsl:when>
+          <xsl:otherwise>
+            <draw:frame draw:layer="layout">
+              <xsl:call-template name ="CreateShape">
+                <xsl:with-param name="grID" select ="$GraphicId"/>
+                <xsl:with-param name ="prID" select="$ParaId" />
                 <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
                 <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
                 <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-							</xsl:call-template>
-							<xsl:copy-of select="$varHyperLinksForShapes" />
-						</draw:frame>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:when>
-			
-			<!-- Basic shapes end-->
+              </xsl:call-template>
+              <xsl:copy-of select="$varHyperLinksForShapes" />
+            </draw:frame>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
 
-			<!-- Connectors -->
-			<!-- Line -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst = 'line'">
-				<draw:line draw:layer="layout">
-					<xsl:call-template name ="DrawLine">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-					</xsl:call-template>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:line>
-			</xsl:when>
-			<!-- Straight Connector-->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'straightConnector')]">
-				<draw:line draw:layer="layout">
-					<xsl:call-template name ="DrawLine">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-					</xsl:call-template>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:line >
-			</xsl:when>
-			<!-- Elbow Connector-->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'bentConnector')]">
-				<draw:connector draw:layer="layout">
-					<xsl:call-template name ="DrawLine">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-					</xsl:call-template>
-					<xsl:copy-of select="$varHyperLinksForConnectors" />
-				</draw:connector >
-			</xsl:when>
-			<!--Curved Connector-->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'curvedConnector')]">
-				<draw:connector draw:layer="layout" draw:type="curve">
-					<xsl:call-template name ="DrawLine">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-					</xsl:call-template>
-					<xsl:copy-of select="$varHyperLinksForConnectors" />
-				</draw:connector >
-			</xsl:when>
-			
-			<!-- Custom shapes: -->
-		 			 
-			<!--Rectangle -->
-			<xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle Custom')]">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+      <!-- Basic shapes end-->
+
+      <!-- Connectors -->
+      <!-- Line -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst = 'line'">
+        <draw:line draw:layer="layout">
+          <xsl:call-template name ="DrawLine">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+          </xsl:call-template>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:line>
+      </xsl:when>
+      <!-- Straight Connector-->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'straightConnector')]">
+        <draw:line draw:layer="layout">
+          <xsl:call-template name ="DrawLine">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+          </xsl:call-template>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:line >
+      </xsl:when>
+      <!-- Elbow Connector-->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'bentConnector')]">
+        <draw:connector draw:layer="layout">
+          <xsl:call-template name ="DrawLine">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+          </xsl:call-template>
+          <xsl:copy-of select="$varHyperLinksForConnectors" />
+        </draw:connector >
+      </xsl:when>
+      <!--Curved Connector-->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst[contains(., 'curvedConnector')]">
+        <draw:connector draw:layer="layout" draw:type="curve">
+          <xsl:call-template name ="DrawLine">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+          </xsl:call-template>
+          <xsl:copy-of select="$varHyperLinksForConnectors" />
+        </draw:connector >
+      </xsl:when>
+
+      <!-- Custom shapes: -->
+
+      <!--Rectangle -->
+      <xsl:when test ="p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle Custom')]">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 										 draw:type="rectangle" 
 										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Rounded  Rectangle -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='roundRect'">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Rounded  Rectangle -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='roundRect'">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -912,31 +1106,31 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 						draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" 
 						draw:text-areas="0 4300 21600 21600" 
 						draw:mirror-horizontal="true" draw:type="flowchart-card" 
 						draw:enhanced-path="M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Snip Same Side Corner Rectangle -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='snip2SameRect'">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Snip Same Side Corner Rectangle -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='snip2SameRect'">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 										 draw:type="rectangle" 
 										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-				<!--<draw:custom-shape draw:layer="layout" >
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+        <!--<draw:custom-shape draw:layer="layout" >
 					<xsl:call-template name ="CreateShape">
 						<xsl:with-param name="grID" select ="$GraphicId"/>
 						<xsl:with-param name ="prID" select="$ParaId" />
@@ -951,23 +1145,23 @@ Copyright (c) 2007, Sonata Software Limited
 					</draw:enhanced-geometry>
 					<xsl:copy-of select="$varHyperLinksForShapes" />
 				</draw:custom-shape>-->
-			</xsl:when>
-			<!-- Snip Diagonal Corner Rectangle -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='snip2DiagRect'">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+      </xsl:when>
+      <!-- Snip Diagonal Corner Rectangle -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='snip2DiagRect'">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 										 draw:type="rectangle" 
 										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-				<!--<draw:custom-shape draw:layer="layout" >
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+        <!--<draw:custom-shape draw:layer="layout" >
 					<xsl:call-template name ="CreateShape">
 						<xsl:with-param name="grID" select ="$GraphicId"/>
 						<xsl:with-param name ="prID" select="$ParaId" />
@@ -982,11 +1176,11 @@ Copyright (c) 2007, Sonata Software Limited
 					</draw:enhanced-geometry>
 					<xsl:copy-of select="$varHyperLinksForShapes" />
 				</draw:custom-shape>-->
-			</xsl:when>
-			<!-- Snip and Round Single Corner Rectangle -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='snipRoundRect'">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
+      </xsl:when>
+      <!-- Snip and Round Single Corner Rectangle -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='snipRoundRect'">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1023,13 +1217,13 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 										 draw:type="rectangle" 
 										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-				<!--<draw:custom-shape draw:layer="layout" >
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+        <!--<draw:custom-shape draw:layer="layout" >
 					<xsl:call-template name ="CreateShape">
 						<xsl:with-param name="grID" select ="$GraphicId"/>
 						<xsl:with-param name ="prID" select="$ParaId" />
@@ -1044,23 +1238,23 @@ Copyright (c) 2007, Sonata Software Limited
 					</draw:enhanced-geometry>
 					<xsl:copy-of select="$varHyperLinksForShapes" />
 				</draw:custom-shape>-->
-			</xsl:when>
-			<!-- Round Same Side Corner Rectangle -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='round2SameRect'">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+      </xsl:when>
+      <!-- Round Same Side Corner Rectangle -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='round2SameRect'">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" 
 										 draw:type="rectangle" 
 										 draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-				<!--<draw:custom-shape draw:layer="layout" >
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+        <!--<draw:custom-shape draw:layer="layout" >
 					<xsl:call-template name ="CreateShape">
 						<xsl:with-param name="grID" select ="$GraphicId"/>
 						<xsl:with-param name ="prID" select="$ParaId" />
@@ -1075,13 +1269,13 @@ Copyright (c) 2007, Sonata Software Limited
 					</draw:enhanced-geometry>
 					<xsl:copy-of select="$varHyperLinksForShapes" />
 				</draw:custom-shape>-->
-			</xsl:when>
-			<!-- Round Diagonal Corner Rectangle -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='round2DiagRect'">
-				<draw:custom-shape draw:layer="layout" >
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
+      </xsl:when>
+      <!-- Round Diagonal Corner Rectangle -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='round2DiagRect'">
+        <draw:custom-shape draw:layer="layout" >
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
@@ -1119,438 +1313,490 @@ Copyright (c) 2007, Sonata Software Limited
             <!-- Extra parameter inserted by Vijayeta,For Bullets and numbering-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
             <!--End of definition of Extra parameter inserted by Vijayeta,For Bullets and numbering-->
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:type="flowchart-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- Flowchart: Alternate Process -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartAlternateProcess'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
-					<draw:equation draw:name="f0" draw:formula="45"/>
-					<draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
-					<draw:equation draw:name="f2" draw:formula="?f1 *3163/7636"/>
-					<draw:equation draw:name="f3" draw:formula="left+?f2 "/>
-					<draw:equation draw:name="f4" draw:formula="top+?f2 "/>
-					<draw:equation draw:name="f5" draw:formula="right-?f2 "/>
-					<draw:equation draw:name="f6" draw:formula="bottom-?f2 "/>
-					<draw:equation draw:name="f7" draw:formula="left+$0 "/>
-					<draw:equation draw:name="f8" draw:formula="top+$0 "/>
-					<draw:equation draw:name="f9" draw:formula="bottom-$0 "/>
-					<draw:equation draw:name="f10" draw:formula="right-$0 "/>
-					<draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
-				</draw:enhanced-geometry>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Decision -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDecision'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-decision" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 0 10800 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Data -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartInputOutput'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="12960 0 10800 0 2160 10800 8600 21600 10800 21600 19400 10800" draw:text-areas="4230 0 17370 21600" draw:type="flowchart-data" draw:enhanced-path="M 4230 0 L 21600 0 17370 21600 0 21600 4230 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Predefined Process-->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPredefinedProcess'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="2540 0 19060 21600" draw:type="flowchart-predefined-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 2540 0 L 2540 21600 N M 19060 0 L 19060 21600 N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Internal Storage -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartInternalStorage'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="4230 4230 21600 21600" draw:type="flowchart-internal-storage" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 4230 0 L 4230 21600 N M 0 4230 L 21600 4230 N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Document -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDocument'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 20320 21600 10800" draw:text-areas="0 0 21600 17360" draw:type="flowchart-document" draw:enhanced-path="M 0 0 L 21600 0 21600 17360 C 13050 17220 13340 20770 5620 21600 2860 21100 1850 20700 0 20120 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Multi document -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMultidocument'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 19890 21600 10800" draw:text-areas="0 3600 18600 18009" draw:type="flowchart-multidocument" draw:enhanced-path="M 0 3600 L 1500 3600 1500 1800 3000 1800 3000 0 21600 0 21600 14409 20100 14409 20100 16209 18600 16209 18600 18009 C 11610 17893 11472 20839 4833 21528 2450 21113 1591 20781 0 20300 Z N M 1500 3600 F L 18600 3600 18600 16209 N M 3000 1800 F L 20100 1800 20100 14409 N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Terminator -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartTerminator'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="1060 3180 20540 18420" draw:type="flowchart-terminator" draw:enhanced-path="M 3470 21600 X 0 10800 3470 0 L 18130 0 X 21600 10800 18130 21600 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Preparation -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPreparation'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-preparation" draw:enhanced-path="M 4350 0 L 17250 0 21600 10800 17250 21600 4350 21600 0 10800 4350 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Manual Input -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualInput'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2150 0 10800 10800 19890 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-manual-input" draw:enhanced-path="M 0 4300 L 21600 0 21600 21600 0 21600 0 4300 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Manual Operation -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualOperation'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 2160 10800 10800 21600 19440 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-manual-operation" draw:enhanced-path="M 0 0 L 21600 0 17250 21600 4350 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Connector -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartConnector'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3180 3180 18420 18420" draw:type="flowchart-connector" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Off-page Connector -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOffpageConnector'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 0 21600 17150" draw:type="flowchart-off-page-connector" draw:enhanced-path="M 0 0 L 21600 0 21600 17150 10800 21600 0 17150 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Card -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPunchedCard'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-card" draw:enhanced-path="M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Punched Tape -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPunchedTape'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2020 0 10800 10800 19320 21600 10800" draw:text-areas="0 4360 21600 17240" draw:type="flowchart-punched-tape" draw:enhanced-path="M 0 2230 C 820 3990 3410 3980 5370 4360 7430 4030 10110 3890 10690 2270 11440 300 14200 160 16150 0 18670 170 20690 390 21600 2230 L 21600 19420 C 20640 17510 18320 17490 16140 17240 14710 17370 11310 17510 10770 19430 10150 21150 7380 21290 5290 21600 3220 21250 610 21130 0 19420 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Summing Junction -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSummingJunction'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-summing-junction" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 3100 3100 L 18500 18500 N M 3100 18500 L 18500 3100 N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Or -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOr'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-or" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 0 10800 L 21600 10800 N M 10800 0 L 10800 21600 N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Collate -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartCollate'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 10800 10800 10800 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-collate" draw:enhanced-path="M 0 0 L 21600 21600 0 21600 21600 0 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Sort -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSort'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-					<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-sort" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 Z N M 0 10800 L 21600 10800 N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Extract -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartExtract'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 10800 16200 21600" draw:type="flowchart-extract" draw:enhanced-path="M 10800 0 L 21600 21600 0 21600 10800 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Merge-->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMerge'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 0 16200 10800" draw:type="flowchart-merge" draw:enhanced-path="M 0 0 L 21600 0 10800 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Stored Data -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOnlineStorage'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 18000 10800" draw:text-areas="3600 0 18000 21600" draw:type="flowchart-stored-data" draw:enhanced-path="M 3600 21600 X 0 10800 3600 0 L 21600 0 X 18000 10800 21600 21600 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Delay -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDelay'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 3100 18500 18500" draw:type="flowchart-delay" draw:enhanced-path="M 10800 0 X 21600 10800 10800 21600 L 0 21600 0 0 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Sequential Access Storage -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticTape'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-sequential-access" draw:enhanced-path="M 20980 18150 L 20980 21600 10670 21600 C 4770 21540 0 16720 0 10800 0 4840 4840 0 10800 0 16740 0 21600 4840 21600 10800 21600 13520 20550 16160 18670 18170 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Direct Access Storage -->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticDrum'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 14800 10800 21600 10800" draw:text-areas="3400 0 14800 21600" draw:type="flowchart-direct-access-storage" draw:enhanced-path="M 18200 0 X 21600 10800 18200 21600 L 3400 21600 X 0 10800 3400 0 Z N M 18200 0 X 14800 10800 18200 21600 N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Magnetic Disk-->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticDisk'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 6800 10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 6800 21600 18200" draw:type="flowchart-magnetic-disk" draw:enhanced-path="M 0 3400 Y 10800 0 21600 3400 L 21600 18200 Y 10800 21600 0 18200 Z N M 0 3400 Y 10800 6800 21600 3400 N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-			<!-- FlowChart: Display-->
-			<xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDisplay'">
-				<draw:custom-shape draw:layer="layout">
-					<xsl:call-template name ="CreateShape">
-						<xsl:with-param name="grID" select ="$GraphicId"/>
-						<xsl:with-param name ="prID" select="$ParaId" />
-					</xsl:call-template>
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3600 0 17800 21600" draw:type="flowchart-display" draw:enhanced-path="M 3600 0 L 17800 0 X 21600 10800 17800 21600 L 3600 21600 0 10800 Z N"/>
-					<xsl:copy-of select="$varHyperLinksForShapes" />
-				</draw:custom-shape>
-			</xsl:when>
-		 				 
-		</xsl:choose>
-	</xsl:template>
-	<!-- Draw Shape reading values from pptx p:spPr-->
-	<xsl:template name ="CreateShape">
-		<xsl:param name ="grID" />
-		<xsl:param name ="prID" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:type="flowchart-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- Flowchart: Alternate Process -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartAlternateProcess'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:path-stretchpoint-x="10800" draw:path-stretchpoint-y="10800" draw:text-areas="?f3 ?f4 ?f5 ?f6" draw:type="round-rectangle" draw:modifiers="3600" draw:enhanced-path="M ?f7 0 X 0 ?f8 L 0 ?f9 Y ?f7 21600 L ?f10 21600 X 21600 ?f9 L 21600 ?f8 Y ?f10 0 Z N">
+            <draw:equation draw:name="f0" draw:formula="45"/>
+            <draw:equation draw:name="f1" draw:formula="$0 *sin(?f0 *(pi/180))"/>
+            <draw:equation draw:name="f2" draw:formula="?f1 *3163/7636"/>
+            <draw:equation draw:name="f3" draw:formula="left+?f2 "/>
+            <draw:equation draw:name="f4" draw:formula="top+?f2 "/>
+            <draw:equation draw:name="f5" draw:formula="right-?f2 "/>
+            <draw:equation draw:name="f6" draw:formula="bottom-?f2 "/>
+            <draw:equation draw:name="f7" draw:formula="left+$0 "/>
+            <draw:equation draw:name="f8" draw:formula="top+$0 "/>
+            <draw:equation draw:name="f9" draw:formula="bottom-$0 "/>
+            <draw:equation draw:name="f10" draw:formula="right-$0 "/>
+            <draw:handle draw:handle-position="$0 top" draw:handle-switched="true" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="10800"/>
+          </draw:enhanced-geometry>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Decision -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDecision'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-decision" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 0 10800 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Data -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartInputOutput'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="12960 0 10800 0 2160 10800 8600 21600 10800 21600 19400 10800" draw:text-areas="4230 0 17370 21600" draw:type="flowchart-data" draw:enhanced-path="M 4230 0 L 21600 0 17370 21600 0 21600 4230 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Predefined Process-->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPredefinedProcess'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="2540 0 19060 21600" draw:type="flowchart-predefined-process" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 2540 0 L 2540 21600 N M 19060 0 L 19060 21600 N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Internal Storage -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartInternalStorage'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="4230 4230 21600 21600" draw:type="flowchart-internal-storage" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 Z N M 4230 0 L 4230 21600 N M 0 4230 L 21600 4230 N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Document -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDocument'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 20320 21600 10800" draw:text-areas="0 0 21600 17360" draw:type="flowchart-document" draw:enhanced-path="M 0 0 L 21600 0 21600 17360 C 13050 17220 13340 20770 5620 21600 2860 21100 1850 20700 0 20120 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Multi document -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMultidocument'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 19890 21600 10800" draw:text-areas="0 3600 18600 18009" draw:type="flowchart-multidocument" draw:enhanced-path="M 0 3600 L 1500 3600 1500 1800 3000 1800 3000 0 21600 0 21600 14409 20100 14409 20100 16209 18600 16209 18600 18009 C 11610 17893 11472 20839 4833 21528 2450 21113 1591 20781 0 20300 Z N M 1500 3600 F L 18600 3600 18600 16209 N M 3000 1800 F L 20100 1800 20100 14409 N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Terminator -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartTerminator'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="1060 3180 20540 18420" draw:type="flowchart-terminator" draw:enhanced-path="M 3470 21600 X 0 10800 3470 0 L 18130 0 X 21600 10800 18130 21600 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Preparation -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPreparation'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-preparation" draw:enhanced-path="M 4350 0 L 17250 0 21600 10800 17250 21600 4350 21600 0 10800 4350 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Manual Input -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualInput'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2150 0 10800 10800 19890 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-manual-input" draw:enhanced-path="M 0 4300 L 21600 0 21600 21600 0 21600 0 4300 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Manual Operation -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartManualOperation'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 2160 10800 10800 21600 19440 10800" draw:text-areas="4350 0 17250 21600" draw:type="flowchart-manual-operation" draw:enhanced-path="M 0 0 L 21600 0 17250 21600 4350 21600 0 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Connector -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartConnector'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3180 3180 18420 18420" draw:type="flowchart-connector" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Off-page Connector -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOffpageConnector'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 0 21600 17150" draw:type="flowchart-off-page-connector" draw:enhanced-path="M 0 0 L 21600 0 21600 17150 10800 21600 0 17150 0 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Card -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPunchedCard'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 4300 21600 21600" draw:type="flowchart-card" draw:enhanced-path="M 4300 0 L 21600 0 21600 21600 0 21600 0 4300 4300 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Punched Tape -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartPunchedTape'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 2020 0 10800 10800 19320 21600 10800" draw:text-areas="0 4360 21600 17240" draw:type="flowchart-punched-tape" draw:enhanced-path="M 0 2230 C 820 3990 3410 3980 5370 4360 7430 4030 10110 3890 10690 2270 11440 300 14200 160 16150 0 18670 170 20690 390 21600 2230 L 21600 19420 C 20640 17510 18320 17490 16140 17240 14710 17370 11310 17510 10770 19430 10150 21150 7380 21290 5290 21600 3220 21250 610 21130 0 19420 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Summing Junction -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSummingJunction'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-summing-junction" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 3100 3100 L 18500 18500 N M 3100 18500 L 18500 3100 N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Or -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOr'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3160 3160 0 10800 3160 18440 10800 21600 18440 18440 21600 10800 18440 3160" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-or" draw:enhanced-path="U 10800 10800 10800 10800 0 23592960 Z N M 0 10800 L 21600 10800 N M 10800 0 L 10800 21600 N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Collate -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartCollate'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 10800 10800 10800 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-collate" draw:enhanced-path="M 0 0 L 21600 21600 0 21600 21600 0 0 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Sort -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartSort'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:text-areas="5400 5400 16200 16200" draw:type="flowchart-sort" draw:enhanced-path="M 0 10800 L 10800 0 21600 10800 10800 21600 Z N M 0 10800 L 21600 10800 N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Extract -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartExtract'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 10800 16200 21600" draw:type="flowchart-extract" draw:enhanced-path="M 10800 0 L 21600 21600 0 21600 10800 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Merge-->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMerge'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 5400 10800 10800 21600 16200 10800" draw:text-areas="5400 0 16200 10800" draw:type="flowchart-merge" draw:enhanced-path="M 0 0 L 21600 0 10800 21600 0 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Stored Data -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartOnlineStorage'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 18000 10800" draw:text-areas="3600 0 18000 21600" draw:type="flowchart-stored-data" draw:enhanced-path="M 3600 21600 X 0 10800 3600 0 L 21600 0 X 18000 10800 21600 21600 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Delay -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDelay'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 3100 18500 18500" draw:type="flowchart-delay" draw:enhanced-path="M 10800 0 X 21600 10800 10800 21600 L 0 21600 0 0 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Sequential Access Storage -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticTape'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3100 3100 18500 18500" draw:type="flowchart-sequential-access" draw:enhanced-path="M 20980 18150 L 20980 21600 10670 21600 C 4770 21540 0 16720 0 10800 0 4840 4840 0 10800 0 16740 0 21600 4840 21600 10800 21600 13520 20550 16160 18670 18170 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Direct Access Storage -->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticDrum'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 14800 10800 21600 10800" draw:text-areas="3400 0 14800 21600" draw:type="flowchart-direct-access-storage" draw:enhanced-path="M 18200 0 X 21600 10800 18200 21600 L 3400 21600 X 0 10800 3400 0 Z N M 18200 0 X 14800 10800 18200 21600 N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Magnetic Disk-->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartMagneticDisk'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 6800 10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="0 6800 21600 18200" draw:type="flowchart-magnetic-disk" draw:enhanced-path="M 0 3400 Y 10800 0 21600 3400 L 21600 18200 Y 10800 21600 0 18200 Z N M 0 3400 Y 10800 6800 21600 3400 N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+      <!-- FlowChart: Display-->
+      <xsl:when test ="p:spPr/a:prstGeom/@prst='flowChartDisplay'">
+        <draw:custom-shape draw:layer="layout">
+          <xsl:call-template name ="CreateShape">
+            <xsl:with-param name="grID" select ="$GraphicId"/>
+            <xsl:with-param name ="prID" select="$ParaId" />
+          </xsl:call-template>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 0 10800 10800 21600 21600 10800" draw:text-areas="3600 0 17800 21600" draw:type="flowchart-display" draw:enhanced-path="M 3600 0 L 17800 0 X 21600 10800 17800 21600 L 3600 21600 0 10800 Z N"/>
+          <xsl:copy-of select="$varHyperLinksForShapes" />
+        </draw:custom-shape>
+      </xsl:when>
+
+    </xsl:choose>
+  </xsl:template>
+  <!-- Draw Shape reading values from pptx p:spPr-->
+  <xsl:template name ="CreateShape">
+    <xsl:param name ="grID" />
+    <xsl:param name ="prID" />
     <!-- Addition of a parameter,by Vijayets ,for bullets and numbering in shapes-->
     <xsl:param name="SlideRelationId"/>
 
-		<xsl:attribute name ="draw:style-name">
-			<xsl:value-of select ="$grID"/>
-		</xsl:attribute>
-		<xsl:attribute name ="draw:text-style-name">
-			<xsl:value-of select ="$prID"/>
-		</xsl:attribute>
+    <xsl:attribute name ="draw:style-name">
+      <xsl:value-of select ="$grID"/>
+    </xsl:attribute>
+    <xsl:attribute name ="draw:text-style-name">
+      <xsl:value-of select ="$prID"/>
+    </xsl:attribute>
 
-		<xsl:for-each select ="p:spPr/a:xfrm">
-			<xsl:attribute name ="svg:width">
-				<xsl:call-template name="ConvertEmu">
-					<xsl:with-param name="length" select="a:ext/@cx"/>
-					<xsl:with-param name="unit">cm</xsl:with-param>
-				</xsl:call-template>
-			</xsl:attribute>
+    <!-- For the Grouping of Shapes Bug Fixing -->
+    <xsl:choose>
+      <xsl:when test ="parent::node()/p:grpSpPr/a:xfrm">
+        <xsl:for-each select ="p:spPr/a:xfrm">
+          <xsl:attribute name ="svg:width">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="((parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:ext/@cx - 
+											parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:chExt/@cx)
+											+ a:ext/@cx)"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
 
-			<xsl:attribute name ="svg:height">
-				<xsl:call-template name="ConvertEmu">
-					<xsl:with-param name="length" select="a:ext/@cy"/>
-					<xsl:with-param name="unit">cm</xsl:with-param>
-				</xsl:call-template>
-			</xsl:attribute>
+          <xsl:attribute name ="svg:height">
+            <xsl:call-template name="ConvertEmu">
+              <!--<xsl:with-param name="length" select="(($aExtcy) + ($aExtSpcy))"/>-->
+              <xsl:with-param name="length" select="((parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:ext/@cy - 
+											parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:chExt/@cy)
+											+ a:ext/@cy)"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
 
-			<xsl:attribute name ="svg:x">
-				<xsl:call-template name="ConvertEmu">
-					<xsl:with-param name="length" select="a:off/@x"/>
-					<xsl:with-param name="unit">cm</xsl:with-param>
-				</xsl:call-template>
-			</xsl:attribute>
+          <xsl:attribute name ="svg:x">
+            <xsl:call-template name="ConvertEmu">
+              <!--<xsl:with-param name="length" select="(($aOffx) + ($aOffSpx))"/>-->
+              <xsl:with-param name="length" select="((parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:off/@x - 
+											parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:chOff/@x)
+											+ a:off/@x)"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
 
-			<xsl:attribute name ="svg:y">
-				<xsl:call-template name="ConvertEmu">
-					<xsl:with-param name="length" select="a:off/@y"/>
-					<xsl:with-param name="unit">cm</xsl:with-param>
-				</xsl:call-template>
-			</xsl:attribute>
-		</xsl:for-each>
-		<xsl:choose>
-			<xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox Custom')])">
-				<draw:text-box>
-					<xsl:call-template name ="AddShapeText">
-						<xsl:with-param name ="prID" select ="$prID" />
+          <xsl:attribute name ="svg:y">
+            <xsl:call-template name="ConvertEmu">
+              <!--<xsl:with-param name="length" select="(($aOffy) + ($aOffSpy))"/>-->
+              <xsl:with-param name="length" select="((parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:off/@y - 
+											parent::node()/parent::node()/parent::node()/p:grpSpPr/a:xfrm/a:chOff/@y)
+											+ a:off/@y)"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- End of code for Grouping of shapes Bug -->
+
+        <!--<xsl:when test ="p:spPr/a:xfrm">-->
+        <xsl:for-each select ="p:spPr/a:xfrm">
+          <xsl:attribute name ="svg:width">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="a:ext/@cx"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+
+          <xsl:attribute name ="svg:height">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="a:ext/@cy"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+
+          <xsl:attribute name ="svg:x">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="a:off/@x"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+
+          <xsl:attribute name ="svg:y">
+            <xsl:call-template name="ConvertEmu">
+              <xsl:with-param name="length" select="a:off/@y"/>
+              <xsl:with-param name="unit">cm</xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:for-each>
+        <!--</xsl:when>-->
+      </xsl:otherwise>
+    </xsl:choose>
+
+    <xsl:choose>
+      <xsl:when test ="(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')]) and not(p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox Custom')])">
+        <draw:text-box>
+          <xsl:call-template name ="AddShapeText">
+            <xsl:with-param name ="prID" select ="$prID" />
             <!-- Addition of a parameter,by vijayeta,for bullets and numbering in shapes-->
             <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-					</xsl:call-template> 
-				</draw:text-box>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:call-template name ="AddShapeText">
-					<xsl:with-param name ="prID" select ="$prID" />
+          </xsl:call-template>
+        </draw:text-box>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name ="AddShapeText">
+          <xsl:with-param name ="prID" select ="$prID" />
           <!-- Addition of a parameter,by vijayeta,for bullets and numbering in shapes-->
           <xsl:with-param name="SlideRelationId" select ="$SlideRelationId" />
-				</xsl:call-template>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-	<!-- Draw line -->
-	<xsl:template name ="DrawLine">
-		<xsl:param name ="grID" />
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <!-- Draw line -->
+  <xsl:template name ="DrawLine">
+    <xsl:param name ="grID" />
 
-		<xsl:attribute name ="draw:style-name">
-			<xsl:value-of select ="$grID"/>
-		</xsl:attribute>
+    <xsl:attribute name ="draw:style-name">
+      <xsl:value-of select ="$grID"/>
+    </xsl:attribute>
 
-		<xsl:for-each select ="p:spPr/a:xfrm">
-			<xsl:variable name ="xCenter">
-				<xsl:value-of select ="a:off/@x + (a:ext/@cx div 2)"/>
-			</xsl:variable>
-			<xsl:variable name ="yCenter">
-				<xsl:value-of select ="a:off/@y + (a:ext/@cy div 2)"/>
-			</xsl:variable>
-			<xsl:variable name ="angle">
-				<xsl:if test ="not(@rot)">
-					<xsl:value-of select="0" />
-				</xsl:if>
-				<xsl:if test ="@rot">
-					<xsl:value-of select ="(@rot div 60000) * ((22 div 7) div 180)"/>
-				</xsl:if>
-			</xsl:variable>
-			<xsl:variable name ="cxBy2">
-				<xsl:if test ="(@flipH = 1)">
-					<xsl:value-of select ="(-1 * a:ext/@cx) div 2"/>
-				</xsl:if>
-				<xsl:if test ="not(@flipH) or (@flipH != 1) ">
-					<xsl:value-of select ="a:ext/@cx div 2"/>
-				</xsl:if>
-			</xsl:variable>
-			<xsl:variable name ="cyBy2">
-				<xsl:if test ="(@flipV = 1)">
-					<xsl:value-of select ="(-1 * a:ext/@cy) div 2"/>
-				</xsl:if>
-				<xsl:if test ="not(@flipV) or (@flipV != 1)">
-					<xsl:value-of select ="a:ext/@cy div 2"/>
-				</xsl:if>
-			</xsl:variable>
-			<xsl:attribute name ="svg:x1">
-				<xsl:value-of select ="concat('svg-x1:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
-			</xsl:attribute>
-			<xsl:attribute name ="svg:y1">
-				<xsl:value-of select ="concat('svg-y1:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
-			</xsl:attribute>
-			<xsl:attribute name ="svg:x2">
-				<xsl:value-of select ="concat('svg-x2:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
-			</xsl:attribute>
-			<xsl:attribute name ="svg:y2">
-				<xsl:value-of select ="concat('svg-y2:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
-			</xsl:attribute>
-			<!--<xsl:attribute name ="svg:x1">
+    <xsl:for-each select ="p:spPr/a:xfrm">
+      <xsl:variable name ="xCenter">
+        <xsl:value-of select ="a:off/@x + (a:ext/@cx div 2)"/>
+      </xsl:variable>
+      <xsl:variable name ="yCenter">
+        <xsl:value-of select ="a:off/@y + (a:ext/@cy div 2)"/>
+      </xsl:variable>
+      <xsl:variable name ="angle">
+        <xsl:if test ="not(@rot)">
+          <xsl:value-of select="0" />
+        </xsl:if>
+        <xsl:if test ="@rot">
+          <xsl:value-of select ="(@rot div 60000) * ((22 div 7) div 180)"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name ="cxBy2">
+        <xsl:if test ="(@flipH = 1)">
+          <xsl:value-of select ="(-1 * a:ext/@cx) div 2"/>
+        </xsl:if>
+        <xsl:if test ="not(@flipH) or (@flipH != 1) ">
+          <xsl:value-of select ="a:ext/@cx div 2"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name ="cyBy2">
+        <xsl:if test ="(@flipV = 1)">
+          <xsl:value-of select ="(-1 * a:ext/@cy) div 2"/>
+        </xsl:if>
+        <xsl:if test ="not(@flipV) or (@flipV != 1)">
+          <xsl:value-of select ="a:ext/@cy div 2"/>
+        </xsl:if>
+      </xsl:variable>
+      <xsl:attribute name ="svg:x1">
+        <xsl:value-of select ="concat('svg-x1:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+      </xsl:attribute>
+      <xsl:attribute name ="svg:y1">
+        <xsl:value-of select ="concat('svg-y1:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+      </xsl:attribute>
+      <xsl:attribute name ="svg:x2">
+        <xsl:value-of select ="concat('svg-x2:',$xCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+      </xsl:attribute>
+      <xsl:attribute name ="svg:y2">
+        <xsl:value-of select ="concat('svg-y2:',$yCenter, ':', $cxBy2, ':', $cyBy2, ':', $angle)"/>
+      </xsl:attribute>
+      <!--<xsl:attribute name ="svg:x1">
 				<xsl:value-of select ="$xCenter - m:cos($angle) * $cxBy2 + m:sin($angle) * $cyBy2"/>
 			</xsl:attribute>
 			<xsl:attribute name ="svg:y1">
@@ -1563,12 +1809,12 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:value-of select ="$yCenter + m:sin($angle) * $cxBy2 + m:cos($angle) * $cyBy2"/>
 			</xsl:attribute>-->
 
-		</xsl:for-each>
+    </xsl:for-each>
 
-	</xsl:template>
-	<!-- Add text to the shape -->
-	<xsl:template name ="AddShapeText">
-		<xsl:param name ="prID" />
+  </xsl:template>
+  <!-- Add text to the shape -->
+  <xsl:template name ="AddShapeText">
+    <xsl:param name ="prID" />
     <xsl:param name="SlideRelationId"/>
     <xsl:variable name ="SlideNumber" select ="substring-before(substring-after($SlideRelationId,'ppt/slides/_rels/'),'.xml.rels')"/>
     <!--concat($SlideNumber,'textboxshape_List',position()-->
@@ -1587,104 +1833,112 @@ Copyright (c) 2007, Sonata Software Limited
           </xsl:call-template>
         </xsl:if>
         <xsl:if test ="not(a:pPr/a:buChar) and not(a:pPr/a:buAutoNum)and not(a:pPr/a:buBlip)">
-			<text:p >
-				<xsl:attribute name ="text:style-name">
-					<xsl:value-of select ="concat($prID,position())"/>
-				</xsl:attribute>
-				<xsl:for-each select ="node()">
-					<xsl:if test ="name()='a:r'">
-						<text:span text:style-name="{generate-id()}">
-							<!--<xsl:value-of select ="a:t"/>-->
-							<!--converts whitespaces sequence to text:s-->
-							<!-- 1699083 bug fix  -->
-							<xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
-							<xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-							<xsl:choose >
-								<xsl:when test ="a:rPr[@cap='all']">
-									<xsl:choose >
-										<xsl:when test =".=''">
-											<text:s/>
-										</xsl:when>
-										<xsl:when test ="not(contains(.,'  '))">
-											<xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
-										</xsl:when>
-										<xsl:when test =". =' '">
-											<text:s/>
-										</xsl:when>
-										<xsl:otherwise >
-											<xsl:call-template name ="InsertWhiteSpaces">
-												<xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-											</xsl:call-template>
-										</xsl:otherwise>
-									</xsl:choose>
-								</xsl:when>
-								<xsl:when test ="a:rPr[@cap='small']">
-									<xsl:choose >
-										<xsl:when test =".=''">
-											<text:s/>
-										</xsl:when>
-										<xsl:when test ="not(contains(.,'  '))">
-											<xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
-										</xsl:when>
-										<xsl:when test =".= ' '">
-											<text:s/>
-										</xsl:when>
-										<xsl:otherwise >
-											<xsl:call-template name ="InsertWhiteSpaces">
-												<xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
-											</xsl:call-template>
-										</xsl:otherwise>
-									</xsl:choose >
-								</xsl:when>
-								<xsl:otherwise >
-									<xsl:choose >
-										<xsl:when test =".=''">
-											<text:s/>
-										</xsl:when>
-										<xsl:when test ="not(contains(.,'  '))">
-											<xsl:value-of select ="."/>
-										</xsl:when>
-										<xsl:otherwise >
-											<xsl:call-template name ="InsertWhiteSpaces">
-												<xsl:with-param name ="string" select ="."/>
-											</xsl:call-template>
-										</xsl:otherwise >
-									</xsl:choose>
-								</xsl:otherwise>
-							</xsl:choose>
-						</text:span>
-					</xsl:if >
-					<xsl:if test ="name()='a:br'">
-						<text:line-break/>
-					</xsl:if>
+          <text:p >
+            <xsl:attribute name ="text:style-name">
+              <xsl:value-of select ="concat($prID,position())"/>
+            </xsl:attribute>
+            <xsl:for-each select ="node()">
+              <xsl:if test ="name()='a:r'">
+                <text:span text:style-name="{generate-id()}">
+                  <!--<xsl:value-of select ="a:t"/>-->
+                  <!--converts whitespaces sequence to text:s-->
+                  <!-- 1699083 bug fix  -->
+                  <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+                  <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+                  <xsl:choose >
+                    <xsl:when test ="a:rPr[@cap='all']">
+                      <xsl:choose >
+                        <xsl:when test =".=''">
+                          <text:s/>
+                        </xsl:when>
+                        <xsl:when test ="not(contains(.,'  '))">
+                          <xsl:value-of select ="translate(.,$lcletters,$ucletters)"/>
+                        </xsl:when>
+                        <xsl:when test =". =' '">
+                          <text:s/>
+                        </xsl:when>
+                        <xsl:otherwise >
+                          <xsl:call-template name ="InsertWhiteSpaces">
+                            <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                          </xsl:call-template>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:when>
+                    <xsl:when test ="a:rPr[@cap='small']">
+                      <xsl:choose >
+                        <xsl:when test =".=''">
+                          <text:s/>
+                        </xsl:when>
+                        <xsl:when test ="not(contains(.,'  '))">
+                          <xsl:value-of select ="translate(.,$ucletters,$lcletters)"/>
+                        </xsl:when>
+                        <xsl:when test =".= ' '">
+                          <text:s/>
+                        </xsl:when>
+                        <xsl:otherwise >
+                          <xsl:call-template name ="InsertWhiteSpaces">
+                            <xsl:with-param name ="string" select ="translate(.,$lcletters,$ucletters)"/>
+                          </xsl:call-template>
+                        </xsl:otherwise>
+                      </xsl:choose >
+                    </xsl:when>
+                    <xsl:otherwise >
+                      <xsl:choose >
+                        <xsl:when test =".=''">
+                          <text:s/>
+                        </xsl:when>
+                        <xsl:when test ="not(contains(.,'  '))">
+                          <xsl:value-of select ="."/>
+                        </xsl:when>
+                        <xsl:otherwise >
+                          <xsl:call-template name ="InsertWhiteSpaces">
+                            <xsl:with-param name ="string" select ="."/>
+                          </xsl:call-template>
+                        </xsl:otherwise >
+                      </xsl:choose>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </text:span>
+              </xsl:if >
+              <xsl:if test ="name()='a:br'">
+                <text:line-break/>
+              </xsl:if>
               <!-- Added by lohith.ar for fix 1731885-->
-              <xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">               
+              <xsl:if test="name()='a:endParaRPr' and not(a:endParaRPr/a:hlinkClick)">
                 <text:span text:style-name="{generate-id()}" />
               </xsl:if>
-				</xsl:for-each>
-			</text:p>
+            </xsl:for-each>
+          </text:p>
           <!--Code inserted by vijayeta,for Bullets and Numbering If Bullets are present-->
         </xsl:if >
       </xsl:for-each>
-       <!--If no bullets are present or default bullets-->
-           
-		</xsl:for-each>
+      <!--If no bullets are present or default bullets-->
 
-	</xsl:template>
-	<!-- Generate autometic styles in contet.xsl for graphic properties-->
-	<!--<xsl:template name ="InsertStylesForGraphicProperties"  >
+    </xsl:for-each>
+
+  </xsl:template>
+  <!-- Generate autometic styles in contet.xsl for graphic properties-->
+  <!--<xsl:template name ="InsertStylesForGraphicProperties"  >
 		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
 			<xsl:variable name ="SlideId">
 				<xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
 			</xsl:variable>
-			--><!-- Graphic properties for shapes with p:sp nodes--><!--
+			-->
+  <!-- Graphic properties for shapes with p:sp nodes-->
+  <!--
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:sp">
-				--><!--Check for shape or texbox --><!--
-				--><!--<xsl:if test = "p:style or p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or 
+				-->
+  <!--Check for shape or texbox -->
+  <!--
+				-->
+  <!--<xsl:if test = "p:style or p:nvSpPr/p:cNvPr/@name[contains(., 'TextBox')] or 
 										   p:style or p:nvSpPr/p:cNvPr/@name[contains(., 'Text Box')] or 
 										   p:nvSpPr/p:cNvPr/@name[contains(., 'Rectangle')] or 
-										   p:nvSpPr/p:cNvPr/@name[contains(., 'Line')]">--><!--
-					--><!-- Generate graphic properties ID--><!--
+										   p:nvSpPr/p:cNvPr/@name[contains(., 'Line')]">-->
+  <!--
+					-->
+  <!-- Generate graphic properties ID-->
+  <!--
 					<xsl:variable  name ="GraphicId">
 						<xsl:value-of select ="concat('s',substring($SlideId,6,string-length($SlideId)-9) ,concat('gr',position()))"/>
 					</xsl:variable>
@@ -1695,16 +1949,24 @@ Copyright (c) 2007, Sonata Software Limited
 						</xsl:attribute >
 						<style:graphic-properties>
 
-							--><!-- FILL --><!--
+							-->
+  <!-- FILL -->
+  <!--
 							<xsl:call-template name ="Fill" />
 
-							--><!-- LINE COLOR --><!--
+							-->
+  <!-- LINE COLOR -->
+  <!--
 							<xsl:call-template name ="LineColor" />
 
-							--><!-- LINE STYLE --><!--
+							-->
+  <!-- LINE STYLE -->
+  <!--
 							<xsl:call-template name ="LineStyle"/>
 
-							--><!-- TEXT ALIGNMENT --><!--
+							-->
+  <!-- TEXT ALIGNMENT -->
+  <!--
 							<xsl:call-template name ="TextLayout" />
 
 						</style:graphic-properties >
@@ -1718,11 +1980,17 @@ Copyright (c) 2007, Sonata Software Limited
 							</style:paragraph-properties>
 						</xsl:if>
 					</style:style>
-				--><!--</xsl:if >--><!--
+				-->
+  <!--</xsl:if >-->
+  <!--
 			</xsl:for-each>
-			--><!-- Graphic properties for shapes with p:cxnSp nodes--><!--
+			-->
+  <!-- Graphic properties for shapes with p:cxnSp nodes-->
+  <!--
 			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree/p:cxnSp">
-				--><!-- Generate graphic properties ID--><!--
+				-->
+  <!-- Generate graphic properties ID-->
+  <!--
 				<xsl:variable  name ="GraphicId">
 					<xsl:value-of select ="concat('s',substring($SlideId,6,string-length($SlideId)-9) ,concat('grLine',position()))"/>
 				</xsl:variable>
@@ -1733,10 +2001,14 @@ Copyright (c) 2007, Sonata Software Limited
 					</xsl:attribute >
 					<style:graphic-properties>
 
-						--><!-- LINE COLOR --><!--
+						-->
+  <!-- LINE COLOR -->
+  <!--
 						<xsl:call-template name ="LineColor" />
 
-						--><!-- LINE STYLE --><!--
+						-->
+  <!-- LINE STYLE -->
+  <!--
 						<xsl:call-template name ="LineStyle"/>
 
 					</style:graphic-properties >
@@ -1745,169 +2017,169 @@ Copyright (c) 2007, Sonata Software Limited
 			</xsl:for-each>
 		</xsl:for-each>
 	</xsl:template>-->
-	<xsl:template name ="InsertStylesForGraphicProperties"  >
-		<xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
-			<xsl:variable name ="SlideId">
-				<xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
-			</xsl:variable>
-			<xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree">
-				<xsl:call-template name ="getGraphicProperties">
-					<xsl:with-param name ="SlideId" select="$SlideId" />
-					<xsl:with-param name ="grID" select ="'gr'" />
-				</xsl:call-template>
-			</xsl:for-each>
-		</xsl:for-each>
-	</xsl:template>
-	<xsl:template name="getGraphicProperties">
-		<xsl:param name ="SlideId" />
-		<xsl:param name ="grID" />
-		<!-- Graphic properties for shapes with p:sp nodes-->
-		<xsl:for-each select ="p:sp">
-			<!-- Generate graphic properties ID-->
-			<xsl:variable  name ="GraphicId">
-				<xsl:value-of select ="concat('slide',substring($SlideId,6,string-length($SlideId)-9) ,concat($grID,position()))"/>
-			</xsl:variable>
+  <xsl:template name ="InsertStylesForGraphicProperties"  >
+    <xsl:for-each select ="document('ppt/presentation.xml')/p:presentation/p:sldIdLst/p:sldId">
+      <xsl:variable name ="SlideId">
+        <xsl:value-of  select ="concat(concat('slide',position()),'.xml')" />
+      </xsl:variable>
+      <xsl:for-each select ="document(concat('ppt/slides/',$SlideId))/p:sld/p:cSld/p:spTree">
+        <xsl:call-template name ="getGraphicProperties">
+          <xsl:with-param name ="SlideId" select="$SlideId" />
+          <xsl:with-param name ="grID" select ="'gr'" />
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="getGraphicProperties">
+    <xsl:param name ="SlideId" />
+    <xsl:param name ="grID" />
+    <!-- Graphic properties for shapes with p:sp nodes-->
+    <xsl:for-each select ="p:sp">
+      <!-- Generate graphic properties ID-->
+      <xsl:variable  name ="GraphicId">
+        <xsl:value-of select ="concat('slide',substring($SlideId,6,string-length($SlideId)-9) ,concat($grID,position()))"/>
+      </xsl:variable>
 
-			<style:style style:family="graphic" style:parent-style-name="standard">
-				<xsl:attribute name ="style:name">
-					<xsl:value-of select ="$GraphicId"/>
-				</xsl:attribute >
-				<style:graphic-properties>
+      <style:style style:family="graphic" style:parent-style-name="standard">
+        <xsl:attribute name ="style:name">
+          <xsl:value-of select ="$GraphicId"/>
+        </xsl:attribute >
+        <style:graphic-properties>
 
-							<!-- FILL -->
-							<xsl:call-template name ="Fill" />
+          <!-- FILL -->
+          <xsl:call-template name ="Fill" />
 
-							<!-- LINE COLOR -->
-							<xsl:call-template name ="LineColor" />
+          <!-- LINE COLOR -->
+          <xsl:call-template name ="LineColor" />
 
-							<!-- LINE STYLE -->
-							<xsl:call-template name ="LineStyle"/>
+          <!-- LINE STYLE -->
+          <xsl:call-template name ="LineStyle"/>
 
-							<!-- TEXT ALIGNMENT -->
-							<xsl:call-template name ="TextLayout" />
+          <!-- TEXT ALIGNMENT -->
+          <xsl:call-template name ="TextLayout" />
 
-						</style:graphic-properties >
-						<xsl:if test ="p:txBody/a:bodyPr/@vert">
-							<style:paragraph-properties>
-								<xsl:attribute name ="style:writing-mode">
-									<xsl:call-template name ="getTextDirection">
-										<xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
-									</xsl:call-template>
-								</xsl:attribute>
-							</style:paragraph-properties>
-						</xsl:if>
-					</style:style>
-				<!--</xsl:if >-->
-			</xsl:for-each>
-			<!-- Graphic properties for shapes with p:cxnSp nodes-->
-		<xsl:for-each select ="p:cxnSp">
-				<!-- Generate graphic properties ID-->
-				<xsl:variable  name ="GraphicId">
-				<xsl:value-of select ="concat('slide',substring($SlideId,6,string-length($SlideId)-9) ,concat($grID,'Line',position()))"/>
-				</xsl:variable>
+        </style:graphic-properties >
+        <xsl:if test ="p:txBody/a:bodyPr/@vert">
+          <style:paragraph-properties>
+            <xsl:attribute name ="style:writing-mode">
+              <xsl:call-template name ="getTextDirection">
+                <xsl:with-param name ="vert" select ="p:txBody/a:bodyPr/@vert" />
+              </xsl:call-template>
+            </xsl:attribute>
+          </style:paragraph-properties>
+        </xsl:if>
+      </style:style>
+      <!--</xsl:if >-->
+    </xsl:for-each>
+    <!-- Graphic properties for shapes with p:cxnSp nodes-->
+    <xsl:for-each select ="p:cxnSp">
+      <!-- Generate graphic properties ID-->
+      <xsl:variable  name ="GraphicId">
+        <xsl:value-of select ="concat('slide',substring($SlideId,6,string-length($SlideId)-9) ,concat($grID,'Line',position()))"/>
+      </xsl:variable>
 
-				<style:style style:family="graphic" style:parent-style-name="standard">
-					<xsl:attribute name ="style:name">
-						<xsl:value-of select ="$GraphicId"/>
-					</xsl:attribute >
-					<style:graphic-properties>
+      <style:style style:family="graphic" style:parent-style-name="standard">
+        <xsl:attribute name ="style:name">
+          <xsl:value-of select ="$GraphicId"/>
+        </xsl:attribute >
+        <style:graphic-properties>
 
-						<!-- LINE COLOR -->
-						<xsl:call-template name ="LineColor" />
+          <!-- LINE COLOR -->
+          <xsl:call-template name ="LineColor" />
 
-						<!-- LINE STYLE -->
-						<xsl:call-template name ="LineStyle"/>
+          <!-- LINE STYLE -->
+          <xsl:call-template name ="LineStyle"/>
 
-					</style:graphic-properties >
-				</style:style>
+        </style:graphic-properties >
+      </style:style>
 
-			</xsl:for-each>
-		<!-- Graphic properties for grouped shapes with p:grpSp nodes-->
-		<xsl:for-each select ="p:grpSp">
-			<xsl:call-template name ="getGraphicProperties">
-				<xsl:with-param name ="SlideId" select="$SlideId" />
-				<xsl:with-param name ="grID" select ="concat('grp',generate-id())" />
-			</xsl:call-template>
-		</xsl:for-each>
-	</xsl:template>
-	<!-- Get fill color for shape-->
-	<xsl:template name="Fill">
-		<xsl:choose>
-			<!-- No fill -->
-			<xsl:when test ="p:spPr/a:noFill">
-				<xsl:attribute name ="draw:fill">
-					<xsl:value-of select="'none'" />
-				</xsl:attribute>
-				<xsl:attribute name ="draw:fill-color">
-					<xsl:value-of select="'#ffffff'"/>
-				</xsl:attribute>
-			</xsl:when>
+    </xsl:for-each>
+    <!-- Graphic properties for grouped shapes with p:grpSp nodes-->
+    <xsl:for-each select ="p:grpSp">
+      <xsl:call-template name ="getGraphicProperties">
+        <xsl:with-param name ="SlideId" select="$SlideId" />
+        <xsl:with-param name ="grID" select ="concat('grp',generate-id())" />
+      </xsl:call-template>
+    </xsl:for-each>
+  </xsl:template>
+  <!-- Get fill color for shape-->
+  <xsl:template name="Fill">
+    <xsl:choose>
+      <!-- No fill -->
+      <xsl:when test ="p:spPr/a:noFill">
+        <xsl:attribute name ="draw:fill">
+          <xsl:value-of select="'none'" />
+        </xsl:attribute>
+        <xsl:attribute name ="draw:fill-color">
+          <xsl:value-of select="'#ffffff'"/>
+        </xsl:attribute>
+      </xsl:when>
 
-			<!-- Solid fill-->
-			<xsl:when test ="p:spPr/a:solidFill">
-				<xsl:attribute name ="draw:fill">
-					<xsl:value-of select="'solid'" />
-				</xsl:attribute>
-				<!-- Standard color-->
-				<xsl:if test ="p:spPr/a:solidFill/a:srgbClr/@val">
-					<xsl:attribute name ="draw:fill-color">
-						<xsl:value-of select="concat('#',p:spPr/a:solidFill/a:srgbClr/@val)"/>
-					</xsl:attribute>
-					<!-- Transparency percentage-->
-					<xsl:if test="p:spPr/a:solidFill/a:srgbClr/a:alpha/@val">
-						<xsl:variable name ="alpha">
-							<xsl:value-of select ="p:spPr/a:solidFill/a:srgbClr/a:alpha/@val"/>
-						</xsl:variable>
-						<xsl:if test="($alpha != '') or ($alpha != 0)">
-							<xsl:attribute name ="draw:opacity">
-								<xsl:value-of select="concat(($alpha div 1000), '%')"/>
-							</xsl:attribute>
-						</xsl:if>
-					</xsl:if>
-				</xsl:if>
+      <!-- Solid fill-->
+      <xsl:when test ="p:spPr/a:solidFill">
+        <xsl:attribute name ="draw:fill">
+          <xsl:value-of select="'solid'" />
+        </xsl:attribute>
+        <!-- Standard color-->
+        <xsl:if test ="p:spPr/a:solidFill/a:srgbClr/@val">
+          <xsl:attribute name ="draw:fill-color">
+            <xsl:value-of select="concat('#',p:spPr/a:solidFill/a:srgbClr/@val)"/>
+          </xsl:attribute>
+          <!-- Transparency percentage-->
+          <xsl:if test="p:spPr/a:solidFill/a:srgbClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="p:spPr/a:solidFill/a:srgbClr/a:alpha/@val"/>
+            </xsl:variable>
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="draw:opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
 
-				<!--Theme color-->
-				<xsl:if test ="p:spPr/a:solidFill/a:schemeClr/@val">
-					<xsl:attribute name ="draw:fill-color">
-						<xsl:call-template name ="getColorCode">
-							<xsl:with-param name ="color">
-								<xsl:value-of select="p:spPr/a:solidFill/a:schemeClr/@val"/>
-							</xsl:with-param>
-							<xsl:with-param name ="lumMod">
-								<xsl:value-of select="p:spPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
-							</xsl:with-param>
-							<xsl:with-param name ="lumOff">
-								<xsl:value-of select="p:spPr/a:solidFill/a:schemeClr/a:lumOff/@val"/>
-							</xsl:with-param>
-						</xsl:call-template>
-					</xsl:attribute>
-					<!-- Transparency percentage-->
-					<xsl:if test="p:spPr/a:solidFill/a:schemeClr/a:alpha/@val">
-						<xsl:variable name ="alpha">
-							<xsl:value-of select ="p:spPr/a:solidFill/a:schemeClr/a:alpha/@val"/>
-						</xsl:variable>
-						<xsl:if test="($alpha != '') or ($alpha != 0)">
-							<xsl:attribute name ="draw:opacity">
-								<xsl:value-of select="concat(($alpha div 1000), '%')"/>
-							</xsl:attribute>
-						</xsl:if>
-					</xsl:if>
-				</xsl:if>
-			</xsl:when>
-			
-			<xsl:otherwise>
-			<!--Fill refernce-->
-			<xsl:if test ="p:style/a:fillRef">
-				<xsl:attribute name ="draw:fill">
-					<xsl:value-of select="'solid'" />
-				</xsl:attribute>
-				<!-- Standard color-->
-				<xsl:if test ="p:style/a:fillRef/a:srgbClr/@val">
-					<xsl:attribute name ="draw:fill-color">
-						<xsl:value-of select="concat('#',p:style/a:fillRef/a:srgbClr/@val)"/>
-					</xsl:attribute>
-					<!-- Shade percentage-->
-					<!--<xsl:if test="p:style/a:fillRef/a:srgbClr/a:shade/@val">
+        <!--Theme color-->
+        <xsl:if test ="p:spPr/a:solidFill/a:schemeClr/@val">
+          <xsl:attribute name ="draw:fill-color">
+            <xsl:call-template name ="getColorCode">
+              <xsl:with-param name ="color">
+                <xsl:value-of select="p:spPr/a:solidFill/a:schemeClr/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumMod">
+                <xsl:value-of select="p:spPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumOff">
+                <xsl:value-of select="p:spPr/a:solidFill/a:schemeClr/a:lumOff/@val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <!-- Transparency percentage-->
+          <xsl:if test="p:spPr/a:solidFill/a:schemeClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="p:spPr/a:solidFill/a:schemeClr/a:alpha/@val"/>
+            </xsl:variable>
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="draw:opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <!--Fill refernce-->
+        <xsl:if test ="p:style/a:fillRef">
+          <xsl:attribute name ="draw:fill">
+            <xsl:value-of select="'solid'" />
+          </xsl:attribute>
+          <!-- Standard color-->
+          <xsl:if test ="p:style/a:fillRef/a:srgbClr/@val">
+            <xsl:attribute name ="draw:fill-color">
+              <xsl:value-of select="concat('#',p:style/a:fillRef/a:srgbClr/@val)"/>
+            </xsl:attribute>
+            <!-- Shade percentage-->
+            <!--<xsl:if test="p:style/a:fillRef/a:srgbClr/a:shade/@val">
 						<xsl:variable name ="shade">
 							<xsl:value-of select ="a:solidFill/a:srgbClr/a:shade/@val"/>
 						</xsl:variable>
@@ -1917,25 +2189,25 @@ Copyright (c) 2007, Sonata Software Limited
 							</xsl:attribute>
 						</xsl:if>
 					</xsl:if>-->
-				</xsl:if>
+          </xsl:if>
 
-				<!--Theme color-->
-				<xsl:if test ="p:style/a:fillRef//a:schemeClr/@val">
-					<xsl:attribute name ="draw:fill-color">
-						<xsl:call-template name ="getColorCode">
-							<xsl:with-param name ="color">
-								<xsl:value-of select="p:style/a:fillRef/a:schemeClr/@val"/>
-							</xsl:with-param>
-							<xsl:with-param name ="lumMod">
-								<xsl:value-of select="p:style/a:fillRef/a:schemeClr/a:lumMod/@val"/>
-							</xsl:with-param>
-							<xsl:with-param name ="lumOff">
-								<xsl:value-of select="p:style/a:fillRef/a:schemeClr/a:lumOff/@val"/>
-							</xsl:with-param>
-						</xsl:call-template>
-					</xsl:attribute>
-					<!-- Shade percentage-->
-					<!--<xsl:if test="a:solidFill/a:schemeClr/a:shade/@val">
+          <!--Theme color-->
+          <xsl:if test ="p:style/a:fillRef//a:schemeClr/@val">
+            <xsl:attribute name ="draw:fill-color">
+              <xsl:call-template name ="getColorCode">
+                <xsl:with-param name ="color">
+                  <xsl:value-of select="p:style/a:fillRef/a:schemeClr/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name ="lumMod">
+                  <xsl:value-of select="p:style/a:fillRef/a:schemeClr/a:lumMod/@val"/>
+                </xsl:with-param>
+                <xsl:with-param name ="lumOff">
+                  <xsl:value-of select="p:style/a:fillRef/a:schemeClr/a:lumOff/@val"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:attribute>
+            <!-- Shade percentage-->
+            <!--<xsl:if test="a:solidFill/a:schemeClr/a:shade/@val">
 						<xsl:variable name ="shade">
 							<xsl:value-of select ="a:solidFill/a:schemeClr/a:shade/@val"/>
 						</xsl:variable>
@@ -1945,360 +2217,360 @@ Copyright (c) 2007, Sonata Software Limited
 							</xsl:attribute>
 						</xsl:if>
 					</xsl:if>-->
-				</xsl:if>
-			</xsl:if>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-	<!-- Get border color for shape -->
-	<xsl:template name ="LineColor">
+          </xsl:if>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <!-- Get border color for shape -->
+  <xsl:template name ="LineColor">
 
-		<xsl:choose>
-			<!-- No line-->
-			<xsl:when test ="p:spPr/a:ln/a:noFill">
-				<xsl:attribute name ="draw:stroke">
-					<xsl:value-of select="'none'" />
-				</xsl:attribute>
-			</xsl:when>
-			
-			<!-- Solid line color-->
-			<xsl:when test ="p:spPr/a:ln/a:solidFill">
-				<xsl:attribute name ="draw:stroke">
-					<xsl:value-of select="'solid'" />
-				</xsl:attribute>
-				<!-- Standard color for border-->
-				<xsl:if test ="p:spPr/a:ln/a:solidFill/a:srgbClr/@val">
-					<xsl:attribute name ="svg:stroke-color">
-						<xsl:value-of select="concat('#',p:spPr/a:ln/a:solidFill/a:srgbClr/@val)"/>
-					</xsl:attribute>
-					<!-- Transparency percentage-->
-					<xsl:if test="p:spPr/a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
-						<xsl:variable name ="alpha">
-							<xsl:value-of select ="p:spPr/a:ln/a:solidFill/a:srgbClr/a:alpha/@val"/>
-						</xsl:variable>
-						<xsl:if test="($alpha != '') or ($alpha != 0)">
-							<xsl:attribute name ="svg:stroke-opacity">
-								<xsl:value-of select="concat(($alpha div 1000), '%')"/>
-							</xsl:attribute>
-						</xsl:if>
-					</xsl:if>
-				</xsl:if>
-				<!-- Theme color for border-->
-				<xsl:if test ="p:spPr/a:ln/a:solidFill/a:schemeClr/@val">
-					<xsl:attribute name ="svg:stroke-color">
-						<xsl:call-template name ="getColorCode">
-							<xsl:with-param name ="color">
-								<xsl:value-of select="p:spPr/a:ln/a:solidFill/a:schemeClr/@val"/>
-							</xsl:with-param>
-							<xsl:with-param name ="lumMod">
-								<xsl:value-of select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:lumMod/@val"/>
-							</xsl:with-param>
-							<xsl:with-param name ="lumOff">
-								<xsl:value-of select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:lumOff/@val"/>
-							</xsl:with-param>
-						</xsl:call-template>
-					</xsl:attribute>
-					<!-- Transparency percentage-->
-					<xsl:if test="p:spPr/a:ln/a:solidFill/a:schemeClr/a:alpha/@val">
-						<xsl:variable name ="alpha">
-							<xsl:value-of select ="p:spPr/a:ln/a:solidFill/a:schemeClr/a:alpha/@val"/>
-						</xsl:variable>
-						<xsl:if test="($alpha != '') or ($alpha != 0)">
-							<xsl:attribute name ="svg:stroke-opacity">
-								<xsl:value-of select="concat(($alpha div 1000), '%')"/>
-							</xsl:attribute>
-						</xsl:if>
-					</xsl:if>
-				</xsl:if>
-			</xsl:when>
-			
-			<xsl:otherwise>
-				<!--Line reference-->
-				<xsl:if test ="not( (p:spPr/a:prstGeom/@prst='flowChartInternalStorage') or
+    <xsl:choose>
+      <!-- No line-->
+      <xsl:when test ="p:spPr/a:ln/a:noFill">
+        <xsl:attribute name ="draw:stroke">
+          <xsl:value-of select="'none'" />
+        </xsl:attribute>
+      </xsl:when>
+
+      <!-- Solid line color-->
+      <xsl:when test ="p:spPr/a:ln/a:solidFill">
+        <xsl:attribute name ="draw:stroke">
+          <xsl:value-of select="'solid'" />
+        </xsl:attribute>
+        <!-- Standard color for border-->
+        <xsl:if test ="p:spPr/a:ln/a:solidFill/a:srgbClr/@val">
+          <xsl:attribute name ="svg:stroke-color">
+            <xsl:value-of select="concat('#',p:spPr/a:ln/a:solidFill/a:srgbClr/@val)"/>
+          </xsl:attribute>
+          <!-- Transparency percentage-->
+          <xsl:if test="p:spPr/a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="p:spPr/a:ln/a:solidFill/a:srgbClr/a:alpha/@val"/>
+            </xsl:variable>
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="svg:stroke-opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
+        <!-- Theme color for border-->
+        <xsl:if test ="p:spPr/a:ln/a:solidFill/a:schemeClr/@val">
+          <xsl:attribute name ="svg:stroke-color">
+            <xsl:call-template name ="getColorCode">
+              <xsl:with-param name ="color">
+                <xsl:value-of select="p:spPr/a:ln/a:solidFill/a:schemeClr/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumMod">
+                <xsl:value-of select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:lumMod/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumOff">
+                <xsl:value-of select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:lumOff/@val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <!-- Transparency percentage-->
+          <xsl:if test="p:spPr/a:ln/a:solidFill/a:schemeClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="p:spPr/a:ln/a:solidFill/a:schemeClr/a:alpha/@val"/>
+            </xsl:variable>
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="svg:stroke-opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <!--Line reference-->
+        <xsl:if test ="not( (p:spPr/a:prstGeom/@prst='flowChartInternalStorage') or
 									(p:spPr/a:prstGeom/@prst='flowChartPredefinedProcess') or
 									(p:spPr/a:prstGeom/@prst='flowChartSummingJunction') or
 									(p:spPr/a:prstGeom/@prst='flowChartOr') )">
-				<xsl:if test ="p:style/a:lnRef">
-					<xsl:attribute name ="draw:stroke">
-						<xsl:value-of select="'solid'" />
-					</xsl:attribute>
-					<!--Standard color for border-->
-					<xsl:if test ="p:style/a:lnRef/a:srgbClr/@val">
-						<xsl:attribute name ="svg:stroke-color">
-							<xsl:value-of select="concat('#',p:style/a:lnRef/a:srgbClr/@val)"/>
-						</xsl:attribute>
+          <xsl:if test ="p:style/a:lnRef">
+            <xsl:attribute name ="draw:stroke">
+              <xsl:value-of select="'solid'" />
+            </xsl:attribute>
+            <!--Standard color for border-->
+            <xsl:if test ="p:style/a:lnRef/a:srgbClr/@val">
+              <xsl:attribute name ="svg:stroke-color">
+                <xsl:value-of select="concat('#',p:style/a:lnRef/a:srgbClr/@val)"/>
+              </xsl:attribute>
 
-						<!--Shade percentage-->
-						<!--
+              <!--Shade percentage-->
+              <!--
 					<xsl:if test="p:style/a:lnRef/a:srgbClr/a:shade/@val">
 						<xsl:variable name ="shade">
 							<xsl:value-of select ="p:style/a:lnRef/a:srgbClr/a:shade/@val"/>
 						</xsl:variable>
 						-->
-						<!--<xsl:if test="($shade != '') or ($shade != 0)">
+              <!--<xsl:if test="($shade != '') or ($shade != 0)">
 							<xsl:attribute name ="svg:stroke-opacity">
 								<xsl:value-of select="concat(($shade div 1000), '%')"/>
 							</xsl:attribute>
 						</xsl:if>-->
-						<!--
+              <!--
 					</xsl:if>-->
-					</xsl:if>
-					<!--Theme color for border-->
-					<xsl:if test ="p:style/a:lnRef/a:schemeClr/@val">
-						<xsl:attribute name ="svg:stroke-color">
-							<xsl:call-template name ="getColorCode">
-								<xsl:with-param name ="color">
-									<xsl:value-of select="p:style/a:lnRef/a:schemeClr/@val"/>
-								</xsl:with-param>
-								<xsl:with-param name ="lumMod">
-									<xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumMod/@val"/>
-								</xsl:with-param>
-								<xsl:with-param name ="lumOff">
-									<xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumOff/@val"/>
-								</xsl:with-param>
-							</xsl:call-template>
-						</xsl:attribute>
-						<!--Shade percentage -->
-						<!--<xsl:if test="p:style/a:lnRef/a:schemeClr/a:shade/@val">
+            </xsl:if>
+            <!--Theme color for border-->
+            <xsl:if test ="p:style/a:lnRef/a:schemeClr/@val">
+              <xsl:attribute name ="svg:stroke-color">
+                <xsl:call-template name ="getColorCode">
+                  <xsl:with-param name ="color">
+                    <xsl:value-of select="p:style/a:lnRef/a:schemeClr/@val"/>
+                  </xsl:with-param>
+                  <xsl:with-param name ="lumMod">
+                    <xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumMod/@val"/>
+                  </xsl:with-param>
+                  <xsl:with-param name ="lumOff">
+                    <xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumOff/@val"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+              <!--Shade percentage -->
+              <!--<xsl:if test="p:style/a:lnRef/a:schemeClr/a:shade/@val">
 						<xsl:variable name ="shade">
 							<xsl:value-of select ="p:style/a:lnRef/a:schemeClr/a:shade/@val"/>
 						</xsl:variable>
 						-->
-						<!--<xsl:if test="($shade != '') or ($shade != 0)">
+              <!--<xsl:if test="($shade != '') or ($shade != 0)">
 							<xsl:attribute name ="svg:stroke-opacity">
 								<xsl:value-of select="concat(($shade div 1000), '%')"/>
 							</xsl:attribute>
 						</xsl:if>-->
-						<!--
+              <!--
 					</xsl:if>-->
-					</xsl:if>
-				</xsl:if>
-				</xsl:if>
-			</xsl:otherwise> 
-		</xsl:choose>
-	</xsl:template>
-	<!-- Get line styles for shape -->
-	<xsl:template name ="LineStyle">
-		<!-- Line width-->
-		<xsl:for-each select ="p:spPr">
-			<xsl:if test ="a:ln/@w">
-				 	<xsl:attribute name ="svg:stroke-width">
-						<xsl:call-template name="ConvertEmu">
-							<xsl:with-param name="length" select="a:ln/@w"/>
-							<xsl:with-param name="unit">cm</xsl:with-param>
-						</xsl:call-template>
-					</xsl:attribute>
-			</xsl:if>
-			<xsl:if test ="not(a:ln/@w) and (parent::node()/p:nvSpPr/p:cNvPr/@name[contains(., 'Text')])">
-				<xsl:attribute name ="draw:stroke">
-					<xsl:value-of select ="'none'"/>
-				</xsl:attribute>
-			</xsl:if>
-		</xsl:for-each>
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <!-- Get line styles for shape -->
+  <xsl:template name ="LineStyle">
+    <!-- Line width-->
+    <xsl:for-each select ="p:spPr">
+      <xsl:if test ="a:ln/@w">
+        <xsl:attribute name ="svg:stroke-width">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="a:ln/@w"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="not(a:ln/@w) and (parent::node()/p:nvSpPr/p:cNvPr/@name[contains(., 'Text')])">
+        <xsl:attribute name ="draw:stroke">
+          <xsl:value-of select ="'none'"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
 
-		<!-- Line Dash property-->
-		<xsl:for-each select ="p:spPr/a:ln">
-			<xsl:if test ="not(a:noFill)">
-				<xsl:choose>
-					<xsl:when test ="(a:prstDash/@val='solid') or not(a:prstDash/@val)">
-						<xsl:attribute name ="draw:stroke">
-							<xsl:value-of select ="'solid'"/>
-						</xsl:attribute>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:attribute name ="draw:stroke">
-							<xsl:value-of select ="'dash'"/>
-						</xsl:attribute>
-						<xsl:attribute name ="draw:stroke-dash">
-							<xsl:choose>
-								<xsl:when test="(a:prstDash/@val='sysDot') and (@cap='rnd')">
-									<xsl:value-of select ="'sysDotRound'"/>
-								</xsl:when>
-								<xsl:when test="a:prstDash/@val='sysDot'">
-									<xsl:value-of select ="'sysDot'"/>
-								</xsl:when>
-								<xsl:when test ="(a:prstDash/@val='sysDash') and (@cap='rnd')">
-									<xsl:value-of select ="'sysDashRound'"/>
-								</xsl:when>
-								<xsl:when test ="a:prstDash/@val='sysDash'">
-									<xsl:value-of select ="'sysDash'"/>
-								</xsl:when>
-								<xsl:when test ="(a:prstDash/@val='dash') and (@cap='rnd')">
-									<xsl:value-of select ="'dashRound'"/>
-								</xsl:when>
-								<xsl:when test ="a:prstDash/@val='dash'">
-									<xsl:value-of select ="'dash'"/>
-								</xsl:when>
-								<xsl:when test ="(a:prstDash/@val='dashDot') and (@cap='rnd')">
-									<xsl:value-of select ="'dashDotRound'"/>
-								</xsl:when>
-								<xsl:when test ="a:prstDash/@val='dashDot'">
-									<xsl:value-of select ="'dashDot'"/>
-								</xsl:when>
-								<xsl:when test ="(a:prstDash/@val='lgDash') and (@cap='rnd')">
-									<xsl:value-of select ="'lgDashRound'"/>
-								</xsl:when>
-								<xsl:when test ="a:prstDash/@val='lgDash'">
-									<xsl:value-of select ="'lgDash'"/>
-								</xsl:when>
-								<xsl:when test ="(a:prstDash/@val='lgDashDot') and (@cap='rnd')">
-									<xsl:value-of select ="'lgDashDotRound'"/>
-								</xsl:when>
-								<xsl:when test ="a:prstDash/@val='lgDashDot'">
-									<xsl:value-of select ="'lgDashDot'"/>
-								</xsl:when>
-								<xsl:when test ="(a:prstDash/@val='lgDashDotDot') and (@cap='rnd')">
-									<xsl:value-of select ="'lgDashDotDotRound'"/>
-								</xsl:when>
-								<xsl:when test ="a:prstDash/@val='lgDashDotDot'">
-									<xsl:value-of select ="'lgDashDotDot'"/>
-								</xsl:when>
-							</xsl:choose>
-						</xsl:attribute>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:if>
-		</xsl:for-each >
+    <!-- Line Dash property-->
+    <xsl:for-each select ="p:spPr/a:ln">
+      <xsl:if test ="not(a:noFill)">
+        <xsl:choose>
+          <xsl:when test ="(a:prstDash/@val='solid') or not(a:prstDash/@val)">
+            <xsl:attribute name ="draw:stroke">
+              <xsl:value-of select ="'solid'"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name ="draw:stroke">
+              <xsl:value-of select ="'dash'"/>
+            </xsl:attribute>
+            <xsl:attribute name ="draw:stroke-dash">
+              <xsl:choose>
+                <xsl:when test="(a:prstDash/@val='sysDot') and (@cap='rnd')">
+                  <xsl:value-of select ="'sysDotRound'"/>
+                </xsl:when>
+                <xsl:when test="a:prstDash/@val='sysDot'">
+                  <xsl:value-of select ="'sysDot'"/>
+                </xsl:when>
+                <xsl:when test ="(a:prstDash/@val='sysDash') and (@cap='rnd')">
+                  <xsl:value-of select ="'sysDashRound'"/>
+                </xsl:when>
+                <xsl:when test ="a:prstDash/@val='sysDash'">
+                  <xsl:value-of select ="'sysDash'"/>
+                </xsl:when>
+                <xsl:when test ="(a:prstDash/@val='dash') and (@cap='rnd')">
+                  <xsl:value-of select ="'dashRound'"/>
+                </xsl:when>
+                <xsl:when test ="a:prstDash/@val='dash'">
+                  <xsl:value-of select ="'dash'"/>
+                </xsl:when>
+                <xsl:when test ="(a:prstDash/@val='dashDot') and (@cap='rnd')">
+                  <xsl:value-of select ="'dashDotRound'"/>
+                </xsl:when>
+                <xsl:when test ="a:prstDash/@val='dashDot'">
+                  <xsl:value-of select ="'dashDot'"/>
+                </xsl:when>
+                <xsl:when test ="(a:prstDash/@val='lgDash') and (@cap='rnd')">
+                  <xsl:value-of select ="'lgDashRound'"/>
+                </xsl:when>
+                <xsl:when test ="a:prstDash/@val='lgDash'">
+                  <xsl:value-of select ="'lgDash'"/>
+                </xsl:when>
+                <xsl:when test ="(a:prstDash/@val='lgDashDot') and (@cap='rnd')">
+                  <xsl:value-of select ="'lgDashDotRound'"/>
+                </xsl:when>
+                <xsl:when test ="a:prstDash/@val='lgDashDot'">
+                  <xsl:value-of select ="'lgDashDot'"/>
+                </xsl:when>
+                <xsl:when test ="(a:prstDash/@val='lgDashDotDot') and (@cap='rnd')">
+                  <xsl:value-of select ="'lgDashDotDotRound'"/>
+                </xsl:when>
+                <xsl:when test ="a:prstDash/@val='lgDashDotDot'">
+                  <xsl:value-of select ="'lgDashDotDot'"/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:for-each >
 
-		<!-- Line join property -->
-		<xsl:choose>
-			<xsl:when test ="p:spPr/a:ln/a:miter">
-				<xsl:attribute name ="draw:stroke-linejoin">
-					<xsl:value-of select ="'miter'"/>
-				</xsl:attribute>
-			</xsl:when>
-			<xsl:when test ="p:spPr/a:ln/a:bevel">
-				<xsl:attribute name ="draw:stroke-linejoin">
-					<xsl:value-of select ="'bevel'"/>
-				</xsl:attribute>
-			</xsl:when>
-			<xsl:when test ="p:spPr/a:ln/a:round">
-				<xsl:attribute name ="draw:stroke-linejoin">
-					<xsl:value-of select ="'round'"/>
-				</xsl:attribute>
-			</xsl:when>
-		</xsl:choose>
+    <!-- Line join property -->
+    <xsl:choose>
+      <xsl:when test ="p:spPr/a:ln/a:miter">
+        <xsl:attribute name ="draw:stroke-linejoin">
+          <xsl:value-of select ="'miter'"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test ="p:spPr/a:ln/a:bevel">
+        <xsl:attribute name ="draw:stroke-linejoin">
+          <xsl:value-of select ="'bevel'"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test ="p:spPr/a:ln/a:round">
+        <xsl:attribute name ="draw:stroke-linejoin">
+          <xsl:value-of select ="'round'"/>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
 
-		<!-- Line Arrow -->
-		<!-- Head End-->
-		<xsl:for-each select ="p:spPr/a:ln/a:headEnd">
-			<xsl:if test ="@type">
-				<xsl:attribute name ="draw:marker-start">
-					<xsl:value-of select ="@type"/>
-				</xsl:attribute>
-				<xsl:attribute name ="draw:marker-start-width">
-					<xsl:call-template name ="getArrowSize">
-						<xsl:with-param name ="w" select ="@w" />
-						<xsl:with-param name ="len" select ="@len" />
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-		</xsl:for-each>
+    <!-- Line Arrow -->
+    <!-- Head End-->
+    <xsl:for-each select ="p:spPr/a:ln/a:headEnd">
+      <xsl:if test ="@type">
+        <xsl:attribute name ="draw:marker-start">
+          <xsl:value-of select ="@type"/>
+        </xsl:attribute>
+        <xsl:attribute name ="draw:marker-start-width">
+          <xsl:call-template name ="getArrowSize">
+            <xsl:with-param name ="w" select ="@w" />
+            <xsl:with-param name ="len" select ="@len" />
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
 
-		<!-- Tail End-->
-		<xsl:for-each select ="p:spPr/a:ln/a:tailEnd">
-			<xsl:if test ="@type">
-				<xsl:attribute name ="draw:marker-end">
-					<xsl:value-of select ="@type"/>
-				</xsl:attribute>
-				<xsl:attribute name ="draw:marker-end-width">
-					<xsl:call-template name ="getArrowSize">
-						<xsl:with-param name ="w" select ="@w" />
-						<xsl:with-param name ="len" select ="@len" />
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-		</xsl:for-each>
-	</xsl:template>
-	<!-- Get arrow size -->
-	<xsl:template name ="getArrowSize">
-		<xsl:param name ="w" />
-		<xsl:param name ="len" />
+    <!-- Tail End-->
+    <xsl:for-each select ="p:spPr/a:ln/a:tailEnd">
+      <xsl:if test ="@type">
+        <xsl:attribute name ="draw:marker-end">
+          <xsl:value-of select ="@type"/>
+        </xsl:attribute>
+        <xsl:attribute name ="draw:marker-end-width">
+          <xsl:call-template name ="getArrowSize">
+            <xsl:with-param name ="w" select ="@w" />
+            <xsl:with-param name ="len" select ="@len" />
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  <!-- Get arrow size -->
+  <xsl:template name ="getArrowSize">
+    <xsl:param name ="w" />
+    <xsl:param name ="len" />
 
-		<xsl:choose>
-			<xsl:when test ="($w = 'sm') and ($len = 'sm')">
-				<xsl:value-of select ="concat($sm-sm,'cm')"/>
-			</xsl:when>
-			<xsl:when test ="($w = 'sm') and ($len = 'med')">
-				<xsl:value-of select ="concat($sm-med,'cm')"/>
-			</xsl:when>
-			<xsl:when test ="($w = 'sm') and ($len = 'lg')">
-				<xsl:value-of select ="concat($sm-lg,'cm')"/>
-			</xsl:when>
-			<xsl:when test ="($w = 'med') and ($len = 'sm')">
-				<xsl:value-of select ="concat($med-sm,'cm')" />
-			</xsl:when>
-			<xsl:when test ="($w = 'med') and ($len = 'lg')">
-				<xsl:value-of select ="concat($med-lg,'cm')" />
-			</xsl:when>
-			<xsl:when test ="($w = 'lg') and ($len = 'sm')">
-				<xsl:value-of select ="concat($lg-sm,'cm')" />
-			</xsl:when>
-			<xsl:when test ="($w = 'lg') and ($len = 'med')">
-				<xsl:value-of select ="concat($lg-med,'cm')" />
-			</xsl:when>
-			<xsl:when test ="($w = 'lg') and ($len = 'lg')">
-				<xsl:value-of select ="concat($lg-lg,'cm')" />
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:value-of select ="concat($med-med,'cm')"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-	<!-- Get text layout for shapes -->
-	<xsl:template name ="TextLayout">
-		<xsl:for-each select="p:txBody">
-			<xsl:attribute name ="draw:textarea-horizontal-align">
-				<xsl:choose>
-					<!--BugFixed-1709909-->
-					<xsl:when test ="p:txBody/a:bodyPr/@anchorCtr= 1">
-						<xsl:value-of select ="'center'"/>
-					</xsl:when>
-					<xsl:when test ="p:txBody/a:bodyPr/@anchorCtr= 0">
-						<xsl:value-of select ="'justify'"/>
-					</xsl:when>
-					<!--Justify alignment-->
-					<xsl:otherwise>
-						<xsl:value-of select ="'justify'"/>
-					</xsl:otherwise>
-				</xsl:choose>
-				<!-- Center alignment
+    <xsl:choose>
+      <xsl:when test ="($w = 'sm') and ($len = 'sm')">
+        <xsl:value-of select ="concat($sm-sm,'cm')"/>
+      </xsl:when>
+      <xsl:when test ="($w = 'sm') and ($len = 'med')">
+        <xsl:value-of select ="concat($sm-med,'cm')"/>
+      </xsl:when>
+      <xsl:when test ="($w = 'sm') and ($len = 'lg')">
+        <xsl:value-of select ="concat($sm-lg,'cm')"/>
+      </xsl:when>
+      <xsl:when test ="($w = 'med') and ($len = 'sm')">
+        <xsl:value-of select ="concat($med-sm,'cm')" />
+      </xsl:when>
+      <xsl:when test ="($w = 'med') and ($len = 'lg')">
+        <xsl:value-of select ="concat($med-lg,'cm')" />
+      </xsl:when>
+      <xsl:when test ="($w = 'lg') and ($len = 'sm')">
+        <xsl:value-of select ="concat($lg-sm,'cm')" />
+      </xsl:when>
+      <xsl:when test ="($w = 'lg') and ($len = 'med')">
+        <xsl:value-of select ="concat($lg-med,'cm')" />
+      </xsl:when>
+      <xsl:when test ="($w = 'lg') and ($len = 'lg')">
+        <xsl:value-of select ="concat($lg-lg,'cm')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select ="concat($med-med,'cm')"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <!-- Get text layout for shapes -->
+  <xsl:template name ="TextLayout">
+    <xsl:for-each select="p:txBody">
+      <xsl:attribute name ="draw:textarea-horizontal-align">
+        <xsl:choose>
+          <!--BugFixed-1709909-->
+          <xsl:when test ="p:txBody/a:bodyPr/@anchorCtr= 1">
+            <xsl:value-of select ="'center'"/>
+          </xsl:when>
+          <xsl:when test ="p:txBody/a:bodyPr/@anchorCtr= 0">
+            <xsl:value-of select ="'justify'"/>
+          </xsl:when>
+          <!--Justify alignment-->
+          <xsl:otherwise>
+            <xsl:value-of select ="'justify'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <!-- Center alignment
 					<xsl:when test ="(a:p/a:pPr/@algn ='ctr') or (a:bodyPr/@anchorCtr = '1')">
 						<xsl:value-of select ="'center'"/>
 					</xsl:when>-->
-				<!-- Right alignment
+        <!-- Right alignment
 					<xsl:when test ="a:p/a:pPr/@algn ='r'">
 						<xsl:value-of select ="'right'"/>
 					</xsl:when>-->
-				<!--Justify alignment
+        <!--Justify alignment
 					<xsl:when test ="(a:p/a:pPr/@algn ='just') or (a:bodyPr/@anchorCtr = '0')">
 						<xsl:value-of select ="'justify'"/>
 					</xsl:when>-->
-				<!-- Left alignment
+        <!-- Left alignment
 					<xsl:otherwise>
 						<xsl:value-of select ="'left'"/>
 					</xsl:otherwise>-->
 
-			</xsl:attribute>
-			<xsl:attribute name ="draw:textarea-vertical-align">
-				<xsl:choose>
-					<!-- Middle alignment-->
-					<xsl:when test ="a:bodyPr/@anchor ='ctr'">
-						<xsl:value-of select ="'middle'"/>
-					</xsl:when>
-					<!-- Bottom alignment-->
-					<xsl:when test ="a:bodyPr/@anchor ='b'">
-						<xsl:value-of select ="'bottom'"/>
-					</xsl:when>
-					<!-- Top alignment -->
-					<xsl:otherwise>
-						<xsl:value-of select ="'top'"/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
+      </xsl:attribute>
+      <xsl:attribute name ="draw:textarea-vertical-align">
+        <xsl:choose>
+          <!-- Middle alignment-->
+          <xsl:when test ="a:bodyPr/@anchor ='ctr'">
+            <xsl:value-of select ="'middle'"/>
+          </xsl:when>
+          <!-- Bottom alignment-->
+          <xsl:when test ="a:bodyPr/@anchor ='b'">
+            <xsl:value-of select ="'bottom'"/>
+          </xsl:when>
+          <!-- Top alignment -->
+          <xsl:otherwise>
+            <xsl:value-of select ="'top'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
 
-			<!--fo:padding-->
-			<!--<xsl:if test ="a:bodyPr/@lIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
+      <!--fo:padding-->
+      <!--<xsl:if test ="a:bodyPr/@lIns or (a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
 				<xsl:attribute name ="fo:padding-left">
 					<xsl:call-template name="getPadding">
 						<xsl:with-param name="length" select="a:bodyPr/@lIns"/>
@@ -2330,131 +2602,131 @@ Copyright (c) 2007, Sonata Software Limited
 				</xsl:attribute>
 			</xsl:if>-->
 
-			<xsl:if test ="a:bodyPr/@lIns">
-				<xsl:attribute name ="fo:padding-left">
-					<xsl:call-template name="ConvertEmu">
-						<xsl:with-param name="length" select="a:bodyPr/@lIns"/>
-						<xsl:with-param name="unit">cm</xsl:with-param>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test ="not(a:bodyPr/@lIns)">
-				<xsl:attribute name ="fo:padding-left">
-					<xsl:call-template name="ConvertEmu">
-						<xsl:with-param name="length" select="'91440'"/>
-						<xsl:with-param name="unit">cm</xsl:with-param>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-			
-			<xsl:if test ="a:bodyPr/@tIns">
-				<xsl:attribute name ="fo:padding-top">
-					<xsl:call-template name="ConvertEmu">
-						<xsl:with-param name="length" select="a:bodyPr/@tIns"/>
-						<xsl:with-param name="unit">cm</xsl:with-param>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test ="not(a:bodyPr/@tIns)">
-				<xsl:attribute name ="fo:padding-top">
-					<xsl:call-template name="ConvertEmu">
-						<xsl:with-param name="length" select="'45720'"/>
-						<xsl:with-param name="unit">cm</xsl:with-param>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
+      <xsl:if test ="a:bodyPr/@lIns">
+        <xsl:attribute name ="fo:padding-left">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="a:bodyPr/@lIns"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="not(a:bodyPr/@lIns)">
+        <xsl:attribute name ="fo:padding-left">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="'91440'"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
 
-			<xsl:if test ="a:bodyPr/@rIns">
-				<xsl:attribute name ="fo:padding-right">
-					<xsl:call-template name="ConvertEmu">
-						<xsl:with-param name="length" select="a:bodyPr/@rIns"/>
-						<xsl:with-param name="unit">cm</xsl:with-param>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test ="not(a:bodyPr/@rIns)">
-				<xsl:attribute name ="fo:padding-right">
-					<xsl:call-template name="ConvertEmu">
-						<xsl:with-param name="length" select="'91440'"/>
-						<xsl:with-param name="unit">cm</xsl:with-param>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
+      <xsl:if test ="a:bodyPr/@tIns">
+        <xsl:attribute name ="fo:padding-top">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="a:bodyPr/@tIns"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="not(a:bodyPr/@tIns)">
+        <xsl:attribute name ="fo:padding-top">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="'45720'"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
 
-			<xsl:if test ="a:bodyPr/@bIns">
-				<xsl:attribute name ="fo:padding-bottom">
-					<xsl:call-template name="ConvertEmu">
-						<xsl:with-param name="length" select="a:bodyPr/@bIns"/>
-						<xsl:with-param name="unit">cm</xsl:with-param>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test ="not(a:bodyPr/@bIns)">
-				<xsl:attribute name ="fo:padding-bottom">
-					<xsl:call-template name="ConvertEmu">
-						<xsl:with-param name="length" select="'45720'"/>
-						<xsl:with-param name="unit">cm</xsl:with-param>
-					</xsl:call-template>
-				</xsl:attribute>
-			</xsl:if>
+      <xsl:if test ="a:bodyPr/@rIns">
+        <xsl:attribute name ="fo:padding-right">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="a:bodyPr/@rIns"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="not(a:bodyPr/@rIns)">
+        <xsl:attribute name ="fo:padding-right">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="'91440'"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
 
-			<!--Wrap text in shape -->
-			<xsl:choose>
-				<xsl:when test="(a:bodyPr/@wrap='none')">
-					<xsl:attribute name ="fo:wrap-option">
-						<xsl:value-of select ="'wrap'"/>
-					</xsl:attribute>
-				</xsl:when>
-				<xsl:when test="(a:bodyPr/@wrap='square')  or (a:p/a:pPr/@fontAlgn='auto')">
-					<xsl:attribute name ="fo:wrap-option">
-						<xsl:value-of select ="'no-wrap'"/>
-					</xsl:attribute>
-				</xsl:when>
+      <xsl:if test ="a:bodyPr/@bIns">
+        <xsl:attribute name ="fo:padding-bottom">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="a:bodyPr/@bIns"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="not(a:bodyPr/@bIns)">
+        <xsl:attribute name ="fo:padding-bottom">
+          <xsl:call-template name="ConvertEmu">
+            <xsl:with-param name="length" select="'45720'"/>
+            <xsl:with-param name="unit">cm</xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+
+      <!--Wrap text in shape -->
+      <xsl:choose>
+        <xsl:when test="(a:bodyPr/@wrap='none')">
+          <xsl:attribute name ="fo:wrap-option">
+            <xsl:value-of select ="'wrap'"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="(a:bodyPr/@wrap='square')  or (a:p/a:pPr/@fontAlgn='auto')">
+          <xsl:attribute name ="fo:wrap-option">
+            <xsl:value-of select ="'no-wrap'"/>
+          </xsl:attribute>
+        </xsl:when>
         <xsl:otherwise>
           <xsl:attribute name ="fo:wrap-option">
             <xsl:value-of select ="'no-wrap'"/>
           </xsl:attribute>
         </xsl:otherwise>
-			</xsl:choose>
+      </xsl:choose>
 
-			<xsl:if test ="( (a:bodyPr/a:spAutoFit) or (a:bodyPr/@wrap='square') )">
-				<xsl:attribute name="draw:auto-grow-height">
-					<xsl:value-of select ="'true'"/>
-				</xsl:attribute>
-			</xsl:if>
-			<xsl:if test ="not(a:bodyPr/a:spAutoFit)">
-				<xsl:attribute name="draw:auto-grow-height">
-					<xsl:value-of select ="'false'"/>
-				</xsl:attribute>
-				<xsl:attribute name="draw:auto-grow-width">
-					<xsl:value-of select ="'false'"/>
-				</xsl:attribute>
-			</xsl:if>
-		</xsl:for-each>
-	</xsl:template>
-	<!-- Get text padding-->
-	<xsl:template name ="getPadding">
-		<xsl:param name ="length" />
-		<xsl:choose>
-			<xsl:when test ="($length != '')">
-				<xsl:call-template name="ConvertEmu">
-					<xsl:with-param name="length" select="$length"/>
-					<xsl:with-param name="unit">cm</xsl:with-param>
-				</xsl:call-template>
-			</xsl:when>
-			<xsl:when test ="(a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
-				<xsl:value-of select ="'0cm'"/>
-			</xsl:when>
-		</xsl:choose>
-	</xsl:template>
-	<!--Text direction-->
-	<xsl:template name ="getTextDirection">
-		<xsl:param name ="vert" />
-		<xsl:choose>
-			<xsl:when test ="$vert = 'vert'">
-				<xsl:value-of select ="'tb-rl'"/>
-			</xsl:when>
-			<!--<xsl:when test ="$vert = 'vert270'">
+      <xsl:if test ="( (a:bodyPr/a:spAutoFit) or (a:bodyPr/@wrap='square') )">
+        <xsl:attribute name="draw:auto-grow-height">
+          <xsl:value-of select ="'true'"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:if test ="not(a:bodyPr/a:spAutoFit)">
+        <xsl:attribute name="draw:auto-grow-height">
+          <xsl:value-of select ="'false'"/>
+        </xsl:attribute>
+        <xsl:attribute name="draw:auto-grow-width">
+          <xsl:value-of select ="'false'"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+  <!-- Get text padding-->
+  <xsl:template name ="getPadding">
+    <xsl:param name ="length" />
+    <xsl:choose>
+      <xsl:when test ="($length != '')">
+        <xsl:call-template name="ConvertEmu">
+          <xsl:with-param name="length" select="$length"/>
+          <xsl:with-param name="unit">cm</xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test ="(a:bodyPr/@wrap='square') or (a:p/a:pPr/@fontAlgn='auto')">
+        <xsl:value-of select ="'0cm'"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  <!--Text direction-->
+  <xsl:template name ="getTextDirection">
+    <xsl:param name ="vert" />
+    <xsl:choose>
+      <xsl:when test ="$vert = 'vert'">
+        <xsl:value-of select ="'tb-rl'"/>
+      </xsl:when>
+      <!--<xsl:when test ="$vert = 'vert270'">
 					<xsl:value-of select ="'tb-lr'"/>
 				</xsl:when>
 				<xsl:when test ="$vert = 'wordArtVert'">
@@ -2469,7 +2741,7 @@ Copyright (c) 2007, Sonata Software Limited
 				<xsl:when test ="$vert = 'wordArtVertRtl'">
 					<xsl:value-of select ="'lr'" />
 				</xsl:when>-->
-		</xsl:choose>
-	</xsl:template>
-		
+    </xsl:choose>
+  </xsl:template>
+
 </xsl:stylesheet >
