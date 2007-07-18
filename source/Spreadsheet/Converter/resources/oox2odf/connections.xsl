@@ -38,6 +38,7 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
     
+    <!-- Get cell when the connectionl is starting and ending -->
     <xsl:template name="ConnectionsCell">
         <xsl:param name="number"/>
         <xsl:for-each select="ancestor::e:workbook/e:definedNames">
@@ -132,6 +133,7 @@
         
     </xsl:template>
     
+    <!-- Insert Connection -->
     <xsl:template name="InsertConnections">
         <xsl:param name="rowNum"/>
         <xsl:param name="colNum"/>
@@ -175,6 +177,7 @@
       
     </xsl:template>
     
+    <!-- Insert connection properties -->
     <xsl:template name="ConnectionProperties">
         <xsl:param name="sheetNr"/>
         <xsl:param name="ConnectionName"/>
@@ -206,6 +209,11 @@
                                         <xsl:apply-templates select="e:webPr/e:tables/e:x[1]"/>
                                    </xsl:attribute>
                                 </xsl:when>
+                                <xsl:when test="not(e:webPr/e:tables/e:x)">
+                                    <xsl:attribute name="table:name">
+                                        <xsl:apply-templates select="HTML_tables"/>
+                                    </xsl:attribute>
+                                </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:attribute name="table:name">
                                         <xsl:text>HTML_1</xsl:text>
@@ -220,6 +228,7 @@
         </xsl:for-each>
     </xsl:template>
     
+    <!-- Insert numbers of tables  -->
     <xsl:template match="e:x">
         <xsl:param name="TableName"/>
         

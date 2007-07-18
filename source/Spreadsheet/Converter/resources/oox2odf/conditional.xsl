@@ -37,7 +37,7 @@
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
 
 
-  <!-- We check cell when the conditional is starting and ending -->
+  <!-- Get cell when the conditional is starting and ending -->
   <xsl:template name="ConditionalCell">
     <xsl:param name="sheet"/>
     <xsl:param name="document"/>
