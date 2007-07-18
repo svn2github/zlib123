@@ -342,11 +342,16 @@ exclude-result-prefixes="p a r xlink ">
         <xsl:attribute name ="presentation:use-date-time-name">
           <xsl:value-of select ="concat('dtd',position())"/>
         </xsl:attribute>
-        <xsl:attribute name ="presentation:presentation-page-layout-name">
+        <xsl:variable name ="lyoutName">
           <xsl:call-template name ="GetLayOutName">
             <xsl:with-param name ="slideRelName" select ="concat(concat('slide',position()),'.xml')"/>
           </xsl:call-template>
-        </xsl:attribute>
+        </xsl:variable>
+        <xsl:if test ="$lyoutName!=''">
+          <xsl:attribute name ="presentation:presentation-page-layout-name">
+            <xsl:value-of select ="$lyoutName"/>
+          </xsl:attribute>
+        </xsl:if>
         <xsl:call-template name ="DrawFrames">
           <xsl:with-param name ="SlideFile" select ="concat(concat('slide',position()),'.xml')" />
         </xsl:call-template>
@@ -1858,6 +1863,12 @@ exclude-result-prefixes="p a r xlink ">
               <!--</xsl:if>-->
               <!--End of Code inserted by VijayetaFor Bullets, Enable Numbering-->
               <!-- Ends -->
+			  <!-- @@Code for Paragraph tabs Pradeep Nemadi -->
+				<!-- Starts-->
+				<xsl:if test ="a:pPr/a:tabLst/a:tab">
+					<xsl:call-template name ="paragraphTabstops" />
+				</xsl:if>
+				<!-- Ends -->	
             </style:paragraph-properties >
           </style:style>
           <!-- Modified by pradeep for fix 1731885-->
@@ -2603,22 +2614,23 @@ exclude-result-prefixes="p a r xlink ">
       <xsl:value-of select ="concat('ppt/slides/_rels/',$slideRelName,'.rels')"/>
     </xsl:variable >
     <xsl:for-each select ="document($LtName)//node()/@Target[contains(.,'slideLayouts')]">
+      <xsl:variable name ="Val">
+          <xsl:value-of select="substring(substring-before(.,'.xml'),28)"/>
+      </xsl:variable>
       <xsl:choose >
-        <xsl:when test =" contains(.,'1') ">
+        
+        <xsl:when test ="( $Val mod 11 )= 1 ">          
           <xsl:value-of  select ="'AL1T0'"/>
         </xsl:when>
-        <xsl:when test =" contains(.,'2') ">
+        <xsl:when test ="( $Val mod 11) = 2 ">
           <xsl:value-of  select ="'AL2T1'"/>
         </xsl:when>
-        <xsl:when test =" contains(.,'4') ">
+        <xsl:when test =" ($Val mod 11 )= 4 ">
           <xsl:value-of  select ="'AL3T3'"/>
         </xsl:when>
-        <xsl:when test =" contains(.,'6') ">
+        <xsl:when test =" ($Val mod 11 )= 6 ">
           <xsl:value-of  select ="'AL1T19'"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of  select ="'AL0T0'"/>
-        </xsl:otherwise>
+        </xsl:when>      
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>

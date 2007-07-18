@@ -57,7 +57,6 @@ Copyright (c) 2007, Sonata Software Limited
   exclude-result-prefixes="a style svg fo r">
   <xsl:import href="common.xsl"/>
   <xsl:import href="content.xsl"/>
-
   <xsl:template name="SlideMaster" >
     <xsl:call-template name="InsertStandardStyle"/>
     <xsl:call-template name="InsertSlideMasterCommnadFeaturesStyle"/>
@@ -287,29 +286,456 @@ Copyright (c) 2007, Sonata Software Limited
                 <xsl:attribute name ="style:family">
                   <xsl:value-of select ="'presentation'"/>
                 </xsl:attribute>
-                <style:graphic-properties draw:stroke="none">
+                <style:graphic-properties>
                   <xsl:call-template name="TitleSubTitleGraphicProperty">
                     <xsl:with-param name="blnSubTitle">
                       <xsl:value-of select="'false'"/>
                     </xsl:with-param>
                   </xsl:call-template>
                   <text:list-style>
-                    <xsl:for-each select ="./p:txBody/a:p">
-                      <xsl:call-template name="slideMasterBullett">
-                        <xsl:with-param name="SlideMasterFile">
-                          <xsl:value-of select="$slideMasterPath"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="levelNo">
-                          <xsl:value-of select="./a:pPr/@lvl"/>
-                        </xsl:with-param>
-                        <xsl:with-param name="pos">
-                          <xsl:value-of select="position()"/>
-                        </xsl:with-param>
-                      </xsl:call-template>
-                    </xsl:for-each>
+                      <xsl:for-each select ="./p:txBody/a:p">
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="./a:pPr/@lvl"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="position()"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:for-each>
+                    <xsl:variable name="var_MaxOutNumber">
+                      <xsl:for-each select="./p:txBody/a:p/a:pPr/@lvl">
+                        <xsl:sort data-type="number" order="descending"/>
+                        <xsl:if test="position()=1">
+                          <xsl:value-of select="."/>
+                        </xsl:if>
+                      </xsl:for-each>
+                    </xsl:variable>
+                    <!--<xsl:variable name="var_MaxOutNumber">
+                        <xsl:for-each select ="./p:txBody/a:p">
+                            <xsl:value-of select="./a:pPr/@lvl"/>
+                      </xsl:for-each>
+                    </xsl:variable>-->
+                    <xsl:choose>
+                      <xsl:when test="$var_MaxOutNumber='0'">
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'0'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:when>
+                      <xsl:when test="$var_MaxOutNumber='1'">
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'1'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'1'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'1'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'1'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'1'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'1'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'1'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:when>
+                      <xsl:when test="$var_MaxOutNumber='2'">
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:when>
+                      <xsl:when test="$var_MaxOutNumber='3'">
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:when>
+                      <xsl:when test="$var_MaxOutNumber='4'">
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:when>
+                      <xsl:when test="$var_MaxOutNumber='5'">
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:when>
+                      <xsl:when test="$var_MaxOutNumber='6'">
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:when>
+                      <xsl:when test="$var_MaxOutNumber='7'">
+                        <xsl:call-template name="slideMasterBullett">
+                          <xsl:with-param name="SlideMasterFile">
+                            <xsl:value-of select="$slideMasterPath"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="levelNo">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                          <xsl:with-param name="pos">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </xsl:when>
+                    </xsl:choose>
                   </text:list-style>
                 </style:graphic-properties>
-                <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMasterPath))//p:txStyles/p:bodyStyle/a:lvl1pPr">
+                <xsl:for-each select ="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl1pPr">
                   <xsl:call-template name="Outlines">
                     <xsl:with-param name="level">
                       <xsl:value-of select="'1'"/>
@@ -317,166 +743,1534 @@ Copyright (c) 2007, Sonata Software Limited
                   </xsl:call-template>
                 </xsl:for-each>
               </style:style>
-            </xsl:when>
+              <xsl:variable name="var_MaxOutNumber">
+              <xsl:for-each select="./p:txBody/a:p/a:pPr/@lvl">
+                <xsl:sort data-type="number" order="descending"/>
+                <xsl:if test="position()=1">
+                 <xsl:value-of select="."/>
+                </xsl:if>
+              </xsl:for-each>
+              </xsl:variable>
+              <!--<xsl:variable name="var_MaxOutNumber">
+                <xsl:for-each select ="./p:txBody/a:p">
+                  <xsl:value-of select="./a:pPr/@lvl"/>
+                </xsl:for-each>
+              </xsl:variable>-->
+                <xsl:choose>
+                  <xsl:when test="$var_MaxOutNumber='0'">
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl1pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
+                        </xsl:attribute>
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl1pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
 
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl1pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl1pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl1pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl1pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl1pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl1pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>  
+                  </xsl:when>
+                  <xsl:when test="$var_MaxOutNumber='1'">
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
+                        </xsl:attribute>
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:when test="$var_MaxOutNumber='2'">
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
+                        </xsl:attribute>
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:when test="$var_MaxOutNumber='3'">
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
+                        </xsl:attribute>
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:when test="$var_MaxOutNumber='4'">
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
+                        </xsl:attribute>
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl5pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl5pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl5pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl5pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl5pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:when test="$var_MaxOutNumber='5'">
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
+                        </xsl:attribute>
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl5pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl6pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl6pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl6pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl6pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:when test="$var_MaxOutNumber='6'">
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
+                        </xsl:attribute>
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl5pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl6pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl7pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl7pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl7pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:when test="$var_MaxOutNumber='7'">
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
+                        </xsl:attribute>
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl5pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl6pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl7pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl8pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:when test="$var_MaxOutNumber='8'">
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl2pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
+                        </xsl:attribute>
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'2'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl3pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'3'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl4pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'4'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl5pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'5'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl6pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'6'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl7pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'7'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl8pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline7')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'8'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:txStyles/p:bodyStyle/a:lvl9pPr">
+                      <style:style>
+                        <xsl:attribute name="style:name">
+                          <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:family">
+                          <xsl:value-of select ="'presentation'"/>
+                        </xsl:attribute>
+                        <xsl:attribute name ="style:parent-style-name">
+                          <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
+                        </xsl:attribute>
+
+                        <xsl:call-template name="Outlines">
+                          <xsl:with-param name="level">
+                            <xsl:value-of select="'9'"/>
+                          </xsl:with-param>
+                        </xsl:call-template>
+                      </style:style>
+                    </xsl:for-each>
+                  </xsl:when>
+                </xsl:choose>
+            </xsl:when>
           </xsl:choose>
         </xsl:for-each>
+        <xsl:if test="not(document(concat('ppt/slideMasters/',$slideMasterPath))//p:sp)">
+          <!-- style for Title-->
+          <style:style>
+            <xsl:attribute name="style:name">
+              <xsl:value-of select="concat($slideMasterName,'-title')"/>
+            </xsl:attribute>
+            <xsl:attribute name ="style:family">
+              <xsl:value-of select ="'presentation'"/>
+            </xsl:attribute>
+            <xsl:call-template name="TitleStyle">
+              <xsl:with-param name="SlideMasterFile">
+                <xsl:value-of select="$slideMasterPath"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </style:style>
+          <!-- style for sub-Title-->
+          <style:style>
+            <xsl:attribute name="style:name">
+              <xsl:value-of select="concat($slideMasterName,'-subtitle')"/>
+            </xsl:attribute>
+            <xsl:attribute name ="style:family">
+              <xsl:value-of select ="'presentation'"/>
+            </xsl:attribute>
+            <xsl:call-template name="SubtitleStyle">
+              <xsl:with-param name="SlideMasterFile">
+                <xsl:value-of select="$slideMasterPath"/>
+              </xsl:with-param>
+            </xsl:call-template>
+
+          </style:style>
+          <!-- style for Outline 1-->
+          <style:style>
+            <xsl:attribute name="style:name">
+              <xsl:value-of select="concat($slideMasterName,'-outline1')"/>
+            </xsl:attribute>
+            <xsl:attribute name ="style:family">
+              <xsl:value-of select ="'presentation'"/>
+            </xsl:attribute>
+            <style:graphic-properties draw:stroke="none" draw:fill="none">
+              <text:list-style>
+                <xsl:call-template name="slideMasterBullett">
+                    <xsl:with-param name="SlideMasterFile">
+                      <xsl:value-of select="$slideMasterPath"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="levelNo">
+                      <xsl:value-of select="'0'"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="pos">
+                      <xsl:value-of select="'1'"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                <xsl:call-template name="slideMasterBullett">
+                  <xsl:with-param name="SlideMasterFile">
+                    <xsl:value-of select="$slideMasterPath"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="levelNo">
+                    <xsl:value-of select="'1'"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="pos">
+                    <xsl:value-of select="'2'"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+                <xsl:call-template name="slideMasterBullett">
+                  <xsl:with-param name="SlideMasterFile">
+                    <xsl:value-of select="$slideMasterPath"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="levelNo">
+                    <xsl:value-of select="'2'"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="pos">
+                    <xsl:value-of select="'3'"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+                <xsl:call-template name="slideMasterBullett">
+                  <xsl:with-param name="SlideMasterFile">
+                    <xsl:value-of select="$slideMasterPath"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="levelNo">
+                    <xsl:value-of select="'3'"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="pos">
+                    <xsl:value-of select="'4'"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+                <xsl:call-template name="slideMasterBullett">
+                  <xsl:with-param name="SlideMasterFile">
+                    <xsl:value-of select="$slideMasterPath"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="levelNo">
+                    <xsl:value-of select="'4'"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="pos">
+                    <xsl:value-of select="'5'"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+                <xsl:call-template name="slideMasterBullett">
+                  <xsl:with-param name="SlideMasterFile">
+                    <xsl:value-of select="$slideMasterPath"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="levelNo">
+                    <xsl:value-of select="'5'"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="pos">
+                    <xsl:value-of select="'6'"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+                <xsl:call-template name="slideMasterBullett">
+                  <xsl:with-param name="SlideMasterFile">
+                    <xsl:value-of select="$slideMasterPath"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="levelNo">
+                    <xsl:value-of select="'6'"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="pos">
+                    <xsl:value-of select="'7'"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+                <xsl:call-template name="slideMasterBullett">
+                    <xsl:with-param name="SlideMasterFile">
+                      <xsl:value-of select="$slideMasterPath"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="levelNo">
+                      <xsl:value-of select="'7'"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="pos">
+                      <xsl:value-of select="'8'"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                <xsl:call-template name="slideMasterBullett">
+                    <xsl:with-param name="SlideMasterFile">
+                      <xsl:value-of select="$slideMasterPath"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="levelNo">
+                      <xsl:value-of select="'8'"/>
+                    </xsl:with-param>
+                    <xsl:with-param name="pos">
+                      <xsl:value-of select="'9'"/>
+                    </xsl:with-param>
+                  </xsl:call-template>
+              </text:list-style>
+            </style:graphic-properties>
+            <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMasterPath))//p:txStyles/p:bodyStyle/a:lvl1pPr">
+              <xsl:call-template name="Outlines">
+                <xsl:with-param name="level">
+                  <xsl:value-of select="'1'"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </style:style>
+        </xsl:if>
         <!-- style for other Outlines-->
-        <xsl:for-each select ="document(concat('ppt/slideMasters/',$slideMasterPath))//p:txStyles/p:bodyStyle">
-
-          <xsl:for-each select="./a:lvl2pPr">
-            <style:style>
-              <xsl:attribute name="style:name">
-                <xsl:value-of select="concat($slideMasterName,'-outline2')"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:family">
-                <xsl:value-of select ="'presentation'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:parent-style-name">
-                <xsl:value-of select ="concat($slideMasterName,'-outline1')"/>
-              </xsl:attribute>
-
-              <xsl:call-template name="Outlines">
-                <xsl:with-param name="level">
-                  <xsl:value-of select="'2'"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </style:style>
-          </xsl:for-each>
-          <xsl:for-each select="./a:lvl3pPr">
-            <style:style>
-              <xsl:attribute name="style:name">
-                <xsl:value-of select="concat($slideMasterName,'-outline3')"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:family">
-                <xsl:value-of select ="'presentation'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:parent-style-name">
-                <xsl:value-of select ="concat($slideMasterName,'-outline2')"/>
-              </xsl:attribute>
-
-              <xsl:call-template name="Outlines">
-                <xsl:with-param name="level">
-                  <xsl:value-of select="'3'"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </style:style>
-          </xsl:for-each>
-          <xsl:for-each select="./a:lvl4pPr">
-            <style:style>
-              <xsl:attribute name="style:name">
-                <xsl:value-of select="concat($slideMasterName,'-outline4')"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:family">
-                <xsl:value-of select ="'presentation'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:parent-style-name">
-                <xsl:value-of select ="concat($slideMasterName,'-outline3')"/>
-              </xsl:attribute>
-
-              <xsl:call-template name="Outlines">
-                <xsl:with-param name="level">
-                  <xsl:value-of select="'4'"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </style:style>
-          </xsl:for-each>
-          <xsl:for-each select="./a:lvl5pPr">
-            <style:style>
-              <xsl:attribute name="style:name">
-                <xsl:value-of select="concat($slideMasterName,'-outline5')"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:family">
-                <xsl:value-of select ="'presentation'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:parent-style-name">
-                <xsl:value-of select ="concat($slideMasterName,'-outline4')"/>
-              </xsl:attribute>
-
-              <xsl:call-template name="Outlines">
-                <xsl:with-param name="level">
-                  <xsl:value-of select="'5'"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </style:style>
-          </xsl:for-each>
-          <xsl:for-each select="./a:lvl6pPr">
-            <style:style>
-              <xsl:attribute name="style:name">
-                <xsl:value-of select="concat($slideMasterName,'-outline6')"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:family">
-                <xsl:value-of select ="'presentation'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:parent-style-name">
-                <xsl:value-of select ="concat($slideMasterName,'-outline5')"/>
-              </xsl:attribute>
-
-              <xsl:call-template name="Outlines">
-                <xsl:with-param name="level">
-                  <xsl:value-of select="'6'"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </style:style>
-          </xsl:for-each>
-          <xsl:for-each select="./a:lvl7pPr">
-            <style:style>
-              <xsl:attribute name="style:name">
-                <xsl:value-of select="concat($slideMasterName,'-outline7')"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:family">
-                <xsl:value-of select ="'presentation'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:parent-style-name">
-                <xsl:value-of select ="concat($slideMasterName,'-outline6')"/>
-              </xsl:attribute>
-
-              <xsl:call-template name="Outlines">
-                <xsl:with-param name="level">
-                  <xsl:value-of select="'7'"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </style:style>
-          </xsl:for-each>
-          <xsl:for-each select="./a:lvl8pPr">
-            <style:style>
-              <xsl:attribute name="style:name">
-                <xsl:value-of select="concat($slideMasterName,'-outline8')"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:family">
-                <xsl:value-of select ="'presentation'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:parent-style-name">
-                <xsl:value-of select ="concat($slideMasterName,'-outline7')"/>
-              </xsl:attribute>
-
-              <xsl:call-template name="Outlines">
-                <xsl:with-param name="level">
-                  <xsl:value-of select="'8'"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </style:style>
-          </xsl:for-each>
-          <xsl:for-each select="./a:lvl9pPr">
-            <style:style>
-              <xsl:attribute name="style:name">
-                <xsl:value-of select="concat($slideMasterName,'-outline9')"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:family">
-                <xsl:value-of select ="'presentation'"/>
-              </xsl:attribute>
-              <xsl:attribute name ="style:parent-style-name">
-                <xsl:value-of select ="concat($slideMasterName,'-outline8')"/>
-              </xsl:attribute>
-
-              <xsl:call-template name="Outlines">
-                <xsl:with-param name="level">
-                  <xsl:value-of select="'9'"/>
-                </xsl:with-param>
-              </xsl:call-template>
-            </style:style>
-          </xsl:for-each>
-        </xsl:for-each>
+      
         <!-- for style of Slide Master's Background Color-->
         <style:style>
           <xsl:attribute name="style:name">
@@ -505,7 +2299,6 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
-
   <!-- @@Get bullet chars and level from slide master 
 This tmplate will get the bullet level and charactor and Marginleft-->
   <xsl:template name ="slideMasterBullett">
@@ -547,7 +2340,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl1pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl1pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl1pPr/@marL + ./a:lvl1pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -573,13 +2366,22 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               </xsl:for-each>
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl1pPr/@indent">
-                  <xsl:attribute name ="text:min-label-width">
-                    <xsl:value-of select="concat(format-number(./a:lvl1pPr/@indent div 360000, '#.##'), 'cm')"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="./a:lvl1pPr/@indent &lt; 0">
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number((0 - ./a:lvl1pPr/@indent) div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number(./a:lvl1pPr/@indent div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if >
                 <xsl:if test ="./a:lvl1pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl1pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl1pPr/@marL + ./a:lvl1pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -620,7 +2422,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl1pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl1pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl1pPr/@marL + ./a:lvl1pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -665,7 +2467,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl1pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl1pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl1pPr/@marL + ./a:lvl1pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -712,7 +2514,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl2pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl2pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl2pPr/@marL + ./a:lvl2pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -738,13 +2540,22 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               </xsl:for-each>
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl2pPr/@indent">
-                  <xsl:attribute name ="text:min-label-width">
-                    <xsl:value-of select="concat(format-number(./a:lvl2pPr/@indent div 360000, '#.##'), 'cm')"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="./a:lvl2pPr/@indent &lt; 0">
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number((0 - ./a:lvl2pPr/@indent) div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number(./a:lvl2pPr/@indent div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if >
                 <xsl:if test ="./a:lvl2pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl2pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl2pPr/@marL + ./a:lvl2pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -785,7 +2596,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl2pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl2pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl2pPr/@marL + ./a:lvl2pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -830,7 +2641,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl2pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl2pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl2pPr/@marL + ./a:lvl2pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -877,7 +2688,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl3pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl3pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl3pPr/@marL + ./a:lvl3pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -903,13 +2714,22 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               </xsl:for-each>
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl3pPr/@indent">
-                  <xsl:attribute name ="text:min-label-width">
-                    <xsl:value-of select="concat(format-number(./a:lvl3pPr/@indent div 360000, '#.##'), 'cm')"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="./a:lvl3pPr/@indent &lt; 0">
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number((0 - ./a:lvl3pPr/@indent) div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number(./a:lvl3pPr/@indent div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if >
                 <xsl:if test ="./a:lvl3pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl3pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl3pPr/@marL + ./a:lvl3pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -950,7 +2770,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl3pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl3pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl3pPr/@marL + ./a:lvl3pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -995,7 +2815,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl3pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl3pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl3pPr/@marL + ./a:lvl3pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1042,7 +2862,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl4pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl4pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl4pPr/@marL + ./a:lvl4pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1068,13 +2888,22 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               </xsl:for-each>
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl4pPr/@indent">
-                  <xsl:attribute name ="text:min-label-width">
-                    <xsl:value-of select="concat(format-number(./a:lvl4pPr/@indent div 360000, '#.##'), 'cm')"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="./a:lvl4pPr/@indent &lt; 0">
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number((0 - ./a:lvl4pPr/@indent) div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number(./a:lvl4pPr/@indent div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if >
                 <xsl:if test ="./a:lvl4pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl4pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl4pPr/@marL + ./a:lvl4pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1115,7 +2944,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl4pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl4pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl4pPr/@marL + ./a:lvl4pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1160,7 +2989,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl4pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl4pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl4pPr/@marL + ./a:lvl4pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1207,7 +3036,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl5pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl5pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl5pPr/@marL + ./a:lvl5pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1233,13 +3062,22 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               </xsl:for-each>
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl5pPr/@indent">
-                  <xsl:attribute name ="text:min-label-width">
-                    <xsl:value-of select="concat(format-number(./a:lvl5pPr/@indent div 360000, '#.##'), 'cm')"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="./a:lvl5pPr/@indent &lt; 0">
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number((0 - ./a:lvl5pPr/@indent) div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number(./a:lvl5pPr/@indent div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if >
                 <xsl:if test ="./a:lvl5pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl5pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl5pPr/@marL + ./a:lvl5pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1280,7 +3118,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl5pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl5pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl5pPr/@marL + ./a:lvl5pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1325,7 +3163,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl5pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl5pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl5pPr/@marL + ./a:lvl5pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1372,7 +3210,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl6pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl6pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl6pPr/@marL + ./a:lvl6pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1398,13 +3236,22 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               </xsl:for-each>
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl6pPr/@indent">
-                  <xsl:attribute name ="text:min-label-width">
-                    <xsl:value-of select="concat(format-number(./a:lvl6pPr/@indent div 360000, '#.##'), 'cm')"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="./a:lvl6pPr/@indent &lt; 0">
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number((0 - ./a:lvl6pPr/@indent) div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number(./a:lvl6pPr/@indent div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if >
                 <xsl:if test ="./a:lvl6pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl6pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl6pPr/@marL + ./a:lvl6pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1445,7 +3292,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl6pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl6pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl6pPr/@marL + ./a:lvl6pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1490,7 +3337,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl6pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl6pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl6pPr/@marL + ./a:lvl6pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1537,7 +3384,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl7pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl7pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl7pPr/@marL + ./a:lvl7pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1563,13 +3410,22 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               </xsl:for-each>
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl7pPr/@indent">
-                  <xsl:attribute name ="text:min-label-width">
-                    <xsl:value-of select="concat(format-number(./a:lvl7pPr/@indent div 360000, '#.##'), 'cm')"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="./a:lvl7pPr/@indent &lt; 0">
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number((0 - ./a:lvl7pPr/@indent) div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number(./a:lvl7pPr/@indent div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if >
                 <xsl:if test ="./a:lvl7pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl7pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl7pPr/@marL + ./a:lvl7pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1610,7 +3466,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl7pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl7pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl7pPr/@marL + ./a:lvl7pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1655,7 +3511,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl7pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl7pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl7pPr/@marL + ./a:lvl7pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1702,7 +3558,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl8pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl8pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl8pPr/@marL + ./a:lvl8pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1728,13 +3584,22 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               </xsl:for-each>
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl8pPr/@indent">
-                  <xsl:attribute name ="text:min-label-width">
-                    <xsl:value-of select="concat(format-number(./a:lvl8pPr/@indent div 360000, '#.##'), 'cm')"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="./a:lvl8pPr/@indent &lt; 0">
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number((0 - ./a:lvl8pPr/@indent) div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number(./a:lvl8pPr/@indent div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if >
                 <xsl:if test ="./a:lvl8pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl8pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl8pPr/@marL + ./a:lvl8pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1775,7 +3640,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl8pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl8pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl8pPr/@marL + ./a:lvl8pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1820,7 +3685,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl8pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl8pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl8pPr/@marL + ./a:lvl8pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1867,7 +3732,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl9pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl9pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl9pPr/@marL + ./a:lvl9pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1893,13 +3758,22 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               </xsl:for-each>
               <style:list-level-properties>
                 <xsl:if test ="./a:lvl9pPr/@indent">
-                  <xsl:attribute name ="text:min-label-width">
-                    <xsl:value-of select="concat(format-number(./a:lvl9pPr/@indent div 360000, '#.##'), 'cm')"/>
-                  </xsl:attribute>
+                  <xsl:choose>
+                    <xsl:when test="./a:lvl9pPr/@indent &lt; 0">
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number((0 - ./a:lvl9pPr/@indent) div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:attribute name ="text:min-label-width">
+                        <xsl:value-of select="concat(format-number(./a:lvl9pPr/@indent div 360000, '#.##'), 'cm')"/>
+                      </xsl:attribute>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if >
                 <xsl:if test ="./a:lvl9pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl9pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl9pPr/@marL + ./a:lvl9pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1940,7 +3814,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl9pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl9pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl9pPr/@marL + ./a:lvl9pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -1985,7 +3859,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 </xsl:if >
                 <xsl:if test ="./a:lvl9pPr/@marL">
                   <xsl:attribute name ="text:space-before">
-                    <xsl:value-of select="concat(format-number(./a:lvl9pPr/@marL div 360000, '#.##'), 'cm')"/>
+                    <xsl:value-of select="concat(format-number( (./a:lvl9pPr/@marL + ./a:lvl9pPr/@indent) div 360000, '#.##'), 'cm')"/>
                   </xsl:attribute>
                 </xsl:if>
               </style:list-level-properties>
@@ -2004,179 +3878,6 @@ This tmplate will get the bullet level and charactor and Marginleft-->
         </xsl:when>
       </xsl:choose>
     </xsl:for-each>
-  </xsl:template>
-  <xsl:template name ="slideMasterOutlines">
-    <xsl:param name="SlideMasterFile" />
-    <xsl:param name="level"></xsl:param>
-
-    <xsl:for-each select="document(concat('ppt/slideMasters/',$SlideMasterFile))/p:sldMaster/p:txStyles/p:bodyStyle">
-      <xsl:choose>
-        <xsl:when test="$level='1'">
-          <style:paragraph-properties text:enable-numbering="true">
-
-            <xsl:for-each select="./a:lvl1pPr">
-              <xsl:call-template name="tmpShapeParaProp">
-                <xsl:with-param name="lnSpcReduction" select="'0'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:paragraph-properties>
-          <style:text-properties>
-            <xsl:for-each select="a:lvl1pPr">
-              <xsl:call-template name="tmpShapeTextProperty">
-                <xsl:with-param name="fontType" select="'minor'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:text-properties>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$level='2'">
-          <style:paragraph-properties >
-            <xsl:for-each select="a:lvl2pPr">
-              <xsl:call-template name="tmpShapeParaProp">
-                <xsl:with-param name="lnSpcReduction" select="'0'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:paragraph-properties>
-          <style:text-properties>
-            <xsl:for-each select="a:lvl2pPr">
-              <xsl:call-template name="tmpShapeTextProperty">
-                <xsl:with-param name="fontType" select="'minor'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-
-          </style:text-properties>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$level='3'">
-          <style:paragraph-properties >
-            <xsl:for-each select="a:lvl3pPr">
-              <xsl:call-template name="tmpShapeParaProp">
-                <xsl:with-param name="lnSpcReduction" select="'0'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:paragraph-properties>
-          <style:text-properties>
-            <xsl:for-each select="a:lvl3pPr">
-              <xsl:call-template name="tmpShapeTextProperty">
-                <xsl:with-param name="fontType" select="'minor'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-
-          </style:text-properties>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$level='4'">
-          <style:paragraph-properties >
-            <xsl:for-each select="a:lvl4pPr">
-              <xsl:call-template name="tmpShapeParaProp">
-                <xsl:with-param name="lnSpcReduction" select="'0'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:paragraph-properties>
-          <style:text-properties>
-            <xsl:for-each select="a:lvl4pPr">
-              <xsl:call-template name="tmpShapeTextProperty">
-                <xsl:with-param name="fontType" select="'minor'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:text-properties>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$level='5'">
-          <style:paragraph-properties >
-            <xsl:for-each select="a:lvl5pPr">
-              <xsl:call-template name="tmpShapeParaProp">
-                <xsl:with-param name="lnSpcReduction" select="'0'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:paragraph-properties>
-          <style:text-properties>
-            <xsl:for-each select="a:lvl5pPr">
-              <xsl:call-template name="tmpShapeTextProperty">
-                <xsl:with-param name="fontType" select="'minor'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:text-properties>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$level='6'">
-          <style:paragraph-properties >
-            <xsl:for-each select="a:lvl6pPr">
-              <xsl:call-template name="tmpShapeParaProp">
-                <xsl:with-param name="lnSpcReduction" select="'0'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:paragraph-properties>
-          <style:text-properties>
-            <xsl:for-each select="a:lvl6pPr">
-              <xsl:call-template name="tmpShapeTextProperty">
-                <xsl:with-param name="fontType" select="'minor'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:text-properties>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$level='7'">
-          <style:paragraph-properties >
-            <xsl:for-each select="a:lvl7pPr">
-              <xsl:call-template name="tmpShapeParaProp">
-                <xsl:with-param name="lnSpcReduction" select="'0'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:paragraph-properties>
-          <style:text-properties>
-            <xsl:for-each select="a:lvl7pPr">
-              <xsl:call-template name="tmpShapeTextProperty">
-                <xsl:with-param name="fontType" select="'minor'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:text-properties>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$level='8'">
-          <style:paragraph-properties >
-            <xsl:for-each select="a:lvl8pPr">
-              <xsl:call-template name="tmpShapeParaProp">
-                <xsl:with-param name="lnSpcReduction" select="'0'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:paragraph-properties>
-          <style:text-properties>
-            <xsl:for-each select="a:lvl8pPr">
-              <xsl:call-template name="tmpShapeTextProperty">
-                <xsl:with-param name="fontType" select="'minor'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:text-properties>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="$level='9'">
-          <style:paragraph-properties >
-            <xsl:for-each select="a:lvl9pPr">
-              <xsl:call-template name="tmpShapeParaProp">
-                <xsl:with-param name="lnSpcReduction" select="'0'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:paragraph-properties>
-          <style:text-properties>
-            <xsl:for-each select="a:lvl9pPr">
-              <xsl:call-template name="tmpShapeTextProperty">
-                <xsl:with-param name="fontType" select="'minor'"/>
-              </xsl:call-template>
-            </xsl:for-each>
-          </style:text-properties>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:for-each>
-
   </xsl:template>
   <xsl:template name ="slideMasterInternalMargins">
     <xsl:param name ="phType"/>
@@ -2270,18 +3971,50 @@ This tmplate will get the bullet level and charactor and Marginleft-->
   </xsl:template>
   <xsl:template name="TitleStyle">
     <xsl:param name="SlideMasterFile"></xsl:param>
-    <style:graphic-properties draw:stroke="none">
+    <style:graphic-properties>
       <xsl:call-template name="TitleSubTitleGraphicProperty">
         <xsl:with-param name="blnSubTitle">
           <xsl:value-of select="'false'"/>
         </xsl:with-param>
       </xsl:call-template>
       <text:list-style>
-        <text:list-level-style-bullet text:level="1">
+        <text:list-level-style-bullet text:level="1" text:bullet-char="●">
+          <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+        </text:list-level-style-bullet>
+        <text:list-level-style-bullet text:level="2" text:bullet-char="●">
+          <style:list-level-properties text:space-before="0.6cm" text:min-label-width="0.6cm"/>
+          <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+        </text:list-level-style-bullet>
+        <text:list-level-style-bullet text:level="3" text:bullet-char="●">
+          <style:list-level-properties text:space-before="1.2cm" text:min-label-width="0.6cm"/>
+          <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+        </text:list-level-style-bullet>
+        <text:list-level-style-bullet text:level="4" text:bullet-char="●">
+          <style:list-level-properties text:space-before="1.8cm" text:min-label-width="0.6cm"/>
+          <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+        </text:list-level-style-bullet>
+        <text:list-level-style-bullet text:level="5" text:bullet-char="●">
+          <style:list-level-properties text:space-before="2.4cm" text:min-label-width="0.6cm"/>
+          <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+        </text:list-level-style-bullet>
+        <text:list-level-style-bullet text:level="6" text:bullet-char="●">
+          <style:list-level-properties text:space-before="3cm" text:min-label-width="0.6cm"/>
+          <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+        </text:list-level-style-bullet>
+        <text:list-level-style-bullet text:level="7" text:bullet-char="●">
+          <style:list-level-properties text:space-before="3.6cm" text:min-label-width="0.6cm"/>
+          <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+        </text:list-level-style-bullet>
+        <text:list-level-style-bullet text:level="8" text:bullet-char="●">
+          <style:list-level-properties text:space-before="4.2cm" text:min-label-width="0.6cm"/>
+          <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
+        </text:list-level-style-bullet>
+        <text:list-level-style-bullet text:level="9" text:bullet-char="●">
+          <style:list-level-properties text:space-before="4.8cm" text:min-label-width="0.6cm"/>
+          <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
       </text:list-style>
     </style:graphic-properties>
-
     <style:paragraph-properties>
       <xsl:for-each select="document(concat('ppt/slideMasters/',$SlideMasterFile))//p:txStyles/p:titleStyle/a:lvl1pPr">
         <xsl:call-template name="tmpShapeParaProp"/>
@@ -2296,7 +4029,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
     </xsl:for-each>
   </xsl:template>
   <xsl:template name="DatePageNoFooterStyle">
-    <style:graphic-properties draw:stroke="none">
+    <style:graphic-properties>
       <xsl:call-template name="TitleSubTitleGraphicProperty"/>
     </style:graphic-properties>
     <style:paragraph-properties>
@@ -2472,7 +4205,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                               </xsl:with-param>
                             </xsl:call-template>
                           </xsl:for-each>-->
-                    </draw:text-box>
+                    </draw:text-box> 
                   </draw:frame>
                 </xsl:when>
                 <xsl:when test="p:nvSpPr/p:nvPr/p:ph/@type='dt'">
@@ -2611,45 +4344,45 @@ This tmplate will get the bullet level and charactor and Marginleft-->
   </xsl:template>
   <xsl:template name="SubtitleStyle">
     <xsl:param name="SlideMasterFile"></xsl:param>
-    <style:graphic-properties draw:stroke="none">
+    <style:graphic-properties>
       <xsl:call-template name="TitleSubTitleGraphicProperty">
         <xsl:with-param name="blnSubTitle">
           <xsl:value-of select="'true'"/>
         </xsl:with-param>
       </xsl:call-template>
       <text:list-style>
-        <text:list-level-style-bullet text:level="1" text:bullet-char="?">
+        <text:list-level-style-bullet text:level="1" text:bullet-char="●">
           <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
-        <text:list-level-style-bullet text:level="2" text:bullet-char="?">
+        <text:list-level-style-bullet text:level="2" text:bullet-char="●">
           <style:list-level-properties text:space-before="0.6cm" text:min-label-width="0.6cm"/>
           <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
-        <text:list-level-style-bullet text:level="3" text:bullet-char="?">
+        <text:list-level-style-bullet text:level="3" text:bullet-char="●">
           <style:list-level-properties text:space-before="1.2cm" text:min-label-width="0.6cm"/>
           <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
-        <text:list-level-style-bullet text:level="4" text:bullet-char="?">
+        <text:list-level-style-bullet text:level="4" text:bullet-char="●">
           <style:list-level-properties text:space-before="1.8cm" text:min-label-width="0.6cm"/>
           <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
-        <text:list-level-style-bullet text:level="5" text:bullet-char="?">
+        <text:list-level-style-bullet text:level="5" text:bullet-char="●">
           <style:list-level-properties text:space-before="2.4cm" text:min-label-width="0.6cm"/>
           <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
-        <text:list-level-style-bullet text:level="6" text:bullet-char="?">
+        <text:list-level-style-bullet text:level="6" text:bullet-char="●">
           <style:list-level-properties text:space-before="3cm" text:min-label-width="0.6cm"/>
           <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
-        <text:list-level-style-bullet text:level="7" text:bullet-char="?">
+        <text:list-level-style-bullet text:level="7" text:bullet-char="●">
           <style:list-level-properties text:space-before="3.6cm" text:min-label-width="0.6cm"/>
           <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
-        <text:list-level-style-bullet text:level="8" text:bullet-char="?">
+        <text:list-level-style-bullet text:level="8" text:bullet-char="●">
           <style:list-level-properties text:space-before="4.2cm" text:min-label-width="0.6cm"/>
           <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
-        <text:list-level-style-bullet text:level="9" text:bullet-char="?">
+        <text:list-level-style-bullet text:level="9" text:bullet-char="●">
           <style:list-level-properties text:space-before="4.8cm" text:min-label-width="0.6cm"/>
           <style:text-properties fo:font-family="StarSymbol" style:use-window-font-color="true" fo:font-size="45%"/>
         </text:list-level-style-bullet>
@@ -2676,9 +4409,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
       <xsl:when test="$level='0'">
         <text:list>
           <text:list-item>
-            <text:p>
-              <xsl:value-of select="$text"/>
-            </text:p>
+            <text:p>vipul</text:p>
           </text:list-item>
         </text:list>
       </xsl:when>
@@ -2687,206 +4418,203 @@ This tmplate will get the bullet level and charactor and Marginleft-->
           <text:list-item>
             <text:list>
               <text:list-item>
-                <text:p>
-                  <xsl:value-of select="$text"/>
-                </text:p>
+                <text:p>sateesh</text:p>
               </text:list-item>
             </text:list>
           </text:list-item>
         </text:list>
       </xsl:when>
       <xsl:when test="$level='2'">
-        <text:list-item>
-          <text:list>
-            <text:list-item>
-              <text:list>
-                <text:list-item>
-                  <text:p>
-                    <xsl:value-of select="$text"/>
-                  </text:p>
-                </text:list-item>
-              </text:list>
-            </text:list-item>
-          </text:list>
-        </text:list-item>
+        <text:list>
+          <text:list-item>
+            <text:list>
+              <text:list-item>
+                <text:list>
+                  <text:list-item>
+                    <text:p>pradeep</text:p>
+                  </text:list-item>
+                </text:list>
+              </text:list-item>
+            </text:list>
+          </text:list-item>
+        </text:list>
       </xsl:when>
       <xsl:when test="$level='3'">
-        <text:list-item>
-          <text:list>
-            <text:list-item>
-              <text:list>
-                <text:list-item>
-                  <text:list>
-                    <text:list-item>
-                      <text:p >
-                        <xsl:value-of select="$text"/>
-                      </text:p>
-                    </text:list-item>
-                  </text:list>
-                </text:list-item>
-              </text:list>
-            </text:list-item>
-          </text:list>
-        </text:list-item>
+        <text:list>
+          <text:list-item>
+            <text:list>
+              <text:list-item>
+                <text:list>
+                  <text:list-item>
+                    <text:list>
+                      <text:list-item>
+                        <text:p>Lohith</text:p>
+                      </text:list-item>
+                    </text:list>
+                  </text:list-item>
+                </text:list>
+              </text:list-item>
+            </text:list>
+          </text:list-item>
+        </text:list>
       </xsl:when>
       <xsl:when test="$level='4'">
-        <text:list-item>
-          <text:list>
-            <text:list-item>
-              <text:list>
-                <text:list-item>
-                  <text:list>
-                    <text:list-item>
-                      <text:list>
-                        <text:list-item>
-                          <text:p>
-                            <xsl:value-of select="$text"/>
-                          </text:p>
-                        </text:list-item>
-                      </text:list>
-                    </text:list-item>
-                  </text:list>
-                </text:list-item>
-              </text:list>
-            </text:list-item>
-          </text:list>
-        </text:list-item>
+        <text:list>
+          <text:list-item>
+            <text:list>
+              <text:list-item>
+                <text:list>
+                  <text:list-item>
+                    <text:list>
+                      <text:list-item>
+                        <text:list>
+                          <text:list-item>
+                            <text:p>Venkatsh</text:p>
+                          </text:list-item>
+                        </text:list>
+                      </text:list-item>
+                    </text:list>
+                  </text:list-item>
+                </text:list>
+              </text:list-item>
+            </text:list>
+          </text:list-item>
+        </text:list>
       </xsl:when>
       <xsl:when test="$level='5'">
-        <text:list-item>
-          <text:list>
-            <text:list-item>
-              <text:list>
-                <text:list-item>
-                  <text:list>
-                    <text:list-item>
-                      <text:list>
-                        <text:list-item>
-                          <text:list>
-                            <text:list-item>
-                              <text:p>
-                                <xsl:value-of select="$text"/>
-                              </text:p>
-                            </text:list-item>
-                          </text:list>
-                        </text:list-item>
-                      </text:list>
-                    </text:list-item>
-                  </text:list>
-                </text:list-item>
-              </text:list>
-            </text:list-item>
-          </text:list>
-        </text:list-item>
+        <text:list>
+          <text:list-item>
+            <text:list>
+              <text:list-item>
+                <text:list>
+                  <text:list-item>
+                    <text:list>
+                      <text:list-item>
+                        <text:list>
+                          <text:list-item>
+                            <text:list>
+                              <text:list-item>
+                                <text:p>6</text:p>
+                              </text:list-item>
+                            </text:list>
+                          </text:list-item>
+                        </text:list>
+                      </text:list-item>
+                    </text:list>
+                  </text:list-item>
+                </text:list>
+              </text:list-item>
+            </text:list>
+          </text:list-item>
+        </text:list>
       </xsl:when>
       <xsl:when test="$level='6'">
-        <text:list-item>
-          <text:list>
-            <text:list-item>
-              <text:list>
-                <text:list-item>
-                  <text:list>
-                    <text:list-item>
-                      <text:list>
-                        <text:list-item>
-                          <text:list>
-                            <text:list-item>
-                              <text:list>
-                                <text:list-item>
-                                  <text:p>
-                                    <!--<xsl:value-of select="$text"/>-->
-                                  </text:p>
-                                </text:list-item>
-                              </text:list>
-                            </text:list-item>
-                          </text:list>
-                        </text:list-item>
-                      </text:list>
-                    </text:list-item>
-                  </text:list>
-                </text:list-item>
-              </text:list>
-            </text:list-item>
-          </text:list>
-        </text:list-item>
+        <text:list>
+          <text:list-item>
+            <text:list>
+              <text:list-item>
+                <text:list>
+                  <text:list-item>
+                    <text:list>
+                      <text:list-item>
+                        <text:list>
+                          <text:list-item>
+                            <text:list>
+                              <text:list-item>
+                                <text:list>
+                                  <text:list-item>
+                                    <text:p>7</text:p>
+                                  </text:list-item>
+                                </text:list>
+                              </text:list-item>
+                            </text:list>
+                          </text:list-item>
+                        </text:list>
+                      </text:list-item>
+                    </text:list>
+                  </text:list-item>
+                </text:list>
+              </text:list-item>
+            </text:list>
+          </text:list-item>
+        </text:list>
       </xsl:when>
       <xsl:when test="$level='7'">
-        <text:list-item>
-          <text:list>
-            <text:list-item>
-              <text:list>
-                <text:list-item>
-                  <text:list>
-                    <text:list-item>
-                      <text:list>
-                        <text:list-item>
-                          <text:list>
-                            <text:list-item>
-                              <text:list>
-                                <text:list-item>
-                                  <text:list>
-                                    <text:list-item>
-                                      <text:p>
-                                        <!--<xsl:value-of select="$text"/>-->
-                                      </text:p>
-                                    </text:list-item>
-                                  </text:list>
-                                </text:list-item>
-                              </text:list>
-                            </text:list-item>
-                          </text:list>
-                        </text:list-item>
-                      </text:list>
-                    </text:list-item>
-                  </text:list>
-                </text:list-item>
-              </text:list>
-            </text:list-item>
-          </text:list>
-        </text:list-item>
+        <text:list>
+          <text:list-item>
+            <text:list>
+              <text:list-item>
+                <text:list>
+                  <text:list-item>
+                    <text:list>
+                      <text:list-item>
+                        <text:list>
+                          <text:list-item>
+                            <text:list>
+                              <text:list-item>
+                                <text:list>
+                                  <text:list-item>
+                                    <text:list>
+                                      <text:list-item>
+                                        <text:p>8</text:p>
+                                      </text:list-item>
+                                    </text:list>
+                                  </text:list-item>
+                                </text:list>
+                              </text:list-item>
+                            </text:list>
+                          </text:list-item>
+                        </text:list>
+                      </text:list-item>
+                    </text:list>
+                  </text:list-item>
+                </text:list>
+              </text:list-item>
+            </text:list>
+          </text:list-item>
+        </text:list>
       </xsl:when>
       <xsl:when test="$level='8'">
-        <text:list-item>
-          <text:list>
-            <text:list-item>
-              <text:list>
-                <text:list-item>
-                  <text:list>
-                    <text:list-item>
-                      <text:list>
-                        <text:list-item>
-                          <text:list>
-                            <text:list-item>
-                              <text:list>
-                                <text:list-item>
-                                  <text:list>
-                                    <text:list-item>
-                                      <text:list>
-                                        <text:list-item>
-                                          <text:p>
-                                            <!--<xsl:value-of select="$text"/>-->
-                                          </text:p>
-                                        </text:list-item>
-                                      </text:list>
-                                    </text:list-item>
-                                  </text:list>
-                                </text:list-item>
-                              </text:list>
-                            </text:list-item>
-                          </text:list>
-                        </text:list-item>
-                      </text:list>
-                    </text:list-item>
-                  </text:list>
-                </text:list-item>
-              </text:list>
-            </text:list-item>
-          </text:list>
-        </text:list-item>
+        <text:list>
+          <text:list-item>
+            <text:list>
+              <text:list-item>
+                <text:list>
+                  <text:list-item>
+                    <text:list>
+                      <text:list-item>
+                        <text:list>
+                          <text:list-item>
+                            <text:list>
+                              <text:list-item>
+                                <text:list>
+                                  <text:list-item>
+                                    <text:list>
+                                      <text:list-item>
+                                        <text:list>
+                                          <text:list-item>
+                                            <text:p>9</text:p>
+                                          </text:list-item>
+                                        </text:list>
+                                      </text:list-item>
+                                    </text:list>
+                                   </text:list-item>
+                                </text:list>
+                              </text:list-item>
+                            </text:list>
+                          </text:list-item>
+                        </text:list>
+                      </text:list-item>
+                    </text:list>
+                  </text:list-item>
+                </text:list>
+              </text:list-item>
+            </text:list>
+          </text:list-item>
+        </text:list>
       </xsl:when>
     </xsl:choose>
-
-  </xsl:template>
+  </xsl:template> 
   <xsl:template name ="prad">
     <xsl:param name="level"></xsl:param>
     <xsl:param name="paraId"></xsl:param>
@@ -3165,7 +4893,6 @@ This tmplate will get the bullet level and charactor and Marginleft-->
 
     </xsl:for-each>
   </xsl:template>
-
   <xsl:template name="getSlideMasterBGColor">
     <xsl:param name="slideMasterFile"></xsl:param>
     <xsl:for-each select="document(concat('ppt/slideMasters/',$slideMasterFile))//p:cSld/p:bg">
@@ -3198,7 +4925,9 @@ This tmplate will get the bullet level and charactor and Marginleft-->
           <xsl:attribute name="draw:fill-color">
             <xsl:call-template name ="getColorCode">
               <xsl:with-param name ="color">
-                <xsl:value-of select="p:bgRef/a:schemeClr/@val"/>
+                <xsl:call-template name="tmpThemeClr_Background">
+                  <xsl:with-param name="ClrMap" select="p:bgRef/a:schemeClr/@val"/>
+                </xsl:call-template>
               </xsl:with-param>
               <xsl:with-param name ="lumMod">
                 <xsl:value-of select="p:bgRef/a:schemeClr/a:lumMod/@val" />
@@ -3206,7 +4935,6 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               <xsl:with-param name ="lumOff">
                 <xsl:value-of select="p:bgRef/a:schemeClr/a:lumOff/@val" />
               </xsl:with-param>
-
             </xsl:call-template>
           </xsl:attribute>
 
@@ -3218,7 +4946,9 @@ This tmplate will get the bullet level and charactor and Marginleft-->
           <xsl:attribute name="draw:fill-color">
             <xsl:call-template name ="getColorCode">
               <xsl:with-param name ="color">
-                <xsl:value-of select="p:bgPr/a:solidFill/a:schemeClr/@val"/>
+                <xsl:call-template name="tmpThemeClr_Background">
+                  <xsl:with-param name="ClrMap" select="p:bgPr/a:solidFill/a:schemeClr/@val"/>
+                </xsl:call-template>
               </xsl:with-param>
               <xsl:with-param name ="lumMod">
                 <xsl:value-of select="p:bgPr/a:solidFill/a:schemeClr/a:lumMod/@val" />
@@ -3238,7 +4968,9 @@ This tmplate will get the bullet level and charactor and Marginleft-->
           <xsl:attribute name="draw:fill-color">
             <xsl:call-template name ="getColorCode">
               <xsl:with-param name ="color">
-                <xsl:value-of select="p:bgRef/a:solidFill/a:schemeClr/@val"/>
+                <xsl:call-template name="tmpThemeClr_Background">
+                  <xsl:with-param name="ClrMap" select="p:bgRef/a:solidFill/a:schemeClr/@val"/>
+                </xsl:call-template>
               </xsl:with-param>
               <xsl:with-param name ="lumMod">
                 <xsl:value-of select="p:bgRef/a:solidFill/a:schemeClr/a:lumMod/@val" />
@@ -3246,7 +4978,6 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               <xsl:with-param name ="lumOff">
                 <xsl:value-of select="p:bgRef/a:solidFill/a:schemeClr/a:lumOff/@val" />
               </xsl:with-param>
-
             </xsl:call-template>
           </xsl:attribute>
 
@@ -3268,9 +4999,20 @@ This tmplate will get the bullet level and charactor and Marginleft-->
   <xsl:template name ="Outlines">
     <xsl:param name="level"></xsl:param>
     <xsl:param name="blnBullet"></xsl:param>
+    <xsl:if test="not($blnBullet='true')">
     <style:paragraph-properties>
       <xsl:choose>
         <xsl:when test="./a:buChar">
+          <xsl:attribute name ="text:enable-numbering">
+            <xsl:value-of select ="'true'"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="./a:buBlip">
+          <xsl:attribute name ="text:enable-numbering">
+            <xsl:value-of select ="'true'"/>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:when test="./a:buAutoNum">
           <xsl:attribute name ="text:enable-numbering">
             <xsl:value-of select ="'true'"/>
           </xsl:attribute>
@@ -3288,8 +5030,9 @@ This tmplate will get the bullet level and charactor and Marginleft-->
           </xsl:attribute>
         </xsl:when>
       </xsl:choose>-->
-      <xsl:call-template name="tmpShapeParaProp"/>
+      <xsl:call-template name="tmpOutlineParaProp"/>
     </style:paragraph-properties>
+    </xsl:if>
     <style:text-properties>
       <xsl:choose>
         <xsl:when test="$blnBullet='true'">
@@ -3317,11 +5060,13 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               <xsl:attribute name ="fo:color">
                 <xsl:call-template name ="getColorCode">
                   <xsl:with-param name ="color">
-                    <xsl:value-of select="./a:buClr/a:schemeClr/@val"/>
+                    <xsl:call-template name="tmpThemeClr">
+                      <xsl:with-param name="ClrMap" select="./a:buClr/a:schemeClr/@val"/>
+                    </xsl:call-template>
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:attribute>
-            </xsl:if>
+            </xsl:if> 
           </xsl:if>
           <xsl:if test ="not(./a:buClr)">
             <xsl:choose>
@@ -3334,7 +5079,9 @@ This tmplate will get the bullet level and charactor and Marginleft-->
                 <xsl:attribute name ="fo:color">
                   <xsl:call-template name ="getColorCode">
                     <xsl:with-param name ="color">
-                      <xsl:value-of select="./a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                      <xsl:call-template name="tmpThemeClr">
+                        <xsl:with-param name="ClrMap" select="./a:defRPr/a:solidFill/a:schemeClr/@val"/>
+                      </xsl:call-template>
                     </xsl:with-param>
                     <xsl:with-param name ="lumMod">
                       <xsl:choose>
@@ -3435,8 +5182,6 @@ This tmplate will get the bullet level and charactor and Marginleft-->
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-  <!--added by vipul to insert slide master's shapes style-->
   <xsl:template name ="GraphicStyleForSlideMaster">
     <xsl:for-each select="document('ppt/presentation.xml')//p:sldMasterIdLst/p:sldMasterId">
       <xsl:variable name="sldMasterIdRelation">
@@ -3513,7 +5258,7 @@ This tmplate will get the bullet level and charactor and Marginleft-->
               <xsl:attribute name ="style:name">
                 <xsl:value-of select ="$GraphicId"/>
               </xsl:attribute >
-              <style:graphic-properties draw:stroke="none">
+              <style:graphic-properties>
 
                 <!--FILL-->
                 <xsl:call-template name ="Fill" />
@@ -3990,14 +5735,56 @@ This tmplate will get the bullet level and charactor and Marginleft-->
     <xsl:param name="blnSubTitle"></xsl:param>
     <!--<xsl:if test="$blnSubTitle='false'">-->
     <!--for getting back ground color-->
-    <xsl:for-each select="./p:spPr">
+    <xsl:choose>
+      <xsl:when test="./p:spPr/a:solidFill/a:srgbClr">
+        <xsl:attribute name ="draw:fill-color">
+          <xsl:value-of select ="concat('#',./p:spPr/a:solidFill/a:srgbClr/@val)"/>
+        </xsl:attribute>
+        <xsl:attribute name="draw:fill">
+          <xsl:value-of select="'solid'"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:when test="./p:spPr/a:solidFill/a:schemeClr">
+        <xsl:attribute name ="draw:fill-color">
+          <xsl:call-template name ="getColorCode">
+            <xsl:with-param name ="color">
+              <xsl:call-template name="tmpThemeClr">
+                <xsl:with-param name="ClrMap" select="./p:spPr/a:solidFill/a:schemeClr/@val"/>
+              </xsl:call-template>
+            </xsl:with-param>
+            <xsl:with-param name ="lumMod">
+              <xsl:if test="./p:spPr/a:solidFill/a:schemeClr/a:lumMod">
+                <xsl:value-of select="./p:spPr/a:solidFill/a:schemeClr/a:lumMod/@val" />
+              </xsl:if>
+            </xsl:with-param>
+            <xsl:with-param name ="lumOff">
+              <xsl:if test="./p:spPr/a:solidFill/a:schemeClr/a:lumOff">
+                <xsl:value-of select="./p:spPr/a:solidFill/a:schemeClr/a:lumOff/@val" />
+              </xsl:if>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:attribute>
+        <xsl:attribute name="draw:fill">
+          <xsl:value-of select="'solid'"/>
+        </xsl:attribute>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="draw:fill">
+          <xsl:value-of select="'none'"/>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+    <!--<xsl:for-each select="./p:spPr">
       <xsl:call-template name="getSPBackColor"></xsl:call-template>
-    </xsl:for-each>
+    </xsl:for-each>-->
     <!--</xsl:if>-->
-    <!--for getting border color-->
-    <xsl:if test="p:spPr/a:ln/a:solidFill/a:srgbClr">
-      <xsl:attribute name ="draw:stroke">
-        <xsl:value-of select ="concat('#',p:spPr/a:ln/a:solidFill/a:srgbClr/@val)"/>
+    <xsl:if test ="p:spPr/a:ln">
+      <xsl:call-template name="tmpLineColor"/>
+      <xsl:call-template name="LineStyle"/>
+    </xsl:if>
+    <xsl:if test ="not(p:spPr/a:ln)">
+      <xsl:attribute name="draw:stroke">
+        <xsl:value-of select="'none'"/>
       </xsl:attribute>
     </xsl:if>
     <!--Vertical alignment-->
@@ -4086,8 +5873,6 @@ This tmplate will get the bullet level and charactor and Marginleft-->
         <xsl:value-of select ="concat(format-number(p:txBody/a:bodyPr/@rIns div 360000, '#.##'), 'cm')"/>
       </xsl:attribute>
     </xsl:if>
-
-
   </xsl:template>
   <xsl:template name="spDateTimeGraphicProperty">
     <xsl:for-each select=".">
@@ -4343,11 +6128,6 @@ This tmplate will get the bullet level and charactor and Marginleft-->
       </xsl:attribute>
     </xsl:if >
     <!-- Convert Laeft margin of the paragraph-->
-    <xsl:if test ="@marL">
-      <xsl:attribute name ="fo:margin-left">
-        <xsl:value-of select="concat(format-number(@marL div 360000, '#.##'), 'cm')"/>
-      </xsl:attribute>
-    </xsl:if>
     <xsl:if test ="@marR">
       <xsl:attribute name ="fo:margin-right">
         <xsl:value-of select="concat(format-number(@marR div 360000, '#.##'), 'cm')"/>
@@ -4358,23 +6138,28 @@ This tmplate will get the bullet level and charactor and Marginleft-->
         <xsl:value-of select="concat(format-number(./@indent div 360000, '#.##'), 'cm')"/>
       </xsl:attribute>
     </xsl:if >
-    <xsl:variable name="var_marL">
-      <xsl:for-each select=".">
-        <xsl:value-of select="@marL"/>
-      </xsl:for-each>
-    </xsl:variable>
-    <xsl:for-each select="./a:spcBef/a:spcPct">
-      <xsl:if test ="@val">
-        <xsl:attribute name ="fo:margin-top">
-          <xsl:value-of select="concat(format-number( ( $var_marL div  @val ) div 360000 ,'#.###'),'cm')"/>
+    <xsl:for-each select=".">
+      <xsl:if test ="./@marL">
+        <xsl:attribute name ="fo:margin-left">
+          <xsl:value-of select="concat(format-number(./@marL div 360000, '#.##'), 'cm')"/>
         </xsl:attribute>
-      </xsl:if>
-    </xsl:for-each>
-    <xsl:for-each select="./a:spcBef/a:spcPts">
-      <xsl:if test ="@val">
-        <xsl:attribute name ="fo:margin-top">
-          <xsl:value-of select="concat(format-number(@val div 2835 ,'#.##'),'cm')"/>
-        </xsl:attribute>
+        <xsl:variable name="var_marL">
+            <xsl:value-of select="@marL"/>
+        </xsl:variable>
+        <xsl:for-each select="./a:spcBef/a:spcPct">
+          <xsl:if test ="@val">
+            <xsl:attribute name ="fo:margin-top">
+              <xsl:value-of select="concat(format-number( ( $var_marL div  @val ) div 360000 ,'#.###'),'cm')"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:for-each>
+        <xsl:for-each select="./a:spcBef/a:spcPts">
+          <xsl:if test ="@val">
+            <xsl:attribute name ="fo:margin-top">
+              <xsl:value-of select="concat(format-number(@val div 2835 ,'#.##'),'cm')"/>
+            </xsl:attribute>
+          </xsl:if>
+        </xsl:for-each>
       </xsl:if>
     </xsl:for-each>
     <xsl:for-each select="./a:spcAft/a:spcPct">
@@ -4504,7 +6289,9 @@ This tmplate will get the bullet level and charactor and Marginleft-->
       <xsl:attribute name ="fo:color">
         <xsl:call-template name ="getColorCode">
           <xsl:with-param name ="color">
-            <xsl:value-of select="./a:defRPr/a:solidFill/a:schemeClr/@val"/>
+            <xsl:call-template name="tmpThemeClr">
+              <xsl:with-param name="ClrMap" select="./a:defRPr/a:solidFill/a:schemeClr/@val"/>
+            </xsl:call-template>
           </xsl:with-param>
           <xsl:with-param name ="lumMod">
             <xsl:value-of select="./a:defRPr/a:solidFill/a:schemeClr/a:lumMod/@val"/>
@@ -4540,13 +6327,13 @@ This tmplate will get the bullet level and charactor and Marginleft-->
     </xsl:if>
     <!-- Italic-->
     <xsl:attribute name ="fo:font-style">
-      <xsl:if test ="@i='1'">
+      <xsl:if test ="./a:defRPr/@i='1'">
         <xsl:value-of select ="'italic'"/>
       </xsl:if >
-      <xsl:if test ="@i='0'">
+      <xsl:if test ="./a:defRPr/@i='0'">
         <xsl:value-of select ="'normal'"/>
       </xsl:if >
-      <xsl:if test ="not(@i)">
+      <xsl:if test ="not(./a:defRPr/@i)">
         <xsl:value-of select ="'normal'"/>
       </xsl:if >
     </xsl:attribute>
@@ -4584,9 +6371,10 @@ This tmplate will get the bullet level and charactor and Marginleft-->
       </xsl:attribute>
     </xsl:if >
     <!-- Convert Laeft margin of the paragraph-->
+
     <xsl:if test ="@marL">
       <xsl:attribute name ="fo:margin-left">
-        <xsl:value-of select="concat(format-number(@marL div 360000, '#.##'), 'cm')"/>
+        <xsl:value-of select="concat(format-number( @marL div 360000, '#.##'), 'cm')"/>
       </xsl:attribute>
     </xsl:if>
     <xsl:if test ="@marR">
@@ -4594,41 +6382,67 @@ This tmplate will get the bullet level and charactor and Marginleft-->
         <xsl:value-of select="concat(format-number(@marR div 360000, '#.##'), 'cm')"/>
       </xsl:attribute>
     </xsl:if>
-    <xsl:if test ="@indent">
+    <xsl:if test ="./@indent">
       <xsl:attribute name ="fo:text-indent">
-        <xsl:value-of select="concat(format-number(@indent div 360000, '#.##'), 'cm')"/>
+        <xsl:value-of select="concat(format-number(./@indent div 360000, '#.##'), 'cm')"/>
       </xsl:attribute>
     </xsl:if >
-
-    <xsl:if test ="a:spcBef/a:spcPts/@val">
-      <xsl:attribute name ="fo:margin-top">
-        <xsl:value-of select="concat(format-number(a:spcBef/a:spcPts/@val div 2835, '#.##'), 'cm')"/>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if test ="a:spcAft/a:spcPts/@val">
-      <xsl:attribute name ="fo:margin-bottom">
-        <xsl:value-of select="concat(format-number(a:spcAft/a:spcPts/@val div 2835, '#.##'), 'cm')"/>
-      </xsl:attribute>
-    </xsl:if>
-    <xsl:if test ="a:lnSpc/a:spcPct/@val">
-      <xsl:choose>
-        <xsl:when test="$lnSpcReduction='0'">
-          <xsl:attribute name="fo:line-height">
-            <xsl:value-of select="concat(format-number(a:lnSpc/a:spcPct/@val div 1000,'###'), '%')"/>
-          </xsl:attribute>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:attribute name="fo:line-height">
-            <xsl:value-of select="concat(format-number((a:lnSpc/a:spcPct/@val - $lnSpcReduction) div 1000,'###'), '%')"/>
-          </xsl:attribute>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if >
-    <xsl:if test ="a:lnSpc/a:spcPts/@val">
-      <xsl:attribute name="style:line-height-at-least">
-        <xsl:value-of select="concat(format-number(a:lnSpc/a:spcPts/@val div 2835, '#.##'), 'cm')"/>
-      </xsl:attribute>
-    </xsl:if>
+    <xsl:variable name="var_marL">
+      <xsl:for-each select="./a:defRPr">
+        <xsl:value-of select="./@sz"/>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:for-each select="./a:spcBef/a:spcPct">
+      <xsl:if test ="@val">
+        <xsl:attribute name ="fo:margin-top">
+          <xsl:value-of select="concat(format-number( ( $var_marL * ( @val div 100000 ) ) div 2835 ,'#.###'),'cm')"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
+    <!--<xsl:for-each select="./a:spcBef/a:spcPts">
+      <xsl:if test ="@val">
+        <xsl:attribute name ="fo:margin-top">
+          <xsl:value-of select="concat( format-number(@val div 2835 ,'#.##'),'cm')"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>-->
+    <xsl:for-each select="./a:spcAft/a:spcPct">
+      <xsl:if test ="@val">
+        <xsl:attribute name ="fo:margin-bottom">
+          <xsl:value-of select="concat(format-number(@val div 2976 div 28.35 ,'#.##'),'cm')"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
+    <xsl:for-each select="./a:spcAft/a:spcPts">
+      <xsl:if test ="@val">
+        <xsl:attribute name ="fo:margin-bottom">
+          <xsl:value-of select="concat(format-number(@val div  2835 ,'#.##'),'cm')"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
+    <xsl:for-each select="./a:lnSpc/a:spcPct">
+      <xsl:if test ="a:lnSpc/a:spcPct">
+        <xsl:choose>
+          <xsl:when test="$lnSpcReduction='0'">
+            <xsl:attribute name="fo:line-height">
+              <xsl:value-of select="concat(format-number(@val div 1000,'###'), '%')"/>
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="fo:line-height">
+              <xsl:value-of select="concat(format-number((@val - $lnSpcReduction) div 1000,'###'), '%')"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if >
+    </xsl:for-each>
+    <xsl:for-each select="./a:lnSpc/a:spcPts">
+      <xsl:if test ="a:lnSpc/a:spcPts">
+        <xsl:attribute name="style:line-height-at-least">
+          <xsl:value-of select="concat(format-number(@val div 2835, '#.##'), 'cm')"/>
+        </xsl:attribute>
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
   <xsl:template name ="TextParagraphProp" >
     <xsl:for-each select="document('ppt/presentation.xml')//p:sldMasterIdLst/p:sldMasterId">
@@ -5253,4 +7067,222 @@ This tmplate will get the bullet level and charactor and Marginleft-->
     </xsl:for-each >
 
   </xsl:template>
+  <xsl:template name="tmpThemeClr">
+    <xsl:param name="ClrMap"/>
+    <xsl:for-each select="./parent::node()/parent::node()/parent::node()/p:clrMap">
+      <xsl:choose>
+        <xsl:when test="$ClrMap ='tx1'">
+          <xsl:value-of select="@tx1" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='tx2'">
+          <xsl:value-of select="@tx2" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='bg1'">
+          <xsl:value-of select="@bg1" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent1'">
+          <xsl:value-of select="@accent1" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent2'">
+          <xsl:value-of select="@accent2" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent3'">
+          <xsl:value-of select="@accent3" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent4'">
+          <xsl:value-of select="@accent4" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent5'">
+          <xsl:value-of select="@accent5" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent6'">
+          <xsl:value-of select="@accent6" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='hlink'">
+            <xsl:value-of select="@hlink" />
+          </xsl:when>
+        <xsl:when test="$ClrMap ='folHlink'">
+          <xsl:value-of select="@folHlink" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$ClrMap" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name="tmpThemeClr_Background">
+    <xsl:param name="ClrMap"/>
+    <xsl:for-each select="./parent::node()/parent::node()/p:clrMap">
+      <xsl:choose>
+        <xsl:when test="$ClrMap ='tx1'">
+          <xsl:value-of select="@tx1" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='tx2'">
+          <xsl:value-of select="@tx2" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='bg1'">
+          <xsl:value-of select="@bg1" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent1'">
+          <xsl:value-of select="@accent1" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent2'">
+          <xsl:value-of select="@accent2" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent3'">
+          <xsl:value-of select="@accent3" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent4'">
+          <xsl:value-of select="@accent4" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent5'">
+          <xsl:value-of select="@accent5" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='accent6'">
+          <xsl:value-of select="@accent6" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='hlink'">
+          <xsl:value-of select="@hlink" />
+        </xsl:when>
+        <xsl:when test="$ClrMap ='folHlink'">
+          <xsl:value-of select="@folHlink" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$ClrMap" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+  <xsl:template name ="tmpLineColor">
+
+    <xsl:choose>
+      <!-- No line-->
+      <xsl:when test ="p:spPr/a:ln/a:noFill">
+        <xsl:attribute name ="draw:stroke">
+          <xsl:value-of select="'none'" />
+        </xsl:attribute>
+      </xsl:when>
+
+      <!-- Solid line color-->
+      <xsl:when test ="p:spPr/a:ln/a:solidFill">
+        <xsl:attribute name ="draw:stroke">
+          <xsl:value-of select="'solid'" />
+        </xsl:attribute>
+        <!-- Standard color for border-->
+        <xsl:if test ="p:spPr/a:ln/a:solidFill/a:srgbClr/@val">
+          <xsl:attribute name ="svg:stroke-color">
+            <xsl:value-of select="concat('#',p:spPr/a:ln/a:solidFill/a:srgbClr/@val)"/>
+          </xsl:attribute>
+          <!-- Transparency percentage-->
+          <xsl:if test="p:spPr/a:ln/a:solidFill/a:srgbClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="p:spPr/a:ln/a:solidFill/a:srgbClr/a:alpha/@val"/>
+            </xsl:variable>
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="svg:stroke-opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
+        <!-- Theme color for border-->
+        <xsl:if test ="p:spPr/a:ln/a:solidFill/a:schemeClr/@val">
+          <xsl:attribute name ="svg:stroke-color">
+            <xsl:call-template name ="getColorCode">
+              <xsl:with-param name ="color">
+                <xsl:call-template name="tmpThemeClr">
+                  <xsl:with-param name="ClrMap" select="p:spPr/a:ln/a:solidFill/a:schemeClr/@val"/>
+                </xsl:call-template>
+              </xsl:with-param>
+              <xsl:with-param name ="lumMod">
+                <xsl:value-of select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:lumMod/@val"/>
+              </xsl:with-param>
+              <xsl:with-param name ="lumOff">
+                <xsl:value-of select="p:spPr/a:ln/a:solidFill/a:schemeClr/a:lumOff/@val"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+          <!-- Transparency percentage-->
+          <xsl:if test="p:spPr/a:ln/a:solidFill/a:schemeClr/a:alpha/@val">
+            <xsl:variable name ="alpha">
+              <xsl:value-of select ="p:spPr/a:ln/a:solidFill/a:schemeClr/a:alpha/@val"/>
+            </xsl:variable>
+            <xsl:if test="($alpha != '') or ($alpha != 0)">
+              <xsl:attribute name ="svg:stroke-opacity">
+                <xsl:value-of select="concat(($alpha div 1000), '%')"/>
+              </xsl:attribute>
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <!--Line reference-->
+        <xsl:if test ="not( (p:spPr/a:prstGeom/@prst='flowChartInternalStorage') or
+									(p:spPr/a:prstGeom/@prst='flowChartPredefinedProcess') or
+									(p:spPr/a:prstGeom/@prst='flowChartSummingJunction') or
+									(p:spPr/a:prstGeom/@prst='flowChartOr') )">
+          <xsl:if test ="p:style/a:lnRef">
+            <xsl:attribute name ="draw:stroke">
+              <xsl:value-of select="'solid'" />
+            </xsl:attribute>
+            <!--Standard color for border-->
+            <xsl:if test ="p:style/a:lnRef/a:srgbClr/@val">
+              <xsl:attribute name ="svg:stroke-color">
+                <xsl:value-of select="concat('#',p:style/a:lnRef/a:srgbClr/@val)"/>
+              </xsl:attribute>
+
+              <!--Shade percentage-->
+              <!--
+					<xsl:if test="p:style/a:lnRef/a:srgbClr/a:shade/@val">
+						<xsl:variable name ="shade">
+							<xsl:value-of select ="p:style/a:lnRef/a:srgbClr/a:shade/@val"/>
+						</xsl:variable>
+						-->
+              <!--<xsl:if test="($shade != '') or ($shade != 0)">
+							<xsl:attribute name ="svg:stroke-opacity">
+								<xsl:value-of select="concat(($shade div 1000), '%')"/>
+							</xsl:attribute>
+						</xsl:if>-->
+              <!--
+					</xsl:if>-->
+            </xsl:if>
+            <!--Theme color for border-->
+            <xsl:if test ="p:style/a:lnRef/a:schemeClr/@val">
+              <xsl:attribute name ="svg:stroke-color">
+                <xsl:call-template name ="getColorCode">
+                  <xsl:with-param name ="color">
+                    <xsl:call-template name="tmpThemeClr">
+                      <xsl:with-param name="ClrMap" select="p:style/a:lnRef/a:schemeClr/@val"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
+                  <xsl:with-param name ="lumMod">
+                    <xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumMod/@val"/>
+                  </xsl:with-param>
+                  <xsl:with-param name ="lumOff">
+                    <xsl:value-of select="p:style/a:lnRef/a:schemeClr/a:lumOff/@val"/>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </xsl:attribute>
+              <!--Shade percentage -->
+              <!--<xsl:if test="p:style/a:lnRef/a:schemeClr/a:shade/@val">
+						<xsl:variable name ="shade">
+							<xsl:value-of select ="p:style/a:lnRef/a:schemeClr/a:shade/@val"/>
+						</xsl:variable>
+						-->
+              <!--<xsl:if test="($shade != '') or ($shade != 0)">
+							<xsl:attribute name ="svg:stroke-opacity">
+								<xsl:value-of select="concat(($shade div 1000), '%')"/>
+							</xsl:attribute>
+						</xsl:if>-->
+              <!--
+					</xsl:if>-->
+            </xsl:if>
+          </xsl:if>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  
 </xsl:stylesheet>
