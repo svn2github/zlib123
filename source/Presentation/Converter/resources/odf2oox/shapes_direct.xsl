@@ -622,6 +622,7 @@ Copyright (c) 2007, Sonata Software Limited
 										<xsl:value-of select ="parent::node()/@presentation:style-name"/>
 									</xsl:if >
 								</xsl:with-param >
+                <xsl:with-param name ="masterPageName" select ="$masterPageName" />
               </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
@@ -1397,11 +1398,11 @@ Copyright (c) 2007, Sonata Software Limited
       <!--Arrow type-->
       <xsl:if test="(@draw:marker-start) and (@draw:marker-start != '')">
         <a:headEnd>
-          <xsl:attribute name ="type">
-            <xsl:call-template name ="getArrowType">
-              <xsl:with-param name ="ArrowType" select ="@draw:marker-start" />
-            </xsl:call-template>
-          </xsl:attribute>
+			<xsl:attribute name ="type">
+				<xsl:call-template name ="getArrowType">
+					<xsl:with-param name ="ArrowType" select ="@draw:marker-start" />
+				</xsl:call-template>
+			</xsl:attribute>
           <xsl:if test ="@draw:marker-start-width">
             <xsl:call-template name ="setArrowSize">
               <xsl:with-param name ="size" select ="substring-before(@draw:marker-start-width,'cm')" />
@@ -1944,6 +1945,9 @@ Copyright (c) 2007, Sonata Software Limited
       </xsl:choose>
     </xsl:if>
 
+	  <xsl:if test ="not(document('styles.xml')/office:document-styles/office:styles/draw:marker[@draw:name=$ArrowType])">
+		  <xsl:value-of  select ="'none'"/>	  
+	  </xsl:if >
   </xsl:template>
   <!-- Text formatting-->
   <xsl:template name ="processShapeText" >
@@ -2440,17 +2444,30 @@ Copyright (c) 2007, Sonata Software Limited
             </xsl:if>
             <xsl:if test ="not(name()='text:span' or name()='text:line-break')">
               <a:r>
-                <a:rPr lang="en-US" smtClean="0">
-                  <!--Font Size -->
-                  <xsl:variable name ="textId">
-                    <xsl:value-of select ="@text:style-name"/>
+                <a:rPr lang="en-US" smtClean="0" kern="0">
+                  <xsl:variable name ="DefFontSize">
+                    <xsl:call-template name ="getDefaultFontSize">
+                      <xsl:with-param name ="className" select ="$prClassName"/>
+                    </xsl:call-template >
                   </xsl:variable>
-                  <xsl:if test ="not($textId ='')">
-                    <xsl:call-template name ="fontStyles">
-                      <xsl:with-param name ="Tid" select ="$textId" />
-                      <xsl:with-param name ="prClassName" select ="$prClassName"/>
-                    </xsl:call-template>
+                  <xsl:if  test ="$DefFontSize!=''">
+                    <xsl:attribute name ="sz">
+                      <xsl:call-template name ="convertToPoints">
+                        <xsl:with-param name ="unit" select ="'pt'"/>
+                        <xsl:with-param name ="length" select ="$DefFontSize"/>
+                      </xsl:call-template>
+                    </xsl:attribute>
                   </xsl:if>
+                  <a:latin charset="0" >
+                    <xsl:attribute name ="typeface">
+                      <xsl:call-template name ="getDefaultFonaName">
+                        <xsl:with-param name ="className" select ="$prClassName"/>
+                        <!-- Node added by vijayeta,to insert font sizes to inner levels-->
+                        <xsl:with-param name ="lvl" select ="0"/>
+                      </xsl:call-template >
+                    </xsl:attribute>
+                  </a:latin >
+                  <!--<xsl:copy-of select="$varTextHyperLinks"/>-->
                 </a:rPr >
                 <a:t>
                   <xsl:call-template name ="insertTab" />

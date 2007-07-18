@@ -2274,6 +2274,12 @@ Copyright (c) 2007, Sonata Software Limited
                 </a:fld>
                 <a:endParaRPr lang="en-US"/>
                 </xsl:when>
+                <xsl:when test="./draw:text-box/text:p/text:span/text:page-number">
+                  <a:r>
+                    <a:rPr lang="en-US" smtClean="0" />
+                    <a:t>‹#›</a:t>
+                  </a:r >
+                </xsl:when>
                 <xsl:otherwise >
                   <a:r>
                     <a:rPr lang="en-US" smtClean="0" />
