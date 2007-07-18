@@ -137,7 +137,9 @@
     <definedNames>
       <xsl:call-template name="InsertPrintRanges"/>
       <xsl:call-template name="InsertHeaders"/>
-     <xsl:call-template name="InsertDefineConnection"/>
+      <xsl:for-each select="table:table">
+        <xsl:call-template name="InsertDefineConnection"/>
+     </xsl:for-each>
       <!--definedName name="praca" localSheetId="0">Sheet1!$C$11:$D$11</definedName-->
     </definedNames>
 
@@ -444,7 +446,7 @@
   </xsl:template>
   
   <xsl:template name="InsertDefineConnection">
-    <xsl:for-each select="table:table">      
+         
       
       <!-- if there is a shheet with the same name modify name -->
       <xsl:variable name="SheetName">
@@ -465,7 +467,7 @@
       </xsl:variable>
       
      
-        <xsl:apply-templates select="descendant::table:table-row[1]" mode="connection">
+    <xsl:apply-templates select="table:table-row[1]" mode="connection">
           <xsl:with-param name="rowNumber">
             <xsl:text>1</xsl:text>
           </xsl:with-param>
@@ -476,10 +478,9 @@
             <xsl:value-of select="$SheetId"/>
           </xsl:with-param>
           <xsl:with-param name="tableName" select="@table:name"/>
-        </xsl:apply-templates>
+   </xsl:apply-templates>
       
-      </xsl:for-each>
-     
+      
   </xsl:template>
   
   <!-- search coditional -->
@@ -507,8 +508,8 @@
     <!-- check next row -->
     <xsl:choose>
       <!-- next row is a sibling -->
-      <xsl:when test="following::table:table-row">
-        <xsl:apply-templates select="following::table:table-row[1]" mode="connection">
+      <xsl:when test="following-sibling::table:table-row">
+        <xsl:apply-templates select="following-sibling::table:table-row[1]" mode="connection">
           <xsl:with-param name="rowNumber">
             <xsl:choose>
               <xsl:when test="@table:number-rows-repeated">

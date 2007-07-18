@@ -211,10 +211,10 @@
       </xsl:if>
       
       <xsl:for-each
-        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">        
-        <xsl:for-each select="table:table-row/table:table-cell/table:cell-range-source">
+        select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">        
+
           <Relationship Id="{generate-id()}" Target="{concat('../queryTables/queryTable', position(), '.xml')}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/queryTable"/>
-        </xsl:for-each>
+
      </xsl:for-each>
 
       <!-- drawing.xml file -->
@@ -323,13 +323,12 @@
   
   <xsl:template name="InsertLinkExternalRels">
     
-    <xsl:for-each
-      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">      
+    <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
     
-      <xsl:call-template name="QueryTable"/>
+      <xsl:call-template name="InsertQueryTable"/>
       
-    </xsl:for-each>
     
+    </xsl:for-each>
   </xsl:template>
   
 </xsl:stylesheet>

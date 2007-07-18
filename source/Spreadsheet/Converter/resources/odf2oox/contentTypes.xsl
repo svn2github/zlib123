@@ -40,8 +40,7 @@
   <!-- content types -->
   <xsl:template name="ContentTypes">
     <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-      <Override PartName="/xl/queryTables/queryTable1.xml"
-        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.queryTable+xml"/>
+      <xsl:call-template name="InsertConnectionContentTypes"/>
       <Override PartName="/xl/theme/theme1.xml"
         ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
       <Default Extension="jpeg" ContentType="image/jpeg"/>
@@ -161,5 +160,17 @@
           ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>        
         </xsl:for-each>
     </xsl:template>
+  
+  <xsl:template name="InsertConnectionContentTypes">
+    <xsl:for-each
+      select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+      <xsl:variable name="queryTableTarget">
+        <xsl:value-of select="concat('/xl/queryTables/queryTable', position(), '.xml')"/>
+      </xsl:variable>
+      <Override PartName="{$queryTableTarget}"
+        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.queryTable+xml"/>    
+    </xsl:for-each>   
+  </xsl:template>
+  
   
 </xsl:stylesheet>

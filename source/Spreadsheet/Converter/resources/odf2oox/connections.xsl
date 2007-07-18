@@ -69,101 +69,22 @@
     <!-- Insert conections to web site -->
     <xsl:template name="InsertConnections">        
         <connections xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-            <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table">
-                <xsl:apply-templates select="descendant::table:table-row[1]" mode="connectionURL">
-                    <xsl:with-param name="rowNumber">
-                        <xsl:text>1</xsl:text>
-                    </xsl:with-param>
-                    <xsl:with-param name="cellNumber">
-                        <xsl:text>0</xsl:text>
-                    </xsl:with-param>            
-                </xsl:apply-templates>       
-            </xsl:for-each>
-          </connections>
-    </xsl:template>
-    
-    
-    <!-- search connection -->
-    <xsl:template match="table:table-row" mode="connectionURL">
-        <xsl:param name="rowNumber"/>
-        <xsl:param name="cellNumber"/>   
-     
-        
-        <xsl:apply-templates
-            select="child::node()[name() = 'table:table-cell' or name()= 'table:covered-table-cell'][1]"
-            mode="connectionURL">
-            <xsl:with-param name="colNumber">
-                <xsl:text>0</xsl:text>
-            </xsl:with-param>
-            <xsl:with-param name="rowNumber" select="$rowNumber"/>
-        </xsl:apply-templates>
-
-        <!-- check next row -->
-        <xsl:choose>
-            <!-- next row is a sibling -->
-            <xsl:when test="following::table:table-row">
-                <xsl:apply-templates select="following::table:table-row[1]" mode="connectionURL">
-                    <xsl:with-param name="rowNumber">
-                        <xsl:choose>
-                            <xsl:when test="@table:number-rows-repeated">
-                                <xsl:value-of select="$rowNumber+@table:number-rows-repeated"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="$rowNumber+1"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:with-param>
-                    <xsl:with-param name="cellNumber">
-                        <xsl:text>0</xsl:text>
-                    </xsl:with-param>                    
-                </xsl:apply-templates>
-            </xsl:when>
-        </xsl:choose>
-    </xsl:template>
-    
-    <!-- Skip table:covered-table-cell -->
-    <xsl:template match="table:covered-table-cell" mode="connectionURL">
-        <xsl:param name="colNumber"/>
-        <xsl:param name="rowNumber"/>
-       
-        <xsl:if test="following-sibling::table:table-cell">
-            <xsl:apply-templates
-                select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell' ][1]"
-                mode="connectionURL">
-                <xsl:with-param name="colNumber">
-                    <xsl:choose>
-                        <xsl:when test="@table:number-columns-repeated != ''">
-                            <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="$colNumber + 1"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:with-param>
-                <xsl:with-param name="rowNumber">
-                    <xsl:value-of select="$rowNumber"/>
-                </xsl:with-param>            
-            </xsl:apply-templates>
-        </xsl:if>
-        
-    </xsl:template>
-    
-    <!-- insert define connection -->
-    <xsl:template match="table:table-cell" mode="connectionURL">
-        <xsl:param name="colNumber"/>
-        <xsl:param name="rowNumber"/>
-        
-        <xsl:for-each select="table:cell-range-source">
-                
-            <connection id="1" name="Connection" type="4" refreshedVersion="3" background="1" saveData="1">
-                <webPr sourceData="1" parsePre="1" consecutive="1" xl2000="1">
-                    <xsl:attribute name="url">
-                        <xsl:value-of select="@xlink:href"/>
+            <xsl:for-each select="document('content.xml')/office:document-content/office:body/office:spreadsheet/table:table/table:table-row/table:table-cell/table:cell-range-source">
+                <connection type="4" refreshedVersion="3" background="1" saveData="1">
+                    <xsl:attribute name="id">
+                        <xsl:value-of select="position()"/>
                     </xsl:attribute>
-                                    
-                    <xsl:if test="@table:name != 'HTML_all' and @table:name != 'HTML_tables'">
+                    <xsl:attribute name="name">
+                        <xsl:value-of select="concat('Connection', position())"/>
+                    </xsl:attribute>
+                    <webPr sourceData="1" parsePre="1" consecutive="1" xl2000="1">
+                        <xsl:attribute name="url">
+                            <xsl:value-of select="@xlink:href"/>
+                        </xsl:attribute>
+                        
+                        <xsl:if test="@table:name != 'HTML_all' and @table:name != 'HTML_tables'">
                             <xsl:attribute name="htmlTables">
-                               <xsl:text>1</xsl:text>
+                                <xsl:text>1</xsl:text>
                             </xsl:attribute>
                             <tables>
                                 <xsl:call-template name="InsertTablesConnection">
@@ -172,33 +93,12 @@
                                     </xsl:with-param>
                                 </xsl:call-template>
                             </tables>
-                    </xsl:if>
-                    
-                </webPr>
-            </connection>
-            
-        </xsl:for-each>
-        
-        <xsl:if test="following-sibling::table:table-cell">
-            <xsl:apply-templates
-                select="following-sibling::node()[name() = 'table:table-cell' or name() = 'table:covered-table-cell'][1]"
-                mode="connectionURL">
-                <xsl:with-param name="colNumber">
-                    <xsl:choose>
-                        <xsl:when test="@table:number-columns-repeated != ''">
-                            <xsl:value-of select="number($colNumber) + number(@table:number-columns-repeated)"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="$colNumber + 1"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:with-param>
-                <xsl:with-param name="rowNumber">
-                    <xsl:value-of select="$rowNumber"/>
-                </xsl:with-param>
-            </xsl:apply-templates>
-        </xsl:if>
-        
+                        </xsl:if>
+                        
+                    </webPr>
+                </connection>
+            </xsl:for-each>
+          </connections>
     </xsl:template>
     
     <!-- Insert connections to tables -->
