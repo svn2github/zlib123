@@ -45,8 +45,10 @@
   <xsl:import href="picture.xsl"/>
   <xsl:import href="note.xsl"/>
   <xsl:import href="conditional.xsl"/>
+  <xsl:import href="validation.xsl"/>
   <xsl:import href="elements.xsl"/>
   <xsl:import href="measures.xsl"/>
+
   <xsl:import href="connections.xsl"/>
   
 
@@ -91,6 +93,11 @@
 
     <office:body>
       <office:spreadsheet>
+
+        <xsl:apply-templates select="document('xl/workbook.xml')/e:workbook/e:sheets/e:sheet[1]"
+          mode="Validation">
+          <xsl:with-param name="number">1</xsl:with-param>
+        </xsl:apply-templates>
 
         <!-- insert strings from sharedStrings to be moved later by post-processor-->
         <xsl:for-each select="document('xl/sharedStrings.xml')/e:sst">
@@ -279,6 +286,30 @@
       </xsl:for-each>
     </xsl:variable>
 
+    <!-- Check If Data Validation are in this sheet -->
+    <xsl:variable name="ValidationCell">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+        <xsl:call-template name="ValidationCell"/>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:variable name="ValidationRow">
+      <xsl:call-template name="ValidationRow">
+        <xsl:with-param name="ValidationCell">
+          <xsl:value-of select="$ValidationCell"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:variable name="ValidationCellStyle">
+      <xsl:for-each select="document(concat('xl/',$Id))">
+        <xsl:call-template name="ValidationCell">
+          <xsl:with-param name="document">
+            <xsl:text>style</xsl:text>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:variable>
 
     <xsl:variable name="PictureRow">
       <xsl:for-each select="document(concat('xl/',$Id))">
@@ -415,6 +446,15 @@
           <xsl:value-of select="$PictureRow"/>
         </xsl:with-param>
         <xsl:with-param name="removeFilter" select="$removeFilter"/>
+        <xsl:with-param name="ValidationCell">
+          <xsl:value-of select="$ValidationCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationRow">
+          <xsl:value-of select="$ValidationRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationCellStyle">
+          <xsl:value-of select="$ValidationCellStyle"/>
+        </xsl:with-param>
         <xsl:with-param name="ConnectionsCell">
           <xsl:value-of select="$ConnectionCell"/>
         </xsl:with-param>
@@ -690,6 +730,9 @@
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
     <xsl:param name="removeFilter"/>
+    <xsl:param name="ValidationCell"/>
+    <xsl:param name="ValidationRow"/>
+    <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
 
 
@@ -976,6 +1019,15 @@
                   <xsl:value-of select="$ConditionalCellStyle"/>
                 </xsl:with-param>
                 <xsl:with-param name="removeFilter" select="$removeFilter"/>
+                <xsl:with-param name="ValidationCell">
+                  <xsl:value-of select="$ValidationCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="ValidationRow">
+                  <xsl:value-of select="$ValidationRow"/>
+                </xsl:with-param>
+                <xsl:with-param name="ValidationCellStyle">
+                  <xsl:value-of select="$ValidationCellStyle"/>
+                </xsl:with-param>
                 <xsl:with-param name="ConnectionsCell">
                   <xsl:value-of select="$ConnectionsCell"/>
                 </xsl:with-param>
@@ -1052,6 +1104,9 @@
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
     <xsl:param name="removeFilter"/>
+    <xsl:param name="ValidationCell"/>
+    <xsl:param name="ValidationRow"/>
+    <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
 
     <xsl:variable name="this" select="."/>
@@ -1276,6 +1331,15 @@
         <xsl:value-of select="$ConditionalCellStyle"/>
       </xsl:with-param>
       <xsl:with-param name="removeFilter" select="$removeFilter"/>
+      <xsl:with-param name="ValidationCell">
+        <xsl:value-of select="$ValidationCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationRow">
+        <xsl:value-of select="$ValidationRow"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationCellStyle">
+        <xsl:value-of select="$ValidationCellStyle"/>
+      </xsl:with-param>
       <xsl:with-param name="ConnectionsCell">
         <xsl:value-of select="$ConnectionsCell"/>
       </xsl:with-param>
@@ -1505,6 +1569,9 @@
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ValidationCell"/>
+    <xsl:param name="ValidationRow"/>
+    <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
 
     <xsl:variable name="this" select="."/>
@@ -1689,6 +1756,15 @@
       </xsl:with-param>
       <xsl:with-param name="ConditionalCellStyle">
         <xsl:value-of select="$ConditionalCellStyle"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationCell">
+        <xsl:value-of select="$ValidationCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationRow">
+        <xsl:value-of select="$ValidationRow"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationCellStyle">
+        <xsl:value-of select="$ValidationCellStyle"/>
       </xsl:with-param>
       <xsl:with-param name="ConnectionsCell">
         <xsl:value-of select="$ConnectionsCell"/>
