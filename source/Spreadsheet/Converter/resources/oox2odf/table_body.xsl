@@ -170,6 +170,9 @@
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="removeFilter"/>
+    <xsl:param name="ValidationRow"/>
+    <xsl:param name="ValidationCell"/>
+    <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
 
 
@@ -232,7 +235,8 @@
           </xsl:attribute>
 
           <!-- if row is fidden and fiter is not being removed -->
-          <xsl:if test="@hidden=1 and not(@r &gt;= substring-before($removeFilter,':') and @r &lt;= substring-after($removeFilter,':'))">
+          <xsl:if
+            test="@hidden=1 and not(@r &gt;= substring-before($removeFilter,':') and @r &lt;= substring-after($removeFilter,':'))">
             <xsl:attribute name="table:visibility">
               <xsl:text>collapse</xsl:text>
             </xsl:attribute>
@@ -269,6 +273,15 @@
               </xsl:with-param>
               <xsl:with-param name="ConditionalCellStyle">
                 <xsl:value-of select="$ConditionalCellStyle"/>
+              </xsl:with-param>
+              <xsl:with-param name="ValidationCell">
+                <xsl:value-of select="$ValidationCell"/>
+              </xsl:with-param>
+              <xsl:with-param name="ValidationRow">
+                <xsl:value-of select="$ValidationRow"/>
+              </xsl:with-param>
+              <xsl:with-param name="ValidationCellStyle">
+                <xsl:value-of select="$ValidationCellStyle"/>
               </xsl:with-param>
               <xsl:with-param name="ConnectionsCell">
                 <xsl:value-of select="$ConnectionsCell"/>
@@ -341,7 +354,8 @@
                 </xsl:if>
               </table:table-cell>
             </xsl:when>
-            <xsl:when test="($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '') and $GetMinRowWithElements=@r and not(e:c)">
+            <xsl:when
+              test="($PictureCell != '' or $NoteCell != '' or $ConditionalCell != '') and $GetMinRowWithElements=@r and not(e:c)">
               <xsl:call-template name="InsertElementsBetweenTwoColl">
                 <xsl:with-param name="sheet">
                   <xsl:value-of select="$sheet"/>
@@ -363,10 +377,10 @@
                 </xsl:with-param>
                 <xsl:with-param name="ConditionalCell">
                   <xsl:value-of select="$ConditionalCell"/>
-                  </xsl:with-param>
-                  <xsl:with-param name="ConditionalCellStyle">
+                </xsl:with-param>
+                <xsl:with-param name="ConditionalCellStyle">
                   <xsl:value-of select="$ConditionalCellStyle"/>
-                  </xsl:with-param>
+                </xsl:with-param>
                 <xsl:with-param name="ElementsColl">
                   <xsl:value-of select="concat($PictureColl, $NoteColl)"/>
                 </xsl:with-param>
@@ -791,8 +805,11 @@
     <xsl:param name="sheetNr"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ValidationCell"/>
+    <xsl:param name="ValidationRow"/>
+    <xsl:param name="ValidationCellStyle"/>
     <xsl:param name="ConnectionsCell"/>
-    
+
     <xsl:message terminate="no">progress:c</xsl:message>
 
     <xsl:choose>
@@ -912,6 +929,8 @@
             </xsl:attribute>
           </xsl:if>
 
+
+          <!-- check if conditional -->
           <xsl:if
             test="@s or contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $colNum, ';'))">
             <xsl:choose>
@@ -955,8 +974,7 @@
 
             <xsl:variable name="horizontal">
               <xsl:for-each select="document('xl/styles.xml')">
-                <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"
-                />
+                <xsl:value-of select="key('Xf', '')[position() = $position]/e:alignment/@horizontal"/>
               </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$horizontal = 'centerContinuous' and e:v">
@@ -970,6 +988,15 @@
                 <xsl:text>1</xsl:text>
               </xsl:attribute>
             </xsl:if>
+          </xsl:if>
+          
+          <!-- chceck if DataValidation -->
+
+          <xsl:if
+            test="contains(concat(';', $ValidationCell), concat(';', $rowNum, ':', $colNum, ';'))">
+            <xsl:attribute name="table:content-validation-name">
+              <xsl:value-of select="(concat('val',(. + 1)))"/>
+            </xsl:attribute>
           </xsl:if>
           
           <xsl:if test="e:v">
@@ -2801,13 +2828,13 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    
-      <xsl:variable name="formatingMarks">
-        <xsl:call-template name="StripText">
-          <xsl:with-param name="formatCode" select="$formatCode"/>
-        </xsl:call-template>
-      </xsl:variable>  
-    
+
+    <xsl:variable name="formatingMarks">
+      <xsl:call-template name="StripText">
+        <xsl:with-param name="formatCode" select="$formatCode"/>
+      </xsl:call-template>
+    </xsl:variable>
+
     <xsl:variable name="outputValue">
       <xsl:choose>
         <xsl:when test="contains($value,'.') and $numStyle and $numStyle!=''">
@@ -2828,7 +2855,7 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:with-param>
-            </xsl:call-template>
+          </xsl:call-template>
         </xsl:when>
         <xsl:when test="contains($value,'.') and $numId = 10">
           <xsl:call-template name="FormatAfterComma">
