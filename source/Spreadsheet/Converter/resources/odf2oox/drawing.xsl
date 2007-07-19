@@ -162,37 +162,6 @@
         </xsl:choose>
       </xsl:for-each>
 
-      <!--Insert TextBox -->
-      <!--xsl:for-each select="descendant::draw:frame/draw:text-box">
-        <xdr:twoCellAnchor>
-
-          <xsl:call-template name="SetPosition"/>
-
-          <xdr:sp macro="" textlink="">
-            <xdr:nvSpPr>
-              <xdr:cNvPr id="position()" name="concat('TextBox ',position())"/>
-              <xdr:cNvSpPr txBox="1"/>
-            </xdr:nvSpPr>
-
-            <xsl:call-template name="InsertFrameProperties"/>
-
-            <xdr:txBody>
-
-              <xsl:call-template name="InsertTextBoxProperties"/>
-
-              <a:lstStyle/-->
-
-      <!-- insert text -->
-      <!--xsl:apply-templates mode="text-box"/>
-
-            </xdr:txBody>
-
-          </xdr:sp>
-          <xdr:clientData/>
-        </xdr:twoCellAnchor>
-
-      </xsl:for-each-->
-
     </xdr:wsDr>
 
   </xsl:template>
