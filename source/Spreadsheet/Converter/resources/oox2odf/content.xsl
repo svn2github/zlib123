@@ -50,7 +50,7 @@
   <xsl:import href="measures.xsl"/>
 
   <xsl:import href="connections.xsl"/>
-  
+
 
   <xsl:key name="numFmtId" match="e:styleSheet/e:numFmts/e:numFmt" use="@numFmtId"/>
   <xsl:key name="Xf" match="e:styleSheet/e:cellXfs/e:xf" use="''"/>
@@ -311,6 +311,7 @@
       </xsl:for-each>
     </xsl:variable>
 
+
     <xsl:variable name="PictureRow">
       <xsl:for-each select="document(concat('xl/',$Id))">
         <xsl:call-template name="PictureRow">
@@ -341,7 +342,7 @@
           <xsl:variable name="customFiltersNum">
             <xsl:value-of select="count(e:filterColumn/e:customFilters)"/>
           </xsl:variable>
-          <xsl:variable name="topFiltersNum">  
+          <xsl:variable name="topFiltersNum">
             <xsl:value-of select="count(e:filterColumn/e:top10)"/>
           </xsl:variable>
 
@@ -359,16 +360,16 @@
         </xsl:for-each>
       </xsl:if>
     </xsl:variable>
-    
-  <xsl:variable name="ConnectionCell">
-    <xsl:call-template name="ConnectionsCell">
-      <xsl:with-param name="number">
-        <xsl:value-of select="$number - 1"/>
-      </xsl:with-param>
-    </xsl:call-template>
-  </xsl:variable>
 
-    
+    <xsl:variable name="ConnectionCell">
+      <xsl:call-template name="ConnectionsCell">
+        <xsl:with-param name="number">
+          <xsl:value-of select="$number - 1"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+
     <table:table>
       <!-- Insert Table (Sheet) Name -->
       <xsl:attribute name="table:name">
@@ -387,7 +388,8 @@
         <xsl:text>&apos;</xsl:text>
       </xsl:variable>
       <xsl:for-each select="document('xl/workbook.xml')/e:workbook/e:definedNames/e:definedName">
-        <xsl:if test="string($checkedName) = substring-before(./self::node(), '!') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
+        <xsl:if
+          test="string($checkedName) = substring-before(./self::node(), '!') and (@name = '_xlnm.Print_Area' or @name = '_xlnm.Print_Titles')">
           <xsl:attribute name="table:print-ranges">
             <xsl:value-of
               select="concat($apostrof, substring-before(./self::node(), '!'), $apostrof,'.', substring-before(substring-after(./self::node(), '$'),'$'), substring-before(substring-after(substring-after(./self::node(), '$'),'$'),':'),':', $apostrof, substring-before(./self::node(), '!'), $apostrof, '.',substring-before(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'), substring-after(substring-after(substring-after(substring-after(./self::node(), '!'),':'),'$'),'$'))"
@@ -475,7 +477,7 @@
     <xsl:choose>
       <xsl:when test="contains($value, $name) and @name = '_xlnm.Print_Area' ">
 
-    <!--         
+        <!--         
         <xsl:variable name="apos">
           <xsl:text>&apos;</xsl:text>
         </xsl:variable>
@@ -499,7 +501,7 @@
         </xsl:variable>
 -->
 
-       <xsl:call-template name="InsertRanges">
+        <xsl:call-template name="InsertRanges">
           <xsl:with-param name="ranges" select="text()"/>
           <xsl:with-param name="mode" select="substring-after(text(),',')"/>
           <xsl:with-param name="checkedName" select="$checkedName"/>
@@ -616,7 +618,7 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-<!--  
+            <!--  
            <xsl:value-of
               select="concat($apos,$checkedName,$apos,'.',$start,':',$apos,$checkedName,$apos,'.',$end)"/>
             <xsl:text> </xsl:text>
@@ -645,7 +647,7 @@
             </xsl:variable>
 
             <!-- single-cell range can be defined either as Sheet1!$A$2:$A$2 or as Sheet1!$A$2-->
-           <xsl:variable name="endRange">
+            <xsl:variable name="endRange">
               <xsl:choose>
                 <xsl:when test="contains(substring-after($ranges, concat($sheetName,'!') ), ':' )">
                   <xsl:value-of select="substring-after($ranges,':')"/>
@@ -688,7 +690,7 @@
               </xsl:choose>
             </xsl:variable>
 
-  <!--          <xsl:value-of
+            <!--          <xsl:value-of
               select="concat($apos,$checkedName,$apos,'.',$start,':',$apos,$checkedName,$apos,'.',$end)"/>
 -->
           </xsl:otherwise>
@@ -938,6 +940,15 @@
                     <xsl:value-of select="$ConditionalRow"/>
                   </xsl:with-param>
                   <xsl:with-param name="sheetNr" select="$sheetNr"/>
+                  <xsl:with-param name="ValidationCell">
+                    <xsl:value-of select="$ValidationCell"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="ValidationRow">
+                    <xsl:value-of select="$ValidationRow"/>
+                  </xsl:with-param>
+                  <xsl:with-param name="ValidationCellStyle">
+                    <xsl:value-of select="$ValidationCellStyle"/>
+                  </xsl:with-param>
                 </xsl:call-template>
               </xsl:when>
 
@@ -1074,6 +1085,15 @@
                   <xsl:value-of select="$ConditionalRow"/>
                 </xsl:with-param>
                 <xsl:with-param name="sheetNr" select="$sheetNr"/>
+                <xsl:with-param name="ValidationCell">
+                  <xsl:value-of select="$ValidationCell"/>
+                </xsl:with-param>
+                <xsl:with-param name="ValidationRow">
+                  <xsl:value-of select="$ValidationRow"/>
+                </xsl:with-param>
+                <xsl:with-param name="ValidationCellStyle">
+                  <xsl:value-of select="$ValidationCellStyle"/>
+                </xsl:with-param>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
@@ -1146,7 +1166,17 @@
     <xsl:variable name="GetMinRowWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
-          <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow)"/>
+          <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow)"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+        <xsl:choose>
+          <xsl:when test="preceding::e:row[1]/@r = ''">
+            <xsl:text>0</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="preceding::e:row[1]/@r"/>
+          </xsl:otherwise>
+        </xsl:choose>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1200,6 +1230,15 @@
           <xsl:with-param name="EndRow">
             <xsl:value-of select="@r - 1"/>
           </xsl:with-param>
+          <xsl:with-param name="ValidationCell">
+            <xsl:value-of select="$ValidationCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="ValidationRow">
+            <xsl:value-of select="$ValidationRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="ValidationCellStyle">
+            <xsl:value-of select="$ValidationCellStyle"/>
+          </xsl:with-param>
         </xsl:call-template>
 
       </xsl:when>
@@ -1238,7 +1277,6 @@
       <!-- when this row is not first one and there were pictures rows after previous non-empty row-->
       <xsl:when
         test="preceding::e:row[1]/@r &lt;  @r - 1 and $GetMinRowWithElement &gt; preceding::e:row[1]/@r and $GetMinRowWithElement &lt; @r - 1">
-
         <xsl:call-template name="InsertElementsBetwenTwoRows">
           <xsl:with-param name="sheet">
             <xsl:value-of select="$sheet"/>
@@ -1273,6 +1311,15 @@
           </xsl:with-param>
           <xsl:with-param name="prevRow">
             <xsl:value-of select="preceding::e:row[1]/@r"/>
+          </xsl:with-param>
+          <xsl:with-param name="ValidationCell">
+            <xsl:value-of select="$ValidationCell"/>
+          </xsl:with-param>
+          <xsl:with-param name="ValidationRow">
+            <xsl:value-of select="$ValidationRow"/>
+          </xsl:with-param>
+          <xsl:with-param name="ValidationCellStyle">
+            <xsl:value-of select="$ValidationCellStyle"/>
           </xsl:with-param>
         </xsl:call-template>
 
@@ -1346,7 +1393,7 @@
     </xsl:call-template>
 
     <xsl:if
-      test="not(following-sibling::e:row) and ($PictureRow != '' or $NoteRow != '' or $ConditionalRow != '')">
+      test="not(following-sibling::e:row) and ($PictureRow != '' or $NoteRow != '' or $ConditionalRow != '' or $ValidationRow != '')">
 
       <xsl:variable name="GetMinRowWithElementAfterLastRow">
         <xsl:call-template name="GetMinRowWithPicture">
@@ -1393,6 +1440,15 @@
         </xsl:with-param>
         <xsl:with-param name="prevRow">
           <xsl:value-of select="@r"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationCell">
+          <xsl:value-of select="$ValidationCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationRow">
+          <xsl:value-of select="$ValidationRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationCellStyle">
+          <xsl:value-of select="$ValidationCellStyle"/>
         </xsl:with-param>
       </xsl:call-template>
 
@@ -1635,11 +1691,22 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
+    
+    <xsl:variable name="ValidationColl">
+      <xsl:call-template name="GetCollsWithElement">
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="$rowNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="ElementCell">
+          <xsl:value-of select="concat(';', $ValidationCell)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
 
     <xsl:variable name="GetMinCollWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
-          <xsl:value-of select="concat($PictureColl, $NoteColl)"/>
+          <xsl:value-of select="concat($PictureColl, $NoteColl, $ValidationColl)"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
           <xsl:choose>
@@ -1700,6 +1767,18 @@
         <xsl:value-of select="$NoteColl"/>
       </xsl:with-param>
       <xsl:with-param name="sheetNr" select="$sheetNr"/>
+      <xsl:with-param name="ValidationCell">
+        <xsl:value-of select="$ValidationCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationRow">
+        <xsl:value-of select="$ValidationRow"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationCellStyle">
+        <xsl:value-of select="$ValidationCellStyle"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationColl">
+        <xsl:value-of select="$ValidationColl"/>
+      </xsl:with-param>
     </xsl:call-template>
 
     <!-- Insert this cell or covered cell if this one is Merge Cell -->
@@ -1828,6 +1907,18 @@
       </xsl:with-param>
       <xsl:with-param name="ConnectionsCell">
         <xsl:value-of select="$ConnectionsCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationCell">
+        <xsl:value-of select="$ValidationCell"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationRow">
+        <xsl:value-of select="$ValidationRow"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationCellStyle">
+        <xsl:value-of select="$ValidationCellStyle"/>
+      </xsl:with-param>
+      <xsl:with-param name="ValidationColl">
+        <xsl:value-of select="$ValidationColl"/>
       </xsl:with-param>
     </xsl:call-template>
 
