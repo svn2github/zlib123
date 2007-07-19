@@ -44,30 +44,33 @@
   exclude-result-prefixes="e r c xdr draw xlink">
 
   <!-- Insert Empty Sheet with picture -->
-  
+
   <xsl:template name="InsertEmptySheetWithElements">
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="PictureCell"/>
     <xsl:param name="PictureRow"/>
-    <xsl:param name="NoteCell"/>  
+    <xsl:param name="NoteCell"/>
     <xsl:param name="NoteRow"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
     <xsl:param name="ConditionalRow"/>
     <xsl:param name="prevRow" select="0"/>
     <xsl:param name="sheetNr"/>
-    
+    <xsl:param name="ValidationCell"/>     
+    <xsl:param name="ValidationRow"/>
+    <xsl:param name="ValidationCellStyle"/>  
+
     <xsl:variable name="id">
       <xsl:value-of select="key('drawing', '')/@r:id"/>
     </xsl:variable>
-    
+
     <xsl:variable name="AllElementsCell">
-      <xsl:value-of select="concat($PictureCell, $NoteCell, $ConditionalCell)"/>
+      <xsl:value-of select="concat($PictureCell, $NoteCell, $ConditionalCell, $ValidationCell)"/>
     </xsl:variable>
-    
+
     <xsl:variable name="AllElementsRow">
-      <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow)"/>
+      <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow)"/>
     </xsl:variable>
 
     <xsl:variable name="GetMinRowWithElement">
@@ -82,16 +85,16 @@
     </xsl:variable>
 
     <xsl:if test="number($GetMinRowWithElement) - number($prevRow) - 1 &gt; 0">
-    <xsl:call-template name="InsertEmptyRows">
-      <xsl:with-param name="repeat">
-        <xsl:value-of select="number($GetMinRowWithElement) - number($prevRow) - 1"/>
-      </xsl:with-param>
-      <xsl:with-param name="sheet">
-        <xsl:value-of select="$sheet"/>
-      </xsl:with-param>
-    </xsl:call-template>
+      <xsl:call-template name="InsertEmptyRows">
+        <xsl:with-param name="repeat">
+          <xsl:value-of select="number($GetMinRowWithElement) - number($prevRow) - 1"/>
+        </xsl:with-param>
+        <xsl:with-param name="sheet">
+          <xsl:value-of select="$sheet"/>
+        </xsl:with-param>
+      </xsl:call-template>
     </xsl:if>
-    
+
     <xsl:variable name="CollsWithElements">
       <xsl:call-template name="GetCollsWithElement">
         <xsl:with-param name="rowNumber">
@@ -102,351 +105,9 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
- <xsl:if test="$GetMinRowWithElement != ''">
-   
-    <xsl:for-each select="document(concat('xl/',$sheet))">
-    <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
-    <xsl:call-template name="InsertElementsInThisRow">
-      <xsl:with-param name="sheet">
-        <xsl:value-of select="$sheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="NameSheet">
-        <xsl:value-of select="$NameSheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="PictureCell">
-        <xsl:value-of select="$PictureCell"/>
-      </xsl:with-param>
-      <xsl:with-param name="PictureRow">
-        <xsl:value-of select="$PictureRow"/>
-      </xsl:with-param>
-      <xsl:with-param name="NoteCell">
-        <xsl:value-of select="$NoteCell"/>
-      </xsl:with-param>
-      <xsl:with-param name="NoteRow">
-        <xsl:value-of select="$NoteRow"/>
-      </xsl:with-param>
-      <xsl:with-param name="ConditionalCell">
-        <xsl:value-of select="$ConditionalCell"/>
-      </xsl:with-param>
-      <xsl:with-param name="ConditionalCellStyle">
-        <xsl:value-of select="$ConditionalCellStyle"/>
-      </xsl:with-param>
-      <xsl:with-param name="ElementsColl">
-        <xsl:value-of select="$CollsWithElements"/>
-      </xsl:with-param>
-      <xsl:with-param name="rowNum">
-        <xsl:value-of select="$GetMinRowWithElement"/>
-      </xsl:with-param>
-      <xsl:with-param name="sheetNr" select="$sheetNr"/>
-    </xsl:call-template>
-    </table:table-row>
-    </xsl:for-each>
-    
-    <xsl:call-template name="InsertEmptySheetWithElements">
-      <xsl:with-param name="sheet">
-        <xsl:value-of select="$sheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="NameSheet">
-        <xsl:value-of select="$NameSheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="PictureCell">
-        <xsl:value-of select="$PictureCell"/>
-      </xsl:with-param>
-      <xsl:with-param name="PictureRow">
-        <xsl:value-of select="$PictureRow"/>
-      </xsl:with-param>
-      <xsl:with-param name="NoteCell">
-        <xsl:value-of select="$NoteCell"/>
-      </xsl:with-param>
-      <xsl:with-param name="NoteRow">
-        <xsl:value-of select="$NoteRow"/>
-      </xsl:with-param>
-      <xsl:with-param name="ConditionalCell">
-        <xsl:value-of select="$ConditionalCell"/>
-      </xsl:with-param>
-      <xsl:with-param name="ConditionalCellStyle">
-        <xsl:value-of select="$ConditionalCellStyle"/>
-      </xsl:with-param>
-      <xsl:with-param name="prevRow">
-        <xsl:value-of select="$GetMinRowWithElement"/>
-      </xsl:with-param>
-      <xsl:with-param name="ConditionalRow">
-        <xsl:value-of select="$ConditionalRow"/>
-      </xsl:with-param>
-      <xsl:with-param name="sheetNr" select="$sheetNr"/>
-    </xsl:call-template>
- </xsl:if>   
-    
-  </xsl:template>
-  
-  <xsl:template name="InsertElementsInThisRow">
-    <xsl:param name="sheet"/>
-    <xsl:param name="NameSheet"/>
-    <xsl:param name="PictureCell"/>
-    <xsl:param name="PictureRow"/>
-    <xsl:param name="NoteCell"/>  
-    <xsl:param name="NoteRow"/>
-    <xsl:param name="ConditionalCell"/>
-    <xsl:param name="ConditionalCellStyle"/>
-    <xsl:param name="ElementsColl"/>
-    <xsl:param name="prevColl" select="0"/>
-    <xsl:param name="rowNum"/>
-    <xsl:param name="sheetNr"/>
 
-    <xsl:variable name="GetMinColWithElement">
-      <xsl:call-template name="GetMinRowWithPicture">
-        <xsl:with-param name="PictureRow">
-          <xsl:value-of select="$ElementsColl"/>
-        </xsl:with-param>
-        <xsl:with-param name="AfterRow">
-          <xsl:value-of select="$prevColl + 1"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-    
-    <xsl:call-template name="InsertEmptyColls">
-      <xsl:with-param name="repeat">
-        <xsl:value-of select="$GetMinColWithElement - $prevColl - 1"/>
-      </xsl:with-param>
-    </xsl:call-template>
-    
-    
-      
-      <xsl:variable name="Target">
-        <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
-        <xsl:call-template name="GetTargetPicture">
-          <xsl:with-param name="sheet">
-            <xsl:value-of select="substring-after($sheet, '/')"/>
-          </xsl:with-param>
-          <xsl:with-param name="id">
-            <xsl:value-of select="@r:id"/>
-          </xsl:with-param>
-        </xsl:call-template>
-        </xsl:for-each>
-      </xsl:variable>
-     
-    <xsl:if test="$GetMinColWithElement != ''">
-    
-    <table:table-cell>
-      
-    <xsl:if test="contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">        
-      <xsl:variable name="ConditionalStyleId">
-        <xsl:value-of
-          select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';') + 1])"
-        />
-      </xsl:variable>
-      <xsl:attribute name="table:style-name">
-        <xsl:value-of select="$ConditionalStyleId"/>
-      </xsl:attribute>
-     </xsl:if>
-      
-     <xsl:if test="contains(concat(';', $PictureCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
-    
-    <xsl:call-template name="InsertPictureInThisCell">
-      <xsl:with-param name="sheet">
-        <xsl:value-of select="$sheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="NameSheet">
-        <xsl:value-of select="$NameSheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="collNum">
-        <xsl:value-of select="$GetMinColWithElement"/>
-      </xsl:with-param>
-      <xsl:with-param name="rowNum">
-        <xsl:value-of select="$rowNum"/>
-      </xsl:with-param>
-      <xsl:with-param name="Target">
-        <xsl:value-of select="$Target"/>
-      </xsl:with-param>
-    </xsl:call-template>
-     </xsl:if>
+    <xsl:if test="$GetMinRowWithElement != ''">
 
-      <xsl:if test="contains(concat(';', $NoteCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
-
-          <xsl:call-template name="InsertNoteInThisCell">
-            <xsl:with-param name="sheetNr">
-              <xsl:value-of select="$sheetNr"/>
-            </xsl:with-param>
-            <xsl:with-param name="colNum">
-              <xsl:value-of select="$GetMinColWithElement"/>
-            </xsl:with-param>
-            <xsl:with-param name="rowNum">
-              <xsl:value-of select="$rowNum"/>
-            </xsl:with-param>
-          </xsl:call-template>
-
-      </xsl:if>
-      
-    </table:table-cell>
-    
-    <xsl:call-template name="InsertElementsInThisRow">
-      <xsl:with-param name="sheet">
-        <xsl:value-of select="$sheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="NameSheet">
-        <xsl:value-of select="$NameSheet"/>
-      </xsl:with-param>
-      <xsl:with-param name="PictureCell">
-        <xsl:value-of select="$PictureCell"/>
-      </xsl:with-param>
-      <xsl:with-param name="PictureRow">
-        <xsl:value-of select="$PictureRow"/>
-      </xsl:with-param>
-      <xsl:with-param name="NoteCell">
-        <xsl:value-of select="$NoteCell"/>
-      </xsl:with-param>
-      <xsl:with-param name="NoteRow">
-        <xsl:value-of select="$NoteRow"/>
-      </xsl:with-param>
-      <xsl:with-param name="ConditionalCell">
-        <xsl:value-of select="$ConditionalCell"/>
-      </xsl:with-param>
-      <xsl:with-param name="ConditionalCellStyle">
-        <xsl:value-of select="$ConditionalCellStyle"/>
-      </xsl:with-param>
-      <xsl:with-param name="ElementsColl">
-        <xsl:value-of select="$ElementsColl"/>
-      </xsl:with-param>
-      <xsl:with-param name="rowNum">
-        <xsl:value-of select="$rowNum"/>
-      </xsl:with-param>
-      <xsl:with-param name="prevColl">
-        <xsl:value-of select="$GetMinColWithElement"/>
-      </xsl:with-param>
-      <xsl:with-param name="sheetNr" select="$sheetNr"/>
-    </xsl:call-template>
-    </xsl:if>
-      
-  </xsl:template>
-  
-  
-  <!-- Insert Empty Rows before element -->
-  <xsl:template name="InsertEmptyRows">
-    <xsl:param name="repeat"/>
-    <xsl:param name="sheet"/>
-    <xsl:if test="$repeat &gt; 0">
-      <xsl:for-each select="document(concat('xl/',$sheet))">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
-          table:number-rows-repeated="{$repeat}">
-          <table:table-cell table:number-columns-repeated="256"/>
-        </table:table-row>
-      </xsl:for-each>
-    </xsl:if>
-  </xsl:template>
-  
-  <!-- Insert Empty Cols before element -->
-  <xsl:template name="InsertEmptyColls">
-    <xsl:param name="repeat"/>
-    <xsl:if test="$repeat &gt; 0">
-    <table:table-cell table:number-columns-repeated="{$repeat}"/>
-   </xsl:if>
-  </xsl:template>
-  
-  <!-- Get colls with picture from this row  -->
-  
-  <xsl:template name="GetCollsWithElement">
-    <xsl:param name="rowNumber"/>
-    <xsl:param name="ElementColl"/>
-    <xsl:param name="ElementCell"/>
-    
-    <xsl:choose>
-      <xsl:when test="contains($ElementCell, concat(concat(';',$rowNumber),':'))">
-        <xsl:call-template name="GetCollsWithElement">
-          <xsl:with-param name="rowNumber">
-            <xsl:value-of select="$rowNumber"/>
-          </xsl:with-param>
-          <xsl:with-param name="ElementColl">
-            <xsl:value-of
-              select="concat($ElementColl, concat(substring-before(substring-after($ElementCell, concat(';', concat($rowNumber, ':'))),';'), ';'))"
-            />
-          </xsl:with-param>
-          <xsl:with-param name="ElementCell">
-            <xsl:value-of
-              select="concat(';', substring-after(substring-after($ElementCell, concat(';', concat($rowNumber, ':'))),';'))"
-            />
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$ElementColl"/>
-      </xsl:otherwise>
-    </xsl:choose>
-    
-  </xsl:template>
-  
-  <xsl:template name="InsertElementsBetwenTwoRows">
-    <xsl:param name="sheet"/>
-    <xsl:param name="NameSheet"/>
-    <xsl:param name="PictureCell"/>
-    <xsl:param name="PictureRow"/>
-    <xsl:param name="NoteCell"/>  
-    <xsl:param name="NoteRow"/>
-    <xsl:param name="ConditionalCell"/>
-    <xsl:param name="ConditionalCellStyle"/>
-    <xsl:param name="ConditionalRow"/>
-    <xsl:param name="prevRow" select="0"/>
-    <xsl:param name="sheetNr"/>
-    <xsl:param name="EndRow"/>
-    
-    <xsl:variable name="id">
-      <xsl:value-of select="key('drawing', '')/@r:id"/>
-    </xsl:variable>
-    
-    <xsl:variable name="AllElementsCell">
-      <xsl:value-of select="concat($PictureCell, $NoteCell, $ConditionalCell)"/>
-    </xsl:variable>
-    
-    <xsl:variable name="AllElementsRow">
-      <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow)"/>
-    </xsl:variable>
-    
-    <xsl:variable name="GetMinRowWithElement">
-      <xsl:call-template name="GetMinRowWithPicture">
-        <xsl:with-param name="PictureRow">
-          <xsl:value-of select="$AllElementsRow"/>
-        </xsl:with-param>
-        <xsl:with-param name="AfterRow">
-          <xsl:value-of select="$prevRow + 1"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-    
-    <xsl:choose>
-      <xsl:when test="number($GetMinRowWithElement) - number($prevRow) - 1 &gt; 0 and $GetMinRowWithElement &lt;= $EndRow">
-        <xsl:call-template name="InsertEmptyRows">
-          <xsl:with-param name="repeat">
-            <xsl:value-of select="number($GetMinRowWithElement) - number($prevRow) - 1"/>
-          </xsl:with-param>
-          <xsl:with-param name="sheet">
-            <xsl:value-of select="$sheet"/>
-          </xsl:with-param>
-        </xsl:call-template>    
-      </xsl:when>
-      <xsl:when test=" ($GetMinRowWithElement &gt; $EndRow or $GetMinRowWithElement = '') and $EndRow - $prevRow &gt; 0">
-        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
-          table:number-rows-repeated="{$EndRow - $prevRow}">
-          <table:table-cell table:number-columns-repeated="256"/>
-        </table:table-row>
-      </xsl:when>
-      <xsl:otherwise/>
-    </xsl:choose>
-    
-    
-    
-    <xsl:variable name="CollsWithElements">
-      <xsl:call-template name="GetCollsWithElement">
-        <xsl:with-param name="rowNumber">
-          <xsl:value-of select="$GetMinRowWithElement"/>
-        </xsl:with-param>
-        <xsl:with-param name="ElementCell">
-          <xsl:value-of select="concat(';', $AllElementsCell)"/>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:variable>
-    
-    <xsl:if test="$GetMinRowWithElement != '' and $GetMinRowWithElement &lt;= $EndRow">
-      
       <xsl:for-each select="document(concat('xl/',$sheet))">
         <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
           <xsl:call-template name="InsertElementsInThisRow">
@@ -481,10 +142,411 @@
               <xsl:value-of select="$GetMinRowWithElement"/>
             </xsl:with-param>
             <xsl:with-param name="sheetNr" select="$sheetNr"/>
+            <xsl:with-param name="ValidationCell">
+              <xsl:value-of select="$ValidationCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="ValidationRow">
+              <xsl:value-of select="$ValidationRow"/>
+            </xsl:with-param>
+            <xsl:with-param name="ValidationCellStyle">
+              <xsl:value-of select="$ValidationCellStyle"/>
+            </xsl:with-param>
           </xsl:call-template>
         </table:table-row>
       </xsl:for-each>
-      
+
+      <xsl:call-template name="InsertEmptySheetWithElements">
+        <xsl:with-param name="sheet">
+          <xsl:value-of select="$sheet"/>
+        </xsl:with-param>
+        <xsl:with-param name="NameSheet">
+          <xsl:value-of select="$NameSheet"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureCell">
+          <xsl:value-of select="$PictureCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$PictureRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="NoteCell">
+          <xsl:value-of select="$NoteCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="NoteRow">
+          <xsl:value-of select="$NoteRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCell">
+          <xsl:value-of select="$ConditionalCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellStyle">
+          <xsl:value-of select="$ConditionalCellStyle"/>
+        </xsl:with-param>
+        <xsl:with-param name="prevRow">
+          <xsl:value-of select="$GetMinRowWithElement"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalRow">
+          <xsl:value-of select="$ConditionalRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="sheetNr" select="$sheetNr"/>
+        <xsl:with-param name="ValidationCell">
+          <xsl:value-of select="$ValidationCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationRow">
+          <xsl:value-of select="$ValidationRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationCellStyle">
+          <xsl:value-of select="$ValidationCellStyle"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+
+  </xsl:template>
+
+  <xsl:template name="InsertElementsInThisRow">
+    <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
+    <xsl:param name="PictureCell"/>
+    <xsl:param name="PictureRow"/>
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="NoteRow"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ElementsColl"/>
+    <xsl:param name="prevColl" select="0"/>
+    <xsl:param name="rowNum"/>
+    <xsl:param name="sheetNr"/>
+    <xsl:param name="ValidationCell"/>     
+    <xsl:param name="ValidationRow"/>
+    <xsl:param name="ValidationCellStyle"/>  
+
+    <xsl:variable name="GetMinColWithElement">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$ElementsColl"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="$prevColl + 1"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:call-template name="InsertEmptyColls">
+      <xsl:with-param name="repeat">
+        <xsl:value-of select="$GetMinColWithElement - $prevColl - 1"/>
+      </xsl:with-param>
+    </xsl:call-template>
+
+
+
+    <xsl:variable name="Target">
+      <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
+        <xsl:call-template name="GetTargetPicture">
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="substring-after($sheet, '/')"/>
+          </xsl:with-param>
+          <xsl:with-param name="id">
+            <xsl:value-of select="@r:id"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:if test="$GetMinColWithElement != ''">
+
+      <table:table-cell>
+        
+        <xsl:if
+          test="contains(concat(';', $ValidationCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+          
+          <xsl:variable name="ValidationStyle">
+            <xsl:value-of select="substring-before(substring-after(concat(';', $ValidationCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';')"/>
+          </xsl:variable>
+          <xsl:attribute name="table:content-validation-name">
+            <xsl:value-of select="concat('val', $ValidationStyle + 1)"/>
+          </xsl:attribute>              
+          
+        </xsl:if>
+
+        <xsl:if
+          test="contains(concat(';', $ConditionalCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+          <xsl:variable name="ConditionalStyleId">
+            <xsl:value-of
+              select="generate-id(key('ConditionalFormatting', '')[position() = substring-before(substring-after(concat(';', $ConditionalCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';') + 1])"
+            />
+          </xsl:variable>
+          <xsl:attribute name="table:style-name">
+            <xsl:value-of select="$ConditionalStyleId"/>
+          </xsl:attribute>
+        </xsl:if>
+
+        <xsl:if
+          test="contains(concat(';', $PictureCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+
+          <xsl:call-template name="InsertPictureInThisCell">
+            <xsl:with-param name="sheet">
+              <xsl:value-of select="$sheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="NameSheet">
+              <xsl:value-of select="$NameSheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="collNum">
+              <xsl:value-of select="$GetMinColWithElement"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+            <xsl:with-param name="Target">
+              <xsl:value-of select="$Target"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+
+        <xsl:if
+          test="contains(concat(';', $NoteCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+
+          <xsl:call-template name="InsertNoteInThisCell">
+            <xsl:with-param name="sheetNr">
+              <xsl:value-of select="$sheetNr"/>
+            </xsl:with-param>
+            <xsl:with-param name="colNum">
+              <xsl:value-of select="$GetMinColWithElement"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$rowNum"/>
+            </xsl:with-param>
+          </xsl:call-template>
+
+        </xsl:if>
+
+      </table:table-cell>
+
+      <xsl:call-template name="InsertElementsInThisRow">
+        <xsl:with-param name="sheet">
+          <xsl:value-of select="$sheet"/>
+        </xsl:with-param>
+        <xsl:with-param name="NameSheet">
+          <xsl:value-of select="$NameSheet"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureCell">
+          <xsl:value-of select="$PictureCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$PictureRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="NoteCell">
+          <xsl:value-of select="$NoteCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="NoteRow">
+          <xsl:value-of select="$NoteRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCell">
+          <xsl:value-of select="$ConditionalCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="ConditionalCellStyle">
+          <xsl:value-of select="$ConditionalCellStyle"/>
+        </xsl:with-param>
+        <xsl:with-param name="ElementsColl">
+          <xsl:value-of select="$ElementsColl"/>
+        </xsl:with-param>
+        <xsl:with-param name="rowNum">
+          <xsl:value-of select="$rowNum"/>
+        </xsl:with-param>
+        <xsl:with-param name="prevColl">
+          <xsl:value-of select="$GetMinColWithElement"/>
+        </xsl:with-param>
+        <xsl:with-param name="sheetNr" select="$sheetNr"/>
+        <xsl:with-param name="ValidationCell">
+          <xsl:value-of select="$ValidationCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationRow">
+          <xsl:value-of select="$ValidationRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationCellStyle">
+          <xsl:value-of select="$ValidationCellStyle"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
+
+  </xsl:template>
+
+
+  <!-- Insert Empty Rows before element -->
+  <xsl:template name="InsertEmptyRows">
+    <xsl:param name="repeat"/>
+    <xsl:param name="sheet"/>
+    <xsl:if test="$repeat &gt; 0">
+      <xsl:for-each select="document(concat('xl/',$sheet))">
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+          table:number-rows-repeated="{$repeat}">
+          <table:table-cell table:number-columns-repeated="256"/>
+        </table:table-row>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Insert Empty Cols before element -->
+  <xsl:template name="InsertEmptyColls">
+    <xsl:param name="repeat"/>
+    <xsl:if test="$repeat &gt; 0">
+      <table:table-cell table:number-columns-repeated="{$repeat}"/>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Get colls with picture from this row  -->
+
+  <xsl:template name="GetCollsWithElement">
+    <xsl:param name="rowNumber"/>
+    <xsl:param name="ElementColl"/>
+    <xsl:param name="ElementCell"/>
+
+    <xsl:choose>
+      <xsl:when test="contains($ElementCell, concat(concat(';',$rowNumber),':'))">
+        <xsl:call-template name="GetCollsWithElement">
+          <xsl:with-param name="rowNumber">
+            <xsl:value-of select="$rowNumber"/>
+          </xsl:with-param>
+          <xsl:with-param name="ElementColl">
+            <xsl:value-of
+              select="concat($ElementColl, concat(substring-before(substring-after($ElementCell, concat(';', concat($rowNumber, ':'))),';'), ';'))"
+            />
+          </xsl:with-param>
+          <xsl:with-param name="ElementCell">
+            <xsl:value-of
+              select="concat(';', substring-after(substring-after($ElementCell, concat(';', concat($rowNumber, ':'))),';'))"
+            />
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$ElementColl"/>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
+  <xsl:template name="InsertElementsBetwenTwoRows">
+    <xsl:param name="sheet"/>
+    <xsl:param name="NameSheet"/>
+    <xsl:param name="PictureCell"/>
+    <xsl:param name="PictureRow"/>
+    <xsl:param name="NoteCell"/>
+    <xsl:param name="NoteRow"/>
+    <xsl:param name="ConditionalCell"/>
+    <xsl:param name="ConditionalCellStyle"/>
+    <xsl:param name="ConditionalRow"/>
+    <xsl:param name="prevRow" select="0"/>
+    <xsl:param name="sheetNr"/>
+    <xsl:param name="EndRow"/>
+    <xsl:param name="ValidationCell"/>     
+    <xsl:param name="ValidationRow"/>
+    <xsl:param name="ValidationCellStyle"/>  
+
+    <xsl:variable name="id">
+      <xsl:value-of select="key('drawing', '')/@r:id"/>
+    </xsl:variable>
+
+    <xsl:variable name="AllElementsCell">
+      <xsl:value-of select="concat($PictureCell, $NoteCell, $ConditionalCell, $ValidationCell)"/>
+    </xsl:variable>
+
+    <xsl:variable name="AllElementsRow">
+      <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow)"/>
+    </xsl:variable>
+
+    <xsl:variable name="GetMinRowWithElement">
+      <xsl:call-template name="GetMinRowWithPicture">
+        <xsl:with-param name="PictureRow">
+          <xsl:value-of select="$AllElementsRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="AfterRow">
+          <xsl:value-of select="$prevRow + 1"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when
+        test="number($GetMinRowWithElement) - number($prevRow) - 1 &gt; 0 and $GetMinRowWithElement &lt;= $EndRow">
+        <xsl:call-template name="InsertEmptyRows">
+          <xsl:with-param name="repeat">
+            <xsl:value-of select="number($GetMinRowWithElement) - number($prevRow) - 1"/>
+          </xsl:with-param>
+          <xsl:with-param name="sheet">
+            <xsl:value-of select="$sheet"/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when
+        test=" ($GetMinRowWithElement &gt; $EndRow or $GetMinRowWithElement = '') and $EndRow - $prevRow &gt; 0">
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}"
+          table:number-rows-repeated="{$EndRow - $prevRow}">
+          <table:table-cell table:number-columns-repeated="256"/>
+        </table:table-row>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
+
+
+
+    <xsl:variable name="CollsWithElements">
+      <xsl:call-template name="GetCollsWithElement">
+        <xsl:with-param name="rowNumber">
+          <xsl:value-of select="$GetMinRowWithElement"/>
+        </xsl:with-param>
+        <xsl:with-param name="ElementCell">
+          <xsl:value-of select="concat(';', $AllElementsCell)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:if test="$GetMinRowWithElement != '' and $GetMinRowWithElement &lt;= $EndRow">
+
+      <xsl:for-each select="document(concat('xl/',$sheet))">
+        <table:table-row table:style-name="{generate-id(key('SheetFormatPr', ''))}">
+          <xsl:call-template name="InsertElementsInThisRow">
+            <xsl:with-param name="sheet">
+              <xsl:value-of select="$sheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="NameSheet">
+              <xsl:value-of select="$NameSheet"/>
+            </xsl:with-param>
+            <xsl:with-param name="PictureCell">
+              <xsl:value-of select="$PictureCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="PictureRow">
+              <xsl:value-of select="$PictureRow"/>
+            </xsl:with-param>
+            <xsl:with-param name="NoteCell">
+              <xsl:value-of select="$NoteCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="NoteRow">
+              <xsl:value-of select="$NoteRow"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCell">
+              <xsl:value-of select="$ConditionalCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="ConditionalCellStyle">
+              <xsl:value-of select="$ConditionalCellStyle"/>
+            </xsl:with-param>
+            <xsl:with-param name="ElementsColl">
+              <xsl:value-of select="$CollsWithElements"/>
+            </xsl:with-param>
+            <xsl:with-param name="rowNum">
+              <xsl:value-of select="$GetMinRowWithElement"/>
+            </xsl:with-param>
+            <xsl:with-param name="sheetNr" select="$sheetNr"/>
+            <xsl:with-param name="ValidationCell">
+              <xsl:value-of select="$ValidationCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="ValidationRow">
+              <xsl:value-of select="$ValidationRow"/>
+            </xsl:with-param>
+            <xsl:with-param name="ValidationCellStyle">
+              <xsl:value-of select="$ValidationCellStyle"/>
+            </xsl:with-param>
+          </xsl:call-template>
+        </table:table-row>
+      </xsl:for-each>
+
       <xsl:call-template name="InsertElementsBetwenTwoRows">
         <xsl:with-param name="sheet">
           <xsl:value-of select="$sheet"/>
@@ -520,17 +582,26 @@
         <xsl:with-param name="EndRow">
           <xsl:value-of select="$EndRow"/>
         </xsl:with-param>
+        <xsl:with-param name="ValidationCell">
+          <xsl:value-of select="$ValidationCell"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationRow">
+          <xsl:value-of select="$ValidationRow"/>
+        </xsl:with-param>
+        <xsl:with-param name="ValidationCellStyle">
+          <xsl:value-of select="$ValidationCellStyle"/>
+        </xsl:with-param>
       </xsl:call-template>
-    </xsl:if>   
-    
+    </xsl:if>
+
   </xsl:template>
-  
+
   <xsl:template name="InsertElementsBetweenTwoColl">
     <xsl:param name="sheet"/>
     <xsl:param name="NameSheet"/>
     <xsl:param name="PictureCell"/>
     <xsl:param name="PictureRow"/>
-    <xsl:param name="NoteCell"/>  
+    <xsl:param name="NoteCell"/>
     <xsl:param name="NoteRow"/>
     <xsl:param name="ConditionalCell"/>
     <xsl:param name="ConditionalCellStyle"/>
@@ -539,7 +610,10 @@
     <xsl:param name="rowNum"/>
     <xsl:param name="sheetNr"/>
     <xsl:param name="EndColl"/>
-    
+    <xsl:param name="ValidationCell"/>     
+    <xsl:param name="ValidationRow"/>
+    <xsl:param name="ValidationCellStyle"/>  
+
     <xsl:variable name="GetMinColWithElement">
       <xsl:call-template name="GetMinRowWithPicture">
         <xsl:with-param name="PictureRow">
@@ -550,16 +624,16 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-   
+
     <xsl:choose>
       <xsl:when test="$GetMinColWithElement &lt; $EndColl">
-        
+
         <xsl:call-template name="InsertEmptyColls">
           <xsl:with-param name="repeat">
             <xsl:value-of select="$GetMinColWithElement - $prevColl - 1"/>
           </xsl:with-param>
         </xsl:call-template>
-        
+
         <xsl:variable name="Target">
           <xsl:for-each select="document(concat('xl/', $sheet))/e:worksheet/e:drawing">
             <xsl:call-template name="GetTargetPicture">
@@ -572,13 +646,24 @@
             </xsl:call-template>
           </xsl:for-each>
         </xsl:variable>
-        
+
         <xsl:if test="$GetMinColWithElement != ''">
-          
+
           <table:table-cell>
+
             
-            <xsl:if test="contains(concat(';', $PictureCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
-              
+            <xsl:if test="contains(concat(';', $ValidationCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+              <xsl:variable name="ValidationStyle">
+                <xsl:value-of select="substring-before(substring-after(concat(';', $ValidationCellStyle), concat(';', $rowNum, ':', $GetMinColWithElement, ';-')), ';')"/>
+              </xsl:variable>
+              <xsl:attribute name="table:content-validation-name">
+                <xsl:value-of select="concat('val', $ValidationStyle + 1)"/>
+              </xsl:attribute>              
+            </xsl:if>
+            
+            <xsl:if
+              test="contains(concat(';', $PictureCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+
               <xsl:call-template name="InsertPictureInThisCell">
                 <xsl:with-param name="sheet">
                   <xsl:value-of select="$sheet"/>
@@ -597,9 +682,10 @@
                 </xsl:with-param>
               </xsl:call-template>
             </xsl:if>
-            
-            <xsl:if test="contains(concat(';', $NoteCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
-              
+
+            <xsl:if
+              test="contains(concat(';', $NoteCell), concat(';', $rowNum, ':', $GetMinColWithElement, ';'))">
+
               <xsl:call-template name="InsertNoteInThisCell">
                 <xsl:with-param name="sheetNr">
                   <xsl:value-of select="$sheetNr"/>
@@ -611,11 +697,13 @@
                   <xsl:value-of select="$rowNum"/>
                 </xsl:with-param>
               </xsl:call-template>
-              
+
             </xsl:if>
             
+            
+
           </table:table-cell>
-          
+
           <xsl:call-template name="InsertElementsBetweenTwoColl">
             <xsl:with-param name="sheet">
               <xsl:value-of select="$sheet"/>
@@ -654,21 +742,30 @@
             <xsl:with-param name="EndColl">
               <xsl:value-of select="$EndColl"/>
             </xsl:with-param>
+            <xsl:with-param name="ValidationCell">
+              <xsl:value-of select="$ValidationCell"/>
+            </xsl:with-param>
+            <xsl:with-param name="ValidationRow">
+              <xsl:value-of select="$ValidationRow"/>
+            </xsl:with-param>
+            <xsl:with-param name="ValidationCellStyle">
+              <xsl:value-of select="$ValidationCellStyle"/>
+            </xsl:with-param>
           </xsl:call-template>
-        </xsl:if>    
-        
+        </xsl:if>
+
       </xsl:when>
-      
+
       <xsl:otherwise>
-        
+
         <xsl:call-template name="InsertEmptyColls">
           <xsl:with-param name="repeat">
             <xsl:value-of select="$EndColl - $prevColl - 1"/>
           </xsl:with-param>
         </xsl:call-template>
-        
+
       </xsl:otherwise>
-      
+
     </xsl:choose>
   </xsl:template>
 
