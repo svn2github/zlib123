@@ -2133,7 +2133,7 @@
         <!-- text position -->
         <xsl:if test="@baseline != 0">
           <xsl:attribute name="style:text-position">
-            <xsl:value-of select="@baseline div 1000"/>
+            <xsl:value-of select="concat(@baseline div 1000,'%' )"/>
             <xsl:text> 75%</xsl:text>
           </xsl:attribute>
         </xsl:if>
