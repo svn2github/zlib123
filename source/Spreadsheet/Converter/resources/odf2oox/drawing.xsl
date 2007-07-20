@@ -562,7 +562,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!--xsl:template match="text()[parent::text:p]" mode="text-box">
+  <xsl:template match="text()[parent::text:p and parent::node()/text:span]" mode="text-box">
     <a:r>
       <a:rPr lang="en-EN" sz="1200">
         <xsl:for-each select="key('style',@text:style-name)/style:text-properties">
@@ -573,7 +573,7 @@
         <xsl:value-of select="."/>
       </a:t>
     </a:r>
-  </xsl:template-->
+  </xsl:template>
 
   <xsl:template match="text()" mode="text-box">
     <xsl:value-of select="."/>
