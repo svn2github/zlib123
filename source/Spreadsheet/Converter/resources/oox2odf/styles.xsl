@@ -544,7 +544,7 @@
         <xsl:when test="@val = 'superscript' ">
           <xsl:text>super 58%</xsl:text>
         </xsl:when>
-        <xsl:when test="@val = 'superscript' ">
+        <xsl:when test="@val = 'subscript' ">
           <xsl:text>sub 58%</xsl:text>
         </xsl:when>
       </xsl:choose>
