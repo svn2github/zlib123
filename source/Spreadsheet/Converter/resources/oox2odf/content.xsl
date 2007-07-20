@@ -35,9 +35,21 @@
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+  xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
+  xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0"
+  xmlns:math="http://www.w3.org/1998/Math/MathML"
+  xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
+  xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
+  xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer"
+  xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events"
+  xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" office:version="1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
+
+
 
   <xsl:import href="relationships.xsl"/>
   <xsl:import href="database-ranges.xsl"/>
@@ -1174,14 +1186,14 @@
           <xsl:value-of select="concat($PictureRow, $NoteRow, $ConditionalRow, $ValidationRow)"/>
         </xsl:with-param>
         <xsl:with-param name="AfterRow">
-        <xsl:choose>
-          <xsl:when test="preceding::e:row[1]/@r = ''">
-            <xsl:text>0</xsl:text>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="preceding::e:row[1]/@r"/>
-          </xsl:otherwise>
-        </xsl:choose>
+          <xsl:choose>
+            <xsl:when test="preceding::e:row[1]/@r = ''">
+              <xsl:text>0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="preceding::e:row[1]/@r"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
@@ -1696,7 +1708,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    
+
     <xsl:variable name="ValidationColl">
       <xsl:call-template name="GetCollsWithElement">
         <xsl:with-param name="rowNumber">
