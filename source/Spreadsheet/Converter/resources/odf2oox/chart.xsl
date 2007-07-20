@@ -69,16 +69,28 @@
 
             <xsl:for-each select="chart:chart">
               <xsl:call-template name="InsertChart"/>
+
+              <xsl:for-each select="key('style', @chart:style-name)/style:graphic-properties">
+                <c:spPr>
+
+                  <!--xsl:choose>
+                    <xsl:when test="@draw:fill = 'none' ">
+                      <a:solidFill>
+                        <a:srgbClr val="ffffff"/>
+                      </a:solidFill>
+                    </xsl:when>
+                    <xsl:otherwise-->
+                      <xsl:call-template name="InsertDrawingFill"/>
+                    <!--/xsl:otherwise>
+                  </xsl:choose-->
+
+                  <xsl:call-template name="InsertDrawingBorder"/>
+                </c:spPr>
+              </xsl:for-each>
+
             </xsl:for-each>
 
-            <c:spPr>
-              <a:solidFill>
-                <a:srgbClr val="FFFFFF"/>
-              </a:solidFill>
-              <a:ln w="9525">
-                <a:noFill/>
-              </a:ln>
-            </c:spPr>
+
             <c:txPr>
               <a:bodyPr/>
               <a:lstStyle/>
@@ -113,11 +125,32 @@
     <!-- @Description: Writes chart definition to output chart file. -->
     <!-- @Context: chart:chart -->
 
+    <xsl:variable name="chartWidth">
+      <xsl:value-of select="substring-before(@svg:width,'cm')"/>
+    </xsl:variable>
+
+    <xsl:variable name="chartHeight">
+      <xsl:value-of select="substring-before(@svg:height,'cm')"/>
+    </xsl:variable>
+
     <c:chart>
-      <xsl:call-template name="InsertTitle"/>
+      <xsl:call-template name="InsertTitle">
+        <xsl:with-param name="chartWidth" select="$chartWidth"/>
+        <xsl:with-param name="chartHeight" select="$chartHeight"/>
+      </xsl:call-template>
+
       <xsl:call-template name="InsertView3D"/>
-      <xsl:call-template name="InsertPlotArea"/>
-      <xsl:call-template name="InsertLegend"/>
+
+      <xsl:call-template name="InsertPlotArea">
+        <xsl:with-param name="chartWidth" select="$chartWidth"/>
+        <xsl:with-param name="chartHeight" select="$chartHeight"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="InsertLegend">
+        <xsl:with-param name="chartWidth" select="$chartWidth"/>
+        <xsl:with-param name="chartHeight" select="$chartHeight"/>
+      </xsl:call-template>
+
       <xsl:call-template name="InsertAdditionalProperties"/>
     </c:chart>
   </xsl:template>
@@ -125,6 +158,9 @@
   <xsl:template name="InsertTitle">
     <!-- @Description: Inserts chart title -->
     <!-- @Context: chart:chart -->
+    <xsl:param name="chartWidth"/>
+    <xsl:param name="chartHeight"/>
+
     <xsl:for-each select="chart:title">
       <c:title>
         <c:tx>
@@ -155,8 +191,12 @@
           <c:manualLayout>
             <c:xMode val="edge"/>
             <c:yMode val="edge"/>
-            <c:x val="0.37282229965156838"/>
-            <c:y val="3.8022813688212961E-2"/>
+
+            <xsl:call-template name="InsideChartPosition">
+              <xsl:with-param name="chartWidth" select="$chartWidth"/>
+              <xsl:with-param name="chartHeight" select="$chartHeight"/>
+            </xsl:call-template>
+
           </c:manualLayout>
         </c:layout>
         <c:spPr>
@@ -172,83 +212,124 @@
   <xsl:template name="InsertPlotArea">
     <!-- @Description: Outputs chart plot area -->
     <!-- @Context: chart:chart -->
+    <xsl:param name="chartWidth"/>
+    <xsl:param name="chartHeight"/>
 
-    <c:plotArea>
-      <c:layout>
-        <c:manualLayout>
-          <c:layoutTarget val="inner"/>
-          <c:xMode val="edge"/>
-          <c:yMode val="edge"/>
-          <c:x val="0.10452961672473868"/>
+    <xsl:for-each select="chart:plot-area">
+
+      <xsl:variable name="plotXOffset">
+        <xsl:value-of select="substring-before(@svg:x,'cm' ) div $chartWidth"/>
+      </xsl:variable>
+
+      <xsl:variable name="plotYOffset">
+        <xsl:value-of select="substring-before(@svg:y,'cm' ) div $chartHeight "/>
+      </xsl:variable>
+
+      <c:plotArea>
+        <c:layout>
+          <c:manualLayout>
+            <c:layoutTarget val="inner"/>
+            <c:xMode val="edge"/>
+            <c:yMode val="edge"/>
+
+            <xsl:call-template name="InsideChartPosition">
+              <xsl:with-param name="chartWidth" select="$chartWidth"/>
+              <xsl:with-param name="chartHeight" select="$chartHeight"/>
+            </xsl:call-template>
+
+            <!--c:x val="0.10452961672473868"/>
           <c:y val="0.24334600760456274"/>
           <c:w val="0.68641114982578355"/>
-          <c:h val="0.60836501901140683"/>
-        </c:manualLayout>
-      </c:layout>
+          <c:h val="0.60836501901140683"/-->
+          </c:manualLayout>
+        </c:layout>
 
-      <xsl:call-template name="InsertChartType"/>
+        <xsl:for-each select="parent::node()">
+          <xsl:call-template name="InsertChartType"/>
+        </xsl:for-each>
 
-      <xsl:if test="key('series','')[@chart:class]">
-        <xsl:call-template name="InsertSecondaryLineChart"/>
-      </xsl:if>
+        <xsl:if test="key('series','')[@chart:class]">
+          <xsl:for-each select="parent::node()">
+            <xsl:call-template name="InsertSecondaryLineChart"/>
+          </xsl:for-each>
+        </xsl:if>
 
-      <xsl:if test="not(@chart:class= 'chart:circle' or @chart:class= 'chart:ring' )">
-        <xsl:call-template name="InsertAxisX"/>
-        <xsl:call-template name="InsertAxisY"/>
-      </xsl:if>
+        <xsl:if test="not(@chart:class= 'chart:circle' or @chart:class= 'chart:ring' )">
+          <xsl:for-each select="chart:axis[@chart:dimension = 'x' ]">
+            <xsl:call-template name="InsertAxisX">
+              <xsl:with-param name="chartWidth" select="$chartWidth"/>
+              <xsl:with-param name="chartHeight" select="$chartHeight"/>
+            </xsl:call-template>
+          </xsl:for-each>
 
-      <c:spPr>
-        <a:noFill/>
-        <a:ln w="25400">
-          <a:noFill/>
-        </a:ln>
-      </c:spPr>
-    </c:plotArea>
+          <xsl:for-each select="chart:axis[@chart:dimension = 'y' ]">
+            <xsl:call-template name="InsertAxisY">
+              <xsl:with-param name="chartWidth" select="$chartWidth"/>
+              <xsl:with-param name="chartHeight" select="$chartHeight"/>
+            </xsl:call-template>
+          </xsl:for-each>
+        </xsl:if>
+
+        <xsl:for-each select="key('style', chart:wall/@chart:style-name)/style:graphic-properties">
+          <c:spPr>
+            <xsl:call-template name="InsertDrawingFill"/>
+            <xsl:call-template name="InsertDrawingBorder"/>
+          </c:spPr>
+        </xsl:for-each>
+
+      </c:plotArea>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertLegend">
     <!-- @Description: Inserts chart legend. -->
     <!-- @Context: chart:chart -->
+    <xsl:param name="chartWidth"/>
+    <xsl:param name="chartHeight"/>
 
-    <c:legend>
-      <c:legendPos val="r"/>
-      <c:layout>
-        <c:manualLayout>
-          <c:xMode val="edge"/>
-          <c:yMode val="edge"/>
-          <c:x val="0.82926829268292679"/>
-          <c:y val="0.47148288973384095"/>
-          <c:w val="0.14285714285714299"/>
-          <c:h val="0.15209125475285182"/>
-        </c:manualLayout>
-      </c:layout>
-      <c:spPr>
-        <a:noFill/>
-        <a:ln w="3175">
-          <a:solidFill>
-            <a:srgbClr val="000000"/>
-          </a:solidFill>
-          <a:prstDash val="solid"/>
-        </a:ln>
-      </c:spPr>
-      <c:txPr>
-        <a:bodyPr/>
-        <a:lstStyle/>
-        <a:p>
-          <a:pPr>
-            <a:defRPr sz="550" b="0" i="0" u="none" strike="noStrike" baseline="0">
-              <a:solidFill>
-                <a:srgbClr val="000000"/>
-              </a:solidFill>
-              <a:latin typeface="Arial"/>
-              <a:ea typeface="Arial"/>
-              <a:cs typeface="Arial"/>
-            </a:defRPr>
-          </a:pPr>
-          <a:endParaRPr lang="pl-PL"/>
-        </a:p>
-      </c:txPr>
-    </c:legend>
+    <xsl:for-each select="chart:legend">
+      <c:legend>
+        <c:legendPos val="r"/>
+        <c:layout>
+          <c:manualLayout>
+            <c:xMode val="edge"/>
+            <c:yMode val="edge"/>
+
+            <xsl:call-template name="InsideChartPosition">
+              <xsl:with-param name="chartWidth" select="$chartWidth"/>
+              <xsl:with-param name="chartHeight" select="$chartHeight"/>
+            </xsl:call-template>
+
+          </c:manualLayout>
+        </c:layout>
+        <c:spPr>
+          <a:noFill/>
+          <a:ln w="3175">
+            <a:solidFill>
+              <a:srgbClr val="000000"/>
+            </a:solidFill>
+            <a:prstDash val="solid"/>
+          </a:ln>
+        </c:spPr>
+        <c:txPr>
+          <a:bodyPr/>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr>
+              <a:defRPr sz="550" b="0" i="0" u="none" strike="noStrike" baseline="0">
+                <a:solidFill>
+                  <a:srgbClr val="000000"/>
+                </a:solidFill>
+                <a:latin typeface="Arial"/>
+                <a:ea typeface="Arial"/>
+                <a:cs typeface="Arial"/>
+              </a:defRPr>
+            </a:pPr>
+            <a:endParaRPr lang="pl-PL"/>
+          </a:p>
+        </c:txPr>
+      </c:legend>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="InsertAdditionalProperties">
@@ -476,7 +557,7 @@
         </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
-    
+
     <xsl:for-each select="key('rows','')">
       <xsl:call-template name="InsertSeries">
         <xsl:with-param name="numSeries" select="$numSeries"/>
@@ -495,6 +576,8 @@
   <xsl:template name="InsertAxisX">
     <!-- @Description: Inserts X-Axis -->
     <!-- @Context: chart:chart -->
+    <xsl:param name="chartWidth"/>
+    <xsl:param name="chartHeight"/>
 
     <c:catAx>
       <c:axId val="110226048"/>
@@ -502,8 +585,28 @@
         <c:orientation val="minMax"/>
       </c:scaling>
       <c:axPos val="b"/>
+
+      <!--xsl:if
+        test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' "-->
+      <xsl:call-template name="InsertTitle">
+        <xsl:with-param name="chartWidth" select="$chartWidth"/>
+        <xsl:with-param name="chartHeight" select="$chartHeight"/>
+      </xsl:call-template>
+      <!--/xsl:if-->
+
       <c:numFmt formatCode="General" sourceLinked="1"/>
-      <c:tickLblPos val="low"/>
+
+      <c:tickLblPos val="low">
+        <xsl:if
+          test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'false' ">
+          <xsl:attribute name="val">
+            <xsl:text>none</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      </c:tickLblPos>
+
+      <!--xsl:if
+        test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'true' "-->
       <c:spPr>
         <a:ln w="3175">
           <a:solidFill>
@@ -517,18 +620,28 @@
         <a:lstStyle/>
         <a:p>
           <a:pPr>
-            <a:defRPr sz="700" b="0" i="0" u="none" strike="noStrike" baseline="0">
+            <a:defRPr>
+
+              <xsl:for-each select="key('style',@chart:style-name)/style:text-properties">
+                <!-- template common with text-box-->
+                <xsl:call-template name="InsertRunProperties"/>
+              </xsl:for-each>
+
+              <!--
               <a:solidFill>
                 <a:srgbClr val="000000"/>
               </a:solidFill>
               <a:latin typeface="Arial"/>
               <a:ea typeface="Arial"/>
               <a:cs typeface="Arial"/>
+                -->
             </a:defRPr>
           </a:pPr>
           <a:endParaRPr lang="pl-PL"/>
         </a:p>
       </c:txPr>
+      <!--/xsl:if-->
+
       <c:crossAx val="110498176"/>
       <c:crossesAt val="0"/>
       <c:auto val="1"/>
@@ -542,12 +655,15 @@
   <xsl:template name="InsertAxisY">
     <!-- @Description: Inserts X-Axis -->
     <!-- @Context: chart:chart -->
+    <xsl:param name="chartWidth"/>
+    <xsl:param name="chartHeight"/>
 
     <c:valAx>
       <c:axId val="110498176"/>
       <c:scaling>
         <c:orientation val="minMax"/>
       </c:scaling>
+
       <c:axPos val="l"/>
       <c:majorGridlines>
         <c:spPr>
@@ -559,8 +675,23 @@
           </a:ln>
         </c:spPr>
       </c:majorGridlines>
+
+      <xsl:call-template name="InsertTitle">
+        <xsl:with-param name="chartWidth" select="$chartWidth"/>
+        <xsl:with-param name="chartHeight" select="$chartHeight"/>
+      </xsl:call-template>
+
       <c:numFmt formatCode="General" sourceLinked="0"/>
-      <c:tickLblPos val="low"/>
+
+      <c:tickLblPos val="low">
+        <xsl:if
+          test="key('style',@chart:style-name)/style:chart-properties/@chart:display-label = 'false' ">
+          <xsl:attribute name="val">
+            <xsl:text>none</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      </c:tickLblPos>
+
       <c:spPr>
         <a:ln w="3175">
           <a:solidFill>
@@ -575,12 +706,18 @@
         <a:p>
           <a:pPr>
             <a:defRPr sz="700" b="0" i="0" u="none" strike="noStrike" baseline="0">
-              <a:solidFill>
+
+              <xsl:for-each select="key('style',@chart:style-name)/style:text-properties">
+                <!-- template common with text-box-->
+                <xsl:call-template name="InsertRunProperties"/>
+              </xsl:for-each>
+
+              <!--a:solidFill>
                 <a:srgbClr val="000000"/>
               </a:solidFill>
               <a:latin typeface="Arial"/>
               <a:ea typeface="Arial"/>
-              <a:cs typeface="Arial"/>
+              <a:cs typeface="Arial"/-->
             </a:defRPr>
           </a:pPr>
           <a:endParaRPr lang="pl-PL"/>
@@ -607,7 +744,7 @@
   <xsl:template name="InsertSeries">
     <!-- @Description: Outputs chart series and their values -->
     <!-- @Context: table:table-rows -->
-    
+
     <xsl:param name="numSeries"/>
     <!-- (number) number of series inside chart -->
     <xsl:param name="numPoints"/>
@@ -1297,6 +1434,148 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="InsideChartPosition">
+    <xsl:param name="chartWidth"/>
+    <xsl:param name="chartHeight"/>
+
+    <xsl:variable name="xOffset">
+      <xsl:value-of select="substring-before(@svg:x,'cm' )"/>
+    </xsl:variable>
+
+    <xsl:variable name="yOffset">
+      <xsl:value-of select="substring-before(@svg:y,'cm' )"/>
+    </xsl:variable>
+
+    <xsl:variable name="width">
+      <xsl:value-of select="substring-before(@svg:width,'cm' )"/>
+    </xsl:variable>
+
+    <xsl:variable name="height">
+      <xsl:value-of select="substring-before(@svg:height,'cm' )"/>
+    </xsl:variable>
+
+    <!-- ugly hack for plot area height increase when width is too wide -->
+    <xsl:variable name="plotWidthCorrection">
+      <xsl:text>0.025</xsl:text>
+    </xsl:variable>
+
+    <xsl:variable name="plotHeightCorrection">
+      <xsl:text>0.05</xsl:text>
+    </xsl:variable>
+
+    <!-- ugly hack for axis Y title influence on plot-area display -->
+    <xsl:variable name="plotXCorrection">
+      <xsl:text>0.1</xsl:text>
+    </xsl:variable>
+
+    <c:x>
+      <xsl:attribute name="val">
+
+        <xsl:variable name="correction">
+          <xsl:choose>
+            <xsl:when
+              test="chart:axis[@chart:dimension = 'y' ]/chart:title and name() = 'chart:plot-area' ">
+              <xsl:value-of select="$plotXCorrection"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="0"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <xsl:value-of select="$xOffset div $chartWidth + $correction"/>
+      </xsl:attribute>
+
+      <!--xsl:attribute name="zzzz">
+        <xsl:value-of select="$xOffset"/>
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="$chartWidth"/>
+      </xsl:attribute-->
+
+    </c:x>
+
+    <c:y>
+      <xsl:attribute name="val">
+        <xsl:choose>
+          <!-- when axis Y title -->
+          <xsl:when test="parent::node()/@chart:dimension = 'y' ">
+            <xsl:value-of select="1 - $yOffset div $chartHeight"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$yOffset div $chartHeight"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
+
+      <!--xsl:attribute name="zzzz">
+        <xsl:value-of select="$yOffset"/>
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="$chartHeight"/>
+      </xsl:attribute-->
+    </c:y>
+
+    <xsl:if test="@svg:width">
+      <c:w>
+        <xsl:attribute name="val">
+
+          <xsl:variable name="correction">
+            <xsl:choose>
+              <!-- ugly hack for axis title influence on plot-area display -->
+              <!--xsl:when
+                test="chart:axis[@chart:dimension = 'y' ]/chart:title and name() = 'chart:plot-area' ">
+                <xsl:value-of select="$plotWidthCorrection + $plotXCorrection"/>
+              </xsl:when-->
+              <xsl:when test="name() = 'chart:plot-area' ">
+                <xsl:value-of select="$plotWidthCorrection"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="0"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <xsl:value-of select="$width div $chartWidth - $correction"/>
+          <!--xsl:value-of select="$width div $chartWidth"/-->
+        </xsl:attribute>
+
+        <!--xsl:attribute name="zzzz">
+          <xsl:value-of select="$width"/>
+          <xsl:text>#</xsl:text>
+          <xsl:value-of select="$chartWidth"/>
+        </xsl:attribute-->
+      </c:w>
+    </xsl:if>
+
+    <xsl:if test="@svg:height">
+      <c:h>
+        <xsl:attribute name="val">
+          <xsl:variable name="correction">
+            <xsl:choose>
+              <!-- ugly hack for axis title influence on plot-area display -->
+              <xsl:when
+                test="chart:axis[@chart:dimension = 'x' ]/chart:title and name() = 'chart:plot-area' ">
+                <xsl:value-of select="$plotHeightCorrection + $plotXCorrection"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="0"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <!--xsl:value-of select="$height div $chartHeight - $correction"/-->
+          <xsl:value-of select="$height div $chartHeight"/>
+        </xsl:attribute>
+
+        <!--xsl:attribute name="zzzz">
+          <xsl:value-of select="$height"/>
+          <xsl:text>#</xsl:text>
+          <xsl:value-of select="$chartHeight"/>
+        </xsl:attribute-->
+      </c:h>
+    </xsl:if>
+
   </xsl:template>
 
 </xsl:stylesheet>
