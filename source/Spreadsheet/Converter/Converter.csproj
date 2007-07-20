@@ -81,6 +81,7 @@
     <EmbeddedResource Include="resources\oox2odf\validation.xsl" />
     <EmbeddedResource Include="resources\oox2odf\conditional.xsl" />
     <EmbeddedResource Include="resources\oox2odf\elements.xsl" />
+    <EmbeddedResource Include="resources\oox2odf\ole_objects.xsl" />
 	<EmbeddedResource Include="resources\oox2odf\chart.xsl" />
 	<EmbeddedResource Include="resources\oox2odf\database-ranges.xsl" />
     <Compile Include="OdfSharedStringsPostProcessor.cs" />
