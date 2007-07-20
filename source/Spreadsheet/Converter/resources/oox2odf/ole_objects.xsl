@@ -33,8 +33,10 @@
   xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
   xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
   xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
   xmlns:e="http://schemas.openxmlformats.org/spreadsheetml/2006/main" exclude-result-prefixes="e r">
@@ -84,10 +86,16 @@
       </xsl:for-each>
     </xsl:variable>
     
+    <xsl:variable name="ShapeId">
+      <xsl:value-of select="concat('_x0000_s', @shapeId)"/>
+    </xsl:variable>
+    
     <xsl:if test="$XlinkOLEObject != ''">
     
-    <draw:frame draw:z-index="0" svg:width="2.137cm" svg:height="0.452cm"
-      svg:x="2.258cm" svg:y="2.259cm">
+    <draw:frame>
+      <xsl:for-each select="document('xl/drawings/vmlDrawing1.vml')">
+        <xsl:apply-templates select="xml/v:shape[@id = $ShapeId]"/>
+      </xsl:for-each>
     <draw:object xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad">
       <xsl:attribute name="xlink:href">    
         <xsl:value-of select="$XlinkOLEObject"/>
@@ -98,5 +106,253 @@
     </xsl:if>
     
   </xsl:template>
+  
+  
+  <xsl:template match="v:shape">
+   <xsl:call-template name="InsertshapeAbsolutePos"/>
+    <xsl:call-template name="InsertShapeWidth"/>
+    <xsl:call-template name="InsertShapeHeight"/>
+  </xsl:template>
+  
+  <xsl:template name="InsertshapeAbsolutePos">
+    <xsl:param name="shape" select="."/>
+    
+    <xsl:variable name="position">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'position'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$position = 'absolute' or $shape[name()='w:framePr']">
+      <xsl:variable name="svgx">
+        <xsl:choose>
+          <xsl:when test="$shape[name()='w:framePr']">
+            <xsl:value-of select="$shape/@e:x"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="GetShapeProperty">
+              <xsl:with-param name="shape" select="$shape"/>
+              <xsl:with-param name="propertyName" select="'margin-left'"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+      <xsl:attribute name="svg:x">
+        <xsl:call-template name="ConvertMeasure">
+          <xsl:with-param name="length" select="$svgx"/>
+          <xsl:with-param name="destUnit" select="'cm'"/>
+        </xsl:call-template>
+      </xsl:attribute>
+      
+      <xsl:variable name="svgy">
+        <xsl:choose>
+          <xsl:when test="$shape[name()='w:framePr']">
+            <xsl:value-of select="$shape/@e:y"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="GetShapeProperty">
+              <xsl:with-param name="shape" select="$shape"/>
+              <xsl:with-param name="propertyName" select="'margin-top'"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+      <xsl:attribute name="svg:y">
+        <xsl:call-template name="ConvertMeasure">
+          <xsl:with-param name="length" select="$svgy"/>
+          <xsl:with-param name="destUnit" select="'cm'"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="GetShapeProperty">
+    <xsl:param name="shape"/>
+    <xsl:param name="propertyName"/>
+    <xsl:variable name="propertyValue">
+      <xsl:choose>
+        <xsl:when test="contains(substring-after($shape/@style,concat($propertyName,':')),';')">
+          <xsl:value-of
+            select="substring-before(substring-after($shape/@style,concat($propertyName,':')),';')"
+          />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-after($shape/@style,concat($propertyName,':'))"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:value-of select="$propertyValue"/>
+  </xsl:template>
+  
+  
+  <xsl:template name="InsertShapeWidth">
+    <xsl:param name="shape" select="."/>
+    <xsl:variable name="wrapStyle">
+      <xsl:choose>
+        <xsl:when test="$shape[name()='e:framePr']">
+          <xsl:value-of select="$shape/@wrap"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="shape" select="$shape"/>
+            <xsl:with-param name="propertyName" select="'mso-wrap-style'"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:variable name="relativeWidth">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-width-percent'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="$relativeWidth != ''">
+        <xsl:call-template name="InsertShapeRelativeWidth">
+          <xsl:with-param name="shape" select="$shape"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$wrapStyle = '' or $wrapStyle != 'none' ">
+        <xsl:variable name="width">
+          <xsl:choose>
+            <xsl:when test="$shape[name()='e:framePr']">
+              <xsl:value-of select="$shape/@e:w"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="GetShapeProperty">
+                <xsl:with-param name="shape" select="$shape"/>
+                <xsl:with-param name="propertyName" select="'width'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:attribute name="svg:width">
+          <xsl:choose>
+            <xsl:when test="$width = 0 and $shape//@o:hr='t'">
+              <xsl:call-template name="ConvertTwips">
+                <xsl:with-param name="length"
+                  select="following::e:pgSz[1]/@w - following::e:pgMar/@right[1] - following::e:pgMar/@left[1]"/>
+                <xsl:with-param name="unit" select="'cm'"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="ConvertMeasure">
+                <xsl:with-param name="length" select="$width"/>
+                <xsl:with-param name="destUnit" select="'cm'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertShapeRelativeWidth">
+    <xsl:param name="shape" select="."/>
+    
+    <xsl:variable name="relativeWidth">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-width-percent'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:attribute name="style:rel-width">
+      <xsl:value-of select="$relativeWidth div 10"/>
+    </xsl:attribute>
+    
+    <xsl:variable name="relativeTo">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-width-relative'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$relativeTo != ''">
+      <xsl:message terminate="no">translation.oox2odf.frame.relativeSize</xsl:message>
+    </xsl:if>
+  </xsl:template>
+  
+  
+  <xsl:template name="InsertShapeHeight">
+    <xsl:param name="shape" select="."/>
+    
+    <xsl:variable name="height">
+      <xsl:choose>
+        <xsl:when test="$shape[name()='e:framePr']">
+          <xsl:value-of select="$shape/@h"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="shape" select="$shape"/>
+            <xsl:with-param name="propertyName" select="'height'"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:variable name="relativeHeight">
+      <xsl:choose>
+        <xsl:when test="$shape[name()='e:framePr']"/>
+        <xsl:otherwise>
+          <xsl:call-template name="GetShapeProperty">
+            <xsl:with-param name="shape" select="$shape"/>
+            <xsl:with-param name="propertyName" select="'mso-height-percent'"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:choose>
+      <xsl:when test="$relativeHeight != ''">
+        <xsl:call-template name="InsertShapeRelativeHeight">
+          <xsl:with-param name="shape" select="$shape"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:if
+          test="not(contains($shape/v:textbox/@style, 'mso-fit-shape-to-text:t'))  or $shape/@h">
+          <xsl:attribute name="svg:height">
+            <xsl:call-template name="ConvertMeasure">
+              <xsl:with-param name="length" select="$height"/>
+              <xsl:with-param name="destUnit" select="'cm'"/>
+            </xsl:call-template>
+          </xsl:attribute>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="InsertShapeRelativeHeight">
+    <xsl:param name="shape" select="."/>
+    
+    <xsl:variable name="relativeHeight">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-height-percent'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:attribute name="style:rel-height">
+      <xsl:value-of select="$relativeHeight div 10"/>
+    </xsl:attribute>
+    
+    <xsl:variable name="relativeTo">
+      <xsl:call-template name="GetShapeProperty">
+        <xsl:with-param name="shape" select="$shape"/>
+        <xsl:with-param name="propertyName" select="'mso-height-relative'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:if test="$relativeTo != ''">
+      <xsl:message terminate="no">translation.oox2odf.frame.relativeSize</xsl:message>
+    </xsl:if>
+  </xsl:template>
+  
 
 </xsl:stylesheet>
